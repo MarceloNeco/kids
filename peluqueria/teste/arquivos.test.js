@@ -47,13 +47,13 @@ for (const pagina of ['index.html'].concat(fs.existsSync(path.join(pasta, 'marca
   });
 }
 
-test('Peluqueria aparece no Feature Tester e obedece o interruptor', () => {
+test('Peluqueria aparece na estante do Bolinho de Chuva e obedece o interruptor', () => {
   const rec = JSON.parse(fs.readFileSync(path.join(pasta, '..', 'recursos-do-app.json'), 'utf8'));
   const r = rec.recursos.find(x => x.id === 'peluqueria');
   assert.ok(r, 'sem entrada em recursos-do-app.json');
   assert.equal(r.pagina, 'peluqueria/');
   assert.ok(r.nome.pt && r.nome.en);
-  assert.ok(fs.readFileSync(path.join(pasta, '..', 'index.html'), 'utf8').includes('url: "peluqueria/"'));
+  assert.ok(fs.readFileSync(path.join(pasta, '..', 'catalogo.js'), 'utf8').includes("url: '/kids/peluqueria/'"));
   assert.ok(ler('index.html').includes('data-recurso="peluqueria"'));
 });
 

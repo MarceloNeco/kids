@@ -1,6 +1,6 @@
 /*
   Catálogo do Bolinho de Chuva — A LISTA ÚNICA dos jogos e apps para criança.
-  Daqui saem os cartões da estante (/bolinho-de-chuva/), da TV (/kids/), o botão "📲 Instalar" de cada cartão,
+  Daqui saem os cartões da estante (/kids/), o botão "📲 Instalar" de cada cartão,
   o "Guardar todos neste aparelho" e o "Instalar um por um". Jogo novo = uma entrada nesta lista; nada mais.
 
   Campos de cada jogo:
@@ -11,39 +11,39 @@
     texto    descrição em português   en    descrição em inglês   tag   texto do botão do cartão
     instalar true = pode ser instalado e funciona sem internet (o service worker fica em url + 'sw.js')
     soOnline true = precisa de internet (ex.: YouTube e TV); o cartão mostra "🌐 Só com internet"
-    tv       { texto, tag, param } = aparece na página da TV (/kids/); param vai no fim do endereço
+    tv       { texto, tag, param } = abre na TV com este parâmetro; param vai no fim do endereço
 
   Como a página usa: <div class="grid" data-catalogo="estante"></div> (ou "tv") e, logo depois,
   <script src="catalogo.js"></script>. O script monta os cartões na hora (a página não pisca vazia).
 */
 (function () {
   var JOGOS = [
-    { id: 'baguncolandia', nome: 'Bagunçolândia', ico: '🍉', cor: '#c6ff3d', url: '/FeatureTesting/baguncolandia/',
+    { id: 'baguncolandia', nome: 'Bagunçolândia', ico: '🍉', cor: '#c6ff3d', url: '/kids/baguncolandia/',
       texto: 'Frutas, doces e personagens voam na TV e você corta, pega, chuta, pula e abaixa com o corpo. 1 ou 2 pessoas, boneco personalizável, ou no dedo no celular.',
       en: 'Slice, catch, kick, jump and duck with your body on the TV. Or by finger on the phone.',
       tag: '▶ Brincar / Play', instalar: true,
       tv: { texto: 'Corte, pegue, chute, pule e abaixe com o corpo. A TV mostra o código; o celular filma.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'peluqueria', nome: 'Peluqueria', ico: '💇', cor: '#ffd166', url: '/FeatureTesting/peluqueria/',
+    { id: 'peluqueria', nome: 'Peluqueria', ico: '💇', cor: '#ffd166', url: '/kids/peluqueria/',
       texto: 'O provador maluco da família: uma coroa, um bigode ou uma peruca desce sobre o bicho e você toca na hora certa. Quanto mais perto, mais pontos. UHUL!',
       en: "The family's crazy fitting room: tap at the right moment, points for precision.",
       tag: '▶ Brincar / Play', instalar: true,
       tv: { texto: 'Um chapéu, um bigode ou uma peruca desce sobre o bicho: aperte OK na hora certa.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'danca-na-sala', nome: 'Dança na Sala', ico: '💃', cor: '#ff4fa3', url: '/FeatureTesting/danca-na-sala.html',
+    { id: 'danca-na-sala', nome: 'Dança na Sala', ico: '💃', cor: '#ff4fa3', url: '/kids/danca-na-sala.html',
       texto: 'A TV toca a música do YouTube e mostra quem está dançando, com neon, fogos e placar de energia. O celular filma e comanda.',
       en: 'Living Room Dance: YouTube on the TV, phone cameras live, energy score.',
       tag: '▶ Dançar / Dance', soOnline: true,
       tv: { texto: 'Música do YouTube na TV e as câmeras dos celulares ao vivo, com neon e placar de energia.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'vruuum', nome: 'Vruuum!', ico: '🏎️', cor: '#ff9f1c', url: '/FeatureTesting/vruuum/',
+    { id: 'vruuum', nome: 'Vruuum!', ico: '🏎️', cor: '#ff9f1c', url: '/kids/vruuum/',
       texto: 'Corrida de carrinho: desvie dos cones e da lama, pegue estrelas, turbo de arco-íris e rampas, passando pela praia, floresta, doces, neve e cidade neon. 1 ou 2 jogadores na mesma tela.',
       en: 'Kart race: dodge, grab stars, rainbow turbo and ramps across 4 worlds. 1 or 2 players.',
       tag: '▶ Correr / Race', instalar: true,
       tv: { texto: 'Corrida de carrinho: setas do controle para virar, OK para buzinar. Pegue as estrelas!', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'purpurina', nome: 'Purpurina', ico: '💄', cor: '#cfa8ff', url: '/FeatureTesting/purpurina/',
+    { id: 'purpurina', nome: 'Purpurina', ico: '💄', cor: '#cfa8ff', url: '/kids/purpurina/',
       texto: 'Maquiagem, roupas, joias e muito brilho: monte a personagem, faça a maquiagem com o pincel, vista roupas e acessórios, cumpra desafios e desfile com confete. Brinque na TV com o celular de controle e música do YouTube ou do Spotify.',
       en: 'Makeup, outfits and sparkle: style your character, take challenges and walk the runway.',
       tag: '▶ Brilhar / Sparkle', instalar: true,
       tv: { texto: 'Maquiagem, roupas e desfile. A TV mostra um código: no celular, toque em 📺 Conectar na TV e brinque com o celular de controle. Música do YouTube e do Spotify.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'rabiscolandia', nome: 'Rabiscolândia', ico: '🎨', cor: '#c6ff3d', url: '/FeatureTesting/rabiscolandia/',
+    { id: 'rabiscolandia', nome: 'Rabiscolândia', ico: '🎨', cor: '#c6ff3d', url: '/kids/rabiscolandia/',
       texto: 'Desenhar, livro de colorir e pintar por números, com pincéis que mexem, adesivos animados, paisagens e música. Desenhe com a mão na frente da câmera ou na TV com o celular de controle.',
       en: 'Draw, color and paint by numbers with live brushes, animated stickers and your hand in the camera.',
       tag: '▶ Desenhar / Draw', instalar: true,
@@ -69,7 +69,7 @@
     if (texto != null) e.textContent = texto;
     return e;
   }
-  // Um cartão só, igual nas duas páginas (/bolinho-de-chuva e /kids). A kids.js, numa TV de verdade,
+  // Um cartão por jogo. A kids.js, numa TV de verdade,
   // adiciona ?tv=auto e cuida das setas do controle; no celular/tablet não muda nada.
   function cartao(j) {
     var a = el('a', 'card');

@@ -1,7 +1,7 @@
 /*
-  Botão fixo "Instalar o aplicativo" — usado pela estante do Bolinho de Chuva (/bolinho-de-chuva/)
-  e pela tela da TV (/kids/). Cada página inclui:
-    <script src=".../bolinho-de-chuva/instalar.js" data-nome="Bolinho de Chuva" data-icone="icone-192.png"></script>
+  Botão fixo "Instalar o aplicativo" — usado pela estante do Bolinho de Chuva (/kids/)
+  e pelos jogos. Cada página inclui:
+    <script src="/kids/instalar.js" data-nome="Bolinho de Chuva" data-icone="icone-192.png"></script>
   e tem na própria pasta um manifest.webmanifest (com <link rel="manifest">) e um sw.js.
 
   Um botão só, para qualquer aparelho:
@@ -104,7 +104,7 @@
   function proximo() {
     var fila = lerFila(), seg = fila.shift();
     try { localStorage.setItem('bolinho:fila', JSON.stringify(fila)); } catch (e) {}
-    location.href = seg ? seg.url + '?instalar=1&fila=1' : '/bolinho-de-chuva/?fila=fim';
+    location.href = seg ? seg.url + '?instalar=1&fila=1' : '/kids/?fila=fim';
   }
   function rotuloProx(feito) {
     var seg = lerFila()[0];
@@ -171,7 +171,7 @@
       '<li>Escolha <b>Adicionar aos favoritos</b> (em algumas TVs aparece <b>Fixar na tela inicial</b> ou <b>Adicionar à página inicial</b>: use esse, se tiver).</li>' +
       '<li>Da próxima vez, abra o navegador e escolha <b>' + NOME + '</b> nos favoritos.</li></ol>' +
       '<p class="en">On the TV: open the browser menu and choose "Add to favorites" (or "Pin to home", if your TV has it).</p>' +
-      '<p class="aviso">TV LG: dá para ter o ícone na barra de apps, igual ao Netflix. Peça para alguém seguir no computador o <a href="https://github.com/MarceloNeco/FeatureTesting/blob/main/tv-lg-kids/LEIA-ME.md" target="_blank" rel="noopener">passo a passo da TV LG</a>.</p>';
+      '<p class="aviso">TV LG: dá para ter o ícone na barra de apps, igual ao Netflix. Peça para alguém seguir no computador o <a href="https://github.com/MarceloNeco/kids/blob/main/tv-lg-kids/LEIA-ME.md" target="_blank" rel="noopener">passo a passo da TV LG</a>.</p>';
     if (fire) return '<p>No tablet Fire, o navegador da Amazon (Silk) põe o ícone na tela inicial assim:</p>' +
       '<ol><li>Toque nos <b>três pontinhos ⋮</b>, no canto de cima, à direita da barra de endereço.</li>' +
       '<li>Toque em <b>Adicionar à tela inicial</b> (em inglês: <b>Add to Home Screen</b>). Se não estiver na lista, role a lista para baixo.</li>' +

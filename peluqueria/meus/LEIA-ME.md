@@ -14,7 +14,7 @@ tela de início (o botão só aparece quando esta pasta tem alguma imagem válid
 
 ## Cenário (a foto de fundo)
 
-1. Abra no celular ou no computador: `https://solverone.com.br/FeatureTesting/peluqueria/marcar.html`.
+1. Abra no celular ou no computador: `https://solverone.com.br/kids/peluqueria/marcar.html`.
 2. Toque em **Escolher foto** e escolha a imagem. Ela fica só no seu aparelho; nada é enviado.
 3. Deixe marcado **Cenário (foto)**. Toque em **Cabeça** e arraste um quadrado sobre o alto da cabeça
    (o centro do quadrado é onde o chapéu para; a largura é o tamanho dele). Faça o mesmo com **Olhos**,

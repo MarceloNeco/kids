@@ -33,7 +33,7 @@ Funciona em LG com webOS 3 ou mais nova (a sua 65UP7750 tem webOS 6.5). Nada é 
 
 ## Passo 4 — Baixar esta pasta
 
-1. Abra https://github.com/MarceloNeco/FeatureTesting no navegador.
+1. Abra https://github.com/MarceloNeco/kids no navegador.
 2. Clique no botão verde **Code** e em **Download ZIP**.
 3. Extraia o ZIP (botão direito, "Extrair tudo"). Dentro tem a pasta **tv-lg-baguncolandia**.
 

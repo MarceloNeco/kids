@@ -1,4 +1,4 @@
-/* Controle remoto da TV — vale nas DUAS páginas (/bolinho-de-chuva e /kids), que são a mesma coisa.
+/* Controle remoto da TV — estante do Bolinho de Chuva (solverone.com.br/kids).
    Numa TV de verdade (sem toque, ou com nome de TV no navegador), as setas passam o foco entre os cartões,
    OK (Enter) abre, e o jogo abre já no "papel de TV" (?tv=auto, que o cartão guarda em data-tv).
    No celular e no tablet (ex.: Amazon Fire), nada disso atrapalha: abre no jeito normal, por toque.

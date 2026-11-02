@@ -4,7 +4,7 @@ Jogo de sala para a família: a TV mostra frutas, doces, bolas e personagens; qu
 chuta **com o corpo**, filmado pelo celular. Uma ou duas pessoas. Aberto, sem cadastro, sem banco,
 sem cookie, sem anúncio. É a primeira brincadeira da família **Bolinho de Chuva**.
 
-Endereço: `https://solverone.com.br/FeatureTesting/baguncolandia/` (atalho para digitar na TV:
+Endereço: `https://solverone.com.br/kids/baguncolandia/` (atalho para digitar na TV:
 `solverone.com.br/tv/bagunca`).
 
 ## Como jogar (passo a passo)
@@ -58,7 +58,7 @@ e as bordas da TV pulsam na batida. O som não sai do celular.
 
 1. Entre em https://developer.spotify.com/dashboard com a sua conta do Spotify e clique em **Create app**.
 2. Preencha: *App name* = `Bagunçolândia`; *App description* = `Controle remoto do jogo de sala`;
-   *Redirect URIs* = `https://solverone.com.br/FeatureTesting/baguncolandia/` (exatamente assim, com a
+   *Redirect URIs* = `https://solverone.com.br/kids/baguncolandia/` (exatamente assim, com a
    barra no fim) e clique em **Add**; em *Which API/SDKs are you planning to use?* marque **Web API**;
    aceite os termos e clique em **Save**.
 3. Na tela do app, clique em **Settings** e copie o **Client ID** (uma sequência de letras e números).
@@ -91,7 +91,7 @@ convida a chamar a TV e jogar com o corpo todo.
 
 ## Se a TV travar ou desenhar errado
 
-Abra na TV o endereço com `?tv=auto&debug` no fim (ex.: `solverone.com.br/FeatureTesting/baguncolandia/?tv=auto&debug`).
+Abra na TV o endereço com `?tv=auto&debug` no fim (ex.: `solverone.com.br/kids/baguncolandia/?tv=auto&debug`).
 Aparece uma caixa no canto com a versão, o modo (leve/normal), os quadros por segundo e qualquer erro.
 Tire uma foto dessa caixa e mande: é o que falta para achar o problema. O desenho é blindado: se uma parte
 (boneco, frutas, placar, legenda) falhar no navegador da TV, as outras continuam.

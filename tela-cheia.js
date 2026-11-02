@@ -7,7 +7,7 @@
   de ficar sem a barra é INSTALAR o aplicativo e abrir pelo ÍCONE — aí abre em tela cheia, como um app de
   verdade. Por isso, no Silk este arquivo não fica tentando (ia falhar sem avisar); a orientação de instalar
   está no botão "Instalar o aplicativo". No Chrome/Android, no Samsung e afins, a tela cheia pelo toque funciona.
-  iPhone não tem tela cheia de página. Usado por /bolinho-de-chuva/ e /kids/.
+  iPhone não tem tela cheia de página. Usado pela estante (/kids/).
 */
 (function () {
   var d = document, el = d.documentElement;

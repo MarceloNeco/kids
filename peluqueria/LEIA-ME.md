@@ -4,7 +4,7 @@ Segunda brincadeira da família **Bolinho de Chuva** (Feature Tester · SolverON
 peruca com óculos…) desce sobre uma imagem (foto de um cachorro, leão, girafa, coruja…). **Toque em qualquer ponto da
 tela** para ele parar. Quanto mais perto do lugar certo, mais pontos.
 
-Endereço (depois do merge): https://solverone.com.br/FeatureTesting/peluqueria/ · na TV:
+Endereço: https://solverone.com.br/kids/peluqueria/ · na TV:
 `solverone.com.br/tv/peluqueria`.
 
 ## Como jogar
@@ -29,7 +29,7 @@ controle para o item e as setas andam entre os botões.
 
 1. Na TV, abra `solverone.com.br/tv/peluqueria` (ou o cartão Peluqueria em `/kids`, ou o app da LG em
    `tv-lg-peluqueria/`). Aparece um **código de 4 letras**.
-2. No celular, abra `solverone.com.br/FeatureTesting/peluqueria`, toque em **📱 Sou o controle**, digite o código e o
+2. No celular, abra `solverone.com.br/kids/peluqueria`, toque em **📱 Sou o controle**, digite o código e o
    seu nome. Até **2 celulares**.
 3. No celular: escolha o nível e toque em **Começar**. Para parar o item, toque em **PARAR**.
 4. **📷 Usar o corpo**: deixe o celular de pé filmando quem joga. Um **movimento brusco** — levantar um braço ou

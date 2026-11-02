@@ -627,11 +627,11 @@
 })();
 
 /* Botão "📲 Instalar" do Bolinho de Chuva: o cartão abre o jogo com ?instalar=1 e só então carrega a barra
-   "Instalar o aplicativo" (bolinho-de-chuva/instalar.js, do Portal, mesmo endereço). Quem só quer jogar não baixa nada a mais. */
+   "Instalar o aplicativo" (instalar.js, na raiz do repositório kids). Quem só quer jogar não baixa nada a mais. */
 (function () {
   if (!/[?&]instalar\b/.test(location.search) || location.protocol === 'file:') return;
   var s = document.createElement('script');
-  s.src = '/bolinho-de-chuva/instalar.js';
+  s.src = '../instalar.js';
   s.setAttribute('data-nome', 'Vruuum!'); s.setAttribute('data-icone', 'icone-192.png');
   s.setAttribute('data-so-com', 'instalar'); s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
   document.body.appendChild(s);

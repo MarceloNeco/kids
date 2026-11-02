@@ -1,5 +1,5 @@
 // Foto de prova: cada cenário com um item de cada tipo posto exatamente no lugar certo.
-// Rodar de FeatureTesting/: node peluqueria/teste/galeria.js  →  /tmp/peluqueria-galeria.png
+// Rodar da raiz do repositório kids: node peluqueria/teste/galeria.js  →  /tmp/peluqueria-galeria.png
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
 const pasta = path.resolve(__dirname, '..');

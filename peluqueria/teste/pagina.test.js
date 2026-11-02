@@ -1,4 +1,4 @@
-// Teste da página inteira no Chromium (Playwright): node peluqueria/teste/pagina.test.js (de FeatureTesting/)
+// Teste da página inteira no Chromium (Playwright): node peluqueria/teste/pagina.test.js (da raiz do repositório kids)
 // Com ?teste o relógio é do teste (PeluqueriaDebug.passo(ms)) e a semente é fixa.
 const { chromium } = require('playwright');
 const path = require('path');

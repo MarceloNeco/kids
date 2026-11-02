@@ -100,7 +100,7 @@
       titulo.classList.remove('troca');
     }, 120);
     var m = MUSICAS[atual];
-    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === H ? 'CC0' : 'CC BY 4.0') : 'Tocar / Play') + ' · <a href="https://github.com/MarceloNeco/marceloneco.github.io/blob/main/bolinho-de-chuva/CREDITOS.md" target="_blank" rel="noopener">créditos</a>';
+    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === H ? 'CC0' : 'CC BY 4.0') : 'Tocar / Play') + ' · <a href="https://github.com/MarceloNeco/kids/blob/main/CREDITOS.md" target="_blank" rel="noopener">créditos</a>';
     for (var i = 0; i < listaBolinhas.length; i++) {
       if (i === atual) listaBolinhas[i].setAttribute('aria-current', 'true'); else listaBolinhas[i].removeAttribute('aria-current');
     }
@@ -123,7 +123,7 @@
     atual = (n + MUSICAS.length) % MUSICAS.length;
     gravar(atual);
     comecou = true;
-    audio.src = '/bolinho-de-chuva/musicas/' + MUSICAS[atual].a + '.mp3';
+    audio.src = '/kids/musicas/' + MUSICAS[atual].a + '.mp3';
     mostrar();
     var p = audio.play();
     if (p && p.catch) p.catch(function () { botaoPlay(); });
@@ -174,7 +174,7 @@
       if (audio.paused && !pausouAntes()) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
     };
     comecou = true;
-    audio.src = '/bolinho-de-chuva/musicas/' + MUSICAS[atual].a + '.mp3';
+    audio.src = '/kids/musicas/' + MUSICAS[atual].a + '.mp3';
     mostrar();
     var p0 = audio.play();
     if (p0 && p0.catch) p0.catch(function (err) {

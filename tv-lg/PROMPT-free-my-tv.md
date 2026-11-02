@@ -1,6 +1,6 @@
 # Prompt para a nova conversa: Free My TV na LG (SolverONE)
 
-Cole o texto abaixo numa conversa nova com o Claude (Fable), com os repositórios FeatureTesting e rootify-one disponíveis.
+Cole o texto abaixo numa conversa nova com o Claude (Fable), com os repositórios kids e rootify-one disponíveis.
 
 ---
 
@@ -22,4 +22,4 @@ Quero retomar a exploração do **Free My TV** (github.com/simbasjungles/free-my
 2. Entender o que dá para aproveitar dele para a SolverONE: um "mural da casa" na TV (pergunta do dia, inbox, recados, lembretes, clima) como app da LG, seguindo a diretriz da plataforma (PT/EN, interruptores do RootifyONE, etc.).
 3. Se fizer sentido, criar uma skill `tv-webos-tizen` com o passo a passo de Modo Desenvolvedor e empacotamento, para virar conhecimento permanente da plataforma.
 
-Comece lendo o README do free-my-tv e a pasta `tv-lg/` do FeatureTesting, me diga o que precisa de mim antes de qualquer instalação, e me faça uma pergunta de cada vez.
+Comece lendo o README do free-my-tv e a pasta `tv-lg/` do repositório kids, me diga o que precisa de mim antes de qualquer instalação, e me faça uma pergunta de cada vez.

@@ -1,20 +1,18 @@
 /*
-  Service worker do Bolinho de Chuva (/bolinho-de-chuva/) e da tela da TV (/kids/): o mesmo arquivo
-  nas duas pastas. Serve para duas coisas: o navegador aceitar instalar a página como aplicativo e ela
-  abrir mesmo sem internet. Rede primeiro (sempre a versão mais nova do site); sem resposta em 4 s, usa
-  a cópia guardada. O cache leva o nome da pasta (dgo-bolinho-de-chuva-vN, dgo-kids-vN) e só apaga
-  caches da própria pasta, porque todos os apps da SolverONE moram no mesmo endereço e dividem o cache.
-  A cada mudança, suba a VERSAO (nas duas cópias).
+  Service worker da estante do Bolinho de Chuva (solverone.com.br/kids/). Serve para duas coisas: o navegador
+  aceitar instalar a estante como aplicativo e ela abrir mesmo sem internet. Rede primeiro (sempre a versão mais
+  nova do site); sem resposta em 4 s, usa a cópia guardada. Cada jogo (/kids/<jogo>/) tem o próprio service
+  worker, que cuida das páginas dele. O cache leva o nome da pasta (dgo-kids-vN) e só apaga caches do próprio
+  Bolinho, porque todos os apps da SolverONE moram no mesmo endereço e dividem o cache.
+  Este endereço (/kids/sw.js) é o mesmo da antiga página /kids do Portal: quem já tinha, atualiza sozinho.
+  A cada mudança na estante, suba a VERSAO.
 */
-var VERSAO = 6;
+var VERSAO = 7;
 var PASTA = (self.registration.scope.replace(/\/$/, '').split('/').pop() || 'raiz');
 var PREFIXO = 'dgo-' + PASTA + '-';
 var CACHE = PREFIXO + 'v' + VERSAO;
-var BASICO = ['./', 'manifest.webmanifest',
-  // arquivos compartilhados pelas duas páginas (estante): guardados já na instalação, para abrir sem internet
-  '/bolinho-de-chuva/estante.css', '/bolinho-de-chuva/catalogo.js', '/bolinho-de-chuva/jogos.js',
-  '/bolinho-de-chuva/kids.js', '/bolinho-de-chuva/instalar.js', '/bolinho-de-chuva/radio.js',
-  '/bolinho-de-chuva/tela-cheia.js'];
+var BASICO = ['./', 'manifest.webmanifest', 'estante.css', 'catalogo.js', 'jogos.js', 'kids.js', 'instalar.js',
+  'radio.js', 'tela-cheia.js', 'icone-192.png', 'icone-512.png', 'icone-180.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(BASICO.map(function (u) { return c.add(u).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
@@ -31,11 +29,8 @@ self.addEventListener('fetch', function (e) {
   var req = e.request;
   var url = new URL(req.url);
   var escopo = new URL(self.registration.scope);
-  // Cuida do próprio escopo e dos arquivos compartilhados em /bolinho-de-chuva/ (estante.css, catalogo.js,
-  // radio.js, etc.), porque /kids e /bolinho-de-chuva são a mesma página servida em dois endereços. Jogos e
-  // outros apps seguem com o service worker deles.
-  if (req.method !== 'GET' || url.origin !== escopo.origin) return;
-  if (url.pathname.indexOf(escopo.pathname) !== 0 && url.pathname.indexOf('/bolinho-de-chuva/') !== 0) return;
+  // Só o que é do próprio Bolinho (/kids/...). As páginas de cada jogo seguem com o service worker do jogo.
+  if (req.method !== 'GET' || url.origin !== escopo.origin || url.pathname.indexOf(escopo.pathname) !== 0) return;
   // Música não passa por aqui: arquivo grande, tocado em pedaços pelo navegador; vem sempre da internet.
   if (/\.mp3$/i.test(url.pathname)) return;
   e.respondWith(new Promise(function (resolve) {

@@ -6,7 +6,7 @@ Peluqueria, a Dança na Sala, o Vruuum! e a Purpurina. App de desenho para crian
 adesivos animados, paisagens, música e **desenho com a mão** na frente da câmera — no celular, no iPad e na TV.
 Sem login, e **sem internet** depois de aberto uma vez.
 
-Endereço (depois do merge): https://solverone.com.br/FeatureTesting/rabiscolandia/ · também pelo cartão em
+Endereço: https://solverone.com.br/kids/rabiscolandia/ · também pelo cartão em
 `solverone.com.br/bolinho-de-chuva`, e na TV por `solverone.com.br/tv/rabiscolandia` (ou o cartão em `solverone.com.br/kids`).
 
 ## Como brincar

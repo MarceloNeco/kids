@@ -148,7 +148,7 @@
     A.mostrar('tv');
     $('tvCodigo').textContent = tv.codigo; $('tvCodigoCanto').textContent = t('Código: ', 'Code: ') + tv.codigo;
     // endereço curto para digitar no celular (lá, o cartão 💄 Purpurina leva ao jogo)
-    $('tvEndereco').textContent = /solverone\.com\.br$/.test(location.host) ? 'solverone.com.br/bolinho-de-chuva' : location.host + location.pathname.replace(/index\.html$/, '');
+    $('tvEndereco').textContent = /solverone\.com\.br$/.test(location.host) ? 'solverone.com.br/kids' : location.host + location.pathname.replace(/index\.html$/, '');
     tv.tocador = M.tocador($('tvMusica'), function (e) { mandarTV(e); mostrarTituloTV(e); });
     S.abrir(tv.codigo, receberNaTV).then(function (sala) { tv.sala = sala; setInterval(function () { mandarTV(tv.tocador.estado()); limparSumidos(); }, 3000); })
       .catch(function () { $('tvEspera').querySelector('.tv-passos').textContent = t('Sem conexão com a internet. Confira o Wi-Fi da TV e recarregue a página.', 'No internet connection. Check the TV Wi-Fi and reload the page.'); });

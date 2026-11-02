@@ -5,7 +5,7 @@ Peluqueria e a Dança na Sala. Corrida de carrinho em 3D, com curvas e morros: o
 criança vira para a esquerda e para a direita e aperta **⬆ PULAR** para passar por cima dos obstáculos.
 Funciona com o celular **deitado ou em pé**, sem login, e **sem internet** depois de aberto uma vez.
 
-Endereço (depois do merge): https://solverone.com.br/FeatureTesting/vruuum/ · também pelos cartões em
+Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 `solverone.com.br/bolinho-de-chuva` e `solverone.com.br/kids` (TV).
 
 ## Como jogar

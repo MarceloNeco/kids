@@ -5,7 +5,7 @@ Peluqueria, a Dança na Sala e o Vruuum!. Jogo de **vestir e maquiar** para meni
 personagem, faz a maquiagem, escolhe roupas, acessórios e cenário, faz desafios por tema e desfila.
 Funciona com o celular **deitado ou em pé**, sem login, e **sem internet** depois de aberto uma vez.
 
-Endereço (depois do merge): https://solverone.com.br/FeatureTesting/purpurina/ · também pelos cartões em
+Endereço: https://solverone.com.br/kids/purpurina/ · também pelos cartões em
 `solverone.com.br/bolinho-de-chuva` e `solverone.com.br/kids` (TV).
 
 ## Como brincar

@@ -1,6 +1,5 @@
-/* Visual da estante do Bolinho de Chuva — o MESMO nos dois endereços (/bolinho-de-chuva e /kids).
-   As duas páginas carregam este arquivo e os mesmos scripts, então são a mesma página; /kids é só o
-   atalho curto para digitar na TV. Responsivo: celular, tablet, computador e TV (foco visível para o
+/* Visual da estante do Bolinho de Chuva — em solverone.com.br/kids (o endereço antigo /bolinho-de-chuva leva para cá).
+   Responsivo: celular, tablet, computador e TV (foco visível para o
    controle remoto). */
 :root{--bg:#0b0a1f;--bg2:#1a1446;--card:#221b4d;--text:#f3f0ff;--muted:#b3acd6;--border:#3a2f73;--lima:#c6ff3d;--rosa:#ff4fa3;--ciano:#3ee8ff;--ouro:#ffd166}
 *{box-sizing:border-box;margin:0}
