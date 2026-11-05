@@ -19,6 +19,20 @@
   }
   var PELE = '#f2c9a0', MORENA = '#8a5a3c';
   // enfeites usados por vários personagens
+  // cabelo loiro e comprido saindo por baixo do capacete (de costas: uma cortina até as costas; de frente: mechas dos lados)
+  function cabeloLoiro(c, x, y, r, costas) {
+    var claro = '#ffe08a', meio = '#f4c542', escuro = '#d9a21b';
+    c.fillStyle = meio; c.beginPath();
+    c.moveTo(x - r * 0.95, y - r * 0.1);
+    c.quadraticCurveTo(x - r * 1.25, y + r * 1.1, x - r * (costas ? 0.85 : 1.05), y + r * 2.0);
+    c.quadraticCurveTo(x, y + r * (costas ? 2.25 : 1.2), x + r * (costas ? 0.85 : 1.05), y + r * 2.0);
+    c.quadraticCurveTo(x + r * 1.25, y + r * 1.1, x + r * 0.95, y - r * 0.1); c.closePath(); c.fill();
+    c.strokeStyle = claro; c.lineWidth = r * 0.07; c.lineCap = 'round';
+    for (var k = -3; k <= 3; k++) { if (!costas && Math.abs(k) < 2) continue; c.beginPath(); c.moveTo(x + k * r * 0.27, y + r * 0.3); c.quadraticCurveTo(x + k * r * 0.36, y + r * 1.1, x + k * r * 0.24, y + r * 1.9); c.stroke(); }
+    c.strokeStyle = escuro; c.lineWidth = r * 0.04;
+    for (var q = -2; q <= 2; q++) { if (!costas && Math.abs(q) < 2) continue; c.beginPath(); c.moveTo(x + q * r * 0.38 + r * 0.1, y + r * 0.5); c.quadraticCurveTo(x + q * r * 0.45, y + r * 1.2, x + q * r * 0.34, y + r * 1.85); c.stroke(); }
+  }
+  function franja(c, x, y, r) { c.fillStyle = '#f4c542'; c.beginPath(); c.moveTo(x - r * 0.62, y - r * 0.12); c.quadraticCurveTo(x - r * 0.3, y + r * 0.08, x, y - r * 0.12); c.quadraticCurveTo(x + r * 0.3, y + r * 0.08, x + r * 0.62, y - r * 0.12); c.lineTo(x + r * 0.55, y - r * 0.32); c.lineTo(x - r * 0.55, y - r * 0.32); c.closePath(); c.fill(); }
   function capacetePilota(c, x, y, r) { circ(c, x, y, r * 1.02, '#ff4fa3'); circ(c, x - r * 0.38, y - r * 0.5, r * 0.18, 'rgba(255,255,255,.45)'); }
   function oculos(c, x, y, r) { c.fillStyle = '#2a2a33'; c.fillRect(x - r * 0.75, y - r * 0.08, r * 1.5, r * 0.16); [-1, 1].forEach(function (l) { circ(c, x + l * r * 0.32, y, r * 0.2, '#2a2a33'); circ(c, x + l * r * 0.32, y, r * 0.14, '#7cd6ff'); circ(c, x + l * r * 0.36, y - r * 0.04, r * 0.04, '#ffffff'); }); }
   function estrela(c, x, y, rr, cor) { c.fillStyle = cor; c.beginPath(); for (var k = 0; k < 10; k++) { var a = -Math.PI / 2 + k * Math.PI / 5, q = k % 2 ? rr * 0.45 : rr; if (k) c.lineTo(x + Math.cos(a) * q, y + Math.sin(a) * q); else c.moveTo(x + Math.cos(a) * q, y + Math.sin(a) * q); } c.closePath(); c.fill(); }
@@ -108,10 +122,11 @@
     { id: 'pepper', nome: ['Pepper', 'Pepper'], origem: 'Pepper&Carrot, de David Revoy, CC BY 4.0, www.peppercarrot.com; desenho próprio', cor: '#d9480f',
       frente: function (c, x, y, r) { elipse(c, x, y + r * 0.2, r * 1.0, r * 1.05, '#d9480f'); rosto(c, x, y + r * 0.14, r * 0.74, PELE); chapeuBruxa(c, x, y, r); },
       costas: function (c, x, y, r) { elipse(c, x + r * 0.15, y + r * 0.95, r * 0.3, r * 0.5, '#c43d0a', 0.3); elipse(c, x, y + r * 0.2, r * 1.0, r * 1.05, '#d9480f'); fios(c, x, y, r, 'rgba(0,0,0,.15)'); chapeuBruxa(c, x, y, r); } },
-    // ---- 1.9.0: personagem ORIGINAL do jogo (nada copiado): uma pilota de corrida, de capacete rosa aberto ----
+    // ---- 1.9.0: personagem ORIGINAL do jogo (nada copiado): uma pilota de corrida, de capacete rosa aberto;
+    // 1.9.1: loira de cabelo comprido saindo do capacete ----
     { id: 'faisca', nome: ['Faísca, a Pilota', 'Sparky the Racer'], origem: 'personagem original do Vruuum! (desenho próprio)', cor: '#ff4fa3',
-      frente: function (c, x, y, r) { [-1, 1].forEach(function (l) { circ(c, x + l * r * 0.92, y + r * 0.45, r * 0.3, '#3a2418'); circ(c, x + l * r * 0.85, y + r * 0.8, r * 0.24, '#3a2418'); }); capacetePilota(c, x, y, r); rosto(c, x, y + r * 0.2, r * 0.62, '#c98a5a'); oculos(c, x, y - r * 0.52, r); },
-      costas: function (c, x, y, r) { [-1, 1].forEach(function (l) { circ(c, x + l * r * 0.92, y + r * 0.45, r * 0.3, '#3a2418'); circ(c, x + l * r * 0.85, y + r * 0.8, r * 0.24, '#3a2418'); }); capacetePilota(c, x, y, r); c.save(); c.beginPath(); c.arc(x, y, r * 1.02, 0, Math.PI * 2); c.clip(); c.fillStyle = '#ffffff'; c.fillRect(x - r * 0.14, y - r * 1.1, r * 0.28, r * 2.2); c.restore(); estrela(c, x, y + r * 0.15, r * 0.3, '#ffd166'); oculos(c, x, y - r * 0.52, r); } }
+      frente: function (c, x, y, r) { cabeloLoiro(c, x, y, r, false); capacetePilota(c, x, y, r); rosto(c, x, y + r * 0.2, r * 0.62, '#f2c9a0'); franja(c, x, y, r); oculos(c, x, y - r * 0.52, r); },
+      costas: function (c, x, y, r) { cabeloLoiro(c, x, y, r, true); capacetePilota(c, x, y, r); c.save(); c.beginPath(); c.arc(x, y, r * 1.02, 0, Math.PI * 2); c.clip(); c.fillStyle = '#ffffff'; c.fillRect(x - r * 0.14, y - r * 1.1, r * 0.28, r * 2.2); c.restore(); estrela(c, x, y + r * 0.15, r * 0.3, '#ffd166'); oculos(c, x, y - r * 0.52, r); } }
   ];
   // corpo de quem pilota o skate (e o que aparece de corpo nos outros veículos): menina ou menino
   var MENINAS = ['emilia', 'cuca', 'iara', 'chapeuzinho', 'alice', 'branca', 'cinderela', 'rapunzel', 'sereia', 'dorothy', 'pepper', 'faisca'];
