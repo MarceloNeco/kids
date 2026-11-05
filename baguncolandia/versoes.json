@@ -2,6 +2,17 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.18",
+      "data": "05/Nov/2026",
+      "hora": "10:00:00",
+      "pt": [
+        "👗 Meu boneco: quem joga sozinho agora joga o boneco que está aberto em \"Quem\" (Boneco 1 ou Boneco 2), no dedo, só no celular e com a TV. Antes era sempre o Boneco 1, mesmo montando o 2. Uma frase embaixo explica, e o aparelho lembra a escolha."
+      ],
+      "en": [
+        "👗 My avatar: a single player now plays the avatar open in \"Who\" (Avatar 1 or Avatar 2), in finger mode, phone only and with the TV. Before it was always Avatar 1, even after building Avatar 2. A short line below explains it, and the device remembers the choice."
+      ]
+    },
+    {
       "versao": "0.8.17",
       "data": "02/Nov/2026",
       "hora": "15:03:27",

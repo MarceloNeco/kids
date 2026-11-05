@@ -65,7 +65,7 @@
         if ('ambiente' in m) o.ambiente = AMBIENTES.indexOf(m.ambiente) >= 0 ? m.ambiente : 'paisagem';
         if ('cena' in m) o.cena = CENAS.indexOf(m.cena) >= 0 ? m.cena : 'aleatoria';
         if ('faixa' in m) o.faixa = typeof m.faixa === 'string' ? m.faixa.slice(0, 12) : '';
-        if (m.acao === 'boneco') { o.j = m.j === 1 ? 1 : 0; o.boneco = bonecoOk(m.boneco); if (!o.boneco) return null; }
+        if (m.acao === 'boneco') { o.j = m.j === 1 ? 1 : 0; o.boneco = bonecoOk(m.boneco); if (!o.boneco) return null; if (m.eu === true) o.eu = true; }
         if ('turmas' in m && m.turmas && typeof m.turmas === 'object') o.turmas = { propria: !!m.turmas.propria, publica: !!m.turmas.publica, minhas: !!m.turmas.minhas };
         if ('video' in m) { if (typeof m.video !== 'string' || !/^[A-Za-z0-9_-]{11}$/.test(m.video)) return null; o.video = m.video; }
         if ('lista' in m) { if (typeof m.lista !== 'string' || !/^[A-Za-z0-9_-]{10,64}$/.test(m.lista)) return null; o.lista = m.lista; }

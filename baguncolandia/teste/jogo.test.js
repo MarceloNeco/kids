@@ -308,3 +308,9 @@ test('validar aceita esqueleto compacto e recusa lixo', () => {
   assert.equal(B.validar({ t: 'dados', k: 'x' }).k, undefined);
   assert.equal(B.validar({ t: 'dados', k: [[[1, 2]]] }).k, undefined);
 });
+
+test('validar: boneco leva "eu" (qual joga quando é 1 pessoa) só se for true', () => {
+  assert.strictEqual(B.validar({ t: 'cmd', acao: 'boneco', j: 1, boneco: { cabeca: 'menino' }, eu: true }).eu, true);
+  assert.strictEqual(B.validar({ t: 'cmd', acao: 'boneco', j: 1, boneco: { cabeca: 'menino' }, eu: 'sim' }).eu, undefined);
+  assert.strictEqual(B.validar({ t: 'cmd', acao: 'boneco', j: 0, boneco: { cabeca: 'menino' } }).eu, undefined);
+});

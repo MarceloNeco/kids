@@ -190,6 +190,39 @@ function ok(msg) { console.log('✓ ' + msg); }
   if (leveOk) ok('modo leve: classe na TV e desenho sem erros'); else falhou('modo leve com problema');
   await dbg.close();
   await cel.screenshot({ path: '/tmp/pagina-cel-jogo.png', fullPage: true });
+  // v0.8.18: o boneco que joga é o que está aberto em "Quem" (o dono montou o Boneco 2 e jogou o Boneco 1). Vale no dedo, só o celular e TV pareada.
+  const ctx2 = await browser.newContext({ viewport: { width: 844, height: 390 }, locale: 'pt-BR' });
+  const id = (b) => b && [b.cabeca, b.acessorio, b.cor].join('|');
+  for (const modo of ['btToque', 'btSolo']) {
+    const p = await ctx2.newPage(); p.on('pageerror', e => erros.push('boneco ' + modo + ': ' + e.message));
+    await p.goto(base + '?teste'); await p.click('#' + modo); await p.fill('#nome', 'Teo');
+    if (modo === 'btToque') {   // monta no Boneco 2: menino de coroa e roupa laranja
+      await p.click('#bonecoEntrar summary'); await p.waitForTimeout(300);
+      await p.click('#bonecoEntrar .quem button:nth-child(2)'); await p.waitForTimeout(200);
+      await p.click('#bonecoEntrar .cabecas button[title="Menino"]'); await p.waitForTimeout(200);
+      await p.evaluate(() => { const ls = [...document.querySelectorAll('#bonecoEntrar .linha')]; const acha = (rot, sel) => ls.find(l => l.firstChild.textContent === rot).querySelector(sel).click(); acha('Acessório', 'button:nth-child(3)'); acha('Cor da roupa', 'button[title="#ff7a00"]'); });
+    }
+    const esperado = await p.evaluate(() => { const c = window.BaguncaApp.CelApp.cel; return c.bonecos[c.quem]; });
+    await p.click('#btEntrar'); await p.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 }); await p.waitForTimeout(400);
+    const noLobby = await p.evaluate(() => document.querySelector('#tvLobby .jog canvas').getAttribute('data-cfg'));
+    await p.click('#localComecar'); await p.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'jogando', null, { timeout: 30000 });
+    const noJogo = await p.evaluate(() => window.Desenho.avatar(0));
+    const nome = modo === 'btToque' ? 'no dedo' : 'só o celular';
+    if (esperado.cabeca === 'menino' && esperado.acessorio === 'coroa' && esperado.cor === '#ff7a00' && noLobby === id(esperado) && id(noJogo) === id(esperado)) ok('boneco ' + nome + ': Boneco 2 do picker = lobby = jogo (' + id(esperado) + ')');
+    else falhou('boneco ' + nome + ': picker ' + id(esperado) + ' · lobby ' + noLobby + ' · jogo ' + id(noJogo));
+    await p.close();
+  }
+  { // TV pareada: o celular manda os dois bonecos e diz qual é o "eu" (passando pela validação da rede)
+    const t = await ctx2.newPage(); await t.goto(base + '?teste'); await t.click('#btTV'); await t.waitForFunction(() => document.getElementById('pct').textContent === '100', null, { timeout: 15000 });
+    const r = await t.evaluate(() => { const A = window.BaguncaApp, tv = A.TVApp.tv, V = (m) => Object.assign(A.Bagunca.validar(Object.assign({ t: 'cmd' }, m)), { id: 'cel1' });
+      tv.jog.push({ id: 'cel1', nome: 'Ana', video: document.createElement('video') }); A.TVApp.comando({ acao: 'config', jogadores: 1, celulares: 1 });
+      A.TVApp.comando(V({ acao: 'boneco', j: 0, boneco: { cabeca: 'mago', cor: '#ffd166', acessorio: 'nenhum' }, eu: false }));
+      A.TVApp.comando(V({ acao: 'boneco', j: 1, boneco: { cabeca: 'menino', cor: '#ff7a00', acessorio: 'coroa' }, eu: true }));
+      const a = window.Desenho.avatar(0); return [a.cabeca, a.acessorio, a.cor].join('|'); });
+    if (r === 'menino|coroa|#ff7a00') ok('boneco TV pareada: a TV usa o boneco aberto no celular (' + r + ')'); else falhou('boneco TV pareada: ' + r);
+    await t.close();
+  }
+  await ctx2.close();
   const errosReais = erros.filter(e => !/favicon|solverone-dados|ERR_NAME_NOT_RESOLVED|ERR_INTERNET|Failed to load resource.*(youtube|supabase)|supabase-js|net::ERR/i.test(e));
   if (errosReais.length) falhou('erros no console: ' + errosReais.join(' | ')); else ok('sem erros de JavaScript nem de CSP');
   await browser.close(); server.close();
