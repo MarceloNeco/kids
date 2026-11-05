@@ -3,9 +3,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const V = require('../veiculos.js');
 
-test('10 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
-  assert.equal(V.LISTA.length, 10);
-  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 10);
+test('11 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
+  assert.equal(V.LISTA.length, 11);
+  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 11);
   const grupos = V.GRUPOS.map(g => g.id);
   for (const v of V.LISTA) {
     assert.ok(grupos.includes(v.grupo), v.id);
@@ -30,7 +30,7 @@ test('diferenças pequenas de velocidade e curva (corrida equilibrada)', () => {
 
 test('nenhum nome de marca nos veículos', () => {
   const nomes = V.LISTA.map(v => v.nome.join(' ')).join(' ').toLowerCase();
-  for (const marca of ['porsche', 'ferrari', 'lamborghini', 'boeing', 'airbus', 'honda', 'yamaha']) assert.ok(!nomes.includes(marca), marca);
+  for (const marca of ['porsche', 'ferrari', 'lamborghini', 'boeing', 'airbus', 'honda', 'yamaha', 'barbie', 'mattel']) assert.ok(!nomes.includes(marca), marca);
 });
 
 test('o skate é animado: vários quadros da perna empurrando o chão, cabeça aberta (sem capacete)', () => {

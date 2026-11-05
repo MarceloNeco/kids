@@ -68,6 +68,11 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 ## O piloto e a selfie
 
+- **Conversível Rosa** (1.9.0): carro bem rosa de capota abaixada (lanternas de coração, laço no porta-malas), desenho
+  próprio sem marca; a cor escolhida vira o friso. Carro de marca (Barbie) e personagens de desenho (Penélope Charmosa)
+  têm dono e não podem entrar.
+- **Versão da página** (1.9.0): `index.html` tem `<meta name="versao">`; se não bater com `APP_VERSION` (aparelho
+  juntou arquivos de versões diferentes), o `app.js` recarrega uma vez.
 - **Corpo** (desde a 1.8.0): 👧 Menina ou 👦 Menino na garagem; no skate a menina usa saia rodada e blusinha com coração.
   Escolher um personagem já ajusta o corpo (`corpoDe` em `personagens.js`); bichinhos ficam com a escolha da criança.
 - **Guia dos controles**: no 3-2-1 e nos 4 primeiros segundos, setas e botão de pular piscam com a explicação; com 2
@@ -96,7 +101,7 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
   aí ficam mais lentos) e empurram quando encostam. Ficam por perto (quem dispara segura, quem fica para trás acelera),
   para a corrida ser sempre disputada (`moverRival` em `motor.js`). O placar mostra a posição (🏁 2º / 4) e o fim mostra
   a classificação; 1º/2º/3º lugar ganham +800/+400/+200 pontos.
-- **Personagens** (`personagens.js`), 23, todos desenhados aqui. De **domínio público**: Emília, Visconde, Saci, Cuca,
+- **Personagens** (`personagens.js`), 24, todos desenhados aqui. Original do jogo (1.9.0): **Faísca, a Pilota**. De **domínio público**: Emília, Visconde, Saci, Cuca,
   Curupira, Iara, Chapeuzinho, Pinóquio, Alice, Robin Hood, Sherlock, Papai Noel e, desde a 1.6.0, Branca de Neve,
   Cinderela, Rapunzel, Pequena Sereia, Peter Pan, Aladim, Dorothy e Espantalho (contos e O Mágico de Oz; desenhos
   próprios, sem copiar filme nenhum). De **licença livre com crédito**: Tux (mascote do Linux, Larry Ewing), Big Buck
@@ -181,7 +186,7 @@ No arquivo baixado (📲 Guardar no celular) tocam só as feitas pelo jogo, para
 | `rock.js` | a banda de rock e as 3 músicas (partitura em `MUSICAS`), testadas no Node. |
 | `som.js` | motor, buzina e efeitos sintetizados (WebAudio); liga e desliga a música do `rock.js`. |
 | `app.js` | menu, controles, tela cheia, bordas seguras, laço da corrida, pausa, resultado, recorde, instalar e baixar. `APP_VERSION` aqui. |
-| `personagens.js` | os 23 personagens de domínio público e licença livre (frente e costas) e o sorteio dos rivais, testados no Node. |
+| `personagens.js` | os 24 personagens (domínio público, licença livre e a Faísca, original) (frente e costas) e o sorteio dos rivais, testados no Node. |
 | `maos.js` | volante no ar: lê as mãos pela câmera (MediaPipe) e vira direção, pulo e freio; contas testadas no Node. |
 | `movimento.js` | **puro**: acelerômetro → direção do volante e pulo pelo toquinho (com calibração no 3‑2‑1), testado no Node. |
 | `cabeca.js` | o piloto animado (de costas, vira em 3D como uma bola e sorri; bichinho, selfie ou personagem), testado no Node. |

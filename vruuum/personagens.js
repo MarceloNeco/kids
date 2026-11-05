@@ -19,6 +19,9 @@
   }
   var PELE = '#f2c9a0', MORENA = '#8a5a3c';
   // enfeites usados por vários personagens
+  function capacetePilota(c, x, y, r) { circ(c, x, y, r * 1.02, '#ff4fa3'); circ(c, x - r * 0.38, y - r * 0.5, r * 0.18, 'rgba(255,255,255,.45)'); }
+  function oculos(c, x, y, r) { c.fillStyle = '#2a2a33'; c.fillRect(x - r * 0.75, y - r * 0.08, r * 1.5, r * 0.16); [-1, 1].forEach(function (l) { circ(c, x + l * r * 0.32, y, r * 0.2, '#2a2a33'); circ(c, x + l * r * 0.32, y, r * 0.14, '#7cd6ff'); circ(c, x + l * r * 0.36, y - r * 0.04, r * 0.04, '#ffffff'); }); }
+  function estrela(c, x, y, rr, cor) { c.fillStyle = cor; c.beginPath(); for (var k = 0; k < 10; k++) { var a = -Math.PI / 2 + k * Math.PI / 5, q = k % 2 ? rr * 0.45 : rr; if (k) c.lineTo(x + Math.cos(a) * q, y + Math.sin(a) * q); else c.moveTo(x + Math.cos(a) * q, y + Math.sin(a) * q); } c.closePath(); c.fill(); }
   function coroa(c, x, y, l, cor) { poli(c, [x - l, y + l * 0.3, x - l, y - l * 0.25, x - l * 0.5, y + l * 0.05, x, y - l * 0.45, x + l * 0.5, y + l * 0.05, x + l, y - l * 0.25, x + l, y + l * 0.3], cor); }
   function fios(c, x, y, r, cor) { c.strokeStyle = cor; c.lineWidth = r * 0.07; c.lineCap = 'round'; for (var k = -2; k <= 2; k++) { c.beginPath(); c.moveTo(x + k * r * 0.22, y - r * 0.85); c.quadraticCurveTo(x + k * r * 0.32, y, x + k * r * 0.2, y + r * 0.85); c.stroke(); } }
   function ondas(c, x, y, r, cor) { c.strokeStyle = cor; c.lineWidth = r * 0.07; c.lineCap = 'round'; for (var k = -3; k <= 3; k++) { c.beginPath(); c.moveTo(x + k * r * 0.2, y - r * 0.8); c.bezierCurveTo(x + k * r * 0.2 + r * 0.15, y - r * 0.2, x + k * r * 0.2 - r * 0.15, y + r * 0.5, x + k * r * 0.25, y + r * 1.4); c.stroke(); } }
@@ -104,11 +107,14 @@
       costas: function (c, x, y, r) { orelhas(c, x, y, r); circ(c, x, y + r * 0.05, r * 0.98, '#d6d6e0'); } },
     { id: 'pepper', nome: ['Pepper', 'Pepper'], origem: 'Pepper&Carrot, de David Revoy, CC BY 4.0, www.peppercarrot.com; desenho próprio', cor: '#d9480f',
       frente: function (c, x, y, r) { elipse(c, x, y + r * 0.2, r * 1.0, r * 1.05, '#d9480f'); rosto(c, x, y + r * 0.14, r * 0.74, PELE); chapeuBruxa(c, x, y, r); },
-      costas: function (c, x, y, r) { elipse(c, x + r * 0.15, y + r * 0.95, r * 0.3, r * 0.5, '#c43d0a', 0.3); elipse(c, x, y + r * 0.2, r * 1.0, r * 1.05, '#d9480f'); fios(c, x, y, r, 'rgba(0,0,0,.15)'); chapeuBruxa(c, x, y, r); } }
-
+      costas: function (c, x, y, r) { elipse(c, x + r * 0.15, y + r * 0.95, r * 0.3, r * 0.5, '#c43d0a', 0.3); elipse(c, x, y + r * 0.2, r * 1.0, r * 1.05, '#d9480f'); fios(c, x, y, r, 'rgba(0,0,0,.15)'); chapeuBruxa(c, x, y, r); } },
+    // ---- 1.9.0: personagem ORIGINAL do jogo (nada copiado): uma pilota de corrida, de capacete rosa aberto ----
+    { id: 'faisca', nome: ['Faísca, a Pilota', 'Sparky the Racer'], origem: 'personagem original do Vruuum! (desenho próprio)', cor: '#ff4fa3',
+      frente: function (c, x, y, r) { [-1, 1].forEach(function (l) { circ(c, x + l * r * 0.92, y + r * 0.45, r * 0.3, '#3a2418'); circ(c, x + l * r * 0.85, y + r * 0.8, r * 0.24, '#3a2418'); }); capacetePilota(c, x, y, r); rosto(c, x, y + r * 0.2, r * 0.62, '#c98a5a'); oculos(c, x, y - r * 0.52, r); },
+      costas: function (c, x, y, r) { [-1, 1].forEach(function (l) { circ(c, x + l * r * 0.92, y + r * 0.45, r * 0.3, '#3a2418'); circ(c, x + l * r * 0.85, y + r * 0.8, r * 0.24, '#3a2418'); }); capacetePilota(c, x, y, r); c.save(); c.beginPath(); c.arc(x, y, r * 1.02, 0, Math.PI * 2); c.clip(); c.fillStyle = '#ffffff'; c.fillRect(x - r * 0.14, y - r * 1.1, r * 0.28, r * 2.2); c.restore(); estrela(c, x, y + r * 0.15, r * 0.3, '#ffd166'); oculos(c, x, y - r * 0.52, r); } }
   ];
   // corpo de quem pilota o skate (e o que aparece de corpo nos outros veículos): menina ou menino
-  var MENINAS = ['emilia', 'cuca', 'iara', 'chapeuzinho', 'alice', 'branca', 'cinderela', 'rapunzel', 'sereia', 'dorothy', 'pepper'];
+  var MENINAS = ['emilia', 'cuca', 'iara', 'chapeuzinho', 'alice', 'branca', 'cinderela', 'rapunzel', 'sereia', 'dorothy', 'pepper', 'faisca'];
   var SEM_CORPO = ['tux', 'bunny'];   // bichinhos: vale a escolha da criança
   function corpoDe(id) { return MENINAS.indexOf(id) >= 0 ? 'menina' : SEM_CORPO.indexOf(id) >= 0 || !id ? null : 'menino'; }
   function achar(id) { for (var k = 0; k < LISTA.length; k++) if (LISTA[k].id === id) return LISTA[k]; return null; }

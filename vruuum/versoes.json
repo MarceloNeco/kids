@@ -2,6 +2,21 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.9.0",
+      "data": "05/Nov/2026",
+      "hora": "11:00:00",
+      "pt": [
+        "Corpo de menina ou menino consertado: com a internet lenta, o aparelho podia juntar a tela de uma versão com o código de outra; aí a opção de corpo sumia e o skate continuava de menina mesmo escolhendo menino. Agora o jogo confere se tela e código são da mesma versão e, se não forem, recarrega sozinho uma vez. E a garagem não quebra mais se faltar algum botão.",
+        "Conversível Rosa: carro novo, bem rosa, de capota abaixada, com lanternas de coração, pneus de faixa branca e laço no porta-malas (desenho próprio, sem marca). A cor escolhida vira o friso.",
+        "Faísca, a Pilota: personagem nova, original do jogo, de capacete rosa com estrela e óculos de corrida. Agora são 24 personagens."
+      ],
+      "en": [
+        "Girl or boy body fixed: on slow internet the device could mix the screen of one version with the code of another; then the body option vanished and the skater stayed a girl even after choosing boy. Now the game checks that screen and code are the same version and, if not, reloads once by itself. And the garage no longer breaks if a button is missing.",
+        "Pink Convertible: a new, very pink car with the top down, heart tail lights, white-wall tires and a bow on the trunk (original design, no brand). The chosen color becomes the trim stripe.",
+        "Sparky the Racer: a new character, original to the game, with a pink helmet with a star and racing goggles. Now there are 24 characters."
+      ]
+    },
+    {
       "versao": "1.8.0",
       "data": "02/Nov/2026",
       "hora": "21:30:00",

@@ -2,8 +2,19 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.8.0';
+  var APP_VERSION = '1.9.0';
   var $ = function (id) { return document.getElementById(id); };
+  /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
+     versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
+     uma vez para pegar tudo da mesma versão. */
+  (function () {
+    var m = document.querySelector('meta[name="versao"]'), vp = m && m.getAttribute('content');
+    try {
+      if (vp !== APP_VERSION && sessionStorage.getItem('vruuum.recarregou') !== APP_VERSION && navigator.onLine !== false) {
+        sessionStorage.setItem('vruuum.recarregou', APP_VERSION); location.reload(); return;
+      }
+    } catch (e) { /* sem sessionStorage: segue */ }
+  })();
   var M = window.VruuumMotor, D = window.VruuumDesenho, Som = window.VruuumSom;
   var TV = /[?&]tv=auto\b/.test(location.search);
   if (TV) document.documentElement.classList.add('tv');
@@ -96,7 +107,7 @@
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
         b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); });
       });
-      $('tirarJ2').addEventListener('click', function () { pref.jogadores = 1; editando = 0; salvar(); Som.tocar('clique'); marcar(); });
+      if ($('tirarJ2')) $('tirarJ2').addEventListener('click', function () { pref.jogadores = 1; editando = 0; salvar(); Som.tocar('clique'); marcar(); });
       Array.prototype.forEach.call(document.querySelectorAll('[data-corpo]'), function (b) {
         b.addEventListener('click', function () { pref.carros[editando].corpo = b.getAttribute('data-corpo'); salvar(); Som.tocar('clique'); marcar(); });
       });
