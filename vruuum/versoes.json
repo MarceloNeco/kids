@@ -2,6 +2,17 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.9.1",
+      "data": "05/Nov/2026",
+      "hora": "20:40:00",
+      "pt": [
+        "Faísca, a Pilota, agora é loira de cabelo comprido, saindo por baixo do capacete (de frente, de costas, no carro e no skate)."
+      ],
+      "en": [
+        "Sparky the Racer now has long blonde hair flowing out from under her helmet (front, back, in the car and on the skateboard)."
+      ]
+    },
+    {
       "versao": "1.9.0",
       "data": "05/Nov/2026",
       "hora": "11:00:00",
