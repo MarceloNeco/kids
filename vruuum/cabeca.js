@@ -241,7 +241,7 @@
     cabeca3d(c, cx, cy, r, pc, pf, e.giro, inclina, v.aberto ? 0.22 : v.capacete ? 0 : 0.14);
     c.restore();
     if (e.sorriso > 0) brilhinho(c, cx, cy, r, e.sorriso);
-    if (!v.capacete && !v.aberto) {   // reflexo do vidro por cima
+    if (!v.capacete && !v.aberto && !v.semVidro) {   // reflexo do vidro por cima (conversível não tem)
       c.save(); caminho(c, v.janela, x0, y0, W, H); c.clip();
       c.fillStyle = 'rgba(255,255,255,.16)'; c.beginPath(); c.moveTo(x0 + W * 0.3, y0); c.lineTo(x0 + W * 0.42, y0); c.lineTo(x0 + W * 0.3, y0 + H * 0.6); c.lineTo(x0 + W * 0.2, y0 + H * 0.6); c.fill();
       c.restore();

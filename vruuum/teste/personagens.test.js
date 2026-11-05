@@ -3,9 +3,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const P = require('../personagens.js');
 
-test('23 personagens, ids únicos, nome PT/EN, origem e desenhos de frente e costas', () => {
-  assert.equal(P.LISTA.length, 23);
-  assert.equal(new Set(P.LISTA.map(p => p.id)).size, 23);
+test('24 personagens, ids únicos, nome PT/EN, origem e desenhos de frente e costas', () => {
+  assert.equal(P.LISTA.length, 24);
+  assert.equal(new Set(P.LISTA.map(p => p.id)).size, 24);
   for (const p of P.LISTA) {
     assert.equal(p.nome.length, 2, p.id); assert.ok(p.origem, p.id);
     assert.equal(typeof p.frente, 'function'); assert.equal(typeof p.costas, 'function');
@@ -14,7 +14,7 @@ test('23 personagens, ids únicos, nome PT/EN, origem e desenhos de frente e cos
 
 test('nenhum personagem de empresa (têm dono e não podem entrar)', () => {
   const tudo = P.LISTA.map(p => (p.id + ' ' + p.nome.join(' ')).toLowerCase()).join(' ');
-  for (const proibido of ['mario', 'sonic', 'mickey', 'shrek', 'rambo', 'exterminador', 'terminator', 'kevin', 'ralph', 'elsa', 'pikachu', 'batman', 'homem-aranha', 'spider', 'ariel', 'peppa', 'bluey', 'patrulha', 'minecraft', 'roblox', 'pokemon'])
+  for (const proibido of ['mario', 'sonic', 'mickey', 'shrek', 'rambo', 'exterminador', 'terminator', 'kevin', 'ralph', 'elsa', 'pikachu', 'batman', 'homem-aranha', 'spider', 'ariel', 'peppa', 'bluey', 'patrulha', 'minecraft', 'roblox', 'pokemon', 'penelope', 'penélope', 'barbie'])
     assert.ok(!tudo.includes(proibido), proibido);
 });
 

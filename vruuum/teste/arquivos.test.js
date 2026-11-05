@@ -13,6 +13,9 @@ test('versão igual nos três lugares', () => {
   assert.equal(a, s); assert.equal(v.versao, a);
   for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
+  const m = ler('index.html').match(/<meta name="versao" content="([\d.]+)">/);
+  assert.ok(m, 'index.html sem <meta name="versao">');
+  assert.equal(m[1], a, 'index.html (a página confere a versão do código e recarrega se forem diferentes)');
 });
 
 test('sw.js guarda todos os arquivos publicados', () => {

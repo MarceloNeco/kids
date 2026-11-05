@@ -1,4 +1,4 @@
-/* Vruuum! — a garagem: 10 veículos, todos desenhados aqui em código, vistos de trás (como na corrida).
+/* Vruuum! — a garagem: 11 veículos, todos desenhados aqui em código, vistos de trás (como na corrida).
    Terra: Clássico, GT (traseira redonda), Superesportivo (largo, aerofólio grande), Kart, Monstrão,
    Moto, Skate (animado: a perna empurra o chão, em quadros). Céu: Aviãozinho, Jato, Helicóptero — esses voam (desenho.js troca a estrada por uma rota no
    ar e os obstáculos por pássaros, nuvens de tempestade, anéis e correntes de ar).
@@ -181,7 +181,7 @@
     [0.37, 0.57].forEach(function (x) { caixa(c, W * (x - 0.038), H * 0.868, W * 0.076, H * 0.038, W * 0.02, '#f1ead6'); caixa(c, W * (x - 0.038), H * 0.868, W * 0.076, H * 0.011, W * 0.01, 'rgba(255,255,255,.75)'); });
   }
   function skatista(c, W, H, cor, emoji, fase, corpo) {   // corpo: 'menina' (saia, blusinha com coração) ou 'menino'
-    var menina = corpo !== 'menino';
+    var menina = corpo === 'menina';   // sem corpo informado (código antigo): menino, como antes da escolha existir
     fase = ((fase || 0) % 1 + 1) % 1;
     var escura = tom(cor, -0.35), clara = tom(cor, 0.2), g = giroCorpo(fase), cg = Math.cos(g), sg = Math.sin(g);
     // pé de trás: onde está em cada momento da remada
@@ -296,6 +296,36 @@
     membro(c, om, [mx, my], W * 0.06 * k, W * 0.052 * k, tom(cor, s < 0 ? -0.25 : 0.05), null);
   }
 
+  // conversível rosa: capota abaixada, a piloto aparece por inteiro; lanternas de coração, pneus de faixa branca,
+  // laço no porta-malas. Desenho próprio, sem marca. A carroceria é sempre rosa; a cor escolhida vira o friso.
+  function coracao(c, x, y, r, cor) {
+    c.fillStyle = cor; c.beginPath(); c.moveTo(x, y + r * 0.9);
+    c.bezierCurveTo(x - r * 1.4, y - r * 0.1, x - r * 0.6, y - r * 1.1, x, y - r * 0.35);
+    c.bezierCurveTo(x + r * 0.6, y - r * 1.1, x + r * 1.4, y - r * 0.1, x, y + r * 0.9); c.fill();
+  }
+  function conversivel(c, W, H, cor, emoji) {
+    var rosa = '#ff6fb5';
+    sombra(c, W, H, 0.48);
+    [0.05, 0.77].forEach(function (x) { pneu(c, W * x, H * 0.66, W * 0.18, H * 0.34); oval(c, W * (x + 0.09), H * 0.83, W * 0.05, H * 0.1, '#f4f4f4'); oval(c, W * (x + 0.09), H * 0.83, W * 0.03, H * 0.06, '#15151b'); });
+    // para-brisa lá na frente (só o aro) e os encostos dos bancos
+    linha(c, [W * 0.3, H * 0.42, W * 0.33, H * 0.17, W * 0.67, H * 0.17, W * 0.7, H * 0.42], '#e9e4f2', W * 0.014);
+    c.globalAlpha = 0.18; poli(c, [W * 0.31, H * 0.42, W * 0.335, H * 0.18, W * 0.665, H * 0.18, W * 0.69, H * 0.42], '#bfe6ff'); c.globalAlpha = 1;
+    // carroceria arredondada
+    c.fillStyle = grad(c, H * 0.4, H * 0.86, tom(rosa, 0.25), tom(rosa, -0.25));
+    c.beginPath(); c.moveTo(W * 0.06, H * 0.62); c.quadraticCurveTo(W * 0.06, H * 0.43, W * 0.2, H * 0.42); c.lineTo(W * 0.8, H * 0.42);
+    c.quadraticCurveTo(W * 0.94, H * 0.43, W * 0.94, H * 0.62); c.lineTo(W * 0.94, H * 0.76); c.quadraticCurveTo(W * 0.5, H * 0.84, W * 0.06, H * 0.76); c.closePath(); c.fill();
+    caixa(c, W * 0.24, H * 0.4, W * 0.52, H * 0.05, H * 0.025, tom(rosa, -0.35));   // borda do habitáculo
+    caixa(c, W * 0.08, H * 0.52, W * 0.84, H * 0.035, H * 0.017, cor);               // friso na cor escolhida
+    coracao(c, W * 0.17, H * 0.6, W * 0.055, '#ff2a55'); coracao(c, W * 0.83, H * 0.6, W * 0.055, '#ff2a55');
+    circ(c, W * 0.155, H * 0.575, W * 0.012, 'rgba(255,255,255,.8)'); circ(c, W * 0.815, H * 0.575, W * 0.012, 'rgba(255,255,255,.8)');
+    // laço no porta-malas
+    poli(c, [W * 0.5, H * 0.5, W * 0.43, H * 0.46, W * 0.43, H * 0.55], '#ffffff'); poli(c, [W * 0.5, H * 0.5, W * 0.57, H * 0.46, W * 0.57, H * 0.55], '#ffffff'); circ(c, W * 0.5, H * 0.505, W * 0.02, '#ffd6ea');
+    caixa(c, W * 0.07, H * 0.72, W * 0.86, H * 0.05, H * 0.025, '#e9e9f0');   // para-choque cromado
+    placa(c, W * 0.4, H * 0.62, W * 0.2, H * 0.065, '♥');
+    escape(c, W * 0.27, H * 0.79, W * 0.03);
+    piloto(c, emoji, W * 0.5, H * 0.33, H * 0.22);
+  }
+
   // ---------- céu ----------
   function aviao(c, W, H, cor, emoji) {   // aviãozinho de hélice, visto de trás
     linha(c, [W * 0.3, H * 0.66, W * 0.3, H * 0.86], '#333', W * 0.012); linha(c, [W * 0.7, H * 0.66, W * 0.7, H * 0.86], '#333', W * 0.012);
@@ -349,6 +379,7 @@
 
   var LISTA = [
     { id: 'classico', janela: { poli: [0.24, 0.43, 0.31, 0.16, 0.69, 0.16, 0.76, 0.43] }, cab: [0.5, 0.37, 0.3], grupo: 'terra', nome: ['Clássico', 'Classic'], w: 800, h: 640, vel: 1, curva: 1, desenhar: function (c, W, H, cor, e) { S.carroTras(c, W, H, cor, e, true); } },
+    { id: 'conversivel', janela: { poli: [0.2, 0.44, 0.2, 0, 0.8, 0, 0.8, 0.44] }, cab: [0.5, 0.27, 0.24], semVidro: true, grupo: 'terra', nome: ['Conversível Rosa', 'Pink Convertible'], w: 820, h: 600, vel: 1.02, curva: 1.04, desenhar: conversivel },
     { id: 'gt', janela: { poli: [0.34, 0.4, 0.37, 0.25, 0.44, 0.19, 0.56, 0.19, 0.63, 0.25, 0.66, 0.4] }, cab: [0.5, 0.36, 0.23], grupo: 'terra', nome: ['GT Redondo', 'Round GT'], w: 820, h: 600, vel: 1.04, curva: 1.03, desenhar: gt },
     { id: 'super', janela: { poli: [0.38, 0.37, 0.41, 0.25, 0.59, 0.25, 0.62, 0.37] }, cab: [0.5, 0.35, 0.18], grupo: 'terra', nome: ['Superesportivo', 'Supercar'], w: 920, h: 560, vel: 1.08, curva: 0.95, desenhar: superesportivo },
     { id: 'kart', janela: { elipse: [0.5, 0.24, 0.184, 0.221] }, cab: [0.5, 0.25, 0.34], capacete: true, grupo: 'terra', nome: ['Kart', 'Kart'], w: 720, h: 600, vel: 0.96, curva: 1.12, desenhar: kart },
