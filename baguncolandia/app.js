@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.17', APP_UPDATED = '02/11/2026';
+  var APP_VERSION = '0.8.18', APP_UPDATED = '05/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -117,11 +117,13 @@
     }
     function porId(id) { return tv.jog.filter(function (j) { return j.id === id; })[0]; }
     /* bonecos escolhidos nos celulares → um por raia (1 celular e 2 pessoas: os dois do mesmo celular) */
+    /* quem joga sozinho num celular usa o boneco que está aberto em "Quem" (Boneco 1 ou 2); com 2 pessoas no mesmo celular, os dois em ordem */
+    function meuBoneco(chave) { var b = tv.bonecos[chave] || {}; return b[b.eu || 0] || null; }
     function aplicarBonecos() {
       var lista = [];
-      if (tv.local) { var b = tv.bonecos.local || {}; lista = tv.cfg.jogadores === 2 ? [b[0] || null, b[1] || null] : [b[0] || null]; }
+      if (tv.local) { var b = tv.bonecos.local || {}; lista = tv.cfg.jogadores === 2 ? [b[0] || null, b[1] || null] : [meuBoneco('local')]; }
       else if (tv.cfg.celulares === 1 && tv.cfg.jogadores === 2) { var b0 = tv.jog[0] ? (tv.bonecos[tv.jog[0].id] || {}) : {}; lista = [b0[0] || null, b0[1] || null]; }
-      else lista = tv.jog.slice(0, tv.cfg.jogadores).map(function (j) { return (tv.bonecos[j.id] || {})[0] || null; });
+      else lista = tv.jog.slice(0, tv.cfg.jogadores).map(function (j) { return meuBoneco(j.id); });
       Desenho.avatares(lista.map(function (b, i) { return b || Boneco.normalizar({}, i); }));
     }
     /* uma câmera, duas pessoas: o esqueleto de quem está na metade esquerda vira coordenadas da raia 1 (e vice-versa) */
@@ -163,11 +165,11 @@
       var L = $('lobbyJogadores'); while (L.firstChild) L.removeChild(L.firstChild);
       var cores = Desenho.CORES.j;
       // o boneco escolhido aparece em cima do nome (os dois, quando uma câmera filma duas pessoas)
-      function bonecoDe(chave, k) { return function () { return (tv.bonecos[chave] || {})[k] || Boneco.normalizar({}, k); }; }
-      function comBonecos(d, chave) { var w = document.createElement('div'); w.className = 'bonecos'; var n = tv.cfg.jogadores === 2 && (tv.local || tv.cfg.celulares === 1) ? 2 : 1; for (var k = 0; k < n; k++) { var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k)); } d.appendChild(w); }
-      function umBoneco(d, chave, k) { var w = document.createElement('div'); w.className = 'bonecos'; var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k)); d.appendChild(w); }
+      function bonecoDe(chave, k, sozinho) { return function () { return (sozinho ? meuBoneco(chave) : (tv.bonecos[chave] || {})[k]) || Boneco.normalizar({}, k); }; }
+      function comBonecos(d, chave) { var w = document.createElement('div'); w.className = 'bonecos'; var n = tv.cfg.jogadores === 2 && (tv.local || tv.cfg.celulares === 1) ? 2 : 1; for (var k = 0; k < n; k++) { var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, n === 1)); } d.appendChild(w); }
+      function umBoneco(d, chave, k) { var w = document.createElement('div'); w.className = 'bonecos'; var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, !(tv.local && tv.cfg.jogadores === 2))); d.appendChild(w); }
       var dois = tv.local && tv.cfg.jogadores === 2;
-      if (tv.local) for (var q = 0; q < (dois ? 2 : 1); q++) { var dq = document.createElement('div'); dq.className = 'jog'; dq.style.setProperty('--cor', cores[q]); umBoneco(dq, 'local', q); dq.classList.add('trocavel'); dq.title = T('Toque para trocar o boneco', 'Tap to change the avatar'); dq.onclick = (function (qq) { return function () { CelApp.trocarBoneco(qq); }; })(q); var nq = document.createElement('span'); if (q === 1) nq.id = 'lobbyNomeJ2'; nq.textContent = q === 0 ? (tv.nome1 || T('Você', 'You')) : (tv.nome2 || T('2ª pessoa', '2nd player')); dq.appendChild(nq); L.appendChild(dq); }
+      if (tv.local) for (var q = 0; q < (dois ? 2 : 1); q++) { var dq = document.createElement('div'); dq.className = 'jog'; dq.style.setProperty('--cor', cores[q]); umBoneco(dq, 'local', q); dq.classList.add('trocavel'); dq.title = T('Toque para trocar o boneco', 'Tap to change the avatar'); dq.onclick = (function (qq) { return function () { CelApp.trocarBoneco(dois ? qq : ((tv.bonecos.local || {}).eu || 0)); }; })(q); var nq = document.createElement('span'); if (q === 1) nq.id = 'lobbyNomeJ2'; nq.textContent = q === 0 ? (tv.nome1 || T('Você', 'You')) : (tv.nome2 || T('2ª pessoa', '2nd player')); dq.appendChild(nq); L.appendChild(dq); }
       $('lobbyNome2').style.display = dois ? '' : 'none';
       if (dois) { $('nome2').value = tv.nome2; if (!tv.nome2) setTimeout(function () { $('nome2').focus(); }, 300); }
       tv.jog.forEach(function (j, i) {
@@ -180,7 +182,7 @@
     }
     /* prévia viva do boneco no lobby: redesenha enquanto o canvas estiver na tela e o lobby aberto; nunca morre por erro */
     function animarBoneco(cv, cfg) {
-      var vivo = function (ts) { if (!document.body.contains(cv)) return; if (tv.fase === 'lobby') { try { Desenho.previa(cv, cfg(), ts); } catch (e) {} } requestAnimationFrame(vivo); };
+      var vivo = function (ts) { if (!document.body.contains(cv)) return; if (tv.fase === 'lobby') { var c = cfg(), id = c.cabeca + '|' + c.acessorio + '|' + c.cor; if (cv.getAttribute('data-cfg') !== id) cv.setAttribute('data-cfg', id); try { Desenho.previa(cv, c, ts); } catch (e) {} } requestAnimationFrame(vivo); };   // data-cfg: qual boneco está no cartão (para os testes)
       requestAnimationFrame(vivo);
     }
     function resumo() {
@@ -219,7 +221,7 @@
       if (m.acao === 'bpm') { if (tv.partida) tv.partida.batida(m.bpm); tv.bpm = m.bpm; return; }
       if (m.acao === 'som') { aplicarSom(m.semSom, m.semMusica); return; }
       if (m.acao === 'casa') { if (tv.partida && tv.partida.irPara && (tv.fase === 'jogando' || tv.fase === 'pausa')) { tv.partida.irPara(m.dir); navCasa(); } return; }   // 🧸 setinhas: cômodo vizinho
-      if (m.acao === 'boneco') { var chave = m.id || 'local'; (tv.bonecos[chave] = tv.bonecos[chave] || {})[m.j] = m.boneco; aplicarBonecos(); return; }
+      if (m.acao === 'boneco') { var chave = m.id || 'local', bb = tv.bonecos[chave] = tv.bonecos[chave] || {}; bb[m.j] = m.boneco; if (m.eu) bb.eu = m.j; aplicarBonecos(); return; }
       if (m.acao === 'musica') { tv.titulo = m.texto || ''; $('tvTitulo').style.display = tv.titulo ? 'block' : 'none'; $('tvTitulo').textContent = '🎵 ' + tv.titulo; return; }
       youtubeComando(m);
     }
@@ -628,9 +630,9 @@
     var CORES_SAPATO = ['#2b2250', '#ffffff', '#ff4fa3', '#ffd166', '#8d5524', '#3ee8ff'];
     cel.bonecos = PADRAO_BONECO.map(function (b) { return Object.assign({}, b); });
     try { var gb = JSON.parse(localStorage.getItem('bagunca:bonecos') || 'null'); if (Array.isArray(gb)) gb.forEach(function (b, i) { if (b && i < 2) Object.assign(cel.bonecos[i], b); }); } catch (e) {}
-    cel.quem = 0;
+    cel.quem = 0; try { cel.quem = localStorage.getItem('bagunca:quem') === '1' ? 1 : 0; } catch (e) {}
     function guardarBonecos() { try { localStorage.setItem('bagunca:bonecos', JSON.stringify(cel.bonecos)); } catch (e) {} }
-    function mandarBonecos() { comando({ acao: 'boneco', j: 0, boneco: cel.bonecos[0] }); comando({ acao: 'boneco', j: 1, boneco: cel.bonecos[1] }); }
+    function mandarBonecos() { comando({ acao: 'boneco', j: 0, boneco: cel.bonecos[0], eu: cel.quem === 0 }); comando({ acao: 'boneco', j: 1, boneco: cel.bonecos[1], eu: cel.quem === 1 }); }   // eu: o que joga quando é 1 pessoa
     var NOMES_CABECA = { menino: ['Menino', 'Boy'], menina: ['Menina', 'Girl'], pano: ['Boneco de pano', 'Rag doll'], elfo: ['Elfo', 'Elf'], hobbit: ['Pequenino', 'Halfling'], mago: ['Mago', 'Wizard'], cavaleiro: ['Cavaleiro', 'Knight'], robo: ['Robô', 'Robot'] };
     var NOMES_CABELO = { curto: ['Curto', 'Short'], espetado: ['Espetado', 'Spiky'], franja: ['Franja', 'Fringe'], longo: ['Longo', 'Long'], cacheado: ['Cacheado', 'Curly'], trancas: ['Tranças', 'Braids'], coque: ['Coque', 'Bun'], maria: ['Maria-chiquinha', 'Pigtails'], careca: ['Sem cabelo', 'No hair'] };
     function montarPicker(container) {
@@ -642,7 +644,8 @@
         return g;
       }
       var prev = document.createElement('div'); prev.className = 'previa'; var cv = document.createElement('canvas'); cv.width = 300; cv.height = 400; prev.appendChild(cv); container.appendChild(prev);
-      var quem = linha(T('Quem', 'Who')); grupo(quem, [{ v: 0, t: T('👤 1ª pessoa', '👤 1st player') }, { v: 1, t: T('👥 2ª pessoa (quando jogam 2)', '👥 2nd player (when 2 play)') }], function () { return cel.quem; }, function (v) { cel.quem = v; montarPicker(container); }, 'grupo quem');
+      var quem = linha(T('Quem', 'Who')); grupo(quem, [{ v: 0, t: T('Boneco 1', 'Avatar 1') }, { v: 1, t: T('Boneco 2', 'Avatar 2') }], function () { return cel.quem; }, function (v) { cel.quem = v; try { localStorage.setItem('bagunca:quem', String(v)); } catch (e) {} mandarBonecos(); montarPicker(container); }, 'grupo quem');
+      var expl = document.createElement('small'); expl.className = 'quemDica'; expl.textContent = T('Jogando sozinho, joga o boneco aberto aqui. Com 2 pessoas: Boneco 1 é a 1ª pessoa e Boneco 2 é a 2ª.', 'Playing alone, the avatar open here plays. With 2 players: Avatar 1 is the 1st player and Avatar 2 the 2nd.'); quem.appendChild(expl);
       var atual = function () { return cel.bonecos[cel.quem]; };
       function muda(k, v) {
         atual()[k] = v;
@@ -759,7 +762,7 @@
     desenharHist();
     /* tocar no cartão do lobby (sem TV): volta para "Meu boneco" já aberto na pessoa certa */
     function trocarBoneco(q) {
-      history.back(); cel.quem = q;
+      history.back(); cel.quem = q; try { localStorage.setItem('bagunca:quem', String(q)); } catch (e) {}
       setTimeout(function () { var d = $('bonecoEntrar'); d.open = true; montarPicker(d.querySelector('.picker')); d.scrollIntoView({ block: 'start' }); }, 250);
     }
     return { entrar: entrar, sair: sair, trocarCameraLocal: trocarCameraLocal, cel: cel, trocarBoneco: trocarBoneco };

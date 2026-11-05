@@ -404,5 +404,5 @@
     ctx.restore();
   }
 
-  root.Desenho = { iniciar: iniciar, quadro: quadro, legenda: legenda, contagem: contagem, confete: confete, podio: podio, nomes: nomes, texto: texto, ambiente: ambiente, avatares: avatares, previa: previa, previaCabeca: previaCabeca, imagem: imagem, pulso: pulso, mostrarBoneco: mostrarBoneco, dedo: function (v) { D.dedo = !!v; }, iconesDireita: function (v) { D.icones = !!v; }, leve: leve, estaLeve: function () { return D.leve; }, erros: function () { return D.erros; }, ehTV: ehTV, limpar: limpar, CORES: CORES, W: W, H: H };
+  root.Desenho = { iniciar: iniciar, quadro: quadro, legenda: legenda, contagem: contagem, confete: confete, podio: podio, nomes: nomes, texto: texto, ambiente: ambiente, avatares: avatares, avatar: function (j) { return avatarCfg(j); }, previa: previa, previaCabeca: previaCabeca, imagem: imagem, pulso: pulso, mostrarBoneco: mostrarBoneco, dedo: function (v) { D.dedo = !!v; }, iconesDireita: function (v) { D.icones = !!v; }, leve: leve, estaLeve: function () { return D.leve; }, erros: function () { return D.erros; }, ehTV: ehTV, limpar: limpar, CORES: CORES, W: W, H: H };
 })(typeof self !== 'undefined' ? self : this);

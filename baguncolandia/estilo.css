@@ -82,6 +82,7 @@ footer { text-align: center; color: var(--muted); font-size: .75rem; padding: 1.
 .picker .cores button { width: 36px; height: 36px; min-height: 36px; padding: 0; border-radius: 50%; border: 3px solid transparent; }
 .picker .cores button.ativo { border-color: #fff; box-shadow: 0 0 0 2px var(--lima); }
 .picker .quem { display: flex; gap: .4rem; }
+.picker .quemDica { display: block; flex-basis: 100%; font-size: .8rem; color: #d8d2f0; margin-top: .3rem; }
 .bloco { border-top: 1px solid var(--border); padding-top: .8rem; display: flex; flex-direction: column; gap: .6rem; }
 .nivel { position: relative; height: 14px; background: rgba(0,0,0,.4); border-radius: 7px; overflow: hidden; }
 .nivel i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--lima), var(--ciano)); transition: width .05s; }
