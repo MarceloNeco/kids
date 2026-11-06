@@ -79,5 +79,24 @@
     return P;
   };
 
+  // Progresso guardado antes da v0.3.0: as rodadas do Difícil antigo foram para o Médio. O código da rodada vem do
+  // conteúdo, então "dificil-xyz" vira "medio-xyz"; as estrelas ganhas nelas vão junto para o Médio, e o Difícil
+  // novo começa do zero. Roda uma vez só (marca prog.v = 3). Devolve true quando rodou (para gravar).
+  J.migrar = function (prog, R) {
+    if (!prog || prog.v >= 3) return false;
+    var d = prog.dificil, m = prog.medio;
+    if (d && m) {
+      var medio = (R.medio || []).map(function (c) { return J.rodada(c, 'medio').id; });
+      (d.feitas || []).forEach(function (id) {
+        var novo = String(id).replace(/^dificil-/, 'medio-');
+        if (medio.indexOf(novo) >= 0 && m.feitas.indexOf(novo) < 0) m.feitas.push(novo);
+      });
+      m.estrelas += d.estrelas || 0; m.rodadas += d.rodadas || 0;
+      prog.dificil = { feitas: [], estrelas: 0, rodadas: 0 };
+    }
+    prog.v = 3;
+    return true;
+  };
+
   if (typeof module !== 'undefined' && module.exports) module.exports = J; else raiz.Enigmas = J;
 })(typeof self !== 'undefined' ? self : this);

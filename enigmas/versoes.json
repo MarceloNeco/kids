@@ -2,6 +2,23 @@
   "app": "enigmas",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "06/Nov/2026",
+      "hora": "21:11:17",
+      "pt": [
+        "🦉 Difícil novo, de verdade: 54 enigmas com 4 pares cada, para 10 anos ou mais (e para adulto se divertir): tabuada, divisão, frações, porcentagem, probleminhas, sequências, números romanos, horas e troco; planetas, corpo humano, plantas, bichos, ímãs e eletricidade, inventores; coletivos, sinônimos, opostos e expressões como \"chover canivete\"; \"complete a dupla\" e adivinhas.",
+        "🦊 Os enigmas do Difícil antigo foram para o Médio, que agora tem 66 (de 5 a 7 pares). Quem já tinha feito alguns não perde nada: eles e as estrelas ganhas neles passam para o Médio.",
+        "〰️ Os riscos de giz agora são curvas finas que saem de cada carta para o lado, cada par com a sua cor e o seu caminho. Onde dois se cruzam, dá para ver qual passa por cima. Mesmo com tudo ligado, dá para seguir cada risco com o olho.",
+        "🍃 Os riscos balançam bem devagarinho, como giz vivo (não balançam se o aparelho estiver com \"reduzir movimento\" ligado). O risco que acompanha o dedo também é curvo."
+      ],
+      "en": [
+        "🦉 A brand-new, truly Hard level: 54 puzzles with 4 pairs each, for ages 10 and up (and fun for grown-ups): times tables, division, fractions, percent, word problems, number patterns, Roman numerals, time and change; planets, the human body, plants, animals, magnets and electricity, inventors; group names, synonyms, opposites and sayings like \"raining cats and dogs\"; \"complete the pair\" and riddles.",
+        "🦊 The old Hard puzzles moved to Medium, which now has 66 (5 to 7 pairs). If you had already solved some, nothing is lost: they and the stars you earned move to Medium.",
+        "〰️ Chalk lines are now thin curves that leave each card sideways, each pair with its own color and its own path. Where two cross, you can see which one goes on top. Even with everything linked, you can follow every line with your eyes.",
+        "🍃 The lines sway very slowly, like living chalk (they stay still if your device has \"reduce motion\" on). The line that follows your finger is curved too."
+      ]
+    },
+    {
       "versao": "0.2.0",
       "data": "06/Nov/2026",
       "hora": "16:25:00",

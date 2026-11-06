@@ -184,8 +184,7 @@ test('celular em pé: arrastando o dedo no Médio e no Difícil', async () => {
   await pg.waitForFunction(() => EnigmasDebug.estado().tela === 'inicio' && !EnigmasDebug.estado().festa);
 
   await pg.click('#btDificil');
-  const n = (await est(pg)).n;
-  assert.ok(n === 6 || n === 7, 'Difícil tem 6 ou 7 pares');
+  assert.equal((await est(pg)).n, 4, 'Difícil tem 4 pares');
   await conferirLayout(pg, 'celular Difícil');
   await pg.screenshot({ path: FOTOS + 'enigmas-celular-dificil.png' });
   await porDedo(pg);
@@ -259,7 +258,7 @@ test('Voltar do celular: com a festa aberta vai ao próximo enigma; na lousa vol
   await pg.waitForFunction(id => { const e = EnigmasDebug.estado(); return !e.festa && e.tela === 'jogo' && e.id !== id; }, id1);
   await pg.goBack();
   await pg.waitForFunction(() => EnigmasDebug.estado().tela === 'inicio');
-  assert.match(await pg.textContent('#progMedio'), /⭐ 3 · 1\/33/);
+  assert.match(await pg.textContent('#progMedio'), /⭐ 3 · 1\/66/);
   assert.deepEqual(await pg.erros(), []);
   await pg.fechar();
 });
@@ -349,6 +348,80 @@ test('🔤 só desenhos: esconde as palavras, tocar mostra o balão com a palavr
   assert.equal(await pg.evaluate(() => Array.from(document.querySelectorAll('.carta:not(.texto) .pal')).filter(p => p.offsetParent).length), 0);
   await porToque(pg);
   await conferirRodadaCompleta(pg, 'Fácil só com desenhos');
+  assert.deepEqual(await pg.erros(), []);
+  await pg.fechar();
+});
+
+// v0.3.0 (achado do dono no celular, 412×915: "com quase tudo ligado vira uma bagunça"): cada risco é uma curva
+// (bezier cúbica, comando C) que sai da carta na horizontal, fina, com um contorno escuro embaixo (halo) para ver quem
+// passa por cima nos cruzamentos; fica no vão entre as colunas (não cobre as palavras); balança bem devagar, e com
+// "reduzir movimento" fica parado. O risco que acompanha o dedo também é curva.
+test('riscos de giz: curvas com halo, no vão entre as colunas, balançam devagar e param com "reduzir movimento"', async () => {
+  for (const calmo of [false, true]) {
+    const pg = await abrir({ viewport: { width: 412, height: 915 }, reducedMotion: calmo ? 'reduce' : 'no-preference' });
+    await pg.click('#btMedio');
+    const id = await pg.evaluate(() => EnigmasDebug.ids('medio').find(i => { EnigmasDebug.abrir('medio', i); return EnigmasDebug.estado().n === 7; }));
+    await pg.evaluate(id => EnigmasDebug.abrir('medio', id), id);
+
+    // arrastando: o risco solto já é curva
+    const cs = await cartas(pg), a = cs.find(c => c.lado === 'e');
+    await pg.mouse.move(a.x, a.y); await pg.mouse.down();
+    await pg.mouse.move(a.x + 60, a.y + 120, { steps: 5 });
+    const solto = await pg.getAttribute('#giz .risco.solto .traco', 'd');
+    assert.match(solto, /^M[\d.\s-]+C[\d.\s-]+$/, 'risco do arraste é curva: ' + solto);
+    await pg.mouse.move(a.x + 60, 5, { steps: 3 }); await pg.mouse.up();   // solta fora das cartas: apaga
+    await pg.waitForTimeout(500);
+
+    await porToque(pg);
+    await esperarFesta(pg);
+    await pg.waitForTimeout(600);
+    const medir = () => pg.evaluate(() => {
+      const svg = document.getElementById('giz').getBoundingClientRect();
+      const gs = Array.from(document.querySelectorAll('#giz .risco.certo'));
+      return {
+        ds: gs.map(g => g.querySelector('.traco').getAttribute('d')),
+        partes: gs.map(g => Array.from(g.querySelectorAll('path')).map(p => p.getAttribute('class')).join(',')),
+        caixas: gs.map(g => { const b = g.querySelector('.traco').getBBox(); return { l: svg.left + b.x, r: svg.left + b.x + b.width }; }),
+        esq: document.getElementById('colEsq').getBoundingClientRect().right, dir: document.getElementById('colDir').getBoundingClientRect().left
+      };
+    });
+    const m1 = await medir();
+    assert.equal(m1.ds.length, 7, 'um risco por par');
+    for (const d of m1.ds) assert.match(d, /^M[\d.\s-]+C[\d.\s-]+$/, 'risco é curva: ' + d);
+    for (const p of m1.partes) assert.equal(p, 'halo,po,traco', 'halo embaixo do traço');
+    for (const c of m1.caixas) assert.ok(c.l >= m1.esq - 0.5 && c.r <= m1.dir + 0.5, 'risco invade as cartas: ' + JSON.stringify(c) + ' vão ' + m1.esq + '–' + m1.dir);
+    // cada par numa faixa diferente: o meio das curvas não cai todo no mesmo lugar
+    const meios = m1.ds.map(d => { const v = d.match(/-?[\d.]+/g).map(Number); return 0.125 * v[0] + 0.375 * v[2] + 0.375 * v[4] + 0.125 * v[6]; });
+    assert.ok(Math.max(...meios) - Math.min(...meios) > 15, 'curvas todas no mesmo lugar: ' + meios.join(' '));
+    if (!calmo) await pg.screenshot({ path: FOTOS + 'enigmas-riscos.png' });
+    await pg.waitForTimeout(800);
+    const m2 = await medir();
+    if (calmo) assert.deepEqual(m2.ds, m1.ds, 'com "reduzir movimento" os riscos ficam parados');
+    else {
+      assert.notDeepEqual(m2.ds, m1.ds, 'os riscos balançam');
+      // devagar e pouquinho: as pontas não saem do lugar e o resto mexe no máximo uns 3 px
+      for (let i = 0; i < 7; i++) {
+        const v1 = m1.ds[i].match(/-?[\d.]+/g).map(Number), v2 = m2.ds[i].match(/-?[\d.]+/g).map(Number);
+        for (const k of [0, 1, 6, 7]) assert.ok(Math.abs(v1[k] - v2[k]) < 0.11, 'a ponta do risco mexeu');
+        for (const k of [3, 5]) assert.ok(Math.abs(v1[k] - v2[k]) <= 5.1, 'balanço grande demais');
+      }
+    }
+    assert.deepEqual(await pg.erros(), []);
+    await pg.fechar();
+  }
+});
+
+test('quem jogou o Difícil antigo: as rodadas feitas e as estrelas aparecem no Médio; o Difícil novo começa do zero', async () => {
+  const pg = await abrir({}, () => {
+    localStorage.setItem('bolinho:enigmas:progresso', JSON.stringify({
+      facil: { feitas: [], estrelas: 0, rodadas: 0 }, medio: { feitas: ['medio-1q8ugsf'], estrelas: 3, rodadas: 1 },
+      dificil: { feitas: ['dificil-n2ejoc', 'dificil-1cxtgc2'], estrelas: 5, rodadas: 2 } }));
+  });
+  assert.match(await pg.textContent('#progMedio'), /⭐ 8 · 3\/66/);
+  assert.match(await pg.textContent('#progDificil'), /⭐ 0 · 0\/\d+/);
+  const p = await pg.evaluate(() => JSON.parse(localStorage.getItem('bolinho:enigmas:progresso')));
+  assert.equal(p.v, 3, 'gravou que já levou o progresso');
+  assert.deepEqual(p.medio.feitas, ['medio-1q8ugsf', 'medio-n2ejoc', 'medio-1cxtgc2']);
   assert.deepEqual(await pg.erros(), []);
   await pg.fechar();
 });

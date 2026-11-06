@@ -73,7 +73,7 @@ a { color: var(--azul); }
 .contador { font-size: .9rem; color: var(--giz2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .estrelas-topo { font-weight: 700; font-size: 1.15rem; white-space: nowrap; padding-right: .2rem; }
 .pista { text-align: center; font-size: clamp(1.1rem, 4.6vw, 1.8rem); font-weight: 600; color: var(--amarelo); line-height: 1.15; }
-.lousa { position: relative; flex: 1; min-height: 0; width: 100%; max-width: 64rem; align-self: center; display: grid; grid-template-columns: minmax(0, 1fr) minmax(2.6rem, 14vw) minmax(0, 1fr);
+.lousa { position: relative; flex: 1; min-height: 0; width: 100%; max-width: 64rem; align-self: center; display: grid; grid-template-columns: minmax(0, 1fr) minmax(2.6rem, 20vw) minmax(0, 1fr);
   padding: .6rem; border: .6rem solid var(--madeira); border-radius: 1rem; touch-action: none; user-select: none; -webkit-user-select: none;
   background:
     radial-gradient(ellipse 40% 30% at 30% 30%, rgba(255, 255, 255, .07), transparent 70%),
@@ -110,13 +110,15 @@ a { color: var(--azul); }
 @keyframes pulo { 0% { transform: scale(1); } 45% { transform: scale(1.07); } 100% { transform: scale(1); } }
 @keyframes brilha { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 230, 128, 0); } 25%, 75% { box-shadow: 0 0 0 6px rgba(255, 230, 128, .8); background: rgba(255, 230, 128, .25); } }
 
-/* risco de giz: um traço com textura (filtro do SVG) e um "pó" largo e clarinho embaixo */
+/* risco de giz: uma curva fina com textura (filtro do SVG), um "pó" clarinho em volta e, embaixo de tudo, um contorno
+   escuro da cor da lousa (halo): onde duas curvas se cruzam, a de cima abre um vãozinho na de baixo (v0.3.0) */
 .giz { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
 .risco path { fill: none; stroke: var(--giz); stroke-linecap: round; stroke-linejoin: round; }
-.risco .po { stroke-width: 15; opacity: .2; }
-.risco .traco { stroke-width: 8; filter: url(#texturaGiz); }
+.risco .halo { stroke: #1f3f2a; stroke-width: 11; stroke-linecap: butt; opacity: .92; }
+.risco .po { stroke-width: 8; opacity: .16; }
+.risco .traco { stroke-width: 4.5; filter: url(#texturaGiz); }
 .risco.solto .traco { opacity: .9; }
-.risco.errado path { stroke: #ffb3b8 !important; }
+.risco.errado path:not(.halo) { stroke: #ffb3b8 !important; }
 .risco.apagando { opacity: 0; transition: opacity .55s ease-in; }
 .risco.desenhando path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: desenha .45s ease-out forwards; }
 @keyframes desenha { to { stroke-dashoffset: 0; } }

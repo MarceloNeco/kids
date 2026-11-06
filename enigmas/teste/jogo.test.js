@@ -79,7 +79,31 @@ test('a próxima rodada sai entre as primeiras que faltam (a dificuldade sobe ao
 });
 
 test('rimas só aparecem na língua delas', () => {
-  const pt = J.lista(R, 'dificil', 'pt'), en = J.lista(R, 'dificil', 'en');
+  const pt = J.lista(R, 'medio', 'pt'), en = J.lista(R, 'medio', 'en');
   assert.ok(pt.every(r => r.so !== 'en')); assert.ok(en.every(r => r.so !== 'pt'));
   assert.ok(pt.some(r => r.so === 'pt')); assert.ok(en.some(r => r.so === 'en'));
+});
+
+test('progresso de antes da v0.3.0: o Difícil antigo vai para o Médio com as estrelas; roda uma vez só', () => {
+  const medio = J.lista(R, 'medio', 'pt').map(r => r.id);
+  const antigoMedio = medio[0], vieram = medio.filter(id => /^medio-(n2ejoc|1cxtgc2)$/.test(id));
+  assert.equal(vieram.length, 2, 'rodadas do Difícil antigo estão no Médio');
+  const prog = {
+    facil: { feitas: ['facil-x'], estrelas: 5, rodadas: 2 },
+    medio: { feitas: [antigoMedio], estrelas: 3, rodadas: 1 },
+    dificil: { feitas: ['dificil-n2ejoc', 'dificil-1cxtgc2', 'dificil-naoexiste'], estrelas: 7, rodadas: 3 }
+  };
+  assert.equal(J.migrar(prog, R), true);
+  assert.deepEqual(prog.medio.feitas, [antigoMedio, 'medio-n2ejoc', 'medio-1cxtgc2']);
+  assert.equal(prog.medio.estrelas, 10); assert.equal(prog.medio.rodadas, 4);
+  assert.deepEqual(prog.dificil, { feitas: [], estrelas: 0, rodadas: 0 }, 'o Difícil novo começa do zero');
+  assert.deepEqual(prog.facil, { feitas: ['facil-x'], estrelas: 5, rodadas: 2 }, 'o Fácil não muda');
+  assert.equal(prog.v, 3);
+  // de novo: não mexe (senão as estrelas do Difícil novo iriam para o Médio a cada vez que abre)
+  prog.dificil = { feitas: ['dificil-abc'], estrelas: 3, rodadas: 1 };
+  assert.equal(J.migrar(prog, R), false);
+  assert.equal(prog.medio.estrelas, 10); assert.equal(prog.dificil.estrelas, 3);
+  // aparelho novo: só marca a versão
+  const novo = { facil: { feitas: [], estrelas: 0, rodadas: 0 }, medio: { feitas: [], estrelas: 0, rodadas: 0 }, dificil: { feitas: [], estrelas: 0, rodadas: 0 } };
+  J.migrar(novo, R); assert.equal(novo.v, 3); assert.equal(novo.medio.estrelas, 0);
 });
