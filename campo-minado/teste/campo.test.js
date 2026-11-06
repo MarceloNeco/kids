@@ -11,9 +11,9 @@ function montar(linhas, colunas, minas) {
   return e;
 }
 
-test('três níveis: Fácil, Médio e Difícil, com tamanho e ouriços certos', () => {
+test('três níveis: Fácil, Médio e Difícil, com tamanho, ouriços e densidade certos', () => {
   assert.deepEqual(CM.ORDEM, ['facil', 'medio', 'dificil']);
-  const esperado = { facil: [8, 8, 8], medio: [10, 14, 22], dificil: [12, 20, 45] };
+  const esperado = { facil: [8, 8, 10], medio: [10, 14, 25], dificil: [12, 20, 50] };
   for (const n of CM.ORDEM) {
     const [curto, longo, minas] = esperado[n];
     const emPe = CM.doNivel(n, false), deitado = CM.doNivel(n, true);
@@ -22,13 +22,21 @@ test('três níveis: Fácil, Médio e Difícil, com tamanho e ouriços certos', 
     assert.equal(emPe.cel.length, curto * longo); assert.equal(emPe.minas, minas);
     assert.ok(minas <= curto * longo - 9, 'sobra lugar para o primeiro toque seguro');
   }
-  // cada nível é mais difícil que o anterior (mais ouriços e mais casas)
+  // cada nível é mais difícil que o anterior (mais ouriços, mais casas e mais ouriço por casa)
   assert.ok(CM.NIVEIS.facil.minas < CM.NIVEIS.medio.minas && CM.NIVEIS.medio.minas < CM.NIVEIS.dificil.minas);
+  const dens = n => CM.NIVEIS[n].minas / (CM.NIVEIS[n].curto * CM.NIVEIS[n].longo);
+  assert.ok(dens('facil') >= 0.15 && dens('facil') <= 0.17, 'Fácil ~16%: ' + dens('facil'));
+  assert.ok(dens('medio') >= 0.17 && dens('medio') <= 0.19, 'Médio ~18% (perto do clássico): ' + dens('medio'));
+  assert.ok(dens('dificil') >= 0.20 && dens('dificil') <= 0.22, 'Difícil ~21% (como o Expert clássico): ' + dens('dificil'));
+  assert.ok(dens('facil') < dens('medio') && dens('medio') < dens('dificil'));
+  // só o Fácil guarda as oito casas em volta do primeiro toque
+  assert.deepEqual(CM.ORDEM.map(n => CM.doNivel(n, false).emVolta), [true, false, false]);
   assert.throws(() => CM.doNivel('impossivel'));
 });
 
-test('primeiro toque nunca acorda ouriço e sempre abre um pedaço (todos os níveis, cantos e meio)', () => {
-  for (const n of CM.ORDEM) for (const deitado of [false, true]) for (let s = 1; s <= 40; s++) {
+test('primeiro toque nunca acorda ouriço: no Fácil livra as 3 × 3 casas, no Médio e no Difícil só a casa tocada', () => {
+  const vizinhaComOurico = { medio: 0, dificil: 0 };
+  for (const n of CM.ORDEM) for (const deitado of [false, true]) for (let s = 1; s <= 200; s++) {
     const e = CM.doNivel(n, deitado), rng = CM.semente(s * 7919);
     const lugares = [0, e.colunas - 1, e.cel.length - 1, e.cel.length - e.colunas, Math.floor(e.cel.length / 2) + Math.floor(e.colunas / 2)];
     const i = lugares[s % lugares.length];
@@ -36,11 +44,40 @@ test('primeiro toque nunca acorda ouriço e sempre abre um pedaço (todos os ní
     assert.equal(r.explodiu, false);
     assert.equal(e.cel.filter(c => c.mina).length, e.minas, 'número certo de ouriços');
     assert.equal(e.cel[i].mina, false);
-    for (const v of CM.vizinhos(e, i)) assert.equal(e.cel[v].mina, false, 'vizinha do primeiro toque sem ouriço');
-    assert.equal(e.cel[i].n, 0, 'o primeiro toque cai numa casa sem número');
-    assert.ok(r.abertas.length >= CM.vizinhos(e, i).length + 1, 'abriu um pedaço');
     assert.equal(e.abertas, r.abertas.length);
+    if (n === 'facil') {
+      for (const v of CM.vizinhos(e, i)) assert.equal(e.cel[v].mina, false, 'Fácil: vizinha do primeiro toque sem ouriço');
+      assert.equal(e.cel[i].n, 0, 'Fácil: o primeiro toque cai numa casa sem número');
+      assert.ok(r.abertas.length >= CM.vizinhos(e, i).length + 1, 'Fácil: abriu um pedacinho');
+    } else if (CM.vizinhos(e, i).some(v => e.cel[v].mina)) vizinhaComOurico[n]++;
   }
+  // regra clássica: no Médio e no Difícil as vizinhas podem ter ouriço (e muitas vezes têm)
+  assert.ok(vizinhaComOurico.medio > 100, 'Médio: vizinhas com ouriço em ' + vizinhaComOurico.medio + ' de 400');
+  assert.ok(vizinhaComOurico.dificil > 100, 'Difícil: vizinhas com ouriço em ' + vizinhaComOurico.dificil + ' de 400');
+});
+
+// quanto do jardim o primeiro toque abre, em média, tocando num lugar qualquer (300 sementes por nível e posição)
+function mediaPrimeiroToque(n) {
+  let soma = 0, soUma = 0, N = 0;
+  for (const deitado of [false, true]) for (let s = 1; s <= 300; s++) {
+    const e = CM.doNivel(n, deitado), rng = CM.semente(s * 2654435761 + (deitado ? 1 : 0));
+    const i = Math.floor(rng() * e.cel.length);
+    const r = CM.abrir(e, i, rng);
+    soma += r.abertas.length / e.cel.length; if (r.abertas.length === 1) soUma++; N++;
+  }
+  return { media: soma / N, soUma: soUma / N };
+}
+test('primeiro toque no Médio e no Difícil abre em média no máximo 25% do jardim (600 jogos cada)', () => {
+  const linhas = [];
+  for (const n of CM.ORDEM) {
+    const m = mediaPrimeiroToque(n);
+    linhas.push(n + ': abre em média ' + (m.media * 100).toFixed(1) + '% · só a casa tocada em ' + (m.soUma * 100).toFixed(0) + '%');
+    if (n !== 'facil') {
+      assert.ok(m.media <= 0.25, n + ' abre demais: ' + m.media);
+      assert.ok(m.soUma >= 0.5, n + ': o primeiro toque muitas vezes mostra só um número');
+    } else assert.ok(m.media < 0.5, 'Fácil abre um pedacinho, não o jardim todo: ' + m.media);
+  }
+  console.log('# ' + linhas.join('\n# '));
 });
 
 test('tabuleiro pequeno demais: guarda pelo menos a casa tocada', () => {
@@ -147,6 +184,69 @@ test('acorde: número com as bandeirinhas certas abre as vizinhas; errado acorda
   CM.abrir(e2, 4); CM.bandeira(e2, 2);
   const r2 = CM.acorde(e2, 4);
   assert.equal(r2.explodiu, true); assert.equal(e2.fim, 'perdeu'); assert.equal(e2.cel[2].errada, true);
+});
+
+// monta um tabuleiro a partir de um desenho (M = ouriço) e abre as casas da lista
+function quadro(linhas, abertas) {
+  const C = linhas[0].length, minas = [];
+  linhas.forEach((l, r) => [...l].forEach((ch, c) => { if (ch === 'M') minas.push(r * C + c); }));
+  const e = montar(linhas.length, C, minas);
+  abertas.forEach(i => { assert.equal(e.cel[i].mina, false); e.cel[i].aberta = true; e.abertas++; });
+  return e;
+}
+test('dica: deduzir acha as gramas seguras e os ouriços só pelos números (regras de um número só)', () => {
+  // índices 3 × 3:   0 1 2 / 3 4 5 / 6 7 8      ouriço no 0; abertas 1, 3, 4, 6, 7, 8; fechadas 0, 2, 5
+  // o 3 vale 1 e só tem o 0 fechado em volta → 0 é ouriço (regra 2);
+  // o 1 vale 1 e já tem esse ouriço → as outras gramas dele, 2 e 5, são seguras (regra 1)
+  const a = quadro(['M..', '...', '...'], [1, 3, 4, 6, 7, 8]);
+  assert.deepEqual([a.cel[1].n, a.cel[3].n, a.cel[4].n], [1, 1, 1]);
+  assert.deepEqual(CM.deduzir(a), { seguras: [2, 5], minas: [0] });
+
+  // só um ouriço fechado em volta de todo mundo: é ouriço e não sobra grama segura
+  const b = quadro(['M..', '...', '...'], [1, 2, 3, 4, 5, 6, 7, 8]);
+  assert.deepEqual(CM.deduzir(b), { seguras: [], minas: [0] });
+
+  // sem certeza, nada pisca: 3 × 4 com ouriço no 0, abertas só as linhas de baixo da esquerda
+  //   0 1 2 3 / 4 5 6 7 / 8 9 10 11  → o 4 vale 1 (fechadas 0, 1) e o 5 vale 1 (fechadas 0, 1, 2, 6): ninguém garante nada
+  const c = quadro(['M...', '....', '....'], [4, 5, 8, 9, 10, 11]);
+  assert.deepEqual([c.cel[4].n, c.cel[5].n], [1, 1]);
+  assert.deepEqual(CM.deduzir(c), { seguras: [], minas: [] });
+
+  // em cadeia: ouriços no 0 e no 1; abertas a linha do meio e a de baixo
+  //   o 4 vale 2 com só 0 e 1 fechados → os dois são ouriço; o 5 vale 2 → o 2 é seguro; o 6 vale 1 → o 3 é seguro
+  const d = quadro(['MM..', '....', '....'], [4, 5, 6, 7, 8, 9, 10, 11]);
+  assert.deepEqual([d.cel[4].n, d.cel[5].n, d.cel[6].n], [2, 2, 1]);
+  assert.deepEqual(CM.deduzir(d), { seguras: [2, 3], minas: [0, 1] });
+  // grama com bandeirinha não pisca
+  CM.bandeira(d, 3);
+  assert.deepEqual(CM.deduzir(d).seguras, [2]);
+  // bandeirinha errada da criança não engana a dica (as bandeirinhas não entram na conta)
+  CM.bandeira(d, 3); CM.bandeira(d, 2);
+  assert.deepEqual(CM.deduzir(d), { seguras: [3], minas: [0, 1] });
+
+  // antes do primeiro toque e depois do fim, não há dica
+  assert.deepEqual(CM.deduzir(CM.doNivel('facil', false)), { seguras: [], minas: [] });
+  const f = montar(3, 3, [8]); CM.abrir(f, 8);
+  assert.deepEqual(CM.deduzir(f), { seguras: [], minas: [] });
+});
+
+test('dica: em jogos de verdade, o que ela diz é sempre certo', () => {
+  let algumaVez = 0;
+  for (let s = 1; s <= 300; s++) {
+    const e = CM.doNivel('facil', false), rng = CM.semente(s);
+    CM.abrir(e, Math.floor(rng() * 64), rng);
+    // joga seguindo a dica até ela não ter mais nada a dizer
+    for (let passo = 0; passo < 64 && !e.fim; passo++) {
+      const d = CM.deduzir(e);
+      d.minas.forEach(i => assert.equal(e.cel[i].mina, true, 'semente ' + s + ': ouriço deduzido errado'));
+      d.seguras.forEach(i => assert.equal(e.cel[i].mina, false, 'semente ' + s + ': grama segura com ouriço'));
+      if (!d.seguras.length) break;
+      algumaVez++;
+      CM.abrir(e, d.seguras[0]);
+      assert.notEqual(e.fim, 'perdeu');
+    }
+  }
+  assert.ok(algumaVez > 300, 'a dica tem o que dizer na maioria dos jogos do Fácil: ' + algumaVez);
 });
 
 test('semente: mesma semente, mesmo jardim', () => {

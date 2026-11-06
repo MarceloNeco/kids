@@ -2,6 +2,23 @@
   "app": "campo-minado",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "06/Nov/2026",
+      "hora": "16:30:00",
+      "pt": [
+        "🦔 Mais desafio no Médio e no Difícil: agora só a grama que você toca primeiro é garantida sem ouriço, como no campo minado clássico do computador. Muitas vezes o primeiro toque mostra só um número, e você precisa pensar desde o começo.",
+        "🌱 Mais ouriços: Fácil 8 × 8 com 10, Médio 10 × 14 com 25 e Difícil 12 × 20 com 50. No Fácil o primeiro toque continua abrindo um pedacinho do jardim.",
+        "📱 O jardim inteiro cabe na tela ao começar, até o Difícil no celular em pé ou deitado, no tablet e no computador, sem ficar embaixo do tocador de música. A barra de cima ficou numa linha só, e o 🔍 chega perto (outro toque volta a mostrar tudo).",
+        "💡 Dica no Fácil: se a criança fica uns segundinhos parada, as gramas que com certeza não têm ouriço piscam devagar. Qualquer toque apaga. Com \"reduzir movimento\" ligado, elas só ficam acesas, sem piscar."
+      ],
+      "en": [
+        "🦔 More challenge on Medium and Hard: now only the first square you tap is guaranteed to have no hedgehog, like the classic computer Minesweeper. The first tap often shows just one number, so you have to think from the start.",
+        "🌱 More hedgehogs: Easy 8 × 8 with 10, Medium 10 × 14 with 25 and Hard 12 × 20 with 50. On Easy the first tap still opens a little piece of the garden.",
+        "📱 The whole garden fits on the screen at the start, even Hard on a phone held upright or sideways, on a tablet and on a computer, without hiding under the music player. The top bar now fits in one row, and 🔍 zooms in (tap again to see it all).",
+        "💡 Hint on Easy: if the child stops for a few seconds, the grass squares that surely have no hedgehog blink slowly. Any tap stops it. With \"reduce motion\" on, they just glow without blinking."
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "06/Nov/2026",
       "hora": "11:05:00",

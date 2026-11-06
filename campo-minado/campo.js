@@ -1,28 +1,30 @@
 /* Campo Minado — o motor do jogo (sem tela). Funciona no navegador (window.CampoMinado) e no Node (testes).
    O tabuleiro é uma lista de casas, da esquerda para a direita e de cima para baixo (índice = linha * colunas + coluna).
    Cada casa: { mina, n (quantos ouriços em volta), aberta, bandeira, errada (bandeira sem ouriço, no fim) }.
-   As minas (ouriços dorminhocos) só são plantadas no primeiro toque, longe dele: o primeiro toque nunca acorda um
-   ouriço e sempre abre um pedaço do jardim (a casa tocada e as oito em volta ficam livres). */
+   As minas (ouriços dorminhocos) só são plantadas no primeiro toque: o primeiro toque nunca acorda um ouriço.
+   No Fácil a casa tocada e as oito em volta ficam livres (abre um pedacinho); no Médio e no Difícil só a casa tocada
+   (regra do jogo clássico: muitas vezes o primeiro toque mostra só um número). */
 (function (raiz) {
   'use strict';
   var C = {};
 
   // curto x longo: o tabuleiro fica em pé no celular em pé e deitado na tela deitada (o app decide ao começar).
+  // emVolta: o primeiro toque também deixa livres as oito casas em volta (só no Fácil).
   C.NIVEIS = {
-    facil: { curto: 8, longo: 8, minas: 8 },
-    medio: { curto: 10, longo: 14, minas: 22 },
-    dificil: { curto: 12, longo: 20, minas: 45 }
+    facil: { curto: 8, longo: 8, minas: 10, emVolta: true },
+    medio: { curto: 10, longo: 14, minas: 25, emVolta: false },
+    dificil: { curto: 12, longo: 20, minas: 50, emVolta: false }
   };
   C.ORDEM = ['facil', 'medio', 'dificil'];
 
-  C.criar = function (linhas, colunas, minas) {
+  C.criar = function (linhas, colunas, minas, emVolta) {
     var cel = [];
     for (var i = 0; i < linhas * colunas; i++) cel.push({ mina: false, n: 0, aberta: false, bandeira: false, errada: false });
-    return { linhas: linhas, colunas: colunas, minas: minas, cel: cel, plantado: false, abertas: 0, bandeiras: 0, fim: null, explodiu: -1 };
+    return { linhas: linhas, colunas: colunas, minas: minas, emVolta: emVolta !== false, cel: cel, plantado: false, abertas: 0, bandeiras: 0, fim: null, explodiu: -1 };
   };
   C.doNivel = function (nome, deitado) {
     var n = C.NIVEIS[nome]; if (!n) throw new Error('nível desconhecido: ' + nome);
-    return deitado ? C.criar(n.curto, n.longo, n.minas) : C.criar(n.longo, n.curto, n.minas);
+    return deitado ? C.criar(n.curto, n.longo, n.minas, n.emVolta) : C.criar(n.longo, n.curto, n.minas, n.emVolta);
   };
 
   C.vizinhos = function (e, i) {
@@ -39,7 +41,7 @@
   C.plantar = function (e, inicio, rng) {
     rng = rng || Math.random;
     var livres = {}; livres[inicio] = true;
-    var viz = C.vizinhos(e, inicio);
+    var viz = e.emVolta ? C.vizinhos(e, inicio) : [];
     // num tabuleiro apertado demais, guarda só a casa tocada
     if (e.cel.length - 1 - viz.length >= e.minas) viz.forEach(function (v) { livres[v] = true; });
     var pode = [];
@@ -100,6 +102,38 @@
     return true;
   };
   C.restantes = function (e) { return e.minas - e.bandeiras; };
+
+  // Dica do Fácil: o que dá para descobrir só olhando os números abertos, com as duas regras simples de um número só
+  // (repetidas até não mudar mais):
+  //  - um número que já tem em volta todos os seus ouriços descobertos → as outras gramas dele são seguras;
+  //  - um número com exatamente tantas gramas fechadas quanto ele vale → todas elas são ouriço.
+  // As bandeirinhas da criança não entram na conta (podem estar erradas): só os números, que nunca mentem.
+  // Devolve { seguras: gramas fechadas sem bandeirinha que dá para abrir sem medo, minas: ouriços descobertos }.
+  C.deduzir = function (e) {
+    var seguro = {}, mina = {}, mudou = true;
+    if (!e.plantado || e.fim) return { seguras: [], minas: [] };
+    while (mudou) {
+      mudou = false;
+      for (var i = 0; i < e.cel.length; i++) {
+        var c = e.cel[i];
+        if (!c.aberta || !c.n) continue;
+        var achadas = 0, duvida = [];
+        C.vizinhos(e, i).forEach(function (v) {
+          if (e.cel[v].aberta || seguro[v]) return;
+          if (mina[v]) achadas++; else duvida.push(v);
+        });
+        if (!duvida.length) continue;
+        if (achadas === c.n) { duvida.forEach(function (v) { seguro[v] = true; }); mudou = true; }
+        else if (achadas + duvida.length === c.n) { duvida.forEach(function (v) { mina[v] = true; }); mudou = true; }
+      }
+    }
+    var r = { seguras: [], minas: [] };
+    for (var k = 0; k < e.cel.length; k++) {
+      if (seguro[k] && !e.cel[k].bandeira) r.seguras.push(k);
+      if (mina[k]) r.minas.push(k);
+    }
+    return r;
+  };
 
   function perder(e) {
     e.fim = 'perdeu';

@@ -1,9 +1,9 @@
 /* Campo Minado — a tela: níveis, tabuleiro, toques (abrir, bandeirinha, acorde), zoom, cronômetro, recordes,
-   sons, fim de jogo e instalar. O jogo em si (minas, números, enchente, vitória) é do motor campo.js.
+   dica do Fácil (gramas seguras piscam depois de uns segundos parado), sons, fim de jogo e instalar. O jogo em si (minas, números, enchente, vitória) é do motor campo.js.
    Guarda só neste aparelho (localStorage "campo-minado.pref"): idioma, sons e o melhor tempo de cada nível. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0';
+  var APP_VERSION = '0.2.0';
   var APP_DATA = '06/Nov/2026';
   var CM = window.CampoMinado;
   var $ = function (id) { return document.getElementById(id); };
@@ -78,7 +78,7 @@
     mostrar('jogo');
   }
   function voltarAoMenu() { if (dentro) { try { history.back(); } catch (e) { aoVoltar(); } } else aoVoltar(); }
-  function aoVoltar() { dentro = false; fecharFim(); pararRelogio(); limparFesta(); mostrar('menu'); mostrarRecordes(); setTimeout(function () { var b = $(nivelBotao()); if (b) b.focus(); }, 30); }
+  function aoVoltar() { dentro = false; fecharFim(); pararRelogio(); apagarDica(); limparFesta(); mostrar('menu'); mostrarRecordes(); setTimeout(function () { var b = $(nivelBotao()); if (b) b.focus(); }, 30); }
   window.addEventListener('popstate', function () { if (dentro) aoVoltar(); });
   function nivelBotao() { return { facil: 'btFacil', medio: 'btMedio', dificil: 'btDificil' }[nivel]; }
 
@@ -98,11 +98,11 @@
 
   // ---------- o jogo ----------
   var nivel = 'facil', est = null, casas = [], rng = TESTE ? CM.semente(42) : Math.random;
-  var modoBandeira = false, t0 = 0, seg = 0, cronometro = null, zoom = 1, base = 40;
+  var modoBandeira = false, t0 = 0, seg = 0, cronometro = null, zoom = 1, base = 40, vao = 2;
   var tab = $('tabuleiro'), area = $('area');
 
   function novoJogo() {
-    fecharFim(); limparFesta(); pararRelogio(); seg = 0; $('tempo').textContent = '0';
+    fecharFim(); limparFesta(); pararRelogio(); apagarDica(); seg = 0; $('tempo').textContent = '0';
     var r = area.getBoundingClientRect();
     est = CM.doNivel(nivel, r.width > r.height * 1.15);
     zoom = 1; modoBandeira = false; pintarModo();
@@ -160,7 +160,7 @@
     if (r.abertas.length) { r.abertas.forEach(desenhar); Som.abrir(r.abertas.length); }
     if (r.abertas.length > 1 && !CALMO) r.abertas.forEach(function (k, n) { var b = casas[k]; b.style.animationDelay = Math.min(n * 6, 400) + 'ms'; b.classList.add('brota'); });
     $('restam').textContent = String(CM.restantes(est));
-    if (est.fim) terminar();
+    if (est.fim) terminar(); else armarDica();
   }
   function tocarCasa(i) {
     if (!est || est.fim) return;
@@ -174,13 +174,18 @@
     if (!est || est.fim) return;
     var c = est.cel[i];
     if (c.aberta) { resultado(CM.acorde(est, i)); return; }
-    if (CM.bandeira(est, i)) { desenhar(i); Som.bandeira(c.bandeira); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { /* sem vibrar */ } $('restam').textContent = String(CM.restantes(est)); }
+    if (CM.bandeira(est, i)) { desenhar(i); Som.bandeira(c.bandeira); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { /* sem vibrar */ } $('restam').textContent = String(CM.restantes(est)); armarDica(); }
   }
 
   function pintarModo() {
     var b = $('btModo'); b.setAttribute('aria-pressed', String(modoBandeira));
     document.documentElement.classList.toggle('modo-bandeira', modoBandeira);
-    $('dicaModo').textContent = modoBandeira ? t('🚩 Modo bandeirinha: cada toque põe ou tira uma bandeirinha.', '🚩 Flag mode: each tap puts or removes a flag.') : (TOQUE ? t('👆 Toque para abrir · segure o dedo para pôr 🚩', '👆 Tap to open · hold your finger to place a 🚩') : t('🖱 Clique para abrir · botão direito põe 🚩', '🖱 Click to open · right-click places a 🚩'));
+    // texto inteiro e texto curto (celular estreito): o CSS mostra um dos dois, sempre numa linha só
+    var txt = modoBandeira ? [t('🚩 Modo bandeirinha: cada toque põe ou tira uma bandeirinha.', '🚩 Flag mode: each tap puts or removes a flag.'), t('🚩 Cada toque põe ou tira 🚩', '🚩 Each tap adds or removes 🚩')]
+      : TOQUE ? [t('👆 Toque para abrir · segure o dedo para pôr 🚩', '👆 Tap to open · hold your finger to place a 🚩'), t('👆 Toque abre · segure põe 🚩', '👆 Tap opens · hold for 🚩')]
+        : [t('🖱 Clique para abrir · botão direito põe 🚩', '🖱 Click to open · right-click places a 🚩'), t('🖱 Clique abre · botão direito põe 🚩', '🖱 Click opens · right-click for 🚩')];
+    var d = $('dicaModo'); d.textContent = '';
+    ['dica-longa', 'dica-curta'].forEach(function (cl, k) { var s = document.createElement('span'); s.className = cl; s.textContent = txt[k]; d.appendChild(s); });
   }
   $('btModo').addEventListener('click', function () { modoBandeira = !modoBandeira; pintarModo(); Som.bandeira(modoBandeira); });
 
@@ -224,28 +229,33 @@
   function meio(ts) { return { x: (ts[0].clientX + ts[1].clientX) / 2, y: (ts[0].clientY + ts[1].clientY) / 2 }; }
 
   // ---------- tamanho das casas e zoom ----------
+  // Ao começar, o jardim inteiro cabe na tela: a casa sai da largura E da altura que sobram para a área (a barra de
+  // cima, a dica e o espaço do tocador de música embaixo já ficaram de fora, no CSS). O 🔍 e os dois dedos aproximam.
   function ajustar() {
     if (!est) return;
     var r = area.getBoundingClientRect();
-    // sobra para o miolo (16), a moldura do jardim (12) e os vãos de 2 px entre as casas
-    base = Math.floor(Math.min((r.width - 28 - 2 * (est.colunas - 1)) / est.colunas, (r.height - 28 - 2 * (est.linhas - 1)) / est.linhas));
-    base = Math.max(26, Math.min(72, base));
+    // sobra para o miolo e a moldura do jardim (4 + 4 de cada lado) e os vãos entre as casas
+    function cabe(v) { return Math.floor(Math.min((r.width - 16 - v * (est.colunas - 1)) / est.colunas, (r.height - 16 - v * (est.linhas - 1)) / est.linhas)); }
+    vao = 2; base = cabe(vao);
+    if (base < 32) { vao = 1; base = cabe(vao); }   // casa pequena: vão de 1 px, sobra mais para a casa
+    base = Math.max(16, Math.min(72, base));
+    tab.style.setProperty('--vao', vao + 'px');
     aplicarZoom(zoom);
   }
   function aplicarZoom(z, centro) {
     var antes = base * zoom;
-    zoom = Math.max(0.7, Math.min(2.6, z));
-    var cel = Math.max(24, Math.round(base * zoom));
+    zoom = Math.max(1, Math.min(2.6, z));
+    var cel = Math.round(base * zoom);
     if (centro) {
       var r = area.getBoundingClientRect(), fx = centro.x - r.left, fy = centro.y - r.top, k = cel / antes;
       tab.style.setProperty('--cel', cel + 'px');
       area.scrollLeft = (area.scrollLeft + fx) * k - fx; area.scrollTop = (area.scrollTop + fy) * k - fy;
     } else tab.style.setProperty('--cel', cel + 'px');
-    $('btMais').disabled = zoom >= 2.6; $('btMenos').disabled = zoom <= 0.7;
+    $('btZoom').setAttribute('aria-pressed', String(zoom > 1.01));
   }
   function centroArea() { var r = area.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
-  $('btMais').addEventListener('click', function () { aplicarZoom(zoom * 1.25, centroArea()); });
-  $('btMenos').addEventListener('click', function () { aplicarZoom(zoom / 1.25, centroArea()); });
+  // 🔍: um toque chega perto, outro toque volta a mostrar o jardim todo
+  $('btZoom').addEventListener('click', function () { if (zoom > 1.01) aplicarZoom(1, centroArea()); else aplicarZoom(2, centroArea()); });
   // o jardim se ajusta sempre que o espaço muda (girar o aparelho, barra que quebra linha, abinha da tela inteira)
   var esperaAjuste = null;
   function pedirAjuste() { clearTimeout(esperaAjuste); esperaAjuste = setTimeout(ajustar, 120); }
@@ -267,9 +277,27 @@
     if (e.key === 'Escape' || e.key === 'GoBack' || e.keyCode === 461) { if (atual === 'jogo') { e.preventDefault(); voltarAoMenu(); } }
   });
 
+  // ---------- dica do Fácil: parado uns segundos, as gramas que com certeza não têm ouriço piscam ----------
+  // Só o que os números abertos garantem (CM.deduzir); se não dá para garantir nada, nada pisca. Qualquer toque apaga.
+  var ESPERA_DICA = 4000, esperaDica = null;
+  function apagarDica() {
+    clearTimeout(esperaDica); esperaDica = null;
+    Array.prototype.forEach.call(tab.querySelectorAll('.casa.dica'), function (b) { b.classList.remove('dica'); });
+  }
+  function armarDica() {
+    apagarDica();
+    if (nivel === 'facil' && est && est.plantado && !est.fim) esperaDica = setTimeout(mostrarDica, ESPERA_DICA);
+  }
+  function mostrarDica() {
+    esperaDica = null;
+    if (nivel !== 'facil' || !est || est.fim || atual !== 'jogo') return;
+    CM.deduzir(est).seguras.forEach(function (k) { casas[k].classList.add('dica'); });
+  }
+  ['pointerdown', 'keydown'].forEach(function (k) { document.addEventListener(k, armarDica, true); });
+
   // ---------- fim de jogo ----------
   function terminar() {
-    pararRelogio(); desenharTudo();
+    pararRelogio(); apagarDica(); desenharTudo();
     var ganhou = est.fim === 'ganhou', novoRec = false;
     $('btNovo').textContent = ganhou ? '😎' : '😵';
     if (ganhou) {
@@ -355,7 +383,7 @@
   // usado pelos testes
   window.CampoDebug = {
     estado: function () { return est; }, nivel: function () { return nivel; }, versao: APP_VERSION, MUSICAS: MUSICAS,
-    casa: function (i) { return casas[i]; }, tocar: tocarCasa, marcar: marcar, pronto: true
+    casa: function (i) { return casas[i]; }, tocar: tocarCasa, marcar: marcar, espera: ESPERA_DICA, pronto: true
   };
 })();
 
