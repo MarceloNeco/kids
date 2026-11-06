@@ -7,6 +7,7 @@
     id       nome curto, sem espaço (identifica o jogo)
     nome     nome que aparece no cartão
     ico      emoji do cartão          cor   cor de destaque do cartão
+    img      (opcional) imagem do cartão no lugar do emoji, ex.: '/kids/baguncolandia/icone.svg'
     url      endereço do jogo a partir da raiz do site (funciona em solverone.com.br e no endereço antigo)
     texto    descrição em português   en    descrição em inglês   tag   texto do botão do cartão
     instalar true = pode ser instalado e funciona sem internet (o service worker fica em url + 'sw.js')
@@ -18,7 +19,7 @@
 */
 (function () {
   var JOGOS = [
-    { id: 'baguncolandia', nome: 'Bagunçolândia', ico: '🍉', cor: '#c6ff3d', url: '/kids/baguncolandia/',
+    { id: 'baguncolandia', nome: 'Bagunçolândia', ico: '🐶', img: '/kids/baguncolandia/icone.svg', cor: '#c6ff3d', url: '/kids/baguncolandia/',
       texto: 'Frutas, doces e personagens voam na TV e você corta, pega, chuta, pula e abaixa com o corpo. 1 ou 2 pessoas, boneco personalizável, ou no dedo no celular.',
       en: 'Slice, catch, kick, jump and duck with your body on the TV. Or by finger on the phone.',
       tag: '▶ Brincar / Play', instalar: true,
@@ -76,10 +77,17 @@
     a.style.setProperty('--c', j.cor);
     a.href = j.url;
     a.setAttribute('data-jogo', j.id);
+    // interruptor do RootifyONE (Controle dos apps → Bolinho de Chuva): jogo desligado some da estante (recursos.js)
+    if (/^\/kids\//.test(j.url)) a.setAttribute('data-recurso', j.id);
     if (j.tv) a.setAttribute('data-tv', j.tv.param || '?tv=auto');
     if (j.instalar) { a.setAttribute('data-instalar', j.url); a.setAttribute('data-sw', window.BolinhoCatalogo.sw(j)); }
     else if (j.soOnline) a.setAttribute('data-so-online', '');
-    a.appendChild(el('div', 'ico', j.ico));
+    var ico = a.appendChild(el('div', 'ico', j.img ? null : j.ico));
+    if (j.img) {
+      var im = document.createElement('img');
+      im.src = j.img; im.alt = ''; im.style.cssText = 'display:block;width:1em;height:1em;border-radius:.22em';
+      ico.appendChild(im);
+    }
     a.appendChild(el('h2', null, j.nome));
     a.appendChild(el('p', null, j.texto));
     if (j.en) a.appendChild(el('p', 'en', j.en));

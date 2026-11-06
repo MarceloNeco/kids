@@ -2,6 +2,19 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.19",
+      "data": "06/Nov/2026",
+      "hora": "12:30:00",
+      "pt": [
+        "🐶 Ícone novo: no lugar da melancia, uma guerra de travesseiro com o cachorrinho — a cara da bagunça.",
+        "🧁 O jogo agora obedece o app \"Bolinho de Chuva\" no Controle dos apps do RootifyONE (um interruptor por jogo)."
+      ],
+      "en": [
+        "🐶 New icon: instead of the watermelon, a pillow fight with the puppy — mayhem at its best.",
+        "🧁 The game now follows the \"Rain Dumpling\" app in RootifyONE's app control (one switch per game)."
+      ]
+    },
+    {
       "versao": "0.8.18",
       "data": "05/Nov/2026",
       "hora": "10:00:00",

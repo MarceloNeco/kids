@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Bagunçolândia: travesseiro voando, penas soltas e um cachorro feliz pulando na bagunça.
+       Desenho original. O que importa fica dentro do círculo central (ícone "maskable"). -->
+  <defs>
+    <radialGradient id="fundo" cx="50%" cy="25%" r="85%"><stop offset="0" stop-color="#2d2275"/><stop offset="1" stop-color="#0b0a1f"/></radialGradient>
+    <linearGradient id="trav" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9fcd"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+    <radialGradient id="pelo" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffc36b"/><stop offset="1" stop-color="#e08a2c"/></radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#fundo)"/>
+  <circle cx="256" cy="256" r="196" fill="none" stroke="#c6ff3d" stroke-width="10" opacity=".9"/>
+
+  <!-- rastro do travesseiro -->
+  <g fill="none" stroke="#c6ff3d" stroke-width="13" stroke-linecap="round">
+    <path d="M92 214q26-12 52-8"/>
+    <path d="M86 262q30-10 60-4"/>
+    <path d="M100 308q24-8 46-2"/>
+  </g>
+
+  <!-- travesseiro -->
+  <g transform="translate(250 228) rotate(-16)">
+    <path d="M-104-74Q0-52 104-74Q88 0 104 74Q0 52-104 74Q-88 0-104-74Z" fill="url(#trav)" stroke="#fff" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M-80-50Q0-34 80-50Q68 0 80 50Q0 34-80 50Q-68 0-80-50Z" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="12 10" opacity=".75"/>
+    <circle cx="-38" cy="-12" r="9" fill="#fff" opacity=".85"/>
+    <circle cx="22" cy="-20" r="7" fill="#fff" opacity=".85"/>
+    <circle cx="44" cy="20" r="9" fill="#fff" opacity=".85"/>
+    <circle cx="-14" cy="24" r="7" fill="#fff" opacity=".85"/>
+  </g>
+
+  <!-- penas voando -->
+  <g fill="#fff" stroke="#c9c2f0" stroke-width="3">
+    <g transform="translate(372 120) rotate(35)"><path d="M2-38C20-26 18 12 4 32L-2 26L-4 32C-16 12-14-22 2-38Z"/><path d="M1-30Q-2 6 0 44" fill="none" stroke-linecap="round"/></g>
+    <g transform="translate(408 210) rotate(-25) scale(.8)"><path d="M2-38C20-26 18 12 4 32L-2 26L-4 32C-16 12-14-22 2-38Z"/><path d="M1-30Q-2 6 0 44" fill="none" stroke-linecap="round"/></g>
+    <g transform="translate(290 96) rotate(-50) scale(.75)"><path d="M2-38C20-26 18 12 4 32L-2 26L-4 32C-16 12-14-22 2-38Z"/><path d="M1-30Q-2 6 0 44" fill="none" stroke-linecap="round"/></g>
+    <g transform="translate(156 128) rotate(20) scale(.7)"><path d="M2-38C20-26 18 12 4 32L-2 26L-4 32C-16 12-14-22 2-38Z"/><path d="M1-30Q-2 6 0 44" fill="none" stroke-linecap="round"/></g>
+  </g>
+
+  <!-- cachorro pulando -->
+  <g transform="translate(330 352) rotate(-10)">
+    <!-- orelhas -->
+    <path d="M-62-38C-96-40-104 10-86 40C-74 58-56 46-54 22Z" fill="#8a4b1f" transform="rotate(-14)"/>
+    <path d="M48-46C70-92 118-84 110-48C104-26 80-24 62-24Z" fill="#8a4b1f"/>
+    <!-- cabeça -->
+    <ellipse cx="0" cy="0" rx="70" ry="62" fill="url(#pelo)" stroke="#fff" stroke-width="6"/>
+    <!-- mancha no olho -->
+    <ellipse cx="-26" cy="-14" rx="22" ry="20" fill="#8a4b1f" opacity=".55"/>
+    <!-- olhos -->
+    <circle cx="-26" cy="-14" r="10" fill="#1a1446"/><circle cx="-23" cy="-18" r="3.5" fill="#fff"/>
+    <circle cx="26" cy="-14" r="10" fill="#1a1446"/><circle cx="29" cy="-18" r="3.5" fill="#fff"/>
+    <!-- focinho -->
+    <ellipse cx="0" cy="22" rx="38" ry="28" fill="#fff3df"/>
+    <path d="M-13 8h26q4 0 2 5l-11 10q-4 3-8 0l-11-10q-2-5 2-5Z" fill="#1a1446"/>
+    <!-- boca aberta e língua -->
+    <path d="M-20 30q20 16 40 0" fill="none" stroke="#1a1446" stroke-width="5" stroke-linecap="round"/>
+    <path d="M-10 36q10 4 20 0v14q0 14-10 14t-10-14Z" fill="#ff6f91" stroke="#1a1446" stroke-width="3"/>
+  </g>
+</svg>
