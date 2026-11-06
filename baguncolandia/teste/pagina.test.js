@@ -142,12 +142,12 @@ function ok(msg) { console.log('✓ ' + msg); }
   await dedo.mouse.move(400, 220); await dedo.mouse.down(); await dedo.mouse.move(400, 60, { steps: 4 }); await dedo.mouse.up(); await dedo.waitForTimeout(150);
   const pul = await dedo.evaluate(() => window.BaguncaDebug.partida.estado().jogadores[0].corpo.pulando);
   if (pul) ok('no dedo: deslizar para cima = pulo'); else falhou('no dedo: não pulou');
-  // v0.8.5: no dedo, o 🧍 fica no canto (embaixo do ⏸), não tampa o jogo e responde ao toque
+  // v0.8.5: no dedo, o 🧍 fica no alto, à direita, fora da área do jogo, e responde ao toque
   for (const [nome, vw, vh] of [['em pé', 390, 844], ['deitado', 844, 390]]) {
     await dedo.setViewportSize({ width: vw, height: vh }); await dedo.waitForTimeout(300);
     const antes = await dedo.evaluate(() => window.BaguncaApp.TVApp.tv.mostrarBoneco);
     await dedo.click('#localBoneco'); await dedo.waitForTimeout(200);
-    const r = await dedo.evaluate((antes) => { const b = document.getElementById('localBoneco').getBoundingClientRect(); return { canto: b.top < innerHeight * 0.4 && b.right > innerWidth * 0.8 && b.width <= 56, mudou: window.BaguncaApp.TVApp.tv.mostrarBoneco !== antes }; }, antes);
+    const r = await dedo.evaluate((antes) => { const b = document.getElementById('localBoneco').getBoundingClientRect(), c = document.getElementById('tvCanvas').getBoundingClientRect(); const fora = b.right <= c.left || b.left >= c.right || b.bottom <= c.top || b.top >= c.bottom; return { canto: b.top < innerHeight * 0.4 && b.right > innerWidth * 0.5 && b.width <= 56 && fora, mudou: window.BaguncaApp.TVApp.tv.mostrarBoneco !== antes }; }, antes);   // v0.8.25: fora da área do jogo (em pé, na fileira do alto)
     if (r.canto && r.mudou) ok('no dedo ' + nome + ': 🧍 no canto e funcionando'); else falhou('no dedo ' + nome + ': 🧍 ' + JSON.stringify(r));
   }
   await dedo.screenshot({ path: '/tmp/pagina-dedo.png' });

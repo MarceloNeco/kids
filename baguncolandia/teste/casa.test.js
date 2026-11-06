@@ -231,3 +231,12 @@ test('⌨️ no computador: ← → andam, ↑ pula, o corpo bagunça e andar at
   const q = partida('quarto'); correr(q, 50); q.teclas(0, { esq: true }); correr(q, 1500); q.teclas(0, { dir: true }); correr(q, 2500);
   assert.ok(q.estado().jogadores[0].pontos > 0, 'o corpo do boneco bagunçou');
 });
+
+test('🧸 no dedo quem bagunça é o boneco: tocar longe não mexe em nada até ele chegar e encostar', () => {
+  const p = partida('quarto'); correr(p, 50);
+  const M = p.estado().casa, o = M.obs.filter((x) => x.y < M.chao - 150).sort((a, b) => Math.abs(b.x - 640) - Math.abs(a.x - 640))[0];   // algo no alto, longe do boneco
+  p.dedo(0, o.x / 1280, o.y / 720); p.avancar(16); p.dedo(0, null);
+  assert.ok(o.dorme, 'o dedo sozinho não bagunça');
+  assert.ok(ate(() => !o.dorme, 5000), 'o boneco foi lá, pulou e encostou');
+  function ate(f, ms) { for (let t = 0; t < ms; t += 16) { p.avancar(16); if (f()) return true; } return false; }
+});

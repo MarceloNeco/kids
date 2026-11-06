@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.24', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.25', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -302,7 +302,7 @@
       Desenho.limpar(); Desenho.ambiente(tv.cfg.ambiente, tv.cfg.cena);
       tv.arrumando = tv.cfg.modo === 'arrumar'; $('tv').classList.remove('podearrumar');
       $('tv').classList.toggle('paisagem', tv.cfg.ambiente === 'paisagem' || tv.cfg.modo === 'bagunca' || tv.arrumando); navCasa();
-      tv.partida.comecar(); tv.fase = 'jogando'; if (tv.cfg.modo === 'bagunca') dizer('Hora da bagunça! Bata em tudo!', 'Mayhem time! Hit everything!'); else if (tv.arrumando) dizer('Hora de arrumar! Arraste cada coisa para o lugar dela.', 'Tidy-up time! Drag each thing back to its place.');   // na fase de jogo a legenda some sozinha tv.fimMusica = false; $('tv').classList.add('jogando');
+      tv.partida.comecar(); tv.fase = 'jogando'; if (tv.cfg.modo === 'bagunca') { if (tv.toque) dizer('Hora da bagunça! Toque onde o boneco deve ir.', 'Mayhem time! Tap where the avatar should go.'); else dizer('Hora da bagunça! Bata em tudo!', 'Mayhem time! Hit everything!'); } else if (tv.arrumando) dizer('Hora de arrumar! Arraste cada coisa para o lugar dela.', 'Tidy-up time! Drag each thing back to its place.');   // na fase de jogo a legenda some sozinha tv.fimMusica = false; $('tv').classList.add('jogando');
       if (tv.cfg.duracao === 0 && tv.player && !tv.tocando) { try { tv.player.playVideo(); } catch (e) {} }
       window.BaguncaDebug = tv;   // só para testes automáticos (nada de segredo aqui)
     }
@@ -474,8 +474,8 @@
       // 🧍 vai até lá: o dedo marca o alvo; o boneco anda (e pula) até ele. Soltar: ele termina de chegar
       function vaiDedo(fn, e, p) { if (!tv.partida || !tv.partida.alvo || !vaiLigado() || tv.fase !== 'jogando') return false; var r = raiaDe(p); if (fn === 'largar') tv.partida.alvo(r.j, null); else tv.partida.alvo(r.j, r.x, p.y); return true; }
       function arrumaDedo(fn, e, p) { if (!tv.arrumando || !tv.partida || !tv.partida.pegar || tv.fase !== 'jogando') return false; if (fn === 'pegar') tv.partida.pegar(e.pointerId, raiaDe(p).j, p.x, p.y); else if (fn === 'mover') tv.partida.mover(e.pointerId, p.x, p.y); else tv.partida.largar(e.pointerId); return true; }
-      cv.addEventListener('pointerdown', function (e) { if (!tv.toque) return; e.preventDefault(); cv.setPointerCapture && cv.setPointerCapture(e.pointerId); var p = pos(e); dedos[e.pointerId] = { x0: p.x, y0: p.y, t0: performance.now(), p: p }; if (arrumaDedo('pegar', e, p) || vaiDedo('pegar', e, p)) return; if (tv.fase === 'lobby' || tv.fase === 'fim') return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); if (tv.partida.dedo) tv.partida.dedo(r.j, r.x, p.y); else corpoDedo(r.j, r.x, performance.now()); } });
-      cv.addEventListener('pointermove', function (e) { if (!tv.toque || !dedos[e.pointerId]) return; e.preventDefault(); var p = pos(e), d = dedos[e.pointerId]; d.p = p; if (arrumaDedo('mover', e, p) || vaiDedo('mover', e, p)) return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); if (tv.partida.dedo) tv.partida.dedo(r.j, r.x, p.y); else corpoDedo(r.j, r.x, performance.now()); } });
+      cv.addEventListener('pointerdown', function (e) { if (!tv.toque) return; e.preventDefault(); cv.setPointerCapture && cv.setPointerCapture(e.pointerId); var p = pos(e); dedos[e.pointerId] = { x0: p.x, y0: p.y, t0: performance.now(), p: p }; if (arrumaDedo('pegar', e, p) || vaiDedo('pegar', e, p)) return; if (tv.fase === 'lobby' || tv.fase === 'fim') return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); if (tv.partida.dedo) tv.partida.dedo(r.j, r.x, p.y); else { tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } } });   // 🧸 na casa o dedo só mostra aonde ir: quem bagunça é o boneco
+      cv.addEventListener('pointermove', function (e) { if (!tv.toque || !dedos[e.pointerId]) return; e.preventDefault(); var p = pos(e), d = dedos[e.pointerId]; d.p = p; if (arrumaDedo('mover', e, p) || vaiDedo('mover', e, p)) return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); if (tv.partida.dedo) tv.partida.dedo(r.j, r.x, p.y); else { tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } } });   // 🧸 na casa o dedo só mostra aonde ir: quem bagunça é o boneco
       function solta(e) {
         var d = dedos[e.pointerId]; if (!d) return; delete dedos[e.pointerId];
         if (arrumaDedo('largar', e, d.p) || vaiDedo('largar', e, d.p)) return;
