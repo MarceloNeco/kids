@@ -13,10 +13,15 @@ Endereço: https://solverone.com.br/kids/enigmas/
 ## Como brincar
 
 - Escolha o nível: **🐣 Fácil** (3 a 5 anos, 3 ou 4 pares, ligações óbvias: bicho e comida, onde mora, cores, barulhos),
-  **🦊 Médio** (5 a 7 anos, 5 pares: opostos, mamãe e filhote, profissão e ferramenta, para que serve, de onde vem,
-  quantos tem) ou **🦉 Difícil** (7 anos ou mais, 6 ou 7 pares com raciocínio: adivinhas, causa e efeito, como
-  resolver, parte e todo, "qual dupla é do mesmo jeito" (analogias), o que vem depois (sequências), contas, metade e
-  dobro, e **rimas** — em português no PT e em inglês no EN).
+  **🦊 Médio** (5 a 9 anos, de 5 a 7 pares: primeiro opostos, mamãe e filhote, profissão e ferramenta, para que serve,
+  de onde vem, quantos tem; depois, com 6 e 7 pares, as rodadas que até a v0.2.0 eram do Difícil: adivinhas, causa e
+  efeito, como resolver, parte e todo, "qual dupla é do mesmo jeito", sequências, contas, metade e dobro, e **rimas** —
+  em português no PT e em inglês no EN) ou **🦉 Difícil** (10 anos ou mais, e para adulto se divertir: só **4 pares**,
+  mas de pensar — tabuada, divisão, frações, porcentagem, probleminhas, sequências, números romanos, horas, troco e
+  medidas; planetas, corpo humano, plantas e fotossíntese, tipos de bicho, cadeia alimentar, ímãs e eletricidade,
+  sólido/líquido/gás, instrumentos, inventores; coletivos, sinônimos e opostos difíceis, expressões como "chover
+  canivete" (no EN, as expressões de lá: "raining cats and dogs"); "complete a dupla" (pena → pássaro; escama → ?) e
+  adivinhas "o que é, o que é?").
 - **Arraste o dedo** (ou o mouse) de um desenho até o outro, de qualquer lado para qualquer lado. Ou **toque num e
   depois no outro**. No teclado ou no controle: setas ↑ ↓ andam na coluna, ← → trocam de lado, Enter escolhe.
 - Acertou: o risco de giz fica colorido e toca um sininho. Errou: os dois desenhos balançam e o risco se apaga sozinho.
@@ -34,8 +39,13 @@ Endereço: https://solverone.com.br/kids/enigmas/
 | Nível | Rodadas (PT) | Rodadas (EN) | Pares |
 |---|---|---|---|
 | Fácil | 36 | 36 | 19 com 3, 17 com 4 |
-| Médio | 33 | 33 | 5 em todas |
-| Difícil | 33 | 33 | 17 com 6, 16 com 7 (4 de rimas próprias de cada língua) |
+| Médio | 66 | 66 | 33 com 5, 17 com 6, 16 com 7 (as de 6 e 7 eram do Difícil até a v0.2.0; 4 de rimas próprias de cada língua) |
+| Difícil | 54 | 54 | 4 em todas (desde a v0.3.0) |
+
+Na v0.3.0 o dono achou o Difícil fácil demais: as rodadas dele foram para o Médio (com o mesmo código, então quem já
+tinha feito algumas não perde nada: o `J.migrar` do `jogo.js` leva as feitas e as estrelas do Difícil antigo para o
+Médio, uma vez só) e o Difícil virou outro, com poucos pares e mais raciocínio. Toda carta de matemática do Difícil tem
+a conta escrita no `R.CONTAS` (fim do `rodadas.js`), e o teste refaz cada conta.
 
 Os enigmas vêm **misturados** e **não repetem** até a criança fazer todos do nível; aí recomeçam (a festa avisa). A
 escolha sorteia entre os 4 próximos que faltam, na ordem do `rodadas.js`, então **dentro do nível a dificuldade sobe
@@ -71,6 +81,26 @@ desenho encolhe um pouco. Mede de novo quando a tela muda de tamanho e quando a 
 de até 360 px a moldura e o vão do giz ficam mais finos (a palavra mais comprida, "cock-a-doodle-doo", precisa de
 105 px). O teste confere todas as rodadas em 390, 320 e 844 px, em PT e EN.
 
+## Riscos de giz (v0.3.0)
+
+Cada ligação é uma **curva suave** (bezier cúbica, `C` no SVG) que sai da bolinha de giz de cada carta na horizontal,
+como um S deitado, fina (4,5 px) e com a cor do par. Para não virar um emaranhado com quase tudo ligado ("uma
+bagunça", disse o dono no celular de 412 px):
+
+- **cada par tem a sua faixa** no vão entre as colunas (`faixaDe` no `app.js`): os riscos que descem ficam nas faixas da
+  esquerda, os que sobem nas da direita, e dentro de cada grupo a ordem é a que não cria cruzamento a mais. Assim dois
+  riscos "paralelos" nunca correm colados, e os cruzamentos se espalham em vez de cair todos no meio;
+- embaixo de cada traço vai um **contorno escuro da cor da lousa** (halo): onde dois se cruzam, o de cima abre um
+  vãozinho no de baixo e dá para ver qual passa por cima;
+- os riscos **balançam bem devagar** (2,5 px, uma ida e volta a cada 6,5 s; as pontas ficam paradas). Com "reduzir
+  movimento" ligado no aparelho, ficam parados;
+- as 7 cores de giz (`CORES` no `app.js`) ficaram bem diferentes entre si (amarelo, rosa, azul, verde, laranja,
+  lilás e branco; as de antes eram claras e parecidas);
+- o vão entre as colunas ficou mais largo (20% da largura da tela em vez de 14%) para as curvas terem espaço;
+- o risco que acompanha o dedo no arraste também é curva.
+
+A curva nunca sai do vão (não cobre as palavras): o teste confere.
+
 ## Música
 
 13 músicas alegres da Bagunçolândia (FreePD, domínio público), tocadas pelo `../trilha.js` com volume **0,22** (abaixo
@@ -82,16 +112,22 @@ segue com os efeitos. Créditos em `CREDITOS.md`.
 
 `node --test enigmas/teste/*.test.js` (da raiz do repositório kids):
 
-- `conteudo.test.js`: pelo menos 30 rodadas por nível e por língua, pares certos por nível, dificuldade subindo,
-  PT e EN em tudo, nenhum desenho/palavra repetido numa rodada (um só jeito de ligar), nenhuma rodada repetida,
-  emojis só até o Unicode 11.
-- `jogo.test.js`: ligar, errar, estrelas, embaralhar sem par alinhado, não repetir até acabar, progressão.
+- `conteudo.test.js`: pelo menos 30 rodadas por nível e por língua (40 no Difícil), pares certos por nível (Difícil
+  sempre 4), dificuldade subindo, PT e EN em tudo, nenhum desenho/palavra repetido numa rodada (um só jeito de ligar),
+  nenhuma rodada repetida, emojis só até o Unicode 11; o Médio tem todas as rodadas do Difícil antigo com o mesmo
+  código; **toda conta do Difícil refeita** pelo teste (e o texto "7 × 8", "6²" ou "XIV" também), com o mesmo número
+  em PT e EN; o Difícil mistura contas, ciências, palavras, adivinhas e "complete a dupla".
+- `jogo.test.js`: ligar, errar, estrelas, embaralhar sem par alinhado, não repetir até acabar, progressão, e o
+  progresso de antes da v0.3.0 indo do Difícil para o Médio uma vez só.
 - `arquivos.test.js`: versão igual em `app.js`, `sw.js` e `versoes.json`; `sw.js` guarda tudo; CSP; ids; PT|EN;
   músicas existem e têm crédito; ícones; nenhum segredo.
 - `pagina.test.js` (Chromium com Playwright e um servidorzinho local): completa rodadas tocando, arrastando com o
   mouse e com o dedo, só com o teclado, no celular em pé, deitado, em 320 px e no computador, em PT e EN, sem
   localStorage, e sem nenhum erro no console. Em todas as rodadas: nenhuma palavra quebra no meio nem sai da carta e a
-  letra fica com 12 px ou mais; 🔤 esconde as palavras, tocar mostra o balão e a voz lê, e o jogo lembra.
+  letra fica com 12 px ou mais; 🔤 esconde as palavras, tocar mostra o balão e a voz lê, e o jogo lembra. Os riscos
+  são curvas (comando `C`) com halo, ficam no vão entre as colunas, cada par numa faixa, balançam devagar e ficam
+  parados com "reduzir movimento"; o risco do arraste também é curva; quem tinha progresso no Difícil antigo vê as
+  estrelas no Médio.
 
 ## Versão
 

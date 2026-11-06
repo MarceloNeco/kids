@@ -130,7 +130,8 @@
 
   // ---------- partida ----------
   var nivel = null, partida = null, rodada = null, sel = null, reiniciou = false;
-  var CORES = ['#fff6c8', '#ffd1e8', '#bfe9ff', '#d4ffc4', '#ffe0b8', '#e5d4ff', '#c8fff4'];
+  // uma cor de giz por par, bem diferentes entre si (v0.3.0: as de antes eram claras e parecidas demais)
+  var CORES = ['#ffec70', '#ff9fd2', '#8fd0ff', '#9ef08a', '#ffad66', '#c9a6ff', '#f4f1e6'];
 
   function comecar(n) {
     nivel = n; telaCheia();

@@ -310,8 +310,8 @@ test('🔤 só desenhos: esconde as palavras, tocar mostra o balão com a palavr
   });
   await pg.click('#btDificil');
   assert.equal(await pg.getAttribute('#btPalavras', 'aria-pressed'), 'true', 'começa com as palavras à vista');
-  const id = await pg.evaluate(() => EnigmasDebug.ids('dificil').find(i => { EnigmasDebug.abrir('dificil', i); return document.querySelector('.carta.texto'); }));
-  await pg.evaluate(id => EnigmasDebug.abrir('dificil', id), id);   // uma rodada com adivinhas (cartas só de texto)
+  const id = await pg.evaluate(() => EnigmasDebug.ids('dificil').find(i => { EnigmasDebug.abrir('dificil', i); return document.querySelector('.carta.texto') && document.querySelector('.carta:not(.texto)'); }));
+  await pg.evaluate(id => EnigmasDebug.abrir('dificil', id), id);   // uma rodada com cartas só de texto e cartas com desenho
   await pg.click('#btPalavras');
   assert.equal(await pg.getAttribute('#btPalavras', 'aria-pressed'), 'false');
   const vis = await pg.evaluate(() => ({
