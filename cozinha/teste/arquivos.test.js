@@ -6,11 +6,11 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.2.1 igual nos três lugares (app.js, sw.js e versoes.json), de 06/Nov/2026', () => {
+test('versão 0.3.0 igual nos três lugares (app.js, sw.js e versoes.json), de 06/Nov/2026', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.2.1'); assert.equal(s, a); assert.equal(v.versao, a);
+  assert.equal(a, '0.3.0'); assert.equal(s, a); assert.equal(v.versao, a);
   assert.equal(v.data, '06/Nov/2026'); assert.match(ler('app.js'), /APP_UPDATED = '06\/Nov\/2026'/);
   for (const k of ['hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
@@ -62,18 +62,26 @@ test('textos t(pt, en) do app sempre nas duas línguas', () => {
   for (const m of js.matchAll(/\bt\('((?:[^'\\]|\\.)*)'\s*\)/g)) assert.fail('t() só com uma língua: ' + m[1]);
 });
 
-test('trilha: pelo menos 10 músicas que existem, com crédito no CREDITOS.md e na licença da Rabiscolândia', () => {
+test('trilha: pelo menos 10 músicas animadas que existem, com crédito no CREDITOS.md e na licença de origem; nada de som de videogame', () => {
   const js = ler('app.js'), cred = ler('CREDITOS.md');
-  const lic = fs.readFileSync(path.join(pasta, '..', 'rabiscolandia', 'musicas', 'LICENCAS.md'), 'utf8');
+  const lic = { M: fs.readFileSync(path.join(pasta, '..', 'rabiscolandia', 'musicas', 'LICENCAS.md'), 'utf8'), B: fs.readFileSync(path.join(pasta, '..', 'baguncolandia', 'CREDITOS.md'), 'utf8') };
+  const PASTA = { M: 'rabiscolandia', B: 'baguncolandia' };
+  assert.match(js, /var M = '\.\.\/rabiscolandia\/musicas\/', B = '\.\.\/baguncolandia\/musicas\/'/);
   assert.match(js, /Trilha\.iniciar\(\{ jogo: 'cozinha'/);
-  const nomes = [...js.matchAll(/M \+ '([a-z0-9-]+\.mp3)'/g)].map(m => m[1]);
-  assert.ok(nomes.length >= 10, 'só ' + nomes.length + ' músicas');
-  for (const n of nomes) {
-    assert.ok(fs.existsSync(path.join(pasta, '..', 'rabiscolandia', 'musicas', n)), 'falta ' + n);
-    assert.ok(lic.includes('`' + n + '`'), 'sem licença ' + n);
-    assert.ok(cred.includes(n), 'CREDITOS.md sem ' + n);
+  const trilha = js.slice(js.indexOf("Trilha.iniciar({ jogo: 'cozinha'"), js.indexOf('] });', js.indexOf("Trilha.iniciar({ jogo: 'cozinha'")));
+  const musicas = [...trilha.matchAll(/\{ a: ([MB]) \+ '([a-z0-9-]+\.mp3)', t: '([^']+)'/g)].map(m => ({ p: m[1], n: m[2], t: m[3] }));
+  assert.ok(musicas.length >= 10, 'só ' + musicas.length + ' músicas');
+  assert.equal(musicas.length, (trilha.match(/\{ a: /g) || []).length, 'toda música aponta para M (Rabiscolândia) ou B (Bagunçolândia)');
+  for (const m of musicas) {
+    assert.ok(fs.existsSync(path.join(pasta, '..', PASTA[m.p], 'musicas', m.n)), 'falta ' + m.n);
+    assert.ok(m.p === 'M' ? lic.M.includes('`' + m.n + '`') : lic.B.includes(m.t), 'sem licença na origem: ' + m.n);
+    assert.ok(cred.includes('`' + m.n + '`'), 'CREDITOS.md sem ' + m.n);
   }
-  assert.match(cred, /Kevin MacLeod/); assert.match(cred, /CC BY/);
+  // o dono não gosta de som de "Atari" (sintetizador/8 bits) nem de música calma demais para cozinhar
+  for (const ruim of ['spazzmatica', 'pixel-peeker', 'bit-bit', 'wakka', 'gymnopedie', 'who-likes-to-party', 'disco-lounge', 'airport-lounge'])
+    assert.ok(!trilha.includes(ruim), 'música que não combina: ' + ruim);
+  assert.ok(!fs.readdirSync(pasta).some(f => /\.mp3$/.test(f)), 'nenhum mp3 copiado para a pasta da cozinha');
+  assert.match(cred, /Kevin MacLeod/); assert.match(cred, /CC BY/); assert.match(cred, /CC0/); assert.match(cred, /Rafael Krux/);
 });
 
 test('pendências: a entrevista com a filha do dono está na lista', () => {

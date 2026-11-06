@@ -69,18 +69,18 @@
     var h = '';
     lista.forEach(function (c) { h += '<circle cx="' + (c[0] + 2) + '" cy="' + (c[1] + 3) + '" r="' + c[2] + '" fill="' + cores[2] + '"/>'; });
     lista.forEach(function (c) { h += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '" fill="' + cores[1] + '"/>'; });
-    lista.forEach(function (c) { h += '<circle cx="' + q(c[0] - c[2] * 0.25) + '" cy="' + q(c[1] - c[2] * 0.3) + '" r="' + q(c[2] * 0.6) + '" fill="' + cores[0] + '" opacity=".55"/>'; });
+    lista.forEach(function (c) { h += '<circle cx="' + q(c[0] - c[2] * 0.25) + '" cy="' + q(c[1] - c[2] * 0.3) + '" r="' + q(c[2] * 0.5) + '" fill="' + cores[0] + '" opacity=".3"/>'; });
     return h;
   }
   var TRONCO = '<path d="M43 112 Q46 92 45 78 Q43 70 35 62 L38 59 Q46 65 48.5 70 Q51 63 61 56 L63 59 Q55 66 54.5 78 Q54 94 57.5 112 Z" fill="#8b5a2b" stroke="#5c3a1a" stroke-width="1.6" stroke-linejoin="round"/>' +
     '<path d="M48 108 Q49 92 48.5 80" stroke="#a8713e" stroke-width="2" fill="none" stroke-linecap="round"/>';
-  function folhaBanana(x, y, ang, L, larg, cor, espelho) {   // folha comprida da bananeira, caindo na ponta, com nervuras
-    var w = larg, nerv = '';
-    for (var i = 1; i <= 5; i++) { var t = i / 6, bx = L * t, by = -1.5 * Math.sin(Math.PI * t) + 9 * t * t; nerv += 'M' + q(bx) + ' ' + q(by) + ' l' + q(4) + ' ' + q(-w * 0.75) + ' '; }
+  function folhaBanana(x, y, ang, L, larg, cor, espelho) {   // folha larga e comprida da bananeira, caindo na ponta, com rasgos
+    var w = larg, rasgos = '';
+    [0.42, 0.62, 0.8].forEach(function (t, i) { var bx = L * t, by = 9 * t * t - 1.5; var sn = i % 2 ? 1 : -1; rasgos += 'M' + q(bx) + ' ' + q(by + sn * w * 0.95) + ' L' + q(bx - 2) + ' ' + q(by + sn * w * 0.4) + ' '; });
     return '<g transform="translate(' + x + ' ' + y + ') ' + (espelho ? 'scale(-1 1) ' : '') + 'rotate(' + ang + ')">' +
-      '<path d="M0 0 C' + q(L * 0.3) + ' ' + q(-w * 1.15) + ' ' + q(L * 0.78) + ' ' + q(-w * 1.05) + ' ' + L + ' 9 C' + q(L * 0.78) + ' ' + q(w * 0.55) + ' ' + q(L * 0.3) + ' ' + q(w * 0.7) + ' 0 0 Z" fill="' + cor + '" stroke="#2f6b2a" stroke-width="1" stroke-linejoin="round"/>' +
-      '<path d="' + nerv + '" stroke="#2f6b2a" stroke-width=".6" opacity=".45" fill="none"/>' +
-      '<path d="M0 0 C' + q(L * 0.3) + ' -2 ' + q(L * 0.78) + ' 0 ' + L + ' 9" stroke="#d9efb0" stroke-width="1.3" fill="none"/></g>';
+      '<path d="M0 0 C' + q(L * 0.12) + ' ' + q(-w * 1.25) + ' ' + q(L * 0.82) + ' ' + q(-w * 1.25) + ' ' + L + ' 9 C' + q(L * 0.82) + ' ' + q(w * 1.15) + ' ' + q(L * 0.12) + ' ' + q(w * 0.95) + ' 0 0 Z" fill="' + cor + '" stroke="#2f6b2a" stroke-width="1" stroke-linejoin="round"/>' +
+      '<path d="' + rasgos + '" stroke="#e6f7ff" stroke-width="1" fill="none" stroke-linecap="round"/>' +
+      '<path d="M0 0 C' + q(L * 0.3) + ' -2 ' + q(L * 0.78) + ' 0 ' + L + ' 9" stroke="#d9efb0" stroke-width="1.6" fill="none"/></g>';
   }
   function folhaUva(x, y, r, cor) {   // folha de parreira (5 pontas arredondadas)
     return '<path transform="translate(' + x + ' ' + y + ') scale(' + r + ')" d="M0 7 C-3 6 -9 6 -9 1 C-11 -2 -8 -5 -5 -4 C-6 -8 -2 -10 0 -7 C2 -10 6 -8 5 -4 C8 -5 11 -2 9 1 C9 6 3 6 0 7 Z" fill="' + cor + '" stroke="#2f6b2a" stroke-width=".25" stroke-linejoin="round"/>';
@@ -102,13 +102,14 @@
     '<path d="M36 76 l-3 -2 M60 74 l2 -3 M46 92 l-3 1" stroke="#5c3a1a" stroke-width="1" stroke-linecap="round"/>' +   // espinhos
     moita([[50, 50, 24], [24, 58, 17], [76, 58, 17], [34, 38, 16], [66, 38, 16], [50, 70, 15], [28, 72, 11], [72, 72, 11]], ['#b8e07a', '#62a83f', '#3f7a2c']) + flor(60, 34, 0.7, '#f3e9a0') + flor(28, 50, 0.7, '#f3e9a0');
   PL.bananeira = chao() +
-    folhaBanana(48, 40, -150, 44, 10, '#3d8f37', false) + folhaBanana(50, 40, -32, 44, 10, '#3d8f37', false) +
+    '<path d="M46 64 C38 70 37 84 40 98 C42 88 44 76 47 68 Z" fill="#b08a4a" stroke="#7a5a2a" stroke-width="1" stroke-linejoin="round"/>' +   // folha velha, seca, pendurada no tronco
+    folhaBanana(47, 40, -155, 40, 10, '#3d8f37', false) +
     '<path d="M41 112 Q43 78 45.5 42 L54.5 42 Q57 78 59 112 Z" fill="#8aa856" stroke="#4f6b2c" stroke-width="1.4" stroke-linejoin="round"/>' +
     '<path d="M46 108 Q47 80 48 46 M53 108 Q53 80 52 46" stroke="#5d7a35" stroke-width="1.1" fill="none" opacity=".7"/>' +
     '<path d="M43 98 q3 -3 6 0 M52 84 q3 -3 5 1 M46 66 q2 -2 4 0" stroke="#8b6b3a" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
-    folhaBanana(50, 41, -10, 46, 10.5, '#4fae43', false) + folhaBanana(50, 41, -10, 44, 10, '#4fae43', true) +
-    folhaBanana(50, 40, -62, 40, 9.5, '#5cbf4a', false) + folhaBanana(50, 40, -62, 38, 9, '#5cbf4a', true) +
-    folhaBanana(49, 40, -96, 34, 8.5, '#6ccb55', false) +
+    folhaBanana(50, 41, -5, 44, 10, '#4fae43', true) +
+    folhaBanana(50, 40, -50, 40, 10, '#5cbf4a', true) + folhaBanana(50, 40, -40, 38, 9.5, '#4fae43', false) +
+    folhaBanana(49, 40, -88, 32, 8.5, '#6ccb55', false) +
     // o cacho: o "engaço" sai do alto, faz a curva e desce; no fim, o coração roxo da bananeira
     '<path d="M51 44 Q68 40 71 54 L72 88" stroke="#6b8a3a" stroke-width="3.4" fill="none" stroke-linecap="round"/>' +
     '<path d="M72 86 C79 89 80 99 72 109 C64 99 65 89 72 86 Z" fill="#7b2d5b" stroke="#4e1636" stroke-width="1.2" stroke-linejoin="round"/>' +
@@ -120,7 +121,7 @@
     '<path d="M30 113 C24 98 36 86 28 72 C22 60 34 50 28 38 C26 33 30 29 34 27" stroke="#6e4423" stroke-width="3.6" fill="none" stroke-linecap="round"/>' +
     '<path d="M30 60 c6 -2 6 -8 2 -8 M34 40 c5 1 7 -4 3 -6 M60 31 c3 4 8 2 6 -2" stroke="#7fae3a" stroke-width=".9" fill="none" stroke-linecap="round"/>' +   // gavinhas que se enrolam
     UVAS.map(function (u) { return '<path d="M' + u[0] + ' 30 Q' + (u[0] + 2) + ' 38 ' + u[0] + ' ' + (u[1] - 8) + '" stroke="#6e4423" stroke-width="1.4" fill="none"/>'; }).join('') +
-    [[10, 22, 1.25, '#4fae43'], [22, 30, 1.1, '#3d8f37'], [34, 21, 1.3, '#5cbf4a'], [44, 31, 1.05, '#4fae43'], [57, 21, 1.25, '#3d8f37'], [66, 31, 1.1, '#5cbf4a'], [78, 21, 1.3, '#4fae43'], [90, 30, 1.1, '#3d8f37'], [30, 48, 0.9, '#5cbf4a'], [26, 80, 0.85, '#4fae43'], [36, 66, 0.8, '#3d8f37']]
+    [[14, 22, 0.85, '#4fae43'], [24, 31, 0.8, '#3d8f37'], [35, 21, 0.9, '#5cbf4a'], [46, 32, 0.75, '#4fae43'], [58, 21, 0.85, '#3d8f37'], [68, 32, 0.8, '#5cbf4a'], [79, 21, 0.9, '#4fae43'], [88, 31, 0.75, '#3d8f37'], [32, 46, 0.7, '#5cbf4a'], [24, 84, 0.7, '#4fae43'], [35, 66, 0.65, '#3d8f37']]
       .map(function (f) { return folhaUva(f[0], f[1], f[2], f[3]); }).join('');
   PL.morangueiro = chao() +
     '<path d="M2 112 Q8 96 50 95 Q92 96 98 112 Z" fill="#8b5a3c"/><path d="M8 104 l5 -2 M20 100 l6 1 M36 98 l5 -1 M58 98 l6 1 M74 100 l5 -1 M88 104 l5 1 M28 106 l6 0 M66 106 l6 -1" stroke="#f1d27a" stroke-width="1.2" stroke-linecap="round"/>' +   // canteiro com palha
@@ -162,16 +163,16 @@
     [[30, 40, 9], [42, 30, 9], [58, 30, 9], [70, 40, 9], [50, 22, 8], [36, 50, 7], [64, 50, 7]].map(function (f) { return '<ellipse cx="' + f[0] + '" cy="' + f[1] + '" rx="' + f[2] + '" ry="' + q(f[2] * 0.62) + '" fill="#4fae43" stroke="#2f6b2a" stroke-width=".9"/>'; }).join('') +
     flor(50, 14, 0.9, '#ffd23f') + flor(40, 20, 0.7, '#ffd23f') +
     [[30, 82, 10, 7], [50, 88, 11, 8], [71, 79, 10, 7]].map(function (b) { return '<ellipse cx="' + b[0] + '" cy="' + b[1] + '" rx="' + b[2] + '" ry="' + b[3] + '" fill="#d9a066" stroke="#8b5a2b" stroke-width="1.3"/><circle cx="' + (b[0] - 3) + '" cy="' + (b[1] - 2) + '" r=".9" fill="#8b5a2b"/><circle cx="' + (b[0] + 4) + '" cy="' + (b[1] + 1) + '" r=".9" fill="#8b5a2b"/>'; }).join('');
-  HO.tomate = '<rect x="64" y="6" width="5" height="70" rx="1.5" fill="#c99a5b" stroke="#7a5426" stroke-width="1.2"/>' +   // a estaca
+  HO.tomate = '<g transform="translate(50 60) scale(.88) translate(-50 -60)"><rect x="64" y="6" width="5" height="70" rx="1.5" fill="#c99a5b" stroke="#7a5426" stroke-width="1.2"/>' +   // a estaca
     '<path d="M50 60 Q48 40 56 26 Q62 16 66 10" stroke="#3a8a30" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
     '<path d="M62 22 h9 M58 38 h11" stroke="#e8d9a0" stroke-width="2" stroke-linecap="round"/>' +   // amarrado na estaca
     [[40, 22, -20], [44, 40, -30], [62, 32, 20], [34, 34, -40], [56, 48, 30], [50, 14, -10], [72, 18, 30]].map(function (f) { return '<g transform="translate(' + f[0] + ' ' + f[1] + ') rotate(' + f[2] + ')"><ellipse cx="0" cy="0" rx="9" ry="4.4" fill="#4fae43" stroke="#2f6b2a" stroke-width=".9"/><path d="M-8 0 H8" stroke="#2f6b2a" stroke-width=".6"/></g>'; }).join('') +
-    '<circle cx="34" cy="48" r="6" fill="#8fd36a" stroke="#4f8a2a" stroke-width="1.1"/><circle cx="62" cy="58" r="5" fill="#a9de7a" stroke="#4f8a2a" stroke-width="1.1"/>';   // tomates verdes (ainda crescendo)
-  HO.alface = '<g stroke="#4f8a2a" stroke-width="1.1" stroke-linejoin="round">' +
+    '<circle cx="34" cy="48" r="6" fill="#8fd36a" stroke="#4f8a2a" stroke-width="1.1"/><circle cx="62" cy="58" r="5" fill="#a9de7a" stroke="#4f8a2a" stroke-width="1.1"/></g>';   // tomates verdes (ainda crescendo)
+  HO.alface = '<g transform="translate(50 60) scale(1.45) translate(-50 -60)"><g stroke="#4f8a2a" stroke-width="1.1" stroke-linejoin="round">' +
     '<path d="M20 60 C10 40 28 30 36 46 C38 30 62 30 64 46 C72 30 90 40 80 60 Z" fill="#7ccc4f"/>' +
     '<path d="M28 60 C22 44 38 36 44 48 C46 36 58 36 58 48 C64 38 78 44 72 60 Z" fill="#a8e070"/>' +
     '<path d="M36 60 C34 48 46 42 50 50 C54 42 66 48 64 60 Z" fill="#d4f29c"/></g>' +
-    '<path d="M50 58 V48 M42 58 Q40 50 36 47 M58 58 Q60 50 64 47" stroke="#8fc45a" stroke-width="1" fill="none"/>';
+    '<path d="M50 58 V48 M42 58 Q40 50 36 47 M58 58 Q60 50 64 47" stroke="#8fc45a" stroke-width="1" fill="none"/></g>';
   HO.cheiro = '<g stroke-linecap="round">' + [36, 40, 44, 48].map(function (x, i) { return '<path d="M' + x + ' 60 Q' + (x - 4 + i) + ' 34 ' + (x - 8 + i * 2) + ' 14" stroke="#2f9a46" stroke-width="2.4" fill="none"/>'; }).join('') +   // cebolinha
     [[60, 30], [70, 24], [66, 40], [76, 38], [56, 44]].map(function (c) { return '<path d="M60 60 Q' + c[0] + ' ' + (c[1] + 14) + ' ' + c[0] + ' ' + c[1] + '" stroke="#3a8a30" stroke-width="1.2" fill="none"/>' +
       '<g fill="#4fae43" stroke="#2f6b2a" stroke-width=".6"><circle cx="' + (c[0] - 3) + '" cy="' + c[1] + '" r="3.2"/><circle cx="' + (c[0] + 3) + '" cy="' + (c[1] - 1) + '" r="3.2"/><circle cx="' + c[0] + '" cy="' + (c[1] - 4) + '" r="3.2"/></g>'; }).join('') + '</g>';   // salsinha

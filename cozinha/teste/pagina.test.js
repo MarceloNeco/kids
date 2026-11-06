@@ -277,3 +277,126 @@ test('Dona Cida em inglês fala em inglês; com a voz desligada ela não fala (s
   assert.deepEqual(erros, [], 'erros no console');
   await ctx.close();
 });
+
+// ---------- o jogo também ensina: cada fruta na sua planta, cada legume onde cresce ----------
+const PLANTA_DE = { banana: 'bananeira', maca: 'macieira', laranja: 'laranjeira', limao: 'limoeiro', morango: 'morangueiro', uva: 'parreira' };
+const NOME_PLANTA = { bananeira: ['bananeira', 'banana plant'], macieira: ['macieira', 'apple tree'], laranjeira: ['laranjeira', 'orange tree'], limoeiro: ['limoeiro', 'lemon tree'], morangueiro: ['pé de morango', 'strawberry plant'], parreira: ['parreira', 'grapevine'] };
+
+test('pomar: cada fruta só aparece na sua planta de verdade, com o nome da planta (a banana no cacho da bananeira)', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 412, height: 915 }, { isMobile: true, hasTouch: true });
+  await comecar(pg, 'medio', 'salada-frutas');
+  await noLugar(pg, 'pomar');
+  const pes = await pg.evaluate(() => [...document.querySelectorAll('.pomar .pe')].map(pe => ({
+    planta: pe.dataset.planta, nome: pe.querySelector('.pe-nome').textContent, desenho: !!pe.querySelector('svg.pl-desenho'),
+    frutas: [...pe.querySelectorAll('.fruta')].map(f => f.dataset.ing) })));
+  assert.deepEqual(pes.map(p => p.planta).sort(), ['bananeira', 'laranjeira', 'macieira', 'morangueiro', 'parreira'], 'só as plantas das frutas da receita');
+  for (const p of pes) {
+    assert.ok(p.desenho, p.planta + ' sem desenho');
+    assert.ok(p.frutas.length >= 2, p.planta + ' sem frutas');
+    for (const f of p.frutas) assert.equal(PLANTA_DE[f], p.planta, f + ' pendurada na planta errada (' + p.planta + ')');
+    for (const n of NOME_PLANTA[p.planta]) assert.ok(p.nome.includes(n), p.planta + ': o nome embaixo devia dizer ' + n);
+  }
+  assert.equal(await pg.locator('.jogo-lugar .fruta').count(), await pg.locator('.pomar .pe .pe-quadro .fruta').count(), 'nenhuma fruta solta fora de uma planta');
+  // a bananeira: folhas compridas, cacho com o coração roxo; as bananas são pencas no cacho
+  assert.ok(await pg.locator('.pe[data-planta="bananeira"] svg.pl-desenho path[fill="#7b2d5b"]').count(), 'a bananeira tem o coração roxo');
+  assert.ok(await pg.locator('.pe[data-planta="bananeira"] .fruta[data-ing="banana"] svg').count(), 'as bananas são pencas desenhadas');
+  // colher ensina de onde vem
+  await pg.click('.pe[data-planta="bananeira"] .fruta.madura[data-ing="banana"]');
+  assert.equal(await tem(pg, 'banana'), 1);
+  assert.match(await pg.textContent('#jogoLugar .fato'), /A banana nasce em cachos na bananeira/);
+  assert.ok(await pg.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'a página rola para o lado');
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('pomar no Fácil da vitamina: a bananeira aparece com o nome, e no máximo mais uma planta', { timeout: 30000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 412, height: 915 }, { isMobile: true, hasTouch: true });
+  await comecar(pg, 'facil', 'vitamina');
+  await noLugar(pg, 'pomar');
+  const plantas = await pg.$$eval('.pomar .pe', l => l.map(p => p.dataset.planta));
+  assert.equal(plantas[0], 'bananeira'); assert.ok(plantas.length <= 2, 'plantas demais: ' + plantas);
+  assert.match(await pg.textContent('.pe[data-planta="bananeira"] .pe-nome'), /bananeira.*banana plant/);
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('horta: cenoura e batata embaixo da terra (puxar 3 vezes), tomate no tomateiro com estaca (um toque), com o nome da planta', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 412, height: 915 }, { isMobile: true, hasTouch: true });
+  await comecar(pg, 'medio', 'peixe-assado');
+  await noLugar(pg, 'horta');
+  const formas = await pg.$$eval('.canteiro .planta', l => l.map(b => ({ ing: b.dataset.ing, forma: [...b.classList].find(c => c.startsWith('f-')), nome: b.querySelector('.pe-nome').textContent })));
+  for (const f of formas) {
+    const esperado = { cenoura: 'f-raiz', batata: 'f-raiz', tomate: 'f-estaca', alface: 'f-cabeca', cheiro: 'f-touceira' }[f.ing];
+    assert.equal(f.forma, esperado, f.ing + ' cresce do jeito errado');
+  }
+  assert.ok(formas.some(f => f.ing === 'cenoura' && /pé de cenoura/.test(f.nome) && /carrot plant/.test(f.nome)));
+  assert.ok(formas.some(f => f.ing === 'tomate' && /tomateiro/.test(f.nome)));
+  // a cenoura fica embaixo da terra: precisa puxar 3 vezes
+  const cen = pg.locator('.planta[data-ing="cenoura"]:not(:disabled)').first();
+  await cen.click(); await cen.click();
+  assert.equal(await tem(pg, 'cenoura'), 0, 'ainda presa na terra');
+  await cen.click();
+  assert.equal(await tem(pg, 'cenoura'), 1);
+  assert.match(await pg.textContent('#jogoLugar .fato'), /embaixo da terra/);
+  // o tomate se colhe do pé com um toque (o tomateiro fica)
+  await pg.locator('.planta[data-ing="tomate"]:not(:disabled)').first().click();
+  assert.equal(await tem(pg, 'tomate'), 1);
+  assert.ok(await pg.locator('.planta[data-ing="tomate"].saiu .puxa svg').count(), 'o tomateiro continua no lugar');
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+// ---------- pescaria com hora certa: o círculo de verdade do nível (?teste&pescareal) e os peixes parados pelo teste ----------
+async function rioDeVerdade(nivel) {
+  const { ctx, pg, erros } = await abrir({ width: 412, height: 915 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  await pg.goto(pg.url() + '&pescareal');
+  await comecar(pg, nivel, 'peixe-assado');
+  await noLugar(pg, 'rio');
+  await pg.evaluate(() => window.Cozinha.rio.parar());
+  return { ctx, pg, erros };
+}
+// um peixe no lugar pedido (distância do anzol, de -0.5 a 0.5), andando para dir; os outros bem longe
+const posPeixe = (pg, dx, dir) => pg.evaluate(([dx, dir]) => { const r = window.Cozinha.rio; r.por(0, 0.5 + dx, dir); r.por(1, 0.08, 1); r.por(2, 0.92, -1); }, [dx, dir]);
+const puxarAgora = async pg => { await pg.waitForSelector('.agua[data-fase="pronto"]'); await pg.tap('#btPuxar'); };
+
+test('rio no Difícil: puxar cedo ou tarde erra (o peixe foge com respingo e "Quase!"); na hora certa, fisga', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await rioDeVerdade('dificil');
+  const zona = await pg.evaluate(() => window.Cozinha.rio.zona());
+  assert.ok(zona <= 0.06, 'círculo pequeno no Difícil: ' + zona);
+  // cedo: o peixe ainda vem chegando (está à direita, nadando para a esquerda, a 0,10 do anzol)
+  await posPeixe(pg, 0.10, -1);
+  await puxarAgora(pg);
+  assert.match(await pg.textContent('#aviso'), /Quase! Puxou cedo/);
+  let p = (await pg.evaluate(() => window.Cozinha.rio.peixes()))[0];
+  assert.ok(p.foge && p.dir === 1, 'o peixe se assustou e vira para longe do anzol');
+  assert.equal(await pg.locator('.respingo').count() >= 1, true, 'respingo');
+  assert.ok(await pg.locator('.respingo .gota').count() >= 1, 'um respinguinho de água');
+  await pg.waitForTimeout(400);
+  const p2 = (await pg.evaluate(() => window.Cozinha.rio.peixes()))[0];
+  assert.ok(p2.x > p.x + 0.05, 'o peixe nadou para longe: ' + p.x + ' → ' + p2.x);
+  assert.equal(await tem(pg, 'peixe'), 0, 'errou: a cesta não muda');
+  // tarde: o peixe já passou (à esquerda, indo embora para a esquerda)
+  await posPeixe(pg, -(zona + 0.03), -1);
+  await puxarAgora(pg);
+  assert.match(await pg.textContent('#aviso'), /Quase! Puxou tarde/);
+  assert.equal(await tem(pg, 'peixe'), 0, 'errou de novo: a cesta não muda');
+  // na hora certa: o peixe bem no círculo
+  await posPeixe(pg, zona * 0.5, -1);
+  await puxarAgora(pg);
+  await pg.waitForSelector('.cardume .peixe.fisgado');
+  await pg.waitForFunction(() => (window.Cozinha.jogo().cesta.peixe || 0) === 1, null, { timeout: 6000 });
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('rio no Fácil: o círculo é bem maior — o mesmo puxão que erra no Difícil fisga no Fácil', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await rioDeVerdade('facil');
+  const zona = await pg.evaluate(() => window.Cozinha.rio.zona());
+  assert.ok(zona >= 0.12, 'círculo largo no Fácil: ' + zona);
+  await posPeixe(pg, 0.10, -1);   // no Difícil isso foi "Quase! Puxou cedo"
+  await puxarAgora(pg);
+  await pg.waitForSelector('.cardume .peixe.fisgado');
+  await pg.waitForFunction(() => (window.Cozinha.jogo().cesta.peixe || 0) === 1, null, { timeout: 6000 });
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});

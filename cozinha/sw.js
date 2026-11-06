@@ -1,10 +1,10 @@
 /* Cozinha — service worker: guarda a pasta no aparelho para abrir sem internet.
    Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte e imagens: cópia primeiro.
-   Músicas (../rabiscolandia/musicas/*.mp3): o service worker não mexe (o navegador busca direto; sem internet,
+   Músicas (../rabiscolandia/musicas/*.mp3 e ../baguncolandia/musicas/*.mp3): o service worker não mexe (o navegador busca direto; sem internet,
    a trilha pula a música que não abre e some sem erro).
    Cache com o nome do app: só apaga caches "cozinha-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e à primeira entrada de versoes.json). */
-var VERSAO = '0.2.1';
+var VERSAO = '0.3.0';
 var CACHE = 'cozinha-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'dados.js', 'logica.js', 'desenhos.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../atualizar.js', '../telacheia.js', '../versao.js', '../trilha.js'];
 self.addEventListener('install', function (e) {

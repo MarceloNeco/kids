@@ -7,7 +7,8 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.2.0** (06/Nov/2026) — pescaria nova no rio e a voz da vovó Dona Cida. Continua sendo uma
+Versão atual: **0.3.0** (06/Nov/2026) — cada fruta e cada legume na sua planta de verdade (o jogo também ensina de
+onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de verdade. Continua sendo uma
 **primeira proposta**: o dono quer entrevistar a filha para ajustar as receitas, os lugares e os passos (pendência 2).
 
 ## Como brincar
@@ -15,14 +16,30 @@ Versão atual: **0.2.0** (06/Nov/2026) — pescaria nova no rio e a voz da vovó
 1. **Escolha o nível e a receita.** A ficha mostra os ingredientes, quanto precisa de cada um (ex.: 3 ovos,
    2 xícaras de farinha) e os lugares onde achar cada um.
 2. **Vila** (🧺 a cesta embaixo mostra o que já tem e o que falta; no Fácil e no Médio os lugares úteis brilham ✨):
-   - 🎣 **Rio** — 3 peixinhos nadam; a vara, a linha, a boia e o anzol ficam desenhados, com o anzol parado dentro do
-     círculo. Toque em *Puxar* (ou na água) quando um peixe passar dentro do círculo (no Fácil e no Médio o círculo
+   - 🎣 **Rio** — 3 peixinhos nadam, cada um na sua velocidade (e mudam de velocidade de vez em quando); a vara, a
+     linha, a boia e o anzol ficam desenhados, com o anzol parado dentro do círculo. O círculo diminui com o nível
+     (Fácil bem largo e peixes devagar; Médio no meio; Difícil estreito e peixes rápidos, precisa acertar a hora).
+     Puxou cedo ou tarde com um peixe perto: ele se assusta, foge rápido com um respinguinho e aparece **"Quase!"**
+     (cedo: "espere o peixe entrar no círculo"; tarde: "o peixe já tinha passado"); a cesta não muda.
+     Toque em *Puxar* (ou na água) quando um peixe passar dentro do círculo (no Fácil e no Médio o círculo
      fica amarelo e a boia belisca quando tem peixe perto): ele fica **preso no anzol**, a linha recolhe e ele sobe se
      mexendo, sai da água com um respingo, a vara balança até o balde e ele cai lá dentro (som feliz, e vai para a
      cesta). Os outros peixes continuam nadando e um peixe novo chega nadando pelo lado. Com *movimento reduzido* no
      aparelho, o peixe sobe reto, sem se mexer e sem respingo. Se a criança sair no meio, o peixe já fisgado vai para a cesta.
-   - 🌳 **Pomar** — toque nas frutas maduras e coloridas; as verdinhas balançam e pedem para esperar (vão amadurecendo).
-   - 🌱 **Horta** — toque 3 vezes (ou puxe o dedo para cima) para tirar o legume da terra; ele nasce de novo.
+   - 🌳 **Pomar** — cada fruta **só na sua planta de verdade**, com o nome da planta embaixo (PT e EN): maçã na
+     macieira, laranja na laranjeira (com flor branca), limão no limoeiro, banana em pencas no cacho da **bananeira**
+     (folhas largas e compridas, folha seca no tronco e o coração roxo na ponta do cacho), uva em cachos na **parreira**
+     (armação de madeira) e morango na plantinha baixinha do chão, no canteiro com palha. Aparecem só as plantas do
+     que a receita pede (e mais uma, se for uma só). Toque nas frutas maduras e coloridas; as verdinhas balançam e
+     pedem para esperar (vão amadurecendo).
+   - 🌱 **Horta** — corte da terra: **cenoura e batata crescem embaixo da terra** (dá para vê-las de leve através da
+     terra; em cima só as folhas) e saem tocando 3 vezes ou puxando o dedo para cima; **tomate** no tomateiro amarrado
+     numa estaca (um toque colhe o tomate vermelho; os verdes continuam crescendo), **alface** (bola de folhas em cima
+     da terra) e **cheiro-verde** (cebolinha e salsinha) saem com um toque. Cada pé tem o nome embaixo. Nasce de novo.
+   - 💡 **O jogo também ensina**: ao pegar qualquer coisa aparece de onde ela vem ("A banana nasce em cachos na
+     bananeira!", "A cenoura cresce embaixo da terra…", "A farinha é feita de trigo moído no moinho!"); no Fácil a voz
+     lê na primeira vez. O que é feito pelas pessoas (farinha, açúcar, sal, óleo, manteiga, chocolate, queijo, pão...)
+     só existe no mercadinho (ou emprestado da vizinha), nunca numa planta.
    - 🐔 **Galinheiro** — toque na galinha para ela levantar; se tiver ovo, pegue. Ovo novo aparece depois de um tempo.
    - 🐄 **Fazendinha da Mimosa** — carinho na vaca e *segure* o botão para encher a xícara de leite.
    - 🏪 **Mercadinho do Seu Zé** — no Fácil é tudo de presente; no Médio e no Difícil a criança toca nas moedas
@@ -65,9 +82,9 @@ Toda receita começa lavando as mãos e termina servindo.
 | Arquivo | O que é |
 |---|---|
 | `index.html` | As telas (entrada, menu, ficha, vila, lugar, cozinha, pronto). CSP sem script inline. |
-| `dados.js` | **Receitas** (ingredientes, quantidades, passos), lugares, ingredientes, utensílios e níveis. Receita nova = uma entrada em `RECEITAS` (o comentário no topo explica os campos). |
+| `dados.js` | **Receitas** (ingredientes, quantidades, passos), lugares, **plantas** (onde cada fruta e legume nasce de verdade), ingredientes (com a frase que ensina de onde vem), utensílios e níveis (incluindo o círculo e a velocidade dos peixes). Receita nova = uma entrada em `RECEITAS` (o comentário no topo explica os campos). |
 | `logica.js` | Regras sem tela: cesta, moedas e troco, favores, passos de cada nível e a ordem, imprevisto, estrelas, texto de cada passo em PT/EN. |
-| `desenhos.js` | Desenhos em SVG feitos em código (utensílios, ingredientes sem emoji, faca sem ponta, ícone do app). |
+| `desenhos.js` | Desenhos em SVG feitos em código (utensílios, ingredientes sem emoji, faca sem ponta, ícone do app, as plantas do pomar e da horta e o lugar das frutas em cada planta). |
 | `app.js` | Telas, mini-jogos da vila, cozinha, receita pronta, progresso, voz, sons, música, service worker. `APP_VERSION`. |
 | `estilo.css` | Visual (fonte Fredoka da Rabiscolândia). |
 | `sw.js` | Modo sem internet (cache `cozinha-v<VERSAO>`). Arquivo novo entra em `ARQUIVOS`. |
@@ -77,8 +94,9 @@ Toda receita começa lavando as mãos e termina servindo.
 | `teste/` | Testes (ver abaixo). `teste/navegador.js` são os ajudantes do navegador (não é teste). |
 
 Peças comuns usadas com `../`: `recursos.js` (interruptor `cozinha` do RootifyONE, app `kids` (Bolinho de Chuva)),
-`atualizar.js` (aviso de versão nova), `telacheia.js`, `trilha.js` (música no canto, com 11 músicas da pasta
-`../rabiscolandia/musicas/`) e `instalar.js` (só com `?instalar=1`).
+`atualizar.js` (aviso de versão nova), `telacheia.js`, `trilha.js` (música no canto, com 13 músicas animadas com
+instrumentos de verdade: 9 da pasta `../rabiscolandia/musicas/` e 4 de `../baguncolandia/musicas/`; nada de som de
+videogame antigo nem música calma demais) e `instalar.js` (só com `?instalar=1`).
 
 ## O que fica guardado (só neste aparelho)
 
@@ -91,18 +109,26 @@ Nenhum dado pessoal, nenhum nome de criança.
 Da raiz do repositório kids: `node --test cozinha/teste/*.test.js` (Node + Playwright com o Chromium do ambiente;
 leva cerca de 2 minutos).
 
-- `dados.test.js` — 10+ receitas, PT/EN, todo ingrediente se consegue em algum lugar em todo nível, Fácil em até 2
+- `dados.test.js` — cada fruta/legume na planta e no lugar certos (o mapa esperado está escrito no teste; nada de
+  farinha em árvore), frase que ensina de onde vem em PT/EN, desenho de cada planta, círculo do peixe menor e peixes mais
+  rápidos a cada nível; 10+ receitas, PT/EN, todo ingrediente se consegue em algum lugar em todo nível, Fácil em até 2
   lugares, moedas suficientes, passos válidos (lavar primeiro, servir por último, ordem certa, nada buscado à toa).
 - `logica.test.js` — cesta, quantidades, moedas e troco, ajudar o Seu Zé, favores e obrigado, imprevisto, ordem dos
   passos, estrelas.
 - `arquivos.test.js` — versão igual em `app.js`, `sw.js` e `versoes.json`; o `sw.js` guarda tudo; CSP; textos PT|EN;
-  músicas com crédito; pendência da entrevista; nenhum segredo.
+  13 músicas que existem (Rabiscolândia e Bagunçolândia), com crédito e licença de origem, sem Spazzmatica nem som
+  de videogame, nenhum mp3 copiado; pendência da entrevista; nenhum segredo.
 - `pagina.test.js` — joga a vitamina de banana do Fácil inteira no **celular** e no **computador** e o bolo de cenoura
   do Fácil no **tablet** (juntando na vila de verdade), o mercadinho com troco e a vizinha no Médio, o imprevisto e as
   fichas no Difícil, e o inglês; a **pescaria** no celular (o peixe preso no anzol sobe quadro a quadro, os outros
   continuam no rio, a cesta passa a 1/1, chega peixe novo) e com movimento reduzido (sobe sem balançar); e a **voz da
   Dona Cida** (com uma voz de mentira no lugar da do navegador: fala ao chegar, ao emprestar, no tchau e sem favores,
   com velocidade 0,9, tom 1,2 e voz feminina em PT e em EN; com a voz desligada não fala) — sem erro no console.
+- `pagina.test.js` (v0.3.0) — o **pomar** mostra cada fruta só na sua planta com o nome (a banana no cacho da
+  bananeira, com o coração roxo) e a frase que ensina; a **horta** com cenoura que precisa ser puxada 3 vezes e tomate
+  colhido com um toque; a **pescaria com hora certa** (`?teste&pescareal` usa o círculo de verdade e o teste para os
+  peixes): no Difícil puxar cedo e tarde dá "Quase!", o peixe foge com respingo e a cesta não muda; na hora certa
+  fisga; no Fácil o mesmo puxão que erra no Difícil fisga.
 - `receitas.test.js` — cozinha **todas** as receitas no Médio e no Difícil até o fim.
 
 `?teste` no endereço deixa as esperas bem curtas e as frutas maduras (só para os testes).

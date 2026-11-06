@@ -2,6 +2,25 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "06/Nov/2026",
+      "hora": "22:00:00",
+      "pt": [
+        "🍌 Cada fruta agora nasce na planta de verdade: banana no cacho da bananeira (com o coração roxo), maçã na macieira, laranja na laranjeira, limão no limoeiro, uva na parreira e morango na plantinha baixinha do chão. Cada planta tem o nome embaixo. Só aparecem as plantas do que a receita pede.",
+        "🥕 Horta de verdade: cenoura e batata ficam embaixo da terra (dá para ver através dela) e saem puxando; tomate no tomateiro amarrado na estaca, alface e cheiro-verde em cima da terra saem com um toque.",
+        "💡 O jogo também ensina: ao pegar uma coisa aparece de onde ela vem (\"A banana nasce em cachos na bananeira!\", \"A farinha é feita de trigo moído no moinho!\").",
+        "🎣 Pescaria um pouco mais difícil: o círculo do anzol é menor e cada peixe nada numa velocidade. Se puxar cedo ou tarde, o peixe leva um susto, foge com um respingo e aparece \"Quase!\". No Fácil continua bem fácil; no Difícil precisa acertar a hora.",
+        "🎵 Músicas novas, só com instrumentos de verdade (ukulele, violão, metais, acordeão, cordas): saíram as que pareciam som de videogame antigo e as muito calmas."
+      ],
+      "en": [
+        "🍌 Each fruit now grows on its real plant: bananas in a bunch on the banana plant (with the purple heart), apples on the apple tree, oranges on the orange tree, lemons on the lemon tree, grapes on the grapevine and strawberries on the small plant on the ground. Each plant has its name underneath. Only the plants the recipe needs show up.",
+        "🥕 A real vegetable garden: carrots and potatoes are under the ground (you can see them through the soil) and come out when you pull; tomatoes on a tomato plant tied to a stake, lettuce and herbs on top of the soil come out with one tap.",
+        "💡 The game also teaches: when you pick something, it shows where it comes from (\"Bananas grow in bunches on the banana plant!\", \"Flour is made from wheat ground at the mill!\").",
+        "🎣 Fishing is a little harder: the circle around the hook is smaller and each fish swims at its own speed. Pull too early or too late and the fish gets scared, swims away with a splash and you see \"Almost!\". Easy is still easy; Hard needs good timing.",
+        "🎵 New music, only with real instruments (ukulele, guitar, brass, accordion, strings): the songs that sounded like old video games and the very calm ones are gone."
+      ]
+    },
+    {
       "versao": "0.2.1",
       "data": "06/Nov/2026",
       "hora": "20:00:00",

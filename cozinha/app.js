@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.1';
+  var APP_VERSION = '0.3.0';
   var APP_UPDATED = '06/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -254,6 +254,18 @@
     else if (!r) aviso(t('A receita não pede ' + nome + ', mas fica na cesta.', 'The recipe does not need ' + nome + ', but it stays in the basket.'));
     else if (r.falta === 0) aviso(t('✅ Já tem ' + nome + ' que chega!', '✅ You have enough ' + nome + '!'));
     else aviso('+1 ' + nome + ' · ' + t('falta ', 'still need ') + r.falta, 1800, true);
+    ensinar(id);
+  }
+  // 💡 o jogo também ensina: de onde vem cada coisa ("A banana nasce em cachos na bananeira!"). Fica escrito no
+  // lugar; no Fácil, a voz lê na primeira vez de cada ingrediente (menos na casa da vizinha, onde quem fala é ela).
+  function ensinar(id) {
+    var g = D.ingrediente[id], el = document.querySelector('#jogoLugar .fato');
+    if (!g || !g.fato || !el) return;
+    el.textContent = '💡 ' + g.fato[en() ? 1 : 0]; el.hidden = false;
+    el.classList.remove('entra'); void el.offsetWidth; el.classList.add('entra');
+    jogo.fatos = jogo.fatos || {};
+    if (!jogo.fatos[id] && jogo.cfg.id === 'facil' && lugarAtual !== 'vizinha') falar(g.fato[en() ? 1 : 0], { fila: true });
+    jogo.fatos[id] = true;
   }
   function coletar(id, de) { L.por(jogo.cesta, id, 1); recebeu(id, de); }
   function erro() { if (jogo) jogo.erros++; Som.toca('erro'); }
@@ -321,6 +333,7 @@
     ir('lugar');
     lugarAtual = id;
     MINI[id](area);
+    var fato = document.createElement('p'); fato.className = 'fato'; fato.hidden = true; fato.setAttribute('aria-live', 'polite'); area.appendChild(fato);
     desenharCesta(); desenharPrecisa();
   }
   // tipos que aparecem num lugar: primeiro o que falta, depois outros do mesmo lugar
@@ -470,7 +483,10 @@
   // Tudo desenhado num quadro só (requestAnimationFrame, só transform e atributos do SVG). Movimento reduzido:
   // sobe reto, sem se mexer e sem respingo.
   MINI.rio = function (area) {
-    var nv = jogo.cfg, zona = RAPIDO ? 0.5 : nv.zonaPeixe, vel = nv.id === 'facil' ? 0.12 : nv.id === 'medio' ? 0.17 : 0.23;
+    // ?teste deixa o círculo enorme (os testes pescam de primeira); ?teste&pescareal usa o círculo de verdade do nível
+    var nv = jogo.cfg, zona = RAPIDO && !/[?&]pescareal\b/.test(location.search) ? 0.5 : nv.zonaPeixe, vel = nv.velPeixe;
+    var varia = nv.id === 'dificil' ? 1.0 : 0.7, parado = false;   // cada peixe tem a sua velocidade (no Difícil, uns bem mais rápidos)
+    function sortearVel() { return parado ? 0 : vel * (0.6 + Math.random() * varia); }
     var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
     var SUP = 0.42, ANZOL_Y = 0.7, TIP0 = [0.5, 0.05], TIP_B = [0.6, 0.02], BASE = [0.05, 0.36], ESC = 1.3, RAIAS = [0.58, 0.71, 0.84];
     area.innerHTML = '<p class="instr">' + t('Toque em Puxar quando um peixinho passar dentro do círculo, perto do anzol. Ele fica preso no anzol e vai para o balde!', 'Tap Pull when a little fish swims inside the circle, near the hook. It gets hooked and goes into the bucket!') + '</p>' +
@@ -495,7 +511,7 @@
     var peixes = [], relogio = 0;
     function novoPeixe(raia, x, dir) {
       var el = document.createElement('span'); el.className = 'peixe'; el.textContent = '🐟'; cardume.appendChild(el);
-      var p = { el: el, y0: raia, x: x, dir: dir, v: vel * (0.75 + Math.random() * 0.5), fase: Math.random() * 6, virar: relogio + 3 + Math.random() * 4, w: el.offsetWidth || 40, h: el.offsetHeight || 40 };
+      var p = { el: el, y0: raia, x: x, dir: dir, v: sortearVel(), fase: Math.random() * 6, virar: parado ? Infinity : relogio + 3 + Math.random() * 4, foge: 0, w: el.offsetWidth || 40, h: el.offsetHeight || 40 };
       peixes.push(p); return p;
     }
     embaralhar(RAIAS).forEach(function (r, i) { novoPeixe(r, 0.15 + i * 0.35 + Math.random() * 0.08, Math.random() < 0.5 ? 1 : -1); });
@@ -515,7 +531,8 @@
       if (calmo) return;
       var r = document.createElement('div'); r.className = 'respingo'; r.style.left = x + 'px'; r.style.top = y + 'px';
       var h = '<span class="anel"></span>';
-      for (var i = 0; forte && i < 7; i++) { var a = -Math.PI * (0.15 + 0.7 * i / 6); h += '<span class="gota" style="--dx:' + Math.round(Math.cos(a) * 34) + 'px;--up:' + Math.round(14 + Math.random() * 22) + 'px"></span>'; }
+      var n = forte === true ? 7 : forte || 0;   // gotas: 7 no peixe que sai da água, 3 no peixe que foge
+      for (var i = 0; i < n; i++) { var a = -Math.PI * (0.15 + 0.7 * i / Math.max(1, n - 1)); h += '<span class="gota" style="--dx:' + Math.round(Math.cos(a) * 34) + 'px;--up:' + Math.round(14 + Math.random() * 22) + 'px"></span>'; }
       r.innerHTML = h; agua.appendChild(r); agendar(function () { r.remove(); }, 800);
     }
     function ponta(tip, carga) { return [tip[0] * W, (tip[1] + 0.025 * carga) * H]; }
@@ -548,15 +565,16 @@
       var temPerto = false;
       peixes.forEach(function (f) {
         if (f === preso) return;
-        f.x += f.dir * f.v * dt;
+        var fugindo = f.foge > relogio;   // levou um susto: nada rápido para longe do anzol
+        f.x += f.dir * (fugindo ? Math.max(vel, 0.1) * 3 : f.v) * dt;
         if (f.x > 0.07 && f.x < 0.93) f.entrando = false;
         if (!f.entrando) {
           if (f.x >= 0.93 && f.dir > 0) f.dir = -1; else if (f.x <= 0.07 && f.dir < 0) f.dir = 1;
-          else if (relogio > f.virar) { f.virar = relogio + 3 + Math.random() * 4; if (Math.random() < 0.35) f.dir = -f.dir; }
+          else if (relogio > f.virar) { f.virar = relogio + 3 + Math.random() * 4; f.v = sortearVel(); if (Math.random() < 0.35) f.dir = -f.dir; }
         }
         var y = (f.y0 + (calmo ? 0 : 0.02 * Math.sin(relogio * 1.3 + f.fase))) * H;
         mover(f.el, f.x * W - f.w / 2, y - f.h / 2, 0, f.dir > 0 ? -1 : 1);
-        if (!f.entrando && Math.abs(f.x - 0.5) <= zona) temPerto = true;
+        if (!f.entrando && !fugindo && Math.abs(f.x - 0.5) <= zona) temPerto = true;
       });
       if (nv.brilho) alvo.classList.toggle('tem-peixe', temPerto && fase === 'pronto');
       // boia: presa na linha, um pouco acima do anzol (na superfície quando o anzol está na água); belisca quando há peixe perto
@@ -598,7 +616,9 @@
     fimLugar.push(function () { vivo = false; cancelAnimationFrame(raf); if (preso && !creditou) { creditou = true; L.por(jogo.cesta, 'peixe', 1); desenharCesta(); } });
     function puxar() {
       if (fase !== 'pronto') return;
-      var perto = peixes.filter(function (f) { return !f.entrando && Math.abs(f.x - 0.5) <= zona; }).sort(function (a, b) { return Math.abs(a.x - 0.5) - Math.abs(b.x - 0.5); })[0];
+      var livres = peixes.filter(function (f) { return !f.entrando && !(f.foge > relogio); }).sort(function (a, b) { return Math.abs(a.x - 0.5) - Math.abs(b.x - 0.5); });
+      var perto = livres.filter(function (f) { return Math.abs(f.x - 0.5) <= zona; })[0];
+      var quase = !perto && livres.filter(function (f) { return Math.abs(f.x - 0.5) <= zona + 0.2; })[0];
       if (perto) {
         preso = perto; creditou = false; saiu = false; alvo.classList.remove('tem-peixe');
         preso.sx = preso.dir > 0 ? -1 : 1;
@@ -609,11 +629,25 @@
       } else {
         mudar('treme');
         agua.classList.remove('balanca'); void agua.offsetWidth; agua.classList.add('balanca'); Som.toca('toque');
-        aviso(t('Escapou! Puxe quando um peixe estiver dentro do círculo ⭕', 'It got away! Pull when a fish is inside the circle ⭕'), 1600);
+        if (quase) {
+          // puxou cedo (o peixe ainda vinha chegando) ou tarde (já tinha passado): ele se assusta e foge com um respingo
+          var cedo = (0.5 - quase.x) * quase.dir > 0;
+          quase.dir = quase.x < 0.5 ? -1 : 1; quase.foge = relogio + 1.4;
+          respingo(quase.x * W, (quase.y0 + (calmo ? 0 : 0.02 * Math.sin(relogio * 1.3 + quase.fase))) * H, 3); Som.toca('agua');
+          aviso(cedo ? t('Quase! Puxou cedo: espere o peixe entrar no círculo ⭕', 'Almost! Too early: wait for the fish to get inside the circle ⭕')
+            : t('Quase! Puxou tarde: o peixe já tinha passado ⭕', 'Almost! Too late: the fish had already swum past ⭕'), 2000);
+        } else aviso(t('Escapou! Puxe quando um peixe estiver dentro do círculo ⭕', 'It got away! Pull when a fish is inside the circle ⭕'), 1600);
       }
     }
     qs(area, '#btPuxar').addEventListener('click', puxar);
     agua.addEventListener('click', puxar);
+    // só nos testes (?teste): parar os peixes e pôr um peixe num lugar para conferir o "quase" e o fisgar na hora certa
+    if (RAPIDO) window.Cozinha.rio = {
+      zona: function () { return zona; },
+      peixes: function () { return peixes.map(function (f) { return { x: f.x, dir: f.dir, foge: f.foge > relogio, preso: f === preso }; }); },
+      parar: function () { parado = true; peixes.forEach(function (f) { f.v = 0; f.virar = Infinity; }); },
+      por: function (i, x, dir) { var f = peixes[i]; f.x = x; f.dir = dir; f.entrando = false; f.foge = 0; }
+    };
   };
 
   MINI.mercado = function (area) {
@@ -1000,19 +1034,23 @@
 
   // ---------- música, service worker ----------
   if (window.Trilha) {
-    var M = '../rabiscolandia/musicas/', au = 'Kevin MacLeod', lic = 'CC BY';
+    // só músicas animadas com instrumentos de verdade (ukulele, violão, metais, acordeão, cordas, marimba...), nada de
+    // som de videogame antigo; tocadas direto das pastas da Rabiscolândia e da Bagunçolândia (nenhum arquivo copiado)
+    var M = '../rabiscolandia/musicas/', B = '../baguncolandia/musicas/', au = 'Kevin MacLeod', lic = 'CC BY', cc0 = 'CC0';
     Trilha.iniciar({ jogo: 'cozinha', creditos: 'CREDITOS.md', volume: 0.4, musicas: [
+      { a: M + 'fluffing-a-duck.mp3', t: 'Fluffing a Duck', au: au, lic: lic },
+      { a: M + 'carefree.mp3', t: 'Carefree', au: au, lic: lic },
+      { a: M + 'sneaky-snitch.mp3', t: 'Sneaky Snitch', au: au, lic: lic },
+      { a: M + 'scheming-weasel.mp3', t: 'Scheming Weasel', au: au, lic: lic },
+      { a: M + 'life-of-riley.mp3', t: 'Life of Riley', au: au, lic: lic },
       { a: M + 'mariachi-snooze.mp3', t: 'Mariachi Snooze', au: au, lic: lic },
-      { a: M + 'spazzmatica-polka.mp3', t: 'Spazzmatica Polka', au: au, lic: lic },
       { a: M + 'carpe-diem.mp3', t: 'Carpe Diem', au: au, lic: lic },
       { a: M + 'street-party.mp3', t: 'Street Party', au: au, lic: lic },
-      { a: M + 'sunflower-dance-party.mp3', t: 'Sunflower Dance Party', au: au, lic: lic },
       { a: M + 'beachfront-celebration.mp3', t: 'Beachfront Celebration', au: au, lic: lic },
-      { a: M + 'airport-lounge.mp3', t: 'Airport Lounge', au: au, lic: lic },
-      { a: M + 'disco-lounge.mp3', t: 'Disco Lounge', au: au, lic: lic },
-      { a: M + 'movement-proposition.mp3', t: 'Movement Proposition', au: au, lic: lic },
-      { a: M + 'who-likes-to-party.mp3', t: 'Who Likes to Party', au: au, lic: lic },
-      { a: M + 'gymnopedie-1.mp3', t: 'Gymnopédie nº 1 (Satie)', au: au, lic: lic }
+      { a: B + 'happy-whistling-ukulele.mp3', t: 'Happy Whistling Ukulele', au: 'Rafael Krux', lic: cc0 },
+      { a: B + 'ukulele-song.mp3', t: 'Ukulele Song', au: 'Rafael Krux', lic: cc0 },
+      { a: B + 'city-sunshine.mp3', t: 'City Sunshine', au: au, lic: cc0 },
+      { a: B + 'funshine.mp3', t: 'Funshine', au: au, lic: cc0 }
     ] });
   }
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
