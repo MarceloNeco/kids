@@ -216,3 +216,18 @@ test('🧸 com a câmera (sem dedo) o corpo manda direto, como antes', () => {
   assert.ok(Math.abs(p.estado().jogadores[0].corpo.x - 0.2) < 0.01);
   assert.strictEqual(p.estado().jogadores[0].vai, null);
 });
+
+test('⌨️ no computador: ← → andam, ↑ pula, o corpo bagunça e andar até a beira leva ao cômodo do lado', () => {
+  const p = partida('sala'); correr(p, 50);
+  const x = () => p.estado().jogadores[0].corpo.x * 1280;
+  const x0 = x(); p.teclas(0, { dir: true }); correr(p, 500);
+  assert.ok(x() > x0 + 150, 'andou para a direita');
+  p.teclas(0, { dir: true, pulo: true }); let menor = 0; for (let t = 0; t < 400; t += 16) { p.avancar(16); menor = Math.min(menor, p.estado().jogadores[0].vai.y); }
+  assert.ok(menor < -100, 'pulou: ' + menor);
+  const cena = p.cena; p.teclas(0, { dir: true }); correr(p, 4000);
+  assert.notStrictEqual(p.cena, cena, 'passou para o cômodo do lado');
+  assert.ok(x() < 640, 'entrou pelo lado esquerdo do cômodo novo: ' + x());
+  // andando pelo chão, o pé chuta o que encontra
+  const q = partida('quarto'); correr(q, 50); q.teclas(0, { esq: true }); correr(q, 1500); q.teclas(0, { dir: true }); correr(q, 2500);
+  assert.ok(q.estado().jogadores[0].pontos > 0, 'o corpo do boneco bagunçou');
+});
