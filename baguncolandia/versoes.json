@@ -2,6 +2,19 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.22",
+      "data": "06/Nov/2026",
+      "hora": "13:00:00",
+      "pt": [
+        "🧸 Bagunça no dedo: o boneco agora ANDA até o dedo, mexendo as pernas, um pouco mais devagar (uma tela em cerca de 2,4 s). Ele não aparece mais do outro lado de uma vez quando você solta o dedo de um lado e encosta no outro. Se o dedo está no alto, ele pula para alcançar; chegou e você segurou o dedo lá em cima, ele fica de costas, mexendo nas coisas.",
+        "A rodada da Bagunça agora tem pelo menos 90 segundos."
+      ],
+      "en": [
+        "🧸 Mayhem with your finger: the avatar now WALKS to your finger, legs moving, a little slower (one screen in about 2.4 s). It no longer pops to the other side at once when you lift your finger on one side and touch the other. If your finger is up high, it jumps to reach; once there, with your finger held up high, it turns its back to us, rummaging through things.",
+        "Mayhem rounds now last at least 90 seconds."
+      ]
+    },
+    {
       "versao": "0.8.21",
       "data": "06/Nov/2026",
       "hora": "18:00:00",

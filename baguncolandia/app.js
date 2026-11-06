@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.21', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.22', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -185,9 +185,10 @@
       var vivo = function (ts) { if (!document.body.contains(cv)) return; if (tv.fase === 'lobby') { var c = cfg(), id = c.cabeca + '|' + c.acessorio + '|' + c.cor; if (cv.getAttribute('data-cfg') !== id) cv.setAttribute('data-cfg', id); try { Desenho.previa(cv, c, ts); } catch (e) {} } requestAnimationFrame(vivo); };   // data-cfg: qual boneco está no cartão (para os testes)
       requestAnimationFrame(vivo);
     }
+    function duracaoDe(c) { return c.modo === 'bagunca' && c.duracao && c.duracao < 90 ? 90 : c.duracao; }   // 🧸 o boneco anda até o dedo: a rodada da bagunça tem pelo menos 90 s
     function resumo() {
       var c = tv.cfg, m = { corta: T('🍉 Corta-corta', '🍉 Slice'), pega: T('🎈 Pega-pega', '🎈 Catch'), chuta: T('⚽ Chuta-chuta', '⚽ Kick'), pula: T('🪵 Pula e abaixa', '🪵 Jump and duck'), bolas: T('🎳 Bagunça de bolas', '🎳 Ball mayhem'), mistura: T('🎪 Bagunça total', '🎪 Total mayhem'), bagunca: T('🧸 Bagunça na casa (6 lugares)', '🧸 House mayhem (6 places)'), arrumar: T('🧹 Arrumar a casa', '🧹 Tidy up the house') }[c.modo] || '';
-      var d = c.duracao ? (c.duracao >= 120 ? '2 min' : c.duracao + ' s') : T('🎵 a música inteira', '🎵 the whole song');
+      var dd = duracaoDe(c), d = dd ? (dd >= 120 ? '2 min' : dd + ' s') : T('🎵 a música inteira', '🎵 the whole song');
       var n = { crianca: T('Criança', 'Kids'), normal: 'Normal', maluco: T('Maluco', 'Crazy') }[c.dificuldade];
       var amb = c.ambiente === 'paisagem' ? T('🏞️ paisagem', '🏞️ landscape') : T('📷 câmera', '📷 camera');
       $('lobbyDica').textContent = c.jogadores !== 2 ? '' : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.');
@@ -293,7 +294,7 @@
       var figs = Figuras.lista(tv.cfg.turmas);
       if (!figs.some(function (f) { return f.papel === 'fruta'; })) figs = Figuras.lista();   // sem fruta nenhuma não dá para cortar
       var nCasas = window.Casa ? Casa.CENAS.length : 3; tv.casaN = tv.casaN == null ? Math.floor(Math.random() * nCasas) : (tv.casaN + 1) % nCasas;   // 🧸 Bagunça: cada rodada num lugar (sala, quarto, jardim, cozinha, banheiro, parquinho)
-      tv.partida = Bagunca.criarPartida({ modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: tv.cfg.duracao, dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas(), vai: vaiLigado() });
+      tv.partida = Bagunca.criarPartida({ modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: duracaoDe(tv.cfg), dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas(), vai: vaiLigado() });
       Desenho.mostrarBoneco(vaiLigado() || tv.mostrarBoneco !== false);   // 🧍 vai até lá: o boneco é quem joga, aparece sempre
       Object.keys(tv.caixas).forEach(function (j) { var c = tv.caixas[j]; if (c) { tv.partida.zonaChute(+j, Math.min(0.95, c.y + c.h * 0.6)); tv.partida.calibrar(+j, c); } });
       if (tv.toque) { tv.dedoCorpo = {}; for (var jt = 0; jt < tv.cfg.jogadores; jt++) { tv.partida.calibrar(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }); tv.partida.corpo(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }, performance.now()); } }
@@ -458,11 +459,12 @@
       // 🧍 vai até lá: o dedo marca o alvo; o boneco anda (e pula) até ele. Soltar: ele termina de chegar
       function vaiDedo(fn, e, p) { if (!tv.partida || !tv.partida.alvo || !vaiLigado() || tv.fase !== 'jogando') return false; var r = raiaDe(p); if (fn === 'largar') tv.partida.alvo(r.j, null); else tv.partida.alvo(r.j, r.x, p.y); return true; }
       function arrumaDedo(fn, e, p) { if (!tv.arrumando || !tv.partida || !tv.partida.pegar || tv.fase !== 'jogando') return false; if (fn === 'pegar') tv.partida.pegar(e.pointerId, raiaDe(p).j, p.x, p.y); else if (fn === 'mover') tv.partida.mover(e.pointerId, p.x, p.y); else tv.partida.largar(e.pointerId); return true; }
-      cv.addEventListener('pointerdown', function (e) { if (!tv.toque) return; e.preventDefault(); cv.setPointerCapture && cv.setPointerCapture(e.pointerId); var p = pos(e); dedos[e.pointerId] = { x0: p.x, y0: p.y, t0: performance.now(), p: p }; if (arrumaDedo('pegar', e, p) || vaiDedo('pegar', e, p)) return; if (tv.fase === 'lobby' || tv.fase === 'fim') return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } });
-      cv.addEventListener('pointermove', function (e) { if (!tv.toque || !dedos[e.pointerId]) return; e.preventDefault(); var p = pos(e), d = dedos[e.pointerId]; d.p = p; if (arrumaDedo('mover', e, p) || vaiDedo('mover', e, p)) return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } });
+      cv.addEventListener('pointerdown', function (e) { if (!tv.toque) return; e.preventDefault(); cv.setPointerCapture && cv.setPointerCapture(e.pointerId); var p = pos(e); dedos[e.pointerId] = { x0: p.x, y0: p.y, t0: performance.now(), p: p }; if (arrumaDedo('pegar', e, p) || vaiDedo('pegar', e, p)) return; if (tv.fase === 'lobby' || tv.fase === 'fim') return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); if (tv.partida.dedo) tv.partida.dedo(r.j, r.x, p.y); else corpoDedo(r.j, r.x, performance.now()); } });
+      cv.addEventListener('pointermove', function (e) { if (!tv.toque || !dedos[e.pointerId]) return; e.preventDefault(); var p = pos(e), d = dedos[e.pointerId]; d.p = p; if (arrumaDedo('mover', e, p) || vaiDedo('mover', e, p)) return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); if (tv.partida.dedo) tv.partida.dedo(r.j, r.x, p.y); else corpoDedo(r.j, r.x, performance.now()); } });
       function solta(e) {
         var d = dedos[e.pointerId]; if (!d) return; delete dedos[e.pointerId];
         if (arrumaDedo('largar', e, d.p) || vaiDedo('largar', e, d.p)) return;
+        if (tv.partida && tv.partida.dedo) { if (tv.fase === 'jogando') tv.partida.dedo(raiaDe(d.p).j, null); return; }   // 🧸 casa: soltou; o boneco termina de andar sozinho
         if (!tv.partida || tv.fase !== 'jogando') return;
         var dy = d.p.y - d.y0, dt = performance.now() - d.t0, r = raiaDe(d.p), c = tv.dedoCorpo[r.j] || (tv.dedoCorpo[r.j] = { pulando: 0, abaixado: 0 });
         if (dt < 600 && dy < -0.12) { c.pulando = performance.now() + 650; Som.tocar('tic'); }        // deslizou para cima: pula

@@ -190,3 +190,29 @@ test('o risco do dedo some quando o dedo para (não fica preso na tela)', () => 
   assert.ok(p.estado().jogadores[0].rastro.length > 0);
   correr(p, 600); assert.strictEqual(p.estado().jogadores[0].rastro.length, 0);
 });
+
+test('🧸 no dedo o boneco anda até o dedo (sem teletransporte), pula se está alto e fica de costas mexendo', () => {
+  const p = partida('sala'); correr(p, 100);
+  const xs = () => p.estado().jogadores[0].corpo.x * 1280;
+  const x0 = xs();
+  p.dedo(0, 0.95, 0.85); p.avancar(16);
+  assert.ok(xs() - x0 < 40, 'não aparece do outro lado de uma vez');
+  let maior = 0, ant = xs();
+  for (let t = 0; t < 1200; t += 16) { p.dedo(0, 0.95, 0.85); p.avancar(16); maior = Math.max(maior, (xs() - ant) / 0.016); ant = xs(); }
+  assert.ok(maior <= 1280 / 2.4 + 1, 'velocidade de criança: ' + maior);
+  assert.ok(xs() > x0 + 400, 'andou bastante em 1,2 s: ' + xs());
+  for (let t = 0; t < 1500; t += 16) { p.dedo(0, 0.95, 0.85); p.avancar(16); }
+  assert.ok(Math.abs(xs() - Math.min(0.95 * 1280, 1280 - 175 * 0.25)) < 30, 'chegou no dedo: ' + xs());
+  // dedo lá em cima (prateleira): pula e, parado lá, fica de costas
+  let pulou = 0, costas = false;
+  for (let t = 0; t < 1500; t += 16) { p.dedo(0, 0.9, 0.3); p.avancar(16); const v = p.estado().jogadores[0].vai; pulou = Math.min(pulou, v.y); costas = costas || v.costas; }
+  assert.ok(pulou < -40, 'pulou para alcançar: ' + pulou);
+  assert.ok(costas, 'ficou de costas mexendo nas coisas');
+});
+
+test('🧸 com a câmera (sem dedo) o corpo manda direto, como antes', () => {
+  const p = partida('sala'); correr(p, 50);
+  p.corpo(0, { x: 0.1, y: 0.1, w: 0.2, h: 0.8 }, 1000); p.avancar(16);
+  assert.ok(Math.abs(p.estado().jogadores[0].corpo.x - 0.2) < 0.01);
+  assert.strictEqual(p.estado().jogadores[0].vai, null);
+});

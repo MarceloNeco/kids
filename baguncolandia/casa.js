@@ -560,7 +560,7 @@
     }
     function organizar() {
       M.organizado = true; M.caixas = [];
-      jogadores.forEach(function (jg) { jg.corpo.x = 0.78; });   // o boneco espera no canto direito: o chão do meio é das caixas
+      jogadores.forEach(function (jg) { jg.corpo.x = 0.78; jg.alvo = null; });   // o boneco espera no canto direito: o chão do meio é das caixas
       var grupos = {}, ordem = [], ocupado = [[0, 150], [W - 400, W]];   // cantos: ◀ e o cesto; ▶ e o botão 💡
       M.obs.forEach(function (o) {
         if (o.extra || !noChao(o, 0)) return;
@@ -654,6 +654,25 @@
       M.folhas.forEach(function (f) { M.folhasChao.push({ x: f.x, y: M.chao + 4 - f.cam, rot: f.rot, cor: f.cor }); }); M.folhas = [];
       eventos = ev0; jogadores.forEach(function (jg, i) { jg.pontos = pts0[i]; });   // o sorteio não conta pontos nem faz barulho
     }
+    /* 👆 no dedo, o boneco ANDA até o dedo (não teletransporta): rápido de criança, mas dá para ver andar; pula se o dedo
+       está alto; chegou e o dedo continua lá em cima → vira de costas, mexendo nas coisas. Câmera: o corpo manda (corpo()). */
+    var BON = { A: 175, vmax: W / 2.4, acel: 5000, g: 2600, puloMax: 260 };
+    function dedo(j, nx, ny) { var jg = jogadores[j]; if (!jg) return; if (nx == null) { if (jg.alvo) jg.alvo.solto = true; return; } var r = raia(j); jg.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h, t: tempo }; }   // null: soltou o dedo
+    function andarBoneco(dt) {
+      jogadores.forEach(function (jg, j) {
+        var r = raia(j), b = jg.bon || (jg.bon = { x: r.x + jg.corpo.x * r.w, y: 0, vx: 0, vy: 0 }), al = jg.alvo, A = BON.A;
+        if (!al) { b.x = r.x + jg.corpo.x * r.w; return; }   // sem dedo: quem manda é o corpo (câmera)
+        var dx = al.x - b.x, quer = clamp(dx * 6, -BON.vmax, BON.vmax);
+        b.vx += clamp(quer - b.vx, -BON.acel * dt, BON.acel * dt);
+        b.x = clamp(b.x + b.vx * dt, r.x + A * 0.25, r.x + r.w - A * 0.25);
+        var ombro = M.chao - A * 1.05, segura = !al.solto;
+        if (b.y === 0 && segura && al.y < ombro && Math.abs(dx) < 70) b.vy = -Math.sqrt(2 * BON.g * Math.min(BON.puloMax, ombro - al.y + 30));
+        if (b.y < 0 || b.vy < 0) { b.vy += BON.g * dt; b.y = Math.min(0, b.y + b.vy * dt); if (b.y === 0) b.vy = 0; }
+        b.cima = segura && al.y < M.chao - A * 0.75 && Math.abs(dx) < 120;
+        b.costas = segura && Math.abs(dx) < 25 && Math.abs(b.vx) < 40 && al.y < M.chao - A * 0.35;   // chegou: de costas, mexendo
+        jg.corpo.x = (b.x - r.x) / r.w; jg.corpo.pulando = b.y < -10;
+      });
+    }
     function movimento(j, pontos, ts) {
       if (fase !== 'jogando' || !jogadores[j] || arrumando) return;
       var jg = jogadores[j], r = raia(j);
@@ -724,6 +743,7 @@
       var dt = Math.min(dtMs, 50) / 1000; tempo += dtMs;
       // dois passos por quadro: a física fica estável mesmo no celular lento
       if (arrumando && !M.organizado) organizar();   // primeira vez neste cômodo arrumando: monta as caixas
+      andarBoneco(Math.min(dtMs, 50) / 1000);
       passo(dt / 2); passo(dt / 2);
       var pct = bagunca();
       if (arrumando) {
@@ -766,7 +786,7 @@
     function estado() {
       return {
         fase: fase, modo: arrumando ? 'arrumar' : 'bagunca', modoBase: arrumando ? 'arrumar' : 'bagunca', arrumando: arrumando, tempo: tempo, restante: duracao ? Math.max(0, Math.ceil((duracao * 1000 - tempo) / 1000)) : null,
-        jogadores: jogadores.map(function (jg, j) { return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: 0, poder: null, poderAte: 0, lento: false, raia: raia(j), zonaChute: 0.6, rastro: tempo - (jg.rastroEm || 0) < 400 ? jg.rastro.slice(-8) : [], corpo: jg.corpo, invencivel: false, esqueleto: null }; }),
+        jogadores: jogadores.map(function (jg, j) { return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: 0, poder: null, poderAte: 0, lento: false, raia: raia(j), zonaChute: 0.6, rastro: tempo - (jg.rastroEm || 0) < 400 ? jg.rastro.slice(-8) : [], corpo: jg.corpo, vai: jg.alvo && jg.bon ? { x: jg.bon.x, y: jg.bon.y, vx: jg.bon.vx, A: BON.A, cima: jg.bon.cima, costas: jg.bon.costas, alvo: null } : null, invencivel: false, esqueleto: null }; }),
         coisas: [], trave: null, bpm: 0, casa: (M.arrumando = arrumando, M.cesto = arrumando ? CESTO : null, M.tempo = tempo, M.dicas = dicasOn, M), bagunca: ultimaPct
       };
     }
@@ -774,7 +794,7 @@
       comecar: comecar, pausar: pausar, continuar: continuar, terminar: terminar, avancar: avancar, movimento: movimento, esqueleto: esqueleto, corpo: corpo, calibrar: calibrar, estado: estado,
       batida: function () {}, zonaChute: function () {}, lancar: function () { return null; }, obstaculo: function () { return null; },
       eventos: function () { var e = eventos; eventos = []; return e; },
-      irPara: irPara, vizinhos: vizinhos, pegar: pegar, mover: mover, largar: largar, dica: dica, dicas: dicas, arrumar: arrumar, get cena() { return cena; }, W: W, H: H
+      irPara: irPara, vizinhos: vizinhos, dedo: dedo, pegar: pegar, mover: mover, largar: largar, dica: dica, dicas: dicas, arrumar: arrumar, get cena() { return cena; }, W: W, H: H
     };
   }
 

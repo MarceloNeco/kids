@@ -83,8 +83,18 @@
     // pescoço + cabeça (balança de leve ao andar; na dor, chacoalha)
     ctx.fillStyle = cfg.pele; ctx.fillRect(-L * 0.6, ty - L * 0.6, L * 1.2, L * 1.2);
     ctx.save(); ctx.translate(0, ty - hs * 0.46 + Math.abs(bal) * 2); ctx.rotate(bal * 0.06 + (o.pose === 'dor' ? Math.sin(ts / 45) * 0.08 : 0));
-    cabeca(ctx, cfg, hs, ts, o.pose); enfeitesDaPose(ctx, hs, o.pose, ts); ctx.restore();
+    cabeca(ctx, cfg, hs, ts, o.pose); if (o.costas) nuca(ctx, cfg, hs); enfeitesDaPose(ctx, hs, o.pose, ts); ctx.restore();
     if (o.pose === 'dor') maosNaCabeca();
+    ctx.restore();
+  }
+  /* de costas (mexendo nas coisas da parede): a parte de trás da cabeça cobre o rosto — cabelo (ou a cor da cabeça), orelhinhas */
+  function nuca(ctx, cfg, hs) {
+    var R = hs / 2, humana = CABECAS.indexOf(cfg.cabeca) >= 0 && cfg.cabeca !== 'robo' && cfg.cabeca !== 'pano', careca = cfg.cabelo === 'careca';
+    var cor = !humana ? tom(cfg.cor, 0.75) : careca ? tom(cfg.pele, 0.92) : cfg.corCabelo;
+    ctx.save();
+    if (humana) { ctx.fillStyle = cfg.pele; [-1, 1].forEach(function (s) { ctx.beginPath(); ctx.ellipse(s * R * 0.97, R * 0.08, R * 0.15, R * 0.21, 0, 0, 6.2832); ctx.fill(); }); }
+    ctx.fillStyle = cor; ctx.beginPath(); ctx.ellipse(0, -R * 0.02, R * 0.93, R * 0.98, 0, 0, 6.2832); ctx.fill();
+    if (humana && !careca) { ctx.strokeStyle = tom(cor, 0.8); ctx.lineWidth = Math.max(1, R * 0.05); [-0.4, 0, 0.4].forEach(function (k) { ctx.beginPath(); ctx.moveTo(k * R * 0.5, -R * 0.85); ctx.quadraticCurveTo(k * R * 1.1, -R * 0.1, k * R * 0.8, R * 0.7); ctx.stroke(); }); }   // fios de cabelo
     ctx.restore();
   }
   /* brilhos da alegria e, na dor, gotinha de suor e estrelinhas rodando (valem para qualquer cabeça, até as da turma) */
