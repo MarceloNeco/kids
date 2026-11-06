@@ -13,3 +13,5 @@
 
 Nada de música, imagem ou personagem com direito autoral de terceiros (as músicas acima são domínio público). As imagens que o dono
 colocar em `meus/` são de responsabilidade dele (ver `LEIA-ME.md`).
+
+06/Nov/2026 (0.8.25): *Comic Game Loop - Mischief* e *Bit Bit Loop* saíram da lista (som de videogame, 8 bits); os arquivos continuam em `musicas/`. O jogo toca as outras 11, sorteadas, com a favorita (*Going Bananas*) por último.

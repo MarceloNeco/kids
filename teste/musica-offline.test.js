@@ -116,7 +116,7 @@ test('Guardar todos guarda as 11 favoritas; sem internet a rádio, a Bagunçolâ
     await pg.goto(base + 'campo-minado/');
     await pg.mouse.click(200, 300); await pg.waitForTimeout(1500);
     assert.strictEqual(await tocandoBlob(pg), 'blob:', 'Campo Minado sem internet');
-    assert.match(await pg.textContent('.trilha .tr-nome'), /Sneaky Snitch/);
+    assert.match(await pg.textContent('.trilha .tr-nome'), /Scheming Weasel/);
 
     // Enigmas: a regra de segurança (CSP) da página precisa deixar tocar blob: (0.1.1)
     await pg.goto(base + 'enigmas/');

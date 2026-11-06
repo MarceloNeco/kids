@@ -7,7 +7,8 @@
     alguém tocar ▶ de novo. Com "economia de dados" ligada, não toca sozinha.
   - ⏯ pausa e continua; ⏮ ⏭ trocam; as bolinhas mostram as 10 músicas e escolhem uma.
   - Cada música baixa só quando vai tocar (preload="none").
-  - Lembra em que música parou (localStorage, com proteção para quando não houver).
+  - Ordem sorteada a cada vez que abre, com a favorita (Cool Rock) sempre por último (Trilha.embaralhar; regra do
+    dono, 06/Nov/2026: com internet, todas as gravadas; a favorita, que é a de sem internet, nunca é a primeira).
   - Tela de bloqueio do celular mostra a música e os botões (Media Session).
   - Sem internet (ou se a música não abre): toca em laço a favorita da estante, guardada no aparelho pelo
     Trilha.offline (trilha.js, carregado antes deste arquivo). Com internet, ela é guardada na primeira música que toca.
@@ -27,15 +28,12 @@
     { t: 'Delay Rock', a: 'delay-rock', au: K },
     { t: 'RetroFuture Clean', a: 'retrofuture-clean', au: K }
   ];
-  var CHAVE = 'bolinho:radio:musica';
+  if (window.Trilha && window.Trilha.embaralhar) MUSICAS = window.Trilha.embaralhar(MUSICAS, 'estante', function (m) { return '/kids/musicas/' + m.a + '.mp3'; });
   var CHAVE_PAUSA = 'bolinho:radio:pausado';
   function pausouAntes() { try { return localStorage.getItem(CHAVE_PAUSA) === '1'; } catch (e) { return false; } }
   function lembrarPausa(sim) { try { if (sim) localStorage.setItem(CHAVE_PAUSA, '1'); else localStorage.removeItem(CHAVE_PAUSA); } catch (e) {} }
 
-  function ler() { try { return parseInt(localStorage.getItem(CHAVE), 10) || 0; } catch (e) { return 0; } }
-  function gravar(v) { try { localStorage.setItem(CHAVE, String(v)); } catch (e) {} }
-
-  var atual = ler() % MUSICAS.length;
+  var atual = 0;
   var falhas = 0;
   var audio = new Audio();
   audio.preload = 'none';
@@ -124,7 +122,6 @@
 
   function tocar(n) {
     atual = (n + MUSICAS.length) % MUSICAS.length;
-    gravar(atual);
     comecou = true; naFavorita = false; audio.loop = false;
     audio.src = '/kids/musicas/' + MUSICAS[atual].a + '.mp3';
     mostrar();

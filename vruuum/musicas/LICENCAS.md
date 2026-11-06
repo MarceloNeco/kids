@@ -101,3 +101,5 @@ Da mesma pasta "Royalty Free Rock" (https://github.com/jeffrey-stellar/stellar-g
 | `el-magicia.mp3` | "El Magicia" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 |
 | `gearhead.mp3` | "Gearhead" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 |
 | `bet-you-can-2.mp3` | "Bet You Can (ver 2)" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 |
+
+**06/Nov/2026 (1.10.3):** o jogo toca **35** gravadas, em ordem sorteada, com a favorita (Kart Grand Prix) no fim e sem as do `rock.js` no meio (elas só tocam sem internet, quando nem a favorita está guardada). Saiu da lista `retrofuture-nasty.mp3` (sintetizador com som de videogame; o arquivo continua aqui).

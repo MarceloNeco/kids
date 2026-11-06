@@ -117,3 +117,15 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - Jogo novo: pasta própria + entrada em `catalogo.js` + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
   no `../recursos.js` + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
+- **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
+  - **Com internet**: tocam **todas** as músicas gravadas do jogo (instrumentos de verdade), em **ordem sorteada**. A
+    favorita do jogo (a música "simples" de sem internet) **nunca é a primeira**: vai para o **fim** da volta.
+    Use `Trilha.embaralhar(lista, jogo)` do `trilha.js` (o `Trilha.iniciar` já faz isso).
+  - **Sem internet**: toca **só uma** música simples, a favorita guardada no aparelho (`Trilha.offline`, cache
+    `bolinho-musicas`), mesmo que outras estejam no cache do jogo. Só se nem ela estiver guardada, toca a música feita
+    no código ("estilo Atari") — ou silêncio, se o jogo não tiver.
+  - Música feita no código (som de "Atari", 8 bits) **nunca toca com internet**, nem intercalada.
+  - Prefira sempre gravações com instrumentos de verdade. Música gravada com som de videogame / 8 bits (chiptune) não
+    entra na lista (deixe o arquivo na pasta, só tire da lista). Cada jogo continua com pelo menos 10 músicas.
+  - A favorita de cada jogo (`FAVORITAS` no `trilha.js`) é de instrumentos de verdade, animada, até 2,5 MB e o jogo a
+    toca. Vigia: `teste/regra-musica.test.js`.

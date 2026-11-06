@@ -5,13 +5,14 @@
 
    Uso:
      <script src="../trilha.js"></script>
-     Trilha.iniciar({ jogo: 'labirinto', musicas: [ { a: '../rabiscolandia/musicas/carefree.mp3', t: 'Carefree',
+     Trilha.iniciar({ jogo: 'labirinto', musicas: [ { a: '../rabiscolandia/musicas/street-party.mp3', t: 'Street Party',
        au: 'Kevin MacLeod', lic: 'CC BY 4.0' }, ... ], creditos: 'CREDITOS.md' });
      Trilha.volume(0.3)         // abaixa a música enquanto acontece outra coisa (null volta ao normal)
      Trilha.tocando()           // true ou false
 
    Como funciona:
-   - Toca uma música depois da outra, sem parar, e começa numa música aleatória.
+   - Toca uma música depois da outra, sem parar, em ordem sorteada (Trilha.embaralhar): a favorita do jogo (a que
+     toca sem internet) nunca é a primeira — fica sempre no fim da volta. Regra do dono (06/Nov/2026).
    - Tenta tocar sozinha ao abrir. Se o navegador barrar, começa no primeiro toque em qualquer lugar da tela. Escuta o
      toque quando o dedo SOLTA (pointerup, touchend, click), que é o momento em que o navegador libera o som, e só para
      de escutar depois que a música começou de verdade.
@@ -33,7 +34,11 @@
                                              Promise com quantas delas ficaram guardadas no aparelho.
        Trilha.offline.tocar(audio, url, falhou)  se a música está guardada E (sem internet, ou falhou = true, ou o
                                              <audio> deu erro), põe o blob: dela em audio.src. Promise<boolean>.
-     Cada arquivo vira um blob: só uma vez por página e o mesmo endereço é reaproveitado (nenhum se acumula). */
+     Cada arquivo vira um blob: só uma vez por página e o mesmo endereço é reaproveitado (nenhum se acumula).
+
+   Trilha.embaralhar(lista, jogo, endereco) (desde 06/Nov/2026) — a ordem com internet, para todo tocador do Bolinho
+     (este, o radio.js e os som.js dos jogos antigos): devolve uma cópia da lista em ordem sorteada, com a favorita
+     do jogo (Trilha.offline.FAVORITAS[jogo]) no fim. endereco(item) dá o MP3 de cada item (sem ele: item.a). */
 (function (raiz) {
   'use strict';
   var T = {};
@@ -48,18 +53,19 @@
     try { return new URL('/kids/', location.href).href; } catch (e) { return '/kids/'; }
   })();
   function completo(u) { try { return new URL(u, BASE).href; } catch (e) { return BASE + u; } }
+  // favoritas: instrumentos de verdade, animadas, até 2,5 MB, e que o próprio jogo toca (revistas em 06/Nov/2026)
   var FAV = {
     estante: 'musicas/cool-rock.mp3',
     baguncolandia: 'baguncolandia/musicas/going-bananas.mp3',
     peluqueria: 'peluqueria/musicas/funky-chunk.mp3',
     vruuum: 'vruuum/musicas/kart-grand-prix.mp3',
-    purpurina: 'purpurina/musicas/glitter-blast.mp3',
-    rabiscolandia: 'rabiscolandia/musicas/carefree.mp3',
-    'campo-minado': 'rabiscolandia/musicas/sneaky-snitch.mp3',
+    purpurina: 'purpurina/musicas/funky-one.mp3',
+    rabiscolandia: 'rabiscolandia/musicas/street-party.mp3',
+    'campo-minado': 'rabiscolandia/musicas/scheming-weasel.mp3',
     'batalha-naval': 'vruuum/musicas/heroic-age.mp3',
     enigmas: 'baguncolandia/musicas/happy-whistling-ukulele.mp3',
-    labirinto: 'peluqueria/musicas/pookatori-and-friends.mp3',
-    cozinha: 'rabiscolandia/musicas/spazzmatica-polka.mp3'
+    labirinto: 'peluqueria/musicas/beachfront-celebration.mp3',
+    cozinha: 'rabiscolandia/musicas/mariachi-snooze.mp3'
   };
   O.FAVORITAS = {};
   Object.keys(FAV).forEach(function (k) { O.FAVORITAS[k] = completo(FAV[k]); });
@@ -94,10 +100,19 @@
     return pronto.then(function (b) { if (!b || audio.src !== antes) return false; audio.src = b; return true; }, function () { return false; });
   };
 
+  // ---------- a ordem com internet: sorteada, a favorita sempre por último ----------
+  T.embaralhar = function (lista, jogo, endereco) {
+    var a = (lista || []).slice(), fav = O.FAVORITAS[jogo];
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; }
+    if (!fav) return a;
+    function eFav(m) { try { return new URL(endereco ? endereco(m) : m.a, typeof location !== 'undefined' ? location.href : BASE).href === fav; } catch (e) { return false; } }
+    return a.filter(function (m) { return !eFav(m); }).concat(a.filter(eFav));
+  };
+
   T.iniciar = function (op) {
     if (typeof document === 'undefined' || !op || !op.musicas || !op.musicas.length) return T;
-    var lista = op.musicas, CH_MUDO = 'bolinho:' + op.jogo + ':trilha-mudo';
-    var atual = Math.floor(Math.random() * lista.length), falhas = 0, volBase = op.volume || 0.5, volFator = 1;
+    var lista = T.embaralhar(op.musicas, op.jogo), CH_MUDO = 'bolinho:' + op.jogo + ':trilha-mudo';
+    var atual = 0, falhas = 0, volBase = op.volume || 0.5, volFator = 1;
     var FAVORITA = O.FAVORITAS[op.jogo], naFavorita = false, guardou = false;
     var audio = new Audio(); audio.preload = 'none'; audio.volume = volBase;
 

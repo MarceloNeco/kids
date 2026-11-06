@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.29', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.30', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -234,7 +234,7 @@
       if (tv.fase === 'jogando' || tv.fase === 'calibrando' || tv.fase === 'contagem') return;
       if (!tv.local && !tv.jog.length) return;
       cheia(''); tv.podio = null;
-      tv.faixa = tv.faixa ? (tv.faixa % (Som.FAIXAS - 1)) + 1 : 1 + Math.floor(Math.random() * (Som.FAIXAS - 1));   // uma música por rodada, nunca a mesma da anterior
+      tv.faixa = tv.faixa ? (tv.faixa % (Som.FAIXAS - 1)) + 1 : 1;   // uma música por rodada, nunca a mesma da anterior (a ordem já vem sorteada no som.js, com a favorita por último)
       if (tv.tocando) Som.musica(false); else Som.musica(true, tv.faixa);   // tocando YouTube: ele é a música
       tv.nomes = tv.local ? (tv.cfg.jogadores === 2 ? [tv.nome1 || T('Esquerda', 'Left'), tv.nome2 || T('Direita', 'Right')] : [tv.nomes[0] || T('Você', 'You')]) : (tv.cfg.celulares === 1 && tv.cfg.jogadores === 2 ? [tv.jog[0].nome + ' 1', tv.jog[0].nome + ' 2'] : tv.jog.slice(0, tv.cfg.jogadores).map(function (j) { return j.nome; }));
       if (tv.cfg.celulares === 1 && tv.cfg.jogadores === 2 && !tv.local) tv.nomes = [T('Esquerda', 'Left'), T('Direita', 'Right')];

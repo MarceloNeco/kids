@@ -51,3 +51,5 @@ lo-fi da Loyalty Freak Music (Sunglasses, Walking Shoes, Friend to Friend, Beach
 
 Nenhuma é música de artista famoso (Madonna, Cyndi Lauper, Beyoncé, Katy Perry, Dua Lipa e afins têm direitos
 autorais e não podem entrar no jogo); são músicas no mesmo clima, liberadas pelo autor para qualquer uso com crédito.
+
+**06/Nov/2026 (0.17.3):** a rádio toca **20** gravadas, em ordem sorteada, com a favorita (Funky One, a de sem internet) no fim. Saiu da lista `laserpack.mp3` (com DarkNES, som de videogame / 8 bits; o arquivo continua aqui). Sem internet toca só a favorita guardada; sem ela, as 3 feitas pelo jogo.

@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.0', APP_DATA = '06/Nov/2026';
+  var APP_VERSION = '0.2.1', APP_DATA = '06/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search;
   var TESTE = /[?&]teste\b/.test(BUSCA);
@@ -20,15 +20,16 @@
     { a: '../purpurina/musicas/voxel-revolution.mp3', t: 'Voxel Revolution', au: KM, lic: CC },
     { a: '../peluqueria/musicas/digital-lemonade.mp3', t: 'Digital Lemonade', au: KM, lic: CC },
     { a: '../purpurina/musicas/shiny-tech.mp3', t: 'Shiny Tech', au: KM, lic: CC },
-    { a: '../peluqueria/musicas/pookatori-and-friends.mp3', t: 'Pookatori and Friends', au: KM, lic: CC },
     { a: '../purpurina/musicas/neon-laser-horizon.mp3', t: 'Neon Laser Horizon', au: KM, lic: CC },
     { a: '../peluqueria/musicas/brightly-fancy.mp3', t: 'Brightly Fancy', au: KM, lic: CC },
     { a: '../purpurina/musicas/cloud-dancer.mp3', t: 'Cloud Dancer', au: KM, lic: CC },
     { a: '../peluqueria/musicas/getting-it-done.mp3', t: 'Getting it Done', au: KM, lic: CC },
     { a: '../purpurina/musicas/moonlight-beach.mp3', t: 'Moonlight Beach', au: KM, lic: CC },
     { a: '../purpurina/musicas/newer-wave.mp3', t: 'Newer Wave', au: KM, lic: CC },
-    { a: '../purpurina/musicas/laserpack.mp3', t: 'Laserpack', au: KM + ' ft. DarkNES', lic: CC },
-    { a: '../peluqueria/musicas/beachfront-celebration.mp3', t: 'Beachfront Celebration', au: KM, lic: CC }
+    { a: '../peluqueria/musicas/beachfront-celebration.mp3', t: 'Beachfront Celebration', au: KM, lic: CC },
+    // 0.2.1: saíram Pookatori and Friends e Laserpack (som de videogame, "Atari"); entraram duas de instrumentos de verdade
+    { a: '../peluqueria/musicas/funky-chunk.mp3', t: 'Funky Chunk', au: KM, lic: CC },
+    { a: '../peluqueria/musicas/stringed-disco.mp3', t: 'Stringed Disco', au: KM, lic: CC }
   ];
 
   /* ---------- preferências e recordes (no aparelho) ---------- */

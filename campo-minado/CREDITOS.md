@@ -12,17 +12,21 @@ The 11 recorded songs play through the games' shared player (`../trilha.js`) and
 
 | Arquivo / File | Crédito / Credit | Licença / License |
 |---|---|---|
-| `investigations.mp3` | "Investigations" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
-| `sneaky-snitch.mp3` | "Sneaky Snitch" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
 | `scheming-weasel.mp3` | "Scheming Weasel (slower)" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
-| `pixel-peeker-polka.mp3` | "Pixel Peeker Polka - faster" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
-| `local-forecast-elevator.mp3` | "Local Forecast - Elevator" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
-| `wallpaper.mp3` | "Wallpaper" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
-| `carefree.mp3` | "Carefree" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
-| `fluffing-a-duck.mp3` | "Fluffing a Duck" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
 | `music-to-delight.mp3` | "Music to Delight" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
 | `batty-mcfaddin.mp3` | "Batty McFaddin (slower)" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
 | `life-of-riley.mp3` | "Life of Riley" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
+| `carpe-diem.mp3` | "Carpe Diem" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
+| `mariachi-snooze.mp3` | "Mariachi Snooze" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
+| `sneaky-snitch.mp3` | "Sneaky Snitch" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY |
+| `airport-lounge.mp3` | "Airport Lounge" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
+| `street-party.mp3` | "Street Party" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
+| `sunflower-dance-party.mp3` | "Sunflower Dance Party" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
+| `beachfront-celebration.mp3` | "Beachfront Celebration" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
+
+Desde a 0.2.1 (06/Nov/2026), só instrumentos de verdade: saíram *Pixel Peeker Polka* (som de videogame) e seis arquivos
+que só tinham silêncio depois do primeiro instante (*Investigations*, *Sneaky Snitch*, *Local Forecast – Elevator*,
+*Wallpaper*, *Carefree*, *Fluffing a Duck*). A música que toca sem internet é *Scheming Weasel*.
 
 Licença CC BY 4.0: https://creativecommons.org/licenses/by/4.0/ — permite uso pessoal e comercial, com o crédito.
 O crédito aparece no tocador quando cada música começa e no rodapé do menu.

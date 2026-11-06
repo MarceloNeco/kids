@@ -2,6 +2,17 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.10.3",
+      "data": "06/Nov/2026",
+      "hora": "21:30:00",
+      "pt": [
+        "🎵 Músicas com instrumentos de verdade; sem internet toca uma música simples guardada"
+      ],
+      "en": [
+        "🎵 Songs with real instruments; offline it plays one simple saved song"
+      ]
+    },
+    {
       "versao": "1.10.2",
       "data": "06/Nov/2026",
       "hora": "20:00:00",

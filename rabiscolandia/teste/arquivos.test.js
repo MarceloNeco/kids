@@ -64,11 +64,13 @@ test('nenhum segredo: só a chave publishable do Supabase', () => {
 
 test('cada música gravada existe e tem crédito em musicas/LICENCAS.md', () => {
   const som = require('../som.js'), lic = ler('musicas/LICENCAS.md');
-  assert.ok(som.GRAVADAS.length >= 20, 'poucas músicas gravadas');
+  assert.ok(som.GRAVADAS.length >= 10, 'poucas músicas gravadas');
   for (const g of som.GRAVADAS) {
     assert.ok(fs.existsSync(path.join(pasta, g.url)), 'falta o arquivo ' + g.url);
     assert.ok(lic.includes('`' + path.basename(g.url) + '`'), 'sem crédito em LICENCAS.md: ' + g.url);
   }
   // e nenhum mp3 sobrando sem estar na rádio
-  for (const f of fs.readdirSync(path.join(pasta, 'musicas')).filter(f => f.endsWith('.mp3'))) assert.ok(som.GRAVADAS.some(g => g.url === 'musicas/' + f), 'mp3 fora da rádio: ' + f);
+  // (fora desde a 0.1.13: Pixel Peeker Polka, som de videogame, e Spazzmatica Polka, synth retrô; continuam na pasta)
+  const FORA = ['pixel-peeker-polka.mp3', 'spazzmatica-polka.mp3'];
+  for (const f of fs.readdirSync(path.join(pasta, 'musicas')).filter(f => f.endsWith('.mp3') && !FORA.includes(f))) assert.ok(som.GRAVADAS.some(g => g.url === 'musicas/' + f), 'mp3 fora da rádio: ' + f);
 });

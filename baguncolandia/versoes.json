@@ -2,6 +2,17 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.30",
+      "data": "06/Nov/2026",
+      "hora": "22:00:00",
+      "pt": [
+        "🎵 Músicas com instrumentos de verdade, em ordem sorteada; sem internet toca uma música simples guardada (sem som de videogame com internet)."
+      ],
+      "en": [
+        "🎵 Real-instrument songs in random order; without internet a simple saved song plays (no video-game sound while online)."
+      ]
+    },
+    {
       "versao": "0.8.29",
       "data": "06/Nov/2026",
       "hora": "22:30:00",

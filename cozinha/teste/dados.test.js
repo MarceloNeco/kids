@@ -109,3 +109,70 @@ test('no Difícil a ordem importa: em várias receitas dá para escolher entre p
 test('dica de adulto: faca, fogão, forno e liquidificador avisam', () => {
   for (const id of ['tabua', 'fogao', 'forno', 'liquidificador', 'batedeira']) assert.ok(D.utensilio[id].adulto, id);
 });
+
+// ---------- o jogo também ensina: cada coisa vem de onde vem de verdade ----------
+// Mapa esperado (escrito aqui, de propósito): lugar da vila e planta de cada fruta e legume, e o tipo da planta.
+const ONDE = {
+  banana: ['pomar', 'bananeira', 'bananeira'], maca: ['pomar', 'macieira', 'arvore'], laranja: ['pomar', 'laranjeira', 'arvore'],
+  limao: ['pomar', 'limoeiro', 'arvore'], morango: ['pomar', 'morangueiro', 'rasteira'], uva: ['pomar', 'parreira', 'parreira'],
+  cenoura: ['horta', 'pe-cenoura', 'raiz'], batata: ['horta', 'pe-batata', 'raiz'], tomate: ['horta', 'tomateiro', 'estaca'],
+  alface: ['horta', 'pe-alface', 'cabeca'], cheiro: ['horta', 'cheiro-verde', 'touceira'],
+  ovo: ['galinheiro'], leite: ['vaca'], peixe: ['rio']
+};
+// o que é feito pelas pessoas não nasce em lugar nenhum da vila: vem do mercadinho (ou emprestado da vizinha)
+const FEITO_PELAS_PESSOAS = ['farinha', 'acucar', 'sal', 'oleo', 'fermento', 'manteiga', 'chocolate', 'leitecond', 'granulado', 'queijo', 'pao', 'polvilho', 'mel'];
+
+test('cada fruta e cada legume nasce na planta certa, e cada coisa vem do lugar certo da vila', () => {
+  for (const [id, [lugar, planta, forma]] of Object.entries(ONDE)) {
+    const g = D.ingrediente[id];
+    assert.equal(g.de, lugar, id + ' devia vir de ' + lugar);
+    if (planta) {
+      assert.equal(g.planta, planta, id + ' devia nascer em ' + planta);
+      assert.ok(D.planta[planta], 'planta desconhecida ' + planta);
+      assert.equal(D.planta[planta].lugar, lugar, planta + ' fica em ' + lugar);
+      assert.equal(D.planta[planta].forma, forma, planta + ' é desenhada como ' + forma);
+      assert.ok(D.planta[planta].pt && D.planta[planta].en, planta + ' sem nome PT/EN');
+    } else assert.ok(!g.planta, id + ' não nasce em planta');
+  }
+  for (const id of FEITO_PELAS_PESSOAS) {
+    const g = D.ingrediente[id];
+    assert.ok(!g.de && !g.planta, id + ' é feito pelas pessoas: não nasce na natureza (nada de farinha na árvore)');
+    assert.ok(g.preco > 0, id + ' se compra no mercadinho');
+  }
+  // todo ingrediente está numa das duas listas, e toda fruta/legume do pomar e da horta tem planta
+  for (const g of D.INGREDIENTES) {
+    assert.ok(ONDE[g.id] || FEITO_PELAS_PESSOAS.includes(g.id), 'ingrediente novo sem lugar conferido no teste: ' + g.id);
+    if (g.de === 'pomar' || g.de === 'horta') assert.ok(g.planta, g.id + ' sem planta');
+  }
+  // o legume que cresce embaixo da terra é só cenoura e batata
+  assert.deepEqual(D.PLANTAS.filter(p => p.forma === 'raiz').map(p => p.id).sort(), ['pe-batata', 'pe-cenoura']);
+});
+
+test('cada ingrediente tem uma frase curta que ensina de onde vem (PT e EN), e a da banana fala da bananeira', () => {
+  for (const g of D.INGREDIENTES) {
+    assert.ok(Array.isArray(g.fato) && g.fato[0] && g.fato[1] && g.fato[0] !== g.fato[1], g.id + ' sem frase PT/EN');
+    assert.ok(g.fato[0].length <= 90 && g.fato[1].length <= 90, g.id + ': frase comprida demais para criança');
+  }
+  assert.match(D.ingrediente.banana.fato[0], /cachos na bananeira/); assert.match(D.ingrediente.banana.fato[1], /banana plant/);
+  assert.match(D.ingrediente.cenoura.fato[0], /embaixo da terra/);
+  assert.match(D.ingrediente.farinha.fato[0], /trigo/);
+});
+
+test('desenhos: toda planta do pomar e da horta tem desenho, e cada planta do pomar tem lugar para as frutas', () => {
+  for (const p of D.PLANTAS.filter(p => p.lugar === 'pomar')) {
+    assert.match(ART.planta(p.id), /^<svg[^>]*viewBox="0 0 100 125"/, p.id + ' sem desenho');
+    assert.ok(ART.FRUTOS[p.id].length >= 2, p.id + ' com poucas frutas');
+    for (const [x, y] of ART.FRUTOS[p.id]) assert.ok(x > 0 && x < 100 && y > 0 && y < 115, p.id + ': fruta fora do desenho');
+  }
+  for (const g of D.INGREDIENTES.filter(g => g.de === 'horta')) assert.match(ART.horta(g.id), /^<svg/, g.id + ' sem desenho na horta');
+  assert.match(ART.planta('bananeira'), /#7b2d5b/, 'a bananeira tem o coração roxo');
+  assert.match(ART.fruto('banana'), /<svg/, 'banana no cacho é uma penca desenhada');
+});
+
+test('pescaria: o círculo do anzol diminui e os peixes ficam mais rápidos do Fácil para o Difícil', () => {
+  const [f, m, d] = ['facil', 'medio', 'dificil'].map(n => D.nivel[n]);
+  assert.ok(f.zonaPeixe > m.zonaPeixe && m.zonaPeixe > d.zonaPeixe, 'círculo menor a cada nível');
+  assert.ok(d.zonaPeixe <= 0.06, 'no Difícil precisa acertar a hora');
+  assert.ok(f.zonaPeixe >= 0.12, 'no Fácil continua fácil');
+  assert.ok(f.velPeixe < m.velPeixe && m.velPeixe < d.velPeixe, 'peixes mais rápidos a cada nível');
+});

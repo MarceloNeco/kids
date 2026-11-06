@@ -46,6 +46,6 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
  const v=await pg.evaluate(()=>[window.BaguncaApp.Bagunca.validar({t:'cmd',id:'abc12345',acao:'som',semSom:true,semMusica:'x'})]);
  conf(v[0] && v[0].semSom===true && v[0].semMusica===false, 'mensagem de som conferida na TV');
  const tocou=await pg.evaluate(async()=>{ Som.mudo(false); Som.semMusica(false); Som.iniciar(); const out=[]; for(let f=0; f<Som.FAIXAS; f++){ Som.musica(true,f); await new Promise(r=>setTimeout(r,900)); out.push(Som.tocandoArquivo()?1:0); } Som.musica(false); return out; });
- conf(tocou.length===12 && tocou.every(x=>x===1), 'todas as '+tocou.length+' músicas tocam ('+tocou.join('')+')');
+ conf(tocou.length===11 && tocou.every(x=>x===1), 'todas as '+tocou.length+' músicas tocam ('+tocou.join('')+')');
  conf(!erros.length,'sem erro de JavaScript '+erros.join(' | '));
  await b.close(); server.close(); process.exitCode=falhas?1:0; })();

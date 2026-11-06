@@ -4,7 +4,7 @@
    progresso de cada nível em "bolinho:enigmas:progresso". Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.0';
+  var APP_VERSION = '0.3.0';
   var $ = function (id) { return document.getElementById(id); };
   var J = window.Enigmas, R = window.EnigmasRodadas;
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -28,6 +28,7 @@
     if (typeof p.rodadas !== 'number') p.rodadas = 0;
   });
   function salvarProg() { gravar(CH_PROG, prog); }
+  if (J.migrar(prog, R)) salvarProg();   // v0.3.0: o Difícil antigo foi para o Médio (as estrelas vão junto)
 
   // ---------- idioma ----------
   function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
@@ -129,7 +130,8 @@
 
   // ---------- partida ----------
   var nivel = null, partida = null, rodada = null, sel = null, reiniciou = false;
-  var CORES = ['#fff6c8', '#ffd1e8', '#bfe9ff', '#d4ffc4', '#ffe0b8', '#e5d4ff', '#c8fff4'];
+  // uma cor de giz por par, bem diferentes entre si (v0.3.0: as de antes eram claras e parecidas demais)
+  var CORES = ['#ffec70', '#ff9fd2', '#8fd0ff', '#9ef08a', '#ffad66', '#c9a6ff', '#f4f1e6'];
 
   function comecar(n) {
     nivel = n; telaCheia();
@@ -241,36 +243,71 @@
   }
 
   // ---------- giz ----------
-  var svg = $('giz'), riscos = {}, tremor = {};
+  // Cada ligação é uma curva suave (bezier cúbica) que sai de cada carta na horizontal, como um S deitado, para dar
+  // para seguir cada risco com o olho mesmo com quase tudo ligado (v0.3.0; antes era quase reta e grossa e virava um
+  // emaranhado). Três cuidados: (1) cada par tem a sua "faixa": o ponto onde o S vira muda de par para par, então as
+  // curvas não passam todas pelo mesmo lugar e os cruzamentos se espalham; (2) embaixo de cada traço vai um contorno
+  // escuro da cor da lousa ("halo"), então onde duas se cruzam a de cima abre um vãozinho na de baixo e dá para ver
+  // qual passa por cima; (3) um balanço bem lento e pequeno (desligado com "reduzir movimento").
+  var svg = $('giz'), riscos = {}, faixa = {}, fase = {};
+  var BALANCO_PX = 2.5, BALANCO_VEL = 2 * Math.PI / 6.5;   // 2,5 px para cada lado, uma ida e volta a cada 6,5 s
+  // ponta do risco: logo depois da bolinha de giz da carta (a bolinha fica à vista), medida a partir do próprio SVG
+  // (ele fica dentro da moldura da lousa; medir pela lousa deslocava o risco a largura da moldura)
+  var FORA = 8;
   function ponto(el) {
-    var L = $('lousa').getBoundingClientRect(), r = el.getBoundingClientRect(), esq = el.getAttribute('data-lado') === 'e';
-    return { x: (esq ? r.right : r.left) - L.left, y: r.top + r.height / 2 - L.top };
+    var L = svg.getBoundingClientRect(), r = el.getBoundingClientRect(), esq = el.getAttribute('data-lado') === 'e';
+    return { x: (esq ? r.right + FORA : r.left - FORA) - L.left, y: r.top + r.height / 2 - L.top };
   }
-  function caminho(a, b, curva) {
-    var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
-    var cx = mx - dy / len * curva, cy = my + dx / len * curva;
-    return 'M' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + b.x.toFixed(1) + ' ' + b.y.toFixed(1);
+  // a = ponta da esquerda, b = ponta da direita; f (0 a 1) = faixa do par; onda = deslocamento do balanço em px
+  function caminho(a, b, f, onda) {
+    // k1 + k2 = dx: a curva nunca volta para trás nem invade as cartas; o meio dela cai entre 25% e 75% do vão
+    var dx = Math.max(24, Math.abs(b.x - a.x)), k1 = dx * (0.15 + 0.7 * f), k2 = dx - k1, o = onda || 0;
+    var n = function (v) { return v.toFixed(1); };
+    return 'M' + n(a.x) + ' ' + n(a.y) + ' C' + n(a.x + k1) + ' ' + n(a.y + o) + ' ' + n(b.x - k2) + ' ' + n(b.y - o) + ' ' + n(b.x) + ' ' + n(b.y);
   }
+  // Faixa de cada par (0 = o trecho do meio da curva corre perto da coluna da esquerda, 1 = perto da direita), uma
+  // diferente para cada par da rodada. Ordem que não cria cruzamento a mais: os riscos que descem ficam nas faixas da
+  // esquerda e, entre eles, quem sai mais alto fica mais à direita; os que sobem ficam nas faixas da direita e, entre
+  // eles, quem sai mais baixo fica mais à direita. Assim dois riscos "paralelos" nunca correm colados um no outro.
+  function faixaDe(par) {
+    var n = partida.n; if (n < 2) return 0.5;
+    function chave(p) { var i = partida.esquerda.indexOf(p), j = partida.direita.indexOf(p); return j > i ? -i : n + i; }
+    var ordem = partida.esquerda.slice().sort(function (x, y) { return chave(x) - chave(y); });
+    return ordem.indexOf(+par) / (n - 1);
+  }
+  function ondaDe(i, agora) { return CALMO ? 0 : Math.sin(fase[i] + agora / 1000 * BALANCO_VEL) * BALANCO_PX; }
   function novoRisco(classe, cor) {
     var g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'risco ' + classe);
-    var p1 = document.createElementNS(SVGNS, 'path'), p2 = document.createElementNS(SVGNS, 'path');
-    p1.setAttribute('class', 'po'); p2.setAttribute('class', 'traco');
-    if (cor) { p1.style.stroke = cor; p2.style.stroke = cor; }
-    g.appendChild(p1); g.appendChild(p2); svg.appendChild(g);
+    ['halo', 'po', 'traco'].forEach(function (c) {
+      var p = document.createElementNS(SVGNS, 'path'); p.setAttribute('class', c);
+      if (cor && c !== 'halo') p.style.stroke = cor;
+      g.appendChild(p);
+    });
+    svg.appendChild(g);
     return g;
   }
   function riscar(g, d) { Array.prototype.forEach.call(g.querySelectorAll('path'), function (p) { p.setAttribute('d', d); }); }
   function cartaDe(lado, i) { return document.querySelector('.carta[data-lado="' + lado + '"][data-par="' + i + '"]'); }
-  function redesenhar() {
+  function redesenhar(agora) {
     if (!partida) return;
-    var L = $('lousa').getBoundingClientRect();
+    if (typeof agora !== 'number') agora = window.performance ? performance.now() : Date.now();
+    var L = svg.getBoundingClientRect();
     svg.setAttribute('viewBox', '0 0 ' + L.width + ' ' + L.height);
     Object.keys(riscos).forEach(function (i) {
       var a = cartaDe('e', i), b = cartaDe('d', i);
-      if (a && b) riscar(riscos[i], caminho(ponto(a), ponto(b), tremor[i]));
+      if (a && b) riscar(riscos[i], caminho(ponto(a), ponto(b), faixa[i], ondaDe(i, agora)));
     });
   }
-  function limparRiscos() { Object.keys(riscos).forEach(function (k) { riscos[k].remove(); }); riscos = {}; tremor = {}; }
+  // balanço: redesenha umas 20 vezes por segundo enquanto há risco na lousa; para sozinho fora do jogo
+  var balancoId = 0, balancoUlt = 0;
+  function balancar(agora) {
+    balancoId = 0;
+    if (CALMO || !partida || !Object.keys(riscos).length || !$('jogo').classList.contains('ativa')) return;
+    if (agora - balancoUlt >= 50) { balancoUlt = agora; redesenhar(agora); }
+    balancoId = requestAnimationFrame(balancar);
+  }
+  function ligarBalanco() { if (!CALMO && !balancoId) balancoId = requestAnimationFrame(balancar); }
+  function limparRiscos() { Object.keys(riscos).forEach(function (k) { riscos[k].remove(); }); riscos = {}; faixa = {}; fase = {}; }
   function remedir() { ajustarTudo(); redesenhar(); }
   if (window.ResizeObserver) new ResizeObserver(remedir).observe($('lousa'));
   window.addEventListener('resize', remedir);
@@ -290,18 +327,20 @@
     var ie = +esq.getAttribute('data-par'), id = +dir.getAttribute('data-par');
     var res = partida.ligar(ie, id);
     escolher(null);
-    var g = gTemp || novoRisco('', null), curva = (Math.random() - 0.5) * 18;
+    var g = gTemp || novoRisco('', null), f = faixaDe(ie);
     if (res === 'certo' || res === 'fim') {
       g.setAttribute('class', 'risco certo' + (gTemp ? '' : ' desenhando'));
-      Array.prototype.forEach.call(g.querySelectorAll('path'), function (p) { p.style.stroke = CORES[ie % CORES.length]; if (!gTemp) p.setAttribute('pathLength', '1'); });
-      riscos[ie] = g; tremor[ie] = curva; riscar(g, caminho(ponto(esq), ponto(dir), curva));
+      Array.prototype.forEach.call(g.querySelectorAll('path'), function (p) { if (p.getAttribute('class') !== 'halo') p.style.stroke = CORES[ie % CORES.length]; if (!gTemp) p.setAttribute('pathLength', '1'); });
+      riscos[ie] = g; faixa[ie] = f; fase[ie] = Math.random() * 2 * Math.PI;
+      riscar(g, caminho(ponto(esq), ponto(dir), f, ondaDe(ie, window.performance ? performance.now() : Date.now())));
+      ligarBalanco();
       [esq, dir].forEach(function (c) { c.classList.add('ligada', 'pulo'); c.disabled = true; });
       Som.certo();
       $('status').textContent = t('Isso! ' + w(rodada.pares[ie][0]) + ' com ' + w(rodada.pares[ie][1]) + '.', 'Yes! ' + w(rodada.pares[ie][0]) + ' with ' + w(rodada.pares[ie][1]) + '.');
       if (res === 'fim') setTimeout(terminar, CALMO ? 300 : 900);
       else { var prox = document.querySelector('.carta:not(:disabled)'); if (prox && document.activeElement && document.activeElement.disabled) prox.focus({ preventScroll: true }); }
     } else if (res === 'errado') {
-      g.setAttribute('class', 'risco errado'); riscar(g, caminho(ponto(esq), ponto(dir), curva));
+      g.setAttribute('class', 'risco errado'); riscar(g, caminho(ponto(esq), ponto(dir), f, 0));
       [esq, dir].forEach(function (c) { c.classList.remove('treme'); void c.offsetWidth; c.classList.add('treme'); setTimeout(function () { c.classList.remove('treme'); }, 600); });
       Som.errado();
       setTimeout(function () { g.classList.add('apagando'); }, 350);
@@ -352,8 +391,9 @@
       arr.g = novoRisco('solto', CORES[+arr.de.getAttribute('data-par') % CORES.length]);
     }
     e.preventDefault();
-    var L = $('lousa').getBoundingClientRect();
-    riscar(arr.g, caminho(ponto(arr.de), { x: e.clientX - L.left, y: e.clientY - L.top }, 0));
+    // o risco solto também é curva: sai da carta na horizontal e chega no dedo
+    var L = svg.getBoundingClientRect(), dedo = { x: e.clientX - L.left, y: e.clientY - L.top }, de = ponto(arr.de);
+    riscar(arr.g, arr.de.getAttribute('data-lado') === 'e' ? caminho(de, dedo, 0.5, 0) : caminho(dedo, de, 0.5, 0));
     var alvo = cartaNoPonto(e.clientX, e.clientY);
     if (alvo && alvo.getAttribute('data-lado') === arr.de.getAttribute('data-lado')) alvo = null;
     if (alvo !== arr.mira) { if (arr.mira) arr.mira.classList.remove('mira'); arr.mira = alvo; if (alvo) alvo.classList.add('mira'); }
@@ -476,8 +516,6 @@
     { a: M + 'silly-boy.mp3', t: 'Silly Boy', au: 'Rafael Krux', lic: FREEPD },
     { a: M + 'funshine.mp3', t: 'Funshine', au: 'Kevin MacLeod', lic: FREEPD },
     { a: M + 'city-sunshine.mp3', t: 'City Sunshine', au: 'Kevin MacLeod', lic: FREEPD },
-    { a: M + 'comic-game-loop-mischief.mp3', t: 'Comic Game Loop - Mischief', au: 'Kevin MacLeod', lic: FREEPD },
-    { a: M + 'bit-bit-loop.mp3', t: 'Bit Bit Loop', au: 'Kevin MacLeod', lic: FREEPD },
     { a: M + 'my-giant-bunny-friend.mp3', t: 'My Giant Bunny Friend', au: 'Bryan Teoh', lic: FREEPD },
     { a: M + 'spring-chicken.mp3', t: 'Spring Chicken', au: 'Bryan Teoh', lic: FREEPD },
     { a: M + 'going-bananas.mp3', t: 'Going Bananas', au: 'Bryan Teoh', lic: FREEPD },
