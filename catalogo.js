@@ -7,6 +7,7 @@
     id       nome curto, sem espaço (identifica o jogo)
     nome     nome que aparece no cartão
     ico      emoji do cartão          cor   cor de destaque do cartão
+    img      (opcional) imagem do cartão no lugar do emoji, ex.: '/kids/baguncolandia/icone.svg'
     url      endereço do jogo a partir da raiz do site (funciona em solverone.com.br e no endereço antigo)
     texto    descrição em português   en    descrição em inglês   tag   texto do botão do cartão
     instalar true = pode ser instalado e funciona sem internet (o service worker fica em url + 'sw.js')
@@ -18,7 +19,7 @@
 */
 (function () {
   var JOGOS = [
-    { id: 'baguncolandia', nome: 'Bagunçolândia', ico: '🍉', cor: '#c6ff3d', url: '/kids/baguncolandia/',
+    { id: 'baguncolandia', nome: 'Bagunçolândia', ico: '🐶', img: '/kids/baguncolandia/icone.svg', cor: '#c6ff3d', url: '/kids/baguncolandia/',
       texto: 'Frutas, doces e personagens voam na TV e você corta, pega, chuta, pula e abaixa com o corpo. 1 ou 2 pessoas, boneco personalizável, ou no dedo no celular.',
       en: 'Slice, catch, kick, jump and duck with your body on the TV. Or by finger on the phone.',
       tag: '▶ Brincar / Play', instalar: true,
@@ -48,6 +49,26 @@
       en: 'Draw, color and paint by numbers with live brushes, animated stickers and your hand in the camera.',
       tag: '▶ Desenhar / Draw', instalar: true,
       tv: { texto: 'Desenhar e colorir na TV. A TV mostra um código: no celular, toque em 📺 Na TV → 🎮 Controlar e desenhe com o dedo, mexendo o celular ou com a mão na câmera.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
+    { id: 'campo-minado', nome: 'Campo Minado', ico: '🦔', img: '/kids/campo-minado/icone.svg', cor: '#7ee081', url: '/kids/campo-minado/',
+      texto: 'Abra o jardim inteiro sem acordar os ouriços que dormem embaixo da grama. Os números contam quantos estão em volta; marque com 🚩. Fácil, médio e difícil.',
+      en: 'Garden Sweeper: open the whole garden without waking the sleepy hedgehogs. Easy, medium and hard.',
+      tag: '▶ Jogar / Play', instalar: true },
+    { id: 'enigmas', nome: 'Enigmas de Ligar', ico: '🧩', img: '/kids/enigmas/icone.svg', cor: '#9ee37d', url: '/kids/enigmas/',
+      texto: 'Na lousa, ligue o que combina: o cachorro com o osso, a bola com o gol. Do fácil (3 anos) ao difícil, com charadas, sequências e rimas.',
+      en: 'Match-up riddles on a chalkboard: link what goes together. From easy to really tricky.',
+      tag: '▶ Ligar / Play', instalar: true },
+    { id: 'labirinto', nome: 'Labirinto', ico: '🐶', img: '/kids/labirinto/icone.svg', cor: '#ffd166', url: '/kids/labirinto/',
+      texto: 'Um labirinto novo a cada vez, quadrado, redondo ou de colmeia, que nasce em 3D. Leve o cachorrinho ou risque o caminho com o dedo, pegue o osso do meio e ache a saída.',
+      en: 'A new 3D maze every time: walk the puppy or draw the path, grab the bone in the middle and find the way out.',
+      tag: '▶ Explorar / Play', instalar: true },
+    { id: 'cozinha', nome: 'Cozinha de Receitas', ico: '🍳', img: '/kids/cozinha/icone.svg', cor: '#ff9f6e', url: '/kids/cozinha/',
+      texto: 'Escolha uma receita, saia pela vila para pescar, colher, comprar no mercado ou pedir emprestado à vizinha, e volte para cozinhar: misturar, bater, ligar o fogão e servir. 12 receitas.',
+      en: 'Recipe Kitchen: gather ingredients around the village (fish, pick, shop, borrow) and cook step by step.',
+      tag: '▶ Cozinhar / Cook', instalar: true },
+    { id: 'batalha-naval', nome: 'Batalha Naval', ico: '⚓', img: '/kids/batalha-naval/icone.svg', cor: '#4fc3ff', url: '/kids/batalha-naval/',
+      texto: 'Esconda seus navios e afunde os dos outros: E4, F2... Jogue em família, de 2 a 4 pessoas, cada uma no seu celular, com um código de 4 letras. Também contra o computador ou passando o aparelho.',
+      en: 'Sea Battle: 2 to 4 players on their own phones with a 4-letter code, or against the computer.',
+      tag: '▶ Navegar / Play', instalar: true },
     { id: 'contador-de-historias', nome: 'Contador de Histórias', ico: '📖', cor: '#3ee8ff', url: '/contador-de-historias/',
       texto: 'Histórias para dormir: um acervo para ler e ouvir, e a criação de histórias novas com os nomes da sua família.',
       en: 'Storyteller: bedtime stories to read, listen to and create.',
@@ -76,10 +97,17 @@
     a.style.setProperty('--c', j.cor);
     a.href = j.url;
     a.setAttribute('data-jogo', j.id);
+    // interruptor do RootifyONE (Controle dos apps → Bolinho de Chuva): jogo desligado some da estante (recursos.js)
+    if (/^\/kids\//.test(j.url)) a.setAttribute('data-recurso', j.id);
     if (j.tv) a.setAttribute('data-tv', j.tv.param || '?tv=auto');
     if (j.instalar) { a.setAttribute('data-instalar', j.url); a.setAttribute('data-sw', window.BolinhoCatalogo.sw(j)); }
     else if (j.soOnline) a.setAttribute('data-so-online', '');
-    a.appendChild(el('div', 'ico', j.ico));
+    var ico = a.appendChild(el('div', 'ico', j.img ? null : j.ico));
+    if (j.img) {
+      var im = document.createElement('img');
+      im.src = j.img; im.alt = ''; im.style.cssText = 'display:block;width:1em;height:1em;border-radius:.22em';
+      ico.appendChild(im);
+    }
     a.appendChild(el('h2', null, j.nome));
     a.appendChild(el('p', null, j.texto));
     if (j.en) a.appendChild(el('p', 'en', j.en));

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+<!-- Fundo do cartão "rabiscolandia" (Bolinho de Chuva). Desenho original; o CSS (cartoes-fundos.css) deixa bem clarinho e fosco. -->
+  <g transform="translate(310 60) rotate(-30) scale(1.2)"><rect x="-36" y="-8" width="56" height="16" rx="3" fill="#c6ff3d"/><path d="M20-8L38 0L20 8Z" fill="#c6ff3d"/><rect x="-24" y="-8" width="6" height="16" fill="#fff" opacity=".55"/><rect x="6" y="-8" width="6" height="16" fill="#fff" opacity=".55"/></g>
+  <g transform="translate(80 320) rotate(20) scale(1.1)"><rect x="-36" y="-8" width="56" height="16" rx="3" fill="#ff4fa3"/><path d="M20-8L38 0L20 8Z" fill="#ff4fa3"/><rect x="-24" y="-8" width="6" height="16" fill="#fff" opacity=".55"/><rect x="6" y="-8" width="6" height="16" fill="#fff" opacity=".55"/></g>
+  <g transform="translate(300 330) rotate(-60) scale(1)"><rect x="-36" y="-8" width="56" height="16" rx="3" fill="#3ee8ff"/><path d="M20-8L38 0L20 8Z" fill="#3ee8ff"/><rect x="-24" y="-8" width="6" height="16" fill="#fff" opacity=".55"/><rect x="6" y="-8" width="6" height="16" fill="#fff" opacity=".55"/></g>
+  <g transform="translate(90 70) rotate(40) scale(0.8)"><rect x="-36" y="-8" width="56" height="16" rx="3" fill="#ffd166"/><path d="M20-8L38 0L20 8Z" fill="#ffd166"/><rect x="-24" y="-8" width="6" height="16" fill="#fff" opacity=".55"/><rect x="6" y="-8" width="6" height="16" fill="#fff" opacity=".55"/></g>
+  <g transform="translate(220 170) rotate(-10) scale(1)"><path d="M-40 0C-30-20-20 20-10 0S10-20 20 0S36 20 44 0" fill="none" stroke="#ff9f1c" stroke-width="6" stroke-linecap="round"/></g>
+  <g transform="translate(360 200) rotate(0) scale(1.3)"><path d="M0 0C4-4 8 2 4 6C-2 12-10 4-8-4C-4-16 12-14 16-2C20 12 6 22-6 20" fill="none" stroke="#cfa8ff" stroke-width="5" stroke-linecap="round"/></g>
+  <g transform="translate(200 370) rotate(8) scale(0.9)"><path d="M0 20C-30 0-26-24-10-24C-4-24 0-18 0-14C0-18 4-24 10-24C26-24 30 0 0 20Z" fill="none" stroke="#ff4fa3" stroke-width="5" stroke-linejoin="round"/></g>
+  <g transform="translate(60 200) rotate(30) scale(0.8)"><path d="M-40 0C-30-20-20 20-10 0S10-20 20 0S36 20 44 0" fill="none" stroke="#3ee8ff" stroke-width="6" stroke-linecap="round"/></g>
+  <g transform="translate(210 50) rotate(0) scale(0.6)"><path d="M0-24L7-8L24-7L11 4L15 22L0 12L-15 22L-11 4L-24-7L-7-8Z" fill="#ffd166"/></g>
+  <g transform="translate(150 260) rotate(0) scale(0.9)"><path d="M0 0C4-4 8 2 4 6C-2 12-10 4-8-4C-4-16 12-14 16-2C20 12 6 22-6 20" fill="none" stroke="#c6ff3d" stroke-width="5" stroke-linecap="round"/></g>
+</svg>

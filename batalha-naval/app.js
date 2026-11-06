@@ -1,0 +1,767 @@
+/* Batalha Naval — telas, arrumar a frota, as partidas (contra o computador, passar o aparelho e em rede) e os efeitos.
+   As regras ficam no logica.js; o jogo em rede (mensagens, vez, voltar depois de recarregar) no rede.js; os sons no som.js.
+   Guarda só neste aparelho (localStorage): preferências em "batalha-naval.pref" e a partida em rede em "batalha-naval.rede"
+   (para voltar se a página recarregar). Nada de dado pessoal: só o apelido que a pessoa digitar. */
+(function () {
+  'use strict';
+  var APP_VERSION = '0.1.0';
+  var L = window.BNLogica, R = window.BNRede;
+  var Som = window.BNSom || { iniciar: function () {}, ligar: function () {}, efeito: function () {} };
+  var $ = function (id) { return document.getElementById(id); };
+  var TESTE = /[?&]teste\b/.test(location.search);
+  var RAPIDO = TESTE ? 0.05 : 1;                    // nos testes as esperas ficam curtinhas
+  var CORES = ['#ffd23f', '#3ee8ff', '#ff6fb5', '#9cff57'];
+  var CH_PREF = 'batalha-naval.pref', CH_REDE = 'batalha-naval.rede';
+  var MUSICAS = [
+    ['heroic-age', 'Heroic Age', 'Kevin MacLeod', 'CC BY 4.0'], ['take-the-lead', 'Take the Lead', 'Kevin MacLeod', 'CC BY 4.0'],
+    ['ready-aim-fire', 'Ready Aim Fire', 'Kevin MacLeod', 'CC BY 4.0'], ['el-magicia', 'El Magicia', 'Kevin MacLeod', 'CC BY 4.0'],
+    ['las-dunas-champions', 'Las Dunas Champions', 'ALBatross (SuperTuxKart)', 'CC BY-SA 4.0'], ['exhilarate', 'Exhilarate', 'Kevin MacLeod', 'CC BY 4.0'],
+    ['bet-you-can', 'Bet You Can', 'Kevin MacLeod', 'CC BY 4.0'], ['cool-hard-facts', 'Cool Hard Facts', 'Kevin MacLeod', 'CC BY 4.0'],
+    ['kart-grand-prix', 'Kart Grand Prix', 'Weirwood (SuperTuxKart)', 'CC BY-SA 3.0'], ['summon-the-rawk', 'Summon the Rawk', 'Kevin MacLeod', 'CC BY 4.0'],
+    ['holizna-way-of-the-samurai', 'Way of the Samurai', 'HoliznaCC0', 'CC0'], ['holizna-americana', 'Americana', 'HoliznaCC0', 'CC0'],
+    ['retrofuture-clean', 'RetroFuture Clean', 'Kevin MacLeod', 'CC BY 4.0'], ['zap-beat', 'Zap Beat', 'Kevin MacLeod', 'CC BY 4.0']
+  ].map(function (m) { return { a: '../vruuum/musicas/' + m[0] + '.mp3', t: m[1], au: m[2], lic: m[3] }; });
+
+  function ler(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function gravar(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem espaço */ } }
+  var pref = ler(CH_PREF) || {};
+  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = /^pt/i.test(navigator.language || 'pt') ? 'pt' : 'en';
+  if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
+  if (typeof pref.nome !== 'string') pref.nome = '';
+  function salvarPref() { gravar(CH_PREF, pref); }
+
+  // ---------- idioma ----------
+  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
+  function N(x) { return x ? (pref.lingua === 'en' ? x.en : x.pt) : ''; }
+  function traduzir() {
+    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
+    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
+    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + t('06/Nov/2026', 'Nov/06/2026');
+    if (jogo && (atual === 'jogo' || atual === 'sala')) desenhar();
+    if (atual === 'arrumar' && arr) pintarArr();
+    atualizarInicio();
+  }
+  function aplicarSom() { Som.ligar(pref.efeitos); $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔈'; $('btEfeitos').setAttribute('aria-pressed', pref.efeitos ? 'true' : 'false'); }
+
+  // ---------- altura da tela (celular: barra do navegador entra e sai) ----------
+  function ajustarAltura() { document.documentElement.style.setProperty('--vh', (window.innerHeight / 100) + 'px'); }
+  ajustarAltura(); window.addEventListener('resize', ajustarAltura);
+
+  // ---------- telas e o Voltar do celular ----------
+  var atual = 'inicio', noHistorico = false, nivelPara = 'pc';
+  function mostrar(id) {
+    Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
+    atual = id; window.scrollTo(0, 0);
+    if (id !== 'inicio' && !noHistorico) { try { history.pushState({ bn: 1 }, ''); noHistorico = true; } catch (e) { /* sem histórico */ } }
+    if (id === 'inicio') atualizarInicio();
+  }
+  window.addEventListener('popstate', function () {
+    noHistorico = false;
+    aoVoltar();
+    if (atual !== 'inicio') { try { history.pushState({ bn: 1 }, ''); noHistorico = true; } catch (e) { /* ok */ } }
+  });
+  function aoVoltar() {
+    if (!$('janela').hidden) { fecharJanela(); return; }
+    if (!$('cortina').hidden) return;
+    if (atual === 'nivel') mostrar(nivelPara === 'criar' ? 'amigos' : 'inicio');
+    else if (atual === 'amigos') mostrar('inicio');
+    else if (atual === 'arrumar') { if (jogo && jogo.modo === 'rede') mostrar('sala'); else confirmarSair(); }
+    else if (atual === 'sala' || atual === 'jogo') confirmarSair();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.voltar'), function (b) { b.addEventListener('click', aoVoltar); });
+  document.addEventListener('keydown', function (e) { if ((e.key === 'Escape' || e.key === 'GoBack' || e.keyCode === 461) && atual !== 'inicio') { e.preventDefault(); aoVoltar(); } });
+
+  // ---------- aviso, estouro, janela, cortina, confete ----------
+  var tAviso = null;
+  function aviso(txt, ms) { var a = $('aviso'); a.textContent = txt; a.hidden = false; clearTimeout(tAviso); tAviso = setTimeout(function () { a.hidden = true; }, ms || 2400); }
+  var tEstouro = null;
+  function estouro(txt, sub, classe) {
+    var el = $('estouro'); el.hidden = true; el.className = 'estouro ' + (classe || ''); el.textContent = txt;
+    if (sub) { var s = document.createElement('small'); s.textContent = sub; el.appendChild(s); }
+    void el.offsetWidth; el.hidden = false;
+    clearTimeout(tEstouro); tEstouro = setTimeout(function () { el.hidden = true; }, 1450);
+  }
+  var janelaFn = null;
+  function abrirJanela(o) {
+    $('janelaTitulo').textContent = o.titulo || ''; $('janelaTexto').textContent = o.texto || ''; $('janelaTexto').hidden = !o.texto;
+    var caixa = $('janelaBotoes'); caixa.innerHTML = '';
+    (o.botoes || [{ t: 'OK' }]).forEach(function (b, i) {
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = b.classe || (i === 0 ? 'medio' : 'medio cinza'); bt.textContent = b.t;
+      bt.addEventListener('click', function () { fecharJanela(); if (b.fn) b.fn(); });
+      caixa.appendChild(bt);
+    });
+    $('janela').hidden = false;
+    setTimeout(function () { var p = caixa.querySelector('button'); if (p) p.focus(); }, 30);
+  }
+  function fecharJanela() { $('janela').hidden = true; }
+  function cortina(titulo, texto, fn) {
+    $('cortinaTitulo').textContent = titulo; $('cortinaTexto').textContent = texto || '';
+    $('cortina').hidden = false; janelaFn = fn;
+    setTimeout(function () { $('btCortina').focus(); }, 30);
+  }
+  $('btCortina').addEventListener('click', function () { $('cortina').hidden = true; var fn = janelaFn; janelaFn = null; if (fn) fn(); });
+  function confete() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var c = $('confete');
+    for (var i = 0; i < 70; i++) {
+      var p = document.createElement('i');
+      p.style.left = (Math.random() * 100) + '%'; p.style.background = CORES[i % 4];
+      p.style.animationDuration = (2 + Math.random() * 2.5) + 's'; p.style.animationDelay = (Math.random() * 0.8) + 's';
+      c.appendChild(p);
+    }
+    setTimeout(function () { c.innerHTML = ''; }, 5500);
+  }
+  function vibrar(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* sem vibrar */ } }
+
+  // ---------- botões de cima ----------
+  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
+  $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); aplicarSom(); Som.efeito('toque'); });
+  $('btAjuda').addEventListener('click', function () {
+    if (atual !== 'inicio') mostrar('inicio');
+    var a = $('ajuda'); a.hidden = !a.hidden; this.setAttribute('aria-expanded', a.hidden ? 'false' : 'true');
+    if (!a.hidden) a.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  $('btCasa').addEventListener('click', function (e) {
+    if (jogo && (jogo.modo === 'rede' ? jogo.p.estado().fase !== 'fim' : jogo.fase === 'jogo')) {
+      e.preventDefault();
+      abrirJanela({ titulo: t('Sair da Batalha Naval?', 'Leave Sea Battle?'), texto: t('A partida em andamento vai acabar para você.', 'The game in progress will end for you.'),
+        botoes: [{ t: t('🚪 Sim, sair', '🚪 Yes, leave'), fn: function () { sairDoJogo(); location.href = '../'; } }, { t: t('Continuar jogando', 'Keep playing') }] });
+    }
+  });
+  // som liberado no primeiro toque
+  document.addEventListener('pointerup', function () { Som.iniciar(); }, { once: true, capture: true });
+  document.addEventListener('keydown', function () { Som.iniciar(); }, { once: true, capture: true });
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('button') && !e.target.closest('.tab')) Som.efeito('toque'); }, true);
+
+  if (window.SolverRecursos && !SolverRecursos.ligado('batalha-naval', true)) {
+    traduzir(); mostrar('desligado'); $('desligado').hidden = false; return;
+  }
+
+  // ---------- início ----------
+  // a partida em rede fica guardada na aba (sessionStorage: duas abas no mesmo computador não se misturam) e no aparelho
+  // (localStorage: para o botão "Voltar para a partida" depois de fechar o navegador)
+  function lerSessao() { try { var v = sessionStorage.getItem(CH_REDE); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function guardarRede(d) { gravar(CH_REDE, d); try { if (d == null) sessionStorage.removeItem(CH_REDE); else sessionStorage.setItem(CH_REDE, JSON.stringify(d)); } catch (e) { /* ok */ } }
+  function salvoRede(daAba) { var d = daAba ? lerSessao() : (lerSessao() || ler(CH_REDE)); return d && d.codigo && d.id && !d.saiu ? d : null; }
+  function enderecoSala(c) { try { history.replaceState(history.state, '', location.pathname + (c ? '?sala=' + c + (TESTE ? '&teste' : '') : (TESTE ? '?teste' : ''))); } catch (e) { /* ok */ } }
+  function atualizarInicio() {
+    var d = salvoRede(), b = $('btVoltarRede');
+    b.hidden = !d || !!jogo; if (d) b.textContent = t('⚓ Voltar para a partida ', '⚓ Back to game ') + d.codigo;
+    $('avisoSemNet').hidden = navigator.onLine !== false;
+  }
+  window.addEventListener('online', atualizarInicio); window.addEventListener('offline', atualizarInicio);
+  $('btVoltarRede').addEventListener('click', function () { var d = salvoRede(); if (d) conectar({ dados: d }); });
+  $('btPC').addEventListener('click', function () { escolherNivel('pc'); });
+  $('btPassa').addEventListener('click', function () { escolherNivel('passa'); });
+  $('btAmigos').addEventListener('click', function () { abrirAmigos(''); });
+  function escolherNivel(para) {
+    nivelPara = para;
+    $('nivelTitulo').textContent = para === 'criar' ? t('Escolha o nível da partida', 'Pick the game level') : t('Escolha o nível', 'Pick the level');
+    Array.prototype.forEach.call(document.querySelectorAll('.so-pc'), function (el) { el.hidden = para !== 'pc'; });
+    mostrar('nivel');
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-nivel]'), function (b) {
+    b.addEventListener('click', function () {
+      var nv = b.getAttribute('data-nivel');
+      if (nivelPara === 'criar') criarRede(nv); else novoLocal(nivelPara, nv);
+    });
+  });
+
+  // ======================= ARRUMAR A FROTA =======================
+  var arr = null;
+  function abrirArrumar(o) {
+    var cfg = L.NIVEIS[o.nivel];
+    arr = { nivel: o.nivel, n: cfg.n, tams: cfg.frota.slice(), frota: cfg.frota.map(function () { return null; }), sel: 0, h: true, aoPronto: o.aoPronto, drag: null, prev: null };
+    if (o.frota && L.frotaValida(o.frota, o.nivel)) {
+      o.frota.forEach(function (nv) { for (var i = 0; i < arr.tams.length; i++) if (arr.tams[i] === nv.tam && !arr.frota[i]) { arr.frota[i] = { x: nv.x, y: nv.y, tam: nv.tam, h: nv.h }; break; } });
+      arr.sel = -1;
+    }
+    $('arrTitulo').textContent = o.titulo;
+    montar($('arrTab'), arr.n, false);
+    mostrar('arrumar'); pintarArr();
+  }
+  function ajustar(nv) {
+    var n = arr.n, x = nv.x, y = nv.y;
+    if (nv.h) { x = Math.max(0, Math.min(n - nv.tam, x)); y = Math.max(0, Math.min(n - 1, y)); }
+    else { y = Math.max(0, Math.min(n - nv.tam, y)); x = Math.max(0, Math.min(n - 1, x)); }
+    return { x: x, y: y, tam: nv.tam, h: nv.h };
+  }
+  function navioEm(x, y) {
+    for (var i = 0; i < arr.frota.length; i++) { var nv = arr.frota[i]; if (!nv) continue; var cs = L.celulas(nv); for (var k = 0; k < cs.length; k++) if (cs[k][0] === x && cs[k][1] === y) return { i: i, k: k }; }
+    return null;
+  }
+  function proximoLivre() { for (var i = 0; i < arr.frota.length; i++) if (!arr.frota[i]) return i; return -1; }
+  function por(i, nv) {
+    if (!L.cabe(arr.frota, arr.n, nv, i)) { Som.efeito('erro'); aviso(t('Não cabe aí: tem outro navio no caminho.', "It doesn't fit there: another ship is in the way.")); return false; }
+    arr.frota[i] = nv; Som.efeito('por'); vibrar(15);
+    arr.sel = proximoLivre();
+    return true;
+  }
+  function girar(i) {
+    var nv = arr.frota[i]; if (!nv) return;
+    var novo = ajustar({ x: nv.x, y: nv.y, tam: nv.tam, h: !nv.h });
+    if (L.cabe(arr.frota, arr.n, novo, i)) { arr.frota[i] = novo; Som.efeito('girar'); }
+    else { Som.efeito('erro'); aviso(t('Não dá para girar aí. Arraste para outro lugar.', "Can't turn it there. Drag it somewhere else.")); }
+  }
+  function celulaDoPonto(cx, cy) {
+    // pela posição real das casas (A1 e B2), para o dedo cair na casa certa em qualquer tamanho de tela
+    var c = $('arrTab')._c, a = c[0][0].getBoundingClientRect(), b = c[1][1].getBoundingClientRect();
+    var px = b.left - a.left, py = b.top - a.top, gx = (px - a.width) / 2, gy = (py - a.height) / 2;
+    var x = Math.floor((cx - a.left + gx) / px), y = Math.floor((cy - a.top + gy) / py);
+    return x >= 0 && y >= 0 && x < arr.n && y < arr.n ? { x: x, y: y } : null;
+  }
+  function inicioArraste(e, fonte, i, k) {
+    arr.drag = { fonte: fonte, i: i, k: k, x0: e.clientX, y0: e.clientY, moveu: false, id: e.pointerId };
+  }
+  $('arrTab').addEventListener('pointerdown', function (e) {
+    if (!arr) return;
+    var c = celulaDoPonto(e.clientX, e.clientY); if (!c) return;
+    e.preventDefault();
+    var achou = navioEm(c.x, c.y);
+    if (achou) inicioArraste(e, 'mar', achou.i, achou.k);
+    else arr.drag = { fonte: 'vazio', c: c, x0: e.clientX, y0: e.clientY, moveu: false, id: e.pointerId };
+  });
+  document.addEventListener('pointermove', function (e) {
+    var d = arr && arr.drag; if (!d || d.id !== e.pointerId || d.fonte === 'vazio') return;
+    if (!d.moveu && Math.abs(e.clientX - d.x0) + Math.abs(e.clientY - d.y0) < 10) return;
+    d.moveu = true; e.preventDefault();
+    var c = celulaDoPonto(e.clientX, e.clientY), tam = arr.tams[d.i], atualNv = arr.frota[d.i], h = atualNv ? atualNv.h : arr.h;
+    if (!c) { arr.prev = null; pintarArr(); return; }
+    var nv = ajustar({ x: h ? c.x - d.k : c.x, y: h ? c.y : c.y - d.k, tam: tam, h: h });
+    arr.prev = { nv: nv, ok: L.cabe(arr.frota, arr.n, nv, d.i), i: d.i };
+    pintarArr();
+  }, { passive: false });
+  function fimArraste(e) {
+    var d = arr && arr.drag; if (!d || d.id !== e.pointerId) return;
+    arr.drag = null;
+    if (d.moveu) {
+      var p = arr.prev; arr.prev = null;
+      if (p && p.ok) { arr.frota[p.i] = p.nv; Som.efeito('por'); vibrar(15); if (arr.sel === p.i || arr.sel < 0) arr.sel = proximoLivre(); }
+      else if (p) Som.efeito('erro');
+    } else if (d.fonte === 'mar') girar(d.i);
+    else if (d.fonte === 'peca') arr.sel = d.i;
+    else if (d.fonte === 'vazio' && arr.sel >= 0) {
+      var tam = arr.tams[arr.sel], velho = arr.frota[arr.sel];
+      por(arr.sel, ajustar({ x: d.c.x, y: d.c.y, tam: tam, h: velho ? velho.h : arr.h }));
+    } else if (d.fonte === 'vazio') aviso(t('Escolha um navio aqui embaixo primeiro.', 'Pick a ship below first.'));
+    pintarArr();
+  }
+  document.addEventListener('pointerup', fimArraste);
+  document.addEventListener('pointercancel', function (e) { if (arr && arr.drag && arr.drag.id === e.pointerId) { arr.drag = null; arr.prev = null; pintarArr(); } });
+  $('arrPecas').addEventListener('pointerdown', function (e) {
+    var b = e.target.closest && e.target.closest('.peca'); if (!b || !arr) return;
+    e.preventDefault();
+    inicioArraste(e, 'peca', +b.getAttribute('data-i'), 0);
+  });
+  $('btGirar').addEventListener('click', function () {
+    if (arr.sel >= 0 && arr.frota[arr.sel]) girar(arr.sel); else { arr.h = !arr.h; Som.efeito('girar'); }
+    pintarArr();
+  });
+  $('btSortear').addEventListener('click', function () { arr.frota = L.aleatoria(arr.nivel); arr.sel = -1; Som.efeito('por'); pintarArr(); });
+  $('btLimpar').addEventListener('click', function () { arr.frota = arr.tams.map(function () { return null; }); arr.sel = 0; pintarArr(); });
+  $('btPronto').addEventListener('click', function () {
+    if (proximoLivre() >= 0) return;
+    var f = arr.frota.map(function (nv) { return { x: nv.x, y: nv.y, tam: nv.tam, h: nv.h }; }), fn = arr.aoPronto;
+    Som.efeito('comecou'); fn(f);
+  });
+  function pintarArr() {
+    if (!arr) return;
+    var el = $('arrTab'), n = arr.n, cls = [], y, x;
+    for (y = 0; y < n; y++) { cls.push([]); for (x = 0; x < n; x++) cls[y].push('c'); }
+    arr.frota.forEach(function (nv, i) {
+      if (!nv) return;
+      L.celulas(nv).forEach(function (c, k) { cls[c[1]][c[0]] += classesNavio(nv, k) + (i === arr.sel ? ' sel' : '') + (arr.drag && arr.drag.moveu && arr.drag.i === i ? ' arrastando' : ''); });
+    });
+    if (arr.prev) L.celulas(arr.prev.nv).forEach(function (c) { if (c[0] < n && c[1] < n) cls[c[1]][c[0]] += ' prev' + (arr.prev.ok ? '' : ' ruim'); });
+    for (y = 0; y < n; y++) for (x = 0; x < n; x++) { var cel = el._c[y][x]; if (cel.className !== cls[y][x]) cel.className = cls[y][x]; }
+    refazer($('arrPecas'), JSON.stringify([arr.tams, arr.sel, arr.frota.map(Boolean)]), function (pecas) { arr.tams.forEach(function (tam, i) {
+      var b = document.createElement('button'); b.type = 'button';
+      b.className = 'peca' + (i === arr.sel ? ' sel' : '') + (arr.frota[i] ? ' posto' : ''); b.setAttribute('data-i', i);
+      var casco = document.createElement('div'); casco.className = 'casco'; for (var k = 0; k < tam; k++) casco.appendChild(document.createElement('i'));
+      var nm = document.createElement('span'); nm.textContent = N(L.NOMES[tam]) + ' (' + tam + ')';
+      b.appendChild(casco); b.appendChild(nm);
+      b.setAttribute('aria-label', N(L.NOMES[tam]) + ', ' + tam + t(' casas', ' squares') + (arr.frota[i] ? t(', no mar', ', placed') : ''));
+      pecas.appendChild(b);
+    }); });
+    var selPosto = arr.sel >= 0 && arr.frota[arr.sel], h = selPosto ? arr.frota[arr.sel].h : arr.h;
+    $('btGirar').textContent = '🔄 ' + t('Girar', 'Turn') + (h ? ' ↔' : ' ↕');
+    $('btPronto').disabled = proximoLivre() >= 0;
+  }
+
+  // ======================= TABULEIRO (desenho) =======================
+  function classesNavio(nv, k) { return ' nv ' + (nv.h ? 'h' : 'v') + (k === 0 ? ' ini' : '') + (k === nv.tam - 1 ? ' fim' : ''); }
+  function montar(el, n, botoes) {
+    if (el._n === n && el._b === botoes) return;
+    el.innerHTML = ''; el.style.setProperty('--n1', n + 1); el._n = n; el._b = botoes; el._c = []; el._anim = {};
+    var canto = document.createElement('span'); canto.className = 'rot'; el.appendChild(canto);
+    for (var x = 0; x < n; x++) { var r = document.createElement('span'); r.className = 'rot'; r.textContent = L.LETRAS.charAt(x); el.appendChild(r); }
+    for (var y = 0; y < n; y++) {
+      var rn = document.createElement('span'); rn.className = 'rot'; rn.textContent = String(y + 1); el.appendChild(rn);
+      el._c.push([]);
+      for (x = 0; x < n; x++) {
+        var c = document.createElement(botoes ? 'button' : 'span'); c.className = 'c';
+        if (botoes) { c.type = 'button'; c.setAttribute('data-x', x); c.setAttribute('data-y', y); }
+        el.appendChild(c); el._c[y].push(c);
+      }
+    }
+  }
+  // o: { vista, frota (navios inteiros que eu conheço), fantasma (navios revelados no fim), pode, pend, ultimo }
+  function pintar(el, n, o) {
+    var cls = [], y, x, v = o.vista.v;
+    for (y = 0; y < n; y++) { cls.push([]); for (x = 0; x < n; x++) cls[y].push('c'); }
+    (o.fantasma || []).forEach(function (nv) { L.celulas(nv).forEach(function (c, k) { if (!v[c[1]][c[0]]) cls[c[1]][c[0]] += classesNavio(nv, k) + ' fantasma'; }); });
+    (o.frota || []).forEach(function (nv) { L.celulas(nv).forEach(function (c, k) { cls[c[1]][c[0]] = 'c' + classesNavio(nv, k); }); });
+    o.vista.afundados.forEach(function (nv) { L.celulas(nv).forEach(function (c, k) { cls[c[1]][c[0]] = 'c' + classesNavio(nv, k); }); });
+    var NOME_EST = ['', t('água', 'water'), t('acerto', 'hit'), t('afundado', 'sunk')];
+    for (y = 0; y < n; y++) for (x = 0; x < n; x++) {
+      var st = v[y][x];
+      if (st === 1) cls[y][x] = 'c agua'; else if (st === 2) cls[y][x] += ' acerto'; else if (st === 3) cls[y][x] += ' afundado';
+      if (st) cls[y][x] += ' ja';
+      if (o.pend && o.pend.x === x && o.pend.y === y) cls[y][x] += ' mira';
+      if (o.ultimo && o.ultimo[0] === x && o.ultimo[1] === y) cls[y][x] += ' ultimo';
+      var an = el._anim[x + ',' + y]; if (an) cls[y][x] += ' ' + an;
+      var cel = el._c[y][x];
+      if (cel.className !== cls[y][x]) cel.className = cls[y][x];
+      if (el._b) {
+        var des = !o.pode || !!st;
+        if (cel.disabled !== des) cel.disabled = des;
+        var lab = L.coord(x, y) + (st ? ', ' + NOME_EST[st] : '');
+        if (cel.getAttribute('aria-label') !== lab) cel.setAttribute('aria-label', lab);
+      }
+    }
+    el.classList.toggle('pode', !!o.pode);
+  }
+  function animar(el, x, y, classe) {
+    if (!el._anim) return;
+    var k = x + ',' + y; el._anim[k] = classe;
+    if (el._c && el._c[y] && el._c[y][x]) el._c[y][x].classList.add(classe);
+    setTimeout(function () { delete el._anim[k]; if (el._c && el._c[y] && el._c[y][x]) el._c[y][x].classList.remove(classe); }, 900);
+    if (classe === 'boom') { el.classList.remove('treme'); void el.offsetWidth; el.classList.add('treme'); setTimeout(function () { el.classList.remove('treme'); }, 500); }
+  }
+
+  // ======================= A PARTIDA (todas) =======================
+  var jogo = null;        // { modo: 'pc' | 'passa' | 'rede', ... }
+  var alvoSel = -1;
+  function nomeJ(j, i) { return (j[i] && j[i].nome) || t('Jogador ', 'Player ') + (i + 1); }
+  // tudo o que a tela precisa, do mesmo jeito nos três modos
+  function dados() {
+    var g = jogo;
+    if (g.modo === 'rede') {
+      var s = g.p.estado(), revel = {};
+      Object.keys(s.revel || {}).forEach(function (k) { revel[k] = s.revel[k].map(L.deLista); });
+      return { nivel: s.nivel, j: s.j, eu: g.p.meu(), vez: s.vez, fase: s.fase, venc: s.venc, log: s.log, frota: s.frota, revel: revel, pend: s.pend, host: g.p.souHost(), h: s.h };
+    }
+    var rv = {};
+    if (g.fase === 'fim') g.frotas.forEach(function (f, i) { rv[i] = f; });
+    return { nivel: g.nivel, j: g.j, eu: g.eu, vez: g.vez, fase: g.fase, venc: g.venc, log: g.log, frota: g.frotas[g.eu], revel: rv, pend: null, host: true, h: 0 };
+  }
+  function ativoJ(p) { return p && !p.f && !p.s; }
+  function podeAtirar(d) {
+    if (d.fase !== 'jogo' || d.eu < 0 || d.vez !== d.eu || d.pend || !ativoJ(d.j[d.eu])) return false;
+    if (jogo.modo !== 'rede' && jogo.ocupado) return false;
+    var a = d.j[alvoSel]; return alvoSel !== d.eu && ativoJ(a) && !a.au;
+  }
+  function escolherAlvo(d) {
+    var opos = [], i;
+    for (i = 0; i < d.j.length; i++) if (i !== d.eu) opos.push(i);
+    var bons = opos.filter(function (k) { return ativoJ(d.j[k]) && !d.j[k].au; });
+    if (opos.indexOf(alvoSel) < 0) alvoSel = bons.length ? bons[0] : opos[0];
+    if (d.fase === 'jogo' && bons.length && bons.indexOf(alvoSel) < 0) alvoSel = bons[0];
+    return opos;
+  }
+  function restantes(d, b) { var total = L.NIVEIS[d.nivel].frota.length, afund = d.log.filter(function (e) { return e[1] === b && e[4] === 2; }).length; return total - afund; }
+
+  function desenhar() {
+    if (!jogo) return;
+    if (jogo.modo === 'rede') { desenharRede(); return; }
+    desenharJogo();
+  }
+  // refaz um pedaço da tela só quando o conteúdo muda (refazer botões toda hora perde o toque de quem está apertando)
+  function refazer(el, chave, fn) { chave = pref.lingua + '|' + chave; if (el._chave === chave) return; el._chave = chave; el.innerHTML = ''; fn(el); }
+  function desenharJogo() {
+    var g = jogo, d = dados(), n = L.NIVEIS[d.nivel].n, opos = escolherAlvo(d), eu = d.eu;
+    // banner (de quem é a vez, sempre grande)
+    var b = textoBanner(d), ban = $('banner');
+    ban.className = 'banner ' + b.classe; ban.style.setProperty('--cor', b.cor || '');
+    ban.textContent = b.txt; if (b.sub) { var sm = document.createElement('small'); sm.textContent = b.sub; ban.appendChild(sm); }
+    // ordem das vezes
+    refazer($('fila'), JSON.stringify([d.j, d.vez, d.fase, eu, g.modo]), function (fila) { d.j.forEach(function (p, i) {
+      var c = document.createElement('span'); c.style.setProperty('--cor', CORES[i]);
+      c.className = (i === d.vez && d.fase === 'jogo' ? 'vez' : '') + (p.f ? ' fora' : '') + (p.s ? ' saiu' : '');
+      c.textContent = (i === d.vez && d.fase === 'jogo' ? '▶ ' : '') + nomeJ(d.j, i) + (i === eu && g.modo === 'rede' ? t(' (você)', ' (you)') : '') + (p.f ? ' 💀' : p.s ? ' 🚪' : p.au ? ' 📡' : '');
+      fila.appendChild(c);
+    }); });
+    // anfitrião: continuar sem quem sumiu
+    var ausentes = g.modo === 'rede' && d.host && d.fase === 'jogo' ? d.j.map(function (p, i) { return i !== eu && ativoJ(p) && p.au ? i : -1; }).filter(function (i) { return i >= 0; }) : [];
+    $('semEle').hidden = !ausentes.length;
+    refazer($('semEle'), JSON.stringify(ausentes) + d.j.map(function (p) { return p.nome; }).join(), function (sem) { ausentes.forEach(function (i) {
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'medio';
+      bt.textContent = t('➡️ Continuar sem ', '➡️ Go on without ') + nomeJ(d.j, i);
+      bt.addEventListener('click', function () { if (jogo === g) g.p.continuarSem(i); });
+      sem.appendChild(bt);
+    }); });
+    // em quem atirar (3 ou 4 jogadores)
+    $('alvos').hidden = opos.length < 2;
+    refazer($('alvos'), JSON.stringify([opos.map(function (i) { var p = d.j[i]; return [p.nome, p.f, p.s, p.au, restantes(d, i)]; }), alvoSel]), function (alvos) { if (opos.length > 1) opos.forEach(function (i) {
+      var p = d.j[i], bt = document.createElement('button'); bt.type = 'button'; bt.setAttribute('role', 'tab');
+      bt.style.setProperty('--cor', CORES[i]); bt.setAttribute('aria-selected', i === alvoSel ? 'true' : 'false');
+      bt.textContent = '🎯 ' + nomeJ(d.j, i) + ' · 🚢' + restantes(d, i) + (p.f ? ' 💀' : p.s ? ' 🚪' : p.au ? ' 📡' : '');
+      bt.addEventListener('click', function () { alvoSel = i; desenhar(); });
+      alvos.appendChild(bt);
+    }); });
+    // mares
+    montar($('tabAlvo'), n, true); montar($('tabMeu'), n, false);
+    var ult = d.log.length ? d.log[d.log.length - 1] : null;
+    $('tituloAlvo').textContent = (g.modo === 'pc' ? '🤖 ' + t('Mar do computador', "Computer's sea") : '🎯 ' + t('Mar de ', "Sea of ") + nomeJ(d.j, alvoSel)) + ' · 🚢 ' + restantes(d, alvoSel);
+    pintar($('tabAlvo'), n, { vista: L.vista(d.log, alvoSel, n), fantasma: d.revel[alvoSel], pode: podeAtirar(d), pend: d.pend && d.pend.alvo === alvoSel ? d.pend : null, ultimo: ult && ult[1] === alvoSel ? [ult[2], ult[3]] : null });
+    var mostraMeu = eu >= 0;
+    $('tabMeu').parentNode.hidden = !mostraMeu;
+    if (mostraMeu) {
+      $('tituloMeu').textContent = '🛡️ ' + (g.modo === 'passa' ? t('Mar de ', 'Sea of ') + nomeJ(d.j, eu) : t('Seu mar', 'Your sea'));
+      pintar($('tabMeu'), n, { vista: L.vista(d.log, eu, n), frota: d.frota || [], pode: false, ultimo: ult && ult[1] === eu ? [ult[2], ult[3]] : null });
+      var vm = L.vista(d.log, eu, n), afund = (d.frota || []).map(function (nv) { return L.celulas(nv).every(function (c) { return vm.v[c[1]][c[0]] === 3; }); });
+      refazer($('frotaInfo'), JSON.stringify([d.frota, afund]), function (info) { (d.frota || []).forEach(function (nv, k) {
+        var s = document.createElement('span'); s.textContent = (afund[k] ? '💀 ' : '🚢 ') + N(L.NOMES[nv.tam]); if (afund[k]) s.style.textDecoration = 'line-through';
+        info.appendChild(s);
+      }); });
+    }
+    $('ultimo').textContent = ult ? nomeJ(d.j, ult[0]) + ' → ' + nomeJ(d.j, ult[1]) + ' ' + L.coord(ult[2], ult[3]) + ': ' + ['💦 ' + t('água', 'water'), '💥 ' + t('acertou', 'hit'), '🚢 ' + t('afundou', 'sunk')][ult[4]] : '';
+    // tiros novos: animação, som e o estouro no meio da tela
+    if (g.vistos == null || g.vistos > d.log.length) g.vistos = d.log.length;
+    if (d.log.length > g.vistos) { var novo = d.log[d.log.length - 1]; g.vistos = d.log.length; mostrarTiro(d, novo); }
+    // fim
+    var fc = $('fimCaixa');
+    if (d.fase === 'fim') {
+      fc.hidden = false;
+      var ganhei = d.venc === eu, nomeV = d.venc >= 0 ? nomeJ(d.j, d.venc) : '';
+      $('fimTitulo').textContent = g.modo === 'pc' ? (ganhei ? t('🏆 Você venceu!', '🏆 You won!') : t('🤖 O computador venceu desta vez!', '🤖 The computer won this time!'))
+        : g.modo === 'rede' && ganhei ? t('🏆 Você venceu!', '🏆 You won!') : '🏆 ' + nomeV + t(' venceu!', ' won!');
+      $('fimTexto').textContent = t('Partida de ', 'Game of ') + d.log.length + t(' tiros. As frotas que sobraram aparecem clarinhas no mar.', ' shots. The fleets left afloat show up faded in the sea.');
+      var bt = $('btDeNovo');
+      if (g.modo === 'rede') { bt.hidden = !d.host; bt.textContent = t('🔁 Jogar de novo (mesma turma)', '🔁 Play again (same group)'); if (!d.host) $('fimTexto').textContent += ' ' + t('Quem criou a sala pode começar outra partida.', 'Whoever created the room can start another game.'); }
+      else { bt.hidden = false; bt.textContent = t('🔁 Jogar de novo', '🔁 Play again'); }
+      if (!g.fimMostrado) {
+        g.fimMostrado = true; fc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        var festa = g.modo === 'passa' || ganhei;
+        setTimeout(function () { Som.efeito(festa ? 'vitoria' : 'derrota'); if (festa) confete(); }, 900 * RAPIDO);
+      }
+    } else { fc.hidden = true; g.fimMostrado = false; }
+  }
+  function textoBanner(d) {
+    var g = jogo, eu = d.eu, nv = nomeJ(d.j, d.vez);
+    if (d.fase === 'fim') {
+      if (d.venc < 0) return { txt: t('Fim da partida', 'Game over'), classe: 'fim' };
+      return { txt: d.venc === eu && g.modo !== 'passa' ? t('🏆 Você venceu!', '🏆 You won!') : g.modo === 'pc' ? t('🤖 O computador venceu!', '🤖 The computer won!') : '🏆 ' + nomeJ(d.j, d.venc) + t(' venceu!', ' won!'), classe: 'fim' };
+    }
+    if (g.modo === 'rede') {
+      var semAnf = g.p.semAnfitriao();
+      if (!g.conectado) return { txt: t('📡 Conectando…', '📡 Connecting…'), classe: 'alerta' };
+      if (semAnf > 8000) return { txt: t('📡 Procurando o anfitrião…', '📡 Looking for the host…'), sub: t('A partida continua sozinha quando a conexão voltar.', 'The game goes on by itself when the connection is back.'), classe: 'alerta' };
+      if (eu >= 0 && !ativoJ(d.j[eu])) return { txt: t('💀 Sua frota afundou!', '💀 Your fleet sank!'), sub: t('Torça pelos outros 👀 · vez de ', 'Cheer for the others 👀 · turn: ') + nv, classe: 'fora' };
+    }
+    if (d.vez === eu) {
+      if (d.pend) return { txt: '💣 ' + t('Tiro em ', 'Shot at ') + L.coord(d.pend.x, d.pend.y) + '…', sub: t('esperando ', 'waiting for ') + nomeJ(d.j, d.pend.alvo) + t(' responder', ' to answer'), classe: 'espera' };
+      if (g.modo !== 'rede' && g.ocupado) return { txt: t('👀 Veja o que aconteceu…', '👀 See what happened…'), classe: 'espera' };
+      var outros = d.j.filter(function (p, i) { return i !== eu && ativoJ(p); }).length;
+      var alvoAus = d.j[alvoSel] && d.j[alvoSel].au;
+      if (alvoAus) return { txt: '📡 ' + nomeJ(d.j, alvoSel) + t(' saiu da conexão', ' lost connection'), sub: t('Esperando voltar…', 'Waiting for them to come back…'), classe: 'alerta' };
+      return { txt: (g.modo === 'passa' ? '🎯 ' + nv + t(', sua vez!', ', your turn!') : t('🎯 Sua vez!', '🎯 Your turn!')),
+        sub: outros > 1 ? t('Escolha um adversário e toque no mar dele', "Pick an opponent and tap their sea") : t('Toque num quadradinho do mar de ', 'Tap a square in the sea of ') + nomeJ(d.j, alvoSel), classe: 'minha' };
+    }
+    if (g.modo === 'pc') return { txt: t('🤖 O computador está mirando…', '🤖 The computer is aiming…'), classe: 'outro', cor: CORES[1] };
+    if (d.j[d.vez] && d.j[d.vez].au) return { txt: '📡 ' + nv + t(' saiu da conexão', ' lost connection'), sub: t('Esperando voltar…', 'Waiting for them to come back…'), classe: 'alerta' };
+    return { txt: '⏳ ' + t('Vez de ', 'Turn: ') + nv, sub: t('Espere a sua vez 🙂', 'Wait for your turn 🙂'), classe: 'outro', cor: CORES[d.vez] };
+  }
+  function mostrarTiro(d, e) {
+    var a = e[0], b = e[1], x = e[2], y = e[3], rc = e[4], eu = d.eu, c = L.coord(x, y);
+    var noAlvo = b === alvoSel && b !== eu, emMim = b === eu;
+    if (noAlvo) animar($('tabAlvo'), x, y, rc ? 'boom' : 'splash');
+    if (emMim) animar($('tabMeu'), x, y, rc ? 'boom' : 'splash');
+    var nomeNavio = rc === 2 ? N(L.NOMES[e[7]]) : '';
+    var quem = nomeJ(d.j, a), deQuem = nomeJ(d.j, b);
+    if (rc === 0) estouro('💦 ' + t('Água!', 'Water!'), quem + ' → ' + c, 'agua');
+    else if (rc === 1) estouro('💥 ' + t('Acertou!', 'Hit!'), emMim && jogo.modo !== 'passa' ? quem + t(' acertou seu navio em ', ' hit your ship at ') + c : quem + ' → ' + c, 'acerto');
+    else estouro('🚢 ' + t('Afundou!', 'Sunk!'), emMim && jogo.modo !== 'passa' ? quem + t(' afundou seu ', ' sank your ') + nomeNavio : t('O ', 'The ') + nomeNavio + t(' de ', ' of ') + deQuem + ' (' + c + ')', 'afundou');
+    Som.efeito(['agua', 'acerto', 'afundou'][rc]);
+    if (emMim && rc) vibrar(rc === 2 ? [80, 60, 160] : 90);
+  }
+
+  // ---------- clicar no mar do adversário ----------
+  $('tabAlvo').addEventListener('click', function (e) {
+    var c = e.target.closest && e.target.closest('button.c'); if (!c || c.disabled || !jogo) return;
+    var x = +c.getAttribute('data-x'), y = +c.getAttribute('data-y');
+    var d = dados(); if (!podeAtirar(d)) return;
+    if (jogo.modo === 'rede') { if (jogo.p.atirar(alvoSel, x, y)) { Som.efeito('toque'); desenhar(); } }
+    else atirarLocal(alvoSel, x, y);
+  });
+  // setas andam pelo mar (teclado e controle)
+  $('tabAlvo').addEventListener('keydown', function (e) {
+    var dir = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] }[e.key];
+    var c = e.target.closest && e.target.closest('button.c'); if (!dir || !c) return;
+    var el = $('tabAlvo'), n = el._n, x = +c.getAttribute('data-x'), y = +c.getAttribute('data-y');
+    x = Math.max(0, Math.min(n - 1, x + dir[0])); y = Math.max(0, Math.min(n - 1, y + dir[1]));
+    e.preventDefault(); el._c[y][x].focus();
+  });
+
+  // ======================= LOCAL: contra o computador e passar o aparelho =======================
+  function novoLocal(modo, nivel) {
+    sairDoJogo();
+    var j = modo === 'pc' ? [{ nome: t('Você', 'You') }, { nome: t('Computador', 'Computer') }] : [{ nome: t('Jogador 1', 'Player 1') }, { nome: t('Jogador 2', 'Player 2') }];
+    jogo = { modo: modo, nivel: nivel, j: j, frotas: [null, null], log: [], vez: 0, eu: 0, fase: 'arrumar', venc: -1, ocupado: false, vistos: null };
+    alvoSel = 1;
+    if (modo === 'pc') {
+      jogo.ia = L.IA(nivel); jogo.frotas[1] = L.aleatoria(nivel);
+      abrirArrumar({ nivel: nivel, titulo: t('⚓ Arrume sua frota', '⚓ Place your fleet'), aoPronto: function (f) { jogo.frotas[0] = f; comecarLocal(); } });
+      return;
+    }
+    var g = jogo;
+    cortina(t('Jogador 1: arrume sua frota', 'Player 1: place your fleet'), t('O Jogador 2 não pode olhar! 🙈', 'Player 2, no peeking! 🙈'), function () {
+      abrirArrumar({ nivel: nivel, titulo: t('⚓ Frota do Jogador 1', '⚓ Player 1 fleet'), aoPronto: function (f) {
+        g.frotas[0] = f;
+        cortina(t('Passe o aparelho para o Jogador 2', 'Pass the device to Player 2'), t('Jogador 2: arrume sua frota. O Jogador 1 não pode olhar! 🙈', 'Player 2: place your fleet. Player 1, no peeking! 🙈'), function () {
+          abrirArrumar({ nivel: nivel, titulo: t('⚓ Frota do Jogador 2', '⚓ Player 2 fleet'), aoPronto: function (f2) {
+            g.frotas[1] = f2;
+            cortina(t('Passe o aparelho para o Jogador 1', 'Pass the device to Player 1'), t('O Jogador 1 começa atirando.', 'Player 1 fires first.'), comecarLocal);
+          } });
+        });
+      } });
+    });
+  }
+  function comecarLocal() {
+    var g = jogo; g.fase = 'jogo'; g.vez = 0; g.eu = 0; alvoSel = 1; g.vistos = 0;
+    mostrar('jogo'); desenhar();
+    estouro(t('⚔️ Começou!', '⚔️ Battle on!'), '', 'vez');
+  }
+  function atirarLocal(b, x, y) {
+    var g = jogo;
+    if (g.fase !== 'jogo' || g.ocupado) return null;
+    var tiros = {};
+    g.log.forEach(function (e) { if (e[1] === b) tiros[L.chave(e[2], e[3])] = 1; });
+    if (tiros[L.chave(x, y)]) return null;
+    var res = L.resolver(g.frotas[b], tiros, x, y), a = g.vez;
+    var e = [a, b, x, y, L.R[res.r]]; if (res.navio) e = e.concat(L.paraLista(res.navio));
+    g.log.push(e);
+    if (res.fim) { g.fase = 'fim'; g.venc = a; g.j[b].f = 1; }
+    g.ocupado = g.fase === 'jogo';
+    desenhar();
+    if (g.fase !== 'jogo') return e;
+    setTimeout(function () {
+      if (jogo !== g) return;
+      g.ocupado = false; g.vez = b;
+      if (g.modo === 'pc') { desenhar(); if (g.vez === 1) setTimeout(function () { if (jogo === g) vezDoComputador(); }, 700 * RAPIDO); }
+      else {
+        cortina(t('Passe o aparelho para ', 'Pass the device to ') + nomeJ(g.j, b), t('Vez de ', 'Turn: ') + nomeJ(g.j, b) + t('. Quem atirou agora não olha! 🙈', '. The other player, no peeking! 🙈'), function () {
+          if (jogo !== g) return;
+          g.eu = b; alvoSel = a; desenhar(); Som.efeito('vez');
+        });
+      }
+    }, 1500 * RAPIDO);
+    return e;
+  }
+  function vezDoComputador() {
+    var g = jogo; if (!g || g.fase !== 'jogo' || g.vez !== 1) return;
+    var c = g.ia.escolher(), e = atirarLocal(0, c[0], c[1]);
+    if (e) g.ia.anotar(e[2], e[3], L.RN[e[4]], e[4] === 2 ? L.deLista(e.slice(5)) : null);
+  }
+
+  // ======================= EM REDE =======================
+  function abrirAmigos(codigo) {
+    $('nome').value = pref.nome || '';
+    $('codigo').value = codigo || '';
+    $('amigosMsg').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Conecte no Wi-Fi ou nos dados para jogar com amigos.', '📡 No internet right now. Connect to Wi-Fi or data to play with friends.') : '';
+    mostrar('amigos');
+    // no computador o cursor já vai para o nome; no celular não (o teclado subiria antes de escolher criar ou entrar)
+    if (!(('ontouchstart' in window) || navigator.maxTouchPoints > 0)) $('nome').focus();
+  }
+  function guardarNome() { pref.nome = R.nome($('nome').value); salvarPref(); return pref.nome; }
+  $('btCriar').addEventListener('click', function () { guardarNome(); escolherNivel('criar'); });
+  $('codigo').addEventListener('input', function () { this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); });
+  $('formEntrar').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var c = $('codigo').value.trim().toUpperCase();
+    if (!/^[A-Z]{4}$/.test(c)) { $('amigosMsg').textContent = t('O código tem 4 letras (quem criou a partida vê na tela).', 'The code has 4 letters (whoever created the game sees it on screen).'); $('codigo').focus(); return; }
+    var nome = guardarNome();
+    conectar({ id: R.idNovo(), nome: nome, codigo: c, host: false });
+  });
+  function criarRede(nivel) { conectar({ id: R.idNovo(), nome: pref.nome, codigo: R.codigoNovo(), host: true, nivel: nivel }); }
+
+  function conectar(op) {
+    sairDoJogo(true);
+    var d = op.dados, g = { modo: 'rede', codigo: d ? d.codigo : op.codigo, canal: null, timer: null, conectado: false, desde: Date.now(), vistos: null, ultimaFase: null };
+    jogo = g; alvoSel = -1;
+    g.p = R.criar({ id: d ? d.id : op.id, nome: op.nome, codigo: g.codigo, host: op.host, nivel: op.nivel, dados: d,
+      mandar: function (m) { if (g.canal) g.canal.mandar(m); },
+      salvar: function (x) { if (jogo === g) guardarRede(x.saiu ? null : x); },
+      aoMudar: function () { if (jogo === g) desenhar(); } });
+    guardarRede(g.p.exportar());
+    enderecoSala(g.codigo);      // recarregar a página volta direto para esta partida
+    mostrar('sala'); desenhar();
+    abrirCanal(g).then(function () {
+      g.p.entrar();
+      var vez = 0;
+      g.timer = setInterval(function () { g.p.tique(); if (++vez % 2 === 0) desenhar(); }, 500);
+      desenhar();
+    }).catch(function () {
+      if (jogo !== g) return;
+      abrirJanela({ titulo: t('📡 Não consegui conectar', "📡 Couldn't connect"),
+        texto: t('Jogar com amigos em aparelhos diferentes precisa de internet. Confira o Wi-Fi ou os dados e tente de novo. Sem internet, dá para jogar contra o computador ou passando o aparelho.', 'Playing with friends on different devices needs internet. Check Wi-Fi or data and try again. Offline, you can play against the computer or pass the device.'),
+        botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again'), fn: function () { conectar({ dados: g.p.exportar() }); } }, { t: t('Voltar', 'Back'), fn: function () { sairDoJogo(true); mostrar('inicio'); } }] });
+    });
+  }
+  function abrirCanal(g) {
+    return R.abrir(g.codigo, function (m) { if (jogo === g) g.p.receber(m); }, function () { if (jogo === g) reabrir(g); }).then(function (canal) {
+      if (jogo !== g) { canal.fechar(); throw new Error('saiu'); }
+      g.canal = canal; g.conectado = true;
+    });
+  }
+  // o canal caiu (tela travada, Wi-Fi): abre outro em silêncio, tentando de novo a cada poucos segundos;
+  // a partida não perde nada — os tiros esperando são repetidos e o estado chega no próximo aviso do anfitrião
+  function reabrir(g) {
+    if (g.reabrindo || jogo !== g) return;
+    g.reabrindo = true; g.conectado = false;
+    var velho = g.canal; g.canal = null; if (velho) velho.fechar();
+    desenhar();
+    abrirCanal(g).then(function () { g.reabrindo = false; g.p.entrar(); desenhar(); })
+      .catch(function () { g.reabrindo = false; if (jogo === g) setTimeout(function () { reabrir(g); }, 4000); });
+  }
+  var escondidoEm = 0;
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { escondidoEm = Date.now(); return; }
+    if (jogo && jogo.modo === 'rede' && escondidoEm && Date.now() - escondidoEm > 8000) reabrir(jogo);
+  });
+  window.addEventListener('online', function () { if (jogo && jogo.modo === 'rede' && !R.LOCAL) reabrir(jogo); });
+  // fechar a partida atual (manter = guardar a partida em rede para voltar depois, sem avisar os outros)
+  function sairDoJogo(manter) {
+    var g = jogo; if (!g) return;
+    jogo = null; arr = null;
+    if (g.modo === 'rede') {
+      clearInterval(g.timer);
+      if (!manter) { g.p.sair(); guardarRede(null); enderecoSala(null); }
+      var c = g.canal; if (c) setTimeout(function () { c.fechar(); }, manter ? 0 : 800);
+    }
+  }
+  function confirmarSair() {
+    var g = jogo; if (!g) { mostrar('inicio'); return; }
+    var fim = g.modo === 'rede' ? g.p.estado().fase === 'fim' : g.fase === 'fim';
+    if (fim) { sairDoJogo(); mostrar('inicio'); return; }
+    abrirJanela({ titulo: t('Sair da partida?', 'Leave the game?'),
+      texto: g.modo === 'rede' ? t('Os outros continuam sem você.', 'The others go on without you.') : t('A partida vai acabar.', 'The game will end.'),
+      botoes: [{ t: t('🚪 Sim, sair', '🚪 Yes, leave'), fn: function () { sairDoJogo(); mostrar('inicio'); } }, { t: t('Continuar jogando', 'Keep playing') }] });
+  }
+  $('btSairJogo').addEventListener('click', confirmarSair);
+  $('btSairSala').addEventListener('click', confirmarSair);
+  $('btInicioFim').addEventListener('click', function () { sairDoJogo(); mostrar('inicio'); });
+  $('btDeNovo').addEventListener('click', function () {
+    var g = jogo; if (!g) return;
+    if (g.modo === 'rede') { g.p.revanche(); return; }
+    novoLocal(g.modo, g.nivel);
+  });
+
+  function linkConvite(c) { return location.origin + location.pathname + '?sala=' + c; }
+  $('btCompartilhar').addEventListener('click', function () {
+    if (!jogo || jogo.modo !== 'rede') return;
+    var url = linkConvite(jogo.codigo), txt = t('Vem jogar Batalha Naval comigo! Código: ', 'Come play Sea Battle with me! Code: ') + jogo.codigo;
+    if (navigator.share) navigator.share({ title: t('Batalha Naval', 'Sea Battle'), text: txt, url: url }).catch(function () { /* cancelou */ });
+    else copiar(url);
+  });
+  $('btCopiar').addEventListener('click', function () { if (jogo && jogo.modo === 'rede') copiar(linkConvite(jogo.codigo)); });
+  function copiar(url) {
+    var ok = function () { aviso(t('🔗 Link copiado! Cole na conversa com quem vai jogar.', '🔗 Link copied! Paste it in a chat with the other players.')); };
+    var manual = function () { var s = window.getSelection(), r = document.createRange(); r.selectNodeContents($('salaLink')); s.removeAllRanges(); s.addRange(r); aviso(t('Copie o link que ficou marcado.', 'Copy the highlighted link.')); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, manual); else manual();
+  }
+
+  function desenharRede() {
+    var g = jogo, p = g.p, s = p.estado(), eu = p.meu();
+    if (s.nao) {
+      sairDoJogo(true); guardarRede(null); enderecoSala(null); mostrar('inicio');
+      abrirJanela({ titulo: s.nao === 'cheia' ? t('A sala está cheia', 'The room is full') : t('Essa partida já começou', 'That game already started'),
+        texto: s.nao === 'cheia' ? t('Cabem até 4 jogadores por partida. Crie outra partida para vocês.', 'Up to 4 players per game. Create another game for your group.') : t('Espere acabar e peça para quem criou tocar em Jogar de novo — ou crie outra partida.', 'Wait for it to end and ask the creator to tap Play again — or create another game.') });
+      return;
+    }
+    if (s.saiu) return;
+    if (s.fase === 'sala') {
+      if (g.ultimaFase && g.ultimaFase !== 'sala') { g.vistos = null; $('fimCaixa').hidden = true; }
+      if (atual !== 'arrumar' && atual !== 'sala') mostrar('sala');
+      desenharSala();
+    } else {
+      if (atual !== 'jogo') {
+        mostrar('jogo');
+        if (g.ultimaFase === 'sala') { setTimeout(function () { estouro(t('⚔️ Começou!', '⚔️ Battle on!'), '', 'vez'); Som.efeito('comecou'); }, 50); }
+      }
+      var antesVez = g.ultimaVez;
+      desenharJogo();
+      if (s.fase === 'jogo' && s.vez === eu && antesVez !== eu && g.ultimaFase) {
+        setTimeout(function () { if (jogo === g && g.p.estado().vez === eu && !g.p.estado().pend) { estouro(t('🎯 Sua vez!', '🎯 Your turn!'), '', 'vez'); Som.efeito('vez'); vibrar(60); } }, 1500 * RAPIDO);
+      }
+      g.ultimaVez = s.vez;
+    }
+    g.ultimaFase = s.fase;
+  }
+  function desenharSala() {
+    var g = jogo, p = g.p, s = p.estado(), eu = p.meu();
+    $('salaCodigo').textContent = g.codigo; $('salaLink').textContent = linkConvite(g.codigo);
+    var lista = $('salaLista'); lista.innerHTML = '';
+    s.j.forEach(function (pj, i) {
+      var li = document.createElement('li'); li.style.setProperty('--cor', CORES[i]);
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = (i === s.h ? '👑 ' : '') + nomeJ(s.j, i) + (i === eu ? t(' (você)', ' (you)') : '');
+      var st = document.createElement('span'); st.className = 'st';
+      st.textContent = pj.au ? t('📡 sem conexão', '📡 offline') : pj.p ? t('✅ pronto', '✅ ready') : t('⚓ arrumando', '⚓ placing');
+      li.appendChild(nm); li.appendChild(st); lista.appendChild(li);
+    });
+    var status = $('salaStatus'), bA = $('btArrumar'), bC = $('btComecar');
+    bA.hidden = eu < 0; bC.hidden = !p.souHost();
+    if (!g.conectado) status.textContent = t('📡 Conectando…', '📡 Connecting…');
+    else if (eu < 0) status.textContent = Date.now() - g.desde > 10000 ? t('🤔 Ninguém respondeu nesse código ainda. Confira as 4 letras com quem criou a partida (ela precisa estar com o jogo aberto).', '🤔 No one answered on that code yet. Check the 4 letters with whoever created the game (they need the game open).') : t('Entrando na sala…', 'Joining the room…');
+    else if (p.semAnfitriao() > 8000) status.textContent = t('📡 Sem notícias de quem criou a sala…', '📡 No news from the room creator…');
+    else if (p.souHost()) {
+      var prontos = s.j.filter(function (x) { return x.p; }).length;
+      status.textContent = s.j.length < 2 ? t('Esperando mais alguém entrar (mínimo 2 jogadores).', 'Waiting for someone else to join (at least 2 players).')
+        : prontos < s.j.length ? t('Esperando todos arrumarem a frota (', 'Waiting for everyone to place their fleet (') + prontos + t(' de ', ' of ') + s.j.length + ').'
+        : t('Todos prontos! Toque em Começar a batalha.', 'Everyone is ready! Tap Start the battle.');
+    } else status.textContent = s.j[eu].p ? t('✅ Sua frota está pronta. Quando todos estiverem prontos, ', '✅ Your fleet is ready. When everyone is ready, ') + nomeJ(s.j, s.h) + t(' começa a batalha.', ' starts the battle.') : t('Arrume sua frota e toque em Pronto.', 'Place your fleet and tap Ready.');
+    bA.textContent = eu >= 0 && s.j[eu].p ? t('✏️ Mudar minha frota', '✏️ Change my fleet') : t('⚓ Arrumar minha frota', '⚓ Place my fleet');
+    bC.disabled = !p.podeComecar();
+  }
+  $('btArrumar').addEventListener('click', function () {
+    var g = jogo; if (!g || g.modo !== 'rede') return;
+    var s = g.p.estado(), eu = g.p.meu(); if (eu < 0) return;
+    if (s.j[eu].p) g.p.pronto(false);
+    abrirArrumar({ nivel: s.nivel, frota: s.frota, titulo: '⚓ ' + t('Sua frota', 'Your fleet') + ' · ' + N(L.NIVEIS[s.nivel]) + ' ' + L.NIVEIS[s.nivel].n + '×' + L.NIVEIS[s.nivel].n,
+      aoPronto: function (f) { if (jogo !== g) return; g.p.definirFrota(f); g.p.pronto(true); mostrar('sala'); desenhar(); } });
+  });
+  $('btComecar').addEventListener('click', function () { if (jogo && jogo.modo === 'rede') jogo.p.comecar(); });
+
+  // ---------- instalar e service worker ----------
+  var pedidoInstalar = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedidoInstalar = e; $('btInstalar').hidden = false; });
+  $('btInstalar').addEventListener('click', function () { if (!pedidoInstalar) return; pedidoInstalar.prompt(); pedidoInstalar.userChoice.then(function () { pedidoInstalar = null; $('btInstalar').hidden = true; }); });
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
+
+  // ---------- começar ----------
+  traduzir(); aplicarSom();
+  if (window.Trilha) Trilha.iniciar({ jogo: 'batalha-naval', musicas: MUSICAS, creditos: 'CREDITOS.md' });
+  (function () {
+    var m = /[?&]sala=([A-Za-z]{4})\b/.exec(location.search);
+    if (m) {
+      var c = m[1].toUpperCase(), d = salvoRede(true) || salvoRede();
+      if (d && d.codigo === c) { conectar({ dados: d }); return; }     // recarregou a página: volta para a mesma partida
+      enderecoSala(null); abrirAmigos(c); return;                       // link de convite: só falta o nome
+    }
+  })();
+
+  // para os testes (e para quem quiser olhar no console)
+  window.BNApp = { versao: APP_VERSION, jogo: function () { return jogo; }, dados: function () { return jogo ? dados() : null; }, MUSICAS: MUSICAS, alvo: function () { return alvoSel; } };
+})();
+
+/* Botão "📲 Instalar" do Bolinho de Chuva: o cartão abre o jogo com ?instalar=1 e só então carrega a barra
+   "Instalar o aplicativo" (instalar.js, na raiz do repositório kids). Quem só quer jogar não baixa nada a mais. */
+(function () {
+  if (!/[?&]instalar\b/.test(location.search) || location.protocol === 'file:') return;
+  var s = document.createElement('script');
+  s.src = '../instalar.js';
+  s.setAttribute('data-nome', 'Batalha Naval'); s.setAttribute('data-icone', 'icone-192.png');
+  s.setAttribute('data-so-com', 'instalar'); s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
+  document.body.appendChild(s);
+})();

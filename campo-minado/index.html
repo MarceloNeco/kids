@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Campo Minado — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#1f5a2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Campo minado no jardim: abra a grama sem acordar os ouriços dorminhocos. Três níveis, bandeirinhas, cronômetro e recorde. / Minesweeper in the garden: open the grass without waking the sleepy hedgehogs. Three levels, flags, timer and best time.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Campo Minado — brincadeira da família Bolinho de Chuva (SolverONE).
+  O motor do jogo fica em campo.js (sem tela, testado no Node); a tela e os toques em app.js.
+  Sem login, sem banco, sem cookie: o idioma, os sons e os recordes ficam só no aparelho (localStorage).
+  Nada de script inline: a CSP acima não permite. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+
+<section id="menu" class="tela ativa" data-recurso="campo-minado">
+  <div class="faixa">
+    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
+    <button id="btEfeitos" class="mini" type="button" aria-label="Sons / Sounds">🔊</button>
+    <button id="btAjuda" class="mini" type="button" aria-label="Como brincar / How to play" aria-expanded="false" aria-controls="ajuda">❓</button>
+  </div>
+  <img class="mascote" src="ourico.svg" alt="" width="120" height="120">
+  <h1 class="logo" data-t="Campo Minado|Garden Sweeper"></h1>
+  <p class="sub" data-t="Abra a grama do jardim sem acordar os ouriços dorminhocos 🦔💤|Open the garden grass without waking the sleepy hedgehogs 🦔💤"></p>
+  <div id="ajuda" class="ajuda" hidden>
+    <h2 data-t="Como brincar|How to play"></h2>
+    <p data-t="🦔 Embaixo da grama dormem uns ouriços. Seu trabalho é abrir o jardim todo sem acordar nenhum!|🦔 Some hedgehogs are sleeping under the grass. Your job is to open the whole garden without waking any of them!"></p>
+    <p data-t="👆 Toque numa grama para abrir. O primeiro toque é sempre seguro e abre um pedaço grande.|👆 Tap a patch of grass to open it. The first tap is always safe and opens a big area."></p>
+    <p data-t="🔢 O número conta quantos ouriços dormem nas casinhas em volta: dos lados, em cima, embaixo e nas diagonais.|🔢 The number tells how many hedgehogs sleep in the squares around it: sides, above, below and diagonals."></p>
+    <p data-t="🚩 Achou um ouriço? Marque com a bandeirinha: ligue o botão 🚩 e toque, ou segure o dedo na grama. No computador, use o botão direito do mouse.|🚩 Found a hedgehog? Mark it with a flag: turn on the 🚩 button and tap, or hold your finger on the grass. On a computer, right-click."></p>
+    <p data-t="⚡ Tocar num número que já tem todas as bandeirinhas em volta abre as outras casinhas de uma vez.|⚡ Tapping a number that already has all its flags around opens the other squares at once."></p>
+    <p data-t="🔍 Jardim grande? Use dois dedos ou os botões ➖ ➕ para chegar perto, e arraste para andar.|🔍 Big garden? Use two fingers or the ➖ ➕ buttons to zoom, and drag to move around."></p>
+  </div>
+  <div class="niveis">
+    <button id="btFacil" class="nivel facil" type="button" data-nivel="facil">
+      <span class="n-nome" data-t="🌱 Fácil|🌱 Easy"></span>
+      <span class="n-info" data-t="8 × 8 · 8 ouriços|8 × 8 · 8 hedgehogs"></span>
+      <span id="recFacil" class="n-rec"></span>
+    </button>
+    <button id="btMedio" class="nivel medio" type="button" data-nivel="medio">
+      <span class="n-nome" data-t="🌷 Médio|🌷 Medium"></span>
+      <span class="n-info" data-t="10 × 14 · 22 ouriços|10 × 14 · 22 hedgehogs"></span>
+      <span id="recMedio" class="n-rec"></span>
+    </button>
+    <button id="btDificil" class="nivel dificil" type="button" data-nivel="dificil">
+      <span class="n-nome" data-t="🌳 Difícil|🌳 Hard"></span>
+      <span class="n-info" data-t="12 × 20 · 45 ouriços|12 × 20 · 45 hedgehogs"></span>
+      <span id="recDificil" class="n-rec"></span>
+    </button>
+  </div>
+  <button id="btInstalar" class="medio-bt" type="button" hidden data-t="📲 Instalar|📲 Install"></button>
+  <p id="versao" class="versao"></p>
+</section>
+
+<section id="jogo" class="tela" data-recurso="campo-minado">
+  <div class="barra">
+    <button id="btVoltar" class="mini" type="button" data-rotulo="Voltar aos níveis|Back to levels">←</button>
+    <span class="placa" id="placaRestam"><img src="ourico.svg" alt="" width="26" height="26"><span id="restam">0</span></span>
+    <button id="btNovo" class="mini rosto" type="button" data-rotulo="Começar de novo|Start over">🙂</button>
+    <span class="placa"><span aria-hidden="true">⏱</span><span id="tempo">0</span></span>
+    <button id="btModo" class="mini modo" type="button" aria-pressed="false" data-rotulo="Modo bandeirinha|Flag mode">🚩</button>
+    <span class="zoom">
+      <button id="btMenos" class="mini" type="button" data-rotulo="Afastar|Zoom out">➖</button>
+      <button id="btMais" class="mini" type="button" data-rotulo="Aproximar|Zoom in">➕</button>
+    </span>
+  </div>
+  <p id="dicaModo" class="dica-modo" aria-live="polite"></p>
+  <div id="area" class="area">
+    <div class="miolo">
+      <div id="tabuleiro" class="tabuleiro" role="group"></div>
+    </div>
+  </div>
+</section>
+
+<div id="fim" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
+  <div class="cartao">
+    <img id="fimDesenho" class="fim-desenho" src="flor.svg" alt="" width="110" height="110">
+    <h2 id="fimTitulo"></h2>
+    <p id="fimTexto"></p>
+    <p id="fimRecorde" class="fim-recorde" hidden></p>
+    <div class="fim-botoes">
+      <button id="btDeNovo" class="grande" type="button"></button>
+      <button id="btNiveis" class="medio-bt" type="button" data-t="🏡 Escolher nível|🏡 Choose level"></button>
+    </div>
+  </div>
+</div>
+<div id="festa" class="festa" aria-hidden="true"></div>
+
+<script src="campo.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js" data-fora-do-arquivo></script>
+<script src="app.js"></script>
+</body>
+</html>

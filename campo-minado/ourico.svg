@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Ouriço dorminhoco do Campo Minado: desenho original, feito para este jogo. -->
+  <ellipse cx="50" cy="84" rx="34" ry="6" fill="#000" opacity=".15"/>
+  <path d="M14 70 L10 58 L20 56 L14 44 L26 44 L22 31 L34 34 L33 21 L44 27 L48 15 L56 25 L63 16 L66 29 L77 23 L76 36 L87 35 L82 47 L92 52 L84 60 L90 70 Z" fill="#7a4a2a"/>
+  <path d="M22 68 C22 46 40 32 58 34 C74 36 86 50 86 68 Z" fill="#9c6237"/>
+  <path d="M30 60 l4 -8 M42 52 l3 -9 M55 50 l2 -9 M67 53 l4 -8 M38 64 l3 -7 M60 62 l3 -7" stroke="#5c3518" stroke-width="3" stroke-linecap="round"/>
+  <path d="M8 72 C8 58 18 50 30 52 C42 54 46 64 44 74 C42 82 14 84 8 72 Z" fill="#f6d9ae"/>
+  <circle cx="7" cy="68" r="5" fill="#3a2418"/>
+  <circle cx="5.5" cy="66.5" r="1.5" fill="#fff" opacity=".8"/>
+  <path d="M19 64 q5 4 10 0" stroke="#3a2418" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="26" cy="73" rx="5" ry="3.2" fill="#ff8fa8" opacity=".8"/>
+  <ellipse cx="36" cy="80" rx="6" ry="4" fill="#5c3518"/>
+  <ellipse cx="70" cy="80" rx="6" ry="4" fill="#5c3518"/>
+</svg>

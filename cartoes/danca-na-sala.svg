@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+<!-- Fundo do cartão "danca-na-sala" (Bolinho de Chuva). Desenho original; o CSS (cartoes-fundos.css) deixa bem clarinho e fosco. -->
+  <g transform="translate(90 60) rotate(-25) scale(1.4)"><path d="M-6-60H6L46 60H-46Z" fill="#ff4fa3" opacity=".55"/><rect x="-10" y="-68" width="20" height="10" rx="3" fill="#ff4fa3"/></g>
+  <g transform="translate(320 60) rotate(25) scale(1.4)"><path d="M-6-60H6L46 60H-46Z" fill="#3ee8ff" opacity=".55"/><rect x="-10" y="-68" width="20" height="10" rx="3" fill="#3ee8ff"/></g>
+  <g transform="translate(205 40) rotate(0) scale(1)"><circle r="22" fill="#cfa8ff"/><g fill="none" stroke="#fff" stroke-width="2" opacity=".7"><ellipse rx="10" ry="22"/><path d="M-22 0H22M-19-11H19M-19 11H19"/></g><path d="M0-22V-36" stroke="#cfa8ff" stroke-width="2"/></g>
+  <g transform="translate(330 300) rotate(10) scale(1.2)"><g fill="#c6ff3d"><ellipse cx="-8" cy="18" rx="11" ry="8" transform="rotate(-20 -8 18)"/><rect x="1" y="-26" width="5" height="44"/><path d="M6-26C18-20 24-10 18 2C20-8 14-14 6-14Z"/></g></g>
+  <g transform="translate(90 320) rotate(-10) scale(1.1)"><g fill="#ffd166"><ellipse cx="-20" cy="20" rx="10" ry="7" transform="rotate(-20 -20 20)"/><ellipse cx="16" cy="14" rx="10" ry="7" transform="rotate(-20 16 14)"/><rect x="-13" y="-20" width="4.5" height="40"/><rect x="23" y="-26" width="4.5" height="40"/><path d="M-13-20L27.5-26V-17L-13-11Z"/></g></g>
+  <g transform="translate(220 240) rotate(-14) scale(0.8)"><g fill="#ff4fa3"><ellipse cx="-8" cy="18" rx="11" ry="8" transform="rotate(-20 -8 18)"/><rect x="1" y="-26" width="5" height="44"/><path d="M6-26C18-20 24-10 18 2C20-8 14-14 6-14Z"/></g></g>
+  <g transform="translate(370 190) rotate(8) scale(0.7)"><g fill="#3ee8ff"><ellipse cx="-20" cy="20" rx="10" ry="7" transform="rotate(-20 -20 20)"/><ellipse cx="16" cy="14" rx="10" ry="7" transform="rotate(-20 16 14)"/><rect x="-13" y="-20" width="4.5" height="40"/><rect x="23" y="-26" width="4.5" height="40"/><path d="M-13-20L27.5-26V-17L-13-11Z"/></g></g>
+  <g transform="translate(150 180) rotate(0) scale(0.5)"><path d="M0-22Q3-3 22 0Q3 3 0 22Q-3 3-22 0Q-3-3 0-22Z" fill="#ffffff"/></g>
+  <g transform="translate(260 370) rotate(0) scale(0.4)"><path d="M0-22Q3-3 22 0Q3 3 0 22Q-3 3-22 0Q-3-3 0-22Z" fill="#ffd166"/></g>
+  <g transform="translate(30 200) rotate(0) scale(0.4)"><path d="M0-24L7-8L24-7L11 4L15 22L0 12L-15 22L-11 4L-24-7L-7-8Z" fill="#ff4fa3"/></g>
+</svg>

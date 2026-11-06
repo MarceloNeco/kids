@@ -102,15 +102,18 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - Raiz = **estante** (página inicial com todos os jogos): `index.html`, `catalogo.js` (**lista única dos jogos**: jogo
   novo = uma entrada lá), `jogos.js`, `kids.js` (controle da TV), `instalar.js`, `radio.js`, `tela-cheia.js`,
   `estante.css`, `sw.js`, `manifest.webmanifest`, `musicas/`, `CREDITOS.md`.
-- Uma pasta por jogo: `baguncolandia/`, `peluqueria/`, `vruuum/`, `purpurina/`, `rabiscolandia/`, e `danca-na-sala.html`
-  na raiz. Atalhos de TV LG: `tv-lg*/`.
+- Uma pasta por jogo: `baguncolandia/`, `peluqueria/`, `vruuum/`, `purpurina/`, `rabiscolandia/`, `campo-minado/`,
+  `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE),
-  `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`; bibliotecas em `baguncolandia/libs/`.
+  `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
+  bibliotecas em `baguncolandia/libs/`. Fundo dos cartões: `cartoes-fundos.css` (tirar a linha do `index.html` = visual antigo).
+- Interruptores: todos os jogos obedecem o app **`kids`** ("Bolinho de Chuva") do RootifyONE, um interruptor por jogo.
 
 ## Regras de cada jogo
 
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
 - Testes: `node --test <jogo>/teste/*.test.js` (rodar da raiz deste repositório).
-- Jogo novo: pasta própria + entrada em `catalogo.js` + entrada em `recursos-do-app.json` (interruptor).
+- Jogo novo: pasta própria + entrada em `catalogo.js` + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
+  no `../recursos.js` + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.

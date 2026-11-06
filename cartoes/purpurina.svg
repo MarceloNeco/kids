@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+<!-- Fundo do cartão "purpurina" (Bolinho de Chuva). Desenho original; o CSS (cartoes-fundos.css) deixa bem clarinho e fosco. -->
+  <g transform="translate(320 90) rotate(8) scale(1.3)"><path d="M-8-30H8L12-12L32 30H-32L-12-12Z" fill="#cfa8ff"/><path d="M-8-30L-12-40M8-30L12-40" stroke="#cfa8ff" stroke-width="3"/><path d="M-12-12H12" stroke="#fff" stroke-width="3" opacity=".7"/></g>
+  <g transform="translate(80 300) rotate(-8) scale(1.1)"><path d="M-8-30H8L12-12L32 30H-32L-12-12Z" fill="#ff4fa3"/><path d="M-8-30L-12-40M8-30L12-40" stroke="#ff4fa3" stroke-width="3"/><path d="M-12-12H12" stroke="#fff" stroke-width="3" opacity=".7"/></g>
+  <g transform="translate(90 80) rotate(20) scale(1.1)"><rect x="-9" y="0" width="18" height="26" rx="2" fill="#fff" opacity=".8"/><path d="M-7 0V-18L7-26V0Z" fill="#ff4fa3"/></g>
+  <g transform="translate(220 60) rotate(0) scale(0.9)"><path d="M0-22Q3-3 22 0Q3 3 0 22Q-3 3-22 0Q-3-3 0-22Z" fill="#ffffff"/></g>
+  <g transform="translate(360 250) rotate(0) scale(1)"><path d="M0-22Q3-3 22 0Q3 3 0 22Q-3 3-22 0Q-3-3 0-22Z" fill="#cfa8ff"/></g>
+  <g transform="translate(200 220) rotate(0) scale(0.6)"><path d="M0-22Q3-3 22 0Q3 3 0 22Q-3 3-22 0Q-3-3 0-22Z" fill="#ffd166"/></g>
+  <g transform="translate(30 190) rotate(0) scale(0.6)"><path d="M0-22Q3-3 22 0Q3 3 0 22Q-3 3-22 0Q-3-3 0-22Z" fill="#3ee8ff"/></g>
+  <g transform="translate(290 370) rotate(0) scale(0.7)"><path d="M0-22Q3-3 22 0Q3 3 0 22Q-3 3-22 0Q-3-3 0-22Z" fill="#ff4fa3"/></g>
+  <g transform="translate(150 140) rotate(0) scale(1.4)"><g fill="#ffffff"><circle r="3" cx="-14" cy="-6"/><circle r="2" cx="6" cy="-14"/><circle r="2.5" cx="14" cy="8"/><circle r="1.8" cx="-6" cy="12"/></g></g>
+  <g transform="translate(330 180) rotate(0) scale(1.2)"><g fill="#ffd166"><circle r="3" cx="-14" cy="-6"/><circle r="2" cx="6" cy="-14"/><circle r="2.5" cx="14" cy="8"/><circle r="1.8" cx="-6" cy="12"/></g></g>
+  <g transform="translate(220 330) rotate(0) scale(1.4)"><g fill="#cfa8ff"><circle r="3" cx="-14" cy="-6"/><circle r="2" cx="6" cy="-14"/><circle r="2.5" cx="14" cy="8"/><circle r="1.8" cx="-6" cy="12"/></g></g>
+  <g transform="translate(60 380) rotate(0) scale(1)"><g fill="#3ee8ff"><circle r="3" cx="-14" cy="-6"/><circle r="2" cx="6" cy="-14"/><circle r="2.5" cx="14" cy="8"/><circle r="1.8" cx="-6" cy="12"/></g></g>
+</svg>

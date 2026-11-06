@@ -1,0 +1,22 @@
+{
+  "app": "campo-minado",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "06/Nov/2026",
+      "hora": "11:05:00",
+      "pt": [
+        "🦔 Primeira versão do Campo Minado: abra a grama do jardim sem acordar os ouriços dorminhocos. O número conta quantos ouriços dormem em volta; o primeiro toque é sempre seguro e abre um pedaço grande.",
+        "🌱 Três níveis: Fácil (8 × 8, 8 ouriços), Médio (10 × 14, 22) e Difícil (12 × 20, 45). O jardim fica em pé no celular em pé e deitado na tela deitada.",
+        "🚩 Bandeirinha de três jeitos: botão 🚩, segurar o dedo na grama ou botão direito do mouse. Tocar num número com todas as bandeirinhas em volta abre as outras casinhas de uma vez.",
+        "⏱ Cronômetro e melhor tempo de cada nível (guardado só no aparelho), flores e pétalas quando ganha, ❓ como brincar, zoom com dois dedos ou ➖ ➕, 11 músicas gravadas e funciona sem internet depois da primeira vez."
+      ],
+      "en": [
+        "🦔 First version of Garden Sweeper (Campo Minado): open the garden grass without waking the sleepy hedgehogs. The number tells how many hedgehogs sleep around it; the first tap is always safe and opens a big area.",
+        "🌱 Three levels: Easy (8 × 8, 8 hedgehogs), Medium (10 × 14, 22) and Hard (12 × 20, 45). The garden stands up on an upright phone and lies down on a landscape screen.",
+        "🚩 Flags three ways: the 🚩 button, holding your finger on the grass, or right-click. Tapping a number with all its flags around opens the other squares at once.",
+        "⏱ Timer and best time per level (kept only on the device), flowers and petals when you win, ❓ how to play, zoom with two fingers or ➖ ➕, 11 recorded songs, and it works offline after the first visit."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Cozinha — Bolinho de Chuva",
+  "short_name": "Cozinha",
+  "description": "Junte os ingredientes pela vila e cozinhe receitas passo a passo, em 3 níveis. / Gather the ingredients around the village and cook recipes step by step, in 3 levels.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff4e0",
+  "theme_color": "#ff8a3d",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

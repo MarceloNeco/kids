@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Ícone do Campo Minado (original): jardim em quadradinhos, números, uma bandeira e um ouriço dorminhoco. -->
+  <rect width="512" height="512" fill="#1f5a2e"/>
+  <g transform="translate(76 76)">
+    <rect width="360" height="360" rx="34" fill="#173f22"/>
+    <g transform="translate(12 12)">
+      <rect x="0" y="0" width="108" height="108" rx="16" fill="#7bd65b"/>
+      <rect x="120" y="0" width="108" height="108" rx="16" fill="#f2dfb8"/>
+      <rect x="240" y="0" width="108" height="108" rx="16" fill="#ecd6aa"/>
+      <rect x="0" y="120" width="108" height="108" rx="16" fill="#f2dfb8"/>
+      <rect x="120" y="120" width="108" height="108" rx="16" fill="#7bd65b"/>
+      <rect x="240" y="120" width="108" height="108" rx="16" fill="#f2dfb8"/>
+      <rect x="0" y="240" width="108" height="108" rx="16" fill="#6cc94d"/>
+      <rect x="120" y="240" width="108" height="108" rx="16" fill="#f2dfb8"/>
+      <rect x="240" y="240" width="108" height="108" rx="16" fill="#7bd65b"/>
+      <g font-family="Arial Rounded MT Bold, Arial, sans-serif" font-weight="900" font-size="82" text-anchor="middle">
+        <text x="174" y="84" fill="#1f5fd1">1</text>
+        <text x="54" y="204" fill="#1d7a2e">2</text>
+        <text x="294" y="204" fill="#1f5fd1">1</text>
+        <text x="174" y="324" fill="#c62828">3</text>
+      </g>
+      <!-- bandeira -->
+      <path d="M40 20 v72" stroke="#5c3518" stroke-width="9" stroke-linecap="round"/>
+      <path d="M44 22 L88 38 L44 56 Z" fill="#ff3d5a"/>
+      <!-- ouriço na grama do meio -->
+      <g transform="translate(124 128) scale(1)">
+        <path d="M14 70 L10 58 L20 56 L14 44 L26 44 L22 31 L34 34 L33 21 L44 27 L48 15 L56 25 L63 16 L66 29 L77 23 L76 36 L87 35 L82 47 L92 52 L84 60 L90 70 Z" fill="#7a4a2a"/>
+        <path d="M22 68 C22 46 40 32 58 34 C74 36 86 50 86 68 Z" fill="#9c6237"/>
+        <path d="M8 72 C8 58 18 50 30 52 C42 54 46 64 44 74 C42 82 14 84 8 72 Z" fill="#f6d9ae"/>
+        <circle cx="7" cy="68" r="5" fill="#3a2418"/>
+        <path d="M19 64 q5 4 10 0" stroke="#3a2418" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="26" cy="73" rx="5" ry="3.2" fill="#ff8fa8"/>
+        <text x="80" y="22" font-family="Arial, sans-serif" font-weight="700" font-size="20" fill="#fff">z</text>
+        <text x="92" y="8" font-family="Arial, sans-serif" font-weight="700" font-size="14" fill="#fff">z</text>
+      </g>
+      <!-- florzinha -->
+      <g transform="translate(250 250) scale(.88)" fill="#ff7bb0">
+        <circle cx="50" cy="26" r="16"/><circle cx="74" cy="44" r="16"/><circle cx="65" cy="72" r="16"/><circle cx="35" cy="72" r="16"/><circle cx="26" cy="44" r="16"/>
+        <circle cx="50" cy="52" r="14" fill="#ffd23f"/>
+      </g>
+    </g>
+  </g>
+</svg>

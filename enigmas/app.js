@@ -1,0 +1,461 @@
+/* Enigmas de Ligar — telas, lousa, risco de giz, toque e arraste, sons, voz, estrelas e progresso.
+   As regras ficam no jogo.js (Enigmas) e as rodadas no rodadas.js (EnigmasRodadas).
+   Guarda só neste aparelho (localStorage, sempre com try/catch): preferências em "bolinho:enigmas:pref" e o
+   progresso de cada nível em "bolinho:enigmas:progresso". Nada vai para a internet. */
+(function () {
+  'use strict';
+  var APP_VERSION = '0.1.0';
+  var $ = function (id) { return document.getElementById(id); };
+  var J = window.Enigmas, R = window.EnigmasRodadas;
+  var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var TESTE = /[?&]teste\b/.test(location.search);
+  var SVGNS = 'http://www.w3.org/2000/svg';
+
+  function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
+  function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem espaço ou modo privado: segue sem lembrar */ } }
+  var CH_PREF = 'bolinho:enigmas:pref', CH_PROG = 'bolinho:enigmas:progresso';
+  var pref = ler(CH_PREF, null) || {};
+  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = /^en/i.test(navigator.language || '') ? 'en' : 'pt';
+  if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
+  if (typeof pref.voz !== 'boolean') pref.voz = true;
+  function salvarPref() { gravar(CH_PREF, pref); }
+  var prog = ler(CH_PROG, null) || {};
+  R.NIVEIS.forEach(function (n) {
+    var p = prog[n] = prog[n] || {};
+    if (!Array.isArray(p.feitas)) p.feitas = [];
+    if (typeof p.estrelas !== 'number') p.estrelas = 0;
+    if (typeof p.rodadas !== 'number') p.rodadas = 0;
+  });
+  function salvarProg() { gravar(CH_PROG, prog); }
+
+  // ---------- idioma ----------
+  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
+  function w(it) { return pref.lingua === 'en' ? it.en : it.pt; }
+  var NOME_NIVEL = { facil: ['Fácil', 'Easy'], medio: ['Médio', 'Medium'], dificil: ['Difícil', 'Hard'] };
+  function traduzir() {
+    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) {
+      var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0];
+    });
+    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
+    document.querySelector('.titulo').setAttribute('aria-label', t('Enigmas de Ligar', 'Linking Puzzles'));
+    pintarPrefs(); pintarProgresso();
+    if (partida) { montarCartas(); pintarTopo(); }
+  }
+
+  function pintarPrefs() {
+    $('btEfeitos').textContent = pref.efeitos ? '🔔' : '🔕';
+    $('btEfeitos').setAttribute('aria-pressed', String(pref.efeitos));
+    $('btEfeitos').setAttribute('aria-label', pref.efeitos ? t('Sons ligados', 'Sounds on') : t('Sons desligados', 'Sounds off'));
+    $('btVoz').setAttribute('aria-pressed', String(pref.voz));
+    $('btVoz').classList.toggle('desligado', !pref.voz);
+    $('btVoz').setAttribute('aria-label', pref.voz ? t('Voz ligada: lê as palavras', 'Voice on: reads the words') : t('Voz desligada', 'Voice off'));
+  }
+
+  function listaNivel(n) { return J.lista(R, n, pref.lingua); }
+  function feitasNoCiclo(n) { var ids = listaNivel(n).map(function (r) { return r.id; }); return prog[n].feitas.filter(function (id) { return ids.indexOf(id) >= 0; }).length; }
+  function pintarProgresso() {
+    R.NIVEIS.forEach(function (n) {
+      var el = $('prog' + n.charAt(0).toUpperCase() + n.slice(1));
+      el.textContent = '⭐ ' + prog[n].estrelas + ' · ' + feitasNoCiclo(n) + '/' + listaNivel(n).length;
+      el.setAttribute('aria-label', t(prog[n].estrelas + ' estrelas, ' + feitasNoCiclo(n) + ' de ' + listaNivel(n).length + ' enigmas',
+        prog[n].estrelas + ' stars, ' + feitasNoCiclo(n) + ' of ' + listaNivel(n).length + ' puzzles'));
+    });
+  }
+
+  // ---------- sons (feitos aqui, no WebAudio) ----------
+  var ctx = null;
+  function audio() {
+    if (!pref.efeitos) return null;
+    try {
+      if (!ctx) { var A = window.AudioContext || window.webkitAudioContext; if (!A) return null; ctx = new A(); }
+      if (ctx.state === 'suspended') ctx.resume();
+    } catch (e) { return null; }
+    return ctx;
+  }
+  function nota(f, ini, dur, tipo, vol) {
+    var c = audio(); if (!c) return;
+    var o = c.createOscillator(), g = c.createGain(), t0 = c.currentTime + ini;
+    o.type = tipo || 'sine'; o.frequency.setValueAtTime(f, t0);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol || 0.18, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(c.destination); o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  var Som = {
+    certo: function () { nota(660, 0, 0.18, 'triangle'); nota(990, 0.1, 0.3, 'triangle'); },
+    errado: function () { nota(330, 0, 0.16, 'sine', 0.1); nota(262, 0.12, 0.22, 'sine', 0.1); },
+    escolher: function () { nota(520, 0, 0.08, 'sine', 0.06); },
+    vitoria: function () { [523, 659, 784, 1047, 784, 1047].forEach(function (f, i) { nota(f, i * 0.11, 0.25, 'triangle', 0.16); }); }
+  };
+
+  // ---------- voz: lê a palavra tocada (ajuda quem ainda não lê) ----------
+  function falar(txt) {
+    if (!pref.voz || !txt || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(txt);
+      u.lang = pref.lingua === 'en' ? 'en-US' : 'pt-BR'; u.rate = 0.95;
+      u.onstart = function () { if (window.Trilha) Trilha.volume(0.35); };
+      u.onend = u.onerror = function () { if (window.Trilha) Trilha.volume(null); };
+      speechSynthesis.speak(u);
+    } catch (e) { /* sem voz neste aparelho */ }
+  }
+
+  // ---------- telas ----------
+  var naPilha = false;
+  function mostrar(id) {
+    Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
+    document.documentElement.classList.toggle('jogando', id === 'jogo');
+  }
+  function voltarInicio() {
+    fecharFesta(); partida = null; sel = null; limparArraste();
+    try { speechSynthesis.cancel(); } catch (e) { /* ok */ }
+    mostrar('inicio'); pintarProgresso();
+    var b = $('bt' + (nivel ? nivel.charAt(0).toUpperCase() + nivel.slice(1) : 'Facil')); if (b) b.focus();
+  }
+  window.addEventListener('popstate', function () { naPilha = false; if ($('jogo').classList.contains('ativa')) voltarInicio(); });
+  function sair() { if (naPilha) { history.back(); } else voltarInicio(); }
+
+  function telaCheia() {
+    var d = document, el = d.documentElement;
+    if (!(window.matchMedia && matchMedia('(pointer: coarse)').matches)) return;
+    try { if (!(d.fullscreenElement || d.webkitFullscreenElement)) { var p = el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' }) : (el.webkitRequestFullscreen && el.webkitRequestFullscreen()); if (p && p.catch) p.catch(function () {}); } } catch (e) { /* sem tela cheia */ }
+  }
+
+  // ---------- partida ----------
+  var nivel = null, partida = null, rodada = null, sel = null, reiniciou = false;
+  var CORES = ['#fff6c8', '#ffd1e8', '#bfe9ff', '#d4ffc4', '#ffe0b8', '#e5d4ff', '#c8fff4'];
+
+  function comecar(n) {
+    nivel = n; telaCheia();
+    if (!naPilha) { try { history.pushState({ enigmas: 1 }, ''); naPilha = true; } catch (e) { /* sem histórico */ } }
+    mostrar('jogo'); novaRodada();
+  }
+
+  function novaRodada() {
+    fecharFesta(); sel = null; limparArraste();
+    var lista = listaNivel(nivel), r = J.escolher(lista, prog[nivel].feitas);
+    reiniciou = r.reiniciou;
+    if (reiniciou) { var ids = lista.map(function (x) { return x.id; }); prog[nivel].feitas = prog[nivel].feitas.filter(function (id) { return ids.indexOf(id) < 0; }); salvarProg(); }
+    rodada = r.rodada; partida = J.Partida(rodada);
+    $('lousa').style.setProperty('--n', partida.n);
+    $('lousa').classList.toggle('so-texto', rodada.pares.some(function (p) { return !p[0].e || !p[1].e; }));
+    montarCartas(); pintarTopo();
+    $('status').textContent = '';
+    falar(t(rodada.dica.pt, rodada.dica.en));
+    var primeira = $('colEsq').querySelector('.carta'); if (primeira && !('ontouchstart' in window)) primeira.focus({ preventScroll: true });
+  }
+
+  function pintarTopo() {
+    $('nomeNivel').textContent = t(NOME_NIVEL[nivel][0], NOME_NIVEL[nivel][1]);
+    var total = listaNivel(nivel).length;
+    $('contador').textContent = t('Enigma ', 'Puzzle ') + Math.min(feitasNoCiclo(nivel) + 1, total) + t(' de ', ' of ') + total;
+    $('estrelasTopo').textContent = '⭐ ' + prog[nivel].estrelas;
+    $('pista').textContent = t(rodada.dica.pt, rodada.dica.en);
+  }
+
+  function longo(e) {
+    try { if (window.Intl && Intl.Segmenter) { var n = 0, it = new Intl.Segmenter().segment(e); for (var s of it) n++; return n; } } catch (x) { /* sem Segmenter */ }
+    return Math.ceil(Array.from(e).length / 2);
+  }
+  function carta(lado, i) {
+    var it = rodada.pares[i][lado === 'e' ? 0 : 1], b = document.createElement('button');
+    b.type = 'button'; b.className = 'carta'; b.setAttribute('data-lado', lado); b.setAttribute('data-par', i);
+    b.setAttribute('aria-label', w(it));
+    if (it.e) {
+      var em = document.createElement('span'); em.className = 'emo'; em.setAttribute('aria-hidden', 'true'); em.textContent = it.e;
+      var q = longo(it.e); if (q >= 2) { em.classList.add('q' + Math.min(q, 6)); b.classList.add('varios'); }
+      b.appendChild(em);
+    } else b.classList.add('texto');
+    var pl = document.createElement('span'); pl.className = 'pal'; pl.textContent = w(it); b.appendChild(pl);
+    if (partida.ligado(lado, i)) { b.classList.add('ligada'); b.disabled = true; }
+    return b;
+  }
+  function montarCartas() {
+    var ce = $('colEsq'), cd = $('colDir');
+    ce.innerHTML = ''; cd.innerHTML = '';
+    partida.esquerda.forEach(function (i) { ce.appendChild(carta('e', i)); });
+    partida.direita.forEach(function (i) { cd.appendChild(carta('d', i)); });
+    sel = null;
+    requestAnimationFrame(redesenhar);
+  }
+
+  // ---------- giz ----------
+  var svg = $('giz'), riscos = {}, tremor = {};
+  function ponto(el) {
+    var L = $('lousa').getBoundingClientRect(), r = el.getBoundingClientRect(), esq = el.getAttribute('data-lado') === 'e';
+    return { x: (esq ? r.right : r.left) - L.left, y: r.top + r.height / 2 - L.top };
+  }
+  function caminho(a, b, curva) {
+    var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var cx = mx - dy / len * curva, cy = my + dx / len * curva;
+    return 'M' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + b.x.toFixed(1) + ' ' + b.y.toFixed(1);
+  }
+  function novoRisco(classe, cor) {
+    var g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'risco ' + classe);
+    var p1 = document.createElementNS(SVGNS, 'path'), p2 = document.createElementNS(SVGNS, 'path');
+    p1.setAttribute('class', 'po'); p2.setAttribute('class', 'traco');
+    if (cor) { p1.style.stroke = cor; p2.style.stroke = cor; }
+    g.appendChild(p1); g.appendChild(p2); svg.appendChild(g);
+    return g;
+  }
+  function riscar(g, d) { Array.prototype.forEach.call(g.querySelectorAll('path'), function (p) { p.setAttribute('d', d); }); }
+  function cartaDe(lado, i) { return document.querySelector('.carta[data-lado="' + lado + '"][data-par="' + i + '"]'); }
+  function redesenhar() {
+    if (!partida) return;
+    var L = $('lousa').getBoundingClientRect();
+    svg.setAttribute('viewBox', '0 0 ' + L.width + ' ' + L.height);
+    Object.keys(riscos).forEach(function (i) {
+      var a = cartaDe('e', i), b = cartaDe('d', i);
+      if (a && b) riscar(riscos[i], caminho(ponto(a), ponto(b), tremor[i]));
+    });
+  }
+  function limparRiscos() { Object.keys(riscos).forEach(function (k) { riscos[k].remove(); }); riscos = {}; tremor = {}; }
+  if (window.ResizeObserver) new ResizeObserver(function () { redesenhar(); }).observe($('lousa'));
+  window.addEventListener('resize', redesenhar);
+
+  // ---------- ligar ----------
+  function escolher(b) {
+    if (sel) sel.classList.remove('escolhida'), sel.setAttribute('aria-pressed', 'false');
+    sel = b;
+    if (b) {
+      b.classList.add('escolhida'); b.setAttribute('aria-pressed', 'true'); Som.escolher();
+      falar(b.getAttribute('aria-label'));
+      $('status').textContent = t(b.getAttribute('aria-label') + ' escolhido. Agora toque no outro lado.', b.getAttribute('aria-label') + ' picked. Now tap the other side.');
+    }
+  }
+  function tentar(a, b, gTemp) {
+    var esq = a.getAttribute('data-lado') === 'e' ? a : b, dir = esq === a ? b : a;
+    var ie = +esq.getAttribute('data-par'), id = +dir.getAttribute('data-par');
+    var res = partida.ligar(ie, id);
+    escolher(null);
+    var g = gTemp || novoRisco('', null), curva = (Math.random() - 0.5) * 18;
+    if (res === 'certo' || res === 'fim') {
+      g.setAttribute('class', 'risco certo' + (gTemp ? '' : ' desenhando'));
+      Array.prototype.forEach.call(g.querySelectorAll('path'), function (p) { p.style.stroke = CORES[ie % CORES.length]; if (!gTemp) p.setAttribute('pathLength', '1'); });
+      riscos[ie] = g; tremor[ie] = curva; riscar(g, caminho(ponto(esq), ponto(dir), curva));
+      [esq, dir].forEach(function (c) { c.classList.add('ligada', 'pulo'); c.disabled = true; });
+      Som.certo();
+      $('status').textContent = t('Isso! ' + w(rodada.pares[ie][0]) + ' com ' + w(rodada.pares[ie][1]) + '.', 'Yes! ' + w(rodada.pares[ie][0]) + ' with ' + w(rodada.pares[ie][1]) + '.');
+      if (res === 'fim') setTimeout(terminar, CALMO ? 300 : 900);
+      else { var prox = document.querySelector('.carta:not(:disabled)'); if (prox && document.activeElement && document.activeElement.disabled) prox.focus({ preventScroll: true }); }
+    } else if (res === 'errado') {
+      g.setAttribute('class', 'risco errado'); riscar(g, caminho(ponto(esq), ponto(dir), curva));
+      [esq, dir].forEach(function (c) { c.classList.remove('treme'); void c.offsetWidth; c.classList.add('treme'); setTimeout(function () { c.classList.remove('treme'); }, 600); });
+      Som.errado();
+      setTimeout(function () { g.classList.add('apagando'); }, 350);
+      setTimeout(function () { g.remove(); }, CALMO ? 400 : 1000);
+      $('status').textContent = t('Ainda não. Tente outro!', 'Not yet. Try another one!');
+    } else g.remove();
+  }
+
+  // toque (e teclado: Enter e espaço viram clique)
+  var semClique = false;
+  function aoTocar(e) {
+    var b = e.target.closest && e.target.closest('.carta');
+    if (!b || b.disabled || !partida) return;
+    if (semClique) return;
+    if (!sel) escolher(b);
+    else if (sel === b) { escolher(null); $('status').textContent = ''; }
+    else if (sel.getAttribute('data-lado') === b.getAttribute('data-lado')) escolher(b);
+    else tentar(sel, b);
+  }
+  $('lousa').addEventListener('click', aoTocar);
+
+  // arrastar com o dedo (ou o mouse) de um desenho até o outro
+  var arr = null;
+  function limparArraste() {
+    if (arr && arr.g) arr.g.remove();
+    if (arr && arr.mira) arr.mira.classList.remove('mira');
+    arr = null;
+  }
+  function cartaNoPonto(x, y) {
+    var el = document.elementFromPoint(x, y), b = el && el.closest ? el.closest('.carta') : null;
+    return b && !b.disabled ? b : null;
+  }
+  $('lousa').addEventListener('pointerdown', function (e) {
+    if (e.button > 0 || !partida) return;
+    var b = e.target.closest && e.target.closest('.carta');
+    if (!b || b.disabled) return;
+    limparArraste();
+    arr = { de: b, x0: e.clientX, y0: e.clientY, ativo: false, id: e.pointerId, g: null, mira: null };
+    try { b.releasePointerCapture && b.releasePointerCapture(e.pointerId); } catch (x) { /* ok */ }
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!arr || e.pointerId !== arr.id) return;
+    var dx = e.clientX - arr.x0, dy = e.clientY - arr.y0;
+    if (!arr.ativo) {
+      if (dx * dx + dy * dy < 144) return;
+      arr.ativo = true; escolher(null); arr.de.classList.add('escolhida');
+      falar(arr.de.getAttribute('aria-label'));
+      arr.g = novoRisco('solto', CORES[+arr.de.getAttribute('data-par') % CORES.length]);
+    }
+    e.preventDefault();
+    var L = $('lousa').getBoundingClientRect();
+    riscar(arr.g, caminho(ponto(arr.de), { x: e.clientX - L.left, y: e.clientY - L.top }, 0));
+    var alvo = cartaNoPonto(e.clientX, e.clientY);
+    if (alvo && alvo.getAttribute('data-lado') === arr.de.getAttribute('data-lado')) alvo = null;
+    if (alvo !== arr.mira) { if (arr.mira) arr.mira.classList.remove('mira'); arr.mira = alvo; if (alvo) alvo.classList.add('mira'); }
+  }, { passive: false });
+  function soltar(e) {
+    if (!arr || e.pointerId !== arr.id) return;
+    var a = arr; arr = null;
+    if (!a.ativo) return;   // foi só um toque: o clique cuida
+    semClique = true; setTimeout(function () { semClique = false; }, 80);
+    a.de.classList.remove('escolhida');
+    if (a.mira) a.mira.classList.remove('mira');
+    var alvo = e.type === 'pointerup' ? cartaNoPonto(e.clientX, e.clientY) : null;
+    if (alvo && alvo.getAttribute('data-lado') !== a.de.getAttribute('data-lado')) tentar(a.de, alvo, a.g);
+    else { a.g.classList.add('apagando'); setTimeout(function () { a.g.remove(); }, 400); }
+  }
+  document.addEventListener('pointerup', soltar);
+  document.addEventListener('pointercancel', soltar);
+
+  // setas do teclado e do controle da TV: sobe e desce na coluna, troca de lado com ← →
+  $('lousa').addEventListener('keydown', function (e) {
+    var b = e.target.closest && e.target.closest('.carta'); if (!b) return;
+    var col = b.parentNode, cartas = Array.prototype.slice.call(col.querySelectorAll('.carta')), i = cartas.indexOf(b), alvo = null;
+    function livre(lista, de, passo) { for (var k = de; k >= 0 && k < lista.length; k += passo) if (!lista[k].disabled) return lista[k]; return null; }
+    if (e.key === 'ArrowDown') alvo = livre(cartas, i + 1, 1);
+    else if (e.key === 'ArrowUp') alvo = livre(cartas, i - 1, -1);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      var outra = Array.prototype.slice.call((col.id === 'colEsq' ? $('colDir') : $('colEsq')).querySelectorAll('.carta'));
+      if ((e.key === 'ArrowRight') === (col.id === 'colEsq')) alvo = livre(outra, Math.min(i, outra.length - 1), 1) || livre(outra, Math.min(i, outra.length - 1), -1);
+    }
+    if (alvo) { e.preventDefault(); alvo.focus(); }
+  });
+
+  // 💡 mostra um par que falta (conta como um erro nas estrelas)
+  $('btDica').addEventListener('click', function () {
+    if (!partida || partida.completa()) return;
+    for (var i = 0; i < partida.n; i++) if (!partida.ligado('e', i)) break;
+    partida.erros++;
+    [cartaDe('e', i), cartaDe('d', i)].forEach(function (c) { c.classList.remove('brilha'); void c.offsetWidth; c.classList.add('brilha'); setTimeout(function () { c.classList.remove('brilha'); }, 1600); });
+    falar(w(rodada.pares[i][0]) + ', ' + w(rodada.pares[i][1]));
+  });
+
+  // ---------- fim da rodada: janela de festa (SolverJanela: Esc, Voltar e tocar fora = próximo enigma) ----------
+  var TITULOS = [['Muito bem!', 'Well done!'], ['Que esperto!', 'So clever!'], ['Mandou bem!', 'Great job!'], ['Isso aí!', 'You did it!'], ['Uau, acertou tudo!', 'Wow, all done!']];
+  var festa = null;
+  function el(tag, classe, texto) { var n = document.createElement(tag); if (classe) n.className = classe; if (texto != null) n.textContent = texto; return n; }
+  function terminar() {
+    if (!partida || festa) return;
+    var est = partida.estrelas();
+    prog[nivel].estrelas += est; prog[nivel].rodadas++;
+    if (prog[nivel].feitas.indexOf(rodada.id) < 0) prog[nivel].feitas.push(rodada.id);
+    salvarProg(); pintarTopo();
+    var tt = TITULOS[Math.floor(Math.random() * TITULOS.length)];
+    var total = listaNivel(nivel).length, feitas = feitasNoCiclo(nivel);
+    var txt = t('Você ganhou ' + est + (est > 1 ? ' estrelas!' : ' estrela!'), 'You earned ' + est + (est > 1 ? ' stars!' : ' star!'));
+    if (feitas >= total) txt += ' ' + t('Você fez todos os ' + total + ' enigmas deste nível! Agora eles voltam misturados.', 'You solved all ' + total + ' puzzles on this level! Now they come back mixed up.');
+    else txt += ' ' + t('Faltam ' + (total - feitas) + ' enigmas neste nível.', (total - feitas) + ' puzzles left on this level.');
+    var caixa = el('div', 'festa-caixa'), h = el('h2', null, t(tt[0], tt[1]));
+    var ee = el('p', 'festa-estrelas', '⭐'.repeat(est) + '☆'.repeat(3 - est)); ee.setAttribute('aria-label', t(est + ' estrelas', est + ' stars'));
+    var bP = el('button', 'grande', t('Próximo enigma ▶', 'Next puzzle ▶')), bN = el('button', 'mini largo', t('🏠 Níveis', '🏠 Levels'));
+    bP.type = bN.type = 'button'; bP.id = 'btProxima'; bN.id = 'btNiveis';
+    var bts = el('div', 'festa-bts'); bts.appendChild(bP); bts.appendChild(bN);
+    [h, ee, el('p', 'festa-texto', txt), bts].forEach(function (n) { caixa.appendChild(n); });
+    var conf = el('div', 'confete'); conf.setAttribute('aria-hidden', 'true'); confete(conf);
+    var tudo = el('div', 'festa-dentro'); tudo.appendChild(conf); tudo.appendChild(caixa);
+    Som.vitoria(); falar(t(tt[0], tt[1]));
+    var abrir = window.SolverJanela ? SolverJanela.abrir : null;
+    if (!abrir) { novaRodada(); return; }
+    festa = abrir({ conteudo: tudo, classe: 'festa', focar: bP, aoFechar: function (motivo) {
+      festa = null;
+      if (motivo === 'niveis') SolverJanela.quandoQuieto(sair);
+      else if (motivo !== 'sair') SolverJanela.quandoQuieto(novaRodada);
+    } });
+    bP.addEventListener('click', function () { if (festa) festa.fechar('proxima'); });
+    bN.addEventListener('click', function () { if (festa) festa.fechar('niveis'); });
+  }
+  function fecharFesta() { if (festa) { var f = festa; festa = null; f.fechar('sair'); } limparRiscos(); }
+  function confete(c) {
+    if (CALMO) return;
+    var E = ['⭐', '✨', '🎉', '🌟', '💛', '🎈'];
+    for (var i = 0; i < 26; i++) {
+      var s = document.createElement('span'); s.textContent = E[i % E.length];
+      s.style.left = (Math.random() * 100) + '%'; s.style.animationDelay = (Math.random() * 0.8) + 's';
+      s.style.animationDuration = (1.8 + Math.random() * 1.4) + 's'; s.style.fontSize = (1.2 + Math.random() * 1.4) + 'rem';
+      c.appendChild(s);
+    }
+  }
+  $('btVoltar').addEventListener('click', sair);
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'Escape' || e.key === 'GoBack' || e.keyCode === 461) && $('jogo').classList.contains('ativa')) { e.preventDefault(); sair(); }
+  });
+
+  // ---------- início ----------
+  R.NIVEIS.forEach(function (n) { $('bt' + n.charAt(0).toUpperCase() + n.slice(1)).addEventListener('click', function () { comecar(n); }); });
+  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
+  $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarPrefs(); if (pref.efeitos) Som.escolher(); });
+  $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarPrefs(); if (pref.voz) falar(t('Voz ligada', 'Voice on')); else { try { speechSynthesis.cancel(); } catch (e) { /* ok */ } } });
+  $('btZerar').addEventListener('click', function () {
+    if (!window.SolverJanela) return;
+    var caixa = el('div', 'festa-caixa pergunta'), bS = el('button', 'grande perigo', t('Apagar', 'Erase')), bC = el('button', 'mini largo', t('Cancelar', 'Cancel'));
+    bS.type = bC.type = 'button';
+    caixa.appendChild(el('h2', null, t('Começar do zero?', 'Start over?')));
+    caixa.appendChild(el('p', 'festa-texto', t('Apaga as estrelas e o progresso dos três níveis neste aparelho.', 'Erases the stars and progress of all three levels on this device.')));
+    var bts = el('div', 'festa-bts'); bts.appendChild(bS); bts.appendChild(bC); caixa.appendChild(bts);
+    var j = SolverJanela.abrir({ conteudo: caixa, classe: 'festa', papel: 'alertdialog', focar: bC, aoFechar: function (motivo) {
+      if (motivo !== 'apagar') return;
+      R.NIVEIS.forEach(function (n) { prog[n] = { feitas: [], estrelas: 0, rodadas: 0 }; }); salvarProg(); pintarProgresso();
+    } });
+    bS.addEventListener('click', function () { j.fechar('apagar'); });
+    bC.addEventListener('click', function () { j.fechar('cancelar'); });
+  });
+  $('versao').textContent = APP_VERSION;
+
+  // música de fundo (trilha comum do Bolinho de Chuva), mais baixinha: a criança está pensando
+  var M = '../baguncolandia/musicas/', FREEPD = 'CC0 (FreePD)';
+  if (window.Trilha) Trilha.iniciar({ jogo: 'enigmas', volume: 0.22, creditos: 'CREDITOS.md', musicas: [
+    { a: M + 'happy-whistling-ukulele.mp3', t: 'Happy Whistling Ukulele', au: 'Rafael Krux', lic: FREEPD },
+    { a: M + 'ukulele-song.mp3', t: 'Ukulele Song', au: 'Rafael Krux', lic: FREEPD },
+    { a: M + 'llama-in-pajama.mp3', t: 'Llama in Pajama', au: 'Rafael Krux', lic: FREEPD },
+    { a: M + 'silly-boy.mp3', t: 'Silly Boy', au: 'Rafael Krux', lic: FREEPD },
+    { a: M + 'funshine.mp3', t: 'Funshine', au: 'Kevin MacLeod', lic: FREEPD },
+    { a: M + 'city-sunshine.mp3', t: 'City Sunshine', au: 'Kevin MacLeod', lic: FREEPD },
+    { a: M + 'comic-game-loop-mischief.mp3', t: 'Comic Game Loop - Mischief', au: 'Kevin MacLeod', lic: FREEPD },
+    { a: M + 'bit-bit-loop.mp3', t: 'Bit Bit Loop', au: 'Kevin MacLeod', lic: FREEPD },
+    { a: M + 'my-giant-bunny-friend.mp3', t: 'My Giant Bunny Friend', au: 'Bryan Teoh', lic: FREEPD },
+    { a: M + 'spring-chicken.mp3', t: 'Spring Chicken', au: 'Bryan Teoh', lic: FREEPD },
+    { a: M + 'going-bananas.mp3', t: 'Going Bananas', au: 'Bryan Teoh', lic: FREEPD },
+    { a: M + 'wakka-wakka.mp3', t: 'Wakka Wakka', au: 'Bryan Teoh', lic: FREEPD },
+    { a: M + 'hippety-hop.mp3', t: 'Hippety Hop', au: 'Alexander Nakarada', lic: FREEPD }
+  ] });
+
+  // ---------- instalar e service worker ----------
+  var pedidoInstalar = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedidoInstalar = e; $('btInstalar').hidden = false; });
+  $('btInstalar').addEventListener('click', function () { if (!pedidoInstalar) return; pedidoInstalar.prompt(); pedidoInstalar.userChoice.then(function () { pedidoInstalar = null; $('btInstalar').hidden = true; }); });
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
+
+  traduzir();
+
+  // para os testes automáticos (só com ?teste no endereço)
+  if (TESTE) window.EnigmasDebug = {
+    pronto: true, versao: APP_VERSION,
+    estado: function () { return { tela: $('jogo').classList.contains('ativa') ? 'jogo' : 'inicio', nivel: nivel, id: rodada && rodada.id, n: partida && partida.n, acertos: partida && partida.acertos, erros: partida && partida.erros, festa: !!festa, riscos: svg.querySelectorAll('.risco').length }; },
+    progresso: function () { return JSON.parse(JSON.stringify(prog)); },
+    // abre uma rodada exata (para o teste conferir o desenho de TODAS as rodadas, não só a sorteada)
+    ids: function (n) { return listaNivel(n).map(function (r) { return r.id; }); },
+    abrir: function (n, id) {
+      var r = listaNivel(n).filter(function (x) { return x.id === id; })[0]; if (!r) return false;
+      nivel = n; mostrar('jogo'); fecharFesta(); sel = null; limparArraste();
+      rodada = r; partida = J.Partida(rodada);
+      $('lousa').style.setProperty('--n', partida.n);
+      $('lousa').classList.toggle('so-texto', rodada.pares.some(function (p) { return !p[0].e || !p[1].e; }));
+      montarCartas(); pintarTopo(); return true;
+    }
+  };
+})();
+
+/* Botão "📲 Instalar" do Bolinho de Chuva: o cartão abre o jogo com ?instalar=1 e só então carrega a barra
+   "Instalar o aplicativo" (instalar.js, na raiz do repositório kids). Quem só quer jogar não baixa nada a mais. */
+(function () {
+  if (!/[?&]instalar\b/.test(location.search) || location.protocol === 'file:') return;
+  var s = document.createElement('script');
+  s.src = '../instalar.js';
+  s.setAttribute('data-nome', 'Enigmas de Ligar'); s.setAttribute('data-icone', 'icone-192.png');
+  s.setAttribute('data-so-com', 'instalar'); s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
+  document.body.appendChild(s);
+})();

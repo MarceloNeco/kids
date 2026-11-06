@@ -1,7 +1,15 @@
 {
-  "app": "feature-tester",
-  "nota": "Interruptores do RootifyONE que os jogos do Bolinho de Chuva obedecem (data-recurso nas páginas). Nada de segredo aqui. Por enquanto continuam no app \"feature-tester\" do RootifyONE (o mesmo de antes da mudança para este repositório), para nenhum ajuste já feito se perder; passar para um app \"kids\" próprio é pendência.",
+  "formato": 1,
+  "app": "kids",
+  "nota": "Interruptores do RootifyONE (Controle dos apps → Bolinho de Chuva) que a estante e os jogos obedecem. UM app com um interruptor por jogo: desligado, o jogo some da estante e a página do jogo esconde o conteúdo marcado com data-recurso. \"app\" desligado = o pacote inteiro em manutenção. Jogo novo = uma entrada aqui. Nada de segredo neste arquivo.",
   "recursos": [
+    {
+      "id": "app",
+      "nome": {
+        "pt": "Bolinho de Chuva inteiro (manutenção)",
+        "en": "Whole Rain Dumpling (maintenance)"
+      }
+    },
     {
       "id": "danca-na-sala",
       "nome": {
@@ -13,32 +21,32 @@
     {
       "id": "baguncolandia",
       "nome": {
-        "pt": "Bagunçolândia (Bolinho de Chuva)",
-        "en": "Mayhemland (Rain Dumpling)"
+        "pt": "Bagunçolândia",
+        "en": "Mayhemland"
       },
       "pagina": "baguncolandia/"
     },
     {
       "id": "peluqueria",
       "nome": {
-        "pt": "Peluqueria (Bolinho de Chuva)",
-        "en": "Peluqueria (Rain Dumpling)"
+        "pt": "Peluqueria",
+        "en": "Peluqueria"
       },
       "pagina": "peluqueria/"
     },
     {
       "id": "vruuum",
       "nome": {
-        "pt": "Vruuum! (Bolinho de Chuva)",
-        "en": "Vruuum! (Rain Dumpling)"
+        "pt": "Vruuum!",
+        "en": "Vruuum!"
       },
       "pagina": "vruuum/"
     },
     {
       "id": "purpurina",
       "nome": {
-        "pt": "Purpurina (Bolinho de Chuva)",
-        "en": "Purpurina (Rain Dumpling)"
+        "pt": "Purpurina",
+        "en": "Purpurina"
       },
       "pagina": "purpurina/"
     },
@@ -53,10 +61,50 @@
     {
       "id": "rabiscolandia",
       "nome": {
-        "pt": "Rabiscolândia (Bolinho de Chuva)",
-        "en": "Rabiscolândia (Rain Dumpling)"
+        "pt": "Rabiscolândia",
+        "en": "Rabiscolândia"
       },
       "pagina": "rabiscolandia/"
+    },
+    {
+      "id": "campo-minado",
+      "nome": {
+        "pt": "Campo Minado",
+        "en": "Minesweeper"
+      },
+      "pagina": "campo-minado/"
+    },
+    {
+      "id": "batalha-naval",
+      "nome": {
+        "pt": "Batalha Naval",
+        "en": "Battleship"
+      },
+      "pagina": "batalha-naval/"
+    },
+    {
+      "id": "enigmas",
+      "nome": {
+        "pt": "Enigmas de Ligar",
+        "en": "Match-up Riddles"
+      },
+      "pagina": "enigmas/"
+    },
+    {
+      "id": "labirinto",
+      "nome": {
+        "pt": "Labirinto",
+        "en": "Maze"
+      },
+      "pagina": "labirinto/"
+    },
+    {
+      "id": "cozinha",
+      "nome": {
+        "pt": "Cozinha de Receitas",
+        "en": "Recipe Kitchen"
+      },
+      "pagina": "cozinha/"
     }
   ]
 }

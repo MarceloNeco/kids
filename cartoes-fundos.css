@@ -1,0 +1,20 @@
+/* Fundos desenhados dos cartões da estante (um tema por jogo), bem clarinhos e foscos para o texto ficar fácil de ler.
+   TUDO deste visual mora aqui e na pasta cartoes/. Para voltar ao visual antigo, apague no index.html a linha
+   <link rel="stylesheet" href="/kids/cartoes-fundos.css"> — nada mais muda.
+   Jogo novo sem desenho próprio usa cartoes/generico.svg; para dar um tema a ele, crie cartoes/<id>.svg e uma linha abaixo
+   com .card[data-jogo="<id>"]::before. O cartão "Em breve" não tem data-jogo e fica como sempre. */
+.card[data-jogo]{position:relative;isolation:isolate;overflow:hidden}
+/* o desenho, desfocado e quase transparente */
+.card[data-jogo]::before{content:"";position:absolute;inset:-8px;z-index:-1;pointer-events:none;
+  background:url(cartoes/generico.svg) center/cover no-repeat;opacity:.2;filter:blur(1.5px) saturate(1.15)}
+/* o "vidro fosco" por cima do desenho: a cor do cartão, mais forte embaixo, onde fica o texto */
+.card[data-jogo]::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(34,27,77,.25),rgba(34,27,77,.55) 55%,rgba(34,27,77,.7))}
+.card[data-jogo="baguncolandia"]::before{background-image:url(cartoes/baguncolandia.svg)}
+.card[data-jogo="peluqueria"]::before{background-image:url(cartoes/peluqueria.svg)}
+.card[data-jogo="danca-na-sala"]::before{background-image:url(cartoes/danca-na-sala.svg)}
+.card[data-jogo="vruuum"]::before{background-image:url(cartoes/vruuum.svg)}
+.card[data-jogo="purpurina"]::before{background-image:url(cartoes/purpurina.svg)}
+.card[data-jogo="rabiscolandia"]::before{background-image:url(cartoes/rabiscolandia.svg)}
+/* celular: ainda mais clarinho, para não poluir a tela pequena */
+@media (max-width:40rem){.card[data-jogo]::before{opacity:.13;filter:blur(2px)}}
