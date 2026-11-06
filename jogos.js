@@ -5,7 +5,8 @@
   - Painel "Todos os jogos" (#todos):
       ⬇ Guardar todos neste aparelho → registra o service worker de cada jogo, com andamento na tela; cada jogo
         guarda o próprio código e passa a abrir sem internet (músicas e partes pesadas seguem a regra de cada jogo,
-        em geral só no Wi-Fi). Ao abrir de novo, a página mostra se já está tudo guardado.
+        em geral só no Wi-Fi). Depois guarda UMA música favorita de cada jogo e da rádio (Trilha.offline, trilha.js),
+        que toca mesmo sem internet. Ao abrir de novo, a página mostra se já está tudo guardado.
       📲 Instalar um por um → navegador nenhum instala vários ícones de uma vez (cada app só se instala a partir da
         própria página). Então abre o primeiro jogo com ?instalar=1&fila=1; depois de instalar (ou pular), a barra
         leva ao próximo; no fim, volta para cá (?fila=fim). A fila fica em localStorage "bolinho:fila".
@@ -90,6 +91,13 @@
       });
     }, Promise.resolve()).then(function () { return feitos; });
   }
+  // uma música favorita por jogo (e a da rádio), inteira no cache "bolinho-musicas": toca sem internet
+  function guardarMusicas(aoAndar) {
+    var O = window.Trilha && window.Trilha.offline;
+    if (!O) return Promise.resolve({ feitas: 0, total: 0 });
+    var ids = Object.keys(O.FAVORITAS);
+    return O.guardar(ids, aoAndar).then(function (n) { return { feitas: n, total: ids.length }; });
+  }
   function marcar(card) {
     var caixa = card.parentNode;
     if (caixa.querySelector('.cx-ok')) return;
@@ -122,13 +130,19 @@
       guardarTodos(function (i, nome) {
         st.textContent = '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…';
       }).then(function (n) {
+        return guardarMusicas(function (i, total) {
+          st.textContent = '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '… / Saving favourite songs: ' + (i + 1) + ' of ' + total + '…';
+        }).then(function (m) { return { n: n, m: m }; });
+      }).then(function (r) {
+        var n = r.n, m = r.m;
+        var musicas = m.total ? ' 🎵 ' + m.feitas + ' de ' + m.total + ' músicas favoritas guardadas: tocam até sem internet. / ' + m.feitas + ' of ' + m.total + ' favourite songs saved for offline.' : '';
         bGuardar.disabled = false;
-        if (n === instalaveis.length) {
+        if (n === instalaveis.length && m.feitas === m.total) {
           st.className = 'st ok';
-          st.textContent = '✓ Pronto: os ' + n + ' jogos funcionam sem internet neste aparelho. As músicas e as partes pesadas terminam de baixar sozinhas no Wi-Fi.';
+          st.textContent = '✓ Pronto: os ' + n + ' jogos funcionam sem internet neste aparelho. As músicas e as partes pesadas terminam de baixar sozinhas no Wi-Fi.' + musicas;
           bGuardar.textContent = '✓ Todos guardados';
         } else {
-          st.textContent = n + ' de ' + instalaveis.length + ' guardados. Confira a internet e toque de novo para terminar.';
+          st.textContent = n + ' de ' + instalaveis.length + ' guardados.' + musicas + ' Confira a internet e toque de novo para terminar.';
         }
       });
     });
@@ -163,6 +177,6 @@
 
   // com o Bolinho instalado, guarda todos sozinho
   var comoApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone === true;
-  if (comoApp) window.addEventListener('load', function () { guardarTodos(); });
-  window.addEventListener('appinstalled', function () { guardarTodos(); });
+  if (comoApp) window.addEventListener('load', function () { guardarTodos().then(function () { return guardarMusicas(); }); });
+  window.addEventListener('appinstalled', function () { guardarTodos().then(function () { return guardarMusicas(); }); });
 })();

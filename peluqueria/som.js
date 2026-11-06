@@ -4,7 +4,9 @@
    laço no menu) e as outras tocam uma por rodada, embaralhadas, emendando quando uma acaba. O arquivo é tocado
    pelo navegador (<audio>) e passa pelo WebAudio só para o volume e o "mudo" (no iPhone o volume do <audio> não
    muda). Ao sair da página, a música e os efeitos param NA HORA (pausa + contexto suspenso) e voltam de onde
-   pararam. Arquivo que não carrega é pulado, sem erro.
+   pararam. Arquivo que não carrega é pulado, sem erro. Sem internet, a que não abre dá lugar à favorita guardada no
+   aparelho (Funky Chunk, Trilha.offline do ../trilha.js, cache "bolinho-musicas"), em laço; ela é guardada na primeira
+   música que toca com internet.
    EFEITOS: curtos e sintetizados no WebAudio (acerto, erro, contagem). O "u-huuu!" do PERFEITO (v0.6.0) é
    GRAVADO: voz de verdade + torcida (efeitos/uhul-1.mp3 e uhul-2.mp3, créditos no CREDITOS.md); se o arquivo
    não carregar, cai na torcida sintetizada.
@@ -20,6 +22,7 @@
   var player = null, atual = null, tipo = 'abertura', faixa = -1, tocando = false, fonte = '';
   var pulso = 0, batidas = [], trocas = [];
   var registro = TESTE ? [] : null;
+  var guardouFavorita = false;          // a favorita (sem internet) é guardada uma vez, na primeira música que toca
   var gritos = [], ultimoGrito = -1;   // "u-huuu!" gravados, decodificados uma vez
 
   function hz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
@@ -134,7 +137,23 @@
     if (!player) {
       player = new Audio(); player.preload = 'auto';
       player.addEventListener('ended', function () { if (tipo === 'jogo') proximaJogo(); });
-      player.addEventListener('error', function () { if (atual) ruins[atual.arquivo] = true; if (tipo === 'jogo') proximaJogo(); else if (lista.length) { tipo = 'jogo'; proximaJogo(); } });
+      player.addEventListener('error', function () {
+        var OFF = root.Trilha && root.Trilha.offline, era = atual;
+        if (OFF && player.src.indexOf('blob:') !== 0) {   // primeiro a favorita guardada no aparelho, em laço
+          OFF.tocar(player, OFF.FAVORITAS.peluqueria).then(function (ok) {
+            if (atual !== era) return;
+            if (!ok) { pularRuim(); return; }
+            player.loop = true; atual = lista.filter(function (o) { return o.arquivo === 'funky-chunk.mp3'; })[0] || atual;
+            if (tocando) retomar(); avisarTroca();
+          });
+          return;
+        }
+        pularRuim();
+      });
+      player.addEventListener('playing', function () {
+        var OFF = root.Trilha && root.Trilha.offline;
+        if (OFF && !guardouFavorita && player.src.indexOf('blob:') !== 0 && root.navigator.onLine !== false) { guardouFavorita = true; OFF.guardar(['peluqueria']); }
+      });
     }
     if (ctx && !ganhoMusica && ctx.createMediaElementSource) {
       try {
@@ -146,6 +165,7 @@
     if (!ganhoMusica) player.volume = VOLUME_MUSICA;
     player.muted = mudo && !ganhoMusica;
   }
+  function pularRuim() { if (atual) ruins[atual.arquivo] = true; if (tipo === 'jogo') proximaJogo(); else if (lista.length) { tipo = 'jogo'; proximaJogo(); } }
   function avisarTroca() { trocas.forEach(function (fn) { try { fn(atual); } catch (e) {} }); }
   function pulsar() {
     clearInterval(pulso);

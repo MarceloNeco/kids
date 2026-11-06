@@ -2,6 +2,17 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.17.1",
+      "data": "06/Nov/2026",
+      "hora": "16:00:00",
+      "pt": [
+        "🎵 Uma música favorita agora toca até sem internet: sem conexão, a Glitter Blast (guardada no aparelho na primeira vez que toca com internet, ou no ⬇ Guardar todos da estante) toca no lugar das que não abrem."
+      ],
+      "en": [
+        "🎵 A favourite song now plays even without internet: offline, Glitter Blast (saved on the device the first time music plays online, or with ⬇ Save all on the shelf) plays instead of the songs that can't load."
+      ]
+    },
+    {
       "versao": "0.17.0",
       "data": "02/Nov/2026",
       "hora": "15:03:27",
