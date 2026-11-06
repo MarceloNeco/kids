@@ -59,3 +59,16 @@ test('estante sem internet: o service worker guarda as peças e os ícones dos c
   for (const f of ['recursos.js', 'trilha.js', 'cartoes-fundos.css']) assert.ok(sw.includes("'" + f + "'"), 'sw.js sem ' + f);
   for (const m of catalogo.matchAll(/img: '\/kids\/([^']+)'/g)) assert.ok(sw.includes("'" + m[1] + "'"), 'sw.js sem ' + m[1]);
 });
+
+test('versão à vista: a estante mostra a VERSAO do sw.js e jogo com tela de entrada carrega o versao.js', () => {
+  const sw = ler('sw.js').match(/var VERSAO = (\d+);/)[1];
+  assert.ok(ler('index.html').includes('data-versao="' + sw + '"'), 'index.html data-versao diferente da VERSAO ' + sw + ' do sw.js');
+  for (const j of jogos) {
+    const pasta = j.url.replace(/^\/kids\//, '');
+    if (!pasta.endsWith('/')) continue;
+    const html = ler(pasta + 'index.html');
+    if (!/id="entrada"/.test(html)) continue;
+    assert.match(html, /<script src="\.\.\/versao\.js" data-alvo="#entrada"/, j.id + ': falta o versao.js na tela de entrada');
+    assert.ok(ler(pasta + 'sw.js').includes("'../versao.js'"), j.id + ': sw.js sem ../versao.js');
+  }
+});
