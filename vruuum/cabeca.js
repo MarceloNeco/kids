@@ -194,7 +194,7 @@
     return N;
   }
   // desenha a cabeça inteira em (cx, cy), raio r, no giro dado
-  function cabeca3d(c, cx, cy, r, pc, pf, giro, inclina, ombro) {
+  function cabeca3d(c, cx, cy, r, pc, pf, giro, inclina, ombro, rabo, t) {
     var esc = r / R0, M = Math.ceil(TS * esc) + 4;
     if (!rascunho || rascunho.width < M) rascunho = tela(Math.max(M, 64), Math.max(M, 64));
     var s = rascunho.getContext('2d'), o = M / 2;
@@ -214,7 +214,11 @@
     s.globalCompositeOperation = 'source-over';
     var f = giro / GIRO_MAX;   // a cabeça vai um pouco para o lado do ombro e desce, como quem olha para trás
     c.save(); c.translate(cx + f * r * ombro, cy + Math.abs(f) * r * 0.06); c.rotate(f * 0.1 + (inclina || 0));
+    // rabo de cavalo (personagens.js): nasce na nuca; com a nuca virada para longe, fica atrás da cabeça
+    var nucaLonge = cg < -0.05;
+    if (rabo && nucaLonge) rabo(c, 0, 0, r, giro, t);
     c.drawImage(rascunho, 0, 0, M, M, -o, -o, M, M);
+    if (rabo && !nucaLonge) rabo(c, 0, 0, r, giro, t);
     c.restore();
   }
 
@@ -223,12 +227,12 @@
      periodo: de quanto em quanto tempo vira. Veículo com capacete (kart, moto): de costas o capacete do
      desenho já é a nuca; quando vira, o capacete inteiro gira e aparece o rosto pela viseira.
      Veículo "aberto" (skate): a cabeça fica no alto do corpo, sem janela, sem ombros, sem vidro. */
-  function desenhar(c, v, x0, y0, W, H, info, t, semente, periodo) {
+  function desenhar(c, v, x0, y0, W, H, info, t, semente, periodo, onde) {   // onde: {x, y, r} da cabeça, quando ela se mexe (cavalo)
     if (!v || !v.cab || !v.janela || W < 6 || !raiz.document) return;
-    var e = estado(t, semente || 0, periodo || 7), cx = x0 + v.cab[0] * W, cy = y0 + v.cab[1] * H, r = v.cab[2] * H / 2;
-    if (v.capacete && !e.giro) return;   // de costas, o capacete do desenho já é a nuca
-    var capCor = null;
+    var e = estado(t, semente || 0, periodo || 7), cx = onde ? onde.x : x0 + v.cab[0] * W, cy = onde ? onde.y : y0 + v.cab[1] * H, r = onde ? onde.r : v.cab[2] * H / 2;
+    var capCor = null, rabo = info.personagem && info.personagem.rabo;
     if (v.capacete) { var je = v.janela.elipse; cx = x0 + je[0] * W; cy = y0 + je[1] * H; r = je[2] * W; capCor = info.cor || '#ff7b00'; }
+    if (v.capacete && !e.giro) { if (rabo) rabo(c, cx, cy, r, 0, t + (semente || 0)); return; }   // de costas, o capacete do desenho já é a nuca
     var pc = pele(info, 'costas', capCor), pf = pele(info, 'frente', capCor) || pc;
     if (!pc) return;
     var inclina = e.sorriso > 0 ? Math.sin(e.sorriso * Math.PI) * 0.12 * (e.giro > 0 ? 1 : -1) : 0;   // inclina a cabeça ao sorrir
@@ -238,7 +242,7 @@
       var tw = 1 - 0.14 * Math.abs(Math.sin(e.giro));
       elipse(c, cx + Math.sin(e.giro) * r * 0.12, cy + r * 1.55, r * 1.5 * tw, r * 0.85, 0, info.camisa || '#3a2f73');
     }
-    cabeca3d(c, cx, cy, r, pc, pf, e.giro, inclina, v.aberto ? 0.22 : v.capacete ? 0 : 0.14);
+    cabeca3d(c, cx, cy, r, pc, pf, e.giro, inclina, v.aberto ? 0.22 : v.capacete ? 0 : 0.14, rabo, t + (semente || 0));
     c.restore();
     if (e.sorriso > 0) brilhinho(c, cx, cy, r, e.sorriso);
     if (!v.capacete && !v.aberto && !v.semVidro) {   // reflexo do vidro por cima (conversível não tem)

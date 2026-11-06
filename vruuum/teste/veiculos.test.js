@@ -3,9 +3,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const V = require('../veiculos.js');
 
-test('11 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
-  assert.equal(V.LISTA.length, 11);
-  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 11);
+test('12 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
+  assert.equal(V.LISTA.length, 12);
+  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 12);
   const grupos = V.GRUPOS.map(g => g.id);
   for (const v of V.LISTA) {
     assert.ok(grupos.includes(v.grupo), v.id);
