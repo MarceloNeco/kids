@@ -1,0 +1,22 @@
+{
+  "app": "labirinto",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "06/Nov/2026",
+      "hora": "08:28:26",
+      "pt": [
+        "🧩 Primeira versão do Labirinto: um labirinto novo a cada partida, em três formatos (quadrado, redondo e colmeia, ou 🎲 surpresa) e três níveis (fácil, médio e difícil).",
+        "🐶 Dois jeitos de brincar: levar o cachorrinho (toque ou arraste onde ele deve ir; ele só anda pelos corredores) ou ✏️ desenhar o caminho com o dedo (a linha para na parede e continua da ponta).",
+        "🦴 Missão: em muitos labirintos é preciso pegar primeiro o osso, a chave, a estrela ou o tesouro no meio, e só então a saída se abre, com estrelinha voando e porta brilhando. No fim, confete, fogos e estrelas pelo tempo.",
+        "🎥 Abertura em 3D (a câmera vem do alto e as paredes sobem), paredes com altura, câmera que segue o cachorrinho, zoom com dois dedos e música da trilha comum. Funciona sem internet e pode ser instalado."
+      ],
+      "en": [
+        "🧩 First version of the Maze: a new maze every game, in three shapes (square, round and honeycomb, or 🎲 surprise) and three levels (easy, medium and hard).",
+        "🐶 Two ways to play: walk the puppy (tap or drag where he should go; he only walks along the corridors) or ✏️ draw the path with your finger (the line stops at walls and goes on from its tip).",
+        "🦴 Mission: in many mazes you must first grab the bone, key, star or treasure in the middle, and only then the exit opens, with a flying star and a glowing door. At the end: confetti, fireworks and stars for your time.",
+        "🎥 3D opening (the camera comes from above and the walls rise), walls with height, a camera that follows the puppy, two-finger zoom and the shared soundtrack. Works offline and can be installed."
+      ]
+    }
+  ]
+}

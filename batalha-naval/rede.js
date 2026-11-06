@@ -357,14 +357,8 @@
         });
         return true;
       },
-      // tabuleiro do jogador b visto por todos: 0 não atirado, 1 água, 2 acerto, 3 afundado; e os navios afundados
-      vista: function (b) {
-        var n = L.NIVEIS[s.nivel].n, v = [], afund = [];
-        for (var y = 0; y < n; y++) { v.push([]); for (var x = 0; x < n; x++) v[y].push(0); }
-        s.log.forEach(function (e) { if (e[1] !== b) return; v[e[3]][e[2]] = e[4] + 1; if (e[4] === 2) afund.push(L.deLista(e.slice(5))); });
-        afund.forEach(function (nv) { L.celulas(nv).forEach(function (c) { v[c[1]][c[0]] = 3; }); });
-        return { v: v, afundados: afund };
-      }
+      // mar do jogador b como todos veem (ver BNLogica.vista)
+      vista: function (b) { return L.vista(s.log, b, L.NIVEIS[s.nivel].n); }
     };
     return API;
   }

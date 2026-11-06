@@ -89,6 +89,16 @@
   function paraLista(nv) { return [nv.x, nv.y, nv.tam, nv.h ? 1 : 0]; }
   function deLista(a) { return { x: a[0], y: a[1], tam: a[2], h: a[3] === 1 }; }
 
+  // vista(log, b, n): o mar do jogador b como todos veem — 0 não atirado, 1 água, 2 acerto, 3 afundado — e os navios afundados.
+  // log = diário de tiros [atirador, alvo, x, y, resultado (0 água, 1 acerto, 2 afundou), e no afundou: x, y, tam, h]
+  function vista(log, b, n) {
+    var v = [], afund = [];
+    for (var y = 0; y < n; y++) { v.push([]); for (var x = 0; x < n; x++) v[y].push(0); }
+    log.forEach(function (e) { if (e[1] !== b) return; v[e[3]][e[2]] = e[4] + 1; if (e[4] === 2) afund.push(deLista(e.slice(5))); });
+    afund.forEach(function (nv) { celulas(nv).forEach(function (c) { v[c[1]][c[0]] = 3; }); });
+    return { v: v, afundados: afund };
+  }
+
   // ======================= o computador =======================
   // vista: 0 não sei, 1 água, 2 acertei (navio ainda boiando), 3 afundado
   // IA(nivel, rnd, jeito): jeito ('facil' | 'medio' | 'dificil') é a esperteza; sem ele, a do próprio nível
@@ -160,7 +170,7 @@
   }
 
   var API = { LETRAS: LETRAS, NIVEIS: NIVEIS, NOMES: NOMES, R: R, RN: RN, coord: coord, chave: chave, celulas: celulas, dentro: dentro, cabe: cabe,
-    frotaValida: frotaValida, aleatoria: aleatoria, resolver: resolver, paraLista: paraLista, deLista: deLista, IA: IA, inteiro: inteiro };
+    frotaValida: frotaValida, aleatoria: aleatoria, resolver: resolver, paraLista: paraLista, deLista: deLista, vista: vista, IA: IA, inteiro: inteiro };
   raiz.BNLogica = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : this);

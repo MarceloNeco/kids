@@ -15,6 +15,15 @@
   function tela(cam, x, y) { return [(x - cam.cx) * cam.z + cam.W / 2, (y - cam.cy) * cam.z + cam.H / 2]; }
   function mundoParaTela(ctx, cam, dpr) { ctx.setTransform(dpr * cam.z, 0, 0, dpr * cam.z, dpr * (cam.W / 2 - cam.cx * cam.z), dpr * (cam.H / 2 - cam.cy * cam.z)); }
 
+  // curvas do redondo: para DESENHAR basta um ponto a cada ~6° (a colisão continua com os pedacinhos finos do gerador)
+  function simplificar(pts) {
+    if (pts.length <= 2) return pts;
+    var comp = 0;
+    for (var k = 1; k < pts.length; k++) comp += Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
+    var r = Math.hypot(pts[0][0], pts[0][1]) || 1, n = Math.max(1, Math.min(pts.length - 1, Math.ceil(comp / r / 0.1))), out = [];
+    for (var i = 0; i <= n; i++) out.push(pts[Math.round(i * (pts.length - 1) / n)]);
+    return out;
+  }
   // dados que não mudam durante a partida: paredes com caixinha (para pular as que estão fora da tela) e distância do meio
   function preparar(L) {
     var l = L.limites, mx = (l.x0 + l.x1) / 2, my = (l.y0 + l.y1) / 2, dmax = Math.hypot(l.x1 - mx, l.y1 - my) || 1;
@@ -23,7 +32,7 @@
       if (e.aberta || i === L.bordaInicio || i === L.bordaSaida) return;
       var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
       e.pts.forEach(function (p) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); });
-      L._paredes.push({ pts: e.pts, x0: x0, y0: y0, x1: x1, y1: y1, d: Math.hypot((x0 + x1) / 2 - mx, (y0 + y1) / 2 - my) / dmax });
+      L._paredes.push({ pts: simplificar(e.pts), x0: x0, y0: y0, x1: x1, y1: y1, d: Math.hypot((x0 + x1) / 2 - mx, (y0 + y1) / 2 - my) / dmax });
     });
   }
 
@@ -33,9 +42,7 @@
     var T = TEMAS[L.forma], W = cam.W, H = cam.H, alt = op.altura == null ? 1 : op.altura, rev = op.revela == null ? 1 : op.revela;
     if (!L._paredes) preparar(L);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var g = ctx.createRadialGradient(W / 2, H * 0.4, 10, W / 2, H / 2, Math.max(W, H) * 0.8);
-    g.addColorStop(0, T.fundo[0]); g.addColorStop(1, T.fundo[1]);
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.clearRect(0, 0, W, H);   // o fundo (T.fundo) fica no CSS do palco: na abertura em 3D só o labirinto voa
     var vx0 = cam.cx - W / 2 / cam.z - 1, vx1 = cam.cx + W / 2 / cam.z + 1, vy0 = cam.cy - H / 2 / cam.z - 1, vy1 = cam.cy + H / 2 / cam.z + 1;
 
     // chão (casas alternadas, para a criança enxergar as casas)
@@ -70,7 +77,7 @@
     }
 
     // paredes em 3D: base no chão, topo levantado e puxado para fora do meio da tela (perspectiva)
-    var f = 0.055 * alt, sobe = 0.2 * cam.z * alt, lw = Math.max(2, 0.14 * cam.z), ox = W / 2, oy = H / 2;
+    var f = 0.3 * cam.z / (1.3 * Math.max(W, H)) * alt, sobe = 0.14 * cam.z * alt, lw = Math.max(2, 0.14 * cam.z), ox = W / 2, oy = H / 2;
     var vis = [];
     for (i = 0; i < L._paredes.length; i++) {
       var p = L._paredes[i];

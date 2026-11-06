@@ -1,0 +1,24 @@
+{
+  "app": "cozinha",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "06/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "👩‍🍳 Primeira versão da Cozinha (ideia da filha do dono): 12 receitas — bolo de cenoura, panqueca de banana, salada de frutas, vitamina de banana, brigadeiro, pizza caseira, sanduíche natural, peixe assado com legumes, omelete, suco de laranja, pão de queijo e cookies —, cada uma com os ingredientes, a quantidade de cada um e o modo de fazer.",
+        "🗺️ Vila para juntar os ingredientes: pescar no rio, colher frutas maduras no pomar, puxar legumes da horta, pegar ovos no galinheiro, tirar leite da vaca Mimosa, comprar no mercadinho com moedas e troco, e pedir emprestado para a vizinha Dona Cida (com obrigado!). A cesta mostra o que tem e o que falta.",
+        "🍳 Cozinha com utensílios: lavar as mãos, cortar com a faca sem ponta, mexer em círculos, segurar para bater, ligar o fogão, virar, forno e geladeira com relógio, modelar com as mãos e servir. No fim, a receita da família com estrelas.",
+        "🌱🌻🌳 Três níveis: Fácil (poucos ingredientes, tudo de graça, o passo certo brilha), Médio (mais ingredientes e moedas) e Difícil (você escolhe a ordem dos passos, moedas contadas, um imprevisto e o sol andando no céu).",
+        "🎵 Música no canto (11 músicas do Kevin MacLeod, CC BY), PT e EN, voz que lê os passos, funciona sem internet e pode ser instalado."
+      ],
+      "en": [
+        "👩‍🍳 First version of Kitchen (the owner's daughter's idea): 12 recipes — carrot cake, banana pancakes, fruit salad, banana smoothie, brigadeiro, homemade pizza, fresh sandwich, baked fish with vegetables, omelette, orange juice, cheese bread and cookies —, each with its ingredients, how much of each and the steps.",
+        "🗺️ A village to gather the ingredients: fish at the river, pick ripe fruit in the orchard, pull veggies in the garden, collect eggs in the hen house, get milk from Mimosa the cow, buy at the shop with coins and change, and borrow from Mrs. Cida next door (saying thank you!). The basket shows what you have and what is missing.",
+        "🍳 A kitchen with tools: wash your hands, cut with the safe knife, stir in circles, hold to blend, turn on the stove, flip, oven and fridge with a timer, shape with your hands and serve. At the end, the family recipe card with stars.",
+        "🌱🌻🌳 Three levels: Easy (few ingredients, everything free, the right step glows), Medium (more ingredients and coins) and Hard (you choose the order of the steps, counted coins, a surprise and the sun moving across the sky).",
+        "🎵 Music in the corner (11 songs by Kevin MacLeod, CC BY), PT and EN, a voice that reads the steps, works offline and can be installed."
+      ]
+    }
+  ]
+}

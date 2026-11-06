@@ -1,0 +1,24 @@
+{
+  "app": "batalha-naval",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "06/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "⚓ Primeira versão da Batalha Naval: arrume a frota (tocar, arrastar, girar ou 🎲 arrumar sozinho) e afunde os navios dos outros, com coordenadas (E4, F2…), água, acerto e afundou com animação e som.",
+        "👫 Com amigos, cada um no seu aparelho (celular, tablet ou computador): um cria a partida e recebe um código de 4 letras e o convite; de 2 a 4 jogadores, todos contra todos. A frota de cada um fica só no aparelho dele. Recarregou a página? Volta para a mesma partida.",
+        "🤖 Contra o computador e 📱 passar o aparelho (com a tela de \"não espie\"), que funcionam sem internet.",
+        "🐟 Fácil (8×8), 🐬 Médio (10×10) e 🦈 Difícil (12×12) — contra o computador, o nível também deixa ele mais esperto.",
+        "🎵 Música de aventura no cantinho da tela (14 músicas com licença livre), com 🔇 para desligar."
+      ],
+      "en": [
+        "⚓ First version of Sea Battle: place your fleet (tap, drag, turn or 🎲 place for me) and sink everyone else's ships, with coordinates (E4, F2…), water, hit and sunk with animation and sound.",
+        "👫 With friends, each on their own device (phone, tablet or computer): one creates the game and gets a 4-letter code and an invite; 2 to 4 players, free-for-all. Each fleet stays only on its own device. Reloaded the page? You go back to the same game.",
+        "🤖 Against the computer and 📱 pass the device (with a \"no peeking\" screen), which work offline.",
+        "🐟 Easy (8×8), 🐬 Medium (10×10) and 🦈 Hard (12×12) — against the computer, the level also makes it smarter.",
+        "🎵 Adventure music in the corner of the screen (14 freely licensed songs), with 🔇 to turn it off."
+      ]
+    }
+  ]
+}

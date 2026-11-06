@@ -4,7 +4,6 @@ const assert = require('node:assert/strict');
 const G = require('../gerador.js');
 const R = require('../regras.js');
 
-const RAIO = 0.2;
 // uma parede fechada entre duas casas vizinhas (nenhuma de borda)
 function paredeEntreVizinhas(L) {
   for (const e of L.arestas) if (!e.aberta && e.b >= 0) return e;
@@ -12,6 +11,7 @@ function paredeEntreVizinhas(L) {
 }
 
 for (const forma of G.FORMAS) {
+  const RAIO = R.RAIO[forma];
   test(`${forma}: risco rápido por cima de uma parede para antes dela`, () => {
     for (let s = 1; s <= 15; s++) {
       const L = G.criar({ forma, nivel: 'medio', semente: s }), C = R.colisor(L, RAIO);

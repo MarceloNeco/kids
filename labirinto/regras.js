@@ -156,7 +156,10 @@
     return seg <= bom ? 3 : seg <= bom * 2 ? 2 : 1;
   }
 
-  var R = { celulaEm: celulaEm, ligadas: ligadas, arestaEntre: arestaEntre, caminho: caminho, vizinhoNaDirecao: vizinhoNaDirecao,
+  // folga da linha até a parede, por formato (a colmeia tem passagens mais estreitas: lado do hexágono ≈ 0,58 casa)
+  var RAIO = { quadrado: 0.2, redondo: 0.2, colmeia: 0.13 };
+
+  var R = { RAIO: RAIO, celulaEm: celulaEm, ligadas: ligadas, arestaEntre: arestaEntre, caminho: caminho, vizinhoNaDirecao: vizinhoNaDirecao,
     colisor: colisor, partida: partida, estrelas: estrelas, casasDoCaminho: casasDoCaminho, cruzam: cruzam, distSeg: distSeg };
   if (typeof module !== 'undefined' && module.exports) module.exports = R; else raiz.Regras = R;
 })(typeof self !== 'undefined' ? self : this);

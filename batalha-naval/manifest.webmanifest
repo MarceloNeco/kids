@@ -1,0 +1,16 @@
+{
+  "name": "Batalha Naval — Bolinho de Chuva",
+  "short_name": "Batalha Naval",
+  "description": "Arrume a frota e afunde os navios dos amigos, cada um no seu aparelho, contra o computador ou passando o aparelho. / Place your fleet and sink your friends' ships, each on their own device, against the computer or passing the device.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#071a30",
+  "theme_color": "#071a30",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
