@@ -33,7 +33,7 @@ test('index.html: CSP sem script inline, scripts existem, interruptor e textos P
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
   for (const m of html.matchAll(/<script src="([^"]+)"/g)) assert.ok(fs.existsSync(path.join(pasta, m[1])), m[1]);
-  assert.match(html, /<script src="\.\.\/recursos\.js" data-app="feature-tester" data-fora-do-arquivo><\/script>/);
+  assert.match(html, /<script src="\.\.\/recursos\.js" data-app="kids" data-fora-do-arquivo><\/script>/);
   assert.match(html, /<script src="\.\.\/atualizar\.js" data-fora-do-arquivo>/);
   assert.match(html, /<script src="\.\.\/telacheia\.js" data-fora-do-arquivo>/);
   assert.match(html, /<script src="\.\.\/trilha\.js">/);
