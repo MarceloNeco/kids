@@ -2,6 +2,17 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.27",
+      "data": "06/Nov/2026",
+      "hora": "20:30:00",
+      "pt": [
+        "🚶 Em todos os modos, com o boneco aparecendo, ele ANDA até onde você toca, de lado, com as pernas mexendo. Antes, se você soltava o dedo de um lado e tocava do outro, ele aparecia lá de uma vez (no Pega-pega, no Corta-corta e nos outros). Também não dá mais aquele salto até a fruta: ele vai andando. Sem o boneco (😊 Fácil e 🧍 desligado), o dedo continua pegando e cortando na hora."
+      ],
+      "en": [
+        "🚶 In every mode, with the avatar showing, it WALKS to where you touch, sideways, legs moving. Before, if you lifted your finger on one side and touched the other, it popped up there at once (in Catch, Slice and the others). No more leap to the fruit either: it walks. Without the avatar (😊 Easy with 🧍 off), your finger still catches and slices right away."
+      ]
+    },
+    {
       "versao": "0.8.26",
       "data": "06/Nov/2026",
       "hora": "19:00:00",

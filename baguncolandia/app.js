@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.26', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.27', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -295,7 +295,7 @@
       var figs = Figuras.lista(tv.cfg.turmas);
       if (!figs.some(function (f) { return f.papel === 'fruta'; })) figs = Figuras.lista();   // sem fruta nenhuma não dá para cortar
       var nCasas = window.Casa ? Casa.CENAS.length : 3; tv.casaN = tv.casaN == null ? Math.floor(Math.random() * nCasas) : (tv.casaN + 1) % nCasas;   // 🧸 Bagunça: cada rodada num lugar (sala, quarto, jardim, cozinha, banheiro, parquinho)
-      tv.partida = Bagunca.criarPartida({ modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: duracaoDe(tv.cfg), dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas(), vai: vaiLigado() });
+      tv.partida = Bagunca.criarPartida({ modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: duracaoDe(tv.cfg), dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas(), vai: vaiLigado(), toque: !!tv.toque });
       Desenho.mostrarBoneco(vaiLigado() || tv.mostrarBoneco !== false);   // 🧍 vai até lá: o boneco é quem joga, aparece sempre
       Object.keys(tv.caixas).forEach(function (j) { var c = tv.caixas[j]; if (c) { tv.partida.zonaChute(+j, Math.min(0.95, c.y + c.h * 0.6)); tv.partida.calibrar(+j, c); } });
       if (tv.toque) { tv.dedoCorpo = {}; for (var jt = 0; jt < tv.cfg.jogadores; jt++) { tv.partida.calibrar(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }); tv.partida.corpo(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }, performance.now()); } }
@@ -312,7 +312,7 @@
       var dt = tv.ultimoQuadro ? Math.min(100, ts - tv.ultimoQuadro) : 16; tv.ultimoQuadro = ts;
       if (tv.local && tv.esqueletoLigado && Esqueleto.pronto() && tv.fase === 'jogando' && ts - (tv.ultimaMedida || 0) > 66) { tv.ultimaMedida = ts; var ks = Esqueleto.detectar(tv.videoLocal, ts); if (ks && ks[0]) tv.partida.esqueleto(0, ks[0], ts); }
       else if (tv.local && tv.visaoLocal && (tv.fase === 'jogando') && ts - (tv.ultimaMedida || 0) > 100) { tv.ultimaMedida = ts; var m = tv.visaoLocal.medir(tv.espelhar !== false); if (m) { tv.partida.movimento(0, m.p, ts); if (tv.visaoLocal.temFundo()) { var cx = tv.visaoLocal.silhueta(m.bruto); if (cx) tv.partida.corpo(0, cx, ts); } } }
-      if (tv.toque && tv.partida && tv.fase === 'jogando' && ts - (tv.ultimaMedida || 0) > 100) { tv.ultimaMedida = ts; Object.keys(tv.dedoCorpo).forEach(function (j) { var c = tv.dedoCorpo[j], e = tv.partida.estado().jogadores[+j]; if (!e) return; var pul = ts < c.pulando, ab = !pul && ts < c.abaixado; tv.partida.corpo(+j, { x: Math.max(0, Math.min(0.8, e.corpo.x - 0.1)), y: pul ? -0.1 : (ab ? 0.45 : 0.1), w: ab ? 0.25 : 0.2, h: ab ? 0.45 : 0.8 }, ts); }); }
+      if (tv.toque && tv.partida && tv.fase === 'jogando' && ts - (tv.ultimaMedida || 0) > 100) { tv.ultimaMedida = ts; Object.keys(tv.dedoCorpo).forEach(function (j) { var c = tv.dedoCorpo[j], e = tv.partida.estado().jogadores[+j]; if (!e) return; var pul = ts < c.pulando, ab = !pul && ts < c.abaixado; tv.partida.corpo(+j, { x: Math.max(0, Math.min(0.8, (c.x != null ? c.x : e.corpo.x) - 0.1)), y: pul ? -0.1 : (ab ? 0.45 : 0.1), w: ab ? 0.25 : 0.2, h: ab ? 0.45 : 0.8 }, ts); }); }
       if (TESTE && window.BaguncaTeste && window.BaguncaTeste.corpo && tv.partida && tv.fase === 'jogando') { var cb = window.BaguncaTeste.corpo(ts); if (cb) tv.partida.corpo(0, cb, ts); }
       if (TESTE && window.BaguncaTeste && window.BaguncaTeste.esqueleto && tv.partida && tv.fase === 'jogando' && ts - (tv.ultimaMedida || 0) > 66) { tv.ultimaMedida = ts; var ke = window.BaguncaTeste.esqueleto(ts); if (ke) tv.partida.esqueleto(0, ke, ts); }
       if (TESTE && window.BaguncaTeste && tv.partida && tv.fase === 'jogando') { var pts = window.BaguncaTeste.pontos && window.BaguncaTeste.pontos(ts); if (pts) tv.partida.movimento(0, pts, ts); }
@@ -466,7 +466,7 @@
       function pos(e) { var r = cv.getBoundingClientRect(); return { x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)) }; }
       function raiaDe(p) { var dois = tv.cfg.jogadores === 2; return dois ? { j: p.x < 0.5 ? 0 : 1, x: p.x < 0.5 ? p.x * 2 : (p.x - 0.5) * 2 } : { j: 0, x: p.x }; }
       function corpoDedo(j, x, ts) {
-        var c = tv.dedoCorpo[j] || (tv.dedoCorpo[j] = { pulando: 0, abaixado: 0 }), agora = performance.now();
+        var c = tv.dedoCorpo[j] || (tv.dedoCorpo[j] = { pulando: 0, abaixado: 0 }), agora = performance.now(); c.x = x;   // destino do dedo
         var pul = agora < c.pulando, ab = !pul && agora < c.abaixado;
         tv.partida.corpo(j, { x: Math.max(0, Math.min(0.8, x - 0.1)), y: pul ? -0.1 : (ab ? 0.45 : 0.1), w: ab ? 0.25 : 0.2, h: ab ? 0.45 : 0.8 }, ts);
       }

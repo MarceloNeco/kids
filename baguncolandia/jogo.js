@@ -163,6 +163,7 @@
     var proximoAviso = 0;
     /* 🧍 "Boneco vai até lá" (no dedo): o dedo marca o alvo, o boneco anda até lá (no máximo 1 tela em 1,5 s),
        pula sozinho se o alvo está alto, e só vale o que ENCOSTA no corpo dele (mãos, pés, tronco) */
+    var toque = !!cfg.toque;   // 👆 no dedo (😊 Fácil): o boneco visível ANDA até onde o dedo foi, nunca aparece do outro lado de uma vez
     var vai = !!cfg.vai, VAI = { A: H * 0.56, vmax: W / 1.5, acel: 7000, g: 2600, puloMax: 330, chao: 0.86 };
     if (vai) jogadores.forEach(function (jg, j) { var r = raia(j); jg.vai = { x: r.x + r.w / 2, y: 0, vx: 0, vy: 0, alvo: null }; });
     var trave = { x: W / 2 - 120, y: 150, w: 240, h: 130 };   // abaixo do relógio e do nome do modo
@@ -308,6 +309,7 @@
         if (fora) { if ((c.papel === 'fruta' || c.papel === 'doce') && c.estilo === 'arco') emitir({ t: 'perdeu', id: c.id, j: c.j, fig: c.fig }); coisas.splice(i, 1); }
       }
       if (vai) passoVai(dt);
+      else if (toque) passoDedo(dt);
       // poderes vencendo
       jogadores.forEach(function (jg, j) { if (jg.poder && tempo > jg.poderAte) { jg.poder = null; emitir({ t: 'poder', j: j, poder: null }); } if (jg.combo && tempo > jg.comboAte) jg.combo = 0; });
       if (duracao && tempo >= duracao * 1000) terminar();
@@ -360,6 +362,14 @@
       B.anda = passo > vel * d * 0.2; if (Math.abs(dx) > 2) B.dir = dx > 0 ? 1 : -1;
       if (B.anda || voa) B.passo += d * (voa ? 14 : Math.max(5, vel / c.tam * 9));
       if ((B.fase === 'vai' || B.fase === 'sai') && (c.x < r.x - c.tam / 2 - 30 || c.x > r.x + r.w + c.tam / 2 + 30 || c.y < r.y - c.tam)) c.sumiu = true;
+    }
+    function passoDedo(dt) {   // anda (não teletransporta): no máximo 1 tela em 2,4 s, freia sem passar do ponto
+      jogadores.forEach(function (jg, j) {
+        if (jg.corpoAlvo == null) return;
+        var r = raia(j), vmax = W / 2.4 / r.w, c = jg.corpo, dx = jg.corpoAlvo - c.x;
+        jg.vxN = (jg.vxN || 0) + clamp(clamp(dx * 6, -vmax, vmax) - (jg.vxN || 0), -12 * dt, 12 * dt);
+        c.x = clamp(c.x + jg.vxN * dt, 0, 1);
+      });
     }
     function alvo(j, nx, ny) {   // dedo no lugar (normalizado na raia); null = solta (o boneco termina de chegar)
       var jg = jogadores[j]; if (!vai || !jg) return;
@@ -515,8 +525,9 @@
     function corpo(j, caixa, ts) {
       var jg = jogadores[j]; if (!jg || !caixa || !caixa.w) return;
       var ref = jg.ref || caixa, c = jg.corpo, alvo = clamp(caixa.x + caixa.w / 2, 0, 1);
-      // suaviza entre amostras seguidas (10×/s); amostra velha ou primeira: vai direto
-      c.x = (ts && c.ts && ts - c.ts < 250) ? c.x + (alvo - c.x) * 0.6 : alvo;
+      // dedo: só marca o destino (passoDedo anda até lá); câmera: suaviza entre amostras seguidas (10×/s), amostra velha vai direto
+      if (toque && !vai) jg.corpoAlvo = alvo;
+      else c.x = (ts && c.ts && ts - c.ts < 250) ? c.x + (alvo - c.x) * 0.6 : alvo;
       c.topo = caixa.y; c.altura = caixa.h; c.ts = ts || 0;
       c.pulando = caixa.y < ref.y - ref.h * 0.12 && caixa.h > ref.h * 0.6;
       if (jg.esq) c.pulando = caixa.y < ref.y - ref.h * 0.1;

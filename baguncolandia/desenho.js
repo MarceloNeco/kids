@@ -272,16 +272,13 @@
     var pose = rc ? rc.tipo : null, k = rc ? Math.min(1, (ts - rc.desde) / (rc.ate - rc.desde)) : 0, pulo = 0, xd = x;
     if (pose === 'festa') {
       pulo = -A * 0.32 * Math.sin(k * Math.PI);                                   // pulinho de comemoração
-      if (D.dedo && !V && rc.x != null) {                                               // no dedo, ele mesmo vai lá: salta até a fruta e volta
-        var ida = k < 0.3 ? k / 0.3 : 1 - (k - 0.3) / 0.7; ida = ida * ida * (3 - 2 * ida);
-        xd = x + (Math.max(r.x + A * 0.2, Math.min(r.x + r.w - A * 0.2, rc.x)) - x) * ida;
-        if (rc.y != null) pulo = Math.min(pulo, -(chao - A * 0.9 - Math.max(r.y + A * 0.3, rc.y)) * ida * 0.6);
-      }
     } else if (pose === 'dor') xd = x + Math.sin(ts / 35) * A * 0.02 * (1 - k);
     var alvoY = corpo.pulando ? -A * 0.5 : 0; av.y = V ? V.y : av.y == null ? 0 : av.y + (alvoY - av.y) * Math.min(1, dt * 12);   // 🧍 vai até lá: o pulo é o do motor
     var alvoAg = corpo.abaixado ? 0.6 : (V && V.agacha > 0) ? 0.9 : 1; av.ag = av.ag == null ? 1 : av.ag + (alvoAg - av.ag) * Math.min(1, dt * 10);
     av.passo = (av.passo || 0) + Math.min(14, Math.abs(av.vx) / 40) * dt * 8;
-    av.fase = (av.fase || 0) + (V ? Math.abs(V.vx) : 0) / (A * 0.55) * 6.2832 * dt;   // de lado: um ciclo de passo a cada ~meia altura andada (passada de criança)
+    av.vxs = (av.vxs || 0) + (av.vx - (av.vxs || 0)) * Math.min(1, dt * 10);   // velocidade suavizada (câmera e dedo)
+    var vel = V ? V.vx : av.vxs;
+    av.fase = (av.fase || 0) + Math.abs(vel) / (A * 0.55) * 6.2832 * dt;   // de lado: um ciclo de passo a cada ~meia altura andada (passada de criança)
     var andando = Math.abs(av.vx) > 30, balanco = andando ? Math.sin(av.passo) : 0;
     var bracoE = false, bracoD = false, ombroY = chao + av.y - A * 0.62 * av.ag;
     (jg.rastro || []).slice(-4).forEach(function (p) { if (ts - p.ts > 400) return; if (p.y < ombroY + A * 0.1) { if (p.x < x - A * 0.05) bracoE = true; else if (p.x > x + A * 0.05) bracoD = true; } });
@@ -297,8 +294,8 @@
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(xd, chao + 4, A * 0.22 * Math.max(0.3, 1 + y / A * 0.6), A * 0.06, 0, 0, 6.2832); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(xd, chao + y); ctx.scale(1 + (1 - av.ag) * 0.35, av.ag);
     if (jg.invencivel && !pose && Math.floor(ts / 90) % 2) ctx.globalAlpha = 0.45;
-    var lado = V && pose !== 'dor' && !V.costas && (Math.abs(V.vx) > 40 || (y < -5 && Math.abs(V.vx) > 10));   // andando a festa não vira de frente: sorri de lado   // andando (ou pulando para o lado): de perfil
-    if (lado) { var dir = V.vx < 0 ? -1 : 1; av.dir = dir; ctx.scale(dir, 1); root.Boneco.corpoLado(ctx, cfg, A, { fase: av.fase, andando: Math.abs(V.vx) > 40, agacha: V.agacha > 0 ? 1 : 0, noAr: y < -5, cima: V.cima || pose === 'festa', ts: ts, expr: pose }); }
+    var lado = pose !== 'dor' && !(V && V.costas) && (Math.abs(vel) > 40 || (y < -5 && Math.abs(vel) > 10));   // andando (dedo, câmera ou teclado): de perfil   // andando a festa não vira de frente: sorri de lado   // andando (ou pulando para o lado): de perfil
+    if (lado) { var dir = vel < 0 ? -1 : 1; av.dir = dir; ctx.scale(dir, 1); root.Boneco.corpoLado(ctx, cfg, A, { fase: av.fase, andando: Math.abs(vel) > 40, agacha: V && V.agacha > 0 ? 1 : 0, noAr: y < -5, cima: (V && V.cima) || pose === 'festa' || av.bE > 0.6 || av.bD > 0.6, ts: ts, expr: pose }); }
     else root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: gesto >= 0 && gesto < 1.4 ? 0.55 + 0.45 * Math.sin(ts / 110) : av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose, costas: !!(V && V.costas && !pose), agacha: V && V.agacha > 0 ? 1 : 0 });
     ctx.restore();
     ctx.save(); ctx.font = '600 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillStyle = cor; sombra(ctx, 'rgba(0,0,0,.8)', 6);
