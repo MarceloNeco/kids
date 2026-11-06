@@ -2,6 +2,21 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.29",
+      "data": "06/Nov/2026",
+      "hora": "22:30:00",
+      "pt": [
+        "🏞️ Cenários novos e mais caprichados: Fazenda (celeiro, silo, moinho, cerca, fardos de feno), Jardim florido (canteiro, laguinho com vitória-régia, banco, casinha de passarinho, casa ao fundo) e Lago na montanha (montanhas com neve, pinheiros, píer, canoa, juncos). A floresta ganhou tronco caído, arbustos e pedras; a praia ganhou castelo de areia, estrela-do-mar, conchas e gaivotas. Muda a cada rodada.",
+        "🐰 No Pega-pega só aparecem cenários onde bicho combina (nada de toupeira na Lua), e a toupeira e a minhoca saem de montinhos de terra; na praia e na cidade elas não aparecem.",
+        "🔍 Mais nítido em tablet grande e TV: o jogo desenha na resolução da tela (até 1,5 vez), sem ficar borrado com o zoom."
+      ],
+      "en": [
+        "🏞️ New, more detailed scenes: Farm (barn, silo, windmill, fence, hay bales), Flower garden (flower bed, little pond with lily pads, bench, birdhouse, house behind) and Mountain lake (snowy mountains, pine trees, pier, canoe, reeds). The forest got a fallen log, bushes and rocks; the beach got a sandcastle, a starfish, shells and seagulls. It changes every round.",
+        "🐰 In Catch only scenes where animals fit show up (no mole on the Moon), and the mole and the earthworm come out of dirt mounds; on the beach and in the city they do not appear.",
+        "🔍 Sharper on big tablets and TVs: the game draws at the screen's resolution (up to 1.5×), so it does not blur when scaled up."
+      ]
+    },
+    {
       "versao": "0.8.28",
       "data": "06/Nov/2026",
       "hora": "21:30:00",

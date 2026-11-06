@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.28', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.29', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -295,11 +295,12 @@
       var figs = Figuras.lista(tv.cfg.turmas);
       if (!figs.some(function (f) { return f.papel === 'fruta'; })) figs = Figuras.lista();   // sem fruta nenhuma não dá para cortar
       var nCasas = window.Casa ? Casa.CENAS.length : 3; tv.casaN = tv.casaN == null ? Math.floor(Math.random() * nCasas) : (tv.casaN + 1) % nCasas;   // 🧸 Bagunça: cada rodada num lugar (sala, quarto, jardim, cozinha, banheiro, parquinho)
-      tv.partida = Bagunca.criarPartida({ modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: duracaoDe(tv.cfg), dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas(), vai: vaiLigado(), toque: !!tv.toque });
+      var cenaR = Desenho.ambiente(tv.cfg.ambiente, tv.cfg.cena, tv.cfg.modo === 'pega' || tv.cfg.modo === 'mistura');   // 🐰 Pega-pega: só onde bicho combina
+      tv.partida = Bagunca.criarPartida({ semBuraco: !!(cenaR && cenaR.buraco === false), modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: duracaoDe(tv.cfg), dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas(), vai: vaiLigado(), toque: !!tv.toque });
       Desenho.mostrarBoneco(vaiLigado() || tv.mostrarBoneco !== false);   // 🧍 vai até lá: o boneco é quem joga, aparece sempre
       Object.keys(tv.caixas).forEach(function (j) { var c = tv.caixas[j]; if (c) { tv.partida.zonaChute(+j, Math.min(0.95, c.y + c.h * 0.6)); tv.partida.calibrar(+j, c); } });
       if (tv.toque) { tv.dedoCorpo = {}; for (var jt = 0; jt < tv.cfg.jogadores; jt++) { tv.partida.calibrar(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }); tv.partida.corpo(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }, performance.now()); } }
-      Desenho.limpar(); Desenho.ambiente(tv.cfg.ambiente, tv.cfg.cena);
+      Desenho.limpar();
       tv.arrumando = tv.cfg.modo === 'arrumar'; $('tv').classList.remove('podearrumar');
       $('tv').classList.toggle('paisagem', tv.cfg.ambiente === 'paisagem' || tv.cfg.modo === 'bagunca' || tv.arrumando); navCasa();
       tv.partida.comecar(); tv.fase = 'jogando'; if (tv.cfg.modo === 'bagunca') { if (tv.toque) dizer('Hora da bagunça! Toque onde o boneco deve ir.', 'Mayhem time! Tap where the avatar should go.'); else dizer('Hora da bagunça! Bata em tudo!', 'Mayhem time! Hit everything!'); } else if (tv.arrumando) dizer('Hora de arrumar! Arraste cada coisa para o lugar dela.', 'Tidy-up time! Drag each thing back to its place.');   // na fase de jogo a legenda some sozinha tv.fimMusica = false; $('tv').classList.add('jogando');
