@@ -837,7 +837,7 @@
     mostrar('pertoLer');
     Q.ler($('pertoVideo'), lerCodigo).then(function (leitor) {
       if (perto !== s) { leitor.parar(); return; }
-      s.leitor = leitor; if (s.etapa === 'lerOferta' || s.etapa === 'lerResposta') $('pertoLerStatus').textContent = t('🔎 Procurando o código…', '🔎 Looking for the code…');
+      s.leitor = leitor; if (!s.avisou && (s.etapa === 'lerOferta' || s.etapa === 'lerResposta')) $('pertoLerStatus').textContent = t('🔎 Procurando o código…', '🔎 Looking for the code…');
     }, function (e) {
       if (perto !== s) return;
       $('pertoLerStatus').textContent = e.codigo === 'negado'
@@ -887,6 +887,7 @@
     return true;
   }
   function avisoCodigo(cod) {
+    if (perto) perto.avisou = true;          // a câmera terminando de abrir não apaga este aviso
     $('pertoLerStatus').textContent = cod === 'versao' ? t('⚠️ Esse código é de outra versão da Batalha Naval. Abram o jogo com internet nos dois aparelhos para atualizar e tentem de novo.', '⚠️ That code is from another version of Sea Battle. Open the game with internet on both devices to update, then try again.')
       : cod === 'resposta' ? t('⚠️ Esse é o código de resposta. Leia o código que aparece no aparelho de quem criou a partida.', "⚠️ That's an answer code. Scan the code on the device of whoever created the game.")
       : cod === 'oferta' ? t('⚠️ Esse é o código de criar partida. Leia o código que o OUTRO aparelho mostra depois de ler o seu.', "⚠️ That's a create-game code. Scan the code the OTHER device shows after scanning yours.")
