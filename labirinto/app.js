@@ -4,14 +4,14 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0', APP_DATA = '06/Nov/2026';
+  var APP_VERSION = '0.2.0', APP_DATA = '06/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search;
   var TESTE = /[?&]teste\b/.test(BUSCA);
   var SEMENTE_URL = (BUSCA.match(/[?&]semente=(\d+)/) || [])[1];
   var MISSAO_URL = (BUSCA.match(/[?&]missao=([01])/) || [])[1];
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-  var VEL = 4.2;                                                   // casas por segundo do cachorrinho
+  var VEL = 3.5;                                                   // casas por segundo do cachorrinho (sempre igual, casa a casa)
   var LARGURA_RISCO = { quadrado: 0.26, redondo: 0.26, colmeia: 0.18 };
   var PAD = { x: 8, cima: 60, baixo: 58 };                         // folgas da tela (em cima a faixa da missão, embaixo o zoom e a música)
   // trilha: músicas animadas e "de aventura" que já moram na Purpurina e na Peluqueria (créditos em CREDITOS.md)
@@ -181,7 +181,8 @@
     jogo = {
       L: L, P: Regras.partida(L), C: Regras.colisor(L, Regras.RAIO[L.forma]), modo: pref.modo,
       cam: { cx: 0, cy: 0, z: 10, W: W, H: H }, zFit: 1, chaoSujo: true, ultCam: '',
-      cao: { de: L.inicio, para: -1, u: 0, fila: [], x: ini.x, y: ini.y, dir: 1, puloT: -1e9, saida: null },
+      cao: { de: L.inicio, para: -1, u: 0, fila: [], x: ini.x, y: ini.y, dir: 1, puloT: -1e9, saida: null, fase: 0, incl: 0, mx: 0, my: 0, hmmT: -1e9 },
+      visao: null, poeira: [],
       risco: [[ini.x, ini.y]], tracos: [], bloqueado: false, ultimaCasa: L.inicio,
       intro: null, glide: null, relogio0: 0, tempo: 0, venceu: false, portaT: L.item < 0 ? -1e9 : null, voo: null,
       trancadaT: -1e9, bateT: -1e9, dicaPontaT: -1e9, pausaSeguir: 0, part: new Desenho.Particulas(), fogos: []
@@ -197,7 +198,7 @@
     $('relogio').textContent = '0:00';
     comecarIntro();
     if (jogo.modo === 'desenhar') dica(t('Arraste o cachorrinho pelo caminho ✏️', 'Drag the puppy along the path ✏️'), 3500);
-    else dica(t('Toque onde o cachorrinho deve ir 🐶', 'Tap where the puppy should go 🐶'), 3000);
+    else dica(t('Toque onde o cachorrinho consegue ver, em linha reta 🐶', 'Tap where the puppy can see in a straight line 🐶'), 3500);
   }
 
   // abertura em 3D: a câmera vem do alto, girando e chegando perto, e as paredes sobem de dentro para fora
@@ -306,12 +307,47 @@
 
   /* ---------- cachorrinho andando ---------- */
   function destinoFinal() { var c = jogo.cao; return c.fila.length ? c.fila[c.fila.length - 1] : c.para >= 0 ? c.para : c.de; }
-  function irPara(alvo) {
-    var c = jogo.cao;
-    if (c.para < 0) { c.fila = Regras.caminho(jogo.L, c.de, alvo).slice(1); return; }
-    var cam = Regras.caminho(jogo.L, c.para, alvo);
-    if (cam.length > 1 && cam[1] === c.de) { var x = c.de; c.de = c.para; c.para = x; c.u = 1 - c.u; c.fila = cam.slice(2); }   // meia-volta no meio do corredor
-    else c.fila = cam.slice(1);
+  // toque (ou dedo arrastando) numa casa: ele só vai se ENXERGA a casa em linha reta, sem virar; se tem parede no meio,
+  // anda até a parede e para. Andando, olha a partir da casa para onde está indo (ou volta, se o alvo ficou para trás).
+  // calado = dedo arrastando ou chegando numa casa: se não enxerga, só segue o que já ia fazer (sem o "hmm?")
+  function mirar(alvo, calado) {
+    var c = jogo.cao, L = jogo.L, olho = c.para >= 0 ? c.para : c.de;
+    if (alvo === olho) { c.fila = []; return; }
+    var r = Regras.reta(L, olho, alvo);
+    if (c.para >= 0 && (!r || r.caminho.length < 2)) {   // atrás dele, a partir da casa de onde saiu?
+      var r2 = Regras.reta(L, c.de, alvo);
+      if (alvo === c.de || (r2 && r2.caminho.length > 1 && r2.caminho[1] !== c.para)) {
+        var x = c.de; c.de = c.para; c.para = x; c.u = 1 - c.u;   // meia-volta no meio do corredor
+        c.fila = alvo === c.para ? [] : r2.caminho.slice(1);
+        return;
+      }
+    }
+    if (r && r.caminho.length > 1) {
+      if (jogo.visao) { jogo.visao = null; $('dica').hidden = true; }   // achou onde ir: apaga a dica do "hmm?"
+      if (c.para >= 0 && r.caminho[1] === c.de) { var y = c.de; c.de = c.para; c.para = y; c.u = 1 - c.u; c.fila = r.caminho.slice(2); }
+      else c.fila = r.caminho.slice(1);
+      return;
+    }
+    if (r) c.fila = [];   // a reta bate logo na parede: fica onde está (ou termina o passo)
+    if (!calado) hmm(olho);
+  }
+  // dedo arrastando: o cachorrinho segue o rastro do dedo, sempre em linha reta: vai para a casa MAIS RECENTE do rastro
+  // que ele enxerga daqui (assim dobra as esquinas por onde o dedo passou, nunca por conta própria)
+  function seguirDedo() {
+    var c = jogo.cao, tr = acao.trilha, olho = c.para >= 0 ? c.para : c.de;
+    for (var k = tr.length - 1; k >= 0; k--) {
+      var r = tr[k] === olho ? null : Regras.reta(jogo.L, olho, tr[k]);
+      if (tr[k] === olho || (r && r.chegou)) { if (r) mirar(tr[k], true); tr.splice(0, k); return; }
+    }
+    mirar(tr[tr.length - 1], true);   // nada do rastro à vista: a regra do toque (em linha reta, até a parede)
+  }
+  // "hmm?": não enxerga até lá. Inclina a cabeça, faz um somzinho e as casas que ele VÊ brilham um pouco
+  function hmm(olho) {
+    var g = jogo, ag = agora();
+    g.visao = { t0: ag, casas: Regras.visiveis(g.L, olho) };
+    if (ag - g.cao.hmmT < 700) return;
+    g.cao.hmmT = ag; Som.hmm();
+    dica(t('Hmm? Daqui ele não vê até lá. Toque onde brilhar ✨', 'Hmm? He can\'t see that far from here. Tap where it glows ✨'), 2200);
   }
   function posEntre(a, b, u) {
     var A = jogo.L.celulas[a], B = jogo.L.celulas[b];
@@ -328,23 +364,37 @@
       var k = Math.min(1, (ag - c.saida.t0) / c.saida.dur);
       c.x = c.saida.de[0] + (c.saida.para[0] - c.saida.de[0]) * k; c.y = c.saida.de[1] + (c.saida.para[1] - c.saida.de[1]) * k;
       if (c.saida.para[0] !== c.saida.de[0]) c.dir = c.saida.para[0] > c.saida.de[0] ? 1 : -1;
+      c.fase += dt * VEL * Math.PI * 2;
       return;
     }
+    c.incl += ((c.para >= 0 ? c.my * 0.22 : 0) - c.incl) * Math.min(1, dt * 10);   // subindo: focinho para cima; descendo: para baixo
     if (jogo.modo !== 'andar' || jogo.venceu) return;
-    if (ag - c.puloT < (calmo ? 200 : 850)) return;   // parado comemorando
+    var pausa = calmo ? 200 : 850;
+    if (ag - c.puloT < pausa) return;   // parado comemorando
     if (c.para < 0) { if (!c.fila.length) return; c.para = c.fila.shift(); c.u = 0; }
-    var A = L.celulas[c.de], B = L.celulas[c.para], d = Math.hypot(B.x - A.x, B.y - A.y) || 1;
-    c.u += dt * VEL * (jogo.vel || 1) / d;
+    var du = dt * VEL * (jogo.vel || 1), f0 = c.fase;
+    c.u += du; c.fase += du * Math.PI * 2;   // uma passada inteira (as quatro patas) por casa
+    if (!calmo && Math.floor(c.fase / Math.PI) !== Math.floor(f0 / Math.PI)) poeira();
     if (c.u >= 1) {
-      c.de = c.para; c.para = -1; c.u = 0;
-      c.x = B.x; c.y = B.y;
+      var sobra = c.u - 1, B = L.celulas[c.para];
+      c.de = c.para; c.para = -1; c.u = 0; c.x = B.x; c.y = B.y;
       Som.passo();
       evento(jogo.P.chegou(c.de));
-      return;
+      if (acao && acao.trilha && acao.trilha.length && jogo.modo === 'andar') seguirDedo();   // dedo ainda na tela: olha de novo para ele
+      if (jogo.venceu || !c.fila.length || agora() - c.puloT < pausa) return;
+      c.para = c.fila.shift(); c.u = Math.min(sobra, 0.99);   // segue sem parar entre as casas
     }
-    var p = posEntre(c.de, c.para, c.u);
-    if (Math.abs(p[0] - c.x) > 1e-4) c.dir = p[0] > c.x ? 1 : -1;
+    var p = posEntre(c.de, c.para, c.u), mx = p[0] - c.x, my = p[1] - c.y, md = Math.hypot(mx, my);
+    if (md > 1e-5) {
+      c.mx = mx / md; c.my = my / md;
+      if (Math.abs(mx) > Math.abs(my) * 0.35) c.dir = mx > 0 ? 1 : -1;   // subindo ou descendo reto: continua virado para o mesmo lado
+    }
     c.x = p[0]; c.y = p[1];
+  }
+  function poeira() {   // nuvenzinha de poeira atrás das patas
+    var c = jogo.cao;
+    jogo.poeira.push({ x: c.x - c.mx * 0.22 + (Math.random() - 0.5) * 0.1, y: c.y + 0.22 - c.my * 0.1, t0: agora() });
+    if (jogo.poeira.length > 24) jogo.poeira.shift();
   }
 
   /* ---------- desenhar o caminho ---------- */
@@ -424,9 +474,9 @@
     if (dedos.size > 2 || !podeMexer()) return;
     var w = paraMundo(e.clientX, e.clientY);
     if (jogo.modo === 'andar') {
-      acao = { id: e.pointerId, alvo: -1, sx: e.clientX, sy: e.clientY };
+      acao = { id: e.pointerId, alvo: -1, sx: e.clientX, sy: e.clientY, trilha: [] };
       var c = Regras.celulaEm(jogo.L, w[0], w[1]);
-      if (c >= 0) { ligarRelogio(); acao.alvo = c; irPara(c); }
+      if (c >= 0) { ligarRelogio(); acao.alvo = c; acao.trilha.push(c); mirar(c, false); }
     } else {
       acao = { id: e.pointerId, novoTraco: true, esperando: !pertoDaPonta(w), sx: e.clientX, sy: e.clientY };
       if (acao.esperando) { jogo.dicaPontaT = agora(); dica(t('Comece pela ponta da linha, onde está o cachorrinho 🐶', 'Start from the tip of the line, where the puppy is 🐶'), 2400); }
@@ -438,7 +488,9 @@
     var w = paraMundo(clientX, clientY);
     if (jogo.modo === 'andar') {
       var c = Regras.celulaEm(jogo.L, w[0], w[1]);
-      if (c >= 0 && c !== acao.alvo) { ligarRelogio(); acao.alvo = c; irPara(c); }
+      if (c >= 0 && c !== acao.alvo) {   // arrastando: a mesma regra, casa a casa, seguindo o rastro do dedo
+        ligarRelogio(); acao.alvo = c; acao.trilha.push(c); if (acao.trilha.length > 300) acao.trilha.shift(); seguirDedo();
+      }
       return;
     }
     if (acao.esperando || jogo.bloqueado) {
@@ -606,6 +658,21 @@
       }
       if (ag - g.bateT < 400) { ctx.fillStyle = 'rgba(255,93,115,' + (1 - (ag - g.bateT) / 400) + ')'; ctx.beginPath(); ctx.arc(tp[0], tp[1], 0.35, 0, Math.PI * 2); ctx.fill(); }
     }
+    // casas que o cachorrinho enxerga, brilhando de leve por ~1 s depois de um toque onde ele não vê
+    if (g.visao && ag - g.visao.t0 < 1200) {
+      var kv0 = (ag - g.visao.t0) / 1200, av = 0.5 * Math.min(1, kv0 * 6) * (1 - kv0 * kv0);
+      ctx.fillStyle = 'rgba(255,246,170,' + av + ')'; ctx.beginPath();
+      g.visao.casas.forEach(function (k) { var vc = L.celulas[k]; ctx.moveTo(vc.x + 0.34, vc.y); ctx.arc(vc.x, vc.y, 0.34, 0, Math.PI * 2); });
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,' + av * 0.9 + ')'; ctx.lineWidth = Math.max(0.04, 2 * px); ctx.stroke();
+    } else g.visao = null;
+    // poeira das patas
+    for (var pi = g.poeira.length - 1; pi >= 0; pi--) {
+      var pz = g.poeira[pi], kz = (ag - pz.t0) / 550;
+      if (kz >= 1) { g.poeira.splice(pi, 1); continue; }
+      ctx.fillStyle = T.poeira.replace('A', (0.45 * (1 - kz)).toFixed(3));
+      ctx.beginPath(); ctx.arc(pz.x, pz.y - kz * 0.12, 0.06 + kz * 0.12, 0, Math.PI * 2); ctx.fill();
+    }
     // cachorrinho
     var c = g.cao, pulo = 0, dtp = (ag - c.puloT) / 1000;
     if (!calmo) {
@@ -615,7 +682,9 @@
     var andando = (g.modo === 'andar' && c.para >= 0) || !!c.saida || (g.modo === 'desenhar' && acao && !g.bloqueado && !acao.esperando);
     var tam = Math.max(0.9, 24 * px);
     if (ag - g.bateT < 300 && !calmo) ctx.translate(Math.sin((ag - g.bateT) / 20) * 0.05, 0);
-    Desenho.cachorro(ctx, c.x, c.y - tam * 0.1, tam, { t: s, dir: c.dir, andando: andando, pulo: pulo, feliz: c.festa || dtp < 1.2 });
+    var kh = (ag - c.hmmT) / 900;
+    Desenho.cachorro(ctx, c.x, c.y - tam * 0.1, tam, { t: s, dir: c.dir, andando: andando, fase: g.modo === 'andar' || c.saida ? c.fase : s * VEL * Math.PI * 2,
+      incl: c.incl, pulo: pulo, feliz: c.festa || dtp < 1.2, hmm: kh >= 0 && kh < 1 ? kh : -1, calmo: calmo });
     // estrelinha voando
     if (g.voo) {
       var kv = (ag - g.voo.t0) / g.voo.dur, de = L.celulas[L.item], pa = de;
@@ -661,11 +730,15 @@
       if (!jogo) return { tela: telaAtual };
       return { tela: telaAtual, forma: jogo.L.forma, nivel: jogo.L.nivel, modo: jogo.modo, item: jogo.L.item, inicio: jogo.L.inicio, saida: jogo.L.saida,
         pegouItem: jogo.P.pegouItem, venceu: jogo.venceu, risco: jogo.risco.length, ponta: ponta(), bloqueado: jogo.bloqueado, casaCao: jogo.cao.de,
-        casaPonta: Regras.celulaEm(jogo.L, ponta()[0], ponta()[1]), intro: !!jogo.intro, glide: !!jogo.glide, fim: !$('fim').hidden, z: jogo.cam.z, zFit: jogo.zFit, portaAberta: jogo.portaT != null };
+        casaPonta: Regras.celulaEm(jogo.L, ponta()[0], ponta()[1]), andando: jogo.cao.para >= 0, fila: jogo.cao.fila.length, hmm: agora() - jogo.cao.hmmT < 1000,
+        brilhando: jogo.visao ? jogo.visao.casas.length : 0, dir: jogo.cao.dir, intro: !!jogo.intro, glide: !!jogo.glide, fim: !$('fim').hidden, z: jogo.cam.z, zFit: jogo.zFit, portaAberta: jogo.portaT != null };
     },
     tela: function (x, y) { return paraTela(x, y); },
     centro: function (c) { var p = jogo.L.celulas[c]; return paraTela(p.x, p.y); },
+    cao: function () { return paraTela(jogo.cao.x, jogo.cao.y); },
     caminho: function (a, b) { return Regras.caminho(jogo.L, a, b); },
+    reta: function (a, b) { return Regras.reta(jogo.L, a, b); },
+    visiveis: function (a) { return Regras.visiveis(jogo.L, a); },
     passagem: function (a, b) { var pts = jogo.L.arestas[Regras.arestaEntre(jogo.L, a, b)].pts; return pts.length === 2 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[Math.floor(pts.length / 2)]; },
     parede: function () { for (var i = 0; i < jogo.L.arestas.length; i++) { var e = jogo.L.arestas[i]; if (!e.aberta && e.b >= 0 && (e.a === jogo.L.inicio || e.b === jogo.L.inicio)) return { a: e.a, b: e.b }; } return null; },
     furou: function () { for (var k = 1; k < jogo.risco.length; k++) if (jogo.C.cruzaParede(jogo.risco[k - 1], jogo.risco[k])) return true; return false; },

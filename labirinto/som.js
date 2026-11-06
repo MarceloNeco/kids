@@ -1,5 +1,5 @@
 /* Labirinto — efeitos sonoros feitos na hora (WebAudio), sem arquivo nenhum.
-   Som.ligar(true|false) · Som.toque() · Som.passo() · Som.bate() · Som.item() · Som.porta() · Som.vitoria() · Som.trancada()
+   Som.ligar(true|false) · Som.toque() · Som.passo() · Som.bate() · Som.item() · Som.porta() · Som.vitoria() · Som.trancada() · Som.hmm()
    A música de fundo é a trilha comum (../trilha.js); estes são só os efeitos. */
 (function (raiz) {
   'use strict';
@@ -27,6 +27,7 @@
     toque: function () { nota(660, 0, 0.08, 'triangle', 0.1); },
     passo: function () { var c = ac(); if (!c || c.currentTime - ultimoPasso < 0.09) return; ultimoPasso = c.currentTime; nota(420 + Math.random() * 120, 0, 0.05, 'triangle', 0.05); },
     bate: function () { nota(180, 0, 0.16, 'square', 0.07, 90); },
+    hmm: function () { nota(392, 0, 0.13, 'sine', 0.07, 370); nota(440, 0.15, 0.2, 'sine', 0.07, 587); },   // "hm-hm?" baixinho, subindo no fim
     trancada: function () { nota(300, 0, 0.1, 'square', 0.06); nota(240, 0.12, 0.14, 'square', 0.06); },
     item: function () { [523, 659, 784, 1047, 1319].forEach(function (f, k) { nota(f, k * 0.07, 0.25, 'triangle', 0.13); }); nota(2093, 0.4, 0.4, 'sine', 0.06); },
     porta: function () { nota(220, 0, 0.6, 'sawtooth', 0.04, 880); [784, 988, 1175].forEach(function (f, k) { nota(f, 0.45 + k * 0.09, 0.4, 'sine', 0.1); }); },

@@ -1,12 +1,15 @@
 /* Batalha Naval — telas, arrumar a frota, as partidas (contra o computador, passar o aparelho, em rede e pertinho) e os efeitos.
-   As regras ficam no logica.js; o jogo em rede (mensagens, vez, voltar depois de recarregar) no rede.js; os sons no som.js.
+   As regras ficam no logica.js; o jogo em rede (mensagens, vez, voltar depois de recarregar) no rede.js; os sons no som.js;
+   o desenho dos navios no navios.js; míssil, explosões, respingos e bolhas no efeitos.js.
    Guarda só neste aparelho (localStorage): preferências em "batalha-naval.pref" e a partida em rede em "batalha-naval.rede"
    (para voltar se a página recarregar). Nada de dado pessoal: só o apelido que a pessoa digitar. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.0';
+  var APP_VERSION = '0.3.0';
   var L = window.BNLogica, R = window.BNRede;
   var Som = window.BNSom || { iniciar: function () {}, ligar: function () {}, efeito: function () {} };
+  var Nav = window.BNNavios;
+  var Fx = window.BNFx || { ativo: function () { return false; }, tiro: function (a, b, c, fn) { fn(); }, agua: function () {}, explosao: function () {}, bolhas: function () {}, tremer: function () {} };
   var $ = function (id) { return document.getElementById(id); };
   var TESTE = /[?&]teste\b/.test(location.search);
   var RAPIDO = TESTE ? 0.05 : 1;                    // nos testes as esperas ficam curtinhas
@@ -77,11 +80,14 @@
   var tAviso = null;
   function aviso(txt, ms) { var a = $('aviso'); a.textContent = txt; a.hidden = false; clearTimeout(tAviso); tAviso = setTimeout(function () { a.hidden = true; }, ms || 2400); }
   var tEstouro = null;
-  function estouro(txt, sub, classe) {
+  // y = altura (na tela) de onde foi o tiro: a faixa aparece longe dali, para não tapar a explosão
+  function estouro(txt, sub, classe, nome, y) {
     var el = $('estouro'); el.hidden = true; el.className = 'estouro ' + (classe || ''); el.textContent = txt;
+    el.style.top = y == null ? '' : y < window.innerHeight / 2 ? '74%' : '26%';
+    if (nome) { var nm = document.createElement('span'); nm.className = 'nome-navio'; nm.textContent = nome; el.appendChild(nm); }
     if (sub) { var s = document.createElement('small'); s.textContent = sub; el.appendChild(s); }
     void el.offsetWidth; el.hidden = false;
-    clearTimeout(tEstouro); tEstouro = setTimeout(function () { el.hidden = true; }, 1450);
+    clearTimeout(tEstouro); tEstouro = setTimeout(function () { el.hidden = true; }, classe === 'afundou' ? 2450 : 1450);
   }
   var janelaFn = null;
   function abrirJanela(o) {
@@ -264,25 +270,33 @@
   $('btPronto').addEventListener('click', function () {
     if (proximoLivre() >= 0) return;
     var f = arr.frota.map(function (nv) { return { x: nv.x, y: nv.y, tam: nv.tam, h: nv.h }; }), fn = arr.aoPronto;
-    Som.efeito('comecou'); fn(f);
+    Som.efeito('pronto'); fn(f);
   });
   function pintarArr() {
     if (!arr) return;
     var el = $('arrTab'), n = arr.n, cls = [], y, x;
     for (y = 0; y < n; y++) { cls.push([]); for (x = 0; x < n; x++) cls[y].push('c'); }
+    var navios = [];
     arr.frota.forEach(function (nv, i) {
       if (!nv) return;
-      L.celulas(nv).forEach(function (c, k) { cls[c[1]][c[0]] += classesNavio(nv, k) + (i === arr.sel ? ' sel' : '') + (arr.drag && arr.drag.moveu && arr.drag.i === i ? ' arrastando' : ''); });
+      var arrastando = arr.drag && arr.drag.moveu && arr.drag.i === i;
+      L.celulas(nv).forEach(function (c, k) { cls[c[1]][c[0]] += classesNavio(nv, k) + (i === arr.sel ? ' sel' : '') + (arrastando ? ' arrastando' : ''); });
+      navios.push({ nv: nv, tipo: Nav.tipo(arr.tams, i), cls: (i === arr.sel ? 'sel' : '') + (arrastando ? ' arrastando' : '') });
     });
-    if (arr.prev) L.celulas(arr.prev.nv).forEach(function (c) { if (c[0] < n && c[1] < n) cls[c[1]][c[0]] += ' prev' + (arr.prev.ok ? '' : ' ruim'); });
+    if (arr.prev) {
+      L.celulas(arr.prev.nv).forEach(function (c) { if (c[0] < n && c[1] < n) cls[c[1]][c[0]] += ' prev' + (arr.prev.ok ? '' : ' ruim'); });
+      navios.push({ nv: arr.prev.nv, tipo: Nav.tipo(arr.tams, arr.prev.i), cls: 'previa' + (arr.prev.ok ? '' : ' ruim'), extra: 'p' });
+    }
     for (y = 0; y < n; y++) for (x = 0; x < n; x++) { var cel = el._c[y][x]; if (cel.className !== cls[y][x]) cel.className = cls[y][x]; }
+    pintarFrota(el, navios);
     refazer($('arrPecas'), JSON.stringify([arr.tams, arr.sel, arr.frota.map(Boolean)]), function (pecas) { arr.tams.forEach(function (tam, i) {
-      var b = document.createElement('button'); b.type = 'button';
+      var b = document.createElement('button'), tipo = Nav.tipo(arr.tams, i); b.type = 'button';
       b.className = 'peca' + (i === arr.sel ? ' sel' : '') + (arr.frota[i] ? ' posto' : ''); b.setAttribute('data-i', i);
-      var casco = document.createElement('div'); casco.className = 'casco'; for (var k = 0; k < tam; k++) casco.appendChild(document.createElement('i'));
-      var nm = document.createElement('span'); nm.textContent = N(L.NOMES[tam]) + ' (' + tam + ')';
+      var casco = document.createElement('div'); casco.className = 'casco'; casco.style.setProperty('--t', tam); casco.appendChild(Nav.svg(tipo, true));
+      var nm = document.createElement('span'); nm.textContent = N(Nav.TIPOS[tipo]);
+      var sm = document.createElement('small'); sm.textContent = tam + t(' casas', ' squares'); nm.appendChild(sm);
       b.appendChild(casco); b.appendChild(nm);
-      b.setAttribute('aria-label', N(L.NOMES[tam]) + ', ' + tam + t(' casas', ' squares') + (arr.frota[i] ? t(', no mar', ', placed') : ''));
+      b.setAttribute('aria-label', N(Nav.TIPOS[tipo]) + ', ' + tam + t(' casas', ' squares') + (arr.frota[i] ? t(', no mar', ', placed') : ''));
       pecas.appendChild(b);
     }); });
     var selPosto = arr.sel >= 0 && arr.frota[arr.sel], h = selPosto ? arr.frota[arr.sel].h : arr.h;
@@ -294,7 +308,8 @@
   function classesNavio(nv, k) { return ' nv ' + (nv.h ? 'h' : 'v') + (k === 0 ? ' ini' : '') + (k === nv.tam - 1 ? ' fim' : ''); }
   function montar(el, n, botoes) {
     if (el._n === n && el._b === botoes) return;
-    el.innerHTML = ''; el.style.setProperty('--n1', n + 1); el._n = n; el._b = botoes; el._c = []; el._anim = {};
+    el.innerHTML = ''; el.style.setProperty('--n1', n + 1); el._n = n; el._b = botoes; el._c = []; el._anim = {}; el._animT = {}; el._navios = {}; el._fxNavio = {};
+    var mar = document.createElement('div'); mar.className = 'mar-fundo'; el.appendChild(mar);
     var canto = document.createElement('span'); canto.className = 'rot'; el.appendChild(canto);
     for (var x = 0; x < n; x++) { var r = document.createElement('span'); r.className = 'rot'; r.textContent = L.LETRAS.charAt(x); el.appendChild(r); }
     for (var y = 0; y < n; y++) {
@@ -332,13 +347,63 @@
       }
     }
     el.classList.toggle('pode', !!o.pode);
+    if (o.navios) pintarFrota(el, o.navios);
   }
-  function animar(el, x, y, classe) {
+  // uma classe passageira numa casa (chegando, boom, splash), que sobrevive aos redesenhos até acabar o tempo
+  function animar(el, x, y, classe, ms) {
     if (!el._anim) return;
-    var k = x + ',' + y; el._anim[k] = classe;
-    if (el._c && el._c[y] && el._c[y][x]) el._c[y][x].classList.add(classe);
-    setTimeout(function () { delete el._anim[k]; if (el._c && el._c[y] && el._c[y][x]) el._c[y][x].classList.remove(classe); }, 900);
-    if (classe === 'boom') { el.classList.remove('treme'); void el.offsetWidth; el.classList.add('treme'); setTimeout(function () { el.classList.remove('treme'); }, 500); }
+    var k = x + ',' + y, cel = el._c && el._c[y] && el._c[y][x], velho = el._anim[k];
+    if (velho && cel) cel.classList.remove(velho);
+    el._anim[k] = classe; if (cel) cel.classList.add(classe);
+    clearTimeout(el._animT[k]);
+    el._animT[k] = setTimeout(function () { if (el._anim[k] !== classe) return; delete el._anim[k]; if (cel) cel.classList.remove(classe); }, ms || 900);
+  }
+
+  // ======================= NAVIOS (desenho por cima das casas) =======================
+  // lista: [{ nv, tipo, cls, extra }] — um <svg> por navio, posto no grid do tabuleiro ocupando exatamente as casas dele;
+  // só cria o que é novo e só troca classes (o redesenho em rede a cada segundo fica barato)
+  function chaveNavio(tipo, nv, extra) { return tipo + ':' + nv.x + ',' + nv.y + ',' + nv.tam + (nv.h ? 'h' : 'v') + (extra || ''); }
+  function pintarFrota(el, lista) {
+    var vistos = {};
+    lista.forEach(function (o) {
+      var k = chaveNavio(o.tipo, o.nv, o.extra), s = el._navios[k];
+      vistos[k] = 1;
+      if (!s) {
+        s = Nav.svg(o.tipo, o.nv.h);
+        s.style.gridColumn = (o.nv.x + 2) + ' / span ' + (o.nv.h ? o.nv.tam : 1);
+        s.style.gridRow = (o.nv.y + 2) + ' / span ' + (o.nv.h ? 1 : o.nv.tam);
+        s._hv = o.nv.h ? 'h' : 'v'; el.appendChild(s); el._navios[k] = s;
+      }
+      s._base = o.cls || ''; classeNavio(el, k);
+    });
+    Object.keys(el._navios).forEach(function (k) { if (!vistos[k]) { var s = el._navios[k]; if (s.parentNode) s.parentNode.removeChild(s); delete el._navios[k]; } });
+  }
+  function classeNavio(el, k) {
+    var s = el._navios[k]; if (!s) return;
+    var fx = el._fxNavio[k] || '', base = fx === 'intacto' ? s._base.replace('afundado', '') : s._base;
+    var c = ('navio-svg ' + s._hv + ' ' + base + ' ' + (fx === 'intacto' ? '' : fx)).replace(/\s+/g, ' ').trim();
+    if (s.getAttribute('class') !== c) s.setAttribute('class', c);
+  }
+  // efeito passageiro num navio: 'escondido' (o míssil ainda voa), 'intacto' (meu navio, antes do impacto), 'afundando'
+  function fxNavio(el, k, classe) { if (!el._fxNavio) return; if (classe) el._fxNavio[k] = classe; else delete el._fxNavio[k]; classeNavio(el, k); }
+  // de que tipo é um navio do mar de b (quem atira em rede só sabe o tamanho do que afundou: o 1º daquele tamanho
+  // ganha o 1º nome, o 2º o 2º — no fim, com as frotas mostradas, vale o nome de verdade)
+  function tipoNoMar(d, b, nv) {
+    if (b === d.eu && d.frota) return Nav.daFrota(d.frota, nv);
+    if (jogo.modo !== 'rede') return Nav.daFrota(jogo.frotas[b], nv);
+    if (d.revel[b]) return Nav.daFrota(d.revel[b], nv);
+    var ord = 0;
+    for (var i = 0; i < d.log.length; i++) { var e = d.log[i]; if (e[1] !== b || e[4] !== 2 || e[7] !== nv.tam) continue; if (e[5] === nv.x && e[6] === nv.y) break; ord++; }
+    return Nav.porOrdem(nv.tam, ord);
+  }
+  function centroCasa(el, x, y) { var r = el._c[y][x].getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, tam: r.width }; }
+  // de onde sai o míssil: do meu mar quando eu atiro; de cima (do mar do outro) quando atiram em mim
+  function origemTiro(el) {
+    var outro = el.id === 'tabAlvo' ? $('tabMeu') : $('tabAlvo'), H = window.innerHeight, W = window.innerWidth;
+    var vis = outro && !outro.parentNode.hidden && outro.getClientRects().length;
+    if (!vis) return { x: W / 2, y: el.id === 'tabAlvo' ? H + 30 : -30 };
+    var r = outro.getBoundingClientRect();
+    return { x: Math.max(0, Math.min(W, r.left + r.width / 2)), y: Math.max(-40, Math.min(H + 40, r.top + r.height / 2)) };
   }
 
   // ======================= A PARTIDA (todas) =======================
@@ -415,15 +480,21 @@
     montar($('tabAlvo'), n, true); montar($('tabMeu'), n, false);
     var ult = d.log.length ? d.log[d.log.length - 1] : null;
     $('tituloAlvo').textContent = (g.modo === 'pc' ? '🤖 ' + t('Mar do computador', "Computer's sea") : '🎯 ' + t('Mar de ', "Sea of ") + nomeJ(d.j, alvoSel)) + ' · 🚢 ' + restantes(d, alvoSel);
-    pintar($('tabAlvo'), n, { vista: L.vista(d.log, alvoSel, n), fantasma: d.revel[alvoSel], pode: podeAtirar(d), pend: d.pend && d.pend.alvo === alvoSel ? d.pend : null, ultimo: ult && ult[1] === alvoSel ? [ult[2], ult[3]] : null });
+    var va = L.vista(d.log, alvoSel, n), navA = va.afundados.map(function (nv) { return { nv: nv, tipo: tipoNoMar(d, alvoSel, nv), cls: 'afundado' }; });
+    (d.revel[alvoSel] || []).forEach(function (nv) {      // no fim: os navios que sobraram, clarinhos
+      if (!L.celulas(nv).every(function (c) { return va.v[c[1]][c[0]] === 3; })) navA.push({ nv: nv, tipo: Nav.daFrota(d.revel[alvoSel], nv), cls: 'fantasma' });
+    });
+    pintar($('tabAlvo'), n, { vista: va, fantasma: d.revel[alvoSel], pode: podeAtirar(d), pend: d.pend && d.pend.alvo === alvoSel ? d.pend : null, ultimo: ult && ult[1] === alvoSel ? [ult[2], ult[3]] : null, navios: navA });
     var mostraMeu = eu >= 0;
     $('tabMeu').parentNode.hidden = !mostraMeu;
     if (mostraMeu) {
       $('tituloMeu').textContent = '🛡️ ' + (g.modo === 'passa' ? t('Mar de ', 'Sea of ') + nomeJ(d.j, eu) : t('Seu mar', 'Your sea'));
-      pintar($('tabMeu'), n, { vista: L.vista(d.log, eu, n), frota: d.frota || [], pode: false, ultimo: ult && ult[1] === eu ? [ult[2], ult[3]] : null });
-      var vm = L.vista(d.log, eu, n), afund = (d.frota || []).map(function (nv) { return L.celulas(nv).every(function (c) { return vm.v[c[1]][c[0]] === 3; }); });
-      refazer($('frotaInfo'), JSON.stringify([d.frota, afund]), function (info) { (d.frota || []).forEach(function (nv, k) {
-        var s = document.createElement('span'); s.textContent = (afund[k] ? '💀 ' : '🚢 ') + N(L.NOMES[nv.tam]); if (afund[k]) s.style.textDecoration = 'line-through';
+      var vm = L.vista(d.log, eu, n), minha = d.frota || [], tams = minha.map(function (nv) { return nv.tam; });
+      var afund = minha.map(function (nv) { return L.celulas(nv).every(function (c) { return vm.v[c[1]][c[0]] === 3; }); });
+      pintar($('tabMeu'), n, { vista: vm, frota: minha, pode: false, ultimo: ult && ult[1] === eu ? [ult[2], ult[3]] : null,
+        navios: minha.map(function (nv, k) { return { nv: nv, tipo: Nav.tipo(tams, k), cls: afund[k] ? 'afundado' : '' }; }) });
+      refazer($('frotaInfo'), JSON.stringify([d.frota, afund]), function (info) { minha.forEach(function (nv, k) {
+        var s = document.createElement('span'); s.textContent = (afund[k] ? '💀 ' : '🚢 ') + N(Nav.TIPOS[Nav.tipo(tams, k)]); if (afund[k]) s.style.textDecoration = 'line-through';
         info.appendChild(s);
       }); });
     }
@@ -443,9 +514,10 @@
       if (g.modo === 'rede') { bt.hidden = !d.host; bt.textContent = t('🔁 Jogar de novo (mesma turma)', '🔁 Play again (same group)'); if (!d.host) $('fimTexto').textContent += ' ' + t('Quem criou a sala pode começar outra partida.', 'Whoever created the room can start another game.'); }
       else { bt.hidden = false; bt.textContent = t('🔁 Jogar de novo', '🔁 Play again'); }
       if (!g.fimMostrado) {
-        g.fimMostrado = true; fc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        g.fimMostrado = true;
         var festa = g.modo === 'passa' || ganhei;
-        setTimeout(function () { Som.efeito(festa ? 'vitoria' : 'derrota'); if (festa) confete(); }, 900 * RAPIDO);
+        // espera o último navio terminar de afundar na tela
+        setTimeout(function () { if (jogo !== g) return; fc.scrollIntoView({ behavior: 'smooth', block: 'center' }); Som.efeito(festa ? 'vitoria' : 'derrota'); if (festa) confete(); }, 2300 * RAPIDO);
       }
     } else { fc.hidden = true; g.fimMostrado = false; }
   }
@@ -475,18 +547,41 @@
     if (d.j[d.vez] && d.j[d.vez].au) return { txt: '📡 ' + nv + t(' saiu da conexão', ' lost connection'), sub: t('Esperando voltar…', 'Waiting for them to come back…'), classe: 'alerta' };
     return { txt: '⏳ ' + t('Vez de ', 'Turn: ') + nv, sub: t('Espere a sua vez 🙂', 'Wait for your turn 🙂'), classe: 'outro', cor: CORES[d.vez] };
   }
+  // um tiro novo: o míssil voa até a casa (o resultado só aparece quando ele chega), depois respingo, explosão ou o
+  // navio afundando, o som, o tremor e a faixa no meio da tela. Com "menos movimento" no aparelho: só a marca e o som.
   function mostrarTiro(d, e) {
-    var a = e[0], b = e[1], x = e[2], y = e[3], rc = e[4], eu = d.eu, c = L.coord(x, y);
+    var g = jogo, a = e[0], b = e[1], x = e[2], y = e[3], rc = e[4], eu = d.eu, c = L.coord(x, y);
     var noAlvo = b === alvoSel && b !== eu, emMim = b === eu;
-    if (noAlvo) animar($('tabAlvo'), x, y, rc ? 'boom' : 'splash');
-    if (emMim) animar($('tabMeu'), x, y, rc ? 'boom' : 'splash');
-    var nomeNavio = rc === 2 ? N(L.NOMES[e[7]]) : '';
-    var quem = nomeJ(d.j, a), deQuem = nomeJ(d.j, b);
-    if (rc === 0) estouro('💦 ' + t('Água!', 'Water!'), quem + ' → ' + c, 'agua');
-    else if (rc === 1) estouro('💥 ' + t('Acertou!', 'Hit!'), emMim && jogo.modo !== 'passa' ? quem + t(' acertou seu navio em ', ' hit your ship at ') + c : quem + ' → ' + c, 'acerto');
-    else estouro('🚢 ' + t('Afundou!', 'Sunk!'), emMim && jogo.modo !== 'passa' ? quem + t(' afundou seu ', ' sank your ') + nomeNavio : t('O ', 'The ') + nomeNavio + t(' de ', ' of ') + deQuem + ' (' + c + ')', 'afundou');
-    Som.efeito(['agua', 'acerto', 'afundou'][rc]);
-    if (emMim && rc) vibrar(rc === 2 ? [80, 60, 160] : 90);
+    var tab = noAlvo ? $('tabAlvo') : emMim && !$('tabMeu').parentNode.hidden ? $('tabMeu') : null;
+    var navio = rc === 2 ? L.deLista(e.slice(5)) : null, tipo = navio ? tipoNoMar(d, b, navio) : null, kN = navio ? chaveNavio(tipo, navio) : null;
+    var nomeNavio = tipo ? N(Nav.TIPOS[tipo]) : '', quem = nomeJ(d.j, a), deQuem = nomeJ(d.j, b), meu = a === eu;
+    var anima = !!tab && Fx.ativo();
+    if (anima) { animar(tab, x, y, 'chegando', 3000); if (kN) fxNavio(tab, kN, noAlvo ? 'escondido' : 'intacto'); }
+    function impacto() {
+      if (jogo !== g) return;
+      if (tab) {
+        animar(tab, x, y, rc ? 'boom' : 'splash');
+        var p = centroCasa(tab, x, y), mares = tab.closest('.mares') || tab;
+        if (rc === 0) Fx.agua(p, p.tam);
+        else if (rc === 1) { Fx.explosao(p, p.tam, false); Fx.tremer(mares, false); }
+        else {
+          L.celulas(navio).forEach(function (cc, i) {
+            setTimeout(function () { if (jogo !== g) return; var q = centroCasa(tab, cc[0], cc[1]); Fx.explosao(q, q.tam, true); Fx.bolhas(q, q.tam, 1800); }, i * 170);
+          });
+          Fx.tremer(mares, true);
+          if (anima) { fxNavio(tab, kN, 'afundando'); setTimeout(function () { fxNavio(tab, kN, null); }, 2400); }
+        }
+      }
+      var yc = tab ? centroCasa(tab, x, y).y : null;
+      if (rc === 0) estouro('💦 ' + t('Água!', 'Water!'), quem + ' → ' + c, 'agua', '', yc);
+      else if (rc === 1) estouro('💥 ' + t('Acertou!', 'Hit!'), emMim && jogo.modo !== 'passa' ? quem + t(' acertou seu navio em ', ' hit your ship at ') + c : quem + ' → ' + c, 'acerto', '', yc);
+      else estouro('💥 ' + t('AFUNDOU!', 'SUNK!'), quem + ' → ' + c, 'afundou',
+        emMim && jogo.modo !== 'passa' ? (Nav.TIPOS[tipo].fem ? t('Sua ', 'Your ') : t('Seu ', 'Your ')) + nomeNavio : jogo.modo === 'pc' ? nomeNavio : t(nomeNavio + ' de ' + deQuem, deQuem + '’s ' + nomeNavio), yc);
+      Som.efeito(['agua', 'acerto', 'afundou'][rc]);
+      if (rc && (meu || emMim)) vibrar(rc === 2 ? [90, 50, 140, 50, 240] : 80);
+    }
+    if (anima) { Som.efeito(meu || !emMim ? 'disparo' : 'assobio'); Fx.tiro(origemTiro(tab), centroCasa(tab, x, y), 650, impacto); }
+    else impacto();
   }
 
   // ---------- clicar no mar do adversário ----------
@@ -534,6 +629,7 @@
     var g = jogo; g.fase = 'jogo'; g.vez = 0; g.eu = 0; alvoSel = 1; g.vistos = 0;
     mostrar('jogo'); desenhar();
     estouro(t('⚔️ Começou!', '⚔️ Battle on!'), '', 'vez');
+    setTimeout(function () { if (jogo === g) Som.efeito('comecou'); }, 700 * RAPIDO);
   }
   function atirarLocal(b, x, y) {
     var g = jogo;
@@ -551,14 +647,14 @@
     setTimeout(function () {
       if (jogo !== g) return;
       g.ocupado = false; g.vez = b;
-      if (g.modo === 'pc') { desenhar(); if (g.vez === 1) setTimeout(function () { if (jogo === g) vezDoComputador(); }, 700 * RAPIDO); }
+      if (g.modo === 'pc') { desenhar(); if (g.vez === 1) setTimeout(function () { if (jogo === g) vezDoComputador(); }, 700 * RAPIDO); else Som.efeito('vez'); }
       else {
         cortina(t('Passe o aparelho para ', 'Pass the device to ') + nomeJ(g.j, b), t('Vez de ', 'Turn: ') + nomeJ(g.j, b) + t('. Quem atirou agora não olha! 🙈', '. The other player, no peeking! 🙈'), function () {
           if (jogo !== g) return;
           g.eu = b; alvoSel = a; desenhar(); Som.efeito('vez');
         });
       }
-    }, 1500 * RAPIDO);
+    }, (res.r === 'afundou' ? 2700 : 1700) * RAPIDO);
     return e;
   }
   function vezDoComputador() {

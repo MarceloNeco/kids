@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0';
+  var APP_VERSION = '0.2.0';
   var APP_UPDATED = '06/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -68,21 +68,48 @@
       erro: function () { nota(240, 0, 0.18, 'triangle', 0.12); nota(200, 0.14, 0.22, 'triangle', 0.1); },
       toque: function () { nota(880, 0, 0.06, 'square', 0.05); },
       moeda: function () { nota(1320, 0, 0.08, 'square', 0.06); nota(1760, 0.07, 0.12, 'square', 0.06); },
+      fisgou: function () { for (var i = 0; i < 5; i++) nota(1400 - i * 90, i * 0.05, 0.04, 'square', 0.04); },
+      agua: function () { nota(700, 0, 0.09, 'sine', 0.12); nota(420, 0.05, 0.16, 'sine', 0.1); },
       fim: function () { [523, 659, 784, 1047, 784, 1047].forEach(function (f, i) { nota(f, i * 0.12, 0.25, 'triangle', 0.16); }); }
     };
     return { toca: function (n) { if (pref.efeitos && SONS[n]) try { SONS[n](); } catch (e) { /* sem som */ } }, acordar: c };
   })();
-  function falar(txt) {
-    if (!pref.voz || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
+  // jeito (opcional): rate, pitch, voz (uma voz do aparelho), fila (true = espera a fala anterior acabar).
+  // Devolve a fala (SpeechSynthesisUtterance) ou null quando a voz está desligada ou o aparelho não fala.
+  function falar(txt, jeito) {
+    if (!pref.voz || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return null;
     try {
       var limpo = String(txt).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').trim();
-      if (!limpo) return;
-      speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(limpo); u.lang = en() ? 'en-US' : 'pt-BR'; u.rate = 0.95;
-      if (window.Trilha) { Trilha.volume(0.3); u.onend = u.onerror = function () { Trilha.volume(null); }; }
+      if (!limpo) return null;
+      jeito = jeito || {};
+      if (!jeito.fila) speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(limpo); u.lang = en() ? 'en-US' : 'pt-BR'; u.rate = jeito.rate || 0.95;
+      if (jeito.pitch) u.pitch = jeito.pitch;
+      if (jeito.voz) u.voice = jeito.voz;
+      if (window.Trilha) { Trilha.volume(0.3); u.onend = u.onerror = soltarMusica; }
       speechSynthesis.speak(u);
-    } catch (e) { /* sem voz */ }
+      return u;
+    } catch (e) { return null; /* sem voz */ }
   }
+  // a música só volta ao normal quando ninguém mais está falando (as falas da vovó podem vir em fila)
+  function soltarMusica() {
+    setTimeout(function () { try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) { /* ok */ } Trilha.volume(null); }, 150);
+  }
+  // voz da Dona Cida (a vovozinha vizinha): uma voz feminina da língua do jogo, se o aparelho tiver; senão a voz padrão
+  var vozes = [];
+  function lerVozes() { try { vozes = speechSynthesis.getVoices() || []; } catch (e) { vozes = []; } }
+  if (window.speechSynthesis) { lerVozes(); try { speechSynthesis.addEventListener('voiceschanged', lerVozes); } catch (e) { /* ok */ } }
+  var FEMININA = /female|femin|mulher|woman|luciana|francisca|fernanda|vit[oó]ria|\bmaria\b|joana|raquel|helo[ií]sa|camila|thalita|leila|let[ií]cia|samantha|karen|victoria|zira|susan|serena|moira|tessa|fiona|allison|\bava\b|jenny|\baria\b|google portugu[eê]s|google us english|google uk english female/i;
+  function vozDaVovo() {
+    if (!vozes.length) lerVozes();
+    var lg = en() ? 'en' : 'pt', certa = en() ? 'en-us' : 'pt-br';
+    var norm = function (v) { return String(v.lang || '').toLowerCase().replace('_', '-'); };
+    var daLingua = vozes.filter(function (v) { return norm(v).indexOf(lg) === 0; });
+    var exatas = daLingua.filter(function (v) { return norm(v) === certa; });
+    return (exatas.length ? exatas : daLingua).filter(function (v) { return FEMININA.test(v.name || ''); })[0] ||
+      daLingua.filter(function (v) { return FEMININA.test(v.name || ''); })[0] || null;
+  }
+  var JEITO_VOVO = { rate: 0.9, pitch: 1.2 };
 
   // ---------- telas e o Voltar do celular ----------
   var atual = 'entrada', pilha = [];
@@ -423,35 +450,152 @@
     fimLugar.push(parar);
   };
 
+  // Rio: 3 peixinhos nadam; o anzol fica parado no meio, dentro do círculo. Puxar com um peixe no círculo = fisgou:
+  // o peixe nada até o anzol, a linha recolhe e ele sobe se mexendo, sai da água com respingo, a vara leva até o
+  // balde e ele cai lá dentro. Os outros peixes continuam nadando, e um peixe novo entra pelo lado.
+  // Tudo desenhado num quadro só (requestAnimationFrame, só transform e atributos do SVG). Movimento reduzido:
+  // sobe reto, sem se mexer e sem respingo.
   MINI.rio = function (area) {
-    var nv = jogo.cfg, zona = RAPIDO ? 0.5 : nv.zonaPeixe, vel = nv.id === 'facil' ? 1.2 : nv.id === 'medio' ? 1.7 : 2.3;
-    area.innerHTML = '<p class="instr">' + t('Toque em Puxar quando o peixinho passar dentro do círculo. Ele pula feliz para o balde!', 'Tap Pull when the little fish swims inside the circle. It jumps happily into the bucket!') + '</p>' +
-      '<div class="agua"><div class="ondas"></div><div class="linha"></div><div class="alvo" style="--z:' + (zona * 200) + '%"></div><div class="peixe">🐟</div></div>' +
+    var nv = jogo.cfg, zona = RAPIDO ? 0.5 : nv.zonaPeixe, vel = nv.id === 'facil' ? 0.12 : nv.id === 'medio' ? 0.17 : 0.23;
+    var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var SUP = 0.42, ANZOL_Y = 0.7, TIP0 = [0.5, 0.05], TIP_B = [0.6, 0.02], BASE = [0.05, 0.36], ESC = 1.3, RAIAS = [0.58, 0.71, 0.84];
+    area.innerHTML = '<p class="instr">' + t('Toque em Puxar quando um peixinho passar dentro do círculo, perto do anzol. Ele fica preso no anzol e vai para o balde!', 'Tap Pull when a little fish swims inside the circle, near the hook. It gets hooked and goes into the bucket!') + '</p>' +
+      '<div class="agua" data-fase="pronto"><div class="ondas"></div><div class="superficie"></div><div class="margem m-esq"></div><div class="margem m-dir"></div>' +
+      '<div class="alvo" style="--z:' + (zona * 200) + '%"></div><div class="balde-boca"></div><div class="cardume"></div>' +
+      '<svg class="pesca" aria-hidden="true"><path class="vara-sombra"/><path class="vara"/><path class="vara-luz"/><path class="cabo"/><circle class="carretilha" r="5"/>' +
+      '<path class="fio-halo"/><path class="fio"/>' +
+      '<g class="boia"><circle r="5.5" class="boia-b"/><path class="boia-v" d="M-5.5,0 A5.5,5.5 0 0 1 5.5,0 Z"/><path class="boia-pino" d="M0,-5.5 V-9"/></g>' +
+      '<g class="anzol"><circle class="anzol-olho" r="2.2"/><path class="anzol-c" d="M0,2 V13 A4.5,4.5 0 0 1 -9,13 V9 L-6.5,11.5"/></g></svg>' +
+      '<div class="balde"><span class="no-balde" hidden>🐟</span><span class="balde-alca"></span><span class="balde-corpo"></span></div></div>' +
       '<button type="button" class="grande" id="btPuxar">' + t('🎣 Puxar!', '🎣 Pull!') + '</button>';
-    var agua = qs(area, '.agua'), peixe = qs(area, '.peixe'), x = 0.1, tt = Math.random() * 6, ult = 0, ocupado = false, raf = 0, vivo = true;
+    var agua = qs(area, '.agua'), cardume = qs(area, '.cardume'), svg = qs(area, '.pesca'), alvo = qs(area, '.alvo'), balde = qs(area, '.balde');
+    var vara = qs(svg, '.vara'), varaS = qs(svg, '.vara-sombra'), varaL = qs(svg, '.vara-luz'), cabo = qs(svg, '.cabo'), carr = qs(svg, '.carretilha');
+    var fio = qs(svg, '.fio'), fioH = qs(svg, '.fio-halo'), boia = qs(svg, '.boia'), anzol = qs(svg, '.anzol');
+    var W = 1, H = 1, bocaY = 0, baldeX = 0.87;
+    function medir() {
+      W = agua.clientWidth || 1; H = agua.clientHeight || 1;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      bocaY = balde.offsetTop; baldeX = (balde.offsetLeft + balde.offsetWidth / 2) / W;
+      peixes.forEach(function (p) { p.w = p.el.offsetWidth || 40; p.h = p.el.offsetHeight || 40; });
+    }
+    var peixes = [], relogio = 0;
+    function novoPeixe(raia, x, dir) {
+      var el = document.createElement('span'); el.className = 'peixe'; el.textContent = '🐟'; cardume.appendChild(el);
+      var p = { el: el, y0: raia, x: x, dir: dir, v: vel * (0.75 + Math.random() * 0.5), fase: Math.random() * 6, virar: relogio + 3 + Math.random() * 4, w: el.offsetWidth || 40, h: el.offsetHeight || 40 };
+      peixes.push(p); return p;
+    }
+    embaralhar(RAIAS).forEach(function (r, i) { novoPeixe(r, 0.15 + i * 0.35 + Math.random() * 0.08, Math.random() < 0.5 ? 1 : -1); });
+    medir();
+    window.addEventListener('resize', medir); fimLugar.push(function () { window.removeEventListener('resize', medir); });
+
+    // estado da pescaria: pronto → vai (o peixe nada até o anzol) → sobe → balanca (até o balde) → solta → volta → pronto.
+    // O anzol fica sempre pendurado na ponta da vara: comprimento da linha (l) e ângulo (fi, 0 = reto para baixo).
+    var DUR = { treme: 0.35, vai: 0.18, sobe: calmo ? 0.8 : 1.1, balanca: calmo ? 0.5 : 0.85, solta: 0.45, volta: 0.8 };
+    var fase = 'pronto', t0 = 0, preso = null, creditou = false, saiu = false, ult = 0, raf = 0, vivo = true;
+    function mudar(f) { fase = f; t0 = relogio; agua.setAttribute('data-fase', f); }
+    function suave(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+    function balanco(p) { var c = 1.1; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); }   // passa um pouco e volta
+    function mix(a, b, p) { return a + (b - a) * p; }
+    function mover(el, x, y, rot, sx, op) { el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) rotate(' + rot.toFixed(1) + 'deg) scaleX(' + sx + ')'; if (op != null) el.style.opacity = op; }
+    function respingo(x, y, forte) {
+      if (calmo) return;
+      var r = document.createElement('div'); r.className = 'respingo'; r.style.left = x + 'px'; r.style.top = y + 'px';
+      var h = '<span class="anel"></span>';
+      for (var i = 0; forte && i < 7; i++) { var a = -Math.PI * (0.15 + 0.7 * i / 6); h += '<span class="gota" style="--dx:' + Math.round(Math.cos(a) * 34) + 'px;--up:' + Math.round(14 + Math.random() * 22) + 'px"></span>'; }
+      r.innerHTML = h; agua.appendChild(r); agendar(function () { r.remove(); }, 800);
+    }
+    function ponta(tip, carga) { return [tip[0] * W, (tip[1] + 0.025 * carga) * H]; }
     function quadro(ts) {
       if (!vivo) return;
-      var dt = ult ? Math.min(0.1, (ts - ult) / 1000) : 0; ult = ts;
-      if (!ocupado) {
-        tt += dt * vel;
-        var nx = 0.5 + 0.42 * Math.sin(tt) * (0.8 + 0.2 * Math.sin(tt * 0.37));
-        peixe.style.transform = 'translate(-50%,-50%) scaleX(' + (nx < x ? 1 : -1) + ')';
-        x = nx; peixe.style.left = (x * 100) + '%'; peixe.style.top = (58 + 8 * Math.sin(tt * 1.7)) + '%';
+      var dt = ult ? Math.min(0.1, (ts - ult) / 1000) : 0; ult = ts; relogio += dt;
+      var p = Math.min(1, (relogio - t0) / (DUR[fase] || 1)), e = suave(p);
+      // vara, linha e anzol
+      var tipF = TIP0, carga = 0, lRest = (ANZOL_Y - TIP0[1]) * H, lSobe = 0.06 * H, l = lRest, fi = calmo ? 0 : 0.012 * Math.sin(relogio * 1.1);
+      var tB = ponta(TIP_B, 1), alvoB = [baldeX * W - 2, bocaY - 22], lB = Math.hypot(alvoB[0] - tB[0], alvoB[1] - tB[1]), fiB = Math.atan2(alvoB[0] - tB[0], alvoB[1] - tB[1]);
+      if (fase === 'treme') { l = lRest - 0.12 * H * Math.sin(Math.PI * p); }
+      else if (fase === 'vai') carga = e;
+      else if (fase === 'sobe') { carga = 1; l = mix(lRest, lSobe, e); fi = 0; }
+      else if (fase === 'balanca') { carga = 1; tipF = [mix(TIP0[0], TIP_B[0], e), mix(TIP0[1], TIP_B[1], e)]; var b = calmo ? e : balanco(p); l = mix(lSobe, lB, e); fi = mix(0, fiB, b); }
+      else if (fase === 'solta') { carga = 1; tipF = TIP_B; l = lB; fi = fiB; }
+      else if (fase === 'volta') { carga = 1 - e; tipF = [mix(TIP_B[0], TIP0[0], e), mix(TIP_B[1], TIP0[1], e)]; l = mix(lB, lRest, e); fi = mix(fiB, 0, e); }
+      var tp = ponta(tipF, carga), tx = tp[0], ty = tp[1], bx = BASE[0] * W, by = BASE[1] * H;
+      if (fase === 'treme') ty -= 0.02 * H * Math.sin(Math.PI * p);
+      var hx = tx + l * Math.sin(fi), hy = ty + l * Math.cos(fi);
+      var dx = tx - bx, dy = ty - by, len = Math.sqrt(dx * dx + dy * dy), nx = dy / len, ny = -dx / len, curva = len * (0.03 + 0.09 * carga);
+      var cx = (bx + tx) / 2 + nx * curva, cy = (by + ty) / 2 + ny * curva, dRod = 'M' + bx.toFixed(1) + ',' + by.toFixed(1) + ' Q' + cx.toFixed(1) + ',' + cy.toFixed(1) + ' ' + tx.toFixed(1) + ',' + ty.toFixed(1);
+      vara.setAttribute('d', dRod); varaS.setAttribute('d', dRod); varaL.setAttribute('d', dRod);
+      cabo.setAttribute('d', 'M' + (bx - dx / len * 8).toFixed(1) + ',' + (by - dy / len * 8).toFixed(1) + ' L' + (bx + dx / len * 26).toFixed(1) + ',' + (by + dy / len * 26).toFixed(1));
+      carr.setAttribute('cx', (bx + dx / len * 18 - nx * 6).toFixed(1)); carr.setAttribute('cy', (by + dy / len * 18 - ny * 6).toFixed(1));
+      var dFio = 'M' + tx.toFixed(1) + ',' + ty.toFixed(1) + ' L' + hx.toFixed(1) + ',' + hy.toFixed(1);
+      fio.setAttribute('d', dFio); fioH.setAttribute('d', dFio);
+      var giro = -fi * 180 / Math.PI;
+      anzol.setAttribute('transform', 'translate(' + hx.toFixed(1) + ',' + hy.toFixed(1) + ') rotate(' + giro.toFixed(1) + ') scale(' + ESC + ')');
+      // peixes nadando
+      var temPerto = false;
+      peixes.forEach(function (f) {
+        if (f === preso) return;
+        f.x += f.dir * f.v * dt;
+        if (f.x > 0.07 && f.x < 0.93) f.entrando = false;
+        if (!f.entrando) {
+          if (f.x >= 0.93 && f.dir > 0) f.dir = -1; else if (f.x <= 0.07 && f.dir < 0) f.dir = 1;
+          else if (relogio > f.virar) { f.virar = relogio + 3 + Math.random() * 4; if (Math.random() < 0.35) f.dir = -f.dir; }
+        }
+        var y = (f.y0 + (calmo ? 0 : 0.02 * Math.sin(relogio * 1.3 + f.fase))) * H;
+        mover(f.el, f.x * W - f.w / 2, y - f.h / 2, 0, f.dir > 0 ? -1 : 1);
+        if (!f.entrando && Math.abs(f.x - 0.5) <= zona) temPerto = true;
+      });
+      if (nv.brilho) alvo.classList.toggle('tem-peixe', temPerto && fase === 'pronto');
+      // boia: presa na linha, um pouco acima do anzol (na superfície quando o anzol está na água); belisca quando há peixe perto
+      var dB = Math.min((ANZOL_Y - SUP) * H, l * 0.55), sB = (fase === 'pronto' && !calmo) ? Math.sin(relogio * 2.2) * 1.5 + (temPerto ? 3 + Math.sin(relogio * 24) * 1.5 : 0) : 0;
+      boia.setAttribute('transform', 'translate(' + (hx - dB * Math.sin(fi)).toFixed(1) + ',' + (hy - dB * Math.cos(fi) + sB).toFixed(1) + ')');
+      // o peixe fisgado: pendurado pela boca na curva do anzol, ao longo da linha, se mexendo
+      if (preso) {
+        var c = Math.cos(-fi), s = Math.sin(-fi), ox = -4.5 * ESC, oy = 15 * ESC;
+        var mx = hx + ox * c - oy * s, my = hy + ox * s + oy * c;
+        var fora = my + preso.w * 0.45 < SUP * H;
+        var mexe = calmo ? 0 : (fora ? 22 * Math.sin(relogio * 20) : 14 * Math.sin(relogio * 14));
+        var base = (preso.sx > 0 ? 90 : -90) + giro, op = 1;
+        if (fase === 'vai') { mx = mix(preso.hx0, mx, e); my = mix(preso.hy0, my, e); base *= e; mexe *= e; }
+        else if (fase === 'solta') { mx = mix(mx, baldeX * W, e); my = mix(my, bocaY + preso.w * 0.9, e * e); base = mix(base, preso.sx > 0 ? 90 : -90, e); mexe *= 1 - p; op = p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4; }
+        if (fase === 'sobe' && !saiu && fora) { saiu = true; respingo(mx, SUP * H, true); Som.toca('agua'); }
+        mover(preso.el, mx - preso.w * 0.1, my - preso.h / 2, base + mexe, preso.sx, op);
+        if (fase === 'solta' && p >= 0.55 && !creditou) {
+          creditou = true; qs(balde, '.no-balde').hidden = false;
+          balde.classList.remove('pula'); void balde.offsetWidth; balde.classList.add('pula');
+          coletar('peixe', balde);
+          aviso(t('Fisgou! O peixinho foi para o balde. 🐟💦', 'Hooked it! The little fish went into the bucket. 🐟💦'), 1800, true);
+        }
+      }
+      if (p >= 1) {
+        if (fase === 'treme') mudar('pronto');
+        else if (fase === 'vai') mudar('sobe');
+        else if (fase === 'sobe') mudar('balanca');
+        else if (fase === 'balanca') mudar('solta');
+        else if (fase === 'solta') {
+          preso.el.remove(); peixes.splice(peixes.indexOf(preso), 1);
+          var lado = Math.random() < 0.5; novoPeixe(preso.y0, lado ? -0.1 : 1.1, lado ? 1 : -1).entrando = true;   // um peixe novo chega nadando pelo lado
+          preso = null; mudar('volta');
+        } else if (fase === 'volta') { mudar('pronto'); respingo(hx, SUP * H, false); }
       }
       raf = requestAnimationFrame(quadro);
     }
     raf = requestAnimationFrame(quadro);
-    fimLugar.push(function () { vivo = false; cancelAnimationFrame(raf); });
+    // saiu do rio no meio da pescaria: o peixe que já estava no anzol vai para a cesta do mesmo jeito
+    fimLugar.push(function () { vivo = false; cancelAnimationFrame(raf); if (preso && !creditou) { creditou = true; L.por(jogo.cesta, 'peixe', 1); desenharCesta(); } });
     function puxar() {
-      if (ocupado) return;
-      if (Math.abs(x - 0.5) <= zona) {
-        ocupado = true; peixe.classList.add('pulo');
-        coletar('peixe', peixe);
-        aviso(t('Pegou! O peixinho pulou no balde. 🐟💦', 'Got it! The little fish jumped into the bucket. 🐟💦'), 1800, true);
-        agendar(function () { peixe.classList.remove('pulo'); tt += 2; ocupado = false; }, 1100 * V);
+      if (fase !== 'pronto') return;
+      var perto = peixes.filter(function (f) { return !f.entrando && Math.abs(f.x - 0.5) <= zona; }).sort(function (a, b) { return Math.abs(a.x - 0.5) - Math.abs(b.x - 0.5); })[0];
+      if (perto) {
+        preso = perto; creditou = false; saiu = false; alvo.classList.remove('tem-peixe');
+        preso.sx = preso.dir > 0 ? -1 : 1;
+        var y = (preso.y0 + (calmo ? 0 : 0.02 * Math.sin(relogio * 1.3 + preso.fase))) * H;
+        preso.hx0 = preso.x * W + (preso.sx > 0 ? -0.4 : 0.4) * preso.w; preso.hy0 = y;   // a cabeça do peixe
+        preso.el.classList.add('fisgado'); preso.el.style.transformOrigin = '10% 50%';
+        mudar('vai'); Som.toca('fisgou');
       } else {
+        mudar('treme');
         agua.classList.remove('balanca'); void agua.offsetWidth; agua.classList.add('balanca'); Som.toca('toque');
-        aviso(t('Escapou! Puxe quando o peixe estiver dentro do círculo ⭕', 'It got away! Pull when the fish is inside the circle ⭕'), 1600);
+        aviso(t('Escapou! Puxe quando um peixe estiver dentro do círculo ⭕', 'It got away! Pull when a fish is inside the circle ⭕'), 1600);
       }
     }
     qs(area, '#btPuxar').addEventListener('click', puxar);
@@ -538,16 +682,30 @@
       '<p class="favores-txt"></p><div class="pedidos">' + itens.map(function (id) {
         return '<button type="button" class="pedido' + (falta.indexOf(id) >= 0 && jogo.cfg.brilho ? ' precisa' : '') + '" data-ing="' + id + '">' + icone(id) + '<span>' + L.nomeIng(id, en()) + '</span></button>';
       }).join('') + '</div><button type="button" class="grande verde" id="btObrigado" hidden>' + t('💛 Obrigado, Dona Cida!', '💛 Thank you, Mrs. Cida!') + '</button>';
-    var balao = qs(area, '.balao'), mao = qs(area, '.na-mao'), bt = qs(area, '#btObrigado');
-    function fala(pt, ing) { balao.textContent = t(pt, ing); }
+    var balao = qs(area, '.balao'), mao = qs(area, '.na-mao'), bt = qs(area, '#btObrigado'), cida = qs(area, '.cida'), falando = null;
+    // a Dona Cida fala em voz alta (se a voz 🗣️ estiver ligada), com voz de vovó: mais devagar e mais fininha;
+    // o balão mostra sempre o que ela disse. fila = espera o aviso anterior acabar de ser lido.
+    function fala(pt, ing, fila) {
+      var txt = t(pt, ing);
+      balao.textContent = txt; balao.classList.remove('novo'); void balao.offsetWidth; balao.classList.add('novo');
+      var u = falar(txt, { rate: JEITO_VOVO.rate, pitch: JEITO_VOVO.pitch, voz: vozDaVovo(), fila: fila });
+      if (!u) return;
+      falando = u; cida.classList.add('falando');
+      var acabou = function () { if (falando === u) { falando = null; cida.classList.remove('falando'); } };
+      try { u.addEventListener('end', acabou); u.addEventListener('error', acabou); } catch (e) { /* ok */ }
+      agendar(acabou, 1500 + txt.length * 110);   // alguns aparelhos não avisam quando a fala acaba
+    }
     function favores() { qs(area, '.favores-txt').textContent = t('💛 Favores hoje: ' + jogo.favores, '💛 Favours today: ' + jogo.favores); }
-    fala('Oi, que bom te ver! Precisa de alguma coisa emprestada? 😊', 'Hi, how nice to see you! Do you need to borrow something? 😊');
+    if (jogo.favores > 0) fala('Oi, meu bem, que bom te ver! Precisa de alguma coisa emprestada? 😊', 'Hello, sweetie, how nice to see you! Do you need to borrow something? 😊');
+    else fala('Oi, meu bem! Hoje eu já emprestei tudo o que podia. Tente o mercadinho! 😊', 'Hello, sweetie! I have already lent all I could today. Try the shop! 😊');
     favores();
+    // saiu da casa no meio da fala: a vovó para de falar
+    fimLugar.push(function () { if (falando && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ } });
     qs(area, '.pedidos').addEventListener('click', function (e) {
       var b = e.target.closest('.pedido'); if (!b) return;
       var id = b.getAttribute('data-ing'), r = L.pedirFavor(jogo, id);
       if (r.ok) {
-        fala('Claro! Aqui está 1 ' + L.nomeIng(id, false) + '. 😊', 'Of course! Here is 1 ' + L.nomeIng(id, true) + '. 😊');
+        fala('Claro, meu bem! Aqui está 1 ' + L.nomeIng(id, false) + '. 😊', 'Of course, sweetie! Here is 1 ' + L.nomeIng(id, true) + '. 😊');
         mao.innerHTML = icone(id); bt.hidden = false; bt.focus(); Som.toca('toque');
         qsa(area, '.pedido').forEach(function (x) { x.disabled = true; });
         agendar(function () { if (jogo.pendente) fala('Como é que se diz? 😉', 'What do we say? 😉'); }, 4500 * V);
@@ -558,7 +716,9 @@
     bt.addEventListener('click', function () {
       var r = L.agradecer(jogo); if (!r.ok) return;
       bt.hidden = true; recebeu(r.id, mao); mao.innerHTML = '';
-      fala('De nada! Volte sempre. 💛', 'You are welcome! Come back any time. 💛'); favores();
+      if (jogo.favores > 0) fala('De nada, meu bem! Volte sempre. Tchau, tchau! 💛', 'You are welcome, sweetie! Come back any time. Bye-bye! 💛', true);
+      else fala('De nada, meu bem! Agora acabaram os favores de hoje. Tchau, tchau! 💛', 'You are welcome, sweetie! That was my last favour for today. Bye-bye! 💛', true);
+      favores();
       qsa(area, '.pedido').forEach(function (x) { x.disabled = false; });
       desenharCarteira();
     });

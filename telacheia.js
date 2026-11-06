@@ -63,6 +63,8 @@
       'border-left:0;border-radius:0 22px 22px 0;background:rgba(42,17,70,.82);color:#fff;font:700 15px/1 system-ui,sans-serif;' +
       'box-shadow:0 3px 12px rgba(0,0,0,.35);cursor:pointer;-webkit-tap-highlight-color:transparent}' +
       '.tela-inteira-bt .i{flex:none}.tela-inteira-bt.pequeno .t{display:none}' +
+      // encolhida: uma lingueta fina e meio transparente na borda, para quase não cobrir o jogo (o toque continua com 44 px de altura)
+      '.tela-inteira-bt.pequeno{min-width:0;width:26px;padding:0 0 0 3px;opacity:.6;border-width:1.5px}.tela-inteira-bt.pequeno .i{width:18px;height:18px}' +
       '.tela-inteira-bt[hidden]{display:none}' +
       '@media (prefers-reduced-motion:no-preference){.tela-inteira-bt{transition:padding .25s}}';
     d.head.appendChild(st);

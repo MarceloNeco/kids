@@ -1,4 +1,4 @@
-// Enigmas de Ligar — o conteúdo (rodadas.js) está certo? Rodar da raiz do kids: node --test enigmas/teste/*.test.js
+// Enigmatic — o conteúdo (rodadas.js) está certo? Rodar da raiz do kids: node --test enigmas/teste/*.test.js
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const R = require('../rodadas.js');

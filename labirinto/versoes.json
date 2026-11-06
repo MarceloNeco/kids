@@ -2,6 +2,21 @@
   "app": "labirinto",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "06/Nov/2026",
+      "hora": "16:24:59",
+      "pt": [
+        "🐶 O cachorrinho agora só vai até onde ele consegue VER, em linha reta: toque numa casa da mesma fileira ou coluna (na colmeia, numa das 6 direções; no redondo, no mesmo anel ou na mesma fatia). Ele não acha mais o caminho sozinho — quem acha é a criança.",
+        "🧱 Se tiver parede no meio, ele anda até a parede e para. Se for preciso virar, ele não sai do lugar: inclina a cabeça, faz \"hmm?\" e as casas que ele enxerga brilham um pouquinho, mostrando onde dá para tocar.",
+        "🐾 Ele anda mais devagar (3 casas e meia por segundo, sempre no mesmo ritmo) e com mais vida: patinhas que se alternam, corpo que balança, orelhas e rabo mexendo, poeirinha atrás e olhando para o lado em que anda. Parado, ele respira, abana o rabo e pisca. Com \"reduzir movimento\" ligado, só desliza."
+      ],
+      "en": [
+        "🐶 The puppy now only goes where it can SEE in a straight line: tap a square in the same row or column (in the honeycomb, one of the 6 directions; in the round maze, the same ring or the same slice). It no longer finds the way by itself — the child does.",
+        "🧱 If there is a wall in the way, it walks up to the wall and stops. If it would need to turn, it stays put: it tilts its head, goes \"hmm?\" and the squares it can see glow a little, showing where you can tap.",
+        "🐾 It walks slower (3.5 squares per second, always the same pace) and livelier: alternating paws, a bouncing body, floppy ears and a wagging tail, little dust puffs behind and it faces the way it walks. Standing still, it breathes, wags and blinks. With \"reduce motion\" on, it just slides."
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "06/Nov/2026",
       "hora": "08:28:26",

@@ -1,11 +1,11 @@
-/* Enigmas de Ligar — service worker: guarda a pasta no aparelho para abrir sem internet.
+/* Enigmatic — service worker: guarda a pasta no aparelho para abrir sem internet.
    Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte e imagens: cópia primeiro.
    Músicas (../baguncolandia/musicas/*.mp3, tocadas pelo ../trilha.js): o service worker não mexe (o navegador
    busca direto; pedidos de áudio vêm em pedaços e passar por aqui atrapalha alguns celulares). Sem internet, o
    tocador pula as que não abrem e o jogo segue com os efeitos.
    Cache com o nome do app: só apaga caches "enigmas-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e à primeira entrada de versoes.json). */
-var VERSAO = '0.1.1';
+var VERSAO = '0.2.0';
 var CACHE = 'enigmas-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'rodadas.js', 'jogo.js', 'app.js', 'fontes/fredoka.woff2', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../recursos.js', '../atualizar.js', '../telacheia.js', '../janela.js', '../trilha.js'];
 self.addEventListener('install', function (e) {
