@@ -27,7 +27,7 @@
 
    BNRede.criar(op) → partida (sem tela: roda no Node para os testes). op = { id, nome, codigo, host, nivel,
      mandar(msg), salvar(dados), aoMudar(), agora(), rnd(), dados (para voltar de onde parou) }
-   BNRede.abrir(codigo, aoReceber) → Promise<{ mandar(msg), fechar() }>  (o canal de verdade) */
+   BNRede.abrir(codigo, aoReceber, aoCair) → Promise<{ mandar(msg), fechar() }>  (o canal de verdade; aoCair = caiu depois de conectado) */
 (function (raiz) {
   'use strict';
   var L = raiz.BNLogica || (typeof require === 'function' ? require('./logica.js') : null);
@@ -381,18 +381,20 @@
     bc.onmessage = function (ev) { r(ev.data); };
     return Promise.resolve({ mandar: function (m) { try { bc.postMessage(JSON.parse(JSON.stringify(m))); } catch (e) { /* fechado */ } }, fechar: function () { try { bc.close(); } catch (e) { /* ok */ } } });
   }
-  function abrirSupabase(codigo, aoReceber) {
+  // aoCair(): o canal caiu depois de conectado (celular travou a tela, Wi-Fi caiu) — a tela abre outro
+  function abrirSupabase(codigo, aoReceber, aoCair) {
     return carregarLib().then(function () {
       if (!sb) sb = raiz.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { realtime: { params: { eventsPerSecond: 20 } }, auth: { persistSession: false, autoRefreshToken: false } });
       return new Promise(function (ok, falha) {
-        var pronto = false, r = entregar(aoReceber), canal = sb.channel('batalha-naval-' + codigo, { config: { broadcast: { self: false } } });
+        var pronto = false, fechado = false, r = entregar(aoReceber), canal = sb.channel('batalha-naval-' + codigo, { config: { broadcast: { self: false } } });
         canal.on('broadcast', { event: 'm' }, function (x) { r(x.payload); });
         var limite = setTimeout(function () { if (!pronto) { pronto = true; try { sb.removeChannel(canal); } catch (e) { /* ok */ } falha(new Error('TIMED_OUT')); } }, 15000);
         canal.subscribe(function (st) {
           if (st === 'SUBSCRIBED' && !pronto) {
             pronto = true; clearTimeout(limite);
-            ok({ mandar: function (m) { try { canal.send({ type: 'broadcast', event: 'm', payload: m }); } catch (e) { /* sem rede: o reenvio cuida */ } }, fechar: function () { try { sb.removeChannel(canal); } catch (e) { /* ok */ } } });
+            ok({ mandar: function (m) { try { canal.send({ type: 'broadcast', event: 'm', payload: m }); } catch (e) { /* sem rede: o reenvio cuida */ } }, fechar: function () { fechado = true; try { sb.removeChannel(canal); } catch (e) { /* ok */ } } });
           } else if ((st === 'CHANNEL_ERROR' || st === 'TIMED_OUT') && !pronto) { pronto = true; clearTimeout(limite); falha(new Error(st)); }
+          else if ((st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') && pronto && !fechado && aoCair) { fechado = true; try { aoCair(); } catch (e) { /* ok */ } }
         });
       });
     });
@@ -400,7 +402,7 @@
 
   var API = {
     criar: criar, validar: validar, codigoNovo: codigoNovo, idNovo: idNovo, nome: nome, TEMPO: TEMPO, LOCAL: LOCAL,
-    abrir: function (codigo, aoReceber) { return LOCAL ? abrirLocal(codigo, aoReceber) : abrirSupabase(codigo, aoReceber); }
+    abrir: function (codigo, aoReceber, aoCair) { return LOCAL ? abrirLocal(codigo, aoReceber) : abrirSupabase(codigo, aoReceber, aoCair); }
   };
   raiz.BNRede = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

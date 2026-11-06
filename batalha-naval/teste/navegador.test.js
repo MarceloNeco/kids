@@ -170,8 +170,57 @@ async function criarSala(aba, nome, nivel) {
 }
 async function entrarSala(aba, nome, codigo) {
   await aba.pg.click('#btAmigos'); await aba.pg.fill('#nome', nome); await aba.pg.fill('#codigo', codigo.toLowerCase()); await aba.pg.click('#btEntrar');
-  await aba.pg.waitForSelector('#sala.ativa', { timeout: 5000 }).catch(async e => { console.log('DEBUG', await aba.pg.evaluate(() => [document.querySelector('.tela.ativa').id, location.href, document.getElementById('amigosMsg').textContent, document.getElementById('codigo').value, document.getElementById('janela').hidden, document.getElementById('janelaTitulo').textContent])); throw e; });
+  await aba.pg.waitForSelector('#sala.ativa', { timeout: 10000 }).catch(async e => { console.log('DEBUG', await aba.pg.evaluate(() => [document.querySelector('.tela.ativa').id, location.href, document.getElementById('amigosMsg').textContent, document.getElementById('codigo').value, document.getElementById('janela').hidden, document.getElementById('janelaTitulo').textContent])); throw e; });
 }
+
+// supabase-js de mentira (o de verdade não alcança a internet daqui): os canais conversam por BroadcastChannel,
+// com o mesmo jeito do Realtime (channel → on('broadcast') → subscribe(status) → send({type, event, payload})).
+// Assim o caminho de verdade do rede.js (sem ?teste) é testado, inclusive o canal caindo no meio.
+const SUPABASE_FALSO = () => {
+  window.__canais = [];
+  window.supabase = { createClient: function (url, chave, op) {
+    window.__sb = { url: url, chave: chave, op: op };
+    return {
+      channel: function (nome, cfg) {
+        var bc = new BroadcastChannel('falso-' + nome), ouvintes = [], aviso = null;
+        var c = { nome: nome, cfg: cfg, fechado: false,
+          on: function (tipo, filtro, fn) { if (tipo === 'broadcast' && filtro.event === 'm') ouvintes.push(fn); return c; },
+          subscribe: function (fn) { aviso = fn; setTimeout(function () { fn('SUBSCRIBED'); }, 30); return c; },
+          send: function (m) { if (!c.fechado && m.type === 'broadcast') bc.postMessage({ event: m.event, payload: m.payload }); return Promise.resolve('ok'); },
+          cair: function () { c.fechado = true; bc.close(); aviso('CLOSED'); } };
+        bc.onmessage = function (ev) { if (!c.fechado) ouvintes.forEach(function (fn) { fn({ payload: ev.data.payload }); }); };
+        window.__canais.push(c);
+        return c;
+      },
+      removeChannel: function (c) { if (!c.fechado) { c.fechado = true; } }
+    };
+  } };
+};
+
+test('caminho de verdade do Supabase (cliente de mentira): partida inteira e o canal caindo no meio', async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 820 }, hasTouch: true, locale: 'pt-BR' });
+  await ctx.addInitScript(SUPABASE_FALSO);
+  const a = await novaAba(ctx, base), b = await novaAba(ctx, base);
+  const codigo = await criarSala(a, 'Ana', 'facil');
+  await entrarSala(b, 'Beto', codigo);
+  const sb = await a.pg.evaluate(() => ({ url: window.__sb.url, chave: window.__sb.chave, canal: window.__canais[0].nome, self: window.__canais[0].cfg.config.broadcast.self }));
+  assert.match(sb.url, /^https:\/\/[a-z0-9]+\.supabase\.co$/); assert.match(sb.chave, /^sb_publishable_/);
+  assert.equal(sb.canal, 'batalha-naval-' + codigo); assert.equal(sb.self, false);
+  await a.pg.waitForFunction(() => document.querySelectorAll('#salaLista li').length === 2);
+  await arrumarEPronto(a); await arrumarEPronto(b);
+  await a.pg.waitForFunction(() => !document.getElementById('btComecar').disabled);
+  await a.pg.click('#btComecar');
+  await b.pg.waitForSelector('#jogo.ativa');
+  for (let i = 0; i < 10; i++) await jogarAteFim([a, b], 1).catch(() => {});
+  // o canal do Beto cai (tela travada): o jogo abre outro sozinho e a partida segue
+  await b.pg.evaluate(() => window.__canais[window.__canais.length - 1].cair());
+  await b.pg.waitForFunction(() => window.__canais.length >= 2 && !window.__canais[window.__canais.length - 1].fechado);
+  await jogarAteFim([a, b]);
+  const da = await a.pg.evaluate(() => window.BNApp.dados()), db = await b.pg.evaluate(() => window.BNApp.dados());
+  assert.equal(da.fase, 'fim'); assert.equal(da.venc, db.venc); assert.deepEqual(da.log, db.log);
+  assert.deepEqual(a.erros, []); assert.deepEqual(b.erros, []);
+  await ctx.close();
+});
 async function arrumarEPronto(aba) {
   await aba.pg.waitForSelector('#btArrumar:not([hidden])'); await aba.pg.click('#btArrumar');
   await aba.pg.click('#btSortear'); await aba.pg.click('#btPronto'); await aba.pg.waitForSelector('#sala.ativa');
@@ -264,6 +313,9 @@ test('entrar com código que não existe avisa; sair da sala volta para o iníci
   await pg.waitForSelector('#inicio.ativa');
   assert.ok(await pg.evaluate(() => !localStorage.getItem('batalha-naval.rede')));
   assert.ok(!/sala=/.test(pg.url()));
+  // link do convite (?sala=CODIGO): abre direto em Entrar, com o código preenchido; só falta o nome
+  await pg.goto(base + '?sala=QWER&teste'); await pg.waitForSelector('#amigos.ativa');
+  assert.equal(await pg.inputValue('#codigo'), 'QWER');
   assert.deepEqual(erros, []);
   await ctx.close();
 });

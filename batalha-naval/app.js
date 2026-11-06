@@ -37,7 +37,7 @@
     document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
     Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
     $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · 06/' + t('Nov', 'Nov') + '/2026';
+    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + t('06/Nov/2026', 'Nov/06/2026');
     if (jogo && (atual === 'jogo' || atual === 'sala')) desenhar();
     if (atual === 'arrumar' && arr) pintarArr();
     atualizarInicio();
@@ -571,7 +571,8 @@
     $('codigo').value = codigo || '';
     $('amigosMsg').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Conecte no Wi-Fi ou nos dados para jogar com amigos.', '📡 No internet right now. Connect to Wi-Fi or data to play with friends.') : '';
     mostrar('amigos');
-    setTimeout(function () { $('nome').focus(); }, 50);
+    // no computador o cursor já vai para o nome; no celular não (o teclado subiria antes de escolher criar ou entrar)
+    if (!(('ontouchstart' in window) || navigator.maxTouchPoints > 0)) $('nome').focus();
   }
   function guardarNome() { pref.nome = R.nome($('nome').value); salvarPref(); return pref.nome; }
   $('btCriar').addEventListener('click', function () { guardarNome(); escolherNivel('criar'); });
@@ -596,9 +597,8 @@
     guardarRede(g.p.exportar());
     enderecoSala(g.codigo);      // recarregar a página volta direto para esta partida
     mostrar('sala'); desenhar();
-    R.abrir(g.codigo, function (m) { if (jogo === g) g.p.receber(m); }).then(function (canal) {
-      if (jogo !== g) { canal.fechar(); return; }
-      g.canal = canal; g.conectado = true; g.p.entrar();
+    abrirCanal(g).then(function () {
+      g.p.entrar();
       var vez = 0;
       g.timer = setInterval(function () { g.p.tique(); if (++vez % 2 === 0) desenhar(); }, 500);
       desenhar();
@@ -609,6 +609,28 @@
         botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again'), fn: function () { conectar({ dados: g.p.exportar() }); } }, { t: t('Voltar', 'Back'), fn: function () { sairDoJogo(true); mostrar('inicio'); } }] });
     });
   }
+  function abrirCanal(g) {
+    return R.abrir(g.codigo, function (m) { if (jogo === g) g.p.receber(m); }, function () { if (jogo === g) reabrir(g); }).then(function (canal) {
+      if (jogo !== g) { canal.fechar(); throw new Error('saiu'); }
+      g.canal = canal; g.conectado = true;
+    });
+  }
+  // o canal caiu (tela travada, Wi-Fi): abre outro em silêncio, tentando de novo a cada poucos segundos;
+  // a partida não perde nada — os tiros esperando são repetidos e o estado chega no próximo aviso do anfitrião
+  function reabrir(g) {
+    if (g.reabrindo || jogo !== g) return;
+    g.reabrindo = true; g.conectado = false;
+    var velho = g.canal; g.canal = null; if (velho) velho.fechar();
+    desenhar();
+    abrirCanal(g).then(function () { g.reabrindo = false; g.p.entrar(); desenhar(); })
+      .catch(function () { g.reabrindo = false; if (jogo === g) setTimeout(function () { reabrir(g); }, 4000); });
+  }
+  var escondidoEm = 0;
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { escondidoEm = Date.now(); return; }
+    if (jogo && jogo.modo === 'rede' && escondidoEm && Date.now() - escondidoEm > 8000) reabrir(jogo);
+  });
+  window.addEventListener('online', function () { if (jogo && jogo.modo === 'rede' && !R.LOCAL) reabrir(jogo); });
   // fechar a partida atual (manter = guardar a partida em rede para voltar depois, sem avisar os outros)
   function sairDoJogo(manter) {
     var g = jogo; if (!g) return;

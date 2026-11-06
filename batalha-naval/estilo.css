@@ -7,7 +7,7 @@
   --vh: 1vh;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; min-height: 100%; background: radial-gradient(120% 80% at 50% 0%, #123e6e 0%, var(--fundo) 60%) fixed; color: var(--texto); }
+html, body { margin: 0; min-height: 100%; background: var(--fundo) radial-gradient(120% 80% at 50% 0%, #123e6e 0%, var(--fundo) 60%) fixed; color: var(--texto); }
 body { font-family: 'Fredoka', 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 17px; line-height: 1.35; overscroll-behavior: none; }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; touch-action: manipulation; }
@@ -169,10 +169,20 @@ h2, h3 { margin: .2rem 0 .5rem; }
 /* deitado (tablet e computador): os dois mares lado a lado */
 @media (min-aspect-ratio: 1/1) and (min-width: 600px) {
   .mares { grid-template-columns: auto auto; align-items: start; justify-content: center; gap: 1.2rem; }
-  .tab.alvo { --lado: min(56vw, calc(100 * var(--vh) - 250px), 640px); }
-  .tab.meu { --lado: min(32vw, calc(100 * var(--vh) - 300px), 380px); }
+  .tab.alvo { --lado: min(56vw, calc(100 * var(--vh) - 230px), 640px); }
+  .tab.meu { --lado: min(32vw, calc(100 * var(--vh) - 270px), 380px); }
   .arrumar-corpo { grid-template-columns: auto minmax(260px, 420px); align-items: start; justify-content: center; }
   .tab.arr { --lado: min(56vw, calc(100 * var(--vh) - 200px), 600px); }
+}
+
+/* tela baixinha deitada (tablet de 7 polegadas): faixa mais fina para o mar crescer */
+@media (min-aspect-ratio: 1/1) and (max-height: 680px) {
+  .banner { padding: .3rem .8rem; font-size: 1.15rem; margin-bottom: .2rem; }
+  .banner small { display: inline; margin-left: .5rem; }
+  .fila { margin: .1rem 0 .2rem; }
+  .titulo-mar { margin: .1rem 0 .2rem; }
+  .tab.alvo { --lado: min(56vw, calc(100 * var(--vh) - 175px), 640px); }
+  .tab.meu { --lado: min(34vw, calc(100 * var(--vh) - 215px), 380px); }
 }
 
 /* ---------- cortina (passar o aparelho), estouro, confete, aviso, janela ---------- */

@@ -269,3 +269,19 @@ test('tiro fora da vez, repetido ou de quem não está na sala não muda nada', 
   M.passo();
   assert.equal(host.p.estado().log.length, 1);
 });
+
+test('40 partidas sorteadas (2 a 4 jogadores, até 30% de perda, recargas e anfitrião caindo): sempre terminam certinhas', () => {
+  for (let sem = 1; sem <= 40; sem++) {
+    const k = 2 + sem % 3, perda = [0, 0.15, 0.3][sem % 3];
+    const M = Mundo(1000 + sem * 7, perda);
+    montar(M, ['A', 'B', 'C', 'D'].slice(0, k), ['facil', 'medio'][sem % 2]);
+    let fora = null, volta = 0;
+    ateOFim(M, 60000, i => {
+      if (!fora && M.rnd() < 0.004) { fora = M.nos.find(o => o.p.souHost()) || M.nos[0]; fora.on = false; volta = i + 50 + Math.floor(M.rnd() * 200); }
+      else if (fora && i === volta) { fora.on = true; M.recarregar(fora); fora = null; }
+      else if (M.rnd() < 0.005) M.recarregar(M.nos[Math.floor(M.rnd() * k)]);
+    });
+    if (fora) { fora.on = true; M.recarregar(fora); for (let q = 0; q < 40; q++) M.passo(500); }
+    conferir(M, M.nos);
+  }
+});
