@@ -11,3 +11,4 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 5 | Mais missões: várias coisas para pegar, chave que abre portas no meio do caminho, labirinto com dois andares. | ideia | 🟡 |
 | 6 | TV: jogar pelas setas do controle (já funciona com teclado) com atalho `tv-lg-*` e o foco dos botões do menu pelo controle. | ideia | 🟡 |
 | 7 | Regra zero (diretriz geral) — itens que a família Bolinho de Chuva ainda não tem e o dono decide se entram: 💬 feedback em toda tela, AssistONE, pacote `.zip` de entrega. | diretriz | ⏸ aguardando o dono |
+| 8 | Cachorrinho só anda até onde enxerga em linha reta (o toque na saída não leva mais sozinho); se precisar virar, "hmm?" e as casas visíveis brilham; parede no meio: para na parede. Mais devagar (3,5 casas/s) e mais animado (patas, balanço, orelhas, rabo, poeira, respirando parado). | dono, 06/Nov/2026 (teste no celular) | ✅ v0.2.0 (⏸ dono testar com as crianças: velocidade e se a regra da linha reta ficou clara) |

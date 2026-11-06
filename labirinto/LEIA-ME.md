@@ -13,9 +13,15 @@ Endereço: https://solverone.com.br/kids/labirinto/
 - **Nível**: fácil, médio ou difícil — o labirinto cresce (quadrado 6×8, 10×14 e 15×22; redondo com 4, 7 e 11 anéis;
   colmeia com 37, 91 e 217 casas). No difícil, no celular, a câmera chega perto e **segue o cachorrinho**; dois dedos
   aproximam e arrastam, e os botões 🔍+ 🔍− ⤢ (ver tudo) ficam embaixo à esquerda. No computador, a rodinha do mouse dá zoom.
-- **🐶 Levar o cachorrinho**: toque (ou arraste o dedo) onde ele deve ir. Ele acha o caminho e anda **só pelos
-  corredores** — nunca atravessa parede, mesmo que o dedo passe por cima de uma. No computador, as **setas** do teclado
-  andam uma casa por vez.
+- **🐶 Levar o cachorrinho**: toque onde o cachorrinho **consegue ver, em linha reta**, e ele vai andando até lá. Ele não
+  acha o caminho sozinho (quem acha é a criança) e nunca vira por conta própria. Em linha reta quer dizer: no ⬛ quadrado,
+  a mesma fileira ou a mesma coluna; na ⬢ colmeia, uma das 6 direções retas; no ⚪ redondo, o mesmo anel (pelo lado mais
+  curto) ou a mesma fatia, para dentro ou para fora. Se tiver parede no meio, ele anda até a última casa antes da parede e
+  para. Se o toque pedir uma curva, ele fica no lugar, inclina a cabeça com um "hmm?" e um somzinho, e as casas que ele
+  enxerga brilham por ~1 s. Arrastando o dedo, ele segue o rastro do dedo, sempre em retas, virando só onde o dedo virou.
+  Anda a 3,5 casas por segundo, sempre no mesmo ritmo, com patinhas alternando, corpo balançando, orelhas e rabo mexendo
+  e poeirinha atrás; parado, respira, abana o rabo e pisca (com "reduzir movimento", só desliza). No computador, as
+  **setas** do teclado andam uma casa por vez.
 - **✏️ Desenhar o caminho**: arraste o cachorrinho (a ponta da linha). Se a linha tentar atravessar uma parede, ela
   **para** na parede e não continua; aparece um anel piscando na ponta e um pontilhado do dedo até ela — volte o dedo até
   a ponta e siga dali. **↩** desfaz o último traço, **🗑️** apaga a linha (se apagar o trecho onde pegou o item, o item volta
@@ -38,8 +44,8 @@ Endereço: https://solverone.com.br/kids/labirinto/
 |---|---|
 | `index.html` | As telas (menu, jogo, fim). Interruptor `data-recurso="labirinto"` (RootifyONE). |
 | `gerador.js` | Gera o labirinto pela semente (busca em profundidade): quadrado, redondo e colmeia, três tamanhos, entrada, saída e item. |
-| `regras.js` | Em que casa está um ponto, caminho do cachorrinho (só por passagens abertas), colisão da linha com as paredes (passinhos curtos, nunca fura), missão e estrelas. |
-| `desenho.js` | Chão e paredes em 3D, cachorrinho, itens, cadeado, bandeira, confetes. |
+| `regras.js` | Em que casa está um ponto, o que o cachorrinho enxerga em linha reta (`reta`, `visiveis`), caminho certo (só por passagens abertas), colisão da linha com as paredes (passinhos curtos, nunca fura), missão e estrelas. |
+| `desenho.js` | Chão e paredes em 3D, cachorrinho (andar com patas, balanço, orelhas, rabo; parado respirando; "hmm?"), itens, cadeado, bandeira, confetes. |
 | `som.js` | Efeitos feitos na hora (WebAudio). |
 | `app.js` | Telas, câmera, toques, pinça, teclado, festa, recordes (`localStorage`: `bolinho:labirinto:pref` e `bolinho:labirinto:recordes`). `APP_VERSION`. |
 | `sw.js` | Sem internet (cache `labirinto-v…`). `VERSAO`. |

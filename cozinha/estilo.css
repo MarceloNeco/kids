@@ -161,12 +161,44 @@ a { color: #1d6fb8; }
 .bt-segurar .barra span { display: block; height: 100%; width: 0; background: #fff; }
 .bt-segurar.segurando { transform: translateY(3px) scale(.98); }
 /* rio */
-.agua { position: relative; width: min(94vw, 36rem); height: 15rem; border-radius: 26px; overflow: hidden; background: linear-gradient(180deg, #8fd8ff 0 18%, #3aa0e8 18%, #1f7fc8); cursor: pointer; }
-.ondas { position: absolute; inset: 18% 0 0; background: repeating-radial-gradient(ellipse at 50% 0, rgba(255, 255, 255, .18) 0 6px, transparent 6px 26px); }
-.linha { position: absolute; left: 50%; top: 0; width: 2px; height: 58%; background: #333; }
-.alvo { position: absolute; left: 50%; top: 58%; width: min(var(--z), 96%); height: 36%; transform: translate(-50%, -50%); border: 4px dashed #fff; border-radius: 999px; }
-.peixe { position: absolute; top: 58%; font-size: 2.8rem; transform: translate(-50%, -50%); pointer-events: none; }
-.peixe.pulo { animation: pulo 1s ease-out forwards; }
+.agua { position: relative; width: min(94vw, 36rem); height: 18rem; border-radius: 26px; overflow: hidden; cursor: pointer; touch-action: manipulation;
+  background: linear-gradient(180deg, #bfeaff 0, #8fd8ff 36%, #49aef0 36%, #2a8fd8 70%, #1a6fb5); }
+.ondas { position: absolute; inset: 36% 0 0; background: repeating-radial-gradient(ellipse at 50% 0, rgba(255, 255, 255, .16) 0 6px, transparent 6px 26px); }
+.superficie { position: absolute; left: 0; right: 0; top: calc(36% - 3px); height: 6px; background: radial-gradient(ellipse 14px 4px at 50% 50%, rgba(255, 255, 255, .85) 60%, transparent 62%) 0 0 / 22px 6px repeat-x; }
+.margem { position: absolute; background: linear-gradient(180deg, #8fdc6a, #5fb646 70%, #9b6b3e 71%); }
+.m-esq { left: -6%; top: 27%; width: 20%; height: 20%; border-radius: 0 70% 30% 0 / 0 100% 40% 0; }
+.m-dir { right: -6%; top: 29%; width: 24%; height: 18%; border-radius: 70% 0 0 30% / 100% 0 0 40%; }
+.alvo { position: absolute; left: 50%; top: 66%; width: min(var(--z), 96%); height: 34%; transform: translate(-50%, -50%); border: 4px dashed rgba(255, 255, 255, .85); border-radius: 999px; transition: border-color .2s, background-color .2s; }
+.alvo.tem-peixe { border-color: #ffe14d; background: rgba(255, 225, 77, .14); }
+.cardume { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.peixe { position: absolute; left: 0; top: 0; font-size: 2.4rem; line-height: 1; will-change: transform; pointer-events: none; }
+.peixe.fisgado { filter: drop-shadow(0 3px 2px rgba(0, 0, 0, .25)); }
+.pesca { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; overflow: visible; }
+.pesca path, .pesca circle { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.vara-sombra { stroke: rgba(60, 30, 10, .25); stroke-width: 8; }
+.vara { stroke: #8a5526; stroke-width: 5; }
+.vara-luz { stroke: #d69a5c; stroke-width: 1.6; stroke-dasharray: 2 6; }
+.cabo { stroke: #3b2616; stroke-width: 8; }
+.pesca .carretilha { fill: #d5dbe1; stroke: #56606b; stroke-width: 2.2; }
+.fio-halo { stroke: rgba(255, 255, 255, .6); stroke-width: 3.6; }
+.fio { stroke: #1f2933; stroke-width: 1.6; }
+.pesca .boia-b { fill: #fff; stroke: #333; stroke-width: 1.2; }
+.pesca .boia-v { fill: #ff4b4b; stroke: #333; stroke-width: 1.2; }
+.boia-pino { stroke: #333; stroke-width: 1.6; }
+.pesca .anzol-olho { stroke: #4a5562; stroke-width: 1.6; }
+.anzol-c { stroke: #4a5562; stroke-width: 2.2; }
+.balde-boca { position: absolute; z-index: 1; left: calc(86% - 1.75rem); top: calc(34% - 3rem - .35rem); width: 3.5rem; height: .8rem; border-radius: 50%; background: #3e4852; border: 3px solid #b9c3cc; }
+.balde { position: absolute; z-index: 4; left: calc(86% - 1.75rem); top: calc(34% - 3rem); width: 3.5rem; height: 3rem; pointer-events: none; }
+.balde-corpo { position: absolute; inset: 0; background: linear-gradient(90deg, #7d8996, #d3dae1 38%, #a3aeb9 70%, #7d8996); clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%); border-radius: 0 0 8px 8px; }
+.balde-corpo::after { content: ''; position: absolute; left: 0; right: 0; top: 40%; height: 4px; background: rgba(60, 70, 80, .35); }
+.balde-alca { position: absolute; left: 8%; right: 8%; top: -1.3rem; height: 1.6rem; border: 3px solid #56606b; border-bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+.no-balde { position: absolute; left: 30%; top: -1.15rem; font-size: 1.7rem; line-height: 1; transform: rotate(-70deg); }
+.balde.pula { animation: pulinho .35s ease-out; }
+.respingo { position: absolute; z-index: 3; width: 0; height: 0; pointer-events: none; }
+.respingo .anel { position: absolute; left: 0; top: 0; width: 3.4rem; height: .9rem; border: 3px solid rgba(255, 255, 255, .85); border-radius: 50%; transform: translate(-50%, -50%) scale(.3); animation: anel .7s ease-out forwards; }
+.respingo .gota { position: absolute; left: 0; top: 0; width: 7px; height: 9px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #e4f6ff; animation: respingo .65s ease-out forwards; }
+@keyframes anel { to { transform: translate(-50%, -50%) scale(1.7); opacity: 0; } }
+@keyframes respingo { 0% { transform: translate(-50%, -50%); } 50% { transform: translate(calc(-50% + var(--dx) * .6), calc(-50% - var(--up))); } 100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + 4px)); opacity: 0; } }
 /* mercado */
 .toldo { width: min(94vw, 40rem); height: 2.4rem; border-radius: 16px 16px 50% 50% / 16px 16px 30% 30%; background: repeating-linear-gradient(90deg, #ff6b6b 0 28px, #fff 28px 56px); }
 .prateleira { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.4rem, 1fr)); gap: 8px; width: min(94vw, 40rem); }
@@ -188,8 +220,13 @@ a { color: #1d6fb8; }
 .caixinha.guardou { transform: translateY(-120%) scale(.5); opacity: 0; }
 /* vizinha */
 .casinha { position: relative; width: min(94vw, 34rem); min-height: 11rem; border-radius: 24px; background: linear-gradient(180deg, #ffd6e8 0 70%, #8fdc6a 70%); display: flex; align-items: flex-end; justify-content: flex-start; padding: 12px; gap: 10px; }
-.cida { font-size: 5rem; }
+.cida { font-size: 5rem; line-height: 1; transform-origin: 50% 100%; }
+.cida.falando { animation: fala .5s ease-in-out infinite alternate; }
 .balao { position: relative; align-self: flex-start; flex: 1; background: #fff; border-radius: 18px; padding: 10px 14px; font-weight: 600; font-size: 1.05rem; box-shadow: 0 3px 0 #f0c0d8; }
+.balao::before { content: ''; position: absolute; left: -12px; top: 22px; border: 8px solid transparent; border-right: 14px solid #fff; border-left: 0; }
+.balao.novo { animation: balao .3s ease-out; }
+@keyframes fala { from { transform: rotate(-3deg) translateY(0); } to { transform: rotate(3deg) translateY(-4px); } }
+@keyframes balao { from { transform: scale(.85); opacity: .4; } to { transform: scale(1); opacity: 1; } }
 .na-mao { position: absolute; left: 4.2rem; bottom: 2.2rem; font-size: 2rem; }
 .pedidos { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.2rem, 1fr)); gap: 8px; width: min(94vw, 34rem); }
 .favores-txt { font-weight: 700; }
@@ -317,7 +354,6 @@ a { color: #1d6fb8; }
 @keyframes treme { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 @keyframes levanta { 0% { transform: translateY(0); } 30% { transform: translateY(-2.2rem); } 75% { transform: translateY(-2.2rem); } 100% { transform: translateY(0); } }
 @keyframes sobe { to { transform: translateY(-3rem); opacity: 0; } }
-@keyframes pulo { 0% { transform: translate(-50%, -50%); } 50% { transform: translate(-50%, -260%) rotate(-20deg); } 100% { transform: translate(-50%, -500%) scale(.3); opacity: 0; } }
 @keyframes certo { 0% { box-shadow: 0 0 0 0 rgba(43, 182, 115, .6); } 100% { box-shadow: 0 0 0 24px rgba(43, 182, 115, 0); } }
 @keyframes pulinho { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
 @keyframes some { to { opacity: 0; } }

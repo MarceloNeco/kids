@@ -7,9 +7,9 @@
   'use strict';
 
   var TEMAS = {
-    quadrado: { nome: 'jardim', fundo: ['#0f3b2c', '#06261b'], chao: '#f4e6bd', chao2: '#ead59b', topo: '#67d86f', lado: '#2e8a47', risco: '#ff4fa3' },
-    redondo: { nome: 'espaço', fundo: ['#251c66', '#0d0a33'], chao: '#3a2f8f', chao2: '#4a3da6', topo: '#ff8ae0', lado: '#a2378b', risco: '#7ef9ff' },
-    colmeia: { nome: 'colmeia', fundo: ['#4a2a05', '#2a1702'], chao: '#ffeab0', chao2: '#ffd978', topo: '#ffb703', lado: '#a86200', risco: '#7b5cff' }
+    quadrado: { nome: 'jardim', fundo: ['#0f3b2c', '#06261b'], chao: '#f4e6bd', chao2: '#ead59b', topo: '#67d86f', lado: '#2e8a47', risco: '#ff4fa3', poeira: 'rgba(150,118,70,A)' },
+    redondo: { nome: 'espaço', fundo: ['#251c66', '#0d0a33'], chao: '#3a2f8f', chao2: '#4a3da6', topo: '#ff8ae0', lado: '#a2378b', risco: '#7ef9ff', poeira: 'rgba(225,215,255,A)' },
+    colmeia: { nome: 'colmeia', fundo: ['#4a2a05', '#2a1702'], chao: '#ffeab0', chao2: '#ffd978', topo: '#ffb703', lado: '#a86200', risco: '#7b5cff', poeira: 'rgba(176,120,30,A)' }
   };
 
   function tela(cam, x, y) { return [(x - cam.cx) * cam.z + cam.W / 2, (y - cam.cy) * cam.z + cam.H / 2]; }
@@ -116,44 +116,63 @@
     ctx.stroke();
   }
 
-  /* ---------- cachorrinho (unidade: 1 = altura dele) ---------- */
+  /* ---------- cachorrinho (unidade: 1 = altura dele) ----------
+     e = { t: segundos, dir: 1 direita | -1 esquerda, andando, fase: passada (2π = as quatro patas, uma casa), incl: inclinação
+           (subindo/descendo), pulo: 0..1, feliz, hmm: 0..1 enquanto faz "hmm?" (-1 nada), calmo: menos movimento }
+     Andando: patas em diagonal (trote), corpo sobe e desce a cada pisada, orelhas balançam, rabo abana.
+     Parado: respira, abana o rabo devagar e pisca. Calmo (reduzir movimento): sem balanço, patas paradas, só desliza. */
   function cachorro(ctx, x, y, tam, e) {
     e = e || {};
-    var t = e.t || 0, dir = e.dir < 0 ? -1 : 1, anda = e.andando ? 1 : 0, pulo = e.pulo || 0;
+    var t = e.t || 0, dir = e.dir < 0 ? -1 : 1, anda = e.andando ? 1 : 0, pulo = e.pulo || 0, calmo = !!e.calmo;
+    var fase = e.fase == null ? t * 22 : e.fase, mexe = anda && !calmo;
+    var hm = e.hmm >= 0 && e.hmm < 1 ? e.hmm : -1, envH = hm < 0 ? 0 : Math.min(1, hm * 5) * Math.min(1, (1 - hm) * 4);
+    var bob = mexe ? (1 - Math.cos(fase * 2)) * 0.5 * 0.06 : 0;          // sobe e desce a cada pisada
+    var resp = calmo || anda ? 0 : Math.sin(t * 2.6) * 0.022;            // respirando parado
+    var treme = calmo ? 0 : envH * Math.sin(hm * 38) * 0.03;             // "hmm?": balança a cabeça
     ctx.save();
     ctx.translate(x, y);
     // sombra
-    ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(0, tam * 0.36, tam * (0.36 - pulo * 0.12), tam * 0.09, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.translate(0, -pulo * tam * 0.55 - anda * Math.abs(Math.sin(t * 14)) * tam * 0.05);
+    ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(0, tam * 0.36, tam * (0.36 - pulo * 0.12 - bob), tam * 0.09, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.save();
+    ctx.translate(treme * tam, -pulo * tam * 0.55);
     ctx.scale(tam * dir, tam);
-    var pelo = '#e9b97a', escuro = '#8a5426', claro = '#fff1dc';
+    if (e.incl) { ctx.translate(0, 0.15); ctx.rotate(e.incl); ctx.translate(0, -0.15); }
+    var pelo = '#e9b97a', escuro = '#8a5426', claro = '#fff1dc', fundo = '#c99358';
     ctx.lineCap = 'round';
+    // patas: trote (a de trás de um lado junto com a da frente do outro); de longe mais escuras
+    function pata(px, off, cor) {
+      var sw = mexe ? Math.sin(fase + off) * 0.07 : 0, lev = mexe ? Math.max(0, Math.cos(fase + off)) * 0.06 : 0;
+      ctx.strokeStyle = cor; ctx.lineWidth = 0.085;
+      ctx.beginPath(); ctx.moveTo(px, 0.15 - bob); ctx.lineTo(px + sw, 0.31 - lev); ctx.stroke();
+      ctx.fillStyle = escuro; ctx.beginPath(); ctx.ellipse(px + sw + 0.012, 0.325 - lev, 0.055, 0.04, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    pata(-0.19, 0, fundo); pata(0.09, Math.PI, fundo);
     // rabo abanando
-    var ab = Math.sin(t * (e.feliz ? 22 : 10)) * 0.5;
+    var ab = Math.sin(t * (e.feliz ? 22 : mexe ? 16 : 7)) * (mexe || e.feliz ? 0.6 : 0.45);
     ctx.strokeStyle = pelo; ctx.lineWidth = 0.09;
-    ctx.beginPath(); ctx.moveTo(-0.26, 0.08); ctx.quadraticCurveTo(-0.46, -0.02 + ab * 0.1, -0.42 + ab * 0.12, -0.2); ctx.stroke();
-    // patinhas
-    ctx.fillStyle = escuro;
-    var pa = anda ? Math.sin(t * 14) * 0.05 : 0;
-    [[-0.17, pa], [-0.05, -pa], [0.08, pa], [0.2, -pa]].forEach(function (p) { ctx.beginPath(); ctx.ellipse(p[0], 0.3 + p[1], 0.055, 0.06, 0, 0, Math.PI * 2); ctx.fill(); });
-    // corpo
-    ctx.fillStyle = pelo; ctx.beginPath(); ctx.ellipse(0, 0.14, 0.3, 0.2, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = claro; ctx.beginPath(); ctx.ellipse(0.08, 0.2, 0.15, 0.1, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = escuro; ctx.beginPath(); ctx.ellipse(-0.12, 0.06, 0.09, 0.07, 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.26, 0.04 - bob); ctx.quadraticCurveTo(-0.46, -0.06 - bob + ab * 0.1, -0.42 + ab * 0.14, -0.24 - bob); ctx.stroke();
+    pata(-0.07, Math.PI, pelo); pata(0.21, 0, pelo);
+    // corpo (respira quando parado)
+    ctx.save(); ctx.translate(0, 0.26 - bob); ctx.scale(1 + resp * 0.5, 1 + resp); ctx.translate(0, -0.26);
+    ctx.fillStyle = pelo; ctx.beginPath(); ctx.ellipse(0, 0.1, 0.3, 0.17, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = claro; ctx.beginPath(); ctx.ellipse(0.08, 0.16, 0.15, 0.085, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = escuro; ctx.beginPath(); ctx.ellipse(-0.12, 0.03, 0.09, 0.065, 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
     // coleira
-    ctx.strokeStyle = '#ff4f7b'; ctx.lineWidth = 0.05; ctx.beginPath(); ctx.arc(0.13, -0.08, 0.17, 0.6, 2.2); ctx.stroke();
-    ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.arc(0.1, 0.09, 0.035, 0, Math.PI * 2); ctx.fill();
-    // cabeça
-    ctx.save(); ctx.translate(0.14, -0.2); ctx.rotate(Math.sin(t * 3) * 0.06);
-    var orelha = e.feliz ? Math.sin(t * 18) * 0.25 : Math.sin(t * 2) * 0.08;
+    ctx.strokeStyle = '#ff4f7b'; ctx.lineWidth = 0.05; ctx.beginPath(); ctx.arc(0.13, -0.1 - bob, 0.17, 0.6, 2.2); ctx.stroke();
+    ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.arc(0.1, 0.07 - bob, 0.035, 0, Math.PI * 2); ctx.fill();
+    // cabeça (balança um pouco a cada pisada; no "hmm?" inclina)
+    ctx.save(); ctx.translate(0.14, -0.22 - bob * 0.7 + resp * 0.6);
+    ctx.rotate(Math.sin(t * 3) * 0.06 + (mexe ? Math.sin(fase * 2) * 0.05 : 0) - envH * 0.42 + (calmo ? 0 : envH * Math.sin(hm * 30) * 0.08));
+    var orelha = e.feliz ? Math.sin(t * 18) * 0.25 : mexe ? Math.sin(fase * 2 - 0.9) * 0.35 : Math.sin(t * 2) * 0.08;
     ctx.fillStyle = escuro;
-    ctx.save(); ctx.translate(-0.2, -0.06); ctx.rotate(0.35 + orelha); ctx.beginPath(); ctx.ellipse(0, 0.1, 0.08, 0.16, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(-0.2, -0.06); ctx.rotate(0.35 + orelha + envH * 0.5); ctx.beginPath(); ctx.ellipse(0, 0.1, 0.08, 0.16, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     ctx.fillStyle = pelo; ctx.beginPath(); ctx.arc(0, 0, 0.24, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = claro; ctx.beginPath(); ctx.ellipse(0.06, 0.09, 0.14, 0.1, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = escuro;
-    ctx.save(); ctx.translate(0.19, -0.07); ctx.rotate(-0.35 - orelha); ctx.beginPath(); ctx.ellipse(0, 0.1, 0.08, 0.16, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-    // olhos (piscam de vez em quando)
-    var pisca = (t % 3.2) < 0.12 ? 0.15 : 1;
+    ctx.save(); ctx.translate(0.19, -0.07); ctx.rotate(-0.35 - orelha * 0.8); ctx.beginPath(); ctx.ellipse(0, 0.1, 0.08, 0.16, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    // olhos (piscam de vez em quando; às vezes duas vezes seguidas)
+    var pisca = (t % 3.7) < 0.12 || ((t + 1.1) % 7.9) < 0.1 ? 0.15 : 1;
     ctx.fillStyle = '#1b1446';
     [[-0.04, -0.04], [0.12, -0.04]].forEach(function (o) { ctx.beginPath(); ctx.ellipse(o[0], o[1], 0.042, 0.05 * pisca, 0, 0, Math.PI * 2); ctx.fill(); });
     if (pisca === 1) { ctx.fillStyle = '#fff'; [[-0.03, -0.06], [0.13, -0.06]].forEach(function (o) { ctx.beginPath(); ctx.arc(o[0], o[1], 0.014, 0, Math.PI * 2); ctx.fill(); }); }
@@ -163,8 +182,20 @@
     ctx.fillStyle = '#2a1a10'; ctx.beginPath(); ctx.ellipse(0.06, 0.05, 0.045, 0.032, 0, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#2a1a10'; ctx.lineWidth = 0.02;
     ctx.beginPath(); ctx.moveTo(0.06, 0.08); ctx.quadraticCurveTo(0.02, 0.13, -0.01, 0.1); ctx.moveTo(0.06, 0.08); ctx.quadraticCurveTo(0.1, 0.13, 0.13, 0.1); ctx.stroke();
-    if (e.feliz || anda) { ctx.fillStyle = '#ff6f91'; ctx.beginPath(); ctx.ellipse(0.06, 0.15, 0.035, 0.05 + (e.feliz ? 0.015 * Math.sin(t * 20) : 0), 0, 0, Math.PI * 2); ctx.fill(); }
+    if (e.feliz || anda) { ctx.fillStyle = '#ff6f91'; ctx.beginPath(); ctx.ellipse(0.06, 0.15, 0.035, 0.05 + (e.feliz ? 0.015 * Math.sin(t * 20) : mexe ? 0.012 * Math.sin(fase * 2) : 0), 0, 0, Math.PI * 2); ctx.fill(); }
     ctx.restore();
+    ctx.restore();
+    // balãozinho com "?" em cima da cabeça (sem espelhar)
+    if (hm >= 0) {
+      var ka = Math.min(1, hm * 6) * Math.min(1, (1 - hm) * 5);
+      ctx.save(); ctx.globalAlpha = ka;
+      ctx.translate(tam * 0.34 * dir, -tam * (0.72 + pulo * 0.55)); ctx.scale(tam * (0.7 + 0.3 * Math.min(1, hm * 6)), tam * (0.7 + 0.3 * Math.min(1, hm * 6)));
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, 0.17, 0, Math.PI * 2); ctx.moveTo(-0.08 * dir, 0.13); ctx.lineTo(-0.16 * dir, 0.25); ctx.lineTo(0.02 * dir, 0.16); ctx.fill();
+      ctx.strokeStyle = '#6a3fd6'; ctx.lineWidth = 0.04; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.arc(0, -0.045, 0.06, Math.PI * 1.05, Math.PI * 2.35); ctx.lineTo(0, 0.045); ctx.stroke();
+      ctx.fillStyle = '#6a3fd6'; ctx.beginPath(); ctx.arc(0, 0.1, 0.024, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
     ctx.restore();
   }
 
