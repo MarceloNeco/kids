@@ -161,14 +161,14 @@ a { color: #1d6fb8; }
 .bt-segurar .barra span { display: block; height: 100%; width: 0; background: #fff; }
 .bt-segurar.segurando { transform: translateY(3px) scale(.98); }
 /* rio */
-.agua { position: relative; width: min(94vw, 36rem); height: 18rem; border-radius: 26px; overflow: hidden; cursor: pointer; touch-action: manipulation;
-  background: linear-gradient(180deg, #bfeaff 0, #8fd8ff 36%, #49aef0 36%, #2a8fd8 70%, #1a6fb5); }
-.ondas { position: absolute; inset: 36% 0 0; background: repeating-radial-gradient(ellipse at 50% 0, rgba(255, 255, 255, .16) 0 6px, transparent 6px 26px); }
-.superficie { position: absolute; left: 0; right: 0; top: calc(36% - 3px); height: 6px; background: radial-gradient(ellipse 14px 4px at 50% 50%, rgba(255, 255, 255, .85) 60%, transparent 62%) 0 0 / 22px 6px repeat-x; }
+.agua { position: relative; width: min(94vw, 36rem); height: 20rem; border-radius: 26px; overflow: hidden; cursor: pointer; touch-action: manipulation;
+  background: linear-gradient(180deg, #bfeaff 0, #8fd8ff 42%, #49aef0 42%, #2a8fd8 72%, #1a6fb5); }
+.ondas { position: absolute; inset: 42% 0 0; background: repeating-radial-gradient(ellipse at 50% 0, rgba(255, 255, 255, .16) 0 6px, transparent 6px 26px); }
+.superficie { position: absolute; left: 0; right: 0; top: calc(42% - 3px); height: 6px; background: radial-gradient(ellipse 14px 4px at 50% 50%, rgba(255, 255, 255, .85) 60%, transparent 62%) 0 0 / 22px 6px repeat-x; }
 .margem { position: absolute; background: linear-gradient(180deg, #8fdc6a, #5fb646 70%, #9b6b3e 71%); }
-.m-esq { left: -6%; top: 27%; width: 20%; height: 20%; border-radius: 0 70% 30% 0 / 0 100% 40% 0; }
-.m-dir { right: -6%; top: 29%; width: 24%; height: 18%; border-radius: 70% 0 0 30% / 100% 0 0 40%; }
-.alvo { position: absolute; left: 50%; top: 66%; width: min(var(--z), 96%); height: 34%; transform: translate(-50%, -50%); border: 4px dashed rgba(255, 255, 255, .85); border-radius: 999px; transition: border-color .2s, background-color .2s; }
+.m-esq { left: -6%; top: 33%; width: 20%; height: 18%; border-radius: 0 70% 30% 0 / 0 100% 40% 0; }
+.m-dir { right: -6%; top: 38.5%; width: 30%; height: 14%; border-radius: 70% 0 0 30% / 100% 0 0 40%; }
+.alvo { position: absolute; left: 50%; top: 71%; width: min(var(--z), 96%); height: 32%; transform: translate(-50%, -50%); border: 4px dashed rgba(255, 255, 255, .85); border-radius: 999px; transition: border-color .2s, background-color .2s; }
 .alvo.tem-peixe { border-color: #ffe14d; background: rgba(255, 225, 77, .14); }
 .cardume { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .peixe { position: absolute; left: 0; top: 0; font-size: 2.4rem; line-height: 1; will-change: transform; pointer-events: none; }
@@ -187,12 +187,12 @@ a { color: #1d6fb8; }
 .boia-pino { stroke: #333; stroke-width: 1.6; }
 .pesca .anzol-olho { stroke: #4a5562; stroke-width: 1.6; }
 .anzol-c { stroke: #4a5562; stroke-width: 2.2; }
-.balde-boca { position: absolute; z-index: 1; left: calc(86% - 1.75rem); top: calc(34% - 3rem - .35rem); width: 3.5rem; height: .8rem; border-radius: 50%; background: #3e4852; border: 3px solid #b9c3cc; }
-.balde { position: absolute; z-index: 4; left: calc(86% - 1.75rem); top: calc(34% - 3rem); width: 3.5rem; height: 3rem; pointer-events: none; }
+.balde-boca { position: absolute; z-index: 1; left: calc(86% - 1.45rem); top: calc(41% - 2.2rem - .3rem); width: 2.9rem; height: .7rem; border-radius: 50%; background: #3e4852; border: 3px solid #b9c3cc; }
+.balde { position: absolute; z-index: 4; left: calc(86% - 1.45rem); top: calc(41% - 2.2rem); width: 2.9rem; height: 2.2rem; pointer-events: none; }
 .balde-corpo { position: absolute; inset: 0; background: linear-gradient(90deg, #7d8996, #d3dae1 38%, #a3aeb9 70%, #7d8996); clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%); border-radius: 0 0 8px 8px; }
 .balde-corpo::after { content: ''; position: absolute; left: 0; right: 0; top: 40%; height: 4px; background: rgba(60, 70, 80, .35); }
-.balde-alca { position: absolute; left: 8%; right: 8%; top: -1.3rem; height: 1.6rem; border: 3px solid #56606b; border-bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
-.no-balde { position: absolute; left: 30%; top: -1.15rem; font-size: 1.7rem; line-height: 1; transform: rotate(-70deg); }
+.balde-alca { position: absolute; left: 10%; right: 10%; top: -.95rem; height: 1.2rem; border: 3px solid #56606b; border-bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+.no-balde { position: absolute; left: 26%; top: -1rem; font-size: 1.35rem; line-height: 1; transform: rotate(-70deg); }
 .balde.pula { animation: pulinho .35s ease-out; }
 .respingo { position: absolute; z-index: 3; width: 0; height: 0; pointer-events: none; }
 .respingo .anel { position: absolute; left: 0; top: 0; width: 3.4rem; height: .9rem; border: 3px solid rgba(255, 255, 255, .85); border-radius: 50%; transform: translate(-50%, -50%) scale(.3); animation: anel .7s ease-out forwards; }

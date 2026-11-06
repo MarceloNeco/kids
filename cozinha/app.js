@@ -458,7 +458,7 @@
   MINI.rio = function (area) {
     var nv = jogo.cfg, zona = RAPIDO ? 0.5 : nv.zonaPeixe, vel = nv.id === 'facil' ? 0.12 : nv.id === 'medio' ? 0.17 : 0.23;
     var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-    var SUP = 0.42, ANZOL_Y = 0.7, TIP0 = [0.5, 0.05], TIP_B = [0.64, 0.02], BASE = [0.05, 0.36], ESC = 1.3, RAIAS = [0.58, 0.71, 0.84];
+    var SUP = 0.42, ANZOL_Y = 0.7, TIP0 = [0.5, 0.05], TIP_B = [0.6, 0.02], BASE = [0.05, 0.36], ESC = 1.3, RAIAS = [0.58, 0.71, 0.84];
     area.innerHTML = '<p class="instr">' + t('Toque em Puxar quando um peixinho passar dentro do círculo, perto do anzol. Ele fica preso no anzol e vai para o balde!', 'Tap Pull when a little fish swims inside the circle, near the hook. It gets hooked and goes into the bucket!') + '</p>' +
       '<div class="agua" data-fase="pronto"><div class="ondas"></div><div class="superficie"></div><div class="margem m-esq"></div><div class="margem m-dir"></div>' +
       '<div class="alvo" style="--z:' + (zona * 200) + '%"></div><div class="balde-boca"></div><div class="cardume"></div>' +
@@ -491,10 +491,10 @@
     // estado da pescaria: pronto → vai (o peixe nada até o anzol) → sobe → balanca (até o balde) → solta → volta → pronto.
     // O anzol fica sempre pendurado na ponta da vara: comprimento da linha (l) e ângulo (fi, 0 = reto para baixo).
     var DUR = { treme: 0.35, vai: 0.18, sobe: calmo ? 0.8 : 1.1, balanca: calmo ? 0.5 : 0.85, solta: 0.45, volta: 0.8 };
-    var fase = 'pronto', t0 = 0, preso = null, larg = 40, creditou = false, saiu = false, ult = 0, raf = 0, vivo = true;
+    var fase = 'pronto', t0 = 0, preso = null, creditou = false, saiu = false, ult = 0, raf = 0, vivo = true;
     function mudar(f) { fase = f; t0 = relogio; agua.setAttribute('data-fase', f); }
     function suave(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
-    function balanco(p) { var c = 1.9; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); }   // passa um pouco e volta
+    function balanco(p) { var c = 1.1; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); }   // passa um pouco e volta
     function mix(a, b, p) { return a + (b - a) * p; }
     function mover(el, x, y, rot, sx, op) { el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) rotate(' + rot.toFixed(1) + 'deg) scaleX(' + sx + ')'; if (op != null) el.style.opacity = op; }
     function respingo(x, y, forte) {
@@ -511,11 +511,11 @@
       var p = Math.min(1, (relogio - t0) / (DUR[fase] || 1)), e = suave(p);
       // vara, linha e anzol
       var tipF = TIP0, carga = 0, lRest = (ANZOL_Y - TIP0[1]) * H, lSobe = 0.06 * H, l = lRest, fi = calmo ? 0 : 0.012 * Math.sin(relogio * 1.1);
-      var tB = ponta(TIP_B, 1), alvoB = [baldeX * W + 6, bocaY - 30], lB = Math.hypot(alvoB[0] - tB[0], alvoB[1] - tB[1]), fiB = Math.atan2(alvoB[0] - tB[0], alvoB[1] - tB[1]);
+      var tB = ponta(TIP_B, 1), alvoB = [baldeX * W - 2, bocaY - 22], lB = Math.hypot(alvoB[0] - tB[0], alvoB[1] - tB[1]), fiB = Math.atan2(alvoB[0] - tB[0], alvoB[1] - tB[1]);
       if (fase === 'treme') { l = lRest - 0.12 * H * Math.sin(Math.PI * p); }
       else if (fase === 'vai') carga = e;
       else if (fase === 'sobe') { carga = 1; l = mix(lRest, lSobe, e); fi = 0; }
-      else if (fase === 'balanca') { carga = 1; tipF = [mix(TIP0[0], TIP_B[0], e), mix(TIP0[1], TIP_B[1], e)]; var b = calmo ? e : balanco(p); l = mix(lSobe, lB, Math.min(1, b)); fi = mix(0, fiB, b); }
+      else if (fase === 'balanca') { carga = 1; tipF = [mix(TIP0[0], TIP_B[0], e), mix(TIP0[1], TIP_B[1], e)]; var b = calmo ? e : balanco(p); l = mix(lSobe, lB, e); fi = mix(0, fiB, b); }
       else if (fase === 'solta') { carga = 1; tipF = TIP_B; l = lB; fi = fiB; }
       else if (fase === 'volta') { carga = 1 - e; tipF = [mix(TIP_B[0], TIP0[0], e), mix(TIP_B[1], TIP0[1], e)]; l = mix(lB, lRest, e); fi = mix(fiB, 0, e); }
       var tp = ponta(tipF, carga), tx = tp[0], ty = tp[1], bx = BASE[0] * W, by = BASE[1] * H;
@@ -586,7 +586,7 @@
       if (fase !== 'pronto') return;
       var perto = peixes.filter(function (f) { return !f.entrando && Math.abs(f.x - 0.5) <= zona; }).sort(function (a, b) { return Math.abs(a.x - 0.5) - Math.abs(b.x - 0.5); })[0];
       if (perto) {
-        preso = perto; larg = perto.w; creditou = false; saiu = false; alvo.classList.remove('tem-peixe');
+        preso = perto; creditou = false; saiu = false; alvo.classList.remove('tem-peixe');
         preso.sx = preso.dir > 0 ? -1 : 1;
         var y = (preso.y0 + (calmo ? 0 : 0.02 * Math.sin(relogio * 1.3 + preso.fase))) * H;
         preso.hx0 = preso.x * W + (preso.sx > 0 ? -0.4 : 0.4) * preso.w; preso.hy0 = y;   // a cabeça do peixe
