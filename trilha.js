@@ -124,12 +124,18 @@
       '.trilha button:focus-visible{outline:3px solid #ffd166}' +
       '.trilha .tr-nome{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:11rem}' +
       '.trilha .tr-nome a{color:#9ee7ff}' +
-      '.trilha.mini .tr-nome{display:none}' +
+      // recolhido (06/Nov/2026, pedido do dono: o tocador cobria os botões do jogo): só uma bolinha 🎵 pequena e meio
+      // transparente no canto; um toque abre por 5 s e ela volta a recolher sozinha
+      '.trilha .tr-abrir{display:none}' +
+      '.trilha.mini{padding:0;gap:0;background:rgba(20,16,58,.55);opacity:.8}' +
+      '.trilha.mini .tr-som,.trilha.mini .tr-prox,.trilha.mini .tr-nome{display:none}' +
+      '.trilha.mini .tr-abrir{display:block;width:36px;height:36px;font-size:1rem}' +
       '@media (max-width:30rem){.trilha .tr-nome{max-width:7rem}}';
     document.head.appendChild(st);
     var bar = document.createElement('div');
     bar.className = 'trilha'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', t('Música', 'Music'));
-    bar.innerHTML = '<button type="button" class="tr-som"></button><button type="button" class="tr-prox" aria-label="' +
+    bar.innerHTML = '<button type="button" class="tr-abrir" aria-label="' + t('Música', 'Music') + '">🎵</button>' +
+      '<button type="button" class="tr-som"></button><button type="button" class="tr-prox" aria-label="' +
       t('Próxima música', 'Next song') + '">⏭</button><span class="tr-nome" aria-live="polite"></span>';
     document.body.appendChild(bar);
     var bSom = bar.querySelector('.tr-som'), nome = bar.querySelector('.tr-nome');
@@ -186,8 +192,11 @@
     });
 
     carregar(atual);
-    setTimeout(function () { bar.classList.add('mini'); }, 6000);
-    bar.addEventListener('pointerenter', function () { bar.classList.remove('mini'); });
+    var recolher = 0;
+    function recolherDepois(ms) { clearTimeout(recolher); recolher = setTimeout(function () { bar.classList.add('mini'); }, ms); }
+    recolherDepois(5000);
+    bar.querySelector('.tr-abrir').addEventListener('click', function () { bar.classList.remove('mini'); recolherDepois(5000); });
+    bar.addEventListener('click', function (e) { if (!bar.classList.contains('mini') && !e.target.closest('.tr-abrir')) recolherDepois(5000); });
 
     function comecar() {
       if (mudo()) return;
