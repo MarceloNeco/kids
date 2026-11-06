@@ -2,6 +2,19 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.28",
+      "data": "06/Nov/2026",
+      "hora": "21:30:00",
+      "pt": [
+        "⚽ Chuta-chuta: agora a bola entra no gol! Chute reto vai para o gol; quase sempre entra, de vez em quando passa raspando. Passar o dedo mais rápido chuta mais forte (a bola vai mais depressa).",
+        "🎯 Piscina de bolinhas: dos lados do gol, o papai (esquerda) e a mamãe (direita) ficam sentados na cadeirinha que dobra, dando tchauzinho. Chute para o lado deles e acerte o alvo: a cadeira dobra, eles caem na piscina, as bolinhas espirram para todo lado, eles riem e sobem de novo pela escadinha. Vale 40 pontos."
+      ],
+      "en": [
+        "⚽ Kick: the ball now goes into the goal! A straight kick goes to the goal; it almost always scores, now and then it just misses. Swiping faster kicks harder (the ball goes faster).",
+        "🎯 Ball pit: on each side of the goal, Dad (left) and Mom (right) sit on the folding seat, waving. Kick toward them and hit the target: the seat folds, they fall into the ball pit, balls splash everywhere, they laugh and climb back up the ladder. Worth 40 points."
+      ]
+    },
+    {
       "versao": "0.8.27",
       "data": "06/Nov/2026",
       "hora": "20:30:00",
