@@ -2,6 +2,21 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.25",
+      "data": "06/Nov/2026",
+      "hora": "17:30:00",
+      "pt": [
+        "Os botões (✕, ⏸, 🧍, 🔊, 🎵) e as setinhas dos cômodos não ficam mais em cima da área do jogo, em todas as brincadeiras: com o aparelho deitado eles ficam numa faixa ao lado (e as setinhas embaixo); em pé, numa fileira no alto.",
+        "🧸 Bagunça no dedo: o dedo só mostra aonde ir. Quem bagunça é o boneco, quando chega lá e encosta: com a mão no que está no alto (ele agacha e pula para alcançar) e com os pés no que está no chão.",
+        "🎵 Saiu a música que parecia de videogame antigo (8-bit). A música de reserva (sem internet) ficou com som mais macio."
+      ],
+      "en": [
+        "The buttons (✕, ⏸, 🧍, 🔊, 🎵) and the room arrows no longer sit on top of the play area, in every game: with the device sideways they go to a strip on the side (arrows at the bottom); upright, to a row at the top.",
+        "🧸 Mayhem with your finger: the finger only shows where to go. The avatar makes the mess when it gets there and touches things: with its hand up high (it crouches and jumps to reach) and with its feet on the floor.",
+        "🎵 The music that sounded like an old video game (8-bit) is gone. The backup music (offline) now sounds softer."
+      ]
+    },
+    {
       "versao": "0.8.24",
       "data": "06/Nov/2026",
       "hora": "16:00:00",

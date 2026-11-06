@@ -117,20 +117,21 @@
     for (var c = 0; c < 2; c++) { var d = b.getChannelData(c); for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.6); }
     return b;
   }
-  /* As faixas são a mesma música-base com outro andamento, outro tom, outra ordem de acordes, outra batida e outro
+  /* Reserva sem internet: só timbres macios (triângulo e seno); onda quadrada e serrote soavam como videogame antigo.
+     As faixas são a mesma música-base com outro andamento, outro tom, outra ordem de acordes, outra batida e outro
      timbre e desenho de melodia: soam como músicas diferentes sem nenhum arquivo. */
   var FAIXAS = [
     { bpm: 124, tom: 0, ordem: [0, 1, 2, 3], batida: 'reta', lead: 'triangle', desloc: 0 },     // 0: carregamento e "Quem vai jogar"
-    { bpm: 132, tom: 2, ordem: [2, 3, 0, 1], batida: 'reta', lead: 'square', desloc: 1 },
+    { bpm: 132, tom: 2, ordem: [2, 3, 0, 1], batida: 'reta', lead: 'triangle', desloc: 1 },
     { bpm: 104, tom: -3, ordem: [0, 3, 1, 2], batida: 'balanco', lead: 'triangle', desloc: -1 },
-    { bpm: 140, tom: 5, ordem: [3, 0, 1, 2], batida: 'galope', lead: 'sawtooth', desloc: 0 },
-    { bpm: 116, tom: -5, ordem: [0, 2, 3, 1], batida: 'balanco', lead: 'square', desloc: 2 },
+    { bpm: 140, tom: 5, ordem: [3, 0, 1, 2], batida: 'galope', lead: 'sine', desloc: 0 },
+    { bpm: 116, tom: -5, ordem: [0, 2, 3, 1], batida: 'balanco', lead: 'triangle', desloc: 2 },
     { bpm: 128, tom: 3, ordem: [2, 1, 3, 0], batida: 'galope', lead: 'triangle', desloc: -2 },
     { bpm: 120, tom: 7, ordem: [0, 1, 3, 2], batida: 'reta', lead: 'sine', desloc: 1 }
   ];
   // 0 = tela "Quem vai jogar" (um laço curto); as outras se revezam nas rodadas
   var TRILHA = ['comic-game-loop-mischief', 'funshine', 'happy-whistling-ukulele', 'ukulele-song', 'going-bananas', 'llama-in-pajama',
-    'my-giant-bunny-friend', 'spring-chicken', 'wakka-wakka', 'hippety-hop', 'silly-boy', 'city-sunshine', 'bit-bit-loop'];
+    'my-giant-bunny-friend', 'spring-chicken', 'wakka-wakka', 'hippety-hop', 'silly-boy', 'city-sunshine'];   // sem a Bit Bit Loop: 8-bit soava como videogame antigo (pedido do dono)
   function volMusica() { return loop && loop.audio ? (baixo ? 0.18 : 0.6) : (baixo ? 0.14 : 0.42); }
   function parar() {
     if (!loop) return;
@@ -209,9 +210,9 @@
         // baixo em colcheias, oitava acima nas colcheias fracas
         if (sub === 0 || sub === 2) osc('sawtooth', BAIXO[grau] * k * (sub === 2 ? 2 : 1), t, semi * 1.8, bassF, 0.5, 0, 0.005);
         // pad: no início de cada tempo, pulsando (como um sidechain)
-        if (sub === 0) { var durP = semi * 3.6; acorde.forEach(function (f, i) { f *= k; osc('sawtooth', f, t + 0.02, durP, padF, 0.08, -7, 0.03); osc('sawtooth', f, t + 0.02, durP, padF, 0.08, 7, 0.03); if (i === 0) osc('square', f / 2, t + 0.02, durP, padF, 0.05, 0, 0.03); }); }
+        if (sub === 0) { var durP = semi * 3.6; acorde.forEach(function (f, i) { f *= k; osc('triangle', f, t + 0.02, durP, padF, 0.12, -7, 0.03); osc('triangle', f, t + 0.02, durP, padF, 0.12, 7, 0.03); if (i === 0) osc('sine', f / 2, t + 0.02, durP, padF, 0.08, 0, 0.03); }); }
         // melodia-gancho (começa na 2ª volta, para a introdução respirar)
-        if (passo >= 128 && t >= melAte) { var n = GANCHO[melI % GANCHO.length]; melI++; var durN = (n[0] === 0 && n.length === 3 ? n[2] : n[1]) * semi; if (n[0] !== 0) { var fm = PENTA[Math.max(0, Math.min(PENTA.length - 1, n[0] - 1 + F.desloc))] * k; osc(F.lead, fm, t, durN * 0.95, leadG, F.lead === 'triangle' || F.lead === 'sine' ? 0.9 : 0.35, 0, 0.01); osc('square', fm * 2, t, durN * 0.6, leadG, 0.18, 5, 0.01); } melAte = t + durN; }
+        if (passo >= 128 && t >= melAte) { var n = GANCHO[melI % GANCHO.length]; melI++; var durN = (n[0] === 0 && n.length === 3 ? n[2] : n[1]) * semi; if (n[0] !== 0) { var fm = PENTA[Math.max(0, Math.min(PENTA.length - 1, n[0] - 1 + F.desloc))] * k; osc(F.lead, fm, t, durN * 0.95, leadG, F.lead === 'triangle' || F.lead === 'sine' ? 0.9 : 0.35, 0, 0.01); osc('sine', fm * 2, t, durN * 0.6, leadG, 0.14, 5, 0.01); } melAte = t + durN; }
         t += semi; passo++;
       }
     }, 120) };

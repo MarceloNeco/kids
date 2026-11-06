@@ -656,40 +656,48 @@
     }
     /* 👆 no dedo, o boneco ANDA até o dedo (não teletransporta): rápido de criança, mas dá para ver andar; pula se o dedo
        está alto; chegou e o dedo continua lá em cima → vira de costas, mexendo nas coisas. Câmera: o corpo manda (corpo()). */
-    var BON = { A: 175, vmax: W / 2.4, acel: 5000, g: 2600, puloMax: 260 };
+    var BON = { A: 175, vmax: W / 2.4, acel: 5000, g: 2600, puloMax: 300, puloAlto: 400 };   // puloAlto: para alcançar o que está lá em cima
     /* ⌨️ computador: ← → andam, ↑/Espaço pulam; andar até a beira leva ao cômodo do lado (1 pessoa) */
     function teclas(j, t) { var jg = jogadores[j]; if (!jg || !t) return; jg.tec = { esq: !!t.esq, dir: !!t.dir, pulo: !!t.pulo }; if (t.esq || t.dir || t.pulo) jg.alvo = null; }
-    function dedo(j, nx, ny) { var jg = jogadores[j]; if (!jg) return; if (nx != null) jg.tec = null; if (nx == null) { if (jg.alvo) jg.alvo.solto = true; return; } var r = raia(j); jg.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h, t: tempo }; }   // null: soltou o dedo
+    function dedo(j, nx, ny) { var jg = jogadores[j]; if (!jg) return; if (nx != null) { jg.tec = null; jg.usou = true; } if (nx == null) { if (jg.alvo) jg.alvo.solto = true; return; } var r = raia(j); jg.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h, t: tempo }; }   // null: soltou o dedo
     function andarBoneco(dt) {
       jogadores.forEach(function (jg, j) {
         var r = raia(j), b = jg.bon || (jg.bon = { x: r.x + jg.corpo.x * r.w, y: 0, vx: 0, vy: 0 }), al = jg.alvo, A = BON.A, tec = jg.tec;
-        if (!al && !tec) { b.x = r.x + jg.corpo.x * r.w; return; }   // sem dedo nem teclado: quem manda é o corpo (câmera)
+        if (!al && !tec) { b.x = r.x + jg.corpo.x * r.w; b.cima = b.costas = false; pularEcair(b, dt); return; }   // sem dedo nem teclado: quem manda é o corpo (câmera)
         var x0 = b.x, y0 = b.y;
         if (tec) {
           var sent = (tec.dir ? 1 : 0) - (tec.esq ? 1 : 0);
           b.vx += clamp(sent * BON.vmax - b.vx, -BON.acel * dt, BON.acel * dt);
-          if (tec.pulo && b.y === 0) { b.vy = -Math.sqrt(2 * BON.g * BON.puloMax); tec.pulo = false; }   // um pulo por toque
+          if (tec.pulo && b.y === 0 && !b.agacha) { b.agacha = 0.1; b.puloV = -Math.sqrt(2 * BON.g * BON.puloMax); tec.pulo = false; }   // um pulo por toque (agacha antes)
           b.x = clamp(b.x + b.vx * dt, r.x + A * 0.25, r.x + r.w - A * 0.25);
           var naBeira = sent !== 0 && (b.x <= r.x + A * 0.25 + 0.5 || b.x >= r.x + r.w - A * 0.25 - 0.5);
           b.beira = naBeira ? (b.beira || 0) + dt : 0;
           if (b.beira > 0.35 && nJog === 1 && !arrumando) { b.beira = 0; irPara(sent); b.x = sent > 0 ? r.x + A * 0.3 : r.x + r.w - A * 0.3; b.vx = sent * BON.vmax * 0.5; }   // passou pela porta
-          if (b.y < 0 || b.vy < 0) { b.vy += BON.g * dt; b.y = Math.min(0, b.y + b.vy * dt); if (b.y === 0) b.vy = 0; }
+          pularEcair(b, dt);
           b.cima = b.y < -20; b.costas = false;
           jg.corpo.x = (b.x - r.x) / r.w; jg.corpo.pulando = b.y < -10;
           bateCorpo(j, x0, y0, b);
           return;
         }
-        var dx = al.x - b.x, quer = clamp(dx * 6, -BON.vmax, BON.vmax);
+        // 👆 o dedo só mostra aonde ir: quem bagunça é o boneco, quando chega e ENCOSTA (mão no alvo, pé no chão)
+        var dx = al.x - b.x, quer = clamp(dx * 6, -BON.vmax, BON.vmax), perto = Math.abs(dx) < 70;
         b.vx += clamp(quer - b.vx, -BON.acel * dt, BON.acel * dt);
         b.x = clamp(b.x + b.vx * dt, r.x + A * 0.25, r.x + r.w - A * 0.25);
         var ombro = M.chao - A * 1.05, segura = !al.solto;
-        if (b.y === 0 && segura && al.y < ombro && Math.abs(dx) < 70) b.vy = -Math.sqrt(2 * BON.g * Math.min(BON.puloMax, ombro - al.y + 30));
-        if (b.y < 0 || b.vy < 0) { b.vy += BON.g * dt; b.y = Math.min(0, b.y + b.vy * dt); if (b.y === 0) b.vy = 0; }
-        b.cima = segura && al.y < M.chao - A * 0.75 && Math.abs(dx) < 120;
+        if (b.y === 0 && !b.agacha && perto && al.y < ombro && (segura || !al.pulou)) { b.agacha = 0.14; b.puloV = -Math.sqrt(2 * BON.g * Math.min(BON.puloAlto, ombro - al.y + 40)); al.pulou = true; }   // alto: agacha e pula na altura certa
+        pularEcair(b, dt);
+        var topo = M.chao + b.y - A * 1.22, alcanca = Math.abs(al.x - b.x) < 48 && al.y >= topo - 15 && al.y <= M.chao + 20;
+        if (alcanca && tempo >= (b.maoAte || 0)) { b.maoAte = tempo + 200; b.mexeu = true; var lado = al.x >= b.x ? 1 : -1; tocar(j, { x: al.x - lado * 14, y: al.y + 14 }, { x: al.x, y: al.y }, b.vx + lado * 160, b.vy, tempo, 'h' + j); }
+        if (al.solto && Math.abs(dx) < 25 && b.y === 0 && !b.agacha) { al.fim = al.fim || tempo + (b.mexeu ? 450 : 800); if (tempo >= al.fim) { jg.alvo = null; b.vx = 0; b.mexeu = false; } }   // tocou e soltou: vai, mexe e para
+        b.cima = alcanca || (segura && al.y < M.chao - A * 0.75 && Math.abs(dx) < 120) || b.y < -20;
         b.costas = segura && Math.abs(dx) < 25 && Math.abs(b.vx) < 40 && al.y < M.chao - A * 0.35;   // chegou: de costas, mexendo
         jg.corpo.x = (b.x - r.x) / r.w; jg.corpo.pulando = b.y < -10;
         bateCorpo(j, x0, y0, b);
       });
+    }
+    function pularEcair(b, dt) {   // agacha (joelho dobra) → sobe → cai
+      if (b.agacha > 0) { b.agacha -= dt; if (b.agacha <= 0) { b.agacha = 0; b.vy = b.puloV; } }
+      if (b.y < 0 || b.vy < 0) { b.vy += BON.g * dt; b.y = Math.min(0, b.y + b.vy * dt); if (b.y === 0) b.vy = 0; }
     }
     function bateCorpo(j, x0, y0, b) {   // o corpo do boneco também bagunça: os pés chutam o que está no chão, as mãos batem no alto ao pular
       if (arrumando || (Math.abs(b.vx) < 60 && b.y === 0)) return;
@@ -811,7 +819,7 @@
     function estado() {
       return {
         fase: fase, modo: arrumando ? 'arrumar' : 'bagunca', modoBase: arrumando ? 'arrumar' : 'bagunca', arrumando: arrumando, tempo: tempo, restante: duracao ? Math.max(0, Math.ceil((duracao * 1000 - tempo) / 1000)) : null,
-        jogadores: jogadores.map(function (jg, j) { return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: 0, poder: null, poderAte: 0, lento: false, raia: raia(j), zonaChute: 0.6, rastro: tempo - (jg.rastroEm || 0) < 400 ? jg.rastro.slice(-8) : [], corpo: jg.corpo, vai: (jg.alvo || jg.tec) && jg.bon ? { x: jg.bon.x, y: jg.bon.y, vx: jg.bon.vx, A: BON.A, cima: jg.bon.cima, costas: jg.bon.costas, alvo: null } : null, invencivel: false, esqueleto: null }; }),
+        jogadores: jogadores.map(function (jg, j) { return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: 0, poder: null, poderAte: 0, lento: false, raia: raia(j), zonaChute: 0.6, rastro: tempo - (jg.rastroEm || 0) < 400 ? jg.rastro.slice(-8) : [], corpo: jg.corpo, vai: (jg.alvo || jg.tec || jg.usou) && jg.bon ? { agacha: jg.bon.agacha || 0, x: jg.bon.x, y: jg.bon.y, vx: jg.bon.vx, A: BON.A, cima: jg.bon.cima, costas: jg.bon.costas, alvo: null } : null, invencivel: false, esqueleto: null }; }),
         coisas: [], trave: null, bpm: 0, casa: (M.arrumando = arrumando, M.cesto = arrumando ? CESTO : null, M.tempo = tempo, M.dicas = dicasOn, M), bagunca: ultimaPct
       };
     }

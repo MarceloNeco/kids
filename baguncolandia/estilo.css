@@ -225,3 +225,18 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
 #localArrumar { display: none; flex: 1 1 100%; background: var(--ouro); color: #1a1446; }
 #tv.podearrumar:not(.jogando) #localArrumar { display: block; }
 #tv:not(.toque) #localModos button[data-v="arrumar"] { display: none; }
+/* Ícones (✕ ⏸ 🧍 🔊 🎵) e setinhas NUNCA em cima da área do jogo: a criança mexe na tela toda.
+   Deitado: o palco deixa uma faixa à direita para os ícones (e, na Bagunça, uma faixa embaixo para as setinhas).
+   Em pé: os ícones viram uma fileira no alto, acima do palco. */
+@media (orientation: landscape) {
+  #tv.local #tvPalco { width: min(calc(100% - 64px), calc(100vh * 16 / 9)); width: min(calc(100% - 64px), calc(100dvh * 16 / 9)); left: calc(50% - 32px); }
+  #tv.local.casa.jogando #tvPalco { width: min(calc(100% - 64px), calc((100vh - 60px) * 16 / 9)); width: min(calc(100% - 64px), calc((100dvh - 60px) * 16 / 9)); top: calc(50% - 30px); }
+  #tv.local.casa.jogando #casaNav { bottom: 6px; right: calc(64px + 1.5vh); }
+}
+@media (orientation: portrait) {
+  #tv.local #tvSom { flex-direction: row; top: 1.5vh; right: calc(1.5vh + 52px); }
+  #tv.local.jogando #tvSom { top: 1.5vh; right: calc(1.5vh + 104px); }
+  #tv.local.toque.jogando #tvSom { top: 1.5vh; right: calc(1.5vh + 156px); }
+  #tv.jogando #localPausa { top: 1.5vh; right: calc(1.5vh + 52px); }
+  #tv.toque.jogando #localBoneco { top: 1.5vh; right: calc(1.5vh + 104px); }
+}
