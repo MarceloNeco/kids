@@ -1,0 +1,114 @@
+/* Campo Minado — visual (família Bolinho de Chuva, fonte Fredoka da Rabiscolândia).
+   Menu: rola. Jogo: ocupa a tela toda; a barra fica em cima e o jardim no resto, com rolagem e zoom quando não cabe.
+   Nada fica embaixo do recorte da câmera: env(safe-area-inset-*). Respeita "reduzir movimento". */
+@font-face { font-family: 'Fredoka'; src: url('../rabiscolandia/fontes/fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
+:root { --bg: #12361f; --bg2: #2b7a3d; --card: #1c4a2a; --borda: #3f8f4f; --text: #fbfff6; --muted: #d6ecd0;
+  --grama: #7bd65b; --grama2: #6cc94d; --terra: #f2dfb8; --terra2: #ecd6aa; --ouro: #ffd166; --rosa: #ff7bb0;
+  --fonte: 'Fredoka', system-ui, -apple-system, sans-serif; --cel: 40px;
+  --st: env(safe-area-inset-top, 0px); --sr: env(safe-area-inset-right, 0px); --sb: env(safe-area-inset-bottom, 0px); --sl: env(safe-area-inset-left, 0px);
+  color-scheme: dark; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: radial-gradient(ellipse at 50% 0%, var(--bg2), var(--bg) 72%) fixed; color: var(--text); font-family: var(--fonte); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+button { font-family: inherit; color: inherit; cursor: pointer; border: 0; min-height: 44px; min-width: 44px; touch-action: manipulation; }
+button:focus-visible { outline: 3px solid var(--ouro); outline-offset: 3px; }
+.tela { display: none; }
+.tela.ativa { display: flex; }
+
+/* ---------- menu ---------- */
+#menu { position: relative; min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+  padding: calc(62px + var(--st)) calc(16px + var(--sr)) calc(80px + var(--sb)) calc(16px + var(--sl)); }
+.faixa { position: absolute; top: calc(8px + var(--st)); right: calc(8px + var(--sr)); display: flex; gap: 6px; z-index: 2; }
+.mini { background: rgba(28, 74, 42, .95); border-radius: 14px; font-size: 1.2rem; padding: 0 10px; border: 2px solid var(--borda); }
+.mini[aria-pressed="true"] { border-color: var(--ouro); background: #8a5a12; }
+.mini:disabled { opacity: .4; cursor: default; }
+.mascote { width: 7.5rem; height: auto; animation: respira 3s ease-in-out infinite; }
+@keyframes respira { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06, .96); } }
+.logo { font-size: clamp(2.3rem, 10vw, 4.6rem); font-weight: 700; line-height: 1; color: var(--ouro); text-shadow: 3px 4px 0 rgba(0, 0, 0, .35); }
+.sub { color: var(--muted); font-size: 1.15rem; max-width: 34rem; }
+.ajuda { max-width: 36rem; text-align: left; background: var(--card); border: 2px solid var(--borda); border-radius: 20px; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; line-height: 1.4; font-size: 1.05rem; }
+.ajuda h2 { font-size: 1.3rem; color: var(--ouro); }
+.niveis { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 26rem; }
+.nivel { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 16px; border-radius: 22px; color: #173f22;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, .28); transition: transform .12s; }
+.nivel:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0, 0, 0, .28); }
+.nivel.facil { background: linear-gradient(#b8f59a, #7bd65b); }
+.nivel.medio { background: linear-gradient(#ffd0e4, #ff9cc6); }
+.nivel.dificil { background: linear-gradient(#ffe7a3, #ffc94a); }
+.n-nome { font-size: 1.6rem; font-weight: 700; }
+.n-info { font-size: 1rem; }
+.n-rec { font-size: .95rem; font-weight: 600; opacity: .85; }
+.medio-bt { background: var(--card); border: 2px solid var(--borda); border-radius: 18px; padding: 8px 18px; font-size: 1.1rem; }
+.grande { background: linear-gradient(#ffe27a, #ffc23d); color: #3b2a00; border-radius: 22px; padding: 12px 24px; font-size: 1.3rem; font-weight: 700; box-shadow: 0 5px 0 rgba(0, 0, 0, .28); }
+.versao { color: var(--muted); font-size: .85rem; max-width: 34rem; }
+
+/* ---------- jogo ---------- */
+#jogo { position: fixed; inset: 0; flex-direction: column; padding: calc(6px + var(--st)) calc(6px + var(--sr)) calc(54px + var(--sb)) calc(6px + var(--sl)); } /* embaixo: lugar do tocador de música */
+.barra { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; }
+.placa { display: inline-flex; align-items: center; gap: 3px; min-height: 44px; padding: 0 7px; border-radius: 14px; background: rgba(0, 0, 0, .3); font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 3.4rem; justify-content: center; }
+.placa img { width: 1.6rem; height: 1.6rem; }
+.rosto { font-size: 1.6rem; }
+.modo { font-size: 1.3rem; }
+.zoom { display: inline-flex; gap: 5px; }
+.barra .mini { padding: 0 6px; }
+/* a abinha comum "Tela inteira" (../telacheia.js) fica no meio da borda esquerda: o jardim abre espaço para ela */
+body:has(.tela-inteira-bt:not([hidden])) #jogo .area { margin-left: 46px; }
+.dica-modo { text-align: center; font-size: .95rem; color: var(--muted); min-height: 1.4em; margin: 4px 0; }
+.modo-bandeira .dica-modo { color: var(--ouro); font-weight: 600; }
+.area { flex: 1; min-height: 0; overflow: auto; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; border-radius: 18px; overscroll-behavior: contain; }
+.miolo { min-width: 100%; min-height: 100%; width: max-content; display: flex; align-items: center; justify-content: center; padding: 8px; }
+.tabuleiro { display: grid; gap: 2px; padding: 6px; border-radius: 16px; background: #173f22; box-shadow: 0 8px 24px rgba(0, 0, 0, .35); }
+.modo-bandeira .tabuleiro { box-shadow: 0 0 0 4px var(--ouro), 0 8px 24px rgba(0, 0, 0, .35); }
+
+.casa { position: relative; width: var(--cel); height: var(--cel); min-width: 0; min-height: 0; border-radius: calc(var(--cel) * .22);
+  background: linear-gradient(160deg, #9be678, var(--grama) 55%, #5fb944); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .18);
+  font-size: calc(var(--cel) * .56); font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: pan-x pan-y; }
+.casa.xadrez { background: linear-gradient(160deg, #8ddb6b, var(--grama2) 55%, #57ad3d); }
+.casa:not(.aberta)::before { content: ''; position: absolute; left: 22%; bottom: 18%; width: 14%; height: 26%; border-radius: 50% 50% 0 0; background: rgba(40, 110, 30, .45); box-shadow: calc(var(--cel) * .2) calc(var(--cel) * -.1) 0 rgba(40, 110, 30, .35); }
+.casa:not(.aberta):hover { filter: brightness(1.08); }
+.casa:focus-visible { outline: 3px solid var(--ouro); outline-offset: 0; z-index: 1; }
+.casa.aberta { background: var(--terra); box-shadow: inset 0 2px 0 rgba(0, 0, 0, .08); cursor: default; }
+.casa.aberta.xadrez { background: var(--terra2); }
+.casa[data-n="1"] { color: #1f5fd1; } .casa[data-n="2"] { color: #1d7a2e; } .casa[data-n="3"] { color: #c62828; }
+.casa[data-n="4"] { color: #5b2a9e; } .casa[data-n="5"] { color: #8a3b12; } .casa[data-n="6"] { color: #00796b; }
+.casa[data-n="7"] { color: #222; } .casa[data-n="8"] { color: #555; }
+.casa.bandeira::after, .casa.errada::after { content: '🚩'; font-size: calc(var(--cel) * .58); }
+.casa.bandeira::after { animation: finca .25s ease-out; }
+.casa.errada { background: #f4c7c7; }
+.casa.errada::after { content: '❌'; }
+.casa.mina { background: var(--terra) url('ourico.svg') center / 82% no-repeat; }
+.casa.mina.estourou { background-color: #ff8fa8; animation: treme .5s ease-in-out 2; }
+.casa.mina:not(.estourou) { animation: aparece .45s ease-out both; }
+.casa.segurou { transform: scale(.85); transition: transform .15s; }
+.casa.brota { animation: abre .28s ease-out both; }
+.tabuleiro.tremeu { animation: treme .45s ease-in-out; }
+.tabuleiro.florido .casa.aberta:not([data-n])::after { content: ''; position: absolute; inset: 12%; background: url('flor.svg') center / contain no-repeat; animation: nasce .5s ease-out both; animation-delay: var(--d, 0ms); }
+@keyframes abre { from { transform: scale(.6); opacity: .3; } to { transform: scale(1); opacity: 1; } }
+@keyframes finca { from { transform: translateY(-40%) scale(1.3); } to { transform: none; } }
+@keyframes aparece { from { transform: scale(0) rotate(-20deg); } 70% { transform: scale(1.15); } to { transform: scale(1); } }
+@keyframes treme { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-3deg); } 75% { transform: translateX(5px) rotate(3deg); } }
+@keyframes nasce { from { transform: scale(0) translateY(40%); opacity: 0; } 70% { transform: scale(1.2); opacity: 1; } to { transform: scale(1); opacity: 1; } }
+
+/* ---------- fim de jogo ---------- */
+.fim { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(6, 24, 12, .6); }
+.cartao { background: var(--card); border: 3px solid var(--borda); border-radius: 26px; padding: 20px 22px; max-width: 26rem; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; animation: chega .35s ease-out; }
+.cartao h2 { font-size: 1.5rem; color: var(--ouro); }
+.cartao p { font-size: 1.1rem; line-height: 1.4; }
+.fim-recorde { color: var(--ouro); font-weight: 700; }
+.fim-botoes { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.fim-desenho { width: 7rem; height: 7rem; }
+.fim-desenho.feliz { animation: pulinho 1s ease-in-out infinite; }
+.fim-desenho.acordado { animation: treme .6s ease-in-out 3; }
+@keyframes chega { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pulinho { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px) rotate(4deg); } }
+
+/* pétalas caindo na vitória */
+.festa { position: fixed; inset: 0; pointer-events: none; z-index: 31; overflow: hidden; }
+.festa i { position: absolute; top: -20px; width: 14px; height: 10px; border-radius: 60% 0; animation: cai linear forwards; }
+@keyframes cai { to { transform: translateY(110vh) rotate(540deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

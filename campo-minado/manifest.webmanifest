@@ -1,0 +1,17 @@
+{
+  "name": "Campo Minado — Bolinho de Chuva",
+  "short_name": "Campo Minado",
+  "description": "Campo minado no jardim: abra a grama sem acordar os ouriços dorminhocos. / Minesweeper in the garden: open the grass without waking the sleepy hedgehogs.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#12361f",
+  "theme_color": "#1f5a2e",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
