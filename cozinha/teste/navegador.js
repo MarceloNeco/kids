@@ -13,8 +13,9 @@ let server, base, browser;
 async function iniciar() {
   server = http.createServer((req, res) => {
     let p = decodeURIComponent(req.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html';
-    // interruptores do RootifyONE moram em outro repositório: aqui respondem "nada desligado"
-    if (p.startsWith('/solverone-dados/')) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{}'); return; }
+    // interruptores do RootifyONE moram em outro repositório: aqui respondem "nada desligado" e o inglês ligado
+    // (interruptor "ingles", ../idioma.js), para os testes que trocam o idioma
+    if (p.startsWith('/solverone-dados/')) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(p.endsWith('/kids.json') ? '{"recursos":{"ingles":{"ligado":true}}}' : '{}'); return; }
     const f = path.join(raiz, p);
     if (!f.startsWith(raiz) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res);

@@ -1,4 +1,4 @@
-# Cozinha — pendências
+# Mão na Massa (pasta cozinha/) — pendências
 
 Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ feita (versão)
 

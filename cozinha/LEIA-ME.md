@@ -1,4 +1,4 @@
-# Cozinha — juntar os ingredientes e cozinhar uma receita
+# Mão na Massa (My Little Big Chef) — juntar os ingredientes e cozinhar uma receita
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE). **Ideia da filha do dono.** A criança escolhe uma receita,
 sai pela vila para juntar os ingredientes (pescando, colhendo, puxando da horta, pegando ovos, tirando leite, comprando
@@ -7,7 +7,9 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.3.0** (06/Nov/2026) — cada fruta e cada legume na sua planta de verdade (o jogo também ensina de
+Versão atual: **0.4.0** (06/Nov/2026) — nome novo, **Mão na Massa** (em inglês, **My Little Big Chef**; a pasta, o
+endereço e o progresso guardado continuam `cozinha`), e por enquanto só em português (o inglês volta com o interruptor
+`ingles` do RootifyONE). Na 0.3.0: cada fruta e cada legume na sua planta de verdade (o jogo também ensina de
 onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de verdade. Continua sendo uma
 **primeira proposta**: o dono quer entrevistar a filha para ajustar as receitas, os lugares e os passos (pendência 2).
 

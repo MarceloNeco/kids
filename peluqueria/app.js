@@ -3,7 +3,7 @@
    (PeluqueriaDebug.passo). Nada de innerHTML com dado de fora; textos por textContent. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.10', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.6.11', APP_UPDATED = '06/11/2026';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.Peluqueria;
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -18,6 +18,7 @@
   var pref = Object.assign({ nivel: 'normal', lingua: /^en/i.test(navigator.language || '') ? 'en' : 'pt', som: true, minhas: false }, ler(CHAVE_PREF, {}));
   if (!P.NIVEIS[pref.nivel]) pref.nivel = 'normal';
   if (pref.lingua !== 'en') pref.lingua = 'pt';
+  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
 
   function T(pt, en) { return pref.lingua === 'en' ? en : pt; }
   function traduzir() {

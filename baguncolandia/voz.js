@@ -4,7 +4,7 @@
    A TV (navegador da LG) nem sempre tem voz: Voz.disponivel() diz; aí o celular fala. */
 (function (root) {
   'use strict';
-  var EN = /^en/i.test((root.navigator && root.navigator.language) || '');
+  var EN = /^en/i.test((root.navigator && root.navigator.language) || '') && !(root.BolinhoIdioma && !root.BolinhoIdioma.ingles());   // ../idioma.js
   var S = root.speechSynthesis, vozes = [], escolhida = null, falando = null, vigia = 0, liberada = false;
   function carregarVozes() {
     if (!S) return;

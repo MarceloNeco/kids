@@ -31,7 +31,7 @@
     }
   }
   function ehTV() { var ua = (root.navigator && navigator.userAgent) || ''; return /Web0S|webOS|SMART-TV|SmartTV|Tizen|BRAVIA|VIDAA|NetCast|HbbTV|AppleTV|CrKey|AFT[A-Z]/i.test(ua); }
-  var EN = /^en/i.test((root.navigator && root.navigator.language) || '');
+  var EN = /^en/i.test((root.navigator && root.navigator.language) || '') && !(root.BolinhoIdioma && !root.BolinhoIdioma.ingles());   // ../idioma.js
   function T(pt, en) { return EN ? en : pt; }
 
   function iniciar(canvas, opts) {

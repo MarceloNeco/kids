@@ -38,6 +38,9 @@
     '.sa-aviso button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}' +
     '@media (prefers-reduced-motion:reduce){.sa-aviso{transition:none}}';
 
+  // sem o interruptor "ingles" do RootifyONE (idioma.js): só o português
+  function L(pt, en) { return window.BolinhoIdioma && !window.BolinhoIdioma.ingles() ? pt : pt + ' / ' + en; }
+
   function avisar(v) {
     if (document.querySelector('.sa-aviso')) return;
     var estilo = document.createElement('style');
@@ -50,15 +53,15 @@
     var txt = document.createElement('span');
     txt.textContent = '✨ Versão nova do ' + nome + ' (' + v.versao + ')';
     var sim = document.createElement('button');
-    sim.type = 'button'; sim.className = 'sa-sim'; sim.textContent = 'Atualizar / Update';
+    sim.type = 'button'; sim.className = 'sa-sim'; sim.textContent = L('Atualizar', 'Update');
     var nao = document.createElement('button');
-    nao.type = 'button'; nao.className = 'sa-nao'; nao.textContent = 'Depois / Later';
+    nao.type = 'button'; nao.className = 'sa-nao'; nao.textContent = L('Depois', 'Later');
     caixa.appendChild(txt); caixa.appendChild(sim); caixa.appendChild(nao);
     document.body.appendChild(caixa);
     requestAnimationFrame(function () { caixa.classList.add('sa-ver'); });
     sim.addEventListener('click', function (e) {
       e.stopPropagation();
-      sim.disabled = true; sim.textContent = 'Atualizando… / Updating…';
+      sim.disabled = true; sim.textContent = L('Atualizando…', 'Updating…');
       atualizar();
     });
     nao.addEventListener('click', function (e) {

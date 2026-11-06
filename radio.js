@@ -101,7 +101,7 @@
       titulo.classList.remove('troca');
     }, 120);
     var m = MUSICAS[atual];
-    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === H ? 'CC0' : 'CC BY 4.0') : 'Tocar / Play') + ' · <a href="https://github.com/MarceloNeco/kids/blob/main/CREDITOS.md" target="_blank" rel="noopener">créditos</a>';
+    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === H ? 'CC0' : 'CC BY 4.0') : 'Tocar<span class="en"> / Play</span>') + ' · <a href="https://github.com/MarceloNeco/kids/blob/main/CREDITOS.md" target="_blank" rel="noopener">créditos</a>';
     for (var i = 0; i < listaBolinhas.length; i++) {
       if (i === atual) listaBolinhas[i].setAttribute('aria-current', 'true'); else listaBolinhas[i].removeAttribute('aria-current');
     }
@@ -162,7 +162,7 @@
   function pular() {
     falhas++;
     if (falhas < MUSICAS.length) tocar(atual + 1);
-    else { autor.textContent = 'Sem internet para tocar agora. / No connection.'; botaoPlay(); }
+    else { autor.innerHTML = 'Sem internet para tocar agora.<span class="en"> / No connection.</span>'; botaoPlay(); }
   }
   // Música que não abriu (sem internet, arquivo faltando): a favorita guardada; sem ela, pula para a próxima, sem ficar em laço.
   audio.addEventListener('error', function () {

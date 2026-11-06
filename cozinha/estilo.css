@@ -27,12 +27,13 @@ a { color: #1d6fb8; }
 #entrada, #desligado { justify-content: center; text-align: center; gap: 16px; }
 .enfeite { font-size: 1.6rem; letter-spacing: .4rem; animation: flutua 3s ease-in-out infinite; }
 .icone-entrada svg { width: min(46vw, 200px); height: auto; filter: drop-shadow(0 8px 14px rgba(160, 80, 20, .25)); animation: pula 2.4s ease-in-out infinite; }
-.logo { font-size: clamp(2.6rem, 13vw, 5.4rem); font-weight: 700; line-height: 1; white-space: nowrap; }
+.logo { font-size: clamp(2.6rem, 13vw, 5.4rem); font-weight: 700; line-height: 1; }
 .logo span { display: inline-block; text-shadow: 3px 4px 0 rgba(120, 60, 20, .18); animation: pula 1.8s ease-in-out infinite; }
 .logo span:nth-child(7n+1) { color: var(--tomate); animation-delay: 0s; } .logo span:nth-child(7n+2) { color: var(--laranja); animation-delay: .1s; }
 .logo span:nth-child(7n+3) { color: #e0a800; animation-delay: .2s; } .logo span:nth-child(7n+4) { color: var(--verde); animation-delay: .3s; }
 .logo span:nth-child(7n+5) { color: var(--azul); animation-delay: .4s; } .logo span:nth-child(7n+6) { color: var(--roxo); animation-delay: .5s; }
 .logo span:nth-child(7n) { color: var(--rosa); animation-delay: .6s; }
+.logo .palavra { white-space: nowrap; animation: none; text-shadow: none; color: inherit; }
 .logo.pequeno { font-size: clamp(2rem, 9vw, 3.2rem); margin-top: 6px; }
 .sub { font-size: 1.15rem; color: var(--muted); max-width: 30rem; }
 .dica { color: var(--muted); font-size: .95rem; text-align: center; max-width: 36rem; }

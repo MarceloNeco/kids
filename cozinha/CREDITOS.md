@@ -1,4 +1,4 @@
-# Cozinha — créditos e licenças
+# Mão na Massa (pasta cozinha/) — créditos e licenças
 
 | O quê | De onde | Licença |
 |---|---|---|

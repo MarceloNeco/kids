@@ -9,7 +9,8 @@
     ico      emoji do cartão          cor   cor de destaque do cartão
     img      (opcional) imagem do cartão no lugar do emoji, ex.: '/kids/baguncolandia/icone.svg'
     url      endereço do jogo a partir da raiz do site (funciona em solverone.com.br e no endereço antigo)
-    texto    descrição em português   en    descrição em inglês   tag   texto do botão do cartão
+    texto    descrição em português   en    descrição em inglês   tag   texto do botão do cartão ("PT / EN")
+             (o inglês, o en e o " / EN" do tag, só aparece com o interruptor "ingles" ligado: idioma.js)
     instalar true = pode ser instalado e funciona sem internet (o service worker fica em url + 'sw.js')
     soOnline true = precisa de internet (ex.: YouTube e TV); o cartão mostra "🌐 Só com internet"
     tv       { texto, tag, param } = abre na TV com este parâmetro; param vai no fim do endereço
@@ -61,9 +62,9 @@
       texto: 'Um labirinto novo a cada vez, quadrado, redondo ou de colmeia, que nasce em 3D. Leve o cachorrinho ou risque o caminho com o dedo, pegue o osso do meio e ache a saída.',
       en: 'A new 3D maze every time: walk the puppy or draw the path, grab the bone in the middle and find the way out.',
       tag: '▶ Explorar / Play', instalar: true },
-    { id: 'cozinha', nome: 'Cozinha de Receitas', ico: '🍳', img: '/kids/cozinha/icone.svg', cor: '#ff9f6e', url: '/kids/cozinha/',
+    { id: 'cozinha', nome: 'Mão na Massa', ico: '🍳', img: '/kids/cozinha/icone.svg', cor: '#ff9f6e', url: '/kids/cozinha/',
       texto: 'Escolha uma receita, saia pela vila para pescar, colher, comprar no mercado ou pedir emprestado à vizinha, e volte para cozinhar: misturar, bater, ligar o fogão e servir. 12 receitas.',
-      en: 'Recipe Kitchen: gather ingredients around the village (fish, pick, shop, borrow) and cook step by step.',
+      en: 'My Little Big Chef: gather ingredients around the village (fish, pick, shop, borrow) and cook step by step.',
       tag: '▶ Cozinhar / Cook', instalar: true },
     { id: 'batalha-naval', nome: 'Batalha Naval', ico: '⚓', img: '/kids/batalha-naval/icone.svg', cor: '#4fc3ff', url: '/kids/batalha-naval/',
       texto: 'Esconda seus navios e afunde os dos outros: E4, F2... Jogue em família, de 2 a 4 pessoas, cada uma no seu celular, com um código de 4 letras. Também contra o computador ou passando o aparelho.',
@@ -111,7 +112,10 @@
     a.appendChild(el('h2', null, j.nome));
     a.appendChild(el('p', null, j.texto));
     if (j.en) a.appendChild(el('p', 'en', j.en));
-    a.appendChild(el('span', 'tag', j.tag));
+    // "▶ Brincar / Play": o " / Play" vai num class="en" (some sem o interruptor "ingles", idioma.js)
+    var tag = j.tag.split(' / ');
+    var sp = a.appendChild(el('span', 'tag', tag[0]));
+    if (tag[1]) sp.appendChild(el('span', 'en', ' / ' + tag.slice(1).join(' / ')));
     return a;
   }
 

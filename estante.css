@@ -17,6 +17,7 @@ h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.05;margin:.4rem 0 .6rem;backgr
 .card p{color:var(--muted);line-height:1.45;font-size:.95rem}
 .card .tag{align-self:flex-start;margin-top:auto;font-size:.8rem;font-weight:700;color:#1a1446;background:var(--c);padding:.3rem .7rem;border-radius:999px}
 .card .en{color:var(--muted);font-size:.85rem;font-style:italic}
+.card .tag .en{color:inherit;font-size:inherit;font-style:normal}
 .breve{opacity:.6}
 .breve .tag{background:var(--border);color:var(--text)}
 footer{margin-top:2.5rem;color:var(--muted);font-size:.9rem;line-height:1.5}

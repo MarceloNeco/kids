@@ -3,7 +3,7 @@
    Guarda só neste aparelho (localStorage "campo-minado.pref"): idioma, sons e o melhor tempo de cada nível. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.1';
+  var APP_VERSION = '0.2.2';
   var APP_DATA = '06/Nov/2026';
   var CM = window.CampoMinado;
   var $ = function (id) { return document.getElementById(id); };
@@ -15,6 +15,7 @@
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   var pref = ler('campo-minado.pref', null) || {};
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
+  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (!pref.recordes || typeof pref.recordes !== 'object') pref.recordes = {};
   function salvarPref() { gravar('campo-minado.pref', pref); }

@@ -5,7 +5,7 @@
    (para voltar se a página recarregar). Nada de dado pessoal: só o apelido que a pessoa digitar. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0';
+  var APP_VERSION = '0.3.1';
   var L = window.BNLogica, R = window.BNRede;
   var Som = window.BNSom || { iniciar: function () {}, ligar: function () {}, efeito: function () {} };
   var Nav = window.BNNavios;
@@ -29,6 +29,7 @@
   function gravar(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem espaço */ } }
   var pref = ler(CH_PREF) || {};
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = /^pt/i.test(navigator.language || 'pt') ? 'pt' : 'en';
+  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (typeof pref.nome !== 'string') pref.nome = '';
   function salvarPref() { gravar(CH_PREF, pref); }
