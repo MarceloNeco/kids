@@ -656,40 +656,48 @@
     }
     /* 👆 no dedo, o boneco ANDA até o dedo (não teletransporta): rápido de criança, mas dá para ver andar; pula se o dedo
        está alto; chegou e o dedo continua lá em cima → vira de costas, mexendo nas coisas. Câmera: o corpo manda (corpo()). */
-    var BON = { A: 175, vmax: W / 2.4, acel: 5000, g: 2600, puloMax: 260 };
+    var BON = { A: 175, vmax: W / 2.4, acel: 5000, g: 2600, puloMax: 300, puloAlto: 400 };   // puloAlto: para alcançar o que está lá em cima
     /* ⌨️ computador: ← → andam, ↑/Espaço pulam; andar até a beira leva ao cômodo do lado (1 pessoa) */
     function teclas(j, t) { var jg = jogadores[j]; if (!jg || !t) return; jg.tec = { esq: !!t.esq, dir: !!t.dir, pulo: !!t.pulo }; if (t.esq || t.dir || t.pulo) jg.alvo = null; }
-    function dedo(j, nx, ny) { var jg = jogadores[j]; if (!jg) return; if (nx != null) jg.tec = null; if (nx == null) { if (jg.alvo) jg.alvo.solto = true; return; } var r = raia(j); jg.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h, t: tempo }; }   // null: soltou o dedo
+    function dedo(j, nx, ny) { var jg = jogadores[j]; if (!jg) return; if (nx != null) { jg.tec = null; jg.usou = true; } if (nx == null) { if (jg.alvo) jg.alvo.solto = true; return; } var r = raia(j); jg.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h, t: tempo }; }   // null: soltou o dedo
     function andarBoneco(dt) {
       jogadores.forEach(function (jg, j) {
         var r = raia(j), b = jg.bon || (jg.bon = { x: r.x + jg.corpo.x * r.w, y: 0, vx: 0, vy: 0 }), al = jg.alvo, A = BON.A, tec = jg.tec;
-        if (!al && !tec) { b.x = r.x + jg.corpo.x * r.w; return; }   // sem dedo nem teclado: quem manda é o corpo (câmera)
+        if (!al && !tec) { b.x = r.x + jg.corpo.x * r.w; b.cima = b.costas = false; pularEcair(b, dt); return; }   // sem dedo nem teclado: quem manda é o corpo (câmera)
         var x0 = b.x, y0 = b.y;
         if (tec) {
           var sent = (tec.dir ? 1 : 0) - (tec.esq ? 1 : 0);
           b.vx += clamp(sent * BON.vmax - b.vx, -BON.acel * dt, BON.acel * dt);
-          if (tec.pulo && b.y === 0) { b.vy = -Math.sqrt(2 * BON.g * BON.puloMax); tec.pulo = false; }   // um pulo por toque
+          if (tec.pulo && b.y === 0 && !b.agacha) { b.agacha = 0.1; b.puloV = -Math.sqrt(2 * BON.g * BON.puloMax); tec.pulo = false; }   // um pulo por toque (agacha antes)
           b.x = clamp(b.x + b.vx * dt, r.x + A * 0.25, r.x + r.w - A * 0.25);
           var naBeira = sent !== 0 && (b.x <= r.x + A * 0.25 + 0.5 || b.x >= r.x + r.w - A * 0.25 - 0.5);
           b.beira = naBeira ? (b.beira || 0) + dt : 0;
           if (b.beira > 0.35 && nJog === 1 && !arrumando) { b.beira = 0; irPara(sent); b.x = sent > 0 ? r.x + A * 0.3 : r.x + r.w - A * 0.3; b.vx = sent * BON.vmax * 0.5; }   // passou pela porta
-          if (b.y < 0 || b.vy < 0) { b.vy += BON.g * dt; b.y = Math.min(0, b.y + b.vy * dt); if (b.y === 0) b.vy = 0; }
+          pularEcair(b, dt);
           b.cima = b.y < -20; b.costas = false;
           jg.corpo.x = (b.x - r.x) / r.w; jg.corpo.pulando = b.y < -10;
           bateCorpo(j, x0, y0, b);
           return;
         }
-        var dx = al.x - b.x, quer = clamp(dx * 6, -BON.vmax, BON.vmax);
+        // 👆 o dedo só mostra aonde ir: quem bagunça é o boneco, quando chega e ENCOSTA (mão no alvo, pé no chão)
+        var dx = al.x - b.x, quer = clamp(dx * 6, -BON.vmax, BON.vmax), perto = Math.abs(dx) < 70;
         b.vx += clamp(quer - b.vx, -BON.acel * dt, BON.acel * dt);
         b.x = clamp(b.x + b.vx * dt, r.x + A * 0.25, r.x + r.w - A * 0.25);
         var ombro = M.chao - A * 1.05, segura = !al.solto;
-        if (b.y === 0 && segura && al.y < ombro && Math.abs(dx) < 70) b.vy = -Math.sqrt(2 * BON.g * Math.min(BON.puloMax, ombro - al.y + 30));
-        if (b.y < 0 || b.vy < 0) { b.vy += BON.g * dt; b.y = Math.min(0, b.y + b.vy * dt); if (b.y === 0) b.vy = 0; }
-        b.cima = segura && al.y < M.chao - A * 0.75 && Math.abs(dx) < 120;
+        if (b.y === 0 && !b.agacha && perto && al.y < ombro && (segura || !al.pulou)) { b.agacha = 0.14; b.puloV = -Math.sqrt(2 * BON.g * Math.min(BON.puloAlto, ombro - al.y + 40)); al.pulou = true; }   // alto: agacha e pula na altura certa
+        pularEcair(b, dt);
+        var topo = M.chao + b.y - A * 1.22, alcanca = Math.abs(al.x - b.x) < 48 && al.y >= topo - 15 && al.y <= M.chao + 20;
+        if (alcanca && tempo >= (b.maoAte || 0)) { b.maoAte = tempo + 200; b.mexeu = true; var lado = al.x >= b.x ? 1 : -1; tocar(j, { x: al.x - lado * 14, y: al.y + 14 }, { x: al.x, y: al.y }, b.vx + lado * 160, b.vy, tempo, 'h' + j); }
+        if (al.solto && Math.abs(dx) < 25 && b.y === 0 && !b.agacha) { al.fim = al.fim || tempo + (b.mexeu ? 450 : 800); if (tempo >= al.fim) { jg.alvo = null; b.vx = 0; b.mexeu = false; } }   // tocou e soltou: vai, mexe e para
+        b.cima = alcanca || (segura && al.y < M.chao - A * 0.75 && Math.abs(dx) < 120) || b.y < -20;
         b.costas = segura && Math.abs(dx) < 25 && Math.abs(b.vx) < 40 && al.y < M.chao - A * 0.35;   // chegou: de costas, mexendo
         jg.corpo.x = (b.x - r.x) / r.w; jg.corpo.pulando = b.y < -10;
         bateCorpo(j, x0, y0, b);
       });
+    }
+    function pularEcair(b, dt) {   // agacha (joelho dobra) → sobe → cai
+      if (b.agacha > 0) { b.agacha -= dt; if (b.agacha <= 0) { b.agacha = 0; b.vy = b.puloV; } }
+      if (b.y < 0 || b.vy < 0) { b.vy += BON.g * dt; b.y = Math.min(0, b.y + b.vy * dt); if (b.y === 0) b.vy = 0; }
     }
     function bateCorpo(j, x0, y0, b) {   // o corpo do boneco também bagunça: os pés chutam o que está no chão, as mãos batem no alto ao pular
       if (arrumando || (Math.abs(b.vx) < 60 && b.y === 0)) return;
@@ -811,7 +819,7 @@
     function estado() {
       return {
         fase: fase, modo: arrumando ? 'arrumar' : 'bagunca', modoBase: arrumando ? 'arrumar' : 'bagunca', arrumando: arrumando, tempo: tempo, restante: duracao ? Math.max(0, Math.ceil((duracao * 1000 - tempo) / 1000)) : null,
-        jogadores: jogadores.map(function (jg, j) { return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: 0, poder: null, poderAte: 0, lento: false, raia: raia(j), zonaChute: 0.6, rastro: tempo - (jg.rastroEm || 0) < 400 ? jg.rastro.slice(-8) : [], corpo: jg.corpo, vai: (jg.alvo || jg.tec) && jg.bon ? { x: jg.bon.x, y: jg.bon.y, vx: jg.bon.vx, A: BON.A, cima: jg.bon.cima, costas: jg.bon.costas, alvo: null } : null, invencivel: false, esqueleto: null }; }),
+        jogadores: jogadores.map(function (jg, j) { return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: 0, poder: null, poderAte: 0, lento: false, raia: raia(j), zonaChute: 0.6, rastro: tempo - (jg.rastroEm || 0) < 400 ? jg.rastro.slice(-8) : [], corpo: jg.corpo, vai: (jg.alvo || jg.tec || jg.usou) && jg.bon ? { agacha: jg.bon.agacha || 0, x: jg.bon.x, y: jg.bon.y, vx: jg.bon.vx, A: BON.A, cima: jg.bon.cima, costas: jg.bon.costas, alvo: null } : null, invencivel: false, esqueleto: null }; }),
         coisas: [], trave: null, bpm: 0, casa: (M.arrumando = arrumando, M.cesto = arrumando ? CESTO : null, M.tempo = tempo, M.dicas = dicasOn, M), bagunca: ultimaPct
       };
     }
@@ -1155,30 +1163,21 @@
   /* a mamãe: adulta (maior que a criança), vem andando e falando; no fim balança a cabeça e sacode o dedo */
   var FALAS_MAE = [['Crianças?', 'Kids?'], ['Que barulho é esse?', 'What is that noise?'], ['Já vou aí!', 'Coming!'], ['O que está acontecendo?', 'What is going on?']];
   var FALAS_BRAVA = [['Que bagunça é essa?!', 'What is this mess?!'], ['Vamos arrumar!', 'Let\'s tidy up!']];
+  var MAE_CFG = { cabeca: 'menina', cabelo: 'coque', corCabelo: '#5d4037', cor: '#5e35b1', roupa: 'vestido', acessorio: 'nenhum', sapato: '#37474f', pele: '#ffd9b3' };
   function mae(ctx, M, ts) {
-    var m = M.mae, k = m.k || 0, x = W + 120 - k * 320, y = M.chao + 4, viu = !!m.viu, fala = Math.floor(ts / 420) % 2 === 0;   // boca abre e fecha falando
-    var passo = viu ? 0 : Math.sin(ts / 120) * 12, bob = viu ? 0 : Math.abs(Math.sin(ts / 120)) * 5, pe = viu ? Math.max(0, Math.sin(ts / 110)) * 8 : 0;   // andando / batendo o pé
-    ctx.save(); ctx.translate(x, y - bob); ctx.scale(1.12, 1.12);
-    ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(0, bob / 1.12, 46, 9, 0, 0, PI2); ctx.fill();
-    ctx.strokeStyle = '#ffd9b3'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-10, -70); ctx.lineTo(-12 + passo, -6); ctx.moveTo(10, -70); ctx.lineTo(12 - passo, -6 - pe); ctx.stroke();
-    ctx.fillStyle = '#37474f'; ctx.beginPath(); ctx.ellipse(-12 + passo, -3, 13, 6, 0, 0, PI2); ctx.ellipse(12 - passo + 4, -3 - pe, 13, 6, 0, 0, PI2); ctx.fill();   // sapatos
-    ctx.fillStyle = '#5e35b1'; ctx.beginPath(); ctx.moveTo(-26, -170); ctx.lineTo(26, -170); ctx.lineTo(48, -64); ctx.lineTo(-48, -64); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = '#ffd9b3'; ctx.lineWidth = 11;
-    if (viu) {
-      var dedo = Math.sin(ts / 90) * 0.35;
-      ctx.beginPath(); ctx.moveTo(-24, -160); ctx.lineTo(-52, -126); ctx.lineTo(-30, -100); ctx.stroke();   // uma mão na cintura
-      ctx.save(); ctx.translate(24, -160); ctx.rotate(-2.2 + dedo); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 46); ctx.stroke(); ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, 46); ctx.lineTo(0, 64); ctx.stroke(); ctx.restore();   // a outra sacudindo o dedo
-    } else { ctx.beginPath(); ctx.moveTo(-24, -160); ctx.lineTo(-34 - passo, -100); ctx.moveTo(24, -160); ctx.lineTo(34 + passo, -100); ctx.stroke(); }
-    ctx.save(); ctx.translate(0, -198); ctx.rotate(viu ? Math.sin(ts / 140) * 0.14 : Math.sin(ts / 240) * 0.05);   // balança a cabeça
-    ctx.fillStyle = '#ffd9b3'; ctx.beginPath(); ctx.arc(0, 0, 28, 0, PI2); ctx.fill();
-    ctx.fillStyle = '#5d4037'; ctx.beginPath(); ctx.arc(0, -8, 29, Math.PI, 0); ctx.fill(); ctx.beginPath(); ctx.arc(0, -40, 14, 0, PI2); ctx.fill();   // cabelo com coque
-    ctx.fillStyle = '#212121'; ctx.beginPath(); ctx.arc(-10, 0, viu ? 4.5 : 3, 0, PI2); ctx.arc(10, 0, viu ? 4.5 : 3, 0, PI2); ctx.fill();
-    if (viu) { ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-16, -12); ctx.lineTo(-5, -8); ctx.moveTo(16, -12); ctx.lineTo(5, -8); ctx.stroke(); }   // sobrancelhas bravas
-    ctx.fillStyle = '#7a1f2e'; ctx.beginPath(); ctx.ellipse(0, 14, 7, fala ? 8 : 2.5, 0, 0, PI2); ctx.fill();
-    ctx.restore(); ctx.restore();
+    var m = M.mae, k = m.k || 0, x = W + 120 - k * 320, y = M.chao + 4, viu = !!m.viu, B = typeof self !== 'undefined' && self.Boneco, A = 300;   // adulta: bem maior que a criança (175)
+    if (B) {
+      ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(x, y, A * 0.16, A * 0.03, 0, 0, PI2); ctx.fill();
+      ctx.save(); ctx.translate(x, y);
+      if (!viu && k < 1) { ctx.scale(-1, 1); B.corpoLado(ctx, MAE_CFG, A, { fase: ts / 1000 * 7, andando: true, ts: ts }); }   // vem andando de lado, olhando para a bagunça
+      else B.corpoEmPe(ctx, MAE_CFG, A, { bE: 0.12, bD: viu ? 0.55 + 0.4 * Math.sin(ts / 95) : 0.2 + 0.15 * Math.sin(ts / 400), ts: ts, pose: viu ? 'brava' : null, balanco: 0 });   // parada: gesticula; viu: brava, sacudindo o dedo
+      ctx.restore();
+    } else {
+      ctx.save(); ctx.translate(x, y); ctx.fillStyle = '#5e35b1'; ctx.beginPath(); ctx.moveTo(-26, -170); ctx.lineTo(26, -170); ctx.lineTo(48, -64); ctx.lineTo(-48, -64); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ffd9b3'; ctx.beginPath(); ctx.arc(0, -198, 28, 0, PI2); ctx.fill(); ctx.restore();
+    }
     // balão de fala
     var lista = viu ? FALAS_BRAVA : FALAS_MAE, f = lista[Math.floor(ts / 1800) % lista.length], txt = /^en/i.test((typeof navigator !== 'undefined' && navigator.language) || '') ? f[1] : f[0];
-    ctx.save(); ctx.font = '700 24px system-ui'; var tw = ctx.measureText(txt).width + 30, bx = Math.min(W - tw - 10, x - tw + 30), by = y - 340;
+    ctx.save(); ctx.font = '700 24px system-ui'; var tw = ctx.measureText(txt).width + 30, bx = Math.min(W - tw - 10, x - tw + 30), by = y - 375;   // acima da cabeça dela
     ctx.fillStyle = 'rgba(255,255,255,.96)'; arred(ctx, bx, by, tw, 46, 20); ctx.fill(); ctx.beginPath(); ctx.moveTo(x - 30, by + 44); ctx.lineTo(x - 6, by + 70); ctx.lineTo(x - 2, by + 44); ctx.fill();
     ctx.fillStyle = viu ? '#c62828' : '#311b92'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(txt, bx + 15, by + 24); ctx.restore();
   }

@@ -13,7 +13,7 @@
   D.leve = false; D.escala = 1; D.fundoImg = null; D.medidas = []; D.pulaQuadro = false;
   function sombra(ctx, cor, blur, offY) { if (D.leve) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; return; } ctx.shadowColor = cor; ctx.shadowBlur = blur; if (offY != null) ctx.shadowOffsetY = offY; }
   function leve(v) {
-    D.leve = !!v; D.escala = D.leve ? 0.75 : 1;
+    D.leve = !!v; D.escala = D.leve ? 0.75 : nitidez();
     if (D.canvas) { D.canvas.width = Math.round(W * D.escala); D.canvas.height = Math.round(H * D.escala); }
     if (root.Boneco) root.Boneco.leve = D.leve;
     D.estrelas = D.estrelas.slice(0, D.leve ? 25 : 60);
@@ -42,23 +42,31 @@
     for (var i = 0; i < (D.menos ? 20 : 60); i++) D.estrelas.push({ x: Math.random() * W, y: Math.random() * H, r: 0.6 + Math.random() * 1.8, v: 4 + Math.random() * 10, a: Math.random() * 6.28 });
     if (opts && opts.nomes) D.nomes = opts.nomes;
     if (root.document && root.document.fonts && root.document.fonts.load) root.document.fonts.load('700 40px Fredoka').catch(function () {});
+    if (root.addEventListener) root.addEventListener('resize', function () { if (D.leve) return; var e = nitidez(); if (Math.abs(e - D.escala) < 0.01) return; leve(false); rasterizarCena(); });   // girou a tela ou mudou o tamanho
   }
   function nomes(n) { D.nomes = n; }
   /* ambiente: 'camera' (vídeo atrás, fundo translúcido) ou 'paisagem' (cena desenhada + boneco) */
-  function ambiente(amb, cenaId) {
+  function ambiente(amb, cenaId, comBichos) {   // comBichos: sorteia só cenários onde bicho combina (Pega-pega)
     D.ambiente = amb === 'paisagem' ? 'paisagem' : 'camera';
+    var cena = null;
     if (D.ambiente === 'paisagem' && root.Cenas) {
-      var cena = (cenaId && cenaId !== 'aleatoria' && root.Cenas.porId(cenaId)) || root.Cenas.sortear(D.cena && D.cena.id);
-      D.cena = cena; D.cenaImg = null;
-      root.Cenas.rasterizar(cena, W, H).then(function (c) { if (D.cena === cena) D.cenaImg = c; });
+      cena = (cenaId && cenaId !== 'aleatoria' && root.Cenas.porId(cenaId)) || root.Cenas.sortear(D.cena && D.cena.id, comBichos ? function (c) { return c.bichos; } : null);
+      D.cena = cena; rasterizarCena();
     }
     D.av = [{}, {}];
+    return cena;
   }
+  function rasterizarCena() {   // na nitidez da tela (tablet e TV grandes não ficam borrados)
+    var cena = D.cena; if (!cena || !root.Cenas) return; D.cenaImg = null;
+    root.Cenas.rasterizar(cena, Math.round(W * D.escala), Math.round(H * D.escala)).then(function (c) { if (D.cena === cena) D.cenaImg = c; });
+  }
+  /* nitidez: desenha na resolução de verdade da tela (até 1,5×), para não ficar borrado em tablet grande e TV */
+  function nitidez() { var c = D.canvas, cw = (c && c.clientWidth) || W, dpr = root.devicePixelRatio || 1; return Math.max(1, Math.min(1.5, Math.round(cw * dpr / W * 4) / 4)); }
   function avatares(lista) { if (lista && lista.length) D.avatares = lista; }
 
   /* figura rasterizada (cache); enquanto não pronta, bolinha da cor do suco */
   function imagem(fig, raio) {
-    var px = Math.min(256, Math.round(raio * 2.3)), k = fig.id + '@' + px;
+    var px = Math.min(320, Math.round(raio * 2.3 * Math.max(1, D.escala))), k = fig.id + '@' + px;
     if (D.figs[k]) return D.figs[k].pronta ? D.figs[k].c : null;
     D.figs[k] = { pronta: false, c: null };
     root.Figuras.rasterizar(fig, px).then(function (c) { D.figs[k] = { pronta: true, c: c }; });
@@ -138,6 +146,7 @@
       pop(ev.j);
     } else if (ev.t === 'pegou') { estrelas(ev.x, ev.y, ev.mascote ? CORES.ouro : cor, ev.mascote ? 30 : 14); texto((ev.mascote ? '★ ' : '') + '+' + ev.pontos, ev.x, ev.y - 50, ev.mascote ? CORES.ouro : cor, ev.mascote ? 44 : 34); pop(ev.j); }
     else if (ev.t === 'chutou') { estrelas(ev.x, ev.y, '#fff', 10); texto(T('Chutou! +', 'Kick! +') + ev.pontos, ev.x, ev.y - 60, cor, 32); pop(ev.j); }
+    else if (ev.t === 'tanque') { for (var bi = 0; bi < 34; bi++) D.parts.push({ x: ev.px + (Math.random() - 0.5) * 200, y: 548, vx: (Math.random() - 0.5) * 760, vy: -280 - Math.random() * 560, g: 1300, r: 7 + Math.random() * 5, cor: CORES_BOLINHAS[bi % CORES_BOLINHAS.length], vida: 1400 }); texto(T('TCHIBUM! +', 'SPLASH! +') + ev.pontos, ev.px, 420, CORES.ouro, 46); pop(ev.j); }   // 🎉 caiu na piscina: bolinhas para todo lado
     else if (ev.t === 'gol') { D.flash = 0.6; estrelas(ev.x, ev.y, CORES.ouro, 40); texto(T('GOOOL! +', 'GOAL! +') + ev.pontos, W / 2, 300, CORES.ouro, 72); pop(ev.j); }
     else if (ev.t === 'vilao') { fumaca(ev.x, ev.y); texto(ev.vida ? T('Ai! −1 vida', 'Ouch! −1 life') : (ev.pontos + ''), ev.x, ev.y - 50, '#ff5252', 36); if (ev.fig === 'chuvisco') D.chuva = 2500; if (ev.vida) D.flash = 0.35; }
     else if (ev.t === 'combo') { texto((EN ? 'COMBO ×' : 'COMBO ×') + ev.n + '  +' + ev.pontos, ev.x || W / 2, (ev.y || 300) - 110, CORES.ouro, 48, true); }
@@ -208,6 +217,7 @@
       jogs.forEach(function (jg) { var r = jg.raia, y = r.y + r.h * jg.zonaChute; var zg = ctx.createLinearGradient(0, y, 0, r.y + r.h); zg.addColorStop(0, 'rgba(62,232,255,.0)'); zg.addColorStop(1, 'rgba(62,232,255,.28)'); ctx.fillStyle = zg; ctx.fillRect(r.x, y, r.w, r.h - (y - r.y)); ctx.setLineDash([14, 10]); ctx.strokeStyle = 'rgba(62,232,255,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(r.x, y); ctx.lineTo(r.x + r.w, y); ctx.stroke(); ctx.setLineDash([]); });
       trave(ctx, estado.trave, ts);
     }
+    if (estado.tanques) seguro('tanques', function () { tanques(ctx, estado.tanques, ts); });
     // rastro de luz onde a pessoa se mexe
     jogs.forEach(function (jg, j) {
       var pts = jg.rastro; if (!pts || pts.length < 1) return;
@@ -272,19 +282,21 @@
     var pose = rc ? rc.tipo : null, k = rc ? Math.min(1, (ts - rc.desde) / (rc.ate - rc.desde)) : 0, pulo = 0, xd = x;
     if (pose === 'festa') {
       pulo = -A * 0.32 * Math.sin(k * Math.PI);                                   // pulinho de comemoração
-      if (D.dedo && !V && rc.x != null) {                                               // no dedo, ele mesmo vai lá: salta até a fruta e volta
-        var ida = k < 0.3 ? k / 0.3 : 1 - (k - 0.3) / 0.7; ida = ida * ida * (3 - 2 * ida);
-        xd = x + (Math.max(r.x + A * 0.2, Math.min(r.x + r.w - A * 0.2, rc.x)) - x) * ida;
-        if (rc.y != null) pulo = Math.min(pulo, -(chao - A * 0.9 - Math.max(r.y + A * 0.3, rc.y)) * ida * 0.6);
-      }
     } else if (pose === 'dor') xd = x + Math.sin(ts / 35) * A * 0.02 * (1 - k);
     var alvoY = corpo.pulando ? -A * 0.5 : 0; av.y = V ? V.y : av.y == null ? 0 : av.y + (alvoY - av.y) * Math.min(1, dt * 12);   // 🧍 vai até lá: o pulo é o do motor
-    var alvoAg = corpo.abaixado ? 0.6 : 1; av.ag = av.ag == null ? 1 : av.ag + (alvoAg - av.ag) * Math.min(1, dt * 10);
+    var alvoAg = corpo.abaixado ? 0.6 : (V && V.agacha > 0) ? 0.9 : 1; av.ag = av.ag == null ? 1 : av.ag + (alvoAg - av.ag) * Math.min(1, dt * 10);
     av.passo = (av.passo || 0) + Math.min(14, Math.abs(av.vx) / 40) * dt * 8;
+    av.vxs = (av.vxs || 0) + (av.vx - (av.vxs || 0)) * Math.min(1, dt * 10);   // velocidade suavizada (câmera e dedo)
+    var vel = V ? V.vx : av.vxs;
+    av.fase = (av.fase || 0) + Math.abs(vel) / (A * 0.55) * 6.2832 * dt;   // de lado: um ciclo de passo a cada ~meia altura andada (passada de criança)
     var andando = Math.abs(av.vx) > 30, balanco = andando ? Math.sin(av.passo) : 0;
     var bracoE = false, bracoD = false, ombroY = chao + av.y - A * 0.62 * av.ag;
     (jg.rastro || []).slice(-4).forEach(function (p) { if (ts - p.ts > 400) return; if (p.y < ombroY + A * 0.1) { if (p.x < x - A * 0.05) bracoE = true; else if (p.x > x + A * 0.05) bracoD = true; } });
     if (pose === 'festa' || (V && V.cima)) { bracoE = bracoD = true; }
+    // parado um tempinho: acena e conversa com as mãos (gesticula)
+    av.parado = andando || pose || (V && (V.cima || V.costas)) ? 0 : (av.parado || 0) + dt;
+    var gesto = av.parado > 2.5 ? (av.parado - 2.5) % 6 : -1;
+    if (gesto >= 0 && gesto < 1.4) bracoD = true; else if (gesto >= 3 && gesto < 3.8) bracoE = true;
     av.bE = av.bE == null ? 0 : av.bE + ((bracoE ? 1 : 0) - av.bE) * Math.min(1, dt * (pose ? 18 : 10));
     av.bD = av.bD == null ? 0 : av.bD + ((bracoD ? 1 : 0) - av.bD) * Math.min(1, dt * (pose ? 18 : 10));
     var y = av.y + pulo;
@@ -292,7 +304,9 @@
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(xd, chao + 4, A * 0.22 * Math.max(0.3, 1 + y / A * 0.6), A * 0.06, 0, 0, 6.2832); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(xd, chao + y); ctx.scale(1 + (1 - av.ag) * 0.35, av.ag);
     if (jg.invencivel && !pose && Math.floor(ts / 90) % 2) ctx.globalAlpha = 0.45;
-    root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose, costas: !!(V && V.costas && !pose) });
+    var lado = pose !== 'dor' && !(V && V.costas) && (Math.abs(vel) > 40 || (y < -5 && Math.abs(vel) > 10));   // andando (dedo, câmera ou teclado): de perfil   // andando a festa não vira de frente: sorri de lado   // andando (ou pulando para o lado): de perfil
+    if (lado) { var dir = vel < 0 ? -1 : 1; av.dir = dir; ctx.scale(dir, 1); root.Boneco.corpoLado(ctx, cfg, A, { fase: av.fase, andando: Math.abs(vel) > 40, agacha: V && V.agacha > 0 ? 1 : 0, noAr: y < -5, cima: (V && V.cima) || pose === 'festa' || av.bE > 0.6 || av.bD > 0.6, ts: ts, expr: pose }); }
+    else root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: gesto >= 0 && gesto < 1.4 ? 0.55 + 0.45 * Math.sin(ts / 110) : av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose, costas: !!(V && V.costas && !pose), agacha: V && V.agacha > 0 ? 1 : 0 });
     ctx.restore();
     ctx.save(); ctx.font = '600 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillStyle = cor; sombra(ctx, 'rgba(0,0,0,.8)', 6);
     ctx.fillText(D.nomes[j] || '', xd, chao + y - A * 1.02 * av.ag - 6); ctx.restore();
@@ -354,6 +368,46 @@
     for (var i = 1; i < 8; i++) { ctx.beginPath(); ctx.moveTo(t.x + t.w * i / 8, t.y); ctx.lineTo(t.x + t.w * i / 8, t.y + t.h); ctx.stroke(); }
     for (var k = 1; k < 5; k++) { ctx.beginPath(); ctx.moveTo(t.x, t.y + t.h * k / 5); ctx.lineTo(t.x + t.w, t.y + t.h * k / 5); ctx.stroke(); }
     ctx.restore();
+  }
+
+  /* ⚽ piscina de bolinhas dos lados do gol: torre com escadinha, cadeirinha que dobra, alvo no braço, papai e mamãe */
+  var PAI = { cabeca: 'menino', cabelo: 'curto', corCabelo: '#3e2723', cor: '#1e88e5', roupa: 'camiseta', acessorio: 'nenhum', sapato: '#37474f', pele: '#f1c27d' };
+  var MAE = { cabeca: 'menina', cabelo: 'coque', corCabelo: '#5d4037', cor: '#8e24aa', roupa: 'vestido', acessorio: 'nenhum', sapato: '#37474f', pele: '#ffd9b3' };
+  var CORES_BOLINHAS = ['#ff5252', '#ffd166', '#3ee8ff', '#c6ff3d', '#ff4fa3', '#8e5bff', '#ff9800'];
+  function tanques(ctx, lista, ts) {
+    lista.forEach(function (k) {
+      var L = k.lado, cx = k.x, topoP = 548, fundoP = 652, assento = 330, poste = cx - L * 105, escada = cx + L * 118, A = 250, cfg = k.quem === 'pai' ? PAI : MAE, B = root.Boneco;
+      var u = k.t, dobra = k.fase === 'caindo' ? Math.min(1, u / 0.25) : k.fase === 'piscina' ? 1 : k.fase === 'subindo' ? Math.max(0, 1 - u / 1.9 * 1.4) : 0;
+      ctx.save(); ctx.lineCap = 'round';
+      // poste, braço do alvo e o alvo (vira um pouquinho quando acertam)
+      ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(poste, fundoP - 10); ctx.lineTo(poste, assento - 70); ctx.lineTo(k.alvo.x, k.alvo.y); ctx.stroke();
+      var a = k.alvo, bate = k.fase === 'caindo' ? Math.sin(u * 30) * 0.25 * (1 - u / 0.55) : 0;
+      ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(bate); [[1, '#ff5252'], [0.72, '#fff'], [0.46, '#ff5252'], [0.2, '#ffd166']].forEach(function (c) { ctx.fillStyle = c[1]; ctx.beginPath(); ctx.arc(0, 0, a.r * c[0], 0, 6.2832); ctx.fill(); }); ctx.restore();
+      if (k.fase === 'sentado') { ctx.strokeStyle = 'rgba(255,209,102,' + (0.4 + 0.3 * Math.sin(ts / 200)) + ')'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(a.x, a.y, a.r + 10, 0, 6.2832); ctx.stroke(); }   // pisca: "acerte aqui!"
+      // escadinha
+      ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 7; [-14, 14].forEach(function (d) { ctx.beginPath(); ctx.moveTo(escada + d, topoP); ctx.lineTo(escada + d, assento - 10); ctx.stroke(); });
+      ctx.lineWidth = 5; for (var y = topoP - 26; y > assento; y -= 30) { ctx.beginPath(); ctx.moveTo(escada - 14, y); ctx.lineTo(escada + 14, y); ctx.stroke(); }
+      // fundo da piscina (as bolinhas de trás)
+      ctx.fillStyle = '#29b6f6'; arred(ctx, cx - 130, topoP - 18, 260, fundoP - topoP + 18, 18); ctx.fill();
+      for (var i = 0; i < 26; i++) { ctx.fillStyle = CORES_BOLINHAS[i % CORES_BOLINHAS.length]; ctx.beginPath(); ctx.arc(cx - 118 + (i * 37) % 236, topoP - 6 + ((i * 13) % 3) * 9, 11, 0, 6.2832); ctx.fill(); }
+      // a cadeirinha (dobra para baixo, presa no poste)
+      ctx.save(); ctx.translate(poste, assento); ctx.rotate(L * dobra * 1.35); ctx.fillStyle = '#ffd166'; arred(ctx, L < 0 ? -175 : 25, -8, 150, 16, 6); ctx.fill(); ctx.fillStyle = '#f9a825'; arred(ctx, L < 0 ? -175 : 25, 6, 150, 8, 4); ctx.fill(); ctx.restore();   // a cadeirinha fica embaixo de quem senta e dobra para baixo
+      // quem está lá
+      if (B) {
+        var px, py, op = {}, sentX = (poste + escada) / 2 + L * 8;
+        if (k.fase === 'sentado') { px = sentX; py = assento + A * 0.22; op = { bE: 0.15, bD: 0.55 + 0.45 * Math.sin(ts / (k.quem === 'pai' ? 130 : 110)), balanco: 0 }; }   // sentado, dando tchauzinho
+        else if (k.fase === 'caindo') { var q = Math.min(1, u / 0.55); px = sentX; py = assento + A * 0.22 + (topoP + A * 0.55 - assento - A * 0.22) * q * q; op = { pose: 'dor' }; }
+        else if (k.fase === 'piscina') { px = sentX + Math.sin(u * 6) * 6; py = topoP + A * 0.55; op = { pose: 'festa', bE: 1, bD: 1 }; }   // rindo no meio das bolinhas
+        else { var s2 = Math.min(1, u / 1.6), s3 = Math.max(0, (u - 1.6) / 0.3); px = escada + (sentX - escada) * s3; py = topoP + (assento + A * 0.22 - topoP) * s2; op = { costas: s3 < 0.5, bE: 0.5 + 0.5 * Math.sin(u * 9), bD: 0.5 - 0.5 * Math.sin(u * 9) }; }   // sobe a escadinha
+        op.ts = ts; ctx.save(); ctx.translate(px, py); B.corpoEmPe(ctx, cfg, A, op); ctx.restore();
+      }
+      // frente da piscina (cobre quem caiu) + bolinhas da frente
+      ctx.fillStyle = 'rgba(41,182,246,.92)'; arred(ctx, cx - 135, topoP + 8, 270, fundoP - topoP - 8, 18); ctx.fill();
+      ctx.strokeStyle = '#0288d1'; ctx.lineWidth = 5; ctx.stroke();
+      for (var f = 0; f < 18; f++) { ctx.fillStyle = CORES_BOLINHAS[(f + 3) % CORES_BOLINHAS.length]; ctx.beginPath(); ctx.arc(cx - 115 + (f * 29) % 230, topoP + 6 + (f % 2) * 6, 12, Math.PI, 0); ctx.fill(); }
+      ctx.fillStyle = '#fff'; ctx.font = '700 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.fillText(k.quem === 'pai' ? T('Papai', 'Dad') : T('Mamãe', 'Mom'), cx, fundoP - 22);
+      ctx.restore();
+    });
   }
 
   function particulas(ctx, dt, dtMs) {

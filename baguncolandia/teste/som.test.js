@@ -1,6 +1,6 @@
 // Som e tela "Quem vai jogar" dos modos sem TV (Chromium, Playwright): node baguncolandia/teste/som.test.js
 // ⏸ só na rodada; 6 modos numa fileira; 2 pessoas = dois bonecos e explicação; música em toda rodada, outra a
-// cada rodada; 🎵 e 🔊 funcionam e ficam guardados; todas as 13 músicas tocam.
+// cada rodada; 🎵 e 🔊 funcionam e ficam guardados; todas as 12 músicas tocam (a 8-bit saiu).
 const { chromium } = require('playwright');
 const path=require('path'),http=require('http'),fs=require('fs');
 const raiz=path.resolve(__dirname,'..','..');

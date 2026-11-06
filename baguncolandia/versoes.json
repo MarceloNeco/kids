@@ -2,14 +2,81 @@
   "app": "baguncolandia",
   "versoes": [
     {
-      "versao": "0.8.25",
+      "versao": "0.8.30",
+      "data": "06/Nov/2026",
+      "hora": "22:00:00",
+      "pt": [
+        "🎵 Músicas com instrumentos de verdade, em ordem sorteada; sem internet toca uma música simples guardada (sem som de videogame com internet)."
+      ],
+      "en": [
+        "🎵 Real-instrument songs in random order; without internet a simple saved song plays (no video-game sound while online)."
+      ]
+    },
+    {
+      "versao": "0.8.29",
+      "data": "06/Nov/2026",
+      "hora": "22:30:00",
+      "pt": [
+        "🏞️ Cenários novos e mais caprichados: Fazenda (celeiro, silo, moinho, cerca, fardos de feno), Jardim florido (canteiro, laguinho com vitória-régia, banco, casinha de passarinho, casa ao fundo) e Lago na montanha (montanhas com neve, pinheiros, píer, canoa, juncos). A floresta ganhou tronco caído, arbustos e pedras; a praia ganhou castelo de areia, estrela-do-mar, conchas e gaivotas. Muda a cada rodada.",
+        "🐰 No Pega-pega só aparecem cenários onde bicho combina (nada de toupeira na Lua), e a toupeira e a minhoca saem de montinhos de terra; na praia e na cidade elas não aparecem.",
+        "🔍 Mais nítido em tablet grande e TV: o jogo desenha na resolução da tela (até 1,5 vez), sem ficar borrado com o zoom."
+      ],
+      "en": [
+        "🏞️ New, more detailed scenes: Farm (barn, silo, windmill, fence, hay bales), Flower garden (flower bed, little pond with lily pads, bench, birdhouse, house behind) and Mountain lake (snowy mountains, pine trees, pier, canoe, reeds). The forest got a fallen log, bushes and rocks; the beach got a sandcastle, a starfish, shells and seagulls. It changes every round.",
+        "🐰 In Catch only scenes where animals fit show up (no mole on the Moon), and the mole and the earthworm come out of dirt mounds; on the beach and in the city they do not appear.",
+        "🔍 Sharper on big tablets and TVs: the game draws at the screen's resolution (up to 1.5×), so it does not blur when scaled up."
+      ]
+    },
+    {
+      "versao": "0.8.28",
       "data": "06/Nov/2026",
       "hora": "21:30:00",
       "pt": [
-        "🎵 Músicas com instrumentos de verdade; sem internet toca uma música simples guardada"
+        "⚽ Chuta-chuta: agora a bola entra no gol! Chute reto vai para o gol; quase sempre entra, de vez em quando passa raspando. Passar o dedo mais rápido chuta mais forte (a bola vai mais depressa).",
+        "🎯 Piscina de bolinhas: dos lados do gol, o papai (esquerda) e a mamãe (direita) ficam sentados na cadeirinha que dobra, dando tchauzinho. Chute para o lado deles e acerte o alvo: a cadeira dobra, eles caem na piscina, as bolinhas espirram para todo lado, eles riem e sobem de novo pela escadinha. Vale 40 pontos."
       ],
       "en": [
-        "🎵 Songs with real instruments; offline it plays one simple saved song"
+        "⚽ Kick: the ball now goes into the goal! A straight kick goes to the goal; it almost always scores, now and then it just misses. Swiping faster kicks harder (the ball goes faster).",
+        "🎯 Ball pit: on each side of the goal, Dad (left) and Mom (right) sit on the folding seat, waving. Kick toward them and hit the target: the seat folds, they fall into the ball pit, balls splash everywhere, they laugh and climb back up the ladder. Worth 40 points."
+      ]
+    },
+    {
+      "versao": "0.8.27",
+      "data": "06/Nov/2026",
+      "hora": "20:30:00",
+      "pt": [
+        "🚶 Em todos os modos, com o boneco aparecendo, ele ANDA até onde você toca, de lado, com as pernas mexendo. Antes, se você soltava o dedo de um lado e tocava do outro, ele aparecia lá de uma vez (no Pega-pega, no Corta-corta e nos outros). Também não dá mais aquele salto até a fruta: ele vai andando. Sem o boneco (😊 Fácil e 🧍 desligado), o dedo continua pegando e cortando na hora."
+      ],
+      "en": [
+        "🚶 In every mode, with the avatar showing, it WALKS to where you touch, sideways, legs moving. Before, if you lifted your finger on one side and touched the other, it popped up there at once (in Catch, Slice and the others). No more leap to the fruit either: it walks. Without the avatar (😊 Easy with 🧍 off), your finger still catches and slices right away."
+      ]
+    },
+    {
+      "versao": "0.8.26",
+      "data": "06/Nov/2026",
+      "hora": "19:00:00",
+      "pt": [
+        "🚶 O boneco agora anda DE LADO, olhando para onde vai: pernas com joelho dobrando a cada passo, braços balançando, corpo subindo e descendo de leve. Antes de pular ele agacha (joelhos dobrados) e no ar encolhe as pernas com as mãos esticadas para cima. Parado, sorri e gesticula (acena de vez em quando).",
+        "👩 A mamãe também: chega andando de lado, de verdade, e quando vê a bagunça vira de frente, franze a testa, faz \"Ooo!\", balança a cabeça e sacode o dedo."
+      ],
+      "en": [
+        "🚶 The avatar now walks SIDEWAYS, facing where it goes: knees bending at every step, arms swinging, body bobbing a little. Before jumping it crouches (knees bent) and in the air it tucks its legs with hands stretched up. Standing still, it smiles and gestures (waves now and then).",
+        "👩 Mom too: she walks in sideways, for real, and when she sees the mess she turns to face us, frowns, goes \"Ooh!\", shakes her head and wags her finger."
+      ]
+    },
+    {
+      "versao": "0.8.25",
+      "data": "06/Nov/2026",
+      "hora": "17:30:00",
+      "pt": [
+        "Os botões (✕, ⏸, 🧍, 🔊, 🎵) e as setinhas dos cômodos não ficam mais em cima da área do jogo, em todas as brincadeiras: com o aparelho deitado eles ficam numa faixa ao lado (e as setinhas embaixo); em pé, numa fileira no alto.",
+        "🧸 Bagunça no dedo: o dedo só mostra aonde ir. Quem bagunça é o boneco, quando chega lá e encosta: com a mão no que está no alto (ele agacha e pula para alcançar) e com os pés no que está no chão.",
+        "🎵 Saiu a música que parecia de videogame antigo (8-bit). A música de reserva (sem internet) ficou com som mais macio."
+      ],
+      "en": [
+        "The buttons (✕, ⏸, 🧍, 🔊, 🎵) and the room arrows no longer sit on top of the play area, in every game: with the device sideways they go to a strip on the side (arrows at the bottom); upright, to a row at the top.",
+        "🧸 Mayhem with your finger: the finger only shows where to go. The avatar makes the mess when it gets there and touches things: with its hand up high (it crouches and jumps to reach) and with its feet on the floor.",
+        "🎵 The music that sounded like an old video game (8-bit) is gone. The backup music (offline) now sounds softer."
       ]
     },
     {

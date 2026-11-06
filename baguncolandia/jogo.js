@@ -16,7 +16,7 @@
   'use strict';
   var W = 1280, H = 720, G = 1100;   // gravidade em px/s²
 
-  var PONTOS = { fruta: 10, doce: 10, heroi: 15, bicho: 15, mascote: 30, vilaoPega: -5, chute: 10, gol: 30, comboCada: 5, desviou: 10, tocou: 5 };
+  var PONTOS = { fruta: 10, doce: 10, heroi: 15, bicho: 15, alvo: 40, mascote: 30, vilaoPega: -5, chute: 10, gol: 30, comboCada: 5, desviou: 10, tocou: 5 };
   var DIFIC = { crianca: { intervalo: 1500, vel: 0.85 }, normal: { intervalo: 1000, vel: 1 }, maluco: { intervalo: 650, vel: 1.2 } };
   var LIMIAR = 35;   // força mínima do ponto de movimento (0..100) para contar
   var MODOS = ['corta', 'pega', 'chuta', 'pula', 'bolas', 'mistura', 'bagunca', 'arrumar'];   // bagunca: motor próprio em casa.js
@@ -163,9 +163,33 @@
     var proximoAviso = 0;
     /* 🧍 "Boneco vai até lá" (no dedo): o dedo marca o alvo, o boneco anda até lá (no máximo 1 tela em 1,5 s),
        pula sozinho se o alvo está alto, e só vale o que ENCOSTA no corpo dele (mãos, pés, tronco) */
+    var toque = !!cfg.toque;   // 👆 no dedo (😊 Fácil): o boneco visível ANDA até onde o dedo foi, nunca aparece do outro lado de uma vez
     var vai = !!cfg.vai, VAI = { A: H * 0.56, vmax: W / 1.5, acel: 7000, g: 2600, puloMax: 330, chao: 0.86 };
     if (vai) jogadores.forEach(function (jg, j) { var r = raia(j); jg.vai = { x: r.x + r.w / 2, y: 0, vx: 0, vy: 0, alvo: null }; });
     var trave = { x: W / 2 - 120, y: 150, w: 240, h: 130 };   // abaixo do relógio e do nome do modo
+    /* ⚽ Chuta-chuta: gol no meio e, dos lados, a piscina de bolinhas — o papai (esquerda) e a mamãe (direita) sentados na
+       cadeirinha que dobra. Acertou o alvo dele(a): a cadeira dobra, cai na piscina (bolinhas para todo lado), sobe pela
+       escadinha e senta de novo. Chute para a esquerda vai no papai, para a direita na mamãe, reto no gol. */
+    var tanques = (modoBase === 'chuta' || modoBase === 'mistura') ? [
+      { quem: 'pai', lado: -1, x: 205, alvo: { x: 395, y: 250, r: 48 }, fase: 'sentado', t: 0 },
+      { quem: 'mae', lado: 1, x: W - 205, alvo: { x: W - 395, y: 250, r: 48 }, fase: 'sentado', t: 0 }
+    ] : null;
+    var TEMPO_TANQUE = { caindo: 0.55, piscina: 1.7, subindo: 1.9 };
+    function passoTanques(dt) {
+      if (!tanques) return;
+      tanques.forEach(function (k) { if (k.fase === 'sentado') { k.t += dt; return; } k.t += dt; var dur = TEMPO_TANQUE[k.fase]; if (k.t >= dur) { k.t = 0; k.fase = k.fase === 'caindo' ? 'piscina' : k.fase === 'piscina' ? 'subindo' : 'sentado'; } });
+    }
+    /* chute mirado: escolhe o alvo pela direção do chute; forte = bola mais rápida; 1 em 4 passa raspando (fácil, mas nem sempre) */
+    function chutar(c, dirX, forte) {
+      var alvoT, tipo;
+      if (tanques && dirX < -120) { alvoT = tanques[0].alvo; tipo = 'pai'; }
+      else if (tanques && dirX > 120) { alvoT = tanques[1].alvo; tipo = 'mae'; }
+      else { alvoT = { x: trave.x + trave.w / 2, y: trave.y + trave.h * 0.55 }; tipo = 'gol'; }
+      var erro = rnd() < 0.25 ? (rnd() < 0.5 ? -1 : 1) * (tipo === 'gol' ? 150 : 95) : (rnd() - 0.5) * (tipo === 'gol' ? 80 : 30);
+      var T = forte ? 0.62 : 0.95, tx = alvoT.x + erro, ty = alvoT.y;
+      c.chutada = true; c.mira = tipo; c.estilo = 'arco'; c.vrot = forte ? 18 : 12;
+      c.vx = (tx - c.x) / T; c.vy = (ty - c.y - 0.5 * G * T * T) / T;
+    }
     function raia(j) { return nJog === 1 ? { x: 0, y: 0, w: W, h: H } : { x: j * W / 2, y: 0, w: W / 2, h: H }; }
     function porPapel(papel) { return figs.filter(function (f) { return f.papel === papel; }); }
     function sortear(lista) { return lista.length ? lista[Math.floor(rnd() * lista.length) % lista.length] : null; }
@@ -215,7 +239,7 @@
         lancar({ fig: fig, x: x, y: r.y + r.h + fig.raio, vx: (alvoX - x) / voo, vy: vy, vrot: (rnd() - 0.5) * 6, j: j, estilo: estilo });
       } else if (m === 'pega') {
         var p = rnd();
-        var bichos = porPapel('bicho');
+        var bichos = porPapel('bicho').filter(function (f) { return !(cfg.semBuraco && f.anda === 'buraco'); });   // sem terra (praia, cidade): nada de toupeira e minhoca
         if (bichos.length && p >= 0.12 + chanceVilao) { soltarBicho(j, sortear(bichos)); return; }   // 🐰 bichos no lugar dos heróis
         fig = p < 0.12 ? sortear(porPapel('poder')) : p < 0.12 + chanceVilao ? sortear(porPapel('vilao')) : sortear(porPapel('heroi'));
         if (!fig) return;
@@ -302,12 +326,16 @@
         // gol
         if (c.papel === 'bola' && c.chutada && c.x > trave.x && c.x < trave.x + trave.w && c.y < trave.y + trave.h && c.y > trave.y - 20) {
           c.morta = true; c.como = 'gol'; jogadores[c.j].pontos += mult(c.j, PONTOS.gol); emitir({ t: 'gol', id: c.id, j: c.j, x: c.x, y: c.y, pontos: PONTOS.gol });
-          trave.x = clamp(W / 2 - 120 + (rnd() - 0.5) * 700, 20, W - trave.w - 20); continue;
+          trave.x = tanques ? W / 2 - trave.w / 2 + (rnd() - 0.5) * 120 : clamp(W / 2 - 120 + (rnd() - 0.5) * 700, 20, W - trave.w - 20); continue;
         }
+        if (tanques && c.papel === 'bola' && c.chutada) { var tq = null; tanques.forEach(function (k) { if (k.fase === 'sentado' && Math.hypot(c.x - k.alvo.x, c.y - k.alvo.y) < k.alvo.r + c.raio * 0.6) tq = k; });
+          if (tq) { c.morta = true; c.como = 'alvo'; tq.fase = 'caindo'; tq.t = 0; jogadores[c.j].pontos += mult(c.j, PONTOS.alvo); emitir({ t: 'tanque', quem: tq.quem, id: c.id, j: c.j, x: tq.alvo.x, y: tq.alvo.y, pontos: PONTOS.alvo, px: tq.x }); continue; } }
         var fora = c.y > H + c.raio + 60 || c.x < -c.raio - 80 || c.x > W + c.raio + 80 || (c.estilo === 'balao' && c.y > H + c.raio);
         if (fora) { if ((c.papel === 'fruta' || c.papel === 'doce') && c.estilo === 'arco') emitir({ t: 'perdeu', id: c.id, j: c.j, fig: c.fig }); coisas.splice(i, 1); }
       }
+      passoTanques(dt);
       if (vai) passoVai(dt);
+      else if (toque) passoDedo(dt);
       // poderes vencendo
       jogadores.forEach(function (jg, j) { if (jg.poder && tempo > jg.poderAte) { jg.poder = null; emitir({ t: 'poder', j: j, poder: null }); } if (jg.combo && tempo > jg.comboAte) jg.combo = 0; });
       if (duracao && tempo >= duracao * 1000) terminar();
@@ -361,6 +389,14 @@
       if (B.anda || voa) B.passo += d * (voa ? 14 : Math.max(5, vel / c.tam * 9));
       if ((B.fase === 'vai' || B.fase === 'sai') && (c.x < r.x - c.tam / 2 - 30 || c.x > r.x + r.w + c.tam / 2 + 30 || c.y < r.y - c.tam)) c.sumiu = true;
     }
+    function passoDedo(dt) {   // anda (não teletransporta): no máximo 1 tela em 2,4 s, freia sem passar do ponto
+      jogadores.forEach(function (jg, j) {
+        if (jg.corpoAlvo == null) return;
+        var r = raia(j), vmax = W / 2.4 / r.w, c = jg.corpo, dx = jg.corpoAlvo - c.x;
+        jg.vxN = (jg.vxN || 0) + clamp(clamp(dx * 6, -vmax, vmax) - (jg.vxN || 0), -12 * dt, 12 * dt);
+        c.x = clamp(c.x + jg.vxN * dt, 0, 1);
+      });
+    }
     function alvo(j, nx, ny) {   // dedo no lugar (normalizado na raia); null = solta (o boneco termina de chegar)
       var jg = jogadores[j]; if (!vai || !jg) return;
       if (nx == null) { if (jg.vai.alvo) jg.vai.alvo.solto = true; return; }
@@ -398,7 +434,7 @@
           var px = clamp(c.x, B.x1, B.x2), py = clamp(c.y, B.topo, B.base);
           if (Math.hypot(c.x - px, c.y - py) > c.raio) return;
           if (c.papel === 'bola' && c.estilo !== 'quica' && !c.chutada && c.y < B.pe - A * 0.35) return;   // chute: só com as pernas
-          acertou(j, c, modoAtual, tempo, { x: V.x, y: c.y + (c.y < B.pe - A * 0.5 ? 40 : -40) });
+          acertou(j, c, modoAtual, tempo, { x: V.x, y: c.y + (c.y < B.pe - A * 0.5 ? 40 : -40) }, V.vx * 0.6, Math.abs(V.vx) > 450);
         });
       });
     }
@@ -434,7 +470,8 @@
           if (atingiu && c.papel === 'obstaculo') atingiu = false;
         }
         if (!atingiu) return;
-        acertou(j, c, modo, ts, L.b);
+        var dx = L.a ? L.b.x - L.a.x : 0, dtl = L.a ? Math.max(0.016, (L.b.ts - L.a.ts) / 1000) : 1;
+        acertou(j, c, modo, ts, L.b, dx / dtl * 0.25, L.a ? Math.hypot(L.b.x - L.a.x, L.b.y - L.a.y) / dtl > 900 : false);
       });
     }
     function distSeg(a, b, p) {
@@ -442,7 +479,7 @@
       var t = l2 ? clamp(((p.x - a.x) * dx + (p.y - a.y) * dy) / l2, 0, 1) : 0;
       return Math.hypot(a.x + t * dx - p.x, a.y + t * dy - p.y);
     }
-    function acertou(j, c, modo, ts, L0) {
+    function acertou(j, c, modo, ts, L0, dirX, forte) {
       var jg = jogadores[j]; L0 = L0 || { x: c.x, y: c.y + 1 };
       if (c.papel === 'fruta' || c.papel === 'doce') {
         c.morta = true; c.como = 'corte'; jg.pontos += mult(j, PONTOS.fruta);
@@ -477,7 +514,7 @@
         c.vx = ux / nn2 * 520 + (rnd() - 0.5) * 100; c.vy = uy / nn2 * 520 - 300;
         jg.pontos += mult(j, PONTOS.tocou); emitir({ t: 'tocou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.tocou });
       } else if (c.papel === 'bola' && !c.chutada) {
-        c.chutada = true; c.vy = -(900 + Math.random() * 0); c.vx = (trave.x + trave.w / 2 - c.x) / 0.9; c.estilo = 'arco'; c.vrot = 12;
+        chutar(c, dirX || 0, !!forte);
         jg.pontos += mult(j, PONTOS.chute); emitir({ t: 'chutou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.chute });
       }
     }
@@ -515,8 +552,9 @@
     function corpo(j, caixa, ts) {
       var jg = jogadores[j]; if (!jg || !caixa || !caixa.w) return;
       var ref = jg.ref || caixa, c = jg.corpo, alvo = clamp(caixa.x + caixa.w / 2, 0, 1);
-      // suaviza entre amostras seguidas (10×/s); amostra velha ou primeira: vai direto
-      c.x = (ts && c.ts && ts - c.ts < 250) ? c.x + (alvo - c.x) * 0.6 : alvo;
+      // dedo: só marca o destino (passoDedo anda até lá); câmera: suaviza entre amostras seguidas (10×/s), amostra velha vai direto
+      if (toque && !vai) jg.corpoAlvo = alvo;
+      else c.x = (ts && c.ts && ts - c.ts < 250) ? c.x + (alvo - c.x) * 0.6 : alvo;
       c.topo = caixa.y; c.altura = caixa.h; c.ts = ts || 0;
       c.pulando = caixa.y < ref.y - ref.h * 0.12 && caixa.h > ref.h * 0.6;
       if (jg.esq) c.pulando = caixa.y < ref.y - ref.h * 0.1;
@@ -526,7 +564,7 @@
       return {
         fase: fase, modo: modoAtual, modoBase: modoBase, tempo: tempo, restante: duracao ? Math.max(0, Math.ceil((duracao * 1000 - tempo) / 1000)) : null,
         jogadores: jogadores.map(function (jg, j) { var r = raia(j); return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: jg.combo, poder: jg.poder, poderAte: jg.poderAte, lento: jg.lento > tempo, raia: r, zonaChute: jg.zonaChute, rastro: jg.rastro.slice(-8), corpo: jg.corpo, vai: jg.vai ? { x: jg.vai.x, y: jg.vai.y, vx: jg.vai.vx, A: VAI.A, cima: corpoVai(j).cima, alvo: jg.vai.alvo } : null, invencivel: jg.invencivelAte > tempo, esqueleto: jg.esq && tempo - 0 >= 0 ? jg.esq.k : null }; }),
-        coisas: coisas, trave: trave, bpm: bpm
+        coisas: coisas, trave: trave, bpm: bpm, tanques: tanques
       };
     }
     function batida(novoBpm) { bpm = novoBpm ? clamp(novoBpm, 40, 220) : 0; ultimaBatida = tempo; }
