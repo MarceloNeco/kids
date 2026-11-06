@@ -124,7 +124,7 @@
         P('desp', 'despejar', 'frigideira', { de: 'liquidificador' }),
         P('virar', 'virar', 'espatula', { em: 'frigideira' }),
         P('desligar', 'desligar', 'fogao'),
-        P('recheio', 'por', 'frigideira', { ing: ['banana', 'mel'], dep: ['desligar', 'cortarB'], pt: 'Coloque a banana e o mel em cima da panqueca', en: 'Put the banana and honey on top of the pancake' }),
+        P('recheio', 'por', 'frigideira', { ing: ['banana', 'mel'], dep: ['desligar', 'cortarB'], pt: 'Enfeite a panqueca', en: 'Top the pancake' }),
         P('servir', 'servir', 'prato')] },
 
     { id: 'salada-frutas', e: '🍓', cor: '#ff5e7e', pt: 'Salada de frutas', en: 'Fruit salad',

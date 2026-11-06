@@ -173,9 +173,10 @@
   function juntar(l, en) { if (l.length <= 1) return l.join(''); return l.slice(0, -1).join(', ') + (en ? ' and ' : ' e ') + l[l.length - 1]; }
   function na(u, en) { return D.utensilio[u].na[en ? 1 : 0]; }
   function textoPasso(p, rec, nivel, en) {
-    if (en ? p.en : p.pt) return en ? p.en : p.pt;
     var q = function (id) { return quantidade(rec, nivel, id); };
     var lista = juntar(p.ing.map(function (id) { return nomeQtd(id, q(id), en); }), en);
+    // texto próprio da receita; num passo de pôr, a lista vem junto para a criança saber o que escolher
+    if (en ? p.en : p.pt) return (en ? p.en : p.pt) + (p.a === 'por' && lista ? ': ' + lista : '');
     switch (p.a) {
       case 'lavar': return p.ing.length ? (en ? 'Wash at the sink: ' + lista : 'Lave na pia: ' + lista)
         : (en ? 'Wash your hands well at the sink' : 'Lave bem as mãos na pia');

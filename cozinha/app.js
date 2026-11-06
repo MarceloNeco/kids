@@ -747,7 +747,7 @@
         this.classList.toggle('girado', liga); qs(palco, '.chama').classList.toggle('acesa', liga); this.disabled = true; Som.toca('toque'); agendarCz(concluir, 500 * V + 100);
       });
     } else if (a === 'despejar') {
-      palco.innerHTML = '<p class="instr">' + t('Toque ', 'Tap the ') + '<b>' + tx(D.utensilio[p.de]) + '</b>' + t(' para despejar', ' to pour') + '</p>' +
+      palco.innerHTML = '<p class="instr">' + t('Toque ' + D.utensilio[p.de].na[0], 'Tap the ' + D.utensilio[p.de].en.toLowerCase()) + t(' para despejar', ' to pour') + '</p>' +
         '<div class="despejo"><button type="button" class="origem" aria-label="' + t('Despejar', 'Pour') + '">' + icone(p.de) + '</button><span class="seta-desp" aria-hidden="true">➜</span>' + big(p.u).replace('grandao', 'grandao destino') + '</div>';
       qs(palco, '.origem').addEventListener('click', function () { this.disabled = true; this.classList.add('despeja'); Som.toca('pega'); agendarCz(concluir, 900 * V + 100); });
     } else if (a === 'virar') {

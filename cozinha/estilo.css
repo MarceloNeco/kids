@@ -21,7 +21,7 @@ a { color: #1d6fb8; }
 .tela { display: none; }
 .tela.ativa { display: flex; }
 .tela { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; gap: 12px;
-  padding: calc(10px + var(--st)) calc(12px + var(--sr)) calc(20px + var(--sb)) calc(12px + var(--sl)); }
+  padding: calc(10px + var(--st)) calc(12px + var(--sr)) calc(80px + var(--sb)) calc(12px + var(--sl)); }   /* embaixo: espaço para o tocador de música */
 
 /* ---------- entrada e menu ---------- */
 #entrada, #desligado { justify-content: center; text-align: center; gap: 16px; }
@@ -195,9 +195,9 @@ a { color: #1d6fb8; }
 .favores-txt { font-weight: 700; }
 
 /* ---------- cozinha ---------- */
-#cozinha { padding-bottom: calc(64px + var(--sb)); }
+#cozinha { padding-bottom: calc(80px + var(--sb)); }
 .cz-corpo { width: 100%; max-width: 70rem; display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.ficha { list-style: none; background: var(--card); border: 3px solid var(--borda); border-radius: 18px; padding: 8px; display: grid; gap: 4px; max-height: 24vh; overflow: auto; counter-reset: p; }
+.ficha { list-style: none; background: var(--card); border: 3px solid var(--borda); border-radius: 18px; padding: 8px; display: grid; gap: 4px; max-height: 19vh; overflow: auto; }
 .ficha li { display: flex; align-items: center; gap: 8px; font-size: .92rem; padding: 4px 8px; border-radius: 10px; color: var(--muted); }
 .ficha li .ic { font-size: 1.3rem; }
 .ficha li span:last-of-type { flex: 1; }
@@ -253,7 +253,7 @@ a { color: #1d6fb8; }
 .maquina.treme-sem-fim { animation: treme .18s linear infinite; }
 /* fogão */
 .fogao-cena { position: relative; }
-.em-cima { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); font-size: 3.2rem; }
+.em-cima { position: absolute; left: 50%; top: -18%; transform: translateX(-50%); font-size: 2.6rem; }
 .chama { position: absolute; left: 50%; top: 40%; transform: translateX(-50%) scale(0); font-size: 2.6rem; transition: transform .3s; }
 .chama.acesa { transform: translateX(-50%) scale(1); animation: chama .5s ease-in-out infinite; }
 .botao-fogao { width: 5.2rem; height: 5.2rem; border-radius: 50%; background: radial-gradient(circle, #fff 40%, #d5dbe3); border: 4px solid #7d8a99; position: relative; transition: transform .4s; }

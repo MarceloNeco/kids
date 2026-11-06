@@ -33,7 +33,7 @@ test('index.html: CSP sem script inline, peças comuns, interruptor cozinha e te
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
   for (const m of html.matchAll(/<script src="([^"]+)"/g)) assert.ok(fs.existsSync(path.join(pasta, m[1])), m[1]);
-  assert.match(html, /<script src="\.\.\/recursos\.js" data-app="feature-tester"/);
+  assert.match(html, /<script src="\.\.\/recursos\.js" data-app="kids"/);
   for (const f of ['../atualizar.js', '../telacheia.js', '../trilha.js']) assert.ok(html.includes('<script src="' + f + '"'), 'falta ' + f);
   assert.match(html, /data-recurso="cozinha"/);
   assert.match(html, /rel="manifest" href="manifest.webmanifest"/);
