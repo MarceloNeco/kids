@@ -1,4 +1,4 @@
-# Enigmas de Ligar — créditos e licenças
+# Enigmatic — créditos e licenças (antes "Enigmas de Ligar")
 
 | O quê | De onde | Licença |
 |---|---|---|

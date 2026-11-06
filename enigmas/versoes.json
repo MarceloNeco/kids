@@ -2,6 +2,23 @@
   "app": "enigmas",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "06/Nov/2026",
+      "hora": "16:25:00",
+      "pt": [
+        "🧩 Novo nome: Enigmatic (o mesmo em português e inglês). O endereço continua o mesmo, e quem já instalou não perde nada.",
+        "✨ As palavras das cartas não quebram mais no meio (nada de \"fu- maça\" ou \"es- toura\"): o desenho fica grande em cima, a palavra embaixo, e as letras diminuem só o necessário para caber.",
+        "🔤 Botão novo no topo: esconde as palavras e deixa só os desenhos. Tocando num desenho, a palavra aparece num balão e a voz lê. O jogo lembra a escolha.",
+        "⛈️ O trovão ganhou um desenho mais claro (nuvem de tempestade) e o raio virou ⚡."
+      ],
+      "en": [
+        "🧩 New name: Enigmatic (the same in Portuguese and English). The address is the same, and anyone who installed it keeps everything.",
+        "✨ Words on the cards no longer break in the middle (no more \"smo- ke\"): the picture is big on top, the word below, and the letters only shrink as much as needed to fit.",
+        "🔤 New button at the top: hides the words and leaves only the pictures. Touch a picture and its word pops up in a bubble and the voice reads it. The game remembers your choice.",
+        "⛈️ Thunder has a clearer picture (a storm cloud) and lightning is now ⚡."
+      ]
+    },
+    {
       "versao": "0.1.1",
       "data": "06/Nov/2026",
       "hora": "19:00:00",

@@ -1,4 +1,4 @@
-// Enigmas de Ligar — arquivos do app: versão, sem internet, página, músicas e créditos.
+// Enigmatic — arquivos do app: versão, sem internet, página, músicas e créditos.
 // Rodar da raiz do kids: node --test enigmas/teste/*.test.js
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -94,4 +94,17 @@ test('nenhum segredo nem dado pessoal nos arquivos', () => {
 
 test('documentos do app existem', () => {
   for (const f of ['LEIA-ME.md', 'PENDENCIAS.md', 'CREDITOS.md', 'fontes/OFL.txt', 'icone.svg']) assert.ok(fs.existsSync(path.join(pasta, f)), 'falta ' + f);
+});
+
+test('nome Enigmatic (igual em PT e EN) na página, no manifesto, na barra de instalar, na estante e no interruptor', () => {
+  const html = ler('index.html'), m = JSON.parse(ler('manifest.webmanifest'));
+  assert.match(html, /<title>Enigmatic — /);
+  assert.match(html, /<h1 class="titulo" aria-label="Enigmatic">/);
+  assert.match(m.name, /^Enigmatic — /); assert.equal(m.short_name, 'Enigmatic');
+  assert.match(ler('app.js'), /setAttribute\('data-nome', 'Enigmatic'\)/);
+  const cat = fs.readFileSync(path.join(pasta, '..', 'catalogo.js'), 'utf8');
+  assert.match(cat, /\{ id: 'enigmas', nome: 'Enigmatic', [^}]*url: '\/kids\/enigmas\/'/, 'cartão da estante (mesmo id e endereço)');
+  const rec = JSON.parse(fs.readFileSync(path.join(pasta, '..', 'recursos-do-app.json'), 'utf8')).recursos.find(r => r.id === 'enigmas');
+  assert.deepEqual(rec.nome, { pt: 'Enigmatic', en: 'Enigmatic' });
+  assert.equal(rec.pagina, 'enigmas/');
 });

@@ -1,4 +1,4 @@
-/* Enigmas de Ligar — todas as rodadas (o conteúdo do jogo). Só dados: quem lê é o jogo.js.
+/* Enigmatic — todas as rodadas (o conteúdo do jogo). Só dados: quem lê é o jogo.js.
 
    Cada rodada: [ 'pista em português|pista em inglês', 'par', 'par', ... ]
    Cada par:    'ESQUERDA = DIREITA'
@@ -205,7 +205,7 @@
       '_ Tem raiz, galhos e dá sombra|Has roots, branches and gives shade = 🌳 árvore|tree',
       '_ Brilha no céu de dia|Shines in the sky by day = ☀️ sol|sun'],
     ['O que acontece?|What happens?',
-      '🌩️ raio|lightning = 🔊 trovão|thunder', '📌 alfinete no balão|pin on a balloon = 💥 estoura|pop!',
+      '⚡ raio|lightning = ⛈️ trovão|thunder', '📌 alfinete no balão|pin on a balloon = 💥 estoura|pop!',
       '🔥 fogo|fire = 💨 fumaça|smoke', '🌱 regar a planta|water the plant = 🌻 a flor cresce|the flower grows',
       '🍦 sorvete no sol|ice cream in the sun = 💧 derrete|it melts', '🌦️ sol com chuva|sun and rain = 🌈 arco-íris|rainbow'],
     ['Como resolver?|How to fix it?',

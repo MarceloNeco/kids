@@ -205,7 +205,7 @@
     if (em) {
       em.style.fontSize = '40px';
       var porLargura = 40 * W / (em.getBoundingClientRect().width || 40) * (deitada && comPal ? 0.45 : 0.95);
-      emo = Math.min(porLargura, comPal ? (deitada ? H * 0.9 : H * 0.55) : H * 0.85, comPal ? 64 : 88);
+      emo = Math.min(porLargura, comPal ? (deitada ? H * 0.8 : H * 0.55) : H * 0.85, comPal ? 64 : 88);
     }
     if (!comPal) { em.style.fontSize = Math.floor(emo) + 'px'; return; }
     var maxL = Math.floor(Math.max(LETRA_MIN, Math.min(em ? 24 : 22, deitada ? H * 0.5 : (em ? H * 0.3 : H * 0.4))));

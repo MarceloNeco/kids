@@ -1,4 +1,4 @@
-// Enigmas de Ligar — a página de verdade no Chromium (Playwright), com um servidorzinho local da raiz do repositório.
+// Enigmatic — a página de verdade no Chromium (Playwright), com um servidorzinho local da raiz do repositório.
 // Rodar da raiz do kids: node --test enigmas/teste/*.test.js
 // Completa rodadas tocando (toque-toque) e arrastando (mouse e dedo), no celular em pé, deitado e no computador,
 // e confere que não aparece nenhum erro no console. Fotos das telas em /tmp/enigmas-*.png (para olhar, se quiser).
@@ -101,6 +101,36 @@ async function conferirLayout(pg, nome) {
     for (let i = 1; i < col.length; i++) assert.ok(col[i].top >= col[i - 1].bottom - 0.5, nome + ': cartas encavaladas');
     for (const c of col) assert.ok(c.bottom - c.top >= 34, nome + ': carta pequena demais para o dedo (' + (c.bottom - c.top) + ' px)');
   }
+}
+
+// As palavras das cartas: nunca quebram no meio (a linha só pula num espaço), cabem dentro da carta e a letra não fica
+// menor que 12 px. (Achado de 06/Nov/2026: "fu- / maça", "es- / toura", "regar a plant / a" no Galaxy S24.)
+// Cada palavra é um <span class="w">: se ela tem mais de um retângulo na tela, quebrou no meio.
+async function conferirPalavras(pg, nome) {
+  const ruins = await pg.evaluate(() => {
+    const out = [];
+    for (const b of document.querySelectorAll('#lousa .carta')) {
+      const cs = getComputedStyle(b), r = b.getBoundingClientRect();
+      const c = { l: r.left + b.clientLeft + parseFloat(cs.paddingLeft) - 1, t: r.top + b.clientTop + parseFloat(cs.paddingTop) - 1 };
+      c.r = r.left + b.clientLeft + b.clientWidth - parseFloat(cs.paddingRight) + 1; c.b = r.top + b.clientTop + b.clientHeight - parseFloat(cs.paddingBottom) + 1;
+      const fora = el => { const q = el.getBoundingClientRect(); return q.left < c.l || q.right > c.r || q.top < c.t || q.bottom > c.b; };
+      const pal = b.querySelector('.pal'), em = b.querySelector('.emo'), rotulo = b.getAttribute('aria-label');
+      if (em && fora(em)) out.push(rotulo + ': desenho sai da carta');
+      if (getComputedStyle(pal).display === 'none') continue;
+      const ps = getComputedStyle(pal);
+      if (pal.textContent !== rotulo) out.push(rotulo + ': texto diferente do rótulo (' + pal.textContent + ')');
+      if (ps.overflowWrap !== 'normal' || ps.hyphens !== 'manual' || ps.wordBreak !== 'normal') out.push(rotulo + ': CSS deixa quebrar palavra (' + ps.overflowWrap + ', ' + ps.hyphens + ', ' + ps.wordBreak + ')');
+      if (parseFloat(ps.fontSize) < 12) out.push(rotulo + ': letra pequena demais (' + ps.fontSize + ')');
+      const ws = pal.querySelectorAll('.w');
+      if (Array.from(ws).map(w => w.textContent).join(' ') !== rotulo) out.push(rotulo + ': nem toda palavra está num <span class="w">');
+      for (const w of ws) {
+        if (w.getClientRects().length !== 1) out.push(rotulo + ': "' + w.textContent + '" quebrou no meio');
+        if (fora(w)) out.push(rotulo + ': "' + w.textContent + '" sai da carta');
+      }
+    }
+    return out;
+  });
+  assert.deepEqual(ruins, [], nome);
 }
 
 test('celular em pé: Fácil por toque-toque, erro sem castigo, próxima rodada e progresso guardado', async () => {
@@ -243,7 +273,9 @@ test('sem localStorage (modo privado travado) o jogo continua', async () => {
 });
 
 // Todas as rodadas de todos os níveis, em PT e EN, no celular em pé (390 e 320 px) e deitado: nenhuma carta sai da
-// tela. (Achado de 06/Nov/2026: uma palavra comprida empurrava a carta da direita para fora em 390 px.)
+// tela e nenhuma palavra quebra no meio nem sai da carta. (Achados de 06/Nov/2026: uma palavra comprida empurrava a
+// carta da direita para fora em 390 px; depois as palavras quebravam no meio com hífen.) Em 390 px confere também o
+// modo 🔤 só desenhos: palavras escondidas e desenhos dentro das cartas.
 test('todas as rodadas cabem na tela do celular, em pé e deitado, em português e inglês', async () => {
   for (const vp of [{ width: 390, height: 844 }, { width: 320, height: 640 }, { width: 844, height: 390 }]) {
     for (const lingua of ['pt', 'en']) {
@@ -255,11 +287,68 @@ test('todas as rodadas cabem na tela do celular, em pé e deitado, em português
         for (const id of ids) {
           assert.ok(await pg.evaluate(([n, id]) => EnigmasDebug.abrir(n, id), [n, id]), 'abrir ' + id);
           await pg.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
-          await conferirLayout(pg, vp.width + 'x' + vp.height + ' ' + lingua + ' ' + n + ' ' + id);
+          const nome = vp.width + 'x' + vp.height + ' ' + lingua + ' ' + n + ' ' + id;
+          await conferirLayout(pg, nome);
+          await conferirPalavras(pg, nome);
+          if (vp.width === 390) {
+            await pg.click('#btPalavras');
+            await conferirPalavras(pg, nome + ' só desenhos');
+            assert.equal(await pg.evaluate(() => Array.from(document.querySelectorAll('.carta:not(.texto) .pal')).filter(p => p.offsetParent).length), 0, nome + ': palavra à vista no modo só desenhos');
+            await pg.click('#btPalavras');
+          }
         }
       }
       assert.deepEqual(await pg.erros(), []);
       await pg.fechar();
     }
   }
+});
+
+test('🔤 só desenhos: esconde as palavras, tocar mostra o balão com a palavra e a voz lê; o jogo lembra', async () => {
+  const pg = await abrir({ hasTouch: true, isMobile: true }, () => {
+    window.__falas = [];
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => ({ speak: u => window.__falas.push(u.text), cancel() {} }) });
+  });
+  await pg.click('#btDificil');
+  assert.equal(await pg.getAttribute('#btPalavras', 'aria-pressed'), 'true', 'começa com as palavras à vista');
+  const id = await pg.evaluate(() => EnigmasDebug.ids('dificil').find(i => { EnigmasDebug.abrir('dificil', i); return document.querySelector('.carta.texto'); }));
+  await pg.evaluate(id => EnigmasDebug.abrir('dificil', id), id);   // uma rodada com adivinhas (cartas só de texto)
+  await pg.click('#btPalavras');
+  assert.equal(await pg.getAttribute('#btPalavras', 'aria-pressed'), 'false');
+  const vis = await pg.evaluate(() => ({
+    desenho: Array.from(document.querySelectorAll('.carta:not(.texto) .pal')).filter(p => p.offsetParent).length,
+    texto: Array.from(document.querySelectorAll('.carta.texto .pal')).filter(p => p.offsetParent).length,
+    cartasTexto: document.querySelectorAll('.carta.texto').length
+  }));
+  assert.equal(vis.desenho, 0, 'palavras das cartas com desenho escondidas');
+  assert.ok(vis.cartasTexto > 0 && vis.texto === vis.cartasTexto, 'adivinha (só texto) continua com o texto');
+  await conferirLayout(pg, 'só desenhos'); await conferirPalavras(pg, 'só desenhos');
+
+  const alvo = await pg.$('.carta:not(.texto)'), palavra = await alvo.getAttribute('aria-label');
+  assert.equal(await pg.isVisible('#balao'), false);
+  await alvo.tap();
+  assert.equal(await pg.isVisible('#balao'), true, 'tocar mostra o balão');
+  assert.equal(await pg.textContent('#balao'), palavra);
+  const b = await pg.evaluate(() => { const r = document.getElementById('balao').getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom, w: innerWidth, h: innerHeight }; });
+  assert.ok(b.l >= 0 && b.r <= b.w && b.t >= 0 && b.b <= b.h, 'balão dentro da tela');
+  assert.ok((await pg.evaluate(() => window.__falas)).includes(palavra), 'a voz lê a palavra');
+  await pg.screenshot({ path: FOTOS + 'enigmas-so-desenhos.png' });
+  await pg.waitForTimeout(2300);
+  assert.equal(await pg.isVisible('#balao'), false, 'o balão some sozinho');
+
+  // com as palavras à vista não aparece balão
+  await pg.click('#btPalavras');
+  await alvo.tap(); await alvo.tap();
+  assert.equal(await pg.isVisible('#balao'), false, 'sem balão com as palavras à vista');
+  await pg.click('#btPalavras');
+
+  // lembra a escolha
+  await pg.reload(); await pg.waitForFunction(() => window.EnigmasDebug && window.EnigmasDebug.pronto);
+  await pg.click('#btFacil');
+  assert.equal(await pg.getAttribute('#btPalavras', 'aria-pressed'), 'false', 'lembrou o modo só desenhos');
+  assert.equal(await pg.evaluate(() => Array.from(document.querySelectorAll('.carta:not(.texto) .pal')).filter(p => p.offsetParent).length), 0);
+  await porToque(pg);
+  await conferirRodadaCompleta(pg, 'Fácil só com desenhos');
+  assert.deepEqual(await pg.erros(), []);
+  await pg.fechar();
 });

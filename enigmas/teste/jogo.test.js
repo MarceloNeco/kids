@@ -1,4 +1,4 @@
-// Enigmas de Ligar — regras do jogo (jogo.js): ligar, errar, estrelas, embaralhar e escolher a próxima rodada.
+// Enigmatic — regras do jogo (jogo.js): ligar, errar, estrelas, embaralhar e escolher a próxima rodada.
 // Rodar da raiz do kids: node --test enigmas/teste/*.test.js
 const test = require('node:test');
 const assert = require('node:assert/strict');

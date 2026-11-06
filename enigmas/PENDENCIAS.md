@@ -1,4 +1,4 @@
-# Enigmas de Ligar — pendências
+# Enigmatic — pendências (antes "Enigmas de Ligar")
 
 Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ feita (versão)
 
@@ -10,3 +10,4 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 4 | Mais enigmas e temas (bandeiras ficaram de fora de propósito; ideias: letras iniciais, sombras, horas no relógio, formas). | ideia | 🟡 |
 | 5 | Casca para a TV LG (`tv-lg-*`) e link curto em `solverone.com.br/tv/`, se a família quiser jogar na TV (as setas e o OK já funcionam). | ideia | 🟡 |
 | 6 | Regra zero (diretriz geral) — itens que a família Bolinho de Chuva ainda não tem e o dono decide se entram: 💬 feedback em toda tela, AssistONE, pacote `.zip` de entrega. | diretriz | ⏸ aguardando o dono |
+| 7 | Nome novo **Enigmatic** (PT e EN) na tela, no manifesto, na estante e no interruptor; palavras das cartas sem quebrar no meio (desenho em cima, palavra embaixo, letra medida carta por carta, mínimo 12 px); botão 🔤 só desenhos com balão ao tocar; trovão ⛈️ e raio ⚡. | dono (print do Galaxy S24), 06/Nov/2026 | ✅ v0.2.0 |

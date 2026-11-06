@@ -1,4 +1,4 @@
-/* Enigmas de Ligar — regras do jogo, sem tela (funciona no navegador e no Node, para os testes).
+/* Enigmatic — regras do jogo, sem tela (funciona no navegador e no Node, para os testes).
    - Lê as rodadas escritas no rodadas.js ('emoji palavra|word = emoji palavra|word').
    - Escolhe a próxima rodada: nunca repete uma rodada antes de passar por todas do nível; sorteia entre as
      próximas JANELA ainda não feitas, na ordem do arquivo (então a dificuldade sobe aos poucos).

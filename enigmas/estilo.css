@@ -70,7 +70,7 @@ a { color: var(--azul); }
 .topo { display: flex; align-items: center; gap: .5rem; }
 .topo-meio { flex: 1; display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .nome-nivel { font-weight: 700; font-size: 1.15rem; }
-.contador { font-size: .9rem; color: var(--giz2); }
+.contador { font-size: .9rem; color: var(--giz2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .estrelas-topo { font-weight: 700; font-size: 1.15rem; white-space: nowrap; padding-right: .2rem; }
 .pista { text-align: center; font-size: clamp(1.1rem, 4.6vw, 1.8rem); font-weight: 600; color: var(--amarelo); line-height: 1.15; }
 .lousa { position: relative; flex: 1; min-height: 0; width: 100%; max-width: 64rem; align-self: center; display: grid; grid-template-columns: minmax(0, 1fr) minmax(2.6rem, 14vw) minmax(0, 1fr);
@@ -133,6 +133,14 @@ a { color: var(--azul); }
   .carta { min-height: 2.2rem; padding: .1rem .45rem; flex-direction: row; gap: .45rem; }
   .carta .pal { width: auto; flex: 0 1 auto; text-align: left; }
   .carta.texto .pal { text-align: center; }
+}
+
+/* celular estreito (320 px): moldura, margem e o vão do giz mais finos, para sobrar largura para as palavras
+   (o "cock-a-doodle-doo" inteiro precisa de 105 px com a letra de 12 px) */
+@media (max-width: 22.5rem) {
+  .lousa { border-width: .45rem; padding: .35rem; grid-template-columns: minmax(0, 1fr) 2rem minmax(0, 1fr); }
+  .carta { padding-left: .3rem; padding-right: .3rem; }
+  .topo { gap: .3rem; }
 }
 
 /* ---------- janela da festa (aberta pelo SolverJanela) ---------- */
