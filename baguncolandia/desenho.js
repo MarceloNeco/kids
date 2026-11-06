@@ -279,12 +279,17 @@
       }
     } else if (pose === 'dor') xd = x + Math.sin(ts / 35) * A * 0.02 * (1 - k);
     var alvoY = corpo.pulando ? -A * 0.5 : 0; av.y = V ? V.y : av.y == null ? 0 : av.y + (alvoY - av.y) * Math.min(1, dt * 12);   // 🧍 vai até lá: o pulo é o do motor
-    var alvoAg = corpo.abaixado ? 0.6 : 1; av.ag = av.ag == null ? 1 : av.ag + (alvoAg - av.ag) * Math.min(1, dt * 10);
+    var alvoAg = corpo.abaixado ? 0.6 : (V && V.agacha > 0) ? 0.9 : 1; av.ag = av.ag == null ? 1 : av.ag + (alvoAg - av.ag) * Math.min(1, dt * 10);
     av.passo = (av.passo || 0) + Math.min(14, Math.abs(av.vx) / 40) * dt * 8;
+    av.fase = (av.fase || 0) + (V ? Math.abs(V.vx) : 0) / (A * 0.55) * 6.2832 * dt;   // de lado: um ciclo de passo a cada ~meia altura andada (passada de criança)
     var andando = Math.abs(av.vx) > 30, balanco = andando ? Math.sin(av.passo) : 0;
     var bracoE = false, bracoD = false, ombroY = chao + av.y - A * 0.62 * av.ag;
     (jg.rastro || []).slice(-4).forEach(function (p) { if (ts - p.ts > 400) return; if (p.y < ombroY + A * 0.1) { if (p.x < x - A * 0.05) bracoE = true; else if (p.x > x + A * 0.05) bracoD = true; } });
     if (pose === 'festa' || (V && V.cima)) { bracoE = bracoD = true; }
+    // parado um tempinho: acena e conversa com as mãos (gesticula)
+    av.parado = andando || pose || (V && (V.cima || V.costas)) ? 0 : (av.parado || 0) + dt;
+    var gesto = av.parado > 2.5 ? (av.parado - 2.5) % 6 : -1;
+    if (gesto >= 0 && gesto < 1.4) bracoD = true; else if (gesto >= 3 && gesto < 3.8) bracoE = true;
     av.bE = av.bE == null ? 0 : av.bE + ((bracoE ? 1 : 0) - av.bE) * Math.min(1, dt * (pose ? 18 : 10));
     av.bD = av.bD == null ? 0 : av.bD + ((bracoD ? 1 : 0) - av.bD) * Math.min(1, dt * (pose ? 18 : 10));
     var y = av.y + pulo;
@@ -292,7 +297,9 @@
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(xd, chao + 4, A * 0.22 * Math.max(0.3, 1 + y / A * 0.6), A * 0.06, 0, 0, 6.2832); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(xd, chao + y); ctx.scale(1 + (1 - av.ag) * 0.35, av.ag);
     if (jg.invencivel && !pose && Math.floor(ts / 90) % 2) ctx.globalAlpha = 0.45;
-    root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose, costas: !!(V && V.costas && !pose) });
+    var lado = V && pose !== 'dor' && !V.costas && (Math.abs(V.vx) > 40 || (y < -5 && Math.abs(V.vx) > 10));   // andando a festa não vira de frente: sorri de lado   // andando (ou pulando para o lado): de perfil
+    if (lado) { var dir = V.vx < 0 ? -1 : 1; av.dir = dir; ctx.scale(dir, 1); root.Boneco.corpoLado(ctx, cfg, A, { fase: av.fase, andando: Math.abs(V.vx) > 40, agacha: V.agacha > 0 ? 1 : 0, noAr: y < -5, cima: V.cima || pose === 'festa', ts: ts, expr: pose }); }
+    else root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: gesto >= 0 && gesto < 1.4 ? 0.55 + 0.45 * Math.sin(ts / 110) : av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose, costas: !!(V && V.costas && !pose), agacha: V && V.agacha > 0 ? 1 : 0 });
     ctx.restore();
     ctx.save(); ctx.font = '600 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillStyle = cor; sombra(ctx, 'rgba(0,0,0,.8)', 6);
     ctx.fillText(D.nomes[j] || '', xd, chao + y - A * 1.02 * av.ag - 6); ctx.restore();

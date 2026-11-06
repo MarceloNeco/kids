@@ -2,6 +2,19 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.26",
+      "data": "06/Nov/2026",
+      "hora": "19:00:00",
+      "pt": [
+        "🚶 O boneco agora anda DE LADO, olhando para onde vai: pernas com joelho dobrando a cada passo, braços balançando, corpo subindo e descendo de leve. Antes de pular ele agacha (joelhos dobrados) e no ar encolhe as pernas com as mãos esticadas para cima. Parado, sorri e gesticula (acena de vez em quando).",
+        "👩 A mamãe também: chega andando de lado, de verdade, e quando vê a bagunça vira de frente, franze a testa, faz \"Ooo!\", balança a cabeça e sacode o dedo."
+      ],
+      "en": [
+        "🚶 The avatar now walks SIDEWAYS, facing where it goes: knees bending at every step, arms swinging, body bobbing a little. Before jumping it crouches (knees bent) and in the air it tucks its legs with hands stretched up. Standing still, it smiles and gestures (waves now and then).",
+        "👩 Mom too: she walks in sideways, for real, and when she sees the mess she turns to face us, frowns, goes \"Ooh!\", shakes her head and wags her finger."
+      ]
+    },
+    {
       "versao": "0.8.25",
       "data": "06/Nov/2026",
       "hora": "17:30:00",
