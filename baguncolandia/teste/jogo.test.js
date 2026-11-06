@@ -314,3 +314,105 @@ test('validar: boneco leva "eu" (qual joga quando é 1 pessoa) só se for true',
   assert.strictEqual(B.validar({ t: 'cmd', acao: 'boneco', j: 1, boneco: { cabeca: 'menino' }, eu: 'sim' }).eu, undefined);
   assert.strictEqual(B.validar({ t: 'cmd', acao: 'boneco', j: 0, boneco: { cabeca: 'menino' } }).eu, undefined);
 });
+
+/* 🧍 "Boneco vai até lá" (no dedo): o boneco anda até o dedo, pula para alcançar e só vale o que encosta nele */
+function vaiPartida(modo) { const p = partida({ modo: modo || 'corta', vai: true }); p.comecar(); return p; }
+function limpar(p) { p.estado().coisas.length = 0; }
+function rodar(p, ms, passo = 16) { for (let t = 0; t < ms; t += passo) p.avancar(passo); }
+
+test('vai até lá: responde na hora e cruza a tela em ~1,5 s, sem teleporte', () => {
+  const p = vaiPartida(); limpar(p);
+  const x0 = p.estado().jogadores[0].vai.x;
+  p.alvo(0, 0.95, 0.8); p.avancar(50);
+  const x1 = p.estado().jogadores[0].vai.x;
+  assert.ok(x1 > x0, 'já começou a andar no primeiro quadro');
+  let ant = x1, maior = 0;
+  for (let t = 0; t < 1500; t += 16) { p.avancar(16); limpar(p); const x = p.estado().jogadores[0].vai.x; maior = Math.max(maior, (x - ant) / 0.016); ant = x; }
+  assert.ok(maior <= 1280 / 1.5 + 1, 'nunca passa de 1 tela em 1,5 s: ' + maior);
+  const fim = p.estado().jogadores[0].vai.x;
+  assert.ok(Math.abs(fim - 0.95 * 1280) < 120 || fim >= 1280 - 0.2 * 720 * 0.56 - 1, 'chegou perto do dedo: ' + fim);
+});
+
+test('vai até lá: alvo alto → pula sozinho; alvo baixo → fica no chão', () => {
+  const p = vaiPartida(); limpar(p);
+  p.alvo(0, 0.5, 0.1); let menor = 0; for (let t = 0; t < 600; t += 16) { p.avancar(16); limpar(p); menor = Math.min(menor, p.estado().jogadores[0].vai.y); }
+  assert.ok(menor < -40, 'pulou: ' + menor);
+  assert.ok(0.86 * 720 + menor - 0.56 * 720 * 1.18 <= 0.1 * 720, 'a mão alcançou a altura do dedo');
+  const q = vaiPartida(); limpar(q);
+  q.alvo(0, 0.5, 0.8); let m2 = 0; for (let t = 0; t < 600; t += 16) { q.avancar(16); limpar(q); m2 = Math.min(m2, q.estado().jogadores[0].vai.y); }
+  assert.equal(m2, 0);
+});
+
+test('vai até lá: só vale encostando — fruta longe não conta, fruta no corpo conta', () => {
+  const p = vaiPartida(); limpar(p);
+  p.lancar({ fig: 'melancia', x: 150, y: 500, estilo: 'voa' }, 0); rodar(p, 300);
+  assert.equal(p.estado().jogadores[0].pontos, 0, 'longe do boneco não marca');
+  p.alvo(0, 150 / 1280, 0.7); rodar(p, 1500);
+  assert.ok(p.estado().jogadores[0].pontos > 0, 'o boneco foi até lá e encostou');
+});
+
+test('vai até lá: no chuta-chuta a bola só vai com as pernas (não com a cabeça)', () => {
+  const p = vaiPartida('chuta'); limpar(p);
+  const alta = p.lancar({ fig: 'bola', x: 640, y: 330, estilo: 'voa' }, 0); p.avancar(16);
+  assert.ok(!alta.chutada, 'bola na altura da cabeça não é chute');
+  const baixa = p.lancar({ fig: 'bola', x: 640, y: 660, estilo: 'voa' }, 0); p.avancar(16);
+  assert.ok(baixa.chutada, 'bola no pé é chute');
+});
+
+/* 🐰 Pega-pega com bichos */
+const BICHOS = [
+  { id: 'coelho', papel: 'bicho', raio: 46, anda: 'pula', tam: 124, vel: 220 },
+  { id: 'borboleta', papel: 'bicho', raio: 46, anda: 'voa', tam: 84, vel: 150 },
+  { id: 'toupeira', papel: 'bicho', raio: 46, anda: 'buraco', tam: 100, vel: 90 },
+  { id: 'cavalo', papel: 'bicho', raio: 46, anda: 'anda', tam: 540, vel: 300 }
+];
+function pegaPega(extra) { const p = partida(Object.assign({ modo: 'pega', figuras: FIGS.concat(BICHOS) }, extra || {})); p.comecar(); return p; }
+function bichos(p) { return p.estado().coisas.filter(c => c.estilo === 'bicho'); }
+function ate(p, cond, ms) { for (let t = 0; t < ms; t += 16) { p.avancar(16); if (cond()) return true; } return false; }
+
+test('pega-pega: os bichos entram no lugar dos heróis e ficam à vista, longe do cantinho', () => {
+  const p = pegaPega();
+  assert.ok(ate(p, () => bichos(p).some(c => c.b.fase === 'fica'), 8000), 'um bicho chegou');
+  const c = bichos(p).find(x => x.b.fase === 'fica');
+  assert.ok(c.x - c.tam / 2 >= -1 && c.x + c.tam / 2 <= 1281, 'inteiro dentro da tela: ' + c.fig);
+  assert.ok(c.x > 250, 'não nasce no cantinho');
+  assert.ok(!p.estado().coisas.some(x => x.papel === 'heroi'), 'sem heróis no lugar dos bichos');
+});
+
+test('pega-pega: bicho que ninguém pega vai embora sozinho', () => {
+  const p = pegaPega();
+  ate(p, () => bichos(p).length > 0, 8000);
+  const c = bichos(p)[0];
+  assert.ok(ate(p, () => !p.estado().coisas.includes(c), 20000), 'sumiu depois de esperar');
+});
+
+test('pega-pega: pegou → +15, vai ao cantinho, fica ~10 s e sai andando; não se pega duas vezes', () => {
+  const p = partida({ modo: 'pega', figuras: FIGS.concat([BICHOS[0]]) }); p.comecar();
+  ate(p, () => bichos(p).some(c => c.b.fase === 'fica' && c.anda !== 'buraco'), 10000);
+  const c = bichos(p).find(x => x.b.fase === 'fica' && x.anda !== 'buraco');
+  p.movimento(0, [[c.x / 1280, c.y / 720, 100]], 1000);
+  assert.equal(p.estado().jogadores[0].pontos, 15);
+  assert.equal(c.b.fase, 'pego');
+  assert.ok(ate(p, () => c.b.fase === 'canto', 8000), 'chegou ao cantinho');
+  assert.ok(c.x < 450, 'cantinho de baixo à esquerda: ' + c.x);
+  p.movimento(0, [[c.x / 1280, c.y / 720, 100]], 9000); assert.equal(p.estado().jogadores[0].pontos, 15, 'no cantinho não conta de novo');
+  rodar(p, 9000); assert.equal(c.b.fase, 'canto', 'ainda descansando');
+  assert.ok(ate(p, () => !p.estado().coisas.includes(c), 12000), 'saiu da tela');
+});
+
+test('pega-pega: a toupeira sai do buraco e só dá para pegar quando está fora', () => {
+  const p = partida({ modo: 'pega', figuras: FIGS.concat([BICHOS[2]]) }); p.comecar();
+  ate(p, () => bichos(p).length > 0, 8000);
+  const t = bichos(p)[0]; assert.ok(t.b.k < 0.35);
+  p.movimento(0, [[t.x / 1280, t.y / 720, 100]], 500); assert.equal(p.estado().jogadores[0].pontos, 0, 'dentro do buraco não conta');
+  ate(p, () => t.b.k >= 1, 2000);
+  p.movimento(0, [[t.x / 1280, t.y / 720, 100]], 2600); assert.equal(p.estado().jogadores[0].pontos, 15);
+});
+
+test('pega-pega no difícil: o boneco anda até o bicho e pega encostando', () => {
+  const p = partida({ modo: 'pega', figuras: FIGS.concat([BICHOS[0]]), vai: true }); p.comecar();
+  ate(p, () => bichos(p).length > 0, 8000);
+  const c = bichos(p)[0];
+  p.alvo(0, c.b.px / 1280, 0.8);   // o dedo vai onde o coelho vai parar
+  assert.ok(ate(p, () => c.pego, 6000), 'pegou');
+});

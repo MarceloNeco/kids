@@ -138,6 +138,9 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
 #tvLocalBar #localComecar { flex: 1; }
 #tv.jogando #localModos, #tv.jogando #localPessoas, #tv.jogando #dicaGire { display: none; }
 #localBoneco { display: none; }
+#localJeito { display: none; }
+#tv.toque.jeitoOk:not(.jogando) #localJeito { display: inline-block; }
+#localJeito.ativo { border-color: var(--lima); box-shadow: inset 0 0 0 2px var(--lima); }
 #tv.toque #localBoneco { display: inline-block; }
 #localBoneco.ativo { border-color: var(--lima); box-shadow: inset 0 0 0 2px var(--lima); }   /* durante a rodada a barra encolhe para não cobrir o palco */
 .cheia { position: absolute; inset: 0; z-index: 8; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; text-align: center; padding: 4vh; background: radial-gradient(ellipse at center, #241a5e 0%, #06051a 75%); }

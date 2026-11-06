@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#0b0a1f">
-<meta name="versao" content="1.9.1">
+<meta name="versao" content="1.10.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Corrida de carrinho para a família: desvie, pegue estrelas, pule rampas e passe por 4 mundos. 1 ou 2 jogadores. / Family kart race: dodge, grab stars, jump ramps across 4 worlds.">
 <link rel="stylesheet" href="estilo.css">
@@ -120,8 +120,6 @@
       </div>
       <p class="rotulo" data-t="Piloto|Driver"></p>
       <div id="bichos" class="bichos" role="group" aria-label="Piloto / Driver"></div>
-      <p class="rotulo" data-t="Personagens de histórias (domínio público e licença livre)|Story characters (public domain and free license)"></p>
-      <div id="personagens" class="bichos" role="group" aria-label="Personagens / Characters"></div>
     </div>
   </div>
 
@@ -144,7 +142,11 @@
     <canvas id="maosTela" width="240" height="180"></canvas>
     <p id="maosAviso"></p>
   </div>
-  <button id="btPausa" class="mini pausa" type="button" aria-label="Pausar / Pause">⏸</button>
+  <div class="botoes-jogo">
+    <button id="btPausa" class="mini" type="button" aria-label="Pausar / Pause">⏸</button>
+    <button id="btSomJogo" class="mini" type="button" aria-label="Som / Sound">🔊</button>
+    <button id="btGirar" class="mini" type="button" aria-label="Virar a tela (deitado ou em pé) / Rotate the screen" hidden>🔄</button>
+  </div>
   <div id="pausa" class="pausa-painel" hidden>
     <h2 data-t="Pausa|Paused"></h2>
     <button id="btContinuar" class="grande" type="button" data-t="▶ Continuar|▶ Resume"></button>
@@ -195,6 +197,7 @@
 <script src="pista.js"></script>
 <script src="motor.js"></script>
 <script src="sprites.js"></script>
+<script src="cavalo.js"></script>
 <script src="veiculos.js"></script>
 <script src="personagens.js"></script>
 <script src="cabeca.js"></script>

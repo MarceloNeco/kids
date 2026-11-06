@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.9.1';
+  var APP_VERSION = '1.10.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -102,7 +102,7 @@
         var b = botao('bicho pers', p.nome[0], function () { var cc = pref.carros[editando]; cc.personagem = p.id; cc.foto = false; if (PE.corpoDe(p.id)) cc.corpo = PE.corpoDe(p.id); salvar(); Som.tocar('buzina', editando); marcar(); });
         b.setAttribute('data-personagem', p.id); b.title = p.nome[0];
         var cv = document.createElement('canvas'); cv.width = cv.height = 80; p.frente(cv.getContext('2d'), 40, 46, 26); b.appendChild(cv);
-        $('personagens').appendChild(b);
+        $('bichos').appendChild(b);
       });
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
         b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); });
@@ -247,7 +247,7 @@
   opcao('data-rivais', function (v) { pref.rivais = v; });
   opcao('data-visual', function (v) { pref.visual = v; D.definirEstilo(v); });
   $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvar(); traduzir(); marcar(); });
-  $('btSom').addEventListener('click', function () { Som.iniciar(); var lig = Som.alternar(); $('btSom').textContent = lig ? '🔊' : '🔇'; });
+  $('btSom').addEventListener('click', function () { Som.iniciar(); var lig = Som.alternar(); $('btSom').textContent = $('btSomJogo').textContent = lig ? '🔊' : '🔇'; });
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
   $('btCorrer').addEventListener('click', function () { iniciarCorrida(); });
 
@@ -345,7 +345,7 @@
       var max = estado.pista.cfg.velMax;
       Som.motor(estado.jogadores.map(function (j) { return estado.fase === 'contagem' ? 0.05 : Math.min(1.5, j.vel / max); }));
     }
-    D.desenhar(ctx, W, H, estado, { toque: TOQUE, jogadores: jogs, margem: bordas });
+    D.desenhar(ctx, W, H, estado, { toque: TOQUE, jogadores: jogs, margem: bordas, botoes: $('btPausa').parentNode.offsetWidth || 0 });   // largura dos botões 🔄 🔊 ⏸ (a barra do caminho não passa por baixo)
     if (estado.fase === 'fim') { acabar(); return; }
     requestAnimationFrame(quadro);
   }
@@ -378,6 +378,14 @@
     tela('menu'); montarMenu(); focarPrimeiro();
   }
   $('btPausa').addEventListener('click', pausar);
+  // durante a corrida: som liga/desliga e virar a tela (deitado <-> em pé) sem precisar pausar
+  $('btSomJogo').addEventListener('click', function () { Som.iniciar(); var lig = Som.alternar(); $('btSomJogo').textContent = $('btSom').textContent = lig ? '🔊' : '🔇'; });
+  $('btGirar').hidden = !(TOQUE && screen.orientation && screen.orientation.lock);
+  $('btGirar').addEventListener('click', function () {
+    var o = screen.orientation, quer = o && o.type && o.type.indexOf('portrait') === 0 ? 'landscape' : 'portrait';
+    Som.tocar('clique');
+    try { var p = o.lock(quer); if (p && p.catch) p.catch(function () { /* este aparelho não deixa girar pelo botão */ }); } catch (e) { /* ok */ }
+  });
   $('btContinuar').addEventListener('click', continuar);
   $('btRecomecar').addEventListener('click', function () { rodando = false; iniciarCorrida(); });
   $('btSair').addEventListener('click', irMenu);
@@ -416,7 +424,7 @@
     bordas = { t: parseFloat(s.paddingTop) || 0, r: parseFloat(s.paddingRight) || 0, b: parseFloat(s.paddingBottom) || 0, l: parseFloat(s.paddingLeft) || 0 };
   }
   window.addEventListener('resize', lerBordas);
-  window.addEventListener('orientationchange', function () { setTimeout(function () { lerBordas(); if (rodando) redimensionar(); }, 300); });
+  window.addEventListener('orientationchange', function () { setTimeout(function () { lerBordas(); if (rodando) { redimensionar(); mov.calibrar(); } }, 300); });   // girou (pelo botão 🔄): o "reto" do volante é o novo jeito de segurar
 
   function tempoTxt(s) { var m = Math.floor(s / 60), r = Math.floor(s % 60); return m + ':' + (r < 10 ? '0' : '') + r; }
   function acabar() {
@@ -631,7 +639,7 @@
   // nome da música tocando, com autor e licença (as gravadas são CC BY-SA: o crédito aparece aqui)
   Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); });
   lerBordas();
-  $('btSom').textContent = Som.ligado() ? '🔊' : '🔇';
+  $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
   traduzir();
   if (TV) setTimeout(function () { try { $('btEntrar').focus(); } catch (e) { /* ok */ } }, 200);
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
