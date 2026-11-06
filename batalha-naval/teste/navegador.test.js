@@ -170,7 +170,7 @@ async function criarSala(aba, nome, nivel) {
 }
 async function entrarSala(aba, nome, codigo) {
   await aba.pg.click('#btAmigos'); await aba.pg.fill('#nome', nome); await aba.pg.fill('#codigo', codigo.toLowerCase()); await aba.pg.click('#btEntrar');
-  await aba.pg.waitForSelector('#sala.ativa');
+  await aba.pg.waitForSelector('#sala.ativa', { timeout: 5000 }).catch(async e => { console.log('DEBUG', await aba.pg.evaluate(() => [document.querySelector('.tela.ativa').id, location.href, document.getElementById('amigosMsg').textContent, document.getElementById('codigo').value, document.getElementById('janela').hidden, document.getElementById('janelaTitulo').textContent])); throw e; });
 }
 async function arrumarEPronto(aba) {
   await aba.pg.waitForSelector('#btArrumar:not([hidden])'); await aba.pg.click('#btArrumar');
@@ -236,7 +236,7 @@ test('com amigos em 3 aparelhos (abas): todos contra todos, escolhendo o alvo, a
     for (const { pg } of abas) {
       if (!(await visivel(pg, '#fimCaixa'))) fim = false;
       if (await pg.$eval('#banner', b => b.classList.contains('minha')).catch(() => false)) {
-        if (++troca % 3 === 0) { const t = await pg.$$('#alvos button'); if (t.length) await t[troca % t.length].click(); }
+        if (++troca % 3 === 0) { const t = await pg.$$('#alvos button:not(:disabled)'); if (t.length) await t[troca % t.length].click().catch(() => {}); }
         const c = await pg.$('#tabAlvo.pode button.c:not(:disabled)'); if (c) await c.click().catch(() => {});
       }
     }

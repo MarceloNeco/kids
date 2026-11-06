@@ -275,8 +275,7 @@
     });
     if (arr.prev) L.celulas(arr.prev.nv).forEach(function (c) { if (c[0] < n && c[1] < n) cls[c[1]][c[0]] += ' prev' + (arr.prev.ok ? '' : ' ruim'); });
     for (y = 0; y < n; y++) for (x = 0; x < n; x++) { var cel = el._c[y][x]; if (cel.className !== cls[y][x]) cel.className = cls[y][x]; }
-    var pecas = $('arrPecas'); pecas.innerHTML = '';
-    arr.tams.forEach(function (tam, i) {
+    refazer($('arrPecas'), JSON.stringify([arr.tams, arr.sel, arr.frota.map(Boolean)]), function (pecas) { arr.tams.forEach(function (tam, i) {
       var b = document.createElement('button'); b.type = 'button';
       b.className = 'peca' + (i === arr.sel ? ' sel' : '') + (arr.frota[i] ? ' posto' : ''); b.setAttribute('data-i', i);
       var casco = document.createElement('div'); casco.className = 'casco'; for (var k = 0; k < tam; k++) casco.appendChild(document.createElement('i'));
@@ -284,7 +283,7 @@
       b.appendChild(casco); b.appendChild(nm);
       b.setAttribute('aria-label', N(L.NOMES[tam]) + ', ' + tam + t(' casas', ' squares') + (arr.frota[i] ? t(', no mar', ', placed') : ''));
       pecas.appendChild(b);
-    });
+    }); });
     var selPosto = arr.sel >= 0 && arr.frota[arr.sel], h = selPosto ? arr.frota[arr.sel].h : arr.h;
     $('btGirar').textContent = '🔄 ' + t('Girar', 'Turn') + (h ? ' ↔' : ' ↕');
     $('btPronto').disabled = proximoLivre() >= 0;
@@ -378,6 +377,8 @@
     if (jogo.modo === 'rede') { desenharRede(); return; }
     desenharJogo();
   }
+  // refaz um pedaço da tela só quando o conteúdo muda (refazer botões toda hora perde o toque de quem está apertando)
+  function refazer(el, chave, fn) { chave = pref.lingua + '|' + chave; if (el._chave === chave) return; el._chave = chave; el.innerHTML = ''; fn(el); }
   function desenharJogo() {
     var g = jogo, d = dados(), n = L.NIVEIS[d.nivel].n, opos = escolherAlvo(d), eu = d.eu;
     // banner (de quem é a vez, sempre grande)
@@ -385,31 +386,30 @@
     ban.className = 'banner ' + b.classe; ban.style.setProperty('--cor', b.cor || '');
     ban.textContent = b.txt; if (b.sub) { var sm = document.createElement('small'); sm.textContent = b.sub; ban.appendChild(sm); }
     // ordem das vezes
-    var fila = $('fila'); fila.innerHTML = '';
-    d.j.forEach(function (p, i) {
+    refazer($('fila'), JSON.stringify([d.j, d.vez, d.fase, eu, g.modo]), function (fila) { d.j.forEach(function (p, i) {
       var c = document.createElement('span'); c.style.setProperty('--cor', CORES[i]);
       c.className = (i === d.vez && d.fase === 'jogo' ? 'vez' : '') + (p.f ? ' fora' : '') + (p.s ? ' saiu' : '');
       c.textContent = (i === d.vez && d.fase === 'jogo' ? '▶ ' : '') + nomeJ(d.j, i) + (i === eu && g.modo === 'rede' ? t(' (você)', ' (you)') : '') + (p.f ? ' 💀' : p.s ? ' 🚪' : p.au ? ' 📡' : '');
       fila.appendChild(c);
-    });
+    }); });
     // anfitrião: continuar sem quem sumiu
-    var sem = $('semEle'); sem.innerHTML = ''; sem.hidden = true;
-    if (g.modo === 'rede' && d.host && d.fase === 'jogo') d.j.forEach(function (p, i) {
-      if (i === eu || !ativoJ(p) || !p.au) return;
+    var ausentes = g.modo === 'rede' && d.host && d.fase === 'jogo' ? d.j.map(function (p, i) { return i !== eu && ativoJ(p) && p.au ? i : -1; }).filter(function (i) { return i >= 0; }) : [];
+    $('semEle').hidden = !ausentes.length;
+    refazer($('semEle'), JSON.stringify(ausentes) + d.j.map(function (p) { return p.nome; }).join(), function (sem) { ausentes.forEach(function (i) {
       var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'medio';
       bt.textContent = t('➡️ Continuar sem ', '➡️ Go on without ') + nomeJ(d.j, i);
-      bt.addEventListener('click', function () { g.p.continuarSem(i); });
-      sem.appendChild(bt); sem.hidden = false;
-    });
+      bt.addEventListener('click', function () { if (jogo === g) g.p.continuarSem(i); });
+      sem.appendChild(bt);
+    }); });
     // em quem atirar (3 ou 4 jogadores)
-    var alvos = $('alvos'); alvos.innerHTML = ''; alvos.hidden = opos.length < 2;
-    if (opos.length > 1) opos.forEach(function (i) {
+    $('alvos').hidden = opos.length < 2;
+    refazer($('alvos'), JSON.stringify([opos.map(function (i) { var p = d.j[i]; return [p.nome, p.f, p.s, p.au, restantes(d, i)]; }), alvoSel]), function (alvos) { if (opos.length > 1) opos.forEach(function (i) {
       var p = d.j[i], bt = document.createElement('button'); bt.type = 'button'; bt.setAttribute('role', 'tab');
       bt.style.setProperty('--cor', CORES[i]); bt.setAttribute('aria-selected', i === alvoSel ? 'true' : 'false');
       bt.textContent = '🎯 ' + nomeJ(d.j, i) + ' · 🚢' + restantes(d, i) + (p.f ? ' 💀' : p.s ? ' 🚪' : p.au ? ' 📡' : '');
       bt.addEventListener('click', function () { alvoSel = i; desenhar(); });
       alvos.appendChild(bt);
-    });
+    }); });
     // mares
     montar($('tabAlvo'), n, true); montar($('tabMeu'), n, false);
     var ult = d.log.length ? d.log[d.log.length - 1] : null;
@@ -420,13 +420,11 @@
     if (mostraMeu) {
       $('tituloMeu').textContent = '🛡️ ' + (g.modo === 'passa' ? t('Mar de ', 'Sea of ') + nomeJ(d.j, eu) : t('Seu mar', 'Your sea'));
       pintar($('tabMeu'), n, { vista: L.vista(d.log, eu, n), frota: d.frota || [], pode: false, ultimo: ult && ult[1] === eu ? [ult[2], ult[3]] : null });
-      var info = $('frotaInfo'); info.innerHTML = '';
-      var vm = L.vista(d.log, eu, n);
-      (d.frota || []).forEach(function (nv) {
-        var afund = L.celulas(nv).every(function (c) { return vm.v[c[1]][c[0]] === 3; });
-        var s = document.createElement('span'); s.textContent = (afund ? '💀 ' : '🚢 ') + N(L.NOMES[nv.tam]); if (afund) s.style.textDecoration = 'line-through';
+      var vm = L.vista(d.log, eu, n), afund = (d.frota || []).map(function (nv) { return L.celulas(nv).every(function (c) { return vm.v[c[1]][c[0]] === 3; }); });
+      refazer($('frotaInfo'), JSON.stringify([d.frota, afund]), function (info) { (d.frota || []).forEach(function (nv, k) {
+        var s = document.createElement('span'); s.textContent = (afund[k] ? '💀 ' : '🚢 ') + N(L.NOMES[nv.tam]); if (afund[k]) s.style.textDecoration = 'line-through';
         info.appendChild(s);
-      });
+      }); });
     }
     $('ultimo').textContent = ult ? nomeJ(d.j, ult[0]) + ' → ' + nomeJ(d.j, ult[1]) + ' ' + L.coord(ult[2], ult[3]) + ': ' + ['💦 ' + t('água', 'water'), '💥 ' + t('acertou', 'hit'), '🚢 ' + t('afundou', 'sunk')][ult[4]] : '';
     // tiros novos: animação, som e o estouro no meio da tela
