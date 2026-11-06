@@ -10,7 +10,9 @@ quadriculado) é uma brincadeira antiga e de domínio comum.
 | supabase-js (`../baguncolandia/libs/supabase.js`), só no jogo com amigos | Supabase | MIT (`../baguncolandia/libs/LICENSE-supabase.txt`) |
 | qrcode-generator 2.0.4 (`libs/qrcode.js`, desenha o QR do Jogar pertinho) | Kazuhiko Arase — https://github.com/kazuhikoarase/qrcode-generator (pacote npm, arquivo `dist/qrcode.js` sem alteração) | MIT (`libs/LICENSE-qrcode-generator.txt`). "QR Code" é marca registrada da DENSO WAVE INCORPORATED. |
 | jsQR 1.4.0 (`libs/jsQR.js`, lê o QR pela câmera quando o aparelho não tem leitor próprio) | Cosmo Wolfe — https://github.com/cozmo/jsQR (o mesmo arquivo do `leitor-ocr/libs/`, igual ao `dist/jsQR.js` do pacote npm) | Apache License 2.0 (`libs/LICENSE-jsQR.txt`) |
-| Efeitos sonoros (água, explosão, afundou, vitória…) | feitos na hora pelo aparelho (Web Audio), `som.js` | originais |
+| Desenho dos navios (porta-aviões, encouraçado, cruzador, submarino, fragata, destróier, lancha-patrulha), marcas de fogo, fumaça e respingo | desenhados em código (SVG), `navios.js` e `estilo.css` | originais |
+| Míssil, explosões, coluna d'água, bolhas | desenhados na hora num canvas, `efeitos.js` | originais |
+| Efeitos sonoros (canhão, assobio, respingo, explosão, afundou, sonar, apito, fanfarra…) | feitos na hora pelo aparelho (Web Audio), `som.js` | originais |
 
 ## Músicas (tocador comum `../trilha.js`)
 

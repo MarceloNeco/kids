@@ -2,6 +2,25 @@
   "app": "batalha-naval",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "06/Nov/2026",
+      "hora": "13:39:50",
+      "pt": [
+        "🚢 Navios de verdade: cada navio agora é desenhado visto de cima, com casco de aço, convés, torres de canhão e a espuma atrás — porta-aviões (com aviões na pista), encouraçado, cruzador, submarino (com a torre e o periscópio), fragata, destróier e lancha-patrulha. O nome de cada um aparece na hora de arrumar a frota.",
+        "🌊 O mar agora se mexe, e cada tiro é um míssil voando até o quadradinho: na água sobe uma coluna d'água com gotas e ondas; no acerto tem clarão, bola de fogo, faíscas e fumaça, a tela treme um pouco e o quadradinho fica pegando fogo.",
+        "💥 Quando afunda, o navio explode por inteiro, vira um casco queimado e inclinado, com bolhas, e aparece a faixa grande \"AFUNDOU!\" com o nome do navio.",
+        "🔊 Muitos sons novos, todos feitos pelo próprio aparelho (funcionam sem internet): baque de metal ao pôr o navio, clique ao girar, apito do navio no Pronto, ping do sonar na sua vez, canhão e míssil, assobio do tiro chegando, respingo, explosões com estrondo, o navio afundando com bolhas, fanfarra de vitória e trombone de derrota. A música abaixa durante os efeitos, e o celular vibra no acerto e quando afunda.",
+        "🐢 Quem deixou o celular com \"menos movimento\" vê as marcas paradas, sem tremer a tela."
+      ],
+      "en": [
+        "🚢 Real-looking ships: each ship is now drawn from above, with a steel hull, deck, gun turrets and foam behind it — aircraft carrier (with jets on deck), battleship, cruiser, submarine (with its tower and periscope), frigate, destroyer and patrol boat. Each one's name shows while you place your fleet.",
+        "🌊 The sea now moves, and every shot is a missile flying to the square: a miss throws up a water column with drops and ripples; a hit has a flash, a fireball, sparks and smoke, the screen shakes a little and the square keeps burning.",
+        "💥 When a ship sinks, it blows up along its whole length, turns into a burnt, tilted wreck with bubbles, and a big \"SUNK!\" banner shows the ship's name.",
+        "🔊 Lots of new sounds, all made by the device itself (they work offline): a metal clunk when placing a ship, a click when turning, the ship's horn on Ready, a sonar ping on your turn, cannon and missile, the whistle of an incoming shot, splash, explosions with rumble, the ship sinking with bubbles, a victory fanfare and a sad trombone. The music dips during the effects, and the phone vibrates on a hit and when a ship sinks.",
+        "🐢 If the phone is set to \"reduce motion\", the marks stay still and the screen doesn't shake."
+      ]
+    },
+    {
       "versao": "0.2.0",
       "data": "06/Nov/2026",
       "hora": "12:52:50",

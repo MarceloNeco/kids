@@ -11,13 +11,45 @@ pela internet ou **pertinho, sem internet** (dois aparelhos no mesmo Wi-Fi), **c
    todos os navios no mar. Navio não fica por cima de outro (encostar do lado pode).
 2. **Atirar**: na sua vez (a faixa grande no alto fica **verde** e pisca: "🎯 Sua vez!"), toque num quadradinho do mar
    do adversário. Cada quadradinho tem nome: letra da coluna + número da linha (**E4**, **F2**…).
-3. **Resposta**: 💦 **Água** (anel branco), 💥 **Acertou** (fogo), 🚢 **Afundou** (o navio inteiro aparece escuro com ✕).
+3. **Resposta**: cada tiro é um míssil voando até o quadradinho. 💦 **Água** (coluna d'água; fica um respingo branco),
+   💥 **Acertou** (explosão, a tela treme um pouco; o quadradinho fica pegando fogo e soltando fumaça), 🚢 **Afundou** (o
+   navio explode por inteiro, aparece queimado e inclinado, com bolhas, e a faixa grande **AFUNDOU! / SUNK!** com o nome dele).
    A vez passa para o próximo a cada tiro. Ganha quem sobrar com navio boiando.
 
 Níveis (escolhidos por quem cria a partida): 🐟 **Fácil** 8×8 com 4 navios (4, 3, 2, 2) · 🐬 **Médio** 10×10 com 5 navios
 (5, 4, 3, 3, 2) · 🦈 **Difícil** 12×12 com 7 navios (5, 4, 4, 3, 3, 2, 2). Contra o computador, o nível também é a
 esperteza dele: no Fácil atira ao acaso; no Médio caça (depois de acertar, procura em volta e segue a linha); no Difícil
 calcula onde é mais provável ter navio (em média ~95, ~53 e ~44 tiros para afundar tudo num mar 10×10).
+
+## 🚢 Os navios, os efeitos e os sons (desde a v0.3.0)
+
+Cada navio é um desenho próprio, visto de cima (SVG feito no `navios.js`: casco de aço com luz e sombra, convés, torres,
+espuma atrás da popa), deitado ou em pé, sempre ocupando exatamente as suas casas. O nome aparece na bandeja de arrumar.
+
+| Tamanho | 1º navio desse tamanho | 2º navio desse tamanho |
+|---|---|---|
+| 5 | Porta-aviões / *Aircraft carrier* (pista, aviões, ilha) | — |
+| 4 | Encouraçado / *Battleship* (3 torres de 3 canhões, convés de madeira) | Cruzador / *Cruiser* (mísseis, radar, heliponto) |
+| 3 | Submarino / *Submarine* (torre, periscópio, lemes) | Fragata / *Frigate* (hangar, heliponto) |
+| 2 | Destróier / *Destroyer* | Lancha-patrulha / *Patrol boat* |
+
+Fácil: encouraçado, submarino, destróier, lancha · Médio: porta-aviões, encouraçado, submarino, fragata, destróier ·
+Difícil: os sete. O tipo vem da ordem na frota (o 1º e o 2º do mesmo tamanho), então **em rede** quem atira só fica
+sabendo o tamanho do navio que afundou (o protocolo não mudou): o 1º afundado daquele tamanho ganha o 1º nome; no fim,
+quando cada um mostra a frota, vale o nome de verdade.
+
+- **Mar**: duas camadas de ondinhas andando devagar (só `transform`, leve para o celular).
+- **Tiro** (`efeitos.js`, um `<canvas>` por cima da tela que só desenha enquanto tem efeito): o míssil sai do meu mar
+  (ou vem de cima, quando atiram em mim) e, ao chegar, coluna d'água + gotas + ondas (água) ou clarão + bola de fogo +
+  faíscas + destroços + fumaça e tremor leve (acerto); ao afundar, explosões em sequência ao longo do navio, bolhas,
+  tremor mais forte e o navio adernando. Enquanto o míssil voa, a marca do quadradinho e o navio afundado ficam escondidos.
+- **Menos movimento** (`prefers-reduced-motion` no aparelho): sem míssil, sem partículas, sem tremor e com o mar parado;
+  as marcas aparecem paradas na hora e os sons continuam.
+- **Sons** (`som.js`, Web Audio, sem arquivo e sem internet): baque de metal (pôr navio), clique (girar), apito do navio
+  (Pronto), corneta (começou), ping do sonar (sua vez), canhão + míssil (disparo), assobio (tiro chegando), respingo,
+  explosão com estrondo, afundou (explosões, casco rangendo, bolhas), fanfarra (vitória), trombone triste (derrota),
+  toque nos botões. Tudo passa por um compressor; durante os efeitos maiores a música (`../trilha.js`) abaixa com
+  `Trilha.volume(0.3)` e volta sozinha. O botão 🔊 desliga os efeitos. O celular vibra no acerto e quando afunda.
 
 ## 👫 Com amigos (cada um no seu aparelho) — precisa de internet
 
@@ -84,13 +116,15 @@ senão jsQR), as duas bibliotecas em `libs/`, guardadas no aparelho pelo `sw.js`
 | Arquivo | O que é |
 |---|---|
 | `index.html` | As telas (início, nível, amigos, sala, arrumar, jogo, cortina). CSP sem script inline. |
-| `estilo.css` | Visual (mar, navios de brinquedo, animações de água/explosão, celular em pé e tablet/computador deitado). |
+| `estilo.css` | Visual (mar que se mexe, marcas de respingo/fogo/fumaça, navio afundando, tremor, faixa AFUNDOU, celular em pé e tablet/computador deitado). |
+| `navios.js` | Os tipos de navio (nome PT/EN por tamanho e ordem) e o desenho SVG de cada um, criado elemento por elemento. |
+| `efeitos.js` | Míssil, explosões, coluna d'água, bolhas e tremor num `<canvas>` por cima da tela (desligado com "menos movimento"). |
 | `logica.js` | Regras sem tela (roda no Node): níveis, coordenadas, posicionar, tiro, afundou, frota aleatória, a IA nos 3 jeitos. |
 | `rede.js` | Jogo em rede sem tela: validação de toda mensagem, a partida (vez, diário de tiros, voltar, sair, anfitrião que some) e o canal, trocável: Supabase Realtime broadcast; `?teste` usa BroadcastChannel; o Jogar pertinho usa o canal direto. |
 | `pertinho.js` | Jogar pertinho: os códigos curtos (SDP ↔ texto do QR, com versão e conferência) e a ligação WebRTC sem servidor. |
 | `qr.js` | Desenhar o QR (`libs/qrcode.js`) e ler com a câmera (BarcodeDetector ou `libs/jsQR.js`), carregados só quando usa. |
 | `libs/` | qrcode-generator 2.0.4 (MIT) e jsQR 1.4.0 (Apache-2.0), com as licenças ao lado. |
-| `som.js` | Efeitos feitos na hora (Web Audio). |
+| `som.js` | Efeitos sonoros feitos na hora (Web Audio, com compressor) e a música abaixando durante eles. |
 | `app.js` | Telas, arrumar a frota (tocar/arrastar/girar), as partidas dos quatro modos (as telas do Jogar pertinho também) e a música (`../trilha.js`). `APP_VERSION`. |
 | `sw.js`, `manifest.webmanifest`, `icone-192.png`, `icone-512.png`, `icone.svg` | Instalável e sem internet (cache `batalha-naval-v…`). Ícones gerados do `icone.svg` com o Playwright. |
 | `versoes.json`, `PENDENCIAS.md`, `CREDITOS.md` | Versões (PT/EN), pendências e créditos. |
@@ -125,3 +159,7 @@ O tiro é repetido a cada 1,5 s até virar diário; o dono do mar só responde c
   também trava o WebRTC (num celular de verdade não), então o teste o tira só nos segundos em que os dois se acham, com
   toda a internet bloqueada e conferindo que nada saiu do aparelho.
 - `arquivos.test.js`: versão igual nos três lugares, tudo no `sw.js`, CSP, textos PT|EN, nenhum segredo.
+- `visual.test.js` (Chromium): os 7 tipos de navio desenhados deitados e em pé ocupando exatamente as casas (360 e 1280 px),
+  nomes PT/EN na bandeja; água/acerto/afundou com míssil, marca, efeito, som, tremor, vibração e a faixa AFUNDOU com o nome;
+  "menos movimento" com marcas paradas e nenhuma partícula; todos os sons no Web Audio de verdade, a música abaixando e
+  o botão 🔊; partidas inteiras sem erro no console em 360×740 e 1280×800.

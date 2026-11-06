@@ -13,9 +13,9 @@
     encouracado: { pt: 'Encouraçado', en: 'Battleship', tam: 4 },
     cruzador: { pt: 'Cruzador', en: 'Cruiser', tam: 4 },
     submarino: { pt: 'Submarino', en: 'Submarine', tam: 3 },
-    fragata: { pt: 'Fragata', en: 'Frigate', tam: 3 },
+    fragata: { pt: 'Fragata', en: 'Frigate', tam: 3, fem: true },
     destroier: { pt: 'Destróier', en: 'Destroyer', tam: 2 },
-    patrulha: { pt: 'Lancha-patrulha', en: 'Patrol boat', tam: 2 }
+    patrulha: { pt: 'Lancha-patrulha', en: 'Patrol boat', tam: 2, fem: true }
   };
   var POR_TAM = { 5: ['porta'], 4: ['encouracado', 'cruzador'], 3: ['submarino', 'fragata'], 2: ['destroier', 'patrulha'] };
   function porOrdem(tam, ord) { var l = POR_TAM[tam] || POR_TAM[2]; return l[Math.min(ord, l.length - 1)]; }
@@ -145,9 +145,9 @@
     function rnd() { sem = (sem * 9301 + 49297) % 233280; return sem / 233280; }
     for (var i = 0; i < W / 100; i++) {
       var cx = i * 100 + 50 + (rnd() - 0.5) * 30, cy = 50 + (rnd() - 0.5) * hw * 0.5, pts = [];
-      for (var k = 0; k < 10; k++) { var a = k / 10 * Math.PI * 2, r = (hw * 0.55) * (0.65 + rnd() * 0.6); pts.push([cx + Math.cos(a) * r * 1.3, cy + Math.sin(a) * r]); }
-      E('path', { d: M(pts), fill: '#140b05', 'fill-opacity': 0.78 }, g);
-      E('circle', { cx: f(cx), cy: f(cy), r: f(hw * 0.28), fill: '#2d170a', 'fill-opacity': 0.9 }, g);
+      for (var k = 0; k < 10; k++) { var a = k / 10 * Math.PI * 2, r = (hw * 0.45) * (0.6 + rnd() * 0.6); pts.push([cx + Math.cos(a) * r * 1.3, cy + Math.sin(a) * r]); }
+      E('path', { d: M(pts), fill: '#1a0e06', 'fill-opacity': 0.6 }, g);
+      E('circle', { cx: f(cx), cy: f(cy), r: f(hw * 0.22), fill: '#2d170a', 'fill-opacity': 0.8 }, g);
       for (k = 0; k < 3; k++) E('circle', { class: 'brasa', cx: f(cx + (rnd() - 0.5) * hw), cy: f(cy + (rnd() - 0.5) * hw * 0.7), r: f(1.6 + rnd() * 1.6), fill: '#ff8a2a' }, g);
     }
     if (W >= 300) { var xm = W * (0.45 + rnd() * 0.1); E('path', { d: 'M' + f(xm) + ' ' + f(50 - hw - 2) + ' L' + f(xm + 8) + ' ' + f(50 - hw * 0.4) + ' L' + f(xm - 6) + ' ' + f(50 + hw * 0.1) + ' L' + f(xm + 7) + ' ' + f(50 + hw * 0.6) + ' L' + f(xm) + ' ' + f(50 + hw + 2), fill: 'none', stroke: '#0a0503', 'stroke-width': 4, 'stroke-linejoin': 'round' }, g); }
@@ -157,7 +157,7 @@
   // ---------- os navios ----------
   var ARTE = {
     porta: function (p) {
-      var hull = casco(20, 494, 27, 80, 22);
+      var hull = casco(20, 494, 30, 80, 24);
       esteira(p, 20, 22, 494, 27, 80);
       var deck = [[22, 23], [175, 19], [228, 9], [340, 5], [372, 15], [432, 21], [478, 33], [494, 50], [478, 63], [424, 73], [362, 79], [250, 84], [120, 84], [22, 78]];
       sombra(p, M(deck));
@@ -185,7 +185,7 @@
       return 27;
     },
     encouracado: function (p) {
-      var x0 = 16, x1 = 395, hw = 33, proa = 96, popa = 26, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 6, x1 - 9, hw - 5, proa - 12, popa - 5);
+      var x0 = 16, x1 = 395, hw = 37, proa = 96, popa = 29, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 6, x1 - 9, hw - 5, proa - 12, popa - 5);
       esteira(p, x0, popa, x1, hw, proa);
       sombra(p, hull);
       E('path', { d: hull, fill: 'url(#bnCasco)', stroke: COR.linha, 'stroke-width': 2 }, p);
@@ -209,7 +209,7 @@
       return hw;
     },
     cruzador: function (p) {
-      var x0 = 16, x1 = 396, hw = 29, proa = 112, popa = 25, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 6, x1 - 9, hw - 4.5, proa - 14, popa - 4.5);
+      var x0 = 16, x1 = 396, hw = 34, proa = 112, popa = 29, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 6, x1 - 9, hw - 4.5, proa - 14, popa - 4.5);
       esteira(p, x0, popa, x1, hw, proa);
       sombra(p, hull);
       E('path', { d: hull, fill: 'url(#bnCasco)', stroke: COR.linha, 'stroke-width': 2 }, p);
@@ -232,7 +232,7 @@
       return hw;
     },
     submarino: function (p) {
-      var x0 = 10, x1 = 294, hw = 21;
+      var x0 = 10, x1 = 294, hw = 25;
       var hull = 'M' + x0 + ' 50 C' + (x0 + 30) + ' ' + (50 - hw * 0.5) + ' ' + (x0 + 70) + ' ' + (50 - hw) + ' ' + (x0 + 112) + ' ' + (50 - hw) + ' L' + (x1 - 44) + ' ' + (50 - hw) +
         ' C' + (x1 - 12) + ' ' + (50 - hw) + ' ' + x1 + ' ' + (50 - hw * 0.6) + ' ' + x1 + ' 50 C' + x1 + ' ' + (50 + hw * 0.6) + ' ' + (x1 - 12) + ' ' + (50 + hw) + ' ' + (x1 - 44) + ' ' + (50 + hw) +
         ' L' + (x0 + 112) + ' ' + (50 + hw) + ' C' + (x0 + 70) + ' ' + (50 + hw) + ' ' + (x0 + 30) + ' ' + (50 + hw * 0.5) + ' ' + x0 + ' 50Z';
@@ -267,7 +267,7 @@
       return hw;
     },
     fragata: function (p) {
-      var x0 = 14, x1 = 294, hw = 27, proa = 86, popa = 24, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 6, x1 - 8, hw - 4.5, proa - 12, popa - 4.5);
+      var x0 = 14, x1 = 294, hw = 32, proa = 86, popa = 28, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 6, x1 - 8, hw - 4.5, proa - 12, popa - 4.5);
       esteira(p, x0, popa, x1, hw, proa);
       sombra(p, hull);
       E('path', { d: hull, fill: 'url(#bnCasco)', stroke: COR.linha, 'stroke-width': 2 }, p);
@@ -286,7 +286,7 @@
       return hw;
     },
     destroier: function (p) {
-      var x0 = 12, x1 = 196, hw = 26, proa = 62, popa = 22, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 5, x1 - 7, hw - 4.5, proa - 9, popa - 4.5);
+      var x0 = 12, x1 = 196, hw = 31, proa = 62, popa = 26, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 5, x1 - 7, hw - 4.5, proa - 9, popa - 4.5);
       esteira(p, x0, popa, x1, hw, proa);
       sombra(p, hull);
       E('path', { d: hull, fill: 'url(#bnCasco)', stroke: COR.linha, 'stroke-width': 2 }, p);
@@ -302,7 +302,7 @@
       return hw;
     },
     patrulha: function (p) {
-      var x0 = 14, x1 = 195, hw = 23, proa = 70, popa = 21, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 5, x1 - 7, hw - 4, proa - 10, popa - 4);
+      var x0 = 14, x1 = 195, hw = 29, proa = 70, popa = 26, hull = casco(x0, x1, hw, proa, popa), deck = casco(x0 + 5, x1 - 7, hw - 4, proa - 10, popa - 4);
       esteira(p, x0, popa, x1, hw, proa, true);
       sombra(p, hull);
       E('path', { d: hull, fill: 'url(#bnCasco)', stroke: COR.linha, 'stroke-width': 2 }, p);
