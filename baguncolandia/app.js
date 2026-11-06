@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.18', APP_UPDATED = '05/11/2026';
+  var APP_VERSION = '0.8.20', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -191,7 +191,8 @@
       var n = { crianca: T('Criança', 'Kids'), normal: 'Normal', maluco: T('Maluco', 'Crazy') }[c.dificuldade];
       var amb = c.ambiente === 'paisagem' ? T('🏞️ paisagem', '🏞️ landscape') : T('📷 câmera', '📷 camera');
       $('lobbyDica').textContent = c.jogadores !== 2 ? '' : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.');
-      $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people') : T(' pessoa', ' person')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones') : T(' celular', ' phone'))) + ' · ' + d + ' · ' + n;
+      $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people') : T(' pessoa', ' person')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones') : T(' celular', ' phone'))) + ' · ' + d + ' · ' + n + (vaiLigado() ? T(' · 💪 difícil: o boneco vai até lá', ' · 💪 hard: the avatar goes there') : tv.toque && JEITO_MODOS.indexOf(c.modo) >= 0 ? T(' · 😊 fácil: o dedo pega na hora', ' · 😊 easy: your finger catches right away') : '');
+      if (tv.toque) botaoJeito();
     }
     var estadoBroadcastEm = 0;
     function estadoParaCelulares() {
@@ -292,7 +293,8 @@
       var figs = Figuras.lista(tv.cfg.turmas);
       if (!figs.some(function (f) { return f.papel === 'fruta'; })) figs = Figuras.lista();   // sem fruta nenhuma não dá para cortar
       var nCasas = window.Casa ? Casa.CENAS.length : 3; tv.casaN = tv.casaN == null ? Math.floor(Math.random() * nCasas) : (tv.casaN + 1) % nCasas;   // 🧸 Bagunça: cada rodada num lugar (sala, quarto, jardim, cozinha, banheiro, parquinho)
-      tv.partida = Bagunca.criarPartida({ modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: tv.cfg.duracao, dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas() });
+      tv.partida = Bagunca.criarPartida({ modo: tv.cfg.modo, jogadores: tv.cfg.jogadores, duracao: tv.cfg.duracao, dificuldade: tv.cfg.dificuldade, figuras: figs, cenaCasa: window.Casa ? Casa.CENAS[tv.casaN] : null, dicas: dicasLigadas(), vai: vaiLigado() });
+      Desenho.mostrarBoneco(vaiLigado() || tv.mostrarBoneco !== false);   // 🧍 vai até lá: o boneco é quem joga, aparece sempre
       Object.keys(tv.caixas).forEach(function (j) { var c = tv.caixas[j]; if (c) { tv.partida.zonaChute(+j, Math.min(0.95, c.y + c.h * 0.6)); tv.partida.calibrar(+j, c); } });
       if (tv.toque) { tv.dedoCorpo = {}; for (var jt = 0; jt < tv.cfg.jogadores; jt++) { tv.partida.calibrar(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }); tv.partida.corpo(jt, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }, performance.now()); } }
       Desenho.limpar(); Desenho.ambiente(tv.cfg.ambiente, tv.cfg.cena);
@@ -425,6 +427,8 @@
       $('nome2').addEventListener('input', function () { tv.nome2 = $('nome2').value.replace(/\s+/g, ' ').trim().slice(0, 14); try { localStorage.setItem('bagunca:nome2', tv.nome2); } catch (e) {} var c = $('lobbyNomeJ2'); if (c) c.textContent = tv.nome2 || T('2ª pessoa', '2nd player'); });
       $('localMusica').onclick = function () { aplicarSom(SOM.mudo, !SOM.semMusica); };
       $('localCamera').onclick = function () { CelApp.trocarCameraLocal(); };
+      $('localJeito').onclick = function () { try { localStorage.setItem('bagunca:jeito', jeitoVai() ? 'dedo' : 'vai'); } catch (e) {} botaoJeito(); resumo(); };
+      botaoJeito();
       $('localBoneco').onclick = function () { tv.mostrarBoneco = !tv.mostrarBoneco; $('localBoneco').classList.toggle('ativo', tv.mostrarBoneco); Desenho.mostrarBoneco(tv.mostrarBoneco); try { localStorage.setItem('bagunca:bonecoDedo', tv.mostrarBoneco ? '1' : '0'); } catch (e) {} };
       $('localPessoas').onclick = function () { var n = tv.cfg.jogadores === 2 ? 1 : 2; $('localPessoas').textContent = n === 2 ? '👥 2' : '👤 1'; comando({ acao: 'config', jogadores: n, celulares: 1 }); };
       $('localModos').querySelectorAll('button').forEach(function (b) { b.onclick = function () { $('localModos').querySelectorAll('button').forEach(function (x) { x.classList.remove('ativo'); }); b.classList.add('ativo'); comando({ acao: 'config', modo: b.getAttribute('data-v') }); }; });
@@ -451,12 +455,14 @@
         tv.partida.corpo(j, { x: Math.max(0, Math.min(0.8, x - 0.1)), y: pul ? -0.1 : (ab ? 0.45 : 0.1), w: ab ? 0.25 : 0.2, h: ab ? 0.45 : 0.8 }, ts);
       }
       // 🧹 arrumação: o dedo pega, arrasta e solta (cada dedo segura uma coisa; dá para as duas arrumarem juntas)
+      // 🧍 vai até lá: o dedo marca o alvo; o boneco anda (e pula) até ele. Soltar: ele termina de chegar
+      function vaiDedo(fn, e, p) { if (!tv.partida || !tv.partida.alvo || !vaiLigado() || tv.fase !== 'jogando') return false; var r = raiaDe(p); if (fn === 'largar') tv.partida.alvo(r.j, null); else tv.partida.alvo(r.j, r.x, p.y); return true; }
       function arrumaDedo(fn, e, p) { if (!tv.arrumando || !tv.partida || !tv.partida.pegar || tv.fase !== 'jogando') return false; if (fn === 'pegar') tv.partida.pegar(e.pointerId, raiaDe(p).j, p.x, p.y); else if (fn === 'mover') tv.partida.mover(e.pointerId, p.x, p.y); else tv.partida.largar(e.pointerId); return true; }
-      cv.addEventListener('pointerdown', function (e) { if (!tv.toque) return; e.preventDefault(); cv.setPointerCapture && cv.setPointerCapture(e.pointerId); var p = pos(e); dedos[e.pointerId] = { x0: p.x, y0: p.y, t0: performance.now(), p: p }; if (arrumaDedo('pegar', e, p)) return; if (tv.fase === 'lobby' || tv.fase === 'fim') return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } });
-      cv.addEventListener('pointermove', function (e) { if (!tv.toque || !dedos[e.pointerId]) return; e.preventDefault(); var p = pos(e), d = dedos[e.pointerId]; d.p = p; if (arrumaDedo('mover', e, p)) return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } });
+      cv.addEventListener('pointerdown', function (e) { if (!tv.toque) return; e.preventDefault(); cv.setPointerCapture && cv.setPointerCapture(e.pointerId); var p = pos(e); dedos[e.pointerId] = { x0: p.x, y0: p.y, t0: performance.now(), p: p }; if (arrumaDedo('pegar', e, p) || vaiDedo('pegar', e, p)) return; if (tv.fase === 'lobby' || tv.fase === 'fim') return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } });
+      cv.addEventListener('pointermove', function (e) { if (!tv.toque || !dedos[e.pointerId]) return; e.preventDefault(); var p = pos(e), d = dedos[e.pointerId]; d.p = p; if (arrumaDedo('mover', e, p) || vaiDedo('mover', e, p)) return; if (tv.partida && tv.fase === 'jogando') { var r = raiaDe(p); tv.partida.movimento(r.j, [[r.x, p.y, 100]], performance.now()); corpoDedo(r.j, r.x, performance.now()); } });
       function solta(e) {
         var d = dedos[e.pointerId]; if (!d) return; delete dedos[e.pointerId];
-        if (arrumaDedo('largar', e, d.p)) return;
+        if (arrumaDedo('largar', e, d.p) || vaiDedo('largar', e, d.p)) return;
         if (!tv.partida || tv.fase !== 'jogando') return;
         var dy = d.p.y - d.y0, dt = performance.now() - d.t0, r = raiaDe(d.p), c = tv.dedoCorpo[r.j] || (tv.dedoCorpo[r.j] = { pulando: 0, abaixado: 0 });
         if (dt < 600 && dy < -0.12) { c.pulando = performance.now() + 650; Som.tocar('tic'); }        // deslizou para cima: pula
@@ -465,6 +471,11 @@
       }
       cv.addEventListener('pointerup', solta); cv.addEventListener('pointercancel', solta);
     }
+    /* jeito de jogar no dedo: 👆 o dedo corta (como sempre) ou 🧍 o boneco vai até lá — guardado no aparelho */
+    var JEITO_MODOS = ['corta', 'pega', 'chuta', 'bolas', 'mistura'];
+    function jeitoVai() { try { return localStorage.getItem('bagunca:jeito') === 'vai'; } catch (e) { return false; } }
+    function vaiLigado() { return !!tv.toque && jeitoVai() && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0; }
+    function botaoJeito() { var v = jeitoVai(), b = $('localJeito'); b.classList.toggle('ativo', v); b.querySelector('span').textContent = v ? T('Difícil', 'Hard') : T('Fácil', 'Easy'); b.firstChild.textContent = v ? '💪 ' : '😊 '; b.title = v ? T('Difícil: o boneco anda (e pula) até onde você segura o dedo. Toque para Fácil.', 'Hard: the avatar walks (and jumps) to where you hold your finger. Tap for Easy.') : T('Fácil: o dedo pega e corta na hora. Toque para Difícil.', 'Easy: your finger catches and slices right away. Tap for Hard.'); $('tv').classList.toggle('jeitoOk', !!tv.toque && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0); }
     function dicasLigadas() { try { return localStorage.getItem('bagunca:dicas') !== '0'; } catch (e) { return true; } }
     function botaoDica() { var v = dicasLigadas(); $('casaDica').classList.toggle('ativo', v); $('casaDica').querySelector('span').textContent = v ? T('Dicas: sim', 'Hints: on') : T('Dicas: não', 'Hints: off'); }
     function sairLocal() {

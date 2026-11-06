@@ -168,6 +168,63 @@
   add({ id: 'quixote', papel: 'heroi', turma: 'publica', raio: 46, suco: '#cfd8dc', nome: { pt: 'Dom Quixote (1605)', en: 'Don Quixote (1605)' },
     svg: svg('<rect x="36" y="56" width="28" height="36" rx="6" fill="#90a4ae"/><path d="M36 60 h28 l-4 6 h-20z" fill="#546e7a"/><rect x="18" y="56" width="10" height="34" rx="5" fill="#cfd8dc"/><rect x="74" y="20" width="5" height="76" rx="2" fill="#8d6e63"/><path d="M76 20 l-6 -14 l12 0z" fill="#cfd8dc"/><circle cx="50" cy="38" r="18" fill="#ffe0b2"/><path d="M28 30 q22 -18 44 0 l0 6 h-44z" fill="#b0bec5"/><path d="M34 28 h32 q-2 -10 -16 -10 q-14 0 -16 10z" fill="#90a4ae"/><path d="M40 48 q10 8 20 0" stroke="#5d4037" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M42 42 l-4 -2 M58 42 l4 -2" stroke="#5d4037" stroke-width="2.5"/><circle cx="44" cy="36" r="2.5" fill="#1f1b3a"/><circle cx="56" cy="36" r="2.5" fill="#1f1b3a"/><path d="M40 56 q10 10 20 0" stroke="#5d4037" stroke-width="3" fill="none"/>', []) });
 
+  /* ================= BICHOS (Pega-pega: aparecem, esperam e vão embora; pegou → vão para o cantinho) =================
+     O corpo é SVG (de lado, olhando para a direita, chão em y≈98). Pernas e asas são desenhadas à parte no palco para
+     mexer: pernas = [x, y do quadril, comprimento, grossura, cor]; asas = [x, y, rx, ry, cor]; asaEixo 'x' = bate para os
+     lados (borboleta de frente). anda: voa | anda | pula | buraco. tam = lado do quadrado no palco (px); vel = px/s. */
+  function olho(x, y, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#fff"/><circle cx="' + (x + r * 0.25) + '" cy="' + y + '" r="' + (r * 0.6) + '" fill="#1f1b3a"/><circle cx="' + (x + r * 0.45) + '" cy="' + (y - r * 0.3) + '" r="' + (r * 0.22) + '" fill="#fff"/>'; }
+  function bicho(f) { f.papel = 'bicho'; f.turma = 'propria'; f.raio = f.raio || 46; f.suco = f.suco || '#ffffff'; return add(f); }
+  bicho({ id: 'borboleta', anda: 'voa', asaEixo: 'x', tam: 84, vel: 150, nome: { pt: 'Borboleta', en: 'Butterfly' },
+    asas: [[34, 38, 20, 18, '#ff7ab8'], [66, 38, 20, 18, '#ff7ab8'], [38, 62, 13, 12, '#ffd166'], [62, 62, 13, 12, '#ffd166']],
+    svg: svg('<ellipse cx="50" cy="52" rx="5" ry="22" fill="#3a2b4a"/><circle cx="50" cy="28" r="7" fill="#3a2b4a"/><path d="M47 22 q-6 -12 -12 -14 M53 22 q6 -12 12 -14" stroke="#3a2b4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>' + olho(47, 27, 2.6) + olho(54, 27, 2.6)) });
+  bicho({ id: 'joaninha', anda: 'voa', tam: 60, vel: 110, nome: { pt: 'Joaninha', en: 'Ladybug' },
+    asas: [[46, 40, 18, 9, 'rgba(220,240,255,.75)']], pernas: [[38, 72, 12, 3, '#1f1b3a'], [52, 74, 12, 3, '#1f1b3a'], [64, 72, 12, 3, '#1f1b3a']],
+    svg: svg('<path d="M18 70 A32 30 0 0 1 82 70 Z" fill="#e53935"/><path d="M50 40 V70" stroke="#1f1b3a" stroke-width="2.5"/><g fill="#1f1b3a"><circle cx="34" cy="58" r="5"/><circle cx="64" cy="56" r="5"/><circle cx="44" cy="48" r="4"/><circle cx="58" cy="66" r="4"/></g><circle cx="84" cy="62" r="11" fill="#1f1b3a"/>' + olho(87, 59, 3.4)) });
+  bicho({ id: 'libelula', anda: 'voa', tam: 96, vel: 230, nome: { pt: 'Libélula', en: 'Dragonfly' },
+    asas: [[44, 40, 22, 7, 'rgba(200,235,255,.8)'], [56, 42, 20, 6, 'rgba(200,235,255,.8)']],
+    svg: svg('<rect x="10" y="47" width="58" height="7" rx="3.5" fill="#26c6da"/><circle cx="72" cy="50" r="9" fill="#00acc1"/>' + olho(76, 47, 4)) });
+  bicho({ id: 'passarinho', anda: 'voa', tam: 80, vel: 240, nome: { pt: 'Passarinho', en: 'Little bird' },
+    asas: [[44, 50, 18, 11, '#1e88e5']], pernas: [[46, 76, 18, 3, '#ff9800'], [56, 76, 18, 3, '#ff9800']],
+    svg: svg('<path d="M14 46 L30 50 L14 58 Z" fill="#1565c0"/><ellipse cx="50" cy="56" rx="28" ry="22" fill="#42a5f5"/><ellipse cx="54" cy="64" rx="16" ry="12" fill="#e3f2fd"/><circle cx="70" cy="38" r="16" fill="#42a5f5"/><path d="M84 36 L96 40 L84 44 Z" fill="#ff9800"/>' + olho(74, 34, 5)) });
+  bicho({ id: 'minhoca', anda: 'buraco', tam: 76, vel: 45, nome: { pt: 'Minhoca', en: 'Earthworm' },
+    svg: svg('<path d="M14 96 q8 -30 26 -26 q20 4 18 -20 q-2 -20 18 -22" stroke="#f48fb1" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M30 76 l6 4 M46 70 l7 2 M58 48 l7 -2" stroke="#ec407a" stroke-width="2.5"/>' + olho(78, 26, 4.5) + '<path d="M74 36 q5 4 10 0" stroke="#ad1457" stroke-width="2" fill="none" stroke-linecap="round"/>') });
+  bicho({ id: 'toupeira', anda: 'buraco', tam: 100, vel: 90, nome: { pt: 'Toupeira', en: 'Mole' },
+    pernas: [[40, 86, 12, 7, '#6d4c41'], [62, 86, 12, 7, '#6d4c41']],
+    svg: svg('<ellipse cx="50" cy="64" rx="34" ry="28" fill="#6d4c41"/><ellipse cx="70" cy="56" rx="20" ry="18" fill="#795548"/><ellipse cx="88" cy="58" rx="8" ry="6" fill="#ff8a80"/><path d="M68 50 q4 -3 8 0" stroke="#1f1b3a" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="78" cy="76" rx="9" ry="6" fill="#ffab91"/><path d="M80 64 l14 -4 M80 66 l14 2" stroke="#3e2723" stroke-width="1.5"/>') });
+  bicho({ id: 'sapo', anda: 'pula', tam: 80, vel: 160, nome: { pt: 'Sapo', en: 'Frog' },
+    pernas: [[30, 78, 18, 8, '#43a047'], [66, 82, 14, 6, '#43a047']],
+    svg: svg('<ellipse cx="50" cy="70" rx="34" ry="22" fill="#66bb6a"/><ellipse cx="54" cy="78" rx="22" ry="12" fill="#c5e1a5"/><circle cx="58" cy="46" r="11" fill="#66bb6a"/><circle cx="78" cy="48" r="11" fill="#66bb6a"/>' + olho(58, 44, 7) + olho(78, 46, 7) + '<path d="M66 64 q10 6 20 0" stroke="#1b5e20" stroke-width="2.5" fill="none" stroke-linecap="round"/>') });
+  bicho({ id: 'coelho', anda: 'pula', tam: 124, vel: 220, nome: { pt: 'Coelho', en: 'Bunny' },
+    pernas: [[30, 80, 16, 9, '#e0e0e0'], [40, 80, 16, 9, '#eeeeee'], [62, 82, 14, 7, '#e0e0e0'], [70, 82, 14, 7, '#eeeeee']],
+    svg: svg('<circle cx="18" cy="62" r="9" fill="#fff"/><ellipse cx="46" cy="68" rx="30" ry="20" fill="#f5f5f5"/><circle cx="74" cy="52" r="16" fill="#f5f5f5"/><ellipse cx="66" cy="22" rx="6" ry="20" fill="#f5f5f5" transform="rotate(-12 66 22)"/><ellipse cx="78" cy="22" rx="6" ry="20" fill="#f5f5f5" transform="rotate(10 78 22)"/><ellipse cx="66" cy="22" rx="3" ry="14" fill="#f8bbd0" transform="rotate(-12 66 22)"/><ellipse cx="78" cy="22" rx="3" ry="14" fill="#f8bbd0" transform="rotate(10 78 22)"/>' + olho(80, 50, 4.5) + '<circle cx="89" cy="56" r="3" fill="#f48fb1"/>') });
+  bicho({ id: 'esquilo', anda: 'pula', tam: 104, vel: 230, nome: { pt: 'Esquilo', en: 'Squirrel' },
+    pernas: [[40, 80, 16, 7, '#a1582c'], [62, 80, 16, 7, '#a1582c']],
+    svg: svg('<path d="M30 80 q-28 -10 -18 -46 q8 -24 26 -8 q-10 14 -2 30 Z" fill="#d2691e"/><ellipse cx="52" cy="66" rx="20" ry="18" fill="#e07b39"/><ellipse cx="56" cy="72" rx="10" ry="10" fill="#ffe0b2"/><circle cx="70" cy="46" r="13" fill="#e07b39"/><path d="M64 34 l2 -10 l6 8 Z" fill="#d2691e"/>' + olho(74, 44, 4) + '<circle cx="83" cy="49" r="2.5" fill="#3e2723"/>') });
+  bicho({ id: 'pato', anda: 'anda', tam: 124, vel: 120, nome: { pt: 'Pato', en: 'Duck' },
+    asas: [[44, 56, 16, 10, '#fdd835']], pernas: [[42, 78, 18, 4, '#ff9800'], [54, 78, 18, 4, '#ff9800']],
+    svg: svg('<ellipse cx="46" cy="62" rx="30" ry="18" fill="#ffeb3b"/><path d="M16 56 l-6 -8 l12 4 Z" fill="#ffeb3b"/><ellipse cx="70" cy="40" rx="13" ry="14" fill="#ffeb3b"/><path d="M80 40 q12 0 14 4 q-6 4 -14 2 Z" fill="#ff9800"/>' + olho(72, 36, 4)) });
+  bicho({ id: 'galinha', anda: 'anda', tam: 124, vel: 130, nome: { pt: 'Galinha', en: 'Hen' },
+    asas: [[44, 58, 15, 10, '#eeeeee']], pernas: [[44, 78, 18, 4, '#fbc02d'], [56, 78, 18, 4, '#fbc02d']],
+    svg: svg('<path d="M16 50 q-4 -16 8 -14 q2 10 6 14 Z" fill="#fafafa"/><ellipse cx="48" cy="62" rx="28" ry="18" fill="#fafafa"/><ellipse cx="70" cy="40" rx="12" ry="14" fill="#fafafa"/><path d="M64 26 q3 -8 6 -2 q3 -6 6 2 Z" fill="#e53935"/><path d="M80 40 l10 3 l-10 3 Z" fill="#fbc02d"/><ellipse cx="78" cy="50" rx="3" ry="5" fill="#e53935"/>' + olho(72, 37, 3.6)) });
+  bicho({ id: 'gato', anda: 'anda', tam: 156, vel: 200, nome: { pt: 'Gato', en: 'Cat' },
+    pernas: [[28, 66, 30, 7, '#f57c00'], [36, 66, 30, 7, '#fb8c00'], [62, 66, 30, 7, '#f57c00'], [70, 66, 30, 7, '#fb8c00']],
+    svg: svg('<path d="M18 62 q-14 -6 -10 -26" stroke="#fb8c00" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="48" cy="60" rx="30" ry="13" fill="#fb8c00"/><path d="M30 52 l6 10 M44 50 l4 12 M58 50 l2 12" stroke="#e65100" stroke-width="3"/><circle cx="78" cy="44" r="14" fill="#fb8c00"/><path d="M68 34 l2 -14 l9 10 Z M80 30 l8 -12 l3 15 Z" fill="#fb8c00"/>' + olho(82, 42, 4) + '<path d="M88 50 l9 -1 M88 52 l9 2" stroke="#5d4037" stroke-width="1.2"/><circle cx="90" cy="48" r="2" fill="#f06292"/>') });
+  bicho({ id: 'cachorro', anda: 'anda', tam: 184, vel: 240, nome: { pt: 'Cachorro', en: 'Dog' },
+    pernas: [[26, 62, 34, 8, '#8d6e63'], [34, 62, 34, 8, '#a1887f'], [62, 62, 34, 8, '#8d6e63'], [70, 62, 34, 8, '#a1887f']],
+    svg: svg('<path d="M16 54 q-10 -10 -4 -22" stroke="#a1887f" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="46" cy="56" rx="32" ry="15" fill="#a1887f"/><circle cx="78" cy="40" r="16" fill="#a1887f"/><ellipse cx="90" cy="46" rx="9" ry="7" fill="#bcaaa4"/><circle cx="96" cy="44" r="3.5" fill="#3e2723"/><ellipse cx="70" cy="44" rx="6" ry="13" fill="#6d4c41" transform="rotate(14 70 44)"/>' + olho(82, 36, 4) + '<path d="M86 52 q4 6 8 2" stroke="#e57373" stroke-width="3" fill="none" stroke-linecap="round"/>') });
+  bicho({ id: 'porquinho', anda: 'anda', tam: 150, vel: 130, nome: { pt: 'Porquinho', en: 'Piglet' },
+    pernas: [[30, 68, 24, 9, '#f48fb1'], [38, 68, 24, 9, '#f8bbd0'], [60, 68, 24, 9, '#f48fb1'], [68, 68, 24, 9, '#f8bbd0']],
+    svg: svg('<path d="M16 56 q-8 -2 -4 -8 q4 -4 2 -8" stroke="#f48fb1" stroke-width="3" fill="none"/><ellipse cx="48" cy="58" rx="34" ry="20" fill="#f8bbd0"/><circle cx="78" cy="48" r="16" fill="#f8bbd0"/><path d="M70 34 l4 -10 l6 10 Z" fill="#f48fb1"/><ellipse cx="92" cy="52" rx="6" ry="7" fill="#f48fb1"/><circle cx="91" cy="50" r="1.4" fill="#ad1457"/><circle cx="91" cy="55" r="1.4" fill="#ad1457"/>' + olho(80, 44, 3.8)) });
+  bicho({ id: 'ovelha', anda: 'anda', tam: 180, vel: 120, nome: { pt: 'Ovelha', en: 'Sheep' },
+    pernas: [[30, 66, 28, 6, '#3e2723'], [38, 66, 28, 6, '#4e342e'], [60, 66, 28, 6, '#3e2723'], [68, 66, 28, 6, '#4e342e']],
+    svg: svg('<g fill="#fafafa"><circle cx="26" cy="54" r="12"/><circle cx="38" cy="44" r="13"/><circle cx="54" cy="44" r="13"/><circle cx="66" cy="52" r="12"/><circle cx="40" cy="62" r="13"/><circle cx="56" cy="62" r="13"/></g><ellipse cx="80" cy="46" rx="11" ry="13" fill="#4e342e"/><ellipse cx="72" cy="40" rx="8" ry="4" fill="#4e342e" transform="rotate(-20 72 40)"/>' + olho(84, 42, 3.5)) });
+  bicho({ id: 'tartaruga', anda: 'anda', tam: 104, vel: 45, nome: { pt: 'Tartaruga', en: 'Turtle' },
+    pernas: [[32, 76, 16, 9, '#8bc34a'], [44, 78, 14, 9, '#9ccc65'], [60, 78, 14, 9, '#8bc34a'], [70, 76, 16, 9, '#9ccc65']],
+    svg: svg('<path d="M18 78 A32 28 0 0 1 82 78 Z" fill="#2e7d32"/><path d="M34 60 l8 -8 l12 0 l8 8 l-8 10 l-12 0 Z" fill="#43a047" stroke="#1b5e20" stroke-width="2"/><rect x="16" y="74" width="68" height="6" rx="3" fill="#1b5e20"/><ellipse cx="88" cy="68" rx="10" ry="8" fill="#9ccc65"/>' + olho(90, 65, 3.4)) });
+  bicho({ id: 'cavalo', anda: 'anda', tam: 540, vel: 300, nome: { pt: 'Cavalo (tamanho de verdade)', en: 'Horse (real size)' },
+    pernas: [[27, 56, 42, 6.5, '#5d4037'], [33, 56, 42, 6.5, '#6d4c41'], [61, 56, 42, 6.5, '#5d4037'], [67, 56, 42, 6.5, '#6d4c41']],
+    svg: svg('<path d="M17 44 q-12 4 -11 26 q4 -10 9 -16" fill="#3e2723"/><ellipse cx="45" cy="49" rx="29" ry="15" fill="#8d6e63"/><path d="M63 46 C66 34 70 24 74 16 L86 19 C82 28 79 38 77 52 Z" fill="#8d6e63"/><ellipse cx="86" cy="23" rx="12" ry="7.5" fill="#8d6e63" transform="rotate(32 86 23)"/><ellipse cx="92" cy="30" rx="5.5" ry="4.5" fill="#6d4c41"/><circle cx="93" cy="30" r="1.1" fill="#3e2723"/><path d="M77 13 l1 -7 l4 6 Z" fill="#6d4c41"/><path d="M75 14 C70 22 67 32 64 44" stroke="#3e2723" stroke-width="5" fill="none" stroke-linecap="round"/>' + olho(84, 19, 2.3)) });
+
   /* ---------- API ---------- */
   var minhas = [];
   function lista(turmas) {
