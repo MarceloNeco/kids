@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Labirinto — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#1b1446">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Labirintos novos a cada partida: quadrados, redondos e de colmeia, em três níveis. Leve o cachorrinho ou risque o caminho com o dedo, pegue o osso no meio e ache a saída. / A new maze every game: square, round and honeycomb, in three levels. Walk the puppy or draw the path, grab the bone in the middle and find the exit.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Labirinto — brincadeira da família Bolinho de Chuva (SolverONE · kids).
+  Gerador com semente (gerador.js), regras e colisão (regras.js), desenho em canvas (desenho.js), efeitos (som.js),
+  telas e controles (app.js). Música: a trilha comum (../trilha.js). Sem login, sem banco: tudo fica no aparelho.
+  Nada de script inline: a CSP acima não permite. Mapa: LEIA-ME.md. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+
+<section id="menu" class="tela ativa" data-recurso="labirinto">
+  <div class="faixa">
+    <a id="btCasa" class="mini" href="../" aria-label="Bolinho de Chuva (início) / Home">🏠</a>
+    <span class="espaco"></span>
+    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
+    <button id="btEfeitos" class="mini" type="button" aria-label="Sons / Sounds">🔊</button>
+    <button id="btAjuda" class="mini" type="button" aria-label="Como brincar / How to play" aria-expanded="false">❓</button>
+  </div>
+  <h1 class="logo" aria-label="Labirinto"><span>L</span><span>a</span><span>b</span><span>i</span><span>r</span><span>i</span><span>n</span><span>t</span><span>o</span></h1>
+  <canvas id="mascote" class="mascote" width="160" height="120" aria-hidden="true"></canvas>
+  <div id="ajuda" class="ajuda" hidden>
+    <p data-t="🧩 Escolha o formato e o nível. Cada partida é um labirinto novo, feito na hora.|🧩 Pick a shape and a level. Every game is a brand-new maze, made on the spot."></p>
+    <p data-t="🐶 Cachorrinho: toque (ou arraste o dedo) onde quer ir e ele vai andando pelos corredores. No computador, use as setas.|🐶 Puppy: tap (or drag your finger) where you want to go and he walks along the corridors. On a computer, use the arrow keys."></p>
+    <p data-t="✏️ Desenhar: risque o caminho com o dedo saindo da ponta da linha. Se bater na parede, a linha para: volte o dedo até a ponta e continue. ↩ desfaz e 🗑️ apaga.|✏️ Draw: draw the path with your finger starting from the tip of the line. If you hit a wall the line stops: bring your finger back to the tip and go on. ↩ undoes and 🗑️ erases."></p>
+    <p data-t="🦴 Missão: em muitos labirintos a saída está trancada. Pegue primeiro o osso, a chave, a estrela ou o tesouro no meio e a porta se abre!|🦴 Mission: in many mazes the exit is locked. First grab the bone, key, star or treasure in the middle and the door opens!"></p>
+    <p data-t="🔍 Labirinto grande: dois dedos aproximam e arrastam (ou os botões 🔍). A câmera segue o cachorrinho.|🔍 Big maze: two fingers zoom and pan (or the 🔍 buttons). The camera follows the puppy."></p>
+  </div>
+
+  <h2 class="titulo-escolha" data-t="Formato|Shape"></h2>
+  <div class="escolha" id="formas" role="radiogroup" aria-label="Formato / Shape">
+    <button class="cartao-forma" type="button" role="radio" data-forma="quadrado" aria-checked="true">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="3" width="34" height="34" rx="3" fill="#f4e6bd"/><path d="M3 3h34v34H3zM11 3v18M19 11v26M27 3v10M27 21h10M11 29h8M3 21h8M19 21h8" fill="none" stroke="#2e8a47" stroke-width="3" stroke-linecap="round"/></svg>
+      <span data-t="Quadrado|Square"></span>
+    </button>
+    <button class="cartao-forma" type="button" role="radio" data-forma="redondo" aria-checked="false">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#3a2f8f"/><path d="M20 3a17 17 0 1 1-12 5M20 9a11 11 0 1 1-11 11M20 15a5 5 0 1 1-5 5M20 3v6M31 20h-6M20 31v6M9 20h6" fill="none" stroke="#ff8ae0" stroke-width="3" stroke-linecap="round"/></svg>
+      <span data-t="Redondo|Round"></span>
+    </button>
+    <button class="cartao-forma" type="button" role="radio" data-forma="colmeia" aria-checked="false">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2l16 9v18l-16 9-16-9V11z" fill="#ffd978"/><path d="M20 2l16 9v18l-16 9-16-9V11zM20 14l7 4v8M13 18v8l7 4M20 2v6M36 29l-7-4" fill="none" stroke="#a86200" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <span data-t="Colmeia|Honeycomb"></span>
+    </button>
+    <button class="cartao-forma" type="button" role="radio" data-forma="surpresa" aria-checked="false">
+      <span class="ico-grande" aria-hidden="true">🎲</span>
+      <span data-t="Surpresa|Surprise"></span>
+    </button>
+  </div>
+
+  <h2 class="titulo-escolha" data-t="Nível|Level"></h2>
+  <div class="escolha" id="niveis" role="radiogroup" aria-label="Nível / Level">
+    <button class="cartao-nivel verde" type="button" role="radio" data-nivel="facil" aria-checked="true"><span data-t="Fácil|Easy"></span><small class="recorde" data-rec="facil"></small></button>
+    <button class="cartao-nivel amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false"><span data-t="Médio|Medium"></span><small class="recorde" data-rec="medio"></small></button>
+    <button class="cartao-nivel vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false"><span data-t="Difícil|Hard"></span><small class="recorde" data-rec="dificil"></small></button>
+  </div>
+
+  <h2 class="titulo-escolha" data-t="Jeito de brincar|How to play"></h2>
+  <div class="escolha" id="modos" role="radiogroup" aria-label="Jeito de brincar / How to play">
+    <button class="chip-modo" type="button" role="radio" data-modo="andar" aria-checked="true" data-t="🐶 Levar o cachorrinho|🐶 Walk the puppy"></button>
+    <button class="chip-modo" type="button" role="radio" data-modo="desenhar" aria-checked="false" data-t="✏️ Desenhar o caminho|✏️ Draw the path"></button>
+  </div>
+
+  <button id="btJogar" class="grande" type="button" data-t="▶ Jogar!|▶ Play!"></button>
+  <button id="btInstalar" class="medio" type="button" hidden data-t="📲 Instalar|📲 Install"></button>
+  <p id="versao" class="versao"></p>
+</section>
+
+<section id="jogo" class="tela" data-recurso="labirinto">
+  <div id="barra" class="barra">
+    <button id="btMenu" class="mini" type="button" aria-label="Voltar ao menu / Back to menu">←</button>
+    <button id="btDesfazer" class="mini so-desenho" type="button" aria-label="Desfazer / Undo">↩</button>
+    <button id="btApagar" class="mini so-desenho" type="button" aria-label="Apagar a linha / Erase the line">🗑️</button>
+    <span id="relogio" class="relogio" aria-label="Tempo / Time">0:00</span>
+    <span class="espaco"></span>
+    <button id="btModo" class="mini" type="button" aria-label="Trocar o jeito de brincar / Switch how to play">✏️</button>
+    <button id="btNovo" class="mini" type="button" aria-label="Outro labirinto / Another maze">🔄</button>
+  </div>
+  <p id="missao" class="missao" aria-live="polite"></p>
+  <div id="palco" class="palco">
+    <div id="mundo" class="mundo">
+      <canvas id="chao" aria-hidden="true"></canvas>
+      <canvas id="atores" aria-label="Labirinto / Maze"></canvas>
+    </div>
+  </div>
+  <div class="zoom">
+    <button id="btMais" class="mini" type="button" aria-label="Aproximar / Zoom in">🔍+</button>
+    <button id="btMenos" class="mini" type="button" aria-label="Afastar / Zoom out">🔍−</button>
+    <button id="btTudo" class="mini" type="button" aria-label="Ver o labirinto inteiro / See the whole maze">⤢</button>
+  </div>
+  <p id="dica" class="dica-jogo" role="status" aria-live="polite" hidden></p>
+</section>
+
+<div id="fim" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
+  <div class="fim-caixa">
+    <h2 id="fimTitulo" data-t="Você conseguiu!|You did it!"></h2>
+    <p id="fimEstrelas" class="fim-estrelas" aria-label=""></p>
+    <p id="fimTexto" class="fim-texto"></p>
+    <div class="fim-botoes">
+      <button id="btDeNovo" class="grande" type="button" data-t="🔄 Outro labirinto|🔄 Another maze"></button>
+      <button id="btMaisDificil" class="medio" type="button" data-t="⬆ Mais difícil|⬆ Harder"></button>
+      <button id="btFimMenu" class="medio" type="button" data-t="🏠 Menu|🏠 Menu"></button>
+    </div>
+  </div>
+</div>
+
+<section id="desligado" class="tela" hidden>
+  <h2 data-t="O Labirinto está descansando agora.|The Maze is resting right now."></h2>
+</section>
+
+<script src="gerador.js"></script>
+<script src="regras.js"></script>
+<script src="desenho.js"></script>
+<script src="som.js"></script>
+<script src="../recursos.js" data-app="feature-tester" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
