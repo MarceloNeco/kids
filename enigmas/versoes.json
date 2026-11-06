@@ -1,0 +1,20 @@
+{
+  "app": "enigmas",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "06/Nov/2026",
+      "hora": "08:25:41",
+      "pt": [
+        "🧩 Primeira versão dos Enigmas de Ligar: ligue cada desenho da esquerda ao da direita que combina com ele, com risco de giz na lousa verde.",
+        "Três níveis: Fácil (3 a 5 anos, 3 ou 4 pares, 36 enigmas), Médio (5 a 7 anos, 5 pares, 33 enigmas) e Difícil (7 anos ou mais, 6 ou 7 pares, 33 enigmas com adivinhas, causa e efeito, parte e todo, sequências, contas e rimas). Os enigmas vêm misturados e só repetem depois de passar por todos.",
+        "Arrastar o dedo de um desenho ao outro ou tocar num e depois no outro (teclado: setas e Enter). Acertou, o risco fica e toca um sino; errou, o desenho balança e o risco se apaga. Estrelas por enigma, 💡 mostra um par, voz lê as palavras, música baixinha, funciona sem internet e dá para instalar."
+      ],
+      "en": [
+        "🧩 First version of Linking Puzzles: link each picture on the left to the one on the right that goes with it, with chalk lines on a green chalkboard.",
+        "Three levels: Easy (ages 3–5, 3 or 4 pairs, 36 puzzles), Medium (ages 5–7, 5 pairs, 33 puzzles) and Hard (ages 7+, 6 or 7 pairs, 33 puzzles with riddles, cause and effect, part and whole, sequences, sums and rhymes). Puzzles come shuffled and only repeat after you have done them all.",
+        "Drag your finger from one picture to the other, or tap one and then the other (keyboard: arrows and Enter). Right: the line stays and a bell rings; wrong: the picture wobbles and the line rubs out. Stars per puzzle, 💡 shows a pair, a voice reads the words, soft music, works offline and can be installed."
+      ]
+    }
+  ]
+}

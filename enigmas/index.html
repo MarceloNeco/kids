@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Enigmas de Ligar — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#1d3b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Ligue cada desenho ao que combina com ele, com risco de giz na lousa. Três níveis, do Fácil ao Difícil. / Link each picture to the one that goes with it, with chalk lines on a chalkboard. Three levels, from Easy to Hard.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Enigmas de Ligar — brincadeira da família Bolinho de Chuva (SolverONE). Ligar a coluna da esquerda com a da
+  direita, como as filhas do dono faziam na lousa. Sem login, sem banco, sem cookie: o progresso fica no aparelho.
+  Nada de script inline: a CSP acima não permite. Mapa dos arquivos: LEIA-ME.md.
+  Versão: APP_VERSION em app.js, VERSAO em sw.js e a primeira entrada de versoes.json.
+-->
+</head>
+<body>
+
+<section id="inicio" class="tela ativa" data-recurso="enigmas">
+  <div class="faixa">
+    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
+    <button id="btEfeitos" class="mini" type="button" aria-pressed="true" aria-label="Sons / Sounds">🔔</button>
+    <button id="btVoz" class="mini" type="button" aria-pressed="true" aria-label="Voz / Voice">🗣️</button>
+  </div>
+  <h1 class="titulo" aria-label="Enigmas de Ligar"><span class="t1" data-t="Enigmas|Linking"></span> <span class="t2" data-t="de Ligar|Puzzles"></span></h1>
+  <p class="sub" data-t="Ligue cada desenho ao que combina com ele|Link each picture to the one that goes with it"></p>
+
+  <div class="niveis">
+    <button id="btFacil" class="nivel facil" type="button" data-nivel="facil">
+      <span class="n-emo" aria-hidden="true">🐣</span>
+      <span class="n-nome" data-t="Fácil|Easy"></span>
+      <span class="n-idade" data-t="3 a 5 anos · 3 ou 4 pares|ages 3–5 · 3 or 4 pairs"></span>
+      <span class="n-prog" id="progFacil"></span>
+    </button>
+    <button id="btMedio" class="nivel medio" type="button" data-nivel="medio">
+      <span class="n-emo" aria-hidden="true">🦊</span>
+      <span class="n-nome" data-t="Médio|Medium"></span>
+      <span class="n-idade" data-t="5 a 7 anos · 5 pares|ages 5–7 · 5 pairs"></span>
+      <span class="n-prog" id="progMedio"></span>
+    </button>
+    <button id="btDificil" class="nivel dificil" type="button" data-nivel="dificil">
+      <span class="n-emo" aria-hidden="true">🦉</span>
+      <span class="n-nome" data-t="Difícil|Hard"></span>
+      <span class="n-idade" data-t="7 anos ou mais · 6 ou 7 pares|ages 7+ · 6 or 7 pairs"></span>
+      <span class="n-prog" id="progDificil"></span>
+    </button>
+  </div>
+
+  <div class="como">
+    <h2 data-t="Como brincar|How to play"></h2>
+    <ol>
+      <li data-t="Arraste o dedo de um desenho da esquerda até o desenho da direita que combina com ele.|Drag your finger from a picture on the left to the picture on the right that goes with it."></li>
+      <li data-t="Ou toque num desenho e depois no outro. No teclado: setas e Enter.|Or tap one picture and then the other. On a keyboard: arrows and Enter."></li>
+      <li data-t="Acertou? O risco de giz fica. Errou? Ele se apaga sozinho, é só tentar de novo!|Got it? The chalk line stays. Missed? It rubs itself out, just try again!"></li>
+      <li data-t="Ligou tudo? Ganha estrelas ⭐ e vem o próximo enigma. 💡 mostra um par quando ficar difícil.|Linked them all? You earn stars ⭐ and the next puzzle comes. 💡 shows one pair when it gets tricky."></li>
+    </ol>
+  </div>
+  <div class="rodape">
+    <button id="btInstalar" class="mini largo" type="button" hidden data-t="📲 Instalar|📲 Install"></button>
+    <button id="btZerar" class="mini largo" type="button" data-t="↺ Começar do zero|↺ Start over"></button>
+  </div>
+  <p class="versao"><span data-t="Versão|Version"></span> <span id="versao"></span> · <a href="CREDITOS.md" target="_blank" rel="noopener" data-t="créditos|credits"></a></p>
+</section>
+
+<section id="jogo" class="tela" data-recurso="enigmas">
+  <header class="topo">
+    <button id="btVoltar" class="mini" type="button" aria-label="Voltar aos níveis / Back to levels">🏠</button>
+    <div class="topo-meio">
+      <span id="nomeNivel" class="nome-nivel"></span>
+      <span id="contador" class="contador"></span>
+    </div>
+    <button id="btDica" class="mini" type="button" aria-label="Mostrar um par / Show one pair">💡</button>
+    <span id="estrelasTopo" class="estrelas-topo" aria-live="polite"></span>
+  </header>
+  <p id="pista" class="pista"></p>
+  <div id="lousa" class="lousa">
+    <div id="colEsq" class="coluna esq" role="group" aria-label="Esquerda / Left"></div>
+    <div id="colDir" class="coluna dir" role="group" aria-label="Direita / Right"></div>
+    <svg id="giz" class="giz" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="texturaGiz" x="-10%" y="-30%" width="120%" height="160%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="ruido"/>
+          <feColorMatrix in="ruido" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.1 1.35" result="furos"/>
+          <feComposite in="SourceGraphic" in2="furos" operator="in" result="riscado"/>
+          <feDisplacementMap in="riscado" in2="ruido" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+    </svg>
+  </div>
+  <p id="status" class="so-leitor" aria-live="polite"></p>
+</section>
+
+<script src="rodadas.js"></script>
+<script src="jogo.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../janela.js" data-fora-do-arquivo></script>
+<script src="../trilha.js" data-fora-do-arquivo></script>
+<script src="app.js"></script>
+</body>
+</html>
