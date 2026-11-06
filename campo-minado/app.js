@@ -3,7 +3,7 @@
    Guarda só neste aparelho (localStorage "campo-minado.pref"): idioma, sons e o melhor tempo de cada nível. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.0';
+  var APP_VERSION = '0.2.1';
   var APP_DATA = '06/Nov/2026';
   var CM = window.CampoMinado;
   var $ = function (id) { return document.getElementById(id); };
@@ -357,18 +357,20 @@
 
   // ---------- música (trilha comum dos jogos) ----------
   var M = '../rabiscolandia/musicas/', AU = 'Kevin MacLeod', LIC = 'CC BY';
+  // 0.2.1: saíram Pixel Peeker Polka (som de videogame) e seis arquivos que só tinham silêncio (Investigations, Sneaky
+  // Snitch, Local Forecast, Wallpaper, Carefree, Fluffing a Duck); entraram sete da mesma pasta, de instrumentos de verdade
   var MUSICAS = [
-    { a: M + 'investigations.mp3', t: 'Investigations', au: AU, lic: 'CC BY 4.0' },
-    { a: M + 'sneaky-snitch.mp3', t: 'Sneaky Snitch', au: AU, lic: 'CC BY 4.0' },
     { a: M + 'scheming-weasel.mp3', t: 'Scheming Weasel', au: AU, lic: LIC },
-    { a: M + 'pixel-peeker-polka.mp3', t: 'Pixel Peeker Polka', au: AU, lic: LIC },
-    { a: M + 'local-forecast-elevator.mp3', t: 'Local Forecast – Elevator', au: AU, lic: 'CC BY 4.0' },
-    { a: M + 'wallpaper.mp3', t: 'Wallpaper', au: AU, lic: 'CC BY 4.0' },
-    { a: M + 'carefree.mp3', t: 'Carefree', au: AU, lic: 'CC BY 4.0' },
-    { a: M + 'fluffing-a-duck.mp3', t: 'Fluffing a Duck', au: AU, lic: 'CC BY 4.0' },
     { a: M + 'music-to-delight.mp3', t: 'Music to Delight', au: AU, lic: LIC },
     { a: M + 'batty-mcfaddin.mp3', t: 'Batty McFaddin', au: AU, lic: LIC },
-    { a: M + 'life-of-riley.mp3', t: 'Life of Riley', au: AU, lic: 'CC BY 4.0' }
+    { a: M + 'life-of-riley.mp3', t: 'Life of Riley', au: AU, lic: 'CC BY 4.0' },
+    { a: M + 'carpe-diem.mp3', t: 'Carpe Diem', au: AU, lic: LIC },
+    { a: M + 'mariachi-snooze.mp3', t: 'Mariachi Snooze', au: AU, lic: LIC },
+    { a: M + 'spazzmatica-polka.mp3', t: 'Spazzmatica Polka', au: AU, lic: LIC },
+    { a: M + 'airport-lounge.mp3', t: 'Airport Lounge', au: AU, lic: LIC },
+    { a: M + 'street-party.mp3', t: 'Street Party', au: AU, lic: 'CC BY 4.0' },
+    { a: M + 'sunflower-dance-party.mp3', t: 'Sunflower Dance Party', au: AU, lic: 'CC BY 4.0' },
+    { a: M + 'beachfront-celebration.mp3', t: 'Beachfront Celebration', au: AU, lic: 'CC BY 4.0' }
   ];
   if (window.Trilha) window.Trilha.iniciar({ jogo: 'campo-minado', musicas: MUSICAS, creditos: 'CREDITOS.md' });
 

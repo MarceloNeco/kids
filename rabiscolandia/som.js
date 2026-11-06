@@ -2,6 +2,8 @@
    Mesmo motor da Purpurina (som.js de lá), com músicas e timbres próprios para DESENHAR: alegres mas
    tranquilas, porque criança desenha por muito tempo. Quatro músicas compostas aqui (nenhuma copiada):
    caixinha de música, marimba, ukulele com assobio e um lo-fi fofo com sininhos.
+   Regra do dono (06/Nov/2026): com internet tocam só as músicas GRAVADAS (abaixo), nunca as feitas aqui; estas só
+   tocam sem internet quando nem a favorita guardada no aparelho está lá (ou onde não há <audio>).
    O navegador só deixa tocar depois de um toque: iniciar() é chamado no 1º toque.
    Música e efeitos têm volumes e botões separados; a música fica sempre mais baixinha que os efeitos.
    Carrega no Node sem quebrar (para os testes): nada de "document" no carregamento, e sem AudioContext
@@ -269,7 +271,7 @@
       var mu = MUSICAS[faixa], r = roteiro(faixa), casas = mu.tempos * 2, e = 30 / mu.bpm, pos = passo % casas;
       tocarColcheia(mu, r[Math.floor(passo / casas)], pos, prox + (pos % 2 ? mu.balanco * e : 0), e);
       passo++; prox += e;
-      if (passo >= r.length * casas) { passo = 0; volta++; parar(); if (soApp) { soApp = false; falhasSeguidas = 0; } setTimeout(avancar, 700); return; }   // acabou: a próxima da rádio (e as gravadas ganham outra chance)
+      if (passo >= r.length * casas) { passo = 0; volta++; parar(); setTimeout(avancar, 700); return; }   // acabou: a próxima da rádio (com internet de volta, as gravadas)
     }
   }
   function comecar() {
@@ -282,25 +284,26 @@
   }
   function parar() { if (timer) { clearInterval(timer); timer = null; } }
 
-  /* ---------- a rádio: músicas GRAVADAS de verdade (instrumentos de verdade, licença livre) intercaladas com as
-     feitas aqui pelo navegador. Pedido do dono (01/Nov/2026): "mais instrumentos, mais elaboradas, não Atari",
-     no clima do primeiro LittleBigPlanet, e "várias músicas". As 22 gravadas são do Kevin MacLeod (CC BY: o
-     crédito aparece na tela quando cada uma começa; detalhes em musicas/LICENCAS.md). Ordem: duas gravadas, uma
-     nossa, duas gravadas...
+  /* ---------- a rádio: músicas GRAVADAS de verdade (instrumentos de verdade, licença livre). Pedido do dono
+     (01/Nov/2026): "mais instrumentos, mais elaboradas, não Atari", no clima do primeiro LittleBigPlanet, e "várias
+     músicas". As 15 gravadas são do Kevin MacLeod (CC BY: o crédito aparece na tela quando cada uma começa; detalhes
+     em musicas/LICENCAS.md). Regra do dono (06/Nov/2026): com internet, todas as gravadas em ordem sorteada, a
+     favorita por último (Trilha.embaralhar do ../trilha.js), e nenhuma feita aqui no meio.
+     Fora desde 06/Nov/2026 (os arquivos continuam na pasta): Pixel Peeker Polka (som de videogame, "Atari") e seis
+     arquivos que só tinham silêncio depois do primeiro instante (Carefree, Fluffing a Duck, Investigations, Local
+     Forecast – Elevator, Sneaky Snitch e Wallpaper).
      À prova de travar (no celular do dono a música "dava um bip e travava"):
      - o navegador recusou tocar (precisa de um toque): tenta de novo no próximo toque na tela;
-     - o arquivo deu erro ou não anda em 12 s: pula para a próxima;
-     - 3 gravadas seguidas sem tocar (sem internet, por exemplo): segue só com as músicas do app.
-     - sem internet (ou gravada que não abre), antes de pular: a favorita guardada no aparelho (Carefree, Trilha.offline
-       do ../trilha.js, cache "bolinho-musicas"; guardada na primeira gravada que toca com internet). */
+     - o arquivo deu erro ou não anda em 12 s: a favorita guardada; sem ela, a próxima gravada (se nenhuma abre, silêncio);
+     - sem internet: só a favorita guardada no aparelho (Street Party, Trilha.offline, cache "bolinho-musicas"; guardada
+       na primeira gravada que toca com internet); sem ela, as músicas feitas aqui. */
   var K = 'Kevin MacLeod (incompetech.com)';
   function gr(arq, nome) { return { url: 'musicas/' + arq + '.mp3', nome: nome, autor: K, licenca: 'CC BY' }; }
   var GRAVADAS = [
-    gr('pixel-peeker-polka', 'Pixel Peeker Polka'), gr('carefree', 'Carefree'), gr('fluffing-a-duck', 'Fluffing a Duck'),
-    gr('airport-lounge', 'Airport Lounge'), gr('sneaky-snitch', 'Sneaky Snitch'), gr('music-to-delight', 'Music to Delight'),
-    gr('spazzmatica-polka', 'Spazzmatica Polka'), gr('local-forecast-elevator', 'Local Forecast – Elevator'), gr('carpe-diem', 'Carpe Diem'),
-    gr('scheming-weasel', 'Scheming Weasel'), gr('mariachi-snooze', 'Mariachi Snooze'), gr('wallpaper', 'Wallpaper'),
-    gr('gymnopedie-1', 'Gymnopédie nº 1 (Satie)'), gr('who-likes-to-party', 'Who Likes to Party'), gr('investigations', 'Investigations'),
+    gr('airport-lounge', 'Airport Lounge'), gr('music-to-delight', 'Music to Delight'),
+    gr('spazzmatica-polka', 'Spazzmatica Polka'), gr('carpe-diem', 'Carpe Diem'),
+    gr('scheming-weasel', 'Scheming Weasel'), gr('mariachi-snooze', 'Mariachi Snooze'),
+    gr('gymnopedie-1', 'Gymnopédie nº 1 (Satie)'), gr('who-likes-to-party', 'Who Likes to Party'),
     gr('batty-mcfaddin', 'Batty McFaddin'), gr('life-of-riley', 'Life of Riley'), gr('disco-lounge', 'Disco Lounge'),
     gr('street-party', 'Street Party'), gr('movement-proposition', 'Movement Proposition'), gr('sunflower-dance-party', 'Sunflower Dance Party'),
     gr('beachfront-celebration', 'Beachfront Celebration')
@@ -308,22 +311,45 @@
   var VOL_GRAVADA = 0.42;                      // as gravadas já vêm com o volume igualado; ficam abaixo dos efeitos
   var lista = [], atual = -1, audio = null, falhasSeguidas = 0, soApp = false, aoTrocar = null, aoAvisar = null;
   var vigia = null, ultimoT = -1, parado = 0, esperandoToque = false, jaFalhou = false, tentativa = 0, ultimoErro = '', gravadasOk = 0;
-  var guardouFavorita = false;
+  var guardouFavorita = false, sintN = 0, agora = null;   // agora: o nome do que toca no lugar (favorita ou do app)
   function temAudio() { return typeof Audio !== 'undefined' && typeof document !== 'undefined'; }
+  function semRede() { return typeof navigator !== 'undefined' && navigator.onLine === false; }
+  function trilha() { return typeof self !== 'undefined' && self.Trilha; }
   function montarLista() {
-    var grav = temAudio() ? GRAVADAS.map(function (g) { return { g: g }; }) : [], sint = MUSICAS.map(function (m, k) { return { s: k }; });
-    lista = [];
-    // três gravadas (instrumentos de verdade) para cada uma feita pelo app
-    while (grav.length || sint.length) {
-      for (var k = 0; k < 3 && grav.length; k++) lista.push(grav.shift());
-      if (sint.length) lista.push(sint.shift());
-    }
+    // sem <audio> (testes no Node): só as feitas aqui; com ele, só as gravadas, sorteadas e com a favorita por último
+    if (!temAudio()) { lista = MUSICAS.map(function (m, k) { return { s: k }; }); return; }
+    lista = GRAVADAS.map(function (g) { return { g: g }; });
+    if (trilha() && trilha().embaralhar) lista = trilha().embaralhar(lista, 'rabiscolandia', function (it) { return it.g.url; });
+  }
+  /* sem internet e sem a favorita guardada: uma das músicas feitas aqui (quando acaba, tenta de novo a rádio) */
+  function tocarApp() {
+    if (!querMusica || !ac || escondida) return;
+    pararVigia(); if (audio) { try { audio.pause(); } catch (e) { /* ok */ } }
+    if (!soApp) { soApp = true; avisar({ tipo: 'soApp', motivo: ultimoErro || 'offline' }); }
+    faixa = sintN++ % MUSICAS.length; passo = 0; agora = MUSICAS[faixa].nome;
+    if (aoTrocar) { try { aoTrocar(agora, null); } catch (e) { /* ok */ } }
+    prox = ac.currentTime + 0.12; comecar();
+  }
+  /* sem internet: só a favorita guardada no aparelho (em laço: quando acaba, a rádio tenta de novo e cai nela) */
+  function semInternet() {
+    var OFF = trilha() && trilha().offline, minha = ++tentativa;
+    if (!OFF || !audio) { tocarApp(); return; }
+    OFF.tocar(audio, OFF.FAVORITAS.rabiscolandia).then(function (ok) {
+      if (minha !== tentativa || !querMusica || escondida) return;
+      if (!ok) { tocarApp(); return; }
+      audio.removeAttribute('data-url');
+      var fav = GRAVADAS.filter(function (g) { return OFF.FAVORITAS.rabiscolandia.indexOf('/' + g.url) > 0; })[0];
+      if (fav) { agora = nomeDe({ g: fav }); if (aoTrocar) { try { aoTrocar(agora, fav); } catch (e) { /* ok */ } } }
+      jaFalhou = false; audio.volume = VOL_GRAVADA;
+      var p = audio.play(); vigiar();
+      if (p && p.catch) p.catch(function (e) { if (minha === tentativa && !(e && e.name === 'AbortError')) tocarApp(); });
+    });
   }
   function nomeDe(it) { return it.g ? it.g.nome + ' — ' + it.g.autor + ' (' + it.g.licenca + ')' : MUSICAS[it.s].nome; }
   function pararVigia() { if (vigia) { clearInterval(vigia); vigia = null; } }
   function pararTudo() { parar(); if (ac) calar(); pararVigia(); if (audio) { try { audio.pause(); } catch (e) { /* ok */ } } }
   function avisar(o) { if (aoAvisar) { try { aoAvisar(o); } catch (e) { /* ok */ } } }
-  /* uma gravada não tocou: conta, e depois de 3 seguidas fica só com as do app (até a pessoa pedir uma gravada) */
+  /* uma gravada não tocou: primeiro a favorita guardada; sem ela, a próxima gravada (sem internet: as do app) */
   function falhou(motivo) {
     if (jaFalhou) return;                      // erro e vigia juntos: conta uma vez só
     jaFalhou = true; pararVigia(); ultimoErro = motivo;
@@ -333,7 +359,7 @@
         if (minha !== tentativa) return;
         if (!ok) { seguirSemGravada(motivo); return; }
         var fav = GRAVADAS.filter(function (g) { return OFF.FAVORITAS.rabiscolandia.indexOf('/' + g.url) > 0; })[0];
-        if (fav && aoTrocar) { try { aoTrocar(nomeDe({ g: fav }), fav); } catch (e) { /* ok */ } }
+        if (fav) { agora = nomeDe({ g: fav }); if (aoTrocar) { try { aoTrocar(agora, fav); } catch (e) { /* ok */ } } }
         if (!querMusica || escondida) return;
         jaFalhou = false;
         var p = audio.play(); vigiar();
@@ -344,7 +370,9 @@
     seguirSemGravada(motivo);
   }
   function seguirSemGravada(motivo) {
-    if (++falhasSeguidas >= 3 && !soApp) { soApp = true; avisar({ tipo: 'soApp', motivo: motivo }); }
+    if (semRede()) { tocarApp(); return; }   // sem internet e sem a favorita: as do app
+    // com internet, nunca as do app: a próxima gravada; se nenhuma abre, silêncio
+    if (++falhasSeguidas >= lista.length) { pararTudo(); return; }
     if (querMusica && !escondida) avancar();
   }
   function pedirToque() {
@@ -366,7 +394,7 @@
         ultimoT = audio.currentTime; parado = 0;
         var OFF = typeof self !== 'undefined' && self.Trilha && self.Trilha.offline;   // tocou com internet: guarda a favorita
         if (OFF && !guardouFavorita && audio.currentTime > 1 && audio.src.indexOf('blob:') !== 0 && navigator.onLine !== false) { guardouFavorita = true; OFF.guardar(['rabiscolandia']); }
-        if (audio.currentTime > 2 && falhasSeguidas) falhasSeguidas = 0; if (audio.currentTime > 2 && ultimoT < 3.2) gravadasOk++; return;
+        if (audio.currentTime > 2 && (falhasSeguidas || soApp)) { falhasSeguidas = 0; soApp = false; } if (audio.currentTime > 2 && ultimoT < 3.2) gravadasOk++; return;
       }
       if (++parado >= 12) falhou('parada');      // 12 s sem andar (internet ruim, arquivo que não abre): próxima
     }, 1000);
@@ -376,14 +404,10 @@
     if (atual < 0) atual = 0;
     var it = lista[atual];
     if (!querMusica || !ac || escondida) return;
-    if (it.g && soApp) { avancar(); return; }
+    if (it.g && semRede()) { if (!audio) criarAudio(); semInternet(); return; }
     jaFalhou = false; var minha = ++tentativa;   // cada tentativa tem número: aviso atrasado de uma música velha não conta
     if (it.s != null) { faixa = it.s; prox = ac.currentTime + 0.12; comecar(); return; }
-    if (!audio) {
-      audio = new Audio(); audio.preload = 'auto';
-      audio.addEventListener('ended', function () { pararVigia(); avancar(); });
-      audio.addEventListener('error', function () { if (lista[atual] && lista[atual].g && audio.getAttribute('data-url') === lista[atual].g.url) falhou('erro ' + (audio.error ? audio.error.code : '')); });
-    }
+    if (!audio) criarAudio();
     if (audio.getAttribute('data-url') !== it.g.url) { audio.src = it.g.url; audio.setAttribute('data-url', it.g.url); }
     audio.volume = VOL_GRAVADA;
     var p;
@@ -398,13 +422,18 @@
       else { pararVigia(); ultimoErro = (e && e.name) || 'recusou'; pedirToque(); }
     });
   }
+  function criarAudio() {   // um único <audio> para todas as gravadas
+    audio = new Audio(); audio.preload = 'auto';
+    audio.addEventListener('ended', function () { pararVigia(); avancar(); });
+    audio.addEventListener('error', function () { if (lista[atual] && lista[atual].g && audio.getAttribute('data-url') === lista[atual].g.url) falhou('erro ' + (audio.error ? audio.error.code : '')); });
+  }
   function tocarItem(k, pedida) {
     if (!lista.length) montarLista();
     atual = ((k % lista.length) + lista.length) % lista.length;
     if (pedida) { soApp = false; falhasSeguidas = 0; }      // a pessoa escolheu: tenta de novo as gravadas
-    pararTudo(); passo = 0;
+    pararTudo(); passo = 0; agora = null;
     if (audio && lista[atual].g) { audio.removeAttribute('data-url'); }
-    if (aoTrocar && querMusica && !(lista[atual].g && soApp)) { try { aoTrocar(nomeDe(lista[atual]), lista[atual].g || null); } catch (e) { /* ok */ } }
+    if (aoTrocar && querMusica && !(lista[atual].g && semRede())) { try { aoTrocar(nomeDe(lista[atual]), lista[atual].g || null); } catch (e) { /* ok */ } }
     tocarAtual();
   }
   function avancar() { if (querMusica) tocarItem(atual + 1); }
@@ -422,12 +451,12 @@
   function anterior() { if (!lista.length) montarLista(); if (querMusica) tocarItem(atual - 1, true); else atual = (atual - 1 + lista.length) % lista.length; }
   /* escolher uma música da lista (chamado no toque: o navegador sempre deixa tocar) */
   function tocar(i) { querMusica = true; tocarItem(i, true); }
-  function nomeAtual() { return querMusica && ac && atual >= 0 ? nomeDe(lista[atual]) : ''; }
+  function nomeAtual() { return querMusica && ac && atual >= 0 ? agora || nomeDe(lista[atual]) : ''; }
   function listar() {
     if (!lista.length) montarLista();
     return lista.map(function (it, i) { return { i: i, nome: it.g ? it.g.nome : MUSICAS[it.s].nome, autor: it.g ? it.g.autor : '', gravada: !!it.g, atual: i === atual && querMusica }; });
   }
-  function estado() { return { tocando: querMusica, atual: atual, nome: nomeAtual(), soApp: soApp, falhas: falhasSeguidas, esperandoToque: esperandoToque, ultimoErro: ultimoErro, gravadasOk: gravadasOk, gravadaAgora: !!(lista[atual] && lista[atual].g), audio: audio ? { t: audio.currentTime, parado: audio.paused, erro: audio.error && audio.error.code, pronto: audio.readyState } : null }; }
+  function estado() { return { tocando: querMusica, atual: atual, nome: nomeAtual(), soApp: soApp, falhas: falhasSeguidas, esperandoToque: esperandoToque, ultimoErro: ultimoErro, gravadasOk: gravadasOk, gravadaAgora: !!(lista[atual] && lista[atual].g) && !timer, appAgora: !!timer, audio: audio ? { t: audio.currentTime, parado: audio.paused, erro: audio.error && audio.error.code, pronto: audio.readyState } : null }; }
 
   // página escondida (outra aba, tela apagada): silencia tudo; ao voltar, a música continua de onde parou
   function vigiarTela() {

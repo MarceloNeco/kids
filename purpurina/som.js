@@ -1,9 +1,11 @@
-/* Purpurina — música e sons. A "rádio" da Purpurina intercala músicas pop gravadas, de licença livre
-   (musicas/*.mp3, créditos em musicas/LICENCAS.md), com as 3 músicas feitas na hora pelo navegador
-   (WebAudio: sininhos, palmas e baixo dançante). Os efeitos também são feitos na hora.
+/* Purpurina — música e sons. A "rádio" da Purpurina toca músicas pop gravadas, de licença livre
+   (musicas/*.mp3, créditos em musicas/LICENCAS.md); as 3 músicas feitas na hora pelo navegador (WebAudio: sininhos,
+   palmas e baixo dançante) só tocam sem elas. Os efeitos também são feitos na hora.
    O navegador só deixa tocar depois de um toque: iniciar() é chamado no 1º botão.
-   Sem internet, a gravada que não abre dá lugar à favorita guardada no aparelho (Glitter Blast, Trilha.offline do
-   ../trilha.js, cache "bolinho-musicas"; guardada na primeira que toca com internet). */
+   Regra do dono (06/Nov/2026): com internet, todas as gravadas em ordem sorteada, a favorita por último
+   (Trilha.embaralhar do ../trilha.js). Sem internet, só a favorita guardada no aparelho (Funky One, Trilha.offline,
+   cache "bolinho-musicas"; guardada na primeira que toca com internet), mesmo que outras estejam no cache do jogo; sem
+   ela, as feitas pelo jogo. */
 (function (raiz) {
   'use strict';
   var ac = null, mestre = null, musGanho = null, ligado = true, musicaLigada = false, timer = null, prox = 0, passo = 0, faixa = 0;
@@ -115,13 +117,30 @@
     { url: 'musicas/beauty-flow.mp3', nome: 'Beauty Flow', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/voxel-revolution.mp3', nome: 'Voxel Revolution', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/c-funk.mp3', nome: 'C-Funk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/laserpack.mp3', nome: 'Laserpack', autor: 'Kevin MacLeod ft. DarkNES (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/shiny-tech.mp3', nome: 'Shiny Tech', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' }
   ];
-  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false;
-  // só as gravadas, em ordem; no arquivo baixado ou sem <audio> (não dá para tocar MP3): as feitas pelo jogo
+  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false, sintN = 0;
+  // só as gravadas, em ordem sorteada com a favorita por último; no arquivo baixado ou sem <audio> (não dá para tocar
+  // MP3): as feitas pelo jogo
   function montarLista() {
     lista = raiz.JOGO_EM_ARQUIVO || !raiz.Audio ? MUSICAS.map(function (m, k) { return { s: k }; }) : GRAVADAS.map(function (g) { return { g: g }; });
+    if (lista[0] && lista[0].g && raiz.Trilha && raiz.Trilha.embaralhar) lista = raiz.Trilha.embaralhar(lista, 'purpurina', function (it) { return it.g.url; });
+  }
+  // sem internet: só a favorita guardada no aparelho; sem ela, uma das feitas pelo jogo
+  function semInternet(it) {
+    var OFF = raiz.Trilha && raiz.Trilha.offline;
+    (OFF ? OFF.tocar(audio, OFF.FAVORITAS.purpurina) : Promise.resolve(false)).then(function (ok) {
+      if (!musicaLigada || lista[atual] !== it) return;
+      if (ok) {
+        var fav = GRAVADAS.filter(function (g) { return OFF.FAVORITAS.purpurina.indexOf('/' + g.url) > 0; })[0];
+        if (fav && aoTrocar) try { aoTrocar(nomeDe({ g: fav })); } catch (e) { /* ok */ }
+        var p = audio.play(); if (p && p.catch) p.catch(function () {});
+        return;
+      }
+      faixa = sintN++ % MUSICAS.length;
+      if (aoTrocar) try { aoTrocar(MUSICAS[faixa].nome); } catch (e) { /* ok */ }
+      sintLigar();
+    });
   }
   function nomeDe(it) { return it.g ? it.g.nome + ' — ' + it.g.autor + ' (' + it.g.licenca + ')' : MUSICAS[it.s].nome; }
   function pararTudo() { sintParar(); if (audio) audio.pause(); }
@@ -130,13 +149,15 @@
     atual = ((k % lista.length) + lista.length) % lista.length;
     var it = lista[atual];
     pararTudo();
-    if (aoTrocar) try { aoTrocar(nomeDe(it)); } catch (e) { /* ok */ }
+    var offline = it.g && raiz.navigator && raiz.navigator.onLine === false;
+    if (aoTrocar && !offline) try { aoTrocar(nomeDe(it)); } catch (e) { /* ok */ }
     if (!musicaLigada || !ac) return;
     if (it.s != null) { faixa = it.s; sintLigar(); falhas = 0; return; }
     if (!audio) {
       audio = new raiz.Audio(); audio.preload = 'auto';
       audio.addEventListener('ended', avancar);
     }
+    if (offline) { audio.volume = 0.75; audio.muted = !ligado; semInternet(it); return; }
     audio.src = it.g.url; audio.volume = 0.75; audio.muted = !ligado;
     var p = audio.play(), OFF = raiz.Trilha && raiz.Trilha.offline;
     function pular() { if (musicaLigada && lista[atual] === it && ++falhas < lista.length) avancar(); }
@@ -163,6 +184,7 @@
       if (atual < 0) { tocarItem(0); return; }
       var it = lista[atual];
       if (it.s != null) sintLigar();
+      else if (raiz.navigator && raiz.navigator.onLine === false) tocarItem(atual);   // sem internet: a favorita (ou a do jogo) de novo
       // a mesma música que estava pausada continua de onde parou; trocada enquanto estava sem música (⏭): começa
       else if (audio && audio.src && audio.src.indexOf(it.g.url) >= 0) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
       else tocarItem(atual);

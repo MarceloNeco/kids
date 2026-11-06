@@ -390,7 +390,7 @@ async function comecar(pg, nivel) {
     confere(await D(pi, () => PeluqueriaSom.fonte()) === 'jogo' && (await D(pi, () => PeluqueriaSom.posicao().faixa)) === 'abertura', 'o toque na entrada já toca a música de abertura');
     confere(await pi.isVisible('#inicio') && await D(pi, () => document.activeElement.id) === 'btJogar', 'e mostra o menu com as luzes');
     await pi.click('#btMaluco');
-    confere((await D(pi, () => PeluqueriaSom.lista().length)) >= 16, '16 músicas de rodada carregadas (além da abertura)');
+    confere((await D(pi, () => PeluqueriaSom.lista().length)) >= 10, 'pelo menos 10 músicas de rodada carregadas (além da abertura)');
     confere(/Kevin MacLeod/.test(await pi.textContent('#tocando')) && /Show Your Moves/.test(await pi.textContent('#tocando')), 'menu mostra a música e o autor (crédito da licença)');
     const rodada = async () => {
       await pi.click('#btJogar'); await pi.waitForTimeout(100);

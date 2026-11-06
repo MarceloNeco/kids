@@ -4,10 +4,11 @@
    Som.mudo(v) cala tudo (efeitos e música); Som.semMusica(v) liga/desliga só a música; Som.abaixar(v) baixa a
    música enquanto a voz explica (calibração).
    Música de verdade: as faixas de TRILHA (pasta musicas/, domínio público CC0 do FreePD, ver CREDITOS.md) tocam
-   por um <audio> ligado ao mesmo volume geral. Sem internet, com "economia de dados" ou se o arquivo falhar, toca
-   a versão sintetizada (FAIXAS) no lugar: nunca fica em silêncio. Antes da sintetizada, tenta a música favorita guardada no
-   aparelho (Going Bananas, Trilha.offline do ../trilha.js, cache "bolinho-musicas"), que é guardada na primeira música
-   que toca com internet. */
+   por um <audio> ligado ao mesmo volume geral, em ordem sorteada a cada vez que abre e com a favorita por último
+   (Trilha.embaralhar do ../trilha.js; regra do dono, 06/Nov/2026). Com internet, só as gravadas: se uma falha, tenta a
+   próxima (nunca a sintetizada). Sem internet: só a favorita guardada no aparelho (Going Bananas, Trilha.offline,
+   cache "bolinho-musicas", guardada na primeira música que toca com internet) e, sem ela, a versão sintetizada
+   (FAIXAS), para não ficar em silêncio. */
 (function (root) {
   'use strict';
   var AC = root.AudioContext || root.webkitAudioContext, ctx = null, master = null, mudo = false, loop = null, semMusica = false, desejada = null, baixo = false;
@@ -128,9 +129,10 @@
     { bpm: 128, tom: 3, ordem: [2, 1, 3, 0], batida: 'galope', lead: 'triangle', desloc: -2 },
     { bpm: 120, tom: 7, ordem: [0, 1, 3, 2], batida: 'reta', lead: 'sine', desloc: 1 }
   ];
-  // 0 = tela "Quem vai jogar" (um laço curto); as outras se revezam nas rodadas
-  var TRILHA = ['comic-game-loop-mischief', 'funshine', 'happy-whistling-ukulele', 'ukulele-song', 'going-bananas', 'llama-in-pajama',
-    'my-giant-bunny-friend', 'spring-chicken', 'wakka-wakka', 'hippety-hop', 'silly-boy', 'city-sunshine', 'bit-bit-loop'];
+  // 0 = tela "Quem vai jogar"; as outras se revezam nas rodadas. Fora desde 06/Nov/2026 (som de videogame, "Atari"):
+  // Comic Game Loop - Mischief e Bit Bit Loop (os arquivos continuam na pasta).
+  var TRILHA = ['funshine', 'happy-whistling-ukulele', 'ukulele-song', 'going-bananas', 'llama-in-pajama',
+    'my-giant-bunny-friend', 'spring-chicken', 'wakka-wakka', 'hippety-hop', 'silly-boy', 'city-sunshine'], sorteou = false;
   function volMusica() { return loop && loop.audio ? (baixo ? 0.18 : 0.6) : (baixo ? 0.14 : 0.42); }
   function parar() {
     if (!loop) return;
@@ -142,15 +144,16 @@
     if (!ctx) return;
     if (!ligar) { desejada = null; parar(); return; }
     desejada = (faixa >= 0 && faixa < TRILHA.length) ? faixa : 0;
+    if (!sorteou && root.Trilha && root.Trilha.embaralhar) { sorteou = true; TRILHA = root.Trilha.embaralhar(TRILHA, 'baguncolandia', function (n) { return 'musicas/' + n + '.mp3'; }); }
     if (semMusica) return;
     if (loop && loop.faixa === desejada) return;
     parar(); tocarArquivo(desejada);
   }
   function sintetica(fx) { return fx === 0 ? 0 : 1 + (fx - 1) % (FAIXAS.length - 1); }
-  function tocarArquivo(fx) {
-    var con = root.navigator && root.navigator.connection, semRede = root.navigator && root.navigator.onLine === false;
+  function tocarArquivo(fx, tentativas) {
+    var semRede = root.navigator && root.navigator.onLine === false;
     var OFF = root.Trilha && root.Trilha.offline, tentouFavorita = false, esperando = false;
-    if (!root.Audio || (semRede && !OFF) || (!semRede && con && con.saveData)) { tocarFaixa(sintetica(fx), fx); return; }
+    if (!root.Audio || (semRede && !OFF)) { tocarFaixa(sintetica(fx), fx); return; }
     var a, item;
     try {
       a = new root.Audio(); a.loop = true; a.preload = 'auto'; if (!semRede) a.src = 'musicas/' + TRILHA[fx] + '.mp3';
@@ -158,10 +161,12 @@
       item = { g: g, faixa: fx, audio: a, timer: 0 }; loop = item;
       g.gain.setTargetAtTime(volMusica(), ctx.currentTime, 0.6);
     } catch (e) { loop = null; tocarFaixa(sintetica(fx), fx); return; }
-    function sintetizada() {   // nem a favorita: a sintetizada entra no lugar, na mesma vez
+    function sintetizada() {   // nem a favorita: sem internet, a sintetizada entra no lugar; com internet, a próxima gravada
       if (loop !== item) return;
       loop = null; try { a.pause(); a.removeAttribute('src'); item.g.disconnect(); } catch (e) {}
-      tocarFaixa(sintetica(fx), fx);
+      if (root.navigator && root.navigator.onLine === false) { tocarFaixa(sintetica(fx), fx); return; }
+      var n = (tentativas || 0) + 1;
+      if (n < TRILHA.length) { tocarArquivo((fx + 1) % TRILHA.length, n); if (loop) loop.faixa = fx; }   // nenhuma abre: silêncio
     }
     function falhou() {   // sem internet ou arquivo com problema: primeiro a favorita guardada no aparelho
       if (loop !== item || esperando) return;

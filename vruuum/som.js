@@ -34,11 +34,12 @@
   }
 
   // ---------- música: a "rádio" do jogo ----------
-  /* Toca as 36 músicas gravadas (musicas/*.mp3: Kevin MacLeod e Anthem of Rain, CC BY 4.0, SuperTuxKart, CC BY-SA,
-     e HoliznaCC0, CC0; créditos em musicas/LICENCAS.md) e, de vez em quando, uma das de rock feitas pelo rock.js. Tocam sem parar, uma depois da outra.
-     Sem a gravada (sem internet e ainda não guardada, ou no arquivo baixado), toca a favorita guardada no aparelho
-     (Kart Grand Prix, Trilha.offline do ../trilha.js, cache "bolinho-musicas"; guardada na primeira que toca com
-     internet) e, sem ela, pula para a próxima.
+  /* Regra do dono (06/Nov/2026): com internet, só as 35 músicas gravadas (musicas/*.mp3: Kevin MacLeod e Anthem of
+     Rain, CC BY 4.0, SuperTuxKart, CC BY-SA, e HoliznaCC0, CC0; créditos em musicas/LICENCAS.md), sem parar, em ordem
+     sorteada e com a favorita por último (Trilha.embaralhar do ../trilha.js). Sem internet, só a favorita guardada no
+     aparelho (Kart Grand Prix, Trilha.offline, cache "bolinho-musicas"; guardada na primeira que toca com internet),
+     mesmo que outras estejam no cache do jogo; sem ela, as de rock feitas pelo rock.js. No arquivo baixado (sem MP3),
+     só as do rock.js. Fora desde 06/Nov/2026: RetroFuture Nasty (sintetizador com som de videogame).
      Um único <audio> para tudo (o iPhone só deixa tocar o elemento que já tocou depois de um toque). */
   var GRAVADAS = [
     { url: 'musicas/volatile-reaction.mp3', nome: 'Volatile Reaction', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
@@ -53,7 +54,6 @@
     { url: 'musicas/ready-aim-fire.mp3', nome: 'Ready Aim Fire', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/summon-the-rawk.mp3', nome: 'Summon the Rawk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/noise-attack.mp3', nome: 'Noise Attack', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/retrofuture-nasty.mp3', nome: 'RetroFuture Nasty', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/hotrock.mp3', nome: 'Hotrock', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/neolith.mp3', nome: 'Neolith', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/iron-bacon.mp3', nome: 'Iron Bacon', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
@@ -81,19 +81,33 @@
     { url: 'musicas/gearhead.mp3', nome: 'Gearhead', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/bet-you-can-2.mp3', nome: 'Bet You Can (ver 2)', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' }
   ];
-  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false;
-  // as gravadas em ordem sorteada (cada vez que abre o jogo começa por uma diferente) e, de 8 em 8 gravadas,
-  // uma das 3 feitas pelo jogo (sem gravadas, como no arquivo baixado: só as do jogo)
+  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false, sintN = 0;
+  // as gravadas em ordem sorteada (cada vez que abre o jogo começa por uma diferente), a favorita por último;
+  // sem gravadas (arquivo baixado): só as 3 feitas pelo jogo
   function montarLista() {
-    var semGravadas = !!raiz.JOGO_EM_ARQUIVO || !raiz.Audio;
     var sint = raiz.VruuumRock ? raiz.VruuumRock.MUSICAS.map(function (m, k) { return { s: k, nome: m.nome, autor: 'Vruuum!', licenca: '' }; }) : [];
-    var grav = semGravadas ? [] : GRAVADAS.map(function (g) { return { g: g }; });
+    if (raiz.JOGO_EM_ARQUIVO || !raiz.Audio) { lista = sint; return; }
+    var grav = GRAVADAS.map(function (g) { return { g: g }; }), T = raiz.Trilha;
+    if (T && T.embaralhar) { lista = T.embaralhar(grav, 'vruuum', function (it) { return it.g.url; }); return; }
     for (var k = grav.length - 1; k > 0; k--) { var r = Math.floor(Math.random() * (k + 1)), tmp = grav[k]; grav[k] = grav[r]; grav[r] = tmp; }
-    lista = [];
-    while (grav.length || sint.length) {
-      for (var q = 0; q < 8 && grav.length; q++) lista.push(grav.shift());
-      if (sint.length) lista.push(sint.shift());
-    }
+    lista = grav;
+  }
+  // sem internet: só a favorita guardada no aparelho; sem ela, uma das feitas pelo rock.js; sem elas, silêncio
+  function semInternet(it) {
+    var OFF = raiz.Trilha && raiz.Trilha.offline;
+    (OFF ? OFF.tocar(audio, OFF.FAVORITAS.vruuum) : Promise.resolve(false)).then(function (ok) {
+      if (!musicaLigada || lista[atual] !== it) return;
+      if (ok) {
+        var fav = GRAVADAS.filter(function (g) { return OFF.FAVORITAS.vruuum.indexOf('/' + g.url) > 0; })[0];
+        if (fav && aoTrocar) aoTrocar(info({ g: fav }));
+        var p = audio.play(); if (p && p.catch) p.catch(function () {});
+        return;
+      }
+      var R = raiz.VruuumRock; if (!R || !R.MUSICAS.length) return;
+      var k = sintN++ % R.MUSICAS.length;
+      if (aoTrocar) aoTrocar({ nome: R.MUSICAS[k].nome, autor: 'Vruuum!', licenca: '' });
+      R.aoFim = avancar; R.comecar(k);
+    });
   }
   function info(item) { return item.g ? { nome: item.g.nome, autor: item.g.autor, licenca: item.g.licenca } : { nome: item.nome, autor: item.autor, licenca: item.licenca }; }
   function pararTudo() { if (raiz.VruuumRock) raiz.VruuumRock.desligar(); if (audio) audio.pause(); }
@@ -103,13 +117,15 @@
     atual = ((k % lista.length) + lista.length) % lista.length;
     var it = lista[atual];
     pararTudo();
-    if (aoTrocar) aoTrocar(info(it));
+    var offline = it.g && raiz.navigator && raiz.navigator.onLine === false;
+    if (aoTrocar && !offline) aoTrocar(info(it));
     if (!musicaLigada) return;
     if (it.s != null) { raiz.VruuumRock.aoFim = avancar; raiz.VruuumRock.comecar(it.s); falhas = 0; return; }
     if (!audio) {
       audio = new raiz.Audio(); audio.preload = 'auto';
       audio.addEventListener('ended', avancar);   // se o arquivo não carregar, o play() falha e pula (abaixo)
     }
+    if (offline) { audio.volume = 0.8; audio.muted = !ligado; semInternet(it); return; }
     audio.src = it.g.url; audio.volume = 0.8; audio.muted = !ligado;
     var p = audio.play(), OFF = raiz.Trilha && raiz.Trilha.offline;
     function pular() { if (musicaLigada && lista[atual] === it && ++falhas < lista.length) avancar(); }
@@ -136,6 +152,7 @@
       if (atual < 0) { tocarItem(0); return; }
       var it = lista[atual];
       if (it.s != null) raiz.VruuumRock.ligar();
+      else if (raiz.navigator && raiz.navigator.onLine === false) tocarItem(atual);   // sem internet: a favorita (ou a do rock.js) de novo
       else if (audio) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
     } else if (!liga && musicaLigada) { musicaLigada = false; pararTudo(); }
   }

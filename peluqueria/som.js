@@ -1,12 +1,13 @@
 /* Peluqueria — música e efeitos.
    MÚSICA (v0.5.0): músicas GRAVADAS, de verdade, com licença aberta — Kevin MacLeod (incompetech.com),
    CC BY 4.0 (créditos no menu e no CREDITOS.md). A lista fica em musicas/musicas.json: uma é a abertura (toca em
-   laço no menu) e as outras tocam uma por rodada, embaralhadas, emendando quando uma acaba. O arquivo é tocado
+   laço no menu) e as outras tocam uma por rodada, embaralhadas, emendando quando uma acaba; a favorita (a de sem
+   internet) fica sempre no fim da volta (regra do dono, 06/Nov/2026). O arquivo é tocado
    pelo navegador (<audio>) e passa pelo WebAudio só para o volume e o "mudo" (no iPhone o volume do <audio> não
    muda). Ao sair da página, a música e os efeitos param NA HORA (pausa + contexto suspenso) e voltam de onde
-   pararam. Arquivo que não carrega é pulado, sem erro. Sem internet, a que não abre dá lugar à favorita guardada no
-   aparelho (Funky Chunk, Trilha.offline do ../trilha.js, cache "bolinho-musicas"), em laço; ela é guardada na primeira
-   música que toca com internet.
+   pararam. Arquivo que não carrega é pulado, sem erro. Sem internet toca só a favorita guardada no aparelho (Funky
+   Chunk, Trilha.offline do ../trilha.js, cache "bolinho-musicas"), em laço — mesmo que outras estejam no cache do jogo;
+   sem ela, silêncio. A favorita é guardada na primeira música que toca com internet.
    EFEITOS: curtos e sintetizados no WebAudio (acerto, erro, contagem). O "u-huuu!" do PERFEITO (v0.6.0) é
    GRAVADO: voz de verdade + torcida (efeitos/uhul-1.mp3 e uhul-2.mp3, créditos no CREDITOS.md); se o arquivo
    não carregar, cai na torcida sintetizada.
@@ -18,7 +19,7 @@
   var Ctx = root.AudioContext || root.webkitAudioContext;
   var ctx = null, mestre = null, ruido = null, ganhoMusica = null, mudo = false;
   var VOLUME = 0.8, VOLUME_MUSICA = 0.75;
-  var abertura = null, lista = [], ordem = [], ponteiro = -1, ruins = {}, forcada = null;
+  var abertura = null, lista = [], ordem = [], ponteiro = -1, ruins = {}, forcada = null, favNoFim = false;
   var player = null, atual = null, tipo = 'abertura', faixa = -1, tocando = false, fonte = '';
   var pulso = 0, batidas = [], trocas = [];
   var registro = TESTE ? [] : null;
@@ -174,6 +175,16 @@
   }
   function tocar(entrada, emLaco) {
     ligarPlayer();
+    var OFF = root.Trilha && root.Trilha.offline;
+    if (OFF && root.navigator.onLine === false) {   // sem internet: só a favorita guardada, em laço; sem ela, silêncio
+      var fav = lista.filter(function (o) { return OFF.FAVORITAS.peluqueria === new URL('musicas/' + o.arquivo, root.location.href).href; })[0];
+      try { player.pause(); } catch (e) {}
+      OFF.tocar(player, OFF.FAVORITAS.peluqueria).then(function (ok) {
+        if (!ok || !fav) { parar(); return; }
+        atual = fav; faixa = lista.indexOf(fav); player.loop = true; retomar(); avisarTroca();
+      });
+      return;
+    }
     atual = entrada; faixa = tipo === 'jogo' ? lista.indexOf(entrada) : -1;
     player.loop = !!emLaco;
     player.src = 'musicas/' + entrada.arquivo;
@@ -188,6 +199,12 @@
   }
   function proximaJogo() {
     if (!lista.length) return;
+    if (!favNoFim) {   // a favorita no fim da volta (o ../trilha.js carrega depois deste arquivo)
+      favNoFim = true;
+      var F = root.Trilha && root.Trilha.offline && root.Trilha.offline.FAVORITAS.peluqueria;
+      var eFav = function (k) { return !!F && F === new URL('musicas/' + lista[k].arquivo, root.location.href).href; };
+      ordem = ordem.filter(function (k) { return !eFav(k); }).concat(ordem.filter(eFav));
+    }
     var entrada = null;
     if (forcada) { entrada = forcada; forcada = null; }
     else for (var k = 0; k < lista.length && !entrada; k++) {

@@ -6,11 +6,11 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.2.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.2.1 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.2.0'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(a, '0.2.1'); assert.equal(a, s); assert.equal(v.versao, a);
   assert.equal(v.data, '06/Nov/2026');
   assert.match(ler('app.js'), /APP_DATA = '06\/Nov\/2026'/);
   for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);

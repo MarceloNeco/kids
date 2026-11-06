@@ -64,6 +64,7 @@ test('músicas gravadas: arquivo existe, crédito e licença, e o sw.js guarda t
     assert.ok(lic.includes(u.replace('musicas/', '')), 'sem crédito: ' + u);
     assert.ok(swMus.includes(u), 'sw.js não guarda ' + u);
   }
-  for (const f of fs.readdirSync(path.join(pasta, 'musicas'))) if (f.endsWith('.mp3')) assert.ok(urls.includes('musicas/' + f), 'mp3 sem uso: ' + f);
+  const FORA = ['retrofuture-nasty.mp3'];   // fora da rádio desde 1.10.3 (som de videogame); o arquivo continua na pasta
+  for (const f of fs.readdirSync(path.join(pasta, 'musicas'))) if (f.endsWith('.mp3') && !FORA.includes(f)) assert.ok(urls.includes('musicas/' + f), 'mp3 sem uso: ' + f);
   assert.match(lic, /CC BY-SA/);
 });
