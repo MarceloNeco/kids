@@ -292,7 +292,7 @@
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(xd, chao + 4, A * 0.22 * Math.max(0.3, 1 + y / A * 0.6), A * 0.06, 0, 0, 6.2832); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(xd, chao + y); ctx.scale(1 + (1 - av.ag) * 0.35, av.ag);
     if (jg.invencivel && !pose && Math.floor(ts / 90) % 2) ctx.globalAlpha = 0.45;
-    root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose });
+    root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose, costas: !!(V && V.costas && !pose) });
     ctx.restore();
     ctx.save(); ctx.font = '600 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillStyle = cor; sombra(ctx, 'rgba(0,0,0,.8)', 6);
     ctx.fillText(D.nomes[j] || '', xd, chao + y - A * 1.02 * av.ag - 6); ctx.restore();
