@@ -9,6 +9,8 @@
   - Cada música baixa só quando vai tocar (preload="none").
   - Lembra em que música parou (localStorage, com proteção para quando não houver).
   - Tela de bloqueio do celular mostra a música e os botões (Media Session).
+  - Sem internet (ou se a música não abre): toca em laço a favorita da estante, guardada no aparelho pelo
+    Trilha.offline (trilha.js, carregado antes deste arquivo). Com internet, ela é guardada na primeira música que toca.
 */
 (function () {
   // Rock alegre e leve, para criança: tom maior, pouca distorção (medido em cada faixa antes de entrar).
@@ -38,6 +40,7 @@
   var audio = new Audio();
   audio.preload = 'none';
   audio.volume = 0.8;
+  var OFF = window.Trilha && window.Trilha.offline, FAV = OFF && OFF.FAVORITAS.estante, naFavorita = false, guardou = false;
 
   var css = '' +
     'body{padding-bottom:7.5rem!important}' +
@@ -122,7 +125,7 @@
   function tocar(n) {
     atual = (n + MUSICAS.length) % MUSICAS.length;
     gravar(atual);
-    comecou = true;
+    comecou = true; naFavorita = false; audio.loop = false;
     audio.src = '/kids/musicas/' + MUSICAS[atual].a + '.mp3';
     mostrar();
     var p = audio.play();
@@ -142,14 +145,36 @@
 
   audio.addEventListener('play', botaoPlay);
   audio.addEventListener('pause', botaoPlay);
-  audio.addEventListener('playing', function () { falhas = 0; });
+  audio.addEventListener('playing', function () {
+    falhas = 0;
+    if (OFF && !guardou && !naFavorita && navigator.onLine !== false) { guardou = true; OFF.guardar(['estante']); }   // guarda a favorita
+  });
   audio.addEventListener('ended', function () { tocar(atual + 1); });
-  // Música que não abriu (sem internet, arquivo faltando): pula para a próxima, sem ficar em laço.
-  audio.addEventListener('error', function () {
-    if (!comecou) return;
+  // Sem internet: a favorita guardada no aparelho, em laço (blob: do arquivo inteiro).
+  function favorita() {
+    if (!FAV) return Promise.resolve(false);
+    return OFF.tocar(audio, FAV).then(function (ok) {
+      if (ok) {
+        naFavorita = true; audio.loop = true; comecou = true;
+        for (var i = 0; i < MUSICAS.length; i++) if (FAV.indexOf('/musicas/' + MUSICAS[i].a + '.mp3') > 0) atual = i;
+        mostrar();
+      }
+      return ok;
+    });
+  }
+  function pular() {
     falhas++;
     if (falhas < MUSICAS.length) tocar(atual + 1);
     else { autor.textContent = 'Sem internet para tocar agora. / No connection.'; botaoPlay(); }
+  }
+  // Música que não abriu (sem internet, arquivo faltando): a favorita guardada; sem ela, pula para a próxima, sem ficar em laço.
+  audio.addEventListener('error', function () {
+    if (!comecou) return;
+    if (naFavorita || !FAV) { naFavorita = false; audio.loop = false; pular(); return; }
+    favorita().then(function (ok) {
+      if (!ok) { pular(); return; }
+      var p = audio.play(); if (p && p.catch) p.catch(function () { botaoPlay(); });
+    });
   });
 
   if ('mediaSession' in navigator) {
@@ -173,14 +198,18 @@
       ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { document.removeEventListener(t, noPrimeiroToque, true); });
       if (audio.paused && !pausouAntes()) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
     };
+    var comecar = function () {
+      var p0 = audio.play();
+      if (p0 && p0.catch) p0.catch(function (err) {
+        if (!err || err.name !== 'NotAllowedError' || esperando) return;
+        esperando = true;
+        ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { document.addEventListener(t, noPrimeiroToque, true); });
+      });
+    };
     comecou = true;
     audio.src = '/kids/musicas/' + MUSICAS[atual].a + '.mp3';
     mostrar();
-    var p0 = audio.play();
-    if (p0 && p0.catch) p0.catch(function (err) {
-      if (!err || err.name !== 'NotAllowedError' || esperando) return;
-      esperando = true;
-      ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { document.addEventListener(t, noPrimeiroToque, true); });
-    });
+    // sem internet ao abrir: a favorita já fica pronta antes do primeiro toque
+    if (FAV && navigator.onLine === false) favorita().then(comecar); else comecar();
   }
 })();

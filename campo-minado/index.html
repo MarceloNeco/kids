@@ -33,26 +33,27 @@
   <div id="ajuda" class="ajuda" hidden>
     <h2 data-t="Como brincar|How to play"></h2>
     <p data-t="🦔 Embaixo da grama dormem uns ouriços. Seu trabalho é abrir o jardim todo sem acordar nenhum!|🦔 Some hedgehogs are sleeping under the grass. Your job is to open the whole garden without waking any of them!"></p>
-    <p data-t="👆 Toque numa grama para abrir. O primeiro toque é sempre seguro e abre um pedaço grande.|👆 Tap a patch of grass to open it. The first tap is always safe and opens a big area."></p>
+    <p data-t="👆 Toque numa grama para abrir. O primeiro toque nunca acorda um ouriço: no Fácil ele abre um pedacinho do jardim; no Médio e no Difícil, muitas vezes mostra só um número.|👆 Tap a patch of grass to open it. The first tap never wakes a hedgehog: on Easy it opens a little piece of the garden; on Medium and Hard it often shows just one number."></p>
     <p data-t="🔢 O número conta quantos ouriços dormem nas casinhas em volta: dos lados, em cima, embaixo e nas diagonais.|🔢 The number tells how many hedgehogs sleep in the squares around it: sides, above, below and diagonals."></p>
     <p data-t="🚩 Achou um ouriço? Marque com a bandeirinha: ligue o botão 🚩 e toque, ou segure o dedo na grama. No computador, use o botão direito do mouse.|🚩 Found a hedgehog? Mark it with a flag: turn on the 🚩 button and tap, or hold your finger on the grass. On a computer, right-click."></p>
     <p data-t="⚡ Tocar num número que já tem todas as bandeirinhas em volta abre as outras casinhas de uma vez.|⚡ Tapping a number that already has all its flags around opens the other squares at once."></p>
-    <p data-t="🔍 Jardim grande? Use dois dedos ou os botões ➖ ➕ para chegar perto, e arraste para andar.|🔍 Big garden? Use two fingers or the ➖ ➕ buttons to zoom, and drag to move around."></p>
+    <p data-t="💡 No Fácil, se você ficar uns segundinhos pensando, as gramas que com certeza não têm ouriço piscam para ajudar. Qualquer toque apaga o pisca-pisca.|💡 On Easy, if you stop to think for a few seconds, the grass squares that surely have no hedgehog blink to help you. Any tap stops the blinking."></p>
+    <p data-t="🔍 O jardim todo cabe na tela. Quer ver de perto? Toque no 🔍 (toque de novo para ver tudo) ou use dois dedos, e arraste para andar.|🔍 The whole garden fits on the screen. Want a closer look? Tap 🔍 (tap again to see it all) or use two fingers, and drag to move around."></p>
   </div>
   <div class="niveis">
     <button id="btFacil" class="nivel facil" type="button" data-nivel="facil">
       <span class="n-nome" data-t="🌱 Fácil|🌱 Easy"></span>
-      <span class="n-info" data-t="8 × 8 · 8 ouriços|8 × 8 · 8 hedgehogs"></span>
+      <span class="n-info" data-t="8 × 8 · 10 ouriços|8 × 8 · 10 hedgehogs"></span>
       <span id="recFacil" class="n-rec"></span>
     </button>
     <button id="btMedio" class="nivel medio" type="button" data-nivel="medio">
       <span class="n-nome" data-t="🌷 Médio|🌷 Medium"></span>
-      <span class="n-info" data-t="10 × 14 · 22 ouriços|10 × 14 · 22 hedgehogs"></span>
+      <span class="n-info" data-t="10 × 14 · 25 ouriços|10 × 14 · 25 hedgehogs"></span>
       <span id="recMedio" class="n-rec"></span>
     </button>
     <button id="btDificil" class="nivel dificil" type="button" data-nivel="dificil">
       <span class="n-nome" data-t="🌳 Difícil|🌳 Hard"></span>
-      <span class="n-info" data-t="12 × 20 · 45 ouriços|12 × 20 · 45 hedgehogs"></span>
+      <span class="n-info" data-t="12 × 20 · 50 ouriços|12 × 20 · 50 hedgehogs"></span>
       <span id="recDificil" class="n-rec"></span>
     </button>
   </div>
@@ -67,10 +68,7 @@
     <button id="btNovo" class="mini rosto" type="button" data-rotulo="Começar de novo|Start over">🙂</button>
     <span class="placa"><span aria-hidden="true">⏱</span><span id="tempo">0</span></span>
     <button id="btModo" class="mini modo" type="button" aria-pressed="false" data-rotulo="Modo bandeirinha|Flag mode">🚩</button>
-    <span class="zoom">
-      <button id="btMenos" class="mini" type="button" data-rotulo="Afastar|Zoom out">➖</button>
-      <button id="btMais" class="mini" type="button" data-rotulo="Aproximar|Zoom in">➕</button>
-    </span>
+    <button id="btZoom" class="mini" type="button" aria-pressed="false" data-rotulo="Chegar perto (toque de novo para ver o jardim todo)|Zoom in (tap again to see the whole garden)">🔍</button>
   </div>
   <p id="dicaModo" class="dica-modo" aria-live="polite"></p>
   <div id="area" class="area">

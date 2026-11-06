@@ -8,6 +8,8 @@ quadriculado) é uma brincadeira antiga e de domínio comum.
 |---|---|---|
 | Fonte Fredoka (`../rabiscolandia/fontes/fredoka.woff2`) | Google Fonts (a mesma da Rabiscolândia e da Purpurina) | SIL Open Font License 1.1 (`../rabiscolandia/fontes/OFL.txt`) |
 | supabase-js (`../baguncolandia/libs/supabase.js`), só no jogo com amigos | Supabase | MIT (`../baguncolandia/libs/LICENSE-supabase.txt`) |
+| qrcode-generator 2.0.4 (`libs/qrcode.js`, desenha o QR do Jogar pertinho) | Kazuhiko Arase — https://github.com/kazuhikoarase/qrcode-generator (pacote npm, arquivo `dist/qrcode.js` sem alteração) | MIT (`libs/LICENSE-qrcode-generator.txt`). "QR Code" é marca registrada da DENSO WAVE INCORPORATED. |
+| jsQR 1.4.0 (`libs/jsQR.js`, lê o QR pela câmera quando o aparelho não tem leitor próprio) | Cosmo Wolfe — https://github.com/cozmo/jsQR (o mesmo arquivo do `leitor-ocr/libs/`, igual ao `dist/jsQR.js` do pacote npm) | Apache License 2.0 (`libs/LICENSE-jsQR.txt`) |
 | Efeitos sonoros (água, explosão, afundou, vitória…) | feitos na hora pelo aparelho (Web Audio), `som.js` | originais |
 
 ## Músicas (tocador comum `../trilha.js`)

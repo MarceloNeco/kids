@@ -1,7 +1,9 @@
 /* Purpurina — música e sons. A "rádio" da Purpurina intercala músicas pop gravadas, de licença livre
    (musicas/*.mp3, créditos em musicas/LICENCAS.md), com as 3 músicas feitas na hora pelo navegador
    (WebAudio: sininhos, palmas e baixo dançante). Os efeitos também são feitos na hora.
-   O navegador só deixa tocar depois de um toque: iniciar() é chamado no 1º botão. */
+   O navegador só deixa tocar depois de um toque: iniciar() é chamado no 1º botão.
+   Sem internet, a gravada que não abre dá lugar à favorita guardada no aparelho (Glitter Blast, Trilha.offline do
+   ../trilha.js, cache "bolinho-musicas"; guardada na primeira que toca com internet). */
 (function (raiz) {
   'use strict';
   var ac = null, mestre = null, musGanho = null, ligado = true, musicaLigada = false, timer = null, prox = 0, passo = 0, faixa = 0;
@@ -116,7 +118,7 @@
     { url: 'musicas/laserpack.mp3', nome: 'Laserpack', autor: 'Kevin MacLeod ft. DarkNES (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/shiny-tech.mp3', nome: 'Shiny Tech', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' }
   ];
-  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0;
+  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false;
   // só as gravadas, em ordem; no arquivo baixado ou sem <audio> (não dá para tocar MP3): as feitas pelo jogo
   function montarLista() {
     lista = raiz.JOGO_EM_ARQUIVO || !raiz.Audio ? MUSICAS.map(function (m, k) { return { s: k }; }) : GRAVADAS.map(function (g) { return { g: g }; });
@@ -136,9 +138,22 @@
       audio.addEventListener('ended', avancar);
     }
     audio.src = it.g.url; audio.volume = 0.75; audio.muted = !ligado;
-    var p = audio.play();
-    // sem o arquivo (sem internet e ainda não guardado): pula para a próxima
-    if (p && p.then) p.then(function () { falhas = 0; }).catch(function () { if (musicaLigada && ++falhas < lista.length) avancar(); });
+    var p = audio.play(), OFF = raiz.Trilha && raiz.Trilha.offline;
+    function pular() { if (musicaLigada && lista[atual] === it && ++falhas < lista.length) avancar(); }
+    // sem o arquivo (sem internet e ainda não guardado): a favorita guardada no aparelho; sem ela, a próxima
+    if (p && p.then) p.then(function () {
+      falhas = 0;
+      if (OFF && !guardouFavorita && raiz.navigator.onLine !== false) { guardouFavorita = true; OFF.guardar(['purpurina']); }
+    }).catch(function () {
+      if (!OFF || !musicaLigada) { pular(); return; }
+      OFF.tocar(audio, OFF.FAVORITAS.purpurina).then(function (ok) {
+        if (!musicaLigada || lista[atual] !== it) return;
+        if (!ok) { pular(); return; }
+        var fav = GRAVADAS.filter(function (g) { return OFF.FAVORITAS.purpurina.indexOf('/' + g.url) > 0; })[0];
+        if (fav && aoTrocar) try { aoTrocar(nomeDe({ g: fav })); } catch (e) { /* ok */ }
+        var p2 = audio.play(); if (p2 && p2.then) p2.then(function () { falhas = 0; }, pular);
+      });
+    });
   }
   function avancar() { tocarItem(atual + 1); }
   function musica(liga) {

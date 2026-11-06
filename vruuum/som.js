@@ -36,7 +36,9 @@
   // ---------- música: a "rádio" do jogo ----------
   /* Toca as 36 músicas gravadas (musicas/*.mp3: Kevin MacLeod e Anthem of Rain, CC BY 4.0, SuperTuxKart, CC BY-SA,
      e HoliznaCC0, CC0; créditos em musicas/LICENCAS.md) e, de vez em quando, uma das de rock feitas pelo rock.js. Tocam sem parar, uma depois da outra.
-     Sem a gravada (sem internet e ainda não guardada, ou no arquivo baixado), pula para a próxima.
+     Sem a gravada (sem internet e ainda não guardada, ou no arquivo baixado), toca a favorita guardada no aparelho
+     (Kart Grand Prix, Trilha.offline do ../trilha.js, cache "bolinho-musicas"; guardada na primeira que toca com
+     internet) e, sem ela, pula para a próxima.
      Um único <audio> para tudo (o iPhone só deixa tocar o elemento que já tocou depois de um toque). */
   var GRAVADAS = [
     { url: 'musicas/volatile-reaction.mp3', nome: 'Volatile Reaction', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
@@ -79,7 +81,7 @@
     { url: 'musicas/gearhead.mp3', nome: 'Gearhead', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/bet-you-can-2.mp3', nome: 'Bet You Can (ver 2)', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' }
   ];
-  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0;
+  var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false;
   // as gravadas em ordem sorteada (cada vez que abre o jogo começa por uma diferente) e, de 8 em 8 gravadas,
   // uma das 3 feitas pelo jogo (sem gravadas, como no arquivo baixado: só as do jogo)
   function montarLista() {
@@ -109,8 +111,22 @@
       audio.addEventListener('ended', avancar);   // se o arquivo não carregar, o play() falha e pula (abaixo)
     }
     audio.src = it.g.url; audio.volume = 0.8; audio.muted = !ligado;
-    var p = audio.play();
-    if (p && p.catch) p.then(function () { falhas = 0; }).catch(function () { if (musicaLigada && ++falhas < lista.length) avancar(); });
+    var p = audio.play(), OFF = raiz.Trilha && raiz.Trilha.offline;
+    function pular() { if (musicaLigada && lista[atual] === it && ++falhas < lista.length) avancar(); }
+    if (p && p.catch) p.then(function () {
+      falhas = 0;
+      if (OFF && !guardouFavorita && raiz.navigator.onLine !== false) { guardouFavorita = true; OFF.guardar(['vruuum']); }
+    }).catch(function () {
+      // sem internet: a favorita guardada no aparelho (blob:, o arquivo inteiro); sem ela, a próxima
+      if (!OFF || !musicaLigada) { pular(); return; }
+      OFF.tocar(audio, OFF.FAVORITAS.vruuum).then(function (ok) {
+        if (!musicaLigada || lista[atual] !== it) return;
+        if (!ok) { pular(); return; }
+        var fav = GRAVADAS.filter(function (g) { return OFF.FAVORITAS.vruuum.indexOf('/' + g.url) > 0; })[0];
+        if (fav && aoTrocar) aoTrocar(info({ g: fav }));
+        var p2 = audio.play(); if (p2 && p2.catch) p2.then(function () { falhas = 0; }, pular);
+      });
+    });
   }
   function avancar() { tocarItem(atual + 1); }
   function musica(liga) {

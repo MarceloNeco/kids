@@ -1,6 +1,6 @@
 // Músicas de verdade (Chromium, Playwright): node baguncolandia/teste/musica.test.js
 // Com internet tocam os arquivos de musicas/ (lobby e uma por rodada, sem repetir a anterior); sem internet toca a
-// sintetizada; 🎵 desliga e liga.
+// a favorita guardada no aparelho (Going Bananas, ../trilha.js) e, sem ela, a sintetizada; 🎵 desliga e liga.
 const { chromium } = require('playwright');
 const path=require('path'),http=require('http'),fs=require('fs');
 const raiz=path.resolve(__dirname,'..','..');
@@ -20,12 +20,22 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
  await pg.evaluate(()=>window.BaguncaApp.TVApp.comando({acao:'comecar'})); await pg.waitForFunction(()=>window.BaguncaApp.TVApp.tv.fase==='jogando',null,{timeout:15000}); await pg.waitForTimeout(2000);
  const st2=await pg.evaluate(()=>({arq:Som.tocandoArquivo(), f:window.BaguncaApp.TVApp.tv.faixa}));
  conf(st2.arq && st2.f!==st.f, 'rodada 2: outra música de verdade (faixa '+st2.f+'); arquivos pedidos: '+[...new Set(pedidos)].join(', '));
- // sem internet: a próxima rodada toca a sintetizada
+ // com internet, a favorita foi guardada no aparelho na primeira música
+ const guardada=await pg.waitForFunction(()=>caches.open('bolinho-musicas').then(c=>c.keys()).then(k=>k.some(r=>/going-bananas\.mp3$/.test(r.url))),null,{timeout:10000}).then(()=>true,()=>false);
+ conf(guardada, 'a favorita (going-bananas.mp3) ficou guardada no cache bolinho-musicas');
+ // sem internet: a próxima rodada toca a favorita guardada
  await ctx.setOffline(true);
  await pg.evaluate(()=>window.BaguncaApp.TVApp.comando({acao:'parar'})); await pg.waitForTimeout(400);
  await pg.evaluate(()=>window.BaguncaApp.TVApp.comando({acao:'comecar'})); await pg.waitForFunction(()=>window.BaguncaApp.TVApp.tv.fase==='jogando',null,{timeout:15000}); await pg.waitForTimeout(2500);
  st=await pg.evaluate(()=>({arq:Som.tocandoArquivo(), tem:Som.tocando()}));
- conf(!st.arq && st.tem, 'sem internet: toca a música sintetizada (não fica em silêncio)');
+ conf(st.arq && st.tem, 'sem internet: toca a música favorita guardada no aparelho');
+ // sem internet e sem a favorita (sem o ../trilha.js): a sintetizada
+ await pg.evaluate(()=>{ window.TrilhaGuardada=window.Trilha; window.Trilha=undefined; });
+ await pg.evaluate(()=>window.BaguncaApp.TVApp.comando({acao:'parar'})); await pg.waitForTimeout(400);
+ await pg.evaluate(()=>window.BaguncaApp.TVApp.comando({acao:'comecar'})); await pg.waitForFunction(()=>window.BaguncaApp.TVApp.tv.fase==='jogando',null,{timeout:15000}); await pg.waitForTimeout(2500);
+ st=await pg.evaluate(()=>({arq:Som.tocandoArquivo(), tem:Som.tocando()}));
+ conf(!st.arq && st.tem, 'sem internet e sem a favorita: toca a música sintetizada (não fica em silêncio)');
+ await pg.evaluate(()=>{ window.Trilha=window.TrilhaGuardada; });
  await ctx.setOffline(false);
  await pg.click('#localMusica'); await pg.waitForTimeout(300);
  conf(!(await pg.evaluate(()=>Som.tocando())), '🎵 desliga a música');

@@ -205,3 +205,17 @@ h2, h3 { margin: .2rem 0 .5rem; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
 }
+
+/* ---------- jogar pertinho (QR code) ---------- */
+.passos { list-style: none; margin: .4rem 0; padding: 0; display: grid; gap: .55rem; counter-reset: passo; }
+.passos li { display: grid; grid-template-columns: auto 1fr; gap: .6rem; align-items: center; padding: .5rem .7rem; border-radius: 16px; background: rgba(255,255,255,.07); counter-increment: passo; }
+.passos li::before { content: counter(passo); grid-row: span 2; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--amarelo); color: #2b1d00; font-weight: 700; }
+.passos .ilu { font-size: 1.9rem; line-height: 1; letter-spacing: .1em; }
+.qr-caixa { display: grid; place-items: center; margin: .6rem auto; }
+.qr { width: min(88vw, 62vh, 440px); height: auto; aspect-ratio: 1; background: #fff; border-radius: 12px; image-rendering: pixelated; box-shadow: 0 0 0 6px #fff, 0 10px 28px rgba(0,0,0,.45); }
+.camera-caixa { position: relative; width: min(94vw, 520px); aspect-ratio: 3 / 4; max-height: 62vh; margin: .5rem auto; border-radius: 18px; overflow: hidden; background: #000; }
+.camera { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mira-qr { position: absolute; inset: 14%; border: 4px solid var(--amarelo); border-radius: 18px; box-shadow: 0 0 0 999px rgba(0,0,0,.25); pointer-events: none; }
+.texto-codigo summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.texto-codigo textarea { width: 100%; min-height: 5rem; margin: .4rem 0; padding: .5rem; border-radius: 12px; border: 2px solid rgba(255,255,255,.2); background: rgba(0,0,0,.25); color: inherit; font: inherit; font-family: monospace; }
+.grande.cinza-g { background: rgba(255,255,255,.12); color: var(--texto); box-shadow: none; min-height: 60px; }

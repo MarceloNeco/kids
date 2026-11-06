@@ -290,7 +290,9 @@
      À prova de travar (no celular do dono a música "dava um bip e travava"):
      - o navegador recusou tocar (precisa de um toque): tenta de novo no próximo toque na tela;
      - o arquivo deu erro ou não anda em 12 s: pula para a próxima;
-     - 3 gravadas seguidas sem tocar (sem internet, por exemplo): segue só com as músicas do app. */
+     - 3 gravadas seguidas sem tocar (sem internet, por exemplo): segue só com as músicas do app.
+     - sem internet (ou gravada que não abre), antes de pular: a favorita guardada no aparelho (Carefree, Trilha.offline
+       do ../trilha.js, cache "bolinho-musicas"; guardada na primeira gravada que toca com internet). */
   var K = 'Kevin MacLeod (incompetech.com)';
   function gr(arq, nome) { return { url: 'musicas/' + arq + '.mp3', nome: nome, autor: K, licenca: 'CC BY' }; }
   var GRAVADAS = [
@@ -306,6 +308,7 @@
   var VOL_GRAVADA = 0.42;                      // as gravadas já vêm com o volume igualado; ficam abaixo dos efeitos
   var lista = [], atual = -1, audio = null, falhasSeguidas = 0, soApp = false, aoTrocar = null, aoAvisar = null;
   var vigia = null, ultimoT = -1, parado = 0, esperandoToque = false, jaFalhou = false, tentativa = 0, ultimoErro = '', gravadasOk = 0;
+  var guardouFavorita = false;
   function temAudio() { return typeof Audio !== 'undefined' && typeof document !== 'undefined'; }
   function montarLista() {
     var grav = temAudio() ? GRAVADAS.map(function (g) { return { g: g }; }) : [], sint = MUSICAS.map(function (m, k) { return { s: k }; });
@@ -324,6 +327,23 @@
   function falhou(motivo) {
     if (jaFalhou) return;                      // erro e vigia juntos: conta uma vez só
     jaFalhou = true; pararVigia(); ultimoErro = motivo;
+    var OFF = typeof self !== 'undefined' && self.Trilha && self.Trilha.offline, minha = tentativa;
+    if (OFF && audio && audio.src.indexOf('blob:') !== 0) {   // primeiro a favorita guardada no aparelho
+      OFF.tocar(audio, OFF.FAVORITAS.rabiscolandia, motivo === 'parada').then(function (ok) {
+        if (minha !== tentativa) return;
+        if (!ok) { seguirSemGravada(motivo); return; }
+        var fav = GRAVADAS.filter(function (g) { return OFF.FAVORITAS.rabiscolandia.indexOf('/' + g.url) > 0; })[0];
+        if (fav && aoTrocar) { try { aoTrocar(nomeDe({ g: fav }), fav); } catch (e) { /* ok */ } }
+        if (!querMusica || escondida) return;
+        jaFalhou = false;
+        var p = audio.play(); vigiar();
+        if (p && p.catch) p.catch(function (e) { if (minha === tentativa && !(e && e.name === 'AbortError')) { jaFalhou = false; falhou('favorita'); } });
+      });
+      return;
+    }
+    seguirSemGravada(motivo);
+  }
+  function seguirSemGravada(motivo) {
     if (++falhasSeguidas >= 3 && !soApp) { soApp = true; avisar({ tipo: 'soApp', motivo: motivo }); }
     if (querMusica && !escondida) avancar();
   }
@@ -342,7 +362,12 @@
     pararVigia(); ultimoT = -1; parado = 0;
     vigia = setInterval(function () {
       if (!audio || audio.paused || escondida) return;
-      if (audio.currentTime > ultimoT + 0.05) { ultimoT = audio.currentTime; parado = 0; if (audio.currentTime > 2 && falhasSeguidas) falhasSeguidas = 0; if (audio.currentTime > 2 && ultimoT < 3.2) gravadasOk++; return; }
+      if (audio.currentTime > ultimoT + 0.05) {
+        ultimoT = audio.currentTime; parado = 0;
+        var OFF = typeof self !== 'undefined' && self.Trilha && self.Trilha.offline;   // tocou com internet: guarda a favorita
+        if (OFF && !guardouFavorita && audio.currentTime > 1 && audio.src.indexOf('blob:') !== 0 && navigator.onLine !== false) { guardouFavorita = true; OFF.guardar(['rabiscolandia']); }
+        if (audio.currentTime > 2 && falhasSeguidas) falhasSeguidas = 0; if (audio.currentTime > 2 && ultimoT < 3.2) gravadasOk++; return;
+      }
       if (++parado >= 12) falhou('parada');      // 12 s sem andar (internet ruim, arquivo que não abre): próxima
     }, 1000);
   }

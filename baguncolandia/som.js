@@ -5,7 +5,9 @@
    música enquanto a voz explica (calibração).
    Música de verdade: as faixas de TRILHA (pasta musicas/, domínio público CC0 do FreePD, ver CREDITOS.md) tocam
    por um <audio> ligado ao mesmo volume geral. Sem internet, com "economia de dados" ou se o arquivo falhar, toca
-   a versão sintetizada (FAIXAS) no lugar: nunca fica em silêncio. */
+   a versão sintetizada (FAIXAS) no lugar: nunca fica em silêncio. Antes da sintetizada, tenta a música favorita guardada no
+   aparelho (Going Bananas, Trilha.offline do ../trilha.js, cache "bolinho-musicas"), que é guardada na primeira música
+   que toca com internet. */
 (function (root) {
   'use strict';
   var AC = root.AudioContext || root.webkitAudioContext, ctx = null, master = null, mudo = false, loop = null, semMusica = false, desejada = null, baixo = false;
@@ -146,22 +148,35 @@
   }
   function sintetica(fx) { return fx === 0 ? 0 : 1 + (fx - 1) % (FAIXAS.length - 1); }
   function tocarArquivo(fx) {
-    var con = root.navigator && root.navigator.connection;
-    if (!root.Audio || (root.navigator && root.navigator.onLine === false) || (con && con.saveData)) { tocarFaixa(sintetica(fx), fx); return; }
+    var con = root.navigator && root.navigator.connection, semRede = root.navigator && root.navigator.onLine === false;
+    var OFF = root.Trilha && root.Trilha.offline, tentouFavorita = false, esperando = false;
+    if (!root.Audio || (semRede && !OFF) || (!semRede && con && con.saveData)) { tocarFaixa(sintetica(fx), fx); return; }
     var a, item;
     try {
-      a = new root.Audio(); a.loop = true; a.preload = 'auto'; a.src = 'musicas/' + TRILHA[fx] + '.mp3';
+      a = new root.Audio(); a.loop = true; a.preload = 'auto'; if (!semRede) a.src = 'musicas/' + TRILHA[fx] + '.mp3';
       var g = ctx.createGain(); g.gain.value = 0.0001; ctx.createMediaElementSource(a).connect(g); g.connect(master);
       item = { g: g, faixa: fx, audio: a, timer: 0 }; loop = item;
       g.gain.setTargetAtTime(volMusica(), ctx.currentTime, 0.6);
     } catch (e) { loop = null; tocarFaixa(sintetica(fx), fx); return; }
-    function falhou() {   // sem internet ou arquivo com problema: a sintetizada entra no lugar, na mesma vez
+    function sintetizada() {   // nem a favorita: a sintetizada entra no lugar, na mesma vez
       if (loop !== item) return;
       loop = null; try { a.pause(); a.removeAttribute('src'); item.g.disconnect(); } catch (e) {}
       tocarFaixa(sintetica(fx), fx);
     }
+    function falhou() {   // sem internet ou arquivo com problema: primeiro a favorita guardada no aparelho
+      if (loop !== item || esperando) return;
+      if (!OFF || tentouFavorita) { sintetizada(); return; }
+      tentouFavorita = esperando = true;
+      OFF.tocar(a, OFF.FAVORITAS.baguncolandia).then(function (ok) {
+        esperando = false;
+        if (loop !== item) return;
+        if (!ok) { sintetizada(); return; }
+        var p2 = a.play(); if (p2 && p2.catch) p2.catch(falhou);
+      });
+    }
     a.addEventListener('error', falhou);
-    var p = a.play(); if (p && p.catch) p.catch(falhou);
+    if (semRede) { falhou(); return; }
+    var p = a.play(); if (p && p.catch) p.then(function () { if (OFF) OFF.guardar(['baguncolandia']); }, falhou);
   }
   function tocarFaixa(fx, rotulo) {
     var F = FAIXAS[fx], k = Math.pow(2, F.tom / 12);
