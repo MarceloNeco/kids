@@ -425,3 +425,17 @@ test('⌨️ no 💪 Difícil: ← → andam até a beira e ↑ pula; no 😊 F�
   let menor = 0; for (let t = 0; t < 400; t += 16) { p.avancar(16); limpar(p); menor = Math.min(menor, p.estado().jogadores[0].vai.y); } assert.ok(menor < -100);
   const f = partida(); f.comecar(); f.teclas(0, { dir: true }); f.avancar(16); assert.equal(f.estado().jogadores[0].vai, null);
 });
+
+test('👆 no dedo (Fácil): tocar do outro lado não teletransporta, o boneco anda até lá', () => {
+  const p = partida({ modo: 'pega', toque: true }); p.comecar();
+  p.corpo(0, { x: 0.1, y: 0.1, w: 0.2, h: 0.8 }, 1000); rodar(p, 2500);
+  const x0 = p.estado().jogadores[0].corpo.x; assert.ok(Math.abs(x0 - 0.2) < 0.02, 'chegou na esquerda: ' + x0);
+  p.corpo(0, { x: 0.8, y: 0.1, w: 0.2, h: 0.8 }, 9000); p.avancar(16);   // soltou e tocou do outro lado
+  assert.ok(p.estado().jogadores[0].corpo.x - x0 < 0.02, 'não apareceu do outro lado');
+  let ant = p.estado().jogadores[0].corpo.x, maior = 0;
+  for (let t = 0; t < 2500; t += 16) { p.avancar(16); const x = p.estado().jogadores[0].corpo.x; maior = Math.max(maior, (x - ant) * 1280 / 0.016); ant = x; }
+  assert.ok(maior <= 1280 / 2.4 + 1, 'velocidade de criança: ' + maior);
+  assert.ok(Math.abs(p.estado().jogadores[0].corpo.x - 0.9) < 0.02, 'chegou na direita');
+  const q = partida({ modo: 'pega' }); q.comecar(); q.corpo(0, { x: 0.8, y: 0.1, w: 0.2, h: 0.8 }, 1000);
+  assert.ok(Math.abs(q.estado().jogadores[0].corpo.x - 0.9) < 0.01, 'com a câmera continua direto');
+});
