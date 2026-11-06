@@ -350,59 +350,73 @@
   }
 
   var MINI = {};
+  // Pomar: cada fruta só nasce na sua planta de verdade (macieira, laranjeira, limoeiro, bananeira, pé de morango,
+  // parreira), com o nome da planta embaixo. Aparecem só as plantas do que a receita pede (e mais uma, se for uma só).
   MINI.pomar = function (area) {
-    var tipos = tiposDe('pomar', 3), nv = jogo.cfg;
-    area.innerHTML = '<p class="instr">' + t('Toque nas frutas maduras e coloridas. As verdinhas ainda precisam esperar!', 'Tap the ripe, colourful fruit. The green ones still need to wait!') + '</p>' +
-      '<div class="arvore"><div class="copa"></div><div class="tronco"></div><div class="grama"></div></div>';
-    var copa = qs(area, '.copa');
-    var POS = [[18, 30], [42, 16], [66, 24], [84, 44], [28, 56], [54, 46], [72, 68], [40, 76], [14, 70]];
-    POS.forEach(function (pos, i) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'fruta';
-      b.style.left = pos[0] + '%'; b.style.top = pos[1] + '%';
-      copa.appendChild(b);
-      function nascer(madura) {
-        var tipo = tipos[i % tipos.length];
-        b.setAttribute('data-ing', tipo); b.innerHTML = icone(tipo); b.disabled = false;
-        b.classList.remove('caiu'); b.classList.toggle('madura', !!madura); b.classList.toggle('verde', !madura);
-        b.setAttribute('aria-label', L.nomeIng(tipo, en()) + (madura ? t(' madura', ' ripe') : t(' verde', ' unripe')));
-      }
-      nascer(RAPIDO || Math.random() < nv.madura);
-      b.addEventListener('click', function () {
-        if (b.disabled) return;
-        if (b.classList.contains('madura')) {
-          coletar(b.getAttribute('data-ing'), b); b.classList.add('caiu'); b.disabled = true;
-          agendar(function () { nascer(RAPIDO); }, 1600 * V);
-        } else {
-          b.classList.remove('balanca'); void b.offsetWidth; b.classList.add('balanca'); Som.toca('toque');
-          aviso(t('Ainda está verde! Espere ficar madura. 🟢➜🟠', 'Still green! Wait until it is ripe. 🟢➜🟠'), 1800);
+    var tipos = tiposDe('pomar', 2), nv = jogo.cfg;
+    area.innerHTML = '<p class="instr">' + t('Cada fruta nasce na sua planta! Toque nas frutas maduras e coloridas. As verdinhas ainda precisam esperar.', 'Each fruit grows on its own plant! Tap the ripe, colourful fruit. The green ones still need to wait.') + '</p>' +
+      '<div class="pomar"></div>';
+    var pomar = qs(area, '.pomar');
+    tipos.forEach(function (tipo) {
+      var pid = D.ingrediente[tipo].planta, pl = D.planta[pid];
+      var pe = document.createElement('div'); pe.className = 'pe p-' + pid; pe.setAttribute('data-planta', pid);
+      pe.innerHTML = '<div class="pe-quadro">' + ART.planta(pid) + '</div><p class="pe-nome"><b>' + tx(pl) + '</b><span>' + (en() ? pl.pt : pl.en) + '</span></p>';
+      var quadro = qs(pe, '.pe-quadro');
+      ART.FRUTOS[pid].forEach(function (pos) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'fruta f-' + tipo;
+        b.style.left = pos[0] + '%'; b.style.top = (pos[1] / 1.25) + '%';
+        quadro.appendChild(b);
+        function nascer(madura) {
+          b.setAttribute('data-ing', tipo); b.innerHTML = ART.fruto(tipo) || icone(tipo); b.disabled = false;
+          b.classList.remove('caiu'); b.classList.toggle('madura', !!madura); b.classList.toggle('verde', !madura);
+          b.setAttribute('aria-label', L.nomeIng(tipo, en()) + (madura ? t(' madura', ' ripe') : t(' verde', ' unripe')) + ' — ' + tx(pl));
         }
+        nascer(RAPIDO || Math.random() < nv.madura);
+        b.addEventListener('click', function () {
+          if (b.disabled) return;
+          if (b.classList.contains('madura')) {
+            coletar(tipo, b); b.classList.add('caiu'); b.disabled = true;
+            agendar(function () { nascer(RAPIDO); }, 1600 * V);
+          } else {
+            b.classList.remove('balanca'); void b.offsetWidth; b.classList.add('balanca'); Som.toca('toque');
+            aviso(t('Ainda está verde! Espere ficar madura. 🟢➜🟠', 'Still green! Wait until it is ripe. 🟢➜🟠'), 1800);
+          }
+        });
       });
-      b._nascer = nascer;
+      pomar.appendChild(pe);
     });
     repetir(function () {
-      var verdes = qsa(copa, '.fruta.verde:not(:disabled)');
+      var verdes = qsa(pomar, '.fruta.verde:not(:disabled)');
       if (verdes.length) { var b = verdes[Math.floor(Math.random() * verdes.length)]; b.classList.remove('verde'); b.classList.add('madura'); b.setAttribute('aria-label', L.nomeIng(b.getAttribute('data-ing'), en()) + t(' madura', ' ripe')); }
     }, 1500 * V);
   };
 
+  // Horta: cenoura e batata crescem EMBAIXO da terra (dá para ver pela terra) e se arrancam puxando 3 vezes;
+  // tomate no tomateiro com estaca, alface (bola de folhas) e cheiro-verde em cima da terra: um toque colhe.
   MINI.horta = function (area) {
     var tipos = tiposDe('horta', 3);
-    area.innerHTML = '<p class="instr">' + t('Toque 3 vezes (ou puxe o dedo para cima) para tirar da terra.', 'Tap 3 times (or swipe up) to pull it out of the ground.') + '</p><div class="canteiro"></div>';
+    var forma = function (id) { return D.planta[D.ingrediente[id].planta].forma; };
+    var raiz = tipos.some(function (id) { return forma(id) === 'raiz'; }), cima = tipos.some(function (id) { return forma(id) !== 'raiz'; });
+    area.innerHTML = '<p class="instr">' + (raiz ? t('O que cresce embaixo da terra: toque 3 vezes (ou puxe o dedo para cima) para arrancar. ', 'What grows under the ground: tap 3 times (or swipe up) to pull it out. ') : '') +
+      (cima ? t('O que cresce em cima da terra: um toque colhe.', 'What grows above the ground: one tap picks it.') : '') + '</p><div class="canteiro"></div>';
     var cant = qs(area, '.canteiro');
     for (var i = 0; i < 6; i++) (function (i) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'planta';
-      b.innerHTML = '<span class="folhas" aria-hidden="true">🌿</span><span class="legume"></span><span class="terra" aria-hidden="true"></span>';
+      var tipo = tipos[i % tipos.length], f = forma(tipo), pl = D.planta[D.ingrediente[tipo].planta], vezes = f === 'raiz' ? 3 : 1;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'planta f-' + f; b.setAttribute('data-ing', tipo);
+      b.innerHTML = '<span class="puxa" aria-hidden="true">' + ART.horta(tipo) + '</span><span class="terra" aria-hidden="true"></span>' +
+        (f === 'estaca' ? '<span class="legume" aria-hidden="true">' + icone(tipo) + '</span>' : '') +
+        '<span class="pe-nome" aria-hidden="true"><b>' + tx(pl) + '</b><span>' + (en() ? pl.pt : pl.en) + '</span></span>';
       cant.appendChild(b);
       var puxou = 0, y0 = null;
       function nascer() {
-        var tipo = tipos[i % tipos.length]; puxou = 0;
-        b.setAttribute('data-ing', tipo); qs(b, '.legume').innerHTML = icone(tipo); b.disabled = false; b.classList.remove('saiu');
-        b.style.setProperty('--sobe', '0'); b.setAttribute('aria-label', t('Puxar ', 'Pull ') + L.nomeIng(tipo, en()));
+        puxou = 0; b.disabled = false; b.classList.remove('saiu');
+        b.style.setProperty('--sobe', '0');
+        b.setAttribute('aria-label', (vezes > 1 ? t('Puxar ', 'Pull ') : t('Colher ', 'Pick ')) + L.nomeIng(tipo, en()) + ' — ' + tx(pl));
       }
       function puxar(n) {
         if (b.disabled) return;
-        puxou = Math.min(3, puxou + n); b.style.setProperty('--sobe', String(puxou)); Som.toca('toque');
-        if (puxou >= 3) { b.disabled = true; b.classList.add('saiu'); coletar(b.getAttribute('data-ing'), b); agendar(nascer, 1700 * V); }
+        puxou = Math.min(vezes, puxou + n); b.style.setProperty('--sobe', String(puxou)); Som.toca('toque');
+        if (puxou >= vezes) { b.disabled = true; b.classList.add('saiu'); coletar(tipo, b); agendar(nascer, 1700 * V); }
       }
       b.addEventListener('pointerdown', function (e) { y0 = e.clientY; });
       b.addEventListener('pointerup', function (e) { var dy = y0 == null ? 0 : e.clientY - y0; y0 = null; puxar(dy < -30 ? 3 : 1); });
