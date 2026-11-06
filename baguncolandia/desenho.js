@@ -13,7 +13,7 @@
   D.leve = false; D.escala = 1; D.fundoImg = null; D.medidas = []; D.pulaQuadro = false;
   function sombra(ctx, cor, blur, offY) { if (D.leve) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; return; } ctx.shadowColor = cor; ctx.shadowBlur = blur; if (offY != null) ctx.shadowOffsetY = offY; }
   function leve(v) {
-    D.leve = !!v; D.escala = D.leve ? 0.75 : 1;
+    D.leve = !!v; D.escala = D.leve ? 0.75 : nitidez();
     if (D.canvas) { D.canvas.width = Math.round(W * D.escala); D.canvas.height = Math.round(H * D.escala); }
     if (root.Boneco) root.Boneco.leve = D.leve;
     D.estrelas = D.estrelas.slice(0, D.leve ? 25 : 60);
@@ -42,23 +42,31 @@
     for (var i = 0; i < (D.menos ? 20 : 60); i++) D.estrelas.push({ x: Math.random() * W, y: Math.random() * H, r: 0.6 + Math.random() * 1.8, v: 4 + Math.random() * 10, a: Math.random() * 6.28 });
     if (opts && opts.nomes) D.nomes = opts.nomes;
     if (root.document && root.document.fonts && root.document.fonts.load) root.document.fonts.load('700 40px Fredoka').catch(function () {});
+    if (root.addEventListener) root.addEventListener('resize', function () { if (D.leve) return; var e = nitidez(); if (Math.abs(e - D.escala) < 0.01) return; leve(false); rasterizarCena(); });   // girou a tela ou mudou o tamanho
   }
   function nomes(n) { D.nomes = n; }
   /* ambiente: 'camera' (vídeo atrás, fundo translúcido) ou 'paisagem' (cena desenhada + boneco) */
-  function ambiente(amb, cenaId) {
+  function ambiente(amb, cenaId, comBichos) {   // comBichos: sorteia só cenários onde bicho combina (Pega-pega)
     D.ambiente = amb === 'paisagem' ? 'paisagem' : 'camera';
+    var cena = null;
     if (D.ambiente === 'paisagem' && root.Cenas) {
-      var cena = (cenaId && cenaId !== 'aleatoria' && root.Cenas.porId(cenaId)) || root.Cenas.sortear(D.cena && D.cena.id);
-      D.cena = cena; D.cenaImg = null;
-      root.Cenas.rasterizar(cena, W, H).then(function (c) { if (D.cena === cena) D.cenaImg = c; });
+      cena = (cenaId && cenaId !== 'aleatoria' && root.Cenas.porId(cenaId)) || root.Cenas.sortear(D.cena && D.cena.id, comBichos ? function (c) { return c.bichos; } : null);
+      D.cena = cena; rasterizarCena();
     }
     D.av = [{}, {}];
+    return cena;
   }
+  function rasterizarCena() {   // na nitidez da tela (tablet e TV grandes não ficam borrados)
+    var cena = D.cena; if (!cena || !root.Cenas) return; D.cenaImg = null;
+    root.Cenas.rasterizar(cena, Math.round(W * D.escala), Math.round(H * D.escala)).then(function (c) { if (D.cena === cena) D.cenaImg = c; });
+  }
+  /* nitidez: desenha na resolução de verdade da tela (até 1,5×), para não ficar borrado em tablet grande e TV */
+  function nitidez() { var c = D.canvas, cw = (c && c.clientWidth) || W, dpr = root.devicePixelRatio || 1; return Math.max(1, Math.min(1.5, Math.round(cw * dpr / W * 4) / 4)); }
   function avatares(lista) { if (lista && lista.length) D.avatares = lista; }
 
   /* figura rasterizada (cache); enquanto não pronta, bolinha da cor do suco */
   function imagem(fig, raio) {
-    var px = Math.min(256, Math.round(raio * 2.3)), k = fig.id + '@' + px;
+    var px = Math.min(320, Math.round(raio * 2.3 * Math.max(1, D.escala))), k = fig.id + '@' + px;
     if (D.figs[k]) return D.figs[k].pronta ? D.figs[k].c : null;
     D.figs[k] = { pronta: false, c: null };
     root.Figuras.rasterizar(fig, px).then(function (c) { D.figs[k] = { pronta: true, c: c }; });

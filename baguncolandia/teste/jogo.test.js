@@ -464,3 +464,8 @@ test('⚽ chute para a esquerda derruba o papai na piscina de bolinhas; ele sobe
   const q = chutaPartida(); const b2 = chuteEm(q, 1); assert.equal(b2.mira, 'mae');
 });
 test('⚽ fora do Chuta-chuta não tem piscina de bolinhas', () => { const p = partida({ modo: 'corta' }); assert.equal(p.estado().tanques, null); });
+
+test('🐰 sem terra (praia, cidade) não aparece toupeira nem minhoca', () => {
+  const p = partida({ modo: 'pega', figuras: FIGS.concat([BICHOS[2]]), semBuraco: true }); p.comecar();
+  rodar(p, 6000); assert.ok(!bichos(p).length, 'toupeira não apareceu');
+});

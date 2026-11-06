@@ -239,7 +239,7 @@
         lancar({ fig: fig, x: x, y: r.y + r.h + fig.raio, vx: (alvoX - x) / voo, vy: vy, vrot: (rnd() - 0.5) * 6, j: j, estilo: estilo });
       } else if (m === 'pega') {
         var p = rnd();
-        var bichos = porPapel('bicho');
+        var bichos = porPapel('bicho').filter(function (f) { return !(cfg.semBuraco && f.anda === 'buraco'); });   // sem terra (praia, cidade): nada de toupeira e minhoca
         if (bichos.length && p >= 0.12 + chanceVilao) { soltarBicho(j, sortear(bichos)); return; }   // 🐰 bichos no lugar dos heróis
         fig = p < 0.12 ? sortear(porPapel('poder')) : p < 0.12 + chanceVilao ? sortear(porPapel('vilao')) : sortear(porPapel('heroi'));
         if (!fig) return;
