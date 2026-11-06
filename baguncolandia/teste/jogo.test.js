@@ -314,3 +314,47 @@ test('validar: boneco leva "eu" (qual joga quando é 1 pessoa) só se for true',
   assert.strictEqual(B.validar({ t: 'cmd', acao: 'boneco', j: 1, boneco: { cabeca: 'menino' }, eu: 'sim' }).eu, undefined);
   assert.strictEqual(B.validar({ t: 'cmd', acao: 'boneco', j: 0, boneco: { cabeca: 'menino' } }).eu, undefined);
 });
+
+/* 🧍 "Boneco vai até lá" (no dedo): o boneco anda até o dedo, pula para alcançar e só vale o que encosta nele */
+function vaiPartida(modo) { const p = partida({ modo: modo || 'corta', vai: true }); p.comecar(); return p; }
+function limpar(p) { p.estado().coisas.length = 0; }
+function rodar(p, ms, passo = 16) { for (let t = 0; t < ms; t += passo) p.avancar(passo); }
+
+test('vai até lá: responde na hora e cruza a tela em ~1,5 s, sem teleporte', () => {
+  const p = vaiPartida(); limpar(p);
+  const x0 = p.estado().jogadores[0].vai.x;
+  p.alvo(0, 0.95, 0.8); p.avancar(50);
+  const x1 = p.estado().jogadores[0].vai.x;
+  assert.ok(x1 > x0, 'já começou a andar no primeiro quadro');
+  let ant = x1, maior = 0;
+  for (let t = 0; t < 1500; t += 16) { p.avancar(16); limpar(p); const x = p.estado().jogadores[0].vai.x; maior = Math.max(maior, (x - ant) / 0.016); ant = x; }
+  assert.ok(maior <= 1280 / 1.5 + 1, 'nunca passa de 1 tela em 1,5 s: ' + maior);
+  const fim = p.estado().jogadores[0].vai.x;
+  assert.ok(Math.abs(fim - 0.95 * 1280) < 120 || fim >= 1280 - 0.2 * 720 * 0.56 - 1, 'chegou perto do dedo: ' + fim);
+});
+
+test('vai até lá: alvo alto → pula sozinho; alvo baixo → fica no chão', () => {
+  const p = vaiPartida(); limpar(p);
+  p.alvo(0, 0.5, 0.1); let menor = 0; for (let t = 0; t < 600; t += 16) { p.avancar(16); limpar(p); menor = Math.min(menor, p.estado().jogadores[0].vai.y); }
+  assert.ok(menor < -40, 'pulou: ' + menor);
+  assert.ok(0.86 * 720 + menor - 0.56 * 720 * 1.18 <= 0.1 * 720, 'a mão alcançou a altura do dedo');
+  const q = vaiPartida(); limpar(q);
+  q.alvo(0, 0.5, 0.8); let m2 = 0; for (let t = 0; t < 600; t += 16) { q.avancar(16); limpar(q); m2 = Math.min(m2, q.estado().jogadores[0].vai.y); }
+  assert.equal(m2, 0);
+});
+
+test('vai até lá: só vale encostando — fruta longe não conta, fruta no corpo conta', () => {
+  const p = vaiPartida(); limpar(p);
+  p.lancar({ fig: 'melancia', x: 150, y: 500, estilo: 'voa' }, 0); rodar(p, 300);
+  assert.equal(p.estado().jogadores[0].pontos, 0, 'longe do boneco não marca');
+  p.alvo(0, 150 / 1280, 0.7); rodar(p, 1500);
+  assert.ok(p.estado().jogadores[0].pontos > 0, 'o boneco foi até lá e encostou');
+});
+
+test('vai até lá: no chuta-chuta a bola só vai com as pernas (não com a cabeça)', () => {
+  const p = vaiPartida('chuta'); limpar(p);
+  const alta = p.lancar({ fig: 'bola', x: 640, y: 330, estilo: 'voa' }, 0); p.avancar(16);
+  assert.ok(!alta.chutada, 'bola na altura da cabeça não é chute');
+  const baixa = p.lancar({ fig: 'bola', x: 640, y: 660, estilo: 'voa' }, 0); p.avancar(16);
+  assert.ok(baixa.chutada, 'bola no pé é chute');
+});

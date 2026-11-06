@@ -161,6 +161,10 @@
     var jogadores = [];
     for (var j = 0; j < nJog; j++) jogadores.push({ pontos: 0, vidas: 3, combo: 0, comboAte: 0, poder: null, poderAte: 0, rastro: [], zonaChute: 0.6, lento: 0, ref: null, corpo: { x: 0.5, topo: 0.1, altura: 0.8, pulando: false, abaixado: false, ts: 0 }, invencivelAte: 0, esq: null, esqRef: [], esqAnt: null });
     var proximoAviso = 0;
+    /* 🧍 "Boneco vai até lá" (no dedo): o dedo marca o alvo, o boneco anda até lá (no máximo 1 tela em 1,5 s),
+       pula sozinho se o alvo está alto, e só vale o que ENCOSTA no corpo dele (mãos, pés, tronco) */
+    var vai = !!cfg.vai, VAI = { A: H * 0.56, vmax: W / 1.5, acel: 7000, g: 2600, puloMax: 330, chao: 0.86 };
+    if (vai) jogadores.forEach(function (jg, j) { var r = raia(j); jg.vai = { x: r.x + r.w / 2, y: 0, vx: 0, vy: 0, alvo: null }; });
     var trave = { x: W / 2 - 120, y: 150, w: 240, h: 130 };   // abaixo do relógio e do nome do modo
     function raia(j) { return nJog === 1 ? { x: 0, y: 0, w: W, h: H } : { x: j * W / 2, y: 0, w: W / 2, h: H }; }
     function porPapel(papel) { return figs.filter(function (f) { return f.papel === papel; }); }
@@ -299,12 +303,48 @@
         var fora = c.y > H + c.raio + 60 || c.x < -c.raio - 80 || c.x > W + c.raio + 80 || (c.estilo === 'balao' && c.y > H + c.raio);
         if (fora) { if ((c.papel === 'fruta' || c.papel === 'doce') && c.estilo === 'arco') emitir({ t: 'perdeu', id: c.id, j: c.j, fig: c.fig }); coisas.splice(i, 1); }
       }
+      if (vai) passoVai(dt);
       // poderes vencendo
       jogadores.forEach(function (jg, j) { if (jg.poder && tempo > jg.poderAte) { jg.poder = null; emitir({ t: 'poder', j: j, poder: null }); } if (jg.combo && tempo > jg.comboAte) jg.combo = 0; });
       if (duracao && tempo >= duracao * 1000) terminar();
       else if (jogadores.every(function (jg) { return jg.vidas <= 0; })) terminar();
     }
 
+    function alvo(j, nx, ny) {   // dedo no lugar (normalizado na raia); null = solta (o boneco termina de chegar)
+      var jg = jogadores[j]; if (!vai || !jg) return;
+      if (nx == null) { if (jg.vai.alvo) jg.vai.alvo.solto = true; return; }
+      var r = raia(j); jg.vai.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h };
+    }
+    function corpoVai(j) {   // a caixa do corpo agora (mãos para cima quando o alvo está acima do ombro)
+      var V = jogadores[j].vai, r = raia(j), pe = r.y + r.h * VAI.chao + V.y, A = VAI.A, cima = !!(V.alvo && V.alvo.y < pe - A * 0.7);
+      return { x1: V.x - A * 0.22, x2: V.x + A * 0.22, topo: pe - A * (cima ? 1.18 : 1.0), base: V.y < -5 ? pe + 10 : r.y + r.h, pe: pe, cima: cima };
+    }
+    function passoVai(dt) {
+      jogadores.forEach(function (jg, j) {
+        var V = jg.vai, r = raia(j), A = VAI.A, chegou = false;
+        if (V.alvo) {
+          var dx = V.alvo.x - V.x, quer = clamp(dx * 8, -VAI.vmax, VAI.vmax);   // freia perto do alvo: chega sem passar
+          V.vx += clamp(quer - V.vx, -VAI.acel * dt, VAI.acel * dt);
+          chegou = Math.abs(dx) < 12;
+          // alvo alto e perto: pula sozinho na altura certa (só do chão)
+          var ombro = r.y + r.h * VAI.chao - A * 1.1;
+          if (V.y === 0 && V.alvo.y < ombro && Math.abs(dx) < A * 0.45) { var h = Math.min(VAI.puloMax, ombro - V.alvo.y + 30); V.vy = -Math.sqrt(2 * VAI.g * h); }
+          if (chegou && V.alvo.solto && V.y === 0) V.alvo = null;
+        } else V.vx += clamp(-V.vx, -VAI.acel * dt, VAI.acel * dt);
+        V.x = clamp(V.x + V.vx * dt, r.x + A * 0.2, r.x + r.w - A * 0.2);
+        if (V.y < 0 || V.vy < 0) { V.vy += VAI.g * dt; V.y = Math.min(0, V.y + V.vy * dt); if (V.y === 0) V.vy = 0; }
+        jg.corpo.x = (V.x - r.x) / r.w; jg.corpo.pulando = V.y < -10;   // o desenho e o resto do jogo usam o corpo
+        // encostou? (só no corpo dele)
+        var B = corpoVai(j);
+        coisas.forEach(function (c) {
+          if (c.morta || c.j !== j || c.papel === 'obstaculo' || c.estilo === 'obstaculo') return;
+          var px = clamp(c.x, B.x1, B.x2), py = clamp(c.y, B.topo, B.base);
+          if (Math.hypot(c.x - px, c.y - py) > c.raio) return;
+          if (c.papel === 'bola' && c.estilo !== 'quica' && !c.chutada && c.y < B.pe - A * 0.35) return;   // chute: só com as pernas
+          acertou(j, c, modoAtual, tempo, { x: V.x, y: c.y + (c.y < B.pe - A * 0.5 ? 40 : -40) });
+        });
+      });
+    }
     function mult(j, p) { return jogadores[j].poder === 'x2' ? p * 2 : p; }
 
     /* pontos de movimento do jogador j (normalizados na raia), com o tempo do relógio (ms) */
@@ -424,13 +464,13 @@
     function estado() {
       return {
         fase: fase, modo: modoAtual, modoBase: modoBase, tempo: tempo, restante: duracao ? Math.max(0, Math.ceil((duracao * 1000 - tempo) / 1000)) : null,
-        jogadores: jogadores.map(function (jg, j) { var r = raia(j); return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: jg.combo, poder: jg.poder, poderAte: jg.poderAte, lento: jg.lento > tempo, raia: r, zonaChute: jg.zonaChute, rastro: jg.rastro.slice(-8), corpo: jg.corpo, invencivel: jg.invencivelAte > tempo, esqueleto: jg.esq && tempo - 0 >= 0 ? jg.esq.k : null }; }),
+        jogadores: jogadores.map(function (jg, j) { var r = raia(j); return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: jg.combo, poder: jg.poder, poderAte: jg.poderAte, lento: jg.lento > tempo, raia: r, zonaChute: jg.zonaChute, rastro: jg.rastro.slice(-8), corpo: jg.corpo, vai: jg.vai ? { x: jg.vai.x, y: jg.vai.y, vx: jg.vai.vx, A: VAI.A, cima: corpoVai(j).cima, alvo: jg.vai.alvo } : null, invencivel: jg.invencivelAte > tempo, esqueleto: jg.esq && tempo - 0 >= 0 ? jg.esq.k : null }; }),
         coisas: coisas, trave: trave, bpm: bpm
       };
     }
     function batida(novoBpm) { bpm = novoBpm ? clamp(novoBpm, 40, 220) : 0; ultimaBatida = tempo; }
     return {
-      comecar: comecar, pausar: pausar, continuar: continuar, terminar: terminar, avancar: avancar, movimento: movimento, esqueleto: esqueleto, lancar: lancar, obstaculo: obstaculo, corpo: corpo, calibrar: calibrar, estado: estado, batida: batida,
+      comecar: comecar, pausar: pausar, continuar: continuar, terminar: terminar, avancar: avancar, movimento: movimento, esqueleto: esqueleto, lancar: lancar, obstaculo: obstaculo, corpo: corpo, calibrar: calibrar, estado: estado, batida: batida, alvo: alvo,
       zonaChute: function (j, frac) { if (jogadores[j]) jogadores[j].zonaChute = clamp(frac, 0.2, 0.95); },
       eventos: function () { var e = eventos; eventos = []; return e; },
       W: W, H: H

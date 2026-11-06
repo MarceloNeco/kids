@@ -223,6 +223,18 @@ function ok(msg) { console.log('✓ ' + msg); }
     await t.close();
   }
   await ctx2.close();
+  // v0.8.19: no dedo, "🧍 Boneco vai até lá": o boneco anda até onde o dedo segura (escolha guardada no aparelho)
+  { const c3 = await browser.newContext({ viewport: { width: 1280, height: 720 }, locale: 'pt-BR' }); const v = await c3.newPage(); v.on('pageerror', e => erros.push('vai: ' + e.message));
+    await v.goto(base + '?teste'); await v.click('#btToque'); await v.fill('#nome', 'Teo'); await v.click('#btEntrar');
+    await v.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 });
+    await v.click('#localModos button[data-v="corta"]'); const antes = await v.textContent('#localJeito'); await v.click('#localJeito');
+    const guardou = await v.evaluate(() => localStorage.getItem('bagunca:jeito'));
+    await v.click('#localComecar'); await v.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'jogando', null, { timeout: 30000 });
+    const x0 = await v.evaluate(() => window.BaguncaDebug.partida.estado().jogadores[0].vai.x);
+    const r = await v.locator('#tvCanvas').boundingBox(); await v.mouse.move(r.x + r.width * 0.9, r.y + r.height * 0.75); await v.mouse.down(); await v.waitForTimeout(1200); await v.mouse.up();
+    const x1 = await v.evaluate(() => window.BaguncaDebug.partida.estado().jogadores[0].vai.x);
+    if (/Dedo corta/.test(antes) && guardou === 'vai' && x1 > x0 + 300) ok('🧍 boneco vai até lá: o boneco andou até o dedo (' + Math.round(x0) + ' → ' + Math.round(x1) + ')'); else falhou('vai até lá: ' + JSON.stringify({ antes, guardou, x0, x1 }));
+    await c3.close(); }
   const errosReais = erros.filter(e => !/favicon|solverone-dados|ERR_NAME_NOT_RESOLVED|ERR_INTERNET|Failed to load resource.*(youtube|supabase)|supabase-js|net::ERR/i.test(e));
   if (errosReais.length) falhou('erros no console: ' + errosReais.join(' | ')); else ok('sem erros de JavaScript nem de CSP');
   await browser.close(); server.close();
