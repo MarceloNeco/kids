@@ -2,6 +2,21 @@
   "app": "batalha-naval",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "06/Nov/2026",
+      "hora": "12:52:50",
+      "pt": [
+        "📶 Jogar pertinho (sem internet): dois aparelhos no mesmo Wi-Fi — por exemplo, um celular com o Roteador Wi-Fi (Ponto de acesso) ligado, mesmo em modo avião, e o outro conectado nele — jogam sem internet e sem servidor. Um mostra um código QR, o outro lê com a câmera, e depois ao contrário.",
+        "🔳 O código QR é pequeno e fácil de ler da tela do outro celular; sem câmera, dá para copiar e colar o código em texto.",
+        "📡 Se os aparelhos não se acharem, o jogo explica o que costuma ser (Wi-Fi diferente, Wi-Fi de avião/hotel que não deixa um ver o outro) e deixa tentar de novo. Se a ligação cair no meio, a partida continua de onde parou depois de trocar os códigos de novo."
+      ],
+      "en": [
+        "📶 Play nearby (no internet): two devices on the same Wi-Fi — for example, one phone with its Wi-Fi hotspot on, even in airplane mode, and the other joined to it — play with no internet and no server. One shows a QR code, the other scans it with the camera, and then the other way round.",
+        "🔳 The QR code is small and easy to scan from the other phone's screen; without a camera, you can copy and paste the code as text.",
+        "📡 If the devices can't find each other, the game explains the usual causes (different Wi-Fi, plane/hotel Wi-Fi that stops devices from seeing each other) and lets you try again. If the link drops mid-game, the game goes on where it stopped after swapping the codes again."
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "06/Nov/2026",
       "hora": "08:49:01",

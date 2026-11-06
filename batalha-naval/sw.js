@@ -1,13 +1,14 @@
-/* Batalha Naval — service worker: guarda a pasta no aparelho para abrir sem internet (contra o computador e passar o
-   aparelho funcionam sem internet; jogar com amigos em aparelhos diferentes precisa dela).
-   Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte, imagens e a biblioteca da rede
-   (supabase-js em ../baguncolandia/libs/, só baixa quando alguém joga com amigos): cópia primeiro.
+/* Batalha Naval — service worker: guarda a pasta no aparelho para abrir sem internet (contra o computador, passar o
+   aparelho e jogar pertinho funcionam sem internet; jogar com amigos pela internet precisa dela).
+   Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte, imagens e as bibliotecas
+   (supabase-js em ../baguncolandia/libs/, só baixa quando alguém joga com amigos; libs/qrcode.js e libs/jsQR.js do
+   Jogar pertinho, guardadas já na instalação porque o pertinho é usado justamente sem internet): cópia primeiro.
    Músicas gravadas (../vruuum/musicas/*.mp3): o service worker não mexe (o navegador busca direto).
    Cache com o nome do app: só apaga caches "batalha-naval-" (nunca os dos outros jogos da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.1.0';
+var VERSAO = '0.2.0';
 var CACHE = 'batalha-naval-v' + VERSAO;
-var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'logica.js', 'rede.js', 'som.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../recursos.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../rabiscolandia/fontes/fredoka.woff2'];
+var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'logica.js', 'rede.js', 'som.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', 'pertinho.js', 'qr.js', 'libs/qrcode.js', 'libs/jsQR.js', '../recursos.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../rabiscolandia/fontes/fredoka.woff2'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
 });

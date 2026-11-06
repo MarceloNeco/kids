@@ -14,7 +14,8 @@
 <link rel="stylesheet" href="estilo.css">
 <!--
   Batalha Naval — brincadeira da família Bolinho de Chuva (SolverONE). Visual, sons e regras próprios.
-  Modos: amigos em aparelhos diferentes (2 a 4, pela internet), contra o computador e passar o aparelho (sem internet).
+  Modos: amigos em aparelhos diferentes (2 a 4, pela internet), jogar pertinho (2 aparelhos no mesmo Wi-Fi, sem internet,
+  ligados por QR code), contra o computador e passar o aparelho (sem internet).
   Sem login, sem banco, sem cookie: a frota de cada um fica só no aparelho dele. Nada de script inline: a CSP não permite.
   Mapa dos arquivos: LEIA-ME.md. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
 -->
@@ -47,7 +48,8 @@
   <div class="botoes">
     <button id="btVoltarRede" class="grande verde" type="button" hidden></button>
     <button id="btAmigos" class="grande" type="button" data-t="👫 Jogar com amigos (cada um no seu aparelho)|👫 Play with friends (each on their own device)"></button>
-    <p id="avisoSemNet" class="aviso-net" hidden data-t="📡 Sem internet agora: jogar com amigos em aparelhos diferentes precisa de internet. Contra o computador e Passar o aparelho funcionam sem internet.|📡 No internet right now: playing with friends on different devices needs internet. Against the computer and Pass the device work offline."></p>
+    <p id="avisoSemNet" class="aviso-net" hidden data-t="📡 Sem internet agora: jogar com amigos pela internet não dá. Jogar pertinho, Contra o computador e Passar o aparelho funcionam sem internet.|📡 No internet right now: playing with friends over the internet won't work. Play nearby, Against the computer and Pass the device work offline."></p>
+    <button id="btPerto" class="grande verde" type="button" data-t="📶 Jogar pertinho (sem internet)|📶 Play nearby (no internet)"></button>
     <button id="btPC" class="grande rosa" type="button" data-t="🤖 Contra o computador|🤖 Against the computer"></button>
     <button id="btPassa" class="grande ciano" type="button" data-t="📱 Passar o aparelho (2 no mesmo)|📱 Pass the device (2 on one)"></button>
     <button id="btInstalar" class="medio" type="button" hidden data-t="📲 Instalar|📲 Install"></button>
@@ -58,6 +60,7 @@
     <p data-t="🎯 Na sua vez, toque num quadradinho do mar do adversário. Cada quadradinho tem nome: letra da coluna e número da linha (E4, F2…).|🎯 On your turn, tap a square in your opponent's sea. Each square has a name: column letter and row number (E4, F2…)."></p>
     <p data-t="💦 Água: não tinha navio. 💥 Acertou: tinha um pedaço de navio. 🚢 Afundou: acertou todos os pedaços daquele navio. Ganha quem afundar a frota inteira dos outros!|💦 Water: no ship there. 💥 Hit: part of a ship. 🚢 Sunk: every part of that ship was hit. Whoever sinks everyone else's whole fleet wins!"></p>
     <p data-t="👫 Com amigos: um toca em Criar partida e recebe um código de 4 letras; os outros tocam em Entrar e digitam o código (ou abrem o link do convite). De 2 a 4 jogadores. Com 3 ou 4, na sua vez você escolhe em quem atirar.|👫 With friends: one taps Create game and gets a 4-letter code; the others tap Join and type the code (or open the invite link). 2 to 4 players. With 3 or 4, on your turn you pick who to fire at."></p>
+    <p data-t="📶 Jogar pertinho (sem internet, até no avião): um celular liga o Roteador Wi-Fi e o outro conecta nele; depois um mostra um código QR e o outro lê com a câmera, e ao contrário. Dois jogadores.|📶 Play nearby (no internet, even on a plane): one phone turns on its Wi-Fi hotspot and the other joins it; then one shows a QR code and the other scans it with the camera, and the other way round. Two players."></p>
     <p data-t="🐟 Fácil: mar 8×8 e 4 navios. 🐬 Médio: mar 10×10 e 5 navios. 🦈 Difícil: mar 12×12 e 7 navios. Contra o computador, o nível também deixa ele mais esperto.|🐟 Easy: 8×8 sea and 4 ships. 🐬 Medium: 10×10 sea and 5 ships. 🦈 Hard: 12×12 sea and 7 ships. Against the computer, the level also makes it smarter."></p>
   </div>
   <p id="versao" class="versao"></p>
@@ -89,12 +92,13 @@
     </form>
     <p id="amigosMsg" class="dica" aria-live="polite"></p>
   </div>
-  <p class="dica" data-t="📡 Jogar em aparelhos diferentes precisa de internet (Wi-Fi ou dados). A frota de cada um fica escondida no próprio aparelho.|📡 Playing on different devices needs internet (Wi-Fi or data). Each fleet stays hidden on its own device."></p>
+  <p class="dica" data-t="📡 Jogar assim precisa de internet (Wi-Fi ou dados). Sem internet, use 📶 Jogar pertinho. A frota de cada um fica escondida no próprio aparelho.|📡 Playing this way needs internet (Wi-Fi or data). Without internet, use 📶 Play nearby. Each fleet stays hidden on its own device."></p>
 </section>
 
 <section id="sala" class="tela" data-recurso="batalha-naval">
   <div class="cabeca"><h2><span data-t="Sala|Room"></span></h2></div>
-  <div class="cartao centro">
+  <p id="salaPerto" class="cartao centro" hidden data-t="📶 Pertinho: os dois aparelhos estão ligados direto, sem internet.|📶 Nearby: both devices are linked directly, no internet."></p>
+  <div id="salaConvite" class="cartao centro">
     <p class="dica" data-t="Código da partida|Game code"></p>
     <div id="salaCodigo" class="codigo-grande" aria-live="polite"></div>
     <p id="salaComo" class="dica" data-t="Os outros abrem solverone.com.br/kids → ⚓ Batalha Naval → 👫 Jogar com amigos e digitam este código. Ou mande o convite:|The others open solverone.com.br/kids → ⚓ Sea Battle → 👫 Play with friends and type this code. Or send the invite:"></p>
@@ -114,6 +118,58 @@
     <button id="btComecar" class="grande verde" type="button" hidden data-t="▶️ Começar a batalha!|▶️ Start the battle!"></button>
     <button id="btSairSala" class="medio cinza" type="button" data-t="🚪 Sair da sala|🚪 Leave the room"></button>
   </div>
+</section>
+
+<section id="perto" class="tela" data-recurso="batalha-naval">
+  <div class="cabeca"><button class="voltar mini" type="button" aria-label="Voltar / Back">←</button><h2 data-t="📶 Jogar pertinho (sem internet)|📶 Play nearby (no internet)"></h2></div>
+  <div class="cartao">
+    <h3 data-t="Como ligar os dois celulares|How to link the two phones"></h3>
+    <ol class="passos">
+      <li><span class="ilu" aria-hidden="true">📱📶</span><span data-t="Um celular liga o Roteador Wi-Fi (também chamado Ponto de acesso ou Hotspot), mesmo em modo avião.|One phone turns on its Wi-Fi hotspot (also called Mobile hotspot or Access point), even in airplane mode."></span></li>
+      <li><span class="ilu" aria-hidden="true">📱➡️📶</span><span data-t="O outro conecta nesse Wi-Fi (o nome aparece na lista de Wi-Fi). Se ele perguntar se quer continuar numa rede sem internet, toque em Sim.|The other one joins that Wi-Fi (its name shows in the Wi-Fi list). If it asks whether to stay on a network without internet, tap Yes."></span></li>
+      <li><span class="ilu" aria-hidden="true">🔳➡️📷</span><span data-t="Um mostra o código, o outro lê com a câmera, e depois ao contrário.|One shows the code, the other scans it with the camera, and then the other way round."></span></li>
+    </ol>
+    <p class="dica" data-t="🍎 iPhone quase nunca consegue ligar o Roteador em modo avião: deixe um Android ser o roteador; o iPhone pode conectar nele.|🍎 iPhones usually can't turn on the hotspot in airplane mode: let an Android be the hotspot; the iPhone can join it."></p>
+    <p class="dica" data-t="💾 Os dois aparelhos precisam ter aberto a Batalha Naval com internet pelo menos uma vez (para ela ficar guardada). O jogo vai pedir a câmera: toque em Permitir.|💾 Both devices need to have opened Sea Battle with internet at least once (so it is saved on them). The game will ask for the camera: tap Allow."></p>
+  </div>
+  <div class="cartao">
+    <label class="campo"><span data-t="Seu nome|Your name"></span> <input id="nomePerto" maxlength="16" autocomplete="off" spellcheck="false"></label>
+  </div>
+  <div class="botoes">
+    <button id="btPertoCriar" class="grande verde" type="button" data-t="➕ Criar partida pertinho|➕ Create nearby game"></button>
+    <button id="btPertoEntrar" class="grande ciano" type="button" data-t="📷 Entrar pertinho (ler o código)|📷 Join nearby (scan the code)"></button>
+  </div>
+  <p id="pertoMsg" class="dica" aria-live="polite"></p>
+</section>
+
+<section id="pertoCodigo" class="tela" data-recurso="batalha-naval">
+  <div class="cabeca"><button class="voltar mini" type="button" aria-label="Voltar / Back">←</button><h2 id="pertoCodTitulo"></h2></div>
+  <p id="pertoCodDica" class="dica centro"></p>
+  <div class="qr-caixa"><canvas id="pertoQR" class="qr" role="img" aria-label="QR code"></canvas></div>
+  <p id="pertoCodStatus" class="status centro" aria-live="polite"></p>
+  <div class="botoes">
+    <button id="btPertoLerResposta" class="grande ciano" type="button" hidden data-t="📷 Agora ler o código do outro celular|📷 Now scan the other phone's code"></button>
+    <button id="btPertoDeNovo" class="medio" type="button" hidden data-t="🔄 Começar de novo|🔄 Start over"></button>
+  </div>
+  <details class="cartao texto-codigo">
+    <summary data-t="Sem câmera? Ver o código em texto|No camera? See the code as text"></summary>
+    <p id="pertoCodTexto" class="link"></p>
+    <button id="btPertoCopiar" class="medio" type="button" data-t="📋 Copiar o código|📋 Copy the code"></button>
+  </details>
+  <div class="botoes"><button id="btPertoCancelar1" class="grande cinza-g" type="button" data-t="✖ Cancelar|✖ Cancel"></button></div>
+</section>
+
+<section id="pertoLer" class="tela" data-recurso="batalha-naval">
+  <div class="cabeca"><button class="voltar mini" type="button" aria-label="Voltar / Back">←</button><h2 id="pertoLerTitulo"></h2></div>
+  <p id="pertoLerDica" class="dica centro"></p>
+  <div class="camera-caixa"><video id="pertoVideo" class="camera" playsinline muted autoplay></video><div class="mira-qr" aria-hidden="true"></div></div>
+  <p id="pertoLerStatus" class="status centro" aria-live="polite"></p>
+  <details id="pertoColarCaixa" class="cartao texto-codigo">
+    <summary data-t="⌨️ Colar o código em texto|⌨️ Paste the code as text"></summary>
+    <textarea id="pertoColar" rows="3" autocomplete="off" spellcheck="false" aria-label="Código / Code"></textarea>
+    <button id="btPertoUsar" class="medio" type="button" data-t="✅ Usar este código|✅ Use this code"></button>
+  </details>
+  <div class="botoes"><button id="btPertoCancelar2" class="grande cinza-g" type="button" data-t="✖ Cancelar|✖ Cancel"></button></div>
 </section>
 
 <section id="arrumar" class="tela" data-recurso="batalha-naval">
@@ -193,6 +249,8 @@
 <script src="../trilha.js" data-fora-do-arquivo></script>
 <script src="logica.js"></script>
 <script src="rede.js"></script>
+<script src="pertinho.js"></script>
+<script src="qr.js"></script>
 <script src="som.js"></script>
 <script src="app.js"></script>
 </body>

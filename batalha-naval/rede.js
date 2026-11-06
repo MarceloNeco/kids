@@ -4,6 +4,7 @@
    publishable da plataforma — públicas por desenho, não dão acesso a tabela nenhuma (a mesma da Rabiscolândia).
    O supabase-js é o da Bagunçolândia (../baguncolandia/libs/supabase.js), carregado só quando alguém joga em rede.
    Com ?teste (ou ?local) o canal é um BroadcastChannel do próprio navegador (testes sem internet: várias abas).
+   No "📶 Jogar pertinho" (sem internet) o canal é um RTCDataChannel direto entre os dois aparelhos (pertinho.js).
    A sala é pública (quem tem o código manda mensagem): TODA mensagem que chega passa por validar() antes de ser usada,
    e a tela só usa textContent com o que veio de fora.
 
@@ -27,7 +28,8 @@
 
    BNRede.criar(op) → partida (sem tela: roda no Node para os testes). op = { id, nome, codigo, host, nivel,
      mandar(msg), salvar(dados), aoMudar(), agora(), rnd(), dados (para voltar de onde parou) }
-   BNRede.abrir(codigo, aoReceber, aoCair) → Promise<{ mandar(msg), fechar() }>  (o canal de verdade; aoCair = caiu depois de conectado) */
+   BNRede.abrir(codigo, aoReceber, aoCair, conexao) → Promise<{ mandar(msg), fechar() }>  (o canal de verdade; aoCair = caiu
+     depois de conectado). Com "conexao" (canal direto do pertinho.js, sem internet) o código não é usado. */
 (function (raiz) {
   'use strict';
   var L = raiz.BNLogica || (typeof require === 'function' ? require('./logica.js') : null);
@@ -400,9 +402,26 @@
     });
   }
 
+  // "📶 Jogar pertinho": canal de dados direto entre os dois aparelhos (pertinho.js), sem servidor nenhum.
+  // As mensagens são as mesmas; chegam como texto JSON e passam pelo mesmo validar().
+  function abrirDireto(conexao, aoReceber, aoCair) {
+    var r = entregar(aoReceber), fechado = false;
+    conexao.ouvir(function (txt) {
+      if (typeof txt !== 'string' || txt.length > 200000) return;
+      var m; try { m = JSON.parse(txt); } catch (e) { return; }
+      r(m);
+    }, function () { if (!fechado && aoCair) { fechado = true; try { aoCair(); } catch (e) { /* ok */ } } });
+    return Promise.resolve({ mandar: function (m) { try { conexao.enviar(JSON.stringify(m)); } catch (e) { /* fechado: o reenvio cuida */ } }, fechar: function () { fechado = true; conexao.fechar(); } });
+  }
+
+  // o transporte é trocável; todos devolvem Promise<{ mandar(msg), fechar() }> e entregam só mensagens validadas:
+  //   conexao (do pertinho.js) → canal direto · ?teste → BroadcastChannel · senão → Supabase Realtime
   var API = {
     criar: criar, validar: validar, codigoNovo: codigoNovo, idNovo: idNovo, nome: nome, TEMPO: TEMPO, LOCAL: LOCAL,
-    abrir: function (codigo, aoReceber, aoCair) { return LOCAL ? abrirLocal(codigo, aoReceber) : abrirSupabase(codigo, aoReceber, aoCair); }
+    abrir: function (codigo, aoReceber, aoCair, conexao) {
+      if (conexao) return abrirDireto(conexao, aoReceber, aoCair);
+      return LOCAL ? abrirLocal(codigo, aoReceber) : abrirSupabase(codigo, aoReceber, aoCair);
+    }
   };
   raiz.BNRede = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

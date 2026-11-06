@@ -2,7 +2,7 @@
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE), em **solverone.com.br/kids/batalha-naval/**. Batalha naval
 com visual, navios e sons próprios, para jogar com a família em **aparelhos diferentes** (celular, tablet, computador),
-**contra o computador** ou **passando o aparelho**. Sem login, sem cadastro. O nome em inglês na tela é *Sea Battle*.
+pela internet ou **pertinho, sem internet** (dois aparelhos no mesmo Wi-Fi), **contra o computador** ou **passando o aparelho**. Sem login, sem cadastro. O nome em inglês na tela é *Sea Battle*.
 
 ## Como jogar
 
@@ -43,6 +43,36 @@ dela mostra a ordem (▶ = agora).
 - **Quem criou a sala sumiu** (15 s): o próximo da lista passa a mandar, sozinho; se quem criou voltar, vira jogador.
   Quem criou e sai pelo botão passa o comando antes de sair.
 
+## 📶 Jogar pertinho (sem internet) — 2 jogadores, cada um no seu aparelho
+
+Para jogar sem internet nenhuma (no avião, na estrada): os dois aparelhos ficam no **mesmo Wi-Fi** e se falam direto,
+sem servidor. A "apresentação" entre eles vai por **QR code**.
+
+1. Um celular **Android** liga o **Roteador Wi-Fi** (Ponto de acesso / Hotspot) — no Galaxy S24 funciona mesmo em modo
+   avião. O outro aparelho conecta nesse Wi-Fi (se ele perguntar "rede sem internet, manter conectado?", tocar em Sim).
+   iPhone quase nunca liga o Roteador em modo avião: o Android é o roteador e o iPhone conecta nele.
+2. Os dois abrem a Batalha Naval (precisa ter sido aberta com internet pelo menos uma vez, para ficar guardada) e tocam
+   em **📶 Jogar pertinho (sem internet)**. A tela explica esses passos com desenhos.
+3. Um toca **➕ Criar partida pertinho**, escolhe o nível e aparece um **QR code** grande. O outro toca **📷 Entrar
+   pertinho** e aponta a câmera para ele; aparece o QR code de resposta. Quem criou toca **📷 Agora ler o código do outro
+   celular** e lê esse. Pronto: os dois caem na sala, arrumam a frota e jogam como no jogo com amigos.
+   Sem câmera: **Ver o código em texto** / **Colar o código em texto**.
+
+- **Não ligou em ~20 s** depois da segunda leitura: o jogo explica o que costuma ser (não estão no mesmo Wi-Fi; Wi-Fi de
+  avião/hotel/loja não deixa um aparelho ver o outro; código de uma tentativa anterior) e oferece **🔄 Tentar de novo**.
+- **A ligação caiu no meio** (tela apagou, alguém saiu do Wi-Fi): os dois veem o aviso e **🔁 Ligar de novo** — quem criou
+  mostra um código novo e o outro lê, e a partida **continua de onde parou**. Enquanto joga pertinho, a tela fica acesa.
+- Recarregar a página no meio perde a partida pertinho (o canal direto não sobrevive à recarga).
+
+Como funciona por dentro (`pertinho.js`): WebRTC com `iceServers: []` (só endereços da rede local) e um canal de dados
+(RTCDataChannel). O QR leva só o essencial do SDP (ice-ufrag, ice-pwd, fingerprint, setup, mid e os endereços UDP),
+em bytes, escrito num alfabeto de 43 letras do modo alfanumérico do QR: ~106 letras = QR versão 5 (37×37). O código
+começa com `BN1O` (oferta) ou `BN1R` (resposta); `1` é a versão do formato (versão diferente = aviso amigável para
+atualizar), e uma conferência no fim recusa código cortado ou mexido. A partida usa as **mesmas mensagens** do jogo pela
+internet (`rede.js`: o transporte é trocável — Supabase, BroadcastChannel nos testes, ou o canal direto).
+Para o QR: `qr.js` desenha com o qrcode-generator e lê com a câmera de trás (leitor do próprio Android quando existe,
+senão jsQR), as duas bibliotecas em `libs/`, guardadas no aparelho pelo `sw.js`.
+
 ## Contra o computador e passar o aparelho — funcionam sem internet
 
 - **🤖 Contra o computador**: você começa; o computador "mira" um pouquinho antes de atirar.
@@ -56,9 +86,12 @@ dela mostra a ordem (▶ = agora).
 | `index.html` | As telas (início, nível, amigos, sala, arrumar, jogo, cortina). CSP sem script inline. |
 | `estilo.css` | Visual (mar, navios de brinquedo, animações de água/explosão, celular em pé e tablet/computador deitado). |
 | `logica.js` | Regras sem tela (roda no Node): níveis, coordenadas, posicionar, tiro, afundou, frota aleatória, a IA nos 3 jeitos. |
-| `rede.js` | Jogo em rede sem tela: validação de toda mensagem, a partida (vez, diário de tiros, voltar, sair, anfitrião que some) e o canal (Supabase Realtime broadcast; `?teste` usa BroadcastChannel). |
+| `rede.js` | Jogo em rede sem tela: validação de toda mensagem, a partida (vez, diário de tiros, voltar, sair, anfitrião que some) e o canal, trocável: Supabase Realtime broadcast; `?teste` usa BroadcastChannel; o Jogar pertinho usa o canal direto. |
+| `pertinho.js` | Jogar pertinho: os códigos curtos (SDP ↔ texto do QR, com versão e conferência) e a ligação WebRTC sem servidor. |
+| `qr.js` | Desenhar o QR (`libs/qrcode.js`) e ler com a câmera (BarcodeDetector ou `libs/jsQR.js`), carregados só quando usa. |
+| `libs/` | qrcode-generator 2.0.4 (MIT) e jsQR 1.4.0 (Apache-2.0), com as licenças ao lado. |
 | `som.js` | Efeitos feitos na hora (Web Audio). |
-| `app.js` | Telas, arrumar a frota (tocar/arrastar/girar), as partidas dos três modos e a música (`../trilha.js`). `APP_VERSION`. |
+| `app.js` | Telas, arrumar a frota (tocar/arrastar/girar), as partidas dos quatro modos (as telas do Jogar pertinho também) e a música (`../trilha.js`). `APP_VERSION`. |
 | `sw.js`, `manifest.webmanifest`, `icone-192.png`, `icone-512.png`, `icone.svg` | Instalável e sem internet (cache `batalha-naval-v…`). Ícones gerados do `icone.svg` com o Playwright. |
 | `versoes.json`, `PENDENCIAS.md`, `CREDITOS.md` | Versões (PT/EN), pendências e créditos. |
 | `teste/` | `node --test batalha-naval/teste/*.test.js` (rodar da raiz do repositório kids). |
@@ -85,4 +118,10 @@ O tiro é repetido a cada 1,5 s até virar diário; o dono do mar só responde c
   falso com perdas, recarregar no meio, sair, anfitrião saindo e sumindo, sala cheia, jogar de novo.
 - `navegador.test.js` (Chromium): sem erros no celular/tablet/computador, arrumar (tocar, girar, arrastar), partida inteira
   contra o computador, passar o aparelho, partidas inteiras com 2 e 3 abas (com recarga) e sair da sala.
+- `pertinho.test.js` (Chromium): códigos de SDP de verdade vão e voltam (tamanho e versão do QR no relatório), versão
+  errada e lixo recusados; o canal direto valida tudo; duas abas **sem internet** (página e bibliotecas pelo service
+  worker) — o QR da tela é lido pelo jsQR e pela câmera falsa do Chromium mostrando o print —, ligam, jogam a partida
+  inteira, a ligação cai e volta; e o aviso "não se acharam" com Tentar de novo. Detalhe: o "sem internet" do Chromium
+  também trava o WebRTC (num celular de verdade não), então o teste o tira só nos segundos em que os dois se acham, com
+  toda a internet bloqueada e conferindo que nada saiu do aparelho.
 - `arquivos.test.js`: versão igual nos três lugares, tudo no `sw.js`, CSP, textos PT|EN, nenhum segredo.
