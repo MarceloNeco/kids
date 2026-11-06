@@ -366,6 +366,12 @@
       if (nx == null) { if (jg.vai.alvo) jg.vai.alvo.solto = true; return; }
       var r = raia(j); jg.vai.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h };
     }
+    function teclas(j, t) {   // ⌨️ computador (💪 Difícil): ← → andam até a beira, ↑/Espaço pulam
+      var jg = jogadores[j]; if (!vai || !jg || !t) return;
+      var r = raia(j), V = jg.vai, sent = (t.dir ? 1 : 0) - (t.esq ? 1 : 0);
+      V.alvo = sent ? { x: sent > 0 ? r.x + r.w : r.x, y: r.y + r.h * VAI.chao } : null;
+      if (t.pulo && V.y === 0) V.vy = -Math.sqrt(2 * VAI.g * VAI.puloMax);
+    }
     function corpoVai(j) {   // a caixa do corpo agora (mãos para cima quando o alvo está acima do ombro)
       var V = jogadores[j].vai, r = raia(j), pe = r.y + r.h * VAI.chao + V.y, A = VAI.A, cima = !!(V.alvo && V.alvo.y < pe - A * 0.7);
       return { x1: V.x - A * 0.22, x2: V.x + A * 0.22, topo: pe - A * (cima ? 1.18 : 1.0), base: V.y < -5 ? pe + 10 : r.y + r.h, pe: pe, cima: cima };
@@ -525,7 +531,7 @@
     }
     function batida(novoBpm) { bpm = novoBpm ? clamp(novoBpm, 40, 220) : 0; ultimaBatida = tempo; }
     return {
-      comecar: comecar, pausar: pausar, continuar: continuar, terminar: terminar, avancar: avancar, movimento: movimento, esqueleto: esqueleto, lancar: lancar, obstaculo: obstaculo, corpo: corpo, calibrar: calibrar, estado: estado, batida: batida, alvo: alvo,
+      comecar: comecar, pausar: pausar, continuar: continuar, terminar: terminar, avancar: avancar, movimento: movimento, esqueleto: esqueleto, lancar: lancar, obstaculo: obstaculo, corpo: corpo, calibrar: calibrar, estado: estado, batida: batida, alvo: alvo, teclas: teclas,
       zonaChute: function (j, frac) { if (jogadores[j]) jogadores[j].zonaChute = clamp(frac, 0.2, 0.95); },
       eventos: function () { var e = eventos; eventos = []; return e; },
       W: W, H: H

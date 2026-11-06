@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.22', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.23', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -191,7 +191,8 @@
       var dd = duracaoDe(c), d = dd ? (dd >= 120 ? '2 min' : dd + ' s') : T('🎵 a música inteira', '🎵 the whole song');
       var n = { crianca: T('Criança', 'Kids'), normal: 'Normal', maluco: T('Maluco', 'Crazy') }[c.dificuldade];
       var amb = c.ambiente === 'paisagem' ? T('🏞️ paisagem', '🏞️ landscape') : T('📷 câmera', '📷 camera');
-      $('lobbyDica').textContent = c.jogadores !== 2 ? '' : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.');
+      var pc = tv.toque && window.matchMedia && matchMedia('(pointer: fine)').matches, teclado = (c.modo === 'bagunca' || vaiLigado()) ? T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump (or use the mouse). Enter pauses.') : T('🖱️ No computador, o mouse é o dedo: clique e arraste. Para jogar com as setas, escolha 💪 Difícil.', '🖱️ On a computer the mouse is your finger: click and drag. To play with the arrow keys, choose 💪 Hard.');
+      $('lobbyDica').textContent = c.jogadores !== 2 ? (pc && c.modo !== 'arrumar' && c.modo !== 'pula' ? teclado : '') : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.');
       $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people') : T(' pessoa', ' person')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones') : T(' celular', ' phone'))) + ' · ' + d + ' · ' + n + (vaiLigado() ? T(' · 💪 difícil: o boneco vai até lá', ' · 💪 hard: the avatar goes there') : tv.toque && JEITO_MODOS.indexOf(c.modo) >= 0 ? T(' · 😊 fácil: o dedo pega na hora', ' · 😊 easy: your finger catches right away') : '');
       if (tv.toque) botaoJeito();
     }
@@ -336,6 +337,7 @@
     }
     var somAte = {};
     function som(ev) {
+      if (ev.t === 'casa' && ev.troca) navCasa();   // andou até a porta: as setinhas mostram os vizinhos novos
       if (ev.t === 'casa' && ev.fala) { var ag2 = performance.now(); if (ag2 > (somAte.fala || 0)) { somAte.fala = ag2 + 2500; dizer(ev.fala[0], ev.fala[1]); } }   // papagaio e a mamãe falam (com legenda)
       if (ev.t === 'casa') { if (!ev.som) return; var agora = performance.now(); if (agora < (somAte[ev.som] || 0)) return; somAte[ev.som] = agora + (ev.silencioso ? 120 : 60); Som.tocar(ev.som); return; }   // 🧸 Bagunça: um som por coisa (sem embolar)
       if (ev.t === 'bagunca100') { Som.tocar('fim'); dizer('Bagunça total!', 'Total mayhem!'); return; }
@@ -438,10 +440,23 @@
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;   // digitando um nome
         if (!$('tv').classList.contains('ativa')) return;
         if (!tv.vozLiberada) { tv.vozLiberada = true; Voz.liberar(); Som.iniciar(); }
+        if (teclaBoneco(e, true)) return;   // ⌨️ computador (sem TV): o teclado mexe o boneco
         if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && tv.partida && tv.partida.irPara && tv.fase === 'jogando') { comando({ acao: 'casa', dir: e.key === 'ArrowLeft' ? -1 : 1 }); return; }   // controle da TV: ◀ ▶ trocam de cômodo
         if (e.key === 'Enter' || e.key === ' ') { if (tv.fase === 'lobby' || tv.fase === 'fim') comecar(); else if (tv.fase === 'jogando' || tv.fase === 'pausa') comando({ acao: 'pausar' }); else if (tv.fase === 'calibrando' && tv.calib) tv.calib.pular(); }
       });
     }
+    /* ⌨️ no computador, sem TV: ← → andam e ↑ ou Espaço pulam (2ª pessoa: A D W). Vale na 🧸 Bagunça e no 💪 Difícil;
+       no 😊 Fácil quem joga é o mouse. Enter continua pausando. */
+    var TECLAS = { ArrowLeft: [0, 'esq'], ArrowRight: [0, 'dir'], ArrowUp: [0, 'pulo'], ' ': [0, 'pulo'], a: [1, 'esq'], d: [1, 'dir'], w: [1, 'pulo'] };
+    function teclaBoneco(e, desce) {
+      var t = TECLAS[e.key.length === 1 ? e.key.toLowerCase() : e.key];
+      if (!t || !tv.local || tv.fase !== 'jogando' || !tv.partida || !tv.partida.teclas || tv.arrumando) return false;
+      if (tv.partida.alvo && !vaiLigado()) return false;   // 😊 Fácil: o teclado não mexe o boneco
+      var j = Math.min(t[0], tv.cfg.jogadores - 1); tv.tec = tv.tec || [{}, {}]; tv.tec[j][t[1]] = desce;
+      tv.partida.teclas(j, tv.tec[j]); if (t[1] === 'pulo' && desce) { tv.tec[j].pulo = false; }   // pulo: uma vez por toque
+      e.preventDefault(); return true;
+    }
+    document.addEventListener('keyup', function (e) { if (tv.local && tv.partida && tv.partida.teclas) { var t = TECLAS[e.key.length === 1 ? e.key.toLowerCase() : e.key]; if (t && t[1] !== 'pulo') teclaBoneco(e, false); } });
     /* ---- 🖐️ no dedo: cada dedo (ou o mouse) vira um ponto de movimento com força 100; a raia é a metade
        onde o dedo está (2 pessoas); deslizar para cima = pulo, para baixo = abaixar; o boneco anda com o dedo ---- */
     var dedos = {}, toqueLigado = false;

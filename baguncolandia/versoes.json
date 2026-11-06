@@ -2,6 +2,19 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.23",
+      "data": "06/Nov/2026",
+      "hora": "15:30:00",
+      "pt": [
+        "⌨️ No computador: na 🧸 Bagunça e no 💪 Difícil, as setas ← → fazem o boneco andar e ↑ ou Espaço fazem ele pular (a 2ª pessoa usa A, D e W). O mouse continua funcionando como o dedo. Enter pausa. O lobby mostra essa dica quando o jogo está num computador.",
+        "🧸 Na Bagunça, o boneco agora bagunça com o corpo: os pés chutam o que está no chão e as mãos batem no que está no alto quando ele pula. Andando até a beira da tela, ele passa pela porta para o cômodo do lado, como num joguinho."
+      ],
+      "en": [
+        "⌨️ On a computer: in 🧸 Mayhem and 💪 Hard, the ← → keys make the avatar walk and ↑ or Space make it jump (the 2nd player uses A, D and W). The mouse still works as your finger. Enter pauses. The lobby shows this tip when the game is on a computer.",
+        "🧸 In Mayhem, the avatar now makes a mess with its body: its feet kick what is on the floor and its hands hit things up high when it jumps. Walking to the edge of the screen takes it through the door to the next room, just like a game."
+      ]
+    },
+    {
       "versao": "0.8.22",
       "data": "06/Nov/2026",
       "hora": "13:00:00",

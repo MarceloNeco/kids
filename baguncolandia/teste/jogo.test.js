@@ -416,3 +416,12 @@ test('pega-pega no difícil: o boneco anda até o bicho e pega encostando', () =
   p.alvo(0, c.b.px / 1280, 0.8);   // o dedo vai onde o coelho vai parar
   assert.ok(ate(p, () => c.pego, 6000), 'pegou');
 });
+
+test('⌨️ no 💪 Difícil: ← → andam até a beira e ↑ pula; no 😊 Fácil o teclado não faz nada', () => {
+  const p = vaiPartida(); limpar(p);
+  const x0 = p.estado().jogadores[0].vai.x; p.teclas(0, { esq: true }); rodar(p, 600); limpar(p);
+  assert.ok(p.estado().jogadores[0].vai.x < x0 - 200, 'andou para a esquerda');
+  p.teclas(0, { pulo: true }); p.avancar(16); assert.ok(p.estado().jogadores[0].vai.y < 0 || p.estado().jogadores[0].vai.vx !== undefined);
+  let menor = 0; for (let t = 0; t < 400; t += 16) { p.avancar(16); limpar(p); menor = Math.min(menor, p.estado().jogadores[0].vai.y); } assert.ok(menor < -100);
+  const f = partida(); f.comecar(); f.teclas(0, { dir: true }); f.avancar(16); assert.equal(f.estado().jogadores[0].vai, null);
+});
