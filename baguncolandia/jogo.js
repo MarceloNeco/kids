@@ -16,7 +16,7 @@
   'use strict';
   var W = 1280, H = 720, G = 1100;   // gravidade em px/s²
 
-  var PONTOS = { fruta: 10, doce: 10, heroi: 15, mascote: 30, vilaoPega: -5, chute: 10, gol: 30, comboCada: 5, desviou: 10, tocou: 5 };
+  var PONTOS = { fruta: 10, doce: 10, heroi: 15, bicho: 15, mascote: 30, vilaoPega: -5, chute: 10, gol: 30, comboCada: 5, desviou: 10, tocou: 5 };
   var DIFIC = { crianca: { intervalo: 1500, vel: 0.85 }, normal: { intervalo: 1000, vel: 1 }, maluco: { intervalo: 650, vel: 1.2 } };
   var LIMIAR = 35;   // força mínima do ponto de movimento (0..100) para contar
   var MODOS = ['corta', 'pega', 'chuta', 'pula', 'bolas', 'mistura', 'bagunca', 'arrumar'];   // bagunca: motor próprio em casa.js
@@ -176,6 +176,7 @@
       var fig = typeof o.fig === 'string' ? figs.filter(function (f) { return f.id === o.fig; })[0] : o.fig;
       if (!fig) return null;
       var c = { id: ++seq, fig: fig.id, papel: fig.papel, raio: fig.raio || 44, x: o.x, y: o.y, vx: o.vx || 0, vy: o.vy || 0, rot: o.rot || 0, vrot: o.vrot || 0, j: o.j || 0, morta: false, chutada: !!o.chutada, nasceu: tempo, estilo: o.estilo || 'arco', fase: rnd() * 6.28, tocadoAte: 0 };
+      if (fig.papel === 'bicho') { c.estilo = 'bicho'; c.tam = fig.tam || 100; c.raio = Math.max(26, c.tam * 0.38); c.vel = fig.vel || 120; c.anda = fig.anda || 'anda'; c.b = o.b; }
       coisas.push(c);
       emitir({ t: 'lancou', id: c.id, fig: c.fig, papel: c.papel, j: c.j });
       return c;
@@ -214,6 +215,8 @@
         lancar({ fig: fig, x: x, y: r.y + r.h + fig.raio, vx: (alvoX - x) / voo, vy: vy, vrot: (rnd() - 0.5) * 6, j: j, estilo: estilo });
       } else if (m === 'pega') {
         var p = rnd();
+        var bichos = porPapel('bicho');
+        if (bichos.length && p >= 0.12 + chanceVilao) { soltarBicho(j, sortear(bichos)); return; }   // 🐰 bichos no lugar dos heróis
         fig = p < 0.12 ? sortear(porPapel('poder')) : p < 0.12 + chanceVilao ? sortear(porPapel('vilao')) : sortear(porPapel('heroi'));
         if (!fig) return;
         if (rnd() < 0.5) {   // desce de balão/paraquedas
@@ -281,6 +284,7 @@
           if (c.x < r0.x - 200 || c.x > r0.x + r0.w + 200) coisas.splice(i, 1);
           continue;
         }
+        if (c.estilo === 'bicho') { passoBicho(c, d); if (c.sumiu) coisas.splice(i, 1); continue; }
         if (c.estilo === 'quica') {
           c.vy += G * 0.6 * d; c.x += c.vx * d; c.y += c.vy * d; c.rot += c.vrot * d;
           var chaoQ = r.y + r.h - c.raio - 10;
@@ -310,6 +314,53 @@
       else if (jogadores.every(function (jg) { return jg.vidas <= 0; })) terminar();
     }
 
+    /* 🐰 bichos do Pega-pega: entram e ficam à vista (nunca escondidos), esperam uns segundos e vão embora se ninguém pega.
+       Pegou: vai andando (ou voando) até o cantinho do jogador, fica ~10 s e sai da tela pelo lado do cantinho. */
+    var ESPERA_CANTO = 10;
+    function chaoDe(j) { var r = raia(j); return r.y + r.h * 0.86; }
+    function ladoCanto(j) { return nJog === 2 && j === 1 ? 1 : -1; }   // 1 jogador: canto de baixo à esquerda; 2: cada um no seu lado de fora
+    function canto(j, c) {
+      var r = raia(j), lado = ladoCanto(j), voa = c.anda === 'voa', grande = c.tam > 300;
+      var x = lado < 0 ? r.x + (grande ? c.tam * 0.22 : 60 + rnd() * 170) : r.x + r.w - (grande ? c.tam * 0.22 : 60 + rnd() * 170);
+      return { x: x, y: voa ? chaoDe(j) - 110 - rnd() * 70 : chaoDe(j) - c.tam / 2 + rnd() * 12 };
+    }
+    function soltarBicho(j, fig) {
+      var vivos = coisas.filter(function (c) { return c.j === j && c.estilo === 'bicho' && !c.pego; }).length;
+      if (vivos >= 3) return null;
+      var r = raia(j), lado = ladoCanto(j), tam = fig.tam || 100, voa = fig.anda === 'voa';
+      var meia = Math.max(tam / 2, 60), x1 = r.x + Math.max(meia, lado < 0 ? 300 : 80), x2 = r.x + r.w - Math.max(meia, lado > 0 ? 300 : 80);   // longe do cantinho
+      var px = x2 > x1 ? x1 + rnd() * (x2 - x1) : r.x + r.w / 2;
+      var py = voa ? r.y + r.h * (0.28 + rnd() * 0.32) : chaoDe(j) - tam / 2;
+      var deEsq = rnd() < 0.5, x0 = fig.anda === 'buraco' ? px : deEsq ? r.x - tam / 2 - 20 : r.x + r.w + tam / 2 + 20;
+      var espera = (4.5 + rnd() * 2.5) * (vai ? 1.6 : 1) / dif.vel;
+      return lancar({ fig: fig, x: x0, y: voa ? py - 60 : py, j: j, b: { fase: 'chega', t: 0, px: px, py: py, tx: px, ty: py, espera: espera, k: fig.anda === 'buraco' ? 0 : 1, dir: x0 < px ? 1 : -1, passo: 0, anda: false } }, j);
+    }
+    function passoBicho(c, d) {
+      var B = c.b, r = raia(c.j), voa = c.anda === 'voa', vel = c.vel;
+      B.t += d;
+      if (B.fase === 'chega') {
+        if (c.anda === 'buraco') { B.k = Math.min(1, B.k + d * 2); if (B.k >= 1) { B.fase = 'fica'; B.t = 0; } }
+        else if (Math.hypot(B.px - c.x, B.py - c.y) < 8) { B.fase = 'fica'; B.t = 0; }
+        B.tx = B.px; B.ty = B.py;
+      } else if (B.fase === 'fica') {   // passeia por perto
+        B.tx = B.px + Math.sin(B.t * (voa ? 1.3 : 0.8)) * (c.anda === 'buraco' ? 0 : voa ? 90 : 70); B.ty = voa ? B.py + Math.sin(B.t * 2.1) * 40 : B.py;
+        if (B.t > B.espera) { B.fase = 'vai'; B.t = 0; B.tx = c.x < r.x + r.w / 2 ? r.x - c.tam - 40 : r.x + r.w + c.tam + 40; B.ty = voa ? r.y - 80 : B.py; }
+      } else if (B.fase === 'vai') {
+        if (c.anda === 'buraco') { B.k = Math.max(0, B.k - d * 2); if (B.k <= 0) c.sumiu = true; return; }
+      } else if (B.fase === 'pego') {
+        if (Math.hypot(B.tx - c.x, B.ty - c.y) < 8) { B.fase = 'canto'; B.t = 0; B.cx = B.tx; B.cy = B.ty; }
+        vel *= 1.3;
+      } else if (B.fase === 'canto') {   // descansa no cantinho
+        B.tx = B.cx + (voa ? Math.sin(B.t * 1.6) * 20 : 0); B.ty = B.cy + (voa ? Math.sin(B.t * 2.4) * 12 : 0);
+        if (B.t > ESPERA_CANTO) { B.fase = 'sai'; B.t = 0; B.tx = ladoCanto(c.j) < 0 ? r.x - c.tam - 60 : r.x + r.w + c.tam + 60; B.ty = voa ? B.cy - 160 : B.cy; }
+      }
+      if (c.anda === 'buraco' && B.fase !== 'pego' && B.fase !== 'canto' && B.fase !== 'sai') { B.anda = false; return; }
+      var dx = B.tx - c.x, dy = B.ty - c.y, dist = Math.hypot(dx, dy), passo = Math.min(dist, vel * d);
+      if (dist > 0.5) { c.x += dx / dist * passo; c.y += dy / dist * passo; }
+      B.anda = passo > vel * d * 0.2; if (Math.abs(dx) > 2) B.dir = dx > 0 ? 1 : -1;
+      if (B.anda || voa) B.passo += d * (voa ? 14 : Math.max(5, vel / c.tam * 9));
+      if ((B.fase === 'vai' || B.fase === 'sai') && (c.x < r.x - c.tam / 2 - 30 || c.x > r.x + r.w + c.tam / 2 + 30 || c.y < r.y - c.tam)) c.sumiu = true;
+    }
     function alvo(j, nx, ny) {   // dedo no lugar (normalizado na raia); null = solta (o boneco termina de chegar)
       var jg = jogadores[j]; if (!vai || !jg) return;
       if (nx == null) { if (jg.vai.alvo) jg.vai.alvo.solto = true; return; }
@@ -337,7 +388,7 @@
         // encostou? (só no corpo dele)
         var B = corpoVai(j);
         coisas.forEach(function (c) {
-          if (c.morta || c.j !== j || c.papel === 'obstaculo' || c.estilo === 'obstaculo') return;
+          if (c.morta || c.pego || c.j !== j || c.papel === 'obstaculo' || c.estilo === 'obstaculo') return;
           var px = clamp(c.x, B.x1, B.x2), py = clamp(c.y, B.topo, B.base);
           if (Math.hypot(c.x - px, c.y - py) > c.raio) return;
           if (c.papel === 'bola' && c.estilo !== 'quica' && !c.chutada && c.y < B.pe - A * 0.35) return;   // chute: só com as pernas
@@ -364,7 +415,7 @@
       jg.rastro = recentes.concat(fortes).slice(-24);
       var modo = modoAtual;
       coisas.forEach(function (c) {
-        if (c.morta || c.j !== j) return;
+        if (c.morta || c.pego || c.j !== j) return;
         var atingiu = false;
         for (var k = 0; k < lamina.length && !atingiu; k++) {
           var L = lamina[k];
@@ -398,6 +449,10 @@
         c.morta = true; c.como = 'vilao';
         if (modo === 'pega') { jg.pontos = Math.max(0, jg.pontos + PONTOS.vilaoPega); emitir({ t: 'vilao', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.vilaoPega }); }
         else { jg.vidas = Math.max(0, jg.vidas - 1); emitir({ t: 'vilao', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, vida: true }); emitir({ t: 'vida', j: j, vidas: jg.vidas }); }
+      } else if (c.papel === 'bicho') {
+        if (c.anda === 'buraco' && c.b.k < 0.35) return;   // ainda (ou já) dentro do buraco
+        c.pego = true; var cn = canto(j, c); c.b.fase = 'pego'; c.b.t = 0; c.b.tx = cn.x; c.b.ty = cn.y;
+        jg.pontos += mult(j, PONTOS.bicho); emitir({ t: 'pegou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.bicho, bicho: true });
       } else if (c.papel === 'heroi') {
         c.morta = true; c.como = 'pegou';
         var fig = figs.filter(function (f) { return f.id === c.fig; })[0], p = fig && fig.mascote ? PONTOS.mascote : PONTOS.heroi;

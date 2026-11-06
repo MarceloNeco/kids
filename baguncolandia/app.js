@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.19', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.20', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -191,7 +191,7 @@
       var n = { crianca: T('Criança', 'Kids'), normal: 'Normal', maluco: T('Maluco', 'Crazy') }[c.dificuldade];
       var amb = c.ambiente === 'paisagem' ? T('🏞️ paisagem', '🏞️ landscape') : T('📷 câmera', '📷 camera');
       $('lobbyDica').textContent = c.jogadores !== 2 ? '' : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.');
-      $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people') : T(' pessoa', ' person')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones') : T(' celular', ' phone'))) + ' · ' + d + ' · ' + n + (vaiLigado() ? T(' · 🧍 boneco vai até lá', ' · 🧍 avatar goes there') : '');
+      $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people') : T(' pessoa', ' person')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones') : T(' celular', ' phone'))) + ' · ' + d + ' · ' + n + (vaiLigado() ? T(' · 💪 difícil: o boneco vai até lá', ' · 💪 hard: the avatar goes there') : tv.toque && JEITO_MODOS.indexOf(c.modo) >= 0 ? T(' · 😊 fácil: o dedo pega na hora', ' · 😊 easy: your finger catches right away') : '');
       if (tv.toque) botaoJeito();
     }
     var estadoBroadcastEm = 0;
@@ -475,7 +475,7 @@
     var JEITO_MODOS = ['corta', 'pega', 'chuta', 'bolas', 'mistura'];
     function jeitoVai() { try { return localStorage.getItem('bagunca:jeito') === 'vai'; } catch (e) { return false; } }
     function vaiLigado() { return !!tv.toque && jeitoVai() && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0; }
-    function botaoJeito() { var v = jeitoVai(), b = $('localJeito'); b.classList.toggle('ativo', v); b.querySelector('span').textContent = v ? T('Boneco vai até lá', 'Avatar goes there') : T('Dedo corta', 'Finger slices'); b.firstChild.textContent = v ? '🧍 ' : '👆 '; $('tv').classList.toggle('jeitoOk', !!tv.toque && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0); }
+    function botaoJeito() { var v = jeitoVai(), b = $('localJeito'); b.classList.toggle('ativo', v); b.querySelector('span').textContent = v ? T('Difícil', 'Hard') : T('Fácil', 'Easy'); b.firstChild.textContent = v ? '💪 ' : '😊 '; b.title = v ? T('Difícil: o boneco anda (e pula) até onde você segura o dedo. Toque para Fácil.', 'Hard: the avatar walks (and jumps) to where you hold your finger. Tap for Easy.') : T('Fácil: o dedo pega e corta na hora. Toque para Difícil.', 'Easy: your finger catches and slices right away. Tap for Hard.'); $('tv').classList.toggle('jeitoOk', !!tv.toque && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0); }
     function dicasLigadas() { try { return localStorage.getItem('bagunca:dicas') !== '0'; } catch (e) { return true; } }
     function botaoDica() { var v = dicasLigadas(); $('casaDica').classList.toggle('ativo', v); $('casaDica').querySelector('span').textContent = v ? T('Dicas: sim', 'Hints: on') : T('Dicas: não', 'Hints: off'); }
     function sairLocal() {

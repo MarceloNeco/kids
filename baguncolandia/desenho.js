@@ -65,6 +65,37 @@
     return null;
   }
 
+  /* 🐰 bicho do Pega-pega: corpo em SVG + pernas que andam e asas que batem (desenhadas aqui); olha para onde vai */
+  function bicho(ctx, c, fig, ts) {
+    var B = c.b, T = c.tam, u = T / 100, px = Math.min(512, Math.round(T)), k = fig.id + '@b' + px, cache = D.figs[k];
+    if (!cache) { D.figs[k] = cache = { pronta: false }; root.Figuras.rasterizar(fig, px).then(function (cv) { D.figs[k] = { pronta: true, c: cv }; }); }
+    var img = cache.pronta ? cache.c : null, voa = c.anda === 'voa', pula = c.anda === 'pula' && B.anda, buraco = c.anda === 'buraco' && B.k < 1;
+    var hop = pula ? -Math.abs(Math.sin(B.passo * 0.5)) * T * 0.28 : 0, saida = buraco ? (1 - B.k) * T * 0.95 : 0;
+    ctx.save(); ctx.translate(c.x, c.y);
+    if (!voa) { ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(0, T / 2 - 2, T * 0.32 * (hop ? 0.7 : 1), T * 0.05, 0, 0, 6.2832); ctx.fill(); }
+    if (c.anda === 'buraco' && !c.pego) { ctx.fillStyle = '#6d4c2f'; ctx.beginPath(); ctx.ellipse(0, T / 2 - 4, T * 0.48, T * 0.12, 0, 0, 6.2832); ctx.fill(); ctx.fillStyle = '#2b1a10'; ctx.beginPath(); ctx.ellipse(0, T / 2 - 4, T * 0.34, T * 0.07, 0, 0, 6.2832); ctx.fill(); }   // o montinho e o buraco
+    if (buraco) { ctx.beginPath(); ctx.rect(-T, -T * 2, T * 2, T * 2 + T / 2 - 4); ctx.clip(); }   // só aparece o que já saiu da terra
+    ctx.translate(0, hop + saida); if (B.dir < 0) ctx.scale(-1, 1);
+    if (c.fig === 'minhoca') ctx.transform(1, 0, Math.sin(ts / 160) * 0.12, 1, 0, 0);   // minhoca rebola
+    var P = function (x) { return (x - 50) * u; };
+    // pernas: pares alternados; pulando, encolhidas; voando, penduradas
+    (fig.pernas || []).forEach(function (pn, i) {
+      var ang = voa ? 0.35 : pula ? (hop < -T * 0.05 ? 0.7 : -0.2) : B.anda ? Math.sin(B.passo + (i % 2) * Math.PI) * 0.55 : 0;
+      ctx.strokeStyle = pn[4]; ctx.lineWidth = pn[3] * u; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(P(pn[0]), P(pn[1])); ctx.lineTo(P(pn[0]) + Math.sin(ang) * pn[2] * u, P(pn[1]) + Math.cos(ang) * pn[2] * u); ctx.stroke();
+    });
+    var asas = function () { (fig.asas || []).forEach(function (a) {   // asas: batem voando (e um pouquinho quando a ave anda)
+      var f = voa ? 0.2 + 0.8 * Math.abs(Math.sin(B.passo)) : B.anda ? 0.85 + 0.15 * Math.sin(B.passo * 2) : 1;
+      ctx.fillStyle = a[4]; ctx.beginPath();
+      if (fig.asaEixo === 'x') ctx.ellipse(P(a[0]) + (a[0] < 50 ? 1 : -1) * a[2] * u * (1 - f) * 0.8, P(a[1]), a[2] * u * f, a[3] * u, 0, 0, 6.2832);
+      else ctx.ellipse(P(a[0]), P(a[1]) - a[3] * u * (1 - f) * 0.6, a[2] * u, a[3] * u * f, -0.25, 0, 6.2832);
+      ctx.fill();
+    }); };
+    if (fig.asaEixo === 'x') asas();   // borboleta: asas atrás do corpo
+    if (img) ctx.drawImage(img, -T / 2, -T / 2, T, T);
+    if (fig.asaEixo !== 'x') asas();
+    ctx.restore();
+  }
   function desenharFigura(ctx, c, fig, alpha) {
     var img = imagem(fig, c.raio), s = c.raio * 2.3;
     ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.rot || 0); ctx.globalAlpha = alpha == null ? 1 : alpha;
@@ -189,10 +220,12 @@
     if ((paisagem || casa) && (D.mostrarBoneco !== false || estado.modo === 'pula')) jogs.forEach(function (jg, j) { seguro('boneco', function () { boneco(ctx, jg, j, ts, dt); }); });   // no modo do dedo a pessoa pode esconder o boneco (menos no Pula e abaixa)
     if (casa && estado.casa.arrumando) seguro('guias', function () { root.Casa.guias(ctx, estado.casa, ts); });   // 🧹 dicas e o que está na mão: por cima do boneco
     // as coisas
-    seguro('coisas', function () { estado.coisas.forEach(function (c) {
+    var ordem = estado.coisas.some(function (c) { return c.estilo === 'bicho'; }) ? estado.coisas.slice().sort(function (a, b) { return (b.estilo === 'bicho' ? b.tam : 0) - (a.estilo === 'bicho' ? a.tam : 0); }) : estado.coisas;   // 🐰 bicho grande atrás (o cavalo não esconde o resto)
+    seguro('coisas', function () { ordem.forEach(function (c) {
       if (c.morta) return;
       if (c.papel === 'obstaculo') { obstaculo(ctx, c, ts); return; }
       var fig = root.Figuras.porId(c.fig); if (!fig) return;
+      if (c.estilo === 'bicho') { bicho(ctx, c, fig, ts); return; }
       if (c.estilo === 'quica') { ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(c.x, jg0chao(jg0(c, jogs)), c.raio * 0.9, c.raio * 0.3, 0, 0, 6.2832); ctx.fill(); ctx.restore(); }
       c.cor = CORES.j[c.j];
       if (c.estilo === 'balao') balao(ctx, c);

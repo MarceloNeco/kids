@@ -2,6 +2,19 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.20",
+      "data": "06/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "😊 Fácil / 💪 Difícil no jogo com o dedo. Fácil: o dedo pega e corta na hora, como sempre. Difícil: o boneco anda (e pula) até onde você segura o dedo.",
+        "🐰 Pega-pega com bichos no lugar dos personagens: borboleta, joaninha, libélula, passarinho, minhoca e toupeira (saem do buraco), sapo, coelho, esquilo, pato, galinha, gato, cachorro, porquinho, ovelha, tartaruga e um cavalo do tamanho de verdade. Eles aparecem sempre à vista, passeiam e, se ninguém pegar, vão embora. Pegou? O bicho vai andando (ou voando) até o cantinho de baixo, descansa uns 10 segundos e depois sai da tela andando, com as pernas mexendo, ou voando, batendo as asas."
+      ],
+      "en": [
+        "😊 Easy / 💪 Hard when playing with your finger. Easy: your finger catches and slices right away, as always. Hard: the avatar walks (and jumps) to where you hold your finger.",
+        "🐰 Catch now has animals instead of characters: butterfly, ladybug, dragonfly, little bird, earthworm and mole (they come out of a hole), frog, bunny, squirrel, duck, hen, cat, dog, piglet, sheep, turtle and a real-size horse. They always appear in plain sight, wander around and leave if nobody catches them. Caught one? It walks (or flies) to the bottom corner, rests about 10 seconds and then leaves the screen walking, legs moving, or flying, wings flapping."
+      ]
+    },
+    {
       "versao": "0.8.19",
       "data": "06/Nov/2026",
       "hora": "10:00:00",
