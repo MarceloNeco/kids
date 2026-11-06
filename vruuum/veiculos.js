@@ -1,12 +1,13 @@
-/* Vruuum! — a garagem: 11 veículos, todos desenhados aqui em código, vistos de trás (como na corrida).
+/* Vruuum! — a garagem: 12 veículos, todos desenhados em código, vistos de trás (como na corrida).
    Terra: Clássico, GT (traseira redonda), Superesportivo (largo, aerofólio grande), Kart, Monstrão,
-   Moto, Skate (animado: a perna empurra o chão, em quadros). Céu: Aviãozinho, Jato, Helicóptero — esses voam (desenho.js troca a estrada por uma rota no
+   Moto, Skate (animado: a perna empurra o chão, em quadros), Cavalo (galopando, em 3D: cavalo.js). Céu: Aviãozinho, Jato, Helicóptero — esses voam (desenho.js troca a estrada por uma rota no
    ar e os obstáculos por pássaros, nuvens de tempestade, anéis e correntes de ar).
    Estilos inspirados em carros esportivos famosos, mas sem marca, logotipo ou nome de fabricante.
    vel e curva: pequenas diferenças (até ~10%) para cada um ter seu jeito sem desequilibrar a corrida. */
 (function (raiz) {
   'use strict';
   var S = raiz.VruuumSprites || { util: {} }, U = S.util, EMOJI = S.EMOJI, FONTE = S.FONTE;   // no Node (testes) só a lista importa
+  var CAV = raiz.VruuumCavalo || (typeof require === 'function' ? require('./cavalo.js') : null);
   var circ = U.circ, oval = U.oval, caixa = U.caixa, poli = U.poli, linha = U.linha, sombra = U.sombra, brilho = U.brilho;
 
   function tom(cor, f) {   // f > 0 clareia, f < 0 escurece
@@ -386,13 +387,14 @@
     { id: 'monstrao', janela: { poli: [0.29, 0.07, 0.71, 0.07, 0.71, 0.22, 0.29, 0.22] }, cab: [0.5, 0.17, 0.14], grupo: 'terra', nome: ['Monstrão', 'Monster Truck'], w: 960, h: 920, vel: 0.95, curva: 0.98, desenhar: monstrao },
     { id: 'moto', janela: { elipse: [0.5, 0.14, 0.18, 0.123] }, cab: [0.5, 0.15, 0.22], capacete: true, grupo: 'moto', nome: ['Moto', 'Motorbike'], w: 520, h: 760, vel: 1.03, curva: 1.1, desenhar: moto },
     { id: 'skate', janela: { elipse: [0.5, 0.1, 0.3, 0.2] }, cab: [0.5, 0.1, 0.2], aberto: true, quadros: 12, bracos: true, grupo: 'moto', nome: ['Skate', 'Skateboard'], w: 560, h: 780, vel: 0.94, curva: 1.15, desenhar: skatista },
+    { id: 'cavalo', janela: { elipse: [0.5, 0.16, 0.3, 0.2] }, cab: [0.5, 0.16, 0.132], aberto: true, quadros: 12, cavalo: true, grupo: 'moto', nome: ['Cavalo', 'Horse'], w: 720, h: 1050, vel: 0.97, curva: 1.12, desenhar: function (c, W, H, cor, e, f, corpo) { CAV.desenhar(c, W, H, cor, e, f, corpo); } },
     { id: 'aviao', janela: { elipse: [0.5, 0.44, 0.075, 0.1] }, cab: [0.5, 0.47, 0.16], grupo: 'ar', nome: ['Aviãozinho', 'Little Plane'], w: 1500, h: 760, vel: 1, curva: 1.05, desenhar: aviao, helice: true },
     { id: 'jato', janela: { elipse: [0.5, 0.43, 0.06, 0.09] }, cab: [0.5, 0.46, 0.14], grupo: 'ar', nome: ['Jato', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92, desenhar: jato, fogo: true },
     { id: 'heli', janela: { elipse: [0.5, 0.48, 0.16, 0.15] }, cab: [0.5, 0.52, 0.21], grupo: 'ar', nome: ['Helicóptero', 'Helicopter'], w: 1100, h: 900, vel: 0.95, curva: 1.12, desenhar: helicoptero, rotor: true }
   ];
   var GRUPOS = [
     { id: 'terra', nome: ['🚗 Carros', '🚗 Cars'] },
-    { id: 'moto', nome: ['🏍️ Moto e skate', '🏍️ Bike and skateboard'] },
+    { id: 'moto', nome: ['🏍️ Moto, skate e cavalo', '🏍️ Bike, skateboard and horse'] },
     { id: 'ar', nome: ['✈️ No céu (voa!)', '✈️ In the sky (flies!)'] }
   ];
   function achar(id) { for (var k = 0; k < LISTA.length; k++) if (LISTA[k].id === id) return LISTA[k]; return null; }

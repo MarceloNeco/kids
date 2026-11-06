@@ -19,18 +19,34 @@
   }
   var PELE = '#f2c9a0', MORENA = '#8a5a3c';
   // enfeites usados por vários personagens
-  // cabelo loiro e comprido saindo por baixo do capacete (de costas: uma cortina até as costas; de frente: mechas dos lados)
-  function cabeloLoiro(c, x, y, r, costas) {
-    var claro = '#ffe08a', meio = '#f4c542', escuro = '#d9a21b';
-    c.fillStyle = meio; c.beginPath();
-    c.moveTo(x - r * 0.95, y - r * 0.1);
-    c.quadraticCurveTo(x - r * 1.25, y + r * 1.1, x - r * (costas ? 0.85 : 1.05), y + r * 2.0);
-    c.quadraticCurveTo(x, y + r * (costas ? 2.25 : 1.2), x + r * (costas ? 0.85 : 1.05), y + r * 2.0);
-    c.quadraticCurveTo(x + r * 1.25, y + r * 1.1, x + r * 0.95, y - r * 0.1); c.closePath(); c.fill();
-    c.strokeStyle = claro; c.lineWidth = r * 0.07; c.lineCap = 'round';
-    for (var k = -3; k <= 3; k++) { if (!costas && Math.abs(k) < 2) continue; c.beginPath(); c.moveTo(x + k * r * 0.27, y + r * 0.3); c.quadraticCurveTo(x + k * r * 0.36, y + r * 1.1, x + k * r * 0.24, y + r * 1.9); c.stroke(); }
-    c.strokeStyle = escuro; c.lineWidth = r * 0.04;
-    for (var q = -2; q <= 2; q++) { if (!costas && Math.abs(q) < 2) continue; c.beginPath(); c.moveTo(x + q * r * 0.38 + r * 0.1, y + r * 0.5); c.quadraticCurveTo(x + q * r * 0.45, y + r * 1.2, x + q * r * 0.34, y + r * 1.85); c.stroke(); }
+  // rabo de cavalo loiro saindo de trás do capacete. giro: quanto a cabeça virou (0 = de costas, como em
+  // cabeca.js); o rabo nasce na nuca, que vai para o lado quando ela vira, e é jogado para fora, balançando
+  // (t = tempo em s). Desenhado ao vivo por cabeca.js (na frente da cabeça quando a nuca aparece, atrás quando não).
+  function raboDeCavalo(c, x, y, r, giro, t) {
+    var s = Math.sin(giro), bal = Math.sin((t || 0) * 3.1) * r * 0.1 + Math.sin((t || 0) * 5.3) * r * 0.04;
+    var a = Math.abs(s), bx = x + s * r * 0.9, by = y - r * 0.15;
+    // de costas cai reto pela nuca até as costas; de lado faz o arco para cima e para fora (preso no alto)
+    var P = [bx, by, bx + s * r * 0.85 + bal * 0.3, by - r * 0.45 * a + r * 0.3 * (1 - a), bx + s * r * 1.4 + bal, by + r * 0.9, bx + s * r * 1.0 + bal * 1.8, by + r * 2.35];
+    function ponto(u) { var b = 1 - u, onda = Math.sin(u * Math.PI * 1.7) * r * 0.13 * (1 - a * 0.4); return [b * b * b * P[0] + 3 * b * b * u * P[2] + 3 * b * u * u * P[4] + u * u * u * P[6] + onda, b * b * b * P[1] + 3 * b * b * u * P[3] + 3 * b * u * u * P[5] + u * u * u * P[7]]; }
+    function larg(u) { return r * (u < 0.3 ? 0.2 + u / 0.3 * 0.24 : 0.44 * Math.pow(1 - (u - 0.3) / 0.7, 0.75) + 0.025); }
+    var N = 22, esq = [], dir = [], meio = [];
+    for (var k = 0; k <= N; k++) {
+      var u = k / N, p = ponto(u), q = ponto(Math.min(1, u + 0.02)), o = ponto(Math.max(0, u - 0.02)), dx = q[0] - o[0], dy = q[1] - o[1], d = Math.sqrt(dx * dx + dy * dy) || 1, w = larg(u);
+      meio.push(p); esq.push([p[0] - dy / d * w, p[1] + dx / d * w]); dir.push([p[0] + dy / d * w, p[1] - dx / d * w]);
+    }
+    var g = c.createLinearGradient(bx - r * 0.5, by, bx + r * 0.5, by + r * 2.3);
+    g.addColorStop(0, '#ffe58f'); g.addColorStop(0.5, '#f6c93f'); g.addColorStop(1, '#e0a91c');
+    c.fillStyle = g; c.beginPath(); c.moveTo(esq[0][0], esq[0][1]);
+    for (k = 1; k <= N; k++) c.lineTo(esq[k][0], esq[k][1]);
+    for (k = N; k >= 0; k--) c.lineTo(dir[k][0], dir[k][1]);
+    c.closePath(); c.fill();
+    c.lineCap = 'round';
+    [[-0.55, 'rgba(201,143,18,.55)', 0.035], [-0.1, 'rgba(255,246,200,.75)', 0.05], [0.35, 'rgba(201,143,18,.45)', 0.03], [0.6, 'rgba(255,240,180,.6)', 0.035]].forEach(function (f) {
+      c.strokeStyle = f[1]; c.lineWidth = Math.max(1, r * f[2]); c.beginPath();
+      for (var k2 = 2; k2 <= N - 1; k2++) { var m = meio[k2], e2 = esq[k2], px = m[0] + (e2[0] - m[0]) * f[0], py = m[1] + (e2[1] - m[1]) * f[0]; if (k2 === 2) c.moveTo(px, py); else c.lineTo(px, py); }
+      c.stroke();
+    });
+    circ(c, bx, by, r * 0.17, '#e23c8f'); circ(c, bx - r * 0.05, by - r * 0.05, r * 0.07, 'rgba(255,255,255,.45)');   // xuxinha rosa
   }
   function franja(c, x, y, r) { c.fillStyle = '#f4c542'; c.beginPath(); c.moveTo(x - r * 0.62, y - r * 0.12); c.quadraticCurveTo(x - r * 0.3, y + r * 0.08, x, y - r * 0.12); c.quadraticCurveTo(x + r * 0.3, y + r * 0.08, x + r * 0.62, y - r * 0.12); c.lineTo(x + r * 0.55, y - r * 0.32); c.lineTo(x - r * 0.55, y - r * 0.32); c.closePath(); c.fill(); }
   function capacetePilota(c, x, y, r) { circ(c, x, y, r * 1.02, '#ff4fa3'); circ(c, x - r * 0.38, y - r * 0.5, r * 0.18, 'rgba(255,255,255,.45)'); }
@@ -123,10 +139,11 @@
       frente: function (c, x, y, r) { elipse(c, x, y + r * 0.2, r * 1.0, r * 1.05, '#d9480f'); rosto(c, x, y + r * 0.14, r * 0.74, PELE); chapeuBruxa(c, x, y, r); },
       costas: function (c, x, y, r) { elipse(c, x + r * 0.15, y + r * 0.95, r * 0.3, r * 0.5, '#c43d0a', 0.3); elipse(c, x, y + r * 0.2, r * 1.0, r * 1.05, '#d9480f'); fios(c, x, y, r, 'rgba(0,0,0,.15)'); chapeuBruxa(c, x, y, r); } },
     // ---- 1.9.0: personagem ORIGINAL do jogo (nada copiado): uma pilota de corrida, de capacete rosa aberto;
-    // 1.9.1: loira de cabelo comprido saindo do capacete ----
+    // 1.9.1: loira de cabelo comprido; 1.10.0: rabo de cavalo que balança e acompanha a cabeça virando ----
     { id: 'faisca', nome: ['Faísca, a Pilota', 'Sparky the Racer'], origem: 'personagem original do Vruuum! (desenho próprio)', cor: '#ff4fa3',
-      frente: function (c, x, y, r) { cabeloLoiro(c, x, y, r, false); capacetePilota(c, x, y, r); rosto(c, x, y + r * 0.2, r * 0.62, '#f2c9a0'); franja(c, x, y, r); oculos(c, x, y - r * 0.52, r); },
-      costas: function (c, x, y, r) { cabeloLoiro(c, x, y, r, true); capacetePilota(c, x, y, r); c.save(); c.beginPath(); c.arc(x, y, r * 1.02, 0, Math.PI * 2); c.clip(); c.fillStyle = '#ffffff'; c.fillRect(x - r * 0.14, y - r * 1.1, r * 0.28, r * 2.2); c.restore(); estrela(c, x, y + r * 0.15, r * 0.3, '#ffd166'); oculos(c, x, y - r * 0.52, r); } }
+      frente: function (c, x, y, r) { raboDeCavalo(c, x, y, r, -1.25, 0.4); capacetePilota(c, x, y, r); rosto(c, x, y + r * 0.2, r * 0.62, '#f2c9a0'); franja(c, x, y, r); oculos(c, x, y - r * 0.52, r); },
+      costas: function (c, x, y, r) { capacetePilota(c, x, y, r); c.save(); c.beginPath(); c.arc(x, y, r * 1.02, 0, Math.PI * 2); c.clip(); c.fillStyle = '#ffffff'; c.fillRect(x - r * 0.14, y - r * 1.1, r * 0.28, r * 2.2); c.restore(); estrela(c, x, y + r * 0.35, r * 0.26, '#ffd166'); oculos(c, x, y - r * 0.52, r); },
+      rabo: raboDeCavalo }
   ];
   // corpo de quem pilota o skate (e o que aparece de corpo nos outros veículos): menina ou menino
   var MENINAS = ['emilia', 'cuca', 'iara', 'chapeuzinho', 'alice', 'branca', 'cinderela', 'rapunzel', 'sereia', 'dorothy', 'pepper', 'faisca'];

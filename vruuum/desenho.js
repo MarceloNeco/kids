@@ -106,7 +106,10 @@
     return { emoji: piloto, foto: p ? null : (foto || null), personagem: p, cor: cor, camisa: V() ? V().tom(cor, -0.4) : '#3a2f73' };
   }
   // o piloto vivo: de costas, e de vez em quando vira, olha e sorri
-  function pilotoVivo(c, vv, x0, y0, cw, ch, info, semente, periodo) { if (Cab()) Cab().desenhar(c, vv, x0, y0, cw, ch, info, Date.now() / 1000, semente, periodo); }
+  function pilotoVivo(c, vv, x0, y0, cw, ch, info, semente, periodo, onde) { if (Cab()) Cab().desenhar(c, vv, x0, y0, cw, ch, info, Date.now() / 1000, semente, periodo, onde); }
+  var CAV = function () { return raiz.VruuumCavalo; };
+  // onde fica a cabeça de quem monta o cavalo (sobe e desce com o galope); nos outros veículos, a do desenho
+  function ondeCabeca(vv, x0, y0, cw, ch, fase) { return vv && vv.cavalo && CAV() ? CAV().cabeca(x0, y0, cw, ch, fase, 0) : null; }
   var V = function () { return raiz.VruuumVeiculos; };
   // o que aparece no lugar de cada coisa quando se está voando
   var NO_CEU = { cone: 'passaro', lama: 'nuvemRaio', turbo: 'anel', rampa: 'corrente', onibus: 'balao' };
@@ -129,7 +132,7 @@
     ESTILO = visual === 'colorido' || visual === 'neon' ? visual : 'misto';
     base = S.basicos();
     carrosJog = jogadores.map(function (j) { return S.carroJogador(j.cor, null, j.veic, undefined, j.corpo); });
-    INFO = jogadores.map(function (j) { return infoPiloto(j.cor, j.piloto, j.foto, j.personagem); });
+    INFO = jogadores.map(function (j) { var inf = infoPiloto(j.cor, j.piloto, j.foto, j.personagem); inf.corpo = j.corpo; return inf; });
     VEIC = jogadores.map(function (j) { return V() ? V().achar(j.veic) : null; });
     VOA = jogadores.map(function (j) { return !!(V() && V().voa(j.veic)); });
     RIV = (estado.rivais || []).map(function (r) { var P3 = raiz.VruuumPersonagens; return { spr: S.carroJogador(r.cor, null, r.veic, undefined, (P3 && P3.corpoDe(r.id)) || (r.r % 2 ? 'menino' : 'menina')), veic: V() ? V().achar(r.veic) : null, voa: !!(V() && V().voa(r.veic)), info: infoPiloto(r.cor, '', null, r.id) }; });
@@ -458,12 +461,12 @@
       if (rs) for (k2 = 0; k2 < rs.length; k2++) {
         var rv = e.rivais[rs[k2]], rd = RIV[rs[k2]]; if (!rd || rv.z < j.z - JOG_Z * 0.6) continue;
         var pr = noPonto(n, rv.z), rX = pr.x + pr.esc * rv.x * LARG, rY = rd.voa ? pr.y - pr.escY * ALT_VOO : pr.y, rW = rd.spr.w * pr.esc, rH = rd.spr.h * pr.esc;
-        var faseR = rd.spr.quadros ? faseSkate(rd, rv, e) : 0, vivo = rW > 24 && (rd.voa || voa || rY <= clip);
+        var faseR = rd.spr.quadros ? faseSkate(rd, rv, e, rd.veic) : 0, vivo = rW > 24 && (rd.voa || voa || rY <= clip);
         rd.lado = (rd.lado || 0) + (Math.max(-1, Math.min(1, (rv.faixa - rv.x) * 4)) - (rd.lado || 0)) * 0.15;   // vira para onde está indo
         if (!rd.voa && !voa && rY <= clip + 2) sombraChao(c, rX, rY, rW, corPedaco(pista, s).noite, rd.info.cor);
         if (vivo) bracos(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info.cor, faseR, rd.lado, 'longe');
         sprite(c, S.quadro(rd.spr, faseR), pr.esc, rX, rY, rd.voa || voa ? 0 : clip, w);
-        if (vivo) { bracos(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info.cor, faseR, rd.lado, 'perto'); pilotoVivo(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info, 10 + rs[k2] * 2.1, 6); }
+        if (vivo) { bracos(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info.cor, faseR, rd.lado, 'perto'); pilotoVivo(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info, 10 + rs[k2] * 2.1, 6, ondeCabeca(rd.veic, rX - rW / 2, rY - rH, rW, rH, faseR)); }
         var luzR = s.tunel ? 1 : ntS;
         if (!rd.voa && luzR > 0.02 && rY <= clip + 2) { c.save(); c.globalCompositeOperation = 'lighter'; luz(c, rX - rW * 0.36, rY - rH * 0.4, rW * 0.25, '#ff2a2a', 0.7 * luzR); luz(c, rX + rW * 0.36, rY - rH * 0.4, rW * 0.25, '#ff2a2a', 0.7 * luzR); c.restore(); }
       }
@@ -475,7 +478,7 @@
         if (!oVoa && !voa && po.y <= clip + 2) sombraChao(c, oX, po.y, oW, corPedaco(pista, s).noite, INFO[outro.n].cor);
         if (oVivo) bracos(c, VEIC[outro.n], oX - oW / 2, oY - oH, oW, oH, INFO[outro.n].cor, faseO, ladoO, 'longe');
         sprite(c, S.quadro(oSpr, faseO), po.esc, oX, oY, oVoa || voa ? 0 : clip, w);
-        if (oVivo) { bracos(c, VEIC[outro.n], oX - oW / 2, oY - oH, oW, oH, INFO[outro.n].cor, faseO, ladoO, 'perto'); pilotoVivo(c, VEIC[outro.n], oX - oW / 2, oY - oH, oW, oH, INFO[outro.n], outro.n * 3.3, 7); }
+        if (oVivo) { bracos(c, VEIC[outro.n], oX - oW / 2, oY - oH, oW, oH, INFO[outro.n].cor, faseO, ladoO, 'perto'); pilotoVivo(c, VEIC[outro.n], oX - oW / 2, oY - oH, oW, oH, INFO[outro.n], outro.n * 3.3, 7, ondeCabeca(VEIC[outro.n], oX - oW / 2, oY - oH, oW, oH, faseO)); }
       }
     }
 
@@ -615,11 +618,14 @@
   function bracos(c, vv, x0, y0, w, h, cor, fase, lado, qual) { if (vv && vv.bracos && V()) V().bracosSkate(c, x0, y0, w, h, cor || '#7b2cbf', fase, lado, qual); }
   // em que momento da remada está o skatista (obj guarda o ritmo): mais rápido, rema mais depressa;
   // pulando ou parado, os dois pés ficam no shape
-  function faseSkate(obj, cor, e) {
-    var tt = Date.now() / 1000, dt = obj.tPe ? Math.min(0.1, Math.max(0, tt - obj.tPe)) : 0, rap = Math.min(1, (cor.vel || 0) / e.pista.cfg.velMax);
+  // (no cavalo é a passada do galope: mais ligeira; pulando, as 4 patas ficam juntas no ar; parado, fica em pé)
+  function faseSkate(obj, cor, e, vv) {
+    var tt = Date.now() / 1000, dt = obj.tPe ? Math.min(0.1, Math.max(0, tt - obj.tPe)) : 0, rap = Math.min(1, (cor.vel || 0) / e.pista.cfg.velMax), cav = vv && vv.cavalo;
     obj.tPe = tt;
+    if (cav && cor.pulo > 0) { obj.fPe = 0.93; return 0.93; }
+    if (cav && rap < 0.03) { obj.fPe = -1; return -1; }
     if (cor.pulo > 0 || rap < 0.03) { obj.fPe = 0.8; return 0.8; }
-    obj.fPe = ((obj.fPe == null ? 0.8 : obj.fPe) + dt * (0.6 + 0.5 * rap)) % 1;
+    obj.fPe = ((obj.fPe == null || obj.fPe < 0 ? 0.8 : obj.fPe) + dt * (cav ? 1.0 + 1.3 * rap : 0.6 + 0.5 * rap)) % 1;
     return obj.fPe;
   }
 
@@ -664,15 +670,16 @@
     c.save();
     c.translate(g.cx, chao - lift);
     // avião inclina bem nas curvas; moto deita um pouco; carro quase nada
-    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'skate') ? 0.22 : 0.07);
+    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'skate') ? 0.22 : vv && vv.cavalo ? 0.04 : 0.07);
     c.rotate(vs.lado * inclina + (j.rodando > 0 ? Math.sin(j.rodando * 22) * 0.25 : 0));
     if (j.rodando > 0) c.scale(Math.max(0.25, Math.abs(Math.cos(j.rodando * 9))) * (Math.cos(j.rodando * 9) < 0 ? -1 : 1), 1);
     extrasAntes(c, vv, cw, ch, tt);
-    var faseQ = spr.quadros ? faseSkate(vs, j, e) : 0, corJ = INFO[j.n] && INFO[j.n].cor;
+    var faseQ = spr.quadros ? faseSkate(vs, j, e, vv) : 0, corJ = INFO[j.n] && INFO[j.n].cor, onde = null;
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'longe');
-    c.drawImage((spr.quadros ? S.quadro(spr, faseQ) : spr).img, -cw / 2, -ch, cw, ch);
+    if (vv && vv.cavalo && CAV()) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, INFO[j.n].corpo, tt);   // ao vivo: de lado nas curvas
+    else c.drawImage((spr.quadros ? S.quadro(spr, faseQ) : spr).img, -cw / 2, -ch, cw, ch);
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'perto');
-    pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], j.n * 3.3, 7);
+    pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], j.n * 3.3, 7, onde);
     extrasDepois(c, vv, cw, ch, tt, j.turbo > 0);
     if (acesas && !voa) {   // lanternas brilhando
       c.globalCompositeOperation = 'lighter';
@@ -736,7 +743,8 @@
     var topo = u * 0.5 + ml.t;
     // barra do caminho até a chegada, com os carrinhos
     var fimPilula = u * 0.5 + ml.l + pilula(c, u * 0.5 + ml.l, topo, (e.jogadores.length === 2 ? piloto + ' ' : '') + '⭐ ' + j.estrelas + '  ' + milhar(j.pontos || 0) + ' pts', u * 1.0, '#ffd93d');
-    var bx = Math.max(w * 0.3, fimPilula + u * 1.2), bw = Math.min(w * 0.4, w - ml.r - bx - u * 4.2), by = topo + u * 0.55, bh = u * 0.45;
+    var reserva = v.y <= 0 && v.x + v.w >= op.W - 1 ? Math.max(u * 2.6, (op.botoes || 0) + u * 0.6) : 0;   // na vista do canto de cima à direita ficam os botões
+    var bx = Math.max(w * 0.3, fimPilula + u * 1.2), bw = Math.min(w * 0.4, w - ml.r - bx - u * 1.6 - reserva), by = topo + u * 0.55, bh = u * 0.45;
     c.fillStyle = 'rgba(26,20,70,.6)'; c.fillRect(bx, by, bw, bh);
     for (var mm = 0; mm < 4; mm++) { c.fillStyle = TEMAS[pista.mundos[mm]].cor; c.fillRect(bx + bw * mm / 4, by, bw / 4 - 1, bh); }
     c.font = Math.round(u * 0.9) + 'px ' + EMOJI; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🏁', bx + bw + u * 0.6, by + bh / 2);
@@ -860,13 +868,14 @@
     var esc = Math.min(W * 0.78 / spr.w, H * 0.8 / spr.h), cw = spr.w * esc, ch = spr.h * esc;
     c.save(); c.translate(W / 2, H * 0.94 + (voa ? Math.sin(tt * 2.2) * H * 0.02 - H * 0.06 : Math.sin(tt * 9) * 1.2));
     if (voa) c.rotate(Math.sin(tt * 0.9) * 0.08);
-    var faseP = tt * 0.8, ladoP = vv && vv.bracos ? Math.sin(tt * 0.9) * 0.9 : 0;   // na garagem o skatista faz curvas para os dois lados
-    if (ladoP) c.rotate(ladoP * 0.12);
+    var cav = vv && vv.cavalo && CAV(), faseP = tt * (cav ? 1.7 : 0.8), ladoP = vv && (vv.bracos || vv.cavalo) ? Math.sin(tt * 0.9) * 0.9 : 0, onde = null;   // na garagem o skatista e o cavalo fazem curvas para os dois lados
+    if (ladoP) c.rotate(ladoP * (cav ? 0.04 : 0.12));
     extrasAntes(c, vv, cw, ch, tt);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'longe');
-    c.drawImage(S.quadro(spr, faseP).img, -cw / 2, -ch, cw, ch);
+    if (cav) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, cor, faseP % 1, ladoP, corpo, tt);
+    else c.drawImage(S.quadro(spr, faseP).img, -cw / 2, -ch, cw, ch);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'perto');
-    pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), 1.2, 4.5);   // na garagem vira mais vezes
+    pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), 1.2, 4.5, onde);   // na garagem vira mais vezes
     extrasDepois(c, vv, cw, ch, tt, false);
     c.restore();
   }

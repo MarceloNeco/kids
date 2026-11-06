@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.10.0",
+      "data": "06/Nov/2026",
+      "hora": "11:30:00",
+      "pt": [
+        "Cavalo: transporte novo! Um cavalo castanho galopando, com a crina e o rabo voando. Na reta ele fica de costas; nas curvas aparece de lado, com quem monta segurando as rédeas e acompanhando o galope bem macio. A cor escolhida vira a manta da sela e a blusa.",
+        "Faísca com rabo de cavalo loiro saindo de trás do capacete: quando ela vira a cabeça, o rabo vai junto para o lado e balança.",
+        "Todos os pilotos numa lista só (bichinhos, selfie e personagens), sem separar por tipo.",
+        "Na corrida, ao lado do ⏸: 🔊 liga e desliga o som e 🔄 vira a tela (deitado ou em pé) sem parar a corrida. O 🔄 só aparece onde o navegador deixa (no iPhone, não)."
+      ],
+      "en": [
+        "Horse: a new ride! A bay horse galloping, with mane and tail flying. On straights you see it from behind; in curves it turns sideways, with the rider holding the reins and moving smoothly with the gallop. The chosen color becomes the saddle blanket and the shirt.",
+        "Sparky now has a blonde ponytail coming out of the back of her helmet: when she turns her head, the ponytail swings to the side with it.",
+        "All drivers in one single list (animals, selfie and characters), no separate groups.",
+        "During the race, next to ⏸: 🔊 turns the sound on and off and 🔄 rotates the screen (sideways or upright) without stopping. 🔄 only shows where the browser allows it (not on iPhone)."
+      ]
+    },
+    {
       "versao": "1.9.1",
       "data": "05/Nov/2026",
       "hora": "20:40:00",
