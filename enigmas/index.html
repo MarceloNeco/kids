@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Enigmas de Ligar — Bolinho de Chuva · SolverONE</title>
+<title>Enigmatic — Bolinho de Chuva · SolverONE</title>
 <link rel="icon" href="icone-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icone-192.png">
@@ -13,7 +13,7 @@
 <meta name="description" content="Ligue cada desenho ao que combina com ele, com risco de giz na lousa. Três níveis, do Fácil ao Difícil. / Link each picture to the one that goes with it, with chalk lines on a chalkboard. Three levels, from Easy to Hard.">
 <link rel="stylesheet" href="estilo.css">
 <!--
-  Enigmas de Ligar — brincadeira da família Bolinho de Chuva (SolverONE). Ligar a coluna da esquerda com a da
+  Enigmatic (antes "Enigmas de Ligar") — brincadeira da família Bolinho de Chuva (SolverONE). Ligar a coluna da esquerda com a da
   direita, como as filhas do dono faziam na lousa. Sem login, sem banco, sem cookie: o progresso fica no aparelho.
   Nada de script inline: a CSP acima não permite. Mapa dos arquivos: LEIA-ME.md.
   Versão: APP_VERSION em app.js, VERSAO em sw.js e a primeira entrada de versoes.json.
@@ -27,7 +27,7 @@
     <button id="btEfeitos" class="mini" type="button" aria-pressed="true" aria-label="Sons / Sounds">🔔</button>
     <button id="btVoz" class="mini" type="button" aria-pressed="true" aria-label="Voz / Voice">🗣️</button>
   </div>
-  <h1 class="titulo" aria-label="Enigmas de Ligar"><span class="t1" data-t="Enigmas|Linking"></span> <span class="t2" data-t="de Ligar|Puzzles"></span></h1>
+  <h1 class="titulo" aria-label="Enigmatic"><span class="t1">Enigma</span><span class="t2">tic</span></h1>
   <p class="sub" data-t="Ligue cada desenho ao que combina com ele|Link each picture to the one that goes with it"></p>
 
   <div class="niveis">
@@ -58,6 +58,7 @@
       <li data-t="Ou toque num desenho e depois no outro. No teclado: setas e Enter.|Or tap one picture and then the other. On a keyboard: arrows and Enter."></li>
       <li data-t="Acertou? O risco de giz fica. Errou? Ele se apaga sozinho, é só tentar de novo!|Got it? The chalk line stays. Missed? It rubs itself out, just try again!"></li>
       <li data-t="Ligou tudo? Ganha estrelas ⭐ e vem o próximo enigma. 💡 mostra um par quando ficar difícil.|Linked them all? You earn stars ⭐ and the next puzzle comes. 💡 shows one pair when it gets tricky."></li>
+      <li data-t="🔤 esconde as palavras: só os desenhos. Toque num desenho para ver a palavra.|🔤 hides the words: pictures only. Touch a picture to see its word."></li>
     </ol>
   </div>
   <div class="rodape">
@@ -74,6 +75,7 @@
       <span id="nomeNivel" class="nome-nivel"></span>
       <span id="contador" class="contador"></span>
     </div>
+    <button id="btPalavras" class="mini" type="button" aria-pressed="true" aria-label="Mostrar palavras / Show words">🔤</button>
     <button id="btDica" class="mini" type="button" aria-label="Mostrar um par / Show one pair">💡</button>
     <span id="estrelasTopo" class="estrelas-topo" aria-live="polite"></span>
   </header>
@@ -93,6 +95,7 @@
     </svg>
   </div>
   <p id="status" class="so-leitor" aria-live="polite"></p>
+  <div id="balao" class="balao" aria-hidden="true" hidden></div>
 </section>
 
 <script src="rodadas.js"></script>

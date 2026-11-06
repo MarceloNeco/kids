@@ -1,10 +1,10 @@
-/* Enigmas de Ligar — telas, lousa, risco de giz, toque e arraste, sons, voz, estrelas e progresso.
+/* Enigmatic — telas, lousa, risco de giz, toque e arraste, sons, voz, estrelas e progresso.
    As regras ficam no jogo.js (Enigmas) e as rodadas no rodadas.js (EnigmasRodadas).
    Guarda só neste aparelho (localStorage, sempre com try/catch): preferências em "bolinho:enigmas:pref" e o
    progresso de cada nível em "bolinho:enigmas:progresso". Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.1';
+  var APP_VERSION = '0.2.0';
   var $ = function (id) { return document.getElementById(id); };
   var J = window.Enigmas, R = window.EnigmasRodadas;
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -18,6 +18,7 @@
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = /^en/i.test(navigator.language || '') ? 'en' : 'pt';
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (typeof pref.voz !== 'boolean') pref.voz = true;
+  if (typeof pref.palavras !== 'boolean') pref.palavras = true;   // 🔤 desligado = só os desenhos
   function salvarPref() { gravar(CH_PREF, pref); }
   var prog = ler(CH_PROG, null) || {};
   R.NIVEIS.forEach(function (n) {
@@ -38,7 +39,6 @@
       var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0];
     });
     $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    document.querySelector('.titulo').setAttribute('aria-label', t('Enigmas de Ligar', 'Linking Puzzles'));
     pintarPrefs(); pintarProgresso();
     if (partida) { montarCartas(); pintarTopo(); }
   }
@@ -50,6 +50,11 @@
     $('btVoz').setAttribute('aria-pressed', String(pref.voz));
     $('btVoz').classList.toggle('desligado', !pref.voz);
     $('btVoz').setAttribute('aria-label', pref.voz ? t('Voz ligada: lê as palavras', 'Voice on: reads the words') : t('Voz desligada', 'Voice off'));
+    $('btPalavras').setAttribute('aria-pressed', String(pref.palavras));
+    $('btPalavras').classList.toggle('desligado', !pref.palavras);
+    $('btPalavras').setAttribute('aria-label', t('Mostrar palavras', 'Show words'));
+    $('btPalavras').title = t('Mostrar palavras', 'Show words');
+    $('lousa').classList.toggle('so-desenhos', !pref.palavras);
   }
 
   function listaNivel(n) { return J.lista(R, n, pref.lingua); }
@@ -108,7 +113,7 @@
     document.documentElement.classList.toggle('jogando', id === 'jogo');
   }
   function voltarInicio() {
-    fecharFesta(); partida = null; sel = null; limparArraste();
+    fecharFesta(); partida = null; sel = null; limparArraste(); esconderBalao();
     try { speechSynthesis.cancel(); } catch (e) { /* ok */ }
     mostrar('inicio'); pintarProgresso();
     var b = $('bt' + (nivel ? nivel.charAt(0).toUpperCase() + nivel.slice(1) : 'Facil')); if (b) b.focus();
@@ -133,13 +138,11 @@
   }
 
   function novaRodada() {
-    fecharFesta(); sel = null; limparArraste();
+    fecharFesta(); sel = null; limparArraste(); esconderBalao();
     var lista = listaNivel(nivel), r = J.escolher(lista, prog[nivel].feitas);
     reiniciou = r.reiniciou;
     if (reiniciou) { var ids = lista.map(function (x) { return x.id; }); prog[nivel].feitas = prog[nivel].feitas.filter(function (id) { return ids.indexOf(id) < 0; }); salvarProg(); }
     rodada = r.rodada; partida = J.Partida(rodada);
-    $('lousa').style.setProperty('--n', partida.n);
-    $('lousa').classList.toggle('so-texto', rodada.pares.some(function (p) { return !p[0].e || !p[1].e; }));
     montarCartas(); pintarTopo();
     $('status').textContent = '';
     falar(t(rodada.dica.pt, rodada.dica.en));
@@ -154,20 +157,21 @@
     $('pista').textContent = t(rodada.dica.pt, rodada.dica.en);
   }
 
-  function longo(e) {
-    try { if (window.Intl && Intl.Segmenter) { var n = 0, it = new Intl.Segmenter().segment(e); for (var s of it) n++; return n; } } catch (x) { /* sem Segmenter */ }
-    return Math.ceil(Array.from(e).length / 2);
-  }
   function carta(lado, i) {
     var it = rodada.pares[i][lado === 'e' ? 0 : 1], b = document.createElement('button');
     b.type = 'button'; b.className = 'carta'; b.setAttribute('data-lado', lado); b.setAttribute('data-par', i);
     b.setAttribute('aria-label', w(it));
     if (it.e) {
       var em = document.createElement('span'); em.className = 'emo'; em.setAttribute('aria-hidden', 'true'); em.textContent = it.e;
-      var q = longo(it.e); if (q >= 2) { em.classList.add('q' + Math.min(q, 6)); b.classList.add('varios'); }
       b.appendChild(em);
     } else b.classList.add('texto');
-    var pl = document.createElement('span'); pl.className = 'pal'; pl.textContent = w(it); b.appendChild(pl);
+    // cada palavra num <span> que não quebra: a linha só pula nos espaços, nunca no meio da palavra
+    var pl = document.createElement('span'); pl.className = 'pal';
+    w(it).split(' ').forEach(function (p, k) {
+      if (k) pl.appendChild(document.createTextNode(' '));
+      var s = document.createElement('span'); s.className = 'w'; s.textContent = p; pl.appendChild(s);
+    });
+    b.appendChild(pl);
     if (partida.ligado(lado, i)) { b.classList.add('ligada'); b.disabled = true; }
     return b;
   }
@@ -177,7 +181,63 @@
     partida.esquerda.forEach(function (i) { ce.appendChild(carta('e', i)); });
     partida.direita.forEach(function (i) { cd.appendChild(carta('d', i)); });
     sel = null;
+    ajustarTudo();
     requestAnimationFrame(redesenhar);
+  }
+
+  // ---------- tamanho do desenho e das letras, carta por carta ----------
+  // O desenho fica grande (cabe na largura e em ~metade da altura); as letras começam grandes e diminuem até tudo
+  // caber dentro da carta, até LETRA_MIN. Se nem assim couber, o desenho encolhe um pouco e mede de novo.
+  var LETRA_MIN = 12;
+  function px(v) { return parseFloat(v) || 0; }
+  function ajustarCarta(b) {
+    var cs = getComputedStyle(b), em = b.querySelector('.emo'), pl = b.querySelector('.pal');
+    var W = b.clientWidth - px(cs.paddingLeft) - px(cs.paddingRight), H = b.clientHeight - px(cs.paddingTop) - px(cs.paddingBottom);
+    if (W <= 0 || H <= 0) return;
+    var deitada = cs.flexDirection === 'row', comPal = getComputedStyle(pl).display !== 'none', palavras = pl.querySelectorAll('.w');
+    function dentro() {
+      var r = b.getBoundingClientRect(), c = { l: r.left + b.clientLeft + px(cs.paddingLeft) - 0.5, t: r.top + b.clientTop + px(cs.paddingTop) - 0.5 };
+      c.r = c.l + W + 1; c.b = c.t + H + 1;
+      var els = [em, comPal ? pl : null].concat(comPal ? Array.prototype.slice.call(palavras) : []);
+      return els.every(function (x) { if (!x) return true; var q = x.getBoundingClientRect(); return q.left >= c.l && q.right <= c.r && q.top >= c.t && q.bottom <= c.b; });
+    }
+    var emo = 0;
+    if (em) {
+      em.style.fontSize = '40px';
+      var porLargura = 40 * W / (em.getBoundingClientRect().width || 40) * (deitada && comPal ? 0.45 : 0.95);
+      emo = Math.min(porLargura, comPal ? (deitada ? H * 0.9 : H * 0.55) : H * 0.85, comPal ? 64 : 88);
+    }
+    if (!comPal) { em.style.fontSize = Math.floor(emo) + 'px'; return; }
+    var maxL = Math.floor(Math.max(LETRA_MIN, Math.min(em ? 24 : 22, deitada ? H * 0.5 : (em ? H * 0.3 : H * 0.4))));
+    for (;;) {
+      if (em) em.style.fontSize = Math.floor(emo) + 'px';
+      var lo = LETRA_MIN, hi = maxL;   // maior tamanho de letra que cabe (busca binária)
+      pl.style.fontSize = hi + 'px';
+      if (!dentro()) {
+        while (hi - lo > 1) { var m = (lo + hi) >> 1; pl.style.fontSize = m + 'px'; if (dentro()) lo = m; else hi = m; }
+        pl.style.fontSize = lo + 'px';
+      }
+      if (!em || emo <= 18 || dentro()) return;
+      emo = Math.max(18, emo * 0.85);
+    }
+  }
+  function ajustarTudo() {
+    if (!partida || !$('jogo').classList.contains('ativa')) return;
+    Array.prototype.forEach.call(document.querySelectorAll('#lousa .carta'), ajustarCarta);
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ajustarTudo(); redesenhar(); });
+
+  // ---------- balão com a palavra (🔤 desligado: só desenhos; ao tocar, a palavra aparece por 2 s) ----------
+  var balaoT = 0;
+  function esconderBalao() { clearTimeout(balaoT); $('balao').hidden = true; }
+  function mostrarBalao(b) {
+    if (pref.palavras || !b || b.classList.contains('texto')) return;
+    var el = $('balao'); el.textContent = b.getAttribute('aria-label'); el.hidden = false;
+    var r = b.getBoundingClientRect(), bw = el.offsetWidth, bh = el.offsetHeight;
+    var y = r.top - bh - 6; if (y < 4) y = r.bottom + 6;
+    el.style.left = Math.max(4, Math.min(innerWidth - bw - 4, r.left + r.width / 2 - bw / 2)) + 'px';
+    el.style.top = Math.max(4, Math.min(innerHeight - bh - 4, y)) + 'px';
+    clearTimeout(balaoT); balaoT = setTimeout(function () { el.hidden = true; }, 2000);
   }
 
   // ---------- giz ----------
@@ -211,8 +271,9 @@
     });
   }
   function limparRiscos() { Object.keys(riscos).forEach(function (k) { riscos[k].remove(); }); riscos = {}; tremor = {}; }
-  if (window.ResizeObserver) new ResizeObserver(function () { redesenhar(); }).observe($('lousa'));
-  window.addEventListener('resize', redesenhar);
+  function remedir() { ajustarTudo(); redesenhar(); }
+  if (window.ResizeObserver) new ResizeObserver(remedir).observe($('lousa'));
+  window.addEventListener('resize', remedir);
 
   // ---------- ligar ----------
   function escolher(b) {
@@ -220,7 +281,7 @@
     sel = b;
     if (b) {
       b.classList.add('escolhida'); b.setAttribute('aria-pressed', 'true'); Som.escolher();
-      falar(b.getAttribute('aria-label'));
+      falar(b.getAttribute('aria-label')); mostrarBalao(b);
       $('status').textContent = t(b.getAttribute('aria-label') + ' escolhido. Agora toque no outro lado.', b.getAttribute('aria-label') + ' picked. Now tap the other side.');
     }
   }
@@ -277,7 +338,7 @@
     if (e.button > 0 || !partida) return;
     var b = e.target.closest && e.target.closest('.carta');
     if (!b || b.disabled) return;
-    limparArraste();
+    limparArraste(); mostrarBalao(b);
     arr = { de: b, x0: e.clientX, y0: e.clientY, ativo: false, id: e.pointerId, g: null, mira: null };
     try { b.releasePointerCapture && b.releasePointerCapture(e.pointerId); } catch (x) { /* ok */ }
   });
@@ -388,6 +449,7 @@
   R.NIVEIS.forEach(function (n) { $('bt' + n.charAt(0).toUpperCase() + n.slice(1)).addEventListener('click', function () { comecar(n); }); });
   $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarPrefs(); if (pref.efeitos) Som.escolher(); });
+  $('btPalavras').addEventListener('click', function () { pref.palavras = !pref.palavras; salvarPref(); pintarPrefs(); esconderBalao(); ajustarTudo(); redesenhar(); });
   $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarPrefs(); if (pref.voz) falar(t('Voz ligada', 'Voice on')); else { try { speechSynthesis.cancel(); } catch (e) { /* ok */ } } });
   $('btZerar').addEventListener('click', function () {
     if (!window.SolverJanela) return;
@@ -442,8 +504,6 @@
       var r = listaNivel(n).filter(function (x) { return x.id === id; })[0]; if (!r) return false;
       nivel = n; mostrar('jogo'); fecharFesta(); sel = null; limparArraste();
       rodada = r; partida = J.Partida(rodada);
-      $('lousa').style.setProperty('--n', partida.n);
-      $('lousa').classList.toggle('so-texto', rodada.pares.some(function (p) { return !p[0].e || !p[1].e; }));
       montarCartas(); pintarTopo(); return true;
     }
   };
@@ -455,7 +515,7 @@
   if (!/[?&]instalar\b/.test(location.search) || location.protocol === 'file:') return;
   var s = document.createElement('script');
   s.src = '../instalar.js';
-  s.setAttribute('data-nome', 'Enigmas de Ligar'); s.setAttribute('data-icone', 'icone-192.png');
+  s.setAttribute('data-nome', 'Enigmatic'); s.setAttribute('data-icone', 'icone-192.png');
   s.setAttribute('data-so-com', 'instalar'); s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
   document.body.appendChild(s);
 })();
