@@ -25,8 +25,10 @@ async function iniciar() {
 }
 async function fechar() { if (browser) await browser.close(); if (server) server.close(); }
 
-async function abrir(viewport, extra) {
+// antes (opcional): função que roda na página antes do jogo (ex.: trocar a voz do navegador por uma de mentira)
+async function abrir(viewport, extra, antes) {
   const ctx = await browser.newContext(Object.assign({ viewport, locale: 'pt-BR', reducedMotion: 'reduce' }, extra || {}));   // sem animação sem fim: o Playwright clica sem esperar parar
+  if (antes) await ctx.addInitScript(antes);
   const pg = await ctx.newPage(), erros = [];
   pg.on('console', m => { if (m.type() === 'error') erros.push(m.text() + ' @' + (m.location() && m.location().url)); });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));

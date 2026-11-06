@@ -2,6 +2,19 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "06/Nov/2026",
+      "hora": "16:30:00",
+      "pt": [
+        "🎣 Pescaria nova no rio: agora tem vara, linha, boia e anzol bem desenhados. Toque em Puxar quando um peixinho passar no círculo: ele fica preso no anzol, sobe pela linha se mexendo, sai da água com um respingo e cai no balde. Os outros peixes continuam nadando, e chega um peixe novo pelo lado.",
+        "👵 A vovó Dona Cida agora fala! Quando você chega na casa dela, quando ela empresta, quando se despede e quando acabam os favores, ela fala em voz alta com voz de vovó (mais devagar e mais fininha) e o balão mostra o que ela disse. Segue o botão 🗣️ da voz e a língua do jogo."
+      ],
+      "en": [
+        "🎣 New fishing at the river: now there is a clearly drawn rod, line, float and hook. Tap Pull when a little fish swims in the circle: it gets hooked, rises up the line wiggling, comes out of the water with a splash and drops into the bucket. The other fish keep swimming, and a new fish swims in from the side.",
+        "👵 Grandma Mrs. Cida now talks! When you arrive at her house, when she lends something, when she says goodbye and when the favours run out, she speaks out loud with a grandma voice (slower and softer) and the speech bubble shows what she said. It follows the 🗣️ voice button and the game language."
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "06/Nov/2026",
       "hora": "12:00:00",

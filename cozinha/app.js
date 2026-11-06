@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0';
+  var APP_VERSION = '0.2.0';
   var APP_UPDATED = '06/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos;
   var RAPIDO = /[?&]teste\b/.test(location.search);

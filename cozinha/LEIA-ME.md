@@ -7,16 +7,20 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Esta versão (0.1.0, 06/Nov/2026) é uma **primeira proposta**: o dono quer entrevistar a filha para ajustar as receitas,
-os lugares e os passos (pendência 2).
+Versão atual: **0.2.0** (06/Nov/2026) — pescaria nova no rio e a voz da vovó Dona Cida. Continua sendo uma
+**primeira proposta**: o dono quer entrevistar a filha para ajustar as receitas, os lugares e os passos (pendência 2).
 
 ## Como brincar
 
 1. **Escolha o nível e a receita.** A ficha mostra os ingredientes, quanto precisa de cada um (ex.: 3 ovos,
    2 xícaras de farinha) e os lugares onde achar cada um.
 2. **Vila** (🧺 a cesta embaixo mostra o que já tem e o que falta; no Fácil e no Médio os lugares úteis brilham ✨):
-   - 🎣 **Rio** — o peixinho nada de um lado para o outro; toque em *Puxar* quando ele passar dentro do círculo e ele
-     pula feliz para o balde.
+   - 🎣 **Rio** — 3 peixinhos nadam; a vara, a linha, a boia e o anzol ficam desenhados, com o anzol parado dentro do
+     círculo. Toque em *Puxar* (ou na água) quando um peixe passar dentro do círculo (no Fácil e no Médio o círculo
+     fica amarelo e a boia belisca quando tem peixe perto): ele fica **preso no anzol**, a linha recolhe e ele sobe se
+     mexendo, sai da água com um respingo, a vara balança até o balde e ele cai lá dentro (som feliz, e vai para a
+     cesta). Os outros peixes continuam nadando e um peixe novo chega nadando pelo lado. Com *movimento reduzido* no
+     aparelho, o peixe sobe reto, sem se mexer e sem respingo. Se a criança sair no meio, o peixe já fisgado vai para a cesta.
    - 🌳 **Pomar** — toque nas frutas maduras e coloridas; as verdinhas balançam e pedem para esperar (vão amadurecendo).
    - 🌱 **Horta** — toque 3 vezes (ou puxe o dedo para cima) para tirar o legume da terra; ele nasce de novo.
    - 🐔 **Galinheiro** — toque na galinha para ela levantar; se tiver ovo, pegue. Ovo novo aparece depois de um tempo.
@@ -24,8 +28,12 @@ os lugares e os passos (pendência 2).
    - 🏪 **Mercadinho do Seu Zé** — no Fácil é tudo de presente; no Médio e no Difícil a criança toca nas moedas
      (de 5, 2 e 1) para pôr no balcão, paga e vê o **troco**. Se as moedas não dão para algo que só o mercado vende,
      aparece *Ajudar o Seu Zé a arrumar* (+2 moedas) — ninguém fica preso.
-   - 👵 **Dona Cida, a vizinha** — empresta ovo, leite, farinha, açúcar, sal, manteiga e mel, com **favores
-     contados**. O ingrediente só vai para a cesta depois de tocar em **💛 Obrigado**.
+   - 👵 **Dona Cida, a vizinha** (a vovozinha) — empresta ovo, leite, farinha, açúcar, sal, manteiga e mel, com
+     **favores contados**. O ingrediente só vai para a cesta depois de tocar em **💛 Obrigado**. Ela **fala em voz
+     alta** (voz do próprio aparelho, funciona sem internet) quando a criança chega, quando empresta, quando pede o
+     obrigado, quando se despede e quando acabam os favores, e o balão mostra o que ela disse. Voz de vovó: um pouco
+     mais devagar (0,9) e mais fininha (1,2), com uma voz feminina em português ou inglês quando o aparelho tiver.
+     Segue o botão 🗣️ (voz desligada = só o balão) e a língua do jogo; a música abaixa enquanto ela fala.
    - 🏠 **Casa** — com tudo na cesta, vai para a cozinha. Se falta algo, diz o quê.
 3. **Cozinha**: a ficha da receita mostra os passos; para cada passo, escolha o **utensílio** certo e faça o
    movimento: lavar e mexer fazendo **círculos com o dedo** (ou o botão), **deslizar o dedo** para cortar com a faca
@@ -91,7 +99,10 @@ leva cerca de 2 minutos).
   músicas com crédito; pendência da entrevista; nenhum segredo.
 - `pagina.test.js` — joga a vitamina de banana do Fácil inteira no **celular** e no **computador** e o bolo de cenoura
   do Fácil no **tablet** (juntando na vila de verdade), o mercadinho com troco e a vizinha no Médio, o imprevisto e as
-  fichas no Difícil, e o inglês — sem erro no console.
+  fichas no Difícil, e o inglês; a **pescaria** no celular (o peixe preso no anzol sobe quadro a quadro, os outros
+  continuam no rio, a cesta passa a 1/1, chega peixe novo) e com movimento reduzido (sobe sem balançar); e a **voz da
+  Dona Cida** (com uma voz de mentira no lugar da do navegador: fala ao chegar, ao emprestar, no tchau e sem favores,
+  com velocidade 0,9, tom 1,2 e voz feminina em PT e em EN; com a voz desligada não fala) — sem erro no console.
 - `receitas.test.js` — cozinha **todas** as receitas no Médio e no Difícil até o fim.
 
 `?teste` no endereço deixa as esperas bem curtas e as frutas maduras (só para os testes).
