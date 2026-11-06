@@ -1163,30 +1163,21 @@
   /* a mamãe: adulta (maior que a criança), vem andando e falando; no fim balança a cabeça e sacode o dedo */
   var FALAS_MAE = [['Crianças?', 'Kids?'], ['Que barulho é esse?', 'What is that noise?'], ['Já vou aí!', 'Coming!'], ['O que está acontecendo?', 'What is going on?']];
   var FALAS_BRAVA = [['Que bagunça é essa?!', 'What is this mess?!'], ['Vamos arrumar!', 'Let\'s tidy up!']];
+  var MAE_CFG = { cabeca: 'menina', cabelo: 'coque', corCabelo: '#5d4037', cor: '#5e35b1', roupa: 'vestido', acessorio: 'nenhum', sapato: '#37474f', pele: '#ffd9b3' };
   function mae(ctx, M, ts) {
-    var m = M.mae, k = m.k || 0, x = W + 120 - k * 320, y = M.chao + 4, viu = !!m.viu, fala = Math.floor(ts / 420) % 2 === 0;   // boca abre e fecha falando
-    var passo = viu ? 0 : Math.sin(ts / 120) * 12, bob = viu ? 0 : Math.abs(Math.sin(ts / 120)) * 5, pe = viu ? Math.max(0, Math.sin(ts / 110)) * 8 : 0;   // andando / batendo o pé
-    ctx.save(); ctx.translate(x, y - bob); ctx.scale(1.12, 1.12);
-    ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(0, bob / 1.12, 46, 9, 0, 0, PI2); ctx.fill();
-    ctx.strokeStyle = '#ffd9b3'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-10, -70); ctx.lineTo(-12 + passo, -6); ctx.moveTo(10, -70); ctx.lineTo(12 - passo, -6 - pe); ctx.stroke();
-    ctx.fillStyle = '#37474f'; ctx.beginPath(); ctx.ellipse(-12 + passo, -3, 13, 6, 0, 0, PI2); ctx.ellipse(12 - passo + 4, -3 - pe, 13, 6, 0, 0, PI2); ctx.fill();   // sapatos
-    ctx.fillStyle = '#5e35b1'; ctx.beginPath(); ctx.moveTo(-26, -170); ctx.lineTo(26, -170); ctx.lineTo(48, -64); ctx.lineTo(-48, -64); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = '#ffd9b3'; ctx.lineWidth = 11;
-    if (viu) {
-      var dedo = Math.sin(ts / 90) * 0.35;
-      ctx.beginPath(); ctx.moveTo(-24, -160); ctx.lineTo(-52, -126); ctx.lineTo(-30, -100); ctx.stroke();   // uma mão na cintura
-      ctx.save(); ctx.translate(24, -160); ctx.rotate(-2.2 + dedo); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 46); ctx.stroke(); ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, 46); ctx.lineTo(0, 64); ctx.stroke(); ctx.restore();   // a outra sacudindo o dedo
-    } else { ctx.beginPath(); ctx.moveTo(-24, -160); ctx.lineTo(-34 - passo, -100); ctx.moveTo(24, -160); ctx.lineTo(34 + passo, -100); ctx.stroke(); }
-    ctx.save(); ctx.translate(0, -198); ctx.rotate(viu ? Math.sin(ts / 140) * 0.14 : Math.sin(ts / 240) * 0.05);   // balança a cabeça
-    ctx.fillStyle = '#ffd9b3'; ctx.beginPath(); ctx.arc(0, 0, 28, 0, PI2); ctx.fill();
-    ctx.fillStyle = '#5d4037'; ctx.beginPath(); ctx.arc(0, -8, 29, Math.PI, 0); ctx.fill(); ctx.beginPath(); ctx.arc(0, -40, 14, 0, PI2); ctx.fill();   // cabelo com coque
-    ctx.fillStyle = '#212121'; ctx.beginPath(); ctx.arc(-10, 0, viu ? 4.5 : 3, 0, PI2); ctx.arc(10, 0, viu ? 4.5 : 3, 0, PI2); ctx.fill();
-    if (viu) { ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-16, -12); ctx.lineTo(-5, -8); ctx.moveTo(16, -12); ctx.lineTo(5, -8); ctx.stroke(); }   // sobrancelhas bravas
-    ctx.fillStyle = '#7a1f2e'; ctx.beginPath(); ctx.ellipse(0, 14, 7, fala ? 8 : 2.5, 0, 0, PI2); ctx.fill();
-    ctx.restore(); ctx.restore();
+    var m = M.mae, k = m.k || 0, x = W + 120 - k * 320, y = M.chao + 4, viu = !!m.viu, B = typeof self !== 'undefined' && self.Boneco, A = 300;   // adulta: bem maior que a criança (175)
+    if (B) {
+      ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(x, y, A * 0.16, A * 0.03, 0, 0, PI2); ctx.fill();
+      ctx.save(); ctx.translate(x, y);
+      if (!viu && k < 1) { ctx.scale(-1, 1); B.corpoLado(ctx, MAE_CFG, A, { fase: ts / 1000 * 7, andando: true, ts: ts }); }   // vem andando de lado, olhando para a bagunça
+      else B.corpoEmPe(ctx, MAE_CFG, A, { bE: 0.12, bD: viu ? 0.55 + 0.4 * Math.sin(ts / 95) : 0.2 + 0.15 * Math.sin(ts / 400), ts: ts, pose: viu ? 'brava' : null, balanco: 0 });   // parada: gesticula; viu: brava, sacudindo o dedo
+      ctx.restore();
+    } else {
+      ctx.save(); ctx.translate(x, y); ctx.fillStyle = '#5e35b1'; ctx.beginPath(); ctx.moveTo(-26, -170); ctx.lineTo(26, -170); ctx.lineTo(48, -64); ctx.lineTo(-48, -64); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ffd9b3'; ctx.beginPath(); ctx.arc(0, -198, 28, 0, PI2); ctx.fill(); ctx.restore();
+    }
     // balão de fala
     var lista = viu ? FALAS_BRAVA : FALAS_MAE, f = lista[Math.floor(ts / 1800) % lista.length], txt = /^en/i.test((typeof navigator !== 'undefined' && navigator.language) || '') ? f[1] : f[0];
-    ctx.save(); ctx.font = '700 24px system-ui'; var tw = ctx.measureText(txt).width + 30, bx = Math.min(W - tw - 10, x - tw + 30), by = y - 340;
+    ctx.save(); ctx.font = '700 24px system-ui'; var tw = ctx.measureText(txt).width + 30, bx = Math.min(W - tw - 10, x - tw + 30), by = y - 375;   // acima da cabeça dela
     ctx.fillStyle = 'rgba(255,255,255,.96)'; arred(ctx, bx, by, tw, 46, 20); ctx.fill(); ctx.beginPath(); ctx.moveTo(x - 30, by + 44); ctx.lineTo(x - 6, by + 70); ctx.lineTo(x - 2, by + 44); ctx.fill();
     ctx.fillStyle = viu ? '#c62828' : '#311b92'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(txt, bx + 15, by + 24); ctx.restore();
   }
