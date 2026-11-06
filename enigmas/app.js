@@ -516,8 +516,6 @@
     { a: M + 'silly-boy.mp3', t: 'Silly Boy', au: 'Rafael Krux', lic: FREEPD },
     { a: M + 'funshine.mp3', t: 'Funshine', au: 'Kevin MacLeod', lic: FREEPD },
     { a: M + 'city-sunshine.mp3', t: 'City Sunshine', au: 'Kevin MacLeod', lic: FREEPD },
-    { a: M + 'comic-game-loop-mischief.mp3', t: 'Comic Game Loop - Mischief', au: 'Kevin MacLeod', lic: FREEPD },
-    { a: M + 'bit-bit-loop.mp3', t: 'Bit Bit Loop', au: 'Kevin MacLeod', lic: FREEPD },
     { a: M + 'my-giant-bunny-friend.mp3', t: 'My Giant Bunny Friend', au: 'Bryan Teoh', lic: FREEPD },
     { a: M + 'spring-chicken.mp3', t: 'Spring Chicken', au: 'Bryan Teoh', lic: FREEPD },
     { a: M + 'going-bananas.mp3', t: 'Going Bananas', au: 'Bryan Teoh', lic: FREEPD },

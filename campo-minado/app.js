@@ -357,8 +357,7 @@
 
   // ---------- música (trilha comum dos jogos) ----------
   var M = '../rabiscolandia/musicas/', AU = 'Kevin MacLeod', LIC = 'CC BY';
-  // 0.2.1: saíram Pixel Peeker Polka (som de videogame) e seis arquivos que só tinham silêncio (Investigations, Sneaky
-  // Snitch, Local Forecast, Wallpaper, Carefree, Fluffing a Duck); entraram sete da mesma pasta, de instrumentos de verdade
+  // 0.2.1: saíram Pixel Peeker Polka (som de videogame) e Spazzmatica Polka (synth retrô); a lista é de instrumentos de verdade
   var MUSICAS = [
     { a: M + 'scheming-weasel.mp3', t: 'Scheming Weasel', au: AU, lic: LIC },
     { a: M + 'music-to-delight.mp3', t: 'Music to Delight', au: AU, lic: LIC },
@@ -366,7 +365,7 @@
     { a: M + 'life-of-riley.mp3', t: 'Life of Riley', au: AU, lic: 'CC BY 4.0' },
     { a: M + 'carpe-diem.mp3', t: 'Carpe Diem', au: AU, lic: LIC },
     { a: M + 'mariachi-snooze.mp3', t: 'Mariachi Snooze', au: AU, lic: LIC },
-    { a: M + 'spazzmatica-polka.mp3', t: 'Spazzmatica Polka', au: AU, lic: LIC },
+    { a: M + 'sneaky-snitch.mp3', t: 'Sneaky Snitch', au: AU, lic: LIC },
     { a: M + 'airport-lounge.mp3', t: 'Airport Lounge', au: AU, lic: LIC },
     { a: M + 'street-party.mp3', t: 'Street Party', au: AU, lic: 'CC BY 4.0' },
     { a: M + 'sunflower-dance-party.mp3', t: 'Sunflower Dance Party', au: AU, lic: 'CC BY 4.0' },

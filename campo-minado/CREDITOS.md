@@ -18,7 +18,7 @@ The 11 recorded songs play through the games' shared player (`../trilha.js`) and
 | `life-of-riley.mp3` | "Life of Riley" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
 | `carpe-diem.mp3` | "Carpe Diem" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
 | `mariachi-snooze.mp3` | "Mariachi Snooze" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
-| `spazzmatica-polka.mp3` | "Spazzmatica Polka" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
+| `sneaky-snitch.mp3` | "Sneaky Snitch" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY |
 | `airport-lounge.mp3` | "Airport Lounge" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution | CC BY |
 | `street-party.mp3` | "Street Party" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |
 | `sunflower-dance-party.mp3` | "Sunflower Dance Party" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 | CC BY 4.0 |

@@ -69,3 +69,5 @@ Mistura de duas gravações, cortada em 3 s com volume igualado (`efeitos/uhul-1
 |---|---|---|
 | “Woohoo! Female Voice Over (vocal sound for character)” — **JeanMyna_VA** | OpenGameArt.org (https://opengameart.org/content/woohoo-female-voice-over-vocal-sound-for-character) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
 | “Free Crowd Cheering Sounds” — **Gregor Quendel** | OpenGameArt.org (https://opengameart.org/content/free-crowd-cheering-sounds) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+
+06/Nov/2026 (0.6.10): *Laserpack* e *Pookatori and Friends* saíram da lista de rodadas (som de videogame, 8 bits); os arquivos continuam em `musicas/`. As rodadas são sorteadas com a favorita (*Funky Chunk*) por último.

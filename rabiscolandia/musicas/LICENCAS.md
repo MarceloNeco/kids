@@ -63,3 +63,7 @@ Copiadas do repositório público https://github.com/Tatwi/RocketTux (`data/musi
 
 As músicas do LittleBigPlanet em si têm direitos autorais (Sony e os artistas) e não podem entrar no app; estas são
 do mesmo clima, liberadas pelo autor para qualquer uso com crédito.
+
+**06/Nov/2026 (0.1.13):** a rádio passou a tocar **15** gravadas, em ordem sorteada, com a favorita (Street Party) no fim e **sem as músicas do app no meio** (elas só tocam sem internet, quando nem a favorita está guardada). Saíram da lista (os arquivos continuam aqui): `pixel-peeker-polka.mp3` (som de videogame) e `carefree.mp3`, `fluffing-a-duck.mp3`, `investigations.mp3`, `local-forecast-elevator.mp3`, `sneaky-snitch.mp3` e `wallpaper.mp3`, que **só têm silêncio** depois do primeiro instante (conferido no ffmpeg e no Chromium).
+
+**06/Nov/2026, mais tarde:** os seis arquivos mudos (`carefree`, `fluffing-a-duck`, `investigations`, `local-forecast-elevator`, `sneaky-snitch`, `wallpaper`) foram **refeitos** a partir dos originais do espelho (SHA-256 conferidos com a tabela acima), com o mesmo tratamento (−16 LUFS, MP3 96 kbps), e **voltaram para a rádio**. Saiu `spazzmatica-polka.mp3` (synth retrô, pedido do dono: nada de som de videogame). A rádio fica com 20 gravadas.

@@ -70,7 +70,7 @@ test('cada música gravada existe e tem crédito em musicas/LICENCAS.md', () => 
     assert.ok(lic.includes('`' + path.basename(g.url) + '`'), 'sem crédito em LICENCAS.md: ' + g.url);
   }
   // e nenhum mp3 sobrando sem estar na rádio
-  // (fora desde a 0.1.13: Pixel Peeker Polka, som de videogame, e seis arquivos que só têm silêncio; continuam na pasta)
-  const FORA = ['pixel-peeker-polka.mp3', 'carefree.mp3', 'fluffing-a-duck.mp3', 'investigations.mp3', 'local-forecast-elevator.mp3', 'sneaky-snitch.mp3', 'wallpaper.mp3'];
+  // (fora desde a 0.1.13: Pixel Peeker Polka, som de videogame, e Spazzmatica Polka, synth retrô; continuam na pasta)
+  const FORA = ['pixel-peeker-polka.mp3', 'spazzmatica-polka.mp3'];
   for (const f of fs.readdirSync(path.join(pasta, 'musicas')).filter(f => f.endsWith('.mp3') && !FORA.includes(f))) assert.ok(som.GRAVADAS.some(g => g.url === 'musicas/' + f), 'mp3 fora da rádio: ' + f);
 });

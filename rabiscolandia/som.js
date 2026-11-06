@@ -301,7 +301,9 @@
   function gr(arq, nome) { return { url: 'musicas/' + arq + '.mp3', nome: nome, autor: K, licenca: 'CC BY' }; }
   var GRAVADAS = [
     gr('airport-lounge', 'Airport Lounge'), gr('music-to-delight', 'Music to Delight'),
-    gr('spazzmatica-polka', 'Spazzmatica Polka'), gr('carpe-diem', 'Carpe Diem'),
+    gr('carefree', 'Carefree'), gr('carpe-diem', 'Carpe Diem'), gr('fluffing-a-duck', 'Fluffing a Duck'),
+    gr('sneaky-snitch', 'Sneaky Snitch'), gr('investigations', 'Investigations'), gr('wallpaper', 'Wallpaper'),
+    gr('local-forecast-elevator', 'Local Forecast – Elevator'),
     gr('scheming-weasel', 'Scheming Weasel'), gr('mariachi-snooze', 'Mariachi Snooze'),
     gr('gymnopedie-1', 'Gymnopédie nº 1 (Satie)'), gr('who-likes-to-party', 'Who Likes to Party'),
     gr('batty-mcfaddin', 'Batty McFaddin'), gr('life-of-riley', 'Life of Riley'), gr('disco-lounge', 'Disco Lounge'),
