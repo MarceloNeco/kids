@@ -439,3 +439,28 @@ test('👆 no dedo (Fácil): tocar do outro lado não teletransporta, o boneco a
   const q = partida({ modo: 'pega' }); q.comecar(); q.corpo(0, { x: 0.8, y: 0.1, w: 0.2, h: 0.8 }, 1000);
   assert.ok(Math.abs(q.estado().jogadores[0].corpo.x - 0.9) < 0.01, 'com a câmera continua direto');
 });
+
+/* ⚽ chute mirado: reto vai no gol; para a esquerda, no alvo do papai; para a direita, no da mamãe */
+function chutaPartida() { const p = partida({ modo: 'chuta' }); p.comecar(); limpar(p); return p; }
+function chuteEm(p, dx) {   // uma passada pelo pé da bola (dx: para onde o dedo vai, px por passada de 50 ms)
+  const b = p.lancar({ fig: 'bola', x: 640, y: 650, estilo: 'voa' }, 0);
+  const ini = dx ? [640 - Math.sign(dx) * 120, 680] : [640, 715];   // começa longe da bola (fora do alcance) e passa por ela
+  p.movimento(0, [[ini[0] / 1280, ini[1] / 720, 100]], 1000); p.movimento(0, [[(640 + Math.sign(dx) * 10) / 1280, 645 / 720, 100]], 1050);
+  return b;
+}
+test('⚽ chute reto entra no gol', () => {
+  const p = chutaPartida(); const b = chuteEm(p, 0);
+  assert.ok(b.chutada && b.mira === 'gol');
+  const ev = []; for (let t = 0; t < 1500; t += 16) { p.avancar(16); ev.push(...p.eventos()); }
+  assert.ok(ev.some(e => e.t === 'gol'), 'GOOOL');
+});
+test('⚽ chute para a esquerda derruba o papai na piscina de bolinhas; ele sobe e senta de novo', () => {
+  const p = chutaPartida(); const b = chuteEm(p, -1);
+  assert.equal(b.mira, 'pai');
+  const ev = []; for (let t = 0; t < 1500; t += 16) { p.avancar(16); ev.push(...p.eventos()); }
+  const tq = ev.find(e => e.t === 'tanque'); assert.ok(tq && tq.quem === 'pai', 'acertou o alvo do papai');
+  const pai = p.estado().tanques[0]; assert.notEqual(pai.fase, 'sentado');
+  rodar(p, 4500); assert.equal(pai.fase, 'sentado', 'subiu a escadinha e sentou');
+  const q = chutaPartida(); const b2 = chuteEm(q, 1); assert.equal(b2.mira, 'mae');
+});
+test('⚽ fora do Chuta-chuta não tem piscina de bolinhas', () => { const p = partida({ modo: 'corta' }); assert.equal(p.estado().tanques, null); });

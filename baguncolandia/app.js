@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.27', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.28', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '');
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -345,6 +345,7 @@
       else if (ev.t === 'pegou') Som.tocar(ev.mascote ? 'mascote' : 'pegou');
       else if (ev.t === 'chutou') Som.tocar('chute');
       else if (ev.t === 'gol') Som.tocar('gol');
+      else if (ev.t === 'tanque') { Som.tocar('agua'); Som.tocar('gol'); dizer(ev.quem === 'pai' ? 'Tchibum! O papai caiu!' : 'Tchibum! A mamãe caiu!', ev.quem === 'pai' ? 'Splash! Dad fell in!' : 'Splash! Mom fell in!'); }
       else if (ev.t === 'vilao') Som.tocar(ev.fig === 'bombeta' ? 'bomba' : 'vilao');
       else if (ev.t === 'combo') Som.tocar('combo');
       else if (ev.t === 'poder' && ev.poder) Som.tocar('poder');

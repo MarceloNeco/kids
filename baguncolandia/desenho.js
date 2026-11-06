@@ -138,6 +138,7 @@
       pop(ev.j);
     } else if (ev.t === 'pegou') { estrelas(ev.x, ev.y, ev.mascote ? CORES.ouro : cor, ev.mascote ? 30 : 14); texto((ev.mascote ? '★ ' : '') + '+' + ev.pontos, ev.x, ev.y - 50, ev.mascote ? CORES.ouro : cor, ev.mascote ? 44 : 34); pop(ev.j); }
     else if (ev.t === 'chutou') { estrelas(ev.x, ev.y, '#fff', 10); texto(T('Chutou! +', 'Kick! +') + ev.pontos, ev.x, ev.y - 60, cor, 32); pop(ev.j); }
+    else if (ev.t === 'tanque') { for (var bi = 0; bi < 34; bi++) D.parts.push({ x: ev.px + (Math.random() - 0.5) * 200, y: 548, vx: (Math.random() - 0.5) * 760, vy: -280 - Math.random() * 560, g: 1300, r: 7 + Math.random() * 5, cor: CORES_BOLINHAS[bi % CORES_BOLINHAS.length], vida: 1400 }); texto(T('TCHIBUM! +', 'SPLASH! +') + ev.pontos, ev.px, 420, CORES.ouro, 46); pop(ev.j); }   // 🎉 caiu na piscina: bolinhas para todo lado
     else if (ev.t === 'gol') { D.flash = 0.6; estrelas(ev.x, ev.y, CORES.ouro, 40); texto(T('GOOOL! +', 'GOAL! +') + ev.pontos, W / 2, 300, CORES.ouro, 72); pop(ev.j); }
     else if (ev.t === 'vilao') { fumaca(ev.x, ev.y); texto(ev.vida ? T('Ai! −1 vida', 'Ouch! −1 life') : (ev.pontos + ''), ev.x, ev.y - 50, '#ff5252', 36); if (ev.fig === 'chuvisco') D.chuva = 2500; if (ev.vida) D.flash = 0.35; }
     else if (ev.t === 'combo') { texto((EN ? 'COMBO ×' : 'COMBO ×') + ev.n + '  +' + ev.pontos, ev.x || W / 2, (ev.y || 300) - 110, CORES.ouro, 48, true); }
@@ -208,6 +209,7 @@
       jogs.forEach(function (jg) { var r = jg.raia, y = r.y + r.h * jg.zonaChute; var zg = ctx.createLinearGradient(0, y, 0, r.y + r.h); zg.addColorStop(0, 'rgba(62,232,255,.0)'); zg.addColorStop(1, 'rgba(62,232,255,.28)'); ctx.fillStyle = zg; ctx.fillRect(r.x, y, r.w, r.h - (y - r.y)); ctx.setLineDash([14, 10]); ctx.strokeStyle = 'rgba(62,232,255,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(r.x, y); ctx.lineTo(r.x + r.w, y); ctx.stroke(); ctx.setLineDash([]); });
       trave(ctx, estado.trave, ts);
     }
+    if (estado.tanques) seguro('tanques', function () { tanques(ctx, estado.tanques, ts); });
     // rastro de luz onde a pessoa se mexe
     jogs.forEach(function (jg, j) {
       var pts = jg.rastro; if (!pts || pts.length < 1) return;
@@ -358,6 +360,46 @@
     for (var i = 1; i < 8; i++) { ctx.beginPath(); ctx.moveTo(t.x + t.w * i / 8, t.y); ctx.lineTo(t.x + t.w * i / 8, t.y + t.h); ctx.stroke(); }
     for (var k = 1; k < 5; k++) { ctx.beginPath(); ctx.moveTo(t.x, t.y + t.h * k / 5); ctx.lineTo(t.x + t.w, t.y + t.h * k / 5); ctx.stroke(); }
     ctx.restore();
+  }
+
+  /* ⚽ piscina de bolinhas dos lados do gol: torre com escadinha, cadeirinha que dobra, alvo no braço, papai e mamãe */
+  var PAI = { cabeca: 'menino', cabelo: 'curto', corCabelo: '#3e2723', cor: '#1e88e5', roupa: 'camiseta', acessorio: 'nenhum', sapato: '#37474f', pele: '#f1c27d' };
+  var MAE = { cabeca: 'menina', cabelo: 'coque', corCabelo: '#5d4037', cor: '#8e24aa', roupa: 'vestido', acessorio: 'nenhum', sapato: '#37474f', pele: '#ffd9b3' };
+  var CORES_BOLINHAS = ['#ff5252', '#ffd166', '#3ee8ff', '#c6ff3d', '#ff4fa3', '#8e5bff', '#ff9800'];
+  function tanques(ctx, lista, ts) {
+    lista.forEach(function (k) {
+      var L = k.lado, cx = k.x, topoP = 548, fundoP = 652, assento = 330, poste = cx - L * 105, escada = cx + L * 118, A = 250, cfg = k.quem === 'pai' ? PAI : MAE, B = root.Boneco;
+      var u = k.t, dobra = k.fase === 'caindo' ? Math.min(1, u / 0.25) : k.fase === 'piscina' ? 1 : k.fase === 'subindo' ? Math.max(0, 1 - u / 1.9 * 1.4) : 0;
+      ctx.save(); ctx.lineCap = 'round';
+      // poste, braço do alvo e o alvo (vira um pouquinho quando acertam)
+      ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(poste, fundoP - 10); ctx.lineTo(poste, assento - 70); ctx.lineTo(k.alvo.x, k.alvo.y); ctx.stroke();
+      var a = k.alvo, bate = k.fase === 'caindo' ? Math.sin(u * 30) * 0.25 * (1 - u / 0.55) : 0;
+      ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(bate); [[1, '#ff5252'], [0.72, '#fff'], [0.46, '#ff5252'], [0.2, '#ffd166']].forEach(function (c) { ctx.fillStyle = c[1]; ctx.beginPath(); ctx.arc(0, 0, a.r * c[0], 0, 6.2832); ctx.fill(); }); ctx.restore();
+      if (k.fase === 'sentado') { ctx.strokeStyle = 'rgba(255,209,102,' + (0.4 + 0.3 * Math.sin(ts / 200)) + ')'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(a.x, a.y, a.r + 10, 0, 6.2832); ctx.stroke(); }   // pisca: "acerte aqui!"
+      // escadinha
+      ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 7; [-14, 14].forEach(function (d) { ctx.beginPath(); ctx.moveTo(escada + d, topoP); ctx.lineTo(escada + d, assento - 10); ctx.stroke(); });
+      ctx.lineWidth = 5; for (var y = topoP - 26; y > assento; y -= 30) { ctx.beginPath(); ctx.moveTo(escada - 14, y); ctx.lineTo(escada + 14, y); ctx.stroke(); }
+      // fundo da piscina (as bolinhas de trás)
+      ctx.fillStyle = '#29b6f6'; arred(ctx, cx - 130, topoP - 18, 260, fundoP - topoP + 18, 18); ctx.fill();
+      for (var i = 0; i < 26; i++) { ctx.fillStyle = CORES_BOLINHAS[i % CORES_BOLINHAS.length]; ctx.beginPath(); ctx.arc(cx - 118 + (i * 37) % 236, topoP - 6 + ((i * 13) % 3) * 9, 11, 0, 6.2832); ctx.fill(); }
+      // a cadeirinha (dobra para baixo, presa no poste)
+      ctx.save(); ctx.translate(poste, assento); ctx.rotate(L * dobra * 1.35); ctx.fillStyle = '#ffd166'; arred(ctx, L < 0 ? -175 : 25, -8, 150, 16, 6); ctx.fill(); ctx.fillStyle = '#f9a825'; arred(ctx, L < 0 ? -175 : 25, 6, 150, 8, 4); ctx.fill(); ctx.restore();   // a cadeirinha fica embaixo de quem senta e dobra para baixo
+      // quem está lá
+      if (B) {
+        var px, py, op = {}, sentX = (poste + escada) / 2 + L * 8;
+        if (k.fase === 'sentado') { px = sentX; py = assento + A * 0.22; op = { bE: 0.15, bD: 0.55 + 0.45 * Math.sin(ts / (k.quem === 'pai' ? 130 : 110)), balanco: 0 }; }   // sentado, dando tchauzinho
+        else if (k.fase === 'caindo') { var q = Math.min(1, u / 0.55); px = sentX; py = assento + A * 0.22 + (topoP + A * 0.55 - assento - A * 0.22) * q * q; op = { pose: 'dor' }; }
+        else if (k.fase === 'piscina') { px = sentX + Math.sin(u * 6) * 6; py = topoP + A * 0.55; op = { pose: 'festa', bE: 1, bD: 1 }; }   // rindo no meio das bolinhas
+        else { var s2 = Math.min(1, u / 1.6), s3 = Math.max(0, (u - 1.6) / 0.3); px = escada + (sentX - escada) * s3; py = topoP + (assento + A * 0.22 - topoP) * s2; op = { costas: s3 < 0.5, bE: 0.5 + 0.5 * Math.sin(u * 9), bD: 0.5 - 0.5 * Math.sin(u * 9) }; }   // sobe a escadinha
+        op.ts = ts; ctx.save(); ctx.translate(px, py); B.corpoEmPe(ctx, cfg, A, op); ctx.restore();
+      }
+      // frente da piscina (cobre quem caiu) + bolinhas da frente
+      ctx.fillStyle = 'rgba(41,182,246,.92)'; arred(ctx, cx - 135, topoP + 8, 270, fundoP - topoP - 8, 18); ctx.fill();
+      ctx.strokeStyle = '#0288d1'; ctx.lineWidth = 5; ctx.stroke();
+      for (var f = 0; f < 18; f++) { ctx.fillStyle = CORES_BOLINHAS[(f + 3) % CORES_BOLINHAS.length]; ctx.beginPath(); ctx.arc(cx - 115 + (f * 29) % 230, topoP + 6 + (f % 2) * 6, 12, Math.PI, 0); ctx.fill(); }
+      ctx.fillStyle = '#fff'; ctx.font = '700 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.fillText(k.quem === 'pai' ? T('Papai', 'Dad') : T('Mamãe', 'Mom'), cx, fundoP - 22);
+      ctx.restore();
+    });
   }
 
   function particulas(ctx, dt, dtMs) {
