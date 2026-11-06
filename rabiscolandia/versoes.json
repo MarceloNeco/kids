@@ -2,6 +2,17 @@
   "app": "rabiscolandia",
   "versoes": [
     {
+      "versao": "0.1.12",
+      "data": "06/Nov/2026",
+      "hora": "20:00:00",
+      "pt": [
+        "🔢 A versão do jogo aparece bem pequenininha no pé da primeira tela."
+      ],
+      "en": [
+        "🔢 The game version now shows, very small, at the bottom of the first screen."
+      ]
+    },
+    {
       "versao": "0.1.11",
       "data": "06/Nov/2026",
       "hora": "16:00:00",
