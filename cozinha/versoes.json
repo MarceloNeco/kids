@@ -2,6 +2,19 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "06/Nov/2026",
+      "hora": "22:30:00",
+      "pt": [
+        "🍳 Nome novo: Mão na Massa (em inglês, My Little Big Chef). O progresso e as preferências continuam os mesmos.",
+        "🇧🇷 Por enquanto só em português (o inglês volta quando for ligado no RootifyONE)"
+      ],
+      "en": [
+        "🍳 New name: My Little Big Chef (Mão na Massa in Portuguese). Progress and settings stay the same.",
+        "🇧🇷 Portuguese only for now (English comes back when it is turned on in RootifyONE)"
+      ]
+    },
+    {
       "versao": "0.3.0",
       "data": "06/Nov/2026",
       "hora": "22:00:00",

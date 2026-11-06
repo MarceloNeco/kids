@@ -52,7 +52,7 @@
       var aviso = document.createElement('span');
       aviso.className = 'cx-on';
       aviso.textContent = '🌐 Só com internet';
-      aviso.title = 'Precisa de internet: YouTube e TV. / Needs internet.';
+      aviso.title = 'Precisa de internet: YouTube e TV.' + (window.BolinhoIdioma && !BolinhoIdioma.ingles() ? '' : ' / Needs internet.');
       caixa.appendChild(aviso);
       return;
     }
@@ -64,6 +64,8 @@
     caixa.appendChild(bot);
   });
 
+  // pedaço em inglês: class="en" (some sem o interruptor "ingles" do RootifyONE, idioma.js)
+  function emIngles(txt) { var s = document.createElement('span'); s.className = 'en'; s.textContent = txt; return s; }
   function nomeDe(card) { return ((card.querySelector('h2') || {}).textContent || '').trim(); }
   function escopo(card) { return card.getAttribute('data-sw').replace(/[^\/]*$/, ''); }
 
@@ -111,7 +113,7 @@
   var painel = document.getElementById('todos');
   if (painel && temSW) {
     painel.hidden = false;
-    painel.innerHTML = '<b>📦 Todos os jogos neste aparelho · All games on this device</b>';
+    painel.innerHTML = '<b>📦 Todos os jogos neste aparelho<span class="en"> · All games on this device</span></b>';
     var bGuardar = document.createElement('button');
     bGuardar.type = 'button'; bGuardar.className = 'forte';
     bGuardar.textContent = '⬇ Guardar todos (jogar sem internet)';
@@ -131,18 +133,22 @@
         st.textContent = '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…';
       }).then(function (n) {
         return guardarMusicas(function (i, total) {
-          st.textContent = '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '… / Saving favourite songs: ' + (i + 1) + ' of ' + total + '…';
+          st.textContent = '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '…';
+          st.appendChild(emIngles(' / Saving favourite songs: ' + (i + 1) + ' of ' + total + '…'));
         }).then(function (m) { return { n: n, m: m }; });
       }).then(function (r) {
         var n = r.n, m = r.m;
-        var musicas = m.total ? ' 🎵 ' + m.feitas + ' de ' + m.total + ' músicas favoritas guardadas: tocam até sem internet. / ' + m.feitas + ' of ' + m.total + ' favourite songs saved for offline.' : '';
+        var musicas = m.total ? ' 🎵 ' + m.feitas + ' de ' + m.total + ' músicas favoritas guardadas: tocam até sem internet.' : '';
+        var musicasEn = m.total ? ' / ' + m.feitas + ' of ' + m.total + ' favourite songs saved for offline.' : '';
         bGuardar.disabled = false;
         if (n === instalaveis.length && m.feitas === m.total) {
           st.className = 'st ok';
           st.textContent = '✓ Pronto: os ' + n + ' jogos funcionam sem internet neste aparelho. As músicas e as partes pesadas terminam de baixar sozinhas no Wi-Fi.' + musicas;
+          if (musicasEn) st.appendChild(emIngles(musicasEn));
           bGuardar.textContent = '✓ Todos guardados';
         } else {
           st.textContent = n + ' de ' + instalaveis.length + ' guardados.' + musicas + ' Confira a internet e toque de novo para terminar.';
+          if (musicasEn) st.appendChild(emIngles(musicasEn));
         }
       });
     });

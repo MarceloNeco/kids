@@ -16,7 +16,7 @@ const raiz = path.resolve(__dirname, '..', '..');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.webmanifest': 'application/manifest+json', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.md': 'text/markdown; charset=utf-8' };
 const server = http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]);
-  if (p.startsWith('/solverone-dados/')) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{}'); return; }
+  if (p.startsWith('/solverone-dados/')) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(p.endsWith('/kids.json') ? '{"recursos":{"ingles":{"ligado":true}}}' : '{}'); return; }   // e o inglês ligado (../idioma.js): o teste troca o idioma
   if (p.endsWith('/')) p += 'index.html';
   const f = path.join(raiz, p);
   if (!f.startsWith(raiz) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }

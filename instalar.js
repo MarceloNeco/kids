@@ -67,6 +67,8 @@
     '.bc-passos li{margin:.35rem 0}' +
     '.bc-passos p{line-height:1.5;margin:.5rem 0;font-size:1rem;color:#f3f0ff}' +
     '.bc-passos .en{color:#b3acd6;font-size:.85rem;font-style:italic}' +
+    '.bc-passos button .en,.bc-passos a .en{color:inherit;font-size:inherit;font-style:normal}' +
+    '.sem-ingles .bc-btn small{display:none}' +   /* sem o interruptor "ingles" (idioma.js): só português */
     '.bc-passos .aviso{background:rgba(255,209,102,.12);border-left:3px solid #ffd166;padding:.5rem .7rem;border-radius:8px}' +
     '.bc-passos a{color:#3ee8ff}' +
     '.bc-botoes{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}' +
@@ -130,7 +132,7 @@
     '<div class="bc-topo"><img src="' + ICONE + '" alt=""><h2 id="bcTitulo">Instalar o ' + NOME + '</h2>' +
     '<button type="button" class="bc-fechar" aria-label="Fechar / Close">✕</button></div>' +
     '<div class="bc-corpo"></div>' +
-    '<div class="bc-botoes"><button type="button" class="bc-leve bc-ja">✓ Já instalei / Done</button></div></div>';
+    '<div class="bc-botoes"><button type="button" class="bc-leve bc-ja">✓ Já instalei<span class="en"> / Done</span></button></div></div>';
   document.body.appendChild(fundo);
   var corpo = fundo.querySelector('.bc-corpo');
 
@@ -191,12 +193,12 @@
       '<li>Toque em <b>Instalar</b>. Pronto: o ícone aparece na tela do celular.</li></ol>' +
       '<p class="aviso">Já apareceu o alerta? Toque em <b>OK</b> e siga os passos acima.</p>' +
       '<p class="en">Samsung Internet may show a Google "risky app" alert. Install from Chrome instead.</p>' +
-      '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">Abrir no Chrome / Open in Chrome</a></div>';
+      '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">Abrir no Chrome<span class="en"> / Open in Chrome</span></a></div>';
     if (android && dentroDeApp) return '<p>Você abriu esta página dentro de outro app (WhatsApp, Instagram…). Para instalar, abra no Chrome:</p>' +
       '<ol><li>Toque em <b>Abrir no Chrome</b> (botão abaixo) ou nos <b>três pontinhos ⋮</b> e em <b>Abrir no navegador</b>.</li>' +
       '<li>No Chrome, toque em <b>Instalar o aplicativo</b>, no topo da página.</li></ol>' +
       '<p class="en">Opened inside another app: open in Chrome, then tap "Install app".</p>' +
-      '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">Abrir no Chrome / Open in Chrome</a></div>';
+      '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">Abrir no Chrome<span class="en"> / Open in Chrome</span></a></div>';
     if (android) return '<ol><li>Toque nos <b>três pontinhos ⋮</b> do navegador (no canto de cima ou de baixo).</li>' +
       '<li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
       '<li>Confirme em <b>Instalar</b>. O ícone aparece junto dos seus apps.</li></ol>' +

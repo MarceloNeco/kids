@@ -4,7 +4,7 @@
    progresso de cada nível em "bolinho:enigmas:progresso". Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0';
+  var APP_VERSION = '0.3.1';
   var $ = function (id) { return document.getElementById(id); };
   var J = window.Enigmas, R = window.EnigmasRodadas;
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -16,6 +16,7 @@
   var CH_PREF = 'bolinho:enigmas:pref', CH_PROG = 'bolinho:enigmas:progresso';
   var pref = ler(CH_PREF, null) || {};
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = /^en/i.test(navigator.language || '') ? 'en' : 'pt';
+  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (typeof pref.voz !== 'boolean') pref.voz = true;
   if (typeof pref.palavras !== 'boolean') pref.palavras = true;   // 🔤 desligado = só os desenhos

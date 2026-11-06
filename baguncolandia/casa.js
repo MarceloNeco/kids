@@ -1176,7 +1176,7 @@
       ctx.save(); ctx.translate(x, y); ctx.fillStyle = '#5e35b1'; ctx.beginPath(); ctx.moveTo(-26, -170); ctx.lineTo(26, -170); ctx.lineTo(48, -64); ctx.lineTo(-48, -64); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ffd9b3'; ctx.beginPath(); ctx.arc(0, -198, 28, 0, PI2); ctx.fill(); ctx.restore();
     }
     // balão de fala
-    var lista = viu ? FALAS_BRAVA : FALAS_MAE, f = lista[Math.floor(ts / 1800) % lista.length], txt = /^en/i.test((typeof navigator !== 'undefined' && navigator.language) || '') ? f[1] : f[0];
+    var lista = viu ? FALAS_BRAVA : FALAS_MAE, f = lista[Math.floor(ts / 1800) % lista.length], txt = /^en/i.test((typeof navigator !== 'undefined' && navigator.language) || '') && !(typeof BolinhoIdioma !== 'undefined' && !BolinhoIdioma.ingles()) ? f[1] : f[0];
     ctx.save(); ctx.font = '700 24px system-ui'; var tw = ctx.measureText(txt).width + 30, bx = Math.min(W - tw - 10, x - tw + 30), by = y - 375;   // acima da cabeça dela
     ctx.fillStyle = 'rgba(255,255,255,.96)'; arred(ctx, bx, by, tw, 46, 20); ctx.fill(); ctx.beginPath(); ctx.moveTo(x - 30, by + 44); ctx.lineTo(x - 6, by + 70); ctx.lineTo(x - 2, by + 44); ctx.fill();
     ctx.fillStyle = viu ? '#c62828' : '#311b92'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(txt, bx + 15, by + 24); ctx.restore();

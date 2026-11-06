@@ -3,8 +3,8 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.30', APP_UPDATED = '06/11/2026';
-  var EN = /^en/i.test(navigator.language || '');
+  var APP_VERSION = '0.8.31', APP_UPDATED = '06/11/2026';
+  var EN = /^en/i.test(navigator.language || '') && !(window.BolinhoIdioma && !BolinhoIdioma.ingles());   // só português sem o interruptor "ingles" (../idioma.js)
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
   document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = T(p[0], p[1] || p[0]); });

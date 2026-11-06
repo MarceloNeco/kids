@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0';
+  var APP_VERSION = '0.4.0';
   var APP_UPDATED = '06/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -23,6 +23,7 @@
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   var pref = ler(CH_PREF, {}) || {};
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'en' ? 'en' : 'pt';
+  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
   if (typeof pref.voz !== 'boolean') pref.voz = true;
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (!D.nivel[pref.nivel]) pref.nivel = 'facil';
@@ -44,6 +45,16 @@
     document.documentElement.lang = en() ? 'en' : 'pt-BR';
     qsa(document, '[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = en() ? p[1] : p[0]; });
     $('btLingua').textContent = en() ? 'PT' : 'EN';
+    // nome do jogo letra por letra: Mão na Massa / My Little Big Chef (cada palavra junta; quebra linha entre palavras)
+    qsa(document, '.logo[data-logo]').forEach(function (el) {
+      var nome = el.getAttribute('data-logo').split('|')[en() ? 1 : 0];
+      el.setAttribute('aria-label', nome); el.textContent = '';
+      nome.split(' ').forEach(function (w, i) {
+        if (i) el.appendChild(document.createTextNode(' '));
+        var p = el.appendChild(document.createElement('span')); p.className = 'palavra';
+        w.split('').forEach(function (c) { p.appendChild(document.createElement('span')).textContent = c; });
+      });
+    });
     $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + (en() ? 'Nov/06/2026' : APP_UPDATED) +
       t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY · ', ' · Music: Kevin MacLeod (incompetech.com), CC BY · ');
     var a = document.createElement('a'); a.href = 'CREDITOS.md'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = t('créditos', 'credits'); $('versao').appendChild(a);
@@ -1067,7 +1078,7 @@
   if (!/[?&]instalar\b/.test(location.search) || location.protocol === 'file:') return;
   var s = document.createElement('script');
   s.src = '../instalar.js';
-  s.setAttribute('data-nome', 'Cozinha'); s.setAttribute('data-icone', 'icone-192.png');
+  s.setAttribute('data-nome', 'Mão na Massa'); s.setAttribute('data-icone', 'icone-192.png');
   s.setAttribute('data-so-com', 'instalar'); s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
   document.body.appendChild(s);
 })();

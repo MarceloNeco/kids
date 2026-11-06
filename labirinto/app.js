@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.1', APP_DATA = '06/Nov/2026';
+  var APP_VERSION = '0.2.2', APP_DATA = '06/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search;
   var TESTE = /[?&]teste\b/.test(BUSCA);
@@ -37,6 +37,7 @@
   function lerJSON(k, pad) { try { var v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : pad; } catch (e) { return pad; } }
   function gravarJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   var pref = Object.assign({ forma: 'quadrado', nivel: 'facil', modo: 'andar', lingua: /^en/i.test(navigator.language || '') ? 'en' : 'pt', efeitos: true, surpresa: 0 }, lerJSON(CH_PREF, {}));
+  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
   function salvarPref() { gravarJSON(CH_PREF, pref); }
   var recordes = lerJSON(CH_REC, {});
 

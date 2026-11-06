@@ -2,6 +2,17 @@
   "app": "rabiscolandia",
   "versoes": [
     {
+      "versao": "0.1.14",
+      "data": "06/Nov/2026",
+      "hora": "22:30:00",
+      "pt": [
+        "🇧🇷 Por enquanto só em português (o inglês volta quando for ligado no RootifyONE)"
+      ],
+      "en": [
+        "🇧🇷 Portuguese only for now (English comes back when it is turned on in RootifyONE)"
+      ]
+    },
+    {
       "versao": "0.1.13",
       "data": "06/Nov/2026",
       "hora": "21:30:00",

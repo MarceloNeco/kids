@@ -15,7 +15,7 @@ const raiz = path.resolve(__dirname, '..', '..');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.webmanifest': 'application/manifest+json', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.md': 'text/markdown; charset=utf-8' };
 const server = http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]);
-  if (p.startsWith('/solverone-dados/')) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{}'); return; }   // interruptores do RootifyONE (no site de verdade existem)
+  if (p.startsWith('/solverone-dados/')) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(p.endsWith('/kids.json') ? '{"recursos":{"ingles":{"ligado":true}}}' : '{}'); return; }   // e o inglês ligado (../idioma.js): o teste troca o idioma   // interruptores do RootifyONE (no site de verdade existem)
   if (p.endsWith('/')) p += 'index.html';
   const f = path.join(raiz, p);
   if (!f.startsWith(raiz) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
@@ -46,7 +46,7 @@ test('abre sem erro no celular em pé e no computador, nas duas línguas, sem ro
   for (const [vp, toque] of [[{ width: 360, height: 740 }, true], [{ width: 1280, height: 800 }, false], [{ width: 800, height: 1280 }, true]]) {
     const ctx = await browser.newContext({ viewport: vp, hasTouch: toque, locale: 'pt-BR' });
     const { pg, erros } = await novaAba(ctx);
-    assert.match(await pg.textContent('#versao'), /0\.3\.0/);
+    assert.match(await pg.textContent('#versao'), /0\.3\.1/);
     assert.equal(await pg.textContent('#btPC'), '🤖 Contra o computador');
     await pg.click('#btLingua');
     assert.equal(await pg.textContent('#btPC'), '🤖 Against the computer');
