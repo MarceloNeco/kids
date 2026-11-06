@@ -33,7 +33,7 @@ test('index.html: CSP sem script inline, scripts existem, interruptor, peças co
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
   assert.ok(!/\son[a-z]+=/i.test(html), 'evento inline (onclick=…)');
   for (const m of html.matchAll(/<script src="([^"]+)"/g)) assert.ok(fs.existsSync(path.join(pasta, m[1])), m[1]);
-  assert.match(html, /<script src="\.\.\/recursos\.js" data-app="feature-tester"/);
+  assert.match(html, /<script src="\.\.\/recursos\.js" data-app="kids"/);
   for (const f of ['../atualizar.js', '../telacheia.js', '../trilha.js']) assert.ok(html.includes('src="' + f + '"'), f);
   assert.match(html, /data-recurso="batalha-naval"/);
   for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);

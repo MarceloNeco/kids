@@ -435,7 +435,17 @@
   if (TESTE) window.EnigmasDebug = {
     pronto: true, versao: APP_VERSION,
     estado: function () { return { tela: $('jogo').classList.contains('ativa') ? 'jogo' : 'inicio', nivel: nivel, id: rodada && rodada.id, n: partida && partida.n, acertos: partida && partida.acertos, erros: partida && partida.erros, festa: !!festa, riscos: svg.querySelectorAll('.risco').length }; },
-    progresso: function () { return JSON.parse(JSON.stringify(prog)); }
+    progresso: function () { return JSON.parse(JSON.stringify(prog)); },
+    // abre uma rodada exata (para o teste conferir o desenho de TODAS as rodadas, não só a sorteada)
+    ids: function (n) { return listaNivel(n).map(function (r) { return r.id; }); },
+    abrir: function (n, id) {
+      var r = listaNivel(n).filter(function (x) { return x.id === id; })[0]; if (!r) return false;
+      nivel = n; mostrar('jogo'); fecharFesta(); sel = null; limparArraste();
+      rodada = r; partida = J.Partida(rodada);
+      $('lousa').style.setProperty('--n', partida.n);
+      $('lousa').classList.toggle('so-texto', rodada.pares.some(function (p) { return !p[0].e || !p[1].e; }));
+      montarCartas(); pintarTopo(); return true;
+    }
   };
 })();
 

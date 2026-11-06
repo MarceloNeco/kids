@@ -72,14 +72,14 @@ a { color: var(--azul); }
 .contador { font-size: .9rem; color: var(--giz2); }
 .estrelas-topo { font-weight: 700; font-size: 1.15rem; white-space: nowrap; padding-right: .2rem; }
 .pista { text-align: center; font-size: clamp(1.1rem, 4.6vw, 1.8rem); font-weight: 600; color: var(--amarelo); line-height: 1.15; }
-.lousa { --n: 4; position: relative; flex: 1; min-height: 0; width: 100%; max-width: 64rem; align-self: center; display: grid; grid-template-columns: 1fr minmax(2.6rem, 14vw) 1fr;
+.lousa { --n: 4; position: relative; flex: 1; min-height: 0; width: 100%; max-width: 64rem; align-self: center; display: grid; grid-template-columns: minmax(0, 1fr) minmax(2.6rem, 14vw) minmax(0, 1fr);
   padding: .6rem; border: .6rem solid var(--madeira); border-radius: 1rem; touch-action: none; user-select: none; -webkit-user-select: none;
   background:
     radial-gradient(ellipse 40% 30% at 30% 30%, rgba(255, 255, 255, .07), transparent 70%),
     radial-gradient(ellipse 35% 25% at 70% 75%, rgba(255, 255, 255, .06), transparent 70%),
     linear-gradient(160deg, #35684a, #2a5539);
   box-shadow: inset 0 0 30px rgba(0, 0, 0, .45), 0 5px 0 var(--madeira2); }
-.coluna { display: flex; flex-direction: column; justify-content: space-evenly; gap: .45rem; min-height: 0; z-index: 1; }
+.coluna { display: flex; flex-direction: column; justify-content: space-evenly; gap: .45rem; min-height: 0; min-width: 0; z-index: 1; }
 .coluna.esq { grid-column: 1; } .coluna.dir { grid-column: 3; }
 .carta { --emo: min(clamp(1.4rem, calc((100vh - 13rem) / var(--n) * .44), 3.6rem), 11vw);
   --pal: min(clamp(.85rem, calc((100vh - 13rem) / var(--n) * .19), 1.55rem), 4.8vw);
@@ -89,7 +89,7 @@ a { color: var(--azul); }
 .carta::after { content: ''; position: absolute; top: 50%; width: .8rem; height: .8rem; margin-top: -.4rem; border-radius: 50%; background: var(--giz); box-shadow: 0 0 6px rgba(255, 255, 255, .5); }
 .esq .carta::after { right: -.5rem; } .dir .carta::after { left: -.5rem; }
 .emo { font-size: var(--emo); line-height: 1; flex: none; }
-.pal { font-size: var(--pal); line-height: 1.12; overflow-wrap: break-word; min-width: 0; }
+.pal { font-size: var(--pal); line-height: 1.12; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; min-width: 0; }
 .carta.texto { justify-content: center; text-align: center; }
 .carta.texto .pal { font-size: calc(var(--pal) * .95); }
 .lousa.so-texto .carta.texto .pal { font-size: min(var(--pal), 1.2rem); }

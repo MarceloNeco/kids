@@ -22,10 +22,12 @@ Progresso salvo e preferências não se perdem: tudo continua no mesmo site (sol
 | `radio.js` + `musicas/` | Rádio de rock no pé da estante. Créditos em `CREDITOS.md`. | Sim |
 | `tela-cheia.js` | Tela cheia no primeiro toque (celular/tablet; no tablet Fire só instalando). | Sim |
 | `estante.css` | Visual da estante. | Sim |
+| `cartoes-fundos.css` + `cartoes/` | Fundo fosco e colorido de cada cartão (um desenho por jogo, `generico.svg` para os outros). **Para voltar ao visual anterior, apague a linha dele no `index.html`.** | Sim |
 | `sw.js` + `manifest.webmanifest` + `icone-*` | Estante instalável e sem internet (escopo `/kids/`). | Sim (subir VERSAO) |
-| `baguncolandia/` `peluqueria/` `vruuum/` `purpurina/` `rabiscolandia/` | Um jogo por pasta, cada um com `index.html`, `app.js`, `sw.js`, `manifest.webmanifest`, `versoes.json`, `LEIA-ME.md`, `PENDENCIAS.md` e `teste/`. | Sim |
+| `baguncolandia/` `peluqueria/` `vruuum/` `purpurina/` `rabiscolandia/` `campo-minado/` `batalha-naval/` `enigmas/` `labirinto/` `cozinha/` | Um jogo por pasta, cada um com `index.html`, `app.js`, `sw.js`, `manifest.webmanifest`, `versoes.json`, `LEIA-ME.md`, `PENDENCIAS.md` e `teste/`. | Sim |
 | `danca-na-sala.html` | Dança na Sala (precisa de internet: YouTube e TV). | Sim |
-| `recursos.js` + `recursos-do-app.json` | Interruptores do RootifyONE. Os jogos ainda obedecem o app "feature-tester" do RootifyONE (ver pendências). | Com cuidado |
+| `recursos.js` + `recursos-do-app.json` | Interruptores do RootifyONE: **um app só, "Bolinho de Chuva" (`kids`), com um interruptor por jogo** (desde 06/Nov/2026). Jogo desligado some da estante (`data-recurso` no cartão) e esconde a página dele; `app` desligado = o pacote inteiro em manutenção. Jogo novo = uma entrada no `recursos-do-app.json`. | Com cuidado |
+| `trilha.js` | Tocador comum de música dos jogos novos (≥ 10 músicas gravadas por jogo, apontando para as pastas `musicas/` que já existem, sem copiar). Começa no primeiro toque (dedo soltando), lembra o 🔇. | Sim |
 | `atualizar.js` | Aviso "✨ Versão nova — Atualizar / Depois" dentro dos jogos. | Sim |
 | `telacheia.js`, `cofre.js`, `janela.js` | Peças comuns usadas pelos jogos (`../`). `cofre.js` e `janela.js` são cópias dos módulos comuns da plataforma. | Com cuidado |
 | `baguncolandia/libs/` | Bibliotecas hospedadas (MediaPipe, supabase-js), usadas também por outros jogos. | Não (só atualizar versão) |
@@ -35,3 +37,5 @@ Progresso salvo e preferências não se perdem: tudo continua no mesmo site (sol
 ## Testes
 
 `node --test <jogo>/teste/*.test.js` na raiz deste repositório (Node + Playwright com o Chromium do ambiente).
+`node --test teste/*.test.js` é o vigia da estante: todo jogo do catálogo tem interruptor, obedece o app `kids`, e quem usa a
+trilha comum toca pelo menos 10 músicas que existem.

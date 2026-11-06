@@ -63,7 +63,7 @@ dela mostra a ordem (▶ = agora).
 | `versoes.json`, `PENDENCIAS.md`, `CREDITOS.md` | Versões (PT/EN), pendências e créditos. |
 | `teste/` | `node --test batalha-naval/teste/*.test.js` (rodar da raiz do repositório kids). |
 
-Peças compartilhadas usadas com `../`: `recursos.js` (interruptor `batalha-naval` do RootifyONE, no app "feature-tester"
+Peças compartilhadas usadas com `../`: `recursos.js` (interruptor `batalha-naval` do RootifyONE, no app "kids" (Bolinho de Chuva)
 como os outros jogos), `atualizar.js`, `telacheia.js`, `trilha.js`, `instalar.js` (com `?instalar=1`),
 `baguncolandia/libs/supabase.js`, `rabiscolandia/fontes/fredoka.woff2` e as músicas de `vruuum/musicas/`.
 

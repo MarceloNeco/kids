@@ -241,3 +241,25 @@ test('sem localStorage (modo privado travado) o jogo continua', async () => {
   await conferirRodadaCompleta(pg, 'sem localStorage');
   await pg.fechar();
 });
+
+// Todas as rodadas de todos os níveis, em PT e EN, no celular em pé (390 e 320 px) e deitado: nenhuma carta sai da
+// tela. (Achado de 06/Nov/2026: uma palavra comprida empurrava a carta da direita para fora em 390 px.)
+test('todas as rodadas cabem na tela do celular, em pé e deitado, em português e inglês', async () => {
+  for (const vp of [{ width: 390, height: 844 }, { width: 320, height: 640 }, { width: 844, height: 390 }]) {
+    for (const lingua of ['pt', 'en']) {
+      const pg = await abrir({ viewport: vp, hasTouch: true, isMobile: true });
+      if (lingua === 'en') await pg.click('#btLingua');
+      for (const n of ['facil', 'medio', 'dificil']) {
+        const ids = await pg.evaluate(n => EnigmasDebug.ids(n), n);
+        assert.ok(ids.length >= 30, n + ' ' + lingua + ': ' + ids.length + ' rodadas');
+        for (const id of ids) {
+          assert.ok(await pg.evaluate(([n, id]) => EnigmasDebug.abrir(n, id), [n, id]), 'abrir ' + id);
+          await pg.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+          await conferirLayout(pg, vp.width + 'x' + vp.height + ' ' + lingua + ' ' + n + ' ' + id);
+        }
+      }
+      assert.deepEqual(await pg.erros(), []);
+      await pg.fechar();
+    }
+  }
+});
