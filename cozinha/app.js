@@ -5,8 +5,8 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.5.0';
-  var APP_UPDATED = '06/Nov/2026';
+  var APP_VERSION = '0.5.1';
+  var APP_UPDATED = '07/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
   var V = RAPIDO ? 0.12 : 1;   // multiplica os tempos de espera
@@ -168,6 +168,16 @@
     mostrar(pilha.length ? pilha.pop() : 'menu');
   });
   qsa(document, '.voltar').forEach(function (b) { b.addEventListener('click', voltar); });
+  // navegação padrão (../navegacao.js): 🏠 Início volta à escolha da receita (tira do histórico as telas de dentro, para o
+  // Voltar do celular sair do jogo a partir dali); o ← de cada tela continua voltando um passo; 🚪 Saída sai do jogo
+  function irAoMenu() {
+    if (atual === 'pronto') { history.back(); return; }
+    var i = pilha.lastIndexOf('menu');
+    if (i < 0) { pilha = []; mostrar('menu'); return; }
+    var n = pilha.length - i; pilha.length = i + 1; history.go(-n);
+  }
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'cozinha', noInicio: function () { return atual === 'entrada' || atual === 'menu' || atual === 'desligado'; }, irParaInicio: irAoMenu,
+    emAndamento: function () { return !!jogo && (atual === 'mapa' || atual === 'lugar' || atual === 'cozinha'); } });
   document.addEventListener('keydown', function (e) { if ((e.key === 'Escape' || e.key === 'GoBack') && atual !== 'entrada' && atual !== 'menu') { e.preventDefault(); voltar(); } });
 
   if (window.SolverRecursos && !SolverRecursos.ligado('cozinha', true)) { traduzir(); $('desligado').hidden = false; mostrar('desligado'); return; }
@@ -185,7 +195,7 @@
   $('btEntrar').addEventListener('click', function () {
     Som.acordar();
     try { if (window.matchMedia && matchMedia('(pointer: coarse)').matches && document.documentElement.requestFullscreen && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); } catch (e) { /* ok */ }
-    ir('menu');
+    mostrar('menu');   // a capa não fica no histórico: o Voltar do celular na escolha da receita sai do jogo
   });
   $('btLingua').addEventListener('click', function () { pref.lingua = en() ? 'pt' : 'en'; salvarPref(); traduzir(); desenharMenu(); });
   $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); traduzir(); aviso(pref.voz ? t('🗣️ Voz ligada', '🗣️ Voice on') : t('🗣️ Voz desligada', '🗣️ Voice off'), 1500, true); if (!pref.voz && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ } });

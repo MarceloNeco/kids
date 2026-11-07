@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.10.4';
+  var APP_VERSION = '1.10.5';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -639,6 +639,11 @@
   $('ver').textContent = 'v' + APP_VERSION;
   // nome da música tocando, com autor e licença (as gravadas são CC BY-SA: o crédito aparece aqui)
   Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); });
+  // navegação padrão (../navegacao.js): 🏠 Início volta ao menu (da corrida e do fim); o Voltar do celular faz o mesmo
+  // (a barra cuida do histórico: este jogo não mexia nele); 🚪 Saída sai do jogo, perguntando antes no meio da corrida
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'vruuum', cuidarDoVoltar: true,
+    noInicio: function () { return estadoTela !== 'jogo' && estadoTela !== 'fim'; }, irParaInicio: irMenu,
+    emAndamento: function () { return estadoTela === 'jogo' && rodando; } });
   lerBordas();
   $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
   traduzir();

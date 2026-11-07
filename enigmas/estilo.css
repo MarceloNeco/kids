@@ -68,6 +68,7 @@ a { color: var(--azul); }
 #jogo { flex-direction: column; height: 100vh; height: 100dvh; gap: .35rem;
   padding: calc(6px + var(--st)) calc(8px + var(--sr)) calc(58px + var(--sb)) calc(8px + var(--sl)); }
 .topo { display: flex; align-items: center; gap: .5rem; }
+.bn-nav .topo { padding-left: calc(var(--nav-largo) - 8px - var(--sl)); min-height: calc(var(--nav-alto) - 12px - var(--st)); }   /* 🏠 e 🚪 (../navegacao.js) no canto */
 .topo-meio { flex: 1; display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .nome-nivel { font-weight: 700; font-size: 1.15rem; }
 .contador { font-size: .9rem; color: var(--giz2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

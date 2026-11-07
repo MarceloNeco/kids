@@ -110,8 +110,6 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
 #tvRodape { position: absolute; left: 2vh; bottom: 2vh; z-index: 6; display: flex; gap: 1.5vh; align-items: center; max-width: 64vw; }
 #tvCanto { font-size: 2.6vh; font-weight: 700; background: rgba(0,0,0,.6); padding: 1vh 2vh; border-radius: 1.5vh; color: var(--ouro); white-space: nowrap; }
 #tvTitulo { font-size: 2.4vh; background: rgba(0,0,0,.6); padding: 1vh 2vh; border-radius: 1.5vh; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: none; }
-#tvSair { position: absolute; right: 1.5vh; top: 1.5vh; z-index: 9; display: none; background: rgba(0,0,0,.5); color: #fff; width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 1.3rem; }
-#tv.local #tvSair { display: block; }
 #tv.local #tvRodape { display: none; }
 /* modo local (só o celular / no dedo): o lobby cabe acima da barra de botões, em pé e deitado */
 #tv.local .cheia { justify-content: flex-start; padding: 3.5rem 1rem 11rem; gap: .8rem; overflow: auto; }
@@ -207,7 +205,7 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
 /* celular deitado: o palco nunca estica (fica 16:9 no meio; os botões vão para a faixa do lado) */
 #tvPalco { width: min(100%, calc(100vh * 16 / 9)); width: min(100%, calc(100dvh * 16 / 9)); }
 @media (max-height: 460px) {
-  #tvSair, #tv.jogando #localPausa, #tv.toque.jogando #localBoneco, #tvSom button { width: 38px; height: 38px; min-height: 38px; font-size: 1rem; }
+  #tv.jogando #localPausa, #tv.toque.jogando #localBoneco, #tvSom button { width: 38px; height: 38px; min-height: 38px; font-size: 1rem; }
   #tv.jogando #localPausa { top: calc(1.5vh + 44px); }
   #tv.toque.jogando #localBoneco { top: calc(1.5vh + 88px); }
   #tvSom { gap: 6px; top: calc(1.5vh + 44px); }
@@ -225,7 +223,7 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
 #localArrumar { display: none; flex: 1 1 100%; background: var(--ouro); color: #1a1446; }
 #tv.podearrumar:not(.jogando) #localArrumar { display: block; }
 #tv:not(.toque) #localModos button[data-v="arrumar"] { display: none; }
-/* Ícones (✕ ⏸ 🧍 🔊 🎵) e setinhas NUNCA em cima da área do jogo: a criança mexe na tela toda.
+/* Ícones (⏸ 🧍 🔊 🎵) e setinhas NUNCA em cima da área do jogo: a criança mexe na tela toda.
    Deitado: o palco deixa uma faixa à direita para os ícones (e, na Bagunça, uma faixa embaixo para as setinhas).
    Em pé: os ícones viram uma fileira no alto, acima do palco. */
 @media (orientation: landscape) {
@@ -233,12 +231,12 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
   #tv.local.casa.jogando #tvPalco { width: min(calc(100% - 64px), calc((100vh - 60px) * 16 / 9)); width: min(calc(100% - 64px), calc((100dvh - 60px) * 16 / 9)); top: calc(50% - 30px); }
   #tv.local.casa.jogando #casaNav { bottom: 6px; right: calc(64px + 1.5vh); }
 }
-@media (orientation: portrait) {
-  #tv.local #tvSom { flex-direction: row; top: 1.5vh; right: calc(1.5vh + 52px); }
-  #tv.local.jogando #tvSom { top: 1.5vh; right: calc(1.5vh + 104px); }
-  #tv.local.toque.jogando #tvSom { top: 1.5vh; right: calc(1.5vh + 156px); }
-  #tv.jogando #localPausa { top: 1.5vh; right: calc(1.5vh + 52px); }
-  #tv.toque.jogando #localBoneco { top: 1.5vh; right: calc(1.5vh + 104px); }
+@media (orientation: portrait) {   /* o canto da direita era do ✕, que virou o 🏠 da barra comum (canto esquerdo) */
+  #tv.local #tvSom { flex-direction: row; top: 1.5vh; right: 1.5vh; }
+  #tv.local.jogando #tvSom { top: 1.5vh; right: calc(1.5vh + 52px); }
+  #tv.local.toque.jogando #tvSom { top: 1.5vh; right: calc(1.5vh + 104px); }
+  #tv.jogando #localPausa { top: 1.5vh; right: 1.5vh; }
+  #tv.toque.jogando #localBoneco { top: 1.5vh; right: calc(1.5vh + 52px); }
 }
 /* 📱 celular deitado (06/Nov/2026, Galaxy S24 com a barra do navegador): no jogo do aparelho a página não amplia nem
    arrasta (o dedo sempre joga; o lobby ainda rola de pé a cabeça). Na 🧸 Bagunça, em tela bem larga, o palco usa a
@@ -263,4 +261,11 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
   #inicio > .col { flex-direction: row; margin-top: .6rem; }
   #inicio .caixa { flex: 1 1 0; padding: .7rem; gap: .6rem; }
   #inicio .big { padding: .7rem; font-size: 1.1rem; }
+}
+/* navegação padrão (../navegacao.js): 🏠 e 🚪 no canto de cima à esquerda; as telas de rolar começam embaixo deles */
+.bn-nav .tela.ativa, .bn-nav #inicio.ativa { padding-top: var(--nav-alto); }
+/* deitado e baixinho, a capa não desce (os quatro botões continuam sem rolar): só a marca e o nome vão para o lado */
+@media (orientation: landscape) and (max-height: 500px) {
+  .bn-nav #inicio.ativa { padding-top: .8rem; }
+  .bn-nav #inicio > .marca, .bn-nav #inicio > h1 { margin-left: max(0px, calc(var(--nav-largo) - max(0px, (100vw - 54rem) / 2) - 2.4rem)); }
 }

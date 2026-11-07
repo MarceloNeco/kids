@@ -163,7 +163,7 @@ async function comecar(pg, nivel) {
   const ip2 = await est(ipad);
   confere(ip2.pausado && ip2.fase === 'caindo', 'tocar no ⏸ pausa e não conta como parar', ip2);
   const bs = await ipad.locator('#btSeguir').boundingBox(); await ipad.touchscreen.tap(bs.x + bs.width / 2, bs.y + bs.height / 2);
-  await ipad.touchscreen.tap(40, 25);
+  const pl = await ipad.locator('.placar').boundingBox(); await ipad.touchscreen.tap(pl.x + 20, pl.y + pl.height / 2);   // o placar fica ao lado do 🏠 e da 🚪 (canto de cima)
   const ip3 = await est(ipad);
   confere(!ip3.pausado && ip3.fase === 'parado', 'tocar em qualquer lugar (até em cima do placar) para o item', ip3);
   confere(ipad.erros().length === 0, 'iPad antigo: sem erros', ipad.erros());
@@ -301,7 +301,7 @@ async function comecar(pg, nivel) {
     await tv.waitForFunction(() => !/Fantasma/.test(document.getElementById('tvJogadores').textContent), null, { timeout: 6000 }).catch(() => {});
     confere(!/Fantasma/.test(await tv.textContent('#tvJogadores')), 'celular que some (sem sinal) sai do lobby');
     confere(/Ana/.test(await tv.textContent('#tvJogadores')), 'quem está ativo (mandando sinal) fica');
-    await tv.click('#tvSair');
+    await tv.click('.bolinho-nav .bn-casa');
     confere(await tv.isVisible('#inicio'), '🏠 no lobby da TV volta ao início');
     await tv.close();
     await cel.waitForFunction(() => /não encontrada|not found/i.test(document.getElementById('ctStatus').textContent), null, { timeout: 6000 }).catch(() => {});
@@ -312,7 +312,7 @@ async function comecar(pg, nivel) {
 
   const pdb = await abrir(browser, base + '?debug&teste');
   await passo(pdb, 500);
-  confere(/v0\.6\.11/.test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
+  confere(/v0\.6\.12/.test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
   confere(await D(pdb, () => PeluqueriaDebug.leve === false), 'celular: modo leve desligado');
 
   /* ---------- revisão final ---------- */
@@ -406,7 +406,7 @@ async function comecar(pg, nivel) {
     await pi.click('#btDeNovo'); await pi.waitForTimeout(100);
     const f2 = await D(pi, () => PeluqueriaSom.posicao().faixa);
     confere(typeof f2 === 'number' && f2 !== f1, '"Jogar de novo" toca outra música', [f1, f2]);
-    await passo(pi, 2200); await pi.click('#btCasa');
+    await passo(pi, 2200); await pi.click('.bolinho-nav .bn-casa');
     confere((await D(pi, () => PeluqueriaSom.posicao().faixa)) === 'abertura', 'de volta ao menu, toca a abertura');
     confere(pi.erros().length === 0, 'música: sem erros', pi.erros());
   }
@@ -435,8 +435,9 @@ async function comecar(pg, nivel) {
   {
     const ph = await abrir(browser, base + '?teste');
     await ph.click('#btNormal'); await ph.click('#btJogar'); await passo(ph, 2200);
-    confere(await ph.isVisible('#btCasa'), '🏠 visível durante a rodada');
-    await ph.click('#btCasa');
+    await ph.waitForSelector('.bolinho-nav .bn-casa', { state: 'visible', timeout: 2000 }).catch(() => {});   // a barra comum confere a tela a cada 1/4 s
+    confere(await ph.isVisible('.bolinho-nav .bn-casa'), '🏠 visível durante a rodada');
+    await ph.click('.bolinho-nav .bn-casa');
     confere(await ph.isVisible('#inicio') && !(await ph.isVisible('#rodada')), '🏠 volta ao menu');
     confere(await D(ph, () => PeluqueriaSom.fonte()) === 'jogo', 'música segue no menu depois do 🏠');
     await ph.click('#btJogar'); await passo(ph, 2200);
@@ -447,7 +448,7 @@ async function comecar(pg, nivel) {
     confere(await ph.isVisible('#fim'), 'chegou ao fim');
     await ph.goBack(); await ph.waitForTimeout(300);
     confere(/peluqueria/.test(ph.url()) && await ph.isVisible('#inicio'), 'Voltar na tela de fim vai ao menu', ph.url());
-    await ph.click('#btJogar'); await passo(ph, 2200); await ph.click('#btCasa');
+    await ph.click('#btJogar'); await passo(ph, 2200); await ph.click('.bolinho-nav .bn-casa');
     await ph.click('#btJogar'); await passo(ph, 2200);
     await ph.goBack(); await ph.waitForTimeout(300);
     confere(/peluqueria/.test(ph.url()) && await ph.isVisible('#inicio'), 'depois de 🏠 e jogar de novo, Voltar ainda vai ao menu', ph.url());

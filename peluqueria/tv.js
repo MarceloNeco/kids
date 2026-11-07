@@ -183,13 +183,12 @@
     tv.jogadores = tv.jogadores.filter(function (x) { return t - x.visto < SUMIU; });
     if (tv.jogadores.length !== antes) { desenharLobby(); estado(); }
   }
-  function sair() {   // 🏠 no lobby (navegador do celular/computador): volta ao início
+  function sair() {   // 🏠 da barra comum (../navegacao.js) no papel de TV: fecha a sala e volta ao início
     tv.aberta = false; (tv.timers || []).forEach(clearInterval);
     if (tv.canal) tv.canal.fechar(); tv.canal = null; tv.jogadores = []; tv.partida = null;
     if (!A.TV) document.documentElement.classList.remove('tv');
     A.voltarInicio();
   }
-  $('tvSair').addEventListener('click', sair);
 
   /* ---------- abrir ---------- */
   function abrir() {
@@ -216,5 +215,5 @@
       nivel: function () { return tv.nivel; }, fase: function () { return tv.fase; }, atraso: function () { return tv.ultimoAtraso; }
     };
   }
-  window.PeluqueriaTV = { abrir: abrir };
+  window.PeluqueriaTV = { abrir: abrir, sair: sair };
 })();

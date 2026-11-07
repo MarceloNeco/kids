@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.3', APP_DATA = '06/Nov/2026';
+  var APP_VERSION = '0.2.4', APP_DATA = '07/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search;
   var TESTE = /[?&]teste\b/.test(BUSCA);
@@ -103,7 +103,9 @@
   }
   window.addEventListener('popstate', function () { empurrado = false; if (telaAtual === 'jogo') irMenu(); });
   function voltarMenu() { if (empurrado) history.back(); else irMenu(); }
-  $('btMenu').addEventListener('click', voltarMenu);
+  // navegação padrão (../navegacao.js): 🏠 Início = voltar ao menu (o mesmo do Voltar do celular), 🚪 Saída
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'labirinto', noInicio: function () { return telaAtual !== 'jogo'; }, irParaInicio: voltarMenu,
+    emAndamento: function () { return telaAtual === 'jogo' && !!jogo && !jogo.venceu; } });
   $('btFimMenu').addEventListener('click', voltarMenu);
   $('btNovo').addEventListener('click', function () { Som.toque(); novoJogo(); });
   $('btDeNovo').addEventListener('click', function () { fecharFim(); novoJogo(); });

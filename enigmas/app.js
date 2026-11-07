@@ -4,7 +4,7 @@
    progresso de cada nível em "bolinho:enigmas:progresso". Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.2';
+  var APP_VERSION = '0.3.3';
   var $ = function (id) { return document.getElementById(id); };
   var J = window.Enigmas, R = window.EnigmasRodadas;
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -122,6 +122,9 @@
   }
   window.addEventListener('popstate', function () { naPilha = false; if ($('jogo').classList.contains('ativa')) voltarInicio(); });
   function sair() { if (naPilha) { history.back(); } else voltarInicio(); }
+  // navegação padrão (../navegacao.js): 🏠 Início = voltar aos níveis (o mesmo do Voltar do celular), 🚪 Saída
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'enigmas', noInicio: function () { return !$('jogo').classList.contains('ativa'); }, irParaInicio: sair,
+    emAndamento: function () { return !!partida && $('jogo').classList.contains('ativa'); } });
 
   function telaCheia() {
     var d = document, el = d.documentElement;
@@ -481,7 +484,6 @@
       c.appendChild(s);
     }
   }
-  $('btVoltar').addEventListener('click', sair);
   document.addEventListener('keydown', function (e) {
     if ((e.key === 'Escape' || e.key === 'GoBack' || e.keyCode === 461) && $('jogo').classList.contains('ativa')) { e.preventDefault(); sair(); }
   });

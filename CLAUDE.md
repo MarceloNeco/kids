@@ -106,7 +106,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
   (só português por enquanto; o inglês com o interruptor `ingles`),
-  `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
+  `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
   bibliotecas em `baguncolandia/libs/`. Fundo dos cartões: `cartoes-fundos.css` (tirar a linha do `index.html` = visual antigo).
 - Interruptores: todos os jogos obedecem o app **`kids`** ("Bolinho de Chuva") do RootifyONE, um interruptor por jogo.
 
@@ -116,11 +116,19 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   novo continua com a versão em inglês, só escondida.** Peça comum: `idioma.js` (logo depois do `recursos.js`, na estante
   e em todo jogo): sem o interruptor, `<html class="sem-ingles">` esconde o que tem `class="en"` e o botão `#btLingua`; o
   jogo pergunta `BolinhoIdioma.ingles()` antes de escolher o inglês.
+- **Navegação padrão (dono, 07/Nov/2026): todo jogo tem 🏠 Início e 🚪 Saída no canto de cima, pela peça comum
+  `navegacao.js`.** `<script src="../navegacao.js" data-fora-do-arquivo>` logo depois do `../idioma.js`, `'../navegacao.js'`
+  no `ARQUIVOS` do `sw.js` e `BolinhoNav.iniciar({ jogo, noInicio, irParaInicio, emAndamento })` no `app.js` (detalhe no
+  começo do arquivo). 🏠 só aparece fora da tela de começo e volta para ela; 🚪 sai (pergunta antes com partida rolando;
+  vai para a estante `/kids/`). O Voltar do celular numa tela de dentro volta (o jogo que não cuida do histórico passa
+  `cuidarDoVoltar: true`). Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
+  `bn-nav`/`bn-dentro` e as medidas `--nav-alto`/`--nav-largo` no `<html>`. Na TV (`?tv=`) a barra some. Vigia:
+  `teste/navegacao.test.js`.
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
 - Testes: `node --test <jogo>/teste/*.test.js` (rodar da raiz deste repositório).
 - Jogo novo: pasta própria + entrada em `catalogo.js` + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
-  no `../recursos.js` + `../idioma.js` logo depois + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
+  no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
   - **Com internet**: tocam **todas** as músicas gravadas do jogo (instrumentos de verdade), em **ordem sorteada**. A

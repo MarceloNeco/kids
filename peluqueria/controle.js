@@ -166,7 +166,6 @@
   $('ctEntrar').addEventListener('click', entrar);
   $('ctCodigo').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('ctNome').focus(); });
   $('ctNome').addEventListener('keydown', function (e) { if (e.key === 'Enter') entrar(); });
-  $('ctSair').addEventListener('click', sair);
   A.aoTocar($('ctParar'), function (e) { e.preventDefault(); parar(0); });   // também no iPad antigo
   /* durante a rodada, tocar em qualquer lugar da tela do controle também é PARAR (v0.6.3) */
   A.aoTocar($('controle'), function (e) {
@@ -199,5 +198,5 @@
       reentrar: function () { join(); }
     };
   }
-  window.PeluqueriaControle = { abrir: abrir };
+  window.PeluqueriaControle = { abrir: abrir, sair: sair };
 })();

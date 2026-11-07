@@ -67,6 +67,7 @@ a { color: #1d6fb8; }
 
 /* ---------- cabeçalho das telas de jogo ---------- */
 .cabeca { width: 100%; max-width: 70rem; display: flex; align-items: center; gap: 8px; }
+.bn-nav .cabeca { padding-left: calc(var(--nav-largo) - 12px - var(--sl)); }   /* 🏠 e 🚪 (../navegacao.js) */
 .cabeca h2 { flex: 1; font-size: clamp(1.05rem, 4.6vw, 1.5rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .carteira { display: flex; gap: 6px; font-weight: 700; font-size: 1rem; }
 .carteira span { background: #fff; border: 2px solid var(--borda); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
