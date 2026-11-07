@@ -140,7 +140,7 @@
       '<rect x="0" y="252" width="320" height="10" rx="5" fill="#e2ad74"/>' +
       grupoRecipiente(para, 212, 252, para === 'frigideira' || para === 'forma' ? 0.9 : 1) +
       '<path class="jorro" d="M0,0" fill="none" stroke="#fff" stroke-width="0" stroke-linecap="round"/>' +
-      '<path class="jorro-luz" d="M0,0" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="0" stroke-linecap="round" stroke-dasharray="6 10"/>' +
+      '<path class="jorro-luz" d="M0,0" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="0" stroke-linecap="round" stroke-dasharray="16 9"/>' +
       '<g class="gotas"><circle r="2.6"/><circle r="2"/><circle r="2.4"/></g><g class="splash" opacity="0"><ellipse class="anel" rx="14" ry="4" fill="none" stroke-width="2.4"/></g>' +
       '<g class="fonte f-' + deId + '" data-giro="0"><clipPath id="cf' + n + '"><path d="' + f.corpo + '"/></clipPath>' + f.fundo +
       '<g clip-path="url(#cf' + n + ')"><g class="nivel-fonte"><rect x="-120" y="-20" width="240" height="200" fill="#fff"/></g></g>' + f.frente + '</g></svg>';
@@ -171,7 +171,7 @@
       // o que está dentro da fonte fica com a superfície reta (gira ao contrário) e acaba no fim
       var a = giroA * Math.PI / 180, b = bicoEm(a), boca = b[1] / ESC;
       var vaza = Math.max(0, Math.min(1, (t - 0.3) / 0.52));
-      var sup = Math.max(-18 + vaza * 70, boca + 2);
+      var sup = Math.max(-18, boca - 30 * (1 - vaza) + 2);   // o que sobra junta perto do bico
       nivelF.parentNode.setAttribute('transform', 'rotate(' + q(-giroA) + ')');
       nivelF.setAttribute('y', q(sup));
       // jorro: do bico até a superfície do que está no recipiente
@@ -301,7 +301,7 @@
       '<path d="M20,206 h220 v10 h-220z" fill="#e84a3c" opacity=".85"/><path d="M40,206 v44 M80,206 v44 M120,206 v44 M160,206 v44 M200,206 v44" stroke="#e84a3c" stroke-width="10" opacity=".25"/>' +
       '<ellipse cx="130" cy="222" rx="64" ry="16" fill="#e9dfd2"/><ellipse cx="130" cy="218" rx="62" ry="15" fill="#fff" stroke="' + c + '" stroke-width="4"/>' +
       '<text class="comida" x="130" y="222" text-anchor="middle" font-size="46">' + comida + '</text>' +
-      '<g class="vapor" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".9"><path class="v1" d="M108,180 c-6,-8 6,-12 0,-20"/><path class="v2" d="M130,174 c-6,-8 6,-12 0,-20"/><path class="v3" d="M152,180 c-6,-8 6,-12 0,-20"/></g>' +
+      '<g class="vapor" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".75"><path class="v1" d="M110,186 c-5,-6 5,-10 0,-16"/><path class="v2" d="M130,180 c-5,-6 5,-10 0,-16"/><path class="v3" d="M150,186 c-5,-6 5,-10 0,-16"/></g>' +
       '<g class="faiscas-m" fill="#ffc93c"><path class="s1" d="M60,196 l3,7 l7,3 l-7,3 l-3,7 l-3,-7 l-7,-3 l7,-3z"/><path class="s2" d="M200,190 l2.5,6 l6,2.5 l-6,2.5 l-2.5,6 l-2.5,-6 l-6,-2.5 l6,-2.5z"/><path class="s3" d="M218,150 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 l5,-2z" fill="#ff5e9c"/></g>' +
       // braço do garfo (este se mexe)
       '<path class="braco-garfo" d="M176,170 C186,186 182,196 170,198" fill="none" stroke="' + cam + '" stroke-width="16" stroke-linecap="round"/>' +
@@ -319,7 +319,7 @@
     var braco = g('.braco-garfo'), garfo = g('.garfo'), maoG = g('.mao-garfo'), garfada = g('.garfada'), boca = g('.boca'), lingua = g('.lingua');
     var abertos = g('.olhos-abertos'), felizes = g('.olhos-felizes'), olhos = svg.querySelectorAll('.olho'), boch = svg.querySelectorAll('.bochecha'), hmm = g('.hmm'), cab = g('.cabeca-m'), faca = g('.faquinha');
     var CICLO = 5200, ini = null, raf = 0, vivo = true;
-    var PRATO = [170, 198], BOCA = [146, 128], OMBRO = [176, 166];
+    var PRATO = [170, 198], BOCA = [158, 127], OMBRO = [176, 166];
     function janela(t, a, b) { return t >= a && t <= b; }
     function quadro(ts) {
       if (!vivo) return;

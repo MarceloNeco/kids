@@ -892,10 +892,10 @@
     if (adulto) $('dicaAdulto').textContent = t('🧑‍🍳 Na cozinha de verdade, ' + tx(u).toLowerCase() + ' só com um adulto junto!', '🧑‍🍳 In a real kitchen, use the ' + tx(u).toLowerCase() + ' only with a grown-up!');
     // utensílios
     var brilha = deveBrilhar();
-    $('utensilios').innerHTML = cz.utens.map(function (id) {
+    $('utensilios').innerHTML = '<div class="bandeja">' + cz.utens.map(function (id) {
       var x = D.utensilio[id];
       return '<button type="button" class="utensilio' + (brilha && p && id === p.u ? ' luz' : '') + (cz.fase === 'acao' && p && id === p.u ? ' usando' : '') + '" data-u="' + id + '"' + (cz.fase === 'utensilio' ? '' : ' aria-disabled="true"') + '>' + icone(id) + '<span>' + tx(x) + '</span></button>';
-    }).join('');
+    }).join('') + '</div>';
     // palco
     var palco = $('palco'); palco.className = 'palco';
     if (cz.fase === 'ficha') {

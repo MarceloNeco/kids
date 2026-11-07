@@ -2,6 +2,33 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.5.0",
+      "data": "06/Nov/2026",
+      "hora": "23:59:00",
+      "pt": [
+        "🥛 Despejar de verdade: o liquidificador, a tigela, o espremedor e a panela agora inclinam PARA o lado do recipiente, com o bico em cima dele, e dá para ver o leite, a massa ou o suco caindo e o recipiente enchendo.",
+        "🥚 Pôr ingredientes com graça: os pedacinhos caem na tigela, a farinha faz uma nuvenzinha, o pacote inclina e derrama, o ovo quebra e a gema cai.",
+        "🧼 Lavar as mãos: a torneira aberta, a água caindo, as duas mãos esfregando junto com o dedo, a espuma aparecendo e, no fim, \"Mãos limpinhas! ✨\".",
+        "😋 Receita pronta: um menininho com chapéu de cozinheiro come o prato com garfo e faquinha, mastiga feliz, lambe os lábios e diz \"Hmm!\".",
+        "📷 Guardar a foto: um botão faz uma foto bonita do prato com o menininho, o nome da receita e a data. No celular dá para mandar para a galeria ou o WhatsApp; no computador ela é baixada. Funciona sem internet.",
+        "✨ Mais animação: a fruta balança, solta do galho e voa para a cesta com brilho; a terra pula quando puxa a cenoura; o leite cai na xícara; a colher faz redemoinho; o liquidificador gira; a chama tremula e a panela solta vapor; o forno acende; a geladeira abre com fumacinha gelada. Quem pediu \"menos movimento\" no aparelho vê tudo parado.",
+        "🎵 A bolinha da música não cobre mais nada: os utensílios ficam numa bandeja presa embaixo da tela, com o cantinho da direita livre.",
+        "📱 Celular deitado: todas as telas cabem na tela, sem precisar arrastar.",
+        "👵 A Dona Cida agora escolhe uma voz de mulher no celular. Se o aparelho só tiver voz de homem, ela fala mais fininha. O botão 👵🔁 troca a voz da vovó e guarda a escolha."
+      ],
+      "en": [
+        "🥛 Real pouring: the blender, bowl, juicer and pot now tilt TOWARDS the container, with the spout over it, and you can see the milk, batter or juice falling in and the container filling up.",
+        "🥚 Adding ingredients is fun: little pieces drop into the bowl, flour makes a small cloud, the package tilts and pours, the egg cracks and the yolk falls in.",
+        "🧼 Washing hands: the tap is running, the water falls, both hands rub along with your finger, the foam builds up and at the end you see \"Squeaky clean hands! ✨\".",
+        "😋 Recipe ready: a little boy in a chef's hat eats the dish with a fork and a child's knife, chews happily, licks his lips and says \"Yum!\".",
+        "📷 Save the photo: a button makes a nice picture of the dish with the boy, the recipe name and the date. On a phone you can send it to the gallery or WhatsApp; on a computer it downloads. Works offline.",
+        "✨ More animation: fruit wobbles, comes off the branch and flies into the basket with a sparkle; soil jumps when you pull a carrot; milk pours into the cup; the spoon makes a swirl; the blender spins; the flame flickers and the pan steams; the oven lights up; the fridge opens with a cold mist. If the device asks for \"reduce motion\", everything stays still.",
+        "🎵 The music bubble no longer covers anything: the kitchen tools sit on a tray stuck to the bottom of the screen, with the right corner kept free.",
+        "📱 Phone on its side: every screen fits, no dragging around.",
+        "👵 Mrs. Cida now picks a female voice on the phone. If the device only has a male voice, she speaks higher. The 👵🔁 button changes grandma's voice and remembers the choice."
+      ]
+    },
+    {
       "versao": "0.4.0",
       "data": "06/Nov/2026",
       "hora": "22:30:00",
