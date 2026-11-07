@@ -6,7 +6,7 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.2 de 06/Nov/2026', () => {
+test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.3 de 06/Nov/2026', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const j = JSON.parse(ler('versoes.json'));
@@ -17,7 +17,7 @@ test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.
   assert.match(v.data, /^\d{2}\/[A-Z][a-z]{2}\/\d{4}$/);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
   assert.equal(ler('app.js').match(/APP_DATA = '([^']+)'/)[1], v.data);
-  assert.equal(a, '0.2.2'); assert.equal(v.data, '06/Nov/2026');
+  assert.equal(a, '0.2.3'); assert.equal(v.data, '06/Nov/2026');
 });
 
 test('sw.js guarda todos os arquivos publicados (e os de fora, com ../)', () => {

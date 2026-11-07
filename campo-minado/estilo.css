@@ -126,3 +126,12 @@ body:has(#jogo.ativa) .tela-inteira-bt { top: auto; bottom: calc(12px + var(--sb
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .casa.dica { filter: brightness(1.3); }   /* a dica fica acesa parada, sem piscar */
 }
+/* 📱 celular deitado (06/Nov/2026): a capa cabe na tela sem rolar; os três níveis lado a lado */
+@media (orientation: landscape) and (max-height: 520px) {
+  #menu { gap: 8px; padding-top: calc(10px + var(--st)); }
+  .mascote { width: 3.4rem; }
+  .logo { font-size: 2.6rem; }
+  .sub { font-size: 1rem; }
+  .niveis { flex-direction: row; max-width: 46rem; }
+  .nivel { flex: 1 1 0; }
+}

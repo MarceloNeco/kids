@@ -120,7 +120,10 @@ a { color: #1d6fb8; }
 .cesta .item b { font-size: .95rem; color: var(--tomate); }
 .cesta .item.ok { border-color: var(--verde); background: #e9fbf1; } .cesta .item.ok b { color: var(--verde); }
 .cesta.completa { border-top-color: var(--verde); }
-.voando { position: fixed; z-index: 60; font-size: 2.4rem; pointer-events: none; transform: translate(0, 0); margin: -1.2rem 0 0 -1.2rem; transition: transform .7s cubic-bezier(.5, -0.3, .6, 1), opacity .7s; }
+.voando { position: fixed; z-index: 60; font-size: 2.4rem; line-height: 1; pointer-events: none; transform: translate(-50%, -50%); will-change: transform; }
+.voando .ic-svg svg { width: 1em; height: 1em; }
+.cesta .item.pop, .cesta-ic.pop { animation: popCesta .45s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes popCesta { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }
 
 /* ---------- lugares ---------- */
 .precisa { font-weight: 600; text-align: center; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; }
@@ -145,7 +148,10 @@ a { color: #1d6fb8; }
 .fruta.verde { filter: hue-rotate(75deg) saturate(.7) brightness(1.05); transform: translate(-50%, -50%) scale(.72); }
 .fruta.f-banana.verde { filter: hue-rotate(55deg) saturate(.85); transform: translate(-50%, -50%) scale(.9); }
 .fruta.madura { filter: drop-shadow(0 0 5px #fff) drop-shadow(0 2px 2px rgba(0, 0, 0, .18)); }
-.fruta.caiu { transform: translate(-50%, 160%) scale(.4); opacity: 0; transition: transform .5s ease-in, opacity .5s; }
+.fruta.colhe { animation: colhe .32s ease-out forwards; filter: drop-shadow(0 0 6px #fff); }
+@keyframes colhe { 0% { transform: translate(-50%, -50%) rotate(0); } 25% { transform: translate(-50%, -50%) rotate(-18deg); } 50% { transform: translate(-50%, -50%) rotate(15deg); }
+  75% { transform: translate(-50%, -66%) rotate(-5deg) scale(1.12); } 100% { transform: translate(-50%, -58%) scale(1.05); } }
+.fruta.caiu { transform: translate(-50%, -50%) scale(.4); opacity: 0; transition: opacity .12s; }
 /* horta: corte da terra — o que cresce embaixo da terra aparece de leve, através dela */
 .canteiro { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 10px; width: min(94vw, 32rem); padding: 14px 10px; border-radius: 22px; background: #8b5a3c; box-shadow: inset 0 -8px 0 #6e452c; }
 .planta { position: relative; height: auto; aspect-ratio: 100 / 132; padding: 0; border-radius: 16px; overflow: hidden; touch-action: none; --sobe: 0;
@@ -176,6 +182,11 @@ a { color: #1d6fb8; }
 /* vaca */
 .pasto { display: flex; align-items: flex-end; justify-content: center; gap: 18px; width: min(94vw, 34rem); padding: 18px; border-radius: 22px; background: linear-gradient(180deg, #d4f4ff 0 45%, #8fdc6a 45%); }
 .mimosa { font-size: clamp(5rem, 22vw, 7rem); position: relative; }
+.jarra-zona { position: relative; margin-left: -1.4rem; }
+.jorro-leite { position: absolute; left: 30%; bottom: calc(100% - 6px); width: 7px; height: 3rem; border-radius: 4px; background: repeating-linear-gradient(180deg, #fff 0 10px, #e9f3ff 10px 14px);
+  box-shadow: 0 0 0 1px #d7e4f1; transform: scaleY(0); transform-origin: top; transition: transform .15s; }
+.pasto.ordenhando .jorro-leite { transform: scaleY(1); animation: leiteCorre .3s linear infinite; }
+@keyframes leiteCorre { to { background-position: 0 14px; } }
 .coracao { position: absolute; left: 50%; top: 0; font-size: 1.8rem; animation: sobe .9s ease-out forwards; }
 .jarra { width: 4.6rem; height: 6rem; border: 4px solid #7d8a99; border-top-width: 2px; border-radius: 8px 8px 18px 18px; background: rgba(255, 255, 255, .7); position: relative; overflow: hidden; }
 .leite-nivel { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: #fff; box-shadow: inset 0 4px 0 #eef3f8; }
@@ -275,9 +286,19 @@ a { color: #1d6fb8; }
 .grandao { font-size: clamp(5rem, 24vw, 7.5rem); line-height: 1; }
 .grandao .ic-svg svg { width: 1em; height: 1em; }
 .grandao.pula { animation: pulinho .35s ease-out; }
-.utensilios { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+.bancada { position: relative; }
+/* bandeja de utensílios: fica presa embaixo da tela (como a cesta na vila) e guarda o cantinho da direita para a
+   bolinha 🎵 da música, que assim nunca cobre um utensílio */
+.utensilios { position: sticky; bottom: 0; z-index: 6; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: calc(100% + 20px); margin: 0 -10px -10px;
+  padding: 8px calc(54px + var(--sr)) calc(8px + var(--sb)) 8px; background: rgba(255, 246, 232, .97); border-top: 3px solid var(--borda); border-radius: 0 0 22px 22px; box-shadow: 0 -6px 12px rgba(120, 60, 20, .08); }
+.utensilios .bandeja { display: contents; }
 .utensilio { width: 5.2rem; min-height: 5.2rem; background: #fff; border: 3px solid var(--borda); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px; font-size: .72rem; line-height: 1.05; box-shadow: 0 4px 0 var(--borda); }
 .utensilio .ic { font-size: 2.1rem; }
+/* celular em pé: a bandeja tem no máximo 2 fileiras; se tiver mais utensílios, arrasta para o lado */
+@media (max-width: 40rem) and (orientation: portrait) {
+  .utensilios .bandeja { width: 100%; display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, auto); grid-auto-columns: 4.5rem; justify-content: safe center; gap: 6px; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 2px 6px; }
+  .utensilio { width: 4.5rem; min-height: 4.5rem; font-size: .66rem; box-shadow: 0 3px 0 var(--borda); } .utensilio .ic { font-size: 1.8rem; }
+}
 .utensilio[aria-disabled="true"] { opacity: .55; }
 .utensilio.usando { opacity: 1; border-color: var(--azul); }
 .luz { animation: chama 1s ease-in-out infinite; }
@@ -314,17 +335,34 @@ a { color: #1d6fb8; }
 /* fogão */
 .fogao-cena { position: relative; }
 .em-cima { position: absolute; left: 50%; top: -18%; transform: translateX(-50%); font-size: 2.6rem; }
-.chama { position: absolute; left: 50%; top: 40%; transform: translateX(-50%) scale(0); font-size: 2.6rem; transition: transform .3s; }
-.chama.acesa { transform: translateX(-50%) scale(1); animation: chama .5s ease-in-out infinite; }
+.chama { position: absolute; left: 50%; top: 36%; width: 1.2em; height: 1.2em; transform: translateX(-50%) scale(0); font-size: 2.6rem; transition: transform .3s; }
+.chama i { position: absolute; left: 0; top: 0; font-style: normal; line-height: 1; transform-origin: 50% 90%; }
+.chama i + i { left: 22%; top: 18%; font-size: .66em; opacity: .9; }
+.chama.acesa { transform: translateX(-50%) scale(1); }
+.chama.acesa i { animation: tremula .32s ease-in-out infinite alternate; }
+.chama.acesa i + i { animation-duration: .26s; animation-delay: .1s; animation-direction: alternate-reverse; }
+@keyframes tremula { 0% { transform: scale(1, 1) rotate(-3deg); } 50% { transform: scale(.9, 1.12) rotate(2deg); } 100% { transform: scale(1.06, .92) rotate(4deg); } }
+/* vapor subindo e óleo chiando (panela no fogo, frigideira, prato servido) */
+.vapores, .chiado { position: absolute; left: 50%; width: 4.4rem; transform: translateX(-50%); pointer-events: none; opacity: 0; transition: opacity .6s; }
+.vapores { top: -62%; height: 3.2rem; } .chiado { top: -16%; height: 1.6rem; }
+.frigideira-cena .vapores { top: -20%; } .frigideira-cena .chiado { top: 28%; }
+.bt-servir .vapores { top: -18%; } .bt-servir .chiado { display: none; }
+.quente .vapores, .quente .chiado, .servido .vapores { opacity: 1; }
+.vapores i { position: absolute; bottom: 0; width: 9px; height: 28px; border-radius: 50%; border-left: 4px solid rgba(150, 160, 185, .55); animation: vapor 1.8s ease-in infinite; }
+.vapores i:nth-child(1) { left: 18%; } .vapores i:nth-child(2) { left: 46%; animation-delay: .6s; } .vapores i:nth-child(3) { left: 74%; animation-delay: 1.2s; }
+@keyframes vapor { 0% { transform: translateY(10px) scaleY(.6); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(6px, -34px) scaleY(1.25); opacity: 0; } }
+.chiado i { position: absolute; bottom: 0; width: 5px; height: 5px; border-radius: 50%; background: #ffd75e; box-shadow: 0 0 3px #fff3b0; animation: chia .5s ease-out infinite; }
+.chiado i:nth-child(1) { left: 12%; --x: -8px; } .chiado i:nth-child(2) { left: 38%; --x: 5px; animation-delay: .15s; } .chiado i:nth-child(3) { left: 62%; --x: -4px; animation-delay: .3s; } .chiado i:nth-child(4) { left: 84%; --x: 9px; animation-delay: .4s; }
+@keyframes chia { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), -18px) scale(.4); opacity: 0; } }
 .botao-fogao { width: 5.2rem; height: 5.2rem; border-radius: 50%; background: radial-gradient(circle, #fff 40%, #d5dbe3); border: 4px solid #7d8a99; position: relative; transition: transform .4s; }
 .botao-fogao span { position: absolute; left: 50%; top: 10%; width: 8px; height: 40%; margin-left: -4px; border-radius: 4px; background: var(--tomate); }
 .botao-fogao.girado { transform: rotate(-90deg); }
 /* despejar */
-.despejo { display: flex; align-items: center; gap: 12px; }
-.origem { font-size: clamp(4rem, 18vw, 6rem); background: #fff; border: 4px dashed var(--azul); border-radius: 24px; padding: 6px 12px; transition: transform .7s; }
-.origem .ic-svg svg { width: 1em; height: 1em; }
-.origem.despeja { transform: rotate(-70deg) translate(10%, -10%); }
-.seta-desp { font-size: 2.4rem; color: var(--azul); }
+.despejo { position: relative; width: min(92vw, 25rem); }
+.cena-desp { width: 100%; height: auto; display: block; overflow: visible; }
+.origem { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 20px; }
+.origem .dedo { position: absolute; left: 13%; top: 40%; font-size: 2.4rem; animation: pula 1s ease-in-out infinite; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .2)); }
+.origem:disabled .dedo { display: none; }
 /* virar */
 .frigideira-cena { position: relative; }
 .massa { position: absolute; left: 50%; top: 42%; width: 3.4rem; height: 2.4rem; margin-left: -1.7rem; border-radius: 50%; background: rgb(calc(255 - var(--d) * 30), calc(246 - var(--d) * 90), calc(207 - var(--d) * 160)); transition: background .2s; }
@@ -341,6 +379,8 @@ a { color: #1d6fb8; }
 .bolinha { width: 1.8rem; height: 1.8rem; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff8, transparent 40%), var(--c); animation: pulinho .3s ease-out; }
 /* servir */
 .bt-servir { position: relative; font-size: clamp(6rem, 26vw, 8rem); }
+.pedacos .pedaco.novo { animation: caiPedaco .4s cubic-bezier(.3, 1.5, .5, 1); }
+@keyframes caiPedaco { from { transform: translateY(-26px) rotate(-30deg) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
 .bt-servir .comida { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%) scale(0); font-size: .5em; transition: transform .4s cubic-bezier(.3, 1.6, .5, 1); }
 .bt-servir.servido .comida { transform: translate(-50%, -60%) scale(1); }
 
@@ -354,7 +394,15 @@ a { color: #1d6fb8; }
 #pronto { position: relative; overflow: hidden; text-align: center; }
 .festa { position: absolute; inset: 0; pointer-events: none; }
 .festa span { position: absolute; top: -10%; font-size: 1.8rem; animation: cai 3s ease-in forwards; }
-.prato-final { width: 10rem; height: 10rem; border-radius: 50%; display: grid; place-items: center; font-size: 5.4rem; background: radial-gradient(circle, #fff 55%, #f1e4d3 56%, #fff 70%); border: 5px solid var(--c); box-shadow: 0 10px 24px rgba(0, 0, 0, .12); animation: festeja 1.2s ease-in-out infinite; }
+/* o menininho comendo (o resto da animação é feito em cenas.js) */
+.prato-final { width: min(80vw, 19rem); aspect-ratio: 260 / 250; position: relative; }
+.prato-final svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 14px rgba(160, 80, 20, .18)); }
+.menino .vapor path { transform-box: fill-box; transform-origin: 50% 100%; animation: vaporM 2.2s ease-in-out infinite; }
+.menino .vapor .v2 { animation-delay: .7s; } .menino .vapor .v3 { animation-delay: 1.4s; }
+@keyframes vaporM { 0% { transform: translateY(8px) scaleY(.6); opacity: 0; } 35% { opacity: .95; } 100% { transform: translateY(-18px) scaleY(1.15); opacity: 0; } }
+.menino .faiscas-m path { transform-box: fill-box; transform-origin: center; animation: brilha 1.4s ease-in-out infinite; }
+.menino .faiscas-m .s2 { animation-delay: .5s; } .menino .faiscas-m .s3 { animation-delay: .9s; }
+.medio.foto { background: linear-gradient(180deg, #ffe08a, #ffc93c); border-color: #e6a800; box-shadow: 0 4px 0 #c98a00; font-weight: 700; }
 .titulo-pronto { font-size: clamp(1.4rem, 6vw, 2.2rem); }
 .estrelas { font-size: 2.4rem; letter-spacing: 4px; }
 .cartao-receita { width: 100%; max-width: 32rem; text-align: left; background: #fffdf6; border: 3px solid #e9c88f; border-radius: 10px; padding: 14px 18px; box-shadow: 0 8px 18px rgba(120, 60, 20, .15); transform: rotate(-1deg);
@@ -389,3 +437,166 @@ a { color: #1d6fb8; }
 .fruta.balanca { animation: balancaF .4s; }
 @keyframes balancaF { 0%, 100% { transform: translate(-50%, -50%) scale(.72) rotate(0); } 25% { transform: translate(-50%, -50%) scale(.72) rotate(-18deg); } 75% { transform: translate(-50%, -50%) scale(.72) rotate(18deg); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+/* ---------- cenas animadas (v0.5.0) ---------- */
+/* partículas: faíscas, terra, pó, pedacinhos, gema, jorrinho (cenas.js, Web Animations) */
+.particula { position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none; line-height: 1; font-size: 1.3rem; will-change: transform, opacity; }
+.particula .ic-svg svg { width: 1em; height: 1em; display: block; }
+.particula.faisca { color: #ffc93c; font-size: 1.1rem; text-shadow: 0 0 6px #fff; }
+.particula.migalha { border-radius: 40%; }
+.particula.nuvem { border-radius: 50%; filter: blur(1.5px); }
+.particula.ing-voa { font-size: 2.6rem; z-index: 71; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .2)); }
+.particula.gema { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff6b0, var(--c, #ffcf33) 55%, #f0a400); box-shadow: 0 0 0 5px rgba(255, 255, 255, .92); }
+.particula.jorrinho { width: 7px; border-radius: 4px; transform-origin: 50% 0; }
+/* recipientes desenhados (tigela de vidro, copo, liquidificador, panela, frigideira, assadeira, prato) */
+.grandao.com-recip { line-height: 0; }
+.recip-svg { width: min(56vw, 12rem); height: auto; overflow: visible; display: block; }
+.recip-svg .boca { pointer-events: none; }
+.redemoinho { transform-box: fill-box; transform-origin: center; }
+.batendo .redemoinho { animation: gira .3s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.maquina { position: relative; }
+.turbilhao { position: absolute; left: 28%; top: 54%; width: 44%; aspect-ratio: 1; border-radius: 50%; opacity: 0; pointer-events: none; transform: scaleY(.38);
+  background: conic-gradient(transparent 0 15%, rgba(255, 255, 255, .95) 20%, transparent 26% 48%, rgba(255, 255, 255, .8) 53%, transparent 59% 80%, rgba(255, 255, 255, .95) 85%, transparent 91%); }
+.m-espremedor .turbilhao { top: 6%; }
+.batendo .turbilhao { opacity: 1; animation: giraAchatado .25s linear infinite; }
+@keyframes giraAchatado { from { transform: scaleY(.38) rotate(0); } to { transform: scaleY(.38) rotate(360deg); } }
+/* mexer: a colher anda em roda dentro do recipiente */
+.mexe-giro .grandao.com-recip { pointer-events: none; }
+.mexe-giro .recip-svg { width: calc(var(--raio) * 1.7); }
+.mexe-giro .colher-gira { top: 34%; transform: none; transition: none; }
+/* lavar as mãos: torneira, água correndo, espuma, mãos esfregando, brilho */
+.alvo-giro.pia-giro { width: min(84vw, 19rem); aspect-ratio: 240 / 230; border-radius: 24px; background: none; padding: 0; box-shadow: 0 6px 0 #cfe3f1; }
+.pia-giro::before { display: none; }
+.cena-pia { width: 100%; height: 100%; display: block; border-radius: 24px; pointer-events: none; }
+.pia-giro .itens-lavar { position: absolute; left: 46%; top: 42%; bottom: auto; transform: translateX(-50%); font-size: 2.8rem; display: flex; gap: 2px; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .15)); }
+.pia-giro .itens-lavar .ic-svg svg { width: 1em; height: 1em; }
+.barra-giro { position: absolute; left: 12%; right: 12%; bottom: -16px; height: 10px; border-radius: 6px; background: #f1e4d3; overflow: hidden; }
+.barra-giro span { display: block; height: 100%; width: 0; background: var(--verde); transition: width .1s; }
+.agua-luz { animation: aguaCorre .45s linear infinite; }
+@keyframes aguaCorre { to { stroke-dashoffset: -24; } }
+.gotinhas circle { transform-box: fill-box; transform-origin: center; animation: gotinha .6s ease-out infinite; }
+.gotinhas circle:nth-child(2) { animation-delay: .2s; } .gotinhas circle:nth-child(3) { animation-delay: .4s; }
+@keyframes gotinha { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-14px) scale(.4); opacity: 0; } }
+.cena-pia .bolha { transform-box: fill-box; transform-origin: center; transform: scale(0); opacity: 0; transition: transform .3s cubic-bezier(.3, 1.6, .5, 1), opacity .2s; }
+.cena-pia .bolha.vis { transform: scale(1); opacity: 1; animation: bolhaMexe 1.1s ease-in-out var(--d, 0s) infinite alternate; }
+@keyframes bolhaMexe { from { transform: scale(1) translateY(0); } to { transform: scale(1.12) translateY(-3px); } }
+.pia-giro.limpo .bolha { opacity: 0; transform: translateY(40px) scale(.5); transition: transform .7s ease-in, opacity .7s; animation: none; }
+.cena-pia .brilhos { transition: opacity .4s; }
+.pia-giro.limpo .brilhos { opacity: 1; }
+.cena-pia .brilhos path { transform-box: fill-box; transform-origin: center; animation: brilha 1s ease-in-out infinite; }
+.cena-pia .brilhos path:nth-child(2n) { animation-delay: .4s; }
+.limpinho { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); background: #fff; border: 3px solid var(--verde); color: #1b8653; font-weight: 700; font-size: 1.15rem;
+  padding: 4px 14px; border-radius: 999px; white-space: nowrap; box-shadow: 0 4px 0 #bdf2d4; animation: estoura .45s cubic-bezier(.3, 1.6, .5, 1); pointer-events: none; }
+@keyframes estoura { from { transform: translateX(-50%) scale(.3); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+/* forno (janelinha acesa e calor), geladeira (porta abre com fumacinha gelada), relógio (tique-taque) */
+.aparelho { position: relative; }
+.brilho-forno { position: absolute; left: 25%; top: 44%; width: 50%; height: 34%; border-radius: 5px; background: radial-gradient(circle, #ffe08a, #ff8a3d 75%); opacity: 0; transition: opacity .5s; pointer-events: none; }
+.ligado .brilho-forno { opacity: .92; animation: brasa 1.1s ease-in-out infinite alternate; }
+@keyframes brasa { from { box-shadow: 0 0 6px 2px rgba(255, 140, 40, .45); } to { box-shadow: 0 0 22px 9px rgba(255, 140, 40, .75); } }
+.calor { position: absolute; left: 20%; top: -24%; width: 60%; height: 30%; opacity: 0; transition: opacity .5s; pointer-events: none; }
+.ligado:not(.pronto-t) .calor { opacity: 1; }
+.calor i { position: absolute; bottom: 0; width: 9px; height: 24px; border-radius: 50%; border-left: 4px solid rgba(255, 140, 60, .55); animation: vapor 1.4s ease-in infinite; }
+.calor i:nth-child(1) { left: 15%; } .calor i:nth-child(2) { left: 45%; animation-delay: .45s; } .calor i:nth-child(3) { left: 75%; animation-delay: .9s; }
+.dentro-gel { position: absolute; left: 21%; top: 39.5%; width: 58%; height: 55%; border-radius: 3px 3px 7px 7px; display: grid; place-items: center; font-size: 2rem; line-height: 1;
+  background: linear-gradient(180deg, #f2fbff, #bfe6ff); box-shadow: inset 0 -4px 0 #9ad4ff, inset 0 0 12px #fff; opacity: 0; transition: opacity .25s; pointer-events: none; }
+.porta-gel { position: absolute; left: 19%; top: 37.5%; width: 62%; height: 59%; border-radius: 0 0 9px 9px; background: #e8f6ff; border: 3px solid #2c7fb8; transform-origin: 0 50%; transition: transform .5s ease-in-out; pointer-events: none; }
+.porta-gel::after { content: ''; position: absolute; left: 12%; top: 10%; width: 6px; height: 42%; border-radius: 3px; background: #2c7fb8; }
+.aparelho.aberta .porta-gel { transform: perspective(260px) rotateY(-78deg); }
+.aparelho.aberta .dentro-gel { opacity: 1; }
+.palco.ligado:not(.pronto-t) .a-relogio .grandao { animation: tique .5s steps(2, jump-none) infinite; }
+@keyframes tique { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+.mini-link { background: none; border: 0; color: #1d6fb8; text-decoration: underline; font-weight: 600; font-size: .95rem; min-height: 40px; padding: 0 8px; }
+
+/* ---------- celular deitado (ex.: 915 × 412, 844 × 390): tudo cabe na tela, sem zoom e sem arrastar ---------- */
+@media (orientation: landscape) and (max-height: 32rem) {
+  .tela { gap: 6px; padding-top: calc(6px + var(--st)); }
+  .cabeca h2 { font-size: 1.1rem; }
+  .cabeca .mini { min-height: 40px; }
+  .carteira span { padding: 2px 8px; font-size: .9rem; }
+  /* entrada e ficha */
+  .icone-entrada svg { width: min(26vh, 110px); }
+  #entrada .logo { font-size: min(12vw, 16vh); }
+  #entrada { gap: 8px; padding-bottom: 12px; }
+  #receita { padding-bottom: calc(10px + var(--sb)); }
+  .ficha-receita { max-width: 52rem; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 16px; row-gap: 6px; align-items: start; padding: 10px 14px; }
+  .ficha-receita > * { grid-column: 1; justify-self: center; text-align: center; }
+  .ficha-receita > h3 { grid-column: 2; grid-row: 1; justify-self: start; }
+  .ficha-receita .lista-ing { grid-column: 2; grid-row: 2 / span 4; justify-self: stretch; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lista-ing li { font-size: .95rem; padding: 3px 8px; }
+  .prato-grande { width: 4.6rem; height: 4.6rem; font-size: 2.4rem; }
+  .bolsa { max-width: 15rem; font-size: .9rem; }
+  /* vila */
+  #mapa, #lugar { padding-bottom: calc(62px + var(--sb)); }
+  .cesta { padding-top: 4px; padding-bottom: calc(4px + var(--sb)); gap: 4px; }
+  .cesta-ic { font-size: 1.4rem; } .cesta .item { font-size: 1.1rem; padding: 0 6px 0 4px; }
+  .sol { height: 20px; flex: none; }
+  .vila { padding: 8px; gap: 8px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .lugar { min-height: max(5.2rem, calc((100dvh - 11rem) / 2)); padding-bottom: 5px; }
+  .lugar .cena span { font-size: 1.7rem; } .lugar .cena .c1 { font-size: 2.1rem; top: 4%; } .lugar .cena .c2 { top: 8%; } .lugar .cena .c3 { top: 18%; }
+  .lugar .faz { display: none; }
+  /* lugares: a cena à esquerda, as instruções e os botões à direita */
+  .precisa { font-size: .9rem; } .precisa .pq { font-size: 1rem; padding: 0 8px; }
+  .jogo-lugar { max-width: 62rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem); column-gap: 14px; row-gap: 8px; align-items: center; align-content: start; }
+  .jogo-lugar > * { grid-column: 2; }
+  .jogo-lugar > .agua, .jogo-lugar > .pomar, .jogo-lugar > .canteiro, .jogo-lugar > .poleiro, .jogo-lugar > .pasto, .jogo-lugar > .prateleira, .jogo-lugar > .casinha { grid-column: 1; grid-row: 1 / span 6; justify-self: center; }
+  .jogo-lugar .instr { font-size: .9rem; }
+  .jogo-lugar .fato { font-size: .85rem; padding: 4px 8px; }
+  .jogo-lugar .grande { font-size: 1.1rem; padding: 10px 16px; min-height: 48px; }
+  .toldo { display: none; }
+  .agua { width: 100%; height: calc(100dvh - 10.5rem); min-height: 10rem; }
+  .pomar { width: 100%; flex-wrap: nowrap; gap: 8px; }
+  .pe { flex: 1 1 0; min-width: 0; max-width: calc((100dvh - 13rem) * .8); }
+  .pe-nome { font-size: .7rem; padding: 2px 4px 4px; } .pe-nome b { font-size: .8rem; }
+  .canteiro { width: 100%; grid-template-columns: repeat(6, minmax(0, 1fr)); padding: 8px; gap: 8px; max-width: calc((100dvh - 13.5rem) / 1.32 * 6 + 5rem); }
+  .poleiro { width: 100%; padding: 8px; } .ninho { height: 7rem; } .galinha { font-size: 2.8rem; }
+  .pasto { width: 100%; padding: 10px; } .mimosa { font-size: 5rem; }
+  /* mercadinho deitado: a prateleira mostra só o desenho e o preço (o nome continua para o leitor de tela) */
+  .jogo-lugar.j-mercado { grid-template-columns: minmax(0, 1fr) minmax(10rem, 13rem); }
+  .prateleira { width: 100%; grid-template-columns: repeat(auto-fill, minmax(3.7rem, 1fr)); gap: 5px; }
+  .produto { position: relative; padding: 3px 2px; font-size: .78rem; min-height: 0; }
+  .produto .pn { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .produto .ic, .pedido .ic { font-size: 1.6rem; }
+  .ajudar-zona { width: 100%; } .caixas { height: 6rem; }
+  .caixa { max-height: calc(100dvh - 12px); overflow: auto; padding: 10px; gap: 6px; width: min(94vw, 34rem); }
+  .jogo-lugar.j-vizinha { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .j-vizinha > .casinha { grid-row: 1 / span 3; min-height: 8rem; width: 100%; }
+  .j-vizinha > #btObrigado { grid-column: 1; grid-row: 4; justify-self: center; }
+  .j-vizinha > .pedidos { grid-row: 3 / span 2; width: 100%; grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr)); }
+  .j-vizinha > .fato { grid-row: 5; }
+  .cida { font-size: 4rem; } .balao { font-size: .95rem; padding: 6px 10px; }
+  /* cozinha: ficha | bancada (passo e palco | utensílios) — os utensílios terminam antes do cantinho da música */
+  #cozinha { height: 100vh; height: 100dvh; min-height: 0; padding-bottom: calc(6px + var(--sb)); }
+  .cz-corpo { display: grid; grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr); min-height: 0; gap: 8px; }
+  .ficha { max-height: none; height: 100%; align-content: start; padding: 4px; }
+  .ficha li { font-size: .78rem; padding: 2px 5px; gap: 5px; } .ficha li .ic { font-size: 1.05rem; }
+  .bancada { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto minmax(0, 1fr); align-items: start; min-height: 0; padding: 6px 8px; gap: 2px 8px; }
+  .bancada > .passo-num, .bancada > .passo-texto, .bancada > .dica-adulto { grid-column: 1; justify-self: center; }
+  .passo-texto { font-size: 1.05rem; } .passo-num { font-size: .78rem; } .dica-adulto { font-size: .78rem; padding: 2px 8px; }
+  .palco { grid-column: 1; grid-row: 4; align-self: stretch; min-height: 0; padding: 2px; gap: 4px; overflow-y: auto; }
+  .palco .instr { font-size: .85rem; }
+  .utensilios { position: static; width: auto; margin: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
+  .utensilios { grid-column: 2; grid-row: 1 / -1; display: grid; grid-template-columns: repeat(3, 3.7rem); align-content: start; gap: 5px; overflow-y: auto; max-height: calc(100dvh - 4.4rem); padding: 2px 2px 52px; }
+  .utensilio { width: 3.7rem; min-height: 3.7rem; font-size: .58rem; box-shadow: 0 3px 0 var(--borda); } .utensilio .ic { font-size: 1.5rem; }
+  .grandao { font-size: 4rem; }
+  .recip-svg { width: min(30vw, 9rem); }
+  .alvo-giro { --raio: 3.4rem; }
+  .alvo-giro.pia-giro { width: auto; height: calc(100dvh - 12.5rem); min-height: 9rem; }
+  .despejo { width: auto; height: calc(100dvh - 11rem); aspect-ratio: 320 / 262; }
+  .cena-desp { height: 100%; width: auto; }
+  .tabua-alvo { height: 7.5rem; } .pedacos .inteiro { font-size: 3.6rem; } .pedacos .pedaco { font-size: 2rem; }
+  .chip-ing { padding: 2px 10px 2px 6px; font-size: .9rem; } .chip-ing .ic { font-size: 1.4rem; }
+  .palco .grande { font-size: 1.05rem; padding: 8px 16px; min-height: 48px; }
+  .timer { width: 4rem; height: 4rem; } .timer span { width: 3rem; height: 3rem; font-size: 1.1rem; }
+  .botao-fogao { width: 4rem; height: 4rem; }
+  .bt-servir { font-size: 5rem; }
+  .massa-mao { width: 7rem; height: 5rem; }
+  .fichas { grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 6px; } .ficha-bt { font-size: .85rem; padding: 4px 8px; } .ficha-bt .ic { font-size: 1.4rem; }
+  /* pronto: o menininho à esquerda; título, estrelas, botões e a receita da família à direita */
+  #pronto.ativa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); column-gap: 18px; row-gap: 6px; align-items: start; align-content: start; padding-bottom: calc(14px + var(--sb)); }
+  #pronto > * { grid-column: 2; }
+  #pronto > .festa { grid-column: 1 / -1; }
+  #pronto > .prato-final { grid-column: 1; grid-row: 1 / span 6; justify-self: center; width: min(40vw, calc(100dvh - 2rem)); position: sticky; top: 8px; }
+  .titulo-pronto { font-size: 1.4rem; } .estrelas { font-size: 1.8rem; }
+  .cartao-receita { max-width: none; }
+}

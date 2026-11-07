@@ -103,7 +103,7 @@ async function desenharCaminho(pg, de, para) {
 test('celular: menu abre sem erro, textos em português, trilha de música e versão', async () => {
   const pg = await abrir(FONE);
   assert.match(await pg.textContent('#btJogar'), /Jogar/);
-  assert.match(await pg.textContent('#versao'), /0\.2\.2/);
+  assert.match(await pg.textContent('#versao'), /0\.2\.3/);
   assert.ok(await pg.isVisible('.trilha'), 'tocador da trilha');
   assert.equal(await pg.evaluate(() => document.querySelectorAll('[data-recurso="labirinto"]').length), 2);
   await pg.click('#btLingua');

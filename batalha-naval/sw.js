@@ -6,7 +6,7 @@
    Músicas gravadas (../vruuum/musicas/*.mp3): o service worker não mexe (o navegador busca direto).
    Cache com o nome do app: só apaga caches "batalha-naval-" (nunca os dos outros jogos da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.3.1';
+var VERSAO = '0.3.2';
 var CACHE = 'batalha-naval-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'logica.js', 'rede.js', 'som.js', 'navios.js', 'efeitos.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', 'pertinho.js', 'qr.js', 'libs/qrcode.js', 'libs/jsQR.js', '../recursos.js', '../idioma.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../rabiscolandia/fontes/fredoka.woff2'];
 self.addEventListener('install', function (e) {

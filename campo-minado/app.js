@@ -3,7 +3,7 @@
    Guarda só neste aparelho (localStorage "campo-minado.pref"): idioma, sons e o melhor tempo de cada nível. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.2';
+  var APP_VERSION = '0.2.3';
   var APP_DATA = '06/Nov/2026';
   var CM = window.CampoMinado;
   var $ = function (id) { return document.getElementById(id); };

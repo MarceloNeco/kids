@@ -101,3 +101,10 @@ button:focus-visible, a:focus-visible { outline: 3px solid #ffd166; outline-offs
   .logo span, .fim-caixa, .fim-estrelas span, .missao.pulso { animation: none !important; }
   * { transition: none !important; }
 }
+/* 📱 celular deitado (06/Nov/2026): a capa encolhe (sem o cachorrinho grande) e o ▶ Jogar fica sempre à vista,
+   grudado embaixo, enquanto as escolhas rolam */
+@media (orientation: landscape) and (max-height: 500px) {
+  #menu #mascote { display: none; }
+  #menu .logo { font-size: 2.4rem; }
+  #menu #btJogar { position: sticky; bottom: .5rem; z-index: 2; flex: none; }
+}

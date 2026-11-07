@@ -162,3 +162,15 @@ dialog.festa[open] { display: flex; align-items: center; justify-content: center
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .confete { display: none; }
 }
+/* 📱 celular deitado (06/Nov/2026): a capa cabe na tela sem rolar; os três níveis lado a lado, cada um com o bicho
+   ao lado do nome */
+@media (orientation: landscape) and (max-height: 32rem) {
+  #inicio { gap: .5rem; padding-top: calc(12px + var(--st)); }
+  .titulo { font-size: 2.8rem; }
+  .sub { font-size: 1.05rem; }
+  .niveis { grid-template-columns: repeat(3, 1fr); max-width: 54rem; gap: .6rem; }
+  .nivel { padding: .5rem .7rem; column-gap: .5rem; }
+  .n-emo { font-size: 2.2rem; }
+  .n-nome { font-size: 1.3rem; }
+  .n-idade { font-size: .85rem; }
+}

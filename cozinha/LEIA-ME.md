@@ -7,7 +7,13 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.4.0** (06/Nov/2026) — nome novo, **Mão na Massa** (em inglês, **My Little Big Chef**; a pasta, o
+Versão atual: **0.5.0** (06/Nov/2026) — **tudo animado e mais de verdade**: despejar inclina PARA o recipiente
+e o jorro (leite, massa, suco, ovo) cai dentro enquanto ele enche; ingredientes caem na tigela (pedacinhos, nuvem de
+farinha, pacote que derrama, ovo que quebra); lavar as mãos com torneira, água, espuma e duas mãos esfregando; no fim
+um **menininho come o prato** (garfo e faquinha, mastiga, lambe os lábios, "Hmm!") e o botão **📷 Guardar a foto**
+faz um PNG do prato; colheita, horta, leite, mexer, bater, fogo, forno e geladeira com animação; a bolinha 🎵 da
+música nunca cobre nada; o celular deitado cabe em todas as telas; a **voz da Dona Cida** escolhe voz de mulher (e
+o 👵🔁 troca). Na 0.4.0: nome novo, **Mão na Massa** (em inglês, **My Little Big Chef**; a pasta, o
 endereço e o progresso guardado continuam `cozinha`), e por enquanto só em português (o inglês volta com o interruptor
 `ingles` do RootifyONE). Na 0.3.0: cada fruta e cada legume na sua planta de verdade (o jogo também ensina de
 onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de verdade. Continua sendo uma
@@ -28,38 +34,67 @@ onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de
      mexendo, sai da água com um respingo, a vara balança até o balde e ele cai lá dentro (som feliz, e vai para a
      cesta). Os outros peixes continuam nadando e um peixe novo chega nadando pelo lado. Com *movimento reduzido* no
      aparelho, o peixe sobe reto, sem se mexer e sem respingo. Se a criança sair no meio, o peixe já fisgado vai para a cesta.
+   - Tudo o que a criança pega **voa para a cesta num arco** e chega com um "pop" e faíscas no item da cesta.
    - 🌳 **Pomar** — cada fruta **só na sua planta de verdade**, com o nome da planta embaixo (PT e EN): maçã na
      macieira, laranja na laranjeira (com flor branca), limão no limoeiro, banana em pencas no cacho da **bananeira**
      (folhas largas e compridas, folha seca no tronco e o coração roxo na ponta do cacho), uva em cachos na **parreira**
      (armação de madeira) e morango na plantinha baixinha do chão, no canteiro com palha. Aparecem só as plantas do
-     que a receita pede (e mais uma, se for uma só). Toque nas frutas maduras e coloridas; as verdinhas balançam e
-     pedem para esperar (vão amadurecendo).
+     que a receita pede (e mais uma, se for uma só). Toque nas frutas maduras e coloridas (ela balança, solta do galho
+     com um pulinho e voa para a cesta); as verdinhas balançam e pedem para esperar (vão amadurecendo).
    - 🌱 **Horta** — corte da terra: **cenoura e batata crescem embaixo da terra** (dá para vê-las de leve através da
      terra; em cima só as folhas) e saem tocando 3 vezes ou puxando o dedo para cima; **tomate** no tomateiro amarrado
      numa estaca (um toque colhe o tomate vermelho; os verdes continuam crescendo), **alface** (bola de folhas em cima
      da terra) e **cheiro-verde** (cebolinha e salsinha) saem com um toque. Cada pé tem o nome embaixo. Nasce de novo.
+     A cada puxão pulam pedacinhos de terra.
    - 💡 **O jogo também ensina**: ao pegar qualquer coisa aparece de onde ela vem ("A banana nasce em cachos na
      bananeira!", "A cenoura cresce embaixo da terra…", "A farinha é feita de trigo moído no moinho!"); no Fácil a voz
      lê na primeira vez. O que é feito pelas pessoas (farinha, açúcar, sal, óleo, manteiga, chocolate, queijo, pão...)
      só existe no mercadinho (ou emprestado da vizinha), nunca numa planta.
    - 🐔 **Galinheiro** — toque na galinha para ela levantar; se tiver ovo, pegue. Ovo novo aparece depois de um tempo.
-   - 🐄 **Fazendinha da Mimosa** — carinho na vaca e *segure* o botão para encher a xícara de leite.
+   - 🐄 **Fazendinha da Mimosa** — carinho na vaca e *segure* o botão para encher a xícara de leite (o leite cai em jorro
+     enquanto segura).
    - 🏪 **Mercadinho do Seu Zé** — no Fácil é tudo de presente; no Médio e no Difícil a criança toca nas moedas
      (de 5, 2 e 1) para pôr no balcão, paga e vê o **troco**. Se as moedas não dão para algo que só o mercado vende,
      aparece *Ajudar o Seu Zé a arrumar* (+2 moedas) — ninguém fica preso.
    - 👵 **Dona Cida, a vizinha** (a vovozinha) — empresta ovo, leite, farinha, açúcar, sal, manteiga e mel, com
      **favores contados**. O ingrediente só vai para a cesta depois de tocar em **💛 Obrigado**. Ela **fala em voz
      alta** (voz do próprio aparelho, funciona sem internet) quando a criança chega, quando empresta, quando pede o
-     obrigado, quando se despede e quando acabam os favores, e o balão mostra o que ela disse. Voz de vovó: um pouco
-     mais devagar (0,9) e mais fininha (1,2), com uma voz feminina em português ou inglês quando o aparelho tiver.
+     obrigado, quando se despede e quando acabam os favores, e o balão mostra o que ela disse. Voz de vovó
+     (v0.5.0; no Samsung do dono ela falava com voz de homem): escolhe primeiro uma voz **feminina** do português do
+     Brasil (nomes conhecidos como Luciana, Francisca, Maria, Vitória, Fernanda, Thalita, Leila, Raquel, Camila,
+     "feminina", "female", Google português do Brasil; no Android os códigos `pt-br-x-afs` e `pt-br-x-pte`), depois
+     uma desconhecida e por último as **masculinas** (Daniel, Antônio, Ricardo, Felipe, "masculina", "male",
+     `pt-br-x-ptd`, `pt-br-x-ptz`). Voz feminina: um pouco mais devagar (0,9) e mais fininha (1,2); voz masculina ou
+     desconhecida: 0,88 e bem mais fininha (1,45). **👵🔁 Trocar a voz da vovó** (no menu, ao lado do 🗣️, e na casa
+     dela) passa para a próxima voz do aparelho, fala uma frase de exemplo e guarda a escolha
+     (`bolinho:cozinha:voz-vovo`). A lista de vozes é lida de novo quando o aparelho avisa (`voiceschanged`) e 300 ms
+     depois. Os códigos do Android vêm de listas da comunidade, não de um documento oficial (conferir no S24).
      Segue o botão 🗣️ (voz desligada = só o balão) e a língua do jogo; a música abaixa enquanto ela fala.
    - 🏠 **Casa** — com tudo na cesta, vai para a cozinha. Se falta algo, diz o quê.
-3. **Cozinha**: a ficha da receita mostra os passos; para cada passo, escolha o **utensílio** certo e faça o
+3. **Cozinha**: a ficha da receita mostra os passos; os utensílios ficam numa **bandeja presa embaixo da tela**
+   (no celular em pé, 2 fileiras que arrastam para o lado se tiver mais), com o canto da direita livre para a bolinha 🎵; para cada passo, escolha o **utensílio** certo e faça o
    movimento: lavar e mexer fazendo **círculos com o dedo** (ou o botão), **deslizar o dedo** para cortar com a faca
    sem ponta, tocar nos ingredientes para pôr na tigela, **segurar** para bater no liquidificador/batedeira/espremedor,
    girar o botão do fogão, esperar dourar e virar, forno/geladeira/relógio com contagem, tocar na massa para modelar e
    servir. Faca, fogão, forno, liquidificador e batedeira mostram a dica: **na cozinha de verdade, só com um adulto**.
-4. **Pronto!** Prato com festa, estrelas (3 sem erros; menos com muitos erros ou se ficou de noite no Difícil) e a
+   Animações (cenas.js, só transform/atributos e requestAnimationFrame; com *reduzir movimento* fica tudo parado):
+   - **despejar**: o utensílio levanta, inclina no sentido do recipiente (o bico fica em cima dele), o jorro cai com a
+     cor do que tem dentro (massa grossa, suco fino), espirra na superfície e o recipiente de vidro enche;
+   - **pôr**: o ingrediente voa até em cima do recipiente — pedacinhos caem, pó (farinha, açúcar, sal, fermento,
+     polvilho) cai como chuvinha e faz nuvem, pacote de líquido (leite, óleo, mel, leite condensado) inclina para o
+     recipiente e derrama, o ovo quebra e a gema cai, o granulado cai colorido — e o recipiente fica mais cheio, com a
+     cor da mistura (o jogo lembra o que já está em cada utensílio);
+   - **lavar as mãos**: torneira aberta, água correndo, as duas mãos esfregam junto com o círculo do dedo, a espuma
+     aparece aos poucos e no fim a água leva a espuma, brilha e aparece "Mãos limpinhas! ✨" (lavar frutas e legumes:
+     eles balançam embaixo da água);
+   - mexer (colher em roda dentro do recipiente e redemoinho), bater (máquina treme e gira por dentro; o espremedor
+     pinga), cortar (pedacinhos pulam e caem na tábua), fogão (chama tremulando, vapor e óleo chiando), forno (janela
+     acesa brilhando e calor), geladeira (porta abre com fumacinha gelada), relógio (tique-taque), servir (vapor e brilho).
+4. **Pronto!** Um **menininho** com chapéu de cozinheiro come o prato: pega um pedacinho com o garfo (a faquinha
+   corta), leva à boca, mastiga de olhos felizes, lambe os lábios e diz "Hmm!", com vapor e brilhos no prato.
+   **📷 Guardar a foto** desenha num canvas (1080 × 1350) o menininho com o prato, o nome da receita, as estrelas, a
+   data e o nível, e guarda como PNG (`mao-na-massa-<receita>-<aaaa-mm-dd>.png`): no celular abre o *compartilhar*
+   (galeria, WhatsApp); no computador baixa o arquivo. Sem internet também. Depois vem a festa, estrelas (3 sem erros; menos com muitos erros ou se ficou de noite no Difícil) e a
    **📜 Receita da família** com os ingredientes e o modo de fazer na ordem em que a criança fez.
 
 ## Níveis
@@ -86,6 +121,7 @@ Toda receita começa lavando as mãos e termina servindo.
 | `index.html` | As telas (entrada, menu, ficha, vila, lugar, cozinha, pronto). CSP sem script inline. |
 | `dados.js` | **Receitas** (ingredientes, quantidades, passos), lugares, **plantas** (onde cada fruta e legume nasce de verdade), ingredientes (com a frase que ensina de onde vem), utensílios e níveis (incluindo o círculo e a velocidade dos peixes). Receita nova = uma entrada em `RECEITAS` (o comentário no topo explica os campos). |
 | `logica.js` | Regras sem tela: cesta, moedas e troco, favores, passos de cada nível e a ordem, imprevisto, estrelas, texto de cada passo em PT/EN. |
+| `cenas.js` | Cenas animadas em SVG/canvas, sem imagem: recipientes que enchem, a cena de despejar (inclina para o recipiente, jorro, nível), a pia com as mãos e a espuma, o menininho comendo (e a animação dele), a foto em PNG e as partículas (faíscas, terra, pó, pedacinhos). Não conhece as regras do jogo. |
 | `desenhos.js` | Desenhos em SVG feitos em código (utensílios, ingredientes sem emoji, faca sem ponta, ícone do app, as plantas do pomar e da horta e o lugar das frutas em cada planta). |
 | `app.js` | Telas, mini-jogos da vila, cozinha, receita pronta, progresso, voz, sons, música, service worker. `APP_VERSION`. |
 | `estilo.css` | Visual (fonte Fredoka da Rabiscolândia). |
@@ -102,14 +138,15 @@ videogame antigo nem música calma demais) e `instalar.js` (só com `?instalar=1
 
 ## O que fica guardado (só neste aparelho)
 
-`localStorage`: `bolinho:cozinha:pref` (língua, voz, sons, nível) e `bolinho:cozinha:progresso` (estrelas de cada
+`localStorage`: `bolinho:cozinha:pref` (língua, voz, sons, nível), `bolinho:cozinha:voz-vovo` (o nome da voz
+escolhida para a Dona Cida, em PT e EN) e `bolinho:cozinha:progresso` (estrelas de cada
 receita em cada nível e quantas receitas já foram feitas). A trilha guarda `bolinho:cozinha:trilha-mudo`.
 Nenhum dado pessoal, nenhum nome de criança.
 
 ## Testes
 
 Da raiz do repositório kids: `node --test cozinha/teste/*.test.js` (Node + Playwright com o Chromium do ambiente;
-leva cerca de 2 minutos).
+leva cerca de 4 minutos).
 
 - `dados.test.js` — cada fruta/legume na planta e no lugar certos (o mapa esperado está escrito no teste; nada de
   farinha em árvore), frase que ensina de onde vem em PT/EN, desenho de cada planta, círculo do peixe menor e peixes mais
@@ -132,5 +169,19 @@ leva cerca de 2 minutos).
   peixes): no Difícil puxar cedo e tarde dá "Quase!", o peixe foge com respingo e a cesta não muda; na hora certa
   fisga; no Fácil o mesmo puxão que erra no Difícil fisga.
 - `receitas.test.js` — cozinha **todas** as receitas no Médio e no Difícil até o fim.
+- `cenas.test.js` (v0.5.0, com movimento: `?teste&devagar` usa os tempos de verdade das animações) — **despejar**: a
+  fonte começa em pé à esquerda do recipiente e, ao tocar, gira no sentido horário (para o recipiente), o jorro aparece
+  do bico até dentro dele e o nível sobe (liquidificador → tigela em pé; espremedor → copo deitado; com movimento
+  reduzido já aparece inclinado e cheio); **pôr**: o pacote de farinha fica à esquerda da tigela e inclina para a
+  direita, e a tigela enche; **lavar as mãos**: torneira, água correndo, duas mãos, espuma que aparece aos poucos e
+  mãos que se mexem com o dedo, "Mãos limpinhas!"; **pronto**: o menininho anima (garfo, boca, língua, olhos, "Hmm!",
+  vapor) e fica parado com movimento reduzido; **📷 foto**: no celular o compartilhar recebe um PNG 1080 × 1350 de
+  verdade; no computador baixa o PNG; **bolinha 🎵** em 390 × 844, 412 × 915 e 915 × 412: nenhum botão, item da cesta
+  ou utensílio inteiro na tela fica embaixo dela (na cozinha, em todas as posições da rolagem); **celular deitado**
+  915 × 412 e 844 × 390: entrada, menu, ficha, vila, os 7 lugares, cozinha e pronto cabem, sem rolar para o lado, com
+  os botões principais na tela (acima da cesta).
+- `voz.test.js` (v0.5.0) — vozes de mentira como no Android: escolhe `pt-br-x-afs` (feminina) e nunca
+  `pt-br-x-ptd`/Daniel; só voz de homem → tom 1,45 e 0,88; voz desconhecida antes da masculina; 👵🔁 troca, fala o
+  exemplo, guarda e continua depois de recarregar.
 
 `?teste` no endereço deixa as esperas bem curtas e as frutas maduras (só para os testes).
