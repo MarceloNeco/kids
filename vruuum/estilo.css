@@ -60,6 +60,8 @@ a { color: var(--ciano); }
 .guardar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 560px; }
 .guardar .dica { flex-basis: 100%; }
 #sondaBorda { position: fixed; top: 0; left: 0; width: 0; height: 0; visibility: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+/* 🏠 e 🚪 (../navegacao.js) no canto de cima: o placar desenhado na pista começa embaixo deles */
+.bn-nav #sondaBorda { padding-top: max(env(safe-area-inset-top), calc(var(--nav-alto) - 6px)); }
 
 .resultado { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 .cartao { background: var(--card); border: 2px solid var(--borda); border-radius: 20px; padding: 14px 22px; min-width: 200px; display: grid; gap: 4px; }

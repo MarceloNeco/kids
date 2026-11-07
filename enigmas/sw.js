@@ -5,9 +5,9 @@
    tocador pula as que não abrem e o jogo segue com os efeitos.
    Cache com o nome do app: só apaga caches "enigmas-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e à primeira entrada de versoes.json). */
-var VERSAO = '0.3.2';
+var VERSAO = '0.3.3';
 var CACHE = 'enigmas-v' + VERSAO;
-var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'rodadas.js', 'jogo.js', 'app.js', 'fontes/fredoka.woff2', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../recursos.js', '../idioma.js', '../atualizar.js', '../telacheia.js', '../janela.js', '../trilha.js'];
+var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'rodadas.js', 'jogo.js', 'app.js', 'fontes/fredoka.woff2', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../janela.js', '../trilha.js'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
 });

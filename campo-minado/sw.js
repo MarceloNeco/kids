@@ -3,9 +3,9 @@
    Músicas gravadas (*.mp3, da pasta da Rabiscolândia): o service worker não mexe (o navegador busca direto).
    Cache com o nome do app: só apaga caches "campo-minado-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.2.3';
+var VERSAO = '0.2.4';
 var CACHE = 'campo-minado-v' + VERSAO;
-var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'campo.js', 'app.js', 'ourico.svg', 'flor.svg', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
+var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'campo.js', 'app.js', 'ourico.svg', 'flor.svg', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
 });

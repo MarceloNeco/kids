@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.17.4';
+  var APP_VERSION = '0.17.5';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -79,6 +79,13 @@
     if (pilha.length) mostrar(pilha.pop());
   });
   Array.prototype.forEach.call(document.querySelectorAll('.voltar'), function (b) { b.addEventListener('click', voltar); });
+  // navegação padrão (../navegacao.js): 🏠 Início volta ao menu de qualquer tela (o ⬅ da Música e da TV continua voltando
+  // um passo, porque elas também abrem do estúdio); 🚪 Saída sai do jogo, perguntando antes no estúdio e no desfile
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'purpurina',
+    noInicio: function () { return atual === 'entrada' || atual === 'menu' || atual === 'desligado' || atual === 'tv'; },
+    irParaInicio: function () { Som.tocar('clique'); if (janelaAberta) fecharPeloBotao(irMenu); else irMenu(); },
+    emAndamento: function () { return atual === 'estudio' || atual === 'desfile'; },
+    esconder: function () { return TV; } });
 
   if (window.SolverRecursos && !SolverRecursos.ligado('purpurina', true)) { mostrar('desligado'); traduzir(); return; }
 
@@ -497,7 +504,6 @@
   }
 
   // ---------- botões do estúdio ----------
-  $('btCasa').addEventListener('click', function () { Som.tocar('clique'); irMenu(); });
   $('btDesfazer').addEventListener('click', function () {
     var e = hist.voltar(); if (!e) return;
     estado = e; Som.tocar('desfazer'); aposMudar();

@@ -3,7 +3,7 @@
    (PeluqueriaDebug.passo). Nada de innerHTML com dado de fora; textos por textContent. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.11', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.6.12', APP_UPDATED = '07/11/2026';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.Peluqueria;
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -93,7 +93,16 @@
   }
   window.addEventListener('popstate', function () { irInicio(); });
   $('btInicio').addEventListener('click', voltarAoMenu);
-  $('btCasa').addEventListener('click', voltarAoMenu);
+  // navegação padrão (../navegacao.js): 🏠 Início volta ao menu (da rodada, do fim, da sala da TV e do celular-controle);
+  // 🚪 Saída sai do jogo. Na TV de verdade (?tv=auto) a barra só aparece na sala (lobby), onde antes ficava o 🏠.
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'peluqueria', noInicio: function () { return app.modo === 'inicio'; },
+    irParaInicio: function () {
+      if (app.modo === 'tv' && window.PeluqueriaTV) PeluqueriaTV.sair();
+      else if (app.modo === 'controle' && window.PeluqueriaControle) PeluqueriaControle.sair();
+      else voltarAoMenu();
+    },
+    emAndamento: function () { return app.modo === 'contagem' || app.modo === 'jogo'; },
+    esconder: function () { return TV && !$('tvLobby').classList.contains('ativa'); } });
 
   function temMinhas() { return catalogo.cenarios.meus.length + catalogo.itens.meus.length > 0; }
 

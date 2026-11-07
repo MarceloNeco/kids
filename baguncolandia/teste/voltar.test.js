@@ -1,5 +1,5 @@
 // Botão Voltar do celular (Chromium, Playwright): node baguncolandia/teste/voltar.test.js
-// O Voltar fecha uma tela por vez (jogo → nome e boneco → menu); no menu o 1º Voltar avisa "toque de novo" e o 2º sai; o ✕ não deixa
+// O Voltar fecha uma tela por vez (jogo → nome e boneco → menu); no menu o 1º Voltar avisa "toque de novo" e o 2º sai; o 🏠 não deixa
 // entrada "sobrando" no histórico.
 const { chromium } = require('playwright');
 const path=require('path'),http=require('http'),fs=require('fs');
@@ -22,11 +22,11 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
     o=await voltar(); conf(!o.tv && o.tela==='inicio' && o.url.startsWith(base), modo+': Voltar de novo → menu inicial');
     o=await voltar(); conf(o.tela==='inicio' && o.aviso, modo+': 1º Voltar no menu → fica e avisa "toque de novo para sair"');
     o=await voltar(); conf(o.url==='about:blank', modo+': 2º Voltar no menu → sai do jogo');
-    // ✕ do jogo continua levando ao menu inicial e não deixa Voltar "sobrando"
+    // 🏠 da barra comum leva ao menu inicial e não deixa Voltar "sobrando"
     await pg.goto(base); await pg.waitForTimeout(400);
     await pg.click(bt); await pg.fill('#nome','Teo'); await pg.click('#btEntrar'); await pg.waitForTimeout(1500);
-    await pg.click('#tvSair'); await pg.waitForTimeout(500); o=await onde(); conf(!o.tv && o.tela==='inicio', modo+': ✕ → menu inicial');
-    o=await voltar(); conf(o.tela==='inicio' && o.aviso, modo+': depois do ✕, Voltar avisa (sem tela fantasma)');
+    await pg.click('.bolinho-nav .bn-casa'); await pg.waitForTimeout(500); o=await onde(); conf(!o.tv && o.tela==='inicio', modo+': 🏠 → menu inicial');
+    o=await voltar(); conf(o.tela==='inicio' && o.aviso, modo+': depois do 🏠, Voltar avisa (sem tela fantasma)');
     o=await voltar(); conf(o.url==='about:blank', modo+': e o Voltar seguinte sai');
     // entrar de novo depois de voltar funciona
     await pg.goto(base); await pg.waitForTimeout(400);

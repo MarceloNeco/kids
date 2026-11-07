@@ -81,7 +81,7 @@ test('🔁 Trocar a voz da vovó: passa para a próxima voz, fala uma frase de e
   f = await falas(pg); ult = f[f.length - 1];
   assert.match(ult.text, /que bom te ver/); assert.equal(ult.voz, 'Joana');
   // no menu também tem o 👵🔁 (com a voz desligada, o exemplo fala mesmo assim)
-  await pg.click('#lugar .voltar'); await pg.click('#mapa .voltar'); await pg.click('#receita .voltar'); await pg.waitForSelector('#menu.ativa');
+  await pg.click('#lugar .voltar'); await pg.click('#mapa .voltar'); await pg.click('.bolinho-nav .bn-casa'); await pg.waitForSelector('#menu.ativa');
   await pg.click('#btVoz');
   await pg.click('#btVozVovo');
   f = await falas(pg); ult = f[f.length - 1];

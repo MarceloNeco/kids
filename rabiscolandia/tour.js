@@ -30,7 +30,7 @@
       { alvo: '#btMusica2', pt: 'Aqui você escolhe as músicas, ou desliga a música.', en: 'Here you choose the songs, or turn the music off.' },
       { alvo: '#btFoto', pt: 'Tire uma foto do seu desenho para guardar ou mandar para alguém.', en: 'Take a photo of your drawing to keep it or send it to someone.' },
       { alvo: '#btLimpar', pt: 'Este começa tudo de novo. Não se preocupa: dá para desfazer.', en: 'This one starts over. Do not worry: you can undo it.' },
-      { alvo: '#btSair', pt: 'A casinha volta para o começo. Seu desenho fica guardado em Meus desenhos.', en: 'The little house goes back to the start. Your drawing is saved in My drawings.' },
+      { alvo: '.bolinho-nav .bn-casa', pt: 'A casinha volta para o começo. Seu desenho fica guardado em Meus desenhos.', en: 'The little house goes back to the start. Your drawing is saved in My drawings.' },
       { alvo: '#btTour', pt: 'Pronto! Se quiser me ver de novo, toque no ponto de interrogação. Agora é com você!', en: 'All done! To see me again, tap the question mark. Now it is your turn!' }
     ]),
     colorir: COMUM_INICIO.concat([

@@ -47,7 +47,7 @@ button:focus-visible { outline: 3px solid var(--ouro); outline-offset: 3px; }
 /* ---------- jogo ---------- */
 /* embaixo: 72 px guardados para o tocador de música comum (../trilha.js, no canto de baixo à direita) */
 #jogo { position: fixed; inset: 0; flex-direction: column; padding: calc(6px + var(--st)) calc(6px + var(--sr)) calc(72px + var(--sb)) calc(6px + var(--sl)); }
-/* a barra de cima numa linha só, até no celular de 360 px: ← 🦔 🙂 ⏱ 🚩 🔍 */
+/* a barra de cima numa linha só, até no celular de 360 px: 🦔 🙂 ⏱ 🚩 🔍 (o 🏠 e a 🚪 ficam na barra comum, acima) */
 .barra { display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 5px; }
 .placa { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 6px; border-radius: 14px; background: rgba(0, 0, 0, .3); font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 3.2rem; justify-content: center; white-space: nowrap; }
 .placa img { width: 1.5rem; height: 1.5rem; }
@@ -64,10 +64,14 @@ body:has(#jogo.ativa) .tela-inteira-bt { top: auto; bottom: calc(12px + var(--sb
 .area { flex: 1; min-height: 0; min-width: 0; overflow: auto; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; border-radius: 18px; overscroll-behavior: contain; }
 .miolo { min-width: 100%; min-height: 100%; width: max-content; display: flex; align-items: center; justify-content: center; padding: 4px; }
 .tabuleiro { display: grid; gap: var(--vao, 2px); padding: 4px; border-radius: 14px; background: #173f22; box-shadow: 0 8px 24px rgba(0, 0, 0, .35); }
+/* navegação padrão (../navegacao.js, 🏠 e 🚪 no canto de cima à esquerda): a barra do jogo desce para baixo dela */
+.bn-nav #jogo { padding-top: var(--nav-alto); }
 /* tela deitada e baixinha (celular deitado): a barra vai para a esquerda, em pé, e a dica só para o leitor de tela */
 @media (orientation: landscape) and (max-height: 520px) {
   #jogo { flex-direction: row; align-items: stretch; gap: 6px; }
   .barra { flex-direction: column; justify-content: flex-start; }
+  .bn-nav #jogo { padding-top: calc(6px + var(--st)); }
+  .bn-nav .barra { padding-top: calc(var(--nav-alto) - 6px - var(--st)); }
   .dica-modo { position: absolute; width: 1px; height: 1px; min-height: 0; margin: 0; overflow: hidden; clip: rect(0 0 0 0); }
 }
 .modo-bandeira .tabuleiro { box-shadow: 0 0 0 4px var(--ouro), 0 8px 24px rgba(0, 0, 0, .35); }

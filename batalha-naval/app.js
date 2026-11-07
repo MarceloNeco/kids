@@ -5,7 +5,7 @@
    (para voltar se a página recarregar). Nada de dado pessoal: só o apelido que a pessoa digitar. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.2';
+  var APP_VERSION = '0.3.3';
   var L = window.BNLogica, R = window.BNRede;
   var Som = window.BNSom || { iniciar: function () {}, ligar: function () {}, efeito: function () {} };
   var Nav = window.BNNavios;
@@ -41,7 +41,7 @@
     document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
     Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
     $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + t('06/Nov/2026', 'Nov/06/2026');
+    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + t('07/Nov/2026', 'Nov/07/2026');
     if (jogo && (atual === 'jogo' || atual === 'sala')) desenhar();
     if (atual === 'arrumar' && arr) pintarArr();
     atualizarInicio();
@@ -59,6 +59,8 @@
     atual = id; window.scrollTo(0, 0);
     if (id !== 'inicio' && !noHistorico) { try { history.pushState({ bn: 1 }, ''); noHistorico = true; } catch (e) { /* sem histórico */ } }
     if (id === 'inicio') atualizarInicio();
+    // de volta à capa por um botão: tira a entrada do histórico, para o próximo Voltar do celular sair do jogo
+    if (id === 'inicio' && noHistorico) { noHistorico = false; try { history.back(); } catch (e) { /* ok */ } }
   }
   window.addEventListener('popstate', function () {
     noHistorico = false;
@@ -130,13 +132,18 @@
     var a = $('ajuda'); a.hidden = !a.hidden; this.setAttribute('aria-expanded', a.hidden ? 'false' : 'true');
     if (!a.hidden) a.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('btCasa').addEventListener('click', function (e) {
-    if (jogo && (jogo.modo === 'rede' ? jogo.p.estado().fase !== 'fim' : jogo.fase === 'jogo')) {
-      e.preventDefault();
-      abrirJanela({ titulo: t('Sair da Batalha Naval?', 'Leave Sea Battle?'), texto: t('A partida em andamento vai acabar para você.', 'The game in progress will end for you.'),
-        botoes: [{ t: t('🚪 Sim, sair', '🚪 Yes, leave'), fn: function () { sairDoJogo(); location.href = '../'; } }, { t: t('Continuar jogando', 'Keep playing') }] });
-    }
-  });
+  // navegação padrão (../navegacao.js): 🏠 Início volta à capa (com partida rolando, pergunta antes, como o Voltar);
+  // 🚪 Saída sai do jogo (com partida rolando, pergunta antes e avisa os outros aparelhos)
+  function irAoInicio() {
+    if (!$('janela').hidden) fecharJanela();
+    if (perto && jogo) cancelarPerto();
+    if (jogo) { confirmarSair(); return; }
+    if (perto) { var s = perto; perto = null; limparPerto(s); }
+    mostrar('inicio');
+  }
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'batalha-naval', noInicio: function () { return atual === 'inicio'; }, irParaInicio: irAoInicio,
+    emAndamento: function () { return !!jogo && (jogo.modo === 'rede' ? jogo.p.estado().fase !== 'fim' : jogo.fase === 'jogo'); },
+    antesDeSair: function () { sairDoJogo(); } });
   // som liberado no primeiro toque
   document.addEventListener('pointerup', function () { Som.iniciar(); }, { once: true, capture: true });
   document.addEventListener('keydown', function () { Som.iniciar(); }, { once: true, capture: true });
@@ -757,7 +764,6 @@
       texto: g.modo === 'rede' ? t('Os outros continuam sem você.', 'The others go on without you.') : t('A partida vai acabar.', 'The game will end.'),
       botoes: [{ t: t('🚪 Sim, sair', '🚪 Yes, leave'), fn: function () { sairDoJogo(); mostrar('inicio'); } }, { t: t('Continuar jogando', 'Keep playing') }] });
   }
-  $('btSairJogo').addEventListener('click', confirmarSair);
   $('btSairSala').addEventListener('click', confirmarSair);
   $('btInicioFim').addEventListener('click', function () { sairDoJogo(); mostrar('inicio'); });
   $('btDeNovo').addEventListener('click', function () {

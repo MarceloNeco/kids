@@ -51,6 +51,12 @@ ul { list-style: none; }
 .guardar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 560px; }
 .guardar .dica { flex-basis: 100%; }
 .rodape { color: var(--muted); font-size: .85rem; }
+/* 🏠 e 🚪 (../navegacao.js) no canto de cima: as telas de rolar começam embaixo deles; no estúdio em pé o topo abre
+   espaço ao lado; deitado, os botões de música do palco descem */
+.bn-nav #desafios, .bn-nav #looks, .bn-nav #conectar, .bn-nav #musica { padding-top: var(--nav-alto); }
+@media (orientation: portrait) { .bn-nav .topo { padding-left: calc(var(--nav-largo) - 6px - var(--sl)); min-height: calc(var(--nav-alto) - 10px - var(--st)); flex-wrap: wrap; justify-content: flex-end; }
+  .bn-nav .topo .titulo { order: 9; flex-basis: 100%; margin-left: calc(6px + var(--sl) - var(--nav-largo)); } }
+@media (orientation: landscape) { .bn-nav .palco-esq { top: calc(var(--nav-alto) - 4px - var(--st)); } }
 .topo-simples { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 900px; }
 .topo-simples h2 { font-size: 1.8rem; }
 

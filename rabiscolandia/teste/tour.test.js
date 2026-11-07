@@ -7,6 +7,7 @@ const T = require('../tour.js');
 const pasta = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(pasta, 'index.html'), 'utf8');
 const app = fs.readFileSync(path.join(pasta, 'app.js'), 'utf8');
+const nav = fs.readFileSync(path.join(pasta, '..', 'navegacao.js'), 'utf8');   // o 🏠 da barra comum (navegação padrão)
 
 test('três passeios, cada balão em português e inglês', () => {
   for (const q of ['livre', 'colorir', 'numeros']) {
@@ -21,6 +22,6 @@ test('todo balão aponta para algo que existe na tela', () => {
     if (!p.alvo) continue;
     for (const m of p.alvo.matchAll(/#([A-Za-z0-9]+)/g)) assert.ok(html.includes('id="' + m[1] + '"'), q + ': falta #' + m[1]);
     for (const m of p.alvo.matchAll(/data-f="([a-z]+)"/g)) assert.ok(app.includes("botaoFerr('" + m[1] + "'"), q + ': falta a ferramenta ' + m[1]);
-    for (const m of p.alvo.matchAll(/\.([a-z-]+)/g)) assert.ok(app.includes("'" + m[1] + "'") || html.includes('class="' + m[1]), q + ': falta a classe ' + m[1]);
+    for (const m of p.alvo.matchAll(/\.([a-z-]+)/g)) assert.ok(app.includes("'" + m[1] + "'") || html.includes('class="' + m[1]) || nav.includes(m[1]), q + ': falta a classe ' + m[1]);
   }
 });

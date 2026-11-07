@@ -56,7 +56,7 @@ for (const [w, h] of TAMANHOS) {
     assert.equal(await pg.isVisible('#menu'), true);
     assert.equal(await pg.textContent('h1'), 'Campo Minado');
     for (const n of ['facil', 'medio', 'dificil']) {
-      if (!(await pg.isVisible('#menu'))) { await pg.click('#btVoltar'); await pg.waitForSelector('#menu', { state: 'visible' }); }
+      if (!(await pg.isVisible('#menu'))) { await pg.click('.bolinho-nav .bn-casa'); await pg.waitForSelector('#menu', { state: 'visible' }); }
       await pg.click('.nivel[data-nivel="' + n + '"]');
       await pg.waitForSelector('#jogo', { state: 'visible' });
       await pg.waitForTimeout(200);   // o ajuste fino do tamanho espera o espaço assentar
@@ -91,7 +91,7 @@ for (const [w, h] of TAMANHOS) {
       assert.equal(m.rola, false, onde + 'o jardim rola sem zoom');
       assert.equal(m.pagina, true, onde + 'a página rola para o lado');
       // a barra: uma linha só em cima (ou uma coluna só, à esquerda, no celular deitado)
-      assert.equal(m.itensBarra, 6, '← 🦔 🙂 ⏱ 🚩 🔍');
+      assert.equal(m.itensBarra, 5, '🦔 🙂 ⏱ 🚩 🔍 (o 🏠 está na barra comum)');
       if (h <= 520 && deitado) { assert.equal(m.colunasBarra, 1, onde + 'barra da esquerda em mais de uma coluna'); assert.ok(m.barraDir <= m.esq, onde + 'barra em cima do jardim'); }
       else { assert.equal(m.linhasBarra, 1, onde + 'barra quebrou em ' + m.linhasBarra + ' linhas'); assert.ok(m.barraBaixo <= m.topo, onde + 'barra em cima do jardim'); }
       // casas de pelo menos 24 px (alvo de toque mínimo); no Fácil, grandes
@@ -136,7 +136,7 @@ test('Fácil: parado uns segundos, as gramas seguras piscam; um toque apaga; no 
   await pg.tap('.casa[data-i="' + dica.certo[0] + '"]');
   assert.equal((await est(pg)).fim === 'perdeu', false);
   // no Médio a dica não aparece
-  await pg.tap('#btVoltar'); await pg.waitForSelector('#menu', { state: 'visible' });
+  await pg.tap('.bolinho-nav .bn-casa'); await pg.waitForSelector('#menu', { state: 'visible' });
   await pg.tap('#btMedio');
   await pg.tap('.casa[data-i="0"]');
   await pg.waitForTimeout(espera + 600);

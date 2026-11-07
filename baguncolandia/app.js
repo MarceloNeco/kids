@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.32', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.33', APP_UPDATED = '07/11/2026';
   var EN = /^en/i.test(navigator.language || '') && !(window.BolinhoIdioma && !BolinhoIdioma.ingles());   // só português sem o interruptor "ingles" (../idioma.js)
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -35,7 +35,9 @@
     });
     return {
       abrir: function (aoVoltar) { pilha.push(aoVoltar); try { history.pushState({ bagunca: pilha.length }, ''); } catch (e) {} },
-      fechar: function (n) { n = Math.min(n || 1, pilha.length); if (!n) return; pilha.length -= n; ignorar++; history.go(-n); }
+      fechar: function (n) { n = Math.min(n || 1, pilha.length); if (!n) return; pilha.length -= n; ignorar++; history.go(-n); },
+      // 🏠 da barra comum (../navegacao.js): fecha todas as camadas (a de cima primeiro) e tira as entradas de uma vez
+      inicio: function () { var cs = pilha.slice().reverse(), n = pilha.length; if (!n) return; pilha.length = 0; ignorar++; history.go(-n); cs.forEach(function (c) { try { c(); } catch (e) {} }); }
     };
   })();
 
@@ -811,7 +813,12 @@
   $('btToque').onclick = function () { CelApp.cel.local = true; CelApp.cel.toque = true; tela('entrar'); Nav.abrir(function () { tela('inicio'); }); $('codigo').style.display = 'none'; $('lblCodigo').style.display = 'none'; $('btEntrar').textContent = T('Começar', 'Start'); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; } catch (e) {} $('nome').focus(); };
   $('btSolo').onclick = function () { CelApp.cel.toque = false; CelApp.cel.local = true; tela('entrar'); Nav.abrir(function () { tela('inicio'); }); $('codigo').style.display = 'none'; $('lblCodigo').style.display = 'none'; $('btEntrar').textContent = T('Começar', 'Start'); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; } catch (e) {} $('nome').focus(); };
   function sairDoJogoLocal(destino) { TVApp.sairLocal(); if (CelApp.cel.streamLocal) CelApp.cel.streamLocal.getTracks().forEach(function (t) { t.stop(); }); tela(destino); }
-  $('tvSair').onclick = function () { sairDoJogoLocal('inicio'); Nav.fechar(2); };
+  /* navegação padrão (../navegacao.js): 🏠 Início volta ao menu inicial de qualquer tela (era o ✕ do jogo no celular);
+     🚪 Saída sai do jogo. O Voltar do celular continua fechando uma tela por vez. Na TV de verdade a barra some. */
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'baguncolandia', irParaInicio: function () { Nav.inicio(); },
+    noInicio: function () { return !!document.querySelector('#inicio.ativa, #desligado.ativa'); },
+    emAndamento: function () { return (TVApp.tv.local && TVApp.tv.fase === 'jogando') || $('jogo').classList.contains('ativa'); },
+    esconder: function () { return /[?&]tv=auto\b/.test(location.search) || ($('tv').classList.contains('ativa') && !TVApp.tv.local); } });
   if (/[?&]tv=auto\b/.test(location.search)) TVApp.iniciar({ gesto: false });   // casca da LG: já entra como TV
   else if (/[?&]tv\b/.test(location.search)) $('btTV').focus();
   if (TESTE) { window.BaguncaApp = { TVApp: TVApp, CelApp: CelApp, Bagunca: Bagunca, Figuras: Figuras, Boneco: Boneco }; }

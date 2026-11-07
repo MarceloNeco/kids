@@ -2,6 +2,17 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.33",
+      "data": "07/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "🏠 Início e 🚪 Saída iguais em todos os jogos, no canto de cima"
+      ],
+      "en": [
+        "🏠 Home and 🚪 Exit the same in every game, in the top corner"
+      ]
+    },
+    {
       "versao": "0.8.32",
       "data": "06/Nov/2026",
       "hora": "23:50:00",

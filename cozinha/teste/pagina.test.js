@@ -264,7 +264,7 @@ test('Dona Cida em inglês fala em inglês; com a voz desligada ela não fala (s
   assert.equal(f.length, 1); assert.match(f[0].text, /how nice to see you/); assert.equal(f[0].lang, 'en-US'); assert.equal(f[0].voz, 'Samantha');
   await voltarVila(pg);
   // desliga a voz no menu e volta à casa dela
-  await pg.click('#mapa .voltar'); await pg.waitForSelector('#receita.ativa'); await pg.click('#receita .voltar'); await pg.waitForSelector('#menu.ativa');
+  await pg.click('#mapa .voltar'); await pg.waitForSelector('#receita.ativa'); await pg.click('.bolinho-nav .bn-casa'); await pg.waitForSelector('#menu.ativa');
   await pg.click('#btVoz');
   assert.equal(await pg.getAttribute('#btVoz', 'aria-pressed'), 'false');
   const antes = (await falas(pg)).length;

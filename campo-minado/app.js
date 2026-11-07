@@ -3,8 +3,8 @@
    Guarda só neste aparelho (localStorage "campo-minado.pref"): idioma, sons e o melhor tempo de cada nível. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.3';
-  var APP_DATA = '06/Nov/2026';
+  var APP_VERSION = '0.2.4';
+  var APP_DATA = '07/Nov/2026';
   var CM = window.CampoMinado;
   var $ = function (id) { return document.getElementById(id); };
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -81,12 +81,15 @@
   function voltarAoMenu() { if (dentro) { try { history.back(); } catch (e) { aoVoltar(); } } else aoVoltar(); }
   function aoVoltar() { dentro = false; fecharFim(); pararRelogio(); apagarDica(); limparFesta(); mostrar('menu'); mostrarRecordes(); setTimeout(function () { var b = $(nivelBotao()); if (b) b.focus(); }, 30); }
   window.addEventListener('popstate', function () { if (dentro) aoVoltar(); });
+  // navegação padrão (../navegacao.js): 🏠 Início = voltar aos níveis (o mesmo do Voltar do celular); 🚪 Saída pergunta
+  // antes de sair com o jardim já começado
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'campo-minado', noInicio: function () { return atual === 'menu'; }, irParaInicio: voltarAoMenu,
+    emAndamento: function () { return atual === 'jogo' && !!est && !!est.plantado && !est.fim; } });
   function nivelBotao() { return { facil: 'btFacil', medio: 'btMedio', dificil: 'btDificil' }[nivel]; }
 
   Array.prototype.forEach.call(document.querySelectorAll('.nivel'), function (b) {
     b.addEventListener('click', function () { nivel = b.getAttribute('data-nivel'); irParaJogo(); novoJogo(); telaCheia(); });
   });
-  $('btVoltar').addEventListener('click', voltarAoMenu);
   $('btNovo').addEventListener('click', function () { novoJogo(); });
   $('btDeNovo').addEventListener('click', function () { novoJogo(); });
   $('btNiveis').addEventListener('click', voltarAoMenu);

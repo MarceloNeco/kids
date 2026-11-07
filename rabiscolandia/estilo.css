@@ -80,6 +80,12 @@ button:focus-visible, input:focus-visible, .carta:focus-visible { outline: 3px s
 .barra-esquerda .topo { padding-left: 8px; }
 .topo::-webkit-scrollbar { display: none; }
 .topo .mini { flex: 0 0 auto; }
+/* 🏠 e 🚪 (../navegacao.js) no canto de cima à esquerda: as telas de rolar começam embaixo deles; na folha, o topo abre
+   espaço ao lado (com a barra à esquerda, ela também desce) e, em pé, o título vai para a linha de baixo */
+.bn-nav #livro, .bn-nav #meus, .bn-nav #tvEscolha, .bn-nav #controle { padding-top: var(--nav-alto); }
+.bn-nav .topo, .bn-nav.barra-esquerda .topo { padding-left: var(--nav-largo); }
+.bn-nav.barra-esquerda .barra { padding-top: var(--nav-alto); }
+@media (orientation: portrait) { .bn-nav .topo { flex-wrap: wrap; gap: 2px; padding-left: calc(var(--nav-largo) - 4px); } .bn-nav .topo .mini { padding: 0; } .bn-nav .titulo-pintar { order: 9; flex-basis: 100%; text-align: center; } }
 .titulo-pintar { flex: 1 1 auto; min-width: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
 .flutua { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
 .flutua .mini { box-shadow: 0 4px 12px rgba(0, 0, 0, .25); }

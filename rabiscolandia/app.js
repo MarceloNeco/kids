@@ -4,7 +4,7 @@
    (banco "rabiscolandia"). Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.14';
+  var APP_VERSION = '0.1.15';
   var $ = function (id) { return document.getElementById(id); };
   var F = window.DesenhoFolha, P = window.DesenhoPaginas || { LISTA: [], CATEGORIAS: [] }, Pt = window.DesenhoPintura;
   var Som = window.DesenhoSom || { iniciar: function () {}, musica: function () {}, musicaLigada: function () { return false; }, efeito: function () {}, efeitos: function () {}, efeitosLigados: function () { return false; }, proxima: function () {}, nomeAtual: function () { return ''; } };
@@ -273,7 +273,22 @@
   function entrarNoPintar() { if (motor) { motor.iniciar(); aplicarLado(); } }
   function sairDoPintar() {
     if (window.DesenhoTour) { DesenhoTour.terminar(true); tourNoHistorico = false; } salvarAgora(); fecharPainel(true); if (motor) motor.parar(); desligarMao(); }
-  $('btSair').addEventListener('click', function () { voltar(); });
+  // navegação padrão (../navegacao.js): 🏠 Início volta ao menu de qualquer tela (fecha antes o passo a passo, o painel e a
+  // janela, e tira do histórico as telas de dentro); o ← do Controle continua voltando um passo; 🚪 Saída sai do jogo
+  function irAoMenu() {
+    if (janelaAberta) { fecharPeloBotao(irAoMenu); return; }
+    var extra = (tourNoHistorico ? 1 : 0) + (painelNoHistorico ? 1 : 0);
+    tourNoHistorico = false; painelNoHistorico = false;
+    if (window.DesenhoTour && DesenhoTour.aberto()) DesenhoTour.terminar(true);
+    fecharPainel(true);
+    var i = pilha.lastIndexOf('menu'), n = extra + (i < 0 ? 0 : pilha.length - i);
+    if (i >= 0) pilha = pilha.slice(0, i);
+    if (n) { ignorar++; history.go(-n); }
+    mostrar('menu');
+  }
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'rabiscolandia',
+    noInicio: function () { return atual === 'entrada' || atual === 'menu' || atual === 'desligado'; }, irParaInicio: irAoMenu,
+    emAndamento: function () { return atual === 'pintar'; }, esconder: function () { return TV; } });
   $('btDesfazer').addEventListener('click', function () { if (motor && motor.desfazer()) Som.efeito('desfazer'); });
   $('btZoomMais').addEventListener('click', function () { motor.zoom(1.4); });
   $('btZoomMenos').addEventListener('click', function () { motor.zoom(1 / 1.4); });
