@@ -36,6 +36,7 @@
     <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
     <button id="btVoz" class="mini" type="button" aria-label="Ler em voz alta / Read aloud">🗣️</button>
     <button id="btEfeitos" class="mini" type="button" aria-label="Sons / Sounds">🔔</button>
+    <button id="btVozVovo" class="mini" type="button" aria-label="Trocar a voz da vovó / Change grandma's voice" title="🔁 Trocar a voz da vovó / Change grandma's voice">👵🔁</button>
     <button id="btAjuda" class="mini" type="button" aria-label="Como brincar / How to play" aria-expanded="false">❓</button>
   </div>
   <h1 class="logo pequeno" aria-label="Mão na Massa" data-logo="Mão na Massa|My Little Big Chef"><span class="palavra"><span>M</span><span>ã</span><span>o</span></span> <span class="palavra"><span>n</span><span>a</span></span> <span class="palavra"><span>M</span><span>a</span><span>s</span><span>s</span><span>a</span></span></h1>
@@ -115,11 +116,12 @@
   <h2 id="prontoTitulo" class="titulo-pronto"></h2>
   <p id="prontoEstrelas" class="estrelas"></p>
   <p id="prontoNota" class="dica"></p>
-  <article id="cartao" class="cartao-receita"></article>
   <div class="linha-botoes">
+    <button id="btFoto" class="medio foto" type="button" data-t="📷 Guardar a foto|📷 Save the photo"></button>
     <button id="btDeNovo" class="medio" type="button" data-t="🔁 Fazer de novo|🔁 Cook it again"></button>
     <button id="btOutra" class="medio verde" type="button" data-t="📖 Outra receita|📖 Another recipe"></button>
   </div>
+  <article id="cartao" class="cartao-receita"></article>
 </section>
 
 <section id="desligado" class="tela" hidden>
@@ -131,6 +133,7 @@
 <script src="dados.js"></script>
 <script src="logica.js"></script>
 <script src="desenhos.js"></script>
+<script src="cenas.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>
 <script src="../atualizar.js" data-fora-do-arquivo></script>

@@ -5,11 +5,14 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.0';
+  var APP_VERSION = '0.5.0';
   var APP_UPDATED = '06/Nov/2026';
-  var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos;
+  var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
   var V = RAPIDO ? 0.12 : 1;   // multiplica os tempos de espera
+  var VA = RAPIDO && !/[?&]devagar\b/.test(location.search) ? 0.12 : 1;   // tempo das animações (?teste&devagar = de verdade)
+  // "reduzir movimento" no aparelho: as cenas ficam paradas (sem voo, sem partícula, sem balanço)
+  function calmo() { return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
   function $(id) { return document.getElementById(id); }
   function qs(el, s) { return el.querySelector(s); }
   function qsa(el, s) { return Array.prototype.slice.call(el.querySelectorAll(s)); }
@@ -106,27 +109,52 @@
   function soltarMusica() {
     setTimeout(function () { try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) { /* ok */ } Trilha.volume(null); }, 150);
   }
-  // voz da Dona Cida (a vovozinha vizinha): uma voz feminina da língua do jogo, se o aparelho tiver; senão a voz padrão
-  var vozes = [];
+  // voz da Dona Cida (a vovozinha vizinha): a melhor voz FEMININA da língua do jogo (pt-BR primeiro). Nomes e códigos
+  // conhecidos: femininas (Luciana, Francisca, Maria, Vitória, Fernanda, Thalita, Leila, Raquel, Camila, "feminina",
+  // "female", Google português do Brasil no computador; no Android, pt-br-x-afs e pt-br-x-pte) e masculinas (Daniel,
+  // Antônio, Ricardo, Felipe, "masculina", "male"; no Android, pt-br-x-ptd e pt-br-x-ptz), que só entram se não houver outra.
+  // Voz masculina ou desconhecida (ex.: a voz padrão do Samsung): fala mais fininha (tom 1,45) e devagar (0,88) para
+  // soar como uma vovó. A família pode trocar no 👵🔁 (gira entre as vozes do aparelho e fica guardada).
+  var vozes = [], CH_VOZ = 'bolinho:cozinha:voz-vovo';
   function lerVozes() { try { vozes = speechSynthesis.getVoices() || []; } catch (e) { vozes = []; } }
-  if (window.speechSynthesis) { lerVozes(); try { speechSynthesis.addEventListener('voiceschanged', lerVozes); } catch (e) { /* ok */ } }
-  var FEMININA = /female|femin|mulher|woman|luciana|francisca|fernanda|vit[oó]ria|\bmaria\b|joana|raquel|helo[ií]sa|camila|thalita|leila|let[ií]cia|samantha|karen|victoria|zira|susan|serena|moira|tessa|fiona|allison|\bava\b|jenny|\baria\b|google portugu[eê]s|google us english|google uk english female/i;
-  function vozDaVovo() {
+  if (window.speechSynthesis) { lerVozes(); try { speechSynthesis.addEventListener('voiceschanged', lerVozes); } catch (e) { /* ok */ } setTimeout(lerVozes, 300); }
+  var FEMININA = /female|femin|mulher|woman|luciana|francisca|fernanda|vit[oó]ria|\bmaria\b|joana|raquel|helo[ií]sa|camila|thalita|leila|let[ií]cia|samantha|karen|victoria|zira|susan|serena|moira|tessa|fiona|allison|\bava\b|jenny|\baria\b|google portugu[eê]s|google us english|pt-br-x-(afs|pte)\b|pt-pt-x-(sfs|jfb)\b/i;
+  var MASCULINA = /\bmale\b|mascul|homem|\bman\b|daniel|ant[oô]nio|ricardo|felipe|\bjo[aã]o\b|\bpaulo\b|duarte|cristiano|f[aá]bio|\bfred\b|\balex\b|\btom\b|\breed\b|\brocko\b|\beddy\b|grandpa|ralph|albert|bruce|\bdavid\b|\bmark\b|\bguy\b|pt-br-x-(ptd|ptz)\b|pt-pt-x-(jmn|pmj)\b/i;
+  function generoVoz(v) { var n = (v.name || '') + ' ' + (v.voiceURI || ''); return MASCULINA.test(n) ? 'm' : FEMININA.test(n) ? 'f' : '?'; }
+  // as vozes da língua do jogo, da melhor para a vovó à pior: pt-BR antes de outro pt; feminina, desconhecida, masculina
+  function vozesDaLingua() {
     if (!vozes.length) lerVozes();
-    var lg = en() ? 'en' : 'pt', certa = en() ? 'en-us' : 'pt-br';
+    var lg = en() ? 'en' : 'pt', certa = en() ? 'en-us' : 'pt-br', NOTA = { f: 0, '?': 1, m: 2 };
     var norm = function (v) { return String(v.lang || '').toLowerCase().replace('_', '-'); };
-    var daLingua = vozes.filter(function (v) { return norm(v).indexOf(lg) === 0; });
-    var exatas = daLingua.filter(function (v) { return norm(v) === certa; });
-    return (exatas.length ? exatas : daLingua).filter(function (v) { return FEMININA.test(v.name || ''); })[0] ||
-      daLingua.filter(function (v) { return FEMININA.test(v.name || ''); })[0] || null;
+    return vozes.filter(function (v) { return norm(v).indexOf(lg) === 0; }).map(function (v, i) { return { v: v, i: i, n: (norm(v) === certa ? 0 : 3) + NOTA[generoVoz(v)] }; })
+      .sort(function (a, b) { return a.n - b.n || a.i - b.i; }).map(function (x) { return x.v; });
   }
-  var JEITO_VOVO = { rate: 0.9, pitch: 1.2 };
+  function vozGuardada() { var g = ler(CH_VOZ, {}) || {}; return g[en() ? 'en' : 'pt'] || null; }
+  function vozDaVovo() {
+    var lista = vozesDaLingua(), nome = vozGuardada();
+    return lista.filter(function (v) { return v.name === nome; })[0] || lista[0] || null;
+  }
+  function jeitoVovo(v) { return v && generoVoz(v) === 'f' ? { rate: 0.9, pitch: 1.2 } : { rate: 0.88, pitch: 1.45 }; }
+  // 👵🔁 trocar a voz da vovó: passa para a próxima voz do aparelho, guarda e fala uma frase de exemplo
+  function trocarVozVovo() {
+    var lista = vozesDaLingua(), atualV = vozDaVovo();
+    if (lista.length < 2) aviso(t('👵 Este aparelho só tem esta voz. Ela fala mais fininha para parecer uma vovó.', '👵 This device only has this voice. It speaks a bit higher to sound like a grandma.'), 3200, true);
+    var nova = lista.length ? lista[(lista.indexOf(atualV) + 1) % lista.length] : null;
+    if (nova) {
+      var g = ler(CH_VOZ, {}) || {}; g[en() ? 'en' : 'pt'] = nova.name; gravar(CH_VOZ, g);
+      if (lista.length > 1) aviso(t('👵 Voz da vovó: ', "👵 Grandma's voice: ") + nova.name + ' (' + (lista.indexOf(nova) + 1) + '/' + lista.length + ')', 2600, true);
+    }
+    var j = jeitoVovo(nova), v = pref.voz; pref.voz = true;
+    falar(t('Oi, meu bem! Assim está boa a minha voz de vovó?', 'Hello, sweetie! Does my grandma voice sound nice like this?'), { rate: j.rate, pitch: j.pitch, voz: nova });
+    pref.voz = v;
+  }
 
   // ---------- telas e o Voltar do celular ----------
   var atual = 'entrada', pilha = [];
   function mostrar(id) {
     if (atual === 'lugar' && id !== 'lugar') limparLugar();
     if (atual === 'cozinha' && id !== 'cozinha') limparCozinha();
+    if (atual === 'pronto' && id !== 'pronto') pararMenino();
     qsa(document, '.tela').forEach(function (s) { s.classList.toggle('ativa', s.id === id); });
     atual = id; window.scrollTo(0, 0);
     if (id === 'mapa') desenharMapa();
@@ -162,6 +190,7 @@
   $('btLingua').addEventListener('click', function () { pref.lingua = en() ? 'pt' : 'en'; salvarPref(); traduzir(); desenharMenu(); });
   $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); traduzir(); aviso(pref.voz ? t('🗣️ Voz ligada', '🗣️ Voice on') : t('🗣️ Voz desligada', '🗣️ Voice off'), 1500, true); if (!pref.voz && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ } });
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); traduzir(); Som.toca('toque'); });
+  $('btVozVovo').addEventListener('click', trocarVozVovo);
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
 
   function desenharMenu() {
@@ -240,24 +269,33 @@
     return L.faltando(jogo.precisa, jogo.cesta).map(function (r) { return emojiDe(r.id) + L.nomeQtd(r.id, r.falta, en()); }).join(', ');
   }
 
-  // voa um ícone até a cesta (ou até outro elemento)
-  function voar(html, de, para) {
+  // voa um ícone até a cesta (ou até outro elemento), num arco, e chega com um "pop" e faíscas no item da cesta.
+  // op: id (o item da cesta que dá o pop), atraso (ms), arco (px para cima), gira (graus), dur (ms).
+  function voar(html, de, para, op) {
+    op = op || {};
     try {
       var alvo = para || qs(document, '.tela.ativa .cesta'); if (!alvo || !de) return;
-      var a = de.getBoundingClientRect(), b = alvo.getBoundingClientRect();
+      var achar = function () { return (!para && op.id && qs(alvo, '.item[data-ing="' + op.id + '"]')) || (!para && qs(alvo, '.cesta-ic')) || alvo; };
+      var a = de.getBoundingClientRect(), b = achar().getBoundingClientRect();
+      var ax = a.left + a.width / 2, ay = a.top + a.height / 2, bx = b.left + b.width / 2, by = b.top + b.height / 2;
+      var chegou = function () { var d = achar(); d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop'); if (!calmo()) { var r = d.getBoundingClientRect(); C.faiscas(r.left + r.width / 2, r.top + r.height / 2, 6); } };
+      if (calmo() || !Element.prototype.animate) { chegou(); return; }
       var v = document.createElement('div'); v.className = 'voando'; v.innerHTML = html;
-      v.style.left = (a.left + a.width / 2) + 'px'; v.style.top = (a.top + a.height / 2) + 'px';
+      v.style.left = ax + 'px'; v.style.top = ay + 'px';
       document.body.appendChild(v);
-      requestAnimationFrame(function () { requestAnimationFrame(function () {
-        v.style.transform = 'translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(.45)';
-        v.style.opacity = '0.2';
-      }); });
-      setTimeout(function () { v.remove(); }, 750);
+      var dx = bx - ax, dy = by - ay, arco = op.arco != null ? op.arco : 90, gira = op.gira || 0, dur = op.dur || 820;
+      var anim = v.animate([
+        { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+        { transform: 'translate(calc(-50% + ' + (dx * 0.45).toFixed(1) + 'px), calc(-50% + ' + (Math.min(0, dy) * 0.45 - arco).toFixed(1) + 'px)) scale(1.15) rotate(' + (gira / 2) + 'deg)', opacity: 1, offset: 0.45 },
+        { transform: 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(.5) rotate(' + gira + 'deg)', opacity: 0.9 }
+      ], { duration: dur, delay: op.atraso || 0, easing: 'cubic-bezier(.45,.05,.55,.95)', fill: 'both' });
+      anim.onfinish = function () { v.remove(); chegou(); };
+      setTimeout(function () { if (v.parentNode) v.remove(); }, dur + (op.atraso || 0) + 600);
     } catch (e) { /* só enfeite */ }
   }
   // chegou um ingrediente na cesta (já somado)
-  function recebeu(id, de) {
-    voar(icone(id), de); Som.toca('pega');
+  function recebeu(id, de, op) {
+    voar(icone(id), de, null, Object.assign({ id: id }, op || {})); Som.toca('pega');
     var r = L.resumo(jogo.precisa, jogo.cesta).filter(function (x) { return x.id === id; })[0];
     var nome = emojiDe(id) + L.nomeIng(id, en());
     desenharCesta(); desenharPrecisa();
@@ -278,7 +316,7 @@
     if (!jogo.fatos[id] && jogo.cfg.id === 'facil' && lugarAtual !== 'vizinha') falar(g.fato[en() ? 1 : 0], { fila: true });
     jogo.fatos[id] = true;
   }
-  function coletar(id, de) { L.por(jogo.cesta, id, 1); recebeu(id, de); }
+  function coletar(id, de, op) { L.por(jogo.cesta, id, 1); recebeu(id, de, op); }
   function erro() { if (jogo) jogo.erros++; Som.toca('erro'); }
 
   // ---------- vila ----------
@@ -392,14 +430,17 @@
         quadro.appendChild(b);
         function nascer(madura) {
           b.setAttribute('data-ing', tipo); b.innerHTML = ART.fruto(tipo) || icone(tipo); b.disabled = false;
-          b.classList.remove('caiu'); b.classList.toggle('madura', !!madura); b.classList.toggle('verde', !madura);
+          b.classList.remove('caiu', 'colhe'); b.classList.toggle('madura', !!madura); b.classList.toggle('verde', !madura);
           b.setAttribute('aria-label', L.nomeIng(tipo, en()) + (madura ? t(' madura', ' ripe') : t(' verde', ' unripe')) + ' — ' + tx(pl));
         }
         nascer(RAPIDO || Math.random() < nv.madura);
         b.addEventListener('click', function () {
           if (b.disabled) return;
           if (b.classList.contains('madura')) {
-            coletar(tipo, b); b.classList.add('caiu'); b.disabled = true;
+            // balança, solta do galho com um pulinho e voa para a cesta
+            b.disabled = true; b.classList.add('colhe');
+            coletar(tipo, b, { atraso: calmo() ? 0 : 300, arco: 110, gira: 30 });
+            agendar(function () { b.classList.remove('colhe'); b.classList.add('caiu'); }, calmo() ? 0 : 320);
             agendar(function () { nascer(RAPIDO); }, 1600 * V);
           } else {
             b.classList.remove('balanca'); void b.offsetWidth; b.classList.add('balanca'); Som.toca('toque');
@@ -440,7 +481,15 @@
       function puxar(n) {
         if (b.disabled) return;
         puxou = Math.min(vezes, puxou + n); b.style.setProperty('--sobe', String(puxou)); Som.toca('toque');
-        if (puxou >= vezes) { b.disabled = true; b.classList.add('saiu'); coletar(tipo, b); agendar(nascer, 1700 * V); }
+        terra(puxou >= vezes ? 12 : 5);
+        if (puxou >= vezes) { b.disabled = true; b.classList.add('saiu'); coletar(tipo, b, { arco: 70, gira: -20 }); agendar(nascer, 1700 * V); }
+      }
+      // pedacinhos de terra pulando (só do que cresce embaixo da terra; o resto solta folhinhas)
+      function terra(n) {
+        if (calmo()) return;
+        var r = b.getBoundingClientRect();
+        if (f === 'raiz') C.migalhas(r.left + r.width * 0.47, r.top + r.height * 0.44, '#6e452c', n, { abre: 70, sobe: 26, cai: 34 });
+        else C.migalhas(r.left + r.width * 0.47, r.top + r.height * 0.36, '#6cc65a', Math.ceil(n / 2), { abre: 50, sobe: 14, cai: 40 });
       }
       b.addEventListener('pointerdown', function (e) { y0 = e.clientY; });
       b.addEventListener('pointerup', function (e) { var dy = y0 == null ? 0 : e.clientY - y0; y0 = null; puxar(dy < -30 ? 3 : 1); });
@@ -466,7 +515,7 @@
         else aviso(t('Có-có... Essa galinha ainda não botou ovo. Tente outra ou volte daqui a pouco!', 'Cluck... This hen has not laid an egg yet. Try another one or come back soon!'), 2400);
       });
       o.addEventListener('click', function () {
-        coletar('ovo', o); o.hidden = true; temOvo = false;
+        coletar('ovo', o, { arco: 46, gira: 25, dur: 950 }); o.hidden = true; temOvo = false;
         agendar(function () { temOvo = true; }, 4000 * V);
       });
     });
@@ -475,15 +524,19 @@
   MINI.vaca = function (area) {
     area.innerHTML = '<p class="instr">' + t('Faça carinho na Mimosa e segure o botão para encher a xícara de leite.', 'Pet Mimosa and hold the button to fill the cup with milk.') + '</p>' +
       '<div class="pasto"><button type="button" class="mimosa" aria-label="' + t('Fazer carinho na vaca', 'Pet the cow') + '">🐄</button>' +
-      '<div class="jarra" aria-hidden="true"><div class="leite-nivel"></div></div></div>' +
+      '<div class="jarra-zona" aria-hidden="true"><span class="jorro-leite"></span><div class="jarra"><div class="leite-nivel"></div></div></div></div>' +
       '<button type="button" class="grande bt-segurar" id="btOrdenhar">' + t('🥛 Segure para tirar o leite', '🥛 Hold to get the milk') + '<span class="barra"><span></span></span></button>';
-    var vaca = qs(area, '.mimosa'), nivelEl = qs(area, '.leite-nivel'), bt = qs(area, '.bt-segurar'), barra = qs(bt, '.barra span');
+    var vaca = qs(area, '.mimosa'), nivelEl = qs(area, '.leite-nivel'), bt = qs(area, '.bt-segurar'), barra = qs(bt, '.barra span'), pasto = qs(area, '.pasto');
+    // o leite cai em jorro na xícara enquanto o dedo segura
+    bt.addEventListener('pointerdown', function () { pasto.classList.add('ordenhando'); });
+    ['pointerup', 'pointerleave', 'pointercancel', 'keyup'].forEach(function (k) { bt.addEventListener(k, function () { pasto.classList.remove('ordenhando'); }); });
     vaca.addEventListener('click', function () {
       var c = document.createElement('span'); c.className = 'coracao'; c.textContent = '❤️'; vaca.appendChild(c); setTimeout(function () { c.remove(); }, 900);
       aviso(t('Muuu! A Mimosa gostou do carinho. 💛', 'Mooo! Mimosa loved the petting. 💛'), 1500, true);
     });
     var parar = segurar(bt, 1700 * V, function (p) { nivelEl.style.height = (p * 100) + '%'; barra.style.width = (p * 100) + '%'; }, function () {
-      coletar('leite', qs(area, '.jarra')); setTimeout(function () { nivelEl.style.height = '0%'; barra.style.width = '0%'; }, 300);
+      pasto.classList.remove('ordenhando');
+      coletar('leite', qs(area, '.jarra'), { arco: 60 }); setTimeout(function () { nivelEl.style.height = '0%'; barra.style.width = '0%'; }, 300);
     });
     fimLugar.push(parar);
   };
@@ -738,7 +791,7 @@
     var itens = D.INGREDIENTES.filter(function (g) { return g.vizinha; }).map(function (g) { return g.id; });
     itens.sort(function (a, b) { return (falta.indexOf(a) < 0) - (falta.indexOf(b) < 0); });
     area.innerHTML = '<div class="casinha"><div class="cida" aria-hidden="true">👵</div><div class="balao" aria-live="polite"></div><div class="na-mao" aria-hidden="true"></div></div>' +
-      '<p class="favores-txt"></p><div class="pedidos">' + itens.map(function (id) {
+      '<p class="favores-txt"></p><button type="button" class="mini-link bt-voz-vovo">' + t('🔁 Trocar a voz da vovó', "🔁 Change grandma's voice") + '</button><div class="pedidos">' + itens.map(function (id) {
         return '<button type="button" class="pedido' + (falta.indexOf(id) >= 0 && jogo.cfg.brilho ? ' precisa' : '') + '" data-ing="' + id + '">' + icone(id) + '<span>' + L.nomeIng(id, en()) + '</span></button>';
       }).join('') + '</div><button type="button" class="grande verde" id="btObrigado" hidden>' + t('💛 Obrigado, Dona Cida!', '💛 Thank you, Mrs. Cida!') + '</button>';
     var balao = qs(area, '.balao'), mao = qs(area, '.na-mao'), bt = qs(area, '#btObrigado'), cida = qs(area, '.cida'), falando = null;
@@ -747,7 +800,8 @@
     function fala(pt, ing, fila) {
       var txt = t(pt, ing);
       balao.textContent = txt; balao.classList.remove('novo'); void balao.offsetWidth; balao.classList.add('novo');
-      var u = falar(txt, { rate: JEITO_VOVO.rate, pitch: JEITO_VOVO.pitch, voz: vozDaVovo(), fila: fila });
+      var vv = vozDaVovo(), jv = jeitoVovo(vv);
+      var u = falar(txt, { rate: jv.rate, pitch: jv.pitch, voz: vv, fila: fila });
       if (!u) return;
       falando = u; cida.classList.add('falando');
       var acabou = function () { if (falando === u) { falando = null; cida.classList.remove('falando'); } };
@@ -758,6 +812,7 @@
     if (jogo.favores > 0) fala('Oi, meu bem, que bom te ver! Precisa de alguma coisa emprestada? 😊', 'Hello, sweetie, how nice to see you! Do you need to borrow something? 😊');
     else fala('Oi, meu bem! Hoje eu já emprestei tudo o que podia. Tente o mercadinho! 😊', 'Hello, sweetie! I have already lent all I could today. Try the shop! 😊');
     favores();
+    qs(area, '.bt-voz-vovo').addEventListener('click', trocarVozVovo);
     // saiu da casa no meio da fala: a vovó para de falar
     fimLugar.push(function () { if (falando && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ } });
     qs(area, '.pedidos').addEventListener('click', function (e) {
@@ -796,7 +851,7 @@
     var usados = [];
     jogo.passos.forEach(function (p) { if (usados.indexOf(p.u) < 0) usados.push(p.u); });
     var extras = embaralhar(D.UTENSILIOS.map(function (u) { return u.id; }).filter(function (u) { return usados.indexOf(u) < 0; })).slice(0, jogo.cfg.distratores);
-    jogo.cz = { feitos: [], atual: null, fase: null, errosPasso: 0, dicaTempo: false,
+    jogo.cz = { feitos: [], atual: null, fase: null, errosPasso: 0, dicaTempo: false, dentro: {},
       utens: D.UTENSILIOS.map(function (u) { return u.id; }).filter(function (u) { return usados.indexOf(u) >= 0 || extras.indexOf(u) >= 0; }),
       fichas: embaralhar(jogo.passos.map(function (p) { return p.id; })) };
     proximo();
@@ -898,19 +953,81 @@
     ['pointerup', 'pointercancel'].forEach(function (k) { alvo.addEventListener(k, function () { ant = null; }); });
     return somar;
   }
+  // o que já está dentro de cada utensílio (para a cor da massa e o quanto está cheio)
+  function dentroDe(u) { var cz = jogo.cz; cz.dentro = cz.dentro || {}; return (cz.dentro[u] = cz.dentro[u] || []); }
+  function corDe(lista) { return C.misturar(lista.map(C.cor)) || jogo.rec.cor; }
+  function nivelDe(lista) { return lista.length ? Math.min(0.85, 0.25 + 0.14 * lista.length) : 0; }
+  function centroDe(el) { var r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; }
+  // um ingrediente cai no recipiente: pedacinhos caem, o pó faz nuvenzinha, o pacote inclina PARA o recipiente e
+  // derrama, o ovo quebra e a gema cai. Depois o recipiente fica mais cheio (com a cor da mistura).
+  function cairNo(dest, id, de, depois) {
+    var boca = qs(dest, '.boca') || dest, b = centroDe(boca), o = centroDe(de), j = C.jeito(id), cor = C.cor(id), dur = 1000 * VA;
+    if (!qs(dest, '.boca')) b.y = centroDe(dest).y - centroDe(dest).h * 0.2;
+    if (calmo() || !Element.prototype.animate) { depois(); dest.classList.remove('pula'); void dest.offsetWidth; dest.classList.add('pula'); return; }
+    var px = b.x - 46, py = b.y - 74, dx = px - o.x, dy = py - o.y, tilt = j === 'po' || j === 'liquido' || j === 'granulado';
+    // o ingrediente vai até em cima do recipiente; pacote: à esquerda, e inclina para a direita (para o recipiente)
+    var fim = tilt ? 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) rotate(110deg)' : 'translate(calc(-50% + ' + (b.x - o.x) + 'px), calc(-50% + ' + (py - o.y) + 'px)) rotate(' + (j === 'ovo' ? 0 : 20) + 'deg)';
+    var voa = C.particula(icone(id), 'ing-voa', o.x, o.y, [
+      { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+      { transform: (tilt ? 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))' : 'translate(calc(-50% + ' + (b.x - o.x) + 'px), calc(-50% + ' + (py - o.y) + 'px))') + ' rotate(0deg) scale(1.1)', opacity: 1, offset: 0.4 },
+      { transform: fim + ' scale(1.1)', opacity: 1, offset: 0.62 },
+      { transform: fim + ' scale(1.1)', opacity: 1, offset: 0.9 },
+      { transform: fim + ' scale(.8)', opacity: 0 }], dur);
+    if (voa) voa.setAttribute('data-inclina', tilt ? '110' : '0');
+    var t1 = dur * 0.55;
+    agendarCz(function () {
+      if (j === 'pedaco') C.migalhas(b.x, py, null, 4, { html: icone(id), sobe: 0, abre: 46, cai: b.y - py + 6, dur: 520 * VA + 80, espalha: 140 * VA });
+      else if (j === 'ovo') {
+        C.migalhas(b.x, py, '#fff', 1, { html: '🥚', sobe: 6, abre: -70, cai: 20, dur: 450 }); C.migalhas(b.x, py, '#fff', 1, { html: '🥚', sobe: 6, abre: 70, cai: 20, dur: 450 });
+        var gema = C.particula('', 'gema', b.x, py + 6, [{ transform: 'translate(-50%,-50%) scale(.6)', opacity: 1 }, { transform: 'translate(-50%, calc(-50% + ' + (b.y - py) + 'px)) scale(1, .7)', opacity: 1, offset: 0.85 }, { transform: 'translate(-50%, calc(-50% + ' + (b.y - py) + 'px)) scale(1.3, .4)', opacity: 0 }], 520 * VA + 60);
+        if (gema) gema.style.setProperty('--c', cor);
+      } else if (j === 'liquido') {
+        var jr = C.particula('', 'jorrinho', b.x - 8, py + 14, [{ transform: 'translateX(-50%) scaleY(0)', opacity: 1 }, { transform: 'translateX(-50%) scaleY(1)', opacity: 1, offset: 0.3 }, { transform: 'translateX(-50%) scaleY(1)', opacity: 1, offset: 0.8 }, { transform: 'translateX(-50%) translateY(' + (b.y - py - 14) + 'px) scaleY(0)', opacity: 0.6 }], 600 * VA + 60);
+        if (jr) { jr.style.height = Math.max(10, b.y - py - 14) + 'px'; jr.style.background = cor; }
+      } else {   // pó e granulado: chuvinha e uma nuvenzinha quando chega
+        var cores = j === 'granulado' ? ['#ff4fa3', '#3ee8ff', '#ffd166', '#7bc950', '#8b5a3c'] : [cor];
+        for (var k = 0; k < 14; k++) C.migalhas(b.x - 8 + (Math.random() - 0.5) * 10, py + 14, cores[k % cores.length], 1, { sobe: 0, abre: 16, cai: b.y - py - 14, tam: j === 'granulado' ? 5 : 4, dur: 420 * VA + 60, espalha: 260 * VA });
+        if (j === 'po') agendarCz(function () { C.nuvem(b.x, b.y, cor === '#ffffff' ? '#fffaf0' : cor, 7); }, 300 * VA);
+      }
+    }, t1);
+    agendarCz(function () { depois(); dest.classList.remove('pula'); void dest.offsetWidth; dest.classList.add('pula'); }, t1 + 420 * VA);
+  }
   function montarAcao(p) {
     var palco = $('palco'), a = p.a, nv = jogo.cfg;
     palco.className = 'palco acao-' + a;
     var big = function (id) { return '<div class="grandao">' + icone(id) + '</div>'; };
-    if (a === 'lavar' || a === 'mexer') {
-      var onde = a === 'lavar' ? 'pia' : p.em;
-      var itens = a === 'lavar' && p.ing.length ? '<div class="itens-lavar">' + p.ing.map(icone).join('') + '</div>' : (a === 'lavar' ? '<div class="itens-lavar"><span class="ic">🧼</span></div>' : '');
-      palco.innerHTML = '<p class="instr">' + (a === 'lavar' ? t('Esfregue fazendo círculos com o dedo 🔄', 'Scrub by making circles with your finger 🔄') : t('Mexa fazendo círculos com o dedo 🔄', 'Stir by making circles with your finger 🔄')) + '</p>' +
-        '<div class="alvo-giro" style="--p:0">' + big(onde) + itens + '<span class="colher-gira" aria-hidden="true">' + (a === 'lavar' ? '💧' : '🥄') + '</span></div>' +
-        '<button type="button" class="medio bt-alt">' + (a === 'lavar' ? t('🧼 Esfregar', '🧼 Scrub') : t('🔄 Mexer', '🔄 Stir')) + '</button>';
-      var alvo = qs(palco, '.alvo-giro'), col = qs(palco, '.colher-gira');
-      var somar = giro(alvo, a === 'lavar' ? 1.5 : (nv.id === 'dificil' ? 3 : 2), function (pr, ang) {
-        alvo.style.setProperty('--p', pr.toFixed(3)); col.style.transform = 'rotate(' + ang + 'rad) translateX(var(--raio)) rotate(' + (-ang) + 'rad)';
+    if (a === 'lavar') {
+      // pia com a torneira aberta: as duas mãos (ou o que está sendo lavado) esfregam junto com o dedo, a espuma
+      // aparece aos poucos e, no fim, a água leva a espuma e brilha: "Mãos limpinhas!"
+      var maos = !p.ing.length;
+      palco.innerHTML = '<p class="instr">' + (maos ? t('Esfregue as mãos fazendo círculos com o dedo 🔄', 'Scrub your hands by making circles with your finger 🔄') : t('Esfregue fazendo círculos com o dedo 🔄', 'Scrub by making circles with your finger 🔄')) + '</p>' +
+        '<div class="alvo-giro pia-giro' + (maos ? ' com-maos' : '') + '" style="--p:0">' + C.cenaPia(maos) + (maos ? '' : '<div class="itens-lavar">' + p.ing.map(icone).join('') + '</div>') +
+        '<p class="limpinho" hidden>' + (maos ? t('Mãos limpinhas! ✨', 'Squeaky clean hands! ✨') : t('Tudo limpinho! ✨', 'All clean! ✨')) + '</p><span class="barra-giro" aria-hidden="true"><span></span></span></div>' +
+        '<button type="button" class="medio bt-alt">' + t('🧼 Esfregar', '🧼 Scrub') + '</button>';
+      var pia = qs(palco, '.alvo-giro'), barraP = qs(palco, '.barra-giro span'), itensL = qs(palco, '.itens-lavar'), tEsf = 0;
+      var somarL = giro(pia, 1.5, function (pr, ang) {
+        barraP.style.width = (pr * 100) + '%'; C.esfregar(pia, pr, ang);
+        if (itensL) itensL.style.transform = 'translate(calc(-50% + ' + (Math.cos(ang) * 6).toFixed(1) + 'px), ' + (Math.sin(ang) * 4).toFixed(1) + 'px) rotate(' + (Math.sin(ang) * 10).toFixed(1) + 'deg)';
+        pia.classList.add('esfregando'); clearTimeout(tEsf); tEsf = setTimeout(function () { pia.classList.remove('esfregando'); }, 260);
+      }, function () {
+        pia.classList.add('limpo'); qs(pia, '.limpinho').hidden = false; Som.toca('pega');
+        if (!calmo()) { var c0 = centroDe(pia); C.faiscas(c0.x, c0.y, 10); }
+        agendarCz(concluir, 900 * VA + 100);
+      });
+      fimCz.push(function () { clearTimeout(tEsf); });
+      qs(palco, '.bt-alt').addEventListener('click', function () { somarL(Math.PI / 4); Som.toca('toque'); });
+    } else if (a === 'mexer') {
+      // a colher gira dentro do recipiente com o dedo, e a massa faz um redemoinho
+      var onde = p.em, temR = C.temRecipiente(onde), dentro = dentroDe(onde);
+      palco.innerHTML = '<p class="instr">' + t('Mexa fazendo círculos com o dedo 🔄', 'Stir by making circles with your finger 🔄') + '</p>' +
+        '<div class="alvo-giro mexe-giro" style="--p:0">' + (temR ? '<div class="grandao com-recip">' + C.recipiente(onde) + '</div>' : big(onde)) + '<span class="colher-gira" aria-hidden="true">🥄</span></div>' +
+        '<button type="button" class="medio bt-alt">' + t('🔄 Mexer', '🔄 Stir') + '</button>';
+      var alvo = qs(palco, '.alvo-giro'), col = qs(palco, '.colher-gira'), rede = qs(palco, '.redemoinho');
+      if (temR) { C.encher(alvo, Math.max(0.55, nivelDe(dentro)), corDe(dentro)); qs(palco, '.giro-sup').setAttribute('opacity', '1'); }
+      var somar = giro(alvo, nv.id === 'dificil' ? 3 : 2, function (pr, ang) {
+        alvo.style.setProperty('--p', pr.toFixed(3));
+        col.style.transform = 'translate(' + (Math.cos(ang) * 30).toFixed(1) + 'px, ' + (Math.sin(ang) * 11).toFixed(1) + 'px) rotate(' + (Math.cos(ang) * 14).toFixed(1) + 'deg)';
+        if (rede) rede.style.transform = 'rotate(' + (ang * 180 / Math.PI).toFixed(1) + 'deg)';
       }, concluir);
       qs(palco, '.bt-alt').addEventListener('click', function () { somar(Math.PI / 4); Som.toca('toque'); });
     } else if (a === 'cortar') {
@@ -923,9 +1040,13 @@
       function cortar() {
         if (!fila.length) return;
         cortes++; Som.toca('toque');
-        var risco = document.createElement('span'); risco.className = 'risco'; risco.style.left = (20 + Math.random() * 60) + '%'; risco.style.transform = 'rotate(' + (60 + Math.random() * 60) + 'deg)'; tab.appendChild(risco); setTimeout(function () { risco.remove(); }, 500);
+        var rx = 20 + Math.random() * 60;
+        var risco = document.createElement('span'); risco.className = 'risco'; risco.style.left = rx + '%'; risco.style.transform = 'rotate(' + (60 + Math.random() * 60) + 'deg)'; tab.appendChild(risco); setTimeout(function () { risco.remove(); }, 500);
         var id = fila[0];
         ped.innerHTML = Array(cortes + 1).join('<span class="pedaco">' + icone(id) + '</span>');
+        var ult = ped.lastElementChild; if (ult) ult.classList.add('novo');
+        // pedacinhos pulam do corte e caem na tábua
+        if (!calmo()) { var r = tab.getBoundingClientRect(); C.migalhas(r.left + r.width * rx / 100, r.top + r.height * 0.45, C.cor(id), 6, { abre: 70, sobe: 22, cai: r.height * 0.3, tam: 7 }); }
         cont.textContent = L.nomeIng(id, en()) + ': ' + cortes + '/' + PRECISA;
         if (cortes >= PRECISA) { fila.shift(); cortes = 0; if (fila.length) agendarCz(mostrarItem, 450); else concluir(); }
       }
@@ -938,39 +1059,71 @@
       var certos = p.ing.slice(), outros = jogo.precisa.map(function (x) { return x.id; }).filter(function (id) { return certos.indexOf(id) < 0; });
       var chips = certos.concat(nv.id === 'facil' ? [] : embaralhar(outros).slice(0, 2));
       chips = nv.id === 'facil' ? chips : embaralhar(chips);
-      palco.innerHTML = '<p class="instr">' + t('Toque em cada ingrediente para colocar ', 'Tap each ingredient to put it ') + D.utensilio[p.u].na[en() ? 1 : 0] + '</p>' + big(p.u).replace('grandao', 'grandao destino') +
+      var temRp = C.temRecipiente(p.u), dentroP = dentroDe(p.u);
+      palco.innerHTML = '<p class="instr">' + t('Toque em cada ingrediente para colocar ', 'Tap each ingredient to put it ') + D.utensilio[p.u].na[en() ? 1 : 0] + '</p>' +
+        '<div class="grandao destino' + (temRp ? ' com-recip' : '') + '">' + (temRp ? C.recipiente(p.u) : icone(p.u)) + '</div>' +
         '<div class="chips">' + chips.map(function (id) { return '<button type="button" class="chip-ing" data-ing="' + id + '">' + icone(id) + '<span>' + L.nomeQtd(id, L.quantidade(jogo.rec, jogo.nivel, id), en()) + '</span></button>'; }).join('') + '</div>';
       var faltam = certos.length, dest = qs(palco, '.destino');
+      if (temRp) C.encher(dest, nivelDe(dentroP), corDe(dentroP));
       qs(palco, '.chips').addEventListener('click', function (e) {
         var b = e.target.closest('.chip-ing'); if (!b || b.disabled) return;
         var id = b.getAttribute('data-ing');
         if (certos.indexOf(id) >= 0) {
-          b.disabled = true; b.classList.add('foi'); voar(icone(id), b, dest); Som.toca('pega');
-          dest.classList.remove('pula'); void dest.offsetWidth; dest.classList.add('pula');
-          if (!--faltam) concluir();
+          b.disabled = true; b.classList.add('foi'); Som.toca('pega');
+          dentroP.push(id);
+          var n = nivelDe(dentroP), cor = corDe(dentroP);
+          cairNo(dest, id, b, function () { if (temRp) C.encher(dest, n, cor); });
+          if (!--faltam) agendarCz(concluir, 1500 * VA + 50);
         } else { erro(); b.classList.remove('treme'); void b.offsetWidth; b.classList.add('treme'); aviso(t('Esse não é deste passo!', 'That one is not for this step!'), 1800); }
       });
     } else if (a === 'bater') {
-      palco.innerHTML = '<p class="instr">' + t('Segure o botão até a barra encher ✋', 'Hold the button until the bar is full ✋') + '</p>' + big(p.u).replace('grandao', 'grandao maquina') +
+      // a máquina treme e gira por dentro (redemoinho) enquanto o dedo segura
+      var liq = p.u === 'liquidificador', dentroB = dentroDe(p.u);
+      palco.innerHTML = '<p class="instr">' + t('Segure o botão até a barra encher ✋', 'Hold the button until the bar is full ✋') + '</p>' +
+        '<div class="grandao maquina m-' + p.u + (liq ? ' com-recip' : '') + '">' + (liq ? C.recipiente('liquidificador') : icone(p.u) + '<span class="turbilhao" aria-hidden="true"></span>') + '</div>' +
         '<button type="button" class="grande bt-segurar">' + (p.u === 'espremedor' ? t('🍊 Segure para espremer', '🍊 Hold to squeeze') : t('✋ Segure para bater', '✋ Hold to blend')) + '<span class="barra"><span></span></span></button>';
       var maq = qs(palco, '.maquina'), bt = qs(palco, '.bt-segurar'), barra = qs(bt, '.barra span');
-      bt.addEventListener('pointerdown', function () { maq.classList.add('treme-sem-fim'); });
-      ['pointerup', 'pointerleave', 'pointercancel', 'keyup'].forEach(function (k) { bt.addEventListener(k, function () { maq.classList.remove('treme-sem-fim'); }); });
-      fimCz.push(segurar(bt, 1800 * V, function (pr) { barra.style.width = (pr * 100) + '%'; }, function () { maq.classList.remove('treme-sem-fim'); bt.disabled = true; concluir(); }));
+      if (liq) { C.encher(maq, Math.max(0.5, nivelDe(dentroB)), corDe(dentroB)); qs(maq, '.giro-sup').setAttribute('opacity', '1'); }
+      var ligaM = function () { maq.classList.add('treme-sem-fim'); palco.classList.add('batendo'); };
+      var paraM = function () { maq.classList.remove('treme-sem-fim'); palco.classList.remove('batendo'); };
+      bt.addEventListener('pointerdown', ligaM);
+      ['pointerup', 'pointerleave', 'pointercancel', 'keyup'].forEach(function (k) { bt.addEventListener(k, paraM); });
+      fimCz.push(segurar(bt, 1800 * V, function (pr) {
+        barra.style.width = (pr * 100) + '%';
+        if (p.u === 'espremedor' && !calmo() && Math.random() < 0.18) { var c1 = centroDe(maq); C.migalhas(c1.x + (Math.random() - 0.5) * 30, c1.y, '#ffb21a', 1, { sobe: 10, abre: 40, cai: c1.h * 0.4, tam: 6 }); }
+      }, function () {
+        paraM(); bt.disabled = true;
+        (p.ing || []).forEach(function (id) { if (dentroB.indexOf(id) < 0) dentroB.push(id); });
+        concluir();
+      }));
     } else if (a === 'ligar' || a === 'desligar') {
+      // chama tremulando, a panela chiando e soltando vapor; desligar: a chama encolhe e o vapor some
       var liga = a === 'ligar';
       palco.innerHTML = '<p class="instr">' + (liga ? t('Gire o botão do fogão para acender o fogo 🔥', 'Turn the stove knob to light the flame 🔥') : t('Gire o botão para apagar o fogo', 'Turn the knob to put out the flame')) + '</p>' +
-        '<div class="fogao-cena">' + big('fogao') + (p.em ? '<div class="em-cima">' + icone(p.em) + '</div>' : '') + '<span class="chama' + (liga ? '' : ' acesa') + '" aria-hidden="true">🔥</span></div>' +
+        '<div class="fogao-cena' + (liga ? '' : ' quente') + '">' + big('fogao') + (p.em ? '<div class="em-cima">' + icone(p.em) + '</div>' : '') +
+        '<span class="chama' + (liga ? '' : ' acesa') + '" aria-hidden="true"><i>🔥</i><i>🔥</i></span>' + vaporHtml() + '</div>' +
         '<button type="button" class="botao-fogao' + (liga ? '' : ' girado') + '" aria-label="' + (liga ? t('Ligar o fogo', 'Turn on the flame') : t('Desligar o fogo', 'Turn off the flame')) + '"><span></span></button>';
       qs(palco, '.botao-fogao').addEventListener('click', function () {
-        this.classList.toggle('girado', liga); qs(palco, '.chama').classList.toggle('acesa', liga); this.disabled = true; Som.toca('toque'); agendarCz(concluir, 500 * V + 100);
+        this.classList.toggle('girado', liga); qs(palco, '.chama').classList.toggle('acesa', liga); qs(palco, '.fogao-cena').classList.toggle('quente', liga);
+        this.disabled = true; Som.toca('toque'); agendarCz(concluir, 900 * VA + 100);
       });
     } else if (a === 'despejar') {
-      palco.innerHTML = '<p class="instr">' + t('Toque ' + D.utensilio[p.de].na[0], 'Tap the ' + D.utensilio[p.de].en.toLowerCase()) + t(' para despejar', ' to pour') + '</p>' +
-        '<div class="despejo"><button type="button" class="origem" aria-label="' + t('Despejar', 'Pour') + '">' + icone(p.de) + '</button><span class="seta-desp" aria-hidden="true">➜</span>' + big(p.u).replace('grandao', 'grandao destino') + '</div>';
-      qs(palco, '.origem').addEventListener('click', function () { this.disabled = true; this.classList.add('despeja'); Som.toca('pega'); agendarCz(concluir, 900 * V + 100); });
+      // o utensílio levanta, inclina PARA o lado do recipiente (bico em cima dele) e o jorro cai lá dentro, enchendo
+      var de = p.de, dentroO = dentroDe(de), dentroA = dentroDe(p.u), corO = corDe(dentroO);
+      var grosso = dentroO.some(function (id) { return ['farinha', 'polvilho', 'ovo', 'cenoura', 'banana', 'chocolate', 'leitecond'].indexOf(id) >= 0; });
+      palco.innerHTML = '<p class="instr">' + t('Toque ' + D.utensilio[de].na[0], 'Tap the ' + D.utensilio[de].en.toLowerCase()) + t(' para despejar', ' to pour') + '</p>' +
+        '<div class="despejo" data-fase="pronto">' + C.cenaDespejo(de, p.u) + '<button type="button" class="origem" aria-label="' + t('Despejar', 'Pour') + '"><span class="dedo" aria-hidden="true">👆</span></button></div>';
+      var desp = qs(palco, '.despejo'), n0 = nivelDe(dentroA);
+      C.encher(desp, n0, corDe(dentroA));
+      qs(palco, '.origem').addEventListener('click', function () {
+        if (this.disabled) return;
+        this.disabled = true; desp.classList.add('despejando'); Som.toca('pega');
+        var todos = dentroA.concat(dentroO.length ? dentroO : [jogo.rec.cor]);
+        fimCz.push(C.animarDespejo(desp, { cor: corO, grosso: grosso, dur: 2600 * VA + 100, calmo: calmo(), n0: n0, n1: Math.max(0.6, Math.min(0.88, n0 + 0.45)), corAlvo: C.misturar(todos.filter(function (x) { return x.charAt(0) !== '#'; }).map(C.cor)) || corO,
+          aoFim: function () { dentroO.forEach(function (id) { dentroA.push(id); }); dentroO.length = 0; agendarCz(concluir, 200 * VA + 50); } }));
+      });
     } else if (a === 'virar') {
-      palco.innerHTML = '<p class="instr">' + t('Espere dourar e toque em Virar!', 'Wait until it is golden and tap Flip!') + '</p><div class="frigideira-cena">' + big(p.em) + '<span class="massa" style="--d:0"></span></div>' +
+      palco.innerHTML = '<p class="instr">' + t('Espere dourar e toque em Virar!', 'Wait until it is golden and tap Flip!') + '</p><div class="frigideira-cena quente">' + big(p.em) + '<span class="massa" style="--d:0"></span>' + vaporHtml() + '</div>' +
         '<button type="button" class="grande bt-virar">' + t('🔄 Virar!', '🔄 Flip!') + '</button>';
       var massa = qs(palco, '.massa'), btv = qs(palco, '.bt-virar'), pr = 0;
       var tv = setInterval(function () { pr = Math.min(1, pr + 0.05 / (2.6 * V)); massa.style.setProperty('--d', pr.toFixed(2)); if (pr >= 0.6) btv.classList.add('luz'); }, 50);
@@ -980,17 +1133,26 @@
         clearInterval(tv); btv.disabled = true; massa.classList.add('vira'); agendarCz(concluir, 700 * V + 100);
       });
     } else if (a === 'assar' || a === 'gelar' || a === 'esperar') {
+      // forno: a janelinha acende e brilha, com calor subindo; geladeira: a porta abre e sai uma fumacinha gelada;
+      // relógio: faz tique-taque. O relógio redondo conta o tempo.
       var cfgT = { assar: ['forno', t('🍽️ Pôr no forno', '🍽️ Put in the oven'), t('🧤 Tirar do forno', '🧤 Take it out'), 5], gelar: ['geladeira', t('❄️ Pôr na geladeira', '❄️ Put in the fridge'), t('Tirar da geladeira', 'Take it out of the fridge'), 4], esperar: ['relogio', t('⏰ Começar a esperar', '⏰ Start waiting'), t('✅ Pronto!', '✅ Ready!'), 4] }[a];
-      palco.innerHTML = '<p class="instr">' + t('Coloque e espere o tempo passar', 'Put it in and wait for the time to pass') + '</p><div class="timer-cena">' + big(cfgT[0]) + '<div class="timer" style="--p:0"><span></span></div></div>' +
+      var extra = a === 'assar' ? '<span class="brilho-forno" aria-hidden="true"></span><span class="calor" aria-hidden="true"><i></i><i></i><i></i></span>'
+        : a === 'gelar' ? '<span class="dentro-gel" aria-hidden="true">' + jogo.rec.e + '</span><span class="porta-gel" aria-hidden="true"></span>' : '';
+      palco.innerHTML = '<p class="instr">' + t('Coloque e espere o tempo passar', 'Put it in and wait for the time to pass') + '</p><div class="timer-cena"><div class="aparelho a-' + cfgT[0] + '">' + big(cfgT[0]) + extra + '</div><div class="timer" style="--p:0"><span></span></div></div>' +
         '<button type="button" class="grande bt-timer">' + cfgT[1] + '</button>';
-      var btt = qs(palco, '.bt-timer'), tim = qs(palco, '.timer'), fase = 0;
+      var btt = qs(palco, '.bt-timer'), tim = qs(palco, '.timer'), apar = qs(palco, '.aparelho'), fase = 0;
       btt.addEventListener('click', function () {
         if (fase === 0) {
           fase = 1; btt.disabled = true; Som.toca('toque'); palco.classList.add('ligado');
+          if (a === 'gelar') {
+            apar.classList.add('aberta');
+            if (!calmo()) [0, 260, 520].forEach(function (ms) { agendarCz(function () { var c2 = centroDe(apar); C.nuvem(c2.x + c2.w * 0.1, c2.y + c2.h * 0.15, '#e3f4ff', 5); }, ms * VA); });
+            agendarCz(function () { apar.classList.remove('aberta'); }, 1100 * VA + 100);
+          }
           var dur = cfgT[3] * 1000 * V, ini = Date.now();
           var iv = setInterval(function () {
             var pr2 = Math.min(1, (Date.now() - ini) / dur); tim.style.setProperty('--p', pr2.toFixed(3)); qs(tim, 'span').textContent = Math.ceil((1 - pr2) * cfgT[3]);
-            if (pr2 >= 1) { clearInterval(iv); fase = 2; btt.disabled = false; btt.textContent = cfgT[2]; btt.classList.add('luz'); qs(tim, 'span').textContent = '✔'; Som.toca('pega'); }
+            if (pr2 >= 1) { clearInterval(iv); fase = 2; btt.disabled = false; btt.textContent = cfgT[2]; btt.classList.add('luz'); qs(tim, 'span').textContent = '✔'; Som.toca('pega'); palco.classList.add('pronto-t'); }
           }, 100);
           fimCz.push(function () { clearInterval(iv); });
         } else if (fase === 2) { btt.disabled = true; concluir(); }
@@ -1003,27 +1165,37 @@
       mm.addEventListener('click', function () {
         if (toques >= N) return; toques++; Som.toca('toque');
         mm.classList.remove('aperta'); void mm.offsetWidth; mm.classList.add('aperta');
+        if (!calmo()) { var c3 = centroDe(mm); C.nuvem(c3.x, c3.y - c3.h * 0.3, '#fff6e6', 3); }
         var s = document.createElement('span'); s.className = 'bolinha'; s.style.setProperty('--c', jogo.rec.cor); bol.appendChild(s); cn.textContent = toques + '/' + N;
         if (toques >= N) concluir();
       });
     } else if (a === 'servir') {
-      palco.innerHTML = '<p class="instr">' + t('Toque para servir! 😋', 'Tap to serve! 😋') + '</p><button type="button" class="bt-servir" aria-label="' + t('Servir', 'Serve') + '">' + icone(p.u) + '<span class="comida" aria-hidden="true">' + jogo.rec.e + '</span></button>';
-      qs(palco, '.bt-servir').addEventListener('click', function () { this.disabled = true; this.classList.add('servido'); agendarCz(concluir, 600 * V + 100); });
+      palco.innerHTML = '<p class="instr">' + t('Toque para servir! 😋', 'Tap to serve! 😋') + '</p><button type="button" class="bt-servir" aria-label="' + t('Servir', 'Serve') + '">' + icone(p.u) + '<span class="comida" aria-hidden="true">' + jogo.rec.e + '</span>' + vaporHtml() + '</button>';
+      qs(palco, '.bt-servir').addEventListener('click', function () {
+        this.disabled = true; this.classList.add('servido');
+        if (!calmo()) { var c4 = centroDe(this); C.faiscas(c4.x, c4.y - c4.h * 0.1, 9); }
+        agendarCz(concluir, 600 * V + 100);
+      });
     }
   }
+  function vaporHtml() { return '<span class="vapores" aria-hidden="true"><i></i><i></i><i></i></span><span class="chiado" aria-hidden="true"><i></i><i></i><i></i><i></i></span>'; }
 
   // ---------- receita pronta ----------
   function terminar() {
     var r = tempoRestante(), atrasou = r != null && r <= 0;
-    var est = L.estrelas({ erros: jogo.erros, atrasou: atrasou });
+    var est = L.estrelas({ erros: jogo.erros, atrasou: atrasou }), nv = jogo.cfg;
     clearInterval(tSol);
     salvarProgresso(jogo.rec.id, jogo.nivel, est);
-    $('prontoPrato').textContent = jogo.rec.e; $('prontoPrato').style.setProperty('--c', jogo.rec.cor);
+    // o menininho comendo o prato (garfo e faquinha, mastiga, lambe os lábios, "Hmm!"), com vapor e brilhos
+    pararMenino();
+    $('prontoPrato').innerHTML = C.menino({ cor: jogo.rec.cor, prato: jogo.rec.e, hmm: t('Hmm!', 'Yum!') });
+    if (!calmo()) pararMenino = C.animarMenino(qs($('prontoPrato'), 'svg'));
+    foto = { rec: jogo.rec, est: est, nivel: nv.e + ' ' + tx(nv) };
     $('prontoTitulo').textContent = t('🎉 Oba! Você fez: ', '🎉 Yay! You made: ') + tx(jogo.rec) + '!';
     $('prontoEstrelas').innerHTML = '<span aria-label="' + est + t(' estrelas', ' stars') + '">' + '⭐'.repeat(est) + '<span class="apagada">' + '☆'.repeat(3 - est) + '</span></span>';
     $('prontoNota').textContent = atrasou ? t('🌙 Ficou de noite, mas a comida ficou uma delícia!', '🌙 It got dark, but the food is delicious!')
       : jogo.erros ? t('Você acertou quase tudo! Errinhos: ' + jogo.erros, 'You got almost everything right! Little mistakes: ' + jogo.erros) : t('Perfeito, sem nenhum erro! 👏', 'Perfect, no mistakes at all! 👏');
-    var nv = jogo.cfg, ordem = jogo.cz.feitos.map(function (id) { return jogo.passos.filter(function (p) { return p.id === id; })[0]; });
+    var ordem = jogo.cz.feitos.map(function (id) { return jogo.passos.filter(function (p) { return p.id === id; })[0]; });
     $('cartao').innerHTML = '<h3>📜 ' + t('Receita da família', 'Family recipe') + '</h3><h4>' + jogo.rec.e + ' ' + tx(jogo.rec) + '</h4>' +
       '<p class="nivel-c">' + nv.e + ' ' + tx(nv) + ' · ' + hoje() + '</p><h5>' + t('Ingredientes', 'Ingredients') + '</h5><ul>' +
       jogo.precisa.map(function (x) { return '<li>' + icone(x.id) + ' ' + L.nomeQtd(x.id, x.q, en()) + '</li>'; }).join('') + '</ul><h5>' + t('Modo de fazer', 'How to make it') + '</h5><ol>' +
@@ -1040,6 +1212,34 @@
     var dd = (d.getDate() < 10 ? '0' : '') + d.getDate();
     return en() ? M[d.getMonth()] + '/' + dd + '/' + d.getFullYear() : dd + '/' + M[d.getMonth()] + '/' + d.getFullYear();
   }
+  var pararMenino = function () {}, foto = null;
+  // 📷 Guardar a foto: desenha o prato com o menininho, o nome da receita e a data num PNG; no celular abre o
+  // "compartilhar" (galeria, WhatsApp), senão baixa o arquivo. Tudo no aparelho, funciona sem internet.
+  function guardarFoto() {
+    if (!foto) return;
+    var bt = $('btFoto'); bt.disabled = true;
+    var d = new Date(), dia = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    var nome = 'mao-na-massa-' + foto.rec.id + '-' + dia + '.png';
+    C.foto({ titulo: t('Mão na Massa', 'My Little Big Chef'), receita: tx(foto.rec), prato: foto.rec.e, cor: foto.rec.cor, estrelas: foto.est, hmm: t('Hmm!', 'Yum!'),
+      linha: t('Feito em ', 'Made on ') + hoje() + ' · ' + foto.nivel, rodape: 'solverone.com.br/kids · Bolinho de Chuva' }).then(function (blob) {
+      var arq = null; try { arq = new File([blob], nome, { type: 'image/png' }); } catch (e) { arq = null; }
+      var celular = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+      if (arq && celular && navigator.share && navigator.canShare && navigator.canShare({ files: [arq] })) {
+        return navigator.share({ files: [arq], title: t('Mão na Massa', 'My Little Big Chef'), text: tx(foto.rec) + ' 😋' }).then(function () {
+          aviso(t('📷 Foto pronta!', '📷 Photo ready!'), 2000, true);
+        }, function (e) { if (!e || e.name !== 'AbortError') baixar(blob, nome); });
+      }
+      baixar(blob, nome);
+    }).catch(function () { aviso(t('Não deu para fazer a foto agora. Tente de novo!', 'Could not make the photo right now. Try again!'), 2600, true); })
+      .then(function () { bt.disabled = false; });
+  }
+  function baixar(blob, nome) {
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = nome; a.hidden = true; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+    aviso(t('📷 Foto guardada no aparelho!', '📷 Photo saved on the device!'), 2400, true);
+  }
+  $('btFoto').addEventListener('click', guardarFoto);
   $('btDeNovo').addEventListener('click', function () { var id = jogo.rec.id; novoJogo(id, jogo.nivel); pilha = ['menu']; mostrar('mapa'); });
   $('btOutra').addEventListener('click', function () { pilha = []; mostrar('menu'); });
 

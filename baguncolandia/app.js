@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.31', APP_UPDATED = '06/11/2026';
+  var APP_VERSION = '0.8.32', APP_UPDATED = '06/11/2026';
   var EN = /^en/i.test(navigator.language || '') && !(window.BolinhoIdioma && !BolinhoIdioma.ingles());   // só português sem o interruptor "ingles" (../idioma.js)
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -407,7 +407,7 @@
     function iniciar(opts) {
       opts = opts || {};
       tv.local = !!opts.local;
-      tela(''); $('tv').classList.add('ativa'); $('tv').classList.toggle('local', tv.local);
+      tela(''); $('tv').classList.add('ativa'); $('tv').classList.toggle('local', tv.local); semZoom(tv.local);
       Desenho.iniciar($('tvCanvas'), { nomes: [] });
       Som.iniciar(); Voz.liberar(); tv.vozLiberada = !!opts.gesto;
       tv.toque = !!opts.toque; $('tv').classList.toggle('toque', tv.toque); Desenho.dedo(tv.toque); Desenho.iconesDireita(tv.local);
@@ -500,8 +500,15 @@
     function sairLocal() {
       dedos = {}; tv.dedoCorpo = {}; tv.toque = false; $('tv').classList.remove('toque');
       cancelAnimationFrame(tv.raf); tv.raf = 0; tv.partida = null; tv.fase = 'carregando'; Som.musica(false); Desenho.legenda(null);
-      $('tv').classList.remove('ativa', 'local', 'semEspelho', 'leve'); while ($('tvFundo').firstChild) $('tvFundo').removeChild($('tvFundo').firstChild);
+      $('tv').classList.remove('ativa', 'local', 'semEspelho', 'leve'); semZoom(false); while ($('tvFundo').firstChild) $('tvFundo').removeChild($('tvFundo').firstChild);
     }
+    // 📱 jogo no aparelho: a página não amplia nem arrasta (o dedo sempre joga); no menu o zoom volta
+    function semZoom(v) {
+      var m = document.querySelector('meta[name="viewport"]'); if (!m) return;
+      if (m.dataset.normal == null) m.dataset.normal = m.content;
+      m.content = v ? m.dataset.normal + ', maximum-scale=1, user-scalable=no' : m.dataset.normal;
+    }
+    document.addEventListener('gesturestart', function (e) { if (tv.local && $('tv').classList.contains('ativa')) e.preventDefault(); }, { passive: false });   // iPhone ignora o user-scalable=no
     function espelhar(v) { tv.espelhar = v !== false; $('tv').classList.toggle('semEspelho', !tv.espelhar); }
     return { iniciar: iniciar, comando: comando, sairLocal: sairLocal, espelhar: espelhar, tv: tv };
   })();
