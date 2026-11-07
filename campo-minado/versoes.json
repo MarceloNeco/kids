@@ -2,6 +2,17 @@
   "app": "campo-minado",
   "versoes": [
     {
+      "versao": "0.2.3",
+      "data": "06/Nov/2026",
+      "hora": "23:50:00",
+      "pt": [
+        "📱 Celular deitado: o jogo ocupa a tela toda e o dedo sempre joga (sem zoom da página)"
+      ],
+      "en": [
+        "📱 Phone lying down: the game fills the whole screen and your finger always plays (no page zoom)"
+      ]
+    },
+    {
       "versao": "0.2.2",
       "data": "06/Nov/2026",
       "hora": "22:30:00",

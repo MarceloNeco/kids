@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.2', APP_DATA = '06/Nov/2026';
+  var APP_VERSION = '0.2.3', APP_DATA = '06/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search;
   var TESTE = /[?&]teste\b/.test(BUSCA);

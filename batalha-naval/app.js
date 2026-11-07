@@ -5,7 +5,7 @@
    (para voltar se a página recarregar). Nada de dado pessoal: só o apelido que a pessoa digitar. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.1';
+  var APP_VERSION = '0.3.2';
   var L = window.BNLogica, R = window.BNRede;
   var Som = window.BNSom || { iniciar: function () {}, ligar: function () {}, efeito: function () {} };
   var Nav = window.BNNavios;

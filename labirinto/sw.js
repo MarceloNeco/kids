@@ -4,7 +4,7 @@
    sem internet a trilha pula as que não abrem e some, e o jogo segue com os efeitos).
    Cache com o nome do app: só apaga caches "labirinto-" (nunca os dos outros jogos da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.2.2';
+var VERSAO = '0.2.3';
 var CACHE = 'labirinto-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'gerador.js', 'regras.js', 'desenho.js', 'som.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../instalar.js'];
 self.addEventListener('install', function (e) {

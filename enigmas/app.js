@@ -4,7 +4,7 @@
    progresso de cada nível em "bolinho:enigmas:progresso". Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.1';
+  var APP_VERSION = '0.3.2';
   var $ = function (id) { return document.getElementById(id); };
   var J = window.Enigmas, R = window.EnigmasRodadas;
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);

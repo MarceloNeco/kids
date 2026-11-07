@@ -46,7 +46,7 @@ test('abre sem erro no celular em pé e no computador, nas duas línguas, sem ro
   for (const [vp, toque] of [[{ width: 360, height: 740 }, true], [{ width: 1280, height: 800 }, false], [{ width: 800, height: 1280 }, true]]) {
     const ctx = await browser.newContext({ viewport: vp, hasTouch: toque, locale: 'pt-BR' });
     const { pg, erros } = await novaAba(ctx);
-    assert.match(await pg.textContent('#versao'), /0\.3\.1/);
+    assert.match(await pg.textContent('#versao'), /0\.3\.2/);
     assert.equal(await pg.textContent('#btPC'), '🤖 Contra o computador');
     await pg.click('#btLingua');
     assert.equal(await pg.textContent('#btPC'), '🤖 Against the computer');
