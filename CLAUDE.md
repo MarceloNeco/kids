@@ -142,3 +142,15 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
     entra na lista (deixe o arquivo na pasta, só tire da lista). Cada jogo continua com pelo menos 10 músicas.
   - A favorita de cada jogo (`FAVORITAS` no `trilha.js`) é de instrumentos de verdade, animada, até 2,5 MB e o jogo a
     toca. Vigia: `teste/regra-musica.test.js`.
+
+## Aviso do dono (13/Nov/2026): Definition of done com 12 pontos — até sair a diretriz nova
+
+- A DoD da plataforma passa a ter 12 pontos: manual e orientações, AssistONE, Novidades da versão, termos, comunicações e
+  e-mails, RootifyONE, ArchONE, EaglePlanONE (roadmap), retrocompatibilidade, segurança e LGPD, qualidade verificável e
+  registro. Vai nascer uma teia de integrações (eventos e comandos com aprovação) entre os apps, o RootifyONE, o ArchONE e
+  o EaglePlanONE; quando a diretriz nova sair (conversa de diretrizes da SolverONE), siga-a.
+- Aplicabilidade: cada ponto vale quando se aplica ao estágio deste app (hoje: site aberto, sem login e sem banco, só no
+  GitHub Pages). **Não** criar login, banco nem integração por causa do aviso; o que não se aplica hoje, dizer "não
+  aplicável hoje" e o motivo em uma linha. Ganhando login, banco ou integração, o app já nasce cumprindo os pontos.
+- Em cada entrega, dizer no resumo o que o RootifyONE, o ArchONE ou o EaglePlanONE precisariam saber (integração nova ou
+  removida, recurso/interruptor novo, item do roadmap concluído). Nada de integração nova sem a regra zero.
