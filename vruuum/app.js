@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.10.5';
+  var APP_VERSION = '1.11.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -56,11 +56,54 @@
 
   if (window.SolverRecursos && !SolverRecursos.ligado('vruuum', true)) { tela('desligado'); traduzir(); return; }
 
-  // ---------- entrada ----------
+  // ---------- entrada: apresentação ----------
+  /* Atrás do logo roda uma corrida de demonstração (como no fliperama): dois pilotos sorteados correndo sozinhos,
+     com cortes de câmera a cada 5 s (um, o outro, e às vezes direto para um looping). O primeiro toque na tela já
+     liga a música; o botão entra no menu. */
+  var demo = null;
+  function iniciarDemo() {
+    var cv = $('demo'); if (!cv || demo || !PE || !M.novaCorrida) return;
+    var noChao = VE.LISTA.filter(function (v) { return !VE.voa(v.id); }).map(function (v) { return v.id; });
+    function sorteia(l) { return l[Math.floor(Math.random() * l.length)]; }
+    var ps = PE.sortear(7, []), configs = ps.slice(2).map(function (p) { var v = VE.achar(sorteia(noChao)); return { id: p.id, veic: v.id, cor: p.cor, mod: { vel: v.vel, curva: v.curva } }; });
+    var jd = ps.slice(0, 2).map(function (p, k) { return { cor: p.cor || D.CORES[k], piloto: D.PILOTOS[k], veic: sorteia(noChao), foto: null, personagem: p.id, corpo: PE.corpoDe(p.id) || 'menino' }; });
+    var e = M.novaCorrida('normal', (Date.now() % 100000) | 0, 2, configs);
+    e.jogadores.forEach(function (j, k) { var v = VE.achar(jd[k].veic); j.mod = { vel: v.vel, curva: v.curva }; j.x = k ? 0.66 : -0.66; });
+    D.preparar(e, jd, pref.lingua, pref.visual);
+    demo = { e: e, jogs: jd, cena: 0, tCena: 0, ultimo: performance.now(), faixas: [-0.66, 0.66], pensa: 0 };
+    requestAnimationFrame(passoDemo);
+  }
+  function pilotoDemo(e, j, k) {   // fica na faixa, foge de cone e lama, e às vezes troca de faixa (para ter curva e derrapagem)
+    var i = Math.floor(j.z / window.VruuumPista.SEG), alvo = demo.faixas[k];
+    var segs = e.pista.segs, ruim = function (fx) { for (var q = i + 2; q < i + 14 && q < segs.length; q++) for (var w = 0; w < segs[q].coisas.length; w++) { var co = segs[q].coisas[w]; if ((co.tipo === 'cone' || co.tipo === 'lama') && Math.abs(co.x - fx) < 0.35) return true; } return false; };
+    if (ruim(alvo)) { var livres = [-0.66, 0, 0.66].filter(function (fx) { return !ruim(fx); }); if (livres.length) demo.faixas[k] = alvo = livres[0]; }
+    var seg = segs[Math.min(segs.length - 1, i)];
+    return { dir: Math.max(-1, Math.min(1, (alvo - j.x) * 4 + seg.curva * 0.25)), pular: Math.random() < 0.004 };
+  }
+  function passoDemo(agora) {
+    if (!demo) return;
+    if (estadoTela !== 'entrada') { demo = null; return; }
+    var cv = $('demo'), W2 = cv.clientWidth, H2 = cv.clientHeight, e = demo.e, dt = Math.min(0.05, Math.max(0, (agora - demo.ultimo) / 1000)); demo.ultimo = agora;
+    if (cv.width !== W2 || cv.height !== H2) { cv.width = W2; cv.height = H2; }
+    var ent = e.jogadores.map(function (j, k) { return pilotoDemo(e, j, k); });
+    M.atualizar(e, ent, dt); e.eventos.forEach(function (ev) { D.evento(ev, e); }); D.passo(dt, e, ent);
+    demo.tCena += dt;
+    if (demo.tCena > 5 && e.fase === 'corrida') {   // corte de câmera
+      demo.tCena = 0; demo.cena++;
+      var l = e.pista.loops && e.pista.loops[demo.cena % e.pista.loops.length];
+      if (demo.cena % 3 === 2 && l) e.jogadores.forEach(function (j, k) { j.z = (l.ini - 45 - k * 6) * window.VruuumPista.SEG; j.vel = e.pista.cfg.velMax; j.x = k ? 0.3 : -0.3; });
+      if (e.jogadores[0].z > e.pista.zChegada - 30000) { demo = null; iniciarDemo(); return; }
+    }
+    D.desenhar(cv.getContext('2d'), W2, H2, e, { toque: false, jogadores: demo.jogs, margem: {}, so: demo.cena % 2, semPlacar: true });
+    requestAnimationFrame(passoDemo);
+  }
+  // o primeiro toque em qualquer lugar da apresentação já liga a música (o navegador só deixa tocar depois de um toque)
+  $('entrada').addEventListener('pointerdown', function () { if (estadoTela === 'entrada') { Som.iniciar(); Som.musica(true); } });
   function entrar() {
     if (estadoTela !== 'entrada') return;
-    Som.iniciar(); Som.tocar('clique'); Som.musica(true);
-    tela('menu'); montarMenu(); focarPrimeiro();
+    Som.iniciar(); Som.tocar('whoosh'); Som.musica(true);
+    $('entrada').classList.add('saindo');
+    setTimeout(function () { $('entrada').classList.remove('saindo'); demo = null; tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
   }
   $('btEntrar').addEventListener('click', entrar);
 
@@ -285,13 +328,13 @@
     var configs = [];
     if (pref.rivais === 'com' && PE) {
       var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return VE.voa(v.id) === voa1; });
-      PE.sortear(pref.jogadores === 1 ? 3 : 2, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {
+      PE.sortear(pref.jogadores === 1 ? 5 : 3, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {   // 1.11.0: mais rivais, disputa de perto
         var v = opcoes[Math.floor(Math.random() * opcoes.length)];
         configs.push({ id: p.id, veic: v.id, cor: p.cor || D.CORES[(k + 3) % D.CORES.length], mod: { vel: v.vel, curva: v.curva } });
       });
     }
     estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs);
-    estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva }; });
+    estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id) }; });
     D.preparar(estado, jogs, pref.lingua, pref.visual);
     tela('jogo'); redimensionar();
     $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false];
@@ -345,18 +388,24 @@
       D.passo(dt, estado, ent);
       var max = estado.pista.cfg.velMax;
       Som.motor(estado.jogadores.map(function (j) { return estado.fase === 'contagem' ? 0.05 : Math.min(1.5, j.vel / max); }));
+      Som.chiado(estado.jogadores.map(function (j) { return j.derrapa > 0 ? Math.min(1, 0.5 + j.derrapa * 0.3) : 0; }));
     }
     D.desenhar(ctx, W, H, estado, { toque: TOQUE, jogadores: jogs, margem: bordas, botoes: $('btPausa').parentNode.offsetWidth || 0 });   // largura dos botões 🔄 🔊 ⏸ (a barra do caminho não passa por baixo)
     if (estado.fase === 'fim') { acabar(); return; }
     requestAnimationFrame(quadro);
   }
 
-  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1 };
+  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1 };
+  // o aparelho treme junto (celular e tablet que deixam; iPhone não deixa): milissegundos de vibração e de pausa
+  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120] };
+  function tremer(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) { /* sem vibrar */ } }
   function tratar(ev) {
     if (ev.tipo === 'vai') mov.fimCalibrar();   // no 3-2-1 só descobre o sinal do sensor; o meio é o reto de verdade
     if (ev.tipo === 'estrela' && ev.ar) Som.tocar('estrelaAr');
+    else if (ev.tipo === 'faisca' || ev.tipo === 'miniturbo') Som.tocar(ev.tipo, ev.nivel);
+    else if (ev.tipo === 'poder' && ev.poder === 'gosma') Som.tocar('gosma');
     else if (SONS[ev.tipo]) Som.tocar(ev.tipo);
-    if (ev.tipo === 'batida' && navigator.vibrate) try { navigator.vibrate(90); } catch (e) { /* sem vibrar */ }
+    if (TREME[ev.tipo] && (ev.j == null || ev.j === 0 || estado.jogadores.length === 1)) tremer(TREME[ev.tipo]);
     D.evento(ev, estado);
   }
   function buzinar(j) {
@@ -366,7 +415,7 @@
 
   function pausar() {
     if (!rodando || pausado || !estado || estado.fase === 'fim') return;
-    pausado = true; $('pausa').hidden = false; Som.motor([]); soltarTrava();
+    pausado = true; $('pausa').hidden = false; Som.motor([]); Som.chiado([]); soltarTrava();
     try { $('btContinuar').focus(); } catch (e) { /* foco opcional */ }
   }
   function continuar() {
@@ -375,7 +424,7 @@
     if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (l) { trava = l; }).catch(function () {});
   }
   function irMenu() {
-    rodando = false; pausado = false; Som.motor([]); Som.musica(true); soltarTrava(); telaCheia(false); pararMaos();
+    rodando = false; pausado = false; Som.motor([]); Som.chiado([]); Som.musica(true); soltarTrava(); telaCheia(false); pararMaos();
     tela('menu'); montarMenu(); focarPrimeiro();
   }
   $('btPausa').addEventListener('click', pausar);
@@ -429,7 +478,7 @@
 
   function tempoTxt(s) { var m = Math.floor(s / 60), r = Math.floor(s % 60); return m + ':' + (r < 10 ? '0' : '') + r; }
   function acabar() {
-    rodando = false; Som.motor([]); soltarTrava(); destravarTela(); pararMaos();
+    rodando = false; Som.motor([]); Som.chiado([]); soltarTrava(); destravarTela(); pararMaos();
     var total = 0;
     estado.pista.segs.forEach(function (s) { s.coisas.forEach(function (c) { if (c.tipo === 'estrela') total++; }); });
     var js = estado.jogadores, melhor = Math.max.apply(null, js.map(function (j) { return j.pontos || 0; }));
@@ -464,6 +513,10 @@
     $('recordeFim').textContent = D.milhar(Math.max(antes, melhor));
     Som.musica(true);
     tela('fim'); traduzir(); focarPrimeiro();
+    // pódio animado (estádio, torcida, fogos e os pontos subindo)
+    Som.tocar('torcida');
+    var t0 = performance.now();
+    (function animar() { if (estadoTela !== 'fim') return; D.podio($('podio'), estado, (performance.now() - t0) / 1000); requestAnimationFrame(animar); })();
   }
 
   // ---------- controles ----------
@@ -647,6 +700,7 @@
   lerBordas();
   $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
   traduzir();
+  try { iniciarDemo(); } catch (e) { demo = null; }   // apresentação: se algo falhar, fica a tela de entrada parada
   if (TV) setTimeout(function () { try { $('btEntrar').focus(); } catch (e) { /* ok */ } }, 200);
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
 })();

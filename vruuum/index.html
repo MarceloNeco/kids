@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#0b0a1f">
-<meta name="versao" content="1.10.5">
+<meta name="versao" content="1.11.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Corrida de carrinho para a família: desvie, pegue estrelas, pule rampas e passe por 4 mundos. 1 ou 2 jogadores. / Family kart race: dodge, grab stars, jump ramps across 4 worlds.">
 <link rel="stylesheet" href="estilo.css">
@@ -26,9 +26,32 @@
 <body>
 
 <section id="entrada" class="tela ativa" data-recurso="vruuum">
-  <div class="estrada-fundo" aria-hidden="true"></div>
-  <h1 class="logo">Vruuum!</h1>
-  <p class="sub" data-t="corrida de carrinho da família|the family kart race"></p>
+  <canvas id="demo" class="demo" aria-hidden="true"></canvas>
+  <div class="demo-escuro" aria-hidden="true"></div>
+  <!-- logo animado em SVG (leve): riscos de velocidade, chamas, letras em 3D entrando de lado e brilhos -->
+  <h1 class="logo-intro"><svg viewBox="0 0 640 250" role="img" aria-label="Vruuum!">
+    <defs>
+      <linearGradient id="lgOuro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbc2"/><stop offset=".42" stop-color="#ffd23f"/><stop offset=".72" stop-color="#ff8c1a"/><stop offset="1" stop-color="#ff3d8b"/></linearGradient>
+      <linearGradient id="lgFogo" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#fff3a0"/><stop offset=".4" stop-color="#ff9f1c"/><stop offset="1" stop-color="#ff2bd6" stop-opacity="0"/></linearGradient>
+    </defs>
+    <g class="lg-riscos">
+      <rect x="20" y="70" width="180" height="7" rx="3.5" fill="#2bf4ff"/><rect x="60" y="112" width="140" height="6" rx="3" fill="#ffffff"/>
+      <rect x="0" y="150" width="210" height="8" rx="4" fill="#ff4fd8"/><rect x="80" y="186" width="120" height="5" rx="2.5" fill="#c6ff3d"/>
+    </g>
+    <g class="lg-chamas"><path d="M150 95 C 95 80, 60 120, 0 110 C 50 130, 60 150, 10 170 C 80 165, 110 190, 150 175 Z" fill="url(#lgFogo)"/></g>
+    <g class="lg-texto" font-family="Fredoka, sans-serif" font-weight="700" font-style="italic" font-size="150" text-anchor="middle">
+      <text x="338" y="186" fill="#3b0f6b">Vruuum!</text>
+      <text x="334" y="181" fill="#5b1a8a">Vruuum!</text>
+      <text x="330" y="176" fill="#7b2cbf">Vruuum!</text>
+      <text x="326" y="171" fill="#ff3d8b">Vruuum!</text>
+      <text x="320" y="164" fill="url(#lgOuro)" stroke="#1a1446" stroke-width="7" paint-order="stroke" stroke-linejoin="round">Vruuum!</text>
+    </g>
+    <g class="lg-brilhos" fill="#ffffff">
+      <path class="b1" d="M175 52 l6 18 18 6 -18 6 -6 18 -6 -18 -18 -6 18 -6 z"/><path class="b2" d="M520 40 l5 15 15 5 -15 5 -5 15 -5 -15 -15 -5 15 -5 z"/>
+      <path class="b3" d="M585 160 l4 12 12 4 -12 4 -4 12 -4 -12 -12 -4 12 -4 z"/>
+    </g>
+  </svg></h1>
+  <p class="sub frase-intro"><span data-t="Pronto|Ready"></span> <span data-t="pra sentir|to feel"></span> <span data-t="a velocidade?|the speed?"></span></p>
   <button id="btEntrar" class="grande" type="button" data-t="🔑 Toque para ligar o motor!|🔑 Tap to start your engine!"></button>
   <p class="dica" data-t="Aumente o volume 🔊|Turn the volume up 🔊"></p>
 </section>
@@ -157,6 +180,7 @@
 
 <section id="fim" class="tela">
   <h2 class="logo pequeno" data-t="🏁 Fim da corrida!|🏁 Race over!"></h2>
+  <canvas id="podio" class="podio" width="720" height="420" aria-hidden="true"></canvas>
   <div id="resultado" class="resultado" aria-live="polite"></div>
   <p id="novoRecorde" class="recorde-novo" hidden data-t="🎉 Novo recorde de pontos!|🎉 New points record!"></p>
   <p class="recorde-menu"><span data-t="Recorde|Record"></span>: <b id="recordeFim">0</b> pts</p>

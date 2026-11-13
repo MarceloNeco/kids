@@ -2,6 +2,33 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.11.0",
+      "data": "13/Nov/2026",
+      "hora": "22:45:00",
+      "pt": [
+        "🎬 Apresentação: uma corrida de demonstração passa atrás do logo animado; o primeiro toque liga a música.",
+        "🚦 Largada com semáforo e a frase \"Pronto pra sentir a velocidade?\".",
+        "🌀 Loopings de verdade: a pista dá uma volta inteira e o mundo gira junto (+300 pontos).",
+        "💨 Derrapagem nas curvas com faíscas azuis, laranjas e roxas; ao soltar, mini-turbo.",
+        "❓ Caixas surpresa: bolha de escudo, foguete ou gosma no rival da frente.",
+        "🏁 Mais rivais disputando de perto, placar de fliperama, turbo com linhas de velocidade, fogos de artifício e pódio no final com torcida.",
+        "🌋 Mundos novos: Cânion do Deserto, Templo na Selva, Vulcão de Lava e Ilhas Flutuantes.",
+        "🦖 Veículos novos: Dinossauro, Arara Gigante, Trenó do Papai Noel com renas, Ônibus Escolar, Furgão de Surfe e Caminhão de Pelúcias.",
+        "🔊 Muitos barulhos novos e o celular tremendo nas batidas, turbos e loopings (onde o aparelho deixa)."
+      ],
+      "en": [
+        "🎬 Intro: a demo race runs behind the animated logo; the first tap starts the music.",
+        "🚦 Start with a traffic light and the line \"Ready to feel the speed?\".",
+        "🌀 Real loops: the road goes all the way around and the world spins with you (+300 points).",
+        "💨 Drifting in curves with blue, orange and purple sparks; let go for a mini turbo.",
+        "❓ Surprise boxes: shield bubble, rocket or goo on the racer ahead.",
+        "🏁 More rivals racing close, arcade scoreboard, turbo speed lines, fireworks and a podium with a cheering crowd at the end.",
+        "🌋 New worlds: Desert Canyon, Jungle Temple, Lava Volcano and Floating Islands.",
+        "🦖 New rides: Dinosaur, Giant Macaw, Santa's Sleigh with reindeer, School Bus, Surf Van and Plush Claw Truck.",
+        "🔊 Lots of new sounds and the phone shaking on crashes, turbos and loops (where the device allows it)."
+      ]
+    },
+    {
       "versao": "1.10.5",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

@@ -1,5 +1,5 @@
-/* Vruuum! — a pista: monta a estrada (retas, curvas, morros e 4 mundos) e espalha estrelas,
-   obstáculos, turbos, rampas e enfeites. Puro (sem tela): roda no navegador e no Node (testes).
+/* Vruuum! — a pista: monta a estrada (retas, curvas, morros, loopings e 4 mundos) e espalha estrelas,
+   obstáculos, turbos, rampas, caixas surpresa e enfeites. Puro (sem tela): roda no navegador e no Node (testes).
    Mesma semente = mesma pista, então os dois jogadores correm exatamente na mesma estrada. */
 (function (raiz) {
   'use strict';
@@ -12,20 +12,28 @@
   var ALT_CHAO = 300;     // estrela flutuando um pouco acima do asfalto
   var ALT_AR = 1500;      // estrela no ar (só pega quem pulou da rampa)
 
-  var MUNDOS = ['praia', 'floresta', 'doces', 'neve', 'neon'];
+  var MUNDOS = ['praia', 'floresta', 'doces', 'neve', 'neon', 'canion', 'templo', 'lava', 'flutuante'];
+  var FANTASTICOS = ['canion', 'templo', 'lava', 'flutuante'];   // toda pista tem 2 destes (1.11.0) e 2 dos outros
   var ENFEITES = {
     praia: ['coqueiro', 'guardasol', 'coqueiro', 'castelo'],
     floresta: ['pinheiro', 'arvore', 'cogumelo', 'flor', 'arvore'],
     doces: ['pirulito', 'bengala', 'cupcake', 'algodao'],
     neve: ['pinheiroNeve', 'boneco', 'pinheiroNeve', 'presente'],
-    neon: ['poste', 'predio', 'palmeiraNeon', 'poste']
+    neon: ['poste', 'predio', 'palmeiraNeon', 'poste'],
+    canion: ['cacto', 'rochedo', 'cacto', 'placa', 'rochedo'],
+    templo: ['pilar', 'cabecaPedra', 'samambaia', 'tocha', 'samambaia'],
+    lava: ['rochaLava', 'pocoLava', 'cristal', 'rochaLava', 'fumaca'],
+    flutuante: ['arvoreLuz', 'cogumeloLuz', 'florLanterna', 'arvoreLuz', 'ilhaVoando']
   };
+  // looping: uma volta inteira (360°) de LOOP_N pedaços; a pista que sai dele fica LOOP_DESVIO para o lado
+  // (como a pista de brinquedo, a saída passa ao lado da entrada). Só no chão: quem voa passa por dentro do arco.
+  var LOOP_N = 150, LOOP_R = LOOP_N * 200 / (2 * Math.PI), LOOP_DESVIO = 5600;
 
   // pedacos: tamanho da corrida (~100 s em velocidade cheia); obst: quanto obstáculo (0 a 1)
   var NIVEIS = {
-    crianca: { pedacos: 3600, velMax: 7200, obst: 0.35, carros: 6, tuneis: 2, velCarro: [0.25, 0.4], perdeCarro: 1, perdeCone: 0, curva: 0.6, morro: 0.5, centrifuga: 0.12, limiteX: 1.3, ajuda: true },
-    normal: { pedacos: 4800, velMax: 9600, obst: 0.7, carros: 14, tuneis: 3, velCarro: [0.3, 0.55], perdeCarro: 3, perdeCone: 1, curva: 1, morro: 1, centrifuga: 0.25, limiteX: 1.5, ajuda: false },
-    turbo: { pedacos: 6000, velMax: 12000, obst: 1, carros: 24, tuneis: 4, velCarro: [0.32, 0.65], perdeCarro: 5, perdeCone: 2, curva: 1.3, morro: 1.2, centrifuga: 0.32, limiteX: 1.6, ajuda: false }
+    crianca: { loops: 1, pedacos: 3600, velMax: 7200, obst: 0.35, carros: 6, tuneis: 2, velCarro: [0.25, 0.4], perdeCarro: 1, perdeCone: 0, curva: 0.6, morro: 0.5, centrifuga: 0.12, limiteX: 1.3, ajuda: true },
+    normal: { loops: 2, pedacos: 4800, velMax: 9600, obst: 0.7, carros: 14, tuneis: 3, velCarro: [0.3, 0.55], perdeCarro: 3, perdeCone: 1, curva: 1, morro: 1, centrifuga: 0.25, limiteX: 1.5, ajuda: false },
+    turbo: { loops: 3, pedacos: 6000, velMax: 12000, obst: 1, carros: 24, tuneis: 4, velCarro: [0.32, 0.65], perdeCarro: 5, perdeCone: 2, curva: 1.3, morro: 1.2, centrifuga: 0.32, limiteX: 1.6, ajuda: false }
   };
 
   // sorteio com semente (mulberry32): mesma semente, mesma sequência
@@ -63,7 +71,17 @@
 
     // largada: uma reta para o 3-2-1
     trecho(10, 90, 10, 0, 0);
+    var loops = [], proxLoop = cfg.pedacos / (cfg.loops + 1);
     while (segs.length < cfg.pedacos - 160) {
+      if (loops.length < cfg.loops && segs.length > proxLoop) {   // looping: reta plana antes e depois
+        trecho(20, 50, 20, 0, 0);
+        var ini = segs.length;
+        for (var n = 0; n < LOOP_N; n++) { add(0, ultimoY()); segs[segs.length - 1].loop = loops.length + 1; }
+        loops.push({ ini: ini, fim: ini + LOOP_N, R: LOOP_R, desvio: LOOP_DESVIO });
+        trecho(20, 50, 20, 0, 0);
+        proxLoop += cfg.pedacos / (cfg.loops + 1);
+        continue;
+      }
       var p = r(), lado = r() < 0.5 ? -1 : 1, forca = entre(2, 6) * cfg.curva;
       if (p < 0.25) trecho(20, inteiro(20, 60), 20, 0, morro());                          // reta
       else if (p < 0.6) trecho(25, inteiro(25, 70), 25, lado * forca, morro());           // curva
@@ -75,26 +93,28 @@
     var chegada = segs.length;
     trecho(10, SOBRA - 20, 10, 0, 0);
 
-    // mundos: 4 dos 5, em ordem sorteada, cada um com 1/4 do caminho até a chegada
-    var ordem = MUNDOS.slice();
-    for (var i = ordem.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), tmp = ordem[i]; ordem[i] = ordem[j]; ordem[j] = tmp; }
-    ordem = ordem.slice(0, 4);
-    var quarto = chegada / 4;
-    segs.forEach(function (s) { s.mundo = Math.min(3, Math.floor(s.i / quarto)); });
+    // mundos: 2 fantásticos e 2 dos outros, em ordem sorteada, cada um com 1/4 do caminho até a chegada
+    function embaralhar(l) { for (var i = l.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), tmp = l[i]; l[i] = l[j]; l[j] = tmp; } return l; }
+    var ordem = embaralhar(embaralhar(FANTASTICOS.slice()).slice(0, 2).concat(embaralhar(MUNDOS.filter(function (m) { return FANTASTICOS.indexOf(m) < 0; })).slice(0, 2)));
+    var quarto = chegada / 4, i;
+    var perto = function (k, folga) { return loops.some(function (l) { return k > l.ini - folga && k < l.fim + folga; }); };
+    var portas = [0, 1, 2, 3].map(function (q) { var k = Math.round(quarto * q); while (q && perto(k, 30)) k++; return k; });   // portal nunca no looping
+    segs.forEach(function (s) { s.mundo = portas[3] <= s.i ? 3 : portas[2] <= s.i ? 2 : portas[1] <= s.i ? 1 : 0; });
     for (i = chegada; i < chegada + 4; i++) segs[i].xadrez = true;
 
     // enfeites dos dois lados (não batem: são só paisagem)
     for (i = 4; i < segs.length; i += inteiro(2, 4)) {
+      if (segs[i].loop) continue;
       var lista = ENFEITES[ordem[segs[i].mundo]];
       segs[i].enfeites.push({ tipo: lista[inteiro(0, lista.length - 1)], x: -(1.5 + r() * 1.5) });
       if (r() < 0.8) segs[i].enfeites.push({ tipo: lista[inteiro(0, lista.length - 1)], x: 1.5 + r() * 1.5 });
     }
     segs[12].enfeites.push({ tipo: 'largada', x: 0 });
-    for (i = 1; i < 4; i++) segs[Math.round(quarto * i)].enfeites.push({ tipo: 'portal', x: 0, mundo: i });
+    for (i = 1; i < 4; i++) segs[portas[i]].enfeites.push({ tipo: 'portal', x: 0, mundo: i });
     segs[chegada].enfeites.push({ tipo: 'chegada', x: 0 });
 
     // coisas na pista: grupos com espaço entre eles; nunca as 3 faixas fechadas
-    function coisa(idx, tipo, x, alt) { if (idx < chegada - 20) segs[idx].coisas.push({ tipo: tipo, x: x, alt: alt || 0, pego: [false, false] }); }
+    function coisa(idx, tipo, x, alt) { if (idx < chegada - 20 && !perto(idx, 25)) segs[idx].coisas.push({ tipo: tipo, x: x, alt: alt || 0, pego: [false, false] }); }
     function faixa() { return FAIXAS[inteiro(0, 2)]; }
     function filaEstrelas(idx, x, n, passo) { for (var k = 0; k < n; k++) coisa(idx + k * passo, 'estrela', x, ALT_CHAO); return idx + n * passo; }
     var idx = 130, folga = Math.round(34 - 18 * cfg.obst);
@@ -119,10 +139,18 @@
       idx = fim + folga + inteiro(0, 12);
     }
 
+    // caixas surpresa: uma fileira nas 3 faixas, de tempos em tempos, onde a pista está livre
+    for (i = 300; i < chegada - 60; i += inteiro(150, 220)) {
+      var livreC = !perto(i, 25);
+      for (var q2 = i - 4; q2 <= i + 4 && livreC; q2++) if (segs[q2].coisas.length) livreC = false;
+      if (livreC) FAIXAS.forEach(function (fx) { coisa(i, 'caixa', fx, ALT_CHAO); });
+    }
+
     // carrinhos do trânsito (andam devagar na sua faixa; os jogadores passam por eles)
     var carros = [];
     for (i = 0; i < cfg.carros; i++) {
-      carros.push({ z: (inteiro(260, chegada - 60)) * SEG, x: faixa(), vel: entre(cfg.velCarro[0], cfg.velCarro[1]) * cfg.velMax, tipo: r() < 0.18 ? 'onibus' : 'carro' + inteiro(0, 4) });
+      var zc = inteiro(260, chegada - 60); while (perto(zc, 10)) zc += 20;
+      carros.push({ z: zc * SEG, x: faixa(), vel: entre(cfg.velCarro[0], cfg.velCarro[1]) * cfg.velMax, tipo: r() < 0.18 ? 'onibus' : 'carro' + inteiro(0, 4) });
     }
 
     // túneis: trechos cobertos (no céu, um tubo de anéis de luz), longe dos portais, da largada e da chegada
@@ -130,7 +158,8 @@
     while (tuneis.length < cfg.tuneis && tentativas++ < 80) {
       var tIni = inteiro(260, chegada - 280), tFim = tIni + inteiro(70, 130), ok = true;
       tuneis.forEach(function (t) { if (tFim > t[0] - 80 && tIni < t[1] + 80) ok = false; });
-      for (var q = 1; q < 4; q++) { var pq = Math.round(quarto * q); if (pq > tIni - 40 && pq < tFim + 40) ok = false; }
+      for (var q = 1; q < 4; q++) { var pq = portas[q]; if (pq > tIni - 40 && pq < tFim + 40) ok = false; }
+      if (loops.some(function (l) { return tFim > l.ini - 60 && tIni < l.fim + 60; })) ok = false;
       if (ok) tuneis.push([tIni, tFim]);
     }
     tuneis.sort(function (a, b) { return a[0] - b[0]; });
@@ -139,7 +168,7 @@
       segs[t[0]].entrada = true;
     });
 
-    return { segs: segs, chegada: chegada, tuneis: tuneis, zChegada: chegada * SEG, comprimento: segs.length * SEG, nivel: NIVEIS[nivel] ? nivel : 'normal', cfg: cfg, mundos: ordem, carros: carros, semente: semente };
+    return { segs: segs, chegada: chegada, tuneis: tuneis, loops: loops, zChegada: chegada * SEG, comprimento: segs.length * SEG, nivel: NIVEIS[nivel] ? nivel : 'normal', cfg: cfg, mundos: ordem, carros: carros, semente: semente };
   }
 
   function achar(pista, z) {
@@ -149,7 +178,14 @@
     return pista.segs[i];
   }
 
-  var VruuumPista = { SEG: SEG, LARGURA: LARGURA, FAIXAS: FAIXAS, ALT_CHAO: ALT_CHAO, ALT_AR: ALT_AR, MUNDOS: MUNDOS, ENFEITES: ENFEITES, NIVEIS: NIVEIS, sorteio: sorteio, montar: montar, achar: achar };
+  // o looping em que está o ponto z (ou null)
+  function noLoop(pista, z) {
+    var i = Math.floor(z / SEG), l = pista.loops || [];
+    for (var k = 0; k < l.length; k++) if (i >= l[k].ini && i < l[k].fim) return l[k];
+    return null;
+  }
+
+  var VruuumPista = { noLoop: noLoop, LOOP_N: LOOP_N, LOOP_R: LOOP_R, FANTASTICOS: FANTASTICOS, SEG: SEG, LARGURA: LARGURA, FAIXAS: FAIXAS, ALT_CHAO: ALT_CHAO, ALT_AR: ALT_AR, MUNDOS: MUNDOS, ENFEITES: ENFEITES, NIVEIS: NIVEIS, sorteio: sorteio, montar: montar, achar: achar };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumPista;
   else raiz.VruuumPista = VruuumPista;
 })(this);
