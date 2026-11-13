@@ -17,7 +17,43 @@
 | Os 12 personagens de domínio público (`personagens.js`): Emília e Visconde (Monteiro Lobato, obra em domínio público no Brasil desde 2019), Saci, Cuca, Curupira, Iara (folclore brasileiro), Chapeuzinho Vermelho (conto popular), Pinóquio (Carlo Collodi, 1883), Alice (Lewis Carroll, 1865), Robin Hood (lenda), Sherlock Holmes (Arthur Conan Doyle), Papai Noel (tradição) | personagens livres; **desenhos feitos aqui**, sem copiar nenhuma adaptação de TV, cinema ou desenho animado | mesma licença do repositório |
 | Reconhecedor de mãos do volante no ar: `hand_landmarker.task` (MediaPipe Hand Landmarker, em `../baguncolandia/libs/mediapipe/`, trazido pela Rabiscolândia) | Google, MediaPipe | Apache 2.0 |
 | Motor de visão MediaPipe Tasks (reaproveitado de `../baguncolandia/libs/mediapipe/`) | Google, MediaPipe | Apache 2.0 (`LICENSE` naquela pasta) |
-| O ronco do motor, a buzina e os efeitos | sintetizados no WebAudio pelo próprio jogo (`som.js`) | mesma licença do repositório |
+| O som de reserva (só enquanto as gravações ainda não carregaram) | sintetizado no WebAudio pelo próprio jogo (`som.js`) | mesma licença do repositório |
+| 1.12.0: desenhos novos (galinha, morcego, Conde Drácula, carrinhos de pipoca e de sorvete, carro-hambúrguer, comidas gigantes, mundo dos blocos) | desenhos próprios em código; o Conde Drácula é personagem de Bram Stoker (1897), domínio público, desenhado aqui sem copiar filme nenhum; o mundo dos blocos é um estilo de construir com cubos, sem nada do Minecraft (que é da Mojang/Microsoft) | mesma licença do repositório |
+
+### Sons gravados (`sons/`, 1.12.0) — convertidos para MP3/WAV mono, alguns cortados
+
+| Arquivo | Origem | Licença |
+|---|---|---|
+| `motor.wav` | "Car engine loop" de Iwan "qubodup" Gabovitch (opengameart.org/content/car-engine-loop-96khz-4s), pelo SuperTuxKart (`sfx/engine_small.ogg`) | **CC BY-SA 3.0** |
+| `derrapa.wav` | "Car tire squeal skid loop" de Tom Haigh (audible-edge) e qubodup, pelo SuperTuxKart (`sfx/skid.ogg`) | **CC BY 3.0** |
+| `batida.mp3`, `cone.mp3`, `tum.mp3`, `lama.mp3` | The Audio Monkey (theaudiomonkey.co.uk), pelo SuperTuxKart (`crash`, `crash2`, `crash3`, `splash`) | **CC BY-SA 4.0** |
+| `turbo.mp3` | Nic3_one (freesound.org/people/Nic3_one/sounds/166542), pelo SuperTuxKart (`nitro.ogg`) | **CC0** |
+| `pulo.mp3` | ShaneF91 (freesound 386572), pelo SuperTuxKart | **CC0** |
+| `boing.mp3` | vrodge (freesound 119518), pelo SuperTuxKart | **CC0** |
+| `gosma.mp3` | Mike Koenig (soundbible.com) e Marianne Gagnon, pelo SuperTuxKart (`goo.ogg`) | **CC BY 3.0** |
+| `splat.mp3` | Percy Duke e jjhouse4 (freesound), pelo SuperTuxKart (`bubblegum_explode.ogg`) | **CC BY 3.0** |
+| `bip.mp3`, `vai.mp3` | Ulrich Metzner e qubodup (opengameart.org/content/race-start-beeps), pelo SuperTuxKart | **CC BY-SA 3.0** |
+| `chegou.mp3` | Mike Koenig, Alexander Björk e QwertyChouskie, pelo SuperTuxKart (`race_finish_victory.ogg`) | **CC BY-SA 3.0** |
+| `aplausos.mp3` | Mike Koenig (soundbible.com/989), pelo SuperTuxKart (`gp_end.ogg`) | **CC BY 3.0** |
+| `fogos.mp3` | sl130594 (freesound 132273), pelo SuperTuxKart | **CC0** |
+| `explosao.mp3` | ZAQraven, pelo SuperTuxKart | **CC0** |
+| `escudo.mp3` | aust_paul (freesound 30935), pelo SuperTuxKart (`forcefield.ogg`) | **CC0** |
+| `caixa.mp3` | Stephan (pdsounds.org), pelo SuperTuxKart (`swap.ogg`) | **CC0** |
+| `aparece.mp3` | martian (freesound 19284), pelo SuperTuxKart | **CC0** |
+| `plop.mp3` | pacomav (freesound 273792), pelo SuperTuxKart | **CC0** |
+| `buzina.mp3` | Mike Koenig (soundbible.com/1048), Marianne Gagnon e Magne Djupvik, pelo SuperTuxKart | **CC BY 3.0** |
+| `ronco.mp3` | Mike Koenig (soundbible.com/804), pelo SuperTuxKart (`car_revup.ogg`) | **CC BY 3.0** |
+| `estrela-ar.mp3` | Tintagel free sound files (domínio público), pelo SuperTuxKart (`grab_collectable.ogg`) | domínio público |
+| `arara.mp3` | James "swiftoid" Swift (freesound 182501), pelo SuperTuxKart (`exotic-birds.ogg`) | **CC0** |
+| `galo.mp3` (cocoricó) | jsbarrett, "Rooster crows" (freesound), pelo jogo Turbo Fat (GitHub Poobslag/turbofat) | **CC0** |
+| `galinha1.mp3`, `galinha2.mp3` | evsecrets (freesound 346961), pelo VoxeLibre (GitHub VoxeLibre/VoxeLibre, `mobs_mc_chicken_buck`) | **CC0** |
+| `estrela.mp3` | monotraum (freesound 162192), pelo Stendhal (GitHub arianne/stendhal, `coins-01`) | **CC0** |
+| `asas.mp3` | dave.des (freesound 127197), pelo Stendhal (`wings-flap-large-1`) | **CC0** |
+| `cavalo.mp3` | foxen10 (freesound 149024), pelo Stendhal (`horse-whinny-01`) | **CC0** |
+| `dino.mp3` | Joel Azzopardi (JoelAudio, freesound 85568), pelo Stendhal (`roar-dragon-1`) | **CC0** |
+| `morcego.mp3` | polymorpheva (freesound 104205), pelo Stendhal (`bat-1`) | **CC0** |
+| `dracula.mp3` (risada) | Jordan Irwin (AntumDeluge, opengameart.org/node/81237), pelo Stendhal (`laugh-evil-01`) | **CC0** |
+| `pipoca.mp3` | fryzu82 (freesound 142325), pelo Stendhal (`cork-pop-1`) | **CC0** |
 | Ícone do jogo | desenhado com o próprio `sprites.js` e exportado para PNG | mesma licença do repositório |
 
 Nenhuma foto ou desenho de terceiros; as únicas músicas de terceiros são as 36 gravadas acima (Kevin MacLeod, Anthem of Rain, SuperTuxKart e HoliznaCC0), todas de licença livre. O jogo é de um gênero clássico (corrida em pseudo-3D,

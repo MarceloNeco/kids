@@ -306,6 +306,7 @@ test('caixa surpresa: a roleta gira e o poder vale sozinho; a bolha protege do c
   assert.ok(p && ['escudo', 'foguete'].includes(p.poder), 'sem rival na frente não vem gosma');
   j.escudo = 3; j.estrelas = 5;
   const s = Math.floor(j.z / P.SEG) + 3;
+  for (let q = s - 3; q < s + 60; q++) e.pista.segs[q].coisas = [];   // só o cone na frente (sem estrela no caminho)
   e.pista.segs[s].coisas.push({ tipo: 'cone', x: j.x, alt: 0, pego: [false, false] });
   const ev2 = correr(e, [{}], 0.5);
   assert.ok(ev2.some(x => x.tipo === 'escudoBate'));

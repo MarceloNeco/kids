@@ -2,6 +2,29 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.12.0",
+      "data": "13/Nov/2026",
+      "hora": "23:30:00",
+      "pt": [
+        "🔊 Sons de verdade: motor de carro, pneu cantando, batidas, turbo, buzina, largada, aplausos e fogos são gravações (nada de som de videogame antigo).",
+        "🐔 Galinha branca: pula batendo as asas e faz cocoricó; cacareja enquanto corre.",
+        "🦇 Morcego: perto dos obstáculos vira o Conde Drácula (com fumaça e risada) e joga abóboras nos outros carrinhos.",
+        "🍿 Carrinho de pipoca, 🍦 carrinho de sorvete e 🍔 carro-hambúrguer.",
+        "🍔 Cidade do Lanche com hambúrgueres gigantes, batata e milkshake; chocolate, pudim e taça de sorvete na Terra dos Doces.",
+        "🧱 Mundo dos Blocos e balões de emoji pela pista.",
+        "🐴 Cada bicho tem a sua voz: o cavalo relincha, o dinossauro ruge, a arara canta (é a buzina deles)."
+      ],
+      "en": [
+        "🔊 Real sounds: car engine, screeching tires, crashes, turbo, horn, start beeps, applause and fireworks are recordings (no more old video game beeps).",
+        "🐔 White hen: jumps flapping her wings and crows; clucks while running.",
+        "🦇 Bat: near obstacles it turns into Count Dracula (with smoke and a laugh) and throws pumpkins at the other karts.",
+        "🍿 Popcorn cart, 🍦 ice cream cart and 🍔 burger car.",
+        "🍔 Burger Town with giant burgers, fries and milkshakes; chocolate, flan and sundaes in Candy Land.",
+        "🧱 Block World and emoji balloons along the road.",
+        "🐴 Every animal has its own voice: the horse neighs, the dinosaur roars, the macaw squawks (that's their horn)."
+      ]
+    },
+    {
       "versao": "1.11.0",
       "data": "13/Nov/2026",
       "hora": "22:45:00",

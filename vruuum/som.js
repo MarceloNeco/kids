@@ -1,5 +1,8 @@
-/* Vruuum! — sons feitos na hora pelo navegador (WebAudio): ronco do motor, música de corrida (rock.js),
-   estrela, batida, lama, turbo, pulo, buzina, 3-2-1 e festa da chegada. Nenhum arquivo de áudio.
+/* Vruuum! — os sons. Desde a 1.11.1 (pedido do dono: "sons realistas, nada de som de Atari") os efeitos são
+   GRAVAÇÕES de verdade, na pasta sons/ (motor de carro, pneu cantando, batidas, turbo, buzina, largada, aplausos,
+   fogos e a voz de cada bicho: galo, galinha, cavalo, dinossauro, arara, morcego, a risada do Drácula), com
+   licença livre (créditos no CREDITOS.md). Enquanto uma gravação ainda não carregou, toca o som feito na hora
+   (WebAudio), para nunca ficar mudo.
    O navegador só deixa tocar depois de um toque: iniciar() é chamado no primeiro botão. */
 (function (raiz) {
   'use strict';
@@ -14,7 +17,40 @@
     mestre = ac.createGain(); mestre.gain.value = ligado ? 0.8 : 0; mestre.connect(ac.destination);
     musGanho = ac.createGain(); musGanho.gain.value = 0.55; musGanho.connect(mestre);
     if (raiz.VruuumRock) raiz.VruuumRock.preparar(ac, musGanho);
+    carregarSons();
   }
+  // ---------- gravações (sons/) ----------
+  var ARQ = { estrela: 'estrela.mp3', 'estrela-ar': 'estrela-ar.mp3', batida: 'batida.mp3', cone: 'cone.mp3', tum: 'tum.mp3', lama: 'lama.mp3', turbo: 'turbo.mp3',
+    pulo: 'pulo.mp3', boing: 'boing.mp3', gosma: 'gosma.mp3', splat: 'splat.mp3', bip: 'bip.mp3', vai: 'vai.mp3', chegou: 'chegou.mp3', aplausos: 'aplausos.mp3',
+    fogos: 'fogos.mp3', explosao: 'explosao.mp3', escudo: 'escudo.mp3', caixa: 'caixa.mp3', aparece: 'aparece.mp3', plop: 'plop.mp3', buzina: 'buzina.mp3',
+    ronco: 'ronco.mp3', galo: 'galo.mp3', galinha1: 'galinha1.mp3', galinha2: 'galinha2.mp3', asas: 'asas.mp3', cavalo: 'cavalo.mp3', dino: 'dino.mp3',
+    arara: 'arara.mp3', morcego: 'morcego.mp3', dracula: 'dracula.mp3', pipoca: 'pipoca.mp3', motor: 'motor.wav', derrapa: 'derrapa.wav' };
+  var buf = {}, carregando = false;
+  function carregarSons() {
+    if (carregando || !ac || !raiz.fetch) return;
+    carregando = true;
+    Object.keys(ARQ).forEach(function (k) {
+      raiz.fetch('sons/' + ARQ[k]).then(function (r) { if (!r.ok) throw new Error('sem ' + k); return r.arrayBuffer(); })
+        .then(function (dados) { ac.decodeAudioData(dados, function (b) { buf[k] = b; }, function () { /* formato que o aparelho não lê: fica o som feito na hora */ }); })
+        .catch(function () { /* sem internet e sem cópia guardada: fica o som feito na hora */ });
+    });
+  }
+  // toca a gravação (volume, velocidade; um pouquinho diferente a cada vez para não cansar). false se ainda não carregou
+  function gravacao(nome, vol, taxa) {
+    var b = buf[nome]; if (!b || !ac) return false;
+    var s = ac.createBufferSource(), g = ac.createGain();
+    s.buffer = b; s.playbackRate.value = (taxa || 1) * (0.96 + Math.random() * 0.08); g.gain.value = vol == null ? 0.8 : vol;
+    s.connect(g); g.connect(mestre); s.start(ac.currentTime + 0.005);
+    return true;
+  }
+  // evento do jogo -> [gravação, volume, velocidade]
+  var GRAVADO = { estrela: ['estrela', 0.55], estrelaAr: ['estrela-ar', 0.8], batida: ['batida', 0.95], cone: ['cone', 0.8], lama: ['lama', 0.75], turbo: ['turbo', 0.7],
+    pulo: ['pulo', 0.7], perdeu: ['plop', 0.5, 1.3], tum: ['tum', 0.7], bip: ['bip', 0.8], vai: ['vai', 0.9], mundo: ['aparece', 0.7], chegou: ['chegou', 0.8],
+    clique: ['plop', 0.45, 1.2], faisca: ['aparece', 0.45, 1.4], miniturbo: ['turbo', 0.6, 1.15], caixa: ['caixa', 0.7], poder: ['aparece', 0.75], escudoBate: ['boing', 0.8],
+    splat: ['splat', 0.9], gosma: ['gosma', 0.8], looping: ['ronco', 0.8], loopFeito: ['aplausos', 0.55], fogos: ['fogos', 0.55], turboRival: ['ronco', 0.3, 1.1],
+    torcida: ['aplausos', 0.8], whoosh: ['turbo', 0.55, 1.2], derrapa: ['tum', 0.15, 1.6], buzina: ['buzina', 0.8], escudo: ['escudo', 0.7], explosao: ['explosao', 0.7],
+    galo: ['galo', 0.9], galinha: [Math.random() < 0.5 ? 'galinha1' : 'galinha2', 0.8], asas: ['asas', 0.7], cavalo: ['cavalo', 0.8], dino: ['dino', 0.85], arara: ['arara', 0.6],
+    morcego: ['morcego', 0.8], dracula: ['dracula', 0.85], pipoca: ['pipoca', 0.7], abobora: ['splat', 0.9, 0.75] };
   function tom(tipo, f, ini, dur, vol, fFim, destino) {
     if (!ac) return;
     var o = ac.createOscillator(), g = ac.createGain();
@@ -166,8 +202,23 @@
   }
 
   // ---------- motor (um por jogador) ----------
+  var motoresG = [];
   function motor(vels) {
     if (!ac) return;
+    if (buf.motor) {   // motor gravado: o mesmo ronco, mais agudo e mais alto quanto mais rápido
+      motores.forEach(function (m) { m.g.gain.setTargetAtTime(0, ac.currentTime, 0.05); });
+      while (motoresG.length < vels.length) {
+        var sm = ac.createBufferSource(), gm = ac.createGain(); sm.buffer = buf.motor; sm.loop = true; gm.gain.value = 0;
+        sm.connect(gm); gm.connect(mestre); sm.start(); motoresG.push({ s: sm, g: gm });
+      }
+      motoresG.forEach(function (m, k) {
+        var v = vels[k], agora = ac.currentTime;
+        if (v == null) { m.g.gain.setTargetAtTime(0, agora, 0.1); return; }
+        m.s.playbackRate.setTargetAtTime(0.55 + v * 0.85 + (k ? 0.05 : 0), agora, 0.1);
+        m.g.gain.setTargetAtTime(0.12 + v * 0.14, agora, 0.1);
+      });
+      return;
+    }
     while (motores.length < vels.length) {
       var o = ac.createOscillator(), o2 = ac.createOscillator(), f = ac.createBiquadFilter(), g = ac.createGain();
       o.type = 'sawtooth'; o2.type = 'square'; f.type = 'lowpass'; f.frequency.value = 500; g.gain.value = 0;
@@ -222,16 +273,24 @@
   var chiados = [];
   function chiado(forcas) {
     if (!ac) return;
+    if (buf.derrapa && chiados.length && !chiados[0].gravado) { chiados.forEach(function (ch) { ch.g.gain.setTargetAtTime(0, ac.currentTime, 0.05); }); chiados = []; }
     while (chiados.length < forcas.length) {
       if (!ruidoBuf) ruido(ac.currentTime, 0.01, 0.0001, 'lowpass', 100);
       var src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
-      src.buffer = ruidoBuf; src.loop = true; f.type = 'bandpass'; f.frequency.value = 2400; f.Q.value = 3; g.gain.value = 0;
+      src.buffer = buf.derrapa || ruidoBuf; src.loop = true; f.type = 'bandpass'; f.frequency.value = 2400; f.Q.value = 3; g.gain.value = 0;
       src.connect(f); f.connect(g); g.connect(mestre); src.start();
-      chiados.push({ g: g, f: f });
+      if (buf.derrapa) f.type = 'allpass';   // o pneu gravado já soa certo: sem filtro
+      chiados.push({ g: g, f: f, gravado: !!buf.derrapa });
     }
-    chiados.forEach(function (ch, k) { var v = forcas[k] || 0; ch.g.gain.setTargetAtTime(v * 0.18, ac.currentTime, 0.05); ch.f.frequency.setTargetAtTime(2000 + v * 1400, ac.currentTime, 0.1); });
+    chiados.forEach(function (ch, k) { var v = forcas[k] || 0; ch.g.gain.setTargetAtTime(v * (ch.gravado ? 0.55 : 0.18), ac.currentTime, 0.05); if (!ch.gravado) ch.f.frequency.setTargetAtTime(2000 + v * 1400, ac.currentTime, 0.1); });
   }
-  function tocar(nome, k) { if (!ac || !ligado || !efeitos[nome]) return; efeitos[nome](ac.currentTime + 0.005, k); }
+  function tocar(nome, k) {
+    if (!ac || !ligado) return;
+    var gr = GRAVADO[nome];
+    if (nome === 'galinha') gr = [Math.random() < 0.5 ? 'galinha1' : 'galinha2', 0.8];
+    if (gr && gravacao(gr[0], gr[1], (gr[2] || 1) * (nome === 'buzina' && k ? 1.12 : 1))) return;
+    if (efeitos[nome]) efeitos[nome](ac.currentTime + 0.005, k);
+  }
   function alternar() { ligado = !ligado; if (mestre) mestre.gain.setTargetAtTime(ligado ? 0.8 : 0, ac.currentTime, 0.05); if (audio) audio.muted = !ligado; return ligado; }
   function parar() { musica(false); motor([]); chiado([]); }
 
