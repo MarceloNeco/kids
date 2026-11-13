@@ -53,7 +53,7 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 - O veículo escolhido fica **sempre à vista**: em pé, preso no topo da tela enquanto as opções rolam; deitado, de um
   lado, com as opções do outro. O botão 🏁 Correr fica preso embaixo. Com 2 jogadores, abas Jogador 1 e Jogador 2.
-- **18 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
+- **23 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
 
 | Grupo | Veículos |
 |---|---|
@@ -179,7 +179,7 @@ No arquivo baixado (📲 Guardar no celular) tocam só as feitas pelo jogo, para
 | `estilo.css` | visual, paleta Bolinho de Chuva, fonte Fredoka. |
 | `pista.js` | **puro**: monta a estrada com semente (retas, curvas, morros, mundos), espalha estrelas, cones, lama, turbos, rampas, enfeites e o trânsito. Níveis em `NIVEIS`. |
 | `motor.js` | **puro**: regras da corrida (volante, curva, acelerar, grama, coisas da pista, batidas, chegada) e lista de eventos para som e efeitos. |
-| `veiculos.js` | a garagem: os 18 veículos (desenho, nome, grupo, velocidade e curva), testada no Node. |
+| `veiculos.js` | a garagem: os 23 veículos (desenho, nome, grupo, velocidade e curva), testada no Node. |
 | `cavalo.js` | o cavalo galopando com quem monta, montado em 3D com peças simples (gira de lado nas curvas); galope testado no Node. |
 | `sprites.js` | todos os desenhos, feitos em código uma vez num canvas escondido. |
 | `desenho.js` | a estrada em 3D (pseudo-3D por pedaços), céu, fundo, enfeites, carros, efeitos, placar e tela dividida. |
@@ -215,3 +215,15 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - **Mais rivais** (5 com 1 jogador, 3 com 2), mais perto e com turbos para passar; **placar de fliperama** (rostinhos na ordem da corrida, poder no alto, velocímetro de ponteiro).
 - **Turbo** com linhas de velocidade e fogo no escapamento; **fogos de artifício**; estrelas brilhando; **pódio** no fim (estádio, torcida, holofotes, pontos subindo).
 - **Muitos barulhos** novos (`som.js`, inclusive o chiado do pneu) e o **aparelho tremendo** onde o navegador deixa (`navigator.vibrate`; iPhone não deixa).
+
+## 1.12.0 — sons de verdade, galinha, Drácula, lanches e blocos
+
+- **Sons gravados** (`sons/`, ~780 KB, créditos no `CREDITOS.md`): motor de carro (o ronco sobe com a velocidade), pneu cantando,
+  batidas, turbo, buzina, largada, aplausos, fogos e a voz de cada bicho. O som feito na hora só toca enquanto a gravação não carregou.
+  Bicho e skate não têm ronco de motor (`semMotor`); a buzina deles é a voz (`voz`: galo, cavalo, dino, arara, morcego).
+- **Galinha branca**: pula e bate as asas (desenhadas ao vivo) com cocoricó; cacareja enquanto corre.
+- **Morcego**: voa; perto de obstáculo vira o **Conde Drácula** (fumaça e risada) e depois volta; joga **abóboras** no rival da frente.
+- **Carrinho de pipoca**, **carrinho de sorvete** e **carro-hambúrguer**.
+- Mundos **Cidade do Lanche** (toalha xadrez, hambúrgueres gigantes, batata, milkshake) e **Mundo dos Blocos** (cubos; nada do Minecraft);
+  chocolate, pudim e taça de sorvete também na Terra dos Doces; **balões de emoji** aparecem de vez em quando em todo mundo.
+

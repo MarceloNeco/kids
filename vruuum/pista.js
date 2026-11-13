@@ -12,19 +12,22 @@
   var ALT_CHAO = 300;     // estrela flutuando um pouco acima do asfalto
   var ALT_AR = 1500;      // estrela no ar (só pega quem pulou da rampa)
 
-  var MUNDOS = ['praia', 'floresta', 'doces', 'neve', 'neon', 'canion', 'templo', 'lava', 'flutuante'];
-  var FANTASTICOS = ['canion', 'templo', 'lava', 'flutuante'];   // toda pista tem 2 destes (1.11.0) e 2 dos outros
+  var MUNDOS = ['praia', 'floresta', 'doces', 'neve', 'neon', 'canion', 'templo', 'lava', 'flutuante', 'lanche', 'blocos'];
+  var FANTASTICOS = ['canion', 'templo', 'lava', 'flutuante', 'lanche', 'blocos'];   // toda pista tem 2 destes (1.11.0) e 2 dos outros
   var ENFEITES = {
     praia: ['coqueiro', 'guardasol', 'coqueiro', 'castelo'],
     floresta: ['pinheiro', 'arvore', 'cogumelo', 'flor', 'arvore'],
-    doces: ['pirulito', 'bengala', 'cupcake', 'algodao'],
+    doces: ['pirulito', 'bengala', 'cupcake', 'algodao', 'chocolate', 'pudim', 'taca'],
     neve: ['pinheiroNeve', 'boneco', 'pinheiroNeve', 'presente'],
     neon: ['poste', 'predio', 'palmeiraNeon', 'poste'],
     canion: ['cacto', 'rochedo', 'cacto', 'placa', 'rochedo'],
     templo: ['pilar', 'cabecaPedra', 'samambaia', 'tocha', 'samambaia'],
     lava: ['rochaLava', 'pocoLava', 'cristal', 'rochaLava', 'fumaca'],
-    flutuante: ['arvoreLuz', 'cogumeloLuz', 'florLanterna', 'arvoreLuz', 'ilhaVoando']
+    flutuante: ['arvoreLuz', 'cogumeloLuz', 'florLanterna', 'arvoreLuz', 'ilhaVoando'],
+    lanche: ['hamburguer', 'batata', 'hamburguer', 'milkshake', 'hamburguer', 'taca', 'pudim', 'chocolate'],
+    blocos: ['arvoreBloco', 'blocoGrama', 'arvoreBloco', 'bauBloco', 'blocoOuro', 'emoji0', 'emoji3']
   };
+  var EMOJIS = 12;   // balões de emoji (sprites.js) aparecem de vez em quando em todo mundo
   // looping: uma volta inteira (360°) de LOOP_N pedaços; a pista que sai dele fica LOOP_DESVIO para o lado
   // (como a pista de brinquedo, a saída passa ao lado da entrada). Só no chão: quem voa passa por dentro do arco.
   var LOOP_N = 150, LOOP_R = LOOP_N * 200 / (2 * Math.PI), LOOP_DESVIO = 5600;
@@ -106,6 +109,7 @@
     for (i = 4; i < segs.length; i += inteiro(2, 4)) {
       if (segs[i].loop) continue;
       var lista = ENFEITES[ordem[segs[i].mundo]];
+      if (r() < 0.05) { segs[i].enfeites.push({ tipo: 'emoji' + inteiro(0, EMOJIS - 1), x: (r() < 0.5 ? -1 : 1) * (1.6 + r() * 1.2) }); continue; }
       segs[i].enfeites.push({ tipo: lista[inteiro(0, lista.length - 1)], x: -(1.5 + r() * 1.5) });
       if (r() < 0.8) segs[i].enfeites.push({ tipo: lista[inteiro(0, lista.length - 1)], x: 1.5 + r() * 1.5 });
     }

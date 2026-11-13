@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.11.0';
+  var APP_VERSION = '1.12.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -387,7 +387,11 @@
       for (var i = 0; i < estado.eventos.length; i++) tratar(estado.eventos[i]);
       D.passo(dt, estado, ent);
       var max = estado.pista.cfg.velMax;
-      Som.motor(estado.jogadores.map(function (j) { return estado.fase === 'contagem' ? 0.05 : Math.min(1.5, j.vel / max); }));
+      Som.motor(estado.jogadores.map(function (j, k) { var v = VE.achar(jogs[k].veic); return v && v.semMotor ? null : estado.fase === 'contagem' ? 0.05 : Math.min(1.5, j.vel / max); }));   // bicho e skate não roncam
+      estado.jogadores.forEach(function (j, k) {   // a galinha cacareja de vez em quando enquanto corre
+        if (jogs[k].veic !== 'galinha' || estado.fase !== 'corrida') return;
+        j.tCoco = (j.tCoco || 2) - dt; if (j.tCoco <= 0) { j.tCoco = 2.5 + Math.random() * 3; Som.tocar('galinha'); }
+      });
       Som.chiado(estado.jogadores.map(function (j) { return j.derrapa > 0 ? Math.min(1, 0.5 + j.derrapa * 0.3) : 0; }));
     }
     D.desenhar(ctx, W, H, estado, { toque: TOQUE, jogadores: jogs, margem: bordas, botoes: $('btPausa').parentNode.offsetWidth || 0 });   // largura dos botões 🔄 🔊 ⏸ (a barra do caminho não passa por baixo)
@@ -401,6 +405,13 @@
   function tremer(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) { /* sem vibrar */ } }
   function tratar(ev) {
     if (ev.tipo === 'vai') mov.fimCalibrar();   // no 3-2-1 só descobre o sinal do sensor; o meio é o reto de verdade
+    var vj = ev.j != null && jogs[ev.j] ? VE.achar(jogs[ev.j].veic) : null;
+    if (ev.tipo === 'vai') estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); if (v && v.voz) setTimeout(function () { Som.tocar(v.voz); }, 300 + k * 400); });   // cada bicho dá o seu grito na largada
+    if (ev.tipo === 'pulo' && vj && vj.galinha) { Som.tocar('galo'); Som.tocar('asas'); D.evento(ev, estado); return; }
+    if (ev.tipo === 'turbo' && vj && vj.id === 'dino') Som.tocar('dino');
+    if (ev.tipo === 'vira') { Som.tocar(ev.dracula ? 'dracula' : 'morcego'); D.evento(ev, estado); return; }
+    if (ev.tipo === 'abobora') { Som.tocar('plop'); return; }
+    if (ev.tipo === 'splat' && ev.abobora) { Som.tocar('abobora'); tremer([25]); D.evento(ev, estado); return; }
     if (ev.tipo === 'estrela' && ev.ar) Som.tocar('estrelaAr');
     else if (ev.tipo === 'faisca' || ev.tipo === 'miniturbo') Som.tocar(ev.tipo, ev.nivel);
     else if (ev.tipo === 'poder' && ev.poder === 'gosma') Som.tocar('gosma');
@@ -410,7 +421,8 @@
   }
   function buzinar(j) {
     if (!estado || pausado || estadoTela !== 'jogo' || j >= estado.jogadores.length) return;
-    Som.tocar('buzina', j); D.evento({ tipo: 'buzina', j: j }, estado);
+    var v = VE.achar(jogs[j].veic);
+    Som.tocar(v && v.voz ? v.voz : 'buzina', j); D.evento({ tipo: 'buzina', j: j }, estado);   // a buzina da galinha é o cocoricó, a do cavalo é o relincho...
   }
 
   function pausar() {

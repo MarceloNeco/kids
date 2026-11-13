@@ -20,6 +20,8 @@
     canion: { ceu: ['#4aa8ff', '#ffe0a8'], grama: ['#e8b36a', '#dfa75c'], borda: ['#ff6b35', '#ffffff'], pista: ['#7a7f87', '#737880'], faixa: '#ffd166', sol: '#fff1a6', nome: ['Cânion do Deserto', 'Desert Canyon'], emoji: '🏜️', cor: '#e07a2f' },
     templo: { ceu: ['#3fa7b5', '#bfeee0'], grama: ['#2f8a5a', '#2a7d51'], borda: ['#e9c46a', '#2a9d8f'], pista: ['#8fa3a0', '#879b98'], faixa: '#e9f5db', sol: '#fff1a6', nome: ['Templo na Selva', 'Jungle Temple'], emoji: '🗿', cor: '#2a9d8f' },
     lava: { ceu: ['#ff7b54', '#ffd3a5'], grama: ['#4a1d14', '#3f1811'], borda: ['#ff6a00', '#ffd166'], pista: ['#4a3b3f', '#443539'], faixa: '#ffb703', sol: '#ffe0a0', nome: ['Vulcão de Lava', 'Lava Volcano'], emoji: '🌋', cor: '#e85d04' },
+    lanche: { ceu: ['#ffb36b', '#ffe9c2'], grama: ['#e63946', '#ffffff'], borda: ['#ffd23f', '#e63946'], pista: ['#5a5a66', '#53535e'], faixa: '#ffd23f', sol: '#fff1a6', nome: ['Cidade do Lanche', 'Burger Town'], emoji: '🍔', cor: '#e63946' },
+    blocos: { ceu: ['#5aa9ff', '#cfe8ff'], grama: ['#5fd068', '#4caf50'], borda: ['#8a5a36', '#c9ced6'], pista: ['#8d8d8d', '#858585'], faixa: '#ffffff', sol: '#fff7c2', nome: ['Mundo dos Blocos', 'Block World'], emoji: '🧱', cor: '#4caf50' },
     flutuante: { ceu: ['#6a7bff', '#c8b6ff'], grama: ['#1d8a7a', '#18806f'], borda: ['#ff4fd8', '#7cf9ff'], pista: ['#6b5b95', '#64558c'], faixa: '#c6ff3d', sol: '#fff7c2', nome: ['Ilhas Flutuantes', 'Floating Islands'], emoji: '✨', cor: '#7b2cbf' }
   };
   // visual NEON (padrão): os mesmos mundos à noite, estrada escura com bordas de neon
@@ -32,6 +34,8 @@
     canion: { ceu: ['#0b0612', '#3b1a2a'], grama: ['#2a160f', '#341c12'], pista: ['#1a1514', '#161210'], borda: ['#ff8c1a', '#ffd166'], faixa: '#ff8c1a' },
     templo: { ceu: ['#02100f', '#0b3a3a'], grama: ['#062018', '#0a2c21'], pista: ['#122422', '#0f1f1d'], borda: ['#3ef0d0', '#ffd166'], faixa: '#3ef0d0' },
     lava: { ceu: ['#120204', '#4a0c0c'], grama: ['#240806', '#2e0b08'], pista: ['#1d1213', '#180f10'], borda: ['#ff4d00', '#ffd000'], faixa: '#ff7b00' },
+    lanche: { ceu: ['#120606', '#4a1a12'], grama: ['#3a0e14', '#2a2a36'], pista: ['#16141c', '#121018'], borda: ['#ffd23f', '#ff3b4f'], faixa: '#ffd23f' },
+    blocos: { ceu: ['#020814', '#0e2448'], grama: ['#123a1a', '#0f3016'], pista: ['#1c1c22', '#18181e'], borda: ['#5fd068', '#ffd166'], faixa: '#5fd068' },
     flutuante: { ceu: ['#030218', '#1a0b4a'], grama: ['#04241f', '#062e28'], pista: ['#160f2a', '#120c24'], borda: ['#3effd8', '#ff4fd8'], faixa: '#c6ff3d' }
   };
   Object.keys(NEON).forEach(function (k) { var a = NEON[k], b = TEMAS[k]; a.nome = b.nome; a.emoji = b.emoji; a.cor = b.cor; a.noite = true; a.sol = null; });
@@ -100,7 +104,7 @@
     for (var k = 0; k < 70; k++) { s0 = (s0 * 9301 + 49297) % 233280; var x = s0 / 233280 * cv.width; s0 = (s0 * 9301 + 49297) % 233280; var y = cv.height * (0.55 + s0 / 233280 * 0.45); c.fillStyle = k % 3 ? 'rgba(255,209,102,.8)' : 'rgba(43,244,255,.7)'; c.fillRect(x, y, 2, 2); }
     fundosNoite[nome] = cv; return cv;
   }
-  var NAO_ESCURECE = { poste: 1, predio: 1, palmeiraNeon: 1, tocha: 1, pocoLava: 1, cristal: 1, arvoreLuz: 1, cogumeloLuz: 1, florLanterna: 1 };
+  var NAO_ESCURECE = { blocoOuro: 1, poste: 1, predio: 1, palmeiraNeon: 1, tocha: 1, pocoLava: 1, cristal: 1, arvoreLuz: 1, cogumeloLuz: 1, florLanterna: 1 };
   function enfeiteSpr(tipo, nS) { var b = base[tipo]; if (!b || !nS || NAO_ESCURECE[tipo]) return b; return S.escurecido(tipo, b, 0.6); }
   var ITEM_NEON = { estrela: 'estrelaNeon', turbo: 'turboNeon', lama: 'oleo' };
 
@@ -199,7 +203,9 @@
     else if (ev.tipo === 'caixa') { if (ev.nova) texto(vs, '❓', '#ffffff', 1.4); brilhinhos(vs, 10, '#7cf9ff'); }
     else if (ev.tipo === 'poder') texto(vs, ev.poder === 'escudo' ? t('🛡️ Bolha!', '🛡️ Bubble!') : ev.poder === 'foguete' ? t('🚀 Foguete!', '🚀 Rocket!') : t('🟢 Gosma!', '🟢 Goo!'), ev.poder === 'escudo' ? '#c6ff3d' : ev.poder === 'foguete' ? '#ff9f1c' : '#7ae03d', 1.5);
     else if (ev.tipo === 'escudoBate') texto(vs, t('Bóing!', 'Boing!'), '#c6ff3d', 1.3);
-    else if (ev.tipo === 'splat') { texto(vs, 'SPLAT!', '#7ae03d', 1.6); }
+    else if (ev.tipo === 'splat') { texto(vs, ev.abobora ? t('🎃 Abóbora!', '🎃 Pumpkin!') : 'SPLAT!', ev.abobora ? '#ff8c1a' : '#7ae03d', 1.6); }
+    else if (ev.tipo === 'vira' && ev.dracula) texto(vs, t('🧛 Conde Drácula!', '🧛 Count Dracula!'), '#ff4d6d', 1.3);
+    else if (ev.tipo === 'pulo' && VEIC[ev.j] && VEIC[ev.j].galinha) texto(vs, t('Cocoricóóó!', 'Cock-a-doodle-doo!'), '#ffffff', 1.4);
     else if (ev.tipo === 'looping') texto(vs, 'LOOPING!', '#ff4fd8', 1.8);
     else if (ev.tipo === 'loopFeito') { texto(vs, t('Que looping!', 'What a loop!'), '#c6ff3d', 1.5); fogos(vs, 2); confete(vs, 25, 'cima'); }
     else if (ev.tipo === 'perdeu') { for (var k = 0; k < Math.min(ev.q, 6); k++) vs.parts.push({ tipo: 'est', x: 0, y: -0.2, vx: (Math.random() - 0.5) * 2.4, vy: -1.8 - Math.random(), vida: 1.2, max: 1.2 }); }
@@ -211,7 +217,7 @@
     else if (ev.tipo === 'lama') { texto(vs, t('Splash!', 'Splash!'), '#c98a4b', 1.2); for (k = 0; k < 10; k++) vs.parts.push({ tipo: 'gota', cor: '#6b3e1f', x: (Math.random() - 0.5) * 0.4, y: -0.1, vx: (Math.random() - 0.5) * 2, vy: -1.5 - Math.random(), vida: 0.8, max: 0.8 }); }
     else if (ev.tipo === 'turbo') texto(vs, 'TURBO!', '#3ee8ff', 1.6);
     else if (ev.tipo === 'pulo') texto(vs, ev.manual ? t('Hop!', 'Hop!') : t('Uhuuu!', 'Wheee!'), '#c6ff3d', ev.manual ? 1.1 : 1.5);
-    else if (ev.tipo === 'buzina') texto(vs, t('Bi-bi!', 'Beep-beep!'), '#ff7ac6', 1.1);
+    else if (ev.tipo === 'buzina') { var vz = VEIC[ev.j] && VEIC[ev.j].voz, BZ = { galo: t('Cocoricó!', 'Cock-a-doodle-doo!'), cavalo: t('Iiirrrí!', 'Neigh!'), dino: t('ROOOAR!', 'ROOOAR!'), arara: t('Cráá!', 'Squawk!'), morcego: t('Iiiik!', 'Eeek!') }; texto(vs, BZ[vz] || t('Bi-bi!', 'Beep-beep!'), '#ff7ac6', 1.1); }
     else if (ev.tipo === 'chegou') { vs.chegouT = 0; vs.lugar = ev.lugar; confete(vs, 70, 'cima'); fogos(vs, 8); }
   }
   function passo(dt, estado, entradas) {
@@ -509,7 +515,7 @@
           sprite(c, base[cs[k2].tipo], pc.esc, tx, pc.y, clip, w); if (luzT > 0.02 && pc.y <= clip + 2) { c.globalAlpha = luzT; lanternasTransito(c, cs[k2].tipo, tx, pc.y, pc.esc); c.globalAlpha = 1; }
         }
       }
-      (e.tiros || []).forEach(function (tr) { if (Math.floor(tr.z / SEG) !== idx) return; var pt = noPonto(n, tr.z); bolaGosma(c, pt.x + pt.esc * tr.x * LARG, voa ? pt.y - pt.escY * ALT_VOO : pt.y, pt.esc, e.t); });
+      (e.tiros || []).forEach(function (tr) { if (Math.floor(tr.z / SEG) !== idx) return; var pt = noPonto(n, tr.z); (tr.tipo === 'abobora' ? aboboraVoando : bolaGosma)(c, pt.x + pt.esc * tr.x * LARG, voa ? pt.y - pt.escY * ALT_VOO : pt.y, pt.esc, e.t); });
       var rs = porSegR[idx];   // rivais neste pedaço (no céu se forem de avião)
       if (rs) for (k2 = 0; k2 < rs.length; k2++) {
         var rv = e.rivais[rs[k2]], rd = RIV[rs[k2]]; if (!rd || rv.z < j.z - JOG_Z * 0.6) continue;
@@ -521,7 +527,7 @@
         sprite(c, S.quadro(rd.spr, faseR), pr.esc, rX, rY, rd.voa || voa ? 0 : clip, w);
         if (vivo) { bracos(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info.cor, faseR, rd.lado, 'perto'); pilotoVivo(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info, 10 + rs[k2] * 2.1, 6, ondeCabeca(rd.veic, rX - rW / 2, rY - rH, rW, rH, faseR)); }
         if (rv.turbo > 0 && !rd.voa && rW > 6) { c.save(); c.translate(rX, rY); fogoEscape(c, rW, rH, Math.min(1, rv.turbo), false); c.restore(); }
-        if (rv.gosma > 0 && rW > 6) gosmaEm(c, rX - rW / 2, rY - rH, rW, rH, rv.gosma);
+        if (rv.gosma > 0 && rW > 6) gosmaEm(c, rX - rW / 2, rY - rH, rW, rH, rv.gosma, rv.gosmaCor);
         var luzR = s.tunel ? 1 : ntS;
         if (!rd.voa && luzR > 0.02 && rY <= clip + 2) { c.save(); c.globalCompositeOperation = 'lighter'; luz(c, rX - rW * 0.36, rY - rH * 0.4, rW * 0.25, '#ff2a2a', 0.7 * luzR); luz(c, rX + rW * 0.36, rY - rH * 0.4, rW * 0.25, '#ff2a2a', 0.7 * luzR); c.restore(); }
       }
@@ -575,10 +581,24 @@
     c.fill();
     c.fillStyle = '#1b1b22'; c.beginPath(); c.arc(x - r * 0.3, y - r * 0.1, r * 0.13, 0, Math.PI * 2); c.arc(x + r * 0.3, y - r * 0.1, r * 0.13, 0, Math.PI * 2); c.fill();   // carinha
   }
-  // gosma grudada no rival atingido
-  function gosmaEm(c, x0, y0, w, h, resta) {
+  // abóbora de Halloween voando (o Drácula joga nos rivais): laranja, com gomos, carinha e cabinho
+  function aboboraVoando(c, x, y, esc, t) {
+    var r = esc * 320; if (r < 1) return;
+    y -= r * 1.6 + Math.abs(Math.sin(t * 8)) * r * 0.7;
+    c.save(); c.translate(x, y); c.rotate(t * 6);
+    var g = c.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r); g.addColorStop(0, '#ffb04a'); g.addColorStop(1, '#d2600a');
+    c.fillStyle = g; c.beginPath(); if (c.ellipse) c.ellipse(0, 0, r * 1.15, r, 0, 0, Math.PI * 2); else c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(140,60,0,.5)'; c.lineWidth = Math.max(1, r * 0.08); [-0.5, 0, 0.5].forEach(function (k) { c.beginPath(); if (c.ellipse) c.ellipse(k * r * 0.5, 0, r * 0.35, r * 0.95, 0, 0, Math.PI * 2); c.stroke(); });
+    c.fillStyle = '#2a1400'; poli3a(c, [[-0.45, -0.2], [-0.2, -0.45], [-0.1, -0.15]], r); poli3a(c, [[0.45, -0.2], [0.2, -0.45], [0.1, -0.15]], r);
+    c.beginPath(); c.moveTo(-r * 0.55, r * 0.2); c.lineTo(-r * 0.3, r * 0.45); c.lineTo(-r * 0.1, r * 0.3); c.lineTo(r * 0.1, r * 0.45); c.lineTo(r * 0.3, r * 0.3); c.lineTo(r * 0.55, r * 0.2); c.lineTo(r * 0.3, r * 0.55); c.lineTo(-r * 0.3, r * 0.55); c.closePath(); c.fill();
+    c.fillStyle = '#3f7a1e'; c.fillRect(-r * 0.1, -r * 1.25, r * 0.2, r * 0.35);
+    c.restore();
+  }
+  function poli3a(c, pts, r) { c.beginPath(); pts.forEach(function (p, k) { if (k) c.lineTo(p[0] * r, p[1] * r); else c.moveTo(p[0] * r, p[1] * r); }); c.closePath(); c.fill(); }
+  // gosma grudada no rival atingido (verde; laranja quando foi abóbora)
+  function gosmaEm(c, x0, y0, w, h, resta, cor) {
     c.save(); c.globalAlpha = Math.min(1, resta);
-    c.fillStyle = '#7ae03d';
+    c.fillStyle = cor || '#7ae03d';
     [[0.3, 0.3, 0.18], [0.55, 0.22, 0.2], [0.72, 0.4, 0.14], [0.45, 0.5, 0.16]].forEach(function (b) { c.beginPath(); c.arc(x0 + w * b[0], y0 + h * b[1], w * b[2], 0, Math.PI * 2); c.fill(); });
     [0.32, 0.5, 0.68].forEach(function (x, k) { c.fillRect(x0 + w * x - w * 0.03, y0 + h * 0.4, w * 0.06, h * (0.2 + k * 0.08)); c.beginPath(); c.arc(x0 + w * x, y0 + h * (0.6 + k * 0.08), w * 0.045, 0, Math.PI * 2); c.fill(); });
     c.restore();
@@ -667,6 +687,21 @@
     c.restore();
   }
 
+  // morcego <-> Conde Drácula: troca aos poucos, com uma nuvem de fumaça no meio da transformação
+  var draculas = {};
+  function morcegoDracula(c, obj, virado, spr, fase, cw, ch, cor, tt) {
+    var dt = obj.tMorf ? Math.min(0.1, tt - obj.tMorf) : 0; obj.tMorf = tt;
+    obj.morf = (obj.morf || 0) + ((virado ? 1 : 0) - (obj.morf || 0)) * Math.min(1, dt * 7);
+    var m = obj.morf;
+    if (!draculas[cor]) draculas[cor] = S.fazer(1300, 1000, function (c2, W2, H2) { V().dracula(c2, W2, H2, cor, null); }, 300);
+    if (m < 0.98) { c.globalAlpha = 1 - m; c.drawImage(S.quadro(spr, fase).img, -cw / 2, -ch, cw, ch); }
+    if (m > 0.02) { c.globalAlpha = m; c.drawImage(draculas[cor].img, -cw / 2, -ch, cw, ch); }
+    c.globalAlpha = 1;
+    if (m > 0.08 && m < 0.92) {   // puf! fumaça roxa
+      var f = Math.sin(m * Math.PI);
+      for (var k = 0; k < 9; k++) { var a = k / 9 * Math.PI * 2 + tt; c.fillStyle = 'rgba(' + (k % 2 ? '120,90,160' : '200,190,220') + ',' + (0.55 * f).toFixed(2) + ')'; c.beginPath(); c.arc(Math.cos(a) * cw * 0.3 * f, -ch * 0.5 + Math.sin(a) * ch * 0.25 * f, cw * 0.12 * (0.6 + f), 0, Math.PI * 2); c.fill(); }
+    }
+  }
   // ---------- looping (360°) ----------
   /* O looping é desenhado em 3D de verdade: uma fita de estrada que sobe, passa de cabeça para baixo e desce ao lado
      da entrada (a saída fica LOOP_DESVIO para o lado). Coordenadas do looping: (0,0,0) = começo, no meio da estrada;
@@ -832,7 +867,7 @@
      paredes perto da entrada e da saída. As cores misturam dia e noite aos poucos, como o resto. No céu, um tubo de
      anéis de luz em volta da rota. A: este pedaço (perto); B: o seguinte (longe), ou null. */
   // boca do túnel por mundo: [cor de dia, cor de noite, cobertura no topo (dia), cobertura (noite)]
-  var BOCA = { praia: ['#b98a52', '#2a2238', '#e9cf94', '#3a2f4a'], floresta: ['#6e6a5e', '#1a2420', '#4cc35a', '#163a24'], doces: ['#7a4a33', '#2a1426', '#ffb6e1', '#5a2050'], neve: ['#7d8aa3', '#1e2638', '#f4f8ff', '#3a4a6a'], neon: ['#2c2752', '#15122e', '#ff2bd6', '#ff2bd6'], canion: ['#c2703d', '#3a1e14', '#e8b36a', '#4a2a18'], templo: ['#6f7f7a', '#162420', '#2f8a5a', '#123a28'], lava: ['#3a2a2a', '#1a0c0c', '#ff6a00', '#ff4d00'], flutuante: ['#4b3f7a', '#1a1440', '#1d8a7a', '#3effd8'] };
+  var BOCA = { praia: ['#b98a52', '#2a2238', '#e9cf94', '#3a2f4a'], floresta: ['#6e6a5e', '#1a2420', '#4cc35a', '#163a24'], doces: ['#7a4a33', '#2a1426', '#ffb6e1', '#5a2050'], neve: ['#7d8aa3', '#1e2638', '#f4f8ff', '#3a4a6a'], neon: ['#2c2752', '#15122e', '#ff2bd6', '#ff2bd6'], canion: ['#c2703d', '#3a1e14', '#e8b36a', '#4a2a18'], templo: ['#6f7f7a', '#162420', '#2f8a5a', '#123a28'], lava: ['#3a2a2a', '#1a0c0c', '#ff6a00', '#ff4d00'], flutuante: ['#4b3f7a', '#1a1440', '#1d8a7a', '#3effd8'], lanche: ['#d2862e', '#3a1e10', '#f6c46e', '#ffd23f'], blocos: ['#8d8d8d', '#26262e', '#5fd068', '#5fd068'] };
   function tunel(c, s, idx, A, B, w, h, voa, ts, pista, nevoa, cobrirTela) {
     var nt = noiteEm(idx), tt = Date.now() / 1000, sx = A.x, sy = A.y, esc = A.e, escY = A.eY;
     var meia = esc * LARG * 1.32, x1 = sx - meia, x2 = sx + meia;
@@ -1012,7 +1047,9 @@
     var faseQ = spr.quadros ? faseSkate(vs, j, e, vv) : 0, corJ = INFO[j.n] && INFO[j.n].cor, onde = null;
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'longe');
     if (vv && vv.cavalo && CAV()) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, INFO[j.n].corpo, tt, vv.bicho);   // ao vivo: de lado nas curvas
+    else if (vv && vv.dracula) morcegoDracula(c, vs, j.dracula, spr, faseQ, cw, ch, corJ, tt);
     else c.drawImage((spr.quadros ? S.quadro(spr, faseQ) : spr).img, -cw / 2, -ch, cw, ch);
+    if (vv && vv.galinha && j.pulo > 0 && V()) V().asasGalinha(c, -cw / 2, -ch, cw, ch, tt);   // pulando, a galinha abre e bate as asas
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'perto');
     pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], j.n * 3.3, 7, onde);
     extrasDepois(c, vv, cw, ch, tt, j.turbo > 0);
@@ -1381,7 +1418,9 @@
     extrasAntes(c, vv, cw, ch, tt);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'longe');
     if (cav) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, cor, faseP % 1, ladoP, corpo, tt, vv.bicho);
+    else if (vv && vv.dracula) morcegoDracula(c, cachePrevia, Math.sin(tt * 1.6) > 0.3, spr, faseP, cw, ch, cor, tt);   // na garagem ele vira e desvira
     else c.drawImage(S.quadro(spr, faseP).img, -cw / 2, -ch, cw, ch);
+    if (vv && vv.galinha && Math.sin(tt * 1.3) > 0.7 && V()) V().asasGalinha(c, -cw / 2, -ch, cw, ch, tt);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'perto');
     pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), 1.2, 4.5, onde);   // na garagem vira mais vezes
     extrasDepois(c, vv, cw, ch, tt, false);

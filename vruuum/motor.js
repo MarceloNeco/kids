@@ -120,6 +120,23 @@
     if (j.escudo > 0) j.escudo = Math.max(0, j.escudo - dt);
     if (j.foguete > 0) j.foguete = Math.max(0, j.foguete - dt);
     if (j.roleta > 0) { j.roleta -= dt; if (j.roleta <= 0) { j.roleta = 0; usarPoder(e, j, max); } }
+    // morcego (1.11.1): perto de obstáculo vira o Conde Drácula (e volta a ser morcego quando passa); joga abóbora no rival da frente
+    if (mod.dracula) {
+      var iJ = Math.floor(j.z / SEG), perto = false;
+      for (var q = iJ + 1; q < iJ + 16 && !perto; q++) { var sq = pista.segs[q]; if (sq) for (var w = 0; w < sq.coisas.length; w++) { var cq = sq.coisas[w]; if ((cq.tipo === 'cone' || cq.tipo === 'lama') && !cq.pego[j.n] && Math.abs(cq.x - j.x) < 0.6) perto = true; } }
+      e.carros.forEach(function (cr) { if (cr.z > j.z && cr.z < j.z + SEG * 15 && Math.abs(cr.x - j.x) < 0.6) perto = true; });
+      e.rivais.forEach(function (rv) { if (rv.z > j.z && rv.z < j.z + SEG * 10 && Math.abs(rv.x - j.x) < 0.5) perto = true; });
+      if (perto !== !!j.dracula) { j.dracula = perto; e.eventos.push({ tipo: 'vira', j: j.n, dracula: perto }); }
+    }
+    if (mod.abobora && e.fase === 'corrida') {
+      j.tAbobora = (j.tAbobora == null ? 3 : j.tAbobora) - dt;
+      if (j.tAbobora <= 0) {
+        var alvoA = -1, dA = Infinity;
+        e.rivais.forEach(function (rv, k) { var d = rv.z - j.z; if (d > 0 && d < SEG * 70 && d < dA && !rv.chegou) { dA = d; alvoA = k; } });
+        if (alvoA >= 0) { e.tiros.push({ tipo: 'abobora', z: j.z + SEG, x: j.x, vel: Math.max(j.vel, max) * 1.5, alvo: alvoA, de: j.n, vida: 4 }); e.eventos.push({ tipo: 'abobora', j: j.n }); j.tAbobora = 4 + Math.random() * 2; }
+        else j.tAbobora = 1;
+      }
+    }
 
     var zAntes = j.z;
     j.z = Math.min(pista.comprimento - SEG, j.z + j.vel * dt);
@@ -221,9 +238,9 @@
       if (!rv || tr.vida <= 0) return false;
       tr.z += tr.vel * dt; tr.x += Math.max(-dt * 3, Math.min(dt * 3, rv.x - tr.x));
       if (tr.z < rv.z - SEG * 0.3) return true;
-      rv.lento = Math.max(rv.lento, 1.8); rv.gosma = 2.6;
+      rv.lento = Math.max(rv.lento, 1.8); rv.gosma = 2.6; rv.gosmaCor = tr.tipo === 'abobora' ? '#ff8c1a' : '#7ae03d';
       var j = e.jogadores[tr.de]; if (j) somar(e, j, PONTOS.splat, 'splat');
-      e.eventos.push({ tipo: 'splat', j: tr.de, r: tr.alvo });
+      e.eventos.push({ tipo: 'splat', j: tr.de, r: tr.alvo, abobora: tr.tipo === 'abobora' });
       return false;
     });
   }
