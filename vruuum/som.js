@@ -200,11 +200,40 @@
     vai: function (t) { tom('square', 1320, t, 0.4, 0.22); },
     mundo: function (t) { [523, 659, 784].forEach(function (f, k) { tom('triangle', f, t + k * 0.08, 0.2, 0.15); }); },
     chegou: function (t) { [523, 659, 784, 1047, 784, 1047].forEach(function (f, k) { tom('square', f, t + k * 0.11, k === 5 ? 0.6 : 0.12, 0.13); }); ruido(t + 0.7, 1.2, 0.15, 'highpass', 5000); },
-    clique: function (t) { tom('triangle', 880, t, 0.06, 0.15); }
+    clique: function (t) { tom('triangle', 880, t, 0.06, 0.15); },
+    // 1.11.0: muitos barulhos novos
+    derrapa: function (t) { ruido(t, 0.25, 0.25, 'bandpass', 2600); tom('sawtooth', 900, t, 0.22, 0.05, 700); },
+    faisca: function (t, n) { var f = [0, 880, 1175, 1568][n || 1]; tom('square', f, t, 0.08, 0.12); tom('square', f * 1.5, t + 0.07, 0.12, 0.1); },
+    miniturbo: function (t, n) { tom('sawtooth', 160, t, 0.5 + (n || 1) * 0.12, 0.2, 1400); ruido(t, 0.5, 0.3, 'highpass', 1500); tom('square', 660, t + 0.05, 0.15, 0.08, 1320); },
+    caixa: function (t) { tom('triangle', 520, t, 0.08, 0.2, 1040); [0, 1, 2, 3, 4, 5, 6, 7].forEach(function (k) { tom('square', 700 + (k % 3) * 220, t + 0.1 + k * 0.12, 0.05, 0.06); }); },
+    poder: function (t) { [784, 988, 1175, 1568].forEach(function (f, k) { tom('triangle', f, t + k * 0.07, 0.14, 0.15); }); },
+    escudoBate: function (t) { tom('sine', 300, t, 0.35, 0.3, 900); tom('sine', 600, t + 0.05, 0.25, 0.12, 1500); },
+    splat: function (t) { ruido(t, 0.3, 0.45, 'lowpass', 700); tom('sine', 260, t, 0.25, 0.35, 60); tom('triangle', 900, t + 0.05, 0.1, 0.1, 300); },
+    gosma: function (t) { tom('sine', 200, t, 0.3, 0.3, 900); tom('sine', 140, t + 0.1, 0.2, 0.2, 400); },
+    looping: function (t) { tom('sawtooth', 220, t, 1.2, 0.12, 880); tom('square', 330, t + 0.2, 1.0, 0.06, 1320); ruido(t, 1.2, 0.18, 'bandpass', 1800); },
+    loopFeito: function (t) { [523, 659, 784, 1047, 1319].forEach(function (f, k) { tom('square', f, t + k * 0.08, 0.16, 0.12); }); ruido(t + 0.3, 0.8, 0.12, 'highpass', 5000); },
+    fogos: function (t) { tom('sine', 120 + Math.random() * 60, t, 0.35, 0.4, 40); ruido(t, 0.6, 0.3, 'lowpass', 1800); for (var k = 0; k < 6; k++) ruido(t + 0.15 + k * 0.07 + Math.random() * 0.05, 0.05, 0.12, 'highpass', 4000); },
+    turboRival: function (t) { tom('sawtooth', 120, t, 0.4, 0.07, 500); },
+    looping2: function (t) { tom('sine', 440, t, 0.2, 0.1); },
+    torcida: function (t) { for (var k = 0; k < 5; k++) ruido(t + k * 0.35, 0.9, 0.12, 'bandpass', 900 + k * 120); [784, 988, 1175].forEach(function (f, k) { tom('triangle', f, t + 0.2 + k * 0.1, 0.3, 0.08); }); },
+    whoosh: function (t) { ruido(t, 0.7, 0.3, 'bandpass', 900); tom('sine', 300, t, 0.6, 0.1, 1200); }
   };
+  // chiado do pneu (contínuo, um por jogador): força 0 a 1 (0 = quieto)
+  var chiados = [];
+  function chiado(forcas) {
+    if (!ac) return;
+    while (chiados.length < forcas.length) {
+      if (!ruidoBuf) ruido(ac.currentTime, 0.01, 0.0001, 'lowpass', 100);
+      var src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+      src.buffer = ruidoBuf; src.loop = true; f.type = 'bandpass'; f.frequency.value = 2400; f.Q.value = 3; g.gain.value = 0;
+      src.connect(f); f.connect(g); g.connect(mestre); src.start();
+      chiados.push({ g: g, f: f });
+    }
+    chiados.forEach(function (ch, k) { var v = forcas[k] || 0; ch.g.gain.setTargetAtTime(v * 0.18, ac.currentTime, 0.05); ch.f.frequency.setTargetAtTime(2000 + v * 1400, ac.currentTime, 0.1); });
+  }
   function tocar(nome, k) { if (!ac || !ligado || !efeitos[nome]) return; efeitos[nome](ac.currentTime + 0.005, k); }
   function alternar() { ligado = !ligado; if (mestre) mestre.gain.setTargetAtTime(ligado ? 0.8 : 0, ac.currentTime, 0.05); if (audio) audio.muted = !ligado; return ligado; }
-  function parar() { musica(false); motor([]); }
+  function parar() { musica(false); motor([]); chiado([]); }
 
-  raiz.VruuumSom = { iniciar: iniciar, tocar: tocar, motor: motor, musica: musica, proxima: proxima, aoTrocarMusica: function (fn) { aoTrocar = fn; if (atual >= 0 && lista[atual]) fn(info(lista[atual])); }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, parar: parar, ligado: function () { return ligado; } };
+  raiz.VruuumSom = { iniciar: iniciar, tocar: tocar, motor: motor, musica: musica, proxima: proxima, aoTrocarMusica: function (fn) { aoTrocar = fn; if (atual >= 0 && lista[atual]) fn(info(lista[atual])); }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, parar: parar, chiado: chiado, ligado: function () { return ligado; } };
 })(this);

@@ -327,6 +327,172 @@
     piloto(c, emoji, W * 0.5, H * 0.33, H * 0.22);
   }
 
+  // ---------- 1.11.0: veículos novos (desenhos próprios, sem marca) ----------
+  function espiral(c, x, y, r, cor, lw) { c.strokeStyle = cor; c.lineWidth = lw; c.lineCap = 'round'; c.beginPath(); for (var k = 0; k <= 40; k++) { var a = k / 40 * Math.PI * 5, rr = r * k / 40; if (k) c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); else c.moveTo(x, y); } c.stroke(); }
+  function brilhoX(c, x, y, r) { c.fillStyle = 'rgba(255,255,255,.95)'; poli(c, [x, y - r, x + r * 0.2, y - r * 0.2, x + r, y, x + r * 0.2, y + r * 0.2, x, y + r, x - r * 0.2, y + r * 0.2, x - r, y, x - r * 0.2, y - r * 0.2], 'rgba(255,255,255,.95)'); }
+  function rodaBranca(c, x, y, w, h) { pneu(c, x, y, w, h); oval(c, x + w / 2, y + h * 0.5, w * 0.36, h * 0.3, '#f4f4f4'); oval(c, x + w / 2, y + h * 0.5, w * 0.2, h * 0.17, '#9aa0a6'); }
+  // furgão de surfe: degradê azul-verde-laranja, espirais, brilhos, prancha no teto e luzes coloridas
+  function furgao(c, W, H, cor, emoji) {
+    sombra(c, W, H, 0.46);
+    [0.07, 0.75].forEach(function (x) { pneu(c, W * x, H * 0.72, W * 0.18, H * 0.28); });
+    // prancha de surfe no rack (vista de trás: a ponta da prancha)
+    linha(c, [W * 0.2, H * 0.1, W * 0.2, H * 0.05, W * 0.8, H * 0.05, W * 0.8, H * 0.1], '#3a3a44', W * 0.02);
+    c.fillStyle = grad(c, 0, H * 0.06, '#ffd166', '#ff4fa3'); c.beginPath(); if (c.ellipse) c.ellipse(W * 0.5, H * 0.035, W * 0.36, H * 0.03, 0, 0, Math.PI * 2); else c.arc(W * 0.5, H * 0.035, W * 0.36, 0, Math.PI * 2); c.fill();
+    linha(c, [W * 0.18, H * 0.035, W * 0.82, H * 0.035], '#ffffff', H * 0.008);
+    // carroceria quadradona em degradê (laranja em cima, verde no meio, azul embaixo)
+    var g = c.createLinearGradient(0, H * 0.08, 0, H * 0.84); g.addColorStop(0, '#ff5a36'); g.addColorStop(0.3, '#ffb627'); g.addColorStop(0.5, '#7bd03a'); g.addColorStop(0.75, '#2f8fe0'); g.addColorStop(1, '#1d5fc4');
+    caixa(c, W * 0.06, H * 0.08, W * 0.88, H * 0.74, W * 0.07, g);
+    caixa(c, W * 0.03, H * 0.06, W * 0.94, H * 0.06, H * 0.02, '#ff5a36');   // aerofólio
+    // vidros de trás (o piloto aparece no do meio)
+    poli(c, [W * 0.24, H * 0.42, W * 0.24, H * 0.17, W * 0.76, H * 0.17, W * 0.76, H * 0.42], '#1b2433');
+    linha(c, [W * 0.5, H * 0.17, W * 0.5, H * 0.42], tom('#2f8fe0', -0.2), W * 0.012);
+    piloto(c, emoji, W * 0.5, H * 0.33, H * 0.2, function () { c.rect(W * 0.24, H * 0.17, W * 0.52, H * 0.25); });
+    // espirais, brilhos e o SURF grafitado
+    espiral(c, W * 0.14, H * 0.3, W * 0.05, '#ffffff', W * 0.008); espiral(c, W * 0.86, H * 0.52, W * 0.05, cor, W * 0.01); espiral(c, W * 0.16, H * 0.66, W * 0.04, '#e63946', W * 0.008);
+    [[0.12, 0.47, 0.025], [0.84, 0.25, 0.03], [0.62, 0.48, 0.02], [0.3, 0.72, 0.022], [0.9, 0.7, 0.02]].forEach(function (b) { brilhoX(c, W * b[0], H * b[1], W * b[2]); });
+    c.save(); c.translate(W * 0.5, H * 0.56); c.rotate(-0.06);
+    c.font = 'italic 700 ' + Math.round(H * 0.13) + 'px ' + FONTE; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.lineJoin = 'round'; c.lineWidth = H * 0.025; c.strokeStyle = '#b5121b'; c.strokeText('SURF', 0, 0); c.fillStyle = grad(c, -H * 0.06, H * 0.06, '#fff3a0', '#ff8c1a'); c.fillText('SURF', 0, 0);
+    c.restore();
+    // luzes de LED (rosa e verde) e para-choque
+    [[0.13, '#ff4fd8'], [0.87, '#3dff9e']].forEach(function (l) { brilho(c, l[1], W * 0.05); circ(c, W * l[0], H * 0.72, W * 0.045, l[1]); c.shadowBlur = 0; circ(c, W * l[0], H * 0.72, W * 0.018, '#ffffff'); });
+    caixa(c, W * 0.04, H * 0.8, W * 0.92, H * 0.05, H * 0.02, '#c9ced6');
+    placa(c, W * 0.39, H * 0.71, W * 0.22, H * 0.06, 'SURF');
+  }
+  // ônibus escolar amarelo gigante: luzes vermelhas piscando, placa de PARE que abre, crianças nas janelas
+  function onibusEscolar(c, W, H, cor, emoji, fase) {
+    fase = fase || 0; var pisca = fase % 0.5 < 0.25, abre = Math.max(0, Math.sin(fase * Math.PI * 2));
+    sombra(c, W, H, 0.48);
+    [0.06, 0.76].forEach(function (x) { pneu(c, W * x, H * 0.76, W * 0.18, H * 0.24); });
+    var am = '#ffc20e';
+    caixa(c, W * 0.05, H * 0.06, W * 0.9, H * 0.78, W * 0.06, grad(c, H * 0.06, H * 0.84, tom(am, 0.15), tom(am, -0.12)));
+    caixa(c, W * 0.05, H * 0.04, W * 0.9, H * 0.06, W * 0.04, tom(am, 0.3));   // teto
+    // luzes de parada piscando lá em cima
+    [[0.16, pisca], [0.84, !pisca]].forEach(function (l) { if (l[1]) brilho(c, '#ff2a2a', W * 0.06); circ(c, W * l[0], H * 0.13, W * 0.04, l[1] ? '#ff3b3b' : '#7a1a1a'); c.shadowBlur = 0; });
+    [[0.3, !pisca], [0.7, pisca]].forEach(function (l) { if (l[1]) brilho(c, '#ffb703', W * 0.05); circ(c, W * l[0], H * 0.13, W * 0.03, l[1] ? '#ffb703' : '#7a5a10'); c.shadowBlur = 0; });
+    c.fillStyle = '#1a1a1a'; c.font = '700 ' + Math.round(H * 0.05) + 'px ' + FONTE; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('ESCOLAR', W * 0.5, H * 0.13);
+    // janelas de trás: as duas dos lados com crianças, a porta de emergência no meio com o piloto
+    [[0.1, '🧒'], [0.71, '👧']].forEach(function (jn, k) {
+      caixa(c, W * jn[0], H * 0.2, W * 0.19, H * 0.2, W * 0.02, '#26313f');
+      c.font = Math.round(H * 0.1) + 'px ' + EMOJI; c.fillText(jn[1], W * (jn[0] + 0.095), H * (0.32 - (k ? abre : 1 - abre) * 0.02));
+    });
+    caixa(c, W * 0.34, H * 0.18, W * 0.32, H * 0.5, W * 0.02, tom(am, -0.2));
+    caixa(c, W * 0.37, H * 0.21, W * 0.26, H * 0.22, W * 0.02, '#26313f');
+    piloto(c, emoji, W * 0.5, H * 0.33, H * 0.18, function () { c.rect(W * 0.37, H * 0.21, W * 0.26, H * 0.22); });
+    caixa(c, W * 0.37, H * 0.46, W * 0.26, H * 0.19, W * 0.02, '#26313f');
+    linha(c, [W * 0.4, H * 0.55, W * 0.47, H * 0.55], '#c9ced6', H * 0.015);   // maçaneta
+    // faixas pretas e lanternas
+    [0.47, 0.56, 0.66].forEach(function (y) { c.fillStyle = '#1a1a1a'; c.fillRect(W * 0.05, H * y, W * 0.29, H * 0.012); c.fillRect(W * 0.66, H * y, W * 0.29, H * 0.012); });
+    lanternaRedonda(c, W * 0.14, H * 0.74, W * 0.035); lanternaRedonda(c, W * 0.86, H * 0.74, W * 0.035);
+    caixa(c, W * 0.03, H * 0.8, W * 0.94, H * 0.05, H * 0.02, '#2a2a30');
+    placa(c, W * 0.4, H * 0.71, W * 0.2, H * 0.06, 'BUS');
+    // a placa de PARE do lado esquerdo, abrindo e fechando
+    c.save(); c.translate(W * 0.06, H * 0.42); c.rotate(-Math.PI / 2 * abre);
+    linha(c, [0, 0, -W * 0.06, 0], '#c9ced6', H * 0.012);
+    var r = W * 0.06, px = -W * 0.11, pts = []; for (var k = 0; k < 8; k++) { var a = Math.PI / 8 + k * Math.PI / 4; pts.push(px + Math.cos(a) * r, Math.sin(a) * r); }
+    poli(c, pts, '#e63946'); c.fillStyle = '#ffffff'; c.font = '700 ' + Math.round(r * 0.55) + 'px ' + FONTE; c.fillText('PARE', px, r * 0.04);
+    c.restore();
+  }
+  // caminhão rosa de máquina de pegar bichinho: a garra passeia e as pelúcias balançam no vidro (o piloto vai lá dentro)
+  var PELUCIAS = [['#ffd23f', 'leão'], ['#7cc8ff', 'uni'], ['#ff8fcf', 'uni'], ['#ffffff', 'uni'], ['#c08552', 'urso'], ['#8be28b', 'sapo'], ['#ffd23f', 'leão'], ['#b388eb', 'uni'], ['#7cc8ff', 'uni']];
+  function pelucia(c, x, y, r, p) {
+    if (p[1] === 'uni') poli(c, [x - r * 0.12, y - r * 0.85, x, y - r * 1.5, x + r * 0.12, y - r * 0.85], '#ffd166');
+    if (p[1] === 'leão') circ(c, x, y, r * 1.25, '#ff9f1c');
+    if (p[1] === 'urso') { circ(c, x - r * 0.7, y - r * 0.75, r * 0.32, p[0]); circ(c, x + r * 0.7, y - r * 0.75, r * 0.32, p[0]); }
+    circ(c, x, y, r, p[0]);
+    circ(c, x - r * 0.35, y - r * 0.1, r * 0.14, '#1b1b22'); circ(c, x + r * 0.35, y - r * 0.1, r * 0.14, '#1b1b22');
+    oval(c, x, y + r * 0.35, r * 0.3, r * 0.2, p[1] === 'sapo' ? '#e85d75' : 'rgba(0,0,0,.12)');
+  }
+  function caminhaoPelucia(c, W, H, cor, emoji, fase) {
+    fase = fase || 0;
+    var rosa = '#ff3d8b';
+    sombra(c, W, H, 0.48);
+    // chaminés cromadas de bolinhas (lá na frente, aparecem dos dois lados)
+    [0.02, 0.9].forEach(function (x) { caixa(c, W * x, H * 0.0, W * 0.08, H * 0.6, W * 0.04, '#d6dbe2'); for (var k = 0; k < 7; k++) circ(c, W * (x + 0.04), H * (0.1 + k * 0.07), W * 0.012, '#1b1b22'); });
+    [0.08, 0.74].forEach(function (x) { rodaBranca(c, W * x, H * 0.74, W * 0.18, H * 0.26); });
+    caixa(c, W * 0.07, H * 0.1, W * 0.86, H * 0.74, W * 0.04, grad(c, H * 0.1, H * 0.84, tom(rosa, 0.2), tom(rosa, -0.2)));
+    // toldo listrado
+    for (var k = 0; k < 9; k++) { c.fillStyle = k % 2 ? '#ffffff' : '#e8336f'; c.fillRect(W * (0.05 + k * 0.1), H * 0.08, W * 0.1, H * 0.07); }
+    // a máquina: vidro, pelúcias balançando, a garra passeando
+    var vx = W * 0.15, vy = H * 0.19, vw = W * 0.7, vh = H * 0.42;
+    c.fillStyle = '#f6e9ff'; c.fillRect(vx, vy, vw, vh);
+    c.save(); c.beginPath(); c.rect(vx, vy, vw, vh); c.clip();
+    for (var p = 0; p < 9; p++) {
+      var col = p % 5, lin = Math.floor(p / 5), bal = Math.sin(fase * Math.PI * 2 + p * 1.7) * H * 0.012;
+      pelucia(c, vx + vw * (0.12 + col * 0.19 + lin * 0.09), vy + vh * (0.88 - lin * 0.25) + bal, W * 0.06, PELUCIAS[p]);
+    }
+    var gx = vx + vw * (0.5 + 0.35 * Math.sin(fase * Math.PI * 2)), gy = vy + vh * 0.32;
+    linha(c, [gx, vy, gx, gy], '#9aa0a6', W * 0.008);
+    linha(c, [gx - W * 0.04, gy + H * 0.06, gx - W * 0.03, gy, gx + W * 0.03, gy, gx + W * 0.04, gy + H * 0.06], '#c9ced6', W * 0.012);
+    circ(c, gx, gy, W * 0.018, '#c9ced6');
+    c.restore();
+    c.fillStyle = 'rgba(255,255,255,.22)'; poli(c, [vx + vw * 0.08, vy, vx + vw * 0.22, vy, vx + vw * 0.06, vy + vh, vx, vy + vh], 'rgba(255,255,255,.22)');
+    caixa(c, vx - W * 0.01, vy + vh * 0.48, vw + W * 0.02, H * 0.012, 0, rosa);   // divisória
+    piloto(c, emoji, W * 0.5, H * 0.33, H * 0.18, function () { c.rect(vx, vy, vw, vh); });
+    // luzes verdes, lanternas, para-choque, faixa de chamas
+    [0.25, 0.5, 0.75].forEach(function (x) { brilho(c, '#3dff6e', W * 0.03); caixa(c, W * x - W * 0.04, H * 0.155, W * 0.08, H * 0.03, H * 0.008, '#3dff6e'); c.shadowBlur = 0; });
+    c.fillStyle = cor; for (k = 0; k < 6; k++) poli(c, [W * (0.12 + k * 0.13), H * 0.74, W * (0.17 + k * 0.13), H * 0.64, W * (0.2 + k * 0.13), H * 0.74], cor);
+    lanternaRedonda(c, W * 0.13, H * 0.69, W * 0.03); lanternaRedonda(c, W * 0.87, H * 0.69, W * 0.03);
+    caixa(c, W * 0.04, H * 0.8, W * 0.92, H * 0.05, H * 0.02, '#c9ced6');
+    placa(c, W * 0.38, H * 0.705, W * 0.24, H * 0.06, '🧸');
+  }
+  // trenó voador com as renas (a do nariz vermelho na frente) e o Papai Noel junto
+  function rena(c, x, y, s, fase, nariz) {
+    var pata = Math.sin(fase * Math.PI * 2) * s * 0.25;
+    oval(c, x, y, s * 0.42, s * 0.3, '#8b5a2b');   // corpo (de trás)
+    linha(c, [x - s * 0.22, y + s * 0.2, x - s * 0.25, y + s * 0.55 + pata], '#6b4220', s * 0.12); linha(c, [x + s * 0.22, y + s * 0.2, x + s * 0.25, y + s * 0.55 - pata], '#6b4220', s * 0.12);
+    circ(c, x, y + s * 0.18, s * 0.12, '#fff3e0');   // rabinho
+    circ(c, x, y - s * 0.38, s * 0.22, '#9a6a3a');   // cabeça
+    [-1, 1].forEach(function (l) { linha(c, [x + l * s * 0.1, y - s * 0.55, x + l * s * 0.3, y - s * 0.85, x + l * s * 0.42, y - s * 0.8], '#c9a06a', s * 0.06); linha(c, [x + l * s * 0.22, y - s * 0.72, x + l * s * 0.18, y - s * 0.9], '#c9a06a', s * 0.05); });
+    if (nariz) { brilho(c, '#ff2a2a', s * 0.6); circ(c, x, y - s * 0.62, s * 0.09, '#ff2a2a'); c.shadowBlur = 0; }
+    linha(c, [x - s * 0.3, y - s * 0.05, x + s * 0.3, y - s * 0.05], '#e63946', s * 0.08);   // arreio
+  }
+  function treno(c, W, H, cor, emoji, fase) {
+    fase = fase || 0;
+    // as renas lá na frente (mais acima e menores), em pares, e a do nariz vermelho puxando
+    var rd = [[0.5, 0.1, 0.09, true], [0.4, 0.22, 0.11], [0.6, 0.22, 0.11], [0.37, 0.36, 0.13], [0.63, 0.36, 0.13]];
+    rd.forEach(function (r, k) { linha(c, [W * r[0], H * (r[1] + 0.03), W * 0.5, H * 0.62], 'rgba(230,57,70,.7)', W * 0.004); rena(c, W * r[0], H * r[1], W * r[2], fase + k * 0.17, r[3]); });
+    // o trenó: vermelho com dourado, esquis curvados embaixo
+    linha(c, [W * 0.18, H * 0.95, W * 0.82, H * 0.95], '#ffd166', H * 0.025); circ(c, W * 0.18, H * 0.91, H * 0.04, '#ffd166'); circ(c, W * 0.82, H * 0.91, H * 0.04, '#ffd166');
+    linha(c, [W * 0.3, H * 0.86, W * 0.3, H * 0.95], '#ffd166', H * 0.015); linha(c, [W * 0.7, H * 0.86, W * 0.7, H * 0.95], '#ffd166', H * 0.015);
+    // saco de presentes atrás
+    c.fillStyle = grad(c, H * 0.5, H * 0.88, '#e63946', '#9d0208');
+    c.beginPath(); c.moveTo(W * 0.16, H * 0.88); c.quadraticCurveTo(W * 0.12, H * 0.58, W * 0.24, H * 0.56); c.lineTo(W * 0.76, H * 0.56); c.quadraticCurveTo(W * 0.88, H * 0.58, W * 0.84, H * 0.88); c.closePath(); c.fill();
+    linha(c, [W * 0.18, H * 0.6, W * 0.82, H * 0.6], '#ffd166', H * 0.02);
+    for (var k = 0; k < 5; k++) espiral(c, W * (0.26 + k * 0.12), H * 0.74, W * 0.025, '#ffd166', W * 0.004);
+    // Papai Noel sentado do lado direito (de costas): gorro vermelho com pompom e casaco
+    oval(c, W * 0.64, H * 0.5, W * 0.1, H * 0.1, '#d62828'); caixa(c, W * 0.54, H * 0.52, W * 0.2, H * 0.03, H * 0.01, '#1b1b22');
+    circ(c, W * 0.64, H * 0.36, W * 0.065, '#f4f4f4');   // barba de lado / cabelo branco
+    poli(c, [W * 0.58, H * 0.35, W * 0.7, H * 0.35, W * 0.66, H * 0.22], '#d62828'); circ(c, W * 0.66, H * 0.21, W * 0.02, '#ffffff'); caixa(c, W * 0.575, H * 0.34, W * 0.13, H * 0.03, H * 0.01, '#ffffff');
+    // o piloto senta do lado esquerdo (corpo; a cabeça é desenhada viva)
+    oval(c, W * 0.38, H * 0.5, W * 0.09, H * 0.09, tom(cor, -0.2));
+    piloto(c, emoji, W * 0.38, H * 0.36, H * 0.16);
+  }
+  // arara gigante voadora (vermelha, amarela e azul), batendo as asas, com quem monta nas costas
+  function arara(c, W, H, cor, emoji, fase) {
+    fase = fase || 0;
+    var bat = Math.sin(fase * Math.PI * 2), pena = function (x0, y0, x1, y1, w0, cores) { var g = c.createLinearGradient(x0, y0, x1, y1); cores.forEach(function (cc, k) { g.addColorStop(k / (cores.length - 1), cc); }); c.strokeStyle = g; c.lineWidth = w0; c.lineCap = 'round'; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); };
+    // asas (sobem e descem), com penas azuis e amarelas na ponta
+    [-1, 1].forEach(function (l) {
+      var bx = W * (0.5 + l * 0.1), by = H * 0.48, tx = W * (0.5 + l * 0.48), ty = H * (0.42 - bat * 0.28);
+      c.fillStyle = '#e63946'; c.beginPath(); c.moveTo(bx, by - H * 0.06); c.quadraticCurveTo((bx + tx) / 2, ty - H * 0.08, tx, ty); c.quadraticCurveTo((bx + tx) / 2, ty + H * 0.12, bx, by + H * 0.08); c.closePath(); c.fill();
+      for (var k = 0; k < 5; k++) { var f = 0.55 + k * 0.1, px = bx + (tx - bx) * f, py = by + (ty - by) * f; pena(px, py, px + l * W * 0.02, py + H * (0.1 + k * 0.012), W * 0.035, ['#ffd23f', '#2f8fe0', '#1d3fa0']); }
+    });
+    // cauda comprida (vermelha e azul) caindo para perto de quem olha
+    [-1, 0, 1].forEach(function (k) { pena(W * 0.5, H * 0.6, W * (0.5 + k * 0.06), H * 0.98, W * 0.06, ['#e63946', '#e63946', '#2f8fe0']); });
+    // corpo, cabeça lá na frente e o bico
+    oval(c, W * 0.5, H * 0.52, W * 0.13, H * 0.13, '#e63946'); oval(c, W * 0.5, H * 0.57, W * 0.09, H * 0.08, '#ffd23f');
+    linha(c, [W * 0.5, H * 0.45, W * 0.5, H * 0.16], '#e63946', W * 0.07);   // pescoço comprido: a cabeça aparece por cima de quem monta
+    circ(c, W * 0.5, H * 0.13, W * 0.06, '#e63946'); oval(c, W * 0.5, H * 0.07, W * 0.026, H * 0.022, '#2a2a30');
+    [-1, 1].forEach(function (l) { oval(c, W * (0.5 + l * 0.045), H * 0.13, W * 0.022, H * 0.03, '#ffffff'); circ(c, W * (0.5 + l * 0.05), H * 0.13, W * 0.009, '#1b1b22'); });
+    // listras que brilham (pássaro de um mundo fantástico)
+    brilho(c, '#7cf9ff', W * 0.03); linha(c, [W * 0.42, H * 0.47, W * 0.58, H * 0.47], '#7cf9ff', H * 0.008); linha(c, [W * 0.44, H * 0.55, W * 0.56, H * 0.55], '#7cf9ff', H * 0.008); c.shadowBlur = 0;
+    // quem monta: corpo nas costas da arara (a cabeça é viva)
+    oval(c, W * 0.5, H * 0.41, W * 0.075, H * 0.07, tom(cor, -0.1));
+    [-1, 1].forEach(function (l) { linha(c, [W * (0.5 + l * 0.06), H * 0.4, W * (0.5 + l * 0.09), H * 0.47], PELE, W * 0.025); });
+    piloto(c, emoji, W * 0.5, H * 0.32, H * 0.13);
+  }
+
   // ---------- céu ----------
   function aviao(c, W, H, cor, emoji) {   // aviãozinho de hélice, visto de trás
     linha(c, [W * 0.3, H * 0.66, W * 0.3, H * 0.86], '#333', W * 0.012); linha(c, [W * 0.7, H * 0.66, W * 0.7, H * 0.86], '#333', W * 0.012);
@@ -388,13 +554,19 @@
     { id: 'moto', janela: { elipse: [0.5, 0.14, 0.18, 0.123] }, cab: [0.5, 0.15, 0.22], capacete: true, grupo: 'moto', nome: ['Moto', 'Motorbike'], w: 520, h: 760, vel: 1.03, curva: 1.1, desenhar: moto },
     { id: 'skate', janela: { elipse: [0.5, 0.1, 0.3, 0.2] }, cab: [0.5, 0.1, 0.2], aberto: true, quadros: 12, bracos: true, grupo: 'moto', nome: ['Skate', 'Skateboard'], w: 560, h: 780, vel: 0.94, curva: 1.15, desenhar: skatista },
     { id: 'cavalo', janela: { elipse: [0.5, 0.16, 0.3, 0.2] }, cab: [0.5, 0.16, 0.132], aberto: true, quadros: 12, cavalo: true, grupo: 'moto', nome: ['Cavalo', 'Horse'], w: 720, h: 1050, vel: 0.97, curva: 1.12, desenhar: function (c, W, H, cor, e, f, corpo) { CAV.desenhar(c, W, H, cor, e, f, corpo); } },
+    { id: 'dino', janela: { elipse: [0.5, 0.16, 0.3, 0.2] }, cab: [0.5, 0.16, 0.132], aberto: true, quadros: 12, cavalo: true, bicho: 'dino', grupo: 'moto', nome: ['Dinossauro', 'Dinosaur'], w: 720, h: 1050, vel: 0.98, curva: 1.08, desenhar: function (c, W, H, cor, e, f, corpo) { CAV.desenhar(c, W, H, cor, e, f, corpo, 'dino'); } },
+    { id: 'furgao', janela: { poli: [0.24, 0.42, 0.24, 0.17, 0.76, 0.17, 0.76, 0.42] }, cab: [0.5, 0.33, 0.2], grupo: 'terra', nome: ['Furgão de Surfe', 'Surf Van'], w: 860, h: 900, vel: 0.99, curva: 1.0, desenhar: furgao },
+    { id: 'escolar', janela: { poli: [0.37, 0.43, 0.37, 0.21, 0.63, 0.21, 0.63, 0.43] }, cab: [0.5, 0.33, 0.17], quadros: 8, grupo: 'terra', nome: ['Ônibus Escolar', 'School Bus'], w: 980, h: 1000, vel: 0.95, curva: 0.96, desenhar: onibusEscolar },
+    { id: 'pelucias', janela: { poli: [0.15, 0.61, 0.15, 0.19, 0.85, 0.19, 0.85, 0.61] }, cab: [0.5, 0.33, 0.17], quadros: 8, grupo: 'terra', nome: ['Caminhão de Pelúcias', 'Plush Claw Truck'], w: 960, h: 960, vel: 0.96, curva: 0.98, desenhar: caminhaoPelucia },
     { id: 'aviao', janela: { elipse: [0.5, 0.44, 0.075, 0.1] }, cab: [0.5, 0.47, 0.16], grupo: 'ar', nome: ['Aviãozinho', 'Little Plane'], w: 1500, h: 760, vel: 1, curva: 1.05, desenhar: aviao, helice: true },
     { id: 'jato', janela: { elipse: [0.5, 0.43, 0.06, 0.09] }, cab: [0.5, 0.46, 0.14], grupo: 'ar', nome: ['Jato', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92, desenhar: jato, fogo: true },
+    { id: 'treno', janela: { elipse: [0.38, 0.36, 0.2, 0.2] }, cab: [0.38, 0.36, 0.17], aberto: true, quadros: 8, grupo: 'ar', nome: ['Trenó do Papai Noel', "Santa's Sleigh"], w: 1300, h: 1000, vel: 1.0, curva: 1.05, desenhar: treno },
+    { id: 'arara', janela: { elipse: [0.5, 0.32, 0.2, 0.2] }, cab: [0.5, 0.32, 0.14], aberto: true, quadros: 8, grupo: 'ar', nome: ['Arara Gigante', 'Giant Macaw'], w: 1300, h: 1000, vel: 1.04, curva: 1.08, desenhar: arara },
     { id: 'heli', janela: { elipse: [0.5, 0.48, 0.16, 0.15] }, cab: [0.5, 0.52, 0.21], grupo: 'ar', nome: ['Helicóptero', 'Helicopter'], w: 1100, h: 900, vel: 0.95, curva: 1.12, desenhar: helicoptero, rotor: true }
   ];
   var GRUPOS = [
     { id: 'terra', nome: ['🚗 Carros', '🚗 Cars'] },
-    { id: 'moto', nome: ['🏍️ Moto, skate e cavalo', '🏍️ Bike, skateboard and horse'] },
+    { id: 'moto', nome: ['🏍️ Moto, skate e montarias', '🏍️ Bike, skateboard and rides'] },
     { id: 'ar', nome: ['✈️ No céu (voa!)', '✈️ In the sky (flies!)'] }
   ];
   function achar(id) { for (var k = 0; k < LISTA.length; k++) if (LISTA[k].id === id) return LISTA[k]; return null; }

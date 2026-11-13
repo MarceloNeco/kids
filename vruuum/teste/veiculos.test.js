@@ -3,9 +3,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const V = require('../veiculos.js');
 
-test('12 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
-  assert.equal(V.LISTA.length, 12);
-  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 12);
+test('18 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
+  assert.equal(V.LISTA.length, 18);
+  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 18);
   const grupos = V.GRUPOS.map(g => g.id);
   for (const v of V.LISTA) {
     assert.ok(grupos.includes(v.grupo), v.id);
@@ -15,8 +15,8 @@ test('12 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
   }
 });
 
-test('avião, jato e helicóptero voam; os outros andam no chão', () => {
-  assert.deepEqual(V.LISTA.filter(v => V.voa(v.id)).map(v => v.id).sort(), ['aviao', 'heli', 'jato']);
+test('avião, jato, helicóptero, trenó e arara voam; os outros andam no chão', () => {
+  assert.deepEqual(V.LISTA.filter(v => V.voa(v.id)).map(v => v.id).sort(), ['arara', 'aviao', 'heli', 'jato', 'treno']);
   assert.equal(V.voa('classico'), false);
   assert.equal(V.achar('nao-existe'), null);
 });
