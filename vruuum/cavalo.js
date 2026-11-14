@@ -127,7 +127,7 @@
      Devolve também onde fica a cabeça de quem monta (centro e raio, na tela). */
   function montar(x0, y0, W, H, cor, fase, lado, corpoPiloto, t, bicho) {
     var dino = bicho === 'dino', PELE_B = dino ? DINO : PELO, PATA = dino ? DINO : PRETO;
-    var yaw = Math.max(-1, Math.min(1, lado || 0)) * GIRO, cam = camera(x0, y0, W, H, yaw), L = [];
+    var yaw = lado && lado.yaw != null ? lado.yaw : Math.max(-1, Math.min(1, lado || 0)) * GIRO, cam = camera(x0, y0, W, H, yaw), L = [];   // {yaw}: giro livre (volta de 360° na largada)
     var cp = corpo(fase), C0 = [0, 1.2, 0];
     function B(p) { var q = gira(p, cp.inc, C0); return [q[0], q[1] + cp.sobe, q[2]]; }   // ponto preso ao corpo do cavalo
     var menina = corpoPiloto === 'menina', camisa = tres(cor), manta = [tom(cor, 0.45), tom(cor, 0.12), tom(cor, -0.35)];

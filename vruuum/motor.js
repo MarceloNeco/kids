@@ -25,8 +25,8 @@
   var TOQUE = { estrela: 0.28, cone: 0.24, lama: 0.3, turbo: 0.3, rampa: 0.3, caixa: 0.33 };
 
   // rivais (personagens): configs = [{ id, veic, mod: { vel, curva } }]
-  function novaCorrida(nivel, semente, nJogadores, configs) {
-    var pista = P.montar(nivel, semente);
+  function novaCorrida(nivel, semente, nJogadores, configs, mundos) {
+    var pista = P.montar(nivel, semente, mundos);   // mundos: os cenários que a criança escolheu (os que faltam são sorteados)
     var n = nJogadores === 2 ? 2 : 1, jogadores = [];
     for (var k = 0; k < n; k++) {
       jogadores.push({ n: k, x: n === 2 ? (k ? 0.4 : -0.4) : 0, z: 1000, vel: 0, estrelas: 0, pontos: 0, tCheck: 0, turbo: 0, pulo: 0, puloMax: 0, recarga: 0, rodando: 0, tremor: 0, chegou: false, tempo: 0, batidas: 0, mundo: 0, fora: false, empurrao: 0, derrapa: 0, ladoDerrapa: 0, roleta: 0, poder: null, escudo: 0, foguete: 0, loop: null, loopings: 0 });

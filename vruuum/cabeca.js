@@ -228,7 +228,7 @@
      desenho já é a nuca; quando vira, o capacete inteiro gira e aparece o rosto pela viseira.
      Veículo "aberto" (skate): a cabeça fica no alto do corpo, sem janela, sem ombros, sem vidro. */
   function desenhar(c, v, x0, y0, W, H, info, t, semente, periodo, onde) {   // onde: {x, y, r} da cabeça, quando ela se mexe (cavalo)
-    if (!v || !v.cab || !v.janela || W < 6 || !raiz.document) return;
+    if (!v || !v.cab || !v.janela || v.semPiloto || W < 6 || !raiz.document) return;   // o Ovo é ele mesmo o piloto
     var e = estado(t, semente || 0, periodo || 7), cx = onde ? onde.x : x0 + v.cab[0] * W, cy = onde ? onde.y : y0 + v.cab[1] * H, r = onde ? onde.r : v.cab[2] * H / 2;
     var capCor = null, rabo = info.personagem && info.personagem.rabo;
     if (v.capacete) { var je = v.janela.elipse; cx = x0 + je[0] * W; cy = y0 + je[1] * H; r = je[2] * W; capCor = info.cor || '#ff7b00'; }
