@@ -56,3 +56,6 @@ footer b{color:var(--ouro)}
 .bib-topo h2 .radinho{width:42px;height:34px}
 .bib-topo h2 .radinho i{font-size:16px}
 .bib-topo h2 small{display:block;font-size:.85rem;font-weight:600;color:#b3acd6}
+
+/* Proteção: se o idioma.js não rodou (ou veio uma cópia antiga sem a classe idioma-*), mostra só o português */
+html:not(.idioma-pt):not(.idioma-en):not(.idioma-es) .en,html:not(.idioma-pt):not(.idioma-en):not(.idioma-es) .es{display:none!important}
