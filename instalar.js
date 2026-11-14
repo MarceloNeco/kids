@@ -54,6 +54,22 @@
   var comoApp = janelaDeApp && (function () { try { return sessionStorage.getItem(MARCA_APP) === '1'; } catch (e) { return true; } })();
   var dentroDeOutroApp = janelaDeApp && !comoApp;
   if (comoApp) return;
+  // "⋮ → Abrir no Chrome" leva ESTA página da janelinha com ✕ para uma aba do Chrome SEM recarregar: o aviso "abriu por
+  // dentro de outro app" ficava lá, no Chrome de verdade, e o Chrome não oferecia instalar (dono, 14/Nov/2026, print).
+  // Saiu da janela de app → recarrega uma vez; já no Chrome, a barra volta a ser o Instalar de um toque.
+  if (dentroDeOutroApp && window.matchMedia) {
+    var aindaJanela = function () {
+      return !!document.fullscreenElement || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: minimal-ui)').matches;
+    };
+    var saiu = false, conferir = function () { if (!saiu && !aindaJanela()) { saiu = true; location.reload(); } };
+    ['standalone', 'fullscreen', 'minimal-ui'].forEach(function (m) {
+      var q = matchMedia('(display-mode: ' + m + ')');
+      if (q && q.addEventListener) q.addEventListener('change', conferir); else if (q && q.addListener) q.addListener(conferir);
+    });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) conferir(); });
+    window.addEventListener('focus', conferir);
+    setInterval(conferir, 1500);
+  }
 
   var css = '' +
     '.bc-inst{position:sticky;top:0;z-index:10;display:flex;justify-content:center;width:100%;padding:.7rem 0 .8rem;pointer-events:none}' +
@@ -300,15 +316,15 @@
     // Android sem a janela de instalar do Chrome: ou abriu por um link de outro app (janelinha com ✕ em cima, onde o
     // Chrome não instala), ou já está instalado (no Samsung o ícone vai para a gaveta de apps, não para a tela inicial)
     if (android) return T('<ol><li>Se em cima da página aparece um <b>✕</b> (a página abriu dentro de outro app, como o atalho do Portal), toque nos <b>três pontinhos ⋮</b> ao lado do ✕ e escolha <b>Abrir no Chrome</b>. Os próximos passos são lá no Chrome.</li>' +
-      '<li>No Chrome, toque nos <b>três pontinhos ⋮</b> (no canto de cima) e em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
+      '<li>No Chrome, toque nos <b>três pontinhos ⋮</b> (no canto de cima), <b>role a lista para baixo</b> e toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>. Se perguntar, escolha <b>Instalar</b> (não "Criar atalho").</li>' +
       '<li>Confirme em <b>Instalar</b>.</li></ol>' +
       '<p class="aviso">Apagar o ícone da tela inicial não desinstala: o ' + N + ' continua instalado na lista de apps (por isso o Chrome não oferece instalar de novo). Não achou o ícone? Arraste a tela inicial para cima para abrir a <b>lista de apps</b> e procure <b>' + N + '</b>. Segure o dedo em cima dele e arraste para a tela inicial.</p>',
       '<ol><li>If you see an <b>✕</b> at the top of the page (it opened inside another app, like the Portal shortcut), tap the <b>three dots ⋮</b> next to the ✕ and choose <b>Open in Chrome</b>. The next steps happen there in Chrome.</li>' +
-      '<li>In Chrome, tap the <b>three dots ⋮</b> (top corner) and <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
+      '<li>In Chrome, tap the <b>three dots ⋮</b> (top corner), <b>scroll down the list</b> and tap <b>Install app</b> or <b>Add to Home screen</b>. If it asks, choose <b>Install</b> (not "Create shortcut").</li>' +
       '<li>Confirm with <b>Install</b>.</li></ol>' +
       '<p class="aviso">Removing the icon from the home screen doesn\'t uninstall it: ' + N + ' is still installed in the app list (that\'s why Chrome won\'t offer to install it again). Can\'t find the icon? Swipe up on the home screen to open the <b>app list</b> and look for <b>' + N + '</b>. Hold your finger on it and drag it to the home screen.</p>',
       '<ol><li>Si arriba de la página aparece una <b>✕</b> (se abrió dentro de otra app, como el acceso directo del Portal), toca los <b>tres puntitos ⋮</b> junto a la ✕ y elige <b>Abrir en Chrome</b>. Los siguientes pasos son allí, en Chrome.</li>' +
-      '<li>En Chrome, toca los <b>tres puntitos ⋮</b> (arriba) y <b>Instalar aplicación</b> o <b>Añadir a la pantalla de inicio</b>.</li>' +
+      '<li>En Chrome, toca los <b>tres puntitos ⋮</b> (arriba), <b>baja por la lista</b> y toca <b>Instalar aplicación</b> o <b>Añadir a la pantalla de inicio</b>. Si te pregunta, elige <b>Instalar</b> (no "Crear acceso directo").</li>' +
       '<li>Confirma con <b>Instalar</b>.</li></ol>' +
       '<p class="aviso">Quitar el icono de la pantalla de inicio no lo desinstala: ' + N + ' sigue instalado en la lista de apps (por eso Chrome no ofrece instalarlo otra vez). ¿No encuentras el icono? Desliza hacia arriba en la pantalla de inicio para abrir la <b>lista de apps</b> y busca <b>' + N + '</b>. Mantén el dedo encima y arrástralo a la pantalla de inicio.</p>');   // sem botão "Abrir no Chrome": dentro da janelinha com ✕ ele só recarrega a página (dono, 14/Nov/2026)
     if (macSafari) return T('<ol><li>No menu do topo da tela, clique em <b>Arquivo</b>.</li>' +
