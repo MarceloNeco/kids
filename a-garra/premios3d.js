@@ -1,4 +1,4 @@
-/* A-GARRA — os prêmios em 3D, montados em código com peças simples (bolas, cilindros, cones, caixas), todos desenho
+/* H-rraaa (pasta a-garra) — os prêmios em 3D, montados em código com peças simples (bolas, cilindros, cones, caixas), todos desenho
    próprio (nenhum personagem de marca). Cada tipo vira UMA geometria com as cores nos vértices (rápido no celular) e,
    por cima, os olhos (piscam) e as asas (batem) como pecinhas separadas.
      MAQUINAS             as máquinas (cada uma é um jogo): nome, prêmios, o raro e se os bichinhos são vivos

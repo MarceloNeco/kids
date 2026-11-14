@@ -24,6 +24,25 @@ test('biblioteca-musicas.js em dia com as músicas de cada jogo, com nome, autor
   }
 });
 
+test('Trilha: música desligada na biblioteca sai do repertório do jogo; todas desligadas = toca todas (nunca mudo)', () => {
+  const guardado = {};
+  globalThis.localStorage = { getItem: (k) => (k in guardado ? guardado[k] : null), setItem: (k, v) => { guardado[k] = String(v); }, removeItem: (k) => { delete guardado[k]; } };
+  globalThis.location = { href: 'http://x/kids/campo-minado/' };
+  delete require.cache[require.resolve('../trilha.js')];
+  const T = require('../trilha.js');
+  const lista = ['a', 'b', 'c'].map((n) => ({ a: '../rabiscolandia/musicas/' + n + '.mp3', t: n }));
+  T.desligar('campo-minado', '/kids/rabiscolandia/musicas/b.mp3', true);   // como a biblioteca grava (endereço da estante)
+  assert.ok(T.desligada('campo-minado', '../rabiscolandia/musicas/b.mp3'), 'o mesmo arquivo, visto de dentro do jogo');
+  for (let i = 0; i < 30; i++) assert.deepStrictEqual(T.embaralhar(lista, 'campo-minado').map((m) => m.t).sort(), ['a', 'c']);
+  assert.strictEqual(T.embaralhar(lista, 'labirinto').length, 3, 'só vale para aquele jogo');
+  T.desligar('campo-minado', '/kids/rabiscolandia/musicas/a.mp3', true); T.desligar('campo-minado', '/kids/rabiscolandia/musicas/c.mp3', true);
+  assert.strictEqual(T.embaralhar(lista, 'campo-minado').length, 3, 'todas desligadas: toca todas');
+  for (const n of ['a', 'b', 'c']) T.desligar('campo-minado', '/kids/rabiscolandia/musicas/' + n + '.mp3', false);
+  assert.deepStrictEqual(T.desligadas('campo-minado'), [], 'religar tira da lista');
+  assert.ok(/TR\.desligada\('peluqueria'/.test(fs.readFileSync(path.join(raiz, 'peluqueria/som.js'), 'utf8')), 'a Peluqueria (tocador próprio) também obedece');
+  delete globalThis.localStorage; delete globalThis.location;
+});
+
 test('estante: 🎵 abre a biblioteca, ▶ toca, Voltar fecha sem sair da estante', async () => {
   const { chromium } = require('playwright');
   const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.mp3': 'audio/mpeg', '.webmanifest': 'application/manifest+json' };
@@ -41,7 +60,7 @@ test('estante: 🎵 abre a biblioteca, ▶ toca, Voltar fecha sem sair da estant
   try {
     for (const [cod, titulo] of [['pt', /Biblioteca de músicas/], ['en', /Music library/], ['es', /Biblioteca de música/]]) {
       const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-      await ctx.addInitScript((c) => { localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:novidades-vistas', '["*"]'); }, cod);
+      await ctx.addInitScript((c) => { localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); }, cod);
       await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
       const pg = await ctx.newPage(), erros = [];
       pg.on('pageerror', (e) => erros.push(e.message));
@@ -58,6 +77,18 @@ test('estante: 🎵 abre a biblioteca, ▶ toca, Voltar fecha sem sair da estant
         await pg.waitForFunction(() => document.querySelector('.bib li.toca') || document.querySelector('.bib li em'), null, { timeout: 5000 });
         const src = await pg.$eval('.bib li >> nth=3', (li) => li.getAttribute('data-a'));
         assert.match(src, /\.mp3$/);
+      }
+      if (cod === 'pt') {
+        // "✓ No jogo" → "🚫 Fora": tira a música do repertório daquele jogo e fica guardado
+        const li = '.bib li[data-jogo="campo-minado"] >> nth=0';
+        assert.match(await pg.textContent(li + ' >> .liga'), /No jogo/);
+        await pg.click(li + ' >> .liga');
+        assert.match(await pg.textContent(li + ' >> .liga'), /Fora/);
+        const a = await pg.getAttribute(li, 'data-a');
+        assert.ok(await pg.evaluate((u) => Trilha.desligada('campo-minado', u), a), 'gravado como desligada');
+        assert.ok(!(await pg.evaluate((u) => Trilha.desligada('labirinto', u), a)), 'só naquele jogo');
+        await pg.click(li + ' >> .liga');
+        assert.ok(!(await pg.evaluate((u) => Trilha.desligada('campo-minado', u), a)), 'religada');
       }
       await pg.goBack(); await pg.waitForTimeout(300);
       assert.ok(await pg.$eval('.bib', (e) => e.hidden), cod + ': o Voltar fechou a biblioteca');

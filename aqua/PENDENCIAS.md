@@ -14,3 +14,5 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 8 | Dicas mais curtas: o caminho da dica sempre chega ao fim, mas não é o mais curto possível (no Difícil pode ter umas 60 jogadas onde 40 bastariam). | v0.1.0 | 🟡 |
 | 9 | Regra zero (diretriz geral): itens que a família Bolinho de Chuva ainda não tem e o dono decide se entram: 💬 feedback em toda tela, AssistONE, pacote `.zip` de entrega. | diretriz | ⏸ aguardando o dono |
 | 10 | Cartão da estante com fundo próprio (`cartoes/aqua.svg`); hoje usa o fundo genérico. | v0.1.0 | 🟡 |
+| 11 | Fundo em carrossel ("está muito vazio o fundo"): fotos de verdade e desenhos animados, misturados; a cena troca com transição a cada frasco fechado; 10 cenas de graça e os cenários da lojinha viram pacotes de 2 cenas. | dono, 14/Nov/2026 | ✅ v0.3.0 |
+| 12 | Ver no celular se o fundo atrapalha em alguma cena (cores dos líquidos difíceis de ver, movimento demais) e se o aparelho fica lento ou esquenta; dá para deixar o véu mais forte ou trocar uma foto. | entrega v0.3.0 | ⏸ aguardando o dono |

@@ -1,4 +1,4 @@
-// Testes de arquivos do A-GARRA: node --test a-garra/teste/*.test.js (rodar da raiz do repositório kids)
+// Testes de arquivos do H-rraaa (pasta a-garra): node --test a-garra/teste/*.test.js (rodar da raiz do repositório kids)
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -6,11 +6,11 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.4.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.4.1 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.4.0'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(a, '0.4.1'); assert.equal(a, s); assert.equal(v.versao, a);
   assert.equal(v.data, '14/Nov/2026');
   assert.match(ler('app.js'), /APP_DATA = \['14\/Nov\/2026', 'Nov\/14\/2026', '14\/nov\/2026'\]/);
   for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);

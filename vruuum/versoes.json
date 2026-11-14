@@ -2,6 +2,54 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.23.0",
+      "data": "14/Nov/2026",
+      "hora": "17:55:00",
+      "pt": [
+        "✈️ Os que voam mais caprichados: rastro branco nas pontas das asas, luzes vermelha e verde piscando, clarão no motor do jato, luz do helicóptero, purpurina mágica atrás do trenó com o nariz da rena brilhando, pintas da arara acendendo e olhos acesos do morcego."
+      ],
+      "en": [
+        "✈️ Fancier flyers: white trails from the wingtips, blinking red and green lights, a glow from the jet engine, the helicopter beacon, magic glitter behind the sleigh with the reindeer's glowing nose, the macaw's spots lighting up and the bat's glowing eyes."
+      ],
+      "es": [
+        "✈️ Los que vuelan, más cuidados: estela blanca en las puntas de las alas, luces roja y verde parpadeando, resplandor en el motor del jet, la luz del helicóptero, purpurina mágica detrás del trineo con la nariz del reno brillando, las manchas del guacamayo encendiéndose y los ojos brillantes del murciélago."
+      ]
+    },
+    {
+      "versao": "1.22.0",
+      "data": "14/Nov/2026",
+      "hora": "17:40:00",
+      "pt": [
+        "🛹 Skate em 3D de verdade: o pé de trás rema no chão, os braços abrem para equilibrar e o shape tem rodinhas e tails; na curva aparece o lado. Menina de saia, menino de bermuda (também nos patins).",
+        "🐎 Cavalo, dinossauro, galinha e ovo levantam poeirinha correndo; a galinha solta penas quando pula."
+      ],
+      "en": [
+        "🛹 Skateboard in real 3D: the back foot pushes the ground, arms open for balance and the board has wheels and kicktails; you see its side in curves. Girls in skirts, boys in shorts (on roller skates too).",
+        "🐎 Horse, dinosaur, hen and egg kick up little dust clouds; the hen drops feathers when she jumps."
+      ],
+      "es": [
+        "🛹 Monopatín en 3D de verdad: el pie de atrás empuja el suelo, los brazos se abren para mantener el equilibrio y la tabla tiene ruedas y colas; en las curvas se ve de lado. Las niñas con falda y los niños con pantalón corto (también en los patines).",
+        "🐎 El caballo, el dinosaurio, la gallina y el huevo levantan polvillo al correr; la gallina suelta plumas cuando salta."
+      ]
+    },
+    {
+      "versao": "1.21.0",
+      "data": "14/Nov/2026",
+      "hora": "17:10:00",
+      "pt": [
+        "✨ Carros mais caprichados: rodas girando de verdade (com raios e pneu andando), pintura brilhando com reflexo de luz, lanternas acesas e fumacinha saindo do escapamento.",
+        "🏎️ Clássico, GT e Superesportivo com carroceria arredondada; Caminhão Guincho com o giroflex iluminando em volta."
+      ],
+      "en": [
+        "✨ Fancier cars: wheels that really spin (spokes and rolling tires), shiny paint that catches the light, glowing tail lights and little puffs of exhaust smoke.",
+        "🏎️ Classic, GT and Supercar with rounded bodies; the Tow Truck's beacons light up around it."
+      ],
+      "es": [
+        "✨ Coches más cuidados: ruedas que giran de verdad (con radios y neumáticos rodando), pintura brillante con reflejos de luz, pilotos encendidos y humito saliendo del tubo de escape.",
+        "🏎️ Clásico, GT y Superdeportivo con carrocería redondeada; el rotativo del Camión Grúa ilumina alrededor."
+      ]
+    },
+    {
       "versao": "1.20.0",
       "data": "14/Nov/2026",
       "hora": "16:40:00",
