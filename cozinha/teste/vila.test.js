@@ -30,7 +30,7 @@ test('vila.js: cada lugar da vila tem o seu bloquinho desenhado, e o cozinheirin
 test('mapa: bloquinhos, ruas, o cozinheirinho na porta de casa e a faixa da missão com a seta (Médio)', { timeout: 30000 }, async () => {
   const { ctx, pg, erros } = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true });
   await comecar(pg, 'medio', 'pao-queijo');
-  assert.equal(await pg.locator('#vila .lugar svg.bloco').count(), 8);
+  assert.equal(await pg.locator('#vila .lugar svg.bloco').count(), 10, '10 lugares (com a padaria e a feira, v0.10.0)');
   await pg.waitForFunction(() => document.querySelector('#vila .ruas path'));
   assert.ok(await pg.evaluate(() => document.querySelector('#vila .ruas path').getAttribute('d').split('M').length > 4), 'ruas desenhadas');
   // o cozinheirinho começa na porta de casa (na rua embaixo do bloco da casa)

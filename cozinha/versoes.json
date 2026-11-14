@@ -2,6 +2,23 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.10.0",
+      "data": "14/Nov/2026",
+      "hora": "15:30:00",
+      "pt": [
+        "🥖 Lugar novo na vila: a Padaria do Seu Joaquim, com um pão gigante no telhado e fumacinha do forno. Vende pão, leite, queijo e manteiga.",
+        "🍉 Lugar novo: a Feira da Dona Rosa, com barracas de toldo listrado e bandeirinhas. Vende frutas e legumes.",
+        "🍇 Receita nova: suco de jabuticaba. No pomar tem a jaboticabeira, e o jogo ensina que a jabuticaba nasce grudadinha no tronco!",
+        "🏘️ A vila agora tem 10 lugares."
+      ],
+      "en": [
+        "🥖 New place in the village: Mr. Joaquim's bakery, with a giant loaf on the roof and smoke from the oven. Sells bread, milk, cheese and butter.",
+        "🍉 New place: Mrs. Rosa's street market, with striped stalls and bunting. Sells fruit and vegetables.",
+        "🍇 New recipe: jabuticaba juice. The orchard has a jabuticaba tree, and the game teaches that the fruit grows stuck right on the trunk!",
+        "🏘️ The village now has 10 places."
+      ]
+    },
+    {
       "versao": "0.9.0",
       "data": "14/Nov/2026",
       "hora": "14:10:00",
