@@ -147,7 +147,7 @@
     function pintar() {
       var tocando = !audio.paused;
       bSom.textContent = tocando ? '🔊' : '🔇';
-      bSom.setAttribute('aria-label', tocando ? t('Desligar a música', 'Turn the music off', 'Apagar la música') : t('Ligar a música', 'Turn the music on', 'Prender la música'));
+      bSom.setAttribute('aria-label', tocando ? t('Desligar a música', 'Turn the music off', 'Apagar la música') : t('Ligar a música', 'Turn the music on', 'Encender la música'));
       var m = naFavorita ? favoritaDaLista() : lista[atual];
       nome.innerHTML = '';
       nome.appendChild(document.createTextNode('🎵 ' + m.t + ' · ' + m.au + ' · ' + m.lic + ' '));

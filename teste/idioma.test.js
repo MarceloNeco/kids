@@ -57,7 +57,8 @@ test('estante: três botões com bandeira, a escolha muda os textos e fica guard
   try {
     await pg.goto(base, { waitUntil: 'load' }); await assentar(pg);
     const bts = await pg.$$eval('[data-idiomas] button', bs => bs.map(b => b.textContent.trim()));
-    assert.deepEqual(bts, ['🇧🇷PT', '🇺🇸EN', '🇪🇸ES']);
+    assert.deepEqual(bts, ['PT', 'EN', 'ES']);
+    assert.equal(await pg.$$eval('[data-idiomas] button svg', s => s.length), 3, 'bandeiras desenhadas (SVG)');
     assert.match(await pg.evaluate(() => document.body.innerText), /Brincar/);
     for (const [cod, re] of [['en', /\bPlay\b/], ['es', /Jugar/], ['pt', /Brincar/]]) {
       await pg.click('[data-idiomas] button[data-idioma="' + cod + '"]');
