@@ -24,6 +24,7 @@ test('sw.js guarda todos os arquivos publicados e as peças de fora', () => {
   for (const a of lista) if (a !== './') assert.ok(fs.existsSync(path.join(pasta, a)), 'falta no disco: ' + a);
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|svg|webmanifest)$/.test(f) && f !== 'sw.js');
   for (const f of publicados) assert.ok(lista.includes(f), 'sw.js não guarda: ' + f);
+  for (const f of fs.readdirSync(path.join(pasta, 'personagens'))) assert.ok(lista.includes('personagens/' + f), 'sw.js não guarda: personagens/' + f);
   const html = ler('index.html');
   for (const m of html.matchAll(/src="(\.\.\/[^"]+)"/g)) assert.ok(lista.includes(m[1]), 'sw.js não guarda: ' + m[1]);
   assert.ok(lista.includes('../rabiscolandia/fontes/fredoka.woff2'));

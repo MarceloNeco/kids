@@ -8,3 +8,5 @@
 | Músicas: *Fluffing a Duck*, *Investigations*, *Music to Delight*, *Life of Riley*, *Sneaky Snitch*, *Carefree*, *Batty McFaddin* (`../rabiscolandia/musicas/`); *Feelin Good*, *Stringed Disco* (`../peluqueria/musicas/`) | Kevin MacLeod (incompetech.com) | Creative Commons: By Attribution 4.0 (detalhe em `rabiscolandia/musicas/LICENCAS.md` e `peluqueria/CREDITOS.md`) |
 | Músicas: *Ukulele Song* e *Happy Whistling Ukulele* (Rafael Krux), *My Giant Bunny Friend* (Bryan Teoh) (`../baguncolandia/musicas/`) | FreePD (freepd.com) | domínio público, CC0 1.0 |
 | Biblioteca supabase-js (só no jogo em dois celulares) | `../baguncolandia/libs/supabase.js` | MIT |
+| Lista de personagens da Meleca Adivinha (`personagens/`) | escrita para este jogo: só nomes, emojis e respostas sim/não; nenhuma imagem, logotipo ou texto de terceiros | do projeto (os nomes são de seus donos) |
+| Voz animada (opcional) | ElevenLabs, com a chave e a conta da própria pessoa; as falas geradas ficam só no aparelho dela | termos da ElevenLabs |
