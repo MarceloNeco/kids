@@ -17,7 +17,7 @@
     return v;
   }
   var CAV = raiz.VruuumCavalo || (typeof require === 'function' ? require('./cavalo.js') : null);
-  var circ = U.circ, oval = U.oval, caixa = U.caixa, poli = U.poli, linha = U.linha, sombra = U.sombra, brilho = U.brilho;
+  var circ = U.circ, oval = U.oval, caixa = U.caixa, poli = U.poli, linha = U.linha, sombra = U.sombra;
 
   function tom(cor, f) {   // f > 0 clareia, f < 0 escurece
     var n = parseInt(cor.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
@@ -201,121 +201,6 @@
     membro(c, om, [mx, my], W * 0.06 * k, W * 0.052 * k, tom(cor, s < 0 ? -0.25 : 0.05), null);
   }
 
-  // conversível rosa: capota abaixada, a piloto aparece por inteiro; lanternas de coração, pneus de faixa branca,
-  // laço no porta-malas. Desenho próprio, sem marca. A carroceria é sempre rosa; a cor escolhida vira o friso.
-
-  // ---------- 1.11.0: veículos novos (desenhos próprios, sem marca) ----------
-  // arara gigante voadora (vermelha, amarela e azul), batendo as asas, com quem monta nas costas
-  function arara(c, W, H, cor, emoji, fase) {
-    fase = fase || 0;
-    var bat = Math.sin(fase * Math.PI * 2), pena = function (x0, y0, x1, y1, w0, cores) { var g = c.createLinearGradient(x0, y0, x1, y1); cores.forEach(function (cc, k) { g.addColorStop(k / (cores.length - 1), cc); }); c.strokeStyle = g; c.lineWidth = w0; c.lineCap = 'round'; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); };
-    // asas (sobem e descem), com penas azuis e amarelas na ponta
-    [-1, 1].forEach(function (l) {
-      var bx = W * (0.5 + l * 0.1), by = H * 0.48, tx = W * (0.5 + l * 0.48), ty = H * (0.42 - bat * 0.28);
-      c.fillStyle = '#e63946'; c.beginPath(); c.moveTo(bx, by - H * 0.06); c.quadraticCurveTo((bx + tx) / 2, ty - H * 0.08, tx, ty); c.quadraticCurveTo((bx + tx) / 2, ty + H * 0.12, bx, by + H * 0.08); c.closePath(); c.fill();
-      for (var k = 0; k < 5; k++) { var f = 0.55 + k * 0.1, px = bx + (tx - bx) * f, py = by + (ty - by) * f; pena(px, py, px + l * W * 0.02, py + H * (0.1 + k * 0.012), W * 0.035, ['#ffd23f', '#2f8fe0', '#1d3fa0']); }
-    });
-    // cauda comprida (vermelha e azul) caindo para perto de quem olha
-    [-1, 0, 1].forEach(function (k) { pena(W * 0.5, H * 0.6, W * (0.5 + k * 0.06), H * 0.98, W * 0.06, ['#e63946', '#e63946', '#2f8fe0']); });
-    // corpo, cabeça lá na frente e o bico
-    oval(c, W * 0.5, H * 0.52, W * 0.13, H * 0.13, '#e63946'); oval(c, W * 0.5, H * 0.57, W * 0.09, H * 0.08, '#ffd23f');
-    linha(c, [W * 0.5, H * 0.45, W * 0.5, H * 0.16], '#e63946', W * 0.07);   // pescoço comprido: a cabeça aparece por cima de quem monta
-    circ(c, W * 0.5, H * 0.13, W * 0.06, '#e63946'); oval(c, W * 0.5, H * 0.07, W * 0.026, H * 0.022, '#2a2a30');
-    [-1, 1].forEach(function (l) { oval(c, W * (0.5 + l * 0.045), H * 0.13, W * 0.022, H * 0.03, '#ffffff'); circ(c, W * (0.5 + l * 0.05), H * 0.13, W * 0.009, '#1b1b22'); });
-    // listras que brilham (pássaro de um mundo fantástico)
-    brilho(c, '#7cf9ff', W * 0.03); linha(c, [W * 0.42, H * 0.47, W * 0.58, H * 0.47], '#7cf9ff', H * 0.008); linha(c, [W * 0.44, H * 0.55, W * 0.56, H * 0.55], '#7cf9ff', H * 0.008); c.shadowBlur = 0;
-    // quem monta: corpo nas costas da arara (a cabeça é viva)
-    oval(c, W * 0.5, H * 0.41, W * 0.075, H * 0.07, tom(cor, -0.1));
-    [-1, 1].forEach(function (l) { linha(c, [W * (0.5 + l * 0.06), H * 0.4, W * (0.5 + l * 0.09), H * 0.47], PELE, W * 0.025); });
-    piloto(c, emoji, W * 0.5, H * 0.32, H * 0.13);
-  }
-
-  // morcego gigante (de costas, asas batendo) com quem monta; perto das coisas ele vira o Conde Drácula
-  function morcego(c, W, H, cor, emoji, fase) {
-    fase = fase || 0; var bat = Math.sin(fase * Math.PI * 2);
-    [-1, 1].forEach(function (l) {
-      var bx = W * (0.5 + l * 0.08), by = H * 0.5, tx = W * (0.5 + l * 0.49), ty = H * (0.4 - bat * 0.26);
-      c.fillStyle = '#2b1d3a'; c.beginPath(); c.moveTo(bx, by - H * 0.1);
-      c.quadraticCurveTo((bx + tx) / 2, ty - H * 0.12, tx, ty);
-      for (var k = 3; k >= 1; k--) { var px = bx + (tx - bx) * (k / 4), py = by + (ty - by) * (k / 4) + H * 0.12; c.quadraticCurveTo(bx + (tx - bx) * ((k + 0.5) / 4), by + (ty - by) * ((k + 0.5) / 4) + H * 0.04, px, py); }
-      c.lineTo(bx, by + H * 0.08); c.closePath(); c.fill();
-      c.strokeStyle = '#5a3f78'; c.lineWidth = W * 0.008; for (k = 1; k < 4; k++) { c.beginPath(); c.moveTo(bx, by); c.lineTo(bx + (tx - bx) * (k / 4), by + (ty - by) * (k / 4) + H * 0.1); c.stroke(); }
-    });
-    oval(c, W * 0.5, H * 0.53, W * 0.11, H * 0.15, '#3a2850'); oval(c, W * 0.5, H * 0.58, W * 0.06, H * 0.08, '#4b3466');
-    // cabeça com orelhas pontudas lá na frente
-    circ(c, W * 0.5, H * 0.2, W * 0.06, '#3a2850');
-    [-1, 1].forEach(function (l) { poli(c, [W * (0.5 + l * 0.02), H * 0.16, W * (0.5 + l * 0.06), H * 0.05, W * (0.5 + l * 0.07), H * 0.18], '#3a2850'); });
-    oval(c, W * 0.5, H * 0.38, W * 0.07, H * 0.06, tom(cor, -0.15));
-    piloto(c, emoji, W * 0.5, H * 0.29, H * 0.13);
-  }
-  // o Conde Drácula (personagem de Bram Stoker, 1897, domínio público; desenho próprio), voando de costas com a capa
-  // aberta (preta por fora, vermelha por dentro) e quem monta sentado nos ombros dele
-  function dracula(c, W, H, cor, emoji) {
-    [-1, 1].forEach(function (l) {
-      c.fillStyle = '#12101a'; c.beginPath(); c.moveTo(W * 0.5, H * 0.42); c.quadraticCurveTo(W * (0.5 + l * 0.3), H * 0.3, W * (0.5 + l * 0.48), H * 0.36);
-      c.lineTo(W * (0.5 + l * 0.42), H * 0.55); c.lineTo(W * (0.5 + l * 0.46), H * 0.72); c.lineTo(W * (0.5 + l * 0.3), H * 0.68); c.lineTo(W * (0.5 + l * 0.26), H * 0.9); c.lineTo(W * 0.5, H * 0.8); c.closePath(); c.fill();
-      c.fillStyle = '#b5121b'; c.beginPath(); c.moveTo(W * (0.5 + l * 0.06), H * 0.48); c.quadraticCurveTo(W * (0.5 + l * 0.3), H * 0.38, W * (0.5 + l * 0.44), H * 0.4); c.lineTo(W * (0.5 + l * 0.38), H * 0.55); c.lineTo(W * (0.5 + l * 0.2), H * 0.6); c.closePath(); c.fill();
-    });
-    caixa(c, W * 0.4, H * 0.48, W * 0.2, H * 0.32, W * 0.05, '#1b1b26');   // costas do terno
-    poli(c, [W * 0.36, H * 0.45, W * 0.64, H * 0.45, W * 0.6, H * 0.36, W * 0.4, H * 0.36], '#b5121b');   // gola alta
-    circ(c, W * 0.5, H * 0.42, W * 0.07, '#15131a'); poli(c, [W * 0.47, H * 0.36, W * 0.5, H * 0.41, W * 0.53, H * 0.36], '#15131a');   // cabelo penteado com o bico
-    [-1, 1].forEach(function (l) { oval(c, W * (0.5 + l * 0.075), H * 0.43, W * 0.015, H * 0.03, '#e9e4f2'); });   // orelhas pálidas
-    // quem monta, sentado nos ombros dele
-    [-1, 1].forEach(function (l) { linha(c, [W * (0.5 + l * 0.04), H * 0.35, W * (0.5 + l * 0.1), H * 0.44], '#3a3a50', W * 0.03); });
-    oval(c, W * 0.5, H * 0.33, W * 0.07, H * 0.06, tom(cor, -0.15));
-    piloto(c, emoji, W * 0.5, H * 0.29, H * 0.13);
-  }
-  // ---------- céu ----------
-  function aviao(c, W, H, cor, emoji) {   // aviãozinho de hélice, visto de trás
-    linha(c, [W * 0.3, H * 0.66, W * 0.3, H * 0.86], '#333', W * 0.012); linha(c, [W * 0.7, H * 0.66, W * 0.7, H * 0.86], '#333', W * 0.012);
-    circ(c, W * 0.3, H * 0.88, H * 0.05, '#15151b'); circ(c, W * 0.7, H * 0.88, H * 0.05, '#15151b');
-    // asas
-    c.fillStyle = grad(c, H * 0.5, H * 0.66, tom(cor, 0.3), tom(cor, -0.2));
-    c.beginPath(); c.moveTo(W * 0.02, H * 0.56); c.lineTo(W * 0.4, H * 0.54); c.lineTo(W * 0.6, H * 0.54); c.lineTo(W * 0.98, H * 0.56); c.lineTo(W * 0.98, H * 0.62); c.lineTo(W * 0.02, H * 0.62); c.closePath(); c.fill();
-    caixa(c, W * 0.0, H * 0.55, W * 0.06, H * 0.08, H * 0.02, '#fff'); caixa(c, W * 0.94, H * 0.55, W * 0.06, H * 0.08, H * 0.02, '#fff');
-    brilho(c, '#ff3b3b', W * 0.02); circ(c, W * 0.01, H * 0.59, H * 0.02, '#ff3b3b'); brilho(c, '#4cd964', W * 0.02); circ(c, W * 0.99, H * 0.59, H * 0.02, '#4cd964'); c.shadowBlur = 0;
-    // corpo, cauda vertical e estabilizador
-    oval(c, W * 0.5, H * 0.56, W * 0.12, H * 0.16, tom(cor, -0.1));
-    poli(c, [W * 0.47, H * 0.5, W * 0.5, H * 0.06, W * 0.53, H * 0.06, W * 0.54, H * 0.5], cor);
-    poli(c, [W * 0.47, H * 0.5, W * 0.5, H * 0.06, W * 0.505, H * 0.06, W * 0.5, H * 0.5], tom(cor, 0.35));
-    caixa(c, W * 0.3, H * 0.36, W * 0.4, H * 0.035, H * 0.015, tom(cor, -0.25));
-    // cabine com o piloto
-    c.save(); c.beginPath(); c.ellipse ? c.ellipse(W * 0.5, H * 0.44, W * 0.075, H * 0.1, 0, 0, Math.PI * 2) : c.arc(W * 0.5, H * 0.44, W * 0.075, 0, Math.PI * 2);
-    c.fillStyle = '#a9dcff'; c.fill(); c.clip(); piloto(c, emoji, W * 0.5, H * 0.46, H * 0.16); c.restore();
-    circ(c, W * 0.5, H * 0.67, W * 0.025, '#2a2a30');
-  }
-  function jato(c, W, H, cor, emoji) {
-    // asas em flecha
-    c.fillStyle = grad(c, H * 0.45, H * 0.7, tom(cor, 0.2), tom(cor, -0.35));
-    c.beginPath(); c.moveTo(W * 0.5, H * 0.46); c.lineTo(W * 0.98, H * 0.66); c.lineTo(W * 0.96, H * 0.7); c.lineTo(W * 0.5, H * 0.62); c.lineTo(W * 0.04, H * 0.7); c.lineTo(W * 0.02, H * 0.66); c.closePath(); c.fill();
-    // duas caudas inclinadas
-    poli(c, [W * 0.4, H * 0.5, W * 0.33, H * 0.1, W * 0.37, H * 0.1, W * 0.45, H * 0.5], tom(cor, -0.15));
-    poli(c, [W * 0.6, H * 0.5, W * 0.67, H * 0.1, W * 0.63, H * 0.1, W * 0.55, H * 0.5], tom(cor, -0.15));
-    oval(c, W * 0.5, H * 0.56, W * 0.13, H * 0.15, cor);
-    c.save(); c.beginPath(); c.ellipse ? c.ellipse(W * 0.5, H * 0.43, W * 0.06, H * 0.09, 0, 0, Math.PI * 2) : c.arc(W * 0.5, H * 0.43, W * 0.06, 0, Math.PI * 2);
-    c.fillStyle = '#ffd98a'; c.fill(); c.clip(); piloto(c, emoji, W * 0.5, H * 0.45, H * 0.14); c.restore();
-    circ(c, W * 0.5, H * 0.62, W * 0.065, '#3a3a44'); circ(c, W * 0.5, H * 0.62, W * 0.045, '#15151b');   // bocal do motor
-    brilho(c, '#ff2a2a', W * 0.02); circ(c, W * 0.04, H * 0.68, H * 0.02, '#ff3b3b'); circ(c, W * 0.96, H * 0.68, H * 0.02, '#4cd964'); c.shadowBlur = 0;
-    c.fillStyle = '#fff'; c.font = '700 ' + Math.round(H * 0.06) + 'px ' + FONTE; c.textAlign = 'center'; c.fillText('★', W * 0.25, H * 0.64); c.fillText('★', W * 0.75, H * 0.64);
-  }
-  function helicoptero(c, W, H, cor, emoji) {
-    // esquis
-    linha(c, [W * 0.18, H * 0.95, W * 0.42, H * 0.95], '#333', H * 0.025); linha(c, [W * 0.58, H * 0.95, W * 0.82, H * 0.95], '#333', H * 0.025);
-    linha(c, [W * 0.32, H * 0.78, W * 0.28, H * 0.95], '#333', H * 0.02); linha(c, [W * 0.68, H * 0.78, W * 0.72, H * 0.95], '#333', H * 0.02);
-    // cabine-bolha
-    c.fillStyle = grad(c, H * 0.2, H * 0.85, tom(cor, 0.3), tom(cor, -0.3));
-    c.beginPath(); c.ellipse ? c.ellipse(W * 0.5, H * 0.55, W * 0.24, H * 0.27, 0, 0, Math.PI * 2) : c.arc(W * 0.5, H * 0.55, W * 0.24, 0, Math.PI * 2); c.fill();
-    c.save(); c.beginPath(); c.ellipse ? c.ellipse(W * 0.5, H * 0.48, W * 0.16, H * 0.15, 0, 0, Math.PI * 2) : c.arc(W * 0.5, H * 0.48, W * 0.16, 0, Math.PI * 2);
-    c.fillStyle = '#a9dcff'; c.fill(); c.clip(); piloto(c, emoji, W * 0.5, H * 0.5, H * 0.18); c.restore();
-    // cauda vindo para a frente (vista de trás) e rotor de cauda
-    circ(c, W * 0.5, H * 0.7, W * 0.06, tom(cor, -0.35)); circ(c, W * 0.5, H * 0.7, W * 0.035, tom(cor, -0.15));
-    poli(c, [W * 0.5, H * 0.64, W * 0.56, H * 0.6, W * 0.57, H * 0.8, W * 0.5, H * 0.76], tom(cor, -0.3));   // aleta da cauda
-    c.globalAlpha = 0.5; oval(c, W * 0.6, H * 0.7, W * 0.02, H * 0.11, '#e0e0e8'); c.globalAlpha = 1;   // rotor de cauda girando
-    // mastro do rotor principal (as pás são desenhadas girando na corrida)
-    caixa(c, W * 0.46, H * 0.22, W * 0.08, H * 0.08, H * 0.02, '#3a3a44'); caixa(c, W * 0.49, H * 0.12, W * 0.02, H * 0.12, H * 0.01, '#3a3a44');
-    brilho(c, '#ff2a2a', W * 0.03); circ(c, W * 0.5, H * 0.84, H * 0.02, '#ff3b3b'); c.shadowBlur = 0;
-  }
-
   var LISTA = [
     em3d('classico', { id: 'classico', grupo: 'terra', nome: ['Clássico', 'Classic'], w: 800, h: 1120, vel: 1, curva: 1 }),
     em3d('conversivel', { id: 'conversivel', grupo: 'terra', nome: ['Conversível Rosa', 'Pink Convertible'], w: 820, h: 1120, vel: 1.02, curva: 1.04 }),
@@ -335,12 +220,12 @@
     em3d('escolar', { id: 'escolar', quadros: 8, grupo: 'terra', nome: ['Ônibus Escolar', 'School Bus'], w: 1000, h: 1100, vel: 0.95, curva: 0.96 }),
     em3d('pelucias', { id: 'pelucias', quadros: 8, grupo: 'terra', nome: ['Caminhão de Pelúcias', 'Plush Claw Truck'], w: 1000, h: 1060, vel: 0.96, curva: 0.98 }),
     em3d('ovo', { id: 'ovo', quadros: 8, semPiloto: true, semMotor: true, grupo: 'moto', nome: ['Ovo Corredor', 'Running Egg'], w: 720, h: 1000, vel: 0.97, curva: 1.14 }),
-    { id: 'aviao', janela: { elipse: [0.5, 0.44, 0.075, 0.1] }, cab: [0.5, 0.47, 0.16], grupo: 'ar', nome: ['Aviãozinho', 'Little Plane'], w: 1500, h: 760, vel: 1, curva: 1.05, desenhar: aviao, helice: true },
-    { id: 'jato', janela: { elipse: [0.5, 0.43, 0.06, 0.09] }, cab: [0.5, 0.46, 0.14], grupo: 'ar', nome: ['Jato', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92, desenhar: jato, fogo: true },
+    em3d('aviao', { id: 'aviao', grupo: 'ar', nome: ['Aviãozinho', 'Little Plane'], w: 1500, h: 760, vel: 1, curva: 1.05 }),
+    em3d('jato', { id: 'jato', grupo: 'ar', nome: ['Jato', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92 }),
     em3d('treno', { id: 'treno', semMotor: true, quadros: 8, grupo: 'ar', nome: ['Trenó do Papai Noel', "Santa's Sleigh"], w: 880, h: 1180, vel: 1.0, curva: 1.05 }),
-    { id: 'arara', semMotor: true, voz: 'arara', janela: { elipse: [0.5, 0.32, 0.2, 0.2] }, cab: [0.5, 0.32, 0.14], aberto: true, quadros: 8, grupo: 'ar', nome: ['Arara Gigante', 'Giant Macaw'], w: 1300, h: 1000, vel: 1.04, curva: 1.08, desenhar: arara },
-    { id: 'morcego', janela: { elipse: [0.5, 0.29, 0.2, 0.2] }, cab: [0.5, 0.29, 0.13], aberto: true, quadros: 8, dracula: true, abobora: true, semMotor: true, voz: 'morcego', grupo: 'ar', nome: ['Morcego (vira Drácula!)', 'Bat (turns into Dracula!)'], w: 1300, h: 1000, vel: 1.02, curva: 1.1, desenhar: morcego },
-    { id: 'heli', janela: { elipse: [0.5, 0.48, 0.16, 0.15] }, cab: [0.5, 0.52, 0.21], grupo: 'ar', nome: ['Helicóptero', 'Helicopter'], w: 1100, h: 900, vel: 0.95, curva: 1.12, desenhar: helicoptero, rotor: true }
+    em3d('arara', { id: 'arara', semMotor: true, voz: 'arara', quadros: 8, grupo: 'ar', nome: ['Arara Gigante', 'Giant Macaw'], w: 1300, h: 1000, vel: 1.04, curva: 1.08 }),
+    em3d('morcego', { id: 'morcego', quadros: 8, dracula: true, abobora: true, semMotor: true, voz: 'morcego', grupo: 'ar', nome: ['Morcego (vira Drácula!)', 'Bat (turns into Dracula!)'], w: 1300, h: 1000, vel: 1.02, curva: 1.1 }),
+    em3d('heli', { id: 'heli', grupo: 'ar', nome: ['Helicóptero', 'Helicopter'], w: 1100, h: 900, vel: 0.95, curva: 1.12 })
   ];
   var GRUPOS = [
     { id: 'terra', nome: ['🚗 Carros', '🚗 Cars'] },
@@ -350,7 +235,7 @@
   function achar(id) { for (var k = 0; k < LISTA.length; k++) if (LISTA[k].id === id) return LISTA[k]; return null; }
   function voa(id) { var v = achar(id); return !!(v && v.grupo === 'ar'); }
 
-  var VruuumVeiculos = { LISTA: LISTA, GRUPOS: GRUPOS, achar: achar, voa: voa, tom: tom, bracosSkate: bracosSkate, giroCorpo: giroCorpo, dracula: dracula };
+  var VruuumVeiculos = { LISTA: LISTA, GRUPOS: GRUPOS, achar: achar, voa: voa, tom: tom, bracosSkate: bracosSkate, giroCorpo: giroCorpo };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumVeiculos;
   else raiz.VruuumVeiculos = VruuumVeiculos;
 })(this);
