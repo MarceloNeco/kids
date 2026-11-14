@@ -179,13 +179,18 @@
   function horta(id) { return HO[id] ? '<svg class="pl-desenho" viewBox="0 0 100 110" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">' + HO[id] + '</svg>' : ''; }
 
   var D = (typeof module !== 'undefined' && module.exports) ? require('./dados.js') : raiz.CozinhaDados;
-  function icone(id) {
+  // Ingrediente e receita têm foto de verdade (fotos/<id>.jpg, fotos livres da Wikimedia Commons; CREDITOS.md).
+  // icone(id) mostra a foto num círculo; icone(id, true) mostra o desenho/emoji (frutas no pé, legumes na terra).
+  function foto(id) { return (D.ingrediente[id] || D.receita[id]) ? 'fotos/' + id + '.jpg' : ''; }
+  function imgFoto(id, cls) { return '<span class="ic ic-foto' + (cls ? ' ' + cls : '') + '"><img src="' + foto(id) + '" alt="" draggable="false" decoding="async"></span>'; }
+  function icone(id, desenho) {
     var x = D.ingrediente[id] || D.utensilio[id];
     if (!x) return '';
+    if (!desenho && D.ingrediente[id]) return imgFoto(id);
     if (x.s && S[x.s]) return '<span class="ic ic-svg">' + S[x.s] + '</span>';
     return '<span class="ic">' + x.e + '</span>';
   }
 
-  var API = { S: S, icone: icone, planta: planta, FRUTOS: FRUTOS, fruto: fruto, horta: horta };
+  var API = { S: S, icone: icone, foto: foto, imgFoto: imgFoto, planta: planta, FRUTOS: FRUTOS, fruto: fruto, horta: horta };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else raiz.CozinhaDesenhos = API;
 })(typeof self !== 'undefined' ? self : this);

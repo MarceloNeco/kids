@@ -1,10 +1,10 @@
 /* Cozinha — service worker: guarda a pasta no aparelho para abrir sem internet.
-   Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte e imagens: cópia primeiro.
+   Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte, imagens e as fotos (fotos/*.jpg): cópia primeiro.
    Músicas (../rabiscolandia/musicas/*.mp3 e ../baguncolandia/musicas/*.mp3): o service worker não mexe (o navegador busca direto; sem internet,
    a trilha pula a música que não abre e some sem erro).
    Cache com o nome do app: só apaga caches "cozinha-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e à primeira entrada de versoes.json). */
-var VERSAO = '0.5.1';
+var VERSAO = '0.6.0';
 var CACHE = 'cozinha-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'dados.js', 'logica.js', 'desenhos.js', 'cenas.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../versao.js', '../trilha.js'];
 self.addEventListener('install', function (e) {
@@ -18,7 +18,7 @@ self.addEventListener('fetch', function (e) {
   var url = new URL(req.url);
   if (url.origin !== location.origin) return;
   if (/\.mp3$/i.test(url.pathname)) return;
-  if (/\.(woff2|png)$/i.test(url.pathname)) {
+  if (/\.(woff2|png|jpg)$/i.test(url.pathname)) {
     e.respondWith(caches.match(req).then(function (r) { return r || fetch(req).then(function (resp) { if (resp.status === 200) { var c2 = resp.clone(); caches.open(CACHE).then(function (c) { return c.put(req, c2); }).catch(function () {}); } return resp; }); }));
     return;
   }

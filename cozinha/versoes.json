@@ -2,6 +2,23 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.6.0",
+      "data": "14/Nov/2026",
+      "hora": "HORA",
+      "pt": [
+        "📸 Comida de verdade: cada receita e cada ingrediente agora aparece com uma foto de verdade (fotos livres da Wikimedia Commons). O pão de queijo é um pão de queijo, e o queijo é um queijo!",
+        "😋 No final, o menininho come a foto do prato de verdade, e a foto guardada também mostra o prato de verdade.",
+        "✨ Mais movimento: as telas entram deslizando, as receitas e os ingredientes aparecem um depois do outro com pulinho, o prato gira na ficha, as comidas da capa pulam em onda e o botão de começar chama para ser tocado.",
+        "📶 As fotos ficam guardadas no aparelho: funciona sem internet."
+      ],
+      "en": [
+        "📸 Real food: every recipe and every ingredient now shows a real photo (free photos from Wikimedia Commons). Cheese bread looks like cheese bread, and cheese looks like cheese!",
+        "😋 At the end, the little boy eats the real dish photo, and the saved picture shows the real dish too.",
+        "✨ More motion: screens slide in, recipes and ingredients pop in one after another, the plate spins on the recipe card, the food on the cover bounces in a wave and the start button invites a tap.",
+        "📶 Photos are stored on the device: works offline."
+      ]
+    },
+    {
       "versao": "0.5.1",
       "data": "07/Nov/2026",
       "hora": "12:00:00",
