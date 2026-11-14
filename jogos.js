@@ -15,6 +15,13 @@
   Sem internet não existe TV: o pareamento celular ↔ TV precisa da internet.
 */
 (function () {
+  // texto nos três idiomas: o elemento recebe um pedaço de cada (class pt / en / es) e o idioma.js mostra o escolhido
+  function tri(el, pt, en, es) {
+    el.textContent = '';
+    [['pt', pt], ['en', en], ['es', es]].forEach(function (p) { var s = document.createElement('span'); s.className = p[0]; s.textContent = p[1]; el.appendChild(s); });
+    return el;
+  }
+  function T(pt, en, es) { return window.BolinhoIdioma ? BolinhoIdioma.t(pt, en, es) : pt; }
   var cards = Array.prototype.slice.call(document.querySelectorAll('a.card[data-instalar], a.card[data-so-online]'));
   if (!cards.length) return;
   var instalaveis = cards.filter(function (c) { return c.hasAttribute('data-instalar'); });
@@ -47,26 +54,24 @@
     caixa.style.setProperty('--c', card.style.getPropertyValue('--c'));
     card.parentNode.insertBefore(caixa, card);
     caixa.appendChild(card);
-    var nome = (card.querySelector('h2') || {}).textContent || '';
+    var nome = nomeDe(card);
     if (card.hasAttribute('data-so-online')) {
       var aviso = document.createElement('span');
       aviso.className = 'cx-on';
-      aviso.textContent = '🌐 Só com internet';
-      aviso.title = 'Precisa de internet: YouTube e TV.' + (window.BolinhoIdioma && !BolinhoIdioma.ingles() ? '' : ' / Needs internet.');
+      tri(aviso, '🌐 Só com internet', '🌐 Internet only', '🌐 Solo con internet');
+      aviso.title = T('Precisa de internet: YouTube e TV.', 'Needs the internet: YouTube and TV.', 'Necesita internet: YouTube y la tele.');
       caixa.appendChild(aviso);
       return;
     }
     var bot = document.createElement('a');
     bot.className = 'cx-inst';
     bot.href = card.getAttribute('data-instalar') + '?instalar=1';
-    bot.textContent = '📲 Instalar';
-    bot.setAttribute('aria-label', 'Instalar ' + nome + ' no aparelho, para jogar sem internet / Install ' + nome);
+    tri(bot, '📲 Instalar', '📲 Install', '📲 Instalar');
+    bot.setAttribute('aria-label', T('Instalar ' + nome + ' no aparelho, para jogar sem internet', 'Install ' + nome + ' on this device, to play without the internet', 'Instalar ' + nome + ' en el aparato, para jugar sin internet'));
     caixa.appendChild(bot);
   });
 
-  // pedaço em inglês: class="en" (some sem o interruptor "ingles" do RootifyONE, idioma.js)
-  function emIngles(txt) { var s = document.createElement('span'); s.className = 'en'; s.textContent = txt; return s; }
-  function nomeDe(card) { return ((card.querySelector('h2') || {}).textContent || '').trim(); }
+  function nomeDe(card) { return ((card.querySelector('h2 .pt') || card.querySelector('h2') || {}).textContent || '').trim(); }
   function escopo(card) { return card.getAttribute('data-sw').replace(/[^\/]*$/, ''); }
 
   // ---------- guardar todos ----------
@@ -105,7 +110,7 @@
     if (caixa.querySelector('.cx-ok')) return;
     var m = document.createElement('span');
     m.className = 'cx-ok';
-    m.textContent = '✓ funciona sem internet';
+    tri(m, '✓ funciona sem internet', '✓ works offline', '✓ funciona sin internet');
     caixa.appendChild(m);
   }
 
@@ -113,42 +118,46 @@
   var painel = document.getElementById('todos');
   if (painel && temSW) {
     painel.hidden = false;
-    painel.innerHTML = '<b>📦 Todos os jogos neste aparelho<span class="en"> · All games on this device</span></b>';
+    tri(painel.appendChild(document.createElement('b')), '📦 Todos os jogos neste aparelho', '📦 All games on this device', '📦 Todos los juegos en este aparato');
     var bGuardar = document.createElement('button');
     bGuardar.type = 'button'; bGuardar.className = 'forte';
-    bGuardar.textContent = '⬇ Guardar todos (jogar sem internet)';
+    tri(bGuardar, '⬇ Guardar todos (jogar sem internet)', '⬇ Save them all (play offline)', '⬇ Guardar todos (jugar sin internet)');
     var bFila = document.createElement('button');
     bFila.type = 'button';
-    bFila.textContent = '📲 Instalar os ícones um por um';
+    tri(bFila, '📲 Instalar os ícones um por um', '📲 Install the icons one by one', '📲 Instalar los íconos uno por uno');
     var st = document.createElement('p');
     st.className = 'st';
     st.setAttribute('aria-live', 'polite');
-    st.textContent = 'Guardar todos: cada jogo passa a abrir sem internet. Instalar um por um: cada jogo ganha o próprio ícone na tela inicial (o navegador só deixa instalar um de cada vez).';
+    tri(st, 'Guardar todos: cada jogo passa a abrir sem internet. Instalar um por um: cada jogo ganha o próprio ícone na tela inicial (o navegador só deixa instalar um de cada vez).',
+      'Save them all: every game will open without the internet. Install one by one: each game gets its own icon on the home screen (the browser only lets you install one at a time).',
+      'Guardar todos: cada juego se abre sin internet. Instalar uno por uno: cada juego tiene su propio ícono en la pantalla de inicio (el navegador solo deja instalar uno a la vez).');
     painel.appendChild(bGuardar); painel.appendChild(bFila); painel.appendChild(st);
 
     bGuardar.addEventListener('click', function () {
       bGuardar.disabled = true;
       st.className = 'st';
       guardarTodos(function (i, nome) {
-        st.textContent = '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…';
+        tri(st, '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…', '⬇ Saving ' + (i + 1) + ' of ' + instalaveis.length + ': ' + nome + '…', '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…');
       }).then(function (n) {
         return guardarMusicas(function (i, total) {
-          st.textContent = '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '…';
-          st.appendChild(emIngles(' / Saving favourite songs: ' + (i + 1) + ' of ' + total + '…'));
+          tri(st, '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '…', '🎵 Saving the favourite songs: ' + (i + 1) + ' of ' + total + '…', '🎵 Guardando las canciones favoritas: ' + (i + 1) + ' de ' + total + '…');
         }).then(function (m) { return { n: n, m: m }; });
       }).then(function (r) {
         var n = r.n, m = r.m;
         var musicas = m.total ? ' 🎵 ' + m.feitas + ' de ' + m.total + ' músicas favoritas guardadas: tocam até sem internet.' : '';
-        var musicasEn = m.total ? ' / ' + m.feitas + ' of ' + m.total + ' favourite songs saved for offline.' : '';
+        var musicasEn = m.total ? ' 🎵 ' + m.feitas + ' of ' + m.total + ' favourite songs saved: they play even without the internet.' : '';
+        var musicasEs = m.total ? ' 🎵 ' + m.feitas + ' de ' + m.total + ' canciones favoritas guardadas: suenan incluso sin internet.' : '';
         bGuardar.disabled = false;
         if (n === instalaveis.length && m.feitas === m.total) {
           st.className = 'st ok';
-          st.textContent = '✓ Pronto: os ' + n + ' jogos funcionam sem internet neste aparelho. As músicas e as partes pesadas terminam de baixar sozinhas no Wi-Fi.' + musicas;
-          if (musicasEn) st.appendChild(emIngles(musicasEn));
-          bGuardar.textContent = '✓ Todos guardados';
+          tri(st, '✓ Pronto: os ' + n + ' jogos funcionam sem internet neste aparelho. As músicas e as partes pesadas terminam de baixar sozinhas no Wi-Fi.' + musicas,
+            '✓ All done: the ' + n + ' games work without the internet on this device. The music and the bigger files finish downloading on their own over Wi-Fi.' + musicasEn,
+            '✓ Listo: los ' + n + ' juegos funcionan sin internet en este aparato. La música y las partes pesadas terminan de bajar solas con el Wi-Fi.' + musicasEs);
+          tri(bGuardar, '✓ Todos guardados', '✓ All saved', '✓ Todos guardados');
         } else {
-          st.textContent = n + ' de ' + instalaveis.length + ' guardados.' + musicas + ' Confira a internet e toque de novo para terminar.';
-          if (musicasEn) st.appendChild(emIngles(musicasEn));
+          tri(st, n + ' de ' + instalaveis.length + ' guardados.' + musicas + ' Confira a internet e toque de novo para terminar.',
+            n + ' of ' + instalaveis.length + ' saved.' + musicasEn + ' Check the internet and tap again to finish.',
+            n + ' de ' + instalaveis.length + ' guardados.' + musicasEs + ' Revisa la internet y toca otra vez para terminar.');
         }
       });
     });
@@ -166,17 +175,17 @@
       var n = 0;
       instalaveis.forEach(function (c) { if (escopos.indexOf(escopo(c)) >= 0) { n++; marcar(c); } });
       if (n === instalaveis.length) {
-        bGuardar.textContent = '✓ Todos guardados';
+        tri(bGuardar, '✓ Todos guardados', '✓ All saved', '✓ Todos guardados');
         if (fimFila) return;   // a mensagem do fim do "Instalar um por um" fica
         st.className = 'st ok';
-        st.textContent = '✓ Os ' + n + ' jogos já funcionam sem internet neste aparelho.';
+        tri(st, '✓ Os ' + n + ' jogos já funcionam sem internet neste aparelho.', '✓ All ' + n + ' games already work without the internet on this device.', '✓ Los ' + n + ' juegos ya funcionan sin internet en este aparato.');
       }
     }).catch(function () {});
 
     // voltou do "Instalar um por um"
     if (fimFila) {
       st.className = 'st ok';
-      st.textContent = '✓ Pronto! Os ícones que você instalou estão na tela inicial do aparelho.';
+      tri(st, '✓ Pronto! Os ícones que você instalou estão na tela inicial do aparelho.', '✓ Done! The icons you installed are on your home screen.', '✓ ¡Listo! Los íconos que instalaste están en la pantalla de inicio.');
       try { history.replaceState(null, '', location.pathname); } catch (e) {}
     }
   }

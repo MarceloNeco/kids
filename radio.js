@@ -14,6 +14,7 @@
     Trilha.offline (trilha.js, carregado antes deste arquivo). Com internet, ela é guardada na primeira música que toca.
 */
 (function () {
+  function T(pt, en, es) { return window.BolinhoIdioma ? BolinhoIdioma.t(pt, en, es) : pt; }
   // Rock alegre e leve, para criança: tom maior, pouca distorção (medido em cada faixa antes de entrar).
   var K = 'Kevin MacLeod', H = 'HoliznaCC0';
   var MUSICAS = [
@@ -77,13 +78,13 @@
   var barra = document.createElement('div');
   barra.className = 'radio';
   barra.setAttribute('role', 'region');
-  barra.setAttribute('aria-label', 'Rádio do Bolinho / Bolinho radio');
+  barra.setAttribute('aria-label', T('Rádio do Bolinho', 'Bolinho radio', 'Radio del Bolinho'));
   var bolinhas = '';
   for (var k = 0; k < MUSICAS.length; k++) bolinhas += '<button type="button" data-n="' + k + '" aria-label="' + (k + 1) + ': ' + MUSICAS[k].t + '"><i></i></button>';
   barra.innerHTML = '<div class="r-disco" aria-hidden="true"></div>' +
-    '<button type="button" class="r-ant" aria-label="Música anterior / Previous">' + ICONE.ant + '</button>' +
-    '<button type="button" class="r-play" aria-label="Tocar / Play">' + ICONE.play + '</button>' +
-    '<button type="button" class="r-prox" aria-label="Próxima música / Next">' + ICONE.prox + '</button>' +
+    '<button type="button" class="r-ant" aria-label="' + T('Música anterior', 'Previous song', 'Canción anterior') + '">' + ICONE.ant + '</button>' +
+    '<button type="button" class="r-play" aria-label="' + T('Tocar', 'Play', 'Reproducir') + '">' + ICONE.play + '</button>' +
+    '<button type="button" class="r-prox" aria-label="' + T('Próxima música', 'Next song', 'Siguiente canción') + '">' + ICONE.prox + '</button>' +
     '<div class="r-info"><div class="r-titulo" aria-live="polite"></div>' +
     '<div class="r-autor"></div><div class="r-bolinhas">' + bolinhas + '</div></div>';
   document.body.appendChild(barra);
@@ -97,11 +98,11 @@
   function mostrar() {
     titulo.classList.add('troca');
     setTimeout(function () {
-      titulo.textContent = comecou ? MUSICAS[atual].t : '🎸 Rock no Bolinho';
+      titulo.textContent = comecou ? MUSICAS[atual].t : T('🎸 Rock no Bolinho', '🎸 Rock at the Bolinho', '🎸 Rock en el Bolinho');
       titulo.classList.remove('troca');
     }, 120);
     var m = MUSICAS[atual];
-    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === H ? 'CC0' : 'CC BY 4.0') : 'Tocar<span class="en"> / Play</span>') + ' · <a href="https://github.com/MarceloNeco/kids/blob/main/CREDITOS.md" target="_blank" rel="noopener">créditos</a>';
+    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === H ? 'CC0' : 'CC BY 4.0') : '<span class="pt">Tocar</span><span class="en">Play</span><span class="es">Reproducir</span>') + ' · <a href="https://github.com/MarceloNeco/kids/blob/main/CREDITOS.md" target="_blank" rel="noopener"><span class="pt">créditos</span><span class="en">credits</span><span class="es">créditos</span></a>';
     for (var i = 0; i < listaBolinhas.length; i++) {
       if (i === atual) listaBolinhas[i].setAttribute('aria-current', 'true'); else listaBolinhas[i].removeAttribute('aria-current');
     }
@@ -116,7 +117,7 @@
   function botaoPlay() {
     var tocando = !audio.paused;
     bPlay.innerHTML = tocando ? ICONE.pausa : ICONE.play;
-    bPlay.setAttribute('aria-label', tocando ? 'Pausar / Pause' : 'Tocar / Play');
+    bPlay.setAttribute('aria-label', tocando ? T('Pausar', 'Pause', 'Pausar') : T('Tocar', 'Play', 'Reproducir'));
     barra.classList.toggle('tocando', tocando);
   }
 
@@ -162,7 +163,7 @@
   function pular() {
     falhas++;
     if (falhas < MUSICAS.length) tocar(atual + 1);
-    else { autor.innerHTML = 'Sem internet para tocar agora.<span class="en"> / No connection.</span>'; botaoPlay(); }
+    else { autor.innerHTML = '<span class="pt">Sem internet para tocar agora.</span><span class="en">No internet to play right now.</span><span class="es">Sin internet para sonar ahora.</span>'; botaoPlay(); }
   }
   // Música que não abriu (sem internet, arquivo faltando): a favorita guardada; sem ela, pula para a próxima, sem ficar em laço.
   audio.addEventListener('error', function () {

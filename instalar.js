@@ -23,6 +23,7 @@
   no fim, de volta ao Bolinho com ?fila=fim.
 */
 (function () {
+  function T(pt, en, es) { return window.BolinhoIdioma ? BolinhoIdioma.t(pt, en, es) : pt; }
   var script = document.currentScript;
   var NOME = (script && script.getAttribute('data-nome')) || 'Bolinho de Chuva';
   var ICONE = (script && script.getAttribute('data-icone')) || 'icone-192.png';
@@ -68,7 +69,6 @@
     '.bc-passos p{line-height:1.5;margin:.5rem 0;font-size:1rem;color:#f3f0ff}' +
     '.bc-passos .en{color:#b3acd6;font-size:.85rem;font-style:italic}' +
     '.bc-passos button .en,.bc-passos a .en{color:inherit;font-size:inherit;font-style:normal}' +
-    '.sem-ingles .bc-btn small{display:none}' +   /* sem o interruptor "ingles" (idioma.js): só português */
     '.bc-passos .aviso{background:rgba(255,209,102,.12);border-left:3px solid #ffd166;padding:.5rem .7rem;border-radius:8px}' +
     '.bc-passos a{color:#3ee8ff}' +
     '.bc-botoes{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}' +
@@ -91,12 +91,12 @@
   barra.className = 'bc-inst';
   barra.innerHTML = '<button type="button" class="bc-btn" aria-haspopup="dialog">' +
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v7"/><path d="M9 11l3 3 3-3"/><path d="M10.5 18.5h3"/></svg>' +
-    '<span>Instalar o aplicativo <small>· Install app</small></span></button>';
+    '<span><span class="pt">Instalar o aplicativo</span><span class="en">Install the app</span><span class="es">Instalar la aplicación</span></span></button>';
   if (FLUTUANTE) {
     barra.className += ' bc-flut';
     var x = document.createElement('button');
     x.type = 'button'; x.className = 'bc-x'; x.textContent = '✕';
-    x.setAttribute('aria-label', 'Fechar / Close');
+    x.setAttribute('aria-label', T('Fechar', 'Close', 'Cerrar'));
     x.addEventListener('click', function () { barra.hidden = true; });
     barra.appendChild(x);
   }
@@ -110,7 +110,7 @@
   }
   function rotuloProx(feito) {
     var seg = lerFila()[0];
-    bProx.textContent = seg ? (feito ? 'Próximo: ' + seg.nome + ' ›' : 'Pular ›') : (feito ? 'Terminar ›' : 'Pular e terminar ›');
+    bProx.textContent = seg ? (feito ? T('Próximo: ', 'Next: ', 'Siguiente: ') + seg.nome + ' ›' : T('Pular ›', 'Skip ›', 'Saltar ›')) : (feito ? T('Terminar ›', 'Finish ›', 'Terminar ›') : T('Pular e terminar ›', 'Skip and finish ›', 'Saltar y terminar ›'));
     bProx.className = feito ? 'bc-btn bc-prox ok' : 'bc-prox';
   }
   if (FILA) {
@@ -129,10 +129,10 @@
   fundo.className = 'bc-fundo';
   fundo.hidden = true;
   fundo.innerHTML = '<div class="bc-passos" role="dialog" aria-modal="true" aria-labelledby="bcTitulo">' +
-    '<div class="bc-topo"><img src="' + ICONE + '" alt=""><h2 id="bcTitulo">Instalar o ' + NOME + '</h2>' +
-    '<button type="button" class="bc-fechar" aria-label="Fechar / Close">✕</button></div>' +
+    '<div class="bc-topo"><img src="' + ICONE + '" alt=""><h2 id="bcTitulo">' + T('Instalar o ', 'Install ', 'Instalar ') + NOME + '</h2>' +
+    '<button type="button" class="bc-fechar" aria-label="' + T('Fechar', 'Close', 'Cerrar') + '">✕</button></div>' +
     '<div class="bc-corpo"></div>' +
-    '<div class="bc-botoes"><button type="button" class="bc-leve bc-ja">✓ Já instalei<span class="en"> / Done</span></button></div></div>';
+    '<div class="bc-botoes"><button type="button" class="bc-leve bc-ja"><span class="pt">✓ Já instalei</span><span class="en">✓ I installed it</span><span class="es">✓ Ya la instalé</span></button></div></div>';
   document.body.appendChild(fundo);
   var corpo = fundo.querySelector('.bc-corpo');
 
@@ -146,7 +146,7 @@
 
   function pronto() {
     botao.className = 'bc-btn ok';
-    texto.innerHTML = '✓ Instalado! Procure o ícone ' + NOME + ' <small>· Installed!</small>';
+    texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el ícono ') + NOME;
     if (FILA) { barra.hidden = false; rotuloProx(true); return; }   // na fila, a barra fica para seguir ao próximo
     setTimeout(function () { barra.hidden = true; }, 6000);
   }
@@ -167,59 +167,129 @@
     return 'intent://' + location.host + location.pathname + location.search + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(endereco) + ';end';
   }
 
+  // Passo a passo de cada aparelho, no idioma escolhido na estante (idioma.js).
   function passos() {
-    if (tv) return '<p>Na TV não existe "instalar" pelo navegador, mas dá para deixar o ' + NOME + ' a um clique:</p>' +
+    var N = NOME;
+    if (tv) return T('<p>Na TV não existe "instalar" pelo navegador, mas dá para deixar o ' + N + ' a um clique:</p>' +
       '<ol><li>Com esta página aberta, aperte o botão de <b>menu</b> do navegador da TV (às vezes é a engrenagem ou os <b>três pontinhos</b>).</li>' +
       '<li>Escolha <b>Adicionar aos favoritos</b> (em algumas TVs aparece <b>Fixar na tela inicial</b> ou <b>Adicionar à página inicial</b>: use esse, se tiver).</li>' +
-      '<li>Da próxima vez, abra o navegador e escolha <b>' + NOME + '</b> nos favoritos.</li></ol>' +
-      '<p class="en">On the TV: open the browser menu and choose "Add to favorites" (or "Pin to home", if your TV has it).</p>' +
-      '<p class="aviso">TV LG: dá para ter o ícone na barra de apps, igual ao Netflix. Peça para alguém seguir no computador o <a href="https://github.com/MarceloNeco/kids/blob/main/tv-lg-kids/LEIA-ME.md" target="_blank" rel="noopener">passo a passo da TV LG</a>.</p>';
-    if (fire) return '<p>No tablet Fire, o navegador da Amazon (Silk) põe o ícone na tela inicial assim:</p>' +
+      '<li>Da próxima vez, abra o navegador e escolha <b>' + N + '</b> nos favoritos.</li></ol>' +
+      '<p class="aviso">TV LG: dá para ter o ícone na barra de apps, igual ao Netflix. Peça para alguém seguir no computador o <a href="https://github.com/MarceloNeco/kids/blob/main/tv-lg-kids/LEIA-ME.md" target="_blank" rel="noopener">passo a passo da TV LG</a>.</p>',
+      '<p>TVs can\'t "install" sites from the browser, but you can keep ' + N + ' just one click away:</p>' +
+      '<ol><li>With this page open, press the TV browser\'s <b>menu</b> button (sometimes it\'s a gear or <b>three dots</b>).</li>' +
+      '<li>Choose <b>Add to favorites</b> (some TVs show <b>Pin to home</b> or <b>Add to home page</b>: use that one if you have it).</li>' +
+      '<li>Next time, open the browser and pick <b>' + N + '</b> from your favorites.</li></ol>' +
+      '<p class="aviso">LG TV: you can have the icon in the apps bar, just like Netflix. Ask someone to follow the <a href="https://github.com/MarceloNeco/kids/blob/main/tv-lg-kids/LEIA-ME.md" target="_blank" rel="noopener">LG TV step-by-step guide</a> on a computer.</p>',
+      '<p>En la tele no se puede "instalar" desde el navegador, pero puedes dejar ' + N + ' a un clic:</p>' +
+      '<ol><li>Con esta página abierta, aprieta el botón de <b>menú</b> del navegador de la tele (a veces es un engranaje o <b>tres puntitos</b>).</li>' +
+      '<li>Elige <b>Agregar a favoritos</b> (en algunas teles aparece <b>Fijar en el inicio</b> o <b>Agregar a la página de inicio</b>: usa esa, si la tiene).</li>' +
+      '<li>La próxima vez, abre el navegador y elige <b>' + N + '</b> en favoritos.</li></ol>' +
+      '<p class="aviso">Tele LG: puedes tener el ícono en la barra de apps, igual que Netflix. Pide a alguien que siga en la computadora la <a href="https://github.com/MarceloNeco/kids/blob/main/tv-lg-kids/LEIA-ME.md" target="_blank" rel="noopener">guía paso a paso de la tele LG</a>.</p>');
+    if (fire) return T('<p>No tablet Fire, o navegador da Amazon (Silk) põe o ícone na tela inicial assim:</p>' +
       '<ol><li>Toque nos <b>três pontinhos ⋮</b>, no canto de cima, à direita da barra de endereço.</li>' +
       '<li>Toque em <b>Adicionar à tela inicial</b> (em inglês: <b>Add to Home Screen</b>). Se não estiver na lista, role a lista para baixo.</li>' +
-      '<li>Deixe o nome <b>' + NOME + '</b> e toque em <b>Adicionar</b>.</li>' +
-      '<li>Volte para a tela inicial do tablet e abra pelo <b>ícone do ' + NOME + '</b> (não pelo navegador).</li></ol>' +
-      '<p class="aviso">📺 <b>É assim que fica em tela cheia no Fire.</b> Aberto pelo ícone, o ' + NOME + ' abre sem a barra de endereço, como um aplicativo. No navegador do Fire a barra não some — ele não tem tela cheia.</p>' +
-      '<p class="en">Fire tablet (Silk): ⋮ menu → Add to Home Screen → Add, then open from the icon for full screen.</p>' +
-      '<p class="aviso">Se o tablet estiver no perfil de criança (Amazon Kids) e essa opção não aparecer, faça estes passos no perfil do adulto.</p>';
-    if (ios) return '<ol><li>Abra esta página no <b>Safari</b> (se estiver dentro de outro app, toque em <b>Abrir no Safari</b>).</li>' +
+      '<li>Deixe o nome <b>' + N + '</b> e toque em <b>Adicionar</b>.</li>' +
+      '<li>Volte para a tela inicial do tablet e abra pelo <b>ícone do ' + N + '</b> (não pelo navegador).</li></ol>' +
+      '<p class="aviso">📺 <b>É assim que fica em tela cheia no Fire.</b> Aberto pelo ícone, o ' + N + ' abre sem a barra de endereço, como um aplicativo. No navegador do Fire a barra não some — ele não tem tela cheia.</p>' +
+      '<p class="aviso">Se o tablet estiver no perfil de criança (Amazon Kids) e essa opção não aparecer, faça estes passos no perfil do adulto.</p>',
+      '<p>On a Fire tablet, the Amazon browser (Silk) puts the icon on the home screen like this:</p>' +
+      '<ol><li>Tap the <b>three dots ⋮</b> in the top corner, to the right of the address bar.</li>' +
+      '<li>Tap <b>Add to Home Screen</b>. If it isn\'t on the list, scroll down.</li>' +
+      '<li>Keep the name <b>' + N + '</b> and tap <b>Add</b>.</li>' +
+      '<li>Go back to the tablet\'s home screen and open it from the <b>' + N + ' icon</b> (not from the browser).</li></ol>' +
+      '<p class="aviso">📺 <b>That\'s how you get full screen on a Fire.</b> Opened from the icon, ' + N + ' has no address bar, just like an app. In the Fire browser the bar never goes away: it has no full screen.</p>' +
+      '<p class="aviso">If the tablet is on a child profile (Amazon Kids) and you can\'t see this option, do these steps on the adult profile.</p>',
+      '<p>En la tableta Fire, el navegador de Amazon (Silk) pone el ícono en la pantalla de inicio así:</p>' +
+      '<ol><li>Toca los <b>tres puntitos ⋮</b> arriba, a la derecha de la barra de direcciones.</li>' +
+      '<li>Toca <b>Agregar a la pantalla de inicio</b> (en inglés: <b>Add to Home Screen</b>). Si no está en la lista, baja un poco.</li>' +
+      '<li>Deja el nombre <b>' + N + '</b> y toca <b>Agregar</b>.</li>' +
+      '<li>Vuelve a la pantalla de inicio de la tableta y ábrelo desde el <b>ícono de ' + N + '</b> (no desde el navegador).</li></ol>' +
+      '<p class="aviso">📺 <b>Así se ve en pantalla completa en la Fire.</b> Abierto desde el ícono, ' + N + ' se abre sin la barra de direcciones, como una aplicación. En el navegador de la Fire la barra no desaparece: no tiene pantalla completa.</p>' +
+      '<p class="aviso">Si la tableta está en el perfil infantil (Amazon Kids) y no aparece esta opción, haz estos pasos en el perfil del adulto.</p>');
+    if (ios) return T('<ol><li>Abra esta página no <b>Safari</b> (se estiver dentro de outro app, toque em <b>Abrir no Safari</b>).</li>' +
       '<li>Toque em <b>Compartilhar</b> (o quadrado com a seta para cima ⬆, embaixo ou no topo da tela).</li>' +
       '<li>Role a lista e toque em <b>Adicionar à Tela de Início</b>.</li>' +
-      '<li>Toque em <b>Adicionar</b>. O ícone aparece junto dos seus apps.</li></ol>' +
-      '<p class="en">iPhone/iPad: Safari → Share ⬆ → Add to Home Screen → Add.</p>';
-    if (samsung) return '<p>No navegador da Samsung, instalar pode mostrar um alerta do Google ("app de risco"). O ' + NOME + ' não tem risco nenhum: o alerta é do jeito que esse navegador instala. Pelo <b>Chrome</b> instala sem alerta:</p>' +
+      '<li>Toque em <b>Adicionar</b>. O ícone aparece junto dos seus apps.</li></ol>',
+      '<ol><li>Open this page in <b>Safari</b> (if you\'re inside another app, tap <b>Open in Safari</b>).</li>' +
+      '<li>Tap <b>Share</b> (the square with the up arrow ⬆, at the bottom or top of the screen).</li>' +
+      '<li>Scroll down the list and tap <b>Add to Home Screen</b>.</li>' +
+      '<li>Tap <b>Add</b>. The icon shows up with your other apps.</li></ol>',
+      '<ol><li>Abre esta página en <b>Safari</b> (si estás dentro de otra app, toca <b>Abrir en Safari</b>).</li>' +
+      '<li>Toca <b>Compartir</b> (el cuadrito con la flecha hacia arriba ⬆, abajo o arriba de la pantalla).</li>' +
+      '<li>Baja en la lista y toca <b>Agregar a pantalla de inicio</b>.</li>' +
+      '<li>Toca <b>Agregar</b>. El ícono aparece junto a tus apps.</li></ol>');
+    if (samsung) return T('<p>No navegador da Samsung, instalar pode mostrar um alerta do Google ("app de risco"). O ' + N + ' não tem risco nenhum: o alerta é do jeito que esse navegador instala. Pelo <b>Chrome</b> instala sem alerta:</p>' +
       '<ol><li>Toque em <b>Abrir no Chrome</b> (botão abaixo).</li>' +
       '<li>No Chrome, toque de novo em <b>Instalar o aplicativo</b>, no topo da página.</li>' +
       '<li>Toque em <b>Instalar</b>. Pronto: o ícone aparece na tela do celular.</li></ol>' +
-      '<p class="aviso">Já apareceu o alerta? Toque em <b>OK</b> e siga os passos acima.</p>' +
-      '<p class="en">Samsung Internet may show a Google "risky app" alert. Install from Chrome instead.</p>' +
-      '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">Abrir no Chrome<span class="en"> / Open in Chrome</span></a></div>';
-    if (android && dentroDeApp) return '<p>Você abriu esta página dentro de outro app (WhatsApp, Instagram…). Para instalar, abra no Chrome:</p>' +
+      '<p class="aviso">Já apareceu o alerta? Toque em <b>OK</b> e siga os passos acima.</p>',
+      '<p>In the Samsung browser, installing may show a Google warning ("risky app"). ' + N + ' is completely safe: the warning comes from the way that browser installs. With <b>Chrome</b> it installs with no warning:</p>' +
+      '<ol><li>Tap <b>Open in Chrome</b> (button below).</li>' +
+      '<li>In Chrome, tap <b>Install the app</b> again, at the top of the page.</li>' +
+      '<li>Tap <b>Install</b>. Done: the icon shows up on your phone\'s screen.</li></ol>' +
+      '<p class="aviso">Already got the warning? Tap <b>OK</b> and follow the steps above.</p>',
+      '<p>En el navegador de Samsung, instalar puede mostrar una alerta de Google ("app de riesgo"). ' + N + ' no tiene ningún riesgo: la alerta sale por la forma en que instala ese navegador. Con <b>Chrome</b> se instala sin alerta:</p>' +
+      '<ol><li>Toca <b>Abrir en Chrome</b> (botón de abajo).</li>' +
+      '<li>En Chrome, toca otra vez <b>Instalar la aplicación</b>, arriba de la página.</li>' +
+      '<li>Toca <b>Instalar</b>. Listo: el ícono aparece en la pantalla del celular.</li></ol>' +
+      '<p class="aviso">¿Ya te salió la alerta? Toca <b>OK</b> y sigue los pasos de arriba.</p>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
+    if (android && dentroDeApp) return T('<p>Você abriu esta página dentro de outro app (WhatsApp, Instagram…). Para instalar, abra no Chrome:</p>' +
       '<ol><li>Toque em <b>Abrir no Chrome</b> (botão abaixo) ou nos <b>três pontinhos ⋮</b> e em <b>Abrir no navegador</b>.</li>' +
-      '<li>No Chrome, toque em <b>Instalar o aplicativo</b>, no topo da página.</li></ol>' +
-      '<p class="en">Opened inside another app: open in Chrome, then tap "Install app".</p>' +
-      '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">Abrir no Chrome<span class="en"> / Open in Chrome</span></a></div>';
-    if (android) return '<ol><li>Toque nos <b>três pontinhos ⋮</b> do navegador (no canto de cima ou de baixo).</li>' +
+      '<li>No Chrome, toque em <b>Instalar o aplicativo</b>, no topo da página.</li></ol>',
+      '<p>You opened this page inside another app (WhatsApp, Instagram…). To install it, open it in Chrome:</p>' +
+      '<ol><li>Tap <b>Open in Chrome</b> (button below), or the <b>three dots ⋮</b> and <b>Open in browser</b>.</li>' +
+      '<li>In Chrome, tap <b>Install the app</b> at the top of the page.</li></ol>',
+      '<p>Abriste esta página dentro de otra app (WhatsApp, Instagram…). Para instalarla, ábrela en Chrome:</p>' +
+      '<ol><li>Toca <b>Abrir en Chrome</b> (botón de abajo) o los <b>tres puntitos ⋮</b> y <b>Abrir en el navegador</b>.</li>' +
+      '<li>En Chrome, toca <b>Instalar la aplicación</b>, arriba de la página.</li></ol>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
+    if (android) return T('<ol><li>Toque nos <b>três pontinhos ⋮</b> do navegador (no canto de cima ou de baixo).</li>' +
       '<li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
       '<li>Confirme em <b>Instalar</b>. O ícone aparece junto dos seus apps.</li></ol>' +
-      '<p class="en">Android: browser menu ⋮ → Install app (or Add to Home screen).</p>' +
-      '<p class="aviso">Se essa opção não aparecer, talvez já esteja instalado: procure o ícone <b>' + NOME + '</b> nos seus apps.</p>';
-    if (macSafari) return '<ol><li>No menu do topo da tela, clique em <b>Arquivo</b>.</li>' +
-      '<li>Clique em <b>Adicionar ao Dock</b> e em <b>Adicionar</b>.</li></ol>' +
-      '<p class="en">Mac Safari: File → Add to Dock.</p>';
-    if (firefox) return '<p>O Firefox do computador não instala sites como aplicativo. Abra esta mesma página no <b>Chrome</b> ou no <b>Edge</b> e toque em <b>Instalar o aplicativo</b>.</p>' +
-      '<p>Ou, para ter só um atalho: aperte <b>Ctrl + D</b> (no Mac, <b>⌘ + D</b>) para guardar nos favoritos.</p>' +
-      '<p class="en">Firefox desktop cannot install sites: use Chrome or Edge, or press Ctrl+D to bookmark.</p>';
-    if (edge) return '<ol><li>Clique nos <b>três pontinhos ⋯</b> no canto de cima do Edge.</li>' +
+      '<p class="aviso">Se essa opção não aparecer, talvez já esteja instalado: procure o ícone <b>' + N + '</b> nos seus apps.</p>',
+      '<ol><li>Tap the browser\'s <b>three dots ⋮</b> (in the top or bottom corner).</li>' +
+      '<li>Tap <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
+      '<li>Confirm with <b>Install</b>. The icon shows up with your other apps.</li></ol>' +
+      '<p class="aviso">If you can\'t see that option, it may already be installed: look for the <b>' + N + '</b> icon in your apps.</p>',
+      '<ol><li>Toca los <b>tres puntitos ⋮</b> del navegador (arriba o abajo).</li>' +
+      '<li>Toca <b>Instalar app</b> o <b>Agregar a la pantalla principal</b>.</li>' +
+      '<li>Confirma con <b>Instalar</b>. El ícono aparece junto a tus apps.</li></ol>' +
+      '<p class="aviso">Si no aparece esa opción, quizá ya esté instalada: busca el ícono <b>' + N + '</b> en tus apps.</p>');
+    if (macSafari) return T('<ol><li>No menu do topo da tela, clique em <b>Arquivo</b>.</li>' +
+      '<li>Clique em <b>Adicionar ao Dock</b> e em <b>Adicionar</b>.</li></ol>',
+      '<ol><li>In the menu at the top of the screen, click <b>File</b>.</li>' +
+      '<li>Click <b>Add to Dock</b>, then <b>Add</b>.</li></ol>',
+      '<ol><li>En el menú de arriba de la pantalla, haz clic en <b>Archivo</b>.</li>' +
+      '<li>Haz clic en <b>Agregar al Dock</b> y en <b>Agregar</b>.</li></ol>');
+    if (firefox) return T('<p>O Firefox do computador não instala sites como aplicativo. Abra esta mesma página no <b>Chrome</b> ou no <b>Edge</b> e toque em <b>Instalar o aplicativo</b>.</p>' +
+      '<p>Ou, para ter só um atalho: aperte <b>Ctrl + D</b> (no Mac, <b>⌘ + D</b>) para guardar nos favoritos.</p>',
+      '<p>Firefox on a computer can\'t install sites as apps. Open this same page in <b>Chrome</b> or <b>Edge</b> and tap <b>Install the app</b>.</p>' +
+      '<p>Or, for just a shortcut: press <b>Ctrl + D</b> (on a Mac, <b>⌘ + D</b>) to save it to your bookmarks.</p>',
+      '<p>Firefox en la computadora no instala sitios como aplicación. Abre esta misma página en <b>Chrome</b> o en <b>Edge</b> y toca <b>Instalar la aplicación</b>.</p>' +
+      '<p>O, para tener solo un acceso directo: aprieta <b>Ctrl + D</b> (en Mac, <b>⌘ + D</b>) para guardarla en favoritos.</p>');
+    if (edge) return T('<ol><li>Clique nos <b>três pontinhos ⋯</b> no canto de cima do Edge.</li>' +
       '<li>Clique em <b>Aplicativos</b> → <b>Instalar este site como um aplicativo</b>.</li>' +
       '<li>Clique em <b>Instalar</b>. Abre na janela própria e ganha ícone no menu Iniciar.</li></ol>' +
-      '<p class="en">Edge: ⋯ → Apps → Install this site as an app.</p>' +
-      '<p class="aviso">Se a opção não aparecer, já deve estar instalado: procure <b>' + NOME + '</b> no menu Iniciar.</p>';
-    return '<ol><li>Clique no ícone de <b>instalar</b> no fim da barra de endereço (um monitor com uma seta ⤓), se aparecer.</li>' +
+      '<p class="aviso">Se a opção não aparecer, já deve estar instalado: procure <b>' + N + '</b> no menu Iniciar.</p>',
+      '<ol><li>Click the <b>three dots ⋯</b> in the top corner of Edge.</li>' +
+      '<li>Click <b>Apps</b> → <b>Install this site as an app</b>.</li>' +
+      '<li>Click <b>Install</b>. It opens in its own window and gets an icon in the Start menu.</li></ol>' +
+      '<p class="aviso">If the option isn\'t there, it\'s probably already installed: look for <b>' + N + '</b> in the Start menu.</p>',
+      '<ol><li>Haz clic en los <b>tres puntitos ⋯</b> arriba en Edge.</li>' +
+      '<li>Haz clic en <b>Aplicaciones</b> → <b>Instalar este sitio como una aplicación</b>.</li>' +
+      '<li>Haz clic en <b>Instalar</b>. Se abre en su propia ventana y tiene ícono en el menú Inicio.</li></ol>' +
+      '<p class="aviso">Si no aparece la opción, seguro ya está instalada: busca <b>' + N + '</b> en el menú Inicio.</p>');
+    return T('<ol><li>Clique no ícone de <b>instalar</b> no fim da barra de endereço (um monitor com uma seta ⤓), se aparecer.</li>' +
       '<li>Ou clique nos <b>três pontinhos ⋮</b> → <b>Transmitir, salvar e compartilhar</b> → <b>Instalar página como app</b>.</li>' +
       '<li>Clique em <b>Instalar</b>. Abre na janela própria, com ícone na área de trabalho.</li></ol>' +
-      '<p class="en">Chrome: install icon in the address bar, or ⋮ → Cast, save and share → Install page as app.</p>' +
-      '<p class="aviso">Se nada disso aparecer, já deve estar instalado: procure <b>' + NOME + '</b> nos seus programas.</p>';
+      '<p class="aviso">Se nada disso aparecer, já deve estar instalado: procure <b>' + N + '</b> nos seus programas.</p>',
+      '<ol><li>Click the <b>install</b> icon at the end of the address bar (a screen with an arrow ⤓), if you see it.</li>' +
+      '<li>Or click the <b>three dots ⋮</b> → <b>Cast, save and share</b> → <b>Install page as app</b>.</li>' +
+      '<li>Click <b>Install</b>. It opens in its own window, with an icon on your desktop.</li></ol>' +
+      '<p class="aviso">If none of this shows up, it\'s probably already installed: look for <b>' + N + '</b> in your programs.</p>',
+      '<ol><li>Haz clic en el ícono de <b>instalar</b> al final de la barra de direcciones (una pantalla con una flecha ⤓), si aparece.</li>' +
+      '<li>O haz clic en los <b>tres puntitos ⋮</b> → <b>Transmitir, guardar y compartir</b> → <b>Instalar página como app</b>.</li>' +
+      '<li>Haz clic en <b>Instalar</b>. Se abre en su propia ventana, con ícono en el escritorio.</li></ol>' +
+      '<p class="aviso">Si no aparece nada de esto, seguro ya está instalada: busca <b>' + N + '</b> en tus programas.</p>');
   }
 
   // Janela de passos: abre com movimento curto, fecha no ✕, no Esc, tocando fora e no Voltar do celular.

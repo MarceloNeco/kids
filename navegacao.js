@@ -25,8 +25,7 @@
   Para o jogo abrir espaço para a barra, ela publica no <html>: as classes "bn-nav" (barra à vista) e "bn-dentro"
   (🏠 à vista), e as medidas --nav-alto (do topo da tela até embaixo da barra, com folga) e --nav-largo (da borda até
   o fim da barra, com folga). Ex.: .bn-nav .barra { padding-left: var(--nav-largo); }
-  Texto em português; o inglês ("Home", "Exit") só com o <html lang="en">, que os jogos só usam com o interruptor
-  "ingles" ligado (idioma.js), e o .en some com o idioma.js.
+  Texto no idioma do <html lang> que o jogo põe (pt-BR, en ou es), que vem da escolha da estante (idioma.js).
 */
 (function (raiz) {
   'use strict';
@@ -39,7 +38,7 @@
 
   function chamar(fn, padrao) { try { return typeof fn === 'function' ? fn() : padrao; } catch (e) { return padrao; } }
   function noInicio() { return !!chamar(cfg.noInicio, true); }
-  function ingles() { return /^en/i.test(el.lang || ''); }
+  function lingua() { var l = (el.lang || '').toLowerCase(); return l.indexOf('en') === 0 ? 'en' : l.indexOf('es') === 0 ? 'es' : 'pt'; }
   function instalado() {
     var mm = raiz.matchMedia;
     return !!(mm && (mm('(display-mode: standalone)').matches || mm('(display-mode: fullscreen)').matches || raiz.navigator.standalone));
@@ -62,7 +61,7 @@
     '.bolinho-nav .bn-saida{gap:4px;padding:0 10px 0 6px}.bolinho-nav .bn-saida .i{font-size:20px}' +
     '.bolinho-nav button:hover{background:rgba(255,255,255,.14)}.bolinho-nav button:active{background:rgba(255,255,255,.26)}' +
     '.bolinho-nav button:focus-visible{outline:3px solid #ffd54a;outline-offset:1px}' +
-    'html[lang^=en] .bolinho-nav .bn-pt,html:not([lang^=en]) .bolinho-nav .bn-en{display:none}' +
+    'html[lang^=en] .bolinho-nav .bn-pt,html[lang^=es] .bolinho-nav .bn-pt,html:not([lang^=en]) .bolinho-nav .bn-en,html:not([lang^=es]) .bolinho-nav .bn-es{display:none}' +
     '.bolinho-sair{position:fixed;inset:0;z-index:2147483200;display:flex;align-items:center;justify-content:center;padding:16px;' +
     'background:rgba(0,0,0,.55);font:600 17px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
     '.bolinho-sair[hidden]{display:none}' +
@@ -74,7 +73,7 @@
     '@media (prefers-reduced-motion:no-preference){.bolinho-sair .c{animation:bnSobe .2s ease-out}}' +
     '@keyframes bnSobe{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}';
 
-  function txt(pt, en) { return ingles() ? en : pt; }
+  function txt(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? es : pt; }
 
   function criar() {
     var st = d.createElement('style'); st.id = 'bolinho-nav-estilo'; st.textContent = CSS; d.head.appendChild(st);
@@ -82,7 +81,7 @@
     barra.className = 'bolinho-nav ' + (cfg.posicao === 'topo-direita' ? 'dir' : 'esq');
     barra.setAttribute('aria-label', 'Navegação');
     barra.innerHTML = '<button type="button" class="bn-casa" hidden><span aria-hidden="true">🏠</span></button>' +
-      '<button type="button" class="bn-saida"><span class="i" aria-hidden="true">🚪</span><span class="bn-pt">Saída</span><span class="en bn-en">Exit</span></button>';
+      '<button type="button" class="bn-saida"><span class="i" aria-hidden="true">🚪</span><span class="bn-pt">Saída</span><span class="bn-en">Exit</span><span class="bn-es">Salir</span></button>';
     var dx = (cfg.desvio && cfg.desvio.x) || 0, dy = (cfg.desvio && cfg.desvio.y) || 0;
     if (dy) barra.style.top = 'calc(env(safe-area-inset-top,0px) + ' + (6 + dy) + 'px)';
     if (dx) barra.style[cfg.posicao === 'topo-direita' ? 'right' : 'left'] = 'calc(env(safe-area-inset-' + (cfg.posicao === 'topo-direita' ? 'right' : 'left') + ',0px) + ' + (6 + dx) + 'px)';
@@ -122,10 +121,10 @@
       aviso.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); fecharAviso(); } });
       d.body.appendChild(aviso);
     }
-    aviso.querySelector('.t').textContent = txt('🚪 Sair do jogo?', '🚪 Leave the game?');
-    aviso.querySelector('.x').textContent = txt('A brincadeira que está rolando vai parar.', 'The game in progress will stop.');
-    aviso.querySelector('.sim').textContent = txt('🚪 Sair', '🚪 Leave');
-    aviso.querySelector('.nao').textContent = txt('▶ Continuar brincando', '▶ Keep playing');
+    aviso.querySelector('.t').textContent = txt('🚪 Sair do jogo?', '🚪 Leave the game?', '🚪 ¿Salir del juego?');
+    aviso.querySelector('.x').textContent = txt('A brincadeira que está rolando vai parar.', 'The game you\'re playing will stop.', 'El juego que está en marcha se va a detener.');
+    aviso.querySelector('.sim').textContent = txt('🚪 Sair', '🚪 Leave', '🚪 Salir');
+    aviso.querySelector('.nao').textContent = txt('▶ Continuar brincando', '▶ Keep playing', '▶ Seguir jugando');
     aviso.hidden = false;
     setTimeout(function () { aviso.querySelector('.nao').focus(); }, 30);
   }
@@ -158,8 +157,8 @@
     var some = escondida(), inicio = noInicio();
     barra.hidden = some;
     btCasa.hidden = inicio;
-    btCasa.setAttribute('aria-label', txt('Início', 'Home')); btCasa.title = btCasa.getAttribute('aria-label');
-    btSaida.setAttribute('aria-label', txt('Saída', 'Exit')); btSaida.title = txt('Sair do jogo', 'Leave the game');
+    btCasa.setAttribute('aria-label', txt('Início', 'Home', 'Inicio')); btCasa.title = btCasa.getAttribute('aria-label');
+    btSaida.setAttribute('aria-label', txt('Saída', 'Exit', 'Salir')); btSaida.title = txt('Sair do jogo', 'Leave the game', 'Salir del juego');
     el.classList.toggle('bn-nav', !some);
     el.classList.toggle('bn-dentro', !some && !inicio);
     var r = some ? null : barra.getBoundingClientRect();

@@ -1,6 +1,6 @@
 // Três idiomas (dono, 14/Nov/2026): Português, English e Español. A escolha é feita só na estante (🇧🇷 PT · 🇺🇸 EN ·
 // 🇪🇸 ES, idioma.js) e cada jogo abre no idioma escolhido, sem botão de idioma próprio.
-// Rodar da raiz do repositório: node --test teste/*.test.js   ·   um jogo só: JOGO=cozinha/ node --test teste/idioma.test.js
+// Rodar da raiz do repositório: node --test teste/*.test.js   ·   um jogo só: JOGO=cozinha/ node --test teste/idioma.test.js (JOGO=- = só a estante)
 const test = require('node:test');
 const assert = require('node:assert');
 const http = require('http');
@@ -26,7 +26,7 @@ function servidor() {
 
 const TODOS = ['baguncolandia/', 'peluqueria/', 'vruuum/', 'purpurina/', 'rabiscolandia/', 'campo-minado/', 'batalha-naval/',
   'enigmas/', 'labirinto/', 'cozinha/', 'a-garra/', 'aqua/', 'quem-e/', 'danca-na-sala.html'];
-const JOGOS = process.env.JOGO ? [process.env.JOGO] : TODOS;
+const JOGOS = process.env.JOGO === '-' ? [] : process.env.JOGO ? [process.env.JOGO] : TODOS;
 const IDIOMAS = [['pt', /^pt/i, 0], ['en', /^en/i, 1], ['es', /^es/i, 2]];
 
 let srv, base, browser;
