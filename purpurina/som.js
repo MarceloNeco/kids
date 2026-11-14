@@ -96,28 +96,33 @@
   function sintParar() { if (timer) { clearInterval(timer); timer = null; } }
 
   // ---------- a rádio: gravadas (pop, dance e R&B, licença livre) e as feitas pelo jogo ----------
-  // só músicas animadas de dança e pop (sem voz), todas CC BY 4.0; a primeira é a de abertura
+  /* Só músicas animadas, com instrumentos de verdade e sem voz (pedido do dono, 14/Nov/2026: "pop animado, tom maior,
+     nada de som de Atari"; no desfile, umas animadas e umas mais emocionantes). 14 compostas para o jogo (modelo aberto
+     ACE-Step, Apache-2.0: o dono pode usar e vender sem pagar nada; detalhe em musicas/LICENCAS.md) e 7 do Kevin MacLeod.
+     A primeira é a de abertura. desfile: true = toca quando ela entra na passarela. As que saíram da rádio continuam na
+     pasta (outros jogos do Bolinho de Chuva tocam elas). */
   var GRAVADAS = [
     { url: 'musicas/disco-medusae.mp3', nome: 'Disco Medusae', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/sexta-a-noite.mp3', nome: 'Sexta à Noite', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/verao-neon.mp3', nome: 'Verão Neon', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/fogos-no-ceu.mp3', nome: 'Fogos no Céu', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/sonho-adolescente.mp3', nome: 'Sonho Adolescente', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/doce-purpurina.mp3', nome: 'Doce Purpurina', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/disco-rosa.mp3', nome: 'Disco Rosa', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/brilho-total.mp3', nome: 'Brilho Total', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/festa-no-quarto.mp3', nome: 'Festa no Quarto', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo' },
+    { url: 'musicas/passarela-de-luz.mp3', nome: 'Passarela de Luz', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo', desfile: true },
+    { url: 'musicas/holofotes.mp3', nome: 'Holofotes', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo', desfile: true },
+    { url: 'musicas/grande-final.mp3', nome: 'Grande Final', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo', desfile: true },
+    { url: 'musicas/seja-voce.mp3', nome: 'Seja Você', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo', desfile: true },
+    { url: 'musicas/coracao-eletrico.mp3', nome: 'Coração Elétrico', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo', desfile: true },
+    { url: 'musicas/estrela-que-brilha.mp3', nome: 'Estrela que Brilha', autor: 'Purpurina (composta para o jogo)', licenca: 'livre, sem custo', desfile: true },
     { url: 'musicas/glitter-blast.mp3', nome: 'Glitter Blast', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/who-likes-to-party.mp3', nome: 'Who Likes to Party', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/miami-viceroy.mp3', nome: 'Miami Viceroy', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/boogie-party.mp3', nome: 'Boogie Party', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/raving-energy.mp3', nome: 'Raving Energy', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/airport-lounge.mp3', nome: 'Airport Lounge', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/cloud-dancer.mp3', nome: 'Cloud Dancer', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/got-funk.mp3', nome: 'Got Funk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/newer-wave.mp3', nome: 'Newer Wave', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/moonlight-beach.mp3', nome: 'Moonlight Beach', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/your-call.mp3', nome: 'Your Call', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/club-seamus.mp3', nome: 'Club Seamus', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/celebration.mp3', nome: 'Celebration', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/funky-one.mp3', nome: 'Funky One', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/neon-laser-horizon.mp3', nome: 'Neon Laser Horizon', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/beauty-flow.mp3', nome: 'Beauty Flow', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/voxel-revolution.mp3', nome: 'Voxel Revolution', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/c-funk.mp3', nome: 'C-Funk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/shiny-tech.mp3', nome: 'Shiny Tech', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' }
+    { url: 'musicas/got-funk.mp3', nome: 'Got Funk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/funky-one.mp3', nome: 'Funky One', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' }
   ];
   var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false, sintN = 0;
   // só as gravadas, em ordem sorteada com a favorita por último; no arquivo baixado ou sem <audio> (não dá para tocar
@@ -192,6 +197,12 @@
   }
   // desafio novo ou desfile: a próxima música, do começo
   function faixaAtual() { if (!lista.length) montarLista(); return nomeDe(lista[Math.max(0, atual)]); }
+  // desfile: uma das músicas de passarela (sorteada, diferente da que está tocando); sem elas, a próxima
+  function desfile() {
+    if (!lista.length) montarLista();
+    var ks = []; lista.forEach(function (it, k) { if (it.g && it.g.desfile && k !== atual) ks.push(k); });
+    tocarItem(ks.length ? ks[Math.floor(Math.random() * ks.length)] : atual + 1);
+  }
   function anterior() { tocarItem(atual - 1); }
   function proxima() { tocarItem(atual + 1); }
   // app escondido (outra aba, tela apagada): silencia; ao voltar, continua
@@ -221,5 +232,5 @@
   function tocar(nome) { if (!ac || !ligado || !efeitos[nome]) return; efeitos[nome](ac.currentTime + 0.005); }
   function alternar() { ligado = !ligado; if (mestre) mestre.gain.setTargetAtTime(ligado ? 0.8 : 0, ac.currentTime, 0.05); if (audio) audio.muted = !ligado; return ligado; }
 
-  raiz.PurpurinaSom = { iniciar: iniciar, tocar: tocar, musica: musica, proxima: proxima, anterior: anterior, faixaAtual: faixaAtual, tocandoMusica: function () { return musicaLigada; }, aoTrocarMusica: function (fn) { aoTrocar = fn; }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, ligado: function () { return ligado; }, MUSICAS: MUSICAS };
+  raiz.PurpurinaSom = { iniciar: iniciar, tocar: tocar, musica: musica, proxima: proxima, desfile: desfile, anterior: anterior, faixaAtual: faixaAtual, tocandoMusica: function () { return musicaLigada; }, aoTrocarMusica: function (fn) { aoTrocar = fn; }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, ligado: function () { return ligado; }, MUSICAS: MUSICAS };
 })(this);

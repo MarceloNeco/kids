@@ -64,6 +64,8 @@ test('músicas: toda música da rádio existe, está no sw.js e tem crédito em 
   assert.equal(urls[0], 'musicas/disco-medusae.mp3', 'a de abertura continua sendo a primeira');
   assert.deepEqual(doSw, urls, 'a mesma lista no sw.js');
   urls.forEach(u => { assert.ok(fs.existsSync(path.join(pasta, u)), u + ' existe'); assert.ok(lic.includes('`' + u.split('/')[1] + '`'), u + ' tem crédito'); });
+  // as que saíram da rádio (0.17.3 e 0.18.0: som de videogame ou lentas) ficam na pasta: outros jogos tocam várias
   const sobrando = fs.readdirSync(path.join(pasta, 'musicas')).filter(f => f.endsWith('.mp3') && !urls.includes('musicas/' + f));
-  assert.deepEqual(sobrando, ['laserpack.mp3'], 'nenhum MP3 fora da rádio (só a Laserpack, que saiu na 0.17.3: som de videogame)');
+  assert.ok(sobrando.length <= 14, 'mp3 esquecido na pasta: ' + sobrando.join(', '));
+  assert.ok(require('../som.js').PurpurinaSom.GRAVADAS.filter(g => g.desfile).length >= 6, 'músicas de desfile');
 });

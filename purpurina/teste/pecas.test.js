@@ -146,3 +146,18 @@ test('traços para parecer com qualquer criança: olhos, boca, nariz, rosto, cab
   const eu = Object.assign(V.novo(), { formaOlho: 'amendoados', distOlhos: 'afastados', formaBoca: 'sorrisinho', nariz: 'batatinha' });
   const s = V.surpresa(eu, Math.random); for (const k of ['formaOlho', 'distOlhos', 'formaBoca', 'nariz']) assert.equal(s[k], eu[k], k);
 });
+
+test('personagens prontas: só usam peças e cores que existem, e têm nome nos três idiomas', () => {
+  const P = require('../pecas.js');
+  assert.ok(P.PRONTAS.length >= 2);
+  for (const pr of P.PRONTAS) {
+    assert.ok(pr.pt && pr.en && pr.es, pr.id + ' sem nome');
+    for (const [k, v] of Object.entries(pr.e)) {
+      assert.ok(k in P.PADRAO, pr.id + ': ' + k + ' não existe');
+      const cat = P.CATEGORIAS.find(c => c.id === k), daCor = P.CATEGORIAS.find(c => c.id + 'Cor' === k);
+      if (cat && cat.opcoes) assert.ok(cat.opcoes.some(o => o.id === v), pr.id + ': ' + k + '=' + v);
+      else if (cat && cat.cores) assert.ok(P.CORES[cat.cores].some(c => c.id === v), pr.id + ': ' + k + '=' + v);
+      if (daCor) assert.ok(P.CORES[daCor.cores].some(c => c.id === v), pr.id + ': ' + k + '=' + v);
+    }
+  }
+});

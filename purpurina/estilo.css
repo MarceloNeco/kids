@@ -313,3 +313,11 @@ dialog.pp-ia::backdrop { background: rgba(20, 6, 36, .72); }
 .chega { animation: chegar .3s cubic-bezier(.2, .9, .3, 1.15) both; animation-delay: calc(var(--i, 0) * 22ms); }
 @keyframes chegar { from { opacity: 0; transform: translateY(14px) scale(.82); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .chega { animation: none; } }
+
+/* 💖 Meus looks: personagens prontas em cima, os guardados embaixo */
+.titulo-prontas { margin: 14px 4px 6px; font-size: 1.05rem; color: #ffe1f3; }
+.nome-pronta { margin: 4px 0 2px; text-align: center; font-weight: 700; font-size: .95rem; }
+
+/* ícones 3D das abas e das partes (img/*.webp): do tamanho do emoji, com sombra macia */
+.i3d { width: 1.9em; height: 1.9em; object-fit: contain; display: block; margin: 0 auto; filter: drop-shadow(0 2px 3px rgba(42, 10, 60, .35)); }
+.grupo-bt .i .i3d { width: 1.7em; height: 1.7em; }
