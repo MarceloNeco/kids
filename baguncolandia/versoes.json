@@ -2,6 +2,17 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.36",
+      "data": "14/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "🪵 Abaixar de verdade: quando você abaixa (no Pula e abaixa e em todo lugar que tem abaixar), o boneco não fica mais \"espremido\". Ele dobra os joelhos, inclina o corpo para a frente, levanta a cabeça e olha para cima, vendo o galho passar por cima. Com vestido, a saia cai por cima das pernas."
+      ],
+      "en": [
+        "🪵 Real ducking: when you duck (in Jump and duck and everywhere you can duck), the puppet is no longer \"squashed\". It bends its knees, leans forward, lifts its head and looks up, watching the branch go over it. With a dress, the skirt falls over the legs."
+      ]
+    },
+    {
       "versao": "0.8.35",
       "data": "14/Nov/2026",
       "hora": "11:00:00",
