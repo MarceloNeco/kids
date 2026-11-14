@@ -1,10 +1,10 @@
 /* ✨ Novidades da semana (pedido do dono, 14/Nov/2026): quando entra jogo novo na estante, em vez de um aviso seco de
    "atualize", aparece uma janela bonita com os jogos novos — ícone, nome, uma frase e ▶ para jogar.
    - Jogo novo = campo "novo" do catalogo.js com data de até 7 dias (BolinhoCatalogo.novos()).
-   - Aparece toda vez que o Bolinho abre, enquanto houver jogo novo (dono, 14/Nov/2026), até a pessoa tocar em
-     "Não mostrar mais esta mensagem" (guarda os jogos em localStorage "bolinho:novidades-vistas"; jogo novo depois
-     aparece de novo). "👍 Legal!", ✕, Esc e tocar fora só fecham nesta visita (sessionStorage), para a janela não
-     voltar a cada volta de um jogo para a estante. (Sem entrada no histórico: ela abre sozinha, sem toque, e o Chrome pularia
+   - Aparece toda vez que a estante abre ou é recarregada, enquanto houver jogo novo (dono, 14/Nov/2026), até a pessoa
+     tocar em "Não mostrar mais esta mensagem" (guarda os jogos em localStorage "bolinho:novidades-ocultas"; jogo novo
+     depois aparece de novo). "👍 Legal!", ✕, Esc e tocar fora só fecham. Voltando de um jogo para a estante não
+     aparece (para não pular na frente a cada partida). (Sem entrada no histórico: ela abre sozinha, sem toque, e o Chrome pularia
      uma entrada criada sem toque — o Voltar sairia da estante.)
    - Na TV (?tv=) não aparece por cima sozinha: os cartões já têm o selo "✨ Novo".
    - Textos em PT/EN/ES pelo idioma.js. */
@@ -12,14 +12,19 @@
   'use strict';
   var d = document, C = window.BolinhoCatalogo;
   if (!C || !C.novos || /[?&]tv=/.test(location.search)) return;
-  var CHAVE = 'bolinho:novidades-vistas';
+  // "Não mostrar mais" fica numa chave nova: a antiga ("bolinho:novidades-vistas") era gravada até pelo "Legal!" da 1ª versão
+  // e escondia a janela de quem só tinha fechado (dono, 14/Nov/2026: "não apareceu"). A antiga é ignorada.
+  var CHAVE = 'bolinho:novidades-ocultas';
   function T(pt, en, es) { return window.BolinhoIdioma ? BolinhoIdioma.t(pt, en, es) : pt; }
   function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
   function vistos() { try { return JSON.parse(localStorage.getItem(CHAVE) || '[]') || []; } catch (e) { return []; } }
   function marcar(ids) { try { localStorage.setItem(CHAVE, JSON.stringify(vistos().concat(ids).filter(function (x, i, a) { return a.indexOf(x) === i; }).slice(-60))); } catch (e) {} }
   if (vistos().indexOf('*') >= 0) return;   // "*" = não mostrar (os testes de outras partes da estante usam)
-  // fechada nesta visita (Legal!, ✕, tocar fora): volta na próxima vez que abrir o Bolinho, não a cada volta de um jogo
-  try { if (sessionStorage.getItem('bolinho:novidades-sessao')) return; } catch (e) {}
+  // voltando de um jogo para a estante (🚪, 🏠 do navegador): não aparece de novo; abrir ou recarregar a estante, aparece
+  function veioDeUmJogo() {
+    try { var r = new URL(d.referrer); return r.origin === location.origin && /\/kids\/./.test(r.pathname) && r.pathname !== location.pathname; } catch (e) { return false; }
+  }
+  if (veioDeUmJogo()) return;
   var novos = C.novos().filter(function (j) { return vistos().indexOf(j.id + '@' + j.novo) < 0; });
   if (!novos.length) return;
 
@@ -72,7 +77,6 @@
       '<button type="button" class="nunca">' + T('Não mostrar mais esta mensagem', "Don't show this message again", 'No volver a mostrar este mensaje') + '</button></div>';
   }
   function naoMostrarMais() { marcar(novos.map(function (j) { return j.id + '@' + j.novo; })); }
-  function fechadaNestaVisita() { try { sessionStorage.setItem('bolinho:novidades-sessao', '1'); } catch (e) {} }
   function abrir() {
     montar();
     caixa.hidden = false;
@@ -80,12 +84,11 @@
   }
   function fechar() {
     if (caixa.hidden) return;
-    caixa.hidden = true; fechadaNestaVisita();
+    caixa.hidden = true;
   }
   caixa.addEventListener('click', function (e) {
     if (e.target.closest('.nunca')) { naoMostrarMais(); return fechar(); }
     if (e.target === caixa || e.target.closest('.nov-x') || e.target.closest('.ok')) return fechar();
-    if (e.target.closest('li a')) fechadaNestaVisita();   // foi jogar: nesta visita não aparece de novo
   });
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !caixa.hidden) fechar(); });
   if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function () { if (!caixa.hidden) montar(); });
