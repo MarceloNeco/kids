@@ -24,7 +24,7 @@ test('CSP sem script inline nem eval', () => {
 
 test('navegação padrão e versão', () => {
   assert.match(app, /BolinhoNav\.iniciar\(\{\s*jogo: 'quem-e'/);
-  assert.match(app, /var APP_VERSION = '0\.5\.0'/);
+  assert.match(app, /var APP_VERSION = '0\.5\.1'/);
 });
 
 test('trilha: pelo menos 10 músicas gravadas que existem', () => {

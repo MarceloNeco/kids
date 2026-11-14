@@ -2,6 +2,20 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.5.1",
+      "data": "14/Nov/2026",
+      "hora": "17:13:19",
+      "pt": [
+        "📚 A Meleca Adivinha agora conhece 1.613 personagens (eram 792): desenhos e animes, filmes e séries, famosos, história, livros, contos, mitos, bichos, comidas, brinquedos e profissões"
+      ],
+      "en": [
+        "📚 The Slime Guesses now knows 1,613 characters (it was 792): cartoons and anime, movies and series, famous people, history, books, fairy tales, myths, animals, food, toys and jobs"
+      ],
+      "es": [
+        "📚 El Slime Adivina ahora conoce 1613 personajes (antes eran 792): dibujos y anime, películas y series, famosos, historia, libros, cuentos, mitos, animales, comidas, juguetes y profesiones"
+      ]
+    },
+    {
       "versao": "0.5.0",
       "data": "14/Nov/2026",
       "hora": "16:38:03",

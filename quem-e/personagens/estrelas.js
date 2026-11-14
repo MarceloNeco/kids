@@ -403,7 +403,7 @@
       'magia:n voa:n engracado:n realeza:n cor-azul:? cor-vermelho:? cor-verde:p cor-amarelo:? cor-rosa:? ' +
       'cor-preto:? cor-branco:? cor-marrom:? grande:n pequeno:n oculos:n careca:n barba:n rapido:p rico:s vivo:s ' +
       'antigo:n recente:s historia:n ator:n dancar:n futebol:s corrida:n politico:n oscar:n estrangeiro-eua:n ' +
-      'europa:n casado:s'],
+      'europa:n casado:?'],
     ['hulk-jogador', 'Hulk (jogador)', '💪', 'FA',
       'real:s pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:n brasileiro:s fala:s desenho:n ' +
       'filme:q serie:q livro:n videogame:n internet:n tv:n disney:n canta:n musica:n esporte:s heroi:n vilao:n ' +
