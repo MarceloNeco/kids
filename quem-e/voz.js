@@ -91,13 +91,15 @@
           if (!raiz.speechSynthesis || !raiz.SpeechSynthesisUtterance) { ok(); return; }
           try {
             speechSynthesis.cancel();
-            var u = new SpeechSynthesisUtterance(txt), lang = lingua() === 'en' ? 'en' : 'pt';
-            u.lang = lang === 'en' ? 'en-US' : 'pt-BR'; u.pitch = jeito.pitch; u.rate = jeito.rate;
+            // o idioma da estante (pt, en ou es): só uma voz desse idioma lê o texto; sem nenhuma, vai só o u.lang
+            var lang = { pt: 'pt', en: 'en', es: 'es' }[lingua()] || 'pt', u = new SpeechSynthesisUtterance(txt);
+            u.lang = { pt: 'pt-BR', en: 'en-US', es: 'es-ES' }[lang]; u.pitch = jeito.pitch; u.rate = jeito.rate;
+            var doIdioma = (speechSynthesis.getVoices() || []).filter(function (v) { return String(v.lang || '').toLowerCase().replace('_', '-').indexOf(lang) === 0; });
             if (jeito.soLocal) {
-              var locais = (speechSynthesis.getVoices() || []).filter(function (v) { return v.localService && String(v.lang || '').toLowerCase().replace('_', '-').indexOf(lang) === 0; });
+              var locais = doIdioma.filter(function (v) { return v.localService; });
               if (!locais.length) { ok(); return; }   // sem voz dentro do aparelho: o nome fica só escrito na tela
               u.voice = locais[0];
-            }
+            } else if (doIdioma.length) u.voice = doIdioma.filter(function (v) { return v.lang === u.lang || v.lang.replace('_', '-') === u.lang; })[0] || doIdioma[0];
             u.onend = u.onerror = function () { ok(); };
             setTimeout(function () { try { speechSynthesis.speak(u); } catch (e) { ok(); } }, 60);
             setTimeout(ok, 12000);

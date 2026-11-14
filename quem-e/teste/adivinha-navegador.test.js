@@ -171,3 +171,43 @@ test('revisão: nome que só tem símbolos não trava; "Não é" esconde o chute
   assert.deepEqual(pg.errosPg, []);
   await ctx.close();
 });
+
+// três idiomas (14/Nov/2026): o idioma vem da estante (../idioma.js, localStorage "bolinho:idioma"); os nomes ficam,
+// as perguntas, respostas e falas mudam, a voz é a do idioma escolhido e o aprender continua funcionando
+test('espanhol escolhido na estante: perguntas, falas e voz em espanhol, e aprende alguém novo', async () => {
+  const ctx = await browser.newContext({ locale: 'pt-BR', viewport: { width: 390, height: 844 } });
+  await ctx.addInitScript(() => {
+    localStorage.setItem('bolinho:idioma', 'es');
+    window.__falas = [];
+    window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+    const vozes = [{ name: 'PT', lang: 'pt-BR', localService: true }, { name: 'ES', lang: 'es-ES', localService: true }, { name: 'EN', lang: 'en-US', localService: true }];
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: u => { window.__falas.push({ texto: u.text, lang: u.lang, voz: u.voice && u.voice.name }); setTimeout(() => u.onend && u.onend(), 5); }, cancel: () => {}, getVoices: () => vozes, speaking: false, addEventListener: () => {} } });
+  });
+  const pg = await pagina(ctx, base + '?teste');
+  assert.equal(await pg.evaluate(() => document.documentElement.lang), 'es');
+  assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma próprio');
+  assert.equal((await pg.textContent('.logo-txt')).trim(), '¿Quién es');
+  await pg.click('#btPink');
+  assert.match(await pg.textContent('#btAdivinha'), /El Slime Adivina/);
+  await pg.click('#btAdivinha'); await pg.waitForSelector('#nivelAdivinha.ativa');
+  await pg.click('#btFamilia'); await pg.waitForSelector('#adivinha.ativa');
+  await pg.waitForFunction(() => /^¿.*\?$/.test(document.getElementById('advPergunta').textContent));
+  assert.equal((await pg.textContent('#advRespostas .resp[data-r="s"]')).trim(), '👍 Sí');
+  assert.equal((await pg.textContent('#advRespostas .resp[data-r="?"]')).trim(), '🤷 No lo sé');
+  await pg.waitForFunction(() => window.__falas.some(f => /^¿/.test(f.texto)));
+  const falas = await pg.evaluate(() => window.__falas);
+  assert.ok(falas.every(f => f.lang === 'es-ES' && f.voz === 'ES'), JSON.stringify(falas.slice(0, 3)));
+  for (let i = 0; i < 300; i++) {
+    if (await pg.locator('#advPerdi:not([hidden])').count()) break;
+    if (await pg.locator('#advChute:not([hidden])').count()) { await pg.click('#btErrou', { timeout: 1000 }).catch(() => {}); continue; }
+    if (await pg.locator('#advRespostas:not([hidden])').count()) await pg.click('#advRespostas .resp[data-r="?"]', { timeout: 1000 }).catch(() => {}); else await pg.waitForTimeout(20);
+  }
+  await pg.waitForSelector('#advPerdi:not([hidden])');
+  assert.match(await pg.textContent('#advPerdiTxt'), /¡Me has ganado!/);
+  await pg.fill('#advNome', 'Mi prima Lucía'); await pg.click('#btEnsinarSalvar');
+  await pg.waitForSelector('#advFim:not([hidden])');
+  assert.match(await pg.textContent('#advFimTxt'), /Ahora ya conozco a Mi prima Lucía/);
+  assert.equal((await pg.evaluate(() => QEDebugAdv.aprender.lista()))[0].nome, 'Mi prima Lucía');
+  assert.deepEqual(pg.errosPg, []);
+  await ctx.close();
+});

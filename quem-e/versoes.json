@@ -2,6 +2,23 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "14/Nov/2026",
+      "hora": "18:40:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante",
+        "🔮 As 127 perguntas da Meleca Adivinha e as do Duelo de Caras também em espanhol; a meleca fala no idioma escolhido"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf",
+        "🔮 All 127 questions of The Slime Guesses and the Face Duel questions in Spanish too; the slime speaks the chosen language"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, que se eligen en la estantería",
+        "🔮 Las 127 preguntas de El Slime Adivina y las del Duelo de Caras también en español; el slime habla en el idioma elegido"
+      ]
+    },
+    {
       "versao": "0.2.3",
       "data": "14/Nov/2026",
       "hora": "10:04:06",
