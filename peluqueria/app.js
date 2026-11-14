@@ -3,7 +3,7 @@
    (PeluqueriaDebug.passo). Nada de innerHTML com dado de fora; textos por textContent. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.12', APP_UPDATED = '07/11/2026';
+  var APP_VERSION = '0.6.13', APP_UPDATED = '14/11/2026';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.Peluqueria;
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -11,30 +11,31 @@
   if (TV) document.documentElement.classList.add('tv');
   var CHAVE_PREF = 'peluqueria-pref', CHAVE_RECORDE = 'peluqueria-recorde';
   var CONTAGEM = 0.7, ESPERA = 2, GUARDA = 0.4;
-  var ROTULO = { PERFEITO: ['PERFEITO!', 'PERFECT!'], BOM: ['BOM!', 'GOOD!'], QUASE: ['QUASE!', 'ALMOST!'], LONGE: ['LONGE!', 'MISS!'] };
+  var ROTULO = { PERFEITO: ['PERFEITO!', 'PERFECT!', '¡PERFECTO!'], BOM: ['BOM!', 'GOOD!', '¡BIEN!'], QUASE: ['QUASE!', 'ALMOST!', '¡CASI!'], LONGE: ['LONGE!', 'MISS!', '¡LEJOS!'] };
 
   function ler(k, padrao) { try { var v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : padrao; } catch (e) { return padrao; } }
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  var pref = Object.assign({ nivel: 'normal', lingua: /^en/i.test(navigator.language || '') ? 'en' : 'pt', som: true, minhas: false }, ler(CHAVE_PREF, {}));
+  var pref = Object.assign({ nivel: 'normal', som: true, minhas: false }, ler(CHAVE_PREF, {}));
   if (!P.NIVEIS[pref.nivel]) pref.nivel = 'normal';
-  if (pref.lingua !== 'en') pref.lingua = 'pt';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  delete pref.lingua;   // o idioma não fica mais aqui: é o escolhido na estante (../idioma.js, 14/Nov/2026)
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';
 
-  function T(pt, en) { return pref.lingua === 'en' ? en : pt; }
+  function T(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' ? (es != null ? es : pt) : pt; }
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = T(p[0], p[1] || p[0]); });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
+    document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = T(p[0], p[1] || p[0], p[2]); });
+    document.querySelectorAll('[data-rotulo]').forEach(function (el) { var p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', T(p[0], p[1] || p[0], p[2])); });
   }
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); });
   function tela(id) { document.querySelectorAll('.tela').forEach(function (s) { s.classList.toggle('ativa', s.id === id); }); }
 
   var app = { modo: 'inicio', rodada: null, pausado: false, resto: 0, espera: 0, resultado: null, trava: null };
-  window.PeluqueriaApp = { tela: tela, T: T, aoTocar: function (el, fn) { aoTocar(el, fn); }, emBotao: emBotao, get lingua() { return pref.lingua; }, estado: function () { return app.rodada; },
+  window.PeluqueriaApp = { tela: tela, T: T, aoTocar: function (el, fn) { aoTocar(el, fn); }, emBotao: emBotao, get lingua() { return lingua; }, estado: function () { return app.rodada; },
     /* para tv.js e controle.js (v0.4.0) */
     catalogo: function () { var u = pref.minhas && temMinhas(); return { cenarios: catalogo.cenarios.jogo.concat(u ? catalogo.cenarios.meus : []), itens: catalogo.itens.jogo.concat(u ? catalogo.itens.meus : []) }; },
     pref: function () { return pref; }, gravarPref: function () { gravar(CHAVE_PREF, pref); },
     definirModo: function (m) { app.modo = m; }, modo: function () { return app.modo; },
-    efeito: function (n) { efeito(n); }, falar: function (pt, en) { falar(pt, en); },
+    efeito: function (n) { efeito(n); }, falar: function (pt, en, es) { falar(pt, en, es); },
     voltarInicio: function () { app.modo = 'tv-saindo'; irInicio(); }, TV: TV, TESTE: TESTE };
   if (window.SolverRecursos && !SolverRecursos.ligado('peluqueria', true)) { tela('desligado'); traduzir(); return; }
   try { if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js'); } catch (e) {}
@@ -57,7 +58,7 @@
   }
   aoTocar(document, ligarMusica, true);
   document.addEventListener('keydown', ligarMusica, true);
-  function falar(pt, en) { if (voz) voz.falar(pt, en); }
+  function falar(pt, en, es) { if (voz) voz.falar(pt, en, es); }
 
   var desenho = PeluqueriaDesenho.criar($('palco'), { leve: TV });
   var catalogo = { cenarios: { jogo: [], meus: [] }, itens: { jogo: [], meus: [] } };
@@ -70,7 +71,6 @@
   document.querySelectorAll('[data-nivel]').forEach(function (b) {
     b.addEventListener('click', function () { pref.nivel = b.getAttribute('data-nivel'); gravar(CHAVE_PREF, pref); marcarNivel(); });
   });
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; gravar(CHAVE_PREF, pref); traduzir(); });
   function marcarSom() { $('btSom').textContent = pref.som ? '🔊' : '🔇'; if (som) som.mudo(!pref.som); }
   $('btSom').addEventListener('click', function () { pref.som = !pref.som; gravar(CHAVE_PREF, pref); marcarSom(); });
   $('btAjuda').addEventListener('click', function () { $('ajuda').hidden = !$('ajuda').hidden; });
@@ -116,7 +116,7 @@
     if (!(history.state && history.state.peluqueria)) { try { history.pushState({ peluqueria: 1 }, ''); } catch (e) {} }
     app.modo = 'contagem'; app.resto = 3 * CONTAGEM; app.pausado = false; app.resultado = null;
     $('numero').textContent = '3'; tela('contagem');
-    falar('Três, dois, um, já!', 'Three, two, one, go!');
+    falar('Três, dois, um, já!', 'Three, two, one, go!', '¡Tres, dos, uno, ya!');
     efeito('conta');
     if (som) som.rodada(pref.nivel);   // cada rodada, uma música diferente
   }
@@ -134,7 +134,7 @@
   function aoResultado(res) {
     app.resultado = res; app.espera = 0;
     var rot = ROTULO[res.categoria];
-    $('aviso').textContent = T(rot[0], rot[1]) + ' +' + res.pontos;
+    $('aviso').textContent = T(rot[0], rot[1], rot[2]) + ' +' + res.pontos;
     efeito(res.categoria);
     if (res.categoria === 'PERFEITO') efeito('uhul');   // "u-huuu!" gravado de verdade (v0.6.0)
     placar();
@@ -210,7 +210,7 @@
     $('recorde').textContent = String(Math.max(antes, r.pontos));
     $('novoRecorde').hidden = !novo;
     tela('fim'); $('btDeNovo').focus();
-    falar(novo ? 'Novo recorde!' : 'Fim da rodada!', novo ? 'New record!' : 'Round over!');
+    falar(novo ? 'Novo recorde!' : 'Fim da rodada!', novo ? 'New record!' : 'Round over!', novo ? '¡Nuevo récord!' : '¡Fin de la ronda!');
   }
 
   /* ---------- relógio ---------- */
@@ -238,7 +238,7 @@
     var r = app.rodada, q = r.quedas[r.i];
     var pos = r.fase === 'caindo' || r.fase === 'parado' ? P.posicao(q, r.nivel, r.i, r.t) : null;
     var res = r.fase === 'parado' ? app.resultado : null, rot = res ? ROTULO[res.categoria] : null;
-    desenho.pintar(r, { pos: pos, resultado: res, rotulo: rot ? T(rot[0], rot[1]) : '', uhul: res && res.categoria === 'PERFEITO' ? T('UHUL!', 'WOOHOO!') : '', pausado: app.pausado, dt: app.pausado ? 0 : dt });
+    desenho.pintar(r, { pos: pos, resultado: res, rotulo: rot ? T(rot[0], rot[1], rot[2]) : '', uhul: res && res.categoria === 'PERFEITO' ? T('UHUL!', 'WOOHOO!', '¡YUJU!') : '', pausado: app.pausado, dt: app.pausado ? 0 : dt });
   }
   var ultimo = 0, errosQuadro = [];
   function quadro(ts) {

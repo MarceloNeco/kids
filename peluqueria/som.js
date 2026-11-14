@@ -266,7 +266,7 @@
     rodada: function () { quandoPronta(rodada); },
     aoBater: function (fn) { batidas.push(fn); }, aoTrocar: function (fn) { trocas.push(fn); },
     lista: function () { return lista.slice(); },
-    posicao: function () { return atual ? { faixa: tipo === 'abertura' ? 'abertura' : faixa, titulo: atual.titulo, autor: atual.autor, arquivo: atual.arquivo, nome: { pt: atual.titulo, en: atual.titulo } } : { faixa: null }; },
+    posicao: function () { return atual ? { faixa: tipo === 'abertura' ? 'abertura' : faixa, titulo: atual.titulo, autor: atual.autor, arquivo: atual.arquivo, nome: { pt: atual.titulo, en: atual.titulo, es: atual.titulo } } : { faixa: null }; },
     _ctx: function () { return ctx; }, _gritos: function () { return gritos.length; }, _elemento: function () { return player; },
     _forcarProxima: function (arquivo) { forcada = lista.filter(function (o) { return o.arquivo === arquivo; })[0] || null; }
   };
