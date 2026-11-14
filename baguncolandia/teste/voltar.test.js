@@ -18,9 +18,7 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
     await pg.goto('about:blank'); await pg.goto(base); await pg.waitForTimeout(400);
     await pg.click('#btPassoCel'); await pg.click(bt); await pg.fill('#nome','Teo'); await pg.click('#btEntrar'); await pg.waitForTimeout(1500);
     let o=await onde(); conf(o.tv, modo+': entrou no jogo');
-    o=await voltar(); conf(!o.tv && o.tela==='entrar', modo+': Voltar no jogo → tela de nome e boneco ('+JSON.stringify(o)+')');
-    o=await voltar(); conf(!o.tv && o.tela==='inicio' && o.passo==='cel' && o.url.startsWith(base), modo+': Voltar de novo → menu inicial, no passo "como?"');
-    o=await voltar(); conf(o.tela==='inicio' && o.passo==='um' && !o.aviso, modo+': Voltar de novo → primeiro passo ("onde vamos jogar?")');
+    o=await voltar(); conf(!o.tv && o.tela==='inicio' && o.passo==='um' && o.url.startsWith(base), modo+': Voltar no meio do jogo → tela inicial, igual ao 🏠 ('+JSON.stringify(o)+')');
     o=await voltar(); conf(o.tela==='inicio' && o.aviso, modo+': 1º Voltar no menu → fica e avisa "toque de novo para sair"');
     o=await voltar(); conf(o.url==='about:blank', modo+': 2º Voltar no menu → sai do jogo');
     // 🏠 da barra comum leva ao menu inicial e não deixa Voltar "sobrando"
@@ -32,7 +30,7 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
     // entrar de novo depois de voltar funciona
     await pg.goto(base); await pg.waitForTimeout(400);
     await pg.click('#btPassoCel'); await pg.click(bt); await pg.fill('#nome','Teo'); await pg.click('#btEntrar'); await pg.waitForTimeout(1200); await voltar();
-    await pg.click('#btEntrar'); await pg.waitForTimeout(1200); o=await onde(); conf(o.tv, modo+': dá para começar de novo depois do Voltar');
+    await pg.click('#btPassoCel'); await pg.click(bt); await pg.click('#btEntrar'); await pg.waitForTimeout(1200); o=await onde(); conf(o.tv, modo+': dá para começar de novo depois do Voltar');
   }
   // celular com TV: Voltar na tela do código → menu
   await pg.goto('about:blank'); await pg.goto(base); await pg.waitForTimeout(400); await pg.click('#btPassoTV'); await pg.click('#btCel');
