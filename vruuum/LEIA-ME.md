@@ -240,3 +240,13 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   com o mesmo veículo de quem joga, nem com o mesmo de outro rival.
 - Abertura mais clara e com turbo de vez em quando (linhas de velocidade).
 
+
+## 1.14.0 — menu com a corrida atrás e música à escolha
+
+- A corrida de demonstração da abertura (`#demo`, agora fixa no `<body>`) continua rodando atrás do menu, com um véu um
+  pouco mais escuro e os botões meio transparentes (`body.com-demo` / `body.demo-menu`, ligados em `tela()` no `app.js`).
+  Na corrida e no fim ela para.
+- Grupo 🎵 Música no menu: ⏮ e ⏭ trocam; tocar no nome abre a lista inteira (na ordem em que vai tocar). A escolhida
+  continua na corrida seguinte; sem escolha, cada corrida começa uma música nova, como antes. `som.js` ganhou
+  `listaMusicas()`, `escolherMusica(k)` e `musicaAtual()`. Sem internet a regra da música não muda: toca só a favorita
+  guardada, e o menu avisa.
