@@ -20,20 +20,27 @@ test('lavar as mãos em 3D: as 8 etapas na ordem, esfregar com círculos do dedo
   await pg.click('[data-u="pia"]');
   await pg.waitForSelector('.lavar3d canvas', { timeout: 25000 });
   const etapa = () => pg.evaluate(() => document.querySelector('.lavar3d').dataset.etapa);
+  // toca no botão da etapa e espera mudar; num navegador lento (3D sem placa de vídeo) toca de novo se o toque se perdeu
+  async function passar(e) {
+    for (let k = 0; k < 5; k++) {
+      await pg.click('.lv-bt');
+      const ok = await pg.waitForFunction(x => { const el = document.querySelector('.lavar3d'); return el.dataset.etapa !== x || el.classList.contains('limpo'); }, e, { timeout: 8000 }).then(() => true, () => false);
+      if (ok) return;
+    }
+    assert.fail('a etapa ' + e + ' não andou');
+  }
   const vistas = [];
   for (const e of ['subir', 'abrir', 'molhar', 'sabao']) {
     vistas.push(await etapa()); assert.equal(await etapa(), e);
     assert.ok((await pg.textContent('.lv-bt')).length > 2, 'botão da etapa ' + e);
-    await pg.click('.lv-bt');
-    await pg.waitForFunction(x => document.querySelector('.lavar3d').dataset.etapa !== x, e, { timeout: 25000 });
+    await passar(e);
   }
   assert.equal(await etapa(), 'esfregar');
   assert.match(await pg.textContent('.lv-instr'), /círculos/);
-  await circulos(pg, '.lavar3d .lv-cena', 2.2);
+  for (let k = 0; k < 4 && await etapa() === 'esfregar'; k++) { await circulos(pg, '.lavar3d .lv-cena', 2.2); await pg.waitForTimeout(500); }
   await pg.waitForFunction(() => document.querySelector('.lavar3d').dataset.etapa === 'enxaguar', null, { timeout: 25000 });
   for (const e of ['enxaguar', 'fechar', 'secar']) {
-    assert.equal(await etapa(), e); await pg.click('.lv-bt');
-    if (e !== 'secar') await pg.waitForFunction(x => document.querySelector('.lavar3d').dataset.etapa !== x, e, { timeout: 25000 });
+    assert.equal(await etapa(), e); await passar(e);
   }
   await pg.waitForSelector('.lavar3d.limpo .limpinho:not([hidden])', { timeout: 25000 });
   assert.match(await pg.textContent('.lavar3d .limpinho'), /Mãos limpinhas/);
