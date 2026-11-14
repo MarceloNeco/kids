@@ -1,12 +1,12 @@
-/* A Garra — service worker: guarda a pasta no aparelho para abrir sem internet.
+/* A-GARRA — service worker: guarda a pasta no aparelho para abrir sem internet.
    Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte e imagens: cópia primeiro.
    Músicas (../baguncolandia/musicas/ e ../purpurina/musicas/): o service worker não mexe (o navegador busca direto;
    sem internet a trilha pula as que não abrem e some, e o jogo segue com os efeitos).
    Cache com o nome do app: só apaga caches "a-garra-" (nunca os dos outros jogos da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.1.0';
+var VERSAO = '0.2.0';
 var CACHE = 'a-garra-v' + VERSAO;
-var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'maquina.js', 'desenho.js', 'som.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../instalar.js'];
+var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'maquina.js', 'premios3d.js', 'cenario3d.js', 'som.js', 'app.js', 'libs/three.module.js', 'libs/three.core.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../instalar.js'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
 });

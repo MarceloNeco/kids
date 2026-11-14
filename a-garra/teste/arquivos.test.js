@@ -1,4 +1,4 @@
-// Testes de arquivos do A Garra: node --test a-garra/teste/*.test.js (rodar da raiz do repositório kids)
+// Testes de arquivos do A-GARRA: node --test a-garra/teste/*.test.js (rodar da raiz do repositório kids)
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -6,11 +6,11 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.1.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.2.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.1.0'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(a, '0.2.0'); assert.equal(a, s); assert.equal(v.versao, a);
   assert.equal(v.data, '14/Nov/2026');
   assert.match(ler('app.js'), /APP_DATA = '14\/Nov\/2026'/);
   for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
@@ -77,4 +77,13 @@ test('nenhum segredo nem dado pessoal no código', () => {
     const s = ler(f);
     assert.ok(!/service_role|sb_secret_|sk-[A-Za-z0-9]{20}|AIza[0-9A-Za-z_-]{30}|ghp_[A-Za-z0-9]{20}/.test(s), f + ' parece ter segredo');
   }
+});
+
+test('3D: a biblioteca Three.js mora na pasta, com a licença, e o service worker guarda os módulos', () => {
+  for (const f of ['libs/three.module.js', 'libs/three.core.js', 'libs/LICENSE-three.txt']) assert.ok(fs.existsSync(path.join(pasta, f)), 'falta ' + f);
+  assert.match(ler('libs/three.module.js'), /from '\.\/three\.core\.js'/);
+  const sw = ler('sw.js');
+  for (const f of ['premios3d.js', 'cenario3d.js', 'libs/three.module.js', 'libs/three.core.js']) assert.ok(sw.includes("'" + f + "'"), 'sw.js sem ' + f);
+  assert.match(ler('index.html'), /<script src="app\.js" type="module"><\/script>/);
+  assert.match(ler('CREDITOS.md'), /Three\.js/);
 });
