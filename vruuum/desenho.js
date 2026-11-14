@@ -231,7 +231,7 @@
     else if (ev.tipo === 'vira' && ev.dracula) texto(vs, t('🧛 Conde Drácula!', '🧛 Count Dracula!', '🧛 ¡Conde Drácula!'), '#ff4d6d', 1.3);
     else if (ev.tipo === 'pulo' && VEIC[ev.j] && VEIC[ev.j].galinha) texto(vs, t('Cocoricóóó!', 'Cock-a-doodle-doo!', '¡Quiquiriquííí!'), '#ffffff', 1.4);
     else if (ev.tipo === 'looping') texto(vs, 'LOOPING!', '#ff4fd8', 1.8);
-    else if (ev.tipo === 'agua') { var vA = VEIC[ev.j] || {}; texto(vs, vA.cavalo || vA.galinha || vA.id === 'ovo' ? t('🌊 Nadando!', '🌊 Swimming!', '🌊 ¡A nadar!') : vA.bracos ? t('🏄 Surfando!', '🏄 Surfing!', '🏄 ¡A surfear!') : t('🌊 Virou barco!', '🌊 Boat mode!', '🌊 ¡Ahora eres un barco!'), '#7cf9ff', 1.6); for (k = 0; k < 16; k++) vs.parts.push({ tipo: 'gota', cor: k % 2 ? '#ffffff' : '#7cd6ff', x: (Math.random() - 0.5) * 0.6, y: -0.1, vx: (Math.random() - 0.5) * 2.6, vy: -1.8 - Math.random(), vida: 0.9, max: 0.9 }); }
+    else if (ev.tipo === 'agua') { var vA = VEIC[ev.j] || {}; texto(vs, vA.cavalo || vA.galinha || vA.id === 'ovo' ? t('🌊 Nadando!', '🌊 Swimming!', '🌊 ¡A nadar!') : vA.bracos || vA.id === 'patins' ? t('🏄 Surfando!', '🏄 Surfing!', '🏄 ¡A surfear!') : t('🌊 Virou barco!', '🌊 Boat mode!', '🌊 ¡Ahora eres un barco!'), '#7cf9ff', 1.6); for (k = 0; k < 16; k++) vs.parts.push({ tipo: 'gota', cor: k % 2 ? '#ffffff' : '#7cd6ff', x: (Math.random() - 0.5) * 0.6, y: -0.1, vx: (Math.random() - 0.5) * 2.6, vy: -1.8 - Math.random(), vida: 0.9, max: 0.9 }); }
     else if (ev.tipo === 'terra') texto(vs, t('🚗 De volta à estrada!', '🚗 Back on the road!', '🚗 ¡De vuelta a la carretera!'), '#ffffff', 1.1);
     else if (ev.tipo === 'loopFeito') { texto(vs, t('Que looping!', 'What a loop!', '¡Menudo looping!'), '#c6ff3d', 1.5); fogos(vs, 2); confete(vs, 25, 'cima'); }
     else if (ev.tipo === 'perdeu') { for (var k = 0; k < Math.min(ev.q, 6); k++) vs.parts.push({ tipo: 'est', x: 0, y: -0.2, vx: (Math.random() - 0.5) * 2.4, vy: -1.8 - Math.random(), vida: 1.2, max: 1.2 }); }
@@ -1195,7 +1195,7 @@
     c.save();
     c.translate(g.cx, chao - lift);
     // avião inclina bem nas curvas; moto deita um pouco; carro quase nada
-    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'skate') ? 0.22 : vv && vv.cavalo ? 0.04 : 0.07);
+    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'skate' || vv.id === 'patins') ? 0.22 : vv && vv.cavalo ? 0.04 : 0.07);
     var derr = j.derrapa > 0 && !voa, nivD = derr ? M2().nivelDerrapa(j.derrapa) : 0;
     if (derr && !naAgua && !(vv && vv.cavalo)) { c.restore(); marcasPneu(c, g, h, cw, j.ladoDerrapa, lift); c.save(); c.translate(g.cx, chao - lift); }
     c.rotate(vs.lado * inclina + (derr ? j.ladoDerrapa * 0.14 : 0) + (j.rodando > 0 ? Math.sin(j.rodando * 22) * 0.25 : 0));

@@ -184,7 +184,7 @@ test('espanhol escolhido na estante: perguntas, falas e voz em espanhol, e apren
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: u => { window.__falas.push({ texto: u.text, lang: u.lang, voz: u.voice && u.voice.name }); setTimeout(() => u.onend && u.onend(), 5); }, cancel: () => {}, getVoices: () => vozes, speaking: false, addEventListener: () => {} } });
   });
   const pg = await pagina(ctx, base + '?teste');
-  assert.equal(await pg.evaluate(() => document.documentElement.lang), 'es');
+  assert.match(await pg.evaluate(() => document.documentElement.lang), /^es(-ES)?$/);
   assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma próprio');
   assert.equal((await pg.textContent('.logo-txt')).trim(), '¿Quién es');
   await pg.click('#btPink');

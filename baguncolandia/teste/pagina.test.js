@@ -21,7 +21,7 @@ function ok(msg) { console.log('✓ ' + msg); }
   const pg = await ctx.newPage(); const erros = [];
   pg.on('console', m => { if (m.type() === 'error') erros.push(m.text() + ' @' + (m.location() && m.location().url)); }); pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
   await pg.goto(base + '?teste'); await pg.waitForTimeout(300);
-  await pg.click('#btTV'); await pg.waitForFunction(() => document.getElementById('pct').textContent === '100', null, { timeout: 15000 });
+  await pg.click('#btPassoTV'); await pg.click('#btTV'); await pg.waitForFunction(() => document.getElementById('pct').textContent === '100', null, { timeout: 15000 });
   ok('carregamento chegou a 100 %');
   await pg.waitForTimeout(800);
   const fase = await pg.evaluate(() => window.BaguncaApp.TVApp.tv.fase);
@@ -77,7 +77,7 @@ function ok(msg) { console.log('✓ ' + msg); }
   // modo "só o celular": tem como começar (barra com ▶ e modos) e a rodada roda com a câmera falsa
   const solo = await ctx.newPage(); await solo.setViewportSize({ width: 390, height: 844 });
   solo.on('pageerror', e => erros.push('solo pageerror: ' + e.message));
-  await solo.goto(base + '?teste'); await solo.click('#btSolo'); await solo.fill('#nome', 'Lia'); await solo.click('#btEntrar');
+  await solo.goto(base + '?teste'); await solo.click('#btPassoCel'); await solo.click('#btSolo'); await solo.fill('#nome', 'Lia'); await solo.click('#btEntrar');
   await solo.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 });
   // nada do lobby pode ficar embaixo da barra de botões nem sobrepor outro texto, em pé e deitado
   for (const [w, h, nome] of [[390, 844, 'em pé'], [844, 390, 'deitado'], [320, 640, '320 px']]) {
@@ -127,7 +127,7 @@ function ok(msg) { console.log('✓ ' + msg); }
   // v0.6: no dedo (sem câmera): o dedo varre uma fruta e marca ponto; deslizar para cima = pulo
   const dedo = await ctx.newPage(); await dedo.setViewportSize({ width: 844, height: 390 });
   dedo.on('pageerror', e => erros.push('dedo pageerror: ' + e.message));
-  await dedo.goto(base + '?teste'); await dedo.click('#btToque'); await dedo.fill('#nome', 'Téo'); await dedo.click('#btEntrar');
+  await dedo.goto(base + '?teste'); await dedo.click('#btPassoCel'); await dedo.click('#btToque'); await dedo.fill('#nome', 'Téo'); await dedo.click('#btEntrar');
   await dedo.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 });
   await dedo.click('#localModos button[data-v="corta"]');   // o padrão agora é 🧸 Bagunça
   await dedo.click('#localComecar');
@@ -154,7 +154,7 @@ function ok(msg) { console.log('✓ ' + msg); }
   // celular em 320 px
   const cel = await ctx.newPage(); await cel.setViewportSize({ width: 320, height: 640 });
   cel.on('console', m => { if (m.type() === 'error') erros.push('cel: ' + m.text() + ' @' + (m.location() && m.location().url)); }); cel.on('pageerror', e => erros.push('cel pageerror: ' + e.message));
-  await cel.goto(base + '?teste'); await cel.click('#btCel'); await cel.waitForTimeout(200);
+  await cel.goto(base + '?teste'); await cel.click('#btPassoTV'); await cel.click('#btCel'); await cel.waitForTimeout(200);
   const largura = await cel.evaluate(() => document.documentElement.scrollWidth);
   if (largura <= 320) ok('celular sem rolagem lateral em 320 px'); else falhou('rolagem lateral: ' + largura);
   await cel.click('#bonecoEntrar summary'); await cel.waitForTimeout(600);
@@ -195,7 +195,7 @@ function ok(msg) { console.log('✓ ' + msg); }
   const id = (b) => b && [b.cabeca, b.acessorio, b.cor].join('|');
   for (const modo of ['btToque', 'btSolo']) {
     const p = await ctx2.newPage(); p.on('pageerror', e => erros.push('boneco ' + modo + ': ' + e.message));
-    await p.goto(base + '?teste'); await p.click('#' + modo); await p.fill('#nome', 'Teo');
+    await p.goto(base + '?teste'); await p.click('#btPassoCel'); await p.click('#' + modo); await p.fill('#nome', 'Teo');
     if (modo === 'btToque') {   // monta no Boneco 2: menino de coroa e roupa laranja
       await p.click('#bonecoEntrar summary'); await p.waitForTimeout(300);
       await p.click('#bonecoEntrar .quem button:nth-child(2)'); await p.waitForTimeout(200);
@@ -213,7 +213,7 @@ function ok(msg) { console.log('✓ ' + msg); }
     await p.close();
   }
   { // TV pareada: o celular manda os dois bonecos e diz qual é o "eu" (passando pela validação da rede)
-    const t = await ctx2.newPage(); await t.goto(base + '?teste'); await t.click('#btTV'); await t.waitForFunction(() => document.getElementById('pct').textContent === '100', null, { timeout: 15000 });
+    const t = await ctx2.newPage(); await t.goto(base + '?teste'); await t.click('#btPassoTV'); await t.click('#btTV'); await t.waitForFunction(() => document.getElementById('pct').textContent === '100', null, { timeout: 15000 });
     const r = await t.evaluate(() => { const A = window.BaguncaApp, tv = A.TVApp.tv, V = (m) => Object.assign(A.Bagunca.validar(Object.assign({ t: 'cmd' }, m)), { id: 'cel1' });
       tv.jog.push({ id: 'cel1', nome: 'Ana', video: document.createElement('video') }); A.TVApp.comando({ acao: 'config', jogadores: 1, celulares: 1 });
       A.TVApp.comando(V({ acao: 'boneco', j: 0, boneco: { cabeca: 'mago', cor: '#ffd166', acessorio: 'nenhum' }, eu: false }));
@@ -225,7 +225,7 @@ function ok(msg) { console.log('✓ ' + msg); }
   await ctx2.close();
   // v0.8.19: no dedo, "💪 Difícil" = o boneco vai até lá: o boneco anda até onde o dedo segura (escolha guardada no aparelho)
   { const c3 = await browser.newContext({ viewport: { width: 1280, height: 720 }, locale: 'pt-BR' }); const v = await c3.newPage(); v.on('pageerror', e => erros.push('vai: ' + e.message));
-    await v.goto(base + '?teste'); await v.click('#btToque'); await v.fill('#nome', 'Teo'); await v.click('#btEntrar');
+    await v.goto(base + '?teste'); await v.click('#btPassoCel'); await v.click('#btToque'); await v.fill('#nome', 'Teo'); await v.click('#btEntrar');
     await v.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 });
     await v.click('#localModos button[data-v="corta"]'); const antes = await v.textContent('#localJeito'); await v.click('#localJeito');
     const guardou = await v.evaluate(() => localStorage.getItem('bagunca:jeito'));

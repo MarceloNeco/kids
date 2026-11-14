@@ -1,5 +1,6 @@
 // ✨ Novidades da semana (dono, 14/Nov/2026): jogo que entrou na estante há até 7 dias (campo "novo" do catalogo.js)
-// aparece numa janela bonita (ícone, nome, frase, ▶ Jogar) uma vez por aparelho, e o cartão dele ganha "✨ Novo".
+// aparece numa janela bonita (ícone, nome, frase, ▶ Jogar) toda vez que o Bolinho abre, até "Não mostrar mais esta
+// mensagem"; e o cartão dele ganha "✨ Novo".
 // Rodar da raiz do repositório: node --test teste/novidades.test.js
 const test = require('node:test');
 const assert = require('node:assert');
@@ -19,7 +20,7 @@ test('catálogo: datas "novo" válidas e de no máximo hoje', () => {
   assert.ok(!C.ehNovo({ novo: '2026-11-14' }, dia('2026-11-21')) && !C.ehNovo({}, dia('2026-11-14')));
 });
 
-test('estante: janela de novidades com os jogos da semana, uma vez só; selo ✨ Novo; some depois de 7 dias e na TV', async () => {
+test('estante: janela de novidades com os jogos da semana a cada visita, até "Não mostrar mais"; selo ✨ Novo; some depois de 7 dias e na TV', async () => {
   const { chromium } = require('playwright');
   const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
   const srv = http.createServer((q, r) => {
@@ -53,7 +54,20 @@ test('estante: janela de novidades com os jogos da semana, uma vez só; selo ✨
     await pg.click('.nov .ok');
     assert.ok(await pg.$eval('.nov', (e) => e.hidden), 'Legal! fecha');
     await pg.reload(); await pg.waitForTimeout(1500);
-    assert.ok(await pg.$eval('.nov', (e) => e.hidden).catch(() => true), 'não aparece de novo no mesmo aparelho');
+    assert.strictEqual(await pg.$('.nov:not([hidden])'), null, 'nesta visita (voltando de um jogo) não aparece de novo');
+    await ctx.close();
+    // outra visita: aparece de novo; "Não mostrar mais" faz parar de vez
+    ctx = await contexto(hoje); pg = await ctx.newPage();
+    await pg.goto(base); await pg.waitForSelector('.nov:not([hidden])', { timeout: 3000 });
+    await pg.evaluate(() => sessionStorage.clear());
+    await pg.click('.nov .ok');
+    await pg.evaluate(() => sessionStorage.clear());   // abriu o Bolinho de novo outro dia
+    await pg.reload(); await pg.waitForSelector('.nov:not([hidden])', { timeout: 3000 }).catch(() => assert.fail('outra visita: a janela tem de aparecer de novo'));
+    assert.match(await pg.textContent('.nov .nunca'), /Não mostrar mais esta mensagem/);
+    await pg.click('.nov .nunca');
+    await pg.evaluate(() => sessionStorage.clear());
+    await pg.reload(); await pg.waitForTimeout(1500);
+    assert.strictEqual(await pg.$('.nov'), null, 'Não mostrar mais: não aparece mais');
     await ctx.close();
 
     for (const [cod, titulo] of [['en', /New this week/], ['es', /Novedades de la semana/]]) {
