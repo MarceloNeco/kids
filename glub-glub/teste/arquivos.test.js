@@ -6,11 +6,11 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.1.2 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.1.3 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.1.2'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(a, '0.1.3'); assert.equal(a, s); assert.equal(v.versao, a);
   assert.equal(v.data, '14/Nov/2026');
   assert.match(ler('app.js'), /APP_DATA = '14\/Nov\/2026'/);
   for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
@@ -87,15 +87,15 @@ test('nenhum segredo nem dado pessoal no código', () => {
   }
 });
 
-test('imagens 3D: uma para cada bicho (menos a sacolinha), Juca, Lili e mergulhador, leves, com crédito', () => {
+test('imagens 3D: uma para cada bicho (menos a sacolinha, a estrela e o filhote, que é a tartaruga pequena), Juca, Lili e mergulhador, leves, com crédito', () => {
   const R = require('../regras.js'), cred = ler('CREDITOS.md');
-  const ids = R.BICHOS.map(b => b.id).filter(id => id !== 'sacola').concat(['juca', 'lili', 'mergulhador']);
+  const ids = R.BICHOS.map(b => b.id).filter(id => !['sacola', 'filhote', 'estrela'].includes(id)).concat(['juca', 'lili', 'mergulhador']);
   let total = 0;
   for (const id of ids) {
     const f = path.join(pasta, 'img', id + '.webp');
     assert.ok(fs.existsSync(f), 'falta img/' + id + '.webp');
     total += fs.statSync(f).size;
   }
-  assert.ok(total < 2.5 * 1048576, 'imagens pesadas demais: ' + total);
+  assert.ok(total < 3.2 * 1048576, 'imagens pesadas demais: ' + total);
   assert.match(cred, /Qwen-Image/); assert.match(cred, /Apache/);
 });

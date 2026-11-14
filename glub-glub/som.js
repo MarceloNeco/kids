@@ -1,6 +1,6 @@
 /* GLUB GLUB — efeitos sonoros feitos na hora (WebAudio), sem arquivo nenhum. A música de fundo é a trilha comum (../trilha.js).
    GlubSom.ligar(true|false) · toque() · mergulho() · glub() · fisgou() · carretilha() · ponto(valor) · balde() · poder() ·
-   bonus() · rioLimpo() · fim() · raro() */
+   bonus() · rioLimpo() · fim() · raro() · corte() · piranhas() · boia() · salvou() · acerto() · gigante() */
 (function (raiz) {
   'use strict';
   var ctx = null, ligado = true, ultimaCarretilha = 0;
@@ -43,6 +43,12 @@
     bonus: function () { nota(392, 0, 0.3, 'sawtooth', 0.07); nota(523, 0.25, 0.45, 'sawtooth', 0.07); },
     rioLimpo: function () { [784, 988, 1175, 1568].forEach(function (f, i) { nota(f, i * 0.12, 0.3, 'sine', 0.1); }); },
     raro: function () { [523, 784, 1047, 1319, 1568].forEach(function (f, i) { nota(f, i * 0.07, 0.35, 'triangle', 0.1); }); },
+    corte: function () { chiado(0, 0.06, 0.3, 4200); chiado(0.08, 0.06, 0.3, 4200); nota(300, 0.02, 0.25, 'sawtooth', 0.05, 120); },   // "tic-tic" da tesoura
+    piranhas: function () { [0, 0.12, 0.24].forEach(function (t) { nota(220, t, 0.08, 'square', 0.05, 180); }); },
+    boia: function () { nota(300, 0, 0.35, 'sine', 0.06, 700); },
+    salvou: function () { [659, 784, 988, 1319].forEach(function (f, i) { nota(f, i * 0.08, 0.2, 'triangle', 0.12); }); },
+    acerto: function () { nota(160, 0, 0.3, 'sine', 0.22, 70); chiado(0, 0.25, 0.25, 500); },
+    gigante: function () { [392, 523, 659, 784, 1047, 1319].forEach(function (f, i) { nota(f, i * 0.1, 0.35, 'triangle', 0.12); }); },
     fim: function () { [523, 523, 659, 784, 659, 784, 1047].forEach(function (f, i) { nota(f, i * 0.14, 0.24, 'triangle', 0.12); }); }
   };
   raiz.GlubSom = S;

@@ -295,3 +295,10 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   e `guincho` (cabine com vidro, braço em "A", cabo e gancho balançando, giroflex, chaminés, rodas duplas atrás).
 - `veiculos.js`: 26 veículos. Patins tem `capacete` (o `cabeca.js` desenha o capacete na cabeça do modelo) e inclina
   na curva como a moto e o skate. No rio a patinadora "surfa".
+
+## 1.21.0 — carros mais caprichados (1ª rodada de "todos os veículos com mais qualidade", dono, 14/Nov/2026)
+
+- `modelos3d.js`, valendo para todo modelo: `verniz()` (brilho de pintura nas caixas), rodas girando (`relogio` = op.t:
+  sulcos do pneu andando e 5 raios na calota), `luzinha()` (brilho somado de lanterna/farol/giroflex) e `fumaca()`.
+- Clássico, GT e Superesportivo refeitos com `casco()` (arredondados). Luzes e fumaça nos outros carros.
+- Próximas rodadas: montarias (cavalo, dinossauro, galinha, ovo, skate, patins) e os que voam.
