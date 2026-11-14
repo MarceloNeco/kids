@@ -26,13 +26,13 @@ test('cada meleca em cada humor: SVG válido, ids com prefixo, humores diferente
   }
 });
 
-test('Melekento Blue: azul translúcido com bolhas; Pink Honey: rosa com fio de mel', () => {
+test('Melekento Blue: geleia azul em pé, com pezinhos; Pink Honey: rosa-choque fosco, deitada, com rabinho pontudo (fotos do dono)', () => {
   const b = M.svg('blue', 'parada', { id: 'b' }), p = M.svg('pink', 'parada', { id: 'p' });
   assert.match(b, /opacity="0?\.\d+"/);
-  assert.ok((b.match(/<circle/g) || []).length >= 6, 'poucas bolhas');
-  assert.ok(b.includes('qm-blue'));
-  assert.ok(p.includes('qm-mel'), 'sem fio de mel');
-  assert.ok(p.includes('qm-pink'));
+  assert.ok(b.includes('qm-blue') && b.includes('qm-pes'), 'Blue sem pezinhos');
+  assert.ok(p.includes('qm-pink') && p.includes('qm-rabo') && p.includes('qm-aba'), 'Pink sem rabinho ou sem a aba');
+  assert.ok(!p.includes('qm-mel'), 'a Pink de verdade não tem fio de mel');
+  assert.ok(/#ff1f8e/i.test(p), 'Pink sem o rosa-choque das fotos');
 });
 
 test('classe de animação por humor', () => {
