@@ -16,6 +16,9 @@ vira e a vez passa. Acertou, ganhou.
   cortina entre as vezes) · 📱 cada um no seu celular, com um código de 4 letras (precisa de internet nos dois).
 - **Níveis:** 🐣 Fácil 12 caras (perguntas fáceis de ver; as cartas viram sozinhas) · 🐥 Médio 24 (barba, brinco, peruca,
   nariz de palhaço, cor da roupa) · 🦉 Difícil 36 (tipo de chapéu e de óculos, cor dos olhos, sardas).
+- **🧍 Corpo inteiro** (0.3.0, botão na escolha do nível, fica guardado): as cartas mostram a pessoa toda, com perguntas
+  novas (grupo "🧍 Corpo inteiro"): saia, short, calça, vestido, descalço (Fácil) · tênis, bota, mochila, segurando algo
+  (Médio) · o que segura: balão, bola, sorvete, livro, flor (Difícil). Em 📱 rede, quem cria a sala decide.
 - **Tabuleiro novo a cada partida:** as caras são sorteadas e desenhadas pelo jogo (`caras.js`), com nomes sorteados
   (metade de menino, metade de menina). Ninguém real é desenhado.
 - **Lupa:** 🔍 e tocar numa cara, ou segurar o dedo nela.
@@ -46,7 +49,7 @@ A pessoa pensa em alguém (de desenho, de filme, famoso, um bicho, uma coisa ou 
 perguntas. Respostas: **Sim · Acho que sim · Não sei · Acho que não · Não**, e ↩️ volta uma pergunta.
 
 - **Níveis:** 🧒 Infantil (só perguntas fáceis e personagens que criança conhece) · 👨‍👩‍👧 Família · 🧑 Adulto (a lista inteira).
-- **Lista pronta:** 667 personagens em `personagens/*.js` (familia, disney, desenhos, filmes, musica, famosos, mundo) e 127
+- **Lista pronta:** 792 personagens em `personagens/*.js` (familia, disney, desenhos, filmes, musica, famosos, mundo, jogos, novos) e 127
   perguntas em `adivinha-perguntas.js`. Só nome e emoji, nunca foto.
 - **Como ela pensa** (`adivinha.js`): chance para cada personagem, que cai com respostas que não combinam (com sobra, para
   aguentar resposta errada); a próxima pergunta é a que mais divide os mais prováveis; chuta quando tem certeza ou nas
@@ -62,4 +65,4 @@ perguntas. Respostas: **Sim · Acho que sim · Não sei · Acho que não · Não
 
 ## Próxima brincadeira
 
-Corpo inteiro no Duelo de Caras, Jogar pertinho e o resto em `PENDENCIAS.md`.
+Jogar pertinho e o resto em `PENDENCIAS.md`.

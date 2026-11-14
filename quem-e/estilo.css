@@ -100,7 +100,7 @@ button:disabled { cursor: default; opacity: .5; }
 #jogo .conversa { min-width: 0; }
 #jogo .meleca-mini { width: 54px; height: 54px; }
 #jogo .balao { flex: 1; font-size: 1.05rem; padding: 6px 12px; }
-.meu-nome { font-weight: 700; font-size: 1.05rem; flex: 1; min-width: 0; }
+.meu-nome { font-weight: 700; font-size: clamp(.82rem, 3.4vw, 1.05rem); flex: 1; min-width: 0; }
 .topo .lupa-bt { min-height: 48px; min-width: 48px; }
 #acoes { flex-wrap: nowrap; }
 #acoes .grande { flex: 1 1 auto; padding: 8px 10px; }
@@ -112,7 +112,7 @@ button:disabled { cursor: default; opacity: .5; }
 .carta { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .tabuleiro { display: grid; grid-template-columns: repeat(var(--colunas, 4), var(--carta, 70px)); gap: var(--gap, 6px); justify-content: center; align-content: center; }
 
-.carta { width: var(--carta, 70px); height: calc(var(--carta, 70px) * 1.38); min-height: 0; min-width: 0; position: relative; perspective: 600px; padding: 0; }
+.carta { width: var(--carta, 70px); height: calc(var(--carta, 70px) * var(--prop, 1.38)); min-height: 0; min-width: 0; position: relative; perspective: 600px; padding: 0; }
 .carta .frente, .carta .verso { position: absolute; inset: 0; border-radius: calc(var(--carta, 70px) * .16); border: 3px solid var(--tinta); overflow: hidden;
   backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform .32s cubic-bezier(.2, .8, .3, 1.2); }
 .carta .frente { background: var(--branco); display: flex; flex-direction: column; }
@@ -273,3 +273,6 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
   .adv-fala { padding: 10px 14px; }
 }
 .rotulo-campo { font-weight: 700; margin-bottom: -6px; }
+.corpo-bt[aria-pressed="true"] { background: #fff3c4; border-color: var(--mel); }
+.corpo-bt[aria-pressed="true"]::before { content: '✓ '; }
+.lupa svg[viewBox$="620"] { width: min(60vw, 260px, 36vh); }

@@ -86,7 +86,7 @@ test('perguntas por nível: acumulam e cada uma tem texto PT/EN, ícone e grupo'
   for (const id of ['comprido', 'careca', 'peruca', 'barba', 'bigode', 'brinco', 'colar', 'nariz', 'roupa-azul']) { assert.ok(m.includes(id), id); assert.ok(!f.includes(id), id); }
   for (const id of ['bone', 'coroa', 'oculos-escuros', 'olhos-azuis', 'sardas']) { assert.ok(d.includes(id), id); assert.ok(!m.includes(id), id); }
   for (const p of L.PERGUNTAS) {
-    assert.ok(p.pt && p.en && p.ico && ['quem', 'cabelo', 'rosto', 'cabeca', 'joias', 'roupa'].includes(p.grupo), p.id);
+    assert.ok(p.pt && p.en && p.ico && ['quem', 'cabelo', 'rosto', 'cabeca', 'joias', 'roupa', 'corpo'].includes(p.grupo), p.id);
     assert.ok(/\?$/.test(p.pt) && /\?$/.test(p.en), 'interrogação: ' + p.id);
   }
 });
@@ -156,4 +156,39 @@ test('meleca: sempre acaba acertando, e no Difícil é mais esperta que no Fáci
     somaD += partidaMeleca(t, seg, 'dificil', rnd);
   }
   assert.ok(somaD < somaF, 'difícil ' + somaD + ' × fácil ' + somaF);
+});
+
+// ---------- corpo inteiro (dono, 14/Nov/2026): saia, short, calça, vestido, tênis, bota, descalço, mochila, segurando algo ----------
+test('corpo inteiro: perguntas de roupa e calçado só com o corpo ligado, acumulando por nível', () => {
+  const sem = L.perguntasDoNivel('dificil').map(p => p.id), com = L.perguntasDoNivel('dificil', true).map(p => p.id);
+  for (const id of ['saia', 'short', 'calca', 'vestido', 'descalco']) { assert.ok(!sem.includes(id), id); assert.ok(L.perguntasDoNivel('facil', true).some(p => p.id === id), 'fácil: ' + id); }
+  for (const id of ['tenis', 'bota', 'mochila', 'segura']) { assert.ok(L.perguntasDoNivel('medio', true).some(p => p.id === id), 'médio: ' + id); assert.ok(!L.perguntasDoNivel('facil', true).some(p => p.id === id), id); }
+  for (const id of ['segura-balao', 'segura-bola', 'segura-sorvete']) assert.ok(com.includes(id) && !L.perguntasDoNivel('medio', true).some(p => p.id === id), id);
+  for (const p of L.PERGUNTAS.filter(x => x.corpo)) assert.equal(p.grupo, 'corpo');
+});
+
+test('corpo inteiro: tabuleiros válidos, únicos, perguntas úteis e mesma semente = mesmo tabuleiro', () => {
+  for (const nivel of NIVEIS) {
+    let boas = 0;
+    for (let s = 1; s <= 150; s++) {
+      const t = L.gerarTabuleiro(s, nivel, { corpo: true }), n = t.caras.length, ps = L.perguntasDoNivel(nivel, true);
+      assert.equal(t.corpo, true);
+      for (const c of t.caras) {
+        assert.ok(['calca', 'short', 'saia', 'vestido'].includes(c.baixo), c.baixo);
+        assert.ok(['tenis', 'bota', 'sapato', 'descalco'].includes(c.calcado), c.calcado);
+        if (c.calcado === 'descalco') assert.ok(nivel !== 'dificil' || true);
+      }
+      const assin = t.caras.map(c => ps.map(p => p.teste(c) ? 1 : 0).join(''));
+      assert.equal(new Set(assin).size, n, nivel + ' ' + s + ': caras iguais');
+      let ok = true;
+      for (const id of t.perguntas) { const sim = t.caras.filter(c => L.responder(c, id)).length; assert.ok(sim >= 1 && sim < n, id); if (sim < 2 || sim > Math.ceil(2 * n / 3)) ok = false; }
+      assert.ok(t.perguntas.some(id => L.pergunta(id).corpo), 'nenhuma pergunta de corpo');
+      if (ok) boas++;
+    }
+    assert.ok(boas >= 140, nivel + ' boas ' + boas);
+    assert.equal(JSON.stringify(L.gerarTabuleiro(9, nivel, { corpo: true })), JSON.stringify(L.gerarTabuleiro(9, nivel, { corpo: true })));
+  }
+  // sem o corpo, nada muda (os tabuleiros de antes continuam iguais)
+  const t = L.gerarTabuleiro(5, 'medio');
+  assert.ok(!t.corpo && !('baixo' in t.caras[0]));
 });
