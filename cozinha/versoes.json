@@ -2,9 +2,9 @@
   "app": "cozinha",
   "versoes": [
     {
-      "versao": "0.8.1",
+      "versao": "0.11.1",
       "data": "14/Nov/2026",
-      "hora": "16:30:00",
+      "hora": "17:10:00",
       "pt": [
         "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante. Textos, receitas e falas mudam juntos.",
         "👵 A Dona Cida fala com voz de mulher no idioma escolhido, e o 👵🔁 troca só entre as vozes desse idioma."
@@ -16,6 +16,72 @@
       "es": [
         "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería. Los textos, las recetas y las voces cambian juntos.",
         "👵 Doña Cida habla con voz de mujer en el idioma elegido, y el 👵🔁 solo cambia entre las voces de ese idioma."
+      ]
+    },
+    {
+      "versao": "0.11.0",
+      "data": "14/Nov/2026",
+      "hora": "16:20:00",
+      "pt": [
+        "🛒 O mercadinho por dentro tem setores, como um mercado de verdade: hortifrúti nos caixotes, geladeira, açougue, padaria e as prateleiras da mercearia. O setor que tem o que falta brilha com uma seta.",
+        "🏠 Cozinha em 3D: enquanto você escolhe o utensílio, aparece a cozinha inteira (pia, fogão com forno, geladeira, ilha e mesinha, com piso xadrez), e o cozinheirinho anda até o lugar certo antes de cada passo.",
+        "🥄 Os utensílios ficam pendurados numa barra de madeira, como na cozinha da vovó."
+      ],
+      "en": [
+        "🛒 The shop inside has sections, like a real supermarket: fruit and veg in crates, fridge, butcher, bakery and the pantry shelves. The section with what you still need glows with an arrow.",
+        "🏠 3D kitchen: while you pick the tool, the whole kitchen shows up (sink, stove with oven, fridge, island and a little table, with a checkered floor), and the little chef walks to the right spot before each step.",
+        "🥄 The kitchen tools hang from a wooden bar, like in grandma's kitchen."
+      ],
+      "es": [
+        "🛒 El mercado por dentro tiene secciones, como un supermercado de verdad: frutas y verduras en cajas, nevera, carnicería, panadería y las estanterías de la despensa. La sección que tiene lo que falta brilla con una flecha.",
+        "🏠 Cocina en 3D: mientras eliges el utensilio, aparece la cocina entera (fregadero, fogón con horno, nevera, isla y mesita, con suelo de cuadros), y el cocinerito va andando al sitio correcto antes de cada paso.",
+        "🥄 Los utensilios cuelgan de una barra de madera, como en la cocina de la abuela."
+      ]
+    },
+    {
+      "versao": "0.10.0",
+      "data": "14/Nov/2026",
+      "hora": "15:30:00",
+      "pt": [
+        "🥖 Lugar novo na vila: a Padaria do Seu Joaquim, com um pão gigante no telhado e fumacinha do forno. Vende pão, leite, queijo e manteiga.",
+        "🍉 Lugar novo: a Feira da Dona Rosa, com barracas de toldo listrado e bandeirinhas. Vende frutas e legumes.",
+        "🍇 Receita nova: suco de jabuticaba. No pomar tem a jaboticabeira, e o jogo ensina que a jabuticaba nasce grudadinha no tronco!",
+        "🏘️ A vila agora tem 10 lugares."
+      ],
+      "en": [
+        "🥖 New place in the village: Mr. Joaquim's bakery, with a giant loaf on the roof and smoke from the oven. Sells bread, milk, cheese and butter.",
+        "🍉 New place: Mrs. Rosa's street market, with striped stalls and bunting. Sells fruit and vegetables.",
+        "🍇 New recipe: jabuticaba juice. The orchard has a jabuticaba tree, and the game teaches that the fruit grows stuck right on the trunk!",
+        "🏘️ The village now has 10 places."
+      ],
+      "es": [
+        "🥖 Lugar nuevo en el pueblo: la Panadería de don Joaquim, con una barra de pan gigante en el tejado y humito del horno. Vende pan, leche, queso y mantequilla.",
+        "🍉 Lugar nuevo: el Mercadillo de doña Rosa, con puestos de toldos de rayas y banderitas. Vende frutas y verduras.",
+        "🍇 Receta nueva: zumo de jabuticaba. En el huerto está el árbol de jabuticaba, ¡y el juego enseña que la fruta crece pegadita al tronco!",
+        "🏘️ El pueblo ya tiene 10 lugares."
+      ]
+    },
+    {
+      "versao": "0.9.0",
+      "data": "14/Nov/2026",
+      "hora": "14:10:00",
+      "pt": [
+        "🐄 Na fazendinha, a Mimosa agora é desenhada grande, e a criança senta no banquinho para tirar o leite no balde (as mãos mexem e o leite cai enquanto você segura).",
+        "🍓 No pomar, as frutas são de \"massinha\": gordinhas, brilhantes e com folhinha (laranja, maçã, limão, morango e uva).",
+        "🧑‍🍳 Na horta, no pomar e no galinheiro, o cozinheirinho entra junto e anda até a planta, a árvore ou a galinha que você tocar.",
+        "🪵 A horta ganhou cerquinha de madeira e o galinheiro ficou com cara de casinha, com telhado e janelinha."
+      ],
+      "en": [
+        "🐄 At the farm, Mimosa is now drawn big, and the child sits on a stool to milk her into a bucket (the hands move and the milk pours while you hold).",
+        "🍓 In the orchard, the fruits look like modelling clay: chubby, shiny and with a little leaf (orange, apple, lemon, strawberry and grapes).",
+        "🧑‍🍳 In the garden, the orchard and the hen house, the little chef comes along and walks to the plant, tree or hen you tap.",
+        "🪵 The garden got a wooden fence and the hen house looks like a little house, with a roof and a window."
+      ],
+      "es": [
+        "🐄 En la granjita, Mimosa ahora está dibujada en grande, y el niño se sienta en el taburete para ordeñarla en el cubo (las manos se mueven y la leche cae mientras mantienes pulsado).",
+        "🍓 En el huerto, las frutas parecen de plastilina: gorditas, brillantes y con una hojita (naranja, manzana, limón, fresa y uva).",
+        "🧑‍🍳 En la huerta, el huerto y el gallinero, el cocinerito entra contigo y va andando hasta la planta, el árbol o la gallina que toques.",
+        "🪵 La huerta tiene una vallita de madera y el gallinero parece una casita, con tejado y ventanita."
       ]
     },
     {

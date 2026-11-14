@@ -2,6 +2,28 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.37",
+      "data": "14/Nov/2026",
+      "hora": "13:00:00",
+      "pt": [
+        "⬇️ Agora dá para abaixar em todo jeito de jogar, também no 💪 Difícil (o boneco vai até lá): segure o dedo embaixo dos pés do boneco para ele abaixar (como tocar acima da cabeça faz ele pular). No computador, segure a seta ↓ (2ª pessoa: S). Isso vale na 🎲 Mistura quando chega a parte do Pula e abaixa: antes, no Difícil, o galho pegava sempre."
+      ],
+      "en": [
+        "⬇️ You can now duck in every way of playing, also in 💪 Hard (the puppet goes there): hold your finger under the puppet's feet to duck (like touching above its head makes it jump). On a computer, hold the ↓ arrow (2nd player: S). This matters in 🎲 Mix when the Jump and duck part comes: before, in Hard, the branch always hit."
+      ]
+    },
+    {
+      "versao": "0.8.36",
+      "data": "14/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "🪵 Abaixar de verdade: quando você abaixa (no Pula e abaixa e em todo lugar que tem abaixar), o boneco não fica mais \"espremido\". Ele dobra os joelhos, inclina o corpo para a frente, levanta a cabeça e olha para cima, vendo o galho passar por cima. Com vestido, a saia cai por cima das pernas."
+      ],
+      "en": [
+        "🪵 Real ducking: when you duck (in Jump and duck and everywhere you can duck), the puppet is no longer \"squashed\". It bends its knees, leans forward, lifts its head and looks up, watching the branch go over it. With a dress, the skirt falls over the legs."
+      ]
+    },
+    {
       "versao": "0.8.35",
       "data": "14/Nov/2026",
       "hora": "11:00:00",

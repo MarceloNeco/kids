@@ -2,6 +2,23 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "14/Nov/2026",
+      "hora": "14:09:20",
+      "pt": [
+        "🧍 Duelo de Caras com corpo inteiro: ligue o botão na escolha do nível",
+        "👗 Saia, short, calça, vestido, tênis, bota, sapato ou descalço, mochila e o que a pessoa segura (balão, bola, sorvete, livro, flor)",
+        "❓ Perguntas novas do corpo: \"Usa saia?\", \"Está descalço?\", \"Segura um balão?\"…",
+        "📚 A Meleca Adivinha conhece 792 personagens: chegaram jogos (Minecraft, Mario, Pokémon, Sonic, Zelda…), Gabby, Miraculous, Guerreiras do K-Pop, Pocoyo, PJ Masks e mais"
+      ],
+      "en": [
+        "🧍 Face Duel with the whole body: turn on the button when choosing the level",
+        "👗 Skirt, shorts, trousers, dress, sneakers, boots, shoes or barefoot, backpack and what the person holds (balloon, ball, ice cream, book, flower)",
+        "❓ New body questions: \"Wearing a skirt?\", \"Barefoot?\", \"Holding a balloon?\"…",
+        "📚 The Guessing Slime knows 792 characters: games arrived (Minecraft, Mario, Pokémon, Sonic, Zelda…), Gabby, Miraculous, K-Pop Demon Hunters, Pocoyo, PJ Masks and more"
+      ]
+    },
+    {
       "versao": "0.2.3",
       "data": "14/Nov/2026",
       "hora": "10:04:06",

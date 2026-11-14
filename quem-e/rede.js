@@ -58,7 +58,7 @@
       case 'oi': case 'tchau': case 'pronto': return r;
       case 'pulso': r.n = int(m.n, 0, MAXN); r.p = m.p === true; return r.n === null ? null : r;
       case 'sala':
-        r.para = id8(m.para); r.nivel = L.NIVEIS[m.nivel] ? m.nivel : null; r.semente = int(m.semente, 0, 4294967295);
+        r.para = id8(m.para); r.nivel = Object.prototype.hasOwnProperty.call(L.NIVEIS, m.nivel) ? m.nivel : null; r.semente = int(m.semente, 0, 4294967295); r.corpo = m.corpo === true;
         return r.para && r.nivel && r.semente !== null ? r : null;
       case 'nao': r.para = id8(m.para); return r.para && m.motivo === 'cheia' ? (r.motivo = 'cheia', r) : null;
       case 'ev': r.e = evento(m.e); return r.e ? r : null;
@@ -75,7 +75,7 @@
     var agora = op.agora || Date.now;
     var s = op.dados ? JSON.parse(JSON.stringify(op.dados)) : {
       codigo: op.codigo, id: op.id, host: !!op.host, eu: op.host ? 0 : 1, outro: null,
-      nivel: op.host ? op.nivel : null, semente: op.host ? op.semente >>> 0 : null,
+      nivel: op.host ? op.nivel : null, semente: op.host ? op.semente >>> 0 : null, corpo: op.host ? !!op.corpo : false,
       segredo: null, outroPronto: false, log: [], dePe: null, revelado: null, cheia: false, saiu: false
     };
     var partida = null, ultimo = agora(), ultPulso = 0, ultOi = 0, aplicando = false;
@@ -97,7 +97,7 @@
       } catch (err) { return false; }
     }
     function montar() {
-      partida = QP.criar({ modo: 'rede', nivel: s.nivel, semente: s.semente, eu: s.eu });
+      partida = QP.criar({ modo: 'rede', nivel: s.nivel, semente: s.semente, eu: s.eu, corpo: !!s.corpo });
       if (s.segredo !== null) partida.escolherSegredo(s.eu, s.segredo);
       if (s.outroPronto) partida.marcarPronto(1 - s.eu);
       aplicando = true;
@@ -163,14 +163,14 @@
         var m = validar(bruto); if (!m || m.de === s.id) return;
         if (m.t === 'oi') {
           if (!s.host) return;
-          if (!s.outro || s.outro === m.de) { s.outro = m.de; ultimo = agora(); mandar({ t: 'sala', para: m.de, nivel: s.nivel, semente: s.semente }); salvar(); avisar(); }
+          if (!s.outro || s.outro === m.de) { s.outro = m.de; ultimo = agora(); mandar({ t: 'sala', para: m.de, nivel: s.nivel, semente: s.semente, corpo: !!s.corpo }); salvar(); avisar(); }
           else mandar({ t: 'nao', para: m.de, motivo: 'cheia' });
           return;
         }
         if (m.t === 'sala') {
           if (s.host || m.para !== s.id || (s.outro && s.outro !== m.de)) return;
           var novo = !s.nivel;
-          s.outro = m.de; s.nivel = m.nivel; s.semente = m.semente; ultimo = agora();
+          s.outro = m.de; s.nivel = m.nivel; s.semente = m.semente; s.corpo = m.corpo; ultimo = agora();
           if (novo) { montar(); salvar(); avisar(); }
           return;
         }

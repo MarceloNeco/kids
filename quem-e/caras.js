@@ -76,6 +76,12 @@
     return s + '</defs>';
   }
 
+  // pescoço com sombra embaixo do queixo (o corpo inteiro desenha só ele; o busto desenha dentro da roupa)
+  function pescoco(g, cores) {
+    return p('M130,' + (g.cy + g.ry - 30) + ' L130,292 Q150,304 170,292 L170,' + (g.cy + g.ry - 30) + 'Z', { fill: cores.pele, stroke: esc(cores.pele, 0.3), 'stroke-width': 2 }) +
+      p('M130,' + (g.cy + g.ry - 8) + ' Q150,' + (g.cy + g.ry + 14) + ' 170,' + (g.cy + g.ry - 8) + ' L170,' + (g.cy + g.ry + 6) + ' Q150,' + (g.cy + g.ry + 20) + ' 130,' + (g.cy + g.ry + 6) + 'Z', { fill: esc(cores.pele, 0.2), opacity: 0.55 });
+  }
+
   // ---------- roupa e ombros ----------
   function roupa(c, g, I, cores, grande) {
     var corpo = 'M18,360 C22,318 52,294 104,284 L196,284 C248,294 278,318 282,360Z';
@@ -314,16 +320,83 @@
   }
 
   // ---------- o desenho inteiro ----------
+  // ---------- corpo inteiro (dono, 14/Nov/2026): da cintura para baixo, braços, sapatos, mochila e o que segura ----------
+  var CALCA = '#3b5b9a';
+  function corpoInteiro(c, g, I, cores) {
+    var pele = cores.pele, pe = { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 2.5, 'stroke-linejoin': 'round' };
+    var roupaCor = cores.roupa, roupaT = esc(roupaCor, 0.4), baixoCor = c.baixo === 'calca' ? CALCA : c.baixo === 'vestido' ? roupaCor : ENFEITE[c.roupaCor];
+    var crianca = g.crianca, s = '';
+    var pernaE = 'M106,500 L136,500 L134,566 L108,566Z', pernaD = espelhar(pernaE);
+    // mochila atrás do corpo
+    if (c.mochila) s += '<rect x="66" y="300" width="168" height="130" rx="26" fill="' + ENFEITE[c.roupaCor] + '" stroke="' + esc(ENFEITE[c.roupaCor], 0.4) + '" stroke-width="3"/>';
+    // pernas de pele (aparecem com short, saia e vestido; descalço mostra os pés)
+    if (c.baixo !== 'calca') s += p(pernaE, pe) + p(pernaD, pe);
+    // parte de baixo
+    if (c.baixo === 'calca') {
+      var cal = { fill: baixoCor, stroke: esc(baixoCor, 0.4), 'stroke-width': 2.5, 'stroke-linejoin': 'round' };
+      s += p('M86,424 L148,424 L144,566 L98,566Z', cal) + p(espelhar('M86,424 L148,424 L144,566 L98,566Z'), cal) +
+        p('M150,430 L150,470', { stroke: esc(baixoCor, 0.5), 'stroke-width': 2 }) + p('M100,446 Q118,452 134,446', { fill: 'none', stroke: cla(baixoCor, 0.3), 'stroke-width': 2, 'stroke-dasharray': '4 3' });
+    } else if (c.baixo === 'short') {
+      var sh = { fill: baixoCor, stroke: esc(baixoCor, 0.4), 'stroke-width': 2.5, 'stroke-linejoin': 'round' };
+      s += p('M84,424 L150,424 L146,500 L96,500Z', sh) + p(espelhar('M84,424 L150,424 L146,500 L96,500Z'), sh);
+    } else if (c.baixo === 'saia') {
+      s += p('M84,424 L216,424 L242,508 L58,508Z', { fill: baixoCor, stroke: esc(baixoCor, 0.4), 'stroke-width': 2.5, 'stroke-linejoin': 'round' }) +
+        p('M110,430 L98,506 M150,430 L150,506 M190,430 L202,506', { stroke: esc(baixoCor, 0.25), 'stroke-width': 2, opacity: 0.6 });
+    } else {
+      s += p('M82,410 L218,410 L246,520 L54,520Z', { fill: 'url(#' + I + 'ro)', stroke: roupaT, 'stroke-width': 3, 'stroke-linejoin': 'round' }) + (c.estampa !== 'lisa' ? p('M82,410 L218,410 L246,520 L54,520Z', { fill: 'url(#' + I + 'es)' }) : '');
+    }
+    // tronco (camiseta) com a cor e a estampa da carta
+    var tronco = 'M102,284 L198,284 C228,290 238,312 234,344 L222,432 L78,432 L66,344 C62,312 72,290 102,284Z';
+    s += p(tronco, { fill: 'url(#' + I + 'ro)', stroke: roupaT, 'stroke-width': 3, 'stroke-linejoin': 'round' });
+    if (c.estampa !== 'lisa') s += p(tronco, { fill: 'url(#' + I + 'es)' });
+    s += p('M124,286 Q150,306 176,286', { fill: 'none', stroke: roupaT, 'stroke-width': 5, 'stroke-linecap': 'round' });
+    if (c.baixo !== 'vestido') s += p('M78,428 L222,428', { stroke: esc(c.baixo === 'calca' ? CALCA : baixoCor, 0.35), 'stroke-width': 6 });
+    // alças da mochila
+    if (c.mochila) s += p('M112,288 L104,424 M188,288 L196,424', { stroke: esc(ENFEITE[c.roupaCor], 0.25), 'stroke-width': 9, 'stroke-linecap': 'round' });
+    // braços: manga da camiseta e o resto de pele; mãos
+    var braco = 'M74,300 C58,336 52,388 56,436';
+    s += p(braco, { fill: 'none', stroke: esc(pele, 0.35), 'stroke-width': 26, 'stroke-linecap': 'round' }) + p(braco, { fill: 'none', stroke: pele, 'stroke-width': 21, 'stroke-linecap': 'round' }) +
+      p(espelhar(braco), { fill: 'none', stroke: esc(pele, 0.35), 'stroke-width': 26, 'stroke-linecap': 'round' }) + p(espelhar(braco), { fill: 'none', stroke: pele, 'stroke-width': 21, 'stroke-linecap': 'round' });
+    var manga = 'M76,298 C66,318 62,336 61,352';
+    s += p(manga, { fill: 'none', stroke: roupaT, 'stroke-width': 31, 'stroke-linecap': 'round' }) + p(manga, { fill: 'none', stroke: roupaCor, 'stroke-width': 26, 'stroke-linecap': 'round' }) +
+      p(espelhar(manga), { fill: 'none', stroke: roupaT, 'stroke-width': 31, 'stroke-linecap': 'round' }) + p(espelhar(manga), { fill: 'none', stroke: roupaCor, 'stroke-width': 26, 'stroke-linecap': 'round' });
+    s += circ(56, 442, 13, pe) + circ(244, 442, 13, pe);
+    // pés e calçados
+    [[121, 1], [179, -1]].forEach(function (q) {
+      var x = q[0], ld = q[1];
+      if (c.calcado === 'descalco') s += p('M' + (x - 16) + ',566 Q' + (x - 18) + ',584 ' + x + ',584 Q' + (x + 18) + ',584 ' + (x + 16) + ',566Z', pe) + circ(x - 8 * ld, 580, 2, { fill: esc(pele, 0.3) }) + circ(x - 2 * ld, 582, 2, { fill: esc(pele, 0.3) });
+      else if (c.calcado === 'tenis') s += p('M' + (x - 18) + ',560 L' + (x + 14) + ',560 Q' + (x + 26) + ',566 ' + (x + 24 * 1) + ',580 L' + (x - 20) + ',580Z', { fill: '#ffffff', stroke: '#3a1450', 'stroke-width': 3, 'stroke-linejoin': 'round' }) +
+        p('M' + (x - 20) + ',580 L' + (x + 24) + ',580', { stroke: ENFEITE[c.roupaCor], 'stroke-width': 5 }) + p('M' + (x - 8) + ',564 L' + (x + 6) + ',568', { stroke: ENFEITE[c.roupaCor], 'stroke-width': 3 });
+      else if (c.calcado === 'bota') s += p('M' + (x - 17) + ',522 L' + (x + 15) + ',522 L' + (x + 16) + ',566 Q' + (x + 30) + ',570 ' + (x + 28) + ',584 L' + (x - 19) + ',584Z', { fill: '#7a4a2a', stroke: '#3a1450', 'stroke-width': 3, 'stroke-linejoin': 'round' }) +
+        p('M' + (x - 17) + ',530 L' + (x + 15) + ',530', { stroke: '#a8724a', 'stroke-width': 4 });
+      else s += p('M' + (x - 16) + ',564 L' + (x + 14) + ',564 Q' + (x + 24) + ',570 ' + (x + 22) + ',580 L' + (x - 18) + ',580Z', { fill: '#2c2233', stroke: '#3a1450', 'stroke-width': 3, 'stroke-linejoin': 'round' }) + elip(x, 567, 8, 2, { fill: '#fff', opacity: 0.3 });
+    });
+    // o que segura na mão direita (lado direito da carta)
+    var hx = 244, hy = 442;
+    if (c.segura === 'balao') s += p('M' + hx + ',' + (hy - 10) + ' Q' + (hx + 14) + ',' + (hy - 70) + ' ' + (hx + 8) + ',' + (hy - 120), { fill: 'none', stroke: '#3a1450', 'stroke-width': 2 }) +
+      elip(hx + 8, hy - 150, 24, 30, { fill: '#ff3f6a', stroke: '#9e0f22', 'stroke-width': 3 }) + elip(hx, hy - 160, 6, 9, { fill: '#fff', opacity: 0.6 });
+    else if (c.segura === 'bola') s += circ(hx + 6, hy + 20, 20, { fill: '#fff', stroke: '#3a1450', 'stroke-width': 3 }) + p(estrelaP(hx + 6, hy + 20, 7), { fill: '#3a1450' });
+    else if (c.segura === 'sorvete') s += p('M' + (hx - 12) + ',' + (hy - 14) + ' L' + (hx + 12) + ',' + (hy - 14) + ' L' + hx + ',' + (hy + 18) + 'Z', { fill: '#e8b16a', stroke: '#a8724a', 'stroke-width': 2.5 }) +
+      circ(hx, hy - 24, 15, { fill: '#ff9fc8', stroke: '#c84f86', 'stroke-width': 2.5 }) + circ(hx - 4, hy - 30, 3, { fill: '#fff', opacity: 0.7 });
+    else if (c.segura === 'livro') s += '<rect x="' + (hx - 18) + '" y="' + (hy - 34) + '" width="36" height="44" rx="4" fill="#2fa86a" stroke="#1f6e46" stroke-width="3"/>' + p('M' + (hx - 10) + ',' + (hy - 24) + ' L' + (hx + 10) + ',' + (hy - 24), { stroke: '#fff', 'stroke-width': 2.5 });
+    else if (c.segura === 'flor') s += p('M' + hx + ',' + (hy - 6) + ' L' + hx + ',' + (hy - 56), { stroke: '#2fa86a', 'stroke-width': 4 }) + flor5(hx, hy - 64, 9, '#ffd23f', '#ff5fa8');
+    void crianca;
+    return s;
+  }
+  function estrelaP(x, y, r) { var d = ''; for (var i = 0; i < 5; i++) { var a = -Math.PI / 2 + i * 2 * Math.PI / 5; d += (i ? 'L' : 'M') + n(x + Math.cos(a) * r) + ',' + n(y + Math.sin(a) * r); } return d + 'Z'; }
+  function flor5(x, y, r, miolo, petala) { var s = ''; for (var i = 0; i < 5; i++) { var a = i * 2 * Math.PI / 5; s += circ(x + Math.cos(a) * r, y + Math.sin(a) * r, r * 0.8, { fill: petala, stroke: esc(petala, 0.35), 'stroke-width': 1.5 }); } return s + circ(x, y, r * 0.6, { fill: miolo }); }
+
   function svg(c, op) {
     op = op || {};
     var I = op.id || 'qc', g = geometria(c), grande = !!op.grande;
     var cores = { pele: PALETAS.pele[c.pele] || PALETAS.pele.p2, cabelo: corCabelo(c), roupa: PALETAS.roupa[c.roupaCor] || '#3a7be0' };
-    var tam = op.largura ? ' width="' + op.largura + '" height="' + (op.altura || Math.round(op.largura * H / W)) + '"' : '';
-    var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '"' + tam + ' role="img">' + defs(c, g, I, cores) +
-      '<rect width="300" height="360" fill="url(#' + I + 'fu)"/>' +
+    var corpo = !!op.corpo && !!c.baixo, alto = corpo ? 620 : H;
+    var tam = op.largura ? ' width="' + op.largura + '" height="' + (op.altura || Math.round(op.largura * alto / W)) + '"' : '';
+    var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + alto + '"' + tam + ' role="img">' + defs(c, g, I, cores) +
+      '<rect width="300" height="' + alto + '" fill="url(#' + I + 'fu)"/>' +
       circ(40, 46, 10, { fill: '#fff', opacity: 0.35 }) + circ(262, 70, 6, { fill: '#fff', opacity: 0.35 }) + circ(250, 30, 3.5, { fill: '#fff', opacity: 0.5 });
     var pelos = pelosRosto(c, g, cores);
-    s += cabeloTras(c, g, I, cores) + roupa(c, g, I, cores, grande) + colar(c, g) + orelhas(c, g, cores) +
+    s += cabeloTras(c, g, I, cores) + (corpo ? corpoInteiro(c, g, I, cores) + pescoco(g, cores) : roupa(c, g, I, cores, grande)) + colar(c, g) + orelhas(c, g, cores) +
       p(rosto(g), { fill: 'url(#' + I + 'pe)', stroke: esc(cores.pele, 0.38), 'stroke-width': 2.5 }) +
       bochechas(c, g) + rugas(c, g, cores) + olhos(c, g, grande) + sobrancelhas(c, g, cores) + pelos.barba + boca(c, g) + pelos.bigode + nariz(c, g, I, cores) +
       cabeloFrente(c, g, I, cores, grande) + oculos(c, g, I) + naCabeca(c, g, I);

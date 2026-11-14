@@ -35,7 +35,7 @@ Pedido do dono (14/Nov/2026): a foto de cada receita e de cada ingrediente (o p�
 o queijo como queijo). Todas vêm da **Wikimedia Commons**, com licença livre (domínio público, CC0, CC BY ou CC BY-SA).
 Cada uma foi cortada num quadrado e diminuída para 320 × 320 (JPG), e fica em `fotos/` para funcionar sem internet.
 As fotos com **CC BY-SA** continuam com a mesma licença (CC BY-SA) depois do corte. Quem tirou a foto e o link estão
-na tabela. A foto do *pacotinho de gelatina* é uma gelatina pronta (não havia foto livre boa do pozinho).
+na tabela. A foto do *pacotinho de gelatina* é uma gelatina pronta (não havia foto livre boa do pozinho). A do *suco de jabuticaba* (v0.10.0) é um copo de suco de uva, da mesma cor roxa-escura (não havia foto livre do suco de jabuticaba).
 
 | Arquivo | Foto original (Wikimedia Commons) | Autor | Licença |
 |---|---|---|---|
@@ -56,6 +56,7 @@ na tabela. A foto do *pacotinho de gelatina* é uma gelatina pronta (não havia 
 | `fotos/gelatina.jpg` | [2019-10-10 22 15 43 Gelatin from a single opened cup of Jell-O strawberry gelatin snack being lifted by a spoon in the Franklin Farm section of Oak Hill, Fairfax County, Virginia.jpg](https://commons.wikimedia.org/wiki/File:2019-10-10_22_15_43_Gelatin_from_a_single_opened_cup_of_Jell-O_strawberry_gelatin_snack_being_lifted_by_a_spoon_in_the_Franklin_Farm_section_of_Oak_Hill,_Fairfax_County,_Virginia.jpg) | Famartin | CC BY-SA 4.0 |
 | `fotos/gelatina-po.jpg` | [2019-10-10 22 13 03 A single opened cup of Jell-O strawberry gelatin snack after being mixed by a spoon in the Franklin Farm section of Oak Hill, Fairfax County, Virginia.jpg](https://commons.wikimedia.org/wiki/File:2019-10-10_22_13_03_A_single_opened_cup_of_Jell-O_strawberry_gelatin_snack_after_being_mixed_by_a_spoon_in_the_Franklin_Farm_section_of_Oak_Hill,_Fairfax_County,_Virginia.jpg) | Famartin | CC BY-SA 4.0 |
 | `fotos/granulado.jpg` | [Hagelslag.jpg](https://commons.wikimedia.org/wiki/File:Hagelslag.jpg) | No machine-readable author provided. DennisM assumed (based  | domínio público |
+| `fotos/jabuticaba.jpg` | [Jabuticaba Myrciaria cauliflora fruit.jpg](https://commons.wikimedia.org/wiki/File:Jabuticaba_Myrciaria_cauliflora_fruit.jpg) | mauroguanandi | CC BY 2.0 |
 | `fotos/laranja.jpg` | [Oranges - whole-halved-segment.jpg](https://commons.wikimedia.org/wiki/File:Oranges_-_whole-halved-segment.jpg) | Ivar Leidus | CC BY-SA 4.0 |
 | `fotos/leite.jpg` | [Glass of Milk (33657535532).jpg](https://commons.wikimedia.org/wiki/File:Glass_of_Milk_(33657535532).jpg) | NIAID | CC BY 2.0 |
 | `fotos/leitecond.jpg` | [Tin of condensed milk.jpg](https://commons.wikimedia.org/wiki/File:Tin_of_condensed_milk.jpg) | Robin from Rotterdam, Netherlands | CC BY-SA 2.0 |
@@ -78,6 +79,7 @@ na tabela. A foto do *pacotinho de gelatina* é uma gelatina pronta (não havia 
 | `fotos/sal.jpg` | [Salt, sugar and pepper shakers.jpg](https://commons.wikimedia.org/wiki/File:Salt,_sugar_and_pepper_shakers.jpg) | Paul Goyette | CC BY-SA 2.0 |
 | `fotos/salada-frutas.jpg` | [Fruit salad (1).jpg](https://commons.wikimedia.org/wiki/File:Fruit_salad_(1).jpg) | Renee Comet (Photographer) | domínio público |
 | `fotos/sanduiche.jpg` | [Caprese Sandwich, Jolly Holiday Bakery Cafe 2013.jpg](https://commons.wikimedia.org/wiki/File:Caprese_Sandwich,_Jolly_Holiday_Bakery_Cafe_2013.jpg) | HarshLight from San Jose, CA, USA | CC BY 2.0 |
+| `fotos/suco-jabuticaba.jpg` | [Glass of grape juice.jpeg](https://commons.wikimedia.org/wiki/File:Glass_of_grape_juice.jpeg) | Oyp | CC BY-SA 3.0 |
 | `fotos/suco-laranja.jpg` | [Orange juice 1 edit1.jpg](https://commons.wikimedia.org/wiki/File:Orange_juice_1_edit1.jpg) | Agency of the United States Department of Agriculture Edited | domínio público |
 | `fotos/tomate.jpg` | [Tomato je.jpg](https://commons.wikimedia.org/wiki/File:Tomato_je.jpg) | Softeis | CC BY-SA 3.0 |
 | `fotos/uva.jpg` | [巨峰の房、窓辺.jpg](https://commons.wikimedia.org/wiki/File:%E5%B7%A8%E5%B3%B0%E3%81%AE%E6%88%BF%E3%80%81%E7%AA%93%E8%BE%BA.jpg) | Kanko* | CC BY 2.0 |
