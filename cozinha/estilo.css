@@ -905,3 +905,10 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 /* 5 botões no alto do menu (v0.12.0, com o 🎬): mais justinhos, para não ficar embaixo da barra 🏠 🚪 */
 #menu .faixa { gap: 4px; }
 #menu .faixa .mini { min-width: 42px; padding: 0 5px; font-size: 1.1rem; }
+
+/* liquidificador 3D batendo (v0.12.0): a mistura colorida dentro do copo, girando */
+.maquina.m-liquidificador { position: relative; }
+.maquina.m-liquidificador .ic-3d { font-size: 1.1em; }
+.mistura3d { position: absolute; left: 31%; width: 36%; top: 34%; height: 30%; border-radius: 6px 6px 30% 30%; background: var(--c); opacity: .75; mix-blend-mode: multiply; pointer-events: none; }
+.maquina.treme-sem-fim .mistura3d { animation: misturaGira .25s linear infinite; }
+@keyframes misturaGira { 0% { border-radius: 30% 6px 30% 30%; transform: skewX(6deg); } 50% { border-radius: 6px 30% 30% 30%; transform: skewX(-6deg); } 100% { border-radius: 30% 6px 30% 30%; transform: skewX(6deg); } }

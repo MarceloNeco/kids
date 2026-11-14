@@ -1458,9 +1458,10 @@
       });
     } else if (a === 'bater') {
       // a máquina treme e gira por dentro (redemoinho) enquanto o dedo segura
-      var liq = p.u === 'liquidificador', dentroB = dentroDe(p.u);
+      // v0.12.0: com o liquidificador em 3D (render), a mistura colorida gira dentro do copo de vidro dele
+      var liq = p.u === 'liquidificador' && !ART.render('liquidificador'), liq3d = p.u === 'liquidificador' && !liq, dentroB = dentroDe(p.u);
       palco.innerHTML = '<p class="instr">' + t('Segure o botão até a barra encher ✋', 'Hold the button until the bar is full ✋', 'Mantén pulsado el botón hasta que se llene la barra ✋') + '</p>' +
-        '<div class="grandao maquina m-' + p.u + (liq ? ' com-recip' : '') + '">' + (liq ? C.recipiente('liquidificador') : icone(p.u) + '<span class="turbilhao" aria-hidden="true"></span>') + '</div>' +
+        '<div class="grandao maquina m-' + p.u + (liq ? ' com-recip' : '') + '">' + (liq ? C.recipiente('liquidificador') : icone(p.u) + (liq3d ? '<span class="mistura3d" aria-hidden="true" style="--c:' + (corDe(dentroB) || jogo.rec.cor) + '"></span>' : '') + '<span class="turbilhao" aria-hidden="true"></span>') + '</div>' +
         '<button type="button" class="grande bt-segurar">' + (p.u === 'espremedor' ? t('🍊 Segure para espremer', '🍊 Hold to squeeze', '🍊 Mantén pulsado para exprimir') : t('✋ Segure para bater', '✋ Hold to blend', '✋ Mantén pulsado para batir')) + '<span class="barra"><span></span></span></button>';
       var maq = qs(palco, '.maquina'), bt = qs(palco, '.bt-segurar'), barra = qs(bt, '.barra span');
       if (liq) { C.encher(maq, Math.max(0.5, nivelDe(dentroB)), corDe(dentroB)); qs(maq, '.giro-sup').setAttribute('opacity', '1'); }
