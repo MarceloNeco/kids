@@ -2,6 +2,21 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.2.3",
+      "data": "14/Nov/2026",
+      "hora": "10:04:06",
+      "pt": [
+        "🔁 Passando o aparelho: escreva o nome de quem joga (fica só neste aparelho)",
+        "🗣️ A meleca avisa em voz alta para quem passar o celular e lê a pergunta para quem vai responder",
+        "💥 O Melekento Blue e a Pink Honey ficaram bagunceiros: Splash! Ploft!"
+      ],
+      "en": [
+        "🔁 Pass the device: write each player's name (stays only on this device)",
+        "🗣️ The slime says out loud who gets the phone and reads the question to whoever answers",
+        "💥 Melekento Blue and Pink Honey got messy: Splash! Ploft!"
+      ]
+    },
+    {
       "versao": "0.2.2",
       "data": "14/Nov/2026",
       "hora": "09:56:05",

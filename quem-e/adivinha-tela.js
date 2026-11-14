@@ -39,7 +39,7 @@
     ensino = null; chuteAtual = null; A.limparFesta();
     jogo = M.criar({ base: baseCorrigida(), nivel: nivel, extras: ap.lista(), rnd: A.TESTE ? sorteio(7) : Math.random });
     humorAgora = ''; A.mostrar('adivinha'); $('btJaChega') && ($('btJaChega').hidden = true);
-    dizer(t('Pensou em alguém? Então vamos lá!', 'Got someone in mind? Here we go!'));
+    dizer(t('Pensou em alguém? Então segura que lá vem bagunça!', 'Got someone in mind? Hold on, here comes a mess!'));
     depois(passo, 900);
   }
   function sorteio(s) { s = s >>> 0 || 1; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -59,7 +59,7 @@
       $('advChuteEmoji').textContent = a.personagem.emoji; $('advChuteNome').textContent = a.personagem.nome;
       $('advContador').textContent = t('Hmm… já sei!', 'Hmm… I know!');
       A.falar(t('Você pensou em ', 'You thought of ') + a.personagem.nome + '?', /^apr-/.test(a.personagem.id));
-      $('advPergunta').textContent = t('Já sei! 🤩', 'I know! 🤩');
+      $('advPergunta').textContent = A.zoeira('sei');
       $('btAcertou').focus();
     } else perdi();
   }
@@ -109,7 +109,7 @@
   function perdi() {
     mostrarBloco('advPerdi'); humor('triste'); A.Som.perdeu();
     $('advContador').textContent = '🏆';
-    var txt = t('Você me venceu! 🏆 Me ensina quem era?', 'You beat me! 🏆 Will you teach me who it was?');
+    var txt = t('Ploft! Você me venceu! 🏆 Me ensina quem era?', 'Ploft! You beat me! 🏆 Will you teach me who it was?');
     $('advPerdiTxt').textContent = txt; dizer(txt);
     montarForm(false);
   }
