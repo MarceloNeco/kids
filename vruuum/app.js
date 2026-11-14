@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.24.0';
+  var APP_VERSION = '1.25.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -143,7 +143,19 @@
     if (demo) D.preparar(demo.e, demo.jogs, lingua, pref.visual);
   }
   // a fileira de cenários dá uma tremidinha para mostrar que tem mais para o lado (quando cabe tudo, não treme)
+  // setas da fileira de cenários: aparecem só quando há mais para aquele lado; tocando, anda uma tela
+  function setasCenarios() {
+    var t = $('mundosEsc'); if (!t) return;
+    var tem = t.scrollWidth > t.clientWidth + 4;
+    $('mundosDir').hidden = !tem || t.scrollLeft + t.clientWidth >= t.scrollWidth - 8;
+    $('mundosEsq').hidden = !tem || t.scrollLeft <= 8;
+  }
+  $('mundosDir').addEventListener('click', function () { var t = $('mundosEsc'); t.scrollBy({ left: t.clientWidth * 0.75, behavior: 'smooth' }); Som.tocar('clique'); });
+  $('mundosEsq').addEventListener('click', function () { var t = $('mundosEsc'); t.scrollBy({ left: -t.clientWidth * 0.75, behavior: 'smooth' }); Som.tocar('clique'); });
+  $('mundosEsc').addEventListener('scroll', setasCenarios, { passive: true });
+  window.addEventListener('resize', setasCenarios);
   function tremerCenarios() {
+    setasCenarios();
     var t = $('mundosEsc'); if (!t || t.scrollWidth <= t.clientWidth + 4) return;
     t.classList.remove('treme'); void t.offsetWidth; t.classList.add('treme');
   }
