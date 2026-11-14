@@ -46,11 +46,10 @@ test('interruptor purpurina no recursos-do-app.json do Feature Tester', () => {
   assert.ok(r.recursos.some(x => x.id === 'purpurina' && x.pagina === 'purpurina/'));
 });
 
-test('baixar: baixar.js na página e interruptores fora do arquivo', () => {
+test('sem o botão de baixar arquivo (dono, 14/Nov/2026: só confundia; instalar é o caminho)', () => {
   const html = ler('index.html');
-  assert.match(html, /<script src="baixar.js"><\/script>/);
+  assert.doesNotMatch(html, /btBaixar|baixar\.js/);
   assert.match(html, /recursos\.js"[^>]*data-fora-do-arquivo/);
-  assert.match(html, /id="btBaixar"/);
 });
 
 test('instalar: botão sempre à vista, passo a passo comum offline e "já instalado" (dono, 14/Nov/2026: "não acho o ícone")', () => {
@@ -64,10 +63,6 @@ test('instalar: botão sempre à vista, passo a passo comum offline e "já insta
   // tela cheia pelo ⛶ não é janela de app (senão o passo a passo diz "abriu dentro de outro app")
   assert.match(js, /fullscreen\)'\)\.matches && !document\.fullscreenElement/);
   assert.match(fs.readFileSync(path.join(pasta, '..', 'instalar.js'), 'utf8'), /fullscreen\)'\)\.matches && !document\.fullscreenElement/);
-});
-
-test('baixar.js igual ao do Vruuum! (um só jeito de montar o arquivo)', () => {
-  assert.equal(ler('baixar.js'), fs.readFileSync(path.join(pasta, '..', 'vruuum', 'baixar.js'), 'utf8'));
 });
 
 test('músicas: toda música da rádio existe, está no sw.js e tem crédito em musicas/LICENCAS.md', () => {

@@ -121,7 +121,8 @@
     var toca = tocandoAgora();
     ['btSemMusica', 'btSemMusicaMenu'].forEach(function (id) {
       var b = $(id); if (!b) return;
-      b.textContent = toca ? '🔕' : '🎶'; b.setAttribute('aria-pressed', toca ? 'false' : 'true');
+      // o ícone mostra como está agora (dono, 14/Nov/2026: estava ao contrário): 🎶 tocando, 🔕 sem música
+      b.textContent = toca ? '🎶' : '🔕'; b.setAttribute('aria-pressed', toca ? 'false' : 'true');
       b.setAttribute('aria-label', toca ? t('Sem música', 'No music', 'Sin música') : t('Ligar a música', 'Music on', 'Encender la música'));
     });
   }
@@ -131,8 +132,11 @@
     if (!e) return;
     if (daTV !== conectado()) return;
     setTimeout(atualizarSemMusica, 0);
-    var nome = e.fonte === 'youtube' ? '▶ YouTube' : e.fonte === 'spotify' ? '🟢 Spotify' : '✨ Purpurina';
-    $('musicaAgora').textContent = (e.tocando ? '🎶 ' : '⏸ ') + nome + (e.titulo && e.titulo !== 'YouTube' && e.titulo !== 'Spotify' ? ' · ' + e.titulo : '');
+    // só o nome da música, numa linha (dono, 14/Nov/2026: dentro da Purpurina não precisa dizer "Purpurina", nem autor e
+    // licença aqui; os créditos ficam em CREDITOS.md e na 🎵 Biblioteca da estante). YouTube/Spotify: o nome da fonte.
+    var musica = e.titulo && e.titulo !== 'YouTube' && e.titulo !== 'Spotify' ? e.titulo.split(' — ')[0] : '';
+    var nome = e.fonte === 'youtube' ? '▶ YouTube' : e.fonte === 'spotify' ? '🟢 Spotify' : '';
+    $('musicaAgora').textContent = (e.tocando ? '🎶 ' : '⏸ ') + (nome && musica ? nome + ' · ' + musica : nome || musica);
     $('btMusTocar').textContent = e.tocando ? '⏸' : '▶';
     $('btMusTocar').setAttribute('aria-label', e.tocando ? t('Pausar', 'Pause', 'Pausar') : t('Tocar', 'Play', 'Reproducir'));
     if (e.erro === 'bloqueado') $('musicaAviso').textContent = t('O dono desse vídeo não deixa tocar fora do YouTube. Escolha outro.', "This video's owner doesn't allow playing outside YouTube. Pick another one.", "El dueño de este vídeo no deja reproducirlo fuera de YouTube. Elige otro.");
