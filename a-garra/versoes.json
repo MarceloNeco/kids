@@ -2,6 +2,29 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.4.3",
+      "data": "14/Nov/2026",
+      "hora": "18:24:29",
+      "pt": [
+        "🔇 O 🔊 agora desliga tudo: a música e os efeitos",
+        "🎵 Com o tocador aberto no jogo, o botão de parar a música não fica mais escondido embaixo do 🏠 Saída",
+        "📱 Em celular com tela mais estreita (zoom de tela), o PEGAR, as setas e os botões da câmera cabem inteiros",
+        "⛶ Botão de tela cheia no menu e ao lado da câmera"
+      ],
+      "en": [
+        "🔇 The 🔊 button now turns everything off: the music and the sound effects",
+        "🎵 With the music player open in the game, the stop-music button is no longer hidden under 🏠 Exit",
+        "📱 On phones with a narrower screen (display zoom), GRAB, the arrows and the camera buttons fit completely",
+        "⛶ Full screen button on the menu and next to the camera"
+      ],
+      "es": [
+        "🔇 El 🔊 ahora lo apaga todo: la música y los efectos",
+        "🎵 Con el reproductor abierto en el juego, el botón para quitar la música ya no queda escondido debajo de 🏠 Salir",
+        "📱 En móviles con la pantalla más estrecha (zoom de pantalla), COGER, las flechas y los botones de la cámara caben enteros",
+        "⛶ Botón de pantalla completa en el menú y junto a la cámara"
+      ]
+    },
+    {
       "versao": "0.4.2",
       "data": "14/Nov/2026",
       "hora": "14:01:46",

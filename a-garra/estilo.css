@@ -73,7 +73,7 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 /* ---------- jogo: em pé, máquina em cima e o controle embaixo (setas à esquerda, PEGAR à direita) ---------- */
 #jogo { display: none; }
 #jogo.ativa {
-  display: grid; grid-template-columns: 1fr auto; grid-template-rows: 1fr auto;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden;
   grid-template-areas: "palco palco" "cruz pegar";
 }
 .palco { grid-area: palco; position: relative; overflow: hidden; min-height: 0; }
@@ -92,7 +92,8 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 }
 .aviso.ver { opacity: 1; }
 .cruz {
-  grid-area: cruz; display: grid; grid-template-columns: repeat(3, 62px); grid-template-rows: repeat(3, 52px); gap: 2px;
+  /* setas e PEGAR encolhem em tela estreita (celular com zoom de tela: ~320 px), para nada sair da tela */
+  grid-area: cruz; display: grid; grid-template-columns: repeat(3, min(62px, 17vw)); grid-template-rows: repeat(3, min(52px, 14vw)); gap: 2px;
   grid-template-areas: ". cima ." "esq . dir" ". baixo ."; padding: .3rem .6rem max(.6rem, env(safe-area-inset-bottom));
 }
 #btCima { grid-area: cima; } #btEsq { grid-area: esq; } #btDir { grid-area: dir; } #btBaixo { grid-area: baixo; }
@@ -102,8 +103,8 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 }
 .seta.apertado, .seta:active { transform: translateY(3px); box-shadow: 0 1px 0 #17123a; }
 .pegar {
-  grid-area: pegar; align-self: center; justify-self: end; width: 130px; height: 130px; margin: 0 .8rem max(.6rem, env(safe-area-inset-bottom)) 0;
-  border: 0; border-radius: 50%; font-size: 1.6rem; font-weight: 800; color: #3a0612; touch-action: none;
+  grid-area: pegar; align-self: center; justify-self: end; width: min(130px, 33vw); height: min(130px, 33vw); margin: 0 .6rem max(.6rem, env(safe-area-inset-bottom)) 0;
+  border: 0; border-radius: 50%; font-size: clamp(1.1rem, 5.5vw, 1.6rem); font-weight: 800; color: #3a0612; touch-action: none;
   background: radial-gradient(circle at 40% 30%, #ff9db3, #ff2d55 60%, #c2002f); box-shadow: 0 7px 0 #7d001f, 0 0 26px rgba(255,45,85,.55);
 }
 .pegar:active { transform: translateY(5px); box-shadow: 0 2px 0 #7d001f; }
@@ -152,6 +153,8 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 
 /* tocador de música comum (../trilha.js): na hora de jogar ele sobe para o canto de cima, longe do botão PEGAR */
 body.jogando .trilha { top: max(.4rem, env(safe-area-inset-top)); bottom: auto; }
+/* aberto, o tocador não pode ficar embaixo do 🏠 Saída (senão o botão de parar a música some): fica à direita dela */
+body.jogando .trilha:not(.mini) { max-width: calc(100% - var(--nav-largo, 9rem) - .6rem); }
 
 /* celular deitado: o menu cabe sem rolar */
 @media (orientation: landscape) and (max-height: 520px) {
