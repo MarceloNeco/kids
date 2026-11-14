@@ -38,7 +38,9 @@
     P('videogame', 'I', 'onde', 'É de videogame?', 'Is it from a video game?', '¿Es de un videojuego?', N),
     P('internet', 'F', 'onde', 'Ficou famoso na internet (YouTube, TikTok…)?', 'Did it get famous on the internet (YouTube, TikTok…)?', '¿Se hizo famoso en internet (YouTube, TikTok…)?', N),
     P('tv', 'F', 'onde', 'Apresenta ou apresentou programa de TV?', 'Does it host (or did it host) a TV show?', '¿Presenta o ha presentado un programa de televisión?', N),
-    P('disney', 'I', 'onde', 'É da Disney ou da Pixar?', 'Is it from Disney or Pixar?', '¿Es de Disney o de Pixar?', N),
+    P('disney', 'I', 'onde', 'É da Disney/Pixar?', 'Is it from Disney/Pixar?', '¿Es de Disney/Pixar?', N),   // uma pergunta só: a Pixar é da Disney
+    P('dreamworks', 'I', 'onde', 'É da DreamWorks (Shrek, Kung Fu Panda, Madagascar…)?', 'Is it from DreamWorks (Shrek, Kung Fu Panda, Madagascar…)?', '¿Es de DreamWorks (Shrek, Kung Fu Panda, Madagascar…)?', T),
+    P('illumination', 'I', 'onde', 'É da Illumination (Minions, Sing, Pets…)?', 'Is it from Illumination (Minions, Sing, Pets…)?', '¿Es de Illumination (Minions, ¡Canta!, Mascotas…)?', T),
     // ---------- o que faz (núcleo) ----------
     P('canta', 'I', 'faz', 'Canta?', 'Does it sing?', '¿Canta?', N),
     P('musica', 'I', 'faz', 'É famoso por causa de música?', 'Is it famous for music?', '¿Es famoso por la música?', N),

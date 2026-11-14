@@ -2,6 +2,23 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.6.2",
+      "data": "14/Nov/2026",
+      "hora": "20:16:35",
+      "pt": [
+        "🎬 A pergunta \"É da Disney ou da Pixar?\" virou \"É da Disney/Pixar?\" (a Pixar é da Disney, era uma pergunta só)",
+        "🐉 Perguntas novas: \"É da DreamWorks?\" (Shrek, Kung Fu Panda, Madagascar…) e \"É da Illumination?\" (Minions, Sing, Pets…)"
+      ],
+      "en": [
+        "🎬 The question \"Is it from Disney or Pixar?\" is now \"Is it from Disney/Pixar?\" (Pixar belongs to Disney, so it was always one question)",
+        "🐉 New questions: \"Is it from DreamWorks?\" (Shrek, Kung Fu Panda, Madagascar…) and \"Is it from Illumination?\" (Minions, Sing, Pets…)"
+      ],
+      "es": [
+        "🎬 La pregunta \"¿Es de Disney o de Pixar?\" ahora es \"¿Es de Disney/Pixar?\" (Pixar es de Disney, siempre fue una sola pregunta)",
+        "🐉 Preguntas nuevas: \"¿Es de DreamWorks?\" (Shrek, Kung Fu Panda, Madagascar…) y \"¿Es de Illumination?\" (Minions, ¡Canta!, Mascotas…)"
+      ]
+    },
+    {
       "versao": "0.6.1",
       "data": "14/Nov/2026",
       "hora": "18:30:35",
