@@ -60,8 +60,8 @@
     P('crianca', 'facil', 'quem', '🧒', 'É criança?', 'Is it a child?', '¿Es un niño o una niña?', function (c) { return c.tipo === 'menino' || c.tipo === 'menina'; }),
     P('adulto', 'facil', 'quem', '🧑', 'É adulto?', 'Is it a grown-up?', '¿Es una persona adulta?', function (c) { return c.tipo === 'homem' || c.tipo === 'mulher'; }),
     P('idoso', 'facil', 'quem', '👴', 'É vovô ou vovó?', 'Is it a grandpa or grandma?', '¿Es un abuelo o una abuela?', function (c) { return c.tipo === 'vovo' || c.tipo === 'vova'; }),
-    P('masculino', 'facil', 'quem', '👦', 'É menino ou homem?', 'Is it a boy or a man?', '¿Es un chico o un hombre?', ehMasc),
-    P('feminino', 'facil', 'quem', '👧', 'É menina ou mulher?', 'Is it a girl or a woman?', '¿Es una chica o una mujer?', function (c) { return !ehMasc(c); })
+    P('masculino', 'facil', 'quem', '👦', 'É masculino (menino, homem ou velhinho)?', 'Is it male (a boy, a man or an old man)?', '¿Es masculino (un chico, un hombre o un abuelito)?', ehMasc),
+    P('feminino', 'facil', 'quem', '👧', 'É feminino (menina, mulher ou velhinha)?', 'Is it female (a girl, a woman or an old woman)?', '¿Es femenino (una chica, una mujer o una abuelita)?', function (c) { return !ehMasc(c); })
   ];
   Object.keys(CORES_CABELO).forEach(function (cor) {
     var t = CORES_CABELO[cor];

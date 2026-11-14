@@ -24,10 +24,10 @@
     P('pessoa', 'I', 'oque', 'É uma pessoa?', 'Is it a person?', '¿Es una persona?', N),
     P('bicho', 'I', 'oque', 'É um bicho?', 'Is it an animal?', '¿Es un animal?', N),
     P('coisa', 'I', 'oque', 'É uma coisa (um objeto, uma comida, um lugar)?', 'Is it a thing (an object, a food, a place)?', '¿Es una cosa (un objeto, una comida, un lugar)?', N),
-    P('masculino', 'I', 'oque', 'É menino ou homem?', 'Is it a boy or a man?', '¿Es un chico o un hombre?', N),
-    P('feminino', 'I', 'oque', 'É menina ou mulher?', 'Is it a girl or a woman?', '¿Es una chica o una mujer?', N),
+    P('masculino', 'I', 'oque', 'É masculino (menino, homem ou velhinho)?', 'Is it male (a boy, a man or an old man)?', '¿Es masculino (un chico, un hombre o un abuelito)?', N),
+    P('feminino', 'I', 'oque', 'É feminino (menina, mulher ou velhinha)?', 'Is it female (a girl, a woman or an old woman)?', '¿Es femenino (una chica, una mujer o una abuelita)?', N),
     P('crianca', 'I', 'oque', 'É criança (ou filhote)?', 'Is it a child (or a baby animal)?', '¿Es un niño o una niña (o una cría de animal)?', N),
-    P('idoso', 'I', 'oque', 'É velhinho ou velhinha?', 'Is it old?', '¿Es un abuelito o una abuelita?', N),
+    P('idoso', 'I', 'oque', 'É idoso (velhinho ou velhinha)?', 'Is it old (an old man or an old woman)?', '¿Es mayor (un abuelito o una abuelita)?', N),
     P('brasileiro', 'I', 'oque', 'É do Brasil?', 'Is it from Brazil?', '¿Es de Brasil?', N),
     P('fala', 'I', 'oque', 'Fala como gente?', 'Does it talk like people?', '¿Habla como las personas?', N),
     // ---------- de onde vem (núcleo) ----------
