@@ -1,8 +1,9 @@
 /* Quem é? — as duas melecas das filhas do dono, desenhadas em SVG no código:
-     Melekento Blue — espuma com jeito de geleia azul, translúcida, com bolhinhas dentro e espuminha em cima;
-     Pink Honey     — melequinha rosa brilhante que escorre, com um fio de mel dourado.
-   Desenhadas pela descrição do dono (14/Nov/2026). Quando chegar a foto das massinhas de verdade, ajustar aqui
-   (cores em LISTA e CORES, formato em CORPO). Pendência no PENDENCIAS.md do jogo.
+     Melekento Blue — geleia azul mole, translúcida, EM PÉ, com dois pezinhos, bolhinhas dentro e espuminha em cima
+                      (descrição do dono, 14/Nov/2026; dois olhos, para não parecer nenhum monstro de desenho);
+     Pink Honey     — bichinho mole de borracha rosa-choque FOSCO, deitado: cabeça com olhinhos e narizinho em bolinhas,
+                      uma aba atrás da cabeça, corpo redondo e rabinho pontudo (fotos e vídeo do dono, 14/Nov/2026).
+   Cores em LISTA e CORES, formato em CORPO.
 
    QEMelecas.svg(id, humor, op) → texto SVG (200 × 200)
      id     'blue' | 'pink'
@@ -14,16 +15,16 @@
   'use strict';
   var LISTA = [
     { id: 'blue', nome: 'Melekento Blue', cor: '#2e8bff' },
-    { id: 'pink', nome: 'Pink Honey', cor: '#ff5fa8' }
+    { id: 'pink', nome: 'Pink Honey', cor: '#ff1f8e' }
   ];
   var CORES = {
     blue: { claro: '#a8dcff', meio: '#2e8bff', escuro: '#1b4fd1', contorno: '#163a9c' },
-    pink: { claro: '#ffc2df', meio: '#ff5fa8', escuro: '#d6347f', contorno: '#9c1f5c' }
+    pink: { claro: '#ff74b8', meio: '#ff1f8e', escuro: '#c80f6b', contorno: '#8f0a4c' }
   };
-  var MEL = '#ffb52e', TINTA = '#3a1450';
+  var TINTA = '#3a1450';
   var CORPO = {
-    blue: 'M28,172 C8,170 12,126 34,104 C42,64 76,34 108,36 C146,38 174,72 172,112 C190,128 192,168 164,173 Q96,180 28,172Z',
-    pink: 'M38,170 C18,168 24,124 44,100 C54,62 84,40 112,44 C146,48 168,84 160,118 C172,134 170,164 148,169 Q122,176 104,172 Q100,186 92,172 Q64,176 38,170Z'
+    blue: 'M60,168 C44,166 40,140 46,112 C50,70 70,34 100,32 C130,34 150,70 154,112 C160,140 156,166 140,168 Q100,174 60,168Z',
+    pink: 'M30,122 C26,92 44,72 70,70 C90,68 104,80 112,86 C130,80 150,78 164,72 C176,92 176,112 172,120 C178,142 162,164 132,166 C110,170 96,162 84,162 C60,166 34,152 30,122Z'
   };
 
   function n(v) { return Math.round(v * 10) / 10; }
@@ -35,28 +36,30 @@
   function defs(id, I) {
     var c = CORES[id];
     return '<defs><radialGradient id="' + I + 'co" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="' + c.claro + '"/><stop offset=".55" stop-color="' + c.meio + '"/><stop offset="1" stop-color="' + c.escuro + '"/></radialGradient>' +
-      '<linearGradient id="' + I + 'me" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="' + MEL + '"/></linearGradient></defs>';
+      '</defs>';
   }
 
   function corpo(id, I) {
-    var c = CORES[id], s = elip(100, 176, 78, 9, { fill: TINTA, opacity: 0.18 });
+    var c = CORES[id], s = elip(100, 176, 70, 8, { fill: TINTA, opacity: 0.18 }), traco = { stroke: c.contorno, 'stroke-width': 3.5, 'stroke-linejoin': 'round' };
     if (id === 'blue') {
-      s += p(CORPO.blue, { fill: 'url(#' + I + 'co)', 'fill-opacity': 0.88, stroke: c.contorno, 'stroke-width': 3.5, 'stroke-linejoin': 'round' });
-      // bolhinhas dentro da geleia
-      [[52, 140, 7], [70, 158, 4], [150, 146, 8], [134, 162, 4.5], [160, 126, 3.5], [44, 118, 4], [118, 150, 3], [88, 150, 2.6]].forEach(function (b) {
+      // pezinhos (atrás do corpo), corpo de geleia em pé, bolhinhas e espuminha
+      s += '<g class="qm-pes">' + elip(76, 170, 17, 9, Object.assign({ fill: c.meio }, traco)) + elip(124, 170, 17, 9, Object.assign({ fill: c.meio }, traco)) + '</g>';
+      s += p(CORPO.blue, Object.assign({ fill: 'url(#' + I + 'co)', 'fill-opacity': 0.88 }, traco));
+      [[66, 146, 6], [84, 158, 3.5], [138, 140, 7], [124, 156, 4], [142, 118, 3], [58, 122, 3.5], [110, 150, 2.6]].forEach(function (b) {
         s += circ(b[0], b[1], b[2], { fill: '#ffffff', opacity: 0.4, stroke: '#ffffff', 'stroke-width': 1, 'stroke-opacity': 0.7 });
       });
-      // espuminha em cima
-      [[78, 44, 9], [96, 37, 11], [116, 39, 10], [134, 47, 8], [64, 54, 7]].forEach(function (b) { s += circ(b[0], b[1], b[2], { fill: '#e6f4ff', opacity: 0.85, stroke: c.contorno, 'stroke-width': 1.5 }); });
+      [[84, 40, 8], [100, 33, 10], [117, 39, 8], [70, 50, 6]].forEach(function (b) { s += circ(b[0], b[1], b[2], { fill: '#e6f4ff', opacity: 0.85, stroke: c.contorno, 'stroke-width': 1.5 }); });
+      s += p('M62,96 Q68,66 92,52', { fill: 'none', stroke: '#ffffff', 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0.5 });
     } else {
-      s += p(CORPO.pink, { fill: 'url(#' + I + 'co)', stroke: c.contorno, 'stroke-width': 3.5, 'stroke-linejoin': 'round' });
-      // pingos rosa escorrendo e o fio de mel
-      s += p('M58,166 Q60,180 66,184 Q72,180 70,168Z', { fill: c.meio, stroke: c.contorno, 'stroke-width': 2.5 }) +
-        '<g class="qm-mel">' + p('M140,160 Q146,176 144,188 Q142,196 148,198 Q156,196 152,186 Q150,174 152,160Z', { fill: 'url(#' + I + 'me)', stroke: '#c9841a', 'stroke-width': 2 }) +
-        elip(146, 191, 2, 3, { fill: '#fff', opacity: 0.7 }) + '</g>';
+      // rabinho pontudo, corpo deitado, a aba atrás da cabeça e as bolinhas da cabeça (como nas fotos)
+      s += '<g class="qm-rabo">' + p('M156,78 L194,48 C190,76 182,98 170,116Z', Object.assign({ fill: c.meio }, traco)) + '</g>';
+      s += p(CORPO.pink, Object.assign({ fill: 'url(#' + I + 'co)' }, traco));
+      s += '<g class="qm-aba">' + p('M94,78 C112,70 128,84 126,106 C124,128 116,146 104,154 C100,132 98,110 90,94Z', Object.assign({ fill: c.meio }, traco)) +
+        p('M104,84 C114,88 118,100 116,114', { fill: 'none', stroke: c.claro, 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.6 }) + '</g>';
+      s += circ(34, 116, 5, Object.assign({ fill: c.meio }, traco, { 'stroke-width': 2 })) + circ(58, 76, 4.5, Object.assign({ fill: c.meio }, traco, { 'stroke-width': 2 })) + circ(78, 74, 4.5, Object.assign({ fill: c.meio }, traco, { 'stroke-width': 2 }));
+      // fosco: só um reflexo suave
+      s += p('M132,96 Q148,92 158,98', { fill: 'none', stroke: '#ffffff', 'stroke-width': 6, 'stroke-linecap': 'round', opacity: 0.22 });
     }
-    // brilho grande e molhado
-    s += p('M54,92 Q64,62 94,52', { fill: 'none', stroke: '#ffffff', 'stroke-width': 9, 'stroke-linecap': 'round', opacity: 0.55 }) + circ(48, 106, 4.5, { fill: '#fff', opacity: 0.6 });
     return s;
   }
 
@@ -69,6 +72,8 @@
     return s;
   }
 
+  // a Pink tem a cara na cabeça, à esquerda e menor; o Blue, no meio do corpo
+  var LUGAR_CARA = { blue: '', pink: 'translate(64 112) scale(.74) translate(-102 -115)' };
   function cara(humor) {
     var s = olho(80, 100, humor, -1) + olho(124, 100, humor, 1);
     if (humor === 'feliz' || humor === 'parada' || humor === 'falando') s += elip(64, 124, 9, 5, { fill: '#ff4f8f', opacity: 0.35 }) + elip(140, 124, 9, 5, { fill: '#ff4f8f', opacity: 0.35 });
@@ -87,7 +92,7 @@
     humor = humor || 'parada';
     var I = (op && op.id) || 'qm';
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img">' + defs(id, I) +
-      '<g class="qm-' + id + ' ' + (ANIM[humor] || 'qm-respira') + '">' + corpo(id, I) + cara(humor) + '</g></svg>';
+      '<g class="qm-' + id + ' ' + (ANIM[humor] || 'qm-respira') + '">' + corpo(id, I) + (LUGAR_CARA[id] ? '<g transform="' + LUGAR_CARA[id] + '">' + cara(humor) + '</g>' : cara(humor)) + '</g></svg>';
   }
 
   var M = { LISTA: LISTA, svg: svg };
