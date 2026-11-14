@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.24.0",
+      "data": "14/Nov/2026",
+      "hora": "17:14:00",
+      "pt": [
+        "🖼️ Cenários com fotinho: no celular, uma fileira de fotos com o nome embaixo para arrastar com o dedo (dá uma tremidinha para mostrar que tem mais); no computador, todos de uma vez. A ordem muda cada vez que você abre o jogo.",
+        "📱 Nível, visual e como dirigir com os botões numa linha só."
+      ],
+      "en": [
+        "🖼️ Worlds with little pictures: on phones, a row of pictures with the name underneath that you swipe with your finger (it wiggles to show there's more); on computers, all of them at once. The order changes every time you open the game.",
+        "📱 Level, look and how to steer with their buttons on a single row."
+      ],
+      "es": [
+        "🖼️ Escenarios con fotito: en el móvil, una fila de fotos con el nombre debajo para deslizar con el dedo (se mueve un poquito para enseñar que hay más); en el ordenador, todos a la vez. El orden cambia cada vez que abres el juego.",
+        "📱 Nivel, estilo y cómo conducir con sus botones en una sola fila."
+      ]
+    },
+    {
       "versao": "1.23.0",
       "data": "14/Nov/2026",
       "hora": "17:55:00",

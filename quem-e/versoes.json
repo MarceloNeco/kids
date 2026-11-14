@@ -2,6 +2,23 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.6.0",
+      "data": "14/Nov/2026",
+      "hora": "20:13:42",
+      "pt": [
+        "✨ O Melekento Blue e a Pink Honey agora em 3D, com carinhas diferentes: feliz, pensando, ops e triste",
+        "🫧 Feitos especialmente para o jogo; se a imagem não carregar, aparece o desenho de antes"
+      ],
+      "en": [
+        "✨ Melekento Blue and Pink Honey are now 3D, with different faces: happy, thinking, oops and sad",
+        "🫧 Made especially for the game; if an image doesn't load, the old drawing shows up instead"
+      ],
+      "es": [
+        "✨ Melekento Blue y Pink Honey ahora en 3D, con caritas distintas: feliz, pensando, ups y triste",
+        "🫧 Hechos especialmente para el juego; si una imagen no carga, aparece el dibujo de antes"
+      ]
+    },
+    {
       "versao": "0.5.1",
       "data": "14/Nov/2026",
       "hora": "17:13:19",
