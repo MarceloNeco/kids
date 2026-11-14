@@ -1,0 +1,17 @@
+{
+  "name": "Quem é? — Bolinho de Chuva",
+  "short_name": "Quem é?",
+  "description": "Duelo de Caras: cada um escolhe um personagem em segredo e pergunta até descobrir o do outro, com o Melekento Blue e a Pink Honey. / Face Duel: pick a secret character and ask until you find the other one.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#d8f8ea",
+  "theme_color": "#2e8bff",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

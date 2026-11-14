@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Quem é? — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#2e8bff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Quem é? Duelo de Caras: cada um escolhe um personagem em segredo e pergunta até descobrir o do outro. Com o Melekento Blue e a Pink Honey. / Who Is It? Face Duel: pick a secret character and ask questions until you find the other one.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Quem é? — brincadeira da família Bolinho de Chuva (SolverONE). Primeira brincadeira: Duelo de Caras.
+  Motor sem tela: logica.js (tabuleiro, perguntas, meleca) e partida.js (regras da vez). Desenhos: caras.js e melecas.js.
+  A tela e os toques ficam em app.js. Sem login, sem banco, sem cookie: preferências só no aparelho (localStorage).
+  Nada de script inline: a CSP acima não permite. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+
+<section id="inicio" class="tela ativa" data-recurso="quem-e">
+  <div class="faixa">
+    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
+    <button id="btVoz" class="mini" type="button" aria-pressed="true" data-rotulo="Voz da meleca|Slime voice">🗣️</button>
+    <button id="btEfeitos" class="mini" type="button" aria-pressed="true" data-rotulo="Sons|Sounds">🔊</button>
+    <button id="btAjuda" class="mini" type="button" aria-expanded="false" aria-controls="ajuda" data-rotulo="Como brincar|How to play">❓</button>
+  </div>
+  <h1 class="logo"><span class="logo-txt" data-t="Quem é|Who is it"></span><span class="logo-gota">?</span></h1>
+  <p class="sub" data-t="Duelo de Caras|Face Duel"></p>
+  <h2 class="pergunta-grande" data-t="Quem vai brincar com você?|Who's going to play with you?"></h2>
+  <div class="melecas">
+    <button id="btBlue" class="meleca-bt blue" type="button" data-meleca="blue"><span class="meleca-img" aria-hidden="true"></span><span class="meleca-nome">Melekento Blue</span></button>
+    <button id="btPink" class="meleca-bt pink" type="button" data-meleca="pink"><span class="meleca-img" aria-hidden="true"></span><span class="meleca-nome">Pink Honey</span></button>
+  </div>
+  <div id="ajuda" class="ajuda" hidden>
+    <h2 data-t="Como brincar|How to play"></h2>
+    <p data-t="🤫 Cada um escolhe um personagem em segredo.|🤫 Each player secretly picks a character."></p>
+    <p data-t="❓ Na sua vez, faça uma pergunta: &quot;Usa óculos?&quot;, &quot;Tem coroa?&quot;. O outro responde Sim ou Não.|❓ On your turn, ask a question: &quot;Wearing glasses?&quot;, &quot;Got a crown?&quot;. The other player answers Yes or No."></p>
+    <p data-t="🗑️ Depois, descarte quem não serve mais: um botão faz tudo de uma vez, ou vire as cartas com o dedo.|🗑️ Then flip down everyone who doesn't fit: one button does it all, or flip cards with your finger."></p>
+    <p data-t="🎯 Acha que já sabe? Na sua vez, em vez de perguntar, toque em &quot;É este!&quot; e escolha a cara. Acertou, ganhou!|🎯 Think you know? On your turn, instead of asking, tap &quot;This one!&quot; and pick the face. Get it right and you win!"></p>
+    <p data-t="🔍 Quer ver de perto? Ligue a lupa e toque numa cara, ou segure o dedo em cima dela.|🔍 Want a closer look? Turn on the magnifier and tap a face, or hold your finger on it."></p>
+  </div>
+  <button id="btInstalar" class="medio-bt" type="button" hidden data-t="📲 Instalar|📲 Install"></button>
+  <p id="versao" class="versao"></p>
+</section>
+
+<section id="modos" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" id="balaoModos"></p></div>
+  <div class="opcoes">
+    <button id="btMeleca" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🤖</span><span id="txtMeleca"></span></button>
+    <button id="btPassar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🔁</span><span data-t="Passando o aparelho|Pass the device"></span></button>
+    <button id="btRede" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📱</span><span data-t="Cada um no seu celular|Each on their own phone"></span></button>
+  </div>
+</section>
+
+<section id="rede" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Cada um no seu celular! Um cria a partida e manda o código para o outro.|Each on their own phone! One creates the game and sends the code to the other."></p></div>
+  <div id="redeInicio" class="opcoes">
+    <button id="btCriarSala" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">➕</span><span data-t="Criar uma partida|Create a game"></span></button>
+    <div class="entrar">
+      <label for="codigo" data-t="Recebeu um código? Digite aqui:|Got a code? Type it here:"></label>
+      <div class="linha">
+        <input id="codigo" class="codigo" type="text" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD">
+        <button id="btEntrarSala" class="grande" type="button" data-t="🔑 Entrar|🔑 Join"></button>
+      </div>
+    </div>
+    <p class="dica" data-t="📡 Os dois celulares precisam de internet (Wi-Fi ou dados).|📡 Both phones need internet (Wi-Fi or data)."></p>
+  </div>
+  <div id="redeSala" class="opcoes" hidden>
+    <p class="dica" data-t="Código da partida|Game code"></p>
+    <p id="codigoSala" class="codigo-grande"></p>
+    <button id="btConvidar" class="grande" type="button" data-t="📤 Mandar convite|📤 Send invite"></button>
+  </div>
+  <p id="redeStatus" class="status" aria-live="polite"></p>
+</section>
+
+<section id="niveis" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Quantas caras no tabuleiro?|How many faces on the board?"></p></div>
+  <div class="opcoes">
+    <button id="btFacil" class="grande nivel facil" type="button" data-nivel="facil"><span class="n-nome" data-t="🐣 Fácil|🐣 Easy"></span><span class="n-info" data-t="12 caras, perguntas fáceis de ver|12 faces, easy-to-spot questions"></span></button>
+    <button id="btMedio" class="grande nivel medio" type="button" data-nivel="medio"><span class="n-nome" data-t="🐥 Médio|🐥 Medium"></span><span class="n-info" data-t="24 caras, com barba, brinco, peruca e nariz de palhaço|24 faces with beards, earrings, wigs and clown noses"></span></button>
+    <button id="btDificil" class="grande nivel dificil" type="button" data-nivel="dificil"><span class="n-nome" data-t="🦉 Difícil|🦉 Hard"></span><span class="n-info" data-t="36 caras, até a cor dos olhos e as sardas contam|36 faces, even eye color and freckles count"></span></button>
+  </div>
+</section>
+
+<section id="segredo" class="tela" data-recurso="quem-e">
+  <div class="topo"><p class="titulo" id="tituloSegredo"></p></div>
+  <div class="area"><div id="gradeSegredo" class="tabuleiro" role="group"></div></div>
+  <div class="painel">
+    <p class="dica" id="dicaSegredo" data-t="Toque numa cara para escolher. Segure o dedo para ver de perto.|Tap a face to choose it. Hold your finger on it for a closer look."></p>
+    <div class="linha">
+      <button id="btSortear" class="medio-bt" type="button" data-t="🎲 Sortear|🎲 Random"></button>
+      <button id="btConfirmarSegredo" class="grande" type="button" disabled></button>
+    </div>
+  </div>
+</section>
+
+<section id="jogo" class="tela" data-recurso="quem-e">
+  <div class="topo">
+    <button id="meuSegredo" class="meu-segredo" type="button" data-rotulo="Meu personagem secreto (ver de perto)|My secret character (closer look)"></button>
+    <p class="meu-nome" id="meuNome"></p>
+    <button id="btLupa" class="mini lupa-bt" type="button" aria-pressed="false" data-rotulo="Lupa: tocar numa cara mostra ela grande|Magnifier: tap a face to see it big">🔍</button>
+  </div>
+  <div class="area" id="area"><div id="tabuleiro" class="tabuleiro" role="group"></div></div>
+  <div class="painel" id="painel">
+    <div class="conversa"><span class="meleca-mini" id="melecaJogo" aria-hidden="true"></span><p class="balao" id="balao" aria-live="polite"></p></div>
+    <div id="acoes" class="linha">
+      <button id="btPerguntar" class="grande" type="button" data-t="❓ Perguntar|❓ Ask"></button>
+      <button id="btPalpite" class="grande rosa" type="button" data-t="🎯 É este!|🎯 This one!"></button>
+    </div>
+    <div id="perguntas" class="perguntas" hidden>
+      <div class="perg-topo"><button id="btFecharPerguntas" class="mini" type="button" data-rotulo="Voltar|Back">←</button><p data-t="O que você quer perguntar?|What do you want to ask?"></p></div>
+      <div id="listaPerguntas" class="lista-perguntas"></div>
+    </div>
+    <div id="responder" class="responder" hidden>
+      <p class="perg-feita" id="pergFeita"></p>
+      <p id="olhaDeNovo" class="olha" hidden></p>
+      <div class="linha">
+        <button id="btSim" class="grande sim" type="button" data-t="👍 Sim|👍 Yes"></button>
+        <button id="btNao" class="grande nao" type="button" data-t="👎 Não|👎 No"></button>
+      </div>
+    </div>
+    <div id="descartar" class="descartar" hidden>
+      <p class="resp-veio" id="respVeio"></p>
+      <div class="linha">
+        <button id="btDescartar" class="grande" type="button"></button>
+        <button id="btPronto" class="grande verde" type="button" data-t="✅ Pronto, passar a vez|✅ Done, next turn"></button>
+      </div>
+    </div>
+    <div id="palpitando" class="palpitando" hidden>
+      <p data-t="🎯 Toque na cara que você acha que é.|🎯 Tap the face you think it is."></p>
+      <div class="linha">
+        <button id="btCancelarPalpite" class="medio-bt" type="button" data-t="Cancelar|Cancel"></button>
+        <button id="btConfirmarPalpite" class="grande rosa" type="button" disabled></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="cortina" class="cortina" hidden role="dialog" aria-modal="true" aria-labelledby="cortinaTitulo">
+  <div class="cartao">
+    <p class="cortina-ico" aria-hidden="true">🙈</p>
+    <h2 id="cortinaTitulo"></h2>
+    <p id="cortinaTexto"></p>
+    <button id="btCortina" class="grande" type="button" data-t="👀 Estou pronto|👀 I'm ready"></button>
+  </div>
+</div>
+
+<div id="fim" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
+  <div class="cartao">
+    <span class="fim-meleca" id="fimMeleca" aria-hidden="true"></span>
+    <h2 id="fimTitulo"></h2>
+    <div class="fim-caras" id="fimCaras"></div>
+    <div class="linha">
+      <button id="btDeNovo" class="grande" type="button" data-t="🔁 Jogar de novo|🔁 Play again"></button>
+      <button id="btOutroNivel" class="medio-bt" type="button" data-t="Trocar o nível|Change level"></button>
+    </div>
+  </div>
+</div>
+<div id="festa" class="festa" aria-hidden="true"></div>
+
+<script src="nomes.js"></script>
+<script src="logica.js"></script>
+<script src="partida.js"></script>
+<script src="caras.js"></script>
+<script src="melecas.js"></script>
+<script src="rede.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../janela.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js" data-fora-do-arquivo></script>
+<script src="app.js"></script>
+</body>
+</html>
