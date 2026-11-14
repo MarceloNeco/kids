@@ -80,6 +80,12 @@ test('três frutas numa passada viram combo com bônus', () => {
   assert.equal(p.estado().jogadores[0].pontos, 30 + 15);   // 3×10 + bônus 3×5
 });
 
+test('não morre: perdeu os 3 corações, eles voltam e a rodada continua até o tempo zerar', () => {
+  const p = partida({ duracao: 60 }); p.comecar(); limpar(p); rodar(p, 100);
+  for (let k = 0; k < 4; k++) { p.estado().coisas.length = 0; p.obstaculo({ tipo: 'baixo', x: 700, vx: -500 }, 0); rodar(p, 1500); }   // bate 4 vezes (a criança parada no chão)
+  assert.equal(p.estado().fase, 'jogando', 'continua brincando');
+  assert.ok(p.estado().jogadores[0].vidas > 0, 'os corações voltaram');
+});
 test('a rodada acaba quando o tempo zera', () => {
   const p = partida({ duracao: 5 }); p.comecar();
   p.avancar(5200);

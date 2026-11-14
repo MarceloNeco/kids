@@ -10,4 +10,5 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 4 | **Entrega 3 — cada um no seu celular**, com código, como a Batalha Naval (`rede.js`). | dono, 14/Nov/2026 | 🟡 |
 | 5 | Testar com as filhas (5 e 9 anos) no celular em pé e deitado e no tablet: o fácil está fácil? O difícil desafia? Os botões estão no lugar certo? | entrega v0.1.0 | ⏸ dono |
 | 6 | A sacolinha do “Limpa o Rio!” continua desenhada no código (a imagem gerada veio com peixes dentro). Gerar outra quando houver nova rodada de imagens. | v0.1.0 | 🟡 |
+| 8 | Rodadas especiais sorteadas (Limpa o Rio com rede, Socorro na Água, Leva os Filhotes, Chuva de Estrelas, O Gigante com 3 acertos), quem vale mais nada mais rápido, gigantes que brilham e piranhas que cortam a linha. | dono, 14/Nov/2026 | ✅ v0.1.3 |
 | 7 | Mais animação nas imagens 3D (hoje o corpo ondula e “respira”; as nadadeiras de verdade só se mexem nos desenhos do código): gerar quadros extras com IA ou separar o rabo da imagem. | dono, 14/Nov/2026 | 🟡 |

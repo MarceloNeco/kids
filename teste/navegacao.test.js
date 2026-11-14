@@ -33,9 +33,10 @@ const TAMANHOS = [[390, 844], [915, 412]];
 // inicio: o que só aparece na tela de começo; entrar: do começo até uma tela de dentro (começar uma partida);
 // confirmar: o jogo pergunta antes de largar a partida (🏠 e Voltar) e o teste responde que sim;
 // fundo: jogos de várias telas, onde o Voltar volta uma tela por vez (diretriz): o 🏠 é testado lá do fundo;
+// voltasNoComeco: a tela de começo tem passos (o Voltar volta um passo antes de chegar ao primeiro)
 const JOGOS = [
-  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#btToque',
-    entrar: async (pg) => { await pg.click('#btToque'); await pg.waitForTimeout(300); },
+  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#inicio.ativa', voltasNoComeco: 1,
+    entrar: async (pg) => { await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.waitForTimeout(300); },
     fundo: async (pg) => { await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar');
       await pg.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 }); await pg.click('#localComecar'); await pg.waitForTimeout(1500); } },
   { id: 'peluqueria', url: 'peluqueria/', entrada: '#btEntrar', inicio: '#btJogar',
@@ -157,6 +158,7 @@ for (const j of JOGOS) {
         await esperarInicio(pg, j, onde + ' (Voltar)');
         assert.ok(pg.url().startsWith(base + j.url.split('?')[0]), onde + ': o Voltar saiu do jogo (' + pg.url() + ')');
         // Voltar na tela de começo: sai do jogo (para a estante, de onde veio)
+        for (let i = 0; i < (j.voltasNoComeco || 0); i++) { await pg.goBack().catch(() => {}); await pg.waitForTimeout(300); }   // começo em passos (Bagunçolândia: "como?" → "onde vamos jogar?")
         // 1º Voltar na tela de começo: não sai, avisa "toque de novo para sair" (diretriz; todos os jogos)
         await pg.goBack().catch(() => {}); await pg.waitForTimeout(400);
         assert.ok(pg.url().startsWith(base + j.url.split('?')[0]), onde + ': o 1º Voltar na tela de começo saiu direto do jogo');
