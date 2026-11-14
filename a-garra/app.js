@@ -1,4 +1,4 @@
-/* A-GARRA — telas, controles, câmera 3D, fichas, coleção e fim da partida.
+/* H-rraaa (pasta a-garra) — telas, controles, câmera 3D, fichas, coleção e fim da partida.
    A máquina por dentro é a maquina.js (window.Maquina); os prêmios, a premios3d.js; as máquinas, a cenario3d.js; os efeitos,
    a som.js (window.Som). Aqui só junta tudo. Com ?teste aparece window.GarraDebug (usado pelos testes no navegador);
    ?semente=N repete a mesma máquina. Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.4.0', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
+const APP_VERSION = '0.4.1', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -48,17 +48,17 @@ const lingua = () => (window.BolinhoIdioma ? window.BolinhoIdioma.atual() : 'pt'
 const IDX = { pt: 0, en: 1, es: 2 };
 const t = (pt, en, es) => { const l = lingua(); return l === 'en' ? en : l === 'es' && es != null ? es : pt; };
 const nome = (tipo) => { const n = NOMES[tipo] || [tipo, tipo, tipo]; return t(n[0], n[1], n[2]); };
-const LOGO = ['A-GARRA', 'THE CLAW', 'LA GARRA'];
+const LOGO = 'H-rraaa';   // o nome do jogo (dono, 14/Nov/2026), igual nos três idiomas; o H vai colorido
 const todosDe = (id) => MAQUINAS[id].tipos.concat([MAQUINAS[id].raro]);
 function traduzir() {
   const l = lingua(), i = IDX[l];
   document.documentElement.lang = l === 'en' ? 'en' : l === 'es' ? 'es' : 'pt-BR';
   document.querySelectorAll('[data-t]').forEach((el) => { const p = el.getAttribute('data-t').split('|'); el.textContent = p[i] != null ? p[i] : p[0]; });
   document.querySelectorAll('[data-rotulo]').forEach((el) => { const p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', p[i] != null ? p[i] : p[0]); });
-  // o nome na tela (uma letra por pedacinho, o separador em amarelo): A-GARRA · THE CLAW · LA GARRA
-  const logo = $('logo'); logo.setAttribute('aria-label', LOGO[i]); logo.textContent = '';
-  [...LOGO[i]].forEach((c) => { const s = document.createElement('span'); if (c === '-' || c === ' ') { s.className = 'sep'; s.textContent = c === ' ' ? '\u00a0' : c; } else s.textContent = c; logo.appendChild(s); });
-  document.title = LOGO[i] + ' — Bolinho de Chuva · SolverONE';
+  // o nome na tela (uma letra por pedacinho: o H com as cores do arco-íris, o traço em amarelo)
+  const logo = $('logo'); logo.setAttribute('aria-label', LOGO); logo.textContent = '';
+  [...LOGO].forEach((c, k) => { const s = document.createElement('span'); if (c === '-') s.className = 'sep'; else if (!k) s.className = 'h'; s.textContent = c; logo.appendChild(s); });
+  document.title = LOGO + ' — Bolinho de Chuva · SolverONE';
   $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + APP_DATA[i];
   pintarMenu();
   if (telaAtual === 'colecao') pintarColecao();
@@ -120,6 +120,7 @@ const VISTAS = [{ yaw: 0, pitch: 0.42 }, { yaw: 0, pitch: 1.2 }, { yaw: 1.5, pit
 const GIRO = 1.65;   // até onde a câmera gira para cada lado (um pouco mais que de lado, para ver a profundidade da garra)
 let cam = { yaw: 0, pitch: 0.42, zoom: 1, vista: 0 }, camAlvo = new THREE.Vector3(MED.L / 2, 2.2, MED.P / 2);
 let cena = null, maq = null, objetos = [], m = null, raycaster = new THREE.Raycaster();
+let proximoDesenho = 0, desenhouAntes = false;   // aparelho lento: espera antes de desenhar de novo (ver no fim de quadro())
 let porta = null, avisoT = 0, ultimoQuadro = 0, fichasIni = 0, fimT = null, velocidade = 1, apertando = { dx: 0, dz: 0 }, botaoApertado = 0;
 const chaveConta = () => pref.maquina + '-' + pref.nivel;
 
@@ -382,7 +383,12 @@ function quadro(agora) {
   if (!quadro.visorT || seg - quadro.visorT > 0.25) { quadro.visorT = seg; maq.visor(m.fichas, m.cfg.tempo ? Math.ceil(m.tempo) : null, m.ganhos.length); }
   pintarBarra();
   posicionarCamera();
-  render.render(cena, camera);
+  // mostrar o 3D é o mais pesado. Num aparelho lento (o quadro que desenhou levou mais de 80 ms até o próximo), espera
+  // o mesmo tanto antes de desenhar de novo: a física e os toques continuam no tempo certo e a página não trava (no
+  // celular comum, com placa de vídeo, nada muda)
+  if (desenhouAntes && dt > 0.08) proximoDesenho = agora + dt * 1000;
+  desenhouAntes = false;
+  if (agora >= proximoDesenho) { render.render(cena, camera); desenhouAntes = true; }
 }
 
 /* ---------- instalar, service worker e começo ---------- */
@@ -425,7 +431,7 @@ if (TESTE) window.GarraDebug = {
 if (/[?&]instalar\b/.test(location.search) && location.protocol !== 'file:') {
   const s = document.createElement('script');
   s.src = '../instalar.js';
-  s.setAttribute('data-nome', 'A-GARRA'); s.setAttribute('data-icone', 'icone-192.png');
+  s.setAttribute('data-nome', 'H-rraaa'); s.setAttribute('data-icone', 'icone-192.png');
   s.setAttribute('data-so-com', 'instalar'); s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
   document.body.appendChild(s);
 }

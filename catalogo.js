@@ -93,7 +93,7 @@
       en: "Hide your ships and sink everyone else's: E4, F2... Play as a family, 2 to 4 players, each on their own phone, with a 4-letter code. You can also play against the computer or pass the phone around.",
       es: "Esconde tus barcos y hunde los de los demás: E4, F2... Juega en familia, de 2 a 4 personas, cada una en su móvil, con un código de 4 letras. También contra el ordenador o pasando el móvil.",
       tag: '▶ Navegar / Sail / Navegar', instalar: true },
-    { id: 'a-garra', nomes: { en: "THE CLAW", es: "LA GARRA" }, nome: 'A-GARRA', ico: '🧸', img: '/kids/a-garra/icone.svg', cor: '#39ff6a', url: '/kids/a-garra/',
+    { id: 'a-garra', nome: 'H-rraaa', ico: '🧸', img: '/kids/a-garra/icone.svg', cor: '#39ff6a', url: '/kids/a-garra/',
       texto: 'A máquina de pegar bichinho em 3D, igual à do fliperama: leve a garra com as setas, aperte PEGAR e torça para ela não soltar! Pelúcias, bichinhos que mexem, insetos, hambúrgueres e filhotes de verdade que andam.',
       en: "The 3D claw machine, just like at the arcade: move the claw with the arrows, press GRAB and hope it doesn't let go! Plushies, wiggly critters, bugs, burgers and real-looking puppies that walk around.",
       es: "La máquina de garra en 3D, igual que la de la feria: mueve la garra con las flechas, pulsa COGER ¡y cruza los dedos para que no lo suelte! Peluches, bichitos que se mueven, insectos, hamburguesas y cachorritos que caminan.",

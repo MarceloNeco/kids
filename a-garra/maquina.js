@@ -1,4 +1,4 @@
-/* A-GARRA — a máquina por dentro, em 3D: os prêmios (bolas que caem, rolam, se empilham e "dormem" quando param), a
+/* H-rraaa (pasta a-garra) — a máquina por dentro, em 3D: os prêmios (bolas que caem, rolam, se empilham e "dormem" quando param), a
    garra (anda para os lados e para frente/trás, desce, fecha, sobe e leva até o buraco) e a regra de pagamento,
    igual à das máquinas de verdade: quase sempre a garra fecha FRACA e deixa cair; só de vez em quando vem FORTE.
    Sem desenho e sem tela: roda igual no navegador e no Node (testes em teste/maquina.test.js).

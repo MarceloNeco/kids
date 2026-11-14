@@ -2,6 +2,23 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.4.1",
+      "data": "14/Nov/2026",
+      "hora": "12:44:20",
+      "pt": [
+        "🌈 O jogo agora se chama H-rraaa, com o H colorido (no menu e nos letreiros das máquinas)",
+        "🐢 Em aparelho lento a máquina não trava mais a tela: os botões (🏠, setas, PEGAR) respondem na hora"
+      ],
+      "en": [
+        "🌈 The game is now called H-rraaa, with a colorful H (on the menu and the machine signs)",
+        "🐢 On slow devices the machine no longer freezes the screen: the buttons (🏠, arrows, GRAB) respond right away"
+      ],
+      "es": [
+        "🌈 El juego ahora se llama H-rraaa, con la H de colores (en el menú y en los carteles de las máquinas)",
+        "🐢 En aparatos lentos la máquina ya no congela la pantalla: los botones (🏠, flechas, COGER) responden al momento"
+      ]
+    },
+    {
       "versao": "0.4.0",
       "data": "14/Nov/2026",
       "hora": "15:25:00",
