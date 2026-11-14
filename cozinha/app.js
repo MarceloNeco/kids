@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.0';
+  var APP_VERSION = '0.10.0';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -410,7 +410,7 @@
     var u = L.lugaresUteis(jogo.precisa, jogo.cesta), ids = Object.keys(u);
     if (!jogo.cfg.moedas && u.mercado && !ids.some(function (l) { return NATUREZA.indexOf(l) >= 0; })) return 'mercado';
     ids.sort(function (a, b) {
-      var na = NATUREZA.indexOf(a) >= 0 ? 0 : a === 'mercado' ? 1 : 2, nb = NATUREZA.indexOf(b) >= 0 ? 0 : b === 'mercado' ? 1 : 2;
+      var na = NATUREZA.indexOf(a) >= 0 ? 0 : L.LOJAS.indexOf(a) >= 0 ? 1 : 2, nb = NATUREZA.indexOf(b) >= 0 ? 0 : L.LOJAS.indexOf(b) >= 0 ? 1 : 2;
       return na - nb || u[b].length - u[a].length || D.LUGARES.findIndex(function (l) { return l.id === a; }) - D.LUGARES.findIndex(function (l) { return l.id === b; });
     });
     if (jogo.favores <= 0) ids = ids.filter(function (l) { return l !== 'vizinha'; }).concat(ids.indexOf('vizinha') >= 0 ? ['vizinha'] : []);
@@ -923,13 +923,19 @@
     };
   };
 
-  MINI.mercado = function (area) {
-    var nv = jogo.cfg;
+  // lojas (v0.10.0): o mercadinho do Seu Zé, a padaria do Seu Joaquim e a feira da Dona Rosa funcionam do mesmo jeito
+  // (de graça no Fácil; moedas e troco no Médio e no Difícil); cada uma vende as suas coisas (logica.vende)
+  MINI.padaria = function (area) { MINI.mercado(area, 'padaria'); };
+  MINI.feira = function (area) { MINI.mercado(area, 'feira'); };
+  MINI.mercado = function (area, loja) {
+    loja = loja || 'mercado';
+    var nv = jogo.cfg, dono = D.lugar[loja].dono, ze = en() ? dono[1] : dono[0];
     var falta = L.faltando(jogo.precisa, jogo.cesta).map(function (r) { return r.id; });
-    var itens = D.INGREDIENTES.filter(function (g) { return g.preco > 0; }).map(function (g) { return g.id; });
+    var itens = D.INGREDIENTES.filter(function (g) { return L.vende(loja, g.id); }).map(function (g) { return g.id; });
+    area.classList.add('loja-' + loja);
     itens.sort(function (a, b) { return (falta.indexOf(a) < 0) - (falta.indexOf(b) < 0); });
-    area.innerHTML = '<div class="toldo" aria-hidden="true"></div><p class="instr">' + (nv.moedas ? t('Toque no que quer comprar e pague com as suas moedas. O Seu Zé dá o troco!', 'Tap what you want to buy and pay with your coins. Mr. Zé gives you the change!')
-      : t('Hoje o Seu Zé está dando tudo de presente! Toque no que precisa. 🎁', 'Today Mr. Zé is giving everything away! Tap what you need. 🎁')) + '</p>' +
+    area.innerHTML = '<div class="toldo" aria-hidden="true"></div><p class="instr">' + (nv.moedas ? t('Toque no que quer comprar e pague com as suas moedas. ' + ze + ' dá o troco!', 'Tap what you want to buy and pay with your coins. ' + ze + ' gives you the change!')
+      : t('Hoje ' + ze + ' está dando tudo de presente! Toque no que precisa. 🎁', 'Today ' + ze + ' is giving everything away! Tap what you need. 🎁')) + '</p>' +
       '<div class="prateleira">' + itens.map(function (id, i) {
         var p = L.preco(id, nv);
         return '<button type="button" class="produto' + (falta.indexOf(id) >= 0 && nv.brilho ? ' precisa' : '') + '" data-ing="' + id + '" style="--i:' + i + '">' + icone(id) +
@@ -938,7 +944,7 @@
     var caixa = qs(area, '.caixa');
     function mostrarAjudar() {
       var z = qs(area, '.ajudar-zona');
-      z.innerHTML = L.precisaAjudar(jogo, jogo.precisa, nv) ? '<button type="button" class="medio verde" id="btAjudar">' + t('🧹 Ajudar o Seu Zé a arrumar (+2 💰)', '🧹 Help Mr. Zé tidy up (+2 💰)') + '</button>' : '';
+      z.innerHTML = L.precisaAjudar(jogo, jogo.precisa, nv) ? '<button type="button" class="medio verde" id="btAjudar">' + t('🧹 Ajudar ' + (loja === 'feira' ? 'a ' : 'o ') + ze + ' a arrumar (+2 💰)', '🧹 Help ' + ze + ' tidy up (+2 💰)') + '</button>' : '';
       var b = qs(z, '#btAjudar'); if (b) b.addEventListener('click', ajudar);
     }
     function ajudar() {
@@ -958,7 +964,7 @@
     function abrirCaixa(id, de) {
       var p = L.preco(id, nv), naMao = [];
       var carteira = L.moedasPara(jogo.moedas);
-      if (jogo.moedas < p) { Som.toca('erro'); aviso(t('Suas moedas não dão para isso. Tente outro lugar, peça para a vizinha ou ajude o Seu Zé.', 'Your coins are not enough for that. Try another place, ask the neighbour or help Mr. Zé.'), 3600); mostrarAjudar(); return; }
+      if (jogo.moedas < p) { Som.toca('erro'); aviso(t('Suas moedas não dão para isso. Tente outro lugar, peça para a vizinha ou ajude ' + (loja === 'feira' ? 'a ' : 'o ') + ze + '.', 'Your coins are not enough for that. Try another place, ask the neighbour or help ' + ze + '.'), 3600); mostrarAjudar(); return; }
       caixa.hidden = false;
       function desenhar() {
         var soma = L.soma(naMao);

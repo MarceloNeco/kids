@@ -18,7 +18,7 @@
   var COR = { peixe: '#a9c2d6', laranja: '#ff9f1a', banana: '#ffe27a', maca: '#f25c4a', morango: '#ff3b5c', uva: '#8e44ad', limao: '#e8e04a',
     cenoura: '#ff8a1a', tomate: '#e8432f', alface: '#7bc950', batata: '#e9c27a', cheiro: '#3fa34d', ovo: '#ffcf33', leite: '#ffffff',
     farinha: '#fbf3e4', acucar: '#ffffff', sal: '#f4f4f4', oleo: '#ffd84d', fermento: '#f3ead8', manteiga: '#ffe680', chocolate: '#6b3b1f',
-    leitecond: '#fff1d0', granulado: '#ff4fa3', queijo: '#ffd84d', pao: '#e0a96d', mel: '#f2a900', polvilho: '#ffffff', 'gelatina-po': '#e8344e', carne: '#b8433a' };
+    leitecond: '#fff1d0', granulado: '#ff4fa3', queijo: '#ffd84d', pao: '#e0a96d', mel: '#f2a900', polvilho: '#ffffff', 'gelatina-po': '#e8344e', jabuticaba: '#3b1a3f', carne: '#b8433a' };
   var JEITO = { farinha: 'po', acucar: 'po', sal: 'po', fermento: 'po', polvilho: 'po', leite: 'liquido', oleo: 'liquido', leitecond: 'liquido', mel: 'liquido', ovo: 'ovo', granulado: 'granulado', 'gelatina-po': 'po' };
   function jeito(id) { return JEITO[id] || 'pedaco'; }
   function cor(id) { return COR[id] || '#f2c27a'; }

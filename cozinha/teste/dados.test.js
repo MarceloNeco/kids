@@ -115,6 +115,7 @@ test('dica de adulto: faca, fogão, forno e liquidificador avisam', () => {
 const ONDE = {
   banana: ['pomar', 'bananeira', 'bananeira'], maca: ['pomar', 'macieira', 'arvore'], laranja: ['pomar', 'laranjeira', 'arvore'],
   limao: ['pomar', 'limoeiro', 'arvore'], morango: ['pomar', 'morangueiro', 'rasteira'], uva: ['pomar', 'parreira', 'parreira'],
+  jabuticaba: ['pomar', 'jaboticabeira', 'tronco'],   // v0.10.0: grudada no tronco
   cenoura: ['horta', 'pe-cenoura', 'raiz'], batata: ['horta', 'pe-batata', 'raiz'], tomate: ['horta', 'tomateiro', 'estaca'],
   alface: ['horta', 'pe-alface', 'cabeca'], cheiro: ['horta', 'cheiro-verde', 'touceira'],
   ovo: ['galinheiro'], leite: ['vaca'], peixe: ['rio']
