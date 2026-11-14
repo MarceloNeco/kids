@@ -53,3 +53,31 @@ Nenhuma é música de artista famoso (Madonna, Cyndi Lauper, Beyoncé, Katy Perr
 autorais e não podem entrar no jogo); são músicas no mesmo clima, liberadas pelo autor para qualquer uso com crédito.
 
 **06/Nov/2026 (0.17.3):** a rádio toca **20** gravadas, em ordem sorteada, com a favorita (Funky One, a de sem internet) no fim. Saiu da lista `laserpack.mp3` (com DarkNES, som de videogame / 8 bits; o arquivo continua aqui). Sem internet toca só a favorita guardada; sem ela, as 3 feitas pelo jogo.
+
+## 14/Nov/2026 (0.21.0): mais 17 na rádio, 9 delas de passarela
+
+Pedido do dono: músicas mais animadas e maduras (estilo Katy Perry, tom maior) e, no desfile, umas animadas e outras mais
+sóbrias e emocionantes (como "Be the One"), sem voz, de uso comercial livre e sem custo. Enquanto as compostas no
+Higgsfield não chegam (os créditos acabaram), entraram mais 17 do Kevin MacLeod (CC BY 4.0), escolhidas pelo Claude: medidas por
+computador (batidas por minuto, tom maior ou menor, energia; ninguém ouviu) e pelo estilo conhecido de cada faixa.
+
+- **9 novas** nesta pasta, copiadas do mesmo repositório público https://github.com/noobsandnerdsgroup/audio (crédito de cada
+  uma no `README.md` de lá: "Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0
+  License"). Mesmo tratamento das outras: −15 LUFS, MP3 de 96 kbps, as longas cortadas em 3min30 com 5 s de final suave.
+- **8 que já estavam no Bolinho**, tocadas direto da pasta do outro jogo (não baixam de novo): Digital Lemonade, Enter the
+  Party, Disco con Tutti, Funky Chunk, Stringed Disco, Show Your Moves e Electro Cabello (`../peluqueria/musicas/`, créditos
+  em `peluqueria/CREDITOS.md`) e Street Party (`../rabiscolandia/musicas/`, créditos lá).
+- **Desfile** (`desfile: true` no `som.js`): a passarela sorteia uma destas 9: Chill Wave, Ethernight Club, Dream Catcher,
+  Miami Nights, Twisting, Electro Cabello, Newer Wave, Club Seamus e Neon Laser Horizon.
+
+| Arquivo | Crédito |
+|---|---|
+| `island-meet-and-greet.mp3` | "Island Meet and Greet" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Island+Meet+and+Greet (cortada em 3min30, com final suave) |
+| `paradise-found.mp3` | "Paradise Found" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Paradise+Found |
+| `late-night-radio.mp3` | "Late Night Radio" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Late+Night+Radio (cortada em 3min30, com final suave) |
+| `vibing-over-venus.mp3` | "Vibing Over Venus" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Vibing+Over+Venus (cortada em 3min30, com final suave) |
+| `chill-wave.mp3` | "Chill Wave" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Chill+Wave (cortada em 3min30, com final suave) (desfile) |
+| `ethernight-club.mp3` | "Ethernight Club" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Ethernight+Club (cortada em 3min30, com final suave) (desfile) |
+| `dream-catcher.mp3` | "Dream Catcher" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Dream+Catcher (cortada em 3min30, com final suave) (desfile) |
+| `miami-nights.mp3` | "Miami Nights - Extended Theme" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Miami+Nights+-+Extended+Theme (desfile) |
+| `twisting.mp3` | "Twisting" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?keywords=Twisting (cortada em 3min30, com final suave) (desfile) |

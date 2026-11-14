@@ -14,6 +14,8 @@
   - Cartão com data-so-online (ex.: Dança na Sala: YouTube e TV) ganha "🌐 Só com internet".
   Sem internet não existe TV: o pareamento celular ↔ TV precisa da internet.
 */
+// a estante marca a aba: os jogos abertos daqui sabem que o Voltar na tela de começo volta para cá (navegacao.js)
+try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessionStorage */ }
 (function () {
   // texto nos três idiomas: o elemento recebe um pedaço de cada (class pt / en / es) e o idioma.js mostra o escolhido
   function tri(el, pt, en, es) {

@@ -104,7 +104,7 @@
     for (var k = 0; k < 70; k++) { s0 = (s0 * 9301 + 49297) % 233280; var x = s0 / 233280 * cv.width; s0 = (s0 * 9301 + 49297) % 233280; var y = cv.height * (0.55 + s0 / 233280 * 0.45); c.fillStyle = k % 3 ? 'rgba(255,209,102,.8)' : 'rgba(43,244,255,.7)'; c.fillRect(x, y, 2, 2); }
     fundosNoite[nome] = cv; return cv;
   }
-  var NAO_ESCURECE = { blocoOuro: 1, poste: 1, predio: 1, palmeiraNeon: 1, tocha: 1, pocoLava: 1, cristal: 1, arvoreLuz: 1, cogumeloLuz: 1, florLanterna: 1, setaD: 1, setaE: 1 };
+  var NAO_ESCURECE = { blocoOuro: 1, poste: 1, predio: 1, palmeiraNeon: 1, tocha: 1, pocoLava: 1, cristal: 1, arvoreLuz: 1, cogumeloLuz: 1, florLanterna: 1 };
   function enfeiteSpr(tipo, nS) { var b = base[tipo]; if (!b || !nS || NAO_ESCURECE[tipo]) return b; return S.escurecido(tipo, b, 0.6); }
   var ITEM_NEON = { estrela: 'estrelaNeon', turbo: 'turboNeon', lama: 'oleo' };
 
@@ -545,6 +545,11 @@
       for (k2 = 0; n > 3 && k2 < s.enfeites.length; k2++) {   // enfeite colado na câmera taparia a tela
         var en = s.enfeites[k2];
         if (s.parede && !voa && Math.abs(en.x) > 1.6) continue;   // atrás do paredão
+        if (en.tipo === 'setaD' || en.tipo === 'setaE') {   // setas de luz flutuando na curva, acendendo em sequência
+          if (voa) continue;
+          sprite(c, base[en.tipo + (Math.floor(Date.now() / 110) % 4)], esc, sx + esc * en.x * LARG, sy - escY * 450, clip, w);
+          continue;
+        }
         var arco = en.tipo === 'portal' || en.tipo === 'chegada' || en.tipo === 'largada', spr = en.tipo === 'portal' ? portais[en.mundo] : en.tipo === 'chegada' ? chegada : en.tipo === 'largada' ? largada : enfeiteSpr(en.tipo, ntS >= 0.5);
         if (!spr) continue;
         if (voa && arco) sprite(c, spr, esc, sx + esc * en.x * LARG, syAr + escY * 1900, 0, w);   // no céu, o portal fica na altura do voo
