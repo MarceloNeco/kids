@@ -171,13 +171,31 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 @keyframes cai { to { transform: translateY(110vh) rotate(720deg); } }
 
 /* ---------- animação das melecas ---------- */
-.qm-respira { transform-origin: 50% 90%; transform-box: fill-box; animation: respira 2.8s ease-in-out infinite; }
-.qm-pula { transform-origin: 50% 100%; transform-box: fill-box; animation: pula .7s ease-in-out 3; }
-.qm-treme { transform-origin: 50% 90%; transform-box: fill-box; animation: treme .12s linear 6; }
+/* sempre em movimento (dono, 14/Nov/2026): parada ela balança e respira; feliz pula sem parar; ops chacoalha de tempos em tempos */
+.qm-respira { transform-origin: 50% 100%; transform-box: fill-box; animation: respira 2.6s ease-in-out infinite; }
+.qm-pula { transform-origin: 50% 100%; transform-box: fill-box; animation: pula 1.1s ease-in-out infinite; }
+.qm-treme { transform-origin: 50% 100%; transform-box: fill-box; animation: treme 1.6s ease-in-out infinite; }
+.qm-pink.qm-respira { animation-delay: -1.3s; }   /* as duas não balançam iguaizinhas */
 .qm-mel { transform-origin: 50% 0; transform-box: fill-box; animation: mel 2.4s ease-in-out infinite; }
-@keyframes respira { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.04, .96); } }
-@keyframes pula { 0%, 100% { transform: translateY(0) scale(1, 1); } 30% { transform: translateY(0) scale(1.12, .86); } 60% { transform: translateY(-14%) scale(.92, 1.1); } }
-@keyframes treme { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3%); } }
+@keyframes respira {
+  0%, 100% { transform: translateY(0) rotate(0) scale(1, 1); }
+  25% { transform: translateY(-3%) rotate(-3deg) scale(.98, 1.03); }
+  50% { transform: translateY(0) rotate(0) scale(1.05, .95); }
+  75% { transform: translateY(-3%) rotate(3deg) scale(.98, 1.03); }
+}
+@keyframes pula {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(0) scale(1.12, .86); }
+  45% { transform: translateY(-14%) scale(.92, 1.1) rotate(-4deg); }
+  70% { transform: translateY(0) scale(1.08, .92); }
+  85% { transform: translateY(0) scale(.98, 1.02); }
+}
+@keyframes treme {
+  0%, 40%, 100% { transform: translateX(0) rotate(0); }
+  5%, 15%, 25% { transform: translateX(3%) rotate(3deg); }
+  10%, 20%, 30% { transform: translateX(-3%) rotate(-3deg); }
+  70% { transform: translateY(-2%) scale(.98, 1.03); }
+}
 @keyframes mel { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.18); } }
 
 /* ---------- celular deitado: tabuleiro à esquerda, conversa e painel à direita ---------- */
@@ -303,6 +321,6 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 /* melecas em 3D (melecas/*.webp): o mesmo lugar do SVG; falando = um balancinho */
 .qm-3d { width: 100%; height: 100%; object-fit: contain; display: block; -webkit-user-drag: none; user-select: none; }
 .qm-3d.qm-respira, .qm-3d.qm-pula, .qm-3d.qm-treme { transform-box: border-box; }
-.qm-3d.qm-fala { animation: fala .5s ease-in-out infinite; transform-origin: 50% 100%; }
-@keyframes fala { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.03, .96); } }
+.qm-3d.qm-fala { animation: fala .9s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes fala { 0%, 100% { transform: scale(1, 1) rotate(0); } 25% { transform: scale(1.04, .95) rotate(-2deg); } 50% { transform: translateY(-2%) scale(.98, 1.03); } 75% { transform: scale(1.04, .95) rotate(2deg); } }
 @media (prefers-reduced-motion: reduce) { .qm-3d.qm-fala { animation: none; } }

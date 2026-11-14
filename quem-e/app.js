@@ -5,7 +5,7 @@
    voz e a meleca escolhida. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.0';
+  var APP_VERSION = '0.6.1';
   var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026', APP_DATA_ES = '14/nov/2026';
   var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };
@@ -18,7 +18,7 @@
   var pref = ler('bolinho:quem-e:pref', null) || {};
   var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';   // o idioma escolhido na estante (../idioma.js)
   delete pref.lingua;
-  if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
+  delete pref.efeitos;   // o botão 🔊 de cima saiu (a música é o 🎵 de baixo): os sons do jogo ficam sempre ligados
   if (typeof pref.voz !== 'boolean') pref.voz = true;   // voz começa ligada (no Fácil ajuda quem ainda não lê)
   if (pref.meleca !== 'blue' && pref.meleca !== 'pink') pref.meleca = 'pink';
   function salvarPref() { gravar('bolinho:quem-e:pref', pref); }
@@ -44,7 +44,6 @@
   // ---------- sons (feitos na hora, sem arquivo) ----------
   var ctxAudio = null;
   function bip(freq, dur, tipo, quando, vol, ate) {
-    if (!pref.efeitos) return;
     try {
       if (!ctxAudio) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; ctxAudio = new AC(); }
       if (ctxAudio.state === 'suspended') ctxAudio.resume();
@@ -64,10 +63,8 @@
     perdeu: function () { [392, 349, 330, 262].forEach(function (f, k) { bip(f, 0.22, 'triangle', k * 0.16, 0.1); }); }
   };
   function pintarBotoes() {
-    var b = $('btEfeitos'); b.textContent = pref.efeitos ? '🔊' : '🔈'; b.setAttribute('aria-pressed', String(pref.efeitos));
     var v = $('btVoz'); v.textContent = pref.voz ? '🗣️' : '🤐'; v.setAttribute('aria-pressed', String(pref.voz));
   }
-  $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarBotoes(); Som.sim(); });
   $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarBotoes(); if (pref.voz) falar(t('Voz ligada!', 'Voice on!', '¡Voz encendida!')); else calar(); });
 
   // ---------- voz da meleca (voz.js: voz do aparelho ou, se a pessoa ligar, ElevenLabs com a chave do cofre) ----------
