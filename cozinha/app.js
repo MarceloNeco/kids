@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.1';
+  var APP_VERSION = '0.7.0';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -190,7 +190,10 @@
     if (atual === 'pronto' && id !== 'pronto') pararMenino();
     qsa(document, '.tela').forEach(function (s) { s.classList.toggle('ativa', s.id === id); });
     atual = id; window.scrollTo(0, 0);
-    if (id === 'mapa') desenharMapa();
+    if (id === 'mapa') {
+      desenharMapa();
+      if (jogo && jogo.seguir) { var sg = jogo.seguir; jogo.seguir = null; setTimeout(function () { if (atual === 'mapa' && jogo) irPara(sg); }, 700); }
+    }
     if (id === 'cozinha' && jogo && jogo.cz) { if (jogo.cz.fase === 'feito') proximo(); else desenharCozinha(); }
     if (id === 'menu') desenharMenu();
   }
@@ -278,7 +281,7 @@
   function novoJogo(recId, nivel) {
     var r = D.receita[recId], nv = D.nivel[nivel];
     jogo = { rec: r, nivel: nivel, cfg: nv, precisa: L.ingredientesDoNivel(r, nv), passos: L.passosDoNivel(r, nv), cesta: {},
-      moedas: L.moedasIniciais(r, nv), favores: nv.favores, pendente: null, erros: 0, inicio: Date.now(), imprevistoFeito: false, cz: null };
+      moedas: L.moedasIniciais(r, nv), favores: nv.favores, pendente: null, erros: 0, inicio: Date.now(), imprevistoFeito: false, cz: null, pos: 'casa' };
     clearInterval(tSol);
     $('sol').hidden = !nv.tempo;
     if (nv.tempo) tSol = setInterval(desenharCarteira, 1000);
@@ -349,6 +352,7 @@
     else if (r.falta === 0) aviso(t('✅ Já tem ' + nome + ' que chega!', '✅ You have enough ' + nome + '!'));
     else aviso('+1 ' + nome + ' · ' + t('falta ', 'still need ') + r.falta, 1800, true);
     ensinar(id);
+    seguirSePronto();
   }
   // 💡 o jogo também ensina: de onde vem cada coisa ("A banana nasce em cachos na bananeira!"). Fica escrito no
   // lugar; no Fácil, a voz lê na primeira vez de cada ingrediente (menos na casa da vizinha, onde quem fala é ela).
@@ -364,32 +368,140 @@
   function coletar(id, de, op) { L.por(jogo.cesta, id, 1); recebeu(id, de, op); }
   function erro() { if (jogo) jogo.erros++; Som.toca('erro'); }
 
-  // ---------- vila ----------
-  var CENAS = {
-    rio: '<span class="c1">🐟</span><span class="c2">🎣</span>', pomar: '<span class="c1">🌳</span><span class="c2">🍊</span><span class="c3">🍎</span>',
-    horta: '<span class="c1">🥕</span><span class="c2">🌱</span><span class="c3">🍅</span>', galinheiro: '<span class="c1">🐔</span><span class="c2">🥚</span>',
-    vaca: '<span class="c1">🐄</span><span class="c2">🥛</span>', mercado: '<span class="c1">🏪</span><span class="c2">💰</span>',
-    vizinha: '<span class="c1">🏡</span><span class="c2">👵</span>', casa: '<span class="c1">🏠</span><span class="c2">🍳</span>'
-  };
+  // ---------- vila (v0.7.0): cidadezinha "3D" vista de cima, com ruas, e o cozinheirinho que anda até cada lugar ----------
+  // Os lugares continuam botões (data-lugar) numa grade (2 colunas em pé, 4 deitado/tablet); cada um é um bloquinho
+  // desenhado no vila.js. As ruas passam nos vãos: uma rua embaixo de cada fileira e ruas de cima a baixo entre as
+  // colunas. O cozinheirinho começa na porta de casa e anda pelas ruas até a porta do lugar tocado; lá ele entra.
+  // Missão: uma faixa diz o que buscar agora e onde (no Fácil e no Médio uma seta pula em cima do lugar). Depois de pegar
+  // tudo de um lugar, no Fácil e no Médio ele segue sozinho para o próximo (e para casa, com a cesta cheia).
+  var VI = window.CozinhaVila, andando = null;
+  var NATUREZA = ['rio', 'pomar', 'horta', 'galinheiro', 'vaca'];
+  // o próximo lugar da missão: primeiro a natureza (de graça, e o jogo ensina de onde vem), depois mercadinho e vizinha;
+  // entre eles, o que tem mais coisas da lista
+  function proximoLugar() {
+    if (!jogo) return null;
+    if (L.completa(jogo.precisa, jogo.cesta)) return 'casa';
+    var u = L.lugaresUteis(jogo.precisa, jogo.cesta), ids = Object.keys(u);
+    if (!jogo.cfg.moedas && u.mercado && !ids.some(function (l) { return NATUREZA.indexOf(l) >= 0; })) return 'mercado';
+    ids.sort(function (a, b) {
+      var na = NATUREZA.indexOf(a) >= 0 ? 0 : a === 'mercado' ? 1 : 2, nb = NATUREZA.indexOf(b) >= 0 ? 0 : b === 'mercado' ? 1 : 2;
+      return na - nb || u[b].length - u[a].length || D.LUGARES.findIndex(function (l) { return l.id === a; }) - D.LUGARES.findIndex(function (l) { return l.id === b; });
+    });
+    if (jogo.favores <= 0) ids = ids.filter(function (l) { return l !== 'vizinha'; }).concat(ids.indexOf('vizinha') >= 0 ? ['vizinha'] : []);
+    return ids[0] || null;
+  }
+  function textoMissao() {
+    var prox = proximoLugar();
+    if (prox === 'casa') return t('🧺 Tudo na cesta! Agora é ir para 🏠 Casa cozinhar!', '🧺 Everything is in the basket! Now head 🏠 Home to cook!');
+    if (!jogo.cfg.brilho || !prox) return t('📜 Falta: ', '📜 Still missing: ') + textoFalta();
+    var u = L.lugaresUteis(jogo.precisa, jogo.cesta)[prox] || [], falt = L.faltando(jogo.precisa, jogo.cesta);
+    var o = u.map(function (id) { var f = falt.filter(function (r) { return r.id === id; })[0]; return emojiDe(id) + L.nomeQtd(id, f.falta, en()); }).join(', ');
+    var l = D.lugar[prox];
+    return t('👉 Agora: buscar ' + o + ' em ' + l.e + ' ' + l.pt, '👉 Now: get ' + o + ' at ' + l.e + ' ' + l.en);
+  }
   function desenharMapa() {
     if (!jogo) return;
-    var uteis = L.lugaresUteis(jogo.precisa, jogo.cesta), completa = L.completa(jogo.precisa, jogo.cesta);
-    $('vila').innerHTML = D.LUGARES.map(function (l) {
+    var uteis = L.lugaresUteis(jogo.precisa, jogo.cesta), completa = L.completa(jogo.precisa, jogo.cesta), prox = jogo.cfg.brilho ? proximoLugar() : null;
+    $('missao').textContent = textoMissao();
+    $('vila').innerHTML = '<svg class="ruas" aria-hidden="true" focusable="false"></svg>' + D.LUGARES.map(function (l) {
       var aqui = jogo.cfg.brilho && uteis[l.id] ? uteis[l.id] : null;
       var extra = '';
       if (l.id === 'casa') extra = completa ? '<span class="brilho">✨</span>' : '';
       else if (aqui) extra = '<span class="brilho">✨</span><span class="aqui">' + aqui.slice(0, 4).map(function (id) { return icone(id); }).join('') + '</span>';
-      return '<button type="button" class="lugar l-' + l.id + (l.id === 'casa' && completa ? ' pronta' : '') + (aqui ? ' util' : '') + '" data-lugar="' + l.id + '">' +
-        '<span class="cena" aria-hidden="true">' + CENAS[l.id] + '</span><span class="nome">' + tx(l) + '</span><span class="faz">' + l.faz[en() ? 1 : 0] + '</span>' + extra + '</button>';
-    }).join('');
+      if (prox === l.id) extra += '<span class="seta" aria-hidden="true">⬇️</span>';
+      return '<button type="button" class="lugar l-' + l.id + (l.id === 'casa' && completa ? ' pronta' : '') + (aqui ? ' util' : '') + (prox === l.id ? ' proximo' : '') + '" data-lugar="' + l.id + '">' +
+        '<span class="cena" aria-hidden="true">' + VI.bloco(l.id) + '</span><span class="nome">' + tx(l) + '</span><span class="faz">' + l.faz[en() ? 1 : 0] + '</span>' + extra + '</button>';
+    }).join('') +
+      '<span class="nuvem n1" aria-hidden="true">' + VI.nuvem() + '</span><span class="nuvem n2" aria-hidden="true">' + VI.nuvem() + '</span>' +
+      '<span class="carro" aria-hidden="true">' + VI.carro('#3aa0e8') + '</span><span class="boneco" aria-hidden="true">' + VI.boneco() + '</span>';
     desenharCesta();
+    requestAnimationFrame(function () { desenharRuas(); porNaPorta(jogo.pos || 'casa'); });
+  }
+  // geometria da vila: porta de cada lugar (meio da rua embaixo dele) e as ruas de cima a baixo entre as colunas
+  function geo() {
+    var vila = $('vila'), bs = qsa(vila, '.lugar'), cs = getComputedStyle(vila), gapL = parseFloat(cs.rowGap) || 24, gapC = parseFloat(cs.columnGap) || 16;
+    var portas = {}, xs = [], linhas = [];
+    bs.forEach(function (b) {
+      var x = b.offsetLeft + b.offsetWidth * 0.8, y = b.offsetTop + b.offsetHeight + gapL / 2;   // a porta fica à direita do nome
+      portas[b.getAttribute('data-lugar')] = [x, y];
+      if (linhas.indexOf(y) < 0) linhas.push(y);
+      var dir = b.offsetLeft + b.offsetWidth + gapC / 2; if (xs.indexOf(dir) < 0) xs.push(dir);
+    });
+    xs.sort(function (a, b) { return a - b; }); xs.pop();   // a última coluna não tem rua à direita
+    return { portas: portas, verticais: xs, linhas: linhas.sort(function (a, b) { return a - b; }), larg: vila.clientWidth, alt: vila.clientHeight, gapL: gapL };
+  }
+  function desenharRuas() {
+    var vila = $('vila'), svg = qs(vila, '.ruas'); if (!svg || !qs(vila, '.lugar')) return;
+    var g = geo(), w = g.larg, h = g.alt, rua = Math.max(12, g.gapL * 0.62), y0 = g.linhas[0], y1 = g.linhas[g.linhas.length - 1];
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h); svg.setAttribute('width', w); svg.setAttribute('height', h);
+    var d = g.linhas.map(function (y) { return 'M6 ' + y + ' H' + (w - 6); }).join(' ') + ' ' + g.verticais.map(function (x) { return 'M' + x + ' ' + (y0 - (g.linhas.length > 1 ? 0 : 0)) + ' V' + y1; }).join(' ');
+    svg.innerHTML = '<path d="' + d + '" stroke="#b8b0a2" stroke-width="' + (rua + 4) + '" stroke-linecap="round" fill="none"/>' +
+      '<path d="' + d + '" stroke="#d9d3c7" stroke-width="' + rua + '" stroke-linecap="round" fill="none"/>' +
+      '<path d="' + d + '" stroke="#fff" stroke-width="1.6" stroke-dasharray="7 7" fill="none" opacity=".9"/>';
+    var carro = qs(vila, '.carro'); if (carro) { carro.style.top = (y0 - 13) + 'px'; carro.style.setProperty('--larg', w + 'px'); }
+  }
+  window.addEventListener('resize', function () { if (atual === 'mapa' && jogo && !andando) { desenharRuas(); porNaPorta(jogo.pos || 'casa'); } });
+  function porNaPorta(id) {
+    var bon = qs($('vila'), '.boneco'), p = geo().portas[id]; if (!bon || !p) return;
+    bon.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px)'; bon.classList.remove('anda', 'entra');
+  }
+  // anda pelas ruas até a porta do lugar e chama aoChegar. Com "reduzir movimento" ou nos testes rápidos, chega na hora.
+  function andarAte(id, aoChegar) {
+    var vila = $('vila'), bon = qs(vila, '.boneco'), g = geo(), de = g.portas[jogo.pos || 'casa'], ate = g.portas[id];
+    jogo.pos = id;
+    if (!bon || !de || !ate || calmo() || VA < 1 || !Element.prototype.animate) { aoChegar(); return; }
+    var cam = [de];
+    if (Math.abs(de[1] - ate[1]) > 2) {
+      var vx = g.verticais.slice().sort(function (a, b) { return (Math.abs(de[0] - a) + Math.abs(a - ate[0])) - (Math.abs(de[0] - b) + Math.abs(b - ate[0])); })[0];
+      if (vx == null) vx = de[0];
+      cam.push([vx, de[1]], [vx, ate[1]]);
+    }
+    cam.push(ate);
+    var dist = [0]; for (var i = 1; i < cam.length; i++) dist.push(dist[i - 1] + Math.abs(cam[i][0] - cam[i - 1][0]) + Math.abs(cam[i][1] - cam[i - 1][1]));
+    var tot = dist[dist.length - 1] || 1, quadros = [], lado = 1;
+    for (var k = 0; k < cam.length; k++) {
+      var nl = k < cam.length - 1 && cam[k + 1][0] !== cam[k][0] ? (cam[k + 1][0] < cam[k][0] ? -1 : 1) : lado;
+      var tr = function (l) { return 'translate(' + cam[k][0] + 'px,' + cam[k][1] + 'px) scaleX(' + l + ')'; };
+      quadros.push({ offset: dist[k] / tot, transform: tr(lado) });
+      if (nl !== lado) { quadros.push({ offset: dist[k] / tot, transform: tr(nl) }); lado = nl; }
+    }
+    andando = id; bon.classList.add('anda'); Som.toca('toque');
+    var anim = bon.animate(quadros, { duration: Math.min(2600, 260 + tot / 0.22), easing: 'linear', fill: 'forwards' });
+    anim.onfinish = function () {
+      bon.style.transform = quadros[quadros.length - 1].transform; anim.cancel();
+      bon.classList.remove('anda'); bon.classList.add('entra');
+      setTimeout(function () { andando = null; if (atual === 'mapa') aoChegar(); }, 280);
+    };
+  }
+  function irPara(id) {
+    if (andando) return;
+    var faz = function () { if (id === 'casa') irCasa(); else abrirLugar(id); };
+    // em casa sem a cesta cheia: avisa na hora (não precisa andar até lá para saber)
+    if (id === 'casa' && !L.completa(jogo.precisa, jogo.cesta)) { faz(); return; }
+    andarAte(id, faz);
   }
   $('vila').addEventListener('click', function (e) {
     var b = e.target.closest('[data-lugar]'); if (!b || !jogo) return;
     Som.toca('toque');
-    var id = b.getAttribute('data-lugar');
-    if (id === 'casa') irCasa(); else abrirLugar(id);
+    irPara(b.getAttribute('data-lugar'));
   });
+  // depois de pegar tudo o que precisava de um lugar: no Fácil e no Médio volta à vila e segue sozinho para o próximo
+  // lugar (ou para casa); no Difícil só volta à vila (a criança escolhe). Nos testes só com ?teste&seguir.
+  var SEGUIR = !RAPIDO || /[?&]seguir\b/.test(location.search);
+  function seguirSePronto() {
+    if (!SEGUIR || !jogo || atual !== 'lugar' || !lugarAtual || jogo.saindo) return;
+    if ((L.lugaresUteis(jogo.precisa, jogo.cesta)[lugarAtual] || []).length) return;
+    var de = lugarAtual, prox = proximoLugar();
+    jogo.saindo = true;
+    agendar(function () {
+      jogo.saindo = false;
+      if (atual !== 'lugar' || lugarAtual !== de) return;
+      jogo.seguir = jogo.cfg.brilho ? prox : null;
+      if (prox) aviso(prox === 'casa' ? t('✔ Pronto aqui! Agora vamos para casa cozinhar! 🏠', '✔ Done here! Now let us go home to cook! 🏠')
+        : t('✔ Pronto aqui! Agora: ', '✔ Done here! Next: ') + D.lugar[prox].e + ' ' + tx(D.lugar[prox]), 2600, true);
+      voltar();
+    }, (de === 'vizinha' ? 3600 : de === 'mercado' ? 2400 : 1500) * V);
+  }
   function irCasa() {
     if (!L.completa(jogo.precisa, jogo.cesta)) { aviso(t('Ainda falta: ', 'Still missing: ') + textoFalta(), 4200); return; }
     if (jogo.cfg.evento && !jogo.imprevistoFeito) {
@@ -409,7 +521,7 @@
   var lugarAtual = null, tLugar = [], fimLugar = [];
   function agendar(fn, ms) { var id = setTimeout(fn, ms); tLugar.push(function () { clearTimeout(id); }); return id; }
   function repetir(fn, ms) { var id = setInterval(fn, ms); tLugar.push(function () { clearInterval(id); }); return id; }
-  function limparLugar() { tLugar.forEach(function (f) { f(); }); tLugar = []; fimLugar.forEach(function (f) { try { f(); } catch (e) { /* ok */ } }); fimLugar = []; lugarAtual = null; var j = document.getElementById('jogoLugar'); if (j) j.innerHTML = ''; }
+  function limparLugar() { if (jogo) jogo.saindo = false; tLugar.forEach(function (f) { f(); }); tLugar = []; fimLugar.forEach(function (f) { try { f(); } catch (e) { /* ok */ } }); fimLugar = []; lugarAtual = null; var j = document.getElementById('jogoLugar'); if (j) j.innerHTML = ''; }
   function desenharPrecisa() {
     if (!jogo || !lugarAtual) return;
     var u = L.lugaresUteis(jogo.precisa, jogo.cesta)[lugarAtual] || [];
