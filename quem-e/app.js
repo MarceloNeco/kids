@@ -71,13 +71,46 @@
   // Melekento Blue fala mais grosso e borbulhante; Pink Honey mais fininho. Sem voz no aparelho, segue só com texto.
   // privado = nome que a família ensinou: nunca vai para a internet.
   var voz = window.QEVoz ? QEVoz.criar(QEVoz.ambienteDoNavegador(function () { return lingua; })) : null;
-  if (voz) { voz.usarEleven(!!pref.eleven); if (pref.vozBlue) voz.definirVoz('blue', pref.vozBlue); if (pref.vozPink) voz.definirVoz('pink', pref.vozPink); }
+  if (voz) { voz.usarEleven(!!pref.eleven); voz.dublar(pref.dublagem); if (pref.vozBlue) voz.definirVoz('blue', pref.vozBlue); if (pref.vozPink) voz.definirVoz('pink', pref.vozPink); }
   function falar(txt, privado) {
     if (!pref.voz || !voz) return;
     if (window.Trilha) Trilha.volume(0.3);
     voz.falar(txt, { meleca: pref.meleca, privado: !!privado }).then(function () { if (window.Trilha) Trilha.volume(null); });
   }
   function calar() { if (voz) voz.calar(); }
+
+  // ---------- 🎭 dublar a meleca: vozes prontas (dono, 14/Nov/2026) ----------
+  var DUBLAGENS = [
+    ['meleca', '🫧', 'Do jeito da meleca', "The slime's own voice", 'La voz del propio slime'],
+    ['esquilo', '🐿️', 'Esquilo (fininha e rápida)', 'Chipmunk (squeaky and fast)', 'Ardilla (aguda y rápida)'],
+    ['gigante', '🧌', 'Gigante (grossona)', 'Giant (deep voice)', 'Gigante (voz grave)'],
+    ['vovo', '👵', 'Vovó (calminha)', 'Granny (nice and calm)', 'Abuelita (tranquila)'],
+    ['apressada', '🚀', 'Apressadinha (bem rápida)', 'In a hurry (super fast)', 'Con prisa (muy rápida)'],
+    ['preguica', '🦥', 'Preguiça (beeem devagar)', 'Sloth (sooo slow)', 'Perezoso (muuuy lento)']
+  ];
+  function abrirDublar() {
+    if (!window.SolverJanela || !voz) return;
+    var caixa = document.createElement('div'); caixa.className = 'voz-caixa';
+    var h = document.createElement('h2'); h.textContent = t('🎭 Dublar a meleca', '🎭 Dub the slime', '🎭 Doblar al slime'); caixa.appendChild(h);
+    var p = document.createElement('p'); p.textContent = t('Escolha a voz. Toque para ouvir!', 'Pick a voice. Tap to hear it!', 'Elige la voz. ¡Toca para oírla!'); caixa.appendChild(p);
+    var lista = document.createElement('div'); lista.className = 'dub-lista'; caixa.appendChild(lista);
+    DUBLAGENS.forEach(function (d) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'dub-bt'; b.setAttribute('data-dub', d[0]);
+      b.setAttribute('aria-pressed', String(voz.dublagem() === d[0]));
+      var e = document.createElement('span'); e.className = 'dub-emoji'; e.setAttribute('aria-hidden', 'true'); e.textContent = d[1]; b.appendChild(e);
+      b.appendChild(document.createTextNode(t(d[2], d[3], d[4])));
+      b.addEventListener('click', function () {
+        pref.dublagem = d[0]; voz.dublar(d[0]); pref.voz = true; salvarPref(); pintarBotoes();
+        Array.prototype.forEach.call(lista.children, function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        falar(pref.meleca === 'blue' ? t('Oi! Eu sou o Melekento Blue! Vamos brincar?', "Hi! I'm Melekento Blue! Let's play?", '¡Hola! ¡Soy Melekento Blue! ¿Jugamos?') : t('Oi! Eu sou a Pink Honey! Vamos brincar?', "Hi! I'm Pink Honey! Let's play?", '¡Hola! ¡Soy Pink Honey! ¿Jugamos?'));
+      });
+      lista.appendChild(b);
+    });
+    var fechar = document.createElement('button'); fechar.type = 'button'; fechar.className = 'grande'; fechar.textContent = t('Pronto', 'Done', 'Listo');
+    fechar.addEventListener('click', function () { j.fechar('ok'); }); caixa.appendChild(fechar);
+    var j = window.SolverJanela.abrir({ conteudo: caixa, classe: 'qe-janela' });
+  }
+  $('btDublar').addEventListener('click', abrirDublar);
 
   // ---------- o jeito das melecas: as duas são SUPER bagunceiras (dono, 14/Nov/2026) ----------
   var ZOEIRA = {
