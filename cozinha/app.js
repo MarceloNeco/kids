@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.12.0';
+  var APP_VERSION = '0.12.1';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -402,7 +402,7 @@
   function desenharCesta() {
     if (!jogo) return;
     var h = '<span class="cesta-ic" aria-hidden="true">🧺</span>' + L.resumo(jogo.precisa, jogo.cesta).map(function (r) {
-      return '<span class="item' + (r.falta ? '' : ' ok') + '" data-ing="' + r.id + '" role="button" tabindex="0" aria-label="' + L.nomeIng(r.id, lingua, 2) + ': ' + r.tem + t(' de ', ' of ', ' de ') + r.precisa + '">' + icone(r.id) + '<b>' + r.tem + '/' + r.precisa + '</b></span>';
+      return '<span class="item' + (r.falta ? '' : ' ok') + '" data-ing="' + r.id + '" role="button" tabindex="0" aria-label="' + L.nomeIng(r.id, lingua, 2) + ': ' + r.tem + t(' de ', ' of ', ' de ') + r.precisa + '">' + icone(r.id) + '<b>' + r.tem + '/' + r.precisa + '</b><i class="ces-n">' + L.nomeIng(r.id, lingua).split(' de ').pop().split(' of ').pop() + '</i></span>';
     }).join('');
     $('cestaMapa').innerHTML = h; $('cestaLugar').innerHTML = h;
     var completa = L.completa(jogo.precisa, jogo.cesta);
@@ -501,6 +501,11 @@
   function usaLavar3D() { return !!(window.Lavar3D && Lavar3D.suportado() && (!RAPIDO || /[?&]lavar3d\b/.test(location.search))); }
   // cozinha em 3D (cozinha3d.js); nos testes só com ?teste&cozinha3d
   function usaCozinha3D() { return !!(window.Cozinha3D && Cozinha3D.suportado() && (!RAPIDO || /[?&]cozinha3d\b/.test(location.search))); }
+  // nomes curtos na cidade 3D (v0.12.1: os nomes compridos se encavalavam no celular)
+  var CURTOS = { rio: ['Rio', 'River', 'Río'], pomar: ['Pomar', 'Orchard', 'Frutales'], horta: ['Horta', 'Garden', 'Huerta'], galinheiro: ['Galinheiro', 'Hen house', 'Gallinero'],
+    vaca: ['Fazenda', 'Farm', 'Granja'], mercado: ['Mercado', 'Shop', 'Tienda'], padaria: ['Padaria', 'Bakery', 'Panadería'], feira: ['Feira', 'Market', 'Mercadillo'],
+    vizinha: ['Dona Cida', 'Mrs. Cida', 'Doña Cida'], casa: ['Casa', 'Home', 'Casa'] };
+  function nomeCurto(id) { return CURTOS[id] ? ix(CURTOS[id]) : tx(D.lugar[id]); }
   function usa3D() { return !!(window.Cidade3D && Cidade3D.suportado() && !/[?&]vila2d\b/.test(location.search) && (!RAPIDO || /[?&]vila3d\b/.test(location.search))); }
   window.addEventListener('cidade3d-pronta', function () { if (atual === 'mapa' && jogo) desenharMapa(); });
   function desenharMapa() {
@@ -514,13 +519,14 @@
       else if (aqui) extra = '<span class="brilho">✨</span><span class="aqui">' + aqui.slice(0, 4).map(function (id) { return icone(id); }).join('') + '</span>';
       if (prox === l.id) extra += '<span class="seta" aria-hidden="true">⬇️</span>';
       return '<button type="button" class="lugar l-' + l.id + (l.id === 'casa' && completa ? ' pronta' : '') + (aqui ? ' util' : '') + (prox === l.id ? ' proximo' : '') + '" data-lugar="' + l.id + '">' +
-        '<span class="nome">' + tx(l) + '</span>' + extra + '</button>';
+        '<span class="nome">' + (usa3D() ? nomeCurto(l.id) : tx(l)) + '</span>' + extra + '</button>';
     }).join('');
     if (usa3D()) {
       var vila = $('vila');
       vila.classList.add('vila3d');
       if (!qs(vila, '.cidade3d')) vila.innerHTML = '<div class="cidade3d" aria-hidden="true"></div><div class="rotulos"></div>' +
-        '<div class="girar"><button type="button" class="mini" data-girar="-1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟲</button><button type="button" class="mini" data-girar="1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟳</button></div>';
+        '<div class="girar"><button type="button" class="mini" data-girar="-1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟲</button><button type="button" class="mini" data-girar="1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟳</button></div>' +
+        '<div class="zoom-bt"><button type="button" class="mini" data-zoom="1.3" aria-label="' + t('Aproximar', 'Zoom in', 'Acercar') + '">➕</button><button type="button" class="mini" data-zoom="0.77" aria-label="' + t('Afastar', 'Zoom out', 'Alejar') + '">➖</button></div>';
       qs(vila, '.rotulos').innerHTML = botoes;
       desenharCesta();
       Cidade3D.montar(vila, { pos: jogo.pos || 'casa', aoTocar: function (id) { if (!jogo) return; Som.toca('toque'); irPara(id); }, instantaneo: calmo() || VA < 1,
@@ -613,6 +619,7 @@
   }
   $('vila').addEventListener('click', function (e) {
     var gi = e.target.closest('[data-girar]'); if (gi && window.Cidade3D) { Cidade3D.girar(+gi.getAttribute('data-girar')); Som.toca('toque'); return; }
+    var zo = e.target.closest('[data-zoom]'); if (zo && window.Cidade3D) { Cidade3D.zoom(+zo.getAttribute('data-zoom')); Som.toca('toque'); return; }
     var b = e.target.closest('[data-lugar]'); if (!b || !jogo) return;
     Som.toca('toque');
     irPara(b.getAttribute('data-lugar'));
