@@ -324,3 +324,14 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   demonstração do fundo), o nome embaixo e o número da ordem quando há mais de um escolhido. No celular cabem 2¼ e
   arrasta de lado (com uma tremidinha ao abrir o menu, `tremerCenarios()`); de 640 px, 4¼; de 1000 px, grade com
   todos. Ordem sorteada a cada vez que o jogo abre (🎲 Surpresa sempre primeiro).
+
+## 1.25.0 — menu no celular, quinas arredondadas, pernas do Ovo e setas do vídeo (dono, 14/Nov/2026)
+
+- Jogadores e rivais também com `.opcoes.linha3` (nome comprido quebra em duas linhas dentro do botão). Música:
+  `.musica-esc` na largura da tela, nome cortado com "…". Cenários: 2,6 cartões visíveis e setas `#mundosEsq`/`#mundosDir`
+  (`setasCenarios()`), que somem quando não há mais para aquele lado.
+- `solido()` com chanfro (quinas arredondadas, `op.chanfro`, padrão 0,16) em toda caixa e tronco; os desenhos das faces
+  (letra, emoji, bolinha) respeitam a proporção da face (`ASP`), sem esticar.
+- Ovo: pernas pelo relógio (bem rápidas) com o borrão da roda de pernas e pose de pulo com `op.voo`; galinha mais rápida.
+- Setas das curvas viraram holograma flutuante (4 quadros `setaD0..3`/`setaE0..3`, a seta acesa anda), a cada 7 pedaços
+  nas curvas com |curva| ≥ 1,8.

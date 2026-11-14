@@ -198,9 +198,9 @@
     }
     segs.forEach(function (sg) { if (sg.agua) sg.parede = true; if (sg.tunel || perto(sg.i, 20)) sg.parede = false; });
     // setas nas curvas (como as placas de pista de corrida): do lado de fora da curva, apontando para onde ela vai
-    for (i4 = 140; i4 < chegada - 10; i4 += 6) {
+    for (i4 = 140; i4 < chegada - 10; i4 += 7) {
       var sc = segs[i4];
-      if (Math.abs(sc.curva) >= 2.2 && !sc.tunel && !sc.loop && !perto(i4, 15)) sc.enfeites.push({ tipo: sc.curva > 0 ? 'setaD' : 'setaE', x: (sc.curva > 0 ? -1 : 1) * 1.32 });
+      if (Math.abs(sc.curva) >= 1.8 && !sc.tunel && !sc.loop && !perto(i4, 15)) sc.enfeites.push({ tipo: sc.curva > 0 ? 'setaD' : 'setaE', x: (sc.curva > 0 ? -1 : 1) * 1.45 });
     }
 
     return { segs: segs, chegada: chegada, tuneis: tuneis, rios: rios, loops: loops, zChegada: chegada * SEG, comprimento: segs.length * SEG, nivel: NIVEIS[nivel] ? nivel : 'normal', cfg: cfg, mundos: ordem, carros: carros, semente: semente };

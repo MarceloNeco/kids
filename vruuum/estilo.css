@@ -40,8 +40,9 @@ a { color: var(--ciano); }
 .demo-menu .rotulo { color: #e4ddff; text-shadow: 0 1px 4px rgba(0,0,0,.8); }
 .demo-menu .logo.pequeno { animation: lgPula 1.6s ease-in-out infinite; }
 /* música no menu */
-.musica-esc { display: flex; align-items: center; gap: 8px; max-width: min(560px, 100%); }
-.mus-nome { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1rem; }
+.musica-esc { display: flex; align-items: center; gap: 6px; width: min(560px, calc(100vw - 32px)); }
+.musica-esc .mini { flex: 0 0 44px; padding: 0; }
+.mus-nome { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(.85rem, 3.8vw, 1rem); padding: 8px 10px; }   /* 1.25.0: o nome comprido é cortado com "…" e os botões cabem */
 .mus-lista { display: flex; flex-direction: column; gap: 4px; width: min(460px, 100%); max-height: 46vh; overflow-y: auto; padding: 6px; border-radius: 16px; background: rgba(20,16,56,.94); box-shadow: 0 0 0 2px var(--borda); }
 .mus-item { text-align: left; padding: 6px 12px; border-radius: 12px; background: transparent; font-size: .95rem; border: 2px solid transparent; }
 .mus-item[aria-pressed="true"] { border-color: var(--ouro); background: rgba(255,209,102,.16); }
@@ -105,12 +106,17 @@ a { color: var(--ciano); }
 
 /* 1.24.0: três botões numa linha só (nível e visual), espremendo a letra no celular estreito */
 .opcoes.linha3 { flex-wrap: nowrap; width: min(560px, calc(100vw - 32px)); }
-.opcoes.linha3 .opcao { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: clamp(.82rem, 3.7vw, 1.15rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.opcoes.linha3 .opcao { flex: 1 1 0; min-width: 0; padding: 8px 6px; font-size: clamp(.82rem, 3.7vw, 1.15rem); line-height: 1.15; }   /* nome comprido quebra em duas linhas dentro do botão */
 /* cenários: fileira de fotinhos para arrastar (no celular cabem 2 e um pedacinho do próximo); em tela larga, grade */
-.grupo-mundos { width: 100%; }
+.grupo-mundos { width: 100%; position: relative; }
+/* 1.25.0: setas por cima da fileira de cenários (pulsando), para ficar claro que tem mais para o lado */
+.mundos-seta { position: absolute; top: calc(50% + 4px); transform: translateY(-50%); z-index: 2; width: 36px; height: 56px; border-radius: 12px; font-size: 1.3rem; color: #1a1446; background: rgba(255,209,102,.9); box-shadow: 0 4px 14px rgba(0,0,0,.45); animation: setaPulsa 1.1s ease-in-out infinite; }
+.mundos-seta.dir { right: 2px; } .mundos-seta.esq { left: 2px; animation: none; }
+@keyframes setaPulsa { 50% { transform: translateY(-50%) translateX(4px); } }
+@media (min-width: 1000px) { .mundos-seta { display: none; } }
 .mundos-trilho { display: flex; gap: 10px; width: calc(100% + 32px); margin: 0 -16px; padding: 4px 16px 10px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .mundos-trilho::-webkit-scrollbar { display: none; }
-.cartao-mundo { position: relative; flex: 0 0 calc((100% - 32px - 20px) / 2.25); scroll-snap-align: start; display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 4px 4px 6px; border-radius: 16px; background: var(--card); border: 3px solid transparent; }
+.cartao-mundo { position: relative; flex: 0 0 calc((100% - 32px - 20px) / 2.6); scroll-snap-align: start; display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 4px 4px 6px; border-radius: 16px; background: var(--card); border: 3px solid transparent; }
 .cartao-mundo canvas { width: 100%; aspect-ratio: 16 / 10; height: auto; border-radius: 11px; display: block; background: #1a1446; }
 .cartao-mundo span { font-size: .88rem; font-weight: 600; line-height: 1.15; min-height: 2.3em; display: flex; align-items: center; justify-content: center; text-align: center; }
 .cartao-mundo[aria-pressed="true"] { border-color: var(--ouro); background: rgba(255,209,102,.18); box-shadow: 0 0 16px rgba(255,209,102,.35); }
@@ -118,7 +124,7 @@ a { color: var(--ciano); }
 .cartao-mundo .ordem:empty { display: none; }
 .mundos-trilho.treme .cartao-mundo { animation: tremeCenario 1s ease-in-out 1; }
 @keyframes tremeCenario { 0%, 100% { transform: none; } 25% { transform: translateX(-34px); } 50% { transform: none; } 72% { transform: translateX(-14px); } }
-@media (min-width: 640px) { .cartao-mundo { flex-basis: calc((100% - 32px - 40px) / 4.25); } }
+@media (min-width: 640px) { .cartao-mundo { flex-basis: calc((100% - 32px - 40px) / 4.5); } }
 @media (min-width: 1000px) { .mundos-trilho { flex-wrap: wrap; justify-content: center; overflow: visible; width: min(1100px, 100%); margin: 0 auto; padding: 4px 0 10px; } .cartao-mundo { flex: 0 0 160px; } }
 @media (prefers-reduced-motion: reduce) { .mundos-trilho.treme .cartao-mundo { animation: none; } }
 .podio { width: min(620px, 94vw); height: auto; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
