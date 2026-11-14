@@ -46,6 +46,7 @@ Real recordings under free licenses, converted to mono MP3, trimmed and level-ad
 | `sons/brilho.mp3` | sininho / small bell | opengameart.org/content/100-cc0-sfx (`bell_03.ogg`) | rubberduck | **CC0** | corte de 1,4 s, final suave |
 | `sons/aplausos.mp3` | aplausos / applause | Mike Koenig (soundbible.com/989), pelo SuperTuxKart (`gp_end.ogg`); cópia igual à de `../vruuum/sons/aplausos.mp3` | Mike Koenig | **CC BY 3.0** — https://creativecommons.org/licenses/by/3.0/ | nenhuma além da conversão já feita no Vruuum! |
 | `sons/erro.mp3` | batida em madeira / knock on wood | commons.wikimedia.org/wiki/File:Knocking_on_wood_or_door.ogg (do PDSounds) | stephan | **domínio público / public domain** | corte de uma batida, final suave |
+| `sons/sanfona.mp3` ("Falhou!", desde a 0.4.0) | sanfona descendo "uón-uón-uóóón" / accordion going down | https://opengameart.org/content/accordion-sound (`accordion_squeeze.mp3`) | NicholasJudy567 (OpenGameArt) | **CC0** | um ciclo cortado e a terceira nota feita da segunda, meio tom abaixo (a mesma gravação); mono, volume igualado, final suave. A página não diz quem gravou; pela análise do som parece sanfona de palheta de verdade |
 
 Enquanto uma gravação não carrega, o `som.js` toca um som de reserva feito na hora pelo próprio jogo (mesma licença
 do repositório).
@@ -74,6 +75,14 @@ WebP; photos under CC BY-SA keep that license in this resized version.
 As 8 cenas desenhadas do fundo (chuva com arco-íris, jardim, vaga-lumes, pôr do sol, nuvens com pipa, peixes e
 tartaruga, fogueira e bandeirinhas, planetas e foguete) são feitas no código do próprio jogo (`fundo.js`), com a mesma
 licença do repositório. The 8 drawn scenes are made in the game's own code (`fundo.js`).
+
+## Biblioteca 3D / 3D library (Cubo d'Água, desde a 0.4.0)
+
+| Arquivo / File | O que é / What it is | Origem / Source | Licença / License |
+|---|---|---|---|
+| `libs/three.module.min.js` | three.js r170, que desenha o Cubo d'Água em 3D (cópia igual à de `../cozinha/libs/`) / draws the 3D Water Cube | https://threejs.org (pacote npm `three@0.170.0`) | **MIT** — `libs/three-LICENSE.txt` |
+
+O cubo, as pastilhas, o vidro, a luz e os reflexos são feitos no código (`cubo3d.js`), sem imagem nenhuma.
 
 ## Fonte / Font
 

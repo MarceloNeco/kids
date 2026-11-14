@@ -58,12 +58,12 @@ button:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
 .versao { color: var(--tinta2); font-size: .85rem; max-width: 34rem; }
 
 /* ---------- jogo ---------- */
-#jogo { position: fixed; inset: 0; flex-direction: column; gap: 4px; overflow: hidden; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+#jogo, #cubo { position: fixed; inset: 0; flex-direction: column; gap: 4px; overflow: hidden; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
   padding: calc(6px + var(--st)) calc(6px + var(--sr)) calc(8px + var(--sb)) calc(6px + var(--sl)); }
 /* o desenho ocupa a tela toda (o frasco que despeja pode passar por trás da barra); os toques são dos botões */
 #palco { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 .barra { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 6px; min-height: 48px; }
-.bn-nav #jogo .barra { padding-left: var(--nav-largo); justify-content: flex-end; }
+.bn-nav #jogo .barra, .bn-nav #cubo .barra { padding-left: var(--nav-largo); justify-content: flex-end; }
 .placa { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 12px; border-radius: 999px; background: rgba(255, 255, 255, .92); border: 2px solid var(--tinta); font-size: 1.05rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .area { position: relative; z-index: 1; flex: 1 1 auto; min-height: 0; touch-action: none; }
 .frascos { position: absolute; inset: 0; }
@@ -83,7 +83,7 @@ button:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
 .aj.chama { animation: chama .5s ease-in-out 3; }
 @keyframes chama { 50% { transform: translateY(-8px) scale(1.1); background: var(--sol); } }
 /* a abinha comum "Tela inteira" (../telacheia.js): durante o jogo fica logo abaixo do 🏠 e da 🚪, fora das ajudas */
-body:has(#jogo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px); transform: none; }
+body:has(#jogo.ativa) .tela-inteira-bt, body:has(#cubo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px); transform: none; }
 
 /* fundo em carrossel (fundo.js, desde a 0.3.0): uma cena de cada vez atrás dos frascos; a nova entra devagar por cima
    da anterior. Fotos um pouco desfocadas e com zoom bem lento; véu claro (escuro nas cenas de noite) para os frascos
@@ -125,6 +125,17 @@ body:has(#jogo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px);
 @keyframes estoura { from { transform: scale(0) rotate(-40deg); } }
 .cartao h2 { font-size: 1.9rem; }
 .fim-gotas { font-size: 1.35rem; font-weight: 700; color: #0c7c8c; }
+/* ---------- Cubo d'Água (desde a 0.4.0) ---------- */
+.modos { display: flex; gap: 0; border: 2.5px solid var(--tinta); border-radius: 999px; overflow: hidden; background: var(--papel); box-shadow: 0 4px 0 rgba(23, 50, 77, .3); }
+.modo { padding: 8px 16px; font-size: 1.1rem; font-weight: 700; background: transparent; color: var(--tinta); border-radius: 0; }
+.modo[aria-checked="true"] { background: linear-gradient(#aef0f2, #4fd0e0); }
+.area-cubo { touch-action: none; }
+.cubo-tela { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.carrega { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, .9); border: 2px solid var(--tinta); border-radius: 16px; padding: 10px 16px; font-weight: 600; }
+/* as setas do cubinho marcado: numa fileira própria, acima das ajudas (no celular deitado, ao lado delas) */
+.setas { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); display: flex; gap: 8px; }
+.setas[hidden] { display: none; }
+.aj.seta { background: #fff4c2; }
 .fim-botoes { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; width: 100%; }
 
 /* ---------- celular deitado: as ajudas vão para a direita e os frascos ficam com a altura quase toda ---------- */
@@ -136,8 +147,9 @@ body:has(#jogo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px);
   .niveis { flex-direction: row; max-width: 46rem; }
   .nivel { flex: 1; padding: 8px 6px; }
   .n-nome { font-size: 1.25rem; } .n-info { font-size: .82rem; } .n-rec { font-size: .85rem; }
-  #jogo { display: none; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; column-gap: 8px; padding-bottom: calc(6px + var(--sb)); }
-  #jogo.ativa { display: grid; }
+  #jogo, #cubo { display: none; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; column-gap: 8px; padding-bottom: calc(6px + var(--sb)); }
+  #jogo.ativa, #cubo.ativa { display: grid; }
+  .setas { left: auto; right: calc(100% + 8px); bottom: 54px; transform: none; display: grid; grid-template-columns: repeat(2, 56px); }
   .barra { grid-column: 1; min-height: 46px; }
   .area { grid-column: 1; grid-row: 2; }
   .ajudas { grid-column: 2; grid-row: 1 / span 2; flex-direction: column; justify-content: flex-start; gap: 12px; padding: 12px 8px 50px 6px; }

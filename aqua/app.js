@@ -27,6 +27,12 @@
     if (!Array.isArray(pref.estrelas[n])) pref.estrelas[n] = [];
   });
   pref.gotas = Math.max(0, Math.floor(pref.gotas) || 0);
+  // Cubo d'Água (desde a 0.4.0): progresso próprio; as gotinhas e a lojinha são as mesmas
+  if (pref.modo !== 'cubo') pref.modo = 'frascos';
+  if (!pref.cubo || typeof pref.cubo !== 'object') pref.cubo = {};
+  if (!pref.cubo.fase || typeof pref.cubo.fase !== 'object') pref.cubo.fase = {};
+  if (!pref.cubo.estrelas || typeof pref.cubo.estrelas !== 'object') pref.cubo.estrelas = {};
+  M.NIVEIS.forEach(function (n) { pref.cubo.fase[n] = Math.max(1, Math.floor(pref.cubo.fase[n]) || 1); if (!Array.isArray(pref.cubo.estrelas[n])) pref.cubo.estrelas[n] = []; });
   if (!pref.tem || typeof pref.tem !== 'object') pref.tem = {};
   if (!Array.isArray(pref.tem.frascos)) pref.tem.frascos = [];
   if (!Array.isArray(pref.tem.cenarios)) pref.tem.cenarios = [];
@@ -63,20 +69,32 @@
     $('btSimbolos').setAttribute('aria-pressed', String(pref.simbolos));
   }
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; Som.ligar(pref.efeitos); salvarPref(); pintarEfeitos(); Som.acordar(); Som.vidro(); });
-  $('btSimbolos').addEventListener('click', function () { pref.simbolos = !pref.simbolos; salvarPref(); pintarEfeitos(); });
+  $('btSimbolos').addEventListener('click', function () { pref.simbolos = !pref.simbolos; salvarPref(); pintarEfeitos(); if (window.AquaCubo) AquaCubo.simbolos(pref.simbolos); });
 
   // ---------- menu: a fase de cada nível, as estrelas e as gotinhas ----------
   var REC_ID = { facil: 'recFacil', medio: 'recMedio', dificil: 'recDificil' };
-  function somaEstrelas(n) { return pref.estrelas[n].reduce(function (a, b) { return a + (b || 0); }, 0); }
+  function progresso() { return pref.modo === 'cubo' ? pref.cubo : pref; }
+  function somaEstrelas(n) { return progresso().estrelas[n].reduce(function (a, b) { return a + (b || 0); }, 0); }
+  var INFO_CUBO = { facil: ['1 a 3 giros para desfazer', '1 to 3 turns to undo', '1 a 3 giros para deshacer'],
+    medio: ['4 a 8 giros · fatias do meio', '4 to 8 turns · middle slices', '4 a 8 giros · capas del medio'],
+    dificil: ['10 a 25 giros · bem embaralhado', '10 to 25 turns · really mixed up', '10 a 25 giros · muy revuelto'] };
   function pintarMenu() {
+    var cubo = pref.modo === 'cubo';
     M.NIVEIS.forEach(function (n) {
-      var e = somaEstrelas(n);
-      $(REC_ID[n]).textContent = t('Fase ', 'Stage ', 'Fase ') + pref.fase[n] + (e ? ' · ⭐ ' + e : '');
+      var e = somaEstrelas(n), b = $(REC_ID[n]).parentNode, info = b.querySelector('.n-info');
+      $(REC_ID[n]).textContent = t('Fase ', 'Stage ', 'Fase ') + progresso().fase[n] + (e ? ' · ⭐ ' + e : '');
+      if (cubo) info.textContent = t(INFO_CUBO[n][0], INFO_CUBO[n][1], INFO_CUBO[n][2]); else info.textContent = parte(info.getAttribute('data-t'));
     });
+    $('btModoFrascos').setAttribute('aria-checked', String(!cubo)); $('btModoCubo').setAttribute('aria-checked', String(cubo));
+    var sub = document.querySelector('#menu .sub');
+    sub.textContent = cubo ? t('Gire as fatias do cubo de água até cada face ficar de uma cor só', 'Turn the slices of the water cube until each face holds just one color', 'Gira las capas del cubo de agua hasta que cada cara quede de un solo color') : parte(sub.getAttribute('data-t'));
     pintarGotas();
   }
+  Array.prototype.forEach.call(document.querySelectorAll('.modo'), function (b) {
+    b.addEventListener('click', function () { Som.acordar(); Som.toque(); pref.modo = b.getAttribute('data-modo'); salvarPref(); pintarMenu(); });
+  });
   function pintarGotas() {
-    ['gotasMenuN', 'gotasJogo', 'gotasLoja'].forEach(function (id) { $(id).textContent = String(pref.gotas); });
+    ['gotasMenuN', 'gotasJogo', 'gotasLoja', 'gotasCubo'].forEach(function (id) { $(id).textContent = String(pref.gotas); });
     $('gotasMenu').setAttribute('aria-label', t('Gotinhas: ', 'Droplets: ', 'Gotitas: ') + pref.gotas);
     $('placaGotas').setAttribute('aria-label', t('Gotinhas: ', 'Droplets: ', 'Gotitas: ') + pref.gotas);
   }
@@ -87,6 +105,10 @@
     Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
     atual = id; window.scrollTo(0, 0);
     if (id === 'jogo') pedirQuadro();
+    // o fundo em carrossel serve às duas brincadeiras: muda para a tela que está aberta
+    if (id === 'jogo' || id === 'cubo') { var c = $('cenario'); if (c.parentNode !== $(id)) { $(id).insertBefore(c, $(id).firstChild); Fundo.redimensionar(); } }
+    if (window.AquaCubo) AquaCubo.ativo(id === 'cubo');
+    if (id === 'cubo') quadroCubo();
   }
   function entrar(id) {
     if (!dentro) { dentro = true; try { history.pushState({ aqua: 1 }, ''); } catch (e) { /* sem histórico */ } }
@@ -102,11 +124,15 @@
   // navegação padrão (../navegacao.js): 🏠 Início = voltar aos níveis (o mesmo do Voltar do celular); 🚪 Saída pergunta
   // antes de sair com a fase já começada
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'aqua', noInicio: function () { return atual === 'menu'; }, irParaInicio: voltarAoMenu,
-    emAndamento: function () { return atual === 'jogo' && !!est && hist.length > 0 && !fimDeFase; } });
+    emAndamento: function () { return (atual === 'jogo' && !!est && hist.length > 0 && !fimDeFase) || (atual === 'cubo' && !!cuboEst && cuboEst.giros.length > 0 && !cuboFim); } });
   function botaoDoNivel() { return { facil: 'btFacil', medio: 'btMedio', dificil: 'btDificil' }[nivel]; }
 
   Array.prototype.forEach.call(document.querySelectorAll('.nivel'), function (b) {
-    b.addEventListener('click', function () { Som.acordar(); nivel = b.getAttribute('data-nivel'); fase = pref.fase[nivel]; entrar('jogo'); novoJogo(); telaCheia(); });
+    b.addEventListener('click', function () {
+      Som.acordar(); nivel = b.getAttribute('data-nivel');
+      if (pref.modo === 'cubo') { cuboFase = pref.cubo.fase[nivel]; entrar('cubo'); abrirCubo(); telaCheia(); return; }
+      fase = pref.fase[nivel]; entrar('jogo'); novoJogo(); telaCheia();
+    });
   });
   $('btLoja').addEventListener('click', function () { Som.acordar(); entrar('loja'); montarLoja(); });
   $('btLojaVoltar').addEventListener('click', voltarAoMenu);
@@ -453,23 +479,25 @@
   $('btReiniciar').addEventListener('click', function () { Som.acordar(); Som.toque(); novoJogo(); });
 
   // ---------- fim de fase: estrelas, gotinhas e comemoração ----------
-  function comemorar() {
-    var u = usos, estrelas = (u.embaralhar || u.extra) ? 1 : (u.desfazer || u.dica) ? 2 : 3;
-    var antigas = pref.estrelas[nivel][fase - 1] || 0, nova = fase >= pref.fase[nivel];
+  // o fim de fase das duas brincadeiras: prog = onde guarda (pref ou pref.cubo), f = a fase, u = as ajudas usadas
+  function comemorar(prog, f, u) {
+    if (!prog) { prog = pref; f = fase; u = usos; }
+    var estrelas = (u.embaralhar || u.extra) ? 1 : (u.desfazer || u.dica) ? 2 : 3;
+    var antigas = prog.estrelas[nivel][f - 1] || 0, nova = f >= prog.fase[nivel];
     var ganho = nova ? 10 * estrelas : Math.max(2, 10 * (estrelas - antigas));
-    pref.estrelas[nivel][fase - 1] = Math.max(antigas, estrelas);
-    for (var k = 0; k < fase; k++) if (!pref.estrelas[nivel][k]) pref.estrelas[nivel][k] = pref.estrelas[nivel][k] || 0;
-    if (nova) pref.fase[nivel] = fase + 1;
+    prog.estrelas[nivel][f - 1] = Math.max(antigas, estrelas);
+    for (var k = 0; k < f; k++) if (!prog.estrelas[nivel][k]) prog.estrelas[nivel][k] = prog.estrelas[nivel][k] || 0;
+    if (nova) prog.fase[nivel] = f + 1;
     pref.gotas += ganho; salvarPref(); pintarGotas(); esconderAviso(); dicaPar = null;
     Som.aplausos(); Som.brilho();
     if (window.Trilha && Trilha.volume) { Trilha.volume(0.35); setTimeout(function () { Trilha.volume(null); }, 3200); }
-    if (!CALMO) confete();
+    if (!CALMO && atual === 'jogo') confete();
     $('fimEstrelas').innerHTML = '';
     for (var e = 1; e <= 3; e++) { var sp = document.createElement('span'); sp.textContent = '⭐'; sp.className = e <= estrelas ? 'acesa' : 'apagada'; sp.style.animationDelay = (e * 0.18) + 's'; $('fimEstrelas').appendChild(sp); }
     $('fimEstrelas').setAttribute('aria-label', estrelas + t(' de 3 estrelas', ' of 3 stars', ' de 3 estrellas'));
     $('fimTitulo').textContent = [t('Conseguiu!', 'You did it!', '¡Lo has conseguido!'), t('Muito bem!', 'Well done!', '¡Muy bien!'), t('Perfeito!', 'Perfect!', '¡Perfecto!')][estrelas - 1];
-    $('fimTexto').textContent = estrelas === 3 ? t('Fase ' + fase + ' sem nenhuma ajuda. Que capricho!', 'Stage ' + fase + ' with no helpers at all. Brilliant!', 'Fase ' + fase + ' sin ninguna ayuda. ¡Qué bien lo hiciste!')
-      : t('Fase ' + fase + ' pronta. Sem usar as ajudas ela vale 3 estrelas.', 'Stage ' + fase + ' done. With no helpers it is worth 3 stars.', 'Fase ' + fase + ' lista. Sin usar ayudas vale 3 estrellas.');
+    $('fimTexto').textContent = estrelas === 3 ? t('Fase ' + f + ' sem nenhuma ajuda. Que capricho!', 'Stage ' + f + ' with no helpers at all. Brilliant!', 'Fase ' + f + ' sin ninguna ayuda. ¡Qué bien lo hiciste!')
+      : t('Fase ' + f + ' pronta. Sem usar as ajudas ela vale 3 estrelas.', 'Stage ' + f + ' done. With no helpers it is worth 3 stars.', 'Fase ' + f + ' lista. Sin usar ayudas vale 3 estrellas.');
     $('fimGotas').textContent = '💧 +' + ganho + t(' gotinhas', ' droplets', ' gotitas');
     $('fim').hidden = false;
     setTimeout(function () { $('btProxima').focus(); }, 60);
@@ -483,8 +511,11 @@
         r: 5 + Math.random() * 6, giro: Math.random() * 6, vg: (Math.random() - 0.5) * 9, cor: cores[k % cores.length], vida: 3.2 + Math.random() * 1.2, idade: 0 });
     }
   }
-  $('btProxima').addEventListener('click', function () { fase = Math.min(fase + 1, pref.fase[nivel]); novoJogo(); });
-  $('btDeNovo').addEventListener('click', function () { novoJogo(); });
+  $('btProxima').addEventListener('click', function () {
+    if (atual === 'cubo') { cuboFase = Math.min(cuboFase + 1, pref.cubo.fase[nivel]); novoCubo(); return; }
+    fase = Math.min(fase + 1, pref.fase[nivel]); novoJogo();
+  });
+  $('btDeNovo').addEventListener('click', function () { if (atual === 'cubo') novoCubo(); else novoJogo(); });
   $('btNiveis').addEventListener('click', voltarAoMenu);
 
   // ---------- o quadro: mexer e desenhar ----------
@@ -682,6 +713,87 @@
     });
   }
 
+  // ---------- Cubo d'Água (desde a 0.4.0): o 3D fica no cubo3d.js (three.js), carregado só quando a criança escolhe ----------
+  var CuboM = window.CuboMotor;
+  var LIMITES_CUBO = { facil: { desfazer: Infinity, dica: Infinity }, medio: { desfazer: 10, dica: 3 }, dificil: { desfazer: 5, dica: 1 } };
+  var cuboEst = null, cuboUsos = { desfazer: 0, dica: 0 }, cuboFase = 1, cuboFim = false, cuboPromessa = null, cuboUltimo = 0, cuboQuadro = 0;
+  function carregarCubo() {
+    if (window.AquaCubo) return Promise.resolve(true);
+    if (!cuboPromessa) cuboPromessa = import('./cubo3d.js').then(function () {
+      AquaCubo.iniciar($('areaCubo'), { calmo: CALMO, vel: VEL, simbolos: pref.simbolos,
+        aoGirar: function (g, daCrianca) { Som.glub(); esconderAvisoCubo(); pintarAjudasCubo(); },
+        aoFacePronta: function () { Som.rolha(); setTimeout(function () { Som.brilho(); }, 160 / VEL); proximaCena(true); },
+        aoSelecionar: function (sim) { $('setas').hidden = !sim; },
+        aoVencer: function () { if (cuboFim || atual !== 'cubo') return; cuboFim = true; comemorar(pref.cubo, cuboFase, cuboUsos); } });
+      return true;
+    }).catch(function () { cuboPromessa = null; return false; });
+    return cuboPromessa;
+  }
+  function abrirCubo() {
+    $('carregaCubo').hidden = false; $('carregaCubo').textContent = t('Montando o cubo…', 'Building the cube…', 'Montando el cubo…');
+    carregarCubo().then(function (ok) {
+      if (!ok) { $('carregaCubo').textContent = t('Este aparelho não conseguiu abrir o cubo em 3D. Tente os Frascos!', 'This device could not open the 3D cube. Try the Bottles!', 'Este dispositivo no ha podido abrir el cubo en 3D. ¡Prueba los Frascos!'); return; }
+      $('carregaCubo').hidden = true;
+      if (atual === 'cubo') { AquaCubo.ativo(true); novoCubo(); }
+    });
+  }
+  function novoCubo() {
+    fecharFim(); cuboFim = false; cuboUsos = { desfazer: 0, dica: 0 };
+    cuboEst = CuboM.gerar(nivel, cuboFase);
+    cenas = Fundo.lista(pref.tem.cenarios);
+    cenaN = (cuboFase * 5 + { facil: 1, medio: 3, dificil: 6 }[nivel]) % cenas.length;
+    Fundo.mostrar(cenas[cenaN], true);
+    $('setas').hidden = true; esconderAvisoCubo();
+    if (window.AquaCubo) AquaCubo.carregar(cuboEst);
+    pintarBarraCubo(); pintarAjudasCubo();
+  }
+  function restaCubo(tipo) { return LIMITES_CUBO[nivel][tipo] - cuboUsos[tipo]; }
+  function pintarBarraCubo() {
+    $('placaFaseCubo').textContent = t('Fase ', 'Stage ', 'Fase ') + cuboFase;
+    $('placaFaseCubo').setAttribute('aria-label', t('Cubo d\'Água, nível ', 'Water Cube, level ', 'Cubo de Agua, nivel ') + t(NOME_NIVEL[nivel][0], NOME_NIVEL[nivel][1], NOME_NIVEL[nivel][2]) + t(', fase ', ', stage ', ', fase ') + cuboFase);
+    pintarGotas();
+  }
+  function pintarAjudasCubo() {
+    [['desfazer', 'btDesfazerCubo', 'nDesfazerCubo'], ['dica', 'btDicaCubo', 'nDicaCubo']].forEach(function (a) {
+      var r = restaCubo(a[0]), b = $(a[1]);
+      $(a[2]).textContent = r === Infinity ? '∞' : String(r);
+      b.classList.toggle('vazia', r <= 0 || (a[0] === 'desfazer' && !(cuboEst && cuboEst.giros.length)));
+      var rot = parte(b.getAttribute('data-rotulo'));
+      b.setAttribute('aria-label', rot + (r === Infinity ? t(' (sem limite)', ' (no limit)', ' (sin límite)') : t(' (restam ', ' (', ' (quedan ') + r + t(')', ' left)', ')')));
+    });
+  }
+  var esperaAvisoCubo = 0;
+  function avisoCubo(txt) { var a = $('avisoCubo'); a.textContent = txt; a.hidden = false; clearTimeout(esperaAvisoCubo); esperaAvisoCubo = setTimeout(esconderAvisoCubo, 4200); }
+  function esconderAvisoCubo() { clearTimeout(esperaAvisoCubo); $('avisoCubo').hidden = true; }
+  function prontoCubo() { Som.acordar(); return !!(window.AquaCubo && cuboEst && !cuboFim && !AquaCubo.ocupado()); }
+  $('btDesfazerCubo').addEventListener('click', function () {
+    if (!prontoCubo()) return;
+    if (!cuboEst.giros.length) { avisoCubo(t('Ainda não tem giro para desfazer.', 'There is no turn to undo yet.', 'Todavía no hay ningún giro para deshacer.')); return; }
+    if (restaCubo('desfazer') <= 0) { avisoCubo(t('Acabaram os desfazer desta fase. Na próxima fase voltam todos!', 'No more undos in this stage. They all come back in the next one!', 'Se han acabado las veces de deshacer de esta fase. ¡En la próxima vuelven!')); Som.erro(); return; }
+    if (AquaCubo.desfazer()) { cuboUsos.desfazer++; pintarAjudasCubo(); }
+  });
+  $('btDicaCubo').addEventListener('click', function () {
+    if (!prontoCubo()) return;
+    if (restaCubo('dica') <= 0) { avisoCubo(t('Acabaram as dicas desta fase. Na próxima fase voltam todas!', 'No more hints in this stage. They all come back in the next one!', 'Se han acabado las pistas de esta fase. ¡En la próxima vuelven!')); Som.erro(); return; }
+    if (AquaCubo.dica()) {
+      cuboUsos.dica++; pintarAjudasCubo(); Som.brilho();
+      avisoCubo(t('Viu a fatia que balançou? Gire ela para o lado que ela foi primeiro.', 'See the slice that wiggled? Turn it the way it moved first.', '¿Has visto la capa que se ha movido? Gírala hacia el lado al que fue primero.'));
+    }
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.seta'), function (b) {
+    b.addEventListener('click', function () { if (!prontoCubo()) return; AquaCubo.seta(+b.getAttribute('data-dx'), +b.getAttribute('data-dy')); });
+  });
+  $('btReiniciarCubo').addEventListener('click', function () { Som.acordar(); Som.toque(); if (cuboEst) { cuboEst.giros = []; } novoCubo(); });
+  // o fundo em carrossel também anda na tela do cubo (o cubo3d.js desenha o cubo; aqui só o fundo)
+  function quadroCubo() {
+    if (cuboQuadro || CALMO) return;
+    cuboQuadro = requestAnimationFrame(function passo(ts) {
+      cuboQuadro = 0; if (atual !== 'cubo') { cuboUltimo = 0; return; }
+      var dt = cuboUltimo ? Math.min(0.05, (ts - cuboUltimo) / 1000) : 0.016; cuboUltimo = ts;
+      Fundo.quadro(dt * VEL); cuboQuadro = requestAnimationFrame(passo);
+    });
+  }
+
   traduzir();
 
   // ---------- música: a trilha comum (../trilha.js), com gravações animadas da pasta da Purpurina ----------
@@ -712,7 +824,7 @@
   window.AquaApp = {
     estado: function () { return est; }, nivel: function () { return nivel; }, fase: function () { return fase; }, versao: APP_VERSION, MUSICAS: MUSICAS,
     pref: function () { return pref; }, usos: function () { return usos; }, tela: function () { return atual; }, lay: function () { return lay; },
-    animando: function () { return anims.length; }, perdeu: function () { return perdeu; }, semSaida: function () { return jogadasSemSaida(); }, cena: function () { return Fundo.atual(); }, cenas: function () { return cenas.slice(); }, dica: function () { return dicaPar; }, assentar: terminarAnims, fim: function () { return fimDeFase; }, LIMITES: LIMITES
+    animando: function () { return anims.length; }, cubo: function () { return cuboEst; }, cuboUsos: function () { return cuboUsos; }, cuboFase: function () { return cuboFase; }, perdeu: function () { return perdeu; }, semSaida: function () { return jogadasSemSaida(); }, cena: function () { return Fundo.atual(); }, cenas: function () { return cenas.slice(); }, dica: function () { return dicaPar; }, assentar: terminarAnims, fim: function () { return fimDeFase; }, LIMITES: LIMITES
   };
 })();
 
