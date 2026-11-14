@@ -288,6 +288,12 @@
     var bob = Math.sin(t * 1.6) * 2.5, rot = Math.sin(t * 1.3) * 0.025;
     c.save(); c.rotate(rot); c.translate(0, bob);
     c.fillStyle = 'rgba(0,40,80,0.25)'; elipse(c, 0, 10, 105, 9); c.fill();
+    if (IMG.juca) {
+      var mj = personagemImg(c, 'juca', t, false);
+      barco(c);
+      c.restore();
+      return { x: mj.x, y: mj.y + bob };
+    }
     var pele = '#e0a87a';
     // pernas da jardineira dobradas, pés descalços
     c.fillStyle = '#3d6fb0'; c.beginPath(); c.moveTo(-34, -32); c.quadraticCurveTo(-2, -60, 18, -42); c.lineTo(22, -28); c.quadraticCurveTo(-6, -42, -30, -18); c.closePath(); c.fill();
@@ -320,7 +326,11 @@
     c.fillStyle = '#5a3418'; c.beginPath(); c.moveTo(-50, -132); c.quadraticCurveTo(-30, -152, 0, -140); c.quadraticCurveTo(-6, -132, -14, -134); c.quadraticCurveTo(-24, -128, -32, -134); c.quadraticCurveTo(-40, -128, -50, -124); c.closePath(); c.fill();
     chapeu(c, -20, -146, 1.08, -0.1, 'remendo');
     c.strokeStyle = '#8fbf4a'; c.lineWidth = 1.8; c.beginPath(); c.moveTo(-6, -104); c.quadraticCurveTo(8, -108, 18, -100 + Math.sin(t * 3) * 2); c.stroke();
-    // barquinho
+    barco(c);
+    c.restore();
+    return { x: 26, y: -68 + bob };
+  }
+  function barco(c) {
     c.fillStyle = grad(c, 0, -34, 0, 14, [[0, '#b97536'], [0.5, '#8d5226'], [1, '#5b3215']]);
     c.beginPath(); c.moveTo(-104, -32); c.quadraticCurveTo(-96, 12, -40, 14); c.lineTo(46, 14); c.quadraticCurveTo(98, 8, 112, -38); c.quadraticCurveTo(10, -22, -104, -32); c.closePath(); c.fill();
     c.strokeStyle = 'rgba(60,30,10,0.55)'; c.lineWidth = 1.6;
@@ -328,8 +338,6 @@
     c.fillStyle = '#d99a55'; c.beginPath(); c.moveTo(-106, -34); c.quadraticCurveTo(10, -24, 114, -40); c.lineTo(112, -34); c.quadraticCurveTo(10, -18, -104, -28); c.closePath(); c.fill();
     c.fillStyle = 'rgba(255,255,255,0.25)'; c.beginPath(); c.moveTo(-90, -24); c.quadraticCurveTo(0, -14, 96, -30); c.lineTo(96, -27); c.quadraticCurveTo(0, -10, -90, -20); c.closePath(); c.fill();
     c.fillStyle = '#ffd23f'; c.font = 'bold 13px sans-serif'; c.textAlign = 'center'; c.fillText('JUCA', 40, -2);
-    c.restore();
-    return { x: 26, y: -68 + bob };
   }
   function lili(c, t) {
     // origem: centro da ilhota na linha da água; a menina senta na beira esquerda e olha para a esquerda
@@ -342,6 +350,12 @@
     c.fillStyle = '#4aa84a'; [[60, -40], [90, -30], [-40, -32]].forEach(function (p) { for (var i = -2; i <= 2; i++) { c.beginPath(); c.moveTo(p[0] + i * 3, p[1]); c.lineTo(p[0] + i * 5, p[1] - 12 + Math.abs(i) * 2); c.lineTo(p[0] + i * 3 + 2, p[1]); c.fill(); } });
     c.fillStyle = '#ffd1dc'; elipse(c, 108, -8, 4, 3); c.fill(); c.fillStyle = '#fff3c4'; elipse(c, -58, -6, 3.5, 2.5); c.fill();
     coqueiro(c, 92, -36, 140, -0.2, false);
+    if (IMG.lili) {
+      var ml = personagemImg(c, 'lili', t, true);
+      c.fillStyle = '#8a5a20'; c.font = 'bold 13px sans-serif'; c.textAlign = 'center'; c.fillText('LILI', 30, -6);
+      c.restore();
+      return ml;
+    }
     c.translate(0, bob);
     var pele = '#9a5b34', bal = Math.sin(t * 2.2) * 0.25;
     [[-46, 0], [-34, 1]].forEach(function (p, i) { c.save(); c.translate(p[0], -34); c.rotate(0.35 + (i ? -bal : bal)); c.fillStyle = pele; c.fillRect(-4, 0, 9, 30); c.fillStyle = '#c0392b'; elipse(c, -3, 31, 8, 5); c.fill(); c.restore(); });   // sapatilhas vermelhas
@@ -380,6 +394,14 @@
   function lugar(E, j) {
     var pt = R.ponta(E, j), e = escala(), dir = E.j[j].lado === 'dir';
     return { x: pt.x + (dir ? 150 : -122) * e * (A.W >= H ? 1 : 0.85), y: E.sup, e: e, dir: dir };
+  }
+  // onde ficam as mãos em cada imagem (fração da largura e da altura), para a vara sair delas
+  var MAOS = { juca: [0.74, 0.5], lili: [0.24, 0.52] };
+  function personagemImg(c, id, t, dir) {
+    var im = IMG[id], alt = 175, larg = alt * im.naturalWidth / im.naturalHeight, bob = dir ? Math.sin(t * 1.1) * 1.2 : 0;   // o Juca já balança com o barco
+    var x0 = dir ? -62 - larg / 2 : -22 - larg / 2, y0 = -alt + (dir ? -30 : 4) + bob;
+    c.drawImage(im, x0, y0, larg, alt);
+    return { x: x0 + MAOS[id][0] * larg, y: y0 + MAOS[id][1] * alt };
   }
   function personagem(c, E, j, t) {
     var L = lugar(E, j), pt = R.ponta(E, j);
@@ -847,16 +869,29 @@
     polvo: '#ff5fa2', lagosta: '#ff8a3a', caranguejo: '#ff6a3a', morsa: '#9fd0ff', bau: '#ffcc33', garrafa: '#9ff7ff', 'agua-viva': '#ff9ff0' };
   var ALTURA = { orca: 0.95, 'cavalo-marinho': 1.05, 'agua-viva': 1.1, polvo: 1.0, caranguejo: 1.0, lagosta: 0.9, tartaruga: 0.9, morsa: 1.0, baleia: 0.9, lanterna: 1.25, sereia: 0.8, baleia: 1.0, bota: 1.0, bau: 0.9, pneu: 0.9, sacola: 0.9 };
   function pintarBicho(c, id, k) { (PINTA[id] || PINTA.lambari)(c, k); }
+  // imagens 3D geradas com IA (img/<id>.webp, ver CREDITOS.md): quando carregam, tomam o lugar do desenho feito no código;
+  // sem elas (arquivo que não abriu), o jogo continua com o desenho do código
+  var IMG = {};
+  function carregarImagens(base) {
+    if (typeof Image === 'undefined') return;
+    R.BICHOS.map(function (b) { return b.id; }).concat(['juca', 'lili', 'mergulhador']).forEach(function (id) {
+      var im = new Image(); im.onload = function () { IMG[id] = im; A.sprites = {}; }; im.src = base + id + '.webp';
+    });
+  }
   // a tira de quadros de um bicho num tamanho (px de comprimento): cada quadro com as nadadeiras numa fase, o corpo
   // ondulando (colunas de 1 px deslocadas por uma onda que corre da cabeça para o rabo) e o brilho dos bichos do fundo
   function sprite(id, comp) {
     var chave = id + ':' + Math.round(comp), sp = A.sprites[chave];
     if (sp) return sp;
-    var d = R.POR_ID[id] || { alt: 0.5 }, w = Math.ceil(comp * 1.6), h = Math.ceil(comp * (ALTURA[id] || Math.max(0.95, d.alt * 1.9)));
+    var d = R.POR_ID[id] || { alt: 0.5 }, im = IMG[id], iw = comp * 1.08, ih = im ? iw * im.naturalHeight / im.naturalWidth : 0;
+    var w = Math.ceil(comp * 1.6), h = Math.ceil(im ? Math.max(ih * 1.3, comp * 0.5) : comp * (ALTURA[id] || Math.max(0.95, d.alt * 1.9)));
     var cv = tela(w * QUADROS, h), c = cv.getContext('2d'), b1 = tela(w, h), c1 = b1.getContext('2d'), b2 = tela(w, h), c2 = b2.getContext('2d');
-    var onda = ONDA[id] != null ? ONDA[id] : 0.045, brilho = BRILHO[id], cabeca = w / 2 + comp * 0.5;
+    var onda = (ONDA[id] != null ? ONDA[id] : 0.045) * (im ? 1.25 : 1), brilho = BRILHO[id], cabeca = w / 2 + comp * 0.5;
     for (var q = 0; q < QUADROS; q++) {
-      c1.clearRect(0, 0, w, h); c1.save(); c1.translate(w / 2, h / 2); c1.scale(comp / 100, comp / 100); pintarBicho(c1, id, q / QUADROS); c1.restore();
+      c1.clearRect(0, 0, w, h); c1.save(); c1.translate(w / 2, h / 2);
+      if (im) { var resp = 1 + 0.03 * Math.sin(q / QUADROS * TAU); c1.scale(1, resp); c1.drawImage(im, -iw / 2, -ih / 2, iw, ih); }   // a imagem 3D "respira" e ondula
+      else { c1.scale(comp / 100, comp / 100); pintarBicho(c1, id, q / QUADROS); }
+      c1.restore();
       var fonte = b1;
       if (brilho) { c2.clearRect(0, 0, w, h); c2.shadowColor = brilho; c2.shadowBlur = Math.max(4, comp * 0.07); c2.drawImage(b1, 0, 0); c2.shadowBlur = 0; fonte = b2; }
       if (!onda) { c.drawImage(fonte, w * q, 0); continue; }
@@ -966,6 +1001,15 @@
     if (f > 1) { M.ini = -1; M.prox = t + 18 + Math.random() * 14; return; }
     var x = M.dir > 0 ? -150 + f * (W + 300) : W + 150 - f * (W + 300), y = M.y + Math.sin(t * 0.9) * 10, e = escala() * 0.9, k = t * 1.4;
     c.save(); c.translate(x, y); c.scale(M.dir * e, e);
+    if (IMG.mergulhador) {
+      c.globalCompositeOperation = 'lighter';
+      c.fillStyle = grad(c, 60, 0, 230, 0, [[0, 'rgba(255,250,200,0.35)'], [1, 'rgba(255,250,200,0)']]); c.beginPath(); c.moveTo(60, 0); c.lineTo(230, -55); c.lineTo(230, 60); c.closePath(); c.fill();
+      c.globalCompositeOperation = 'source-over';
+      var im = IMG.mergulhador, lw = 150, lh = lw * im.naturalHeight / im.naturalWidth;
+      c.rotate(Math.sin(t * 1.4) * 0.05); c.drawImage(im, -lw / 2, -lh / 2, lw, lh);
+      c.restore();
+      return;
+    }
     c.globalCompositeOperation = 'lighter';   // facho da lanterna
     c.fillStyle = grad(c, 40, 0, 200, 0, [[0, 'rgba(255,250,200,0.35)'], [1, 'rgba(255,250,200,0)']]); c.beginPath(); c.moveTo(40, 2); c.lineTo(210, -50); c.lineTo(210, 60); c.closePath(); c.fill();
     c.globalCompositeOperation = 'source-over';
@@ -1034,6 +1078,7 @@
   /* =================================================================== API */
   function preparar(canvas, larg, alt, dpr, op) {
     op = op || {}; A.per = PERIODOS[op.periodo] || PERIODOS.dia; A.cen = op.cenario || 'roca';
+    if (!A.carregou) { A.carregou = true; carregarImagens(op.imagens || 'img/'); }
     A.dpr = Math.min(2, dpr || 1); A.s = alt / H; A.W = H * larg / alt; A.sup = A.W >= H ? 270 : 230;
     canvas.width = Math.round(larg * A.dpr); canvas.height = Math.round(alt * A.dpr);
     A.sprites = {}; A.fundo = pintarFundo(); prepararVivos();
