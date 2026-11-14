@@ -20,6 +20,15 @@ Party, Disco Lounge, Movement Proposition e Sunflower Dance Party (eletrônicas)
 Desenhos das plantas do pomar e da horta (macieira, laranjeira, limoeiro, bananeira com o cacho e o coração, pé de morango,
 parreira, pé de cenoura, pé de batata, tomateiro com estaca, alface, cheiro-verde): **originais, feitos em código** (`desenhos.js`).
 
+## Voz gravada da Dona Cida (v0.6.1)
+
+Pedido do dono (14/Nov/2026): no Samsung dele a vovó falava com voz de homem (a voz do aparelho). As 14 frases dela
+(`voz/cida-*.mp3`) foram gravadas com a voz feminina **`pf_dora`** (português do Brasil) do **Kokoro-82M**
+(hexgrad, https://huggingface.co/hexgrad/Kokoro-82M), modelo de voz livre com licença **Apache 2.0**, que permite
+uso pessoal e comercial (os áudios gerados não têm restrição). Geradas com `kokoro-onnx` (MIT), velocidade 0,88,
+e convertidas para MP3 mono de 48 kbps com o ffmpeg. Frase nova da vovó = gerar o mp3 com o mesmo jeito, pôr no
+`sw.js` e chamar `fala(pt, en, fila, 'chave')`.
+
 ## Fotos de comida de verdade (v0.6.0)
 
 Pedido do dono (14/Nov/2026): a foto de cada receita e de cada ingrediente (o pão de queijo aparece como pão de queijo, e
