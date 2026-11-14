@@ -2,9 +2,22 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.14.0",
+      "data": "14/Nov/2026",
+      "hora": "01:20:00",
+      "pt": [
+        "🏎️ O menu agora tem a corrida de demonstração rodando atrás, a mesma da abertura, sem parar quando você entra.",
+        "🎵 Escolha a música no menu: ⏮ e ⏭ para trocar, ou toque no nome para ver a lista inteira. A música escolhida continua tocando na corrida."
+      ],
+      "en": [
+        "🏎️ The menu now has the demo race running behind it, the same one from the opening, without stopping when you go in.",
+        "🎵 Pick the music in the menu: ⏮ and ⏭ to switch, or tap the name to see the whole list. The song you pick keeps playing in the race."
+      ]
+    },
+    {
       "versao": "1.13.0",
       "data": "14/Nov/2026",
-      "hora": "12:00:00",
+      "hora": "00:50:00",
       "pt": [
         "🧊 Veículos novos em 3D de verdade: furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer e galinha. Na curva aparece a lateral e na descida dá para ver o teto; pelas janelas de vidro dá para ver o piloto.",
         "🥚 Ovo Corredor: o ovo da cantiga antiga correndo sozinho, sem carro.",
