@@ -2,6 +2,23 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.38",
+      "data": "14/Nov/2026",
+      "hora": "14:00:00",
+      "pt": [
+        "🪵 Papai e mamãe no Pula e abaixa (com 1 pessoa): o papai fica à direita (ele vê o tronco e o galho primeiro e mostra o que fazer) e a mamãe à esquerda. Os dois pulam o tronco e abaixam do galho com o mesmo movimento do boneco (joelhos dobrados, olhando para cima) e falam com você (\"Upa!\", \"Abaixa!\", \"Faz igual ao papai!\").",
+        "🎉 Eles comemoram quando você acerta (gol, chute, desviou, pegou um bicho), cada um do seu jeito: o papai pula com os dois braços para cima, a mamãe bate palmas dando pulinhos, os dois sorrindo (\"Isso aí, campeã(o)!\", \"Muito bem, meu amor!\"). Na piscina de bolinhas do Chuta-chuta, quem está sentado também comemora.",
+        "😢 Quando você se machuca, os dois colocam as mãos na cabeça e fazem carinha triste, com lagriminha (\"Ih! Machucou?\", \"Tudo bem, meu amor?\").",
+        "🤸 No pulo, os braços do boneco agora vão para cima e para trás, sem tapar o rosto."
+      ],
+      "en": [
+        "🪵 Dad and Mom in Jump and duck (1 player): Dad stands on the right (he sees the log and the branch first and shows what to do) and Mom on the left. Both jump over the log and duck under the branch with the same moves as the puppet (knees bent, looking up) and talk to you (\"Hop!\", \"Duck!\", \"Do like Dad!\").",
+        "🎉 They celebrate when you score (goal, kick, dodge, catching a critter), each in their own way: Dad jumps with both arms up, Mom claps with little hops, both smiling (\"That's it, champ!\", \"Well done, sweetie!\"). In the Kick ball pit, whoever is seated celebrates too.",
+        "😢 When you get hurt, both put their hands on their heads and make a sad little face, with a tear (\"Oops! Did it hurt?\", \"Are you okay, sweetie?\").",
+        "🤸 When jumping, the puppet's arms now go up and back, without covering the face."
+      ]
+    },
+    {
       "versao": "0.8.37",
       "data": "14/Nov/2026",
       "hora": "13:00:00",
