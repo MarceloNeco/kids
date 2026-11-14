@@ -2,6 +2,20 @@
   "app": "rabiscolandia",
   "versoes": [
     {
+      "versao": "0.1.16",
+      "data": "14/Nov/2026",
+      "hora": "15:20:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante (o Rabisquinho fala no idioma escolhido)"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf (Scribbly speaks the chosen language)"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería (Rabisquinho habla en el idioma elegido)"
+      ]
+    },
+    {
       "versao": "0.1.15",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

@@ -195,14 +195,15 @@ test('celular em pé: arrastando o dedo no Médio e no Difícil', async () => {
   await pg.fechar();
 });
 
-test('computador: arrastando com o mouse, teclado e inglês', async () => {
-  const pg = await abrir({ viewport: { width: 1280, height: 800 } });
-  await pg.click('#btLingua');
+const idioma = c => "localStorage.setItem('bolinho:idioma', '" + c + "');";   // a escolha da estante (../idioma.js)
+test('computador: arrastando com o mouse, teclado e inglês (escolhido na estante)', async () => {
+  const pg = await abrir({ viewport: { width: 1280, height: 800 } }, idioma('en'));
+  assert.equal(await pg.$('#btLingua'), null, 'o jogo não tem botão de idioma: a escolha é na estante');
   assert.equal(await pg.textContent('.n-nome'), 'Easy');
   await pg.click('#btDificil');
   await conferirLayout(pg, 'computador Difícil');
   const pista = await pg.textContent('#pista');
-  const ok = await pg.evaluate(p => EnigmasRodadas.dificil.some(r => r[0].replace(/^(pt|en):/, '').split('|')[1] === p), pista);
+  const ok = await pg.evaluate(p => EnigmasRodadas.dificil.some(r => r[0].replace(/^(pt|en|es):/, '').split('|')[1] === p), pista);
   assert.ok(ok, 'pista em inglês: ' + pista);
   await pg.screenshot({ path: FOTOS + 'enigmas-computador.png' });
   await porMouse(pg);
@@ -273,15 +274,15 @@ test('sem localStorage (modo privado travado) o jogo continua', async () => {
   await pg.fechar();
 });
 
-// Todas as rodadas de todos os níveis, em PT e EN, no celular em pé (390 e 320 px) e deitado: nenhuma carta sai da
+// Todas as rodadas de todos os níveis, em PT, EN e ES, no celular em pé (390 e 320 px) e deitado: nenhuma carta sai da
 // tela e nenhuma palavra quebra no meio nem sai da carta. (Achados de 06/Nov/2026: uma palavra comprida empurrava a
 // carta da direita para fora em 390 px; depois as palavras quebravam no meio com hífen.) Em 390 px confere também o
 // modo 🔤 só desenhos: palavras escondidas e desenhos dentro das cartas.
-test('todas as rodadas cabem na tela do celular, em pé e deitado, em português e inglês', async () => {
+test('todas as rodadas cabem na tela do celular, em pé e deitado, em português, inglês e espanhol', async () => {
   for (const vp of [{ width: 390, height: 844 }, { width: 320, height: 640 }, { width: 844, height: 390 }]) {
-    for (const lingua of ['pt', 'en']) {
-      const pg = await abrir({ viewport: vp, hasTouch: true, isMobile: true });
-      if (lingua === 'en') await pg.click('#btLingua');
+    for (const lingua of ['pt', 'en', 'es']) {
+      const pg = await abrir({ viewport: vp, hasTouch: true, isMobile: true }, idioma(lingua));
+      assert.equal(await pg.evaluate(() => document.documentElement.lang.slice(0, 2)), lingua);
       for (const n of ['facil', 'medio', 'dificil']) {
         const ids = await pg.evaluate(n => EnigmasDebug.ids(n), n);
         assert.ok(ids.length >= 30, n + ' ' + lingua + ': ' + ids.length + ' rodadas');

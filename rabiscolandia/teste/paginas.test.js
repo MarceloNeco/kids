@@ -5,9 +5,9 @@ const P = require('../paginas.js');
 
 const catIds = new Set(P.CATEGORIAS.map(c => c.id));
 
-test('categorias: id, nome em PT e EN e ícone', () => {
+test('categorias: id, nome em PT, EN e ES e ícone', () => {
   assert.ok(P.CATEGORIAS.length > 0);
-  for (const c of P.CATEGORIAS) assert.ok(c.id && c.pt && c.en && c.ico, 'categoria incompleta ' + c.id);
+  for (const c of P.CATEGORIAS) assert.ok(c.id && c.pt && c.en && c.es && c.ico, 'categoria incompleta ' + c.id);
 });
 
 test('lista: pelo menos 18 desenhos de pelo menos 4 categorias', () => {
@@ -20,7 +20,7 @@ test('cada desenho: id, nomes, categoria e paleta', () => {
   for (const p of P.LISTA) {
     assert.match(p.id, /^[a-z0-9-]+$/, 'id fora do formato: ' + p.id);
     assert.ok(!ids.has(p.id), 'id repetido ' + p.id); ids.add(p.id);
-    assert.ok(typeof p.pt === 'string' && p.pt.trim() && typeof p.en === 'string' && p.en.trim(), p.id + ' sem nome');
+    assert.ok(typeof p.pt === 'string' && p.pt.trim() && typeof p.en === 'string' && p.en.trim() && typeof p.es === 'string' && p.es.trim(), p.id + ' sem nome');
     assert.ok(catIds.has(p.cat), p.id + ': categoria desconhecida ' + p.cat);
     assert.ok(Array.isArray(p.cores) && p.cores.length >= 5 && p.cores.length <= 12, p.id + ': paleta com ' + (p.cores || []).length + ' cores');
     for (const c of p.cores) assert.match(c, /^#[0-9a-f]{6}$/i, p.id + ': cor ' + c);
@@ -53,7 +53,7 @@ test('cada desenho: 2 ou 3 variações do mesmo tamanho da paleta', () => {
   for (const p of P.LISTA) {
     assert.ok(Array.isArray(p.variacoes) && p.variacoes.length >= 2 && p.variacoes.length <= 3, p.id + ': variações');
     for (const v of p.variacoes) {
-      assert.ok(v.pt && v.en, p.id + ': variação sem nome');
+      assert.ok(v.pt && v.en && v.es, p.id + ': variação sem nome');
       assert.equal(v.cores.length, p.cores.length, p.id + '/' + v.pt + ': tamanho da paleta');
       for (const c of v.cores) assert.match(c, /^#[0-9a-f]{6}$/i, p.id + '/' + v.pt + ': cor ' + c);
     }

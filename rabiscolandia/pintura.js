@@ -27,19 +27,19 @@
   var CONTORNO = 7;                                                // espessura do contorno (caixa 1000)
 
   var PINCEIS = [
-    { id: 'canetinha', ico: '🖊️', pt: 'Canetinha', en: 'Marker' },
-    { id: 'lapis', ico: '✏️', pt: 'Lápis', en: 'Pencil' },
-    { id: 'giz', ico: '🖍️', pt: 'Giz de cera', en: 'Crayon' },
-    { id: 'pincel', ico: '🖌️', pt: 'Pincel macio', en: 'Soft brush' },
-    { id: 'spray', ico: '💨', pt: 'Spray', en: 'Spray' },
-    { id: 'arcoiris', ico: '🌈', pt: 'Arco-íris vivo', en: 'Live rainbow', vivo: true },
-    { id: 'neon', ico: '💡', pt: 'Neon que pisca', en: 'Glowing neon', vivo: true },
-    { id: 'purpurina', ico: '✨', pt: 'Purpurina', en: 'Glitter', vivo: true },
-    { id: 'minhoca', ico: '🐛', pt: 'Minhoca dançante', en: 'Dancing worm', vivo: true },
-    { id: 'balde', ico: '🪣', pt: 'Balde de tinta', en: 'Paint bucket' },
-    { id: 'borracha', ico: '🧽', pt: 'Borracha (apaga traços, adesivos e animados)', en: 'Eraser (erases strokes, stickers and animations)' },
-    { id: 'adesivo', ico: '⭐', pt: 'Adesivo', en: 'Sticker' },
-    { id: 'mover', ico: '✋', pt: 'Mover adesivo', en: 'Move sticker' }
+    { id: 'canetinha', ico: '🖊️', pt: 'Canetinha', en: 'Marker', es: 'Rotulador' },
+    { id: 'lapis', ico: '✏️', pt: 'Lápis', en: 'Pencil', es: 'Lápiz' },
+    { id: 'giz', ico: '🖍️', pt: 'Giz de cera', en: 'Crayon', es: 'Cera de colores' },
+    { id: 'pincel', ico: '🖌️', pt: 'Pincel macio', en: 'Soft brush', es: 'Pincel suave' },
+    { id: 'spray', ico: '💨', pt: 'Spray', en: 'Spray', es: 'Espray' },
+    { id: 'arcoiris', ico: '🌈', pt: 'Arco-íris vivo', en: 'Live rainbow', es: 'Arcoíris vivo', vivo: true },
+    { id: 'neon', ico: '💡', pt: 'Neon que pisca', en: 'Glowing neon', es: 'Neón que parpadea', vivo: true },
+    { id: 'purpurina', ico: '✨', pt: 'Purpurina', en: 'Glitter', es: 'Purpurina', vivo: true },
+    { id: 'minhoca', ico: '🐛', pt: 'Minhoca dançante', en: 'Dancing worm', es: 'Gusano bailarín', vivo: true },
+    { id: 'balde', ico: '🪣', pt: 'Balde de tinta', en: 'Paint bucket', es: 'Cubo de pintura' },
+    { id: 'borracha', ico: '🧽', pt: 'Borracha (apaga traços, adesivos e animados)', en: 'Eraser (erases strokes, stickers and animations)', es: 'Goma de borrar (borra trazos, pegatinas y animaciones)' },
+    { id: 'adesivo', ico: '⭐', pt: 'Adesivo', en: 'Sticker', es: 'Pegatina' },
+    { id: 'mover', ico: '✋', pt: 'Mover adesivo', en: 'Move sticker', es: 'Mover pegatina' }
   ];
   var VIVO = {}; PINCEIS.forEach(function (p) { if (p.vivo) VIVO[p.id] = 1; });
 
