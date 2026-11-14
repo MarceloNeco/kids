@@ -2,6 +2,23 @@
   "app": "batalha-naval",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "14/Nov/2026",
+      "hora": "15:20:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante",
+        "👫 Jogando com amigos, cada aparelho mostra a partida no idioma que escolheu"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, picked on the shelf",
+        "👫 Playing with friends, each device shows the game in its own chosen language"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería",
+        "👫 Jugando con amigos, cada dispositivo muestra la partida en el idioma que eligió"
+      ]
+    },
+    {
       "versao": "0.3.3",
       "data": "07/Nov/2026",
       "hora": "12:00:00",
