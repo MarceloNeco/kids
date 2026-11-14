@@ -20,11 +20,12 @@
   Lista de jogos: catalogo.js (uma entrada por jogo monta estante + TV). Rádio: radio.js (a música favorita
   sem internet vem do Trilha.offline, em trilha.js). Instalar + guardar
   todos: jogos.js e instalar.js. Controle da TV: kids.js. Tela cheia: tela-cheia.js.
+  🎵 Biblioteca de músicas: biblioteca.js + biblioteca-musicas.js (gerado: node ferramentas/biblioteca-musicas.js).
 -->
 </head>
 <body>
 <div class="wrap">
-  <div class="idiomas-topo" data-idiomas></div>
+  <div class="barra-topo"><button type="button" class="bt-biblioteca" id="btBiblioteca"><span class="pt">🎵 Músicas</span><span class="en">🎵 Music</span><span class="es">🎵 Música</span></button><div class="idiomas-topo" data-idiomas></div></div>
   <div class="marca"><span>🍩</span> SolverONE <span class="pt">apresenta</span><span class="en">presents</span><span class="es">presenta</span></div>
   <h1>Bolinho de Chuva</h1>
   <p class="sub"><span class="pt">Brincadeiras para criança e família, sem cadastro e sem anúncio: histórias para dormir, dança e jogos em que se brinca com o corpo todo na frente da TV.</span><span class="en">Games for kids and families, with no sign-up and no ads: bedtime stories, dancing and games you play with your whole body in front of the TV.</span><span class="es">Juegos para niños y familias, sin registro y sin anuncios: cuentos para dormir, baile y juegos en los que te mueves con todo el cuerpo frente a la tele.</span></p>
@@ -49,6 +50,8 @@
 <script src="/kids/trilha.js"></script>
 <script src="/kids/radio.js"></script>
 <script src="/kids/tela-cheia.js"></script>
-<script src="/kids/versao.js" data-alvo="footer" data-versao="23" data-prefixo="Bolinho de Chuva ·" defer></script>
+<script src="/kids/biblioteca-musicas.js"></script>
+<script src="/kids/biblioteca.js"></script>
+<script src="/kids/versao.js" data-alvo="footer" data-versao="25" data-prefixo="Bolinho de Chuva ·" defer></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
   "app": "baguncolandia",
   "versoes": [
     {
-      "versao": "0.8.40",
+      "versao": "0.8.41",
       "data": "14/Nov/2026",
       "hora": "17:00:00",
       "pt": [
@@ -15,6 +15,7 @@
         "🏠 Pantalla de inicio más sencilla, en dos pasos y sin tener que bajar en el móvil: primero \"¿Dónde jugamos?\" (📱 Solo en el móvil, lo más habitual, o 📺 Con la TV); luego \"¿cómo?\": en el móvil, 👆 Con el dedo o 🤸 Con el cuerpo (cámara); con la TV, 📺 Esta es la TV o 📱 Este es el móvil. ← Atrás (y el botón Atrás del móvil) vuelve al primer paso."
       ]
     },
+    {"versao": "0.8.40", "data": "14/Nov/2026", "hora": "16:40:00", "pt": ["↩️ O Voltar do celular continua com o aviso próprio da Bagunçolândia (\"toque de novo para sair\"); a peça comum da navegação, que agora faz isso em todos os jogos, não repete o aviso aqui."], "en": ["↩️ The phone's Back button keeps Mayhemland's own warning (\"tap again to leave\"); the shared navigation piece, which now does this in every game, doesn't repeat it here."], "es": ["↩️ El botón Atrás del móvil mantiene el aviso propio de Alborotolandia (\"toca otra vez para salir\"); la pieza común de navegación, que ahora lo hace en todos los juegos, no lo repite aquí."]},
     {
       "versao": "0.8.39",
       "data": "14/Nov/2026",
