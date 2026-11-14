@@ -4,7 +4,8 @@
    - Toca uma música por vez; ao tocar, pausa a rádio da estante.
    - Fecha no ✕, no Esc e no Voltar do celular (entrada no histórico ao abrir).
    - Textos em PT/EN/ES pelo idioma.js; os nomes das músicas ficam como o autor publicou.
-   - Sem internet, a música que não estiver guardada no aparelho avisa "precisa de internet".
+   - Sem internet, toca a cópia guardada no aparelho (as favoritas, Trilha.offline); a que não estiver guardada avisa
+     "precisa de internet".
    - "✓ No jogo" / "🚫 Fora" (dono, 14/Nov/2026): tira a música do repertório daquele jogo neste aparelho
      (Trilha.desligar do trilha.js; o jogo não a toca mais; todas fora = o jogo toca todas, nunca fica mudo). */
 (function () {
@@ -103,15 +104,37 @@
     var r = d.querySelector('.radio.tocando .r-play');
     if (r) r.click();
   }
+  // Sem internet (ou se a internet falhar), toca a cópia guardada no aparelho, se houver: as favoritas de cada jogo e da
+  // rádio ficam no cache "bolinho-musicas" (Trilha.offline, ../trilha.js). Sem cópia: "precisa de internet".
+  // (dono, 14/Nov/2026: o Bolinho FM não tocava nada sem internet, nem as músicas já guardadas)
+  var semCopia = null, procurando = {};
+  function daGuardada(url) {
+    var O = window.Trilha && Trilha.offline, abs;
+    try { abs = new URL(url, location.href).href; } catch (e) { abs = url; }
+    if (!O || !O.tocar) { semCopia = url; marcar(true); return; }
+    if (procurando[url]) return;
+    procurando[url] = 1;
+    O.tocar(audio, abs, true).then(function (ok) {
+      delete procurando[url];
+      if (tocandoUrl !== url) return;
+      if (!ok) { semCopia = url; return marcar(true); }
+      var p = audio.play();
+      if (p && p.catch) p.catch(function () { semCopia = url; marcar(true); });
+    });
+  }
   function tocar(url) {
     if (tocandoUrl === url && !audio.paused) { audio.pause(); return; }
-    if (tocandoUrl !== url) { tocandoUrl = url; audio.src = url; }
     pausarRadio();
+    if (tocandoUrl !== url || semCopia === url) {
+      tocandoUrl = url; semCopia = null;
+      if (navigator.onLine === false) { audio.pause(); return daGuardada(url); }
+      audio.src = url;
+    }
     var p = audio.play();
-    if (p && p.catch) p.catch(function () { marcar(true); });
+    if (p && p.catch) p.catch(function () { daGuardada(url); });
   }
   ['play', 'pause', 'ended'].forEach(function (ev) { audio.addEventListener(ev, function () { marcar(); }); });
-  audio.addEventListener('error', function () { marcar(true); });
+  audio.addEventListener('error', function () { if (tocandoUrl) daGuardada(tocandoUrl); });
 
   // trava a página de trás enquanto a janela está aberta (dono, 14/Nov/2026: rolar até o fim da janela não pode mexer o fundo)
   function travarFundo(sim) {
