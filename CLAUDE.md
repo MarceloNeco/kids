@@ -128,7 +128,9 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   no `ARQUIVOS` do `sw.js` e `BolinhoNav.iniciar({ jogo, noInicio, irParaInicio, emAndamento })` no `app.js` (detalhe no
   começo do arquivo). 🏠 só aparece fora da tela de começo e volta para ela; 🚪 sai (pergunta antes com partida rolando;
   vai para a estante `/kids/`). O Voltar do celular numa tela de dentro volta (o jogo que não cuida do histórico passa
-  `cuidarDoVoltar: true`). Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
+  `cuidarDoVoltar: true`); na tela de começo o 1º Voltar avisa "toque de novo para sair" e só o 2º sai, e a guarda do
+  histórico (posta no primeiro toque) faz o jogo voltar ao começo em vez de fechar quando o Chrome pula uma entrada (dono,
+  14/Nov/2026). Jogo com aviso próprio passa `guarda: false`. Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
   `bn-nav`/`bn-dentro` e as medidas `--nav-alto`/`--nav-largo` no `<html>`. Na TV (`?tv=`) a barra some. Vigia:
   `teste/navegacao.test.js`.
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
