@@ -1,0 +1,24 @@
+{
+  "app": "a-garra",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "14/Nov/2026",
+      "hora": "02:30:00",
+      "pt": [
+        "🧸 Jogo novo: A Garra, a máquina de pegar bichinho de pelúcia",
+        "🕹️ Leve a garra com ⬅ ➡ ou com o dedo e aperte PEGAR",
+        "🎰 Três máquinas: cabine vermelha, neon verde e estrelas azul",
+        "🟢🟡🔴 Fácil, médio e difícil, com fichas e relógio",
+        "⭐ 13 bichinhos para colecionar, com uma estrela dourada rara"
+      ],
+      "en": [
+        "🧸 New game: The Claw, the plush-grabbing machine",
+        "🕹️ Move the claw with ⬅ ➡ or your finger and press GRAB",
+        "🎰 Three machines: red booth, green neon and blue stars",
+        "🟢🟡🔴 Easy, medium and hard, with tokens and a timer",
+        "⭐ 13 plushies to collect, including a rare golden star"
+      ]
+    }
+  ]
+}

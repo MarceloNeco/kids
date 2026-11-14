@@ -32,7 +32,7 @@ function publicar(ingles) {
 }
 
 const JOGOS = ['baguncolandia/', 'peluqueria/', 'vruuum/', 'purpurina/', 'rabiscolandia/', 'campo-minado/', 'batalha-naval/',
-  'enigmas/', 'labirinto/', 'cozinha/', 'danca-na-sala.html'];
+  'enigmas/', 'labirinto/', 'cozinha/', 'a-garra/', 'danca-na-sala.html'];
 
 let srv, base, browser;
 test.before(async () => {

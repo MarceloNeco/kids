@@ -50,6 +50,8 @@ const JOGOS = [
     jogar: async (pg) => { await pg.click('#btFacil'); await pg.waitForTimeout(600); } },
   { id: 'labirinto', url: 'labirinto/?teste', capa: ['#btJogar'], alvo: '#palco',
     jogar: async (pg) => { await pg.click('#btJogar'); await pg.waitForTimeout(800); } },
+  { id: 'a-garra', url: 'a-garra/?teste', capa: ['#btJogar'], alvo: '#palco',
+    jogar: async (pg) => { await pg.click('#btJogar'); await pg.waitForTimeout(600); } },
   { id: 'danca-na-sala', url: 'danca-na-sala.html?teste', capa: ['#btTV', '#btCel', '#btSolo'], alvo: '#jogo .camBox', corpo: true,
     jogar: async (pg) => { await pg.click('#btSolo'); await pg.fill('#nome', 'Lara').catch(() => {}); await pg.click('#btEntrar'); await pg.waitForSelector('#jogo.solo', { timeout: 15000 }); await pg.waitForTimeout(800); } },
 ];
