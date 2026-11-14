@@ -76,6 +76,16 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
       assert.strictEqual(await pg.$$eval('.bc-btn, .bt-instalar', (b) => b.length), 1, 'um botão de instalar só');
       await ctx.close();
     }
+    // já instalado neste aparelho (o Chrome responde getInstalledRelatedApps): a barra some também no navegador
+    for (const [instalado, deveVer] of [[true, false], [false, true]]) {
+      const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, userAgent: UA.celular, locale: 'pt-BR', serviceWorkers: 'block' });
+      await ctx.addInitScript((i) => { localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); navigator.getInstalledRelatedApps = () => Promise.resolve(i ? [{ platform: 'webapp', url: location.origin + '/kids/manifest.webmanifest' }] : []); }, instalado);
+      await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+      const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(400);
+      assert.strictEqual(!(await pg.$eval('.bc-inst', (e) => e.hidden)), deveVer, instalado ? 'já instalado: sem barra no navegador' : 'não instalado: barra à vista');
+      await ctx.close();
+    }
+    assert.match(fs.readFileSync(path.join(raiz, 'manifest.webmanifest'), 'utf8'), /"related_applications": \[\{ "platform": "webapp", "url": "https:\/\/solverone\.com\.br\/kids\/manifest\.webmanifest" \}\]/, 'manifest diz qual é o app (webapp)');
     // janela de app: pelo ícone do Bolinho (?app=1) some tudo; dentro da janela de um JOGO instalado (🚪 do jogo leva à
     // estante, sem ?app=1) o botão aparece e ensina a abrir no Chrome para instalar
     {
@@ -99,8 +109,9 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
       assert.ok(await pg.isVisible('.bc-btn'), 'dentro de um jogo instalado: o botão aparece');
       await pg.click('.bc-btn');
       await pg.waitForSelector('.bc-fundo:not([hidden])');
-      assert.match(await pg.textContent('.bc-corpo'), /por dentro de um jogo instalado/);
-      assert.match(await pg.getAttribute('.bc-corpo a.bc-forte', 'href'), /^intent:\/\//, 'botão Abrir no Chrome');
+      assert.match(await pg.textContent('.bc-corpo'), /por dentro de outro app/);
+      assert.match(await pg.textContent('.bc-corpo'), /três pontinhos ⋮.*Abrir no Chrome/, 'ensina o ⋮ → Abrir no Chrome (o link intent só recarregava a página)');
+      assert.strictEqual(await pg.$('.bc-corpo a.bc-forte'), null, 'sem o botão que só recarregava');
       await ctx.close();
       assert.match(fs.readFileSync(path.join(raiz, 'manifest.webmanifest'), 'utf8'), /"start_url": "\.\/\?app=1"/, 'o ícone abre com ?app=1');
     }
