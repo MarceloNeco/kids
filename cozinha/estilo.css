@@ -949,7 +949,8 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .vila3d .zoom-bt { position: absolute; right: 8px; top: 62px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
 .vila3d .zoom-bt .mini { font-size: 1.2rem; background: rgba(255, 255, 255, .92); }
 @media (orientation: landscape) and (max-height: 32rem) {
-  .cesta .item { font-size: 1.2rem; min-width: 3rem; } .cesta .item .ces-n { display: none; }
+  .cesta .item { font-size: 1.15rem; min-width: 0; flex-direction: row; gap: 3px; padding: 1px 6px 1px 4px; border-radius: 999px; } .cesta .item .ces-n { display: none; } .cesta .item b { margin: 0; }
+  .cesta { padding-top: 3px; padding-bottom: calc(3px + var(--sb)); }
   #mapa, #lugar { padding-bottom: calc(52px + var(--sb)); }
   .vila.vila3d { height: calc(100dvh - 9.4rem); min-height: 12rem; }
   .vila3d .zoom-bt { top: 8px; right: 112px; flex-direction: row; }
