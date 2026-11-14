@@ -10,7 +10,8 @@
     (beforeinstallprompt): o toque instala na hora.
   - Onde o navegador não tem essa janela (iPhone, Mac, Firefox, tablet Fire da Amazon, TV, navegador
     dentro de outro app), o toque abre o passo a passo daquele aparelho, detectado sem perguntar.
-  - Já aberto como aplicativo (pelo ícone), o botão some. No navegador ele fica sempre à vista ("Já instalei" só o
+  - Já aberto como aplicativo (pelo ícone), o botão some. No navegador, se o Chrome disser que o Bolinho já está
+    instalado neste aparelho (getInstalledRelatedApps), também some. No navegador ele fica sempre à vista ("Já instalei" só o
     esconde nesta visita): é o único botão de instalar da estante.
   Enquanto a janela de passos está aberta, <body> ganha a classe "bc-modal" (o kids.js deixa as
   setas e o OK do controle para ela).
@@ -143,6 +144,18 @@
     '<div class="bc-botoes"><button type="button" class="bc-leve bc-ja"><span class="pt">✓ Já instalei</span><span class="en">✓ I installed it</span><span class="es">✓ Ya la he instalado</span></button></div></div>';
   document.body.appendChild(fundo);
   var corpo = fundo.querySelector('.bc-corpo');
+
+  // Já instalado neste aparelho? No Chrome do Android (e do computador) o site pode perguntar ao navegador
+  // (getInstalledRelatedApps + "related_applications" no manifest). Instalado = a barra não aparece, nem no navegador
+  // (dono, 14/Nov/2026: "o site não reconhece que tem uma instância local"). Onde o navegador não sabe responder
+  // (iPhone, Firefox), a barra continua.
+  if (navigator.getInstalledRelatedApps && !FILA) {
+    try {
+      navigator.getInstalledRelatedApps().then(function (apps) {
+        if (apps && apps.length && !pedido) { gravar('1'); barra.hidden = true; }
+      }).catch(function () {});
+    } catch (e) { /* navegador sem a pergunta */ }
+  }
 
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();

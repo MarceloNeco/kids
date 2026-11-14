@@ -6,6 +6,7 @@
   "lang": "pt-BR",
   "start_url": "./?app=1",
   "scope": "./",
+  "related_applications": [{ "platform": "webapp", "url": "https://solverone.com.br/kids/manifest.webmanifest" }],
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0b0a1f",
