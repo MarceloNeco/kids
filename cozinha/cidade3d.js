@@ -15,8 +15,15 @@ const PAISAGEM = [['rio', 'pomar', 'horta', 'galinheiro', 'vaca'], ['mercado', '
 
 let R = null;   // tudo da cidade montada: renderer, cena, câmera, lotes, ruas, quem anda...
 
+// v0.12.2: pergunta uma vez só e devolve a tela de teste (cada pergunta abria uma tela 3D escondida; passando do limite
+// do aparelho, o navegador apagava a mais antiga, a cidade, e ela ficava branca). Perdeu a cidade de vez: sem 3D.
+let tem3D = null, semVolta = false;
 function suportado() {
-  try { const c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'))); } catch (e) { return false; }
+  if (semVolta) return false;
+  if (tem3D === null) {
+    try { const c = document.createElement('canvas'); const gl = window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')); tem3D = !!gl; const x = gl && gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); } catch (e) { tem3D = false; }
+  }
+  return tem3D;
 }
 
 // ---------- materiais e peças ----------
@@ -245,8 +252,17 @@ function montar(el, op) {
   const grade = retrato ? RETRATO : PAISAGEM;
   if (R && R.host === host && R.retrato === retrato) { R.op = op; acharRotulos(el); porNaPorta(op.pos || 'casa'); continuar(); return; }
   pausar();
-  if (R && R.renderer) R.renderer.dispose();
+  if (R && R.renderer) { R.renderer.dispose(); R.renderer.forceContextLoss(); }
   const renderer = new THREE.WebGLRenderer({ antialias: true });
+  // o aparelho apagou a cidade (falta de memória, muitas telas 3D): se devolver, monta de novo; se não devolver, vira a vila desenhada
+  const tela = renderer.domElement;
+  tela.addEventListener('webglcontextlost', e => {
+    e.preventDefault(); if (!R || R.renderer !== renderer) return;
+    pausar(); const el0 = R.el, op0 = R.op;
+    R.perdida = setTimeout(() => { if (!R || R.renderer !== renderer) return; semVolta = true; R = null; window.dispatchEvent(new Event('cidade3d-pronta')); }, 2500);
+    R.remontar = () => { R = null; renderer.dispose(); montar(el0, op0); };
+  });
+  tela.addEventListener('webglcontextrestored', () => { if (!R || R.renderer !== renderer) return; clearTimeout(R.perdida); R.remontar(); });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -311,6 +327,8 @@ function acharRotulos(el) {
 function ajustarTamanho() {
   if (!R) return;
   const w = R.host.clientWidth || 300, h = R.host.clientHeight || 300;
+  // v0.12.2: em tablet grande, no máximo ~2,4 milhões de pontos (a tela 3D gigante gastava a memória do aparelho)
+  R.renderer.setPixelRatio(Math.max(1, Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(2400000 / (w * h)))));
   R.renderer.setSize(w, h, false); R.w = w; R.h = h;
 }
 function posicionarCamera() {
