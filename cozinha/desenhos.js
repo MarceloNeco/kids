@@ -25,6 +25,7 @@
     '<rect x="16" y="28" width="32" height="14" rx="4" fill="#6cc3ff"/><circle cx="24" cy="49" r="2.4" fill="#d6e6f5"/><circle cx="32" cy="50" r="2.4" fill="#d6e6f5"/><circle cx="40" cy="49" r="2.4" fill="#d6e6f5"/>');
 
   // ---------- utensílios ----------
+  S.jabuticaba = svg('<circle cx="24" cy="38" r="14" fill="#2b1030"/><circle cx="42" cy="34" r="14" fill="#3b1a3f"/><circle cx="34" cy="20" r="12" fill="#2b1030"/><ellipse cx="20" cy="32" rx="4" ry="2.6" fill="#fff" opacity=".5"/><ellipse cx="38" cy="28" rx="4" ry="2.6" fill="#fff" opacity=".5"/>');
   S.gelatina = svg('<path d="M14 12h36l-3 44H17z" fill="#ff5e7e" stroke="#c42d4f" stroke-width="3" stroke-linejoin="round"/><path d="M14 12h36" stroke="#c42d4f" stroke-width="5" stroke-linecap="round"/>' +
     '<ellipse cx="32" cy="36" rx="11" ry="9" fill="#fff" opacity=".9"/><path d="M25 38q7-8 14 0q-7 6-14 0z" fill="#e8344e"/><circle cx="29" cy="33" r="1.6" fill="#fff"/>');
   S.grelha = svg('<rect x="6" y="18" width="52" height="34" rx="5" fill="#4a5568" stroke="#2d3748" stroke-width="3"/>' +
@@ -135,13 +136,20 @@
         ' M' + x + ' ' + y + ' Q' + (x - 6) + ' ' + (y - 8) + ' ' + (x - 10) + ' ' + (y - 6) + ' M' + x + ' ' + y + ' Q' + (x + 6) + ' ' + (y - 8) + ' ' + (x + 10) + ' ' + (y - 6) + '" stroke="#3a8a30" stroke-width="1.3" fill="none" stroke-linecap="round"/>' +
         trevo(x - 12, y - 26, 0.95, -30) + trevo(x, y - 34, 1.05, 0) + trevo(x + 12, y - 26, 0.95, 30) + flor(x - 6, y - 14, 0.9) + flor(x + 7, y - 13, 0.8);
     }).join('');
+  // jaboticabeira (v0.10.0, referência do dono): tronco claro e liso, galhos abertos e copa pequena lá em cima; a
+  // jabuticaba nasce GRUDADA no tronco e nos galhos grossos (o jogo ensina isso)
+  PL.jaboticabeira = chao() +
+    '<path d="M42 113 Q44 92 43 74 Q38 62 26 52 L29 48 Q40 56 46 64 Q48 52 47 40 L53 40 Q53 54 54 63 Q61 52 72 46 L74 50 Q62 58 57 72 Q56 92 58 113 Z" fill="#c9b49a" stroke="#8a7458" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M45 104 q3 -2 5 0 M52 90 q3 -2 4 1 M46 80 q2 -2 4 0" stroke="#a8927a" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
+    moita([[50, 26, 17], [30, 36, 12], [70, 34, 12], [38, 18, 11], [62, 18, 11]], ['#a5e070', '#5cb845', '#3d8a32']);
   var FRUTOS = {
     macieira: [[30, 36], [69, 34], [36, 62], [66, 60]],
     laranjeira: [[30, 36], [69, 34], [36, 62], [66, 60]],
     limoeiro: [[28, 52], [72, 50], [42, 72], [64, 74]],
     bananeira: [[72, 58], [72, 78]],
     parreira: UVAS,
-    morangueiro: [[11, 98], [37, 101], [63, 101], [89, 98]]
+    morangueiro: [[11, 98], [37, 101], [63, 101], [89, 98]],
+    jaboticabeira: [[48, 104], [53, 88], [46, 72], [30, 55], [71, 53]]
   };
   function planta(id) { return PL[id] ? '<svg class="pl-desenho" viewBox="0 0 100 125" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">' + PL[id] + '</svg>' : ''; }
   // a "penca" de bananas (os dedos apontam para cima, como no cacho de verdade). Verde = ainda não está madura.
@@ -151,7 +159,26 @@
       return '<path d="M' + (x - 3.5) + ' 30 Q' + (x - 5 + dx * 0.4) + ' 16 ' + (x + dx - 1.5) + ' 5 L' + (x + dx + 1.8) + ' 4.5 Q' + (x + 3 + dx * 0.4) + ' 16 ' + (x + 3.5) + ' 30 Z" fill="#ffd23f" stroke="#b88a00" stroke-width="1.3" stroke-linejoin="round"/>' +
         '<path d="M' + (x + dx - 1.4) + ' 5.6 L' + (x + dx + 1.6) + ' 5" stroke="#5c3a1a" stroke-width="2.2" stroke-linecap="round"/>';
     }).join('') + '</svg>';
-  function fruto(ing) { return ing === 'banana' ? '<span class="ic ic-svg">' + S.penca + '</span>' : null; }
+  // frutas "de massinha" (v0.9.0, referência do dono): bolinhas gordinhas com gradiente, brilho e folhinha, no pé
+  function grad(id, cor, claro, escuro) { return '<radialGradient id="' + id + '" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="' + claro + '"/><stop offset=".55" stop-color="' + cor + '"/><stop offset="1" stop-color="' + escuro + '"/></radialGradient>'; }
+  function brilho(x, y) { return '<ellipse cx="' + x + '" cy="' + y + '" rx="4.5" ry="3" fill="#fff" opacity=".55" transform="rotate(-30 ' + x + ' ' + y + ')"/>'; }
+  var FOLHA = '<path d="M33 9 q9 -7 16 -2 q-7 7 -16 2z" fill="#4caf50" stroke="#2e7d32" stroke-width="1"/><path d="M32 6 v6" stroke="#6b4423" stroke-width="2.4" stroke-linecap="round"/>';
+  var MASSINHA = {
+    laranja: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gLar', '#ff9a1f', '#ffd27a', '#e06a00') + '</defs><circle cx="32" cy="36" r="24" fill="url(#gLar)"/>' + brilho(23, 26) + '<circle cx="32" cy="14" r="2" fill="#8a5a2b"/>' + FOLHA + '</svg>',
+    maca: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gMac', '#e8342e', '#ff8f80', '#a11a16') + '</defs><path d="M32 16 C18 8 6 20 9 36 C12 54 24 60 32 56 C40 60 52 54 55 36 C58 20 46 8 32 16Z" fill="url(#gMac)"/>' + brilho(21, 26) + FOLHA + '</svg>',
+    limao: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gLim', '#ffe03a', '#fff6a8', '#c9a800') + '</defs><ellipse cx="32" cy="36" rx="26" ry="19" fill="url(#gLim)"/><path d="M5 36 l-3 0 M59 36 l3 0" stroke="#c9a800" stroke-width="4" stroke-linecap="round"/>' + brilho(22, 28) + FOLHA + '</svg>',
+    morango: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gMor', '#ff2f4f', '#ff9aa8', '#b3001f') + '</defs><path d="M32 60 C14 46 8 30 14 20 C20 12 44 12 50 20 C56 30 50 46 32 60Z" fill="url(#gMor)"/>' +
+      [[22, 26], [32, 24], [42, 26], [26, 36], [38, 36], [32, 46], [20, 32], [44, 32]].map(function (p) { return '<ellipse cx="' + p[0] + '" cy="' + p[1] + '" rx="1.4" ry="2" fill="#ffe38a"/>'; }).join('') +
+      '<path d="M16 18 q8 2 16 -6 q8 8 16 6 q-4 6 -16 4 q-12 2 -16 -4z" fill="#3fae4a" stroke="#2e7d32" stroke-width="1"/>' + brilho(22, 24) + '</svg>',
+    jabuticaba: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gJab', '#3b1a3f', '#8a5a94', '#14061a') + '</defs><circle cx="32" cy="32" r="26" fill="url(#gJab)"/>' + brilho(22, 22) + '<circle cx="32" cy="8" r="2.4" fill="#5b4636"/></svg>',
+    uva: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gUva', '#8e44ad', '#d6a6f0', '#4a1a63') + '</defs>' +
+      [[22, 20], [34, 19], [46, 21], [16, 31], [28, 31], [40, 31], [52, 32], [22, 42], [34, 42], [46, 42], [28, 52], [40, 52], [34, 61]].map(function (p) { return '<circle cx="' + p[0] + '" cy="' + (p[1] - 2) + '" r="7" fill="url(#gUva)"/>'; }).join('') +
+      '<path d="M34 12 v-8" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/><path d="M36 8 q12 -8 20 0 q-10 8 -20 0z" fill="#4caf50"/>' + brilho(19, 16) + '</svg>'
+  };
+  function fruto(ing) {
+    if (ing === 'banana') return '<span class="ic ic-svg">' + S.penca + '</span>';
+    return MASSINHA[ing] ? '<span class="ic ic-svg massinha">' + MASSINHA[ing] + '</span>' : null;
+  }
 
   // horta: a planta (com o legume, quando ele fica embaixo da terra) e o que se colhe
   var HO = {};

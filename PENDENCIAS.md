@@ -67,3 +67,12 @@ interruptor em `recursos-do-app.json`. Antes de começar cada um, fazer uma entr
 | 36 | **Quem é?**: jogo de adivinhar com o Melekento Blue e a Pink Honey (as massinhas das filhas), inspirado no formato "pense em alguém e eu descubro", com identidade própria. Primeira brincadeira: **Duelo de Caras** (cada um escolhe uma cara desenhada em segredo e pergunta até descobrir a do outro; contra a meleca, passando o aparelho ou cada um no seu celular). | Dono, 14/Nov/2026 | ✅ v0.1.0 (14/Nov/2026); pendências em `quem-e/PENDENCIAS.md` |
 | 37 | **Quem é? — A Meleca Adivinha**: a pessoa pensa em alguém e a meleca descobre (lista grande, aprende quando erra, João Alves, Infantil/Família/Adulto, voz ElevenLabs opcional). | Dono, 14/Nov/2026 | ✅ v0.2.0 (14/Nov/2026): 667 personagens; falta o dono conferir o João Alves e testar a voz animada com a chave dele (`quem-e/PENDENCIAS.md`) |
 | 38 | Mandar a **foto das massinhas** (Melekento Blue e Pink Honey) para ajustar o desenho das melecas. | Dono, 14/Nov/2026 | ⏸ aguardando o dono |
+
+## GLUB GLUB (pescaria, dono 13–14/Nov/2026)
+
+| # | Descrição | Origem | Situação |
+|---|---|---|---|
+| 39 | **GLUB GLUB**, jogo novo de pescaria (Juca e Lili, anzol em pêndulo, 28 bichos e prêmios em 3D, 3 níveis por jogador, sozinho ou em dois no mesmo aparelho, balde, bolhas de poder, “Limpa o Rio!”, álbum, 3 lugares × 3 horas do dia). Detalhe em `glub-glub/PENDENCIAS.md`. | Dono, 13/Nov/2026 | ✅ v0.1.0 (14/Nov/2026); ⏸ testar com as filhas |
+| 40 | GLUB GLUB na **TV** com celulares de controle (Entrega 2) e como **aplicativo na TV LG pelo free-my-tv**, com o celular de controle todo desenhado. | Dono, 14/Nov/2026 | 🟡 fase 2 |
+| 41 | GLUB GLUB **cada um no seu celular**, com código (Entrega 3). | Dono, 14/Nov/2026 | 🟡 |
+

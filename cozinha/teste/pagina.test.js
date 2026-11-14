@@ -57,8 +57,9 @@ test('tablet: bolo de cenoura no Fácil, juntando na horta, no galinheiro e no m
   const { ctx, pg, erros } = await abrir({ width: 800, height: 1280 }, { hasTouch: true });
   await comecar(pg, 'facil', 'bolo-cenoura');
   await noLugar(pg, 'horta');
+  // um pé de cenoura de cada vez (o .first() trocava de pé no meio quando o primeiro nascia de novo: teste instável)
   for (let i = 0; i < 2; i++) {
-    const planta = pg.locator('.planta[data-ing="cenoura"]:not(:disabled)').first();
+    const planta = pg.locator('.planta[data-ing="cenoura"]').nth(i);
     for (let k = 0; k < 3; k++) await planta.click();
   }
   await pg.waitForFunction(() => window.Cozinha.jogo().cesta.cenoura === 2);

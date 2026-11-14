@@ -230,3 +230,25 @@ test('passando o aparelho: nomes de quem joga, a meleca avisa a troca e lê a pe
   assert.deepEqual(await pg.evaluate(() => JSON.parse(localStorage.getItem('bolinho:quem-e:pref')).nomes), ['Ana', 'Bia']);
   await ctx.close();
 });
+
+for (const vp of [{ width: 360, height: 740 }, { width: 740, height: 360 }]) {
+  test('corpo inteiro ligado: cartas altas, perguntas de roupa e tudo cabe em ' + vp.width + '×' + vp.height, async () => {
+    const pg = await abrir(vp);
+    await pg.click('#btPink'); await pg.click('#btMeleca');
+    await pg.click('#btCorpo');
+    assert.equal(await pg.getAttribute('#btCorpo', 'aria-pressed'), 'true');
+    await pg.click('#btDificil');
+    await pg.waitForSelector('#segredo.ativa');
+    await pg.click('#segredo .carta[data-id="0"]'); await pg.click('#btConfirmarSegredo');
+    await pg.waitForSelector('#jogo.ativa');
+    assert.ok(await pg.evaluate(() => QEDebug.estado() && document.querySelector('#tabuleiro .carta svg').getAttribute('viewBox').split(' ')[3] > 400), 'carta sem o corpo');
+    const r = await pg.evaluate(() => { const c = [...document.querySelectorAll('#tabuleiro .carta')].map(x => x.getBoundingClientRect()); return { fora: c.filter(b => b.bottom > innerHeight + 1 || b.right > innerWidth + 1).length, menor: Math.min(...c.map(b => b.width)), alta: c[0].height / c[0].width }; });
+    assert.equal(r.fora, 0); assert.ok(r.menor >= 28, 'estreita: ' + r.menor); assert.ok(r.alta > 1.9, 'não é alta: ' + r.alta);
+    await pg.click('#btPerguntar');
+    assert.ok(await pg.locator('#perguntas button[data-p="saia"], #perguntas button[data-p="short"], #perguntas button[data-p="calca"], #perguntas button[data-p="vestido"]').count() >= 1);
+    assert.deepEqual(pg.erros(), []);
+    // a escolha fica guardada
+    assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem('bolinho:quem-e:pref')).corpo), true);
+    await pg.ctx.close();
+  });
+}

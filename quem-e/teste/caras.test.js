@@ -54,3 +54,13 @@ test('largura e altura opcionais', () => {
   const s = C.svg(base(), { id: 'w', largura: 120, altura: 144 });
   assert.ok(s.includes('width="120"') && s.includes('height="144"'));
 });
+
+test('corpo inteiro: desenho alto, e cada peça de roupa muda o desenho', () => {
+  const b = Object.assign(base(), { baixo: 'calca', calcado: 'tenis', mochila: false, segura: null });
+  const s0 = C.svg(b, { id: 'k', corpo: true });
+  assert.ok(s0.includes('viewBox="0 0 300 620"'));
+  for (const [k, v] of [['baixo', 'saia'], ['baixo', 'short'], ['baixo', 'vestido'], ['calcado', 'bota'], ['calcado', 'descalco'], ['calcado', 'sapato'], ['mochila', true], ['segura', 'balao'], ['segura', 'bola'], ['segura', 'sorvete']])
+    assert.notEqual(C.svg(Object.assign({}, b, { [k]: v }), { id: 'k', corpo: true }), s0, k + '=' + v);
+  for (const m of s0.matchAll(/url\(#([^)]+)\)/g)) assert.ok(s0.includes(' id="' + m[1] + '"'), m[1]);
+  assert.ok(s0.length < 22000, 'pesado: ' + s0.length);
+});

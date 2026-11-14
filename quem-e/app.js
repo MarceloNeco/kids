@@ -5,7 +5,7 @@
    voz e a meleca escolhida. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0';
+  var APP_VERSION = '0.3.1';
   var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026', APP_DATA_ES = '14/nov/2026';
   var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };
@@ -137,6 +137,10 @@
       mostrar('modos');
     });
   });
+  // corpo inteiro (guardado nas preferências): cartas altas com roupa de baixo, sapato, mochila e o que segura
+  function pintarCorpo() { $('btCorpo').setAttribute('aria-pressed', String(!!pref.corpo)); }
+  $('btCorpo').addEventListener('click', function () { pref.corpo = !pref.corpo; salvarPref(); pintarCorpo(); Som.gosma(); });
+  pintarCorpo();
   $('btMeleca').addEventListener('click', function () { modo = 'meleca'; mostrar('niveis'); });
   $('btPassar').addEventListener('click', function () { modo = 'passar'; mostrar('niveis'); });
   $('btRede').addEventListener('click', function () { modo = 'rede'; telaRede(); });
@@ -161,6 +165,7 @@
   var nSvg = 0;
   function desenhar(id) {
     // carta pequena: mostra um pouco mais de perto (a cabeça, sem tanto fundo)
+    if (partida.tabuleiro.corpo) return CARAS.svg(partida.tabuleiro.caras[id], { id: 'q' + (nSvg++) + 'x', corpo: true }).replace('viewBox="0 0 300 620"', 'viewBox="22 40 256 556"');
     return CARAS.svg(partida.tabuleiro.caras[id], { id: 'q' + (nSvg++) + 'x' }).replace('viewBox="0 0 300 360"', 'viewBox="25 42 250 300"');
   }
   function montarGrade(el) {
@@ -190,11 +195,13 @@
     var area = el.parentNode; if (!area || !el.children.length || !area.clientWidth) return;
     var cs = getComputedStyle(area), pv = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom), ph = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
     var W = area.clientWidth - ph - 4, H = area.clientHeight - pv - 4, n = el.children.length, gap = W < 420 ? 4 : 7, melhor = 0, colunas = 1;
+    var prop = partida && partida.tabuleiro.corpo ? 2.36 : 1.38;   // corpo inteiro: carta alta
+    el.style.setProperty('--prop', prop);
     for (var c = 1; c <= n; c++) {
-      var lin = Math.ceil(n / c), w = Math.min((W - gap * (c - 1)) / c, ((H - gap * (lin - 1)) / lin) / 1.38);
+      var lin = Math.ceil(n / c), w = Math.min((W - gap * (c - 1)) / c, ((H - gap * (lin - 1)) / lin) / prop);
       if (w > melhor) { melhor = w; colunas = c; }
     }
-    melhor = Math.max(30, Math.floor(melhor));
+    melhor = Math.max(partida && partida.tabuleiro.corpo ? 26 : 30, Math.floor(melhor));
     el.style.setProperty('--colunas', colunas); el.style.setProperty('--carta', melhor + 'px'); el.style.setProperty('--gap', gap + 'px');
   }
   function ajustarTudo() { if (atual === 'jogo') ajustarGrade($('tabuleiro')); if (atual === 'segredo') ajustarGrade($('gradeSegredo')); }
@@ -215,7 +222,7 @@
     if (!window.SolverJanela || !partida) return;
     var c = partida.tabuleiro.caras[id], caixa = document.createElement('div');
     caixa.className = 'lupa';
-    caixa.innerHTML = CARAS.svg(c, { id: 'lupa', grande: true }) + '<p class="lupa-nome"></p><button type="button" class="grande lupa-fechar"></button>';
+    caixa.innerHTML = CARAS.svg(c, { id: 'lupa', grande: true, corpo: !!partida.tabuleiro.corpo }) + '<p class="lupa-nome"></p><button type="button" class="grande lupa-fechar"></button>';
     caixa.querySelector('.lupa-nome').textContent = c.nome;
     var bt = caixa.querySelector('.lupa-fechar'); bt.textContent = t('Fechar', 'Close', 'Cerrar');
     var j = SolverJanela.abrir({ conteudo: caixa, classe: 'qe-janela' });
@@ -228,7 +235,7 @@
   function novaPartida() {
     clearTimeout(timerMeleca); fecharSobreposicoes(); desligarLupa();
     var semente = TESTE ? 1234 : Math.floor(Math.random() * 1e9);
-    partida = QP.criar({ modo: modo, nivel: nivel, semente: semente, rnd: TESTE ? L.sorteio(5) : Math.random });
+    partida = QP.criar({ modo: modo, nivel: nivel, semente: semente, corpo: !!pref.corpo, rnd: TESTE ? L.sorteio(5) : Math.random });
     montarGrade($('gradeSegredo')); montarGrade($('tabuleiro'));
     quemSegura = 0; humorAtual = ''; humor('parada'); $('meuSegredo').removeAttribute('data-chave');
     irParaSegredo(0);
@@ -392,7 +399,7 @@
   }
 
   // ---------- perguntar ----------
-  var GRUPOS = [['quem', '👤 Quem é', '👤 Who', '👤 Quién es'], ['cabelo', '💇 Cabelo', '💇 Hair', '💇 Pelo'], ['rosto', '👀 Rosto', '👀 Face', '👀 Cara'], ['cabeca', '🎩 Na cabeça', '🎩 On the head', '🎩 En la cabeza'], ['joias', '💎 Joias', '💎 Jewelry', '💎 Joyas'], ['roupa', '👕 Roupa', '👕 Clothes', '👕 Ropa']];
+  var GRUPOS = [['quem', '👤 Quem é', '👤 Who', '👤 Quién es'], ['cabelo', '💇 Cabelo', '💇 Hair', '💇 Pelo'], ['rosto', '👀 Rosto', '👀 Face', '👀 Cara'], ['cabeca', '🎩 Na cabeça', '🎩 On the head', '🎩 En la cabeza'], ['joias', '💎 Joias', '💎 Jewelry', '💎 Joyas'], ['roupa', '👕 Roupa', '👕 Clothes', '👕 Ropa'], ['corpo', '🧍 Corpo inteiro', '🧍 Whole body', '🧍 Cuerpo entero']];
   $('btPerguntar').addEventListener('click', function () { $('perguntas').hidden = false; pintar(); $('listaPerguntas').scrollTop = 0; });
   $('btFecharPerguntas').addEventListener('click', function () { fecharPainelPerguntas(); pintar(); });
   function fecharPainelPerguntas() { $('perguntas').hidden = true; }
@@ -601,7 +608,7 @@
 
   function criarSala() {
     var codigo = REDE.codigoNovo(), semente = Math.floor(Math.random() * 4e9);
-    conectar(codigo, { id: REDE.idNovo(), codigo: codigo, host: true, nivel: nivel, semente: semente });
+    conectar(codigo, { id: REDE.idNovo(), codigo: codigo, host: true, nivel: nivel, semente: semente, corpo: !!pref.corpo });
     $('redeInicio').hidden = true; $('redeSala').hidden = false; $('codigoSala').textContent = codigo;
     $('redeStatus').textContent = t('Esperando alguém entrar com o código…', 'Waiting for someone to join with the code…', 'Esperando a que alguien entre con el código…');
     mostrar('rede');

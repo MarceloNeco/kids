@@ -37,6 +37,7 @@ test('ingredientes, lugares e utensílios com textos PT, EN e ES e desenho', () 
   for (const u of D.UTENSILIOS) { assert.ok(u.pt && u.en && u.es && u.na[0] && u.na[1] && /^(en|con) (el|la|las) /.test(u.na[2]), u.id); assert.ok(ART.icone(u.id).length > 10, u.id + ' sem ícone'); }
   for (const n of D.NIVEIS) assert.ok(n.pt && n.en && n.es && n.txt[0] && n.txt[1] && n.txt[2], n.id);
   for (const f of D.FAMILIA) assert.ok(f.es, f.id + ' sem nome ES');
+  for (const l of D.LUGARES.filter(x => x.dono)) assert.ok(l.dono.length === 3 && l.dono.every(Boolean), l.id + ': dono em PT, EN e ES');
   // os lugares pedidos: rio, pomar, horta, galinheiro, vaca, mercado e vizinha
   for (const id of ['rio', 'pomar', 'horta', 'galinheiro', 'vaca', 'mercado', 'vizinha', 'casa']) assert.ok(D.lugar[id], 'falta o lugar ' + id);
 });
@@ -118,6 +119,7 @@ test('dica de adulto: faca, fogão, forno e liquidificador avisam', () => {
 const ONDE = {
   banana: ['pomar', 'bananeira', 'bananeira'], maca: ['pomar', 'macieira', 'arvore'], laranja: ['pomar', 'laranjeira', 'arvore'],
   limao: ['pomar', 'limoeiro', 'arvore'], morango: ['pomar', 'morangueiro', 'rasteira'], uva: ['pomar', 'parreira', 'parreira'],
+  jabuticaba: ['pomar', 'jaboticabeira', 'tronco'],   // v0.10.0: grudada no tronco
   cenoura: ['horta', 'pe-cenoura', 'raiz'], batata: ['horta', 'pe-batata', 'raiz'], tomate: ['horta', 'tomateiro', 'estaca'],
   alface: ['horta', 'pe-alface', 'cabeca'], cheiro: ['horta', 'cheiro-verde', 'touceira'],
   ovo: ['galinheiro'], leite: ['vaca'], peixe: ['rio']

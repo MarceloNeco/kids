@@ -439,15 +439,16 @@
       if (nx == null) { if (jg.vai.alvo) jg.vai.alvo.solto = true; return; }
       var r = raia(j); jg.vai.alvo = { x: r.x + clamp(nx, 0, 1) * r.w, y: r.y + clamp(ny, 0, 1) * r.h };
     }
-    function teclas(j, t) {   // ⌨️ computador (💪 Difícil): ← → andam até a beira, ↑/Espaço pulam
+    function teclas(j, t) {   // ⌨️ computador (💪 Difícil): ← → andam até a beira, ↑/Espaço pulam, ↓ abaixa (enquanto segura)
       var jg = jogadores[j]; if (!vai || !jg || !t) return;
+      jg.vai.tecBaixo = !!t.baixo;
       var r = raia(j), V = jg.vai, sent = (t.dir ? 1 : 0) - (t.esq ? 1 : 0);
       V.alvo = sent ? { x: sent > 0 ? r.x + r.w : r.x, y: r.y + r.h * VAI.chao } : null;
       if (t.pulo && V.y === 0) V.vy = -Math.sqrt(2 * VAI.g * VAI.puloMax);
     }
     function corpoVai(j) {   // a caixa do corpo agora (mãos para cima quando o alvo está acima do ombro)
       var V = jogadores[j].vai, r = raia(j), pe = r.y + r.h * VAI.chao + V.y, A = VAI.A, cima = !!(V.alvo && V.alvo.y < pe - A * 0.7);
-      return { x1: V.x - A * 0.22, x2: V.x + A * 0.22, topo: pe - A * (cima ? 1.18 : 1.0), base: V.y < -5 ? pe + 10 : r.y + r.h, pe: pe, cima: cima };
+      return { x1: V.x - A * 0.22, x2: V.x + A * 0.22, topo: pe - A * (cima ? 1.18 : V.abaixa ? 0.65 : 1.0), base: V.y < -5 ? pe + 10 : r.y + r.h, pe: pe, cima: cima };
     }
     function passoVai(dt) {
       jogadores.forEach(function (jg, j) {
@@ -461,9 +462,13 @@
           if (V.y === 0 && V.alvo.y < ombro && Math.abs(dx) < A * 0.45) { var h = Math.min(VAI.puloMax, ombro - V.alvo.y + 30); V.vy = -Math.sqrt(2 * VAI.g * h); }
           if (chegou && V.alvo.solto && V.y === 0) V.alvo = null;
         } else V.vx += clamp(-V.vx, -VAI.acel * dt, VAI.acel * dt);
+        // ⬇️ abaixar: ↓ no teclado, ou o dedo parado embaixo dos pés dele (como o dedo acima da cabeça faz pular)
+        var pe0 = r.y + r.h * VAI.chao, dedoNoPe = !!(V.alvo && !V.alvo.solto && V.alvo.y > pe0 - A * 0.12 && Math.abs(V.alvo.x - V.x) < A * 0.3);
+        V.abaixa = V.y === 0 && V.vy === 0 && (!!V.tecBaixo || (dedoNoPe && (V.abaixa || Math.abs(V.vx) < 60)));
+        if (V.abaixa) V.vx += clamp(-V.vx, -VAI.acel * 2 * dt, VAI.acel * 2 * dt);   // abaixado não anda
         V.x = clamp(V.x + V.vx * dt, r.x + A * 0.2, r.x + r.w - A * 0.2);
         if (V.y < 0 || V.vy < 0) { V.vy += VAI.g * dt; V.y = Math.min(0, V.y + V.vy * dt); if (V.y === 0) V.vy = 0; }
-        jg.corpo.x = (V.x - r.x) / r.w; jg.corpo.pulando = V.y < -10;   // o desenho e o resto do jogo usam o corpo
+        jg.corpo.x = (V.x - r.x) / r.w; jg.corpo.pulando = V.y < -10; jg.corpo.abaixado = !!V.abaixa;   // o desenho e o resto do jogo usam o corpo
         // encostou? (só no corpo dele)
         var B = corpoVai(j);
         coisas.forEach(function (c) {

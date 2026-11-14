@@ -25,7 +25,7 @@
     op = op || {};
     var modo = op.modo || 'passar', nivel = op.nivel || 'facil', semente = op.semente >>> 0, eu = op.eu || 0;
     var rnd = op.rnd || Math.random;
-    var tab = L.gerarTabuleiro(semente, nivel), n = tab.caras.length;
+    var corpo = !!op.corpo, tab = L.gerarTabuleiro(semente, nivel, { corpo: corpo }), n = tab.caras.length;
     function cheio() { var a = []; for (var i = 0; i < n; i++) a.push(true); return a; }
     var e = salvo || {
       fase: 'segredo', vez: 0, segredos: [null, null], prontos: [false, false], dePe: [cheio(), cheio()], feitas: [[], []],
@@ -115,7 +115,7 @@
         return null;
       },
 
-      salvar: function () { return { modo: modo, nivel: nivel, semente: semente, eu: eu, estado: JSON.parse(JSON.stringify(e)) }; }
+      salvar: function () { return { modo: modo, nivel: nivel, semente: semente, eu: eu, corpo: corpo, estado: JSON.parse(JSON.stringify(e)) }; }
     };
 
     function fecharPalpite(j, acertou) {
@@ -128,7 +128,7 @@
     return p;
   }
 
-  function voltar(s) { return criar({ modo: s.modo, nivel: s.nivel, semente: s.semente, eu: s.eu }, s.estado); }
+  function voltar(s) { return criar({ modo: s.modo, nivel: s.nivel, semente: s.semente, eu: s.eu, corpo: !!s.corpo }, s.estado); }
 
   var QP = { criar: function (op) { return criar(op, null); }, voltar: voltar };
   raiz.QEPartida = QP;
