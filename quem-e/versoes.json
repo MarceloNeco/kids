@@ -2,6 +2,17 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.2.1",
+      "data": "14/Nov/2026",
+      "hora": "09:35:56",
+      "pt": [
+        "🚕 O João Alves do jeito que as meninas imaginam: atlético, forte, uns 45 anos, de óculos escuros, sem superpoder, muito inteligente e humilde"
+      ],
+      "en": [
+        "🚕 João Alves the way the girls imagine him: athletic, strong, about 45, with sunglasses, no superpowers, very smart and humble"
+      ]
+    },
+    {
       "versao": "0.2.0",
       "data": "14/Nov/2026",
       "hora": "03:46:15",
