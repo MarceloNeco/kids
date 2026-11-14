@@ -2,6 +2,26 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.12.1",
+      "data": "14/Nov/2026",
+      "hora": "19:10:00",
+      "pt": [
+        "🏙️ A cidade não foge mais para o canto: ela enche a tela, aproxima do meio (➕ ➖ ou dois dedos) e, aproximada, dá para arrastar com o dedo.",
+        "🏷️ Os nomes dos lugares ficaram curtos (Mercado, Padaria, Feira, Dona Cida…) e não se encavalam mais.",
+        "🧺 A cesta ficou numa fileira só, com o nome embaixo de cada ingrediente, e a cidade ganhou espaço."
+      ],
+      "en": [
+        "🏙️ The town no longer drifts to the corner: it fills the screen, zooms from the middle (➕ ➖ or two fingers) and, when zoomed in, you can drag it with your finger.",
+        "🏷️ Place names are short now (Shop, Bakery, Market, Mrs. Cida…) and no longer pile up.",
+        "🧺 The basket is a single row with each ingredient's name underneath, and the town got more room."
+      ],
+      "es": [
+        "🏙️ El pueblo ya no se va a la esquina: llena la pantalla, se acerca desde el centro (➕ ➖ o dos dedos) y, acercado, puedes arrastrarlo con el dedo.",
+        "🏷️ Los nombres de los lugares son cortos (Tienda, Panadería, Mercadillo, Doña Cida…) y ya no se amontonan.",
+        "🧺 La cesta está en una sola fila, con el nombre debajo de cada ingrediente, y el pueblo ganó espacio."
+      ]
+    },
+    {
       "versao": "0.12.0",
       "data": "14/Nov/2026",
       "hora": "18:30:00",
