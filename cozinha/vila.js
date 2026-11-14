@@ -294,6 +294,57 @@
       '<circle cx="26" cy="18" r="5" fill="#fff" stroke="#e1d4c4"/><circle cx="36" cy="16" r="6" fill="#fff" stroke="#e1d4c4"/><rect x="22" y="20" width="18" height="6" rx="2" fill="#fff" stroke="#e1d4c4"/></svg>';
   }
 
-  var API = { bloco: bloco, boneco: boneco, vacaGrande: vacaGrande, ordenha: ordenha, carro: carro, nuvem: nuvem, LUGARES_DESENHADOS: Object.keys(B) };
+  // ---------- a cozinha "casinha cortada" (v0.11.0, referências do dono) ----------
+  // Sala vista de cima, inclinada: piso xadrez, duas paredes no fundo, bancada com pia e fogão (forno embaixo) na
+  // parede da esquerda, geladeira e armário com janela na da direita, ilha no meio e a mesinha na frente. O app.js põe o
+  // cozinheirinho em cima e o faz andar até a estação do passo (ESTACOES: onde ele fica de pé, em % do desenho).
+  function Q(u, v, z) { return [q(150 + (u - v) * 128), q(78 + (u + v) * 62 - (z || 0))]; }
+  function cx2(u0, v0, u1, v1, h, cor, z0) {
+    z0 = z0 || 0; var z1 = z0 + h;
+    return poli([Q(u0, v1, z0), Q(u1, v1, z0), Q(u1, v1, z1), Q(u0, v1, z1)], tom(cor, 0.06), CONT) +
+      poli([Q(u1, v0, z0), Q(u1, v1, z0), Q(u1, v1, z1), Q(u1, v0, z1)], tom(cor, -0.16), CONT) +
+      poli([Q(u0, v0, z1), Q(u1, v0, z1), Q(u1, v1, z1), Q(u0, v1, z1)], tom(cor, 0.22), CONT);
+  }
+  function emE(v, ua, ub, za, zb, cor, extra) { return poli([Q(ua, v, za), Q(ub, v, za), Q(ub, v, zb), Q(ua, v, zb)], cor, extra); }
+  function emD(u, va, vb, za, zb, cor, extra) { return poli([Q(u, va, za), Q(u, vb, za), Q(u, vb, zb), Q(u, va, zb)], cor, extra); }
+  var ESTACOES = { pia: [0.24, 0.3], fogao: [0.25, 0.66], geladeira: [0.82, 0.3], bancada: [0.55, 0.86], mesa: [0.86, 0.72], porta: [0.62, 0.98] };
+  function estacaoPos(id) { var e = ESTACOES[id] || ESTACOES.porta, p = Q(e[0], e[1], 0); return [q(p[0] / 300 * 100), q(p[1] / 210 * 100)]; }
+  function cozinhaDiorama() {
+    var h = '<svg class="diorama-svg" viewBox="0 0 300 210" aria-hidden="true" focusable="false">';
+    // paredes do fundo (esquerda e direita) com rodapé, e o piso xadrez
+    h += poli([Q(0, 0, 0), Q(0, 1, 0), Q(0, 1, 78), Q(0, 0, 78)], '#9fd8e8') + poli([Q(0, 0, 0), Q(1, 0, 0), Q(1, 0, 78), Q(0, 0, 78)], '#c4ecf5');
+    h += poli([Q(0, 0, 78), Q(0, 1, 78), Q(-0.04, 1, 80), Q(-0.04, -0.04, 80)], '#7cc3d6') + poli([Q(0, 0, 78), Q(1, 0, 78), Q(1, -0.04, 80), Q(-0.04, -0.04, 80)], '#9fd8e8');
+    for (var i = 0; i < 6; i++) for (var j = 0; j < 6; j++) {
+      var a = i / 6, b = (i + 1) / 6, c = j / 6, d = (j + 1) / 6;
+      h += poli([Q(a, c), Q(b, c), Q(b, d), Q(a, d)], (i + j) % 2 ? '#3b3b4f' : '#f4f1ea');
+    }
+    h += poli([Q(1, 0, 0), Q(1, 1, 0), Q(1, 1, -8), Q(1, 0, -8)], '#7c6a58') + poli([Q(0, 1, 0), Q(1, 1, 0), Q(1, 1, -8), Q(0, 1, -8)], '#9b8670');
+    // janela na parede da direita e armários altos na da esquerda
+    h += '<g class="est est-janela">' + emE(0, 0.32, 0.56, 36, 64, '#fff', '') + emE(0, 0.34, 0.54, 38, 62, '#bfe9ff', '') + '<path d="M' + Q(0.44, 0, 38).join(' ') + ' L' + Q(0.44, 0, 62).join(' ') + '" stroke="#fff" stroke-width="2"/></g>';
+    h += cx2(0, 0.06, 0.12, 0.94, 18, '#ffffff', 50) + [0.27, 0.5, 0.73].map(function (v) { var p = Q(0.12, v, 58); return '<path d="M' + p[0] + ' ' + p[1] + ' v6" stroke="#999" stroke-width="2" stroke-linecap="round"/>'; }).join('');
+    // bancada da esquerda: armários embaixo, tampo, pia e fogão (com o forno na frente)
+    h += cx2(0, 0.06, 0.18, 0.94, 30, '#ffd76a');
+    [0.12, 0.38, 0.5, 0.82].forEach(function (v) { var p = Q(0.18, v, 22); h += '<path d="M' + p[0] + ' ' + p[1] + ' l0 6" stroke="#b88a1a" stroke-width="2" stroke-linecap="round"/>'; });
+    h += '<g class="est est-pia">' + poli([Q(0.03, 0.2), Q(0.15, 0.2), Q(0.15, 0.4), Q(0.03, 0.4)].map(function (x) { return [x[0], x[1] - 30]; }), '#a9b6c4', CONT) +
+      poli([Q(0.05, 0.23), Q(0.13, 0.23), Q(0.13, 0.37), Q(0.05, 0.37)].map(function (x) { return [x[0], x[1] - 30]; }), '#6cc3e8') +
+      '<path d="M' + Q(0.02, 0.3, 30).join(' ') + ' q-2 -12 8 -12" stroke="#7d8a99" stroke-width="2.6" fill="none" stroke-linecap="round"/><path class="agua-pia" d="M' + (Q(0.02, 0.3, 30)[0] + 8) + ' ' + (Q(0.02, 0.3, 30)[1] - 12) + ' v12" stroke="#bfe9ff" stroke-width="2.4"/></g>';
+    h += '<g class="est est-fogao">' + poli([Q(0.02, 0.54), Q(0.17, 0.54), Q(0.17, 0.78), Q(0.02, 0.78)].map(function (x) { return [x[0], x[1] - 30]; }), '#2d2d3a', CONT) +
+      [[0.06, 0.6], [0.13, 0.6], [0.06, 0.72], [0.13, 0.72]].map(function (o) { var p = Q(o[0], o[1], 30); return '<ellipse class="boca" cx="' + p[0] + '" cy="' + p[1] + '" rx="6" ry="3" fill="none" stroke="#e84a3c" stroke-width="1.6"/>'; }).join('') +
+      emD(0.18, 0.56, 0.76, 4, 24, '#2d2d3a', CONT) + emD(0.18, 0.59, 0.73, 8, 20, '#ffb347', ' class="vidro-forno"') + '</g>';
+    // armário e geladeira na parede da direita
+    h += cx2(0.06, 0, 0.62, 0.16, 30, '#ffd76a') + poli([Q(0.06, 0, 30), Q(0.62, 0, 30), Q(0.62, 0.16, 30), Q(0.06, 0.16, 30)], '#f4f1ea', CONT);
+    h += '<g class="est est-geladeira">' + cx2(0.7, 0, 0.94, 0.17, 76, '#8fc9ff') + emE(0.17, 0.72, 0.92, 44, 45.5, '#5a8fc9') + '<path d="M' + Q(0.74, 0.17, 26).join(' ') + ' l0 12 M' + Q(0.74, 0.17, 52).join(' ') + ' l0 12" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></g>';
+    // ilha no meio (a bancada onde se corta e mistura) com tábua e tigela, e a mesinha com os pratos
+    h += '<g class="est est-bancada">' + cx2(0.42, 0.42, 0.68, 0.68, 26, '#e84a3c') + poli([Q(0.42, 0.42, 26), Q(0.68, 0.42, 26), Q(0.68, 0.68, 26), Q(0.42, 0.68, 26)], '#fff6e0', CONT) +
+      poli([Q(0.46, 0.5, 27), Q(0.56, 0.5, 27), Q(0.56, 0.6, 27), Q(0.46, 0.6, 27)], '#d9a066', CONT) + '<ellipse cx="' + Q(0.62, 0.48, 30)[0] + '" cy="' + Q(0.62, 0.48, 30)[1] + '" rx="8" ry="4" fill="#bfe9ff" stroke="#5aa9d6"/></g>';
+    h += '<g class="est est-mesa">' + cx2(0.74, 0.5, 0.96, 0.62, 3, '#c98a4b', 20);
+    [[0.76, 0.52], [0.94, 0.52], [0.76, 0.6], [0.94, 0.6]].forEach(function (o) { var a = Q(o[0], o[1], 0), b = Q(o[0], o[1], 20); h += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="#8a5a2b" stroke-width="2.2"/>'; });
+    var pm = Q(0.85, 0.56, 24); h += '<ellipse cx="' + pm[0] + '" cy="' + pm[1] + '" rx="9" ry="4.4" fill="#fff" stroke="#ccc"/></g>';
+    // vaso de planta e relógio na parede
+    var pr = Q(0, 0.5, 70); h += '<circle cx="' + pr[0] + '" cy="' + (pr[1] + 2) + '" r="7" fill="#fff" stroke="#666" stroke-width="1.4"/><path d="M' + pr[0] + ' ' + (pr[1] + 2) + ' v-4 M' + pr[0] + ' ' + (pr[1] + 2) + ' h3" stroke="#333" stroke-width="1.2"/>';
+    return h + '</svg>';
+  }
+
+  var API = { cozinhaDiorama: cozinhaDiorama, estacaoPos: estacaoPos, ESTACOES: ESTACOES, bloco: bloco, boneco: boneco, vacaGrande: vacaGrande, ordenha: ordenha, carro: carro, nuvem: nuvem, LUGARES_DESENHADOS: Object.keys(B) };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else raiz.CozinhaVila = API;
 })(typeof self !== 'undefined' ? self : this);

@@ -158,3 +158,39 @@ test('lugares por dentro (v0.9.0): vaca desenhada com a criança no banquinho e 
   assert.deepEqual(r.erros, [], 'erros no console');
   await r.ctx.close();
 });
+
+test('parte 3 (v0.11.0): mercado por dentro com setores (o que falta brilha) e a cozinha "casinha cortada" com o cozinheirinho indo até a estação', { timeout: 90000 }, async () => {
+  const r = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  const pg = r.pg;
+  await pg.goto(pg.url() + '&devagar');
+  await pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
+  await comecar(pg, 'medio', 'pao-queijo');
+  await pg.click('[data-lugar="mercado"]', { force: true }); await pg.waitForSelector('#lugar.ativa', { timeout: 8000 });
+  const setores = await pg.$$eval('.mercado-setores .setor', ss => ss.map(s => s.dataset.setor));
+  assert.deepEqual(setores, ['hortifruti', 'geladeira', 'acougue', 'padaria', 'mercearia']);
+  assert.equal(await pg.locator('.setor[data-setor="geladeira"] .produto[data-ing="queijo"]').count(), 1, 'o queijo fica na geladeira');
+  assert.equal(await pg.locator('.setor[data-setor="mercearia"] .produto[data-ing="polvilho"]').count(), 1, 'o polvilho na mercearia');
+  assert.equal(await pg.locator('.setor[data-setor="hortifruti"] .produto[data-ing="tomate"]').count(), 1);
+  // pão de queijo precisa de queijo (geladeira) e polvilho (mercearia): esses setores brilham; o açougue não
+  assert.equal(await pg.locator('.setor.tem-falta[data-setor="geladeira"]').count(), 1);
+  assert.equal(await pg.locator('.setor.tem-falta[data-setor="acougue"]').count(), 0);
+  assert.equal(await pg.locator('.mercado-setores .ajudante').count(), 1, 'o ajudante anda pelo mercado');
+  await pg.click('#lugar .voltar', { force: true }); await pg.waitForSelector('#mapa.ativa');
+  // a cozinha: o desenho em 3D aparece enquanto escolhe o utensílio; ao acertar, ele anda até a pia
+  await pg.evaluate(() => { const j = window.Cozinha.jogo(); j.precisa.forEach(x => { j.cesta[x.id] = x.q; }); });
+  await pg.click('[data-lugar="casa"]', { force: true }); await pg.waitForSelector('#cozinha.ativa', { timeout: 8000 });
+  assert.equal(await pg.locator('#palco .diorama svg.diorama-svg .est-fogao').count(), 1, 'cozinha com fogão');
+  for (const e of ['pia', 'geladeira', 'bancada', 'mesa']) assert.equal(await pg.locator('#palco .diorama .est-' + e).count(), 1, e);
+  const pos = () => pg.evaluate(() => { const c = document.querySelector('#palco .chef-cz').getBoundingClientRect(); return [Math.round(c.left), Math.round(c.top)]; });
+  const p0 = await pos();
+  await pg.click('[data-u="pia"]', { force: true });
+  await pg.waitForTimeout(250);
+  assert.equal(await pg.locator('#palco .diorama.em-pia .chef-cz.anda').count(), 1, 'andando até a pia, que acende');
+  assert.notDeepEqual(await pos(), p0);
+  await pg.waitForFunction(() => window.Cozinha.jogo().cz.fase === 'acao', null, { timeout: 4000 });
+  assert.equal(await pg.evaluate(() => window.Cozinha.jogo().cz.estacao), 'pia');
+  // utensílios pendurados na barra
+  assert.ok(await pg.evaluate(() => getComputedStyle(document.querySelector('#utensilios .utensilio'), '::before').content !== 'none'), 'cordinha do gancho');
+  assert.deepEqual(r.erros, [], 'erros no console');
+  await r.ctx.close();
+});
