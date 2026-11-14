@@ -82,7 +82,7 @@
     ANIM = !!op.anim;
     var e = V.limpar(e0), I = (op.id || 'b') + '-', fundo = op.fundo !== false, out = [];
     var C = function (cat) { var k = P.categoria(cat); return P.cor(k.cores, e[k.opcoes ? cat + 'Cor' : cat]); };
-    var pele = C('pele').hex, peleE = esc(pele, 0.3), cab = C('cabelo').hex, cabE = esc(cab, 0.3);
+    var pele = C('pele').hex, peleE = esc(pele, 0.24), cab = C('cabelo').hex, cabE = esc(cab, 0.3);
     var vis = function (cat) { return V.visivel(e, cat); };
     var estNa = vis('vestido') ? 'vestido' : 'blusa', comEstampa = e.estampa !== 'liso';
     var area = op.soFundo ? [0, 0, W, H] : (op.area || [0, 0, W, H]);
@@ -129,7 +129,7 @@
     // ---------- asas e cabelo de trás (de costas, vão por cima do corpo, lá embaixo) ----------
     var asasF = vis('vestido') && e.vestido === 'fada' ? asas(C('vestido')) : '';
     if (!corpoCostas) out.push(asasF);
-    if (!ang) out.push(grupo(cabeloTras(e, I, cab, cabE)));
+    if (!ang) { var trasF = cabeloTras(e, I, cab, cabE); out.push(grupo(trasF + volumeCabelo(trasF, I))); }
 
     // ---------- pernas, pés e sapatos ----------
     var peleS = esc(pele, 0.12), peleL = cla(pele, 0.28);
@@ -190,7 +190,7 @@
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
     } else {
       out.push(elip(116, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }), elip(284, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }));
-      out.push(pintar(rosto, 'url(#' + I + 'pele)', peleE));
+      out.push(pintar(rosto, 'url(#' + I + 'pele)', peleE) + p(rosto, { fill: 'url(#' + I + 'volRosto)' }));
       var sob = mistura(cab, '#2a1c1a', 0.45);
       out.push(luzLados(pele, menino, dO, ['fininhos', 'fininhosPuxados', 'sorridentes'].indexOf(e.formaOlho) >= 0), luzMeio(pele), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olho(164, -1, e, I, C, 0, op.anim)), deslocar(dO, olho(236, 1, e, I, C, 0, op.anim)));
       out.push(deslocar(-dO, linha(sobr[0], sob, sobr[2])), deslocar(dO, linha(sobr[1], sob, sobr[2])));
@@ -199,7 +199,8 @@
       if (vis('adesivo')) out.push(adesivo(e.adesivo, 266, 250, 13));
       if (e.glitter === 'bochechas' || e.glitter === 'olhos') out.push(glitter(e, C('glitter')));
       // ---------- cabelo da frente e acessórios do rosto ----------
-      out.push(subirTesta(cabeloFrente(e, I, cab, cabE), TESTA[e.testa] || 0));
+      var franjaF = subirTesta(cabeloFrente(e, I, cab, cabE), TESTA[e.testa] || 0);
+      out.push(franjaF + volumeCabelo(franjaF, I));
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
       if (vis('oculos')) out.push(oculos(e.oculos, C('oculos'), dO));
     }
@@ -345,10 +346,11 @@
       s += hf.atras;
       if (zF > -0.35) s += orelha(xF, 12, false, -sg);
       if (zE <= 0.3) s += orelha(xE, 12, false, sg);
-      s += p(cont, { fill: 'none', stroke: cabE, 'stroke-width': 4.4, 'stroke-linejoin': 'round' }) + '<g clip-path="url(#' + I + 'peleR)">' + p(cont, { fill: 'none', stroke: peleE, 'stroke-width': 4.4, 'stroke-linejoin': 'round' }) + '</g>';
+      s += p(cont, { fill: 'none', stroke: cabE, 'stroke-width': 3.4, 'stroke-linejoin': 'round' }) + '<g clip-path="url(#' + I + 'peleR)">' + p(cont, { fill: 'none', stroke: peleE, 'stroke-width': 3.4, 'stroke-linejoin': 'round' }) + '</g>';
       // a cabeça toda é cabelo (com fios que giram junto) e a pele vai por cima
-      s += p(cont, { fill: 'url(#' + I + 'cab)' }) + '<g clip-path="url(#' + I + 'rostoV)">' + fiosCabeca() + p('M146,126 Q200,104 254,126', { fill: 'none', stroke: '#fff', 'stroke-width': 8, opacity: 0.22, 'stroke-linecap': 'round' }) +
-        p(peleD, { fill: 'url(#' + I + 'pele)' }) + p(peleD, { fill: 'none', stroke: cabE, 'stroke-width': 1.8, opacity: 0.6, 'stroke-linejoin': 'round' }) + '</g>';
+      s += p(cont, { fill: 'url(#' + I + 'cab)' }) + p(cont, { fill: 'url(#' + I + 'volCab)' }) + '<g clip-path="url(#' + I + 'rostoV)">' + fiosCabeca() + p('M146,126 Q200,104 254,126', { fill: 'none', stroke: '#fff', 'stroke-width': 13, opacity: 0.13, 'stroke-linecap': 'round' }) + p('M156,123 Q200,106 244,123', { fill: 'none', stroke: '#fff', 'stroke-width': 4, opacity: 0.3, 'stroke-linecap': 'round' }) +
+        p(peleD, { fill: 'url(#' + I + 'pele)' }) + p(peleD, { fill: 'url(#' + I + 'volRosto)' }) + p(peleD, { fill: 'url(#' + I + 'sombCab)' }) +
+        p(peleD, { fill: 'none', stroke: cabE, 'stroke-width': 1.8, opacity: 0.5, 'stroke-linejoin': 'round' }) + '</g>';
       // maquiagem e feições: só onde é pele
       var fe = '';
       if (e.base === 'natural') fe += p(peleD, { fill: mistura(pele, '#ffd9c7', 0.3), opacity: 0.45 });
@@ -376,7 +378,7 @@
       if (cos > -0.1) {
         var xT = xa(-sg * 56, 86), xP = xa(-sg * 34, 86) + sg * 6, xH = xa(-sg * 44, 86), mv = -sg * 300 * (1 - Math.min(1, as / 0.4)), xL = 200 + sg * 900;
         defs += '<clipPath id="' + I + 'cabY"><path d="M' + n(xL) + ',-200 L' + n(xP + sg * 64 + mv) + ',-200 L' + n(xP + mv) + ',116 Q' + n(xH + mv) + ',134 ' + n(xT + mv) + ',168 Q' + n(xT + sg * 4 + mv) + ',204 ' + n(xT + sg * 16 + mv) + ',240 L' + n(xT + sg * 30 + mv) + ',900 L' + n(xL) + ',900Z"/></clipPath>';
-        s += '<g clip-path="url(#' + I + 'cabF)"><g clip-path="url(#' + I + 'cabY)">' + hf.frente + '</g></g>';
+        s += '<g clip-path="url(#' + I + 'cabF)"><g clip-path="url(#' + I + 'cabY)">' + hf.frente + volumeCabelo(hf.frente, I) + '</g></g>';
       }
       s += hf.lado;
       // orelha do lado de cá (com o desenho de dentro), por cima do cabelo, como cabelo preso atrás da orelha
@@ -447,6 +449,14 @@
       '<radialGradient id="' + I + 'luzE" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff8e8" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#1a0630" stop-opacity=".28"/></radialGradient>' +
       '<radialGradient id="' + I + 'vol" cx=".42" cy=".3" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></radialGradient>' +
       '<linearGradient id="' + I + 'shine" x1="0" y1="0" x2="1" y2="1"><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".6"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+      // volume 3D do rosto: luz no centro, sombra suave e quente nas bordas (como luz de estúdio de animação)
+      '<radialGradient id="' + I + 'volRosto" cx=".5" cy=".4" r=".62"><stop offset="0" stop-color="#fff" stop-opacity=".1"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="' + esc(pele, 0.3) + '" stop-opacity="0"/><stop offset="1" stop-color="' + mistura(esc(pele, 0.4), '#a0405a', 0.25) + '" stop-opacity=".46"/></radialGradient>' +
+      // volume do cabelo: luz no alto (de cima e da esquerda), sombra embaixo e nas laterais
+      '<radialGradient id="' + I + 'volCab" cx=".4" cy=".18" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></radialGradient>' +
+      // sombra que o cabelo faz na testa, logo abaixo da linha do cabelo
+      '<linearGradient id="' + I + 'sombCab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + esc(cab, 0.2) + '" stop-opacity=".32"/><stop offset=".16" stop-color="' + esc(cab, 0.2) + '" stop-opacity="0"/></linearGradient>' +
+      // branco do olho com volume (mais escuro em cima, onde a pálpebra faz sombra)
+      '<linearGradient id="' + I + 'esclera" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cde6"/><stop offset=".42" stop-color="#fff"/><stop offset="1" stop-color="#f6f1fb"/></linearGradient>' +
       gradienteCabelo(e, I, cab) +
       '<radialGradient id="' + I + 'iris" cx=".5" cy=".38" r=".6"><stop offset="0" stop-color="' + cla(iris, 0.35) + '"/><stop offset=".7" stop-color="' + iris + '"/><stop offset="1" stop-color="' + esc(iris, 0.45) + '"/></radialGradient>' +
       '<radialGradient id="' + I + 'blush"><stop offset="0" stop-color="' + P.cor('blush', e.blushCor).hex + '" stop-opacity=".8"/><stop offset="1" stop-color="' + P.cor('blush', e.blushCor).hex + '" stop-opacity="0"/></radialGradient>' +
@@ -455,6 +465,12 @@
   }
 
   // ---------- cabelo ----------
+  // cópia do cabelo só com a luz e a sombra (volCab) por cima, sem traço: dá volume sem redesenhar cada penteado
+  function volumeCabelo(s, I) {
+    if (!s) return '';
+    return s.replace(/fill="url\(#[^"]*-cab\)"/g, 'fill="url(#' + I + 'volCab)"').replace(/<(path|circle|ellipse)\s[^>]*fill="(?!url\(#[^"]*volCab)[^"]*"[^>]*\/>/g, '')
+      .replace(/stroke="[^"]*"/g, 'stroke="none"');
+  }
   // mechas: "pontas" e "arco" mudam o degradê do cabelo (vale para todos os cortes); "frente" desenha faixas
   function gradienteCabelo(e, I, cab) {
     var m = P.cor('cabelo', e.mechasCor).hex, st = [[0, cla(cab, 0.12)], [0.1, cla(cab, 0.34)], [0.2, cla(cab, 0.06)], [0.55, cab], [0.85, esc(cab, 0.14)], [1, esc(cab, 0.22)]];
@@ -888,7 +904,7 @@
   function luzLados(pele, menino, dO, semDobra) {
     var rosa = menino ? 0.04 : 0.12, dobra = semDobra ? 0 : menino ? 0.25 : 0.55, a = n(-(dO || 0)), b = n(dO || 0);
     return elip(152, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa }) + elip(248, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa }) +
-      elip(200, 150, 40, 12, { fill: '#fff', opacity: 0.07 }) +
+      elip(200, 150, 40, 12, { fill: '#fff', opacity: 0.12 }) + elip(150, 232, 15, 7, { fill: '#fff', opacity: 0.16 }) + elip(250, 232, 15, 7, { fill: '#fff', opacity: 0.16 }) +
       p('M146,201 Q164,178 182,199', { fill: 'none', stroke: esc(pele, 0.22), 'stroke-width': 1.3, opacity: dobra, transform: 'translate(' + a + ' 0)' }) + p('M218,199 Q236,178 254,201', { fill: 'none', stroke: esc(pele, 0.22), 'stroke-width': 1.3, opacity: dobra, transform: 'translate(' + b + ' 0)' });
   }
   function luzMeio(pele) {
@@ -997,8 +1013,8 @@
     }
     var sombraDoOlho = s; s = '';
     var forma = formaOlho(cx), clip = 'url(#' + I + (lado < 0 ? 'olhoE' : 'olhoD') + ')';
-    s += p(forma, { fill: '#fff' });
-    s += '<g clip-path="' + clip + '">' + circ(ix, cy + 4, 16, { fill: 'url(#' + I + 'iris)' }) + circ(ix, cy + 5, 7.5, { fill: '#1d1420' }) +
+    s += p(forma, { fill: 'url(#' + I + 'esclera)' });
+    s += '<g clip-path="' + clip + '">' + circ(ix, cy + 4, 16, { fill: 'url(#' + I + 'iris)' }) + circ(ix, cy + 4, 15.2, { fill: 'none', stroke: esc(P.cor('olhos', e.olhos).hex, 0.55), 'stroke-width': 1.6, opacity: 0.75 }) + circ(ix, cy + 5, 7.5, { fill: '#1d1420' }) +
       circ(ix + 6, cy - 3, 5.2, { fill: '#fff' }) + circ(ix - 5, cy + 11, 2.6, { fill: '#fff', opacity: 0.85 }) + p('M' + (cx - 22) + ',' + (cy - 2) + 'Q' + cx + ',' + (cy - 32) + ' ' + (cx + 22) + ',' + (cy - 2) + 'L' + (cx + 22) + ',' + (cy + 2) + 'Q' + cx + ',' + (cy - 22) + ' ' + (cx - 22) + ',' + (cy + 2) + 'Z', { fill: '#000', opacity: 0.08 }) + '</g>';
     var lid = 'M' + (cx - 22) + ',' + (cy - 2) + 'Q' + cx + ',' + (cy - 32) + ' ' + (cx + 22) + ',' + (cy - 2);
     s += p(lid, { fill: 'none', stroke: '#2a1c1a', 'stroke-width': 3.2, 'stroke-linecap': 'round' });

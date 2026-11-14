@@ -326,6 +326,19 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
     colar: 'nenhum', colarCor: 'dourado', oculos: 'nenhum', oculosCor: 'chiclete', bolsa: 'nenhum', bolsaCor: 'chiclete', cenario: 'quarto'
   };
 
+  /* Personagens prontas (em 💖 Meus looks): começam já com o jeito de uma criança de verdade — traços, cabelo, olhos e
+     óculos —, para brincar a partir dela. Pedido do dono, com fotos das filhas (que NÃO entram no repositório); os
+     nomes são neutros de propósito, para não expor as crianças. Só o que muda em relação ao PADRAO. */
+  var PRONTAS = [
+    { id: 'morenaOculos', ico: '👓', pt: 'Morena de óculos', en: 'Brunette with glasses', es: 'Morena con gafas', e: {
+      pele: 'p2', rosto: 'coracao', nariz: 'batatinha', formaOlho: 'amendoados', distOlhos: 'afastados', formaBoca: 'sorrisinho',
+      cabelo: 'armadoLongo', cabeloCor: 'escuro', olhos: 'castanho', oculos: 'retangular', oculosCor: 'roxo', brincos: 'bolinha', brincosCor: 'dourado',
+      blusaCor: 'lilas' } },
+    { id: 'cachinhosDourados', ico: '🎀', pt: 'Cachinhos dourados', en: 'Golden curls', es: 'Rizos dorados', e: {
+      pele: 'p1', rosto: 'bochechudo', nariz: 'botao', testa: 'alta', formaOlho: 'grandes', formaBoca: 'pequenininha',
+      cabelo: 'cachosSoltos', cabeloCor: 'loiroEscuro', olhos: 'cinza', brincos: 'bolinha', brincosCor: 'dourado', laco: 'alto', lacoCor: 'rosaclaro' } }
+  ];
+
   /* Desafios: cada um tem 3 dicas. Estrelas = dicas cumpridas, mas sempre pelo menos 1 (ninguém perde).
      Forma das dicas (conferidas em visual.js):
        { c: 'sapatos', tag: 'praia' }        a peça visível da categoria tem essa tag
@@ -393,7 +406,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
   function opcao(catId, id) { var cat = porId[catId]; if (!cat || !cat.opcoes) return null; for (var i = 0; i < cat.opcoes.length; i++) if (cat.opcoes[i].id === id) return cat.opcoes[i]; return null; }
   function cor(paleta, id) { var l = CORES[paleta] || []; for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; return l[0] || null; }
 
-  var API = { ZOOM: ZOOM, CORES: CORES, GRUPOS: GRUPOS, CATEGORIAS: CATEGORIAS, PADRAO: PADRAO, DESAFIOS: DESAFIOS, categoria: categoria, opcao: opcao, cor: cor };
+  var API = { ZOOM: ZOOM, CORES: CORES, GRUPOS: GRUPOS, CATEGORIAS: CATEGORIAS, PADRAO: PADRAO, PRONTAS: PRONTAS, DESAFIOS: DESAFIOS, categoria: categoria, opcao: opcao, cor: cor };
   raiz.PurpurinaPecas = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : this);

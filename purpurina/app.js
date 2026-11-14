@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.18.0';
+  var APP_VERSION = '0.19.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -543,7 +543,23 @@
     Som.tocar('coracao'); recado(t('Guardado em 💖 Meus looks!', 'Saved to 💖 My looks!', '¡Guardado en 💖 Mis looks!'));
     if (atual === 'estudio') { var q = naTela(200, 360); faiscas(q[0], q[1], 10, ['💖', '💕', '💗']); }
   }
+  // personagens prontas (pecas.js, PRONTAS): só vestir, não dá para apagar
+  function listaProntas() {
+    var caixa = $('listaProntas'); caixa.innerHTML = '';
+    P.PRONTAS.forEach(function (pr, k) {
+      var card = document.createElement('div'); card.className = 'look';
+      var mini = document.createElement('div'); mini.className = 'mini-boneca';
+      var e = V.limpar(Object.assign({}, P.PADRAO, pr.e));
+      mini.innerHTML = B.svg(e, { id: 'pronta' + k, area: [0, 60, 400, 600], cortar: true });
+      var nome = document.createElement('p'); nome.className = 'nome-pronta'; nome.textContent = pr.ico + ' ' + N(pr);
+      var linha = document.createElement('div'); linha.className = 'linha';
+      var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('✨ Brincar com ela', '✨ Play with her', '✨ Jugar con ella');
+      vestir.addEventListener('click', function () { livre = e; gravar('purpurina.atual', livre); Som.tocar('brilho'); comecar(null); });
+      linha.appendChild(vestir); card.appendChild(mini); card.appendChild(nome); card.appendChild(linha); caixa.appendChild(card);
+    });
+  }
   function listaLooks() {
+    listaProntas();
     var looks = ler('purpurina.looks', []), caixa = $('listaLooks'); caixa.innerHTML = '';
     $('semLooks').hidden = looks.length > 0;
     looks.forEach(function (l, k) {
