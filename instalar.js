@@ -10,8 +10,8 @@
     (beforeinstallprompt): o toque instala na hora.
   - Onde o navegador não tem essa janela (iPhone, Mac, Firefox, tablet Fire da Amazon, TV, navegador
     dentro de outro app), o toque abre o passo a passo daquele aparelho, detectado sem perguntar.
-  - Já aberto como aplicativo, o botão some. "Já instalei" esconde por 30 dias (se o navegador voltar a
-    oferecer a instalação, é porque não está instalado, e o botão volta na hora).
+  - Já aberto como aplicativo (pelo ícone), o botão some. No navegador ele fica sempre à vista ("Já instalei" só o
+    esconde nesta visita): é o único botão de instalar da estante.
   Enquanto a janela de passos está aberta, <body> ganha a classe "bc-modal" (o kids.js deixa as
   setas e o OK do controle para ela).
 
@@ -131,9 +131,7 @@
   document.body.insertBefore(barra, document.body.firstChild);
   var botao = barra.querySelector('button');
   var texto = barra.querySelector('span');
-  // "Já instalei" esconde por 30 dias (antes era para sempre, e quem tocou sem querer nunca mais achava o botão)
-  function escondidoPorEscolha() { var v = Number(ler()); return v > 1 && Date.now() - v < 30 * 864e5; }
-  if (escondidoPorEscolha() && !FILA) barra.hidden = true;
+  // No navegador o botão fica sempre à vista (dono, 14/Nov/2026: um botão só, e que não suma); só some aberto pelo ícone.
 
   var fundo = document.createElement('div');
   fundo.className = 'bc-fundo';
@@ -362,22 +360,10 @@
   fundo.addEventListener('click', function (e) { if (e.target === fundo) fechar(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.keyCode === 27) fechar(); });
   fundo.querySelector('.bc-ja').addEventListener('click', function () {
-    gravar(String(Date.now())); fechar();
+    gravar('1'); fechar();
     if (FILA) return pronto();
-    barra.hidden = true;
+    barra.hidden = true;   // só nesta visita
   });
-
-  // Botão fixo "📲 Instalar" ao lado do 🎵 Músicas da estante (dono, 14/Nov/2026: "não tô achando o instalador"):
-  // a barra de cima some depois de "Já instalei" ou de instalar; este fica sempre à vista no navegador.
-  var topo = document.querySelector('.barra-topo');
-  if (topo && !FLUTUANTE && !SO_COM) {
-    var fixo = document.createElement('button');
-    fixo.type = 'button'; fixo.className = 'bt-instalar';
-    fixo.innerHTML = '<span class="pt">📲 Instalar</span><span class="en">📲 Install</span><span class="es">📲 Instalar</span>';
-    fixo.addEventListener('click', function () { botao.click(); });
-    var musicas = topo.querySelector('#btBiblioteca');
-    topo.insertBefore(fixo, musicas ? musicas.nextSibling : topo.firstChild);
-  }
 
   botao.addEventListener('click', function () {
     if (!pedido) { abrir(); return; }
