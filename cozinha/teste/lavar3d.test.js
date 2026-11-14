@@ -42,8 +42,9 @@ test('lavar as mãos em 3D: as 8 etapas na ordem, esfregar com círculos do dedo
   for (const e of ['enxaguar', 'fechar', 'secar']) {
     assert.equal(await etapa(), e); await passar(e);
   }
-  await pg.waitForSelector('.lavar3d.limpo .limpinho:not([hidden])', { timeout: 25000 });
-  assert.match(await pg.textContent('.lavar3d .limpinho'), /Mãos limpinhas/);
+  // a frase fica menos de um segundo antes do próximo passo: lê no mesmo instante em que aparece
+  const frase = await pg.waitForFunction(() => { const el = document.querySelector('.lavar3d.limpo .limpinho:not([hidden])'); return el && el.textContent; }, null, { timeout: 25000, polling: 50 });
+  assert.match(await frase.jsonValue(), /Mãos limpinhas/);
   await pg.waitForFunction(() => window.Cozinha.jogo().cz.feitos.includes('lavar'), null, { timeout: 25000 });
   assert.deepEqual(r.erros.filter(e => !/GL Driver|GPU stall|WebGL/.test(e)), [], 'erros no console');
   await r.ctx.close();

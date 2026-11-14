@@ -16,8 +16,9 @@ var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'dados.js', 'logica.js', 'dese
   'voz/cida-aqui-farinha.mp3', 'voz/cida-aqui-leite.mp3', 'voz/cida-aqui-manteiga.mp3', 'voz/cida-aqui-mel.mp3', 'voz/cida-aqui-ovo.mp3', 'voz/cida-aqui-sal.mp3', 'voz/cida-bastante.mp3', 'voz/cida-diz.mp3', 'voz/cida-exemplo.mp3', 'voz/cida-oi-sem.mp3', 'voz/cida-oi.mp3', 'voz/cida-tchau-fim.mp3',
   'voz/cida-tchau.mp3', 'render/acucar.webp', 'render/alface.webp', 'render/banana.webp', 'render/batata.webp', 'render/carne.webp', 'render/cenoura.webp', 'render/cheiro.webp', 'render/chocolate.webp', 'render/farinha.webp', 'render/fermento.webp', 'render/gelatina-po.webp',
   'render/granulado.webp', 'render/jabuticaba.webp', 'render/laranja.webp', 'render/leite.webp', 'render/leitecond.webp', 'render/limao.webp', 'render/maca.webp', 'render/manteiga.webp', 'render/mel.webp', 'render/morango.webp', 'render/oleo.webp', 'render/ovo.webp',
-  'render/pao.webp', 'render/peixe.webp', 'render/polvilho.webp', 'render/queijo.webp', 'render/sal.webp', 'render/tomate.webp', 'render/u-batedeira.webp', 'render/u-colher.webp', 'render/u-espremedor.webp', 'render/u-frigideira.webp', 'render/u-liquidificador.webp', 'render/u-panela.webp',
-  'render/u-pia.webp', 'render/u-tabua.webp', 'render/u-tigela.webp', 'render/uva.webp'];
+  'render/pao.webp', 'render/peixe.webp', 'render/polvilho.webp', 'render/queijo.webp', 'render/sal.webp', 'render/tomate.webp', 'render/u-batedeira.webp', 'render/u-colher.webp', 'render/u-copo.webp', 'render/u-espatula.webp', 'render/u-espeto.webp', 'render/u-espremedor.webp',
+  'render/u-fogao.webp', 'render/u-forma.webp', 'render/u-forno.webp', 'render/u-frigideira.webp', 'render/u-geladeira.webp', 'render/u-grelha.webp', 'render/u-liquidificador.webp', 'render/u-maos.webp', 'render/u-panela.webp', 'render/u-pia.webp', 'render/u-prato.webp', 'render/u-relogio.webp',
+  'render/u-tabua.webp', 'render/u-tigela.webp', 'render/uva.webp'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
 });

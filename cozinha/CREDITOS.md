@@ -92,5 +92,5 @@ na tabela. A foto do *pacotinho de gelatina* é uma gelatina pronta (não havia 
 | **three.js** r170 (`libs/three.module.min.js`, cópia de `libs/three-LICENSE.txt`), a biblioteca que desenha a cidade em 3D (`cidade3d.js`) | https://threejs.org (pacote npm `three@0.170.0`) | **MIT** |
 | Ícones em 3D de ingredientes e utensílios (`render/*.webp`) | Gerados para este jogo no **Higgsfield** (GPU alugada pelo dono), com o modelo aberto **Qwen-Image** (Qwen/Qwen-Image), e o fundo tirado com o **rembg** (MIT, modelo isnet-general-use); 256 × 256, WebP com transparência | Qwen-Image: **Apache 2.0** (as imagens geradas são livres para uso pessoal e comercial) |
 
-Prédios, carros, árvores, a vaca, as galinhas e o cozinheirinho da cidade 3D: **originais, montados em código** (`cidade3d.js`).
+Prédios, carros, árvores, a vaca, as galinhas e o cozinheirinho da cidade 3D, a cozinha 3D (`cozinha3d.js`) e o banheiro com a criança lavando as mãos (`lavar3d.js`): **originais, montados em código** com o three.js. Ícones 3D: 50 imagens (30 ingredientes e 20 utensílios), uma por item, geradas para este jogo em 14/Nov/2026.
 
