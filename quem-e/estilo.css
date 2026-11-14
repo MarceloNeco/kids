@@ -1,0 +1,191 @@
+/* Quem é? — visual (família Bolinho de Chuva, fonte Fredoka da Rabiscolândia).
+   Mundo de geleia: fundo menta com pingos, as cores das duas melecas (azul geleia e rosa mel), tinta ameixa (nunca preto),
+   cartas brancas de borda grossa que viram com um giro curto. O memorável é o logo com o "?" de meleca e as melecas vivas;
+   o resto fica quieto. Jogo: o tabuleiro inteiro cabe na tela (app.js calcula o tamanho da carta), painel embaixo
+   (ou ao lado, no celular deitado). Respeita "reduzir movimento" e as bordas do celular (env(safe-area-inset-*)). */
+@font-face { font-family: 'Fredoka'; src: url('../rabiscolandia/fontes/fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
+:root {
+  --menta: #d8f8ea; --menta2: #b9f0d8; --tinta: #3a1450; --tinta2: #6a4a7e; --branco: #ffffff;
+  --blue: #2e8bff; --blue2: #1b4fd1; --pink: #ff5fa8; --pink2: #d6347f; --mel: #ffb52e; --verde: #2fa86a;
+  --cor: var(--pink); --cor2: var(--pink2);
+  --fonte: 'Fredoka', system-ui, -apple-system, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sr: env(safe-area-inset-right, 0px); --sb: env(safe-area-inset-bottom, 0px); --sl: env(safe-area-inset-left, 0px);
+  color-scheme: only light;
+}
+html[data-meleca="blue"] { --cor: var(--blue); --cor2: var(--blue2); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--fonte); color: var(--tinta); overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+  background-color: var(--menta);
+  background-image: radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .7) 0 14px, transparent 15px),
+    radial-gradient(circle at 86% 12%, rgba(255, 95, 168, .18) 0 26px, transparent 27px),
+    radial-gradient(circle at 78% 88%, rgba(46, 139, 255, .16) 0 34px, transparent 35px),
+    radial-gradient(circle at 8% 82%, rgba(255, 181, 46, .2) 0 20px, transparent 21px);
+  background-attachment: fixed;
+}
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+button { font-family: inherit; color: inherit; cursor: pointer; border: 0; min-height: 44px; min-width: 44px; touch-action: manipulation; background: none; }
+button:focus-visible { outline: 3px solid var(--mel); outline-offset: 3px; }
+button:disabled { cursor: default; opacity: .5; }
+.tela { display: none; }
+.tela.ativa { display: flex; }
+
+.mini { background: var(--branco); border: 3px solid var(--tinta); border-radius: 14px; font-size: 1.15rem; padding: 0 8px; box-shadow: 0 3px 0 var(--tinta); }
+.mini[aria-pressed="true"] { background: #fff3c4; }
+.grande { min-height: 54px; padding: 8px 18px; border-radius: 20px; font-size: 1.15rem; font-weight: 600; background: var(--cor); color: var(--branco);
+  border: 3px solid var(--tinta); box-shadow: 0 5px 0 var(--tinta); transition: transform .1s ease; }
+.grande:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 var(--tinta); }
+.grande.rosa { background: var(--pink); } .grande.verde { background: var(--verde); }
+.grande.sim { background: var(--verde); } .grande.nao { background: #e8433e; }
+.medio-bt { min-height: 48px; padding: 6px 16px; border-radius: 16px; font-size: 1.05rem; font-weight: 600; background: var(--branco); border: 3px solid var(--tinta); box-shadow: 0 4px 0 var(--tinta); }
+.linha { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+
+/* ---------- começo ---------- */
+#inicio { position: relative; min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+  padding: calc(64px + var(--st)) calc(16px + var(--sr)) calc(90px + var(--sb)) calc(16px + var(--sl)); }
+.faixa { position: absolute; top: calc(8px + var(--st)); right: calc(8px + var(--sr)); display: flex; gap: 6px; z-index: 2; }
+.logo { font-size: clamp(3.2rem, 17vw, 6.5rem); font-weight: 700; line-height: .9; letter-spacing: -.02em; color: var(--branco);
+  -webkit-text-stroke: 3px var(--tinta); paint-order: stroke fill; text-shadow: 0 6px 0 var(--tinta); display: inline-flex; align-items: flex-end; }
+.logo-txt { background: linear-gradient(180deg, #8fd0ff 0%, var(--blue) 45%, var(--pink) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 3px var(--tinta); }
+/* o "?" de meleca: um gancho de geleia e uma gota que pinga embaixo */
+.logo-gota { position: relative; width: .62em; height: 1em; margin-left: .04em; }
+.logo-gota::before { content: ''; position: absolute; left: .02em; top: .02em; width: .5em; height: .56em; border: .14em solid var(--pink); border-left-color: transparent;
+  border-bottom-color: transparent; border-radius: 50%; transform: rotate(45deg); filter: drop-shadow(0 .05em 0 var(--tinta)); }
+.logo-gota::after { content: ''; position: absolute; left: .2em; bottom: .02em; width: .2em; height: .26em; background: var(--blue); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  border: 3px solid var(--tinta); animation: pinga 2.4s ease-in-out infinite; }
+@keyframes pinga { 0%, 60%, 100% { transform: translateY(0) scaleY(1); } 75% { transform: translateY(.08em) scaleY(1.25); } }
+.sub { font-size: 1.35rem; font-weight: 600; color: var(--tinta2); margin-top: -2px; }
+.pergunta-grande { font-size: 1.3rem; font-weight: 600; margin-top: 10px; }
+.melecas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.meleca-bt { width: min(44vw, 200px); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 12px; border-radius: 28px;
+  background: var(--branco); border: 4px solid var(--tinta); box-shadow: 0 6px 0 var(--tinta); transition: transform .15s ease; }
+.meleca-bt.blue[aria-pressed="true"] { background: #e3f1ff; } .meleca-bt.pink[aria-pressed="true"] { background: #ffe6f2; }
+.meleca-bt:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--tinta); }
+.meleca-img { width: 100%; aspect-ratio: 1; display: block; }
+.meleca-img svg, .meleca-mini svg, .fim-meleca svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.meleca-nome { font-size: 1.15rem; font-weight: 700; }
+.ajuda { max-width: 34rem; background: var(--branco); border: 3px solid var(--tinta); border-radius: 20px; padding: 14px 16px; text-align: left; display: grid; gap: 8px; font-size: 1.05rem; }
+.versao { font-size: .85rem; color: var(--tinta2); }
+
+/* ---------- modos e níveis ---------- */
+#modos, #niveis { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  padding: calc(70px + var(--st)) calc(16px + var(--sr)) calc(90px + var(--sb)) calc(16px + var(--sl)); }
+.conversa { display: flex; align-items: center; gap: 8px; }
+.meleca-mini { width: 76px; height: 76px; flex: 0 0 auto; display: block; }
+.balao { position: relative; background: var(--branco); border: 3px solid var(--tinta); border-radius: 20px; padding: 10px 14px; font-size: 1.15rem; font-weight: 600; max-width: 28rem; }
+.balao::before { content: ''; position: absolute; left: -12px; top: 50%; margin-top: -8px; border: 8px solid transparent; border-right: 10px solid var(--tinta); border-left: 0; }
+.opcoes { display: grid; gap: 14px; width: min(100%, 26rem); }
+.opcao { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--branco); color: var(--tinta); font-size: 1.25rem; }
+.op-ico { font-size: 2rem; }
+.nivel { display: grid; text-align: left; background: var(--branco); color: var(--tinta); }
+.n-nome { font-size: 1.35rem; } .n-info { font-size: .95rem; font-weight: 400; color: var(--tinta2); }
+.nivel.facil { box-shadow: 0 5px 0 var(--verde); border-color: var(--verde); }
+.nivel.medio { box-shadow: 0 5px 0 var(--mel); border-color: #c98a12; }
+.nivel.dificil { box-shadow: 0 5px 0 var(--pink2); border-color: var(--pink2); }
+
+/* ---------- escolher o segredo e jogo: tela inteira, tabuleiro no meio ---------- */
+#segredo, #jogo { height: 100vh; height: 100dvh; display: none; flex-direction: column; overflow: hidden;
+  padding: calc(6px + var(--st)) calc(6px + var(--sr)) calc(6px + var(--sb)) calc(6px + var(--sl)); }
+#segredo.ativa, #jogo.ativa { display: flex; }
+.topo { display: flex; align-items: center; gap: 8px; min-height: 52px; flex: 0 0 auto; }
+.bn-nav .topo { padding-left: var(--nav-largo); }
+.titulo { font-size: 1.15rem; font-weight: 700; }
+#jogo .conversa { min-width: 0; }
+#jogo .meleca-mini { width: 54px; height: 54px; }
+#jogo .balao { flex: 1; font-size: 1.05rem; padding: 6px 12px; }
+.meu-nome { font-weight: 700; font-size: 1.05rem; }
+#acoes { flex-wrap: nowrap; }
+#acoes .grande { flex: 1 1 auto; padding: 8px 10px; }
+.meu-segredo { position: relative; width: 52px; flex: 0 0 auto; padding: 0; border-radius: 12px; overflow: hidden; border: 3px solid var(--cor); background: var(--branco); box-shadow: 0 3px 0 var(--tinta); }
+.meu-segredo .mini-cara .nome { display: none; }
+.meu-segredo .rotulo { position: absolute; left: 0; right: 0; bottom: 0; font-size: .7rem; font-weight: 700; background: var(--cor); color: var(--branco); }
+.area { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 4px; }
+.tabuleiro { display: grid; grid-template-columns: repeat(var(--colunas, 4), var(--carta, 70px)); gap: var(--gap, 6px); justify-content: center; align-content: center; }
+
+.carta { width: var(--carta, 70px); height: calc(var(--carta, 70px) * 1.38); min-height: 0; min-width: 0; position: relative; perspective: 600px; padding: 0; }
+.carta .frente, .carta .verso { position: absolute; inset: 0; border-radius: calc(var(--carta, 70px) * .16); border: 3px solid var(--tinta); overflow: hidden;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform .32s cubic-bezier(.2, .8, .3, 1.2); }
+.carta .frente { background: var(--branco); display: flex; flex-direction: column; }
+.carta .frente svg { width: 100%; height: auto; display: block; flex: 1 1 auto; min-height: 0; }
+.carta .nome { display: block; font-size: max(.62rem, calc(var(--carta, 70px) * .16)); font-weight: 600; line-height: 1.25; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px 1px; }
+.carta .verso { transform: rotateY(180deg); background: repeating-linear-gradient(135deg, var(--blue) 0 10px, #5aa8ff 10px 20px, var(--pink) 20px 30px, #ff8cc2 30px 40px); }
+.carta .verso::after { content: '?'; position: absolute; inset: 0; display: grid; place-items: center; font-size: calc(var(--carta, 70px) * .55); font-weight: 700; color: var(--branco); -webkit-text-stroke: 2px var(--tinta); paint-order: stroke fill; }
+.carta.virada .frente { transform: rotateY(-180deg); }
+.carta.virada .verso { transform: rotateY(0); }
+.carta.escolhida .frente { border-color: var(--cor); box-shadow: 0 0 0 4px var(--mel) inset; transform: translateY(-3px); }
+.tabuleiro.com-lupa .carta { cursor: zoom-in; }
+.carta:focus-visible { outline: 3px solid var(--mel); outline-offset: 2px; border-radius: 12px; }
+
+.painel { flex: 0 0 auto; display: grid; gap: 8px; padding: 6px 2px 2px; }
+.dica { text-align: center; font-size: .95rem; color: var(--tinta2); }
+.lupa-bt { min-height: 54px; min-width: 54px; font-size: 1.4rem; border-radius: 18px; }
+.perguntas { background: var(--branco); border: 3px solid var(--tinta); border-radius: 20px; padding: 6px 8px 8px; display: grid; gap: 6px; }
+.perg-topo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; }
+.lista-perguntas { max-height: min(46vh, 340px); overflow-y: auto; overscroll-behavior: contain; display: grid; gap: 6px; padding-right: 2px; }
+.lista-perguntas h3 { font-size: .95rem; color: var(--tinta2); margin-top: 4px; }
+.perg { display: flex; gap: 6px; }
+.pergunta { flex: 1; display: flex; align-items: center; gap: 8px; text-align: left; padding: 6px 10px; border-radius: 14px; border: 2px solid var(--tinta); background: #f4f0ff; font-size: 1.05rem; font-weight: 600; }
+.pergunta:active { background: #fff3c4; }
+.pergunta.inutil { opacity: .55; font-weight: 400; }
+.pergunta.feita { background: #e9f7ef; }
+.p-ico { font-size: 1.3rem; width: 1.6rem; text-align: center; }
+.ouvir { border-width: 2px; box-shadow: none; }
+.responder, .descartar, .palpitando { background: var(--branco); border: 3px solid var(--tinta); border-radius: 20px; padding: 8px 10px 10px; display: grid; gap: 8px; text-align: center; }
+.perg-feita { display: grid; gap: 2px; font-size: 1rem; } .perg-feita strong { font-size: 1.3rem; }
+.olha { display: flex; align-items: center; gap: 10px; text-align: left; background: #fff3c4; border-radius: 14px; padding: 6px 8px; font-weight: 600; }
+.mini-cara { display: block; position: relative; }
+.mini-cara svg { width: 100%; height: auto; display: block; }
+.olha .mini-cara { width: 56px; flex: 0 0 auto; border: 3px solid var(--tinta); border-radius: 12px; overflow: hidden; background: var(--branco); }
+.olha .mini-cara .nome, .fim-cara .mini-cara .nome { display: block; font-size: .8rem; text-align: center; font-weight: 600; }
+.pisca { animation: pisca .9s ease-in-out 3; }
+@keyframes pisca { 50% { transform: scale(1.12); box-shadow: 0 0 0 4px var(--mel); } }
+.resp-veio { font-size: 1.15rem; font-weight: 700; }
+
+/* ---------- janelas: lupa, cortina e fim ---------- */
+dialog.qe-janela { border: 4px solid var(--tinta); border-radius: 26px; padding: 12px; background: var(--branco); color: var(--tinta); max-width: min(92vw, 420px); margin: auto; }
+dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
+.lupa { display: grid; gap: 8px; justify-items: center; }
+.lupa svg { width: min(80vw, 340px, 62vh); height: auto; border-radius: 18px; border: 3px solid var(--tinta); }
+.lupa-nome { font-size: 1.5rem; font-weight: 700; }
+.cortina, .fim { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(58, 20, 80, .82); }
+.cortina { background: repeating-linear-gradient(135deg, var(--blue) 0 40px, #4a9dff 40px 80px); }
+.cartao { background: var(--branco); border: 4px solid var(--tinta); border-radius: 28px; padding: 18px; display: grid; gap: 12px; justify-items: center; text-align: center; max-width: 30rem; box-shadow: 0 8px 0 var(--tinta); }
+.cortina-ico { font-size: 3rem; }
+.cartao h2 { font-size: 1.45rem; }
+.fim-meleca { width: 110px; height: 110px; display: block; }
+.fim-caras { display: flex; gap: 14px; }
+.fim-cara { width: 110px; display: grid; gap: 4px; justify-items: center; font-weight: 600; }
+.fim-cara .mini-cara { width: 100%; border: 3px solid var(--tinta); border-radius: 16px; overflow: hidden; }
+.festa { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
+.festa i { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 4px; animation: cai linear forwards; }
+@keyframes cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+/* ---------- animação das melecas ---------- */
+.qm-respira { transform-origin: 50% 90%; transform-box: fill-box; animation: respira 2.8s ease-in-out infinite; }
+.qm-pula { transform-origin: 50% 100%; transform-box: fill-box; animation: pula .7s ease-in-out 3; }
+.qm-treme { transform-origin: 50% 90%; transform-box: fill-box; animation: treme .12s linear 6; }
+.qm-mel { transform-origin: 50% 0; transform-box: fill-box; animation: mel 2.4s ease-in-out infinite; }
+@keyframes respira { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.04, .96); } }
+@keyframes pula { 0%, 100% { transform: translateY(0) scale(1, 1); } 30% { transform: translateY(0) scale(1.12, .86); } 60% { transform: translateY(-14%) scale(.92, 1.1); } }
+@keyframes treme { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3%); } }
+@keyframes mel { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.18); } }
+
+/* ---------- celular deitado: tabuleiro à esquerda, conversa e painel à direita ---------- */
+@media (orientation: landscape) and (max-height: 600px) {
+  #segredo, #jogo { display: none; flex-direction: row; flex-wrap: wrap; }
+  #segredo.ativa, #jogo.ativa { display: grid; grid-template-columns: 1fr minmax(190px, 30vw); grid-template-rows: auto 1fr; grid-template-areas: "area topo" "area painel"; gap: 4px 8px; }
+  .topo { grid-area: topo; }
+  .area { grid-area: area; }
+  .painel { grid-area: painel; align-content: start; overflow-y: auto; }
+  .bn-nav #segredo .area, .bn-nav #jogo .area { padding-top: var(--nav-alto); }
+  .bn-nav .topo { padding-left: 0; }
+  .lista-perguntas { max-height: 52vh; }
+  #jogo .meleca-mini { width: 44px; height: 44px; }
+  .grande { min-height: 48px; font-size: 1.02rem; padding: 6px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
