@@ -115,6 +115,30 @@
   </div>
 </div>
 
+<div id="confirma" class="fim" hidden role="alertdialog" aria-modal="true" aria-labelledby="confTitulo" aria-describedby="confTexto">
+  <div class="cartao">
+    <div class="fim-estrelas" aria-hidden="true">🤔</div>
+    <h2 id="confTitulo" data-t="Tem certeza?|Are you sure?|¿Seguro?"></h2>
+    <p id="confTexto" data-t="Com essa jogada as cores ficam sem saída. Depois, só dá para arrumar voltando com ↩️ desfazer.|With this move the colors get stuck with no way out. After that, you can only fix it by going back with ↩️ undo.|Con esta jugada los colores se quedan sin salida. Después, solo se arregla volviendo con ↩️ deshacer."></p>
+    <div class="fim-botoes">
+      <button id="btConfNao" class="grande" type="button" data-t="🤔 Não, vou pensar|🤔 No, let me think|🤔 No, me lo pienso"></button>
+      <button id="btConfSim" class="medio-bt" type="button" data-t="Fazer mesmo assim|Do it anyway|Hacerlo igualmente"></button>
+    </div>
+  </div>
+</div>
+
+<div id="falhou" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="falhouTitulo">
+  <div class="cartao">
+    <div class="fim-estrelas" aria-hidden="true">💦</div>
+    <h2 id="falhouTitulo" data-t="Ops! Ficou sem saída|Oops! No way out|¡Vaya! Sin salida"></h2>
+    <p data-t="As cores se misturaram de um jeito que não dá mais para arrumar, e não sobrou ajuda para voltar. Vamos tentar de novo?|The colors got mixed in a way that can't be sorted anymore, and there are no helpers left to go back. Shall we try again?|Los colores se han mezclado de una forma que ya no se puede ordenar, y no quedan ayudas para volver. ¿Lo intentamos otra vez?"></p>
+    <div class="fim-botoes">
+      <button id="btFalhouDeNovo" class="grande" type="button" data-t="🔄 Tentar de novo|🔄 Try again|🔄 Intentarlo otra vez"></button>
+      <button id="btFalhouNiveis" class="medio-bt" type="button" data-t="🏡 Escolher nível|🏡 Choose level|🏡 Elegir nivel"></button>
+    </div>
+  </div>
+</div>
+
 <script src="motor.js"></script>
 <script src="som.js"></script>
 <script src="desenho.js"></script>

@@ -4,12 +4,12 @@
    A música de fundo é a trilha comum (../trilha.js); aqui são só os efeitos.
 
    AquaSom.ligar(true|false) · ligado() · acordar() (no primeiro toque: libera o som e carrega as gravações)
-   · vidro() pegar um frasco · despejar(segundos) · glub() · rolha() · brilho() · aplausos() · erro() · toque() */
+   · vidro() pegar um frasco · despejar(segundos) · glub() · rolha() · brilho() · aplausos() · erro() · sanfona() ("Falhou!") · toque() */
 (function (raiz) {
   'use strict';
   var ctx = null, ligado = true, buf = {}, pedidos = false, despejando = null;
   var ARQ = { despejar: 'sons/despejar.mp3', glub: 'sons/glub.mp3', rolha: 'sons/rolha.mp3', vidro: 'sons/vidro.mp3',
-    brilho: 'sons/brilho.mp3', aplausos: 'sons/aplausos.mp3', erro: 'sons/erro.mp3' };
+    brilho: 'sons/brilho.mp3', aplausos: 'sons/aplausos.mp3', erro: 'sons/erro.mp3', sanfona: 'sons/sanfona.mp3' };
 
   function ac() {
     try {
@@ -87,6 +87,20 @@
     rolha: function () { if (!tocar('rolha', 0.9, 1)) { nota(420, 0, 0.07, 'square', 0.1, 150); nota(900, 0.02, 0.05, 'triangle', 0.07); } },
     brilho: function () { if (!tocar('brilho', 0.7, 1)) [1047, 1319, 1568, 2093].forEach(function (f, k) { nota(f, k * 0.07, 0.4, 'sine', 0.09); }); },
     aplausos: function () { if (!tocar('aplausos', 0.8, 1)) [523, 659, 784, 1047, 784, 1047].forEach(function (f, k) { nota(f, k * 0.12, 0.3, 'triangle', 0.13); }); },
+    // "Falhou!": sanfona triste. Reserva: notas de "uón-uón" descendo, com som de palheta (dente de serra abafado)
+    sanfona: function () {
+      if (tocar('sanfona', 0.85, 1)) return;
+      var c = ligado && ac(); if (!c) return;
+      try {
+        [[392, 0, 0.32], [370, 0.34, 0.32], [349, 0.68, 0.32], [330, 1.02, 0.9]].forEach(function (n) {
+          var t0 = c.currentTime + n[1], f = c.createBiquadFilter(), g = c.createGain();
+          f.type = 'lowpass'; f.frequency.value = 1400;
+          g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.09, t0 + 0.04); g.gain.setValueAtTime(0.09, t0 + n[2] * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t0 + n[2]);
+          [1, 1.5, 2.003].forEach(function (m) { var o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(n[0] * m / 2, t0); if (n[1] > 1) o.frequency.linearRampToValueAtTime(n[0] * m / 2 * 0.94, t0 + n[2]); o.connect(f); o.start(t0); o.stop(t0 + n[2] + 0.05); });
+          f.connect(g); g.connect(c.destination);
+        });
+      } catch (e) { /* sem som */ }
+    },
     erro: function () { if (!tocar('erro', 0.6, 1)) nota(190, 0, 0.14, 'triangle', 0.12, 120); }
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = S; else raiz.AquaSom = S;

@@ -5,7 +5,7 @@
    estrelas, as gotinhas e o que já foi trocado na lojinha. Sem dinheiro, sem anúncio, sem conta. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0';
+  var APP_VERSION = '0.4.0';
   var APP_DATA = '14/Nov/2026';
   var M = window.AquaMotor, D = window.AquaDesenho, Som = window.AquaSom, Fundo = window.AquaFundo;
   var $ = function (id) { return document.getElementById(id); };
@@ -126,6 +126,7 @@
   };
   var LEVANTA = 24;                        // quanto o frasco escolhido sobe (pontos do desenho)
   var nivel = 'facil', fase = 1, gerada = null, est = null, hist = [], usos = null, sel = -1, fimDeFase = false;
+  var perdeu = false, pendente = null;     // "sem saída" (dono, 14/Nov/2026): perdeu = não dá mais para voltar; pendente = jogada esperando o "Tem certeza?"
   var vb = [];                             // o jeito de cada frasco na tela (subida, balanço, rolha, brilho, bolhas...)
   var anims = [];                          // despejos em andamento
   var faiscas = [];                        // estrelinhas e confetes
@@ -146,7 +147,7 @@
     fecharFim(); pararTudo();
     gerada = M.gerar(nivel, fase);
     est = M.novoEstado(gerada);
-    hist = []; usos = { desfazer: 0, dica: 0, embaralhar: 0, extra: 0 }; sel = -1; fimDeFase = false; parado = 0;
+    hist = []; usos = { desfazer: 0, dica: 0, embaralhar: 0, extra: 0 }; sel = -1; fimDeFase = false; parado = 0; perdeu = false; pendente = null;
     vb = est.frascos.map(novoVb);
     // cada fase começa numa cena diferente (a mesma fase começa sempre na mesma cena)
     cenas = Fundo.lista(pref.tem.cenarios);
@@ -242,7 +243,7 @@
   function tocar(i) {
     Som.acordar(); parado = 0;
     if (dicaPar && dicaSozinha) dicaPar = null;
-    if (!est || fimDeFase || i >= est.frascos.length) return;
+    if (!est || fimDeFase || perdeu || pendente || i >= est.frascos.length) return;
     if (ocupado(i) || (sel >= 0 && ocupado(sel))) terminarAnims();
     var f = est.frascos[i];
     if (sel < 0) {
@@ -250,7 +251,7 @@
       escolher(i); return;
     }
     if (i === sel) { soltar(); return; }
-    if (M.quantoDespeja(est, sel, i)) { despejar(sel, i); return; }
+    if (M.quantoDespeja(est, sel, i)) { tentarDespejar(sel, i); return; }
     if (f.length && !M.pronto(f, est.cap)) { soltar(true); escolher(i); return; }   // tocou em outro frasco que não combina: pega esse
     tremer(i); Som.erro();
   }
@@ -258,6 +259,76 @@
   function soltar(quieto) { if (sel < 0) return; vb[sel].sobeAlvo = 0; balancar(sel, 0.06); if (!quieto) Som.toque(); sel = -1; rotular(); pedirQuadro(); }
   function tremer(i) { vb[i].treme = 1; pedirQuadro(); }
   function balancar(i, forca) { if (CALMO) return; vb[i].ondaA = Math.max(vb[i].ondaA, forca); vb[i].ondaT = 0; }
+
+  // ---------- sem saída (dono, 14/Nov/2026) ----------
+  // Toda fase começa com solução. A criança pode fazer jogadas que deixam a fase sem saída, desde que ainda dê para
+  // voltar: com o ↩️ desfazer que sobrou (desfazendo as jogadas feitas desde que ficou sem saída), com o 🔀 embaralhar
+  // (que sempre mistura de um jeito com solução) ou com o ➕ frasco extra (se ele resolver). Quando nenhuma ajuda que
+  // sobrou consegue salvar, ela perdeu: "Falhou!" com a sanfona, e recomeça a fase.
+  // No Fácil e no Médio, antes da jogada que deixa sem saída, o jogo pergunta "Tem certeza?" (no Difícil, não: seria dica).
+  function temSaida(frascos) { return M.temSaida(frascos, est.cap); }
+  function comExtra(frascos) { return frascos.map(function (f) { return f.slice(); }).concat([[]]); }
+  // a arrumação de k jogadas atrás, com os frascos de agora (o frasco extra continua, como no desfazer)
+  function atras(k) {
+    var f = (k ? hist[hist.length - k] : est).frascos.map(function (x) { return x.slice(); });
+    while (f.length < est.frascos.length) f.push([]);
+    return f;
+  }
+  // quantas jogadas para trás até a última arrumação com saída (0 = tem saída agora)
+  function jogadasSemSaida() {
+    for (var k = 0; k <= hist.length; k++) if (temSaida(atras(k))) return k;
+    return hist.length + 1;
+  }
+  function daParaSalvar() {
+    if (resta('embaralhar') > 0) return true;
+    var extra = resta('extra') > 0, max = Math.min(resta('desfazer'), hist.length);
+    for (var k = 0; k <= max; k++) {
+      var f = atras(k);
+      if (temSaida(f) || (extra && temSaida(comExtra(f)))) return true;
+    }
+    return false;
+  }
+  function conferirSaida() {
+    if (fimDeFase || perdeu || M.venceu(est) || temSaida(est.frascos)) return;
+    if (!daParaSalvar()) { perdeu = true; esperaFim = setTimeout(falhar, 900 / VEL); return; }
+    if (nivel === 'dificil') return;
+    var n = jogadasSemSaida();
+    aviso(t('Sem saída agora! Volte ' + n + (n === 1 ? ' jogada' : ' jogadas') + ' com ↩️ desfazer.',
+        'No way out now! Go back ' + n + (n === 1 ? ' move' : ' moves') + ' with ↩️ undo.',
+        '¡Ahora no hay salida! Vuelve ' + n + (n === 1 ? ' jugada' : ' jugadas') + ' con ↩️ deshacer.'));
+    chamarAjudas();
+  }
+  function tentarDespejar(de, para) {
+    if (nivel !== 'dificil' && temSaida(est.frascos)) {
+      var sim = M.copiar(est); M.despejar(sim, de, para);
+      if (!temSaida(sim.frascos)) { perguntar(de, para); return; }
+    }
+    despejar(de, para);
+  }
+  function perguntar(de, para) {
+    pendente = [de, para]; Som.erro();
+    $('confirma').hidden = false;
+    setTimeout(function () { $('btConfNao').focus(); }, 60);
+  }
+  function responder(sim) {
+    var p = pendente; pendente = null; $('confirma').hidden = true;
+    if (sim && p && M.quantoDespeja(est, p[0], p[1])) despejar(p[0], p[1]);
+    else { soltar(true); Som.toque(); }
+  }
+  $('btConfNao').addEventListener('click', function () { responder(false); });
+  $('btConfSim').addEventListener('click', function () { responder(true); });
+  $('confirma').addEventListener('click', function (e) { if (e.target === this) responder(false); });   // tocar fora = não
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pendente) responder(false); });
+  function falhar() {
+    if (!perdeu) return;
+    Som.erro(); setTimeout(function () { Som.sanfona(); }, 180 / VEL);
+    if (window.Trilha && Trilha.volume) { Trilha.volume(0.25); setTimeout(function () { Trilha.volume(null); }, 3500); }
+    esconderAviso(); dicaPar = null;
+    $('falhou').hidden = false;
+    setTimeout(function () { $('btFalhouDeNovo').focus(); }, 60);
+  }
+  $('btFalhouDeNovo').addEventListener('click', function () { novoJogo(); });
+  $('btFalhouNiveis').addEventListener('click', voltarAoMenu);
 
   function despejar(de, para) {
     hist.push(M.copiar(est));
@@ -273,6 +344,7 @@
     anims.push({ de: de, para: para, q: r.q, cor: r.cor, dir: dir, t: 0, tIda: 0.22, tVerte: 0.24 + 0.2 * r.q, tVolta: 0.24, revelou: r.revelou, fechou: r.fechou,
       antes: antes, som: false, sobe0: vb[de].sobe });
     sel = -1; dicaPar = null; esconderAviso(); rotular(); pintarAjudas(); pedirQuadro();
+    conferirSaida();
   }
   function concluir(a) {
     var v = vb[a.de], p = vb[a.para];
@@ -298,7 +370,7 @@
   function depoisDaJogada() {
     rotular(); pintarAjudas();
     if (M.venceu(est)) { if (!fimDeFase) { fimDeFase = true; esperaFim = setTimeout(comemorar, 700 / VEL); } return; }
-    if (!anims.length && !M.temJogada(est)) travou();
+    if (!perdeu && !anims.length && !M.temJogada(est)) travou();
   }
   function terminarAnims() {
     var lista = anims; anims = [];
@@ -324,7 +396,7 @@
     aviso(t('Acabaram ' + nomes[tipo][0] + ' desta fase. Na próxima fase voltam todos!', 'No more ' + nomes[tipo][1] + ' in this stage. They all come back in the next one!', 'Se han acabado ' + nomes[tipo][2] + ' de esta fase. ¡En la próxima fase vuelven!'));
     Som.erro();
   }
-  function prepararAjuda() { Som.acordar(); parado = 0; if (anims.length) terminarAnims(); return !!est && !fimDeFase; }
+  function prepararAjuda() { Som.acordar(); parado = 0; if (anims.length) terminarAnims(); return !!est && !fimDeFase && !perdeu && !pendente; }
 
   $('btDesfazer').addEventListener('click', function () {
     if (!prepararAjuda()) return;
@@ -375,6 +447,7 @@
     M.frascoExtra(est); usos.extra++;
     var v = novoVb(); v.nasce = CALMO ? 1 : 0; vb.push(v);
     dicaPar = null; plano = null; esconderAviso(); montarBotoes(); ajustar(); Som.vidro(); Som.brilho(); pintarAjudas();
+    conferirSaida();
   });
 
   $('btReiniciar').addEventListener('click', function () { Som.acordar(); Som.toque(); novoJogo(); });
@@ -402,7 +475,7 @@
     setTimeout(function () { $('btProxima').focus(); }, 60);
     pedirQuadro();
   }
-  function fecharFim() { $('fim').hidden = true; }
+  function fecharFim() { $('fim').hidden = true; $('falhou').hidden = true; $('confirma').hidden = true; pendente = null; }
   function confete() {
     var cores = D.CORES.slice(0, 9).map(function (c) { return c.hex; });
     for (var k = 0; k < 90; k++) {
@@ -639,7 +712,7 @@
   window.AquaApp = {
     estado: function () { return est; }, nivel: function () { return nivel; }, fase: function () { return fase; }, versao: APP_VERSION, MUSICAS: MUSICAS,
     pref: function () { return pref; }, usos: function () { return usos; }, tela: function () { return atual; }, lay: function () { return lay; },
-    animando: function () { return anims.length; }, cena: function () { return Fundo.atual(); }, cenas: function () { return cenas.slice(); }, dica: function () { return dicaPar; }, assentar: terminarAnims, fim: function () { return fimDeFase; }, LIMITES: LIMITES
+    animando: function () { return anims.length; }, perdeu: function () { return perdeu; }, semSaida: function () { return jogadasSemSaida(); }, cena: function () { return Fundo.atual(); }, cenas: function () { return cenas.slice(); }, dica: function () { return dicaPar; }, assentar: terminarAnims, fim: function () { return fimDeFase; }, LIMITES: LIMITES
   };
 })();
 

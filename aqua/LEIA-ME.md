@@ -31,6 +31,18 @@ fases e código são próprios. O dono joga o MAGIC SORT e mandou um print como 
 - **Frasco embaçado** (🌫️): as camadas de baixo aparecem cinzentas com "?" até virarem a de cima. Só passa o pedaço
   que está à vista.
 
+## Sem saída (desde a 0.4.0)
+
+- Toda fase começa com solução. A criança pode fazer jogadas que deixam as cores **sem saída** (não dá mais para
+  terminar daquele jeito), desde que ainda dê para voltar.
+- **Dá para voltar** quando sobra ajuda que salva: ↩️ desfazer suficiente para voltar todas as jogadas feitas desde que
+  ficou sem saída, ou o 🔀 embaralhar (sempre mistura de um jeito com solução), ou o ➕ frasco extra (se ele resolver).
+- **Não dá mais = perdeu**: aparece "Ops! Ficou sem saída", com um "tum" e uma sanfona triste, e a fase recomeça
+  (ajudas cheias de novo). No Fácil o desfazer não tem limite, então nunca perde.
+- **No Fácil e no Médio**, antes da jogada que deixa sem saída, o jogo pergunta **"Tem certeza?"** ("Não, vou pensar" /
+  "Fazer mesmo assim"). Depois dela, avisa quantas jogadas voltar. No Difícil não pergunta nem avisa: seria uma dica.
+- Quem decide é o resolvedor (`AquaMotor.temSaida`), a cada jogada; no Difícil leva no máximo uns 30 milésimos de segundo.
+
 ## Ajudas (nunca custam nada; voltam cheias a cada fase)
 
 | Ajuda | Fácil | Médio | Difícil |
