@@ -42,7 +42,7 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
   const abrir = async (ua, cod, marca) => {
     const tv = /SmartTV/.test(ua);
     const ctx = await b.newContext({ viewport: tv ? { width: 1280, height: 720 } : { width: 390, height: 844 }, userAgent: ua, serviceWorkers: 'block' });
-    await ctx.addInitScript(([c, m]) => { localStorage.setItem('bolinho:idioma', c); if (m) localStorage.setItem('bolinho:instalado:/kids/', m); }, [cod, marca]);
+    await ctx.addInitScript(([c, m]) => { localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:novidades-vistas', '["*"]'); if (m) localStorage.setItem('bolinho:instalado:/kids/', m); }, [cod, marca]);
     await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
     const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(400);
     return { ctx, pg };

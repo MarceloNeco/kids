@@ -371,3 +371,13 @@ test('rio: trechos de água longe dos túneis e loopings; ao entrar vira barco e
   assert.ok(ev.some(x => x.tipo === 'terra'));
   assert.ok(ev.findIndex(x => x.tipo === 'agua') < ev.findIndex(x => x.tipo === 'terra'));
 });
+
+test('paredões: nos rios e nos mundos de pedra, nunca no túnel nem no looping; setas do lado de fora das curvas', () => {
+  for (let s = 1; s < 8; s++) {
+    const p = P.montar('normal', s * 131);
+    p.segs.forEach(sg => { if (sg.agua) assert.ok(sg.parede); if (sg.parede) assert.ok(!sg.tunel && !sg.loop); });
+    const setas = p.segs.filter(sg => sg.enfeites.some(e => e.tipo === 'setaD' || e.tipo === 'setaE'));
+    assert.ok(setas.length > 10);
+    setas.forEach(sg => { const e = sg.enfeites.find(x => x.tipo.startsWith('seta')); assert.equal(e.tipo === 'setaD', sg.curva > 0); assert.ok(e.x * sg.curva < 0); });
+  }
+});

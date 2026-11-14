@@ -8,42 +8,51 @@ button { font-family: inherit; cursor: pointer; touch-action: manipulation; }
 [hidden] { display: none !important; }
 .tela { display: none; position: fixed; inset: 0; }
 .tela.ativa { display: block; }
-#menu.ativa, #album.ativa { display: flex; align-items: center; justify-content: center; }
+#album.ativa { display: flex; align-items: center; justify-content: center; }
+/* começo: o nome no céu, a caixa de escolhas embaixo e o lago vivo (peixes, raios de sol, bolhas) à vista no meio */
+#menu.ativa { display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: calc(var(--nav-alto, 56px) + 2px) 0 calc(var(--sb) + 10px); box-sizing: border-box; pointer-events: none; }
+#menu.ativa > * { pointer-events: auto; }
 
 /* ---------- começo ---------- */
-.painel { width: min(560px, 94vw); max-height: 94vh; overflow: auto; box-sizing: border-box; padding: 14px 16px 10px; border-radius: 26px;
-  background: linear-gradient(180deg, rgba(10, 60, 130, .82), rgba(5, 30, 80, .88)); border: 2px solid rgba(255, 255, 255, .55);
-  box-shadow: 0 10px 40px rgba(0, 20, 60, .5), inset 0 2px 0 rgba(255, 255, 255, .25); text-align: center; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-.logo { margin: 0 0 8px; font-size: clamp(38px, 9vw, 58px); line-height: 1; letter-spacing: 1px; font-weight: 700; }
+.painel { width: min(440px, 94vw); max-height: 70vh; overflow: auto; box-sizing: border-box; padding: 10px 12px 6px; border-radius: 24px;
+  background: rgba(5, 30, 80, .58); border: 2px solid rgba(255, 255, 255, .45); box-shadow: 0 8px 26px rgba(0, 20, 60, .35); text-align: center; }
+.logo { margin: 0; font-size: clamp(40px, 12vw, 64px); line-height: 1; letter-spacing: 1px; font-weight: 700; }
 .logo span { display: inline-block; color: var(--amarelo); text-shadow: 0 3px 0 #c46a00, 0 6px 12px rgba(0, 0, 0, .35); animation: boia 2.4s ease-in-out infinite; }
 .logo span:nth-child(even) { color: #7ff0ff; text-shadow: 0 3px 0 #1a6fa0, 0 6px 12px rgba(0, 0, 0, .35); }
 .logo span:nth-child(1) { animation-delay: 0s } .logo span:nth-child(2) { animation-delay: .15s } .logo span:nth-child(3) { animation-delay: .3s } .logo span:nth-child(4) { animation-delay: .45s }
 .logo span:nth-child(5) { animation-delay: .6s } .logo span:nth-child(6) { animation-delay: .75s } .logo span:nth-child(7) { animation-delay: .9s } .logo span:nth-child(8) { animation-delay: 1.05s }
 @keyframes boia { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
 @media (prefers-reduced-motion: reduce) { .logo span { animation: none } }
-.escolha, .linha { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; margin: 6px 0; }
+.grupo { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+.grupo .rotulo { flex: 0 0 auto; width: 92px; text-align: left; font-size: 15px; line-height: 1.1; }
+/* cada grupo é uma faixa só, com as opções lado a lado (nunca quebra a linha) */
+.seg { flex: 1 1 auto; display: flex; gap: 3px; padding: 3px; min-width: 0; border-radius: 999px; background: rgba(255, 255, 255, .12); border: 1.5px solid rgba(255, 255, 255, .5); }
+.seg .chip { flex: 1 1 0; min-width: 0; padding: 6px 4px; border: 0; background: transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rotulo { font-weight: 600; opacity: .9; margin-right: 2px; }
-.chip { min-height: 44px; padding: 6px 14px; border-radius: 999px; border: 2px solid rgba(255, 255, 255, .6); background: rgba(255, 255, 255, .12); color: #fff; font-size: 17px; font-weight: 600; }
-.chip[aria-checked="true"] { background: #fff; color: var(--azul); border-color: #fff; box-shadow: 0 0 0 3px rgba(255, 210, 63, .7); }
+.chip { min-height: 44px; padding: 6px 14px; border-radius: 999px; border: 2px solid rgba(255, 255, 255, .6); background: rgba(255, 255, 255, .12); color: #fff; font-size: 16px; font-weight: 600; }
+.chip[aria-checked="true"] { background: #fff; color: var(--azul); border-color: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); }
 .chip.verde[aria-checked="true"] { background: #7ee081; color: #10391a; }
 .chip.amarelo[aria-checked="true"] { background: var(--amarelo); color: #4a3200; }
 .chip.vermelho[aria-checked="true"] { background: #ff7a6b; color: #4a0c05; }
-.grande-chip { font-size: 20px; min-height: 52px; padding: 8px 22px; }
-.jogar { margin: 8px 0 4px; min-height: 56px; padding: 8px 34px; border: 0; border-radius: 999px; font-size: 26px; font-weight: 700; color: #4a2600;
+.grande-chip { font-size: 18px; min-height: 48px; }
+.jogar { margin: 2px 0 6px; min-height: 56px; padding: 8px 34px; border: 0; border-radius: 999px; font-size: 26px; font-weight: 700; color: #4a2600;
   background: linear-gradient(180deg, #ffe066, #ffb000); box-shadow: 0 5px 0 #c46a00, 0 8px 18px rgba(0, 0, 0, .3); }
 .jogar:disabled { filter: grayscale(.8); opacity: .55; }
 .jogar:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #c46a00; }
 .aviso { margin: 4px auto; max-width: 420px; padding: 6px 10px; border-radius: 12px; background: rgba(255, 210, 63, .2); font-size: 15px; }
-.rodape { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 4px; }
+.rodape { display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; }
 .mini { min-width: 44px; min-height: 44px; padding: 4px 12px; border-radius: 14px; border: 1.5px solid rgba(255, 255, 255, .5); background: rgba(255, 255, 255, .14); color: #fff; font-size: 17px; font-weight: 600; }
 .ajuda { text-align: left; font-size: 15px; line-height: 1.35; background: rgba(0, 0, 0, .2); border-radius: 14px; padding: 4px 12px; margin-top: 6px; }
-.versao { margin: 6px 0 0; font-size: 12px; opacity: .65; }
+.versao { margin: 4px 0 0; font-size: 12px; opacity: .65; }
 @media (orientation: landscape) and (max-height: 500px) {
-  .painel { padding: 8px 14px 6px; width: min(640px, 80vw); }
-  .logo { font-size: 36px; margin-bottom: 2px; }
-  .escolha, .linha { margin: 3px 0; gap: 6px; }
-  .chip { min-height: 40px; font-size: 15px; padding: 4px 12px; }
-  .grande-chip { min-height: 44px; font-size: 17px; }
+  #menu.ativa { padding-top: calc(var(--st) + 6px); }
+  .painel { padding: 6px 10px 4px; width: min(470px, 60vw); max-height: none; }
+  .logo { font-size: 38px; }
+  .grupo { margin-bottom: 5px; }
+  .chip { min-height: 38px; font-size: 15px; padding: 3px 4px; }
+  .grande-chip { min-height: 40px; font-size: 16px; }
+  .mini { min-height: 40px; }
   .jogar { min-height: 48px; font-size: 22px; margin: 4px 0 2px; }
   .versao { display: none; }
 }
@@ -131,5 +140,10 @@ body.jogando .trilha { right: auto; left: 50%; transform: translateX(-50%); bott
   .balde .item img { max-width: 24px; max-height: 20px; }
   .balde { flex-wrap: wrap; justify-content: center; max-width: 96px; }
   .sozinho .controles.esq { bottom: calc(var(--sb) + 8px); }
-  body:not(.sozinho) .placar { bottom: calc(var(--sb) + 104px); }   /* em dois, os botões ocupam os cantos de baixo */
+  .placar { bottom: calc(var(--sb) + 104px); }   /* acima dos botões 🎣 e ⬆️ */
+}
+/* celular em pé: o nome na mesma altura da barra 🚪, ao lado dela, para não cobrir o Juca e a Lili */
+@media (orientation: portrait) {
+  #menu.ativa { padding-top: calc(var(--st) + 8px); }
+  #menu .logo { align-self: stretch; box-sizing: border-box; padding: 0 8px 0 var(--nav-largo, 100px); font-size: min(44px, 10.5vw); text-align: center; }
 }

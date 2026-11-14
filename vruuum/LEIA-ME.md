@@ -278,3 +278,12 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - Veículo 3D no rio: as rodas recolhem e entram duas boias (`boias()` no `modelos3d.js`); todo veículo ganha esteira
   de espuma, borrifos e balanço (`esteira`/`borrifos` no `desenho.js`). Rivais boiam com espuma por baixo.
 - Mapinha redondo no canto de cima (`miniMapa`): a pista calculada das curvas, rios em azul, chegada e as bolinhas.
+
+## 1.19.0 — paredões de rocha e setas nas curvas (dono: "mais gráficos, montanhas dos lados, 3D arrojado")
+
+- `pista.js`: `seg.parede` em trechos (90 a 170 pedaços) dos mundos de pedra (cânion, templo, lava, neve) e em todos
+  os rios; nunca em túnel nem perto de looping. Setas `setaD`/`setaE` do lado de fora das curvas fortes.
+- `desenho.js`: `paredoes()` desenha os dois paredões de cada pedaço na passada de trás para a frente (cobrem o que
+  está atrás deles), com camadas, pico claro e sombra no pé; cores em `PAREDE`, altura em `alturaParede()`. Enfeite
+  atrás do paredão não é desenhado. Custo medido: cerca de 2 ms a mais por quadro (1280×720, sem placa de vídeo).
+- `sprites.js`: `setaCurva()` (placa escura, borda e setas de neon).
