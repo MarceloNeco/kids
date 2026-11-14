@@ -53,6 +53,19 @@ test('baixar: baixar.js na página e interruptores fora do arquivo', () => {
   assert.match(html, /id="btBaixar"/);
 });
 
+test('instalar: botão sempre à vista, passo a passo comum offline e "já instalado" (dono, 14/Nov/2026: "não acho o ícone")', () => {
+  const html = ler('index.html'), js = ler('app.js'), sw = ler('sw.js'), m = JSON.parse(ler('manifest.webmanifest'));
+  assert.match(html, /<button id="btInstalar"(?![^>]*hidden)[^>]*>/, 'o botão não nasce escondido');
+  assert.match(js, /src = '\.\.\/instalar\.js'/, 'sem a janela do Chrome, abre o passo a passo comum');
+  assert.match(sw, /'\.\.\/instalar\.js'/, 'passo a passo guardado para sem internet');
+  assert.match(js, /getInstalledRelatedApps/);
+  assert.ok(m.related_applications && m.related_applications[0].url.endsWith('/kids/purpurina/manifest.webmanifest'));
+  assert.equal(m.id, './', 'id igual ao de antes (start_url) para não virar outro app');
+  // tela cheia pelo ⛶ não é janela de app (senão o passo a passo diz "abriu dentro de outro app")
+  assert.match(js, /fullscreen\)'\)\.matches && !document\.fullscreenElement/);
+  assert.match(fs.readFileSync(path.join(pasta, '..', 'instalar.js'), 'utf8'), /fullscreen\)'\)\.matches && !document\.fullscreenElement/);
+});
+
 test('baixar.js igual ao do Vruuum! (um só jeito de montar o arquivo)', () => {
   assert.equal(ler('baixar.js'), fs.readFileSync(path.join(pasta, '..', 'vruuum', 'baixar.js'), 'utf8'));
 });

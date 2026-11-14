@@ -44,7 +44,8 @@
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   }
 
-  var janelaDeApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: minimal-ui)').matches)) || navigator.standalone === true;
+  // tela cheia pelo botão ⛶ (document.fullscreenElement) também dá display-mode: fullscreen, mas continua no navegador
+  var janelaDeApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || (matchMedia('(display-mode: fullscreen)').matches && !document.fullscreenElement) || matchMedia('(display-mode: minimal-ui)').matches)) || navigator.standalone === true;
   // Janela de app não quer dizer "o Bolinho já está instalado": aberta pela 🚪 de um JOGO instalado sozinho (outro app),
   // a estante aparece dentro da janela do jogo (com a barrinha ✕ em cima). Só é o app do Bolinho quando abriu pelo ícone
   // dele: o manifest abre em "?app=1" e a aba guarda a marca (dono, 14/Nov/2026: "apaguei o ícone e não achei a opção").

@@ -2,6 +2,23 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.20.0",
+      "data": "14/Nov/2026",
+      "hora": "17:23:24",
+      "pt": [
+        "📲 O botão Instalar no celular aparece sempre. Se a Purpurina já estiver instalada, ele mostra onde achar o ícone (na lista de apps).",
+        "📄 O botão de baixar ficou claro: é só um arquivo nos Downloads, não cria ícone."
+      ],
+      "en": [
+        "📲 The Install on the phone button is always there. If Purpurina is already installed, it shows where to find the icon (in the app list).",
+        "📄 The download button is clearer now: it's just a file in Downloads and doesn't create an icon."
+      ],
+      "es": [
+        "📲 El botón Instalar en el móvil aparece siempre. Si Purpurina ya está instalada, te enseña dónde encontrar el icono (en la lista de apps).",
+        "📄 El botón de descargar ahora es más claro: es solo un archivo en Descargas y no crea icono."
+      ]
+    },
+    {
       "versao": "0.19.0",
       "data": "14/Nov/2026",
       "hora": "15:14:27",
