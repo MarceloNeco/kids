@@ -13,9 +13,9 @@ var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'dados.js', 'logica.js', 'dese
   'fotos/farinha.jpg', 'fotos/fermento.jpg', 'fotos/gelatina-po.jpg', 'fotos/gelatina.jpg', 'fotos/granulado.jpg', 'fotos/jabuticaba.jpg', 'fotos/laranja.jpg', 'fotos/leite.jpg', 'fotos/leitecond.jpg', 'fotos/limao.jpg', 'fotos/maca.jpg', 'fotos/manteiga.jpg',
   'fotos/mel.jpg', 'fotos/morango.jpg', 'fotos/oleo.jpg', 'fotos/omelete.jpg', 'fotos/ovo.jpg', 'fotos/panqueca.jpg', 'fotos/pao-queijo.jpg', 'fotos/pao.jpg', 'fotos/peixe-assado.jpg', 'fotos/peixe.jpg', 'fotos/pizza.jpg', 'fotos/polvilho.jpg',
   'fotos/queijo.jpg', 'fotos/sal.jpg', 'fotos/salada-frutas.jpg', 'fotos/sanduiche.jpg', 'fotos/suco-jabuticaba.jpg', 'fotos/suco-laranja.jpg', 'fotos/tomate.jpg', 'fotos/uva.jpg', 'fotos/vitamina.jpg', 'voz/cida-aqui-acucar.mp3', 'voz/cida-aqui-farinha.mp3', 'voz/cida-aqui-leite.mp3',
-  'voz/cida-aqui-manteiga.mp3', 'voz/cida-aqui-mel.mp3', 'voz/cida-aqui-ovo.mp3', 'voz/cida-aqui-sal.mp3', 'voz/cida-bastante.mp3', 'voz/cida-diz.mp3', 'voz/cida-exemplo.mp3', 'voz/cida-oi-sem.mp3', 'voz/cida-oi.mp3', 'voz/cida-tchau-fim.mp3', 'voz/cida-tchau.mp3', 'render/banana.webp',
-  'render/cenoura.webp', 'render/farinha.webp', 'render/jabuticaba.webp', 'render/laranja.webp', 'render/leite.webp', 'render/limao.webp', 'render/maca.webp', 'render/morango.webp', 'render/ovo.webp', 'render/peixe.webp', 'render/queijo.webp', 'render/tomate.webp',
-  'render/u-liquidificador.webp', 'render/uva.webp'];
+  'voz/cida-aqui-manteiga.mp3', 'voz/cida-aqui-mel.mp3', 'voz/cida-aqui-ovo.mp3', 'voz/cida-aqui-sal.mp3', 'voz/cida-bastante.mp3', 'voz/cida-diz.mp3', 'voz/cida-exemplo.mp3', 'voz/cida-oi-sem.mp3', 'voz/cida-oi.mp3', 'voz/cida-tchau-fim.mp3', 'voz/cida-tchau.mp3', 'render/alface.webp',
+  'render/banana.webp', 'render/batata.webp', 'render/cenoura.webp', 'render/cheiro.webp', 'render/farinha.webp', 'render/jabuticaba.webp', 'render/laranja.webp', 'render/leite.webp', 'render/limao.webp', 'render/maca.webp', 'render/morango.webp', 'render/ovo.webp',
+  'render/peixe.webp', 'render/queijo.webp', 'render/tomate.webp', 'render/u-liquidificador.webp', 'render/uva.webp'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
 });
