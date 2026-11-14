@@ -194,3 +194,68 @@ test('faixa "Limpa o Rio!" inteira na tela do celular em pé', async () => {
   assert.ok(f.x >= 0 && f.x + f.w <= 390, 'faixa cortada: ' + JSON.stringify(f));
   await pg.ctx.close();
 });
+
+// três idiomas (dono, 14/Nov/2026): a escolha é feita só na estante (localStorage "bolinho:idioma", ../idioma.js)
+async function abrirEm(idioma, ctxOp) {
+  const ctx = await browser.newContext(Object.assign({ locale: 'pt-BR' }, ctxOp));
+  await ctx.addInitScript(c => { try { localStorage.setItem('bolinho:idioma', c); } catch (e) {} }, idioma);
+  const pg = await ctx.newPage(), erros = [];
+  pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
+  await pg.goto(base + '?teste');
+  await pg.waitForFunction(() => window.GlubDebug && GlubDebug.pronto);
+  pg.erros = erros; pg.ctx = ctx;
+  return pg;
+}
+const cabe = (pg) => pg.evaluate(() => Array.prototype.filter.call(document.querySelectorAll('.tela.ativa button, .tela.ativa .rotulo, .tela.ativa h2, .faixa:not([hidden])'), function (el) {
+  const r = el.getBoundingClientRect(); if (!r.width) return false;
+  return r.left < -1 || r.right > innerWidth + 1 || el.scrollWidth > el.clientWidth + 2;
+}).map(el => el.id || el.textContent));
+
+test('espanhol escolhido na estante: menu, faixas, fim e álbum em espanhol, sem botão de idioma', async () => {
+  const pg = await abrirEm('es', DEITADO);
+  assert.match(await pg.evaluate(() => document.documentElement.lang), /^es/);
+  assert.equal(await pg.$('#btLingua'), null, 'o jogo não tem botão de idioma próprio');
+  assert.equal((await pg.textContent('#btJogar')).trim(), '▶ ¡A pescar!');
+  assert.equal(await pg.getAttribute('#btEfeitos', 'aria-label'), 'Sonidos');
+  assert.match(await pg.getAttribute('#btHora', 'aria-label'), /^Momento del día: /);
+  assert.match(await pg.textContent('#versao'), /Versión [\d.]+ · \d\d\/[a-z]{3}\/\d{4}/);
+  await pg.click('#btDois'); await pg.click('#btJogar');
+  await pg.waitForFunction(() => GlubDebug.estado().tela === 'jogo');
+  assert.equal(await pg.getAttribute('#pescar0', 'aria-label'), 'Pescar');
+  assert.equal(await pg.getAttribute('#subir0', 'aria-label'), 'Recoger el sedal');
+  await pg.evaluate(() => GlubDebug.avancar(64));
+  await pg.waitForSelector('#fim:not([hidden])');
+  assert.match(await pg.textContent('#fim'), /¡Juntos habéis pescado \d+ puntos!/);
+  await pg.click('#btFimMenu');
+  await pg.waitForFunction(() => GlubDebug.estado().tela === 'menu');
+  await pg.click('#btAlbum');
+  assert.match(await pg.textContent('#album'), /Álbum de cromos/);
+  assert.match(await pg.textContent('#albumConta'), /^\d+ de \d+ cromos$/);
+  assert.deepEqual(pg.erros, []);
+  await pg.ctx.close();
+});
+
+test('idioma trocado na estante (outra aba): o jogo troca na hora', async () => {
+  const pg = await abrirEm('pt', FONE);
+  assert.equal((await pg.textContent('#btJogar')).trim(), '▶ Pescar!');
+  await pg.evaluate(() => BolinhoIdioma.escolher('en'));
+  assert.equal((await pg.textContent('#btJogar')).trim(), "▶ Let's fish!");
+  assert.match(await pg.evaluate(() => document.documentElement.lang), /^en/);
+  await pg.evaluate(() => BolinhoIdioma.escolher('es'));
+  assert.equal((await pg.textContent('#btJogar')).trim(), '▶ ¡A pescar!');
+  assert.equal(await pg.getAttribute('#btAjuda', 'aria-label'), 'Cómo se juega');
+  await pg.ctx.close();
+});
+
+test('nos três idiomas nada sai da tela no celular, em pé e deitado (começo, jogo e "Limpa o Rio!")', async () => {
+  for (const idioma of ['pt', 'en', 'es']) for (const vp of [{ width: 390, height: 844 }, { width: 844, height: 390 }]) {
+    const pg = await abrirEm(idioma, { viewport: vp, hasTouch: true, isMobile: true });
+    await pg.click('#btAjuda');
+    assert.deepEqual(await cabe(pg), [], idioma + ' ' + vp.width + '×' + vp.height + ': começo');
+    await jogarSozinho(pg);
+    await pg.evaluate(() => GlubDebug.avancar(28.5));
+    await pg.waitForSelector('#faixa:not([hidden])');
+    assert.deepEqual(await cabe(pg), [], idioma + ' ' + vp.width + '×' + vp.height + ': jogo');
+    await pg.ctx.close();
+  }
+});
