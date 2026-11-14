@@ -2,6 +2,20 @@
   "app": "peluqueria",
   "versoes": [
     {
+      "versao": "0.6.13",
+      "data": "14/Nov/2026",
+      "hora": "15:20:00",
+      "pt": [
+        "🇧🇷🇺🇸🇪🇸 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante (a voz também fala no idioma escolhido)"
+      ],
+      "en": [
+        "🇧🇷🇺🇸🇪🇸 Now in three languages: Portuguese, English and Spanish, chosen on the shelf (the voice speaks the chosen language too)"
+      ],
+      "es": [
+        "🇧🇷🇺🇸🇪🇸 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería (la voz también habla en el idioma elegido)"
+      ]
+    },
+    {
       "versao": "0.6.12",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

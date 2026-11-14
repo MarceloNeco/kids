@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.elevenlabs.io; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Quem é? — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#2e8bff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Quem é? Duelo de Caras: cada um escolhe um personagem em segredo e pergunta até descobrir o do outro. Com o Melekento Blue e a Pink Honey. / Who Is It? Face Duel: pick a secret character and ask questions until you find the other one. / ¿Quién es? Duelo de Caras: elige un personaje secreto y pregunta hasta descubrir el del otro.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Quem é? — brincadeira da família Bolinho de Chuva (SolverONE). Primeira brincadeira: Duelo de Caras.
+  Motor sem tela: logica.js (tabuleiro, perguntas, meleca) e partida.js (regras da vez). Desenhos: caras.js e melecas.js.
+  A tela e os toques ficam em app.js. Sem login, sem banco, sem cookie: preferências só no aparelho (localStorage).
+  Nada de script inline: a CSP acima não permite. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+
+<section id="inicio" class="tela ativa" data-recurso="quem-e">
+  <div class="faixa">
+    <button id="btVoz" class="mini" type="button" aria-pressed="true" data-rotulo="Voz da meleca|Slime voice|Voz del slime">🗣️</button>
+    <button id="btEfeitos" class="mini" type="button" aria-pressed="true" data-rotulo="Sons|Sounds|Sonidos">🔊</button>
+    <button id="btAjuda" class="mini" type="button" aria-expanded="false" aria-controls="ajuda" data-rotulo="Como brincar|How to play|Cómo jugar">❓</button>
+  </div>
+  <h1 class="logo"><span class="logo-txt" data-t="Quem é|Who Is It|¿Quién es"></span><span class="logo-gota">?</span></h1>
+  <p class="sub" data-t="Duelo de Caras|Face Duel|Duelo de Caras"></p>
+  <h2 class="pergunta-grande" data-t="Quem vai brincar com você?|Who's going to play with you?|¿Quién va a jugar contigo?"></h2>
+  <div class="melecas">
+    <button id="btBlue" class="meleca-bt blue" type="button" data-meleca="blue"><span class="meleca-img" aria-hidden="true"></span><span class="meleca-nome">Melekento Blue</span></button>
+    <button id="btPink" class="meleca-bt pink" type="button" data-meleca="pink"><span class="meleca-img" aria-hidden="true"></span><span class="meleca-nome">Pink Honey</span></button>
+  </div>
+  <div id="ajuda" class="ajuda" hidden>
+    <h2 data-t="Como brincar|How to play|Cómo jugar"></h2>
+    <p data-t="🤫 Cada um escolhe um personagem em segredo.|🤫 Each player secretly picks a character.|🤫 Cada jugador elige un personaje en secreto."></p>
+    <p data-t="❓ Na sua vez, faça uma pergunta: &quot;Usa óculos?&quot;, &quot;Tem coroa?&quot;. O outro responde Sim ou Não.|❓ On your turn, ask a question: &quot;Wearing glasses?&quot;, &quot;Got a crown?&quot;. The other player answers Yes or No.|❓ En tu turno, haz una pregunta: &quot;¿Lleva gafas?&quot;, &quot;¿Tiene corona?&quot;. El otro jugador responde Sí o No."></p>
+    <p data-t="🗑️ Depois, descarte quem não serve mais: um botão faz tudo de uma vez, ou vire as cartas com o dedo.|🗑️ Then flip down everyone who doesn't fit: one button does it all, or flip cards with your finger.|🗑️ Después, baja a todos los que ya no sirven: un botón lo hace todo de una vez, o baja las cartas con el dedo."></p>
+    <p data-t="🎯 Acha que já sabe? Na sua vez, em vez de perguntar, toque em &quot;É este!&quot; e escolha a cara. Acertou, ganhou!|🎯 Think you know? On your turn, instead of asking, tap &quot;This one!&quot; and pick the face. Get it right and you win!|🎯 ¿Crees que ya lo sabes? En tu turno, en vez de preguntar, toca &quot;¡Es este!&quot; y elige la cara. ¡Si aciertas, ganas!"></p>
+    <p data-t="🔍 Quer ver de perto? Ligue a lupa e toque numa cara, ou segure o dedo em cima dela.|🔍 Want a closer look? Turn on the magnifier and tap a face, or hold your finger on it.|🔍 ¿Quieres verla de cerca? Activa la lupa y toca una cara, o deja el dedo encima."></p>
+  </div>
+  <button id="btInstalar" class="medio-bt" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
+  <p id="versao" class="versao"></p>
+</section>
+
+<section id="modos" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" id="balaoModos"></p></div>
+  <div class="opcoes">
+    <button id="btAdivinha" class="grande opcao destaque" type="button"><span class="op-ico" aria-hidden="true">🔮</span><span><span class="op-titulo" data-t="A Meleca Adivinha|The Slime Guesses|El Slime Adivina"></span><span class="op-sub" data-t="Pense em alguém e eu descubro quem é!|Think of someone and I'll find out who!|¡Piensa en alguien y yo descubro quién es!"></span></span></button>
+    <p class="op-grupo" data-t="🎭 Duelo de Caras|🎭 Face Duel|🎭 Duelo de Caras"></p>
+    <button id="btMeleca" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🤖</span><span id="txtMeleca"></span></button>
+    <button id="btPassar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🔁</span><span data-t="Passando o aparelho|Pass the device|Pasando el móvil"></span></button>
+    <button id="btRede" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📱</span><span data-t="Cada um no seu celular|Each on their own phone|Cada uno con su móvil"></span></button>
+  </div>
+</section>
+
+<section id="nomes" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Quem vai brincar? Escreva o nome de cada um (fica guardado só neste aparelho).|Who's playing? Write each name (it stays only on this device).|¿Quién juega? Escribe el nombre de cada uno (se guarda solo en este aparato)."></p></div>
+  <div class="opcoes">
+    <label for="nome1" class="rotulo-campo" data-t="Quem joga primeiro|Who plays first|Quién juega primero"></label>
+    <input id="nome1" class="campo" type="text" maxlength="16" autocomplete="off" placeholder="Jogador 1" data-dica="Jogador 1|Player 1|Jugador 1">
+    <label for="nome2" class="rotulo-campo" data-t="Quem joga depois|Who plays next|Quién juega después"></label>
+    <input id="nome2" class="campo" type="text" maxlength="16" autocomplete="off" placeholder="Jogador 2" data-dica="Jogador 2|Player 2|Jugador 2">
+    <button id="btNomesOk" class="grande" type="button" data-t="▶ Começar|▶ Start|▶ Empezar"></button>
+  </div>
+</section>
+
+<section id="nivelAdivinha" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Pense em alguém: de desenho, de filme, famoso, um bicho ou alguém da sua casa. Quem vai jogar?|Think of someone: from a cartoon, a movie, someone famous, an animal or someone from home. Who's playing?|Piensa en alguien: de dibujos animados, de una película, alguien famoso, un animal o alguien de tu casa. ¿Quién va a jugar?"></p></div>
+  <div class="opcoes">
+    <button id="btInfantil" class="grande nivel facil" type="button" data-nivel-adv="I"><span class="n-nome" data-t="🧒 Infantil|🧒 Kids|🧒 Niños"></span><span class="n-info" data-t="Desenhos, bichos, músicas e famosos que criança conhece|Cartoons, animals, songs and famous people kids know|Dibujos, animales, canciones y famosos que conocen los niños"></span></button>
+    <button id="btFamilia" class="grande nivel medio" type="button" data-nivel-adv="F"><span class="n-nome" data-t="👨‍👩‍👧 Família|👨‍👩‍👧 Family|👨‍👩‍👧 Familia"></span><span class="n-info" data-t="Tudo do Infantil e mais filmes, novelas e famosos da família toda|Everything in Kids plus movies, soap operas and famous people the whole family knows|Todo lo de Niños y además películas, telenovelas y famosos que conoce toda la familia"></span></button>
+    <button id="btAdulto" class="grande nivel dificil" type="button" data-nivel-adv="A"><span class="n-nome" data-t="🧑 Adulto|🧑 Grown-ups|🧑 Adultos"></span><span class="n-info" data-t="A lista inteira, com perguntas mais difíceis|The whole list, with harder questions|La lista entera, con preguntas más difíciles"></span></button>
+  </div>
+  <div class="linha">
+    <button id="btEnsinar" class="medio-bt" type="button" data-t="✏️ Ensinar alguém|✏️ Teach someone|✏️ Enseñar a alguien"></button>
+    <button id="btAprendidos" class="medio-bt" type="button" data-t="📦 O que a meleca aprendeu|📦 What the slime learned|📦 Lo que ha aprendido el slime"></button>
+    <button id="btVozAnimada" class="medio-bt" type="button" data-t="🎙️ Voz animada|🎙️ Lively voice|🎙️ Voz animada"></button>
+  </div>
+</section>
+
+<section id="adivinha" class="tela" data-recurso="quem-e">
+  <div class="adv-topo"><span id="advContador" class="adv-contador"></span></div>
+  <div class="adv-palco">
+    <span class="meleca-grande" id="advMeleca" aria-hidden="true"></span>
+    <div class="adv-fala"><p id="advPergunta" class="adv-pergunta" aria-live="polite"></p></div>
+  </div>
+  <div id="advRespostas" class="adv-respostas">
+    <button class="resp sim" type="button" data-r="s" data-t="👍 Sim|👍 Yes|👍 Sí"></button>
+    <button class="resp psim" type="button" data-r="p" data-t="🙂 Acho que sim|🙂 Probably|🙂 Creo que sí"></button>
+    <button class="resp nsei" type="button" data-r="?" data-t="🤷 Não sei|🤷 Don't know|🤷 No lo sé"></button>
+    <button class="resp pnao" type="button" data-r="q" data-t="🙁 Acho que não|🙁 Probably not|🙁 Creo que no"></button>
+    <button class="resp nao" type="button" data-r="n" data-t="👎 Não|👎 No|👎 No"></button>
+    <button id="btAdvVoltar" class="mini adv-voltar" type="button" data-rotulo="Voltar uma pergunta|Back one question|Volver a la pregunta anterior">↩️</button>
+  </div>
+  <div id="advChute" class="adv-chute" hidden>
+    <p class="adv-chute-txt" data-t="Você pensou em…|You thought of…|Has pensado en…"></p>
+    <p id="advChuteEmoji" class="adv-emoji"></p>
+    <p id="advChuteNome" class="adv-nome"></p>
+    <div class="linha">
+      <button id="btAcertou" class="grande verde" type="button" data-t="🎉 Sim, acertou!|🎉 Yes, you got it!|🎉 ¡Sí, has acertado!"></button>
+      <button id="btErrou" class="grande nao" type="button" data-t="Não é|Nope|No es"></button>
+    </div>
+  </div>
+  <div id="advJoao" class="adv-chute" hidden>
+    <p class="adv-chute-txt" data-t="Qual João foi hoje?|Which João was it today?|¿Qué João ha sido hoy?"></p>
+    <div class="opcoes">
+      <button class="grande opcao joao" type="button" data-joao="taxista">🚕 <span data-t="João Alves, o taxista|João Alves, the taxi driver|João Alves, el taxista"></span></button>
+      <button class="grande opcao joao" type="button" data-joao="wick">🕶️ João Wick Alves</button>
+      <button class="grande opcao joao" type="button" data-joao="grilo">🦗 João Grilo Alves</button>
+      <button class="grande opcao joao" type="button" data-joao="connor">🤖 João Connor Alves</button>
+    </div>
+  </div>
+  <div id="advPerdi" class="adv-chute" hidden>
+    <p class="adv-chute-txt" id="advPerdiTxt"></p>
+    <label for="advNome" data-t="Em quem você pensou?|Who were you thinking of?|¿En quién habías pensado?"></label>
+    <input id="advNome" class="campo" type="text" maxlength="40" autocomplete="off" list="advSugestoes">
+    <datalist id="advSugestoes"></datalist>
+    <div id="advEmojis" class="emojis" role="radiogroup"></div>
+    <div class="linha">
+      <button id="btEnsinarSalvar" class="grande verde" type="button" data-t="🧠 Ensinar a meleca|🧠 Teach the slime|🧠 Enseñar al slime"></button>
+      <button id="btEnsinarPular" class="medio-bt" type="button" data-t="Agora não|Not now|Ahora no"></button>
+    </div>
+    <p class="dica" data-t="Fica guardado só neste aparelho. Nada vai para a internet.|It stays only on this device. Nothing goes to the internet.|Se guarda solo en este aparato. Nada va a internet."></p>
+  </div>
+  <div id="advFim" class="adv-chute" hidden>
+    <p id="advFimTxt" class="adv-chute-txt"></p>
+    <div class="linha">
+      <button id="btAdvDeNovo" class="grande" type="button" data-t="🔁 Jogar de novo|🔁 Play again|🔁 Jugar otra vez"></button>
+      <button id="btAdvNivel" class="medio-bt" type="button" data-t="Trocar o nível|Change level|Cambiar de nivel"></button>
+    </div>
+  </div>
+</section>
+
+<section id="aprendidos" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Quem você me ensinou. Fica só neste aparelho; para passar a outro celular, use Exportar e Importar.|Who you taught me. It stays on this device; to move it to another phone, use Export and Import.|A quién me has enseñado. Se queda en este aparato; para pasarlo a otro móvil, usa Exportar e Importar."></p></div>
+  <ul id="listaAprendidos" class="lista-aprendidos"></ul>
+  <div class="linha">
+    <button id="btExportar" class="medio-bt" type="button" data-t="📤 Exportar|📤 Export|📤 Exportar"></button>
+    <label class="medio-bt arquivo-bt"><span data-t="📥 Importar|📥 Import|📥 Importar"></span><input id="arqImportar" type="file" accept=".json,application/json"></label>
+  </div>
+  <p id="aprendidosStatus" class="status" aria-live="polite"></p>
+</section>
+
+<section id="rede" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Cada um no seu celular! Um cria a partida e manda o código para o outro.|Each on their own phone! One creates the game and sends the code to the other.|¡Cada uno con su móvil! Uno crea la partida y le manda el código al otro."></p></div>
+  <div id="redeInicio" class="opcoes">
+    <button id="btCriarSala" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">➕</span><span data-t="Criar uma partida|Create a game|Crear una partida"></span></button>
+    <div class="entrar">
+      <label for="codigo" data-t="Recebeu um código? Digite aqui:|Got a code? Type it here:|¿Te han dado un código? Escríbelo aquí:"></label>
+      <div class="linha">
+        <input id="codigo" class="codigo" type="text" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD">
+        <button id="btEntrarSala" class="grande" type="button" data-t="🔑 Entrar|🔑 Join|🔑 Entrar"></button>
+      </div>
+    </div>
+    <p class="dica" data-t="📡 Os dois celulares precisam de internet (Wi-Fi ou dados).|📡 Both phones need internet (Wi-Fi or data).|📡 Los dos móviles necesitan internet (wifi o datos)."></p>
+    <button id="btPerto" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📶</span><span data-t="Jogar pertinho (sem internet)|Play nearby (no internet)|Jugar de cerca (sin internet)"></span></button>
+  </div>
+  <div id="redeSala" class="opcoes" hidden>
+    <p class="dica" data-t="Código da partida|Game code|Código de la partida"></p>
+    <p id="codigoSala" class="codigo-grande"></p>
+    <button id="btConvidar" class="grande" type="button" data-t="📤 Mandar convite|📤 Send invite|📤 Mandar invitación"></button>
+  </div>
+  <p id="redeStatus" class="status" aria-live="polite"></p>
+</section>
+
+<section id="perto" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Sem internet? Dá para jogar com os dois celulares pertinho!|No internet? Play with the two phones close together!|¿No hay internet? ¡Podéis jugar con los dos móviles juntitos!"></p></div>
+  <div class="opcoes">
+    <ol class="passos">
+      <li data-t="📱📶 Um celular liga o Roteador Wi-Fi (também chamado Ponto de acesso ou Hotspot), mesmo em modo avião.|📱📶 One phone turns on its Wi-Fi hotspot (also called Mobile hotspot or Access point), even in airplane mode.|📱📶 Un móvil activa el punto de acceso wifi (también llamado compartir conexión o zona wifi), incluso en modo avión."></li>
+      <li data-t="📱➡️📶 O outro conecta nesse Wi-Fi. Se ele perguntar se quer continuar numa rede sem internet, toque em Sim.|📱➡️📶 The other one joins that Wi-Fi. If it asks whether to stay on a network without internet, tap Yes.|📱➡️📶 El otro se conecta a esa wifi. Si pregunta si quieres seguir en una red sin internet, toca Sí."></li>
+      <li data-t="🔳➡️📷 Um mostra o código, o outro lê com a câmera, e depois ao contrário.|🔳➡️📷 One shows the code, the other scans it with the camera, and then the other way round.|🔳➡️📷 Uno enseña el código, el otro lo lee con la cámara, y luego al revés."></li>
+    </ol>
+    <p class="dica" data-t="🍎 iPhone quase nunca liga o Roteador em modo avião: deixe um Android ser o roteador. O jogo vai pedir a câmera: toque em Permitir.|🍎 iPhones usually can't turn on the hotspot in airplane mode: let an Android be the hotspot. The game will ask for the camera: tap Allow.|🍎 El iPhone casi nunca puede activar el punto de acceso en modo avión: que un Android comparta la conexión. El juego pedirá la cámara: toca Permitir."></p>
+    <button id="btPertoCriar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">➕</span><span data-t="Criar partida pertinho|Create nearby game|Crear partida de cerca"></span></button>
+    <button id="btPertoEntrar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📷</span><span data-t="Entrar pertinho (ler o código)|Join nearby (scan the code)|Entrar de cerca (leer el código)"></span></button>
+  </div>
+  <p id="pertoMsg" class="status" aria-live="polite"></p>
+</section>
+
+<section id="pertoCodigo" class="tela" data-recurso="quem-e">
+  <div class="perto-caixa">
+    <h2 id="pertoCodTitulo" class="perto-titulo"></h2>
+    <p id="pertoCodDica" class="dica"></p>
+    <div class="qr-caixa"><canvas id="pertoQR" class="qr" role="img" data-rotulo="Código QR|QR code|Código QR" hidden></canvas></div>
+    <p id="pertoCodStatus" class="status" aria-live="polite"></p>
+    <button id="btPertoLerResposta" class="grande" type="button" hidden data-t="📷 Agora ler o código do outro celular|📷 Now scan the other phone's code|📷 Ahora leer el código del otro móvil"></button>
+    <button id="btPertoDeNovo" class="medio-bt" type="button" hidden data-t="🔄 Começar de novo|🔄 Start over|🔄 Empezar de nuevo"></button>
+    <details class="texto-codigo">
+      <summary data-t="Sem câmera? Ver o código em texto|No camera? See the code as text|¿No hay cámara? Ver el código en texto"></summary>
+      <p id="pertoCodTexto" class="codigo-texto"></p>
+      <button id="btPertoCopiar" class="medio-bt" type="button" data-t="📋 Copiar o código|📋 Copy the code|📋 Copiar el código"></button>
+    </details>
+    <button id="btPertoCancelar1" class="medio-bt" type="button" data-t="✖ Cancelar|✖ Cancel|✖ Cancelar"></button>
+  </div>
+</section>
+
+<section id="pertoLer" class="tela" data-recurso="quem-e">
+  <div class="perto-caixa">
+    <h2 id="pertoLerTitulo" class="perto-titulo"></h2>
+    <p id="pertoLerDica" class="dica"></p>
+    <div class="camera-caixa"><video id="pertoVideo" class="camera" playsinline muted autoplay></video><div class="mira-qr" aria-hidden="true"></div></div>
+    <p id="pertoLerStatus" class="status" aria-live="polite"></p>
+    <details id="pertoColarCaixa" class="texto-codigo">
+      <summary data-t="⌨️ Colar o código em texto|⌨️ Paste the code as text|⌨️ Pegar el código en texto"></summary>
+      <textarea id="pertoColar" rows="3" autocomplete="off" spellcheck="false" data-rotulo="Código|Code|Código"></textarea>
+      <button id="btPertoUsar" class="medio-bt" type="button" data-t="✅ Usar este código|✅ Use this code|✅ Usar este código"></button>
+    </details>
+    <button id="btPertoCancelar2" class="medio-bt" type="button" data-t="✖ Cancelar|✖ Cancel|✖ Cancelar"></button>
+  </div>
+</section>
+
+<section id="niveis" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Quantas caras no tabuleiro?|How many faces on the board?|¿Cuántas caras en el tablero?"></p></div>
+  <div class="opcoes">
+    <button id="btFacil" class="grande nivel facil" type="button" data-nivel="facil"><span class="n-nome" data-t="🐣 Fácil|🐣 Easy|🐣 Fácil"></span><span class="n-info" data-t="12 caras, perguntas fáceis de ver|12 faces, easy-to-spot questions|12 caras, preguntas fáciles de ver"></span></button>
+    <button id="btMedio" class="grande nivel medio" type="button" data-nivel="medio"><span class="n-nome" data-t="🐥 Médio|🐥 Medium|🐥 Medio"></span><span class="n-info" data-t="24 caras, com barba, brinco, peruca e nariz de palhaço|24 faces with beards, earrings, wigs and clown noses|24 caras, con barba, pendientes, peluca y nariz de payaso"></span></button>
+    <button id="btDificil" class="grande nivel dificil" type="button" data-nivel="dificil"><span class="n-nome" data-t="🦉 Difícil|🦉 Hard|🦉 Difícil"></span><span class="n-info" data-t="36 caras, até a cor dos olhos e as sardas contam|36 faces, even eye color and freckles count|36 caras: hasta el color de los ojos y las pecas cuentan"></span></button>
+    <button id="btCorpo" class="medio-bt corpo-bt" type="button" aria-pressed="false"><span data-t="🧍 Corpo inteiro: saia, short, calça, sapato, mochila…|🧍 Whole body: skirt, shorts, pants, shoes, backpack…|🧍 Cuerpo entero: falda, pantalón corto, pantalón, zapatos, mochila…"></span></button>
+  </div>
+</section>
+
+<section id="segredo" class="tela" data-recurso="quem-e">
+  <div class="topo"><p class="titulo" id="tituloSegredo"></p></div>
+  <div class="area"><div id="gradeSegredo" class="tabuleiro" role="group"></div></div>
+  <div class="painel">
+    <p class="dica" id="dicaSegredo" data-t="Toque numa cara para escolher. Segure o dedo para ver de perto.|Tap a face to choose it. Hold your finger on it for a closer look.|Toca una cara para elegirla. Deja el dedo encima para verla de cerca."></p>
+    <div class="linha">
+      <button id="btSortear" class="medio-bt" type="button" data-t="🎲 Sortear|🎲 Random|🎲 Al azar"></button>
+      <button id="btConfirmarSegredo" class="grande" type="button" disabled></button>
+    </div>
+  </div>
+</section>
+
+<section id="jogo" class="tela" data-recurso="quem-e">
+  <div class="topo">
+    <button id="meuSegredo" class="meu-segredo" type="button" data-rotulo="Meu personagem secreto (ver de perto)|My secret character (closer look)|Mi personaje secreto (ver de cerca)"></button>
+    <p class="meu-nome" id="meuNome"></p>
+    <button id="btLupa" class="mini lupa-bt" type="button" aria-pressed="false" data-rotulo="Lupa: tocar numa cara mostra ela grande|Magnifier: tap a face to see it big|Lupa: toca una cara para verla en grande">🔍</button>
+  </div>
+  <div class="area" id="area"><div id="tabuleiro" class="tabuleiro" role="group"></div></div>
+  <div class="painel" id="painel">
+    <div class="conversa"><span class="meleca-mini" id="melecaJogo" aria-hidden="true"></span><p class="balao" id="balao" aria-live="polite"></p></div>
+    <div id="acoes" class="linha">
+      <button id="btPerguntar" class="grande" type="button" data-t="❓ Perguntar|❓ Ask|❓ Preguntar"></button>
+      <button id="btPalpite" class="grande rosa" type="button" data-t="🎯 É este!|🎯 This one!|🎯 ¡Es este!"></button>
+    </div>
+    <div id="perguntas" class="perguntas" hidden>
+      <div class="perg-topo"><button id="btFecharPerguntas" class="mini" type="button" data-rotulo="Voltar|Back|Volver">←</button><p data-t="O que você quer perguntar?|What do you want to ask?|¿Qué quieres preguntar?"></p></div>
+      <div id="listaPerguntas" class="lista-perguntas"></div>
+    </div>
+    <div id="responder" class="responder" hidden>
+      <p class="perg-feita" id="pergFeita"></p>
+      <p id="olhaDeNovo" class="olha" hidden></p>
+      <div class="linha">
+        <button id="btSim" class="grande sim" type="button" data-t="👍 Sim|👍 Yes|👍 Sí"></button>
+        <button id="btNao" class="grande nao" type="button" data-t="👎 Não|👎 No|👎 No"></button>
+      </div>
+    </div>
+    <div id="descartar" class="descartar" hidden>
+      <p class="resp-veio" id="respVeio"></p>
+      <div class="linha">
+        <button id="btDescartar" class="grande" type="button"></button>
+        <button id="btPronto" class="grande verde" type="button" data-t="✅ Pronto, passar a vez|✅ Done, next turn|✅ Listo, pasar el turno"></button>
+      </div>
+    </div>
+    <div id="palpitando" class="palpitando" hidden>
+      <p data-t="🎯 Toque na cara que você acha que é.|🎯 Tap the face you think it is.|🎯 Toca la cara que crees que es."></p>
+      <div class="linha">
+        <button id="btCancelarPalpite" class="medio-bt" type="button" data-t="Cancelar|Cancel|Cancelar"></button>
+        <button id="btConfirmarPalpite" class="grande rosa" type="button" disabled></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="cortina" class="cortina" hidden role="dialog" aria-modal="true" aria-labelledby="cortinaTitulo">
+  <div class="cartao">
+    <p class="cortina-ico" aria-hidden="true">🙈</p>
+    <h2 id="cortinaTitulo"></h2>
+    <p id="cortinaTexto"></p>
+    <button id="btCortina" class="grande" type="button" data-t="👀 Estou pronto|👀 I'm ready|👀 ¡Ya estoy!"></button>
+  </div>
+</div>
+
+<div id="fim" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
+  <div class="cartao">
+    <span class="fim-meleca" id="fimMeleca" aria-hidden="true"></span>
+    <h2 id="fimTitulo"></h2>
+    <div class="fim-caras" id="fimCaras"></div>
+    <div class="linha">
+      <button id="btDeNovo" class="grande" type="button" data-t="🔁 Jogar de novo|🔁 Play again|🔁 Jugar otra vez"></button>
+      <button id="btOutroNivel" class="medio-bt" type="button" data-t="Trocar o nível|Change level|Cambiar de nivel"></button>
+    </div>
+  </div>
+</div>
+<div id="festa" class="festa" aria-hidden="true"></div>
+
+<script src="nomes.js"></script>
+<script src="logica.js"></script>
+<script src="partida.js"></script>
+<script src="caras.js"></script>
+<script src="melecas.js"></script>
+<script src="rede.js"></script>
+<script src="../batalha-naval/pertinho.js" data-fora-do-arquivo></script>
+<script src="../batalha-naval/qr.js" data-fora-do-arquivo></script>
+<script src="adivinha-perguntas.js"></script>
+<script src="adivinha.js"></script>
+<script src="aprender.js"></script>
+<script src="voz.js"></script>
+<script src="personagens/familia.js"></script>
+<script src="personagens/disney.js"></script>
+<script src="personagens/desenhos.js"></script>
+<script src="personagens/filmes.js"></script>
+<script src="personagens/musica.js"></script>
+<script src="personagens/famosos.js"></script>
+<script src="personagens/mundo.js"></script>
+<script src="personagens/jogos.js"></script>
+<script src="personagens/novos.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../janela.js" data-fora-do-arquivo></script>
+<script src="../cofre.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js" data-fora-do-arquivo></script>
+<script src="app.js"></script>
+<script src="adivinha-tela.js"></script>
+</body>
+</html>

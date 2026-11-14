@@ -11,16 +11,16 @@
   'use strict';
   var LETRAS = 'ABCDEFGHIJKL';
   var NIVEIS = {
-    facil: { id: 'facil', n: 8, frota: [4, 3, 2, 2], pt: 'Fácil', en: 'Easy' },
-    medio: { id: 'medio', n: 10, frota: [5, 4, 3, 3, 2], pt: 'Médio', en: 'Medium' },
-    dificil: { id: 'dificil', n: 12, frota: [5, 4, 4, 3, 3, 2, 2], pt: 'Difícil', en: 'Hard' }
+    facil: { id: 'facil', n: 8, frota: [4, 3, 2, 2], pt: 'Fácil', en: 'Easy', es: 'Fácil' },
+    medio: { id: 'medio', n: 10, frota: [5, 4, 3, 3, 2], pt: 'Médio', en: 'Medium', es: 'Medio' },
+    dificil: { id: 'dificil', n: 12, frota: [5, 4, 4, 3, 3, 2, 2], pt: 'Difícil', en: 'Hard', es: 'Difícil' }
   };
   // nome principal de cada tamanho (o 2º navio do mesmo tamanho tem outro nome: veja TIPOS em navios.js)
   var NOMES = {
-    5: { pt: 'Porta-aviões', en: 'Aircraft carrier' },
-    4: { pt: 'Encouraçado', en: 'Battleship' },
-    3: { pt: 'Submarino', en: 'Submarine' },
-    2: { pt: 'Destróier', en: 'Destroyer' }
+    5: { pt: 'Porta-aviões', en: 'Aircraft carrier', es: 'Portaaviones' },
+    4: { pt: 'Encouraçado', en: 'Battleship', es: 'Acorazado' },
+    3: { pt: 'Submarino', en: 'Submarine', es: 'Submarino' },
+    2: { pt: 'Destróier', en: 'Destroyer', es: 'Destructor' }
   };
   var R = { agua: 0, acerto: 1, afundou: 2 };
   var RN = ['agua', 'acerto', 'afundou'];

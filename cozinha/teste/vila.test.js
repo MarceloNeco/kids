@@ -1,0 +1,196 @@
+// A vila "3D" (v0.7.0, pedido do dono de 14/Nov/2026): cada lugar é um bloquinho desenhado (vila.js), com ruas entre
+// eles; o cozinheirinho começa na porta de casa e ANDA pelas ruas até o lugar tocado; uma faixa diz a próxima missão
+// e, no Fácil e no Médio, uma seta pula em cima do lugar; depois de pegar tudo de um lugar ele SEGUE SOZINHO para o
+// próximo (e para casa com a cesta cheia). No Difícil ele só volta à vila (a criança escolhe).
+// node --test cozinha/teste/*.test.js (da raiz do repositório kids)
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const VI = require('../vila.js');
+const D = require('../dados.js');
+const { iniciar, fechar, abrir, comecar, noLugar, voltarVila, segurar, tem } = require('./navegador.js');
+
+test.before(iniciar);
+test.after(fechar);
+
+test('vila.js: cada lugar da vila tem o seu bloquinho desenhado, e o cozinheirinho, o carro e a nuvem existem', () => {
+  for (const l of D.LUGARES) {
+    assert.ok(VI.LUGARES_DESENHADOS.includes(l.id), 'sem desenho: ' + l.id);
+    const svg = VI.bloco(l.id);
+    assert.match(svg, /^<svg class="bloco b-[a-z]+" viewBox="0 -10 200 185"/);
+    assert.ok(svg.length > 1500, l.id + ': desenho pequeno demais');
+    assert.ok(!/NaN|undefined/.test(svg), l.id + ': desenho quebrado');
+  }
+  assert.match(VI.bloco('vaca'), /class="v-pas"/, 'o cata-vento gira');
+  assert.match(VI.bloco('mercado'), /MERCADO/);
+  assert.match(VI.boneco(), /v-pe1[\s\S]*v-pe2[\s\S]*v-chapeu/, 'o cozinheirinho tem pernas que andam e chapéu');
+  // nomes de classe com "v-" para não confundir com as peças dos mini-jogos (ex.: .galinha do galinheiro)
+  for (const l of D.LUGARES) assert.ok(!/class="(galinha|copa|onda|rabo|chapeu)"/.test(VI.bloco(l.id)), l.id);
+});
+
+test('mapa: bloquinhos, ruas, o cozinheirinho na porta de casa e a faixa da missão com a seta (Médio)', { timeout: 30000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true });
+  await comecar(pg, 'medio', 'pao-queijo');
+  assert.equal(await pg.locator('#vila .lugar svg.bloco').count(), 10, '10 lugares (com a padaria e a feira, v0.10.0)');
+  await pg.waitForFunction(() => document.querySelector('#vila .ruas path'));
+  assert.ok(await pg.evaluate(() => document.querySelector('#vila .ruas path').getAttribute('d').split('M').length > 4), 'ruas desenhadas');
+  // o cozinheirinho começa na porta de casa (na rua embaixo do bloco da casa)
+  const perto = await pg.evaluate(() => {
+    const b = document.querySelector('#vila .boneco').getBoundingClientRect(), c = document.querySelector('[data-lugar="casa"]').getBoundingClientRect();
+    return { x: b.left + b.width / 2 >= c.left && b.left + b.width / 2 <= c.right, y: Math.abs(b.bottom - c.bottom) < 40 };
+  });
+  assert.deepEqual(perto, { x: true, y: true }, 'na porta de casa');
+  assert.equal(await pg.evaluate(() => window.Cozinha.jogo().pos), 'casa');
+  // missão: a próxima coisa e o lugar; a seta em cima desse lugar (ovos → galinheiro, que é da natureza)
+  assert.match(await pg.textContent('#missao'), /Agora: buscar .*2 ovos.*Galinheiro/);
+  assert.equal(await pg.locator('.lugar.proximo').count(), 1);
+  assert.equal(await pg.getAttribute('.lugar.proximo', 'data-lugar'), 'galinheiro');
+  assert.equal(await pg.locator('.lugar.proximo .seta').count(), 1);
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('Difícil: a faixa mostra o que falta, sem dizer aonde ir, e não tem seta', { timeout: 30000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 915, height: 412 }, { isMobile: true, hasTouch: true });
+  await comecar(pg, 'dificil', 'omelete');
+  assert.match(await pg.textContent('#missao'), /Falta: /);
+  assert.equal(await pg.locator('.lugar.proximo, .lugar .seta').count(), 0);
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('o cozinheirinho ANDA pela rua até o lugar (com movimento) e entra; com movimento reduzido chega na hora', { timeout: 60000 }, async () => {
+  const r = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  const pg = r.pg;
+  await pg.goto(pg.url() + '&devagar');
+  await pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
+  await comecar(pg, 'facil', 'vitamina');
+  await pg.waitForFunction(() => document.querySelector('#vila .boneco').style.transform.includes('translate'));
+  const pos = () => pg.evaluate(() => { const b = document.querySelector('#vila .boneco').getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top)]; });
+  const p0 = await pos();
+  await pg.click('[data-lugar="rio"]', { force: true });
+  await pg.waitForTimeout(350);
+  assert.equal(await pg.locator('#vila .boneco.anda').count(), 1, 'andando (as pernas mexem)');
+  const p1 = await pos();
+  assert.notDeepEqual(p1, p0, 'saiu do lugar');
+  assert.equal(await pg.locator('#mapa.ativa').count(), 1, 'ainda na vila enquanto anda');
+  await pg.waitForSelector('#lugar.ativa', { timeout: 6000 });
+  assert.equal(await pg.evaluate(() => window.Cozinha.jogo().pos), 'rio');
+  assert.deepEqual(r.erros, [], 'erros no console');
+  await r.ctx.close();
+  // movimento reduzido: entra direto
+  const q = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true });
+  await comecar(q.pg, 'facil', 'vitamina');
+  await noLugar(q.pg, 'horta');
+  assert.equal(await q.pg.evaluate(() => window.Cozinha.jogo().pos), 'horta');
+  await q.ctx.close();
+});
+
+test('missão fluida (Fácil): pegou tudo de um lugar, ele segue sozinho para o próximo e, com a cesta cheia, vai para casa cozinhar', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true });
+  await pg.goto(pg.url() + '&seguir');
+  await comecar(pg, 'facil', 'vitamina');
+  assert.equal(await pg.getAttribute('.lugar.proximo', 'data-lugar'), 'pomar');
+  await noLugar(pg, 'pomar');
+  await pg.click('.fruta.madura[data-ing="banana"]');
+  assert.equal(await tem(pg, 'banana'), 1);
+  // sozinho: volta à vila e anda até a fazendinha (o leite)
+  await pg.waitForFunction(() => window.Cozinha.atual() === 'lugar' && document.querySelector('#lugarTitulo').textContent.includes('Mimosa'), null, { timeout: 8000 });
+  assert.match(await pg.textContent('#aviso'), /Pronto aqui! Agora: .*Mimosa/);
+  await segurar(pg, '#btOrdenhar', 700);
+  await pg.waitForFunction(() => (window.Cozinha.jogo().cesta.leite || 0) === 1);
+  // cesta cheia: vai sozinho para casa e começa a cozinhar
+  await pg.waitForSelector('#cozinha.ativa', { timeout: 8000 });
+  assert.equal(await pg.evaluate(() => window.Cozinha.jogo().pos), 'casa');
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('missão no Difícil: depois de pegar tudo de um lugar, volta para a vila, mas a criança escolhe aonde ir', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true });
+  await pg.goto(pg.url() + '&seguir');
+  await comecar(pg, 'dificil', 'vitamina');
+  await noLugar(pg, 'pomar');
+  const falta = await pg.evaluate(() => window.Cozinha.jogo().precisa.find(x => x.id === 'banana').q);
+  for (let i = 0; i < falta; i++) { await pg.click('.fruta.madura[data-ing="banana"]'); await pg.waitForFunction(n => (window.Cozinha.jogo().cesta.banana || 0) >= n, i + 1); }
+  await pg.waitForSelector('#mapa.ativa', { timeout: 8000 });
+  await pg.waitForTimeout(1200);
+  assert.equal(await pg.locator('#mapa.ativa').count(), 1, 'fica na vila esperando a escolha');
+  assert.equal(await pg.evaluate(() => window.Cozinha.jogo().pos), 'pomar');
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('lugares por dentro (v0.9.0): vaca desenhada com a criança no banquinho e o balde; horta cercada; galinheiro de madeira; frutas de massinha; o ajudante anda até onde a criança toca', { timeout: 90000 }, async () => {
+  const r = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  const pg = r.pg;
+  await pg.goto(pg.url() + '&devagar');
+  await pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
+  await comecar(pg, 'medio', 'salada-frutas');
+  const entra = async l => { await pg.click('[data-lugar="' + l + '"]', { force: true }); await pg.waitForSelector('#lugar.ativa', { timeout: 8000 }); };
+  const sai = async () => { await pg.click('#lugar .voltar', { force: true }); await pg.waitForSelector('#mapa.ativa'); };
+  // fazendinha: a vaca grande, a criança no banquinho e o balde (o leite enche o balde enquanto segura)
+  await entra('vaca');
+  assert.equal(await pg.locator('.mimosa svg.vaca-svg .v-ubere').count(), 1, 'a Mimosa com o úbere');
+  assert.equal(await pg.locator('.ordenhador svg.ordenha-svg').count(), 1, 'a criança sentada tirando leite');
+  assert.equal(await pg.locator('.jarra.balde .leite-nivel').count(), 1, 'o balde');
+  await pg.locator('#btOrdenhar').dispatchEvent('pointerdown');
+  assert.equal(await pg.locator('.pasto.ordenhando').count(), 1, 'as mãos mexem e o leite cai enquanto segura');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.pasto .v-maos')).animationName), 'ordenhar');
+  await pg.locator('#btOrdenhar').dispatchEvent('pointerup'); await sai();
+  // horta: cercada, com o ajudante que anda até a planta tocada
+  await entra('horta');
+  assert.equal(await pg.locator('.canteiro.cercado .ajudante').count(), 1);
+  const aj = () => pg.evaluate(() => { const a = document.querySelector('.ajudante').getBoundingClientRect(); return [Math.round(a.left), Math.round(a.top)]; });
+  await pg.waitForTimeout(150);
+  const a0 = await aj();
+  const pl = await pg.locator('.canteiro .planta').last().boundingBox();
+  await pg.mouse.move(pl.x + pl.width / 2, pl.y + pl.height / 2); await pg.mouse.down(); await pg.mouse.up();
+  await pg.waitForTimeout(1100);
+  assert.notDeepEqual(await aj(), a0, 'o ajudante andou até a planta');
+  await sai();
+  // pomar: frutas desenhadas "de massinha"
+  await entra('pomar');
+  assert.ok(await pg.locator('.pomar .fruta .massinha svg').count() >= 4, 'frutas de massinha no pé');
+  assert.equal(await pg.locator('.pomar .ajudante').count(), 1);
+  await sai();
+  await entra('galinheiro');
+  assert.equal(await pg.locator('.poleiro.casinha-galinha .ajudante').count(), 1, 'galinheiro de madeira com o ajudante');
+  assert.deepEqual(r.erros, [], 'erros no console');
+  await r.ctx.close();
+});
+
+test('parte 3 (v0.11.0): mercado por dentro com setores (o que falta brilha) e a cozinha "casinha cortada" com o cozinheirinho indo até a estação', { timeout: 90000 }, async () => {
+  const r = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  const pg = r.pg;
+  await pg.goto(pg.url() + '&devagar');
+  await pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
+  await comecar(pg, 'medio', 'pao-queijo');
+  await pg.click('[data-lugar="mercado"]', { force: true }); await pg.waitForSelector('#lugar.ativa', { timeout: 8000 });
+  const setores = await pg.$$eval('.mercado-setores .setor', ss => ss.map(s => s.dataset.setor));
+  assert.deepEqual(setores, ['hortifruti', 'geladeira', 'acougue', 'padaria', 'mercearia']);
+  assert.equal(await pg.locator('.setor[data-setor="geladeira"] .produto[data-ing="queijo"]').count(), 1, 'o queijo fica na geladeira');
+  assert.equal(await pg.locator('.setor[data-setor="mercearia"] .produto[data-ing="polvilho"]').count(), 1, 'o polvilho na mercearia');
+  assert.equal(await pg.locator('.setor[data-setor="hortifruti"] .produto[data-ing="tomate"]').count(), 1);
+  // pão de queijo precisa de queijo (geladeira) e polvilho (mercearia): esses setores brilham; o açougue não
+  assert.equal(await pg.locator('.setor.tem-falta[data-setor="geladeira"]').count(), 1);
+  assert.equal(await pg.locator('.setor.tem-falta[data-setor="acougue"]').count(), 0);
+  assert.equal(await pg.locator('.mercado-setores .ajudante').count(), 1, 'o ajudante anda pelo mercado');
+  await pg.click('#lugar .voltar', { force: true }); await pg.waitForSelector('#mapa.ativa');
+  // a cozinha: o desenho em 3D aparece enquanto escolhe o utensílio; ao acertar, ele anda até a pia
+  await pg.evaluate(() => { const j = window.Cozinha.jogo(); j.precisa.forEach(x => { j.cesta[x.id] = x.q; }); });
+  await pg.click('[data-lugar="casa"]', { force: true }); await pg.waitForSelector('#cozinha.ativa', { timeout: 8000 });
+  assert.equal(await pg.locator('#palco .diorama svg.diorama-svg .est-fogao').count(), 1, 'cozinha com fogão');
+  for (const e of ['pia', 'geladeira', 'bancada', 'mesa']) assert.equal(await pg.locator('#palco .diorama .est-' + e).count(), 1, e);
+  const pos = () => pg.evaluate(() => { const c = document.querySelector('#palco .chef-cz').getBoundingClientRect(); return [Math.round(c.left), Math.round(c.top)]; });
+  const p0 = await pos();
+  await pg.click('[data-u="pia"]', { force: true });
+  await pg.waitForTimeout(250);
+  assert.equal(await pg.locator('#palco .diorama.em-pia .chef-cz.anda').count(), 1, 'andando até a pia, que acende');
+  assert.notDeepEqual(await pos(), p0);
+  await pg.waitForFunction(() => window.Cozinha.jogo().cz.fase === 'acao', null, { timeout: 4000 });
+  assert.equal(await pg.evaluate(() => window.Cozinha.jogo().cz.estacao), 'pia');
+  // utensílios pendurados na barra
+  assert.ok(await pg.evaluate(() => getComputedStyle(document.querySelector('#utensilios .utensilio'), '::before').content !== 'none'), 'cordinha do gancho');
+  assert.deepEqual(r.erros, [], 'erros no console');
+  await r.ctx.close();
+});

@@ -25,34 +25,33 @@
 <section id="entrada" class="tela ativa" data-recurso="peluqueria">
   <div class="luzes" aria-hidden="true"><div class="feixe a"></div><div class="feixe b"></div><div class="feixe c"></div><div class="brilhos"></div></div>
   <h1 class="logo">Peluqueria</h1>
-  <p class="sub" data-t="o provador maluco da família|the family's crazy fitting room"></p>
-  <button id="btEntrar" class="grande entrar" type="button" data-t="🎵 Toque para começar a festa!|🎵 Tap to start the party!"></button>
-  <p class="dica" data-t="Aumente o volume 🔊|Turn the volume up 🔊"></p>
+  <p class="sub" data-t="o provador maluco da família|the family's crazy fitting room|el probador loco de la familia"></p>
+  <button id="btEntrar" class="grande entrar" type="button" data-t="🎵 Toque para começar a festa!|🎵 Tap to start the party!|🎵 ¡Toca para empezar la fiesta!"></button>
+  <p class="dica" data-t="Aumente o volume 🔊|Turn the volume up 🔊|Sube el volumen 🔊"></p>
 </section>
 
 <section id="inicio" class="tela" data-recurso="peluqueria">
   <div class="luzes" aria-hidden="true"><div class="feixe a"></div><div class="feixe b"></div><div class="feixe c"></div><div class="brilhos"></div></div>
   <div id="flutuantes" class="flutuantes" aria-hidden="true"></div>
   <div class="faixa">
-    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
-    <button id="btSom" class="mini" type="button" aria-label="Som / Sound">🔊</button>
-    <button id="btAjuda" class="mini" type="button" aria-label="Como jogar / How to play">❓</button>
+    <button id="btSom" class="mini" type="button" aria-label="Som" data-rotulo="Som|Sound|Sonido">🔊</button>
+    <button id="btAjuda" class="mini" type="button" aria-label="Como jogar" data-rotulo="Como jogar|How to play|Cómo jugar">❓</button>
   </div>
   <h1 class="logo">Peluqueria</h1>
-  <p class="sub" data-t="o provador maluco da família|the family's crazy fitting room"></p>
+  <p class="sub" data-t="o provador maluco da família|the family's crazy fitting room|el probador loco de la familia"></p>
   <div id="ajuda" class="ajuda" hidden>
-    <p data-t="Um item vai descer sobre a imagem. Toque em qualquer ponto da tela para ele parar. Quanto mais perto do lugar certo, mais pontos: Perfeito vale 100, Bom 60, Quase 30. Acertos seguidos multiplicam até ×3. São 10 quedas por rodada.|An item will fall over the picture. Tap anywhere on the screen to stop it. The closer to the right spot, the more points: Perfect is 100, Good 60, Almost 30. Hits in a row multiply up to ×3. 10 drops per round."></p>
+    <p data-t="Um item vai descer sobre a imagem. Toque em qualquer ponto da tela para ele parar. Quanto mais perto do lugar certo, mais pontos: Perfeito vale 100, Bom 60, Quase 30. Acertos seguidos multiplicam até ×3. São 10 quedas por rodada.|An item will fall over the picture. Tap anywhere on the screen to stop it. The closer to the right spot, the more points: Perfect is 100, Good 60, Almost 30. Hits in a row multiply up to ×3. 10 drops per round.|Un objeto va a caer sobre la imagen. Toca en cualquier parte de la pantalla para detenerlo. Cuanto más cerca del lugar correcto, más puntos: Perfecto vale 100, Bien 60, Casi 30. Los aciertos seguidos multiplican hasta ×3. Son 10 caídas por ronda."></p>
   </div>
-  <div class="niveis" role="group" aria-label="Nível / Level">
-    <button id="btCrianca" class="nivel crianca" type="button" data-nivel="crianca"><span data-t="Criança|Kids"></span></button>
-    <button id="btNormal" class="nivel normal" type="button" data-nivel="normal"><span data-t="Normal|Normal"></span></button>
-    <button id="btMaluco" class="nivel maluco" type="button" data-nivel="maluco"><span data-t="Maluco|Crazy"></span></button>
+  <div class="niveis" role="group" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
+    <button id="btCrianca" class="nivel crianca" type="button" data-nivel="crianca"><span data-t="Criança|Kids|Niños"></span></button>
+    <button id="btNormal" class="nivel normal" type="button" data-nivel="normal"><span data-t="Normal|Normal|Normal"></span></button>
+    <button id="btMaluco" class="nivel maluco" type="button" data-nivel="maluco"><span data-t="Maluco|Crazy|Loco"></span></button>
   </div>
-  <button id="btMinhas" class="chave" type="button" aria-pressed="false" hidden><span data-t="Minhas imagens|My pictures"></span></button>
-  <button id="btJogar" class="grande" type="button" data-t="Jogar|Play"></button>
+  <button id="btMinhas" class="chave" type="button" aria-pressed="false" hidden><span data-t="Minhas imagens|My pictures|Mis imágenes"></span></button>
+  <button id="btJogar" class="grande" type="button" data-t="Jogar|Play|Jugar"></button>
   <div class="modos-tv">
-    <button id="btTV" class="medio" type="button" data-t="📺 Jogar na TV|📺 Play on the TV"></button>
-    <button id="btControle" class="medio" type="button" data-t="📱 Sou o controle|📱 I'm the controller"></button>
+    <button id="btTV" class="medio" type="button" data-t="📺 Jogar na TV|📺 Play on the TV|📺 Jugar en la tele"></button>
+    <button id="btControle" class="medio" type="button" data-t="📱 Sou o controle|📱 I'm the controller|📱 Soy el mando"></button>
   </div>
   <p id="tocando" class="rodape tocando" aria-live="polite"></p>
   <p class="rodape"><span id="ver"></span> · SolverONE · Bolinho de Chuva</p>
@@ -65,31 +64,31 @@
 <section id="rodada" class="tela">
   <canvas id="palco"></canvas>
   <div class="placar"><span id="pontos">0</span><span id="mult" class="mult" hidden></span><span id="queda">1/10</span></div>
-  <button id="btPausa" class="mini pausa" type="button" aria-label="Pausar / Pause"><span class="barras" aria-hidden="true"></span></button>
-  <button id="btSeguir" class="seguir" type="button" aria-label="Continuar / Resume" hidden>▶</button>
+  <button id="btPausa" class="mini pausa" type="button" aria-label="Pausar" data-rotulo="Pausar|Pause|Pausa"><span class="barras" aria-hidden="true"></span></button>
+  <button id="btSeguir" class="seguir" type="button" aria-label="Continuar" data-rotulo="Continuar|Resume|Seguir" hidden>▶</button>
 </section>
 
 <section id="fim" class="tela">
-  <h2 data-t="Fim da rodada!|Round over!"></h2>
+  <h2 data-t="Fim da rodada!|Round over!|¡Fin de la ronda!"></h2>
   <div id="estrelas" class="estrelas" aria-live="polite"></div>
-  <p class="total"><span id="total">0</span> <span data-t="pontos|points"></span></p>
-  <p id="novoRecorde" class="recorde-novo" hidden data-t="Novo recorde!|New record!"></p>
-  <p class="recorde"><span data-t="Recorde|Record"></span>: <span id="recorde">0</span></p>
-  <p class="perfeitos"><span data-t="Perfeitos|Perfects"></span>: <span id="perfeitos">0</span></p>
-  <button id="btDeNovo" class="grande" type="button" data-t="Jogar de novo|Play again"></button>
-  <button id="btInicio" class="medio" type="button" data-t="Início|Home"></button>
+  <p class="total"><span id="total">0</span> <span data-t="pontos|points|puntos"></span></p>
+  <p id="novoRecorde" class="recorde-novo" hidden data-t="Novo recorde!|New record!|¡Nuevo récord!"></p>
+  <p class="recorde"><span data-t="Recorde|Record|Récord"></span>: <span id="recorde">0</span></p>
+  <p class="perfeitos"><span data-t="Perfeitos|Perfects|Perfectos"></span>: <span id="perfeitos">0</span></p>
+  <button id="btDeNovo" class="grande" type="button" data-t="Jogar de novo|Play again|Jugar otra vez"></button>
+  <button id="btInicio" class="medio" type="button" data-t="Início|Home|Inicio"></button>
 </section>
 
 <!-- ===== TV ===== -->
 <section id="tvLobby" class="tela">
   <h1 class="logo">Peluqueria</h1>
-  <p class="tv-passo" data-t="No celular, abra solverone.com.br/kids/peluqueria, toque em 📱 Sou o controle e digite o código:|On the phone, open solverone.com.br/kids/peluqueria, tap 📱 I'm the controller and type the code:"></p>
+  <p class="tv-passo" data-t="No celular, abra solverone.com.br/kids/peluqueria, toque em 📱 Sou o controle e digite o código:|On the phone, open solverone.com.br/kids/peluqueria, tap 📱 I'm the controller and type the code:|En el móvil, abre solverone.com.br/kids/peluqueria, toca 📱 Soy el mando y escribe el código:"></p>
   <div id="codigo" class="codigo" aria-live="polite">····</div>
   <div id="tvJogadores" class="tv-jogadores" aria-live="polite"></div>
-  <p class="tv-nivel"><span data-t="Nível|Level"></span>: <b id="tvNivel"></b></p>
-  <p class="tv-passo pequeno" data-t="🔊 A música começa no primeiro botão do controle.|🔊 Music starts with the first button on the remote."></p>
-  <p class="tv-passo pequeno" data-t="Até 2 celulares. Sem celular, aperte OK no controle da TV para jogar sozinho.|Up to 2 phones. No phone? Press OK on the TV remote to play alone."></p>
-  <button id="tvComecar" class="grande" type="button" data-t="Começar (OK)|Start (OK)"></button>
+  <p class="tv-nivel"><span data-t="Nível|Level|Nivel"></span>: <b id="tvNivel"></b></p>
+  <p class="tv-passo pequeno" data-t="🔊 A música começa no primeiro botão do controle.|🔊 Music starts with the first button on the remote.|🔊 La música empieza con el primer botón del mando."></p>
+  <p class="tv-passo pequeno" data-t="Até 2 celulares. Sem celular, aperte OK no controle da TV para jogar sozinho.|Up to 2 phones. No phone? Press OK on the TV remote to play alone.|Hasta 2 móviles. ¿No hay móvil? Pulsa OK en el mando de la tele para jugar solo."></p>
+  <button id="tvComecar" class="grande" type="button" data-t="Começar (OK)|Start (OK)|Empezar (OK)"></button>
   <p id="tvAviso" class="tv-passo pequeno"></p>
 </section>
 
@@ -102,39 +101,39 @@
 </section>
 
 <section id="tvFim" class="tela">
-  <h2 data-t="Fim da rodada!|Round over!"></h2>
+  <h2 data-t="Fim da rodada!|Round over!|¡Fin de la ronda!"></h2>
   <div id="tvPodio" class="tv-podio" aria-live="polite"></div>
-  <p class="tv-passo" data-t="OK ou o celular: jogar de novo · Voltar: lobby|OK or the phone: play again · Back: lobby"></p>
+  <p class="tv-passo" data-t="OK ou o celular: jogar de novo · Voltar: lobby|OK or the phone: play again · Back: lobby|OK o el móvil: jugar otra vez · Atrás: sala de espera"></p>
 </section>
 
 <!-- ===== Celular como controle ===== -->
 <section id="controle" class="tela">
-  <h2 data-t="📱 Controle da TV|📱 TV controller"></h2>
+  <h2 data-t="📱 Controle da TV|📱 TV controller|📱 Mando de la tele"></h2>
   <div id="ctEntrada" class="ct-entrada">
-    <label><span data-t="Código da TV|TV code"></span><input id="ctCodigo" maxlength="4" autocomplete="off" autocapitalize="characters" inputmode="text"></label>
-    <label><span data-t="Seu nome|Your name"></span><input id="ctNome" maxlength="14" autocomplete="off"></label>
-    <button id="ctEntrar" class="grande" type="button" data-t="Entrar|Join"></button>
+    <label><span data-t="Código da TV|TV code|Código de la tele"></span><input id="ctCodigo" maxlength="4" autocomplete="off" autocapitalize="characters" inputmode="text"></label>
+    <label><span data-t="Seu nome|Your name|Tu nombre"></span><input id="ctNome" maxlength="14" autocomplete="off"></label>
+    <button id="ctEntrar" class="grande" type="button" data-t="Entrar|Join|Entrar"></button>
   </div>
   <div id="ctPainel" class="ct-painel" hidden>
     <p id="ctStatus" class="ct-status" aria-live="polite"></p>
     <div id="ctNiveis" class="niveis">
-      <button id="ctCrianca" class="nivel crianca" type="button" data-nivel-tv="crianca" data-t="Criança|Kids"></button>
-      <button id="ctNormal" class="nivel normal" type="button" data-nivel-tv="normal" data-t="Normal|Normal"></button>
-      <button id="ctMaluco" class="nivel maluco" type="button" data-nivel-tv="maluco" data-t="Maluco|Crazy"></button>
+      <button id="ctCrianca" class="nivel crianca" type="button" data-nivel-tv="crianca" data-t="Criança|Kids|Niños"></button>
+      <button id="ctNormal" class="nivel normal" type="button" data-nivel-tv="normal" data-t="Normal|Normal|Normal"></button>
+      <button id="ctMaluco" class="nivel maluco" type="button" data-nivel-tv="maluco" data-t="Maluco|Crazy|Loco"></button>
     </div>
-    <button id="ctComecar" class="grande" type="button" data-t="Começar|Start"></button>
-    <button id="ctParar" class="ct-parar" type="button" data-t="PARAR!|STOP!"></button>
+    <button id="ctComecar" class="grande" type="button" data-t="Começar|Start|Empezar"></button>
+    <button id="ctParar" class="ct-parar" type="button" data-t="PARAR!|STOP!|¡ALTO!"></button>
     <div class="ct-corpo">
-      <button id="ctCorpo" class="chave" type="button" aria-pressed="false" data-t="📷 Usar o corpo|📷 Use your body"></button>
-      <button id="ctDois" class="chave" type="button" aria-pressed="false" hidden data-t="👯 2 pessoas neste celular|👯 2 people on this phone"></button>
-      <p id="ctDicaCorpo" class="dica" hidden data-t="Deixe o celular de pé, filmando quem joga. Levante um braço ou chute de repente para parar. Tremidinha não conta.|Stand the phone up, filming the players. Raise an arm or kick suddenly to stop. Small wiggles don't count."></p>
+      <button id="ctCorpo" class="chave" type="button" aria-pressed="false" data-t="📷 Usar o corpo|📷 Use your body|📷 Usar el cuerpo"></button>
+      <button id="ctDois" class="chave" type="button" aria-pressed="false" hidden data-t="👯 2 pessoas neste celular|👯 2 people on this phone|👯 2 personas en este móvil"></button>
+      <p id="ctDicaCorpo" class="dica" hidden data-t="Deixe o celular de pé, filmando quem joga. Levante um braço ou chute de repente para parar. Tremidinha não conta.|Stand the phone up, filming the players. Raise an arm or kick suddenly to stop. Small wiggles don't count.|Deja el móvil de pie, grabando a quien juega. Levanta un brazo o da una patada de repente para detenerlo. Los movimientos pequeñitos no cuentan."></p>
       <div id="ctCamera" class="ct-camera" hidden><video id="ctVideo" muted playsinline></video><canvas id="ctEsq"></canvas></div>
     </div>
   </div>
 </section>
 
 <section id="desligado" class="tela">
-  <p data-t="Esta brincadeira está desligada no momento.|This game is turned off right now."></p>
+  <p data-t="Esta brincadeira está desligada no momento.|This game is turned off right now.|Este juego está apagado por ahora."></p>
 </section>
 
 <div id="aviso" class="sr" aria-live="polite"></div>

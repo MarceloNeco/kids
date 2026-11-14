@@ -1,20 +1,13 @@
 {
   "formato": 1,
   "app": "kids",
-  "nota": "Interruptores do RootifyONE (Controle dos apps → Bolinho de Chuva) que a estante e os jogos obedecem. UM app com um interruptor por jogo: desligado, o jogo some da estante e a página do jogo esconde o conteúdo marcado com data-recurso. \"app\" desligado = o pacote inteiro em manutenção. \"ingles\" só vale ligado de propósito: sem nada publicado, tudo fica só em português (idioma.js). Jogo novo = uma entrada aqui. Nada de segredo neste arquivo.",
+  "nota": "Interruptores do RootifyONE (Controle dos apps → Bolinho de Chuva) que a estante e os jogos obedecem. UM app com um interruptor por jogo: desligado, o jogo some da estante e a página do jogo esconde o conteúdo marcado com data-recurso. \"app\" desligado = o pacote inteiro em manutenção. O idioma (português, inglês ou espanhol) não é interruptor: é escolhido na estante (idioma.js). Jogo novo = uma entrada aqui. Nada de segredo neste arquivo.",
   "recursos": [
     {
       "id": "app",
       "nome": {
         "pt": "Bolinho de Chuva inteiro (manutenção)",
         "en": "Whole Rain Dumpling (maintenance)"
-      }
-    },
-    {
-      "id": "ingles",
-      "nome": {
-        "pt": "Inglês (textos e botão de idioma nos jogos e na estante)",
-        "en": "English (texts and language button in games and shelf)"
       }
     },
     {
@@ -112,6 +105,38 @@
         "en": "My Little Big Chef"
       },
       "pagina": "cozinha/"
+    },
+    {
+      "id": "a-garra",
+      "nome": {
+        "pt": "A-GARRA",
+        "en": "The Claw Machine"
+      },
+      "pagina": "a-garra/"
+    },
+    {
+      "id": "aqua",
+      "nome": {
+        "pt": "AQUA",
+        "en": "AQUA"
+      },
+      "pagina": "aqua/"
+    },
+    {
+      "id": "quem-e",
+      "nome": {
+        "pt": "Quem é? (Duelo de Caras)",
+        "en": "Who Is It? (Face Duel)"
+      },
+      "pagina": "quem-e/"
+    },
+    {
+      "id": "glub-glub",
+      "nome": {
+        "pt": "GLUB GLUB",
+        "en": "GLUB GLUB"
+      },
+      "pagina": "glub-glub/"
     }
   ]
 }

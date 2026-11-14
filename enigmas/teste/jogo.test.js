@@ -6,15 +6,21 @@ const J = require('../jogo.js');
 const R = require('../rodadas.js');
 
 function semente(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-const exemplo = J.rodada(['Do que cada um gosta?|What does each one like?', '🐶 cachorro|dog = 🦴 osso|bone', '🐵 macaco|monkey = 🍌 banana|banana', '_ au au|woof = 🐰 coelho|rabbit'], 'facil');
+const exemplo = J.rodada(['Do que cada um gosta?|What does each one like?|¿Qué le gusta a cada uno?', '🐶 cachorro|dog|perro = 🦴 osso|bone|hueso', '🐵 macaco|monkey|mono = 🍌 banana|banana|plátano', '_ au au|woof|guau guau = 🐰 coelho|rabbit|conejo'], 'facil');
 
-test('lê os itens: emoji, palavra em PT e em EN; "_" é sem desenho', () => {
-  assert.deepEqual(exemplo.pares[0][0], { e: '🐶', pt: 'cachorro', en: 'dog' });
-  assert.deepEqual(exemplo.pares[2][0], { e: '', pt: 'au au', en: 'woof' });
-  assert.deepEqual(exemplo.dica, { pt: 'Do que cada um gosta?', en: 'What does each one like?' });
+test('lê os itens: emoji, palavra em PT, EN e ES; "_" é sem desenho', () => {
+  assert.deepEqual(exemplo.pares[0][0], { e: '🐶', pt: 'cachorro', en: 'dog', es: 'perro' });
+  assert.deepEqual(exemplo.pares[2][0], { e: '', pt: 'au au', en: 'woof', es: 'guau guau' });
+  assert.deepEqual(exemplo.dica, { pt: 'Do que cada um gosta?', en: 'What does each one like?', es: '¿Qué le gusta a cada uno?' });
   assert.equal(exemplo.so, null);
-  const so = J.rodada(['pt:Rima|Rhyme', '🐱 gato|cat = 🦆 pato|duck'], 'dificil');
+  const so = J.rodada(['pt:Rima|Rhyme|Rima', '🐱 gato|cat|gato = 🦆 pato|duck|pato'], 'dificil');
   assert.equal(so.so, 'pt'); assert.equal(so.dica.pt, 'Rima');
+  assert.equal(J.rodada(['es:Rima|Rhyme|Rima', '🐸 sapo|frog|rana = 🍎 maçã|apple|manzana'], 'medio').so, 'es');
+});
+
+test('o código da rodada não muda com o espanhol (o progresso guardado continua valendo)', () => {
+  const antes = J.rodada(['Do que cada um gosta?|What does each one like?', '🐶 cachorro|dog = 🦴 osso|bone', '🐵 macaco|monkey = 🍌 banana|banana', '_ au au|woof = 🐰 coelho|rabbit'], 'facil');
+  assert.equal(exemplo.id, antes.id);
 });
 
 test('só a ligação certa vale; errar conta erro e não liga nada', () => {
@@ -51,7 +57,7 @@ test('embaralha os dois lados e ninguém fica bem na frente do seu par', () => {
 });
 
 test('não repete rodada antes de passar por todas; depois recomeça misturado', () => {
-  for (const n of R.NIVEIS) for (const l of ['pt', 'en']) {
+  for (const n of R.NIVEIS) for (const l of ['pt', 'en', 'es']) {
     const lista = J.lista(R, n, l), rnd = semente(7), feitas = [];
     for (let i = 0; i < lista.length; i++) {
       const { rodada, reiniciou } = J.escolher(lista, feitas, rnd);
@@ -79,9 +85,9 @@ test('a próxima rodada sai entre as primeiras que faltam (a dificuldade sobe ao
 });
 
 test('rimas só aparecem na língua delas', () => {
-  const pt = J.lista(R, 'medio', 'pt'), en = J.lista(R, 'medio', 'en');
-  assert.ok(pt.every(r => r.so !== 'en')); assert.ok(en.every(r => r.so !== 'pt'));
-  assert.ok(pt.some(r => r.so === 'pt')); assert.ok(en.some(r => r.so === 'en'));
+  const pt = J.lista(R, 'medio', 'pt'), en = J.lista(R, 'medio', 'en'), es = J.lista(R, 'medio', 'es');
+  assert.ok(pt.every(r => !r.so || r.so === 'pt')); assert.ok(en.every(r => !r.so || r.so === 'en')); assert.ok(es.every(r => !r.so || r.so === 'es'));
+  assert.ok(pt.some(r => r.so === 'pt')); assert.ok(en.some(r => r.so === 'en')); assert.ok(es.some(r => r.so === 'es'));
 });
 
 test('progresso de antes da v0.3.0: o Difícil antigo vai para o Médio com as estrelas; roda uma vez só', () => {

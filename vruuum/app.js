@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.17.0';
+  var APP_VERSION = '1.18.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -32,8 +32,7 @@
   if (!Array.isArray(pref.mundos)) pref.mundos = [];   // cenários escolhidos (vazio = surpresa)
   if (['neon', 'colorido', 'misto'].indexOf(pref.visual) < 0 || !pref.visualV2) { pref.visual = 'misto'; pref.visualV2 = true; }   // misto: alterna dia e noite (padrão desde a 1.0)
   D.definirEstilo(pref.visual);
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  delete pref.lingua;   // 1.17.0: o idioma não fica mais nas preferências do jogo; vem da estante (../idioma.js)
   if (!pref.carros || pref.carros.length !== 2) pref.carros = [{ cor: 0, piloto: 0 }, { cor: 2, piloto: 1 }];
   var VE = window.VruuumVeiculos, SE = window.VruuumSelfie;
   // a selfie do jogador k, se ele escolheu usar a foto (fica só neste aparelho: selfie.js)
@@ -41,12 +40,15 @@
   pref.carros.forEach(function (c, k) { if (!VE.achar(c.veic)) c.veic = k ? 'gt' : 'classico'; if (c.corpo !== 'menino') c.corpo = 'menina'; });
   function salvar() { gravar('vruuum.pref', pref); }
 
-  // ---------- idioma ----------
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
+  // ---------- idioma: escolhido na estante (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES, ../idioma.js); o jogo não tem botão próprio ----------
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' && es != null ? es : pt; }
+  function tn(nome) { return t(nome[0], nome[1], nome[2]); }   // nomes em lista [pt, en, es] (veículos, personagens, mundos)
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
+    var i = lingua === 'en' ? 1 : lingua === 'es' ? 2 : 0;
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = p[i] != null ? p[i] : p[0]; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-aria]'), function (el) { var p = el.getAttribute('data-aria').split('|'); el.setAttribute('aria-label', p[i] != null ? p[i] : p[0]); });
   }
 
   function tela(id) {
@@ -74,7 +76,7 @@
     var jd = ps.slice(0, 2).map(function (p, k) { return { cor: p.cor || D.CORES[k], piloto: D.PILOTOS[k], veic: sorteia(noChao), foto: null, personagem: p.id, corpo: PE.corpoDe(p.id) || 'menino' }; });
     var e = M.novaCorrida('normal', (Date.now() % 100000) | 0, 2, configs);
     e.jogadores.forEach(function (j, k) { var v = VE.achar(jd[k].veic); j.mod = { vel: v.vel, curva: v.curva }; j.x = k ? 0.66 : -0.66; });
-    D.preparar(e, jd, pref.lingua, pref.visual);
+    D.preparar(e, jd, lingua, pref.visual);
     demo = { e: e, jogs: jd, cena: 0, tCena: 0, ultimo: performance.now(), faixas: [-0.66, 0.66], pensa: 0 };
     requestAnimationFrame(passoDemo);
   }
@@ -116,7 +118,8 @@
 
   // ---------- menu e garagem ----------
   var montado = false, editando = 0, animPrevia = 0;
-  function botao(classe, rotulo, fn) { var b = document.createElement('button'); b.type = 'button'; b.className = classe; b.setAttribute('aria-label', rotulo); b.addEventListener('click', fn); return b; }
+  // rotulo: texto, ou a lista [pt, en, es] (aí o traduzir() troca junto com o idioma)
+  function botao(classe, rotulo, fn) { var b = document.createElement('button'); b.type = 'button'; b.className = classe; if (Array.isArray(rotulo)) { b.setAttribute('data-aria', rotulo.join('|')); rotulo = tn(rotulo); } b.setAttribute('aria-label', rotulo); b.addEventListener('click', fn); return b; }
   function montarMenu() {
     if (!montado) {
       montado = true;
@@ -127,7 +130,7 @@
         var h3 = document.createElement('h3'); h3.setAttribute('data-t', gr.nome.join('|')); g.appendChild(h3);
         var lista = document.createElement('div'); lista.className = 'cartoes'; g.appendChild(lista);
         VE.LISTA.filter(function (v) { return v.grupo === gr.id; }).forEach(function (v) {
-          var b = botao('cartao-veic' + (v.grupo === 'ar' ? ' ar' : ''), v.nome[0] + ' / ' + v.nome[1], function () { pref.carros[editando].veic = v.id; salvar(); Som.tocar('buzina', editando); marcar(); });
+          var b = botao('cartao-veic' + (v.grupo === 'ar' ? ' ar' : ''), v.nome, function () { pref.carros[editando].veic = v.id; salvar(); Som.tocar('buzina', editando); marcar(); });
           b.setAttribute('data-veic', v.id);
           var cv = document.createElement('canvas'); cv.width = 192; cv.height = 128; b.appendChild(cv);
           var sp = document.createElement('span'); sp.setAttribute('data-t', v.nome.join('|')); b.appendChild(sp);
@@ -136,7 +139,7 @@
         caixa.appendChild(g);
       });
       D.CORES.forEach(function (cor, k) {
-        var b = botao('cor', t('Cor ', 'Color ') + (k + 1), function () { pref.carros[editando].cor = k; salvar(); Som.tocar('clique'); marcar(); });
+        var b = botao('cor', ['Cor ' + (k + 1), 'Color ' + (k + 1), 'Color ' + (k + 1)], function () { pref.carros[editando].cor = k; salvar(); Som.tocar('clique'); marcar(); });
         b.style.background = cor; b.setAttribute('data-cor', k); $('cores').appendChild(b);
       });
       D.PILOTOS.forEach(function (emo, k) {
@@ -145,25 +148,25 @@
       });
       if (SE) {
         // a própria foto (aparece depois de tirar) e o botão de tirar/trocar a selfie
-        var bf = botao('bicho foto', t('Minha foto', 'My photo'), function () { pref.carros[editando].foto = true; pref.carros[editando].personagem = null; salvar(); Som.tocar('buzina', editando); marcar(); });
+        var bf = botao('bicho foto', ['Minha foto', 'My photo', 'Mi foto'], function () { pref.carros[editando].foto = true; pref.carros[editando].personagem = null; salvar(); Som.tocar('buzina', editando); marcar(); });
         bf.id = 'btFoto'; var cvf = document.createElement('canvas'); cvf.width = cvf.height = 76; bf.appendChild(cvf); $('bichos').appendChild(bf);
-        var bc = botao('bicho camera', t('Tirar selfie', 'Take a selfie'), abrirSelfie); bc.textContent = '📸'; $('bichos').appendChild(bc);
+        var bc = botao('bicho camera', ['Tirar selfie', 'Take a selfie', 'Hacerte un selfie'], abrirSelfie); bc.textContent = '📸'; $('bichos').appendChild(bc);
       }
       if (PE) PE.LISTA.forEach(function (p) {   // personagens de domínio público como piloto
-        var b = botao('bicho pers', p.nome[0], function () { var cc = pref.carros[editando]; cc.personagem = p.id; cc.foto = false; if (PE.corpoDe(p.id)) cc.corpo = PE.corpoDe(p.id); salvar(); Som.tocar('buzina', editando); marcar(); });
-        b.setAttribute('data-personagem', p.id); b.title = p.nome[0];
+        var b = botao('bicho pers', p.nome, function () { var cc = pref.carros[editando]; cc.personagem = p.id; cc.foto = false; if (PE.corpoDe(p.id)) cc.corpo = PE.corpoDe(p.id); salvar(); Som.tocar('buzina', editando); marcar(); });
+        b.setAttribute('data-personagem', p.id); b.title = tn(p.nome);
         var cv = document.createElement('canvas'); cv.width = cv.height = 80; p.frente(cv.getContext('2d'), 40, 46, 26); b.appendChild(cv);
         $('bichos').appendChild(b);
       });
       // cenários: toque para escolher (até 4, na ordem do toque); 🎲 Surpresa = o jogo sorteia
       [''].concat(window.VruuumPista.MUNDOS).forEach(function (m) {
-        var tm = m && D.TEMAS[m], b = botao('opcao', m ? tm.nome[0] : 'Surpresa', function () {
+        var tm = m && D.TEMAS[m], b = botao('opcao', m ? tm.nome : ['Surpresa', 'Surprise', 'Sorpresa'], function () {
           if (!m) pref.mundos = [];
           else if (pref.mundos.indexOf(m) >= 0) pref.mundos.splice(pref.mundos.indexOf(m), 1);
           else { pref.mundos.push(m); if (pref.mundos.length > 4) pref.mundos.shift(); }
           salvar(); Som.tocar('clique'); marcar();
         });
-        b.setAttribute('data-mundo', m); b.setAttribute('data-t', m ? tm.emoji + ' ' + tm.nome[0] + '|' + tm.emoji + ' ' + tm.nome[1] : '🎲 Surpresa|🎲 Surprise');
+        b.setAttribute('data-mundo', m); b.setAttribute('data-t', m ? tm.nome.map(function (n) { return tm.emoji + ' ' + n; }).join('|') : '🎲 Surpresa|🎲 Surprise|🎲 Sorpresa');
         $('mundosEsc').appendChild(b);
       });
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
@@ -225,12 +228,12 @@
       var menor = Math.min(img.naturalWidth, img.naturalHeight);
       ed.roda = { x: img.naturalWidth / 2, y: img.naturalHeight * 0.42, r: menor * 0.3 };
       $('selfieTam').value = 30; $('selfieEditor').hidden = false;
-      $('selfieAviso').textContent = t('🔎 Procurando o rosto…', '🔎 Looking for the face…');
+      $('selfieAviso').textContent = t('🔎 Procurando o rosto…', '🔎 Looking for the face…', '🔎 Buscando la cara…');
       desenharEditor();
       SE.acharRosto(img).then(function (achou) {
         if (ed.img !== img) return;
-        if (achou) { ed.roda = achou; $('selfieTam').value = Math.round(achou.r / menor * 100); $('selfieAviso').textContent = t('✅ Achei o rosto! Se precisar, arraste o círculo ou mude o tamanho.', '✅ Found the face! Drag the circle or change its size if needed.'); }
-        else $('selfieAviso').textContent = t('🙂 Não achei o rosto sozinho. Arraste o círculo até ele.', "🙂 Couldn't find the face by myself. Drag the circle onto it.");
+        if (achou) { ed.roda = achou; $('selfieTam').value = Math.round(achou.r / menor * 100); $('selfieAviso').textContent = t('✅ Achei o rosto! Se precisar, arraste o círculo ou mude o tamanho.', '✅ Found the face! Drag the circle or change its size if needed.', '✅ ¡He encontrado la cara! Si hace falta, arrastra el círculo o cambia el tamaño.'); }
+        else $('selfieAviso').textContent = t('🙂 Não achei o rosto sozinho. Arraste o círculo até ele.', "🙂 I couldn't find the face on my own. Drag the circle onto it.", '🙂 No he encontrado la cara. Arrastra el círculo hasta ella.');
         desenharEditor();
       });
     };
@@ -252,7 +255,7 @@
     $('selfieUsar').addEventListener('click', function () {
       if (!ed.img) return;
       if (SE.salvar(editando, SE.recortar(ed.img, ed.roda))) { pref.carros[editando].foto = true; salvar(); Som.tocar('chegou'); fecharSelfie(); }
-      else $('selfieAviso').textContent = t('Não deu para guardar a foto neste aparelho.', "Couldn't save the photo on this device.");
+      else $('selfieAviso').textContent = t('Não deu para guardar a foto neste aparelho.', "Couldn't save the photo on this device.", 'No se ha podido guardar la foto en este aparato.');
     });
     $('selfieApagar').addEventListener('click', function () { SE.apagar(editando); pref.carros[editando].foto = false; salvar(); fecharSelfie(); });
     $('selfieFechar').addEventListener('click', fecharSelfie);
@@ -260,7 +263,7 @@
 
   function nomePiloto(k) {
     var c = pref.carros[k], p = c.personagem && PE ? PE.achar(c.personagem) : null;
-    return p ? t(p.nome[0], p.nome[1]) : (c.foto && fotoDe(k) ? '📸' : D.PILOTOS[c.piloto]);
+    return p ? tn(p.nome) : (c.foto && fotoDe(k) ? '📸' : D.PILOTOS[c.piloto]);
   }
   function barra(v) { return Math.max(25, Math.min(100, 30 + (v - 0.92) / 0.2 * 70)) + '%'; }
   function marcar() {
@@ -276,7 +279,7 @@
     $('abas').hidden = pref.jogadores < 2;
     Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
       var k = +b.getAttribute('data-aba'); b.setAttribute('aria-selected', String(k === editando));
-      b.textContent = nomePiloto(k) + ' · ' + t('Jogador ', 'Player ') + (k + 1);
+      b.textContent = nomePiloto(k) + ' · ' + t('Jogador ', 'Player ', 'Jugador ') + (k + 1);
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-veic]'), function (b) {
       b.setAttribute('aria-pressed', String(b.getAttribute('data-veic') === c.veic));
@@ -284,7 +287,7 @@
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-cor]'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-cor') === c.cor)); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-corpo]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-corpo') === c.corpo)); });
-    $('btCorrer').textContent = pref.jogadores === 2 ? t('🏁 Correr! · 2 jogadores', '🏁 Race! · 2 players') : t('🏁 Correr!', '🏁 Race!');
+    $('btCorrer').textContent = pref.jogadores === 2 ? t('🏁 Correr! · 2 jogadores', '🏁 Race! · 2 players', '🏁 ¡A correr! · 2 jugadores') : t('🏁 Correr!', '🏁 Race!', '🏁 ¡A correr!');
     Array.prototype.forEach.call(document.querySelectorAll('[data-piloto]'), function (b) { b.setAttribute('aria-pressed', String(!c.foto && !c.personagem && +b.getAttribute('data-piloto') === c.piloto)); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-personagem]'), function (b) { b.setAttribute('aria-pressed', String(c.personagem === b.getAttribute('data-personagem'))); });
     var bf = $('btFoto'), fot = SE && SE.carregar(editando);
@@ -293,10 +296,10 @@
       if (fot) { var desenhaFoto = function () { var x = bf.querySelector('canvas').getContext('2d'); x.clearRect(0, 0, 76, 76); x.save(); x.beginPath(); x.arc(38, 38, 37, 0, Math.PI * 2); x.clip(); x.drawImage(fot.img, 0, 0, 76, 76); x.restore(); }; if (fot.img.complete) desenhaFoto(); else fot.img.onload = function () { desenhaFoto(); marcar(); }; }
     }
     if (c.foto && !fot) c.foto = false;
-    $('nomeVeic').textContent = (pref.jogadores === 2 || c.personagem ? nomePiloto(editando) + ' · ' : '') + t(v.nome[0], v.nome[1]) + (VE.voa(v.id) ? t(' · voa no céu ✈️', ' · flies in the sky ✈️') : '');
+    $('nomeVeic').textContent = (pref.jogadores === 2 || c.personagem ? nomePiloto(editando) + ' · ' : '') + tn(v.nome) + (VE.voa(v.id) ? t(' · voa no céu ✈️', ' · flies in the sky ✈️', ' · vuela por el cielo ✈️') : '');
     $('barraVel').style.width = barra(v.vel); $('barraCurva').style.width = barra(v.curva);
     var dica = $('dicaTecla'); dica.hidden = TOQUE || pref.jogadores < 2;
-    dica.textContent = editando ? t('Teclado: setas e ⬆', 'Keyboard: arrows and ⬆') : t('Teclado: A, D e W', 'Keyboard: A, D and W');
+    dica.textContent = editando ? t('Teclado: setas e ⬆', 'Keyboard: arrows and ⬆', 'Teclado: flechas y ⬆') : t('Teclado: A, D e W', 'Keyboard: A, D and W', 'Teclado: A, D y W');
     $('recordeMenu').textContent = D.milhar(ler('vruuum.recordePts.' + pref.nivel, 0));
   }
   function opcao(atributo, fn) {
@@ -309,7 +312,6 @@
   opcao('data-controle', function (v) { pref.controle = v; });
   opcao('data-rivais', function (v) { pref.rivais = v; });
   opcao('data-visual', function (v) { pref.visual = v; D.definirEstilo(v); });
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvar(); traduzir(); marcar(); });
   $('btSom').addEventListener('click', function () { Som.iniciar(); var lig = Som.alternar(); $('btSom').textContent = $('btSomJogo').textContent = lig ? '🔊' : '🔇'; });
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
   $('btCorrer').addEventListener('click', function () { iniciarCorrida(); });
@@ -357,7 +359,7 @@
     }
     estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs, pref.mundos);
     estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id) }; });
-    D.preparar(estado, jogs, pref.lingua, pref.visual);
+    D.preparar(estado, jogs, lingua, pref.visual);
     tela('jogo'); redimensionar();
     $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false];
     lerBordas(); telaCheia(true);
@@ -373,14 +375,14 @@
   function ligarMaos() {
     if (pref.controle !== 'maos' || !MA) { pararMaos(); return; }
     ctrlMaos = [MA.criar(), MA.criar()];
-    $('camMaos').hidden = false; $('maosAviso').textContent = t('Ligando a câmera…', 'Starting the camera…');
+    $('camMaos').hidden = false; $('maosAviso').textContent = t('Ligando a câmera…', 'Starting the camera…', 'Encendiendo la cámara…');
     if (maosLigadas) return;
     MA.iniciar($('videoMaos'), function (maos, agora) {
       var partes = MA.separar(maos, estado ? estado.jogadores.length : 1);
       partes.forEach(function (m, k) { if (ctrlMaos[k]) ctrlMaos[k].ler(m, agora); });
       desenharCamMaos(maos);
     }).then(function () { maosLigadas = true; $('maosAviso').textContent = ''; })
-      .catch(function () { $('maosAviso').textContent = t('Sem câmera: use a tela ou o celular.', 'No camera: use the screen or the phone.'); setTimeout(function () { $('camMaos').hidden = true; }, 4000); });
+      .catch(function () { $('maosAviso').textContent = t('Sem câmera: use a tela ou o celular.', 'No camera: use the screen or the phone.', 'Sin cámara: usa la pantalla o el móvil.'); setTimeout(function () { $('camMaos').hidden = true; }, 4000); });
   }
   function pararMaos() { if (MA) MA.parar(); maosLigadas = false; $('camMaos').hidden = true; }
   // janelinha: a imagem espelhada, as mãos marcadas e o volante girando
@@ -396,7 +398,7 @@
       c.save(); c.translate(cx, cy); c.rotate(cm.direcao() * 0.9);
       c.strokeStyle = '#2bf4ff'; c.lineWidth = 4; c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.stroke();
       c.beginPath(); c.moveTo(-r, 0); c.lineTo(r, 0); c.moveTo(0, 0); c.lineTo(0, r); c.stroke(); c.restore();
-      if (cm.maos() === 0) { c.fillStyle = '#fff'; c.font = '700 13px Fredoka, sans-serif'; c.textAlign = 'center'; c.fillText(t('mostre as mãos 🙌', 'show your hands 🙌'), cx, 22); }
+      if (cm.maos() === 0) { c.fillStyle = '#fff'; c.font = '700 13px Fredoka, sans-serif'; c.textAlign = 'center'; c.fillText(t('mostre as mãos 🙌', 'show your hands 🙌', 'muestra las manos 🙌'), cx, 22); }
     });
   }
 
@@ -522,22 +524,22 @@
     var caixa = $('resultado'); caixa.innerHTML = '';
     js.forEach(function (j) {
       var p = total ? j.estrelas / total : 0;
-      var medalha = p >= 0.4 ? t('🥇 Ouro', '🥇 Gold') : p >= 0.2 ? t('🥈 Prata', '🥈 Silver') : t('🥉 Bronze', '🥉 Bronze');
+      var medalha = p >= 0.4 ? t('🥇 Ouro', '🥇 Gold', '🥇 Oro') : p >= 0.2 ? t('🥈 Prata', '🥈 Silver', '🥈 Plata') : t('🥉 Bronze', '🥉 Bronze', '🥉 Bronce');
       var div = document.createElement('div'); div.className = 'cartao' + (js.length === 2 && j.pontos === melhor ? ' vencedor' : '');
       var linhas = [
-        ['quem', jogs[j.n].piloto + (js.length === 2 ? ' ' + t('Jogador ', 'Player ') + (j.n + 1) : '')],
-        ['estrelas', D.milhar(j.pontos || 0) + ' ' + t('pontos', 'points')],
-        ['tempo', '⭐ ' + j.estrelas + ' · ' + t('batidas ', 'crashes ') + j.batidas],
+        ['quem', jogs[j.n].piloto + (js.length === 2 ? ' ' + t('Jogador ', 'Player ', 'Jugador ') + (j.n + 1) : '')],
+        ['estrelas', D.milhar(j.pontos || 0) + ' ' + t('pontos', 'points', 'puntos')],
+        ['tempo', '⭐ ' + j.estrelas + ' · ' + t('batidas ', 'crashes ', 'choques ') + j.batidas],
         ['medalha', medalha],
         ['tempo', '⏱ ' + tempoTxt(j.tempo)]
       ];
-      if (js.length === 2) linhas.push(['medalha', empate ? t('🤝 Empate!', '🤝 Tie!') : j.pontos === melhor ? t('🏆 Mais pontos!', '🏆 Most points!') : t('👏 Muito bem!', '👏 Well done!')]);
+      if (js.length === 2) linhas.push(['medalha', empate ? t('🤝 Empate!', '🤝 Tie!', '🤝 ¡Empate!') : j.pontos === melhor ? t('🏆 Mais pontos!', '🏆 Most points!', '🏆 ¡Más puntos!') : t('👏 Muito bem!', '👏 Well done!', '👏 ¡Muy bien!')]);
       linhas.forEach(function (l) { var el = document.createElement('div'); el.className = l[0]; el.textContent = l[1]; div.appendChild(el); });
       caixa.appendChild(div);
     });
     if (estado.rivais.length) {   // classificação com os rivais
-      var todos = js.map(function (j) { return { nome: (jogs[j.n].personagem && PE ? t(PE.achar(jogs[j.n].personagem).nome[0], PE.achar(jogs[j.n].personagem).nome[1]) : jogs[j.n].piloto) + (js.length === 2 ? ' (' + t('Jogador ', 'Player ') + (j.n + 1) + ')' : ' (' + t('você', 'you') + ')'), fim: j.chegou ? j.tempo : Infinity, z: j.z, eu: true }; })
-        .concat(estado.rivais.map(function (r) { var p = PE.achar(r.id); return { nome: t(p.nome[0], p.nome[1]), fim: r.chegou ? r.tempo : Infinity, z: r.z, eu: false }; }));
+      var todos = js.map(function (j) { return { nome: (jogs[j.n].personagem && PE ? tn(PE.achar(jogs[j.n].personagem).nome) : jogs[j.n].piloto) + (js.length === 2 ? ' (' + t('Jogador ', 'Player ', 'Jugador ') + (j.n + 1) + ')' : ' (' + t('você', 'you', 'tú') + ')'), fim: j.chegou ? j.tempo : Infinity, z: j.z, eu: true }; })
+        .concat(estado.rivais.map(function (r) { var p = PE.achar(r.id); return { nome: tn(p.nome), fim: r.chegou ? r.tempo : Infinity, z: r.z, eu: false }; }));
       todos.sort(function (a, b) { return a.fim !== b.fim ? a.fim - b.fim : b.z - a.z; });
       var ol = document.createElement('ol'); ol.className = 'classificacao';
       todos.forEach(function (o, k) { var li = document.createElement('li'); if (o.eu) li.className = 'eu'; li.textContent = ['🥇', '🥈', '🥉'][k] || ((k + 1) + 'º'); var sp = document.createElement('span'); sp.textContent = o.nome; li.appendChild(sp); ol.appendChild(li); });
@@ -712,22 +714,22 @@
       var p = pedidoInstalar; pedidoInstalar = null;
       p.prompt();
       p.userChoice.then(function (r) {
-        aviso.textContent = r && r.outcome === 'accepted' ? t('Pronto! O Vruuum! ficou na tela do celular, com ícone. Abre até sem internet.', 'Done! Vruuum! is on your home screen. It opens even offline.') : t('Tudo bem. Se mudar de ideia, toque de novo: aí baixa o arquivo do jogo.', 'No problem. Tap again to download the game file instead.');
+        aviso.textContent = r && r.outcome === 'accepted' ? t('Pronto! O Vruuum! ficou na tela do celular, com ícone. Abre até sem internet.', 'Done! Vruuum! is on your home screen. It opens even offline.', '¡Listo! Vruuum! ya está en la pantalla del móvil, con su icono. Se abre incluso sin internet.') : t('Tudo bem. Se mudar de ideia, toque de novo: aí baixa o arquivo do jogo.', 'No problem. Tap again to download the game file instead.', 'Está bien. Si cambias de idea, toca otra vez y se descarga el archivo del juego.');
       }).catch(function () {});
       return;
     }
-    aviso.textContent = t('Preparando o arquivo…', 'Preparing the file…');
+    aviso.textContent = t('Preparando o arquivo…', 'Preparing the file…', 'Preparando el archivo…');
     BaixarJogo.baixar('vruuum.html').then(function () {
-      aviso.textContent = t('Pronto! O arquivo vruuum.html foi para os Downloads. Toque nele para jogar, mesmo sem internet.', 'Done! vruuum.html went to Downloads. Tap it to play, even offline.');
+      aviso.textContent = t('Pronto! O arquivo vruuum.html foi para os Downloads. Toque nele para jogar, mesmo sem internet.', 'Done! vruuum.html is in your Downloads. Tap it to play, even offline.', '¡Listo! El archivo vruuum.html está en Descargas. Tócalo para jugar, incluso sin internet.');
     }).catch(function () {
-      aviso.textContent = t('Não deu agora. Abra o jogo com internet e tente de novo.', "Couldn't do it now. Open the game online and try again.");
+      aviso.textContent = t('Não deu agora. Abra o jogo com internet e tente de novo.', "That didn't work this time. Open the game while online and try again.", 'Esta vez no ha funcionado. Abre el juego con internet y vuelve a intentarlo.');
     });
   });
 
   // ---------- música no menu (1.14.0): ⏮ ⏭ e a lista para escolher; na corrida continua a que estiver tocando ----------
   var musicaEscolhida = false;
   function pintarMusica(i) {
-    $('musNome').textContent = '🎵 ' + (i ? i.nome : t('Toque para escolher', 'Tap to choose')) + ' ▾';
+    $('musNome').textContent = '🎵 ' + (i ? i.nome : t('Toque para escolher', 'Tap to choose', 'Toca para elegir')) + ' ▾';
     $('musOff').hidden = navigator.onLine !== false;
     var at = Som.musicaAtual();
     Array.prototype.forEach.call($('musLista').children, function (b, k) { b.setAttribute('aria-pressed', k === at ? 'true' : 'false'); });
@@ -758,6 +760,8 @@
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'vruuum', cuidarDoVoltar: true,
     noInicio: function () { return estadoTela !== 'jogo' && estadoTela !== 'fim'; }, irParaInicio: irMenu,
     emAndamento: function () { return estadoTela === 'jogo' && rodando; } });
+  // trocaram o idioma na estante (outra aba): o menu troca na hora; o que é desenhado na corrida, na próxima corrida
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); if (montado) marcar(); pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
   lerBordas();
   $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
   traduzir();

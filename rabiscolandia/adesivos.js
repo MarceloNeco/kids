@@ -16,42 +16,42 @@
 
   // ---------- catálogo ----------
   var GRUPOS = [
-    { id: 'bichos', pt: 'Bichos', en: 'Animals', ico: '🐶', itens: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🐘', '🦒', '🐢', '🐧', '🦉', '🐞', '🐝'] },
-    { id: 'fazenda-mar', pt: 'Fazenda e mar', en: 'Farm and sea', ico: '🐠', itens: ['🐮', '🐷', '🐑', '🐐', '🐴', '🐔', '🐥', '🦆', '🐳', '🐬', '🐟', '🐠', '🐙', '🦀', '🦈', '🐚', '🦭', '🐡'] },
-    { id: 'comida', pt: 'Comida e doces', en: 'Food and sweets', ico: '🍦', itens: ['🍎', '🍓', '🍌', '🍉', '🍇', '🍒', '🍍', '🥕', '🍕', '🍔', '🌭', '🍟', '🍩', '🍪', '🎂', '🧁', '🍭', '🍬', '🍫', '🍦'] },
-    { id: 'natureza', pt: 'Natureza e tempo', en: 'Nature and weather', ico: '🌸', itens: ['🌸', '🌻', '🌷', '🌹', '🌼', '🍀', '🌳', '🌴', '🌵', '🍄', '🍁', '☀️', '🌙', '⭐', '☁️', '🌈', '⛄', '❄️', '⚡', '💧'] },
-    { id: 'veiculos', pt: 'Veículos', en: 'Vehicles', ico: '🚗', itens: ['🚗', '🚕', '🚙', '🚌', '🚓', '🚑', '🚒', '🚜', '🏎️', '🚲', '🛴', '🚂', '✈️', '🚁', '🚀', '⛵', '🚤', '🛸'] },
-    { id: 'festa', pt: 'Festa e brinquedos', en: 'Party and toys', ico: '🎈', itens: ['🎈', '🎉', '🎊', '🎁', '🎀', '🪁', '⚽', '🏀', '🧸', '🪀', '🎨', '🖍️', '🎵', '🥁', '🎸', '🎺', '🎮', '🏆'] },
-    { id: 'rostinhos', pt: 'Rostinhos', en: 'Faces', ico: '😀', itens: ['😀', '😄', '😁', '😂', '🥰', '😍', '😘', '😎', '🤩', '🥳', '😜', '🤪', '😇', '🤗', '😴', '😮', '🥺', '😺', '💖', '👍'] },
-    { id: 'fantasia', pt: 'Fantasia', en: 'Fantasy', ico: '✨', itens: ['✨', '🦄', '🧚', '👑', '🏰', '🧜‍♀️', '🧙', '🐉', '🪄', '💎', '🌟', '🔮', '🦋', '🧞', '🪐', '🌠', '👸', '🤴'] }
+    { id: 'bichos', pt: 'Bichos', en: 'Animals', es: 'Animales', ico: '🐶', itens: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🐘', '🦒', '🐢', '🐧', '🦉', '🐞', '🐝'] },
+    { id: 'fazenda-mar', pt: 'Fazenda e mar', en: 'Farm and sea', es: 'Granja y mar', ico: '🐠', itens: ['🐮', '🐷', '🐑', '🐐', '🐴', '🐔', '🐥', '🦆', '🐳', '🐬', '🐟', '🐠', '🐙', '🦀', '🦈', '🐚', '🦭', '🐡'] },
+    { id: 'comida', pt: 'Comida e doces', en: 'Food and sweets', es: 'Comida y dulces', ico: '🍦', itens: ['🍎', '🍓', '🍌', '🍉', '🍇', '🍒', '🍍', '🥕', '🍕', '🍔', '🌭', '🍟', '🍩', '🍪', '🎂', '🧁', '🍭', '🍬', '🍫', '🍦'] },
+    { id: 'natureza', pt: 'Natureza e tempo', en: 'Nature and weather', es: 'Naturaleza y clima', ico: '🌸', itens: ['🌸', '🌻', '🌷', '🌹', '🌼', '🍀', '🌳', '🌴', '🌵', '🍄', '🍁', '☀️', '🌙', '⭐', '☁️', '🌈', '⛄', '❄️', '⚡', '💧'] },
+    { id: 'veiculos', pt: 'Veículos', en: 'Vehicles', es: 'Vehículos', ico: '🚗', itens: ['🚗', '🚕', '🚙', '🚌', '🚓', '🚑', '🚒', '🚜', '🏎️', '🚲', '🛴', '🚂', '✈️', '🚁', '🚀', '⛵', '🚤', '🛸'] },
+    { id: 'festa', pt: 'Festa e brinquedos', en: 'Party and toys', es: 'Fiesta y juguetes', ico: '🎈', itens: ['🎈', '🎉', '🎊', '🎁', '🎀', '🪁', '⚽', '🏀', '🧸', '🪀', '🎨', '🖍️', '🎵', '🥁', '🎸', '🎺', '🎮', '🏆'] },
+    { id: 'rostinhos', pt: 'Rostinhos', en: 'Faces', es: 'Caritas', ico: '😀', itens: ['😀', '😄', '😁', '😂', '🥰', '😍', '😘', '😎', '🤩', '🥳', '😜', '🤪', '😇', '🤗', '😴', '😮', '🥺', '😺', '💖', '👍'] },
+    { id: 'fantasia', pt: 'Fantasia', en: 'Fantasy', es: 'Fantasía', ico: '✨', itens: ['✨', '🦄', '🧚', '👑', '🏰', '🧜‍♀️', '🧙', '🐉', '🪄', '💎', '🌟', '🔮', '🦋', '🧞', '🪐', '🌠', '👸', '🤴'] }
   ];
   var VIVOS = [
-    { id: 'fogos', pt: 'Fogos', en: 'Fireworks', ico: '🎆' },
-    { id: 'sorriso', pt: 'Sorriso', en: 'Smile', ico: '😊' },
-    { id: 'estrela', pt: 'Estrela', en: 'Star', ico: '⭐' },
-    { id: 'coracao', pt: 'Coração', en: 'Heart', ico: '💗' },
-    { id: 'bolhas', pt: 'Bolhas', en: 'Bubbles', ico: '🧼' },
-    { id: 'borboleta', pt: 'Borboleta', en: 'Butterfly', ico: '🦋' },
-    { id: 'sol', pt: 'Sol', en: 'Sun', ico: '☀️' },
-    { id: 'chuva', pt: 'Chuva', en: 'Rain', ico: '🌧️' },
-    { id: 'neve', pt: 'Neve', en: 'Snow', ico: '❄️' },
-    { id: 'confete', pt: 'Confete', en: 'Confetti', ico: '🎊' },
-    { id: 'arco-iris', pt: 'Arco-íris', en: 'Rainbow', ico: '🌈' },
-    { id: 'peixe', pt: 'Peixinho', en: 'Little fish', ico: '🐟' },
-    { id: 'passaro', pt: 'Passarinho', en: 'Little bird', ico: '🐦' },
-    { id: 'foguete', pt: 'Foguete', en: 'Rocket', ico: '🚀' },
-    { id: 'flor', pt: 'Flor', en: 'Flower', ico: '🌸' },
-    { id: 'baloes', pt: 'Balões', en: 'Balloons', ico: '🎈' },
-    { id: 'fantasma', pt: 'Fantasminha', en: 'Little ghost', ico: '👻' },
-    { id: 'gatinho', pt: 'Gatinho', en: 'Kitty', ico: '🐱' }
+    { id: 'fogos', pt: 'Fogos', en: 'Fireworks', es: 'Fuegos artificiales', ico: '🎆' },
+    { id: 'sorriso', pt: 'Sorriso', en: 'Smile', es: 'Sonrisa', ico: '😊' },
+    { id: 'estrela', pt: 'Estrela', en: 'Star', es: 'Estrella', ico: '⭐' },
+    { id: 'coracao', pt: 'Coração', en: 'Heart', es: 'Corazón', ico: '💗' },
+    { id: 'bolhas', pt: 'Bolhas', en: 'Bubbles', es: 'Burbujas', ico: '🧼' },
+    { id: 'borboleta', pt: 'Borboleta', en: 'Butterfly', es: 'Mariposa', ico: '🦋' },
+    { id: 'sol', pt: 'Sol', en: 'Sun', es: 'Sol', ico: '☀️' },
+    { id: 'chuva', pt: 'Chuva', en: 'Rain', es: 'Lluvia', ico: '🌧️' },
+    { id: 'neve', pt: 'Neve', en: 'Snow', es: 'Nieve', ico: '❄️' },
+    { id: 'confete', pt: 'Confete', en: 'Confetti', es: 'Confeti', ico: '🎊' },
+    { id: 'arco-iris', pt: 'Arco-íris', en: 'Rainbow', es: 'Arcoíris', ico: '🌈' },
+    { id: 'peixe', pt: 'Peixinho', en: 'Little fish', es: 'Pececito', ico: '🐟' },
+    { id: 'passaro', pt: 'Passarinho', en: 'Little bird', es: 'Pajarito', ico: '🐦' },
+    { id: 'foguete', pt: 'Foguete', en: 'Rocket', es: 'Cohete', ico: '🚀' },
+    { id: 'flor', pt: 'Flor', en: 'Flower', es: 'Flor', ico: '🌸' },
+    { id: 'baloes', pt: 'Balões', en: 'Balloons', es: 'Globos', ico: '🎈' },
+    { id: 'fantasma', pt: 'Fantasminha', en: 'Little ghost', es: 'Fantasmita', ico: '👻' },
+    { id: 'gatinho', pt: 'Gatinho', en: 'Kitty', es: 'Gatito', ico: '🐱' }
   ];
   var MOVIMENTOS = [
-    { id: 'parado', ico: '⏸️', pt: 'Parado', en: 'Still' },
-    { id: 'pula', ico: '🦘', pt: 'Pula', en: 'Bounce' },
-    { id: 'balanca', ico: '🔔', pt: 'Balança', en: 'Swing' },
-    { id: 'gira', ico: '🌀', pt: 'Gira', en: 'Spin' },
-    { id: 'pulsa', ico: '💓', pt: 'Pulsa', en: 'Pulse' },
-    { id: 'flutua', ico: '🎈', pt: 'Flutua', en: 'Float' }
+    { id: 'parado', ico: '⏸️', pt: 'Parado', en: 'Still', es: 'Quieto' },
+    { id: 'pula', ico: '🦘', pt: 'Pula', en: 'Bounce', es: 'Salta' },
+    { id: 'balanca', ico: '🔔', pt: 'Balança', en: 'Swing', es: 'Se balancea' },
+    { id: 'gira', ico: '🌀', pt: 'Gira', en: 'Spin', es: 'Gira' },
+    { id: 'pulsa', ico: '💓', pt: 'Pulsa', en: 'Pulse', es: 'Palpita' },
+    { id: 'flutua', ico: '🎈', pt: 'Flutua', en: 'Float', es: 'Flota' }
   ];
 
   // ---------- ajudantes ----------

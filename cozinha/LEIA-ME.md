@@ -1,4 +1,4 @@
-# Mão na Massa (My Little Big Chef) — juntar os ingredientes e cozinhar uma receita
+# Mão na Massa (My Little Big Chef · Manos a la Masa) — juntar os ingredientes e cozinhar uma receita
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE). **Ideia da filha do dono.** A criança escolhe uma receita,
 sai pela vila para juntar os ingredientes (pescando, colhendo, puxando da horta, pegando ovos, tirando leite, comprando
@@ -7,7 +7,41 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.5.0** (06/Nov/2026) — **tudo animado e mais de verdade**: despejar inclina PARA o recipiente
+Versão atual: **0.11.1** (14/Nov/2026) — **três idiomas**: português, inglês (EUA) e espanhol (da Espanha), escolhidos só
+na estante (`../idioma.js`, `BolinhoIdioma.atual()`); o jogo não tem mais botão de idioma nem guarda o idioma nas
+preferências. Textos com `t(pt, en, es)`, `data-t="pt|en|es"`, `data-rotulo` (aria-label) e listas `[pt, en, es]` em
+`dados.js`; `logica.textoPasso(..., 'pt'|'en'|'es')`. Nome em espanhol: **Manos a la Masa**. A Dona Cida fala com a
+voz gravada só em português; em inglês e espanhol usa a voz de mulher do aparelho daquela língua (en-US, es-ES
+primeiro) e o 👵🔁 gira só entre as vozes dessa língua (sem voz da língua, só `u.lang`). Na 0.11.0 — **parte 3**: o **mercadinho por dentro** com setores (`SETORES`: hortifrúti,
+geladeira, açougue, padaria, mercearia; o que tem algo da lista brilha; deitado, cada produto só com foto e preço); a
+**cozinha "casinha cortada"** (`vila.cozinhaDiorama`) aparece no palco enquanto a criança escolhe o utensílio, e ao
+acertar o cozinheirinho anda até a estação (`estacaoDe`: pia, fogão, geladeira, bancada, mesa; `chefAte`); utensílios
+pendurados numa barra. Na 0.10.0 — **padaria, feira e jaboticabeira**: a vila tem 10 lugares (5 colunas deitado e
+no tablet); **Padaria do Seu Joaquim** (pão, leite, queijo, manteiga: `padaria: true` no ingrediente) e **Feira da Dona
+Rosa** (frutas e legumes) funcionam como o mercadinho (`MINI.mercado(area, loja)`, `logica.vende`, `LOJAS`); as moedas
+contam o que só se compra (`soCompra`); **jaboticabeira** no pomar (forma `tronco`, a fruta grudada no tronco) e a
+receita **Suco de jabuticaba**. Na 0.9.0 — **lugares por dentro**: fazendinha com a Mimosa desenhada (`vila.vacaGrande`) e a
+criança no banquinho tirando leite no balde (`vila.ordenha`; `.jarra.balde`, as mãos mexem com `.ordenhando`); frutas "de
+massinha" no pomar (`desenhos.fruto`); o **ajudante** (o cozinheirinho) entra na horta, no pomar e no galinheiro e anda até
+onde a criança toca (`app.ajudante`, só enfeite, não atrasa a brincadeira); horta com cerquinha e galinheiro com telhado e
+janelinha. Na 0.8.0 — **família à mesa**: na ficha, "Quem vai comer?" com 8 pessoas (`dados.FAMILIA`:
+eu, mamãe, papai, vovó, vovô, irmão, irmã, bebê; "eu" sempre); a receita serve 2 e cada 2 pessoas a mais multiplicam as
+quantidades e as moedas (`logica.fatorDe`, `ingredientesDoNivel(rec, nível, fator)`); o nível limita (Fácil 2, Médio 4,
+Difícil 6; a pessoa nova entra no lugar da mais antiga); a escolha fica guardada (`pref.familia`); no fim cada pessoa
+aparece à mesa com o prato de verdade, mastigando e levando o garfo à boca (`cenas.familia`). Na 0.7.0 — **vila 3D em que se anda** (`vila.js`): cada lugar é um bloquinho isométrico
+com a sua construção e animações (cata-vento, peixe pulando, fumaça, galinha bicando, rabo da vaca), ruas entre os
+blocos com carrinho e nuvens; o **cozinheirinho** começa na porta de casa e anda pelas ruas até o lugar tocado (com
+movimento reduzido, entra direto). **Faixa da missão** (`#missao`) com o que buscar agora e onde, e uma seta em cima do
+lugar (Fácil e Médio; no Difícil só "Falta: ..."). **Missão fluida**: pegou tudo de um lugar, ele volta e segue sozinho
+para o próximo (natureza primeiro, depois mercadinho e vizinha) e, com a cesta cheia, vai para casa cozinhar (Fácil e
+Médio; no Difícil só volta à vila). Nos testes, o seguir sozinho só liga com `?teste&seguir`. Na 0.6.1 — a **Dona Cida fala com voz de mulher gravada** (`voz/cida-*.mp3`, voz livre "Dora" do Kokoro, Apache 2.0), igual em todo aparelho e sem internet; o 👵🔁 alterna entre a gravada e as vozes do aparelho. Na 0.6.0 — **comida de verdade**: cada receita e cada ingrediente aparece com uma **foto
+de verdade** (fotos livres da Wikimedia Commons, em `fotos/`, guardadas para sem internet; créditos em `CREDITOS.md`):
+o pão de queijo é um pão de queijo e o queijo é um queijo. O menininho do final come a foto do prato, e a foto guardada
+também. Receitas novas: **gelatina com frutas** (a filha do dono adora) e **churrasquinho no espeto** (na grelha do
+fogão, com um adulto). Mais movimento: telas que entram deslizando, cartões e ingredientes que aparecem um depois do
+outro com pulinho, prato que gira na ficha, comidas da capa pulando em onda e o botão de começar com um anel de luz.
+As frutas no pé e os legumes na terra continuam desenhados (`icone(id, true)`). Esta é a **parte 1 de 3** do pedido do
+dono de 14/Nov/2026 (pendências 24 a 27). Na 0.5.0 — **tudo animado e mais de verdade**: despejar inclina PARA o recipiente
 e o jorro (leite, massa, suco, ovo) cai dentro enquanto ele enche; ingredientes caem na tigela (pedacinhos, nuvem de
 farinha, pacote que derrama, ovo que quebra); lavar as mãos com torneira, água, espuma e duas mãos esfregando; no fim
 um **menininho come o prato** (garfo e faquinha, mastiga, lambe os lábios, "Hmm!") e o botão **📷 Guardar a foto**
@@ -61,7 +95,7 @@ onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de
      alta** (voz do próprio aparelho, funciona sem internet) quando a criança chega, quando empresta, quando pede o
      obrigado, quando se despede e quando acabam os favores, e o balão mostra o que ela disse. Voz de vovó
      (v0.5.0; no Samsung do dono ela falava com voz de homem): escolhe primeiro uma voz **feminina** do português do
-     Brasil (nomes conhecidos como Luciana, Francisca, Maria, Vitória, Fernanda, Thalita, Leila, Raquel, Camila,
+     Brasil — **desde a v0.6.1 isso só vale quando a família escolhe uma voz do aparelho no 👵🔁; o padrão em português é a voz gravada** (nomes conhecidos como Luciana, Francisca, Maria, Vitória, Fernanda, Thalita, Leila, Raquel, Camila,
      "feminina", "female", Google português do Brasil; no Android os códigos `pt-br-x-afs` e `pt-br-x-pte`), depois
      uma desconhecida e por último as **masculinas** (Daniel, Antônio, Ricardo, Felipe, "masculina", "male",
      `pt-br-x-ptd`, `pt-br-x-ptz`). Voz feminina: um pouco mais devagar (0,9) e mais fininha (1,2); voz masculina ou
@@ -108,10 +142,11 @@ onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de
 | Ordem | na ordem da ficha | na ordem da ficha | **fichas misturadas**: a criança escolhe o próximo passo, e só vale o que faz sentido (não dá para servir antes de assar) |
 | Extra | — | 2 utensílios a mais na bancada | 4 a mais, passos a mais, um **imprevisto** (o cachorrinho Biscoito pega 1 ingrediente da cesta ao chegar em casa) e o **sol andando no céu** (7 min; passou, vira noite e a criança perde só 1 estrela) |
 
-## Receitas (12)
+## Receitas (15)
 
 Bolo de cenoura · Panqueca de banana · Salada de frutas · Vitamina de banana · Brigadeiro · Pizza caseira ·
-Sanduíche natural · Peixe assado com legumes · Omelete · Suco de laranja · Pão de queijo · Cookies de chocolate.
+Sanduíche natural · Peixe assado com legumes · Omelete · Suco de laranja · Pão de queijo · Cookies de chocolate ·
+Gelatina com frutas · Churrasquinho no espeto · Suco de jabuticaba (v0.10.0) (v0.6.0; a carne vem do mercadinho, que é o açougue da vila por enquanto).
 Toda receita começa lavando as mãos e termina servindo.
 
 ## Arquivos
@@ -122,6 +157,8 @@ Toda receita começa lavando as mãos e termina servindo.
 | `dados.js` | **Receitas** (ingredientes, quantidades, passos), lugares, **plantas** (onde cada fruta e legume nasce de verdade), ingredientes (com a frase que ensina de onde vem), utensílios e níveis (incluindo o círculo e a velocidade dos peixes). Receita nova = uma entrada em `RECEITAS` (o comentário no topo explica os campos). |
 | `logica.js` | Regras sem tela: cesta, moedas e troco, favores, passos de cada nível e a ordem, imprevisto, estrelas, texto de cada passo em PT/EN. |
 | `cenas.js` | Cenas animadas em SVG/canvas, sem imagem: recipientes que enchem, a cena de despejar (inclina para o recipiente, jorro, nível), a pia com as mãos e a espuma, o menininho comendo (e a animação dele), a foto em PNG e as partículas (faíscas, terra, pó, pedacinhos). Não conhece as regras do jogo. |
+| `fotos/` | **Fotos de verdade** (v0.6.0): `fotos/<id>.jpg`, uma por receita e por ingrediente (320 × 320, JPG), da Wikimedia Commons com licença livre. `ART.icone(id)` mostra a foto do ingrediente num círculo; `ART.icone(id, true)` mostra o desenho/emoji (frutas no pé, legumes na terra). Foto nova = arquivo aqui + linha no `CREDITOS.md` + `sw.js` (o teste confere). |
+| `vila.js` | A vila "3D" (v0.7.0): o bloquinho isométrico de cada lugar (`bloco(id)`), o cozinheirinho que anda (`boneco()`), o carrinho e a nuvem, tudo em SVG feito no código. Classes com `v-` para não confundir com as peças dos mini-jogos. |
 | `desenhos.js` | Desenhos em SVG feitos em código (utensílios, ingredientes sem emoji, faca sem ponta, ícone do app, as plantas do pomar e da horta e o lugar das frutas em cada planta). |
 | `app.js` | Telas, mini-jogos da vila, cozinha, receita pronta, progresso, voz, sons, música, service worker. `APP_VERSION`. |
 | `estilo.css` | Visual (fonte Fredoka da Rabiscolândia). |
@@ -180,6 +217,9 @@ leva cerca de 4 minutos).
   ou utensílio inteiro na tela fica embaixo dela (na cozinha, em todas as posições da rolagem); **celular deitado**
   915 × 412 e 844 × 390: entrada, menu, ficha, vila, os 7 lugares, cozinha e pronto cabem, sem rolar para o lado, com
   os botões principais na tela (acima da cesta).
+- `lojas.test.js` (v0.10.0) — onde se compra cada coisa, o pão contando nas moedas, a jaboticabeira; no Médio compra pão na padaria e tomate na feira com moedas; no Fácil colhe jabuticabas no tronco.
+- `familia.test.js` (v0.8.0) — no Médio, chamar 3 pessoas dobra as quantidades e as moedas, o 5º entra no lugar do 1º, a escolha fica guardada, o passo da cozinha fala as quantidades da família e no fim os 3 comem com a foto do prato; no Fácil cabem 2 e, sozinho, ninguém aparece à mesa.
+- `vila.test.js` (v0.7.0) — cada lugar com o seu bloquinho; ruas; o cozinheirinho começa na porta de casa; faixa da missão e seta (Médio), sem seta no Difícil; ele anda com movimento (sai do lugar, pernas mexendo, entra) e entra direto com movimento reduzido; missão fluida no Fácil (segue sozinho para o próximo lugar e para casa) e no Difícil só volta à vila.
 - `voz.test.js` (v0.5.0) — vozes de mentira como no Android: escolhe `pt-br-x-afs` (feminina) e nunca
   `pt-br-x-ptd`/Daniel; só voz de homem → tom 1,45 e 0,88; voz desconhecida antes da masculina; 👵🔁 troca, fala o
   exemplo, guarda e continua depois de recarregar.

@@ -18,8 +18,8 @@
   var COR = { peixe: '#a9c2d6', laranja: '#ff9f1a', banana: '#ffe27a', maca: '#f25c4a', morango: '#ff3b5c', uva: '#8e44ad', limao: '#e8e04a',
     cenoura: '#ff8a1a', tomate: '#e8432f', alface: '#7bc950', batata: '#e9c27a', cheiro: '#3fa34d', ovo: '#ffcf33', leite: '#ffffff',
     farinha: '#fbf3e4', acucar: '#ffffff', sal: '#f4f4f4', oleo: '#ffd84d', fermento: '#f3ead8', manteiga: '#ffe680', chocolate: '#6b3b1f',
-    leitecond: '#fff1d0', granulado: '#ff4fa3', queijo: '#ffd84d', pao: '#e0a96d', mel: '#f2a900', polvilho: '#ffffff' };
-  var JEITO = { farinha: 'po', acucar: 'po', sal: 'po', fermento: 'po', polvilho: 'po', leite: 'liquido', oleo: 'liquido', leitecond: 'liquido', mel: 'liquido', ovo: 'ovo', granulado: 'granulado' };
+    leitecond: '#fff1d0', granulado: '#ff4fa3', queijo: '#ffd84d', pao: '#e0a96d', mel: '#f2a900', polvilho: '#ffffff', 'gelatina-po': '#e8344e', jabuticaba: '#3b1a3f', carne: '#b8433a' };
+  var JEITO = { farinha: 'po', acucar: 'po', sal: 'po', fermento: 'po', polvilho: 'po', leite: 'liquido', oleo: 'liquido', leitecond: 'liquido', mel: 'liquido', ovo: 'ovo', granulado: 'granulado', 'gelatina-po': 'po' };
   function jeito(id) { return JEITO[id] || 'pedaco'; }
   function cor(id) { return COR[id] || '#f2c27a'; }
   // mistura de cores (média simples em RGB) para o que já está no recipiente
@@ -300,7 +300,10 @@
       '<rect x="20" y="206" width="220" height="44" rx="8" fill="#fff" stroke="#f0c48a" stroke-width="3"/>' +
       '<path d="M20,206 h220 v10 h-220z" fill="#e84a3c" opacity=".85"/><path d="M40,206 v44 M80,206 v44 M120,206 v44 M160,206 v44 M200,206 v44" stroke="#e84a3c" stroke-width="10" opacity=".25"/>' +
       '<ellipse cx="130" cy="222" rx="64" ry="16" fill="#e9dfd2"/><ellipse cx="130" cy="218" rx="62" ry="15" fill="#fff" stroke="' + c + '" stroke-width="4"/>' +
-      '<text class="comida" x="130" y="222" text-anchor="middle" font-size="46">' + comida + '</text>' +
+      (op.foto ? '<clipPath id="cpComida"><ellipse cx="130" cy="203" rx="50" ry="25"/></clipPath>' +   // foto de verdade do prato, em montinho
+        '<image class="comida comida-foto" href="' + op.foto + '" x="80" y="172" width="100" height="58" preserveAspectRatio="xMidYMid slice" clip-path="url(#cpComida)"/>' +
+        '<ellipse cx="130" cy="203" rx="50" ry="25" fill="none" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+        : '<text class="comida" x="130" y="222" text-anchor="middle" font-size="46">' + comida + '</text>') +
       '<g class="vapor" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".75"><path class="v1" d="M110,186 c-5,-6 5,-10 0,-16"/><path class="v2" d="M130,180 c-5,-6 5,-10 0,-16"/><path class="v3" d="M150,186 c-5,-6 5,-10 0,-16"/></g>' +
       '<g class="faiscas-m" fill="#ffc93c"><path class="s1" d="M60,196 l3,7 l7,3 l-7,3 l-3,7 l-3,-7 l-7,-3 l7,-3z"/><path class="s2" d="M200,190 l2.5,6 l6,2.5 l-6,2.5 l-2.5,6 l-2.5,-6 l-6,-2.5 l6,-2.5z"/><path class="s3" d="M218,150 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 l5,-2z" fill="#ff5e9c"/></g>' +
       // braço do garfo (este se mexe)
@@ -366,7 +369,7 @@
   }
 
   // ---------- a foto do prato pronto (canvas 1080 × 1350, PNG) ----------
-  // op: titulo (nome do jogo), receita, prato (emoji), cor, estrelas (0–3), linha (data e nível), rodape, hmm.
+  // op: titulo (nome do jogo), receita, prato (emoji), foto (endereço da foto do prato), cor, estrelas (0–3), linha (data e nível), rodape, hmm.
   function carregarSvg(texto) {
     return new Promise(function (ok, erro) {
       var img = new Image(), url = URL.createObjectURL(new Blob([texto], { type: 'image/svg+xml' }));
@@ -379,7 +382,11 @@
     var W = 1080, H = 1350, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     var x = cv.getContext('2d'), F = "'Fredoka', system-ui, sans-serif";
     var fontes = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('700 80px Fredoka'), document.fonts.load('600 40px Fredoka')]).catch(function () {}) : Promise.resolve();
-    return fontes.then(function () { return carregarSvg(menino({ cor: op.cor, prato: op.prato, hmm: op.hmm })).catch(function () { return null; }); }).then(function (img) {
+    // a foto do prato entra no desenho como data: (imagem dentro de SVG desenhado no canvas não busca arquivo de fora)
+    var dados = !op.foto ? Promise.resolve(null) : fetch(op.foto).then(function (r) { return r.ok ? r.blob() : null; }).then(function (bl) {
+      return bl && new Promise(function (ok) { var fr = new FileReader(); fr.onload = function () { ok(fr.result); }; fr.onerror = function () { ok(null); }; fr.readAsDataURL(bl); });
+    }).catch(function () { return null; });
+    return fontes.then(function () { return dados; }).then(function (url) { return carregarSvg(menino({ cor: op.cor, prato: op.prato, foto: url, hmm: op.hmm })).catch(function () { return null; }); }).then(function (img) {
       // fundo quentinho com confete
       var gr = x.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#fff7e6'); gr.addColorStop(1, '#ffd6a5'); x.fillStyle = gr; x.fillRect(0, 0, W, H);
       var CONF = ['#e84a3c', '#ff8a3d', '#ffc93c', '#2bb673', '#3aa0e8', '#8e6bff', '#ff5e9c'], s = 7;
@@ -447,7 +454,45 @@
     }
   }
 
-  var API = { COR: COR, cor: cor, jeito: jeito, misturar: misturar, temRecipiente: temRecipiente, recipiente: recipiente, encher: encher, superficie: superficie,
+  // ---------- família à mesa (v0.8.0) ----------
+  // pessoa(f, foto): uma pessoa da família (dados.FAMILIA) sentada à mesa, com o prato (a foto de verdade) e o garfo.
+  // Só o rosto (para a escolha na ficha): pessoa(f, null, true). Animação no CSS: .fam-garfo leva a comida à boca e
+  // .fam-boca mastiga (param com "reduzir movimento"). Cada pessoa tem cabelo e roupa diferentes.
+  var famId = 0;
+  function cabelo(tipo) {
+    switch (tipo) {
+      case 'longo': return '<path d="M15 30 q-2 -20 17 -21 q19 1 17 21 v14 q-4 -6 -4 -14 q-6 -6 -13 -7 q-7 1 -13 7 q0 8 -4 14z" fill="#6b3e1f"/>';
+      case 'curto': return '<path d="M17 25 q1 -14 15 -14 q14 0 15 14 q-6 -6 -15 -6 q-9 0 -15 6z" fill="#3b2412"/><path d="M24 40 q8 6 16 0" fill="none" stroke="#3b2412" stroke-width="2.4" stroke-linecap="round"/>';
+      case 'coque': return '<circle cx="32" cy="10" r="6" fill="#e8e8e8"/><path d="M16 28 q0 -16 16 -16 q16 0 16 16 q-6 -7 -16 -7 q-10 0 -16 7z" fill="#e8e8e8"/><circle cx="26.5" cy="29" r="3.6" fill="none" stroke="#666" stroke-width="1.2"/><circle cx="37.5" cy="29" r="3.6" fill="none" stroke="#666" stroke-width="1.2"/><path d="M30 29 h4" stroke="#666" stroke-width="1.2"/>';
+      case 'careca': return '<path d="M16 28 q-1 -6 3 -9 M48 28 q1 -6 -3 -9" stroke="#e8e8e8" stroke-width="4" stroke-linecap="round"/><path d="M25 38 q7 -4 14 0" fill="none" stroke="#e8e8e8" stroke-width="3" stroke-linecap="round"/>';
+      case 'bone': return '<path d="M16 24 q2 -13 16 -13 q14 0 16 13z" fill="#e84a3c"/><path d="M46 23 h10 q2 0 0 3 h-11z" fill="#c0392b"/>';
+      case 'chiquinhas': return '<path d="M17 25 q1 -14 15 -14 q14 0 15 14 q-6 -7 -15 -7 q-9 0 -15 7z" fill="#a0522d"/><circle cx="13" cy="28" r="5" fill="#a0522d"/><circle cx="51" cy="28" r="5" fill="#a0522d"/><circle cx="16" cy="24" r="2" fill="#ff5e9c"/><circle cx="48" cy="24" r="2" fill="#ff5e9c"/>';
+      case 'bebe': return '<path d="M30 12 q4 -4 6 1" fill="none" stroke="#a0522d" stroke-width="2" stroke-linecap="round"/>';
+      default: return '<circle cx="25" cy="8" r="5" fill="#fff" stroke="#e1d4c4"/><circle cx="39" cy="8" r="5" fill="#fff" stroke="#e1d4c4"/><circle cx="32" cy="5" r="6" fill="#fff" stroke="#e1d4c4"/><rect x="22" y="8" width="20" height="7" rx="2.4" fill="#fff" stroke="#e1d4c4"/>';
+    }
+  }
+  function pessoa(f, foto, soRosto) {
+    var id = 'fam' + (++famId), bebe = f.cabelo === 'bebe', esc = bebe ? ' transform="translate(8 10) scale(.75)"' : '';
+    var rosto = '<g' + esc + '>' + (soRosto ? '' : '<path d="M12 64 q0 -18 20 -19 q20 1 20 19z" fill="' + f.cor + '" stroke="rgba(0,0,0,.15)"/>' + (bebe ? '<path d="M24 47 q8 8 16 0 v6 q-8 6 -16 0z" fill="#fff"/>' : '')) +
+      '<circle cx="32" cy="30" r="15" fill="' + PELE + '" stroke="' + CONT + '" stroke-width="1.4"/>' + cabelo(f.cabelo) +
+      '<path d="M24.5 30 q2.5 -3 5 0 M34.5 30 q2.5 -3 5 0" fill="none" stroke="#3b2412" stroke-width="1.8" stroke-linecap="round"/>' +
+      '<ellipse cx="23" cy="35" rx="3" ry="1.8" fill="#ff8fa3" opacity=".6"/><ellipse cx="41" cy="35" rx="3" ry="1.8" fill="#ff8fa3" opacity=".6"/>' +
+      '<ellipse class="fam-boca" cx="32" cy="38.5" rx="3.6" ry="2.4" fill="#9b2c3c"/></g>';
+    if (soRosto) return '<svg class="fam-rosto" viewBox="2 0 60 50" aria-hidden="true" focusable="false">' + rosto + '</svg>';
+    return '<svg class="fam-pessoa" viewBox="0 0 64 84" aria-hidden="true" focusable="false">' + rosto +
+      '<rect x="0" y="62" width="64" height="22" rx="4" fill="#fff" stroke="#f0c48a" stroke-width="2"/><path d="M0 62 h64 v5 h-64z" fill="#e84a3c" opacity=".8"/>' +
+      '<ellipse cx="32" cy="70" rx="20" ry="6" fill="#e9dfd2"/><ellipse cx="32" cy="68" rx="19" ry="5.6" fill="#fff" stroke="' + f.cor + '" stroke-width="2"/>' +
+      (foto ? '<clipPath id="' + id + '"><ellipse cx="32" cy="66" rx="13" ry="5.5"/></clipPath><image href="' + foto + '" x="19" y="58" width="26" height="14" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
+      '<g class="fam-garfo"><path d="M48 70 L42 44" stroke="#9aa5b4" stroke-width="2.4" stroke-linecap="round"/><circle cx="42" cy="44" r="3" fill="' + f.cor + '"/></g></svg>';
+  }
+  // a mesa da família: cada pessoa com o seu prato, um pouquinho fora de compasso para parecer de verdade
+  function familia(lista, foto) {
+    return lista.map(function (f, i) {
+      return '<figure class="fam" style="--i:' + i + '">' + pessoa(f, foto) + '<figcaption>' + (f.nome || f.pt) + '</figcaption></figure>';
+    }).join('');
+  }
+
+  var API = { pessoa: pessoa, familia: familia, COR: COR, cor: cor, jeito: jeito, misturar: misturar, temRecipiente: temRecipiente, recipiente: recipiente, encher: encher, superficie: superficie,
     cenaDespejo: cenaDespejo, animarDespejo: animarDespejo, GIRO_DESP: GIRO_DESP, cenaPia: cenaPia, esfregar: esfregar, menino: menino, animarMenino: animarMenino,
     foto: foto, particula: particula, faiscas: faiscas, migalhas: migalhas, nuvem: nuvem };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else raiz.CozinhaCenas = API;

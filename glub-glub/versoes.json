@@ -1,0 +1,38 @@
+{
+  "app": "glub-glub",
+  "versoes": [
+    {
+      "versao": "0.1.1",
+      "data": "14/Nov/2026",
+      "hora": "16:20:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante (o jogo não tem mais botão de idioma próprio)"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf (the game no longer has its own language button)"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, que se eligen en la estantería (el juego ya no tiene su propio botón de idioma)"
+      ]
+    },
+    {
+      "versao": "0.1.0",
+      "data": "14/Nov/2026",
+      "hora": "11:07:56",
+      "pt": [
+        "🎣 GLUB GLUB chegou: pescaria com o Juca e a Lili no lago encantado; o anzol balança e mergulha na direção em que estava",
+        "🐠 28 bichos e prêmios em 3D, do lambari ao Pirarucu Dourado: quanto mais fundo, mais pontos",
+        "🪣 Balde com pedido, bolhas de poder e a rodada “Limpa o Rio!”",
+        "👫 Sozinho ou em dois no mesmo aparelho, cada um no seu nível; álbum de figurinhas",
+        "☀️🌅🌙 Dia, entardecer e noite, na roça, no mar aberto ou na serra; funciona sem internet"
+      ],
+      "en": [
+        "🎣 GLUB GLUB is here: fishing with Juca and Lili in the enchanted lake; the hook swings and dives the way it points",
+        "🐠 28 creatures and prizes in 3D, from the lambari to the Golden Arapaima: the deeper, the more points",
+        "🪣 Bucket orders, power bubbles and the “Clean the River!” round",
+        "👫 Solo or two on the same device, each at their own level; sticker album",
+        "☀️🌅🌙 Day, sunset and night, on the farm, the open sea or the mountains; works offline"
+      ]
+    }
+  ]
+}

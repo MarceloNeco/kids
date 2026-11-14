@@ -40,7 +40,9 @@
 
   /* ================= CORPO EM PÉ =================
      origem no meio dos pés; A = altura total; o = { balanco, andando, bE, bD, pulando, ts, pose }
-     pose: 'festa' (acertou: rosto de alegria e brilhos) ou 'dor' (pegou algo ruim: mãos na cabeça, careta, suor).
+     pose: 'festa' (acertou: rosto de alegria e brilhos) ou 'dor' (pegou algo ruim: mãos na cabeça, careta, suor) ou
+     'triste' (papai/mamãe vendo a criança se machucar: mãos na cabeça, olhos caídos, boca para baixo).
+     palmas: fase (rad) → as duas mãos batem palmas na frente do peito (a mamãe comemorando).
      Proporções de criança: cabeça 0.40A, tronco 0.27A, pernas 0.22A, pescoço curto. */
   function corpoEmPe(ctx, cfg, A, o) {
     cfg = normalizar(cfg); o = o || {};
@@ -79,21 +81,33 @@
         ctx.strokeStyle = tom(cfg.pele, 0.8); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(hx, hy, L * 1.05, 0, 6.2832); ctx.stroke();
       });
     }
-    if (o.pose !== 'dor') bracos();
+    function palmas() {   // mãos se encontram na frente do peito e abrem de novo
+      var gap = tw * (0.06 + 0.32 * Math.abs(Math.sin(o.palmas)));
+      [-1, 1].forEach(function (s) {
+        var ox = s * tw * 0.52, oy = ty + th * 0.18, ex = s * tw * 0.8, ey = oy + A * 0.07, hx = s * gap, hy = ty + th * 0.05;
+        ctx.strokeStyle = cfg.roupa === 'armadura' ? '#b0bec5' : cor; ctx.lineWidth = L * 1.4; ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ex, ey); ctx.stroke();
+        ctx.strokeStyle = cfg.pele; ctx.lineWidth = L; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(hx, hy); ctx.stroke();
+        ctx.fillStyle = cfg.pele; ctx.beginPath(); ctx.ellipse(hx, hy, L * 0.8, L * 1.05, 0, 0, 6.2832); ctx.fill();
+        ctx.strokeStyle = tom(cfg.pele, 0.8); ctx.lineWidth = 1; ctx.stroke();
+      });
+    }
+    var maosCabeca = o.pose === 'dor' || o.pose === 'triste';
+    if (!maosCabeca) { if (o.palmas != null) palmas(); else bracos(); }
     // pescoço + cabeça (balança de leve ao andar; na dor, chacoalha)
     ctx.fillStyle = cfg.pele; ctx.fillRect(-L * 0.6, ty - L * 0.6, L * 1.2, L * 1.2);
-    ctx.save(); ctx.translate(0, ty - hs * 0.46 + Math.abs(bal) * 2); ctx.rotate(bal * 0.06 + (o.pose === 'dor' ? Math.sin(ts / 45) * 0.08 : o.pose === 'brava' ? Math.sin(ts / 140) * 0.12 : 0));
+    ctx.save(); ctx.translate(0, ty - hs * 0.46 + Math.abs(bal) * 2 + (o.pose === 'triste' ? hs * 0.03 : 0)); ctx.rotate(bal * 0.06 + (o.pose === 'dor' ? Math.sin(ts / 45) * 0.08 : o.pose === 'brava' ? Math.sin(ts / 140) * 0.12 : o.pose === 'triste' ? Math.sin(ts / 260) * 0.07 : 0));   // triste: cabeça baixa, balançando devagar ("ai, ai")
     cabeca(ctx, cfg, hs, ts, o.pose); if (o.costas) nuca(ctx, cfg, hs); enfeitesDaPose(ctx, hs, o.pose, ts); ctx.restore();
-    if (o.pose === 'dor') maosNaCabeca();
+    if (maosCabeca) maosNaCabeca();
     ctx.restore();
   }
   /* ---------- de LADO (andando): olha para a direita (quem chama espelha para a esquerda) ----------
-     o: { fase (ciclo do passo, rad), andando, agacha 0..1 (joelhos dobrados antes do pulo), noAr, cima (mãos para cima), ts }
+     o: { fase (ciclo do passo, rad), andando, agacha 0..1 (joelhos dobrados antes do pulo), noAr, cima (mãos para cima), ts,
+          abaixa 0..1 (abaixando para desviar: joelhos bem dobrados, corpo inclinado para a frente, cabeça para cima olhando o galho) }
      Pernas com coxa e canela (o joelho dobra), braços balançando ao contrário das pernas, corpo sobe e desce de leve. */
   function corpoLado(ctx, cfg, A, o) {
     cfg = normalizar(cfg); o = o || {};
     var cor = cfg.cor, escuro = tom(cor, 0.72), hs = A * 0.40, pernaA = A * 0.22, tw = A * 0.24, th = A * 0.27, L = A * 0.055;
-    var l1 = pernaA * 0.55, l2 = pernaA * 0.52, ag = o.agacha || 0, f = o.fase || 0;
+    var l1 = pernaA * 0.55, l2 = pernaA * 0.52, ag = o.agacha || 0, f = o.fase || 0, ab = Math.max(0, Math.min(1, o.abaixa || 0));
     var corPerna = cfg.roupa === 'macacao' ? cor : (cfg.roupa === 'vestido' ? cfg.pele : '#2e2a5a');
     function perna(p) {   // ângulos a partir de "para baixo": coxa para a frente (+), joelho dobra para trás
       if (o.noAr) return [0.55 + Math.sin(p) * 0.15, 1.15];
@@ -102,10 +116,13 @@
       return [Math.sin(p) * 0.55, Math.max(0, -Math.cos(p)) * 1.0 + 0.08];
     }
     var pernas = [perna(f + Math.PI), perna(f)];   // [de trás, da frente]
+    if (o.chute != null) { var ch = o.chute; pernas = [[-0.12 - ch * 0.15, 0.25], [-0.5 + ch * 1.7, 0.9 * (1 - ch) + 0.1]]; }   // chute: a perna da frente vai para trás e lança para a frente
+    if (ab) { var AGACHADO = [[1.15, 2.25], [1.35, 2.45]]; pernas = pernas.map(function (pp, i) { return [pp[0] + (AGACHADO[i][0] - pp[0]) * ab, pp[1] + (AGACHADO[i][1] - pp[1]) * ab]; }); }   // abaixando: coxa para a frente, joelho dobrado, pé embaixo do quadril (de cócoras)
     var alt = function (a) { return l1 * Math.cos(a[0]) + l2 * Math.cos(a[0] - a[1]); };
     var quadril = -(o.noAr ? pernaA * 0.95 : Math.max(alt(pernas[0]), alt(pernas[1])) + L * 0.6);
     if (o.andando && !o.noAr) quadril -= Math.abs(Math.sin(f)) * A * 0.012;   // sobe e desce no passo
-    var inclina = o.andando ? 0.07 : 0, ombroY = quadril - th * 0.86;
+    var inclina = (o.andando ? 0.07 : 0) * (1 - ab) + 0.85 * ab;   // abaixando: o tronco inclina para a frente (a cabeça desce sem achatar nada)
+    var ombroX = Math.sin(inclina) * th * 0.86 * ab, ombroY = quadril - th * 0.86 * (1 - ab + ab * Math.cos(inclina));
     ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     function desenhaPerna(a, tras) {
       var kx = Math.sin(a[0]) * l1, ky = quadril + Math.cos(a[0]) * l1, fx = kx + Math.sin(a[0] - a[1]) * l2, fy = ky + Math.cos(a[0] - a[1]) * l2;
@@ -115,13 +132,14 @@
       ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.beginPath(); ctx.ellipse(fx + L * 0.7, fy + L * 0.6, L * 1.4, L * 0.3, 0, 0, 6.2832); ctx.fill();
     }
     function desenhaBraco(ang, tras) {   // ang: a partir de "para baixo", positivo = para a frente
-      var ox = 0, oy = ombroY, la = A * 0.11, lb = A * 0.1, dob = o.cima ? 0.15 : 0.35;
+      var ox = ombroX, oy = ombroY, la = A * 0.11, lb = A * 0.1, dob = o.cima ? 0.15 : 0.35;
       var ex = ox + Math.sin(ang) * la, ey = oy + Math.cos(ang) * la, hx = ex + Math.sin(ang + dob) * lb, hy = ey + Math.cos(ang + dob) * lb;
       ctx.strokeStyle = tras ? tom(cor, 0.8) : (cfg.roupa === 'armadura' ? '#b0bec5' : cor); ctx.lineWidth = L * 1.4; ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ex, ey); ctx.stroke();
       ctx.strokeStyle = tras ? tom(cfg.pele, 0.88) : cfg.pele; ctx.lineWidth = L; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(hx, hy); ctx.stroke();
       ctx.fillStyle = tras ? tom(cfg.pele, 0.88) : cfg.pele; ctx.beginPath(); ctx.arc(hx, hy, L * 0.95, 0, 6.2832); ctx.fill();
     }
-    var bal = o.andando && !o.noAr ? Math.sin(f) * 0.6 : 0, angTras = o.cima ? Math.PI * 0.92 : (o.noAr ? 2.2 : -bal + 0.1), angFrente = o.cima ? Math.PI * 0.82 : (o.noAr ? 2.5 : bal + 0.15);
+    var bal = o.chute != null ? -0.6 + o.chute * 1.2 : o.andando && !o.noAr ? Math.sin(f) * 0.6 : 0, angTras = o.cima ? Math.PI * 0.92 : (o.noAr ? -2.45 : -bal + 0.1), angFrente = o.cima ? Math.PI * 0.82 : (o.noAr ? -2.15 : bal + 0.15);   // no ar: braços para cima e para trás (não tapam o rosto)
+    if (ab) { angTras += (0.55 - angTras) * ab; angFrente += (1.05 - angFrente) * ab; }   // abaixando: braços para a frente, mãos perto dos joelhos (equilíbrio)
     if (cfg.acessorio === 'asas') asas(ctx, A, ombroY + th * 0.3, o.ts || 0);
     desenhaBraco(angTras, true);
     desenhaPerna(pernas[0], true);
@@ -130,13 +148,18 @@
     // tronco de lado (mais estreito), inclinado para a frente ao andar
     ctx.save(); ctx.translate(0, quadril); ctx.rotate(inclina);
     ctx.fillStyle = cor; ctx.strokeStyle = escuro; ctx.lineWidth = 2;
-    if (cfg.roupa === 'vestido') { ctx.beginPath(); ctx.moveTo(-tw * 0.3, -th); ctx.lineTo(tw * 0.32, -th); ctx.lineTo(tw * 0.55 + (o.andando ? Math.sin(f) * A * 0.02 : 0), th * 0.25); ctx.quadraticCurveTo(0, th * 0.32, -tw * 0.55, th * 0.25); ctx.closePath(); ctx.fill(); }
+    if (cfg.roupa === 'vestido' && ab) {   // abaixando: a blusa inclina com o tronco e a saia cai por cima das pernas dobradas
+      ctx.beginPath(); ctx.moveTo(-tw * 0.3, -th); ctx.lineTo(tw * 0.32, -th); ctx.lineTo(tw * 0.42, th * 0.02); ctx.lineTo(-tw * 0.42, th * 0.02); ctx.closePath(); ctx.fill();
+      ctx.rotate(-inclina * 0.8); ctx.beginPath(); ctx.moveTo(-tw * 0.4, -th * 0.34); ctx.quadraticCurveTo(tw * 0.12, -th * 0.26, tw * 0.42, th * 0.1); ctx.lineTo(tw * 0.85, th * 0.34); ctx.quadraticCurveTo(tw * 0.1, th * 0.44, -tw * 0.55, th * 0.3); ctx.closePath(); ctx.fill();   // a saia cobre a emenda com a blusa
+    }
+    else if (cfg.roupa === 'vestido') { ctx.beginPath(); ctx.moveTo(-tw * 0.3, -th); ctx.lineTo(tw * 0.32, -th); ctx.lineTo(tw * 0.55 + (o.andando ? Math.sin(f) * A * 0.02 : 0), th * 0.25); ctx.quadraticCurveTo(0, th * 0.32, -tw * 0.55, th * 0.25); ctx.closePath(); ctx.fill(); }
     else { arred(ctx, -tw * 0.36, -th, tw * 0.72, th * (cfg.roupa === 'tunica' ? 1.12 : 1), tw * 0.25); ctx.fill(); ctx.stroke(); if (cfg.roupa === 'macacao') { ctx.fillStyle = escuro; arred(ctx, -tw * 0.05, -th - 2, tw * 0.12, th * 0.45, 3); ctx.fill(); } }
     ctx.restore();
-    ctx.fillStyle = cfg.pele; ctx.fillRect(-L * 0.6, ombroY - L * 1.2, L * 1.2, L * 1.4);   // pescoço
+    ctx.fillStyle = cfg.pele; ctx.fillRect(ombroX - L * 0.6, ombroY - L * 1.2, L * 1.2, L * 1.4);   // pescoço
     // cabeça de perfil
-    ctx.save(); ctx.translate(A * 0.015 + inclina * A * 0.2, ombroY - hs * 0.44 + (o.andando ? Math.abs(Math.sin(f)) * 1.5 : 0));
-    cabecaLado(ctx, cfg, hs, o.ts || 0, o.expr); ctx.restore();
+    ctx.save(); ctx.translate(ombroX + A * 0.015 + inclina * A * 0.2 * (1 - ab) + A * 0.03 * ab, ombroY - hs * 0.44 + (o.andando ? Math.abs(Math.sin(f)) * 1.5 : 0));
+    if (ab) ctx.rotate(-0.32 * ab);   // abaixando: queixo para cima, olhando o que passa por cima
+    cabecaLado(ctx, cfg, hs, o.ts || 0, o.expr || (ab > 0.4 ? 'cima' : null)); ctx.restore();
     desenhaBraco(angFrente, false);
     ctx.restore();
   }
@@ -162,8 +185,9 @@
     if (expr === 'festa') { ctx.strokeStyle = ESCURO; ctx.lineWidth = R * 0.07; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(ex - R * 0.13, ey + R * 0.05); ctx.quadraticCurveTo(ex, ey - R * 0.15, ex + R * 0.13, ey + R * 0.05); ctx.stroke(); }
     else {
       ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(ex, ey, R * 0.15, R * 0.22, 0, 0, 6.2832); ctx.fill();
-      ctx.fillStyle = '#3b2a1a'; ctx.beginPath(); ctx.ellipse(ex + R * 0.05, ey + R * 0.03, R * 0.1, R * 0.14, 0, 0, 6.2832); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex + R * 0.02, ey - R * 0.04, R * 0.045, 0, 6.2832); ctx.fill();
+      var olhaCima = expr === 'cima' ? R * 0.09 : 0;   // olhando para cima: a pupila sobe
+      ctx.fillStyle = '#3b2a1a'; ctx.beginPath(); ctx.ellipse(ex + R * 0.05, ey + R * 0.03 - olhaCima, R * 0.1, R * 0.14, 0, 0, 6.2832); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex + R * 0.02, ey - R * 0.04 - olhaCima, R * 0.045, 0, 6.2832); ctx.fill();
       if (menina || tipo === 'elfo') { ctx.strokeStyle = ESCURO; ctx.lineWidth = R * 0.03; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(ex + R * 0.12, ey - R * 0.15); ctx.lineTo(ex + R * 0.24, ey - R * 0.24); ctx.stroke(); }
     }
     ctx.strokeStyle = tom(c, 0.85); ctx.lineWidth = menina ? R * 0.035 : R * 0.07; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(ex - R * 0.15, ey - R * 0.3); ctx.quadraticCurveTo(ex, ey - R * 0.38, ex + R * 0.18, ey - R * 0.3); ctx.stroke();
@@ -327,6 +351,17 @@
       ctx.save(); ctx.fillStyle = cfg.pele; ctx.beginPath(); ctx.ellipse(0, R * 0.57, R * 0.3, R * 0.2, 0, 0, 6.2832); ctx.fill();
       ctx.strokeStyle = tom(cfg.corCabelo, 0.8); ctx.lineWidth = R * 0.07; ctx.lineCap = 'round'; [-1, 1].forEach(function (s) { ctx.beginPath(); ctx.moveTo(s * R * 0.56, -R * 0.4); ctx.lineTo(s * R * 0.16, -R * 0.24); ctx.stroke(); });
       ctx.fillStyle = '#7a1f2e'; ctx.beginPath(); ctx.ellipse(0, R * 0.56, R * 0.11, R * 0.14, 0, 0, 6.2832); ctx.fill();
+      ctx.restore(); return;
+    }
+    if (expr === 'triste') {   // olhos caídos (pálpebra por cima), sobrancelhas de preocupação e boquinha para baixo
+      ctx.save(); ctx.fillStyle = cfg.pele;
+      [-1, 1].forEach(function (s) { var ex = s * R * 0.36; ctx.beginPath(); ctx.ellipse(ex, -R * 0.13, R * 0.24, R * 0.17, s * 0.21, 0, 6.2832); ctx.fill(); });
+      ctx.beginPath(); ctx.ellipse(0, R * 0.57, R * 0.3, R * 0.22, 0, 0, 6.2832); ctx.fill();
+      ctx.strokeStyle = tom(cfg.pele, 0.6); ctx.lineWidth = R * 0.04; ctx.lineCap = 'round';
+      [-1, 1].forEach(function (s) { var ex = s * R * 0.36; ctx.beginPath(); ctx.moveTo(ex - R * 0.19, -R * 0.03 - s * R * 0.04); ctx.lineTo(ex + R * 0.19, -R * 0.03 + s * R * 0.04); ctx.stroke(); });   // pálpebra caída para fora (canto de fora mais baixo)
+      ctx.strokeStyle = tom(cfg.corCabelo, 0.85); ctx.lineWidth = R * 0.06; [-1, 1].forEach(function (s) { ctx.beginPath(); ctx.moveTo(s * R * 0.14, -R * 0.4); ctx.quadraticCurveTo(s * R * 0.32, -R * 0.36, s * R * 0.52, -R * 0.24); ctx.stroke(); });   // pontas de dentro levantadas
+      ctx.strokeStyle = '#8b3a4a'; ctx.lineWidth = R * 0.06; ctx.beginPath(); ctx.moveTo(-R * 0.2, R * 0.64); ctx.quadraticCurveTo(0, R * 0.46, R * 0.2, R * 0.64); ctx.stroke();   // boca para baixo
+      ctx.fillStyle = 'rgba(120,200,255,.9)'; ctx.beginPath(); ctx.moveTo(R * 0.42, R * 0.1); ctx.quadraticCurveTo(R * 0.52, R * 0.28, R * 0.42, R * 0.32); ctx.quadraticCurveTo(R * 0.32, R * 0.28, R * 0.42, R * 0.1); ctx.fill();   // lagriminha
       ctx.restore(); return;
     }
     if (expr !== 'festa' && expr !== 'dor') return;

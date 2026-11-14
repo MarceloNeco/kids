@@ -1,0 +1,72 @@
+{
+  "app": "a-garra",
+  "versoes": [
+    {
+      "versao": "0.4.0",
+      "data": "14/Nov/2026",
+      "hora": "15:25:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante (e os letreiros das máquinas também)"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, picked on the shelf (the machine signs too)"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería (y los carteles de las máquinas también)"
+      ]
+    },
+    {
+      "versao": "0.3.0",
+      "data": "14/Nov/2026",
+      "hora": "03:58:15",
+      "pt": [
+        "🐕 Máquina nova: Bichos de Verdade — filhotes de salsicha, gato, coelho, porquinho-da-índia, pinguim, pato, jabuti e leãozinho, que andam pelo cobertor, olham em volta, abanam o rabo e esperneiam na garra",
+        "🎥 A câmera gira até ver a máquina bem de lado (laterais de vidro), para conferir a profundidade da garra",
+        "🎲 Cada partida é diferente: outra mistura de prêmios, outro formato de monte e bichinhos caídos de jeitos variados"
+      ],
+      "en": [
+        "🐕 New machine: Real Animals — dachshund puppies, cat, rabbit, guinea pig, penguin, duck, tortoise and lion cub that walk on the blanket, look around, wag their tails and kick in the claw",
+        "🎥 The camera turns all the way to the side (glass sides) to check the claw depth",
+        "🎲 Every game is different: another mix of prizes, another pile shape and plushies lying in all sorts of ways"
+      ]
+    },
+    {
+      "versao": "0.2.0",
+      "data": "14/Nov/2026",
+      "hora": "03:10:44",
+      "pt": [
+        "🎰 A-GARRA agora é em 3D: a máquina de verdade, vista de frente e de cima, com zoom e câmera que gira",
+        "🕹️ Controle com ⬆ ⬇ ⬅ ➡ e o botão PEGAR (ou toque no prêmio que você quer)",
+        "💪 Igual à máquina de verdade: a garra quase sempre solta; só vem forte de vez em quando (fácil 1 em 4, médio 1 em 7, difícil 1 em 10)",
+        "📞 Quatro máquinas: Cabine de Telefone (pelúcias), Neon (bichinhos que mexem), Estrelas (insetos) e Lanchonete (hambúrgueres)",
+        "⭐ Coleção por máquina, com um prêmio dourado raro em cada uma"
+      ],
+      "en": [
+        "🎰 The Claw Machine is now 3D: a real machine seen from the front and top, with zoom and a turning camera",
+        "🕹️ Control with ⬆ ⬇ ⬅ ➡ and the GRAB button (or tap the prize you want)",
+        "💪 Just like a real machine: the claw usually lets go; it is only strong once in a while (easy 1 in 4, medium 1 in 7, hard 1 in 10)",
+        "📞 Four machines: Phone Booth (plushies), Neon (wiggly critters), Stars (bugs) and Burger Bar (burgers)",
+        "⭐ A collection for each machine, with a rare golden prize in each one"
+      ]
+    },
+    {
+      "versao": "0.1.0",
+      "data": "14/Nov/2026",
+      "hora": "02:30:00",
+      "pt": [
+        "🧸 Jogo novo: A Garra, a máquina de pegar bichinho de pelúcia",
+        "🕹️ Leve a garra com ⬅ ➡ ou com o dedo e aperte PEGAR",
+        "🎰 Três máquinas: cabine vermelha, neon verde e estrelas azul",
+        "🟢🟡🔴 Fácil, médio e difícil, com fichas e relógio",
+        "⭐ 13 bichinhos para colecionar, com uma estrela dourada rara"
+      ],
+      "en": [
+        "🧸 New game: The Claw, the plush-grabbing machine",
+        "🕹️ Move the claw with ⬅ ➡ or your finger and press GRAB",
+        "🎰 Three machines: red booth, green neon and blue stars",
+        "🟢🟡🔴 Easy, medium and hard, with tokens and a timer",
+        "⭐ 13 plushies to collect, including a rare golden star"
+      ]
+    }
+  ]
+}

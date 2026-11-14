@@ -290,21 +290,21 @@
 
   // ---------- montagem de cada página ----------
   var LISTA = [];
-  function pagina(id, pt_, en, cat, cores, variacoes, desenha) {
+  function pagina(id, pt_, en, es, cat, cores, variacoes, desenha) {
     var formas = [], linhas = [];
     function f(d, n) { formas.push({ d: d, n: n }); }
     function l(v) { if (typeof v === 'string') linhas.push(v); else linhas.push.apply(linhas, v); }
     function poe(b) { formas.push.apply(formas, b.f); linhas.push.apply(linhas, b.l); }
     desenha(f, l, poe);
-    LISTA.push({ id: id, pt: pt_, en: en, cat: cat, cores: cores, formas: formas, linhas: linhas, variacoes: variacoes });
+    LISTA.push({ id: id, pt: pt_, en: en, es: es, cat: cat, cores: cores, formas: formas, linhas: linhas, variacoes: variacoes });
   }
-  function v(pt_, en, cores) { return { pt: pt_, en: en, cores: cores }; }
+  function v(pt_, en, es, cores) { return { pt: pt_, en: en, es: es, cores: cores }; }
 
   // ===== Ursinho na padaria =====
-  pagina('urso-padaria', 'Ursinho na padaria', 'Bear at the bakery', 'passeio',
+  pagina('urso-padaria', 'Ursinho na padaria', 'Bear at the bakery', 'Osito en la panadería', 'passeio',
     ['#ffeccf', '#d99a62', '#b98058', '#f7dcbc', '#ff9fae', '#ffffff', '#f2b45a', '#f47c7c', '#bfe6f5', '#f9b7d3'],
-    [v('Doce', 'Sweet', ['#ffe3ef', '#f4a7c4', '#f2c7a0', '#fff1e3', '#ff8fb1', '#ffffff', '#ffd59a', '#c99bf0', '#d7f3ff', '#a8e6cf']),
-      v('Fim de tarde', 'Sunset', ['#ffd9b8', '#a8693c', '#8c5a3a', '#e8c39e', '#ff8a8a', '#fff6e8', '#e89a3c', '#3fa7a0', '#ffc38a', '#ffe08a'])],
+    [v('Doce', 'Sweet', 'Dulce', ['#ffe3ef', '#f4a7c4', '#f2c7a0', '#fff1e3', '#ff8fb1', '#ffffff', '#ffd59a', '#c99bf0', '#d7f3ff', '#a8e6cf']),
+      v('Fim de tarde', 'Sunset', 'Atardecer', ['#ffd9b8', '#a8693c', '#8c5a3a', '#e8c39e', '#ff8a8a', '#fff6e8', '#e89a3c', '#3fa7a0', '#ffc38a', '#ffe08a'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       // toldo listrado com bainha de ondinhas
@@ -346,10 +346,10 @@
     });
 
   // ===== Piquenique do coelho =====
-  pagina('coelho-piquenique', 'Piquenique do coelhinho', 'Bunny picnic', 'passeio',
+  pagina('coelho-piquenique', 'Piquenique do coelhinho', 'Bunny picnic', 'Pícnic del conejito', 'passeio',
     ['#bfe7ff', '#9bd77a', '#5fb865', '#b07a4f', '#ff8f8f', '#ffffff', '#ffb3c7', '#e9b872', '#ffd84d', '#ffe9a8', '#ef5b5b'],
-    [v('Pôr do sol', 'Sunset', ['#ffc9a3', '#c9d86f', '#7aa65a', '#8c5a3a', '#7fb6ff', '#fff4e6', '#ff9ec0', '#d9a25a', '#ff8c42', '#fff1b8', '#c94a6a']),
-      v('Outono', 'Autumn', ['#d9ecf2', '#d8c27a', '#e08a3c', '#8a5a3a', '#7cc8a8', '#f4e1c6', '#f5a3a3', '#c9894a', '#ffcf5c', '#ffe6b0', '#b5452f'])],
+    [v('Pôr do sol', 'Sunset', 'Atardecer', ['#ffc9a3', '#c9d86f', '#7aa65a', '#8c5a3a', '#7fb6ff', '#fff4e6', '#ff9ec0', '#d9a25a', '#ff8c42', '#fff1b8', '#c94a6a']),
+      v('Outono', 'Autumn', 'Otoño', ['#d9ecf2', '#d8c27a', '#e08a3c', '#8a5a3a', '#7cc8a8', '#f4e1c6', '#f5a3a3', '#c9894a', '#ffcf5c', '#ffe6b0', '#b5452f'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(circ(860, 140, 70), 9);
@@ -383,10 +383,10 @@
     });
 
   // ===== Gatinho na chuva =====
-  pagina('gato-chuva', 'Gatinho na chuva', 'Kitty in the rain', 'natureza',
+  pagina('gato-chuva', 'Gatinho na chuva', 'Kitty in the rain', 'Gatito bajo la lluvia', 'natureza',
     ['#d6e8f5', '#eef3f8', '#ff7aa8', '#ffd166', '#f4b183', '#ff9fb0', '#ffe066', '#6ec1e4', '#9ccff0', '#a9d98b', '#7fc4ff'],
-    [v('Arco-íris', 'Rainbow', ['#e6dcff', '#ffffff', '#7ad3a8', '#ffb3d1', '#c9c9d6', '#ff9fb0', '#9fd8ff', '#ff8f6b', '#c9b8ff', '#bfe8a0', '#b19cff']),
-      v('Noite', 'Night', ['#2f3f6b', '#56658f', '#ff5c8a', '#ffd166', '#e9e2d0', '#ff9fb0', '#ff9a3d', '#2a9d8f', '#4a6fa5', '#3c6e57', '#8fb8ff'])],
+    [v('Arco-íris', 'Rainbow', 'Arcoíris', ['#e6dcff', '#ffffff', '#7ad3a8', '#ffb3d1', '#c9c9d6', '#ff9fb0', '#9fd8ff', '#ff8f6b', '#c9b8ff', '#bfe8a0', '#b19cff']),
+      v('Noite', 'Night', 'Noche', ['#2f3f6b', '#56658f', '#ff5c8a', '#ffd166', '#e9e2d0', '#ff9fb0', '#ff9a3d', '#2a9d8f', '#4a6fa5', '#3c6e57', '#8fb8ff'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(nuvem(170, 120, 250), 2);
@@ -411,10 +411,10 @@
     });
 
   // ===== Banho de espuma =====
-  pagina('pato-banho', 'Banho de espuma', 'Bubble bath', 'casa',
+  pagina('pato-banho', 'Banho de espuma', 'Bubble bath', 'Baño de espuma', 'casa',
     ['#cdeefa', '#f7d6e0', '#ffffff', '#ffcf5c', '#ffe55c', '#ff9e3d', '#e2f3ff', '#ffa3b5', '#a8dd8a', '#ff8fc8'],
-    [v('Doce', 'Sweet', ['#ffe0ef', '#d9c9ff', '#ffffff', '#b8f0d9', '#fff2a8', '#ffb07a', '#fff6fb', '#ff9fc0', '#9fd8ff', '#c9a3ff']),
-      v('Mar', 'Sea', ['#a8e6e1', '#ffe6b3', '#f2fbff', '#3fb8af', '#ffd23f', '#ff7f50', '#d4f3ff', '#ff9f9f', '#ff8fa3', '#5aa9e6'])],
+    [v('Doce', 'Sweet', 'Dulce', ['#ffe0ef', '#d9c9ff', '#ffffff', '#b8f0d9', '#fff2a8', '#ffb07a', '#fff6fb', '#ff9fc0', '#9fd8ff', '#c9a3ff']),
+      v('Mar', 'Sea', 'Mar', ['#a8e6e1', '#ffe6b3', '#f2fbff', '#3fb8af', '#ffd23f', '#ff7f50', '#d4f3ff', '#ff9f9f', '#ff8fa3', '#5aa9e6'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(ret(0, 600, 1000, 180), 7);
@@ -443,10 +443,10 @@
     });
 
   // ===== Hora de dormir =====
-  pagina('urso-quarto', 'Hora de dormir', 'Bedtime', 'casa',
+  pagina('urso-quarto', 'Hora de dormir', 'Bedtime', 'Hora de dormir', 'casa',
     ['#cdd8ff', '#e8c39e', '#34407a', '#ffe27a', '#c98b5a', '#ff9ec7', '#ffffff', '#c99266', '#ff8fa3', '#9fe3c4', '#b8a1ff'],
-    [v('Manhã', 'Morning', ['#fff1c9', '#d9b38c', '#9fdcff', '#ffffff', '#e0a875', '#8fd3ff', '#fffaf0', '#e8b07f', '#ff9eaa', '#ffb3c6', '#a8e6cf']),
-      v('Doce', 'Sweet', ['#ffe0ef', '#f3c9a8', '#6a5acd', '#fff3b0', '#f4a7c4', '#c9a7ff', '#ffffff', '#f2c7a0', '#ff8fb1', '#ffe08a', '#9fe3c4'])],
+    [v('Manhã', 'Morning', 'Mañana', ['#fff1c9', '#d9b38c', '#9fdcff', '#ffffff', '#e0a875', '#8fd3ff', '#fffaf0', '#e8b07f', '#ff9eaa', '#ffb3c6', '#a8e6cf']),
+      v('Doce', 'Sweet', 'Dulce', ['#ffe0ef', '#f3c9a8', '#6a5acd', '#fff3b0', '#f4a7c4', '#c9a7ff', '#ffffff', '#f2c7a0', '#ff8fb1', '#ffe08a', '#9fe3c4'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(ret(0, 770, 1000, 230), 2);
@@ -485,10 +485,10 @@
     });
 
   // ===== Coelhinho cozinheiro =====
-  pagina('coelho-cozinha', 'Coelhinho cozinheiro', 'Little bunny chef', 'casa',
+  pagina('coelho-cozinha', 'Coelhinho cozinheiro', 'Little bunny chef', 'Conejito cocinero', 'casa',
     ['#fff3d6', '#bfe8e0', '#8fcfc0', '#f4ede4', '#f0dcc8', '#ff9aa2', '#7aa6e0', '#d6d6e0', '#ffb347', '#ffb3c1', '#d9a066', '#6cc070'],
-    [v('Limão', 'Lemon', ['#fbffd6', '#ffe08a', '#ffd166', '#fffaf0', '#ffffff', '#7ad3a8', '#ff8a8a', '#c9e4ff', '#ff9f43', '#ffb3c6', '#c08552', '#4fae5a']),
-      v('Lavanda', 'Lavender', ['#efe6ff', '#ffd6e8', '#b9a3f0', '#fff8f0', '#d9c2a8', '#8fd3ff', '#ff7aa8', '#e3e3ec', '#ffb347', '#ff9fb0', '#e0a875', '#7cc68a'])],
+    [v('Limão', 'Lemon', 'Limón', ['#fbffd6', '#ffe08a', '#ffd166', '#fffaf0', '#ffffff', '#7ad3a8', '#ff8a8a', '#c9e4ff', '#ff9f43', '#ffb3c6', '#c08552', '#4fae5a']),
+      v('Lavanda', 'Lavender', 'Lavanda', ['#efe6ff', '#ffd6e8', '#b9a3f0', '#fff8f0', '#d9c2a8', '#8fd3ff', '#ff7aa8', '#e3e3ec', '#ffb347', '#ff9fb0', '#e0a875', '#7cc68a'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(ret(0, 470, 1000, 190), 2);
@@ -520,10 +520,10 @@
     });
 
   // ===== Sorveteria do gatinho =====
-  pagina('gato-sorvete', 'Sorvete do gatinho', 'Kitty ice cream', 'passeio',
+  pagina('gato-sorvete', 'Sorvete do gatinho', 'Kitty ice cream', 'Helado del gatito', 'passeio',
     ['#cdefff', '#ffe7b0', '#ff9fc4', '#ffffff', '#8fd3ff', '#c9c3dc', '#ffa3b1', '#e8b06a', '#ffd1dc', '#b5ead7', '#8b5a3c', '#ffe066'],
-    [v('Tutti-frutti', 'Tutti frutti', ['#fff0c9', '#d6f5e3', '#7ad3a8', '#fffaf0', '#ffb3c6', '#f5c48a', '#ff8fa3', '#d9a066', '#ffe08a', '#c9a7ff', '#ff7a7a', '#8fd3ff']),
-      v('Noite de verão', 'Summer night', ['#3b3f7a', '#c9b38a', '#ffd166', '#f6f1ff', '#ff8fb1', '#a8a3c7', '#ff9fb0', '#d9a066', '#ffb3c6', '#9fe3c4', '#6b4430', '#fff3a3'])],
+    [v('Tutti-frutti', 'Tutti frutti', 'Tutti frutti', ['#fff0c9', '#d6f5e3', '#7ad3a8', '#fffaf0', '#ffb3c6', '#f5c48a', '#ff8fa3', '#d9a066', '#ffe08a', '#c9a7ff', '#ff7a7a', '#8fd3ff']),
+      v('Noite de verão', 'Summer night', 'Noche de verano', ['#3b3f7a', '#c9b38a', '#ffd166', '#f6f1ff', '#ff8fb1', '#a8a3c7', '#ff9fb0', '#d9a066', '#ffb3c6', '#9fe3c4', '#6b4430', '#fff3a3'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(circ(120, 120, 60), 12);
@@ -551,10 +551,10 @@
     });
 
   // ===== Cachorrinho na praia =====
-  pagina('cachorro-praia', 'Cachorrinho na praia', 'Puppy at the beach', 'passeio',
+  pagina('cachorro-praia', 'Cachorrinho na praia', 'Puppy at the beach', 'Perrito en la playa', 'passeio',
     ['#bfeaff', '#5cc6e8', '#ffe2a6', '#ffd23f', '#f2d2a9', '#b07a4f', '#ff9fb0', '#ff6b6b', '#ffffff', '#7bdcb5', '#ffb38a'],
-    [v('Pôr do sol', 'Sunset', ['#ffcf9e', '#4f9fd8', '#f5d08a', '#ff7b54', '#ffe3c2', '#8c5a3a', '#ff8fa3', '#7a5af5', '#fff4e0', '#ffd166', '#ff9fd1']),
-      v('Ilha', 'Island', ['#c9f7ef', '#2ab7ca', '#fff1c1', '#ffcd3c', '#d9b08c', '#6b4430', '#ff9fb0', '#ff8fc8', '#fefefe', '#b8f28b', '#ff8a5c'])],
+    [v('Pôr do sol', 'Sunset', 'Atardecer', ['#ffcf9e', '#4f9fd8', '#f5d08a', '#ff7b54', '#ffe3c2', '#8c5a3a', '#ff8fa3', '#7a5af5', '#fff4e0', '#ffd166', '#ff9fd1']),
+      v('Ilha', 'Island', 'Isla', ['#c9f7ef', '#2ab7ca', '#fff1c1', '#ffcd3c', '#d9b08c', '#6b4430', '#ff9fb0', '#ff8fc8', '#fefefe', '#b8f28b', '#ff8a5c'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(circ(130, 130, 64), 4);
@@ -587,10 +587,10 @@
     });
 
   // ===== Aniversário do ursinho =====
-  pagina('urso-aniversario', 'Aniversário do ursinho', "Bear's birthday", 'festa',
+  pagina('urso-aniversario', 'Aniversário do ursinho', "Bear's birthday", 'Cumpleaños del osito', 'festa',
     ['#fff0f5', '#ff8fab', '#8fd3ff', '#ffe066', '#c8956a', '#f5dcc0', '#ff9e9e', '#ffffff', '#f7c59f', '#b8e0d2', '#c3a6ff', '#ffb347'],
-    [v('Chocolate', 'Chocolate', ['#fff6e0', '#ff7aa8', '#7ad3a8', '#ffd166', '#e3b07c', '#fff0dc', '#ff8fa3', '#fff8f0', '#8b5a3c', '#ffd6e0', '#8fd3ff', '#ff9f43']),
-      v('Festa à noite', 'Night party', ['#33306b', '#ff5c8a', '#4cc9f0', '#ffd23f', '#d9a578', '#f7e0c4', '#ff9fb0', '#fff3fb', '#c9a7ff', '#7a6ad8', '#ff9fd6', '#ffb347'])],
+    [v('Chocolate', 'Chocolate', 'Chocolate', ['#fff6e0', '#ff7aa8', '#7ad3a8', '#ffd166', '#e3b07c', '#fff0dc', '#ff8fa3', '#fff8f0', '#8b5a3c', '#ffd6e0', '#8fd3ff', '#ff9f43']),
+      v('Festa à noite', 'Night party', 'Fiesta de noche', ['#33306b', '#ff5c8a', '#4cc9f0', '#ffd23f', '#d9a578', '#f7e0c4', '#ff9fb0', '#fff3fb', '#c9a7ff', '#7a6ad8', '#ff9fd6', '#ffb347'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       // bandeirinhas
@@ -623,10 +623,10 @@
     });
 
   // ===== Coelhinho na feira =====
-  pagina('coelho-feira', 'Coelhinho na feira', 'Bunny at the market', 'passeio',
+  pagina('coelho-feira', 'Coelhinho na feira', 'Bunny at the market', 'Conejito en el mercado', 'passeio',
     ['#d8f3ff', '#8fd694', '#ffffff', '#d9a066', '#e8d5c4', '#ffb3c6', '#ff5c5c', '#ffa94d', '#5cb85c', '#f2cf6b', '#e6d3b3', '#ff9fb0'],
-    [v('Outono', 'Autumn', ['#ffe8cc', '#e07a5f', '#fff8ec', '#a8693c', '#f4e1c6', '#7ad3a8', '#c94a4a', '#ffb347', '#8a9a3a', '#e3a857', '#d8c3a5', '#ff9fb0']),
-      v('Doce', 'Sweet', ['#ffe6f2', '#c9a7ff', '#fffafd', '#f4a7c4', '#ffffff', '#8fd3ff', '#ff6f91', '#ffc75f', '#7cd992', '#ffe08a', '#f7e6ff', '#ff9fb0'])],
+    [v('Outono', 'Autumn', 'Otoño', ['#ffe8cc', '#e07a5f', '#fff8ec', '#a8693c', '#f4e1c6', '#7ad3a8', '#c94a4a', '#ffb347', '#8a9a3a', '#e3a857', '#d8c3a5', '#ff9fb0']),
+      v('Doce', 'Sweet', 'Dulce', ['#ffe6f2', '#c9a7ff', '#fffafd', '#f4a7c4', '#ffffff', '#8fd3ff', '#ff6f91', '#ffc75f', '#7cd992', '#ffe08a', '#f7e6ff', '#ff9fb0'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(nuvem(840, 110, 180), 3);
@@ -656,10 +656,10 @@
     });
 
   // ===== Passeio de bicicleta =====
-  pagina('cachorro-bicicleta', 'Passeio de bicicleta', 'Bike ride', 'veiculos',
+  pagina('cachorro-bicicleta', 'Passeio de bicicleta', 'Bike ride', 'Paseo en bici', 'veiculos',
     ['#c6ecff', '#a5dc86', '#ece4d4', '#ff6b6b', '#5b5f73', '#fff6d6', '#f7e1c3', '#c98f5a', '#7cc6ff', '#ff9fb0', '#e9b872', '#ff9fd1'],
-    [v('Outono', 'Autumn', ['#ffe9c7', '#e0a458', '#d8cbb3', '#2a9d8f', '#4a4e69', '#fff3d6', '#f2d0a4', '#8c5a3a', '#ffb347', '#ff9fb0', '#c9894a', '#e76f51']),
-      v('Doce', 'Sweet', ['#ffe3f1', '#bfe8c9', '#f6effa', '#b28dff', '#6d6875', '#fffafd', '#ffffff', '#ffc4a3', '#ff8fb1', '#ff9fb0', '#ffd6a5', '#8fd3ff'])],
+    [v('Outono', 'Autumn', 'Otoño', ['#ffe9c7', '#e0a458', '#d8cbb3', '#2a9d8f', '#4a4e69', '#fff3d6', '#f2d0a4', '#8c5a3a', '#ffb347', '#ff9fb0', '#c9894a', '#e76f51']),
+      v('Doce', 'Sweet', 'Dulce', ['#ffe3f1', '#bfe8c9', '#f6effa', '#b28dff', '#6d6875', '#fffafd', '#ffffff', '#ffc4a3', '#ff8fb1', '#ff9fb0', '#ffd6a5', '#8fd3ff'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(nuvem(200, 120, 190), 6); f(nuvem(760, 90, 150), 6);
@@ -687,10 +687,10 @@
     });
 
   // ===== Lendo na janela =====
-  pagina('gato-janela', 'Lendo na janela', 'Reading by the window', 'casa',
+  pagina('gato-janela', 'Lendo na janela', 'Reading by the window', 'Leyendo junto a la ventana', 'casa',
     ['#ffe8d6', '#a9d6ff', '#ffffff', '#c3aed6', '#ffd166', '#f6b26b', '#ff9fb0', '#ef6f6c', '#c9875f', '#7ccf8a', '#5aa469', '#9ad1d4'],
-    [v('Noite', 'Night', ['#3d3a6b', '#1f2a5a', '#fff6e0', '#7a6ad8', '#ffb347', '#e8e1d5', '#ff9fb0', '#4cc9f0', '#8c5a3a', '#6fcf97', '#2f5d50', '#ff8fb1']),
-      v('Primavera', 'Spring', ['#e9fbe9', '#ffd6e8', '#fffdf5', '#ff9fc4', '#b8e6ff', '#c9c3dc', '#ff9fb0', '#ffd166', '#e0a875', '#9be37b', '#ff8fb1', '#ffb3c6'])],
+    [v('Noite', 'Night', 'Noche', ['#3d3a6b', '#1f2a5a', '#fff6e0', '#7a6ad8', '#ffb347', '#e8e1d5', '#ff9fb0', '#4cc9f0', '#8c5a3a', '#6fcf97', '#2f5d50', '#ff8fb1']),
+      v('Primavera', 'Spring', 'Primavera', ['#e9fbe9', '#ffd6e8', '#fffdf5', '#ff9fc4', '#b8e6ff', '#c9c3dc', '#ff9fb0', '#ffd166', '#e0a875', '#9be37b', '#ff8fb1', '#ffb3c6'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       // janela com uma nuvem e uma árvore lá fora
@@ -725,10 +725,10 @@
     });
 
   // ===== Acampamento à noite =====
-  pagina('urso-acampamento', 'Acampamento à noite', 'Camping at night', 'natureza',
+  pagina('urso-acampamento', 'Acampamento à noite', 'Camping at night', 'Campamento de noche', 'natureza',
     ['#2e3a6b', '#ffe28a', '#2f6b5a', '#5b8c5a', '#ff9f68', '#6b3f33', '#b07d56', '#f1d1b0', '#ff6b3d', '#ffd23f', '#8a5a3c', '#ffffff'],
-    [v('Fim de tarde', 'Dusk', ['#ffb38a', '#fff3c4', '#3f7f5f', '#8fbf6a', '#5aa9e6', '#2f3e5c', '#c48a5c', '#f6dcc0', '#ff5d5d', '#ffd166', '#7a4a2c', '#fff6fb']),
-      v('Lua cheia', 'Full moon', ['#1b1f3b', '#f1f1ff', '#3a5a7a', '#4a6a5a', '#c9a7ff', '#3d2c5a', '#d9b48c', '#f7e4cc', '#ff8fa3', '#ffe08a', '#6b4a3a', '#ffe6f2'])],
+    [v('Fim de tarde', 'Dusk', 'Anochecer', ['#ffb38a', '#fff3c4', '#3f7f5f', '#8fbf6a', '#5aa9e6', '#2f3e5c', '#c48a5c', '#f6dcc0', '#ff5d5d', '#ffd166', '#7a4a2c', '#fff6fb']),
+      v('Lua cheia', 'Full moon', 'Luna llena', ['#1b1f3b', '#f1f1ff', '#3a5a7a', '#4a6a5a', '#c9a7ff', '#3d2c5a', '#d9b48c', '#f7e4cc', '#ff8fa3', '#ffe08a', '#6b4a3a', '#ffe6f2'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(lua(830, 140, 66, 52), 2);
@@ -752,10 +752,10 @@
     });
 
   // ===== Casinha na árvore =====
-  pagina('casa-arvore', 'Casinha na árvore', 'Treehouse', 'natureza',
+  pagina('casa-arvore', 'Casinha na árvore', 'Treehouse', 'Casita en el árbol', 'natureza',
     ['#bde7ff', '#93d36b', '#a0714f', '#5fbf5f', '#ffd59e', '#ff7b7b', '#fff3b0', '#d9a066', '#ffffff', '#ff9fc4', '#ffd23f'],
-    [v('Outono', 'Autumn', ['#ffe3c2', '#d8c27a', '#7a4a2c', '#f08a3c', '#fff1d6', '#7a5af5', '#ffe08a', '#b07a4f', '#fff8ec', '#ff8fa3', '#ffd23f']),
-      v('Algodão-doce', 'Cotton candy', ['#ffe3f1', '#bfe8c9', '#b58463', '#9fd8ff', '#fff6fb', '#c9a7ff', '#ffe08a', '#f4a7c4', '#ffffff', '#ff9fb0', '#ffd166'])],
+    [v('Outono', 'Autumn', 'Otoño', ['#ffe3c2', '#d8c27a', '#7a4a2c', '#f08a3c', '#fff1d6', '#7a5af5', '#ffe08a', '#b07a4f', '#fff8ec', '#ff8fa3', '#ffd23f']),
+      v('Algodão-doce', 'Cotton candy', 'Algodón de azúcar', ['#ffe3f1', '#bfe8c9', '#b58463', '#9fd8ff', '#fff6fb', '#c9a7ff', '#ffe08a', '#f4a7c4', '#ffffff', '#ff9fb0', '#ffd166'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(nuvem(150, 110, 180), 9); f(nuvem(870, 90, 150), 9);
@@ -784,10 +784,10 @@
     });
 
   // ===== Natal =====
-  pagina('natal', 'Natal com presentes', 'Christmas presents', 'festa',
+  pagina('natal', 'Natal com presentes', 'Christmas presents', 'Navidad con regalos', 'festa',
     ['#dbeeff', '#e3b98f', '#3fae6a', '#ffd23f', '#ff5c5c', '#5ab0ff', '#ff8fc8', '#9be37b', '#fff3b0', '#c58d63', '#ffffff', '#ff9fb0'],
-    [v('Dourado', 'Golden', ['#fff4dc', '#c9a27a', '#2f8f5b', '#ffcf40', '#c0392b', '#e8b04a', '#a3d9ff', '#ff9f9f', '#fffaf0', '#d9a578', '#fffdf8', '#ff9fb0']),
-      v('Doce', 'Sweet', ['#ffe6f2', '#f3d1b8', '#7fd6b0', '#fff08a', '#ff7aa8', '#b28dff', '#8fd3ff', '#ffd166', '#ffffff', '#e8c2a0', '#fffafd', '#ff9fb0'])],
+    [v('Dourado', 'Golden', 'Dorado', ['#fff4dc', '#c9a27a', '#2f8f5b', '#ffcf40', '#c0392b', '#e8b04a', '#a3d9ff', '#ff9f9f', '#fffaf0', '#d9a578', '#fffdf8', '#ff9fb0']),
+      v('Doce', 'Sweet', 'Dulce', ['#ffe6f2', '#f3d1b8', '#7fd6b0', '#fff08a', '#ff7aa8', '#b28dff', '#8fd3ff', '#ffd166', '#ffffff', '#e8c2a0', '#fffafd', '#ff9fb0'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(ret(0, 780, 1000, 220), 2);
@@ -817,10 +817,10 @@
     });
 
   // ===== Unicórnio no arco-íris =====
-  pagina('unicornio', 'Unicórnio no arco-íris', 'Rainbow unicorn', 'fantasia',
+  pagina('unicornio', 'Unicórnio no arco-íris', 'Rainbow unicorn', 'Unicornio en el arcoíris', 'fantasia',
     ['#e7dcff', '#ff8a8a', '#ffc078', '#ffe680', '#a8e6a1', '#8fd3ff', '#ffffff', '#ff9fd6', '#c9a7ff', '#ffd36e', '#ffb3c6', '#bdeaa6'],
-    [v('Noite mágica', 'Magic night', ['#2b2d63', '#ff7aa8', '#ffb347', '#fff07a', '#7ad3a8', '#6fb8ff', '#f4f0ff', '#8fd3ff', '#ff9fd6', '#ffe08a', '#c9a7ff', '#4a5a8a']),
-      v('Pastel', 'Pastel', ['#fff6e5', '#ffc4d6', '#ffe0b5', '#fff6b0', '#d4f5d0', '#cfe8ff', '#ffffff', '#b8f0e0', '#ffd6a5', '#ffd166', '#ff9fb0', '#d9f2c4'])],
+    [v('Noite mágica', 'Magic night', 'Noche mágica', ['#2b2d63', '#ff7aa8', '#ffb347', '#fff07a', '#7ad3a8', '#6fb8ff', '#f4f0ff', '#8fd3ff', '#ff9fd6', '#ffe08a', '#c9a7ff', '#4a5a8a']),
+      v('Pastel', 'Pastel', 'Pastel', ['#fff6e5', '#ffc4d6', '#ffe0b5', '#fff6b0', '#d4f5d0', '#cfe8ff', '#ffffff', '#b8f0e0', '#ffd6a5', '#ffd166', '#ff9fb0', '#d9f2c4'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       [[420, 2], [380, 3], [340, 4], [300, 5], [260, 6]].forEach(function (b) { f(faixa(500, 640, b[0], b[0] + 40, 180, 360), b[1]); });
@@ -853,10 +853,10 @@
     });
 
   // ===== Dinossauro fofinho =====
-  pagina('dinossauro', 'Dinossauro fofinho', 'Cute dinosaur', 'fantasia',
+  pagina('dinossauro', 'Dinossauro fofinho', 'Cute dinosaur', 'Dinosaurio tierno', 'fantasia',
     ['#d4f1ff', '#b08968', '#ff7b54', '#c5e384', '#7ed6a5', '#fff1b5', '#ffb347', '#ff9fb0', '#4cae6a', '#c49a6c', '#fffaf0', '#ffd166'],
-    [v('Lilás', 'Lilac', ['#ffe9d6', '#9c7ab8', '#ff5d8f', '#f2d78a', '#c9a7ff', '#ffe3f1', '#7ad3a8', '#ff9fb0', '#58b368', '#a8693c', '#fff8ec', '#8fd3ff']),
-      v('Pôr do sol', 'Sunset', ['#ffcf9e', '#7a5a4a', '#ffd23f', '#a6c46a', '#ffb3a7', '#fff6e0', '#7ac7e8', '#ff8fa3', '#3f8f5f', '#8c5a3a', '#f4f0ff', '#ff7b54'])],
+    [v('Lilás', 'Lilac', 'Lila', ['#ffe9d6', '#9c7ab8', '#ff5d8f', '#f2d78a', '#c9a7ff', '#ffe3f1', '#7ad3a8', '#ff9fb0', '#58b368', '#a8693c', '#fff8ec', '#8fd3ff']),
+      v('Pôr do sol', 'Sunset', 'Atardecer', ['#ffcf9e', '#7a5a4a', '#ffd23f', '#a6c46a', '#ffb3a7', '#fff6e0', '#7ac7e8', '#ff8fa3', '#3f8f5f', '#8c5a3a', '#f4f0ff', '#ff7b54'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(circ(880, 120, 60), 12);
@@ -897,10 +897,10 @@
     });
 
   // ===== Foguete no espaço =====
-  pagina('foguete', 'Foguete no espaço', 'Rocket in space', 'veiculos',
+  pagina('foguete', 'Foguete no espaço', 'Rocket in space', 'Cohete en el espacio', 'veiculos',
     ['#2b2d63', '#fff3a3', '#ff9fb5', '#ffd166', '#f5f5f5', '#ff5d5d', '#9ad9ff', '#d4a373', '#ffb347', '#ffe66d', '#c9c9e0', '#ff9fb0'],
-    [v('Galáxia', 'Galaxy', ['#3a1f5d', '#ffd6f5', '#7ad3a8', '#ff9f43', '#ffe8f4', '#8a5cf5', '#ffe08a', '#e3b07c', '#ff7aa8', '#ffd1e8', '#b8a1ff', '#ff9fb0']),
-      v('Doce', 'Sweet', ['#d9f2ff', '#ffb3c6', '#ffd166', '#c9a7ff', '#ffffff', '#7ad3a8', '#fff0b3', '#f2c7a0', '#ff8fa3', '#ffe08a', '#e0e0f5', '#ff9fb0'])],
+    [v('Galáxia', 'Galaxy', 'Galaxia', ['#3a1f5d', '#ffd6f5', '#7ad3a8', '#ff9f43', '#ffe8f4', '#8a5cf5', '#ffe08a', '#e3b07c', '#ff7aa8', '#ffd1e8', '#b8a1ff', '#ff9fb0']),
+      v('Doce', 'Sweet', 'Dulce', ['#d9f2ff', '#ffb3c6', '#ffd166', '#c9a7ff', '#ffffff', '#7ad3a8', '#fff0b3', '#f2c7a0', '#ff8fa3', '#ffe08a', '#e0e0f5', '#ff9fb0'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       [[120, 470, 0], [880, 380, 20], [800, 110, 340], [190, 760, 15], [60, 90, 30]].forEach(function (e) { f(estrela(e[0], e[1], 46, 22, e[2]), 2); });
@@ -928,10 +928,10 @@
     });
 
   // ===== Gatinha sereia =====
-  pagina('sereia', 'Gatinha sereia', 'Mermaid kitty', 'fantasia',
+  pagina('sereia', 'Gatinha sereia', 'Mermaid kitty', 'Gatita sirena', 'fantasia',
     ['#7fd3e8', '#ffe0a3', '#5cc28f', '#f3e9ff', '#6fd6c8', '#ff9fd1', '#ffd166', '#e6fbff', '#ffb347', '#ff7f7f', '#c9a7ff', '#ff9fb0'],
-    [v('Fundo do mar', 'Deep sea', ['#2b4c8c', '#d9c08a', '#2a9d8f', '#ffe6f2', '#c9a7ff', '#7ad3a8', '#ffd23f', '#8fd3ff', '#ff8fa3', '#ffb347', '#ff9fd6', '#ff9fb0']),
-      v('Coral', 'Coral', ['#b8f0e6', '#fff1c9', '#ff8fa3', '#fff6e0', '#ff9f80', '#ffd166', '#c9a7ff', '#ffffff', '#5aa9e6', '#7ad3a8', '#ffb3c6', '#ff9fb0'])],
+    [v('Fundo do mar', 'Deep sea', 'Fondo del mar', ['#2b4c8c', '#d9c08a', '#2a9d8f', '#ffe6f2', '#c9a7ff', '#7ad3a8', '#ffd23f', '#8fd3ff', '#ff8fa3', '#ffb347', '#ff9fd6', '#ff9fb0']),
+      v('Coral', 'Coral', 'Coral', ['#b8f0e6', '#fff1c9', '#ff8fa3', '#fff6e0', '#ff9f80', '#ffd166', '#c9a7ff', '#ffffff', '#5aa9e6', '#7ad3a8', '#ffb3c6', '#ff9fb0'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(chao([[0, 830], [400, 800], [1000, 840]]), 2);
@@ -962,10 +962,10 @@
     });
 
   // ===== Castelo encantado =====
-  pagina('castelo', 'Castelo encantado', 'Enchanted castle', 'fantasia',
+  pagina('castelo', 'Castelo encantado', 'Enchanted castle', 'Castillo encantado', 'fantasia',
     ['#ffd9ec', '#ffffff', '#9fe0a8', '#d9c8ff', '#bfa8f5', '#ff8fb8', '#b8865b', '#fff1a8', '#7fd1ff', '#ffe3b0', '#ffd166'],
-    [v('Noite', 'Night', ['#2b2d63', '#c9c9e0', '#3f7f5f', '#a3b1d9', '#8b9bd1', '#7a5af5', '#6b4430', '#ffe08a', '#ff8fb8', '#d9c08a', '#fff3a3']),
-      v('Princesa', 'Princess', ['#e0f4ff', '#fffafd', '#c5ecb0', '#fff0f7', '#ffd6e8', '#c9a7ff', '#e0a875', '#ffe8a3', '#ff7aa8', '#fff1d6', '#ffd166'])],
+    [v('Noite', 'Night', 'Noche', ['#2b2d63', '#c9c9e0', '#3f7f5f', '#a3b1d9', '#8b9bd1', '#7a5af5', '#6b4430', '#ffe08a', '#ff8fb8', '#d9c08a', '#fff3a3']),
+      v('Princesa', 'Princess', 'Princesa', ['#e0f4ff', '#fffafd', '#c5ecb0', '#fff0f7', '#ffd6e8', '#c9a7ff', '#e0a875', '#ffe8a3', '#ff7aa8', '#fff1d6', '#ffd166'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(circ(870, 130, 62), 11);
@@ -1002,10 +1002,10 @@
     });
 
   // ===== Passeio de carro =====
-  pagina('carro', 'Passeio de carro', 'Car ride', 'veiculos',
+  pagina('carro', 'Passeio de carro', 'Car ride', 'Paseo en coche', 'veiculos',
     ['#cfeeff', '#a8e08f', '#c4c9d6', '#ff6b8b', '#bfe9ff', '#555a6e', '#ffe08a', '#ffcf9e', '#ff9fb0', '#5fbf6a', '#b07a4f', '#ffd23f'],
-    [v('Taxi', 'Taxi', ['#ffeccc', '#c9d86f', '#a3a8b8', '#ffd23f', '#e0f4ff', '#3d405b', '#ffffff', '#c9c3dc', '#ff9fb0', '#4f9d69', '#8c5a3a', '#ff9f43']),
-      v('Noite', 'Night', ['#2b2d63', '#3f6f5a', '#5b5f73', '#8fd3ff', '#ffe08a', '#2a2a3a', '#fff3a3', '#e8dcc8', '#ff9fb0', '#2f5d50', '#5a3a2a', '#f1f1ff'])],
+    [v('Taxi', 'Taxi', 'Taxi', ['#ffeccc', '#c9d86f', '#a3a8b8', '#ffd23f', '#e0f4ff', '#3d405b', '#ffffff', '#c9c3dc', '#ff9fb0', '#4f9d69', '#8c5a3a', '#ff9f43']),
+      v('Noite', 'Night', 'Noche', ['#2b2d63', '#3f6f5a', '#5b5f73', '#8fd3ff', '#ffe08a', '#2a2a3a', '#fff3a3', '#e8dcc8', '#ff9fb0', '#2f5d50', '#5a3a2a', '#f1f1ff'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(circ(150, 130, 62), 12);
@@ -1029,10 +1029,10 @@
     });
 
   // ===== Patinho no jardim =====
-  pagina('pato-jardim', 'Patinho no jardim', 'Duckling in the garden', 'natureza',
+  pagina('pato-jardim', 'Patinho no jardim', 'Duckling in the garden', 'Patito en el jardín', 'natureza',
     ['#d6f5ff', '#9edb7a', '#ffffff', '#ffe066', '#ff9f43', '#7fb7ff', '#ff8fb1', '#c9a3ff', '#ffd23f', '#4fae5a', '#ff9fb0'],
-    [v('Outono', 'Autumn', ['#ffe9c7', '#d8c27a', '#fff6e8', '#fff3b0', '#e07a5f', '#3fa7a0', '#e76f51', '#f4a261', '#ffd166', '#8a9a3a', '#ff9fb0']),
-      v('Algodão-doce', 'Cotton candy', ['#ffe3f1', '#c5ecb0', '#fffafd', '#fff6c2', '#ffb07a', '#c9a7ff', '#8fd3ff', '#ffb3c6', '#fff08a', '#7cc68a', '#ff9fb0'])],
+    [v('Outono', 'Autumn', 'Otoño', ['#ffe9c7', '#d8c27a', '#fff6e8', '#fff3b0', '#e07a5f', '#3fa7a0', '#e76f51', '#f4a261', '#ffd166', '#8a9a3a', '#ff9fb0']),
+      v('Algodão-doce', 'Cotton candy', 'Algodón de azúcar', ['#ffe3f1', '#c5ecb0', '#fffafd', '#fff6c2', '#ffb07a', '#c9a7ff', '#8fd3ff', '#ffb3c6', '#fff08a', '#7cc68a', '#ff9fb0'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(circ(870, 120, 60), 9);
@@ -1063,10 +1063,10 @@
     });
 
   // ===== Cachorrinho e a casinha =====
-  pagina('cachorro-casinha', 'Cachorrinho e a casinha', 'Puppy and the doghouse', 'bichos',
+  pagina('cachorro-casinha', 'Cachorrinho e a casinha', 'Puppy and the doghouse', 'Perrito y su casita', 'bichos',
     ['#d8f0ff', '#a7dc8a', '#ff8f70', '#ffd59e', '#7a5236', '#ffffff', '#9b7653', '#ff9fb0', '#ffe9b0', '#6fb8ff', '#ff5c5c'],
-    [v('Outono', 'Autumn', ['#ffe8cc', '#d8c27a', '#7a5af5', '#f4d6a0', '#4a3a5a', '#f7e7d4', '#c4703c', '#ff9fb0', '#fff6e0', '#e76f51', '#3fa7a0']),
-      v('Doce', 'Sweet', ['#ffe6f2', '#bfe8c9', '#c9a7ff', '#fff2b3', '#8a6a9a', '#fffafd', '#f4a7c4', '#ff9fb0', '#ffffff', '#ffb3c6', '#7ad3a8'])],
+    [v('Outono', 'Autumn', 'Otoño', ['#ffe8cc', '#d8c27a', '#7a5af5', '#f4d6a0', '#4a3a5a', '#f7e7d4', '#c4703c', '#ff9fb0', '#fff6e0', '#e76f51', '#3fa7a0']),
+      v('Doce', 'Sweet', 'Dulce', ['#ffe6f2', '#bfe8c9', '#c9a7ff', '#fff2b3', '#8a6a9a', '#fffafd', '#f4a7c4', '#ff9fb0', '#ffffff', '#ffb3c6', '#7ad3a8'])],
     function (f, l, poe) {
       f(ret(0, 0, 1000, 1000), 1);
       f(nuvem(780, 120, 200), 6); f(nuvem(380, 90, 140), 6);
@@ -1091,13 +1091,13 @@
 
   // ---------- categorias (só as usadas) ----------
   var CATEGORIAS = [
-    { id: 'bichos', pt: 'Bichinhos', en: 'Animals', ico: '🐻' },
-    { id: 'casa', pt: 'Em casa', en: 'At home', ico: '🏠' },
-    { id: 'passeio', pt: 'Passeios', en: 'Outings', ico: '🧺' },
-    { id: 'festa', pt: 'Festas', en: 'Parties', ico: '🎂' },
-    { id: 'fantasia', pt: 'Fantasia', en: 'Fantasy', ico: '🦄' },
-    { id: 'natureza', pt: 'Natureza', en: 'Nature', ico: '🌷' },
-    { id: 'veiculos', pt: 'Veículos', en: 'Vehicles', ico: '🚗' }
+    { id: 'bichos', pt: 'Bichinhos', en: 'Animals', es: 'Animalitos', ico: '🐻' },
+    { id: 'casa', pt: 'Em casa', en: 'At home', es: 'En casa', ico: '🏠' },
+    { id: 'passeio', pt: 'Passeios', en: 'Outings', es: 'Paseos', ico: '🧺' },
+    { id: 'festa', pt: 'Festas', en: 'Parties', es: 'Fiestas', ico: '🎂' },
+    { id: 'fantasia', pt: 'Fantasia', en: 'Fantasy', es: 'Fantasía', ico: '🦄' },
+    { id: 'natureza', pt: 'Natureza', en: 'Nature', es: 'Naturaleza', ico: '🌷' },
+    { id: 'veiculos', pt: 'Veículos', en: 'Vehicles', es: 'Vehículos', ico: '🚗' }
   ].filter(function (c) { return LISTA.some(function (p) { return p.cat === c.id; }); });
 
   var API = { LISTA: LISTA, CATEGORIAS: CATEGORIAS };

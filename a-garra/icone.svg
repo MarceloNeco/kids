@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A Garra: ícone feito à mão para este jogo (garra segurando um ursinho, máquina com neon) -->
+  <defs>
+    <radialGradient id="f" cx="50%" cy="20%" r="80%"><stop offset="0" stop-color="#2f2a6e"/><stop offset="1" stop-color="#0d0a24"/></radialGradient>
+    <radialGradient id="u" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffc4dc"/><stop offset="1" stop-color="#f27aa8"/></radialGradient>
+    <linearGradient id="m" x1="0" x2="1"><stop offset="0" stop-color="#8a8f96"/><stop offset=".45" stop-color="#eef1f5"/><stop offset="1" stop-color="#6d7178"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#f)"/>
+  <rect x="34" y="34" width="444" height="444" rx="84" fill="none" stroke="#39ff6a" stroke-width="12" opacity=".9"/>
+  <rect x="60" y="74" width="392" height="18" rx="9" fill="#151515" opacity=".7"/>
+  <rect x="226" y="66" width="60" height="34" rx="8" fill="url(#m)"/>
+  <path d="M256 100v62" stroke="#2b2b2b" stroke-width="8"/>
+  <!-- ursinho rosa -->
+  <circle cx="186" cy="262" r="34" fill="#f27aa8"/><circle cx="326" cy="262" r="34" fill="#f27aa8"/>
+  <circle cx="186" cy="262" r="17" fill="#ff9fc3"/><circle cx="326" cy="262" r="17" fill="#ff9fc3"/>
+  <circle cx="256" cy="330" r="104" fill="url(#u)"/>
+  <ellipse cx="256" cy="378" rx="56" ry="40" fill="#ffe0ec"/>
+  <circle cx="220" cy="318" r="14" fill="#1c1c22"/><circle cx="292" cy="318" r="14" fill="#1c1c22"/>
+  <circle cx="225" cy="313" r="5" fill="#fff"/><circle cx="297" cy="313" r="5" fill="#fff"/>
+  <ellipse cx="256" cy="350" rx="11" ry="8" fill="#5a2a3a"/>
+  <path d="M244 366q12 12 24 0" stroke="#5a2a3a" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="200" cy="352" rx="14" ry="8" fill="#ff6f9f" opacity=".6"/><ellipse cx="312" cy="352" rx="14" ry="8" fill="#ff6f9f" opacity=".6"/>
+  <!-- garra -->
+  <rect x="222" y="156" width="68" height="40" rx="12" fill="url(#m)"/>
+  <path d="M236 192L188 236L196 296" stroke="#3a3d42" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M276 192L324 236L316 296" stroke="#3a3d42" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M236 192L188 236L196 296" stroke="#e3e7ec" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M276 192L324 236L316 296" stroke="#e3e7ec" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M372 140l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#ffd166"/>
+  <path d="M120 176l5 10 11 1-8 8 2 11-10-6-10 6 2-11-8-8 11-1z" fill="#7ef9ff"/>
+</svg>

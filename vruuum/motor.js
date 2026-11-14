@@ -68,7 +68,7 @@
     if (lp && j.loop !== lp) { j.loop = lp; j.pulo = 0; e.eventos.push({ tipo: 'looping', j: j.n }); }
     else if (!lp && j.loop) { j.loop = null; j.loopings++; e.eventos.push({ tipo: 'loopFeito', j: j.n }); somar(e, j, PONTOS.looping, 'looping'); }
     if (lp) { dir = 0; j.x = Math.max(-0.8, Math.min(0.8, j.x)); j.vel = Math.max(j.vel, max * 0.9); }
-    // rio (1.17.0): ao entrar na água o veículo vira barco (e volta a ser carro na saída); quem voa passa por cima
+    // rio (1.18.0): ao entrar na água o veículo vira barco (e volta a ser carro na saída); quem voa passa por cima
     var ag = !mod.voa && !!seg.agua;
     if (ag !== !!j.agua) { j.agua = ag; e.eventos.push({ tipo: ag ? 'agua' : 'terra', j: j.n }); }
     if (j.chegou) dir *= 0.5;

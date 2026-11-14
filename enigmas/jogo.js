@@ -1,5 +1,5 @@
 /* Enigmatic — regras do jogo, sem tela (funciona no navegador e no Node, para os testes).
-   - Lê as rodadas escritas no rodadas.js ('emoji palavra|word = emoji palavra|word').
+   - Lê as rodadas escritas no rodadas.js ('emoji palavra|word|palabra = emoji palavra|word|palabra').
    - Escolhe a próxima rodada: nunca repete uma rodada antes de passar por todas do nível; sorteia entre as
      próximas JANELA ainda não feitas, na ordem do arquivo (então a dificuldade sobe aos poucos).
    - Partida: embaralha os dois lados (ninguém fica na frente do seu par) e confere cada ligação.
@@ -19,18 +19,24 @@
   J.item = function (txt) {
     var s = String(txt).trim(), i = s.indexOf(' ');
     var e = s.slice(0, i), w = s.slice(i + 1).split('|');
-    return { e: e === '_' ? '' : e, pt: (w[0] || '').trim(), en: (w[1] || '').trim() };
+    return { e: e === '_' ? '' : e, pt: (w[0] || '').trim(), en: (w[1] || '').trim(), es: (w[2] || '').trim() };
   };
 
+  // o código da rodada sai do texto em PT e EN (sem o espanhol, que chegou na v0.3.4): quem já jogou não perde o progresso
+  function semEspanhol(cru) {
+    var so2 = function (s) { return s.split('|').slice(0, 2).join('|'); };
+    return [so2(cru[0])].concat(cru.slice(1).map(function (p) { return p.split(' = ').map(so2).join(' = '); }));
+  }
+
   J.rodada = function (cru, nivel) {
-    var d = cru[0], so = null, m = /^(pt|en):/.exec(d);
+    var d = cru[0], so = null, m = /^(pt|en|es):/.exec(d);
     if (m) { so = m[1]; d = d.slice(3); }
     var dd = d.split('|');
     var pares = cru.slice(1).map(function (p) {
       var lr = p.split(' = ');
       return [J.item(lr[0]), J.item(lr[1])];
     });
-    return { id: nivel + '-' + codigo(cru.join('/')), nivel: nivel, so: so, dica: { pt: dd[0], en: dd[1] }, pares: pares };
+    return { id: nivel + '-' + codigo(semEspanhol(cru).join('/')), nivel: nivel, so: so, dica: { pt: dd[0], en: dd[1], es: dd[2] }, pares: pares };
   };
 
   // rodadas de um nível que valem nesta língua, na ordem do arquivo

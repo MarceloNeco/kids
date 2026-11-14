@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>GLUB GLUB — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#0b3f82">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="GLUB GLUB: pescaria com o Juca e a Lili no lago encantado. O anzol balança: solte na hora certa e pesque os bichos do fundo, que valem mais. Sozinho ou em dois no mesmo aparelho. / GLUB GLUB: fishing with Juca and Lili in the enchanted lake. Drop the swinging hook at the right moment and catch the deep creatures. Alone or two on the same device. / GLUB GLUB: a pescar con Juca y Lili en el lago encantado. Suelta el anzuelo en el momento justo y pesca los animales del fondo. Solo o dos en el mismo aparato.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  GLUB GLUB — pescaria da família Bolinho de Chuva (SolverONE · kids).
+  Regras sem tela (regras.js), desenho em canvas com as imagens 3D de img/ (arte.js), efeitos (som.js), telas e botões
+  (app.js). Música: a trilha comum (../trilha.js). Sem login, sem banco: tudo fica no aparelho.
+  Nada de script inline: a CSP acima não permite. Mapa: LEIA-ME.md. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+<canvas id="lago" aria-label="Lago do GLUB GLUB" data-rotulo="Lago do GLUB GLUB|GLUB GLUB lake|Lago de GLUB GLUB"></canvas>
+
+<section id="menu" class="tela ativa" data-recurso="glub-glub">
+  <div class="painel">
+    <h1 class="logo" aria-label="GLUB GLUB"><span>G</span><span>L</span><span>U</span><span>B</span> <span>G</span><span>L</span><span>U</span><span>B</span></h1>
+    <div class="escolha" role="radiogroup" aria-label="Jeito de jogar" data-rotulo="Jeito de jogar|Game mode|Modo de juego">
+      <button id="btSozinho" class="chip grande-chip" type="button" role="radio" aria-checked="true" data-modo="sozinho" data-t="🎣 Sozinho|🎣 Solo|🎣 Solo"></button>
+      <button id="btDois" class="chip grande-chip" type="button" role="radio" aria-checked="false" data-modo="dois" data-t="👫 Em dois|👫 Two players|👫 Dos jugadores"></button>
+    </div>
+    <div id="linhaSozinho" class="linha">
+      <span class="rotulo" data-t="Quem pesca?|Who's fishing?|¿Quién pesca?"></span>
+      <button class="chip" type="button" role="radio" data-quem="juca" aria-checked="true">👦 Juca</button>
+      <button class="chip" type="button" role="radio" data-quem="lili" aria-checked="false">👧 Lili</button>
+    </div>
+    <div class="linha" id="linhaNivel0">
+      <span class="rotulo" id="rotuloNivel0" data-t="Nível|Level|Nivel"></span>
+      <button class="chip verde" type="button" role="radio" data-nivel-j="0" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+      <button class="chip amarelo" type="button" role="radio" data-nivel-j="0" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+      <button class="chip vermelho" type="button" role="radio" data-nivel-j="0" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+    </div>
+    <div class="linha" id="linhaNivel1" hidden>
+      <span class="rotulo" data-t="Nível da Lili|Lili's level|Nivel de Lili"></span>
+      <button class="chip verde" type="button" role="radio" data-nivel-j="1" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+      <button class="chip amarelo" type="button" role="radio" data-nivel-j="1" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+      <button class="chip vermelho" type="button" role="radio" data-nivel-j="1" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+    </div>
+    <p id="avisoDeitar" class="aviso" hidden data-t="📱↻ Deite o celular para jogar em dois: cada um segura um lado.|📱↻ Turn the phone sideways to play together: each of you holds one side.|📱↻ Pon el móvil en horizontal para jugar dos: cada uno sujeta un lado."></p>
+    <button id="btJogar" class="jogar" type="button" data-t="▶ Pescar!|▶ Let's fish!|▶ ¡A pescar!"></button>
+    <div class="rodape">
+      <button id="btAlbum" class="mini" type="button" data-t="📒 Álbum|📒 Album|📒 Álbum"></button>
+      <button id="btHora" class="mini" type="button" aria-label="Hora do dia">🕒</button>
+      <button id="btAjuda" class="mini" type="button" aria-expanded="false" aria-label="Como brincar" data-rotulo="Como brincar|How to play|Cómo se juega">❓</button>
+      <button id="btEfeitos" class="mini" type="button" aria-label="Sons" data-rotulo="Sons|Sounds|Sonidos">🔊</button>
+      <button id="btInstalar" class="mini" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
+    </div>
+    <div id="ajuda" class="ajuda" hidden>
+      <p data-t="🎣 O anzol balança sozinho. Aperte 🎣 e ele mergulha reto, para o lado em que estava, e pega o primeiro bicho que encostar.|🎣 The hook swings by itself. Press 🎣 and it dives straight, the way it was pointing, catching the first creature it touches.|🎣 El anzuelo se balancea solo. Pulsa 🎣 y se hunde recto, hacia el lado al que apuntaba, y coge lo primero que toque."></p>
+      <p data-t="⬇ Quanto mais fundo, mais vale: o número em cima de cada bicho mostra os pontos. ⬆️ puxa mais rápido (e desiste, se você viu que vai pegar um peixinho).|⬇ The deeper, the more it's worth: the number over each creature shows its points. ⬆️ reels faster (or gives up, if you see a little fish in the way).|⬇ Cuanto más hondo, más vale: el número encima de cada animal indica sus puntos. ⬆️ recoge el sedal más rápido (y te deja rendirte si ves que va a picar un pececito)."></p>
+      <p data-t="🪣 Encha o balde com o que ele pede e ganhe tempo extra. Bolhas trazem poderes: 🕸️ rede, ⚡ anzol ligeiro e 🪱 minhoca dourada. No meio da partida tem o “Limpa o Rio!”: pesque o lixo!|🪣 Fill the bucket with what it asks for to win extra time. Bubbles bring powers: 🕸️ net, ⚡ quick hook and 🪱 golden worm. Halfway through comes “Clean the River!”: fish out the trash!|🪣 Llena el cubo con lo que pide y ganarás tiempo extra. Las burbujas traen poderes: 🕸️ red, ⚡ anzuelo veloz y 🪱 lombriz dorada. A mitad de partida llega “¡Limpia el río!”: ¡pesca la basura!"></p>
+    </div>
+    <p id="versao" class="versao"></p>
+  </div>
+</section>
+
+<section id="jogo" class="tela" data-recurso="glub-glub">
+  <div id="hud" class="hud">
+    <div class="placar esq" id="placar0"><span class="nome">Juca</span><b id="pontos0">0</b><div class="balde" id="balde0" aria-label="Balde" data-rotulo="Balde|Bucket|Cubo"></div></div>
+    <div class="relogio" id="relogio" aria-label="Tempo" data-rotulo="Tempo|Time|Tiempo">60</div>
+    <div class="placar dir" id="placar1"><span class="nome">Lili</span><b id="pontos1">0</b><div class="balde" id="balde1" aria-label="Balde" data-rotulo="Balde|Bucket|Cubo"></div></div>
+  </div>
+  <p id="faixa" class="faixa" role="status" aria-live="polite" hidden></p>
+  <div class="controles esq" id="controles0">
+    <button id="subir0" class="bt-subir" type="button" aria-label="Puxar a linha" data-rotulo="Puxar a linha|Reel in|Recoger el sedal">⬆️</button>
+    <button id="pescar0" class="bt-pescar" type="button" aria-label="Pescar" data-rotulo="Pescar|Fish|Pescar">🎣</button>
+  </div>
+  <div class="controles dir" id="controles1">
+    <button id="pescar1" class="bt-pescar" type="button" aria-label="Pescar" data-rotulo="Pescar|Fish|Pescar">🎣</button>
+    <button id="subir1" class="bt-subir" type="button" aria-label="Puxar a linha" data-rotulo="Puxar a linha|Reel in|Recoger el sedal">⬆️</button>
+  </div>
+</section>
+
+<section id="album" class="tela" data-recurso="glub-glub">
+  <div class="album-caixa">
+    <h2 data-t="📒 Álbum de figurinhas|📒 Sticker album|📒 Álbum de cromos"></h2>
+    <p id="albumConta" class="album-conta"></p>
+    <div id="grade" class="grade"></div>
+  </div>
+</section>
+
+<div id="fim" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
+  <div class="fim-caixa">
+    <h2 id="fimTitulo"></h2>
+    <div id="fimPlacar" class="fim-placar"></div>
+    <p id="fimTime" class="fim-time"></p>
+    <div id="fimNovas" class="fim-novas"></div>
+    <div class="fim-botoes">
+      <button id="btDeNovo" class="jogar" type="button" data-t="🔄 Pescar de novo|🔄 Fish again|🔄 Pescar otra vez"></button>
+      <button id="btFimMenu" class="mini" type="button" data-t="🏠 Começo|🏠 Start|🏠 Inicio"></button>
+    </div>
+  </div>
+</div>
+
+<section id="desligado" class="tela" hidden>
+  <h2 data-t="O GLUB GLUB está descansando agora.|GLUB GLUB is resting right now.|GLUB GLUB está descansando ahora."></h2>
+</section>
+
+<script src="regras.js"></script>
+<script src="arte.js"></script>
+<script src="som.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

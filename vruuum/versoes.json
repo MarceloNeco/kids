@@ -2,9 +2,9 @@
   "app": "vruuum",
   "versoes": [
     {
-      "versao": "1.17.0",
+      "versao": "1.18.0",
       "data": "14/Nov/2026",
-      "hora": "12:36:00",
+      "hora": "15:45:00",
       "pt": [
         "🌊 Rios na pista: a estrada vira água e o veículo vira barco, com boias amarelas no lugar das rodas, espuma e borrifos (os bichos nadam). Na água tem boias, redemoinhos, setas azuis de turbo e lanchinhas.",
         "🗺️ Mapinha redondo no canto: a pista inteira vista de cima, com os rios em azul, a chegada e a bolinha de cada um."
@@ -12,6 +12,24 @@
       "en": [
         "🌊 Rivers on the track: the road turns into water and your ride turns into a boat, with yellow floats instead of wheels, foam and spray (animals swim). On the water there are buoys, whirlpools, blue turbo arrows and little speedboats.",
         "🗺️ Little round map in the corner: the whole track from above, with rivers in blue, the finish and a dot for everyone."
+      ],
+      "es": [
+        "🌊 Ríos en la pista: la carretera se convierte en agua y tu vehículo en un barco, con flotadores amarillos en vez de ruedas, espuma y salpicaduras (los animales nadan). En el agua hay boyas, remolinos, flechas azules de turbo y lanchas pequeñas.",
+        "🗺️ Mapa redondo en la esquina: toda la pista vista desde arriba, con los ríos en azul, la meta y un puntito para cada uno."
+      ]
+    },
+    {
+      "versao": "1.17.0",
+      "data": "14/Nov/2026",
+      "hora": "15:20:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante. O jogo abre no idioma escolhido lá e não tem mais botão de idioma próprio."
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, picked on the home page. The game opens in the language chosen there and no longer has its own language button."
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la página de inicio. El juego se abre en el idioma elegido allí y ya no tiene su propio botón de idioma."
       ]
     },
     {

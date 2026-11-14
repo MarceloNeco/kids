@@ -27,6 +27,7 @@ test('quantidades por nível: Fácil usa as do Fácil, Médio e Difícil as comp
   assert.equal(L.quantidade(r, 'facil', 'fermento'), 0);
   assert.equal(L.nomeQtd('ovo', 1, false), '1 ovo'); assert.equal(L.nomeQtd('ovo', 3, false), '3 ovos');
   assert.equal(L.nomeQtd('farinha', 2, true), '2 cups of flour');
+  assert.equal(L.nomeQtd('farinha', 2, 'es'), '2 tazas de harina'); assert.equal(L.nomeQtd('ovo', 1, 'es'), '1 huevo'); assert.equal(L.nomeQtd('ovo', 3, 'pt'), '3 ovos');
 });
 
 test('lugares: onde achar cada coisa e os lugares que ainda ajudam', () => {
@@ -130,4 +131,25 @@ test('estrelas: 3 sem erros, menos com muitos erros ou se ficou de noite, nunca 
   assert.equal(L.estrelas({ erros: 6 }), 1);
   assert.equal(L.estrelas({ erros: 0, atrasou: true }), 2);
   assert.equal(L.estrelas({ erros: 20, atrasou: true }), 1);
+});
+
+test('família à mesa (v0.8.0): a receita serve 2; mais gente multiplica as quantidades e as moedas; o nível limita quantos', () => {
+  const r = D.receita['bolo-cenoura'];
+  assert.equal(L.fatorDe(1), 1); assert.equal(L.fatorDe(2), 1); assert.equal(L.fatorDe(3), 2); assert.equal(L.fatorDe(4), 2); assert.equal(L.fatorDe(6), 3);
+  assert.equal(L.quantidade(r, 'medio', 'ovo', 2), 6, '4 pessoas: o dobro de ovos');
+  assert.deepEqual(L.ingredientesDoNivel(r, 'facil', 1), L.ingredientesDoNivel(r, 'facil'));
+  assert.ok(L.moedasIniciais(r, 'medio', 2) > L.moedasIniciais(r, 'medio', 1), 'mais gente, mais moedas');
+  assert.ok(L.moedasIniciais(r, 'dificil', 3) >= L.custoSoMercado(r, 'dificil', 3), 'as moedas dão para tudo');
+  assert.equal(L.maxPessoas('facil'), 2); assert.equal(L.maxPessoas('medio'), 4); assert.equal(L.maxPessoas('dificil'), 6);
+  // "eu" sempre; no Fácil só mais uma pessoa (a nova entra no lugar da outra)
+  assert.deepEqual(L.alternarPessoa(['eu'], 'mamae', 'facil'), ['eu', 'mamae']);
+  assert.deepEqual(L.alternarPessoa(['eu', 'mamae'], 'papai', 'facil'), ['eu', 'papai']);
+  assert.deepEqual(L.alternarPessoa(['eu', 'mamae', 'papai'], 'mamae', 'medio'), ['eu', 'papai'], 'tocar de novo tira');
+  assert.deepEqual(L.alternarPessoa(['eu', 'mamae'], 'eu', 'medio'), ['eu', 'mamae'], 'eu não sai');
+  let l = ['eu']; for (const id of ['mamae', 'papai', 'vovo-a', 'vovo-o', 'irmao', 'irma']) l = L.alternarPessoa(l, id, 'dificil');
+  assert.equal(l.length, 6); assert.equal(l[0], 'eu');
+  // o texto do passo mostra a quantidade das porções
+  const p = L.passosDoNivel(r, 'medio').find(x => x.id === 'liq');
+  assert.match(L.textoPasso(p, r, 'medio', false, 2), /6 ovos/);
+  for (const f of D.FAMILIA) assert.ok(f.pt && f.en && /^#[0-9a-f]{6}$/i.test(f.cor) && f.cabelo, f.id);
 });

@@ -174,7 +174,7 @@
       segs[t[0]].entrada = true;
     });
 
-    // rios (1.17.0, vídeo do dono): trechos em que a estrada vira água e os veículos viram barco. Longe dos túneis,
+    // rios (1.18.0, vídeo do dono): trechos em que a estrada vira água e os veículos viram barco. Longe dos túneis,
     // dos loopings, dos portais, da largada e da chegada. Na água o cone vira boia, a lama vira redemoinho e o turbo
     // vira setas de turbo (desenho.js); a regra do jogo é a mesma.
     var rios = []; tentativas = 0;

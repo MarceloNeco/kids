@@ -42,7 +42,7 @@
 (function (raiz) {
   'use strict';
   var T = {};
-  function t(pt, en) { try { return /^en/i.test(document.documentElement.lang) ? en : pt; } catch (e) { return pt; } }
+  function t(pt, en, es) { try { var l = document.documentElement.lang || ''; return /^en/i.test(l) ? en : /^es/i.test(l) ? (es || pt) : pt; } catch (e) { return pt; } }
   function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function gravar(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
 
@@ -65,7 +65,11 @@
     'batalha-naval': 'vruuum/musicas/heroic-age.mp3',
     enigmas: 'baguncolandia/musicas/happy-whistling-ukulele.mp3',
     labirinto: 'peluqueria/musicas/beachfront-celebration.mp3',
-    cozinha: 'rabiscolandia/musicas/mariachi-snooze.mp3'
+    cozinha: 'rabiscolandia/musicas/mariachi-snooze.mp3',
+    'a-garra': 'baguncolandia/musicas/my-giant-bunny-friend.mp3',
+    aqua: 'purpurina/musicas/c-funk.mp3',
+    'quem-e': 'rabiscolandia/musicas/fluffing-a-duck.mp3',
+    'glub-glub': 'baguncolandia/musicas/spring-chicken.mp3'
   };
   O.FAVORITAS = {};
   Object.keys(FAV).forEach(function (k) { O.FAVORITAS[k] = completo(FAV[k]); });
@@ -133,10 +137,10 @@
       '@media (max-width:30rem){.trilha .tr-nome{max-width:7rem}}';
     document.head.appendChild(st);
     var bar = document.createElement('div');
-    bar.className = 'trilha'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', t('Música', 'Music'));
-    bar.innerHTML = '<button type="button" class="tr-abrir" aria-label="' + t('Música', 'Music') + '">🎵</button>' +
+    bar.className = 'trilha'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', t('Música', 'Music', 'Música'));
+    bar.innerHTML = '<button type="button" class="tr-abrir" aria-label="' + t('Música', 'Music', 'Música') + '">🎵</button>' +
       '<button type="button" class="tr-som"></button><button type="button" class="tr-prox" aria-label="' +
-      t('Próxima música', 'Next song') + '">⏭</button><span class="tr-nome" aria-live="polite"></span>';
+      t('Próxima música', 'Next song', 'Siguiente canción') + '">⏭</button><span class="tr-nome" aria-live="polite"></span>';
     document.body.appendChild(bar);
     var bSom = bar.querySelector('.tr-som'), nome = bar.querySelector('.tr-nome');
 
@@ -144,11 +148,11 @@
     function pintar() {
       var tocando = !audio.paused;
       bSom.textContent = tocando ? '🔊' : '🔇';
-      bSom.setAttribute('aria-label', tocando ? t('Desligar a música', 'Turn music off') : t('Ligar a música', 'Turn music on'));
+      bSom.setAttribute('aria-label', tocando ? t('Desligar a música', 'Turn the music off', 'Apagar la música') : t('Ligar a música', 'Turn the music on', 'Encender la música'));
       var m = naFavorita ? favoritaDaLista() : lista[atual];
       nome.innerHTML = '';
       nome.appendChild(document.createTextNode('🎵 ' + m.t + ' · ' + m.au + ' · ' + m.lic + ' '));
-      if (op.creditos) { var a = document.createElement('a'); a.href = op.creditos; a.target = '_blank'; a.rel = 'noopener'; a.textContent = t('créditos', 'credits'); nome.appendChild(a); }
+      if (op.creditos) { var a = document.createElement('a'); a.href = op.creditos; a.target = '_blank'; a.rel = 'noopener'; a.textContent = t('créditos', 'credits', 'créditos'); nome.appendChild(a); }
     }
     function carregar(n) { naFavorita = false; audio.loop = false; atual = (n + lista.length) % lista.length; audio.src = lista[atual].a; pintar(); }
     function favoritaDaLista() {

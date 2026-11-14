@@ -13,9 +13,10 @@ test('versão igual nos três lugares: app.js, sw.js e a primeira entrada de ver
   const v = JSON.parse(ler('versoes.json'));
   assert.equal(v.app, 'enigmas');
   assert.equal(a, s); assert.equal(v.versoes[0].versao, a);
-  for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v.versoes[0][k], 'versoes.json sem ' + k);
+  for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v.versoes[0][k], 'versoes.json sem ' + k);
   assert.match(v.versoes[0].data, /^\d{2}\/(Jan|Fev|Mar|Abr|Mai|Jun|Jul|Ago|Set|Out|Nov|Dez)\/\d{4}$/);
   assert.equal(v.versoes[0].pt.length, v.versoes[0].en.length, 'PT e EN com o mesmo número de itens');
+  assert.equal(v.versoes[0].pt.length, v.versoes[0].es.length, 'PT e ES com o mesmo número de itens');
 });
 
 test('sw.js: cache com o nome do app e guarda todos os arquivos publicados', () => {
@@ -30,14 +31,17 @@ test('sw.js: cache com o nome do app e guarda todos os arquivos publicados', () 
   for (const f of ['../recursos.js', '../atualizar.js', '../telacheia.js', '../janela.js', '../trilha.js']) assert.ok(lista.includes(f), 'sw.js não guarda ' + f);
 });
 
-test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN', () => {
+test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES', () => {
   const html = ler('index.html');
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
   for (const m of html.matchAll(/<script src="([^"]+)"/g)) assert.ok(fs.existsSync(path.join(pasta, m[1])), m[1]);
   assert.match(html, /<script src="\.\.\/recursos\.js" data-app="kids"/, 'interruptores do RootifyONE como nos outros jogos');
   assert.ok((html.match(/data-recurso="enigmas"/g) || []).length >= 2, 'as duas telas obedecem o interruptor "enigmas"');
-  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'texto sem as três línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-rotulo="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'rótulo sem as três línguas: ' + m[1]);
+  assert.ok(!/aria-label="[^"]* \/ [^"]*"/.test(html), 'rótulo "PT / EN" fixo: use data-rotulo="PT|EN|ES"');
+  assert.ok(!html.includes('id="btLingua"'), 'o idioma é escolhido só na estante: nada de botão de idioma no jogo');
   // a ordem importa: dados e regras antes do app; janela.js antes de quem abre janela
   const ordem = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
   assert.ok(ordem.indexOf('rodadas.js') < ordem.indexOf('app.js') && ordem.indexOf('jogo.js') < ordem.indexOf('app.js'));
@@ -50,9 +54,19 @@ test('ids usados no app.js existem no index.html', () => {
   for (const n of ['Facil', 'Medio', 'Dificil']) { assert.ok(html.includes('id="bt' + n + '"')); assert.ok(html.includes('id="prog' + n + '"')); }
 });
 
-test('textos t(pt, en) do app sempre nas duas línguas', () => {
-  const js = ler('app.js');
+test('textos t(pt, en, es) do app sempre nas três línguas', () => {
+  const js = ler('app.js'), S = "'(?:[^'\\\\]|\\\\.)*'";
   for (const m of js.matchAll(/\bt\('((?:[^'\\]|\\.)*)'\s*\)/g)) assert.fail('t() só com uma língua: ' + m[1]);
+  for (const m of js.matchAll(new RegExp('\\bt\\(\\s*' + S + '\\s*,\\s*' + S + '\\s*\\)', 'g'))) assert.fail('t() sem o espanhol: ' + m[0]);
+});
+
+test('idioma vem da estante (BolinhoIdioma) e a voz fala no idioma escolhido', () => {
+  const js = ler('app.js');
+  assert.match(js, /BolinhoIdioma\.atual\(\)/);
+  assert.match(js, /BolinhoIdioma\.aoMudar\(/);
+  assert.match(js, /u\.lang = window\.BolinhoIdioma \? BolinhoIdioma\.voz\(\)/);
+  assert.ok(!/navigator\.language/.test(js), 'o jogo não adivinha mais o idioma');
+  assert.ok(!/pref\.lingua\s*=/.test(js), 'o jogo não guarda mais o idioma nas preferências');
 });
 
 test('música: pelo menos 10 faixas da trilha comum, todas existem, mais baixinha e com crédito', () => {
@@ -96,7 +110,7 @@ test('documentos do app existem', () => {
   for (const f of ['LEIA-ME.md', 'PENDENCIAS.md', 'CREDITOS.md', 'fontes/OFL.txt', 'icone.svg']) assert.ok(fs.existsSync(path.join(pasta, f)), 'falta ' + f);
 });
 
-test('nome Enigmatic (igual em PT e EN) na página, no manifesto, na barra de instalar, na estante e no interruptor', () => {
+test('nome Enigmatic (igual em PT, EN e ES) na página, no manifesto, na barra de instalar, na estante e no interruptor', () => {
   const html = ler('index.html'), m = JSON.parse(ler('manifest.webmanifest'));
   assert.match(html, /<title>Enigmatic — /);
   assert.match(html, /<h1 class="titulo" aria-label="Enigmatic">/);
@@ -105,6 +119,7 @@ test('nome Enigmatic (igual em PT e EN) na página, no manifesto, na barra de in
   const cat = fs.readFileSync(path.join(pasta, '..', 'catalogo.js'), 'utf8');
   assert.match(cat, /\{ id: 'enigmas', nome: 'Enigmatic', [^}]*url: '\/kids\/enigmas\/'/, 'cartão da estante (mesmo id e endereço)');
   const rec = JSON.parse(fs.readFileSync(path.join(pasta, '..', 'recursos-do-app.json'), 'utf8')).recursos.find(r => r.id === 'enigmas');
-  assert.deepEqual(rec.nome, { pt: 'Enigmatic', en: 'Enigmatic' });
+  assert.equal(rec.nome.pt, 'Enigmatic'); assert.equal(rec.nome.en, 'Enigmatic');
+  if (rec.nome.es) assert.equal(rec.nome.es, 'Enigmatic');   // o mesmo nome nas três línguas
   assert.equal(rec.pagina, 'enigmas/');
 });

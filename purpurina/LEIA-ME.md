@@ -113,8 +113,11 @@ música** (fica guardado no aparelho: ao abrir de novo, continua sem; os efeitos
 
 ## O que fica guardado (só neste aparelho)
 
-`purpurina.pref` (idioma) · `purpurina.atual` (o visual do brincar livre) · `purpurina.looks` (favoritos) ·
+`purpurina.atual` (o visual do brincar livre) · `purpurina.looks` (favoritos) ·
 `purpurina.estrelas.<desafio>` (melhor nota). Nada vai para a internet; não há login, cookie nem coleta.
+O idioma (português, inglês ou espanhol) é escolhido só na estante do Bolinho de Chuva (`../idioma.js`); o jogo não tem
+botão de idioma próprio. Textos da tela: `data-t="pt|en|es"` e `data-rotulo="pt|en|es"` (aria-label) no `index.html`;
+no código, `t(pt, en, es)`; peças e desafios com `pt`, `en` e `es` no `pecas.js`.
 
 ## Mapa dos arquivos
 

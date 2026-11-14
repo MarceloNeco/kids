@@ -5,9 +5,16 @@
     - 🚪 Saída: sempre à vista; sai do jogo. Com uma partida rolando, pergunta antes. No aplicativo instalado tenta
       fechar a janela; se ela continuar aberta (ou numa aba do navegador, que não se fecha sozinha), vai para a
       estante do Bolinho de Chuva (/kids/).
-    - Voltar do celular: numa tela de dentro faz o mesmo que o 🏠; na tela de começo sai do jogo (volta para a página de
-      antes, normalmente a estante; no app instalado, fecha). A maioria dos jogos já cuida do Voltar (pushState/popstate);
-      quem não cuida passa cuidarDoVoltar: true e este arquivo põe uma entrada no histórico ao sair da tela de começo.
+    - Voltar do celular: numa tela de dentro faz o mesmo que o 🏠; na tela de começo NÃO sai direto (diretriz): avisa
+      "Toque em Voltar de novo para sair" e só o segundo Voltar sai (volta para a página de antes, normalmente a estante;
+      no app instalado, fecha). A maioria dos jogos já cuida do Voltar (pushState/popstate); quem não cuida passa
+      cuidarDoVoltar: true e este arquivo põe uma entrada no histórico ao sair da tela de começo.
+    - Guarda (dono, 14/Nov/2026: "o Voltar às vezes acaba com o progresso e cai na home do celular"): no primeiro toque
+      na tela de começo, este arquivo põe uma entrada de guarda no histórico (com toque, porque o Chrome do celular pula
+      as entradas criadas sem toque — era isso que fazia o Voltar atravessar o jogo e fechar o app). Se o Voltar chegar
+      na guarda com o jogo numa tela de dentro (alguma entrada do jogo foi pulada), o jogo volta ao começo em vez de
+      fechar. Na tela de começo, sair da guarda mostra o aviso; a guarda volta no próximo toque. O jogo que já faz o
+      próprio aviso passa guarda: false.
   Cada jogo inclui, no index.html, logo depois do idioma.js (sem defer: o app.js do jogo chama BolinhoNav.iniciar):
       <script src="../navegacao.js" data-fora-do-arquivo></script>
   põe '../navegacao.js' na lista ARQUIVOS do sw.js e, no app.js:
@@ -18,6 +25,7 @@
         emAndamento: function () { return partidaRolando; },      // opcional: pergunta antes de sair
         antesDeSair: function () { ... },                         // opcional: arrumar antes de sair (ex.: avisar a rede)
         cuidarDoVoltar: false,                                     // true = o jogo não mexe no histórico
+        guarda: true,                                              // false = o jogo já avisa "Voltar de novo para sair"
         posicao: 'topo-esquerda',                                  // ou 'topo-direita', se o canto esquerdo é do jogo
         desvio: { x: 0, y: 0 },                                    // opcional: afastar da borda (px)
         esconder: function () { return false; }                   // opcional: some (ex.: TV). Padrão: some com ?tv=
@@ -25,8 +33,7 @@
   Para o jogo abrir espaço para a barra, ela publica no <html>: as classes "bn-nav" (barra à vista) e "bn-dentro"
   (🏠 à vista), e as medidas --nav-alto (do topo da tela até embaixo da barra, com folga) e --nav-largo (da borda até
   o fim da barra, com folga). Ex.: .bn-nav .barra { padding-left: var(--nav-largo); }
-  Texto em português; o inglês ("Home", "Exit") só com o <html lang="en">, que os jogos só usam com o interruptor
-  "ingles" ligado (idioma.js), e o .en some com o idioma.js.
+  Texto no idioma do <html lang> que o jogo põe (pt-BR, en ou es), que vem da escolha da estante (idioma.js).
 */
 (function (raiz) {
   'use strict';
@@ -36,10 +43,12 @@
   var ESTANTE = (function () { try { return new URL('./', script && script.src ? script.src : location.href).href; } catch (e) { return '/kids/'; } })();
   var cfg = null, barra = null, btCasa = null, btSaida = null, aviso = null;
   var empurrado = false, ignorar = 0, ultimoInicio = null;
+  var guarda = false, naGuarda = false, avisoVoltar = null, avisoTimer = 0;
+  var hPush = history.pushState, hReplace = history.replaceState;
 
   function chamar(fn, padrao) { try { return typeof fn === 'function' ? fn() : padrao; } catch (e) { return padrao; } }
   function noInicio() { return !!chamar(cfg.noInicio, true); }
-  function ingles() { return /^en/i.test(el.lang || ''); }
+  function lingua() { var l = (el.lang || '').toLowerCase(); return l.indexOf('en') === 0 ? 'en' : l.indexOf('es') === 0 ? 'es' : 'pt'; }
   function instalado() {
     var mm = raiz.matchMedia;
     return !!(mm && (mm('(display-mode: standalone)').matches || mm('(display-mode: fullscreen)').matches || raiz.navigator.standalone));
@@ -49,7 +58,12 @@
     return /[?&]tv=/.test(location.search);
   }
 
-  var CSS = '.bolinho-nav{position:fixed;z-index:2147482000;top:calc(env(safe-area-inset-top,0px) + 6px);' +
+  var CSS = '.bolinho-voltar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);z-index:2147482001;' +
+    'transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:calc(100% - 32px);padding:12px 18px;border-radius:999px;' +
+    'background:rgba(14,12,28,.92);color:#fff;border:1.5px solid rgba(255,255,255,.55);box-shadow:0 4px 16px rgba(0,0,0,.4);' +
+    'font:700 16px/1.25 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;text-align:center;transition:opacity .2s,transform .2s}' +
+    '.bolinho-voltar.ver{opacity:1;transform:translate(-50%,0)}' +
+    '.bolinho-nav{position:fixed;z-index:2147482000;top:calc(env(safe-area-inset-top,0px) + 6px);' +
     'display:flex;align-items:center;gap:2px;padding:2px;border-radius:999px;background:rgba(14,12,28,.78);' +
     'border:1.5px solid rgba(255,255,255,.55);box-shadow:0 2px 10px rgba(0,0,0,.35);' +
     '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);font:700 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
@@ -62,7 +76,7 @@
     '.bolinho-nav .bn-saida{gap:4px;padding:0 10px 0 6px}.bolinho-nav .bn-saida .i{font-size:20px}' +
     '.bolinho-nav button:hover{background:rgba(255,255,255,.14)}.bolinho-nav button:active{background:rgba(255,255,255,.26)}' +
     '.bolinho-nav button:focus-visible{outline:3px solid #ffd54a;outline-offset:1px}' +
-    'html[lang^=en] .bolinho-nav .bn-pt,html:not([lang^=en]) .bolinho-nav .bn-en{display:none}' +
+    'html[lang^=en] .bolinho-nav .bn-pt,html[lang^=es] .bolinho-nav .bn-pt,html:not([lang^=en]) .bolinho-nav .bn-en,html:not([lang^=es]) .bolinho-nav .bn-es{display:none}' +
     '.bolinho-sair{position:fixed;inset:0;z-index:2147483200;display:flex;align-items:center;justify-content:center;padding:16px;' +
     'background:rgba(0,0,0,.55);font:600 17px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
     '.bolinho-sair[hidden]{display:none}' +
@@ -74,7 +88,7 @@
     '@media (prefers-reduced-motion:no-preference){.bolinho-sair .c{animation:bnSobe .2s ease-out}}' +
     '@keyframes bnSobe{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}';
 
-  function txt(pt, en) { return ingles() ? en : pt; }
+  function txt(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? es : pt; }
 
   function criar() {
     var st = d.createElement('style'); st.id = 'bolinho-nav-estilo'; st.textContent = CSS; d.head.appendChild(st);
@@ -82,7 +96,7 @@
     barra.className = 'bolinho-nav ' + (cfg.posicao === 'topo-direita' ? 'dir' : 'esq');
     barra.setAttribute('aria-label', 'Navegação');
     barra.innerHTML = '<button type="button" class="bn-casa" hidden><span aria-hidden="true">🏠</span></button>' +
-      '<button type="button" class="bn-saida"><span class="i" aria-hidden="true">🚪</span><span class="bn-pt">Saída</span><span class="en bn-en">Exit</span></button>';
+      '<button type="button" class="bn-saida"><span class="i" aria-hidden="true">🚪</span><span class="bn-pt">Saída</span><span class="bn-en">Exit</span><span class="bn-es">Salir</span></button>';
     var dx = (cfg.desvio && cfg.desvio.x) || 0, dy = (cfg.desvio && cfg.desvio.y) || 0;
     if (dy) barra.style.top = 'calc(env(safe-area-inset-top,0px) + ' + (6 + dy) + 'px)';
     if (dx) barra.style[cfg.posicao === 'topo-direita' ? 'right' : 'left'] = 'calc(env(safe-area-inset-' + (cfg.posicao === 'topo-direita' ? 'right' : 'left') + ',0px) + ' + (6 + dx) + 'px)';
@@ -122,10 +136,10 @@
       aviso.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); fecharAviso(); } });
       d.body.appendChild(aviso);
     }
-    aviso.querySelector('.t').textContent = txt('🚪 Sair do jogo?', '🚪 Leave the game?');
-    aviso.querySelector('.x').textContent = txt('A brincadeira que está rolando vai parar.', 'The game in progress will stop.');
-    aviso.querySelector('.sim').textContent = txt('🚪 Sair', '🚪 Leave');
-    aviso.querySelector('.nao').textContent = txt('▶ Continuar brincando', '▶ Keep playing');
+    aviso.querySelector('.t').textContent = txt('🚪 Sair do jogo?', '🚪 Leave the game?', '🚪 ¿Salir del juego?');
+    aviso.querySelector('.x').textContent = txt('A brincadeira que está rolando vai parar.', 'The game you\'re playing will stop.', 'El juego que está en marcha se va a detener.');
+    aviso.querySelector('.sim').textContent = txt('🚪 Sair', '🚪 Leave', '🚪 Salir');
+    aviso.querySelector('.nao').textContent = txt('▶ Continuar brincando', '▶ Keep playing', '▶ Seguir jugando');
     aviso.hidden = false;
     setTimeout(function () { aviso.querySelector('.nao').focus(); }, 30);
   }
@@ -145,7 +159,45 @@
     if (!inicio && !empurrado) { empurrado = true; try { history.pushState({ bolinhoNav: 1 }, ''); } catch (e) { empurrado = false; } }
     else if (inicio && empurrado) { empurrado = false; ignorar++; history.back(); }   // o jogo voltou ao início sozinho
   }
-  raiz.addEventListener('popstate', function () {
+  // ---------- guarda do Voltar (todos os jogos, menos quem passa guarda: false) ----------
+  function usarGuarda() { return cfg && cfg.guarda !== false && !escondida(); }
+  // o jogo empilhou uma tela: saímos da guarda. replaceState em cima da guarda não pode apagar a marca dela.
+  try {
+    history.pushState = function () { naGuarda = false; return hPush.apply(history, arguments); };
+    history.replaceState = function (st, t, u) {
+      if (naGuarda) st = Object.assign({}, (st && typeof st === 'object') ? st : {}, { bolinhoGuarda: 1 });
+      return arguments.length > 2 ? hReplace.call(history, st, t, u) : hReplace.call(history, st, t);
+    };
+  } catch (e) { /* navegador antigo: fica sem guarda */ }
+  function armarGuarda() {
+    if (guarda || !usarGuarda() || !noInicio()) return;
+    guarda = true; naGuarda = true;
+    try { hPush.call(history, { bolinhoGuarda: 1 }, ''); } catch (e) { guarda = naGuarda = false; }
+  }
+  ['pointerdown', 'keydown'].forEach(function (ev) { d.addEventListener(ev, armarGuarda, true); });
+  function avisarVoltar() {
+    if (!avisoVoltar) {
+      avisoVoltar = d.createElement('div');
+      avisoVoltar.className = 'bolinho-voltar'; avisoVoltar.setAttribute('role', 'status'); avisoVoltar.setAttribute('aria-live', 'polite');
+      d.body.appendChild(avisoVoltar);
+    }
+    avisoVoltar.textContent = txt('↩️ Toque em Voltar de novo para sair', '↩️ Tap Back again to leave', '↩️ Toca Atrás otra vez para salir');
+    avisoVoltar.classList.add('ver');
+    clearTimeout(avisoTimer); avisoTimer = setTimeout(function () { avisoVoltar.classList.remove('ver'); }, 2500);
+  }
+  raiz.addEventListener('popstate', function (ev) {
+    if (cfg && usarGuarda()) {
+      var st = ev.state || history.state;
+      if (st && st.bolinhoGuarda) {
+        naGuarda = true;
+        // chegou na guarda: tudo do jogo acima dela já saiu. Se o jogo ficou numa tela de dentro (o Chrome pulou a
+        // entrada dele), volta ao começo em vez de deixar o próximo Voltar fechar o app.
+        setTimeout(function () { if (naGuarda && !noInicio()) { chamar(cfg.irParaInicio); atualizar(); } }, 0);
+      } else if (naGuarda) {
+        naGuarda = false; guarda = false;
+        if (!ignorar && noInicio()) avisarVoltar();   // saiu da guarda na tela de começo: o próximo Voltar sai
+      }
+    }
     if (aviso && !aviso.hidden) fecharAviso();
     if (!cfg || !cfg.cuidarDoVoltar) { setTimeout(atualizar, 0); return; }
     if (ignorar) { ignorar--; return; }
@@ -158,8 +210,8 @@
     var some = escondida(), inicio = noInicio();
     barra.hidden = some;
     btCasa.hidden = inicio;
-    btCasa.setAttribute('aria-label', txt('Início', 'Home')); btCasa.title = btCasa.getAttribute('aria-label');
-    btSaida.setAttribute('aria-label', txt('Saída', 'Exit')); btSaida.title = txt('Sair do jogo', 'Leave the game');
+    btCasa.setAttribute('aria-label', txt('Início', 'Home', 'Inicio')); btCasa.title = btCasa.getAttribute('aria-label');
+    btSaida.setAttribute('aria-label', txt('Saída', 'Exit', 'Salir')); btSaida.title = txt('Sair do jogo', 'Leave the game', 'Salir del juego');
     el.classList.toggle('bn-nav', !some);
     el.classList.toggle('bn-dentro', !some && !inicio);
     var r = some ? null : barra.getBoundingClientRect();

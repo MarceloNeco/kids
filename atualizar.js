@@ -38,8 +38,8 @@
     '.sa-aviso button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}' +
     '@media (prefers-reduced-motion:reduce){.sa-aviso{transition:none}}';
 
-  // sem o interruptor "ingles" do RootifyONE (idioma.js): só o português
-  function L(pt, en) { return window.BolinhoIdioma && !window.BolinhoIdioma.ingles() ? pt : pt + ' / ' + en; }
+  // no idioma escolhido na estante (idioma.js)
+  function L(pt, en, es) { return window.BolinhoIdioma ? window.BolinhoIdioma.t(pt, en, es) : pt; }
 
   function avisar(v) {
     if (document.querySelector('.sa-aviso')) return;
@@ -51,17 +51,17 @@
     caixa.setAttribute('role', 'status');
     caixa.setAttribute('aria-live', 'polite');
     var txt = document.createElement('span');
-    txt.textContent = '✨ Versão nova do ' + nome + ' (' + v.versao + ')';
+    txt.textContent = L('✨ Versão nova do ', '✨ New version of ', '✨ Versión nueva de ') + nome + ' (' + v.versao + ')';
     var sim = document.createElement('button');
-    sim.type = 'button'; sim.className = 'sa-sim'; sim.textContent = L('Atualizar', 'Update');
+    sim.type = 'button'; sim.className = 'sa-sim'; sim.textContent = L('Atualizar', 'Update', 'Actualizar');
     var nao = document.createElement('button');
-    nao.type = 'button'; nao.className = 'sa-nao'; nao.textContent = L('Depois', 'Later');
+    nao.type = 'button'; nao.className = 'sa-nao'; nao.textContent = L('Depois', 'Later', 'Después');
     caixa.appendChild(txt); caixa.appendChild(sim); caixa.appendChild(nao);
     document.body.appendChild(caixa);
     requestAnimationFrame(function () { caixa.classList.add('sa-ver'); });
     sim.addEventListener('click', function (e) {
       e.stopPropagation();
-      sim.disabled = true; sim.textContent = L('Atualizando…', 'Updating…');
+      sim.disabled = true; sim.textContent = L('Atualizando…', 'Updating…', 'Actualizando…');
       atualizar();
     });
     nao.addEventListener('click', function (e) {

@@ -1180,20 +1180,20 @@
 
   // ---------- lista (a ordem é a ordem dos botões) ----------
   var LISTA = [
-    { id: 'praia', pt: 'Praia', en: 'Beach', ico: '🏖️', vivo: true },
-    { id: 'campo', pt: 'Campo', en: 'Meadow', ico: '🌼', vivo: true },
-    { id: 'fundo-do-mar', pt: 'Fundo do mar', en: 'Under the sea', ico: '🐠', vivo: true },
-    { id: 'espaco', pt: 'Espaço', en: 'Space', ico: '🪐', vivo: true },
-    { id: 'cidade-noite', pt: 'Cidade à noite', en: 'City at night', ico: '🌃', vivo: true },
-    { id: 'floresta', pt: 'Floresta', en: 'Forest', ico: '🌳', vivo: true },
-    { id: 'neve', pt: 'Neve', en: 'Snow', ico: '⛄', vivo: true },
-    { id: 'castelo', pt: 'Castelo', en: 'Castle', ico: '🏰', vivo: true },
-    { id: 'ceu-arco-iris', pt: 'Céu de arco-íris', en: 'Rainbow sky', ico: '🌈', vivo: true },
-    { id: 'fazenda', pt: 'Fazenda', en: 'Farm', ico: '🚜', vivo: true },
-    { id: 'doces', pt: 'Terra dos doces', en: 'Candy land', ico: '🍭', vivo: true },
-    { id: 'dinossauros', pt: 'Dinossauros', en: 'Dinosaurs', ico: '🦕', vivo: true },
-    { id: 'jardim', pt: 'Jardim', en: 'Garden', ico: '🌻', vivo: true },
-    { id: 'por-do-sol', pt: 'Pôr do sol', en: 'Sunset', ico: '🌅', vivo: true }
+    { id: 'praia', pt: 'Praia', en: 'Beach', es: 'Playa', ico: '🏖️', vivo: true },
+    { id: 'campo', pt: 'Campo', en: 'Meadow', es: 'Campo', ico: '🌼', vivo: true },
+    { id: 'fundo-do-mar', pt: 'Fundo do mar', en: 'Under the sea', es: 'Fondo del mar', ico: '🐠', vivo: true },
+    { id: 'espaco', pt: 'Espaço', en: 'Space', es: 'Espacio', ico: '🪐', vivo: true },
+    { id: 'cidade-noite', pt: 'Cidade à noite', en: 'City at night', es: 'Ciudad de noche', ico: '🌃', vivo: true },
+    { id: 'floresta', pt: 'Floresta', en: 'Forest', es: 'Bosque', ico: '🌳', vivo: true },
+    { id: 'neve', pt: 'Neve', en: 'Snow', es: 'Nieve', ico: '⛄', vivo: true },
+    { id: 'castelo', pt: 'Castelo', en: 'Castle', es: 'Castillo', ico: '🏰', vivo: true },
+    { id: 'ceu-arco-iris', pt: 'Céu de arco-íris', en: 'Rainbow sky', es: 'Cielo de arcoíris', ico: '🌈', vivo: true },
+    { id: 'fazenda', pt: 'Fazenda', en: 'Farm', es: 'Granja', ico: '🚜', vivo: true },
+    { id: 'doces', pt: 'Terra dos doces', en: 'Candy land', es: 'Tierra de los dulces', ico: '🍭', vivo: true },
+    { id: 'dinossauros', pt: 'Dinossauros', en: 'Dinosaurs', es: 'Dinosaurios', ico: '🦕', vivo: true },
+    { id: 'jardim', pt: 'Jardim', en: 'Garden', es: 'Jardín', ico: '🌻', vivo: true },
+    { id: 'por-do-sol', pt: 'Pôr do sol', en: 'Sunset', es: 'Atardecer', ico: '🌅', vivo: true }
   ];
 
   function comEscala(ctx, W, H, fn) {

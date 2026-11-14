@@ -2,7 +2,9 @@
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE), em **solverone.com.br/kids/batalha-naval/**. Batalha naval
 com visual, navios e sons próprios, para jogar com a família em **aparelhos diferentes** (celular, tablet, computador),
-pela internet ou **pertinho, sem internet** (dois aparelhos no mesmo Wi-Fi), **contra o computador** ou **passando o aparelho**. Sem login, sem cadastro. O nome em inglês na tela é *Sea Battle*.
+pela internet ou **pertinho, sem internet** (dois aparelhos no mesmo Wi-Fi), **contra o computador** ou **passando o aparelho**. Sem login, sem cadastro. O nome em inglês na tela é *Sea Battle*; em espanhol, *Batalla Naval*. O idioma (português, inglês ou espanhol) é o
+escolhido na estante (`../idioma.js`); o jogo não tem botão de idioma. Em rede, cada aparelho mostra no seu idioma: as
+mensagens entre aparelhos só levam códigos (ids, coordenadas, resultados, fases) e o nome digitado, nunca texto traduzido.
 
 ## Como jogar
 
@@ -117,7 +119,7 @@ senão jsQR), as duas bibliotecas em `libs/`, guardadas no aparelho pelo `sw.js`
 |---|---|
 | `index.html` | As telas (início, nível, amigos, sala, arrumar, jogo, cortina). CSP sem script inline. |
 | `estilo.css` | Visual (mar que se mexe, marcas de respingo/fogo/fumaça, navio afundando, tremor, faixa AFUNDOU, celular em pé e tablet/computador deitado). |
-| `navios.js` | Os tipos de navio (nome PT/EN por tamanho e ordem) e o desenho SVG de cada um, criado elemento por elemento. |
+| `navios.js` | Os tipos de navio (nome PT/EN/ES por tamanho e ordem) e o desenho SVG de cada um, criado elemento por elemento. |
 | `efeitos.js` | Míssil, explosões, coluna d'água, bolhas e tremor num `<canvas>` por cima da tela (desligado com "menos movimento"). |
 | `logica.js` | Regras sem tela (roda no Node): níveis, coordenadas, posicionar, tiro, afundou, frota aleatória, a IA nos 3 jeitos. |
 | `rede.js` | Jogo em rede sem tela: validação de toda mensagem, a partida (vez, diário de tiros, voltar, sair, anfitrião que some) e o canal, trocável: Supabase Realtime broadcast; `?teste` usa BroadcastChannel; o Jogar pertinho usa o canal direto. |
@@ -127,7 +129,7 @@ senão jsQR), as duas bibliotecas em `libs/`, guardadas no aparelho pelo `sw.js`
 | `som.js` | Efeitos sonoros feitos na hora (Web Audio, com compressor) e a música abaixando durante eles. |
 | `app.js` | Telas, arrumar a frota (tocar/arrastar/girar), as partidas dos quatro modos (as telas do Jogar pertinho também) e a música (`../trilha.js`). `APP_VERSION`. |
 | `sw.js`, `manifest.webmanifest`, `icone-192.png`, `icone-512.png`, `icone.svg` | Instalável e sem internet (cache `batalha-naval-v…`). Ícones gerados do `icone.svg` com o Playwright. |
-| `versoes.json`, `PENDENCIAS.md`, `CREDITOS.md` | Versões (PT/EN), pendências e créditos. |
+| `versoes.json`, `PENDENCIAS.md`, `CREDITOS.md` | Versões (PT/EN/ES), pendências e créditos. |
 | `teste/` | `node --test batalha-naval/teste/*.test.js` (rodar da raiz do repositório kids). |
 
 Peças compartilhadas usadas com `../`: `recursos.js` (interruptor `batalha-naval` do RootifyONE, no app "kids" (Bolinho de Chuva)
@@ -158,8 +160,8 @@ O tiro é repetido a cada 1,5 s até virar diário; o dono do mar só responde c
   inteira, a ligação cai e volta; e o aviso "não se acharam" com Tentar de novo. Detalhe: o "sem internet" do Chromium
   também trava o WebRTC (num celular de verdade não), então o teste o tira só nos segundos em que os dois se acham, com
   toda a internet bloqueada e conferindo que nada saiu do aparelho.
-- `arquivos.test.js`: versão igual nos três lugares, tudo no `sw.js`, CSP, textos PT|EN, nenhum segredo.
+- `arquivos.test.js`: versão igual nos três lugares, tudo no `sw.js`, CSP, textos PT|EN|ES, nenhum segredo.
 - `visual.test.js` (Chromium): os 7 tipos de navio desenhados deitados e em pé ocupando exatamente as casas (360 e 1280 px),
-  nomes PT/EN na bandeja; água/acerto/afundou com míssil, marca, efeito, som, tremor, vibração e a faixa AFUNDOU com o nome;
+  nomes PT/EN/ES na bandeja; água/acerto/afundou com míssil, marca, efeito, som, tremor, vibração e a faixa AFUNDOU com o nome;
   "menos movimento" com marcas paradas e nenhuma partícula; todos os sons no Web Audio de verdade, a música abaixando e
   o botão 🔊; partidas inteiras sem erro no console em 360×740 e 1280×800.

@@ -269,7 +269,7 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   (saíram `extrasAntes`/`extrasDepois` do `desenho.js`); `morcegoDracula()` troca os dois modelos 3D com a fumaça.
 - Ainda do jeito antigo: o skate (o skatista em quadros); cavalo e dinossauro já giram pelo `cavalo.js`.
 
-## 1.17.0 — rio (vira barco) e mapinha (vídeo do dono, 14/Nov/2026)
+## 1.18.0 — rio (vira barco) e mapinha (vídeo do dono, 14/Nov/2026)
 
 - `pista.js`: `rios` (1 no Criança, 2 no Normal e no Turbo), trechos de 110 a 160 pedaços com `seg.agua`, longe dos
   túneis, loopings, portais, largada e chegada. A regra das coisas não muda; só o desenho: cone vira boia, lama vira

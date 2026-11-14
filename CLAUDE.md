@@ -79,8 +79,11 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   perguntar e conte o que mudou.
 - **Segurança**: nenhuma senha, chave de API, token ou segredo entra no código, no repositório, no chat ou em
   arquivo. Chaves de IA ficam só no cofre do navegador da pessoa. Se uma chave aparecer no chat, peça para revogar.
-- **Idioma**: textos para o usuário em PT e EN; instruções para o dono em português, passo a passo, como para
-  iniciante (ele não é desenvolvedor).
+- **Idioma** (dono, 14/Nov/2026): textos para o usuário em **PT (Brasil), EN (EUA) e ES (Espanha)**, tradução
+  humanizada; **um seletor só em todo lugar**, bandeira + sigla (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES), componente do módulo comum,
+  nunca toggle ou dropdown próprio; ES só aparece num app quando ele está 100 % traduzido (até lá, PT|EN). Detalhe na
+  diretriz, "Idioma e datas". Instruções para o dono em português, passo a passo, como para iniciante (ele não é
+  desenvolvedor).
 - **Entrega**: um `.zip` por app, nome `<NOME APP> <VERSAO> <dd-Mmm-aaaa> <HHhMMm>.zip`, arquivos soltos na
   raiz; atualizar `versoes.json`, a versão no código, o `sw.js` e `ARQUITETURA.md`/`PENDENCIAS.md`.
 - **Trabalho demorado** (foto, OCR, IA, importação, áudio) roda no módulo `Fundo`: nunca morre ao sair da tela,
@@ -103,25 +106,31 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   novo = uma entrada lá), `jogos.js`, `kids.js` (controle da TV), `instalar.js`, `radio.js`, `tela-cheia.js`,
   `estante.css`, `sw.js`, `manifest.webmanifest`, `musicas/`, `CREDITOS.md`.
 - Uma pasta por jogo: `baguncolandia/`, `peluqueria/`, `vruuum/`, `purpurina/`, `rabiscolandia/`, `campo-minado/`,
-  `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
+  `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, `aqua/`, `glub-glub/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
-  (só português por enquanto; o inglês com o interruptor `ingles`),
+  (PT/EN/ES escolhido na estante),
   `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
   bibliotecas em `baguncolandia/libs/`. Fundo dos cartões: `cartoes-fundos.css` (tirar a linha do `index.html` = visual antigo).
 - Interruptores: todos os jogos obedecem o app **`kids`** ("Bolinho de Chuva") do RootifyONE, um interruptor por jogo.
 
 ## Regras de cada jogo
 
-- **Idioma: por enquanto só português; o inglês fica escondido, ligado pelo interruptor `ingles` do RootifyONE; todo texto
-  novo continua com a versão em inglês, só escondida.** Peça comum: `idioma.js` (logo depois do `recursos.js`, na estante
-  e em todo jogo): sem o interruptor, `<html class="sem-ingles">` esconde o que tem `class="en"` e o botão `#btLingua`; o
-  jogo pergunta `BolinhoIdioma.ingles()` antes de escolher o inglês.
+- **Idioma (dono, 14/Nov/2026; diretriz "três idiomas"): português (Brasil), inglês (EUA) e espanhol (Espanha), em tudo,
+  com tradução humanizada.** A escolha é feita **só na estante**, num **botão só** com o idioma atual (bandeira SVG + sigla);
+  tocando, ele pergunta se continua nesse idioma ou troca (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES) (dono, 14/Nov/2026), e vale para todos os jogos — **nenhum jogo tem botão de idioma próprio**. Peça comum: `idioma.js` (logo depois do
+  `recursos.js`, na estante e em todo jogo): guarda a escolha em `localStorage` "bolinho:idioma"; o jogo lê
+  `BolinhoIdioma.atual()` ('pt' | 'en' | 'es'), usa `BolinhoIdioma.t(pt, en, es)` e, na fala, `BolinhoIdioma.voz()`
+  (pt-BR / en-US / es-ES), sempre com uma voz do mesmo idioma. Todo texto novo nasce nos três (`data-t="pt|en|es"`,
+  `t(pt, en, es)`). Espanhol da Espanha: móvil, ordenador, coger, gafas, zumo; datas `14/nov/2026`. Vigia:
+  `teste/idioma.test.js`. Não existe mais o interruptor `ingles` do RootifyONE.
 - **Navegação padrão (dono, 07/Nov/2026): todo jogo tem 🏠 Início e 🚪 Saída no canto de cima, pela peça comum
   `navegacao.js`.** `<script src="../navegacao.js" data-fora-do-arquivo>` logo depois do `../idioma.js`, `'../navegacao.js'`
   no `ARQUIVOS` do `sw.js` e `BolinhoNav.iniciar({ jogo, noInicio, irParaInicio, emAndamento })` no `app.js` (detalhe no
   começo do arquivo). 🏠 só aparece fora da tela de começo e volta para ela; 🚪 sai (pergunta antes com partida rolando;
   vai para a estante `/kids/`). O Voltar do celular numa tela de dentro volta (o jogo que não cuida do histórico passa
-  `cuidarDoVoltar: true`). Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
+  `cuidarDoVoltar: true`); na tela de começo o 1º Voltar avisa "toque de novo para sair" e só o 2º sai, e a guarda do
+  histórico (posta no primeiro toque) faz o jogo voltar ao começo em vez de fechar quando o Chrome pula uma entrada (dono,
+  14/Nov/2026). Jogo com aviso próprio passa `guarda: false`. Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
   `bn-nav`/`bn-dentro` e as medidas `--nav-alto`/`--nav-largo` no `<html>`. Na TV (`?tv=`) a barra some. Vigia:
   `teste/navegacao.test.js`.
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
@@ -140,6 +149,10 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   - Música feita no código (som de "Atari", 8 bits) **nunca toca com internet**, nem intercalada.
   - Prefira sempre gravações com instrumentos de verdade. Música gravada com som de videogame / 8 bits (chiptune) não
     entra na lista (deixe o arquivo na pasta, só tire da lista). Cada jogo continua com pelo menos 10 músicas.
+  - **Biblioteca de músicas (dono, 14/Nov/2026):** o botão 🎵 da estante lista todas as músicas gravadas dos jogos e da
+    rádio (`biblioteca.js` + `biblioteca-musicas.js`, gerado). Mudou a música de um jogo (ou jogo novo)? Ponha a lista dele
+    em `teste/listas-musica.js`, o crédito no `CREDITOS.md`/`LICENCAS.md` e rode `node ferramentas/biblioteca-musicas.js`.
+    Vigia: `teste/biblioteca-musicas.test.js`.
   - A favorita de cada jogo (`FAVORITAS` no `trilha.js`) é de instrumentos de verdade, animada, até 2,5 MB e o jogo a
     toca. Vigia: `teste/regra-musica.test.js`.
 
@@ -154,3 +167,20 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   aplicável hoje" e o motivo em uma linha. Ganhando login, banco ou integração, o app já nasce cumprindo os pontos.
 - Em cada entrega, dizer no resumo o que o RootifyONE, o ArchONE ou o EaglePlanONE precisariam saber (integração nova ou
   removida, recurso/interruptor novo, item do roadmap concluído). Nada de integração nova sem a regra zero.
+
+## Várias conversas ao mesmo tempo (dono, 14/Nov/2026): cuidado com conflitos
+
+O dono mexe em vários jogos em paralelo, cada um numa conversa. Para uma não estragar o trabalho da outra:
+- **Comece do `main` mais novo** (`git fetch origin main` e o ramo de trabalho saindo dele) e **mexa só na pasta do seu
+  jogo**. Não altere pasta de outro jogo, nem "aproveite para arrumar" algo fora do pedido.
+- **Arquivos comuns da raiz** (`catalogo.js`, `recursos-do-app.json`, `sw.js`, `index.html`, `trilha.js`, `navegacao.js`,
+  `idioma.js`, `CLAUDE.md`, `ARQUITETURA.md`, `PENDENCIAS.md`, `teste/`): mudanças pequenas e só no que é seu (a sua
+  entrada no catálogo, o seu interruptor, a sua linha nas pendências). Nunca reescreva o arquivo inteiro.
+- **Antes de cada pull request**: busque o `main` de novo e **junte com merge** no seu ramo (nunca rebase nem force push).
+  Se der conflito, **mantenha os dois lados**. Em versões (`APP_VERSION`, `VERSAO`, `versoes.json`, `data-versao`), fique
+  com a do `main` e suba **uma acima** dela; no `versoes.json` a entrada nova vai por cima das que vieram do `main`.
+- **Depois de juntar**, rode de novo os testes do seu jogo e os vigias da raiz (`node --test teste/*.test.js`), um de cada
+  vez. Só publique com tudo passando.
+- **Pull requests pequenos e frequentes**, publicados assim que testados, para os outros pegarem logo o `main` novo.
+- Se um conflito mexer na lógica de outro jogo e não der para juntar sem perder algo, **pare e conte ao dono** em vez de
+  escolher um lado.

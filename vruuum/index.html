@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#0b0a1f">
-<meta name="versao" content="1.17.0">
+<meta name="versao" content="1.18.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Corrida de carrinho para a família: desvie, pegue estrelas, pule rampas e passe por 4 mundos. 1 ou 2 jogadores. / Family kart race: dodge, grab stars, jump ramps across 4 worlds.">
 <link rel="stylesheet" href="estilo.css">
@@ -53,86 +53,85 @@
       <path class="b3" d="M585 160 l4 12 12 4 -12 4 -4 12 -4 -12 -12 -4 12 -4 z"/>
     </g>
   </svg></h1>
-  <p class="sub frase-intro"><span data-t="Pronto|Ready"></span> <span data-t="pra sentir|to feel"></span> <span data-t="a velocidade?|the speed?"></span></p>
-  <button id="btEntrar" class="grande" type="button" data-t="🔑 Toque para ligar o motor!|🔑 Tap to start your engine!"></button>
-  <p class="dica" data-t="Aumente o volume 🔊|Turn the volume up 🔊"></p>
+  <p class="sub frase-intro"><span data-t="Pronto|Ready|¿Listos"></span> <span data-t="pra sentir|to feel|para sentir"></span> <span data-t="a velocidade?|the speed?|la velocidad?"></span></p>
+  <button id="btEntrar" class="grande" type="button" data-t="🔑 Toque para ligar o motor!|🔑 Tap to start your engine!|🔑 ¡Toca para encender el motor!"></button>
+  <p class="dica" data-t="Aumente o volume 🔊|Turn the volume up 🔊|Sube el volumen 🔊"></p>
 </section>
 
 <section id="menu" class="tela" data-recurso="vruuum">
   <div class="faixa">
-    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
-    <button id="btSom" class="mini" type="button" aria-label="Som / Sound">🔊</button>
-    <button id="btAjuda" class="mini" type="button" aria-label="Como jogar / How to play" aria-expanded="false">❓</button>
+    <button id="btSom" class="mini" type="button" aria-label="Som" data-aria="Som|Sound|Sonido">🔊</button>
+    <button id="btAjuda" class="mini" type="button" aria-label="Como jogar" data-aria="Como jogar|How to play|Cómo jugar" aria-expanded="false">❓</button>
   </div>
   <h1 class="logo pequeno">Vruuum!</h1>
 
   <div id="ajuda" class="ajuda" hidden>
-    <p data-t="✈️ Avião, jato e helicóptero voam: a estrada fica lá embaixo e você segue o caminho de luzes no céu, desviando de pássaros, nuvens de tempestade e outros aviões. Os anéis dourados dão TURBO e as correntes de ar levam lá para cima, até as estrelas altas.|✈️ Plane, jet and helicopter fly: the road stays far below and you follow the path of lights in the sky, dodging birds, storm clouds and other planes. Golden rings give TURBO and updrafts lift you up to the high stars."></p>
-    <p data-t="🌊 No rio o veículo vira barco (os bichos nadam): desvie das boias e dos redemoinhos e passe pelas setas azuis para ganhar TURBO. O mapinha redondo, no canto de cima, mostra a pista inteira e onde está cada um.|🌊 On the river your ride turns into a boat (animals swim): dodge the buoys and whirlpools and go through the blue arrows for TURBO. The little round map up in the corner shows the whole track and where everyone is."></p>
-    <p data-t="🏆 Pontos: estrela 100, estrela no ar 200, turbo e rampa 50; cada portal de mundo é um CHECKPOINT (500 + bônus por rapidez). Bater tira pontos, mas ninguém perde.|🏆 Points: star 100, star in the air 200, turbo and ramp 50; every world gate is a CHECKPOINT (500 + speed bonus). Crashing takes points away, but nobody loses."></p>
-    <p data-t="O carro acelera sozinho. Você vira para a esquerda e para a direita e aperta ⬆ PULAR para passar por cima dos cones, da lama e dos carrinhos. Pegue as ⭐ estrelas, passe pelo 🌈 arco-íris para ganhar TURBO e suba na rampa para um pulão até as estrelas do ar. Ninguém perde: bater só deixa o carro mais lento e derruba umas estrelas.|The car speeds up by itself. Steer left and right and press ⬆ JUMP to hop over cones, mud and cars. Grab the ⭐ stars, drive through the 🌈 rainbow for TURBO and hit the ramp for a big jump to the stars in the air. Nobody loses: crashing only slows you down and drops a few stars."></p>
-    <p data-t="👆 Celular ou tablet (deitado ou em pé): segure o lado esquerdo ou direito da tela para virar; toque no botão ⬆ ou deslize o dedo para cima para pular. Com 2 jogadores, cada um no seu pedaço da tela.|👆 Phone or tablet (sideways or upright): hold the left or right side of the screen to steer; tap the ⬆ button or swipe up to jump. With 2 players, each one on their own half."></p>
-    <p data-t="📱 Com 1 jogador, o celular também é volante: incline para um lado e o carro vira; dê um toquinho com o celular para cima e o carro pula. Celular retinho = carro reto.|📱 With 1 player, the phone is also a steering wheel: tilt it and the car turns; give the phone a little flick up and the car jumps. Phone level = car straight."></p>
-    <p data-t="⌨️ Teclado: setas para virar e ⬆ (ou espaço) para pular; com 2 jogadores, jogador 1 usa A, D e W, jogador 2 as setas. H = buzina, para baixo = freio. 📺 Controle da TV: setas para virar, OK para pular. 🎮 Controle de videogame: A pula, X buzina.|⌨️ Keyboard: arrows to steer and ⬆ (or space) to jump; with 2 players, player 1 uses A, D and W, player 2 the arrows. H = horn, down = brake. 📺 TV remote: arrows to steer, OK to jump. 🎮 Game controller: A jumps, X honks."></p>
+    <p data-t="✈️ Avião, jato e helicóptero voam: a estrada fica lá embaixo e você segue o caminho de luzes no céu, desviando de pássaros, nuvens de tempestade e outros aviões. Os anéis dourados dão TURBO e as correntes de ar levam lá para cima, até as estrelas altas.|✈️ Plane, jet and helicopter fly: the road stays far below and you follow the path of lights in the sky, dodging birds, storm clouds and other planes. Golden rings give TURBO and updrafts lift you up to the high stars.|✈️ El avión, el jet y el helicóptero vuelan: la carretera queda allá abajo y tú sigues el camino de luces en el cielo, esquivando pájaros, nubes de tormenta y otros aviones. Los anillos dorados dan TURBO y las corrientes de aire te suben bien alto, hasta las estrellas más altas."></p>
+    <p data-t="🌊 No rio o veículo vira barco (os bichos nadam): desvie das boias e dos redemoinhos e passe pelas setas azuis para ganhar TURBO. O mapinha redondo, no canto de cima, mostra a pista inteira e onde está cada um.|🌊 On the river your ride turns into a boat (animals swim): dodge the buoys and whirlpools and go through the blue arrows for TURBO. The little round map up in the corner shows the whole track and where everyone is.|🌊 En el río tu vehículo se convierte en barco (los animales nadan): esquiva las boyas y los remolinos y pasa por las flechas azules para ganar TURBO. El mapa redondo de la esquina de arriba enseña toda la pista y dónde va cada uno."></p>
+    <p data-t="🏆 Pontos: estrela 100, estrela no ar 200, turbo e rampa 50; cada portal de mundo é um CHECKPOINT (500 + bônus por rapidez). Bater tira pontos, mas ninguém perde.|🏆 Points: star 100, star in the air 200, turbo and ramp 50; every world gate is a CHECKPOINT (500 + speed bonus). Crashing takes points away, but nobody loses.|🏆 Puntos: estrella 100, estrella en el aire 200, turbo y rampa 50; cada portal de mundo es un CHECKPOINT (500 + premio por llegar rápido). Chocar quita puntos, pero nadie pierde."></p>
+    <p data-t="O carro acelera sozinho. Você vira para a esquerda e para a direita e aperta ⬆ PULAR para passar por cima dos cones, da lama e dos carrinhos. Pegue as ⭐ estrelas, passe pelo 🌈 arco-íris para ganhar TURBO e suba na rampa para um pulão até as estrelas do ar. Ninguém perde: bater só deixa o carro mais lento e derruba umas estrelas.|The car speeds up by itself. Steer left and right and press ⬆ JUMP to hop over cones, mud and cars. Grab the ⭐ stars, drive through the 🌈 rainbow for TURBO and hit the ramp for a big jump to the stars in the air. Nobody loses: crashing only slows you down and drops a few stars.|El coche acelera solo. Tú giras a la izquierda y a la derecha y pulsas ⬆ SALTAR para pasar por encima de los conos, el barro y los cochecitos. Coge las ⭐ estrellas, pasa por el 🌈 arcoíris para ganar TURBO y sube a la rampa para dar un saltote hasta las estrellas del aire. Nadie pierde: chocar solo hace que el coche vaya más lento y suelte unas estrellas."></p>
+    <p data-t="👆 Celular ou tablet (deitado ou em pé): segure o lado esquerdo ou direito da tela para virar; toque no botão ⬆ ou deslize o dedo para cima para pular. Com 2 jogadores, cada um no seu pedaço da tela.|👆 Phone or tablet (sideways or upright): hold the left or right side of the screen to steer; tap the ⬆ button or swipe up to jump. With 2 players, each one on their own half.|👆 Móvil o tableta (en horizontal o en vertical): deja el dedo en el lado izquierdo o derecho de la pantalla para girar; toca el botón ⬆ o desliza el dedo hacia arriba para saltar. Con 2 jugadores, cada uno en su mitad de la pantalla."></p>
+    <p data-t="📱 Com 1 jogador, o celular também é volante: incline para um lado e o carro vira; dê um toquinho com o celular para cima e o carro pula. Celular retinho = carro reto.|📱 With 1 player, the phone is also a steering wheel: tilt it and the car turns; give the phone a little flick up and the car jumps. Phone level = car straight.|📱 Con 1 jugador, el móvil también es un volante: inclínalo hacia un lado y el coche gira; dale un golpecito suave hacia arriba y el coche salta. Móvil recto = coche recto."></p>
+    <p data-t="⌨️ Teclado: setas para virar e ⬆ (ou espaço) para pular; com 2 jogadores, jogador 1 usa A, D e W, jogador 2 as setas. H = buzina, para baixo = freio. 📺 Controle da TV: setas para virar, OK para pular. 🎮 Controle de videogame: A pula, X buzina.|⌨️ Keyboard: arrows to steer and ⬆ (or space) to jump; with 2 players, player 1 uses A, D and W, player 2 the arrows. H = horn, down = brake. 📺 TV remote: arrows to steer, OK to jump. 🎮 Game controller: A jumps, X honks.|⌨️ Teclado: flechas para girar y ⬆ (o espacio) para saltar; con 2 jugadores, el jugador 1 usa A, D y W, y el jugador 2 las flechas. H = bocina, abajo = freno. 📺 Mando de la tele: flechas para girar, OK para saltar. 🎮 Mando de consola: A salta, X toca la bocina."></p>
   </div>
 
   <div class="grupo">
-    <p class="rotulo" data-t="Quantos vão correr?|How many racers?"></p>
+    <p class="rotulo" data-t="Quantos vão correr?|How many racers?|¿Cuántos van a correr?"></p>
     <div class="opcoes" role="group">
-      <button class="opcao" type="button" data-jogadores="1" data-t="👤 1 jogador|👤 1 player"></button>
-      <button class="opcao" type="button" data-jogadores="2" data-t="👥 2 jogadores (tela dividida)|👥 2 players (split screen)"></button>
+      <button class="opcao" type="button" data-jogadores="1" data-t="👤 1 jogador|👤 1 player|👤 1 jugador"></button>
+      <button class="opcao" type="button" data-jogadores="2" data-t="👥 2 jogadores (tela dividida)|👥 2 players (split screen)|👥 2 jugadores (pantalla dividida)"></button>
     </div>
   </div>
 
   <div class="grupo">
-    <p class="rotulo" data-t="Nível|Level"></p>
+    <p class="rotulo" data-t="Nível|Level|Nivel"></p>
     <div class="opcoes" role="group">
-      <button class="opcao crianca" type="button" data-nivel="crianca" data-t="🐢 Criança|🐢 Kids"></button>
-      <button class="opcao normal" type="button" data-nivel="normal" data-t="🚗 Normal|🚗 Normal"></button>
-      <button class="opcao turbo" type="button" data-nivel="turbo" data-t="🚀 Turbo|🚀 Turbo"></button>
+      <button class="opcao crianca" type="button" data-nivel="crianca" data-t="🐢 Criança|🐢 Kids|🐢 Peques"></button>
+      <button class="opcao normal" type="button" data-nivel="normal" data-t="🚗 Normal|🚗 Normal|🚗 Normal"></button>
+      <button class="opcao turbo" type="button" data-nivel="turbo" data-t="🚀 Turbo|🚀 Turbo|🚀 Turbo"></button>
     </div>
   </div>
 
   <div class="grupo">
-    <p class="rotulo" data-t="Visual|Look"></p>
+    <p class="rotulo" data-t="Visual|Look|Estilo"></p>
     <div class="opcoes" role="group">
-      <button class="opcao visual-misto" type="button" data-visual="misto" data-t="🔀 Misto|🔀 Mixed"></button>
-      <button class="opcao visual-neon" type="button" data-visual="neon" data-t="🌃 Neon|🌃 Neon"></button>
-      <button class="opcao" type="button" data-visual="colorido" data-t="🌈 Colorido|🌈 Colorful"></button>
+      <button class="opcao visual-misto" type="button" data-visual="misto" data-t="🔀 Misto|🔀 Mixed|🔀 Mixto"></button>
+      <button class="opcao visual-neon" type="button" data-visual="neon" data-t="🌃 Neon|🌃 Neon|🌃 Neón"></button>
+      <button class="opcao" type="button" data-visual="colorido" data-t="🌈 Colorido|🌈 Colorful|🌈 Colorido"></button>
     </div>
   </div>
 
   <div class="grupo">
-    <p class="rotulo" data-t="Cenários da corrida (escolha até 4)|Race worlds (pick up to 4)"></p>
-    <div id="mundosEsc" class="opcoes mundos" role="group" aria-label="Cenários / Worlds"></div>
+    <p class="rotulo" data-t="Cenários da corrida (escolha até 4)|Race worlds (pick up to 4)|Mundos de la carrera (elige hasta 4)"></p>
+    <div id="mundosEsc" class="opcoes mundos" role="group" aria-label="Cenários" data-aria="Cenários|Worlds|Mundos"></div>
   </div>
 
   <div class="grupo">
-    <p class="rotulo" data-t="🎵 Música|🎵 Music"></p>
+    <p class="rotulo" data-t="🎵 Música|🎵 Music|🎵 Música"></p>
     <div class="musica-esc">
-      <button id="musAnt" class="mini" type="button" aria-label="Música anterior / Previous song">⏮</button>
+      <button id="musAnt" class="mini" type="button" aria-label="Música anterior" data-aria="Música anterior|Previous song|Canción anterior">⏮</button>
       <button id="musNome" class="opcao mus-nome" type="button" aria-expanded="false" aria-controls="musLista"></button>
-      <button id="musProx" class="mini" type="button" aria-label="Próxima música / Next song">⏭</button>
+      <button id="musProx" class="mini" type="button" aria-label="Próxima música" data-aria="Próxima música|Next song|Siguiente canción">⏭</button>
     </div>
-    <div id="musLista" class="mus-lista" role="group" aria-label="Músicas / Songs" hidden></div>
-    <p id="musOff" class="dica" hidden data-t="Sem internet: toca só a música guardada no aparelho.|Offline: only the song saved on the device plays."></p>
+    <div id="musLista" class="mus-lista" role="group" aria-label="Músicas" data-aria="Músicas|Songs|Canciones" hidden></div>
+    <p id="musOff" class="dica" hidden data-t="Sem internet: toca só a música guardada no aparelho.|Offline: only the song saved on the device plays.|Sin internet: solo suena la canción guardada en este aparato."></p>
   </div>
 
   <div class="grupo">
-    <p class="rotulo" data-t="Rivais|Rivals"></p>
+    <p class="rotulo" data-t="Rivais|Rivals|Rivales"></p>
     <div class="opcoes" role="group">
-      <button class="opcao" type="button" data-rivais="com" data-t="🏁 Com rivais|🏁 With rivals"></button>
-      <button class="opcao" type="button" data-rivais="sem" data-t="Sem rivais|No rivals"></button>
+      <button class="opcao" type="button" data-rivais="com" data-t="🏁 Com rivais|🏁 With rivals|🏁 Con rivales"></button>
+      <button class="opcao" type="button" data-rivais="sem" data-t="Sem rivais|No rivals|Sin rivales"></button>
     </div>
   </div>
 
   <div class="grupo">
-    <p class="rotulo" data-t="Como dirigir|How to steer"></p>
+    <p class="rotulo" data-t="Como dirigir|How to steer|Cómo conducir"></p>
     <div class="opcoes" role="group">
-      <button class="opcao" type="button" data-controle="toque" data-t="👆 Tela e celular|👆 Screen and phone"></button>
-      <button class="opcao" type="button" data-controle="maos" data-t="🙌 Mãos na câmera|🙌 Hands on camera"></button>
+      <button class="opcao" type="button" data-controle="toque" data-t="👆 Tela e celular|👆 Screen and phone|👆 Pantalla y móvil"></button>
+      <button class="opcao" type="button" data-controle="maos" data-t="🙌 Mãos na câmera|🙌 Hands on camera|🙌 Manos frente a la cámara"></button>
     </div>
-    <p id="dicaMaos" class="dica" hidden data-t="Fique de frente para a câmera, com as duas mãos no ar como num volante. Mão direita para baixo vira para a direita, mão esquerda para baixo vira para a esquerda. As duas mãos para cima rápido: pula. As duas lá embaixo: freia. Na TV: ligue o celular, tablet ou notebook na TV (espelhar a tela ou cabo) com a câmera virada para quem joga. O vídeo não sai do aparelho.|Face the camera with both hands up like holding a wheel. Right hand down turns right, left hand down turns left. Both hands up fast: jump. Both hands low: brake. On a TV: connect the phone, tablet or laptop to the TV (screen mirroring or cable) with the camera facing the players. The video never leaves the device."></p>
+    <p id="dicaMaos" class="dica" hidden data-t="Fique de frente para a câmera, com as duas mãos no ar como num volante. Mão direita para baixo vira para a direita, mão esquerda para baixo vira para a esquerda. As duas mãos para cima rápido: pula. As duas lá embaixo: freia. Na TV: ligue o celular, tablet ou notebook na TV (espelhar a tela ou cabo) com a câmera virada para quem joga. O vídeo não sai do aparelho.|Face the camera with both hands up like holding a wheel. Right hand down turns right, left hand down turns left. Both hands up fast: jump. Both hands low: brake. On a TV: connect the phone, tablet or laptop to the TV (screen mirroring or cable) with the camera facing the players. The video never leaves the device.|Ponte frente a la cámara, con las dos manos en el aire como si sujetaras un volante. Mano derecha abajo: giras a la derecha; mano izquierda abajo: giras a la izquierda. Las dos manos arriba, rápido: saltas. Las dos bien abajo: frenas. En la tele: conecta el móvil, la tableta o el portátil a la tele (duplicar pantalla o cable) con la cámara mirando a quien juega. El vídeo no sale del aparato."></p>
   </div>
 
   <div id="garagem" class="garagem">
@@ -140,41 +139,41 @@
       <div id="abas" class="abas" role="tablist" hidden>
         <button class="aba" type="button" role="tab" data-aba="0"></button>
         <button class="aba" type="button" role="tab" data-aba="1"></button>
-        <button id="tirarJ2" class="aba tirar" type="button" data-t="✕ Só 1 jogador|✕ Just 1 player"></button>
+        <button id="tirarJ2" class="aba tirar" type="button" data-t="✕ Só 1 jogador|✕ Just 1 player|✕ Solo 1 jugador"></button>
       </div>
       <canvas id="previa" class="previa" width="560" height="340" aria-hidden="true"></canvas>
       <p id="nomeVeic" class="nome-veic" aria-live="polite"></p>
       <div class="fichas">
-        <span data-t="Velocidade|Speed"></span><span class="barra"><i id="barraVel"></i></span>
-        <span data-t="Curvas|Handling"></span><span class="barra"><i id="barraCurva"></i></span>
+        <span data-t="Velocidade|Speed|Velocidad"></span><span class="barra"><i id="barraVel"></i></span>
+        <span data-t="Curvas|Handling|Curvas"></span><span class="barra"><i id="barraCurva"></i></span>
       </div>
       <p id="dicaTecla" class="tecla" hidden></p>
     </div>
     <div class="opcoes-garagem">
-      <p class="rotulo titulo-garagem" data-t="Escolha o veículo|Pick your ride"></p>
+      <p class="rotulo titulo-garagem" data-t="Escolha o veículo|Pick your ride|Elige tu vehículo"></p>
       <div id="veiculos" class="veiculos"></div>
-      <p class="rotulo" data-t="Cor|Color"></p>
-      <div id="cores" class="cores" role="group" aria-label="Cor / Color"></div>
-      <p class="rotulo" data-t="Corpo|Body"></p>
-      <div class="opcoes corpo" role="group" aria-label="Corpo / Body">
-        <button class="opcao" type="button" data-corpo="menina" data-t="👧 Menina|👧 Girl"></button>
-        <button class="opcao" type="button" data-corpo="menino" data-t="👦 Menino|👦 Boy"></button>
+      <p class="rotulo" data-t="Cor|Color|Color"></p>
+      <div id="cores" class="cores" role="group" aria-label="Cor" data-aria="Cor|Color|Color"></div>
+      <p class="rotulo" data-t="Corpo|Body|Cuerpo"></p>
+      <div class="opcoes corpo" role="group" aria-label="Corpo" data-aria="Corpo|Body|Cuerpo">
+        <button class="opcao" type="button" data-corpo="menina" data-t="👧 Menina|👧 Girl|👧 Niña"></button>
+        <button class="opcao" type="button" data-corpo="menino" data-t="👦 Menino|👦 Boy|👦 Niño"></button>
       </div>
-      <p class="rotulo" data-t="Piloto|Driver"></p>
-      <div id="bichos" class="bichos" role="group" aria-label="Piloto / Driver"></div>
+      <p class="rotulo" data-t="Piloto|Driver|Piloto"></p>
+      <div id="bichos" class="bichos" role="group" aria-label="Piloto" data-aria="Piloto|Driver|Piloto"></div>
     </div>
   </div>
 
   <div class="barra-correr">
-    <button id="btCorrer" class="grande" type="button" data-t="🏁 Correr!|🏁 Race!"></button>
+    <button id="btCorrer" class="grande" type="button" data-t="🏁 Correr!|🏁 Race!|🏁 ¡A correr!"></button>
   </div>
-  <p class="recorde-menu"><span data-t="Recorde de pontos neste nível|Points record on this level"></span>: <b id="recordeMenu">0</b></p>
+  <p class="recorde-menu"><span data-t="Recorde de pontos neste nível|Best score on this level|Récord de puntos en este nivel"></span>: <b id="recordeMenu">0</b></p>
   <div id="guardar" class="guardar">
-    <button id="btGuardar" class="medio" type="button" data-t="📲 Guardar no celular|📲 Save on the phone"></button>
-    <p id="guardarAviso" class="dica" aria-live="polite" data-t="Para jogar sem internet, com ícone na tela. Sem login.|To play offline, with an icon on the home screen. No login."></p>
+    <button id="btGuardar" class="medio" type="button" data-t="📲 Guardar no celular|📲 Save to your phone|📲 Guardar en el móvil"></button>
+    <p id="guardarAviso" class="dica" aria-live="polite" data-t="Para jogar sem internet, com ícone na tela. Sem login.|To play offline, with an icon on the home screen. No login.|Para jugar sin internet, con un icono en la pantalla. Sin crear cuenta."></p>
   </div>
   <p id="tocando" class="rodape" aria-live="polite"></p>
-  <p class="rodape"><span id="ver"></span> · SolverONE · <a href="https://solverone.com.br/kids/" data-t="🍩 Mais brincadeiras|🍩 More games"></a></p>
+  <p class="rodape"><span id="ver"></span> · SolverONE · <a href="https://solverone.com.br/kids/" data-t="🍩 Mais brincadeiras|🍩 More games|🍩 Más juegos"></a></p>
 </section>
 
 <section id="jogo" class="tela">
@@ -185,51 +184,51 @@
     <p id="maosAviso"></p>
   </div>
   <div class="botoes-jogo">
-    <button id="btPausa" class="mini" type="button" aria-label="Pausar / Pause">⏸</button>
-    <button id="btSomJogo" class="mini" type="button" aria-label="Som / Sound">🔊</button>
-    <button id="btGirar" class="mini" type="button" aria-label="Virar a tela (deitado ou em pé) / Rotate the screen" hidden>🔄</button>
+    <button id="btPausa" class="mini" type="button" aria-label="Pausar" data-aria="Pausar|Pause|Pausa">⏸</button>
+    <button id="btSomJogo" class="mini" type="button" aria-label="Som" data-aria="Som|Sound|Sonido">🔊</button>
+    <button id="btGirar" class="mini" type="button" aria-label="Virar a tela (deitado ou em pé)" data-aria="Virar a tela (deitado ou em pé)|Rotate the screen|Girar la pantalla" hidden>🔄</button>
   </div>
   <div id="pausa" class="pausa-painel" hidden>
-    <h2 data-t="Pausa|Paused"></h2>
-    <button id="btContinuar" class="grande" type="button" data-t="▶ Continuar|▶ Resume"></button>
-    <button id="btRecomecar" class="medio" type="button" data-t="🔁 Começar de novo|🔁 Restart"></button>
-    <button id="btSair" class="medio" type="button" data-t="🏠 Menu|🏠 Menu"></button>
+    <h2 data-t="Pausa|Paused|Pausa"></h2>
+    <button id="btContinuar" class="grande" type="button" data-t="▶ Continuar|▶ Resume|▶ Seguir"></button>
+    <button id="btRecomecar" class="medio" type="button" data-t="🔁 Começar de novo|🔁 Restart|🔁 Empezar de nuevo"></button>
+    <button id="btSair" class="medio" type="button" data-t="🏠 Menu|🏠 Menu|🏠 Menú"></button>
   </div>
 </section>
 
 <section id="fim" class="tela">
-  <h2 class="logo pequeno" data-t="🏁 Fim da corrida!|🏁 Race over!"></h2>
+  <h2 class="logo pequeno" data-t="🏁 Fim da corrida!|🏁 Race over!|🏁 ¡Fin de la carrera!"></h2>
   <canvas id="podio" class="podio" width="720" height="420" aria-hidden="true"></canvas>
   <div id="resultado" class="resultado" aria-live="polite"></div>
-  <p id="novoRecorde" class="recorde-novo" hidden data-t="🎉 Novo recorde de pontos!|🎉 New points record!"></p>
-  <p class="recorde-menu"><span data-t="Recorde|Record"></span>: <b id="recordeFim">0</b> pts</p>
-  <button id="btDeNovo" class="grande" type="button" data-t="🔁 Correr de novo|🔁 Race again"></button>
-  <button id="btMenu" class="medio" type="button" data-t="🏠 Menu|🏠 Menu"></button>
+  <p id="novoRecorde" class="recorde-novo" hidden data-t="🎉 Novo recorde de pontos!|🎉 New high score!|🎉 ¡Nuevo récord de puntos!"></p>
+  <p class="recorde-menu"><span data-t="Recorde|Best|Récord"></span>: <b id="recordeFim">0</b> pts</p>
+  <button id="btDeNovo" class="grande" type="button" data-t="🔁 Correr de novo|🔁 Race again|🔁 Correr otra vez"></button>
+  <button id="btMenu" class="medio" type="button" data-t="🏠 Menu|🏠 Menu|🏠 Menú"></button>
 </section>
 
 <section id="desligado" class="tela">
-  <p data-t="Esta brincadeira está desligada no momento.|This game is turned off right now."></p>
+  <p data-t="Esta brincadeira está desligada no momento.|This game is turned off right now.|Este juego está apagado por ahora."></p>
 </section>
 
 <div id="selfie" class="selfie" hidden role="dialog" aria-modal="true" aria-labelledby="selfieTitulo">
   <div class="selfie-painel">
-    <h2 id="selfieTitulo" data-t="📸 Seu rosto no carrinho|📸 Your face in the car"></h2>
-    <p class="dica" data-t="A foto fica só neste aparelho e não vai para a internet. Peça ajuda a um adulto.|The photo stays only on this device and never goes online. Ask a grown-up to help."></p>
+    <h2 id="selfieTitulo" data-t="📸 Seu rosto no carrinho|📸 Your face in the car|📸 Tu cara en el coche"></h2>
+    <p class="dica" data-t="A foto fica só neste aparelho e não vai para a internet. Peça ajuda a um adulto.|The photo stays only on this device and never goes online. Ask a grown-up to help.|La foto se queda solo en este aparato y no va a internet. Pide ayuda a un adulto."></p>
     <div class="selfie-botoes">
-      <label class="medio botao-arquivo"><span data-t="🤳 Tirar selfie|🤳 Take a selfie"></span><input id="selfieCamera" type="file" accept="image/*" capture="user"></label>
-      <label class="medio botao-arquivo"><span data-t="🖼️ Escolher foto|🖼️ Pick a photo"></span><input id="selfieGaleria" type="file" accept="image/*"></label>
+      <label class="medio botao-arquivo"><span data-t="🤳 Tirar selfie|🤳 Take a selfie|🤳 Hacerte un selfie"></span><input id="selfieCamera" type="file" accept="image/*" capture="user"></label>
+      <label class="medio botao-arquivo"><span data-t="🖼️ Escolher foto|🖼️ Pick a photo|🖼️ Elegir una foto"></span><input id="selfieGaleria" type="file" accept="image/*"></label>
     </div>
     <div id="selfieEditor" class="selfie-editor" hidden>
-      <canvas id="selfieTela" width="400" height="400" aria-label="Arraste o círculo até o rosto / Drag the circle onto the face"></canvas>
+      <canvas id="selfieTela" width="400" height="400" aria-label="Arraste o círculo até o rosto" data-aria="Arraste o círculo até o rosto|Drag the circle onto the face|Arrastra el círculo hasta la cara"></canvas>
       <div class="selfie-ajuste">
         <p id="selfieAviso" class="dica" aria-live="polite"></p>
-        <label class="rotulo selfie-tam"><span data-t="Tamanho do círculo|Circle size"></span><input id="selfieTam" type="range" min="8" max="80" value="35"></label>
-        <button id="selfieUsar" class="grande" type="button" data-t="✅ Usar este rosto|✅ Use this face"></button>
+        <label class="rotulo selfie-tam"><span data-t="Tamanho do círculo|Circle size|Tamaño del círculo"></span><input id="selfieTam" type="range" min="8" max="80" value="35"></label>
+        <button id="selfieUsar" class="grande" type="button" data-t="✅ Usar este rosto|✅ Use this face|✅ Usar esta cara"></button>
       </div>
     </div>
     <div class="selfie-botoes">
-      <button id="selfieApagar" class="medio" type="button" data-t="🗑️ Apagar minha foto|🗑️ Delete my photo"></button>
-      <button id="selfieFechar" class="medio" type="button" data-t="Fechar|Close"></button>
+      <button id="selfieApagar" class="medio" type="button" data-t="🗑️ Apagar minha foto|🗑️ Delete my photo|🗑️ Borrar mi foto"></button>
+      <button id="selfieFechar" class="medio" type="button" data-t="Fechar|Close|Cerrar"></button>
     </div>
   </div>
 </div>

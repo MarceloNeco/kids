@@ -417,7 +417,7 @@
     poli(c, [W * 0.02, H, W * 0.16, H * 0.06, W * 0.12, H * 0.06, W * -0.02, H], '#c79a2e');
   }
 
-  // ---------- 1.17.0: no rio (desenhos próprios) ----------
+  // ---------- 1.18.0: no rio (desenhos próprios) ----------
   function ondinha(c, W, H, y, larg) {   // espuma em volta do que boia
     c.fillStyle = 'rgba(255,255,255,.85)'; c.beginPath(); c.ellipse ? c.ellipse(W / 2, y, larg, H * 0.06, 0, 0, Math.PI * 2) : c.arc(W / 2, y, larg, 0, Math.PI * 2); c.fill();
     c.fillStyle = 'rgba(160,225,255,.9)'; c.beginPath(); c.ellipse ? c.ellipse(W / 2, y, larg * 0.8, H * 0.035, 0, 0, Math.PI * 2) : c.arc(W / 2, y, larg * 0.8, 0, Math.PI * 2); c.fill();

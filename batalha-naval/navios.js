@@ -9,13 +9,13 @@
 (function (raiz) {
   'use strict';
   var TIPOS = {
-    porta: { pt: 'Porta-aviões', en: 'Aircraft carrier', tam: 5 },
-    encouracado: { pt: 'Encouraçado', en: 'Battleship', tam: 4 },
-    cruzador: { pt: 'Cruzador', en: 'Cruiser', tam: 4 },
-    submarino: { pt: 'Submarino', en: 'Submarine', tam: 3 },
-    fragata: { pt: 'Fragata', en: 'Frigate', tam: 3, fem: true },
-    destroier: { pt: 'Destróier', en: 'Destroyer', tam: 2 },
-    patrulha: { pt: 'Lancha-patrulha', en: 'Patrol boat', tam: 2, fem: true }
+    porta: { pt: 'Porta-aviões', en: 'Aircraft carrier', es: 'Portaaviones', tam: 5 },
+    encouracado: { pt: 'Encouraçado', en: 'Battleship', es: 'Acorazado', tam: 4 },
+    cruzador: { pt: 'Cruzador', en: 'Cruiser', es: 'Crucero', tam: 4 },
+    submarino: { pt: 'Submarino', en: 'Submarine', es: 'Submarino', tam: 3 },
+    fragata: { pt: 'Fragata', en: 'Frigate', es: 'Fragata', tam: 3, fem: true },
+    destroier: { pt: 'Destróier', en: 'Destroyer', es: 'Destructor', tam: 2 },
+    patrulha: { pt: 'Lancha-patrulha', en: 'Patrol boat', es: 'Lancha patrullera', tam: 2, fem: true }
   };
   var POR_TAM = { 5: ['porta'], 4: ['encouracado', 'cruzador'], 3: ['submarino', 'fragata'], 2: ['destroier', 'patrulha'] };
   function porOrdem(tam, ord) { var l = POR_TAM[tam] || POR_TAM[2]; return l[Math.min(ord, l.length - 1)]; }

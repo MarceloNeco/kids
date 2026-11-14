@@ -6,7 +6,7 @@
 
 ```json
 [
-  { "nome": { "pt": "Vovó Lia", "en": "Grandma Lia" }, "arquivo": "vovo.png", "papel": "heroi", "mascote": true },
+  { "nome": { "pt": "Vovó Lia", "en": "Grandma Lia", "es": "Abuela Lia" }, "arquivo": "vovo.png", "papel": "heroi", "mascote": true },
   { "nome": "Rex", "arquivo": "rex.png", "papel": "vilao" }
 ]
 ```

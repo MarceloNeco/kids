@@ -131,7 +131,7 @@
   }
   function luzHex(cor, n) { var k = 0.62 + 0.42 * Math.max(0, dot(n, LUZ)), c = hexRgb(cor); return '#' + c.map(function (v) { return ('0' + Math.min(255, Math.round(v * k)).toString(16)).slice(-2); }).join(''); }
   // roda: cilindro de 12 lados deitado no eixo x (pneu escuro e calota clara virada para fora)
-  var emBarco = false;   // no rio (1.17.0) as rodas recolhem e entram as boias (montar)
+  var emBarco = false;   // no rio (1.18.0) as rodas recolhem e entram as boias (montar)
   function roda(cam, L, cen, r, larg, calota) {
     if (emBarco) return;
     var N = 12, lado = cen[0] >= 0 ? 1 : -1, fora = [], dentro = [];
