@@ -3,7 +3,7 @@
    Músicas gravadas (*.mp3, das pastas de outros jogos): o service worker não mexe (o navegador busca direto).
    Cache com o nome do app: só apaga caches "quem-e-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.6.1';
+var VERSAO = '0.6.2';
 var CACHE = 'quem-e-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'nomes.js', 'logica.js', 'partida.js', 'caras.js', 'melecas.js', 'melecas/blue-feliz.webp', 'melecas/blue-ops.webp', 'melecas/blue-pensando.webp', 'melecas/blue-triste.webp', 'melecas/pink-feliz.webp', 'melecas/pink-ops.webp', 'melecas/pink-pensando.webp', 'rede.js', '../batalha-naval/pertinho.js', '../batalha-naval/qr.js', '../batalha-naval/libs/qrcode.js', '../batalha-naval/libs/jsQR.js', 'adivinha-perguntas.js', 'adivinha.js', 'aprender.js', 'voz.js', 'personagens/familia.js', 'personagens/disney.js', 'personagens/desenhos.js', 'personagens/filmes.js', 'personagens/musica.js', 'personagens/famosos.js', 'personagens/mundo.js', 'personagens/jogos.js', 'personagens/novos.js', 'personagens/animacao.js', 'personagens/cinema.js', 'personagens/estrelas.js', 'personagens/historia.js', 'personagens/natureza.js', 'app.js', 'adivinha-tela.js', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../janela.js', '../cofre.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
 self.addEventListener('install', function (e) {

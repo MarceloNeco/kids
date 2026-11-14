@@ -204,7 +204,7 @@
       'cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n chapeu:s arma:p robo:? rabo:n pelo:n monstro:n ' +
       'antigo:s t-mario:n'],
     ['tetris', 'Tetris (as pecinhas)', '🧱', 'IFA',
-      'real:q pessoa:n bicho:n coisa:s masculino:n feminino:n crianca:n idoso:n brasileiro:n fala:n desenho:n ' +
+      'real:q pessoa:n bicho:n coisa:s masculino:n feminino:n crianca:n adolescente:n idoso:n brasileiro:n fala:n desenho:n ' +
       'filme:q serie:n livro:n videogame:s internet:n tv:n disney:n canta:n musica:q esporte:n heroi:n vilao:n ' +
       'magia:n voa:n engracado:n realeza:n cor-azul:p cor-vermelho:p cor-verde:p cor-amarelo:p cor-rosa:p ' +
       'cor-preto:n cor-branco:n cor-marrom:p grande:n pequeno:? rabo:n pelo:n monstro:n robo:n comida:n antigo:s'],
@@ -285,7 +285,7 @@
       'cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n monstro:s robo:n rabo:n pelo:n comida:n antigo:s ' +
       't-mario:s'],
     ['bowser-jr', 'Bowser Jr.', '🐲', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s desenho:p ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s desenho:p ' +
       'filme:n serie:n livro:n videogame:s internet:n tv:n disney:n canta:n musica:n esporte:n heroi:n vilao:s ' +
       'magia:p voa:p engracado:p realeza:s cor-azul:n cor-vermelho:p cor-verde:s cor-amarelo:p cor-rosa:n ' +
       'cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n ruivo:s rabo:s pelo:n dinossauro:p monstro:s robo:n ' +
@@ -351,20 +351,20 @@
       'cor-preto:n cor-branco:q cor-marrom:p grande:n pequeno:n monstro:s robo:n rabo:n pelo:n rapido:p antigo:s ' +
       't-mario:n'],
     ['authentic-games', 'AuthenticGames', '🕹️', 'IFA',
-      'real:s pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:n brasileiro:s fala:s desenho:q ' +
+      'real:s pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:n brasileiro:s fala:s desenho:q ' +
       'filme:q serie:n livro:? videogame:p internet:s tv:n disney:n canta:n musica:n esporte:n heroi:n vilao:n ' +
       'magia:n voa:n engracado:p realeza:n cor-azul:? cor-vermelho:? cor-verde:? cor-amarelo:? cor-rosa:? ' +
       'cor-preto:? cor-branco:? cor-marrom:? grande:n pequeno:n vivo:s antigo:n recente:s historia:n ator:n ' +
       'dancar:n futebol:n corrida:n cientista:n pintor:n politico:n oscar:n estrangeiro-eua:n europa:n espaco:n'],
     ['casimiro', 'Casimiro (Cazé)', '🎙️', 'FA',
-      'real:s pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:n brasileiro:s fala:s desenho:n ' +
+      'real:s pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:n brasileiro:s fala:s desenho:n ' +
       'filme:n serie:n livro:n videogame:q internet:s tv:q disney:n canta:n musica:n esporte:p heroi:n vilao:n ' +
       'magia:n voa:n engracado:s realeza:n cor-azul:? cor-vermelho:? cor-verde:? cor-amarelo:? cor-rosa:? ' +
       'cor-preto:? cor-branco:? cor-marrom:? grande:n pequeno:n barba:s careca:n rico:p vivo:s antigo:n recente:s ' +
       'historia:n ator:n dancar:n futebol:q corrida:n cientista:n pintor:n politico:n oscar:n estrangeiro-eua:n ' +
       'europa:n espaco:n'],
     ['cellbit', 'Cellbit', '🔎', 'FA',
-      'real:s pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:n brasileiro:s fala:s desenho:n ' +
+      'real:s pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:n brasileiro:s fala:s desenho:n ' +
       'filme:n serie:n livro:n videogame:p internet:s tv:n disney:n canta:n musica:n esporte:n heroi:n vilao:n ' +
       'magia:n voa:n engracado:p realeza:n cor-azul:? cor-vermelho:? cor-verde:? cor-amarelo:? cor-rosa:? ' +
       'cor-preto:? cor-branco:? cor-marrom:? grande:n pequeno:n vivo:s antigo:n recente:s historia:n ator:n ' +

@@ -242,6 +242,14 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 .adv-fala { position: relative; background: var(--branco); border: 4px solid var(--tinta); border-radius: 26px; padding: 14px 18px; width: 100%; box-shadow: 0 6px 0 var(--tinta); }
 .adv-fala::before { content: ''; position: absolute; left: 50%; top: -16px; margin-left: -12px; border: 12px solid transparent; border-bottom: 14px solid var(--tinta); border-top: 0; }
 .adv-pergunta { font-size: clamp(1.25rem, 5.4vw, 1.7rem); font-weight: 700; line-height: 1.25; }
+.adv-fala.sai { animation: fala-sai .25s ease-in forwards; }
+.adv-fala.entra { animation: fala-entra .5s cubic-bezier(.3, 1.5, .5, 1); }
+.adv-contador.entra { display: inline-block; animation: conta-pula .5s ease-out; }
+.resp.escolhida { animation: resp-escolhida .45s ease-out; outline: 4px solid var(--tinta); outline-offset: 2px; }
+@keyframes fala-sai { to { opacity: 0; transform: translateX(-35%) rotate(-4deg) scale(.85); } }
+@keyframes fala-entra { 0% { opacity: 0; transform: translateX(35%) rotate(4deg) scale(.85); } 100% { opacity: 1; transform: none; } }
+@keyframes conta-pula { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@keyframes resp-escolhida { 0% { transform: scale(1); } 40% { transform: scale(1.07); } 100% { transform: scale(1); } }
 .adv-respostas { display: grid; gap: 8px; width: min(100%, 26rem); position: relative; }
 .resp { min-height: 52px; border-radius: 18px; border: 3px solid var(--tinta); font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 0 var(--tinta); color: var(--tinta); }
 .resp:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tinta); }
@@ -270,6 +278,10 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 .voz-liga { display: flex; align-items: center; gap: 8px; font-weight: 700; min-height: 44px; }
 .voz-liga input { width: 26px; height: 26px; }
 .passos { padding-left: 1.4em; display: grid; gap: 4px; }
+.dub-lista { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dub-bt { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 76px; padding: 8px 6px; border-radius: 16px; border: 3px solid var(--tinta); background: var(--branco); color: var(--tinta); font-weight: 700; font-size: .95rem; line-height: 1.15; box-shadow: 0 3px 0 var(--tinta); }
+.dub-bt[aria-pressed="true"] { background: #b6ecc8; outline: 4px solid var(--tinta); outline-offset: 1px; }
+.dub-emoji { font-size: 1.8rem; line-height: 1; }
 .voz-caixa a.medio-bt { text-decoration: none; color: var(--tinta); display: inline-flex; align-items: center; justify-self: start; }
 @media (orientation: landscape) and (max-height: 600px) {
   #adivinha.ativa { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "topo topo" "palco botoes"; align-items: center; column-gap: 18px; padding-top: calc(52px + var(--st)); }
@@ -279,12 +291,16 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
   .resp { min-height: 44px; font-size: 1.05rem; }
   .adv-voltar { position: static; }
 }
-/* respostas em duas colunas: Sim | Não, Acho que sim | Acho que não, Não sei | ↩️ (cabe em celular baixinho) */
-.adv-respostas { grid-template-columns: 1fr 1fr; }
-.resp.sim { order: 1; } .resp.nao { order: 2; } .resp.psim { order: 3; } .resp.pnao { order: 4; } .resp.nsei { order: 5; }
-.adv-respostas .adv-voltar { order: 6; position: static; justify-self: center; align-self: center; }
-.adv-respostas #btJaChega { order: 7; grid-column: 1 / -1; }
-.resp.sim, .resp.nao { min-height: 60px; font-size: 1.3rem; }
+/* respostas numa escala só, de um lado ao outro (dono, 14/Nov/2026):
+   Sim, com certeza · Acho que sim · Não sei · Acho que não · Não, com certeza — do verde ao vermelho; ↩️ embaixo */
+.adv-respostas { grid-template-columns: repeat(5, 1fr); gap: 5px; width: min(100%, 34rem); }
+.resp { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 2px; min-height: 84px;
+  font-size: clamp(.74rem, 3.1vw, .95rem); line-height: 1.12; border-radius: 16px; }
+.resp-emoji { font-size: clamp(1.5rem, 7vw, 2rem); line-height: 1; }
+.resp.sim, .resp.nao { border-width: 4px; }
+.resp.sim { background: #5fd38a; } .resp.psim { background: #b6ecc8; } .resp.nsei { background: #f3eefe; } .resp.pnao { background: #ffc4c4; } .resp.nao { background: #ff8080; }
+.adv-respostas .adv-voltar { grid-column: 1 / -1; position: static; justify-self: center; align-self: center; }
+.adv-respostas #btJaChega { grid-column: 1 / -1; }
 @media (max-height: 700px) and (orientation: portrait) {
   #adivinha { padding-top: calc(56px + var(--st)); gap: 6px; }
   .meleca-grande { width: min(32vw, 20vh, 150px); }
