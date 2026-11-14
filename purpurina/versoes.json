@@ -2,6 +2,32 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.19.0",
+      "data": "14/Nov/2026",
+      "hora": "15:14:27",
+      "pt": [
+        "🎶 14 músicas novas compostas para a Purpurina: pop animado em tom maior, com instrumentos de verdade e sem voz (festa, disco, house, pop rock). Saíram as que pareciam som de videogame.",
+        "💃 No desfile toca uma música de passarela: umas animadas e outras mais emocionantes.",
+        "✨ Personagem com cara de 3D: rosto e cabelo com volume, luz e sombra suaves, olhos com brilho e profundidade.",
+        "🧸 Ícones 3D nas abas e nas partes (batom, blush, sombra, cabelo, roupas...).",
+        "👭 Em 💖 Meus looks, duas personagens prontas para brincar: \"Morena de óculos\" e \"Cachinhos dourados\"."
+      ],
+      "en": [
+        "🎶 14 new songs composed for Purpurina: upbeat pop in a major key, with real instruments and no vocals (party, disco, house, pop rock). The ones that sounded like video games are gone.",
+        "💃 The runway plays a catwalk song: some upbeat, some more emotional.",
+        "✨ A character with a 3D look: face and hair with volume, soft light and shadow, eyes with shine and depth.",
+        "🧸 3D icons on the tabs and parts (lipstick, blush, eyeshadow, hair, clothes...).",
+        "👭 In 💖 My looks, two ready-to-play characters: \"Brunette with glasses\" and \"Golden curls\"."
+      ],
+      "es": [
+        "🎶 14 canciones nuevas compuestas para Purpurina: pop animado en tono mayor, con instrumentos de verdad y sin voz (fiesta, disco, house, pop rock). Se han ido las que sonaban a videojuego.",
+        "💃 En el desfile suena una canción de pasarela: unas animadas y otras más emocionantes.",
+        "✨ Personaje con aspecto 3D: cara y pelo con volumen, luz y sombra suaves, ojos con brillo y profundidad.",
+        "🧸 Iconos 3D en las pestañas y en las partes (pintalabios, colorete, sombra, pelo, ropa...).",
+        "👭 En 💖 Mis looks, dos personajes listas para jugar: \"Morena con gafas\" y \"Rizos dorados\"."
+      ]
+    },
+    {
       "versao": "0.18.0",
       "data": "14/Nov/2026",
       "hora": "14:30:00",
