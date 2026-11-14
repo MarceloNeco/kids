@@ -2,7 +2,10 @@
 // navegacao.js. Para cada jogo, com o celular em pé (390×844) e deitado (915×412):
 // - na tela de começo a 🚪 Saída aparece inteira na tela e o 🏠 não;
 // - entrando no jogo, o 🏠 aparece e leva de volta à tela de começo;
-// - o Voltar do celular numa tela de dentro também volta à tela de começo, e na tela de começo sai do jogo;
+// - o Voltar do celular numa tela de dentro também volta à tela de começo; na tela de começo o 1º Voltar avisa
+//   "toque de novo para sair" e só o 2º sai do jogo;
+// - aberto direto (como pelo ícone), se o Chrome pular uma entrada do jogo e o Voltar cair na guarda, o jogo volta ao
+//   começo em vez de fechar;
 // - a 🚪, numa aba comum do navegador, leva à estante (/kids/);
 // - a barra não cobre nenhum outro botão visível do jogo (na tela de começo e na de jogar);
 // - nenhum erro no console.
@@ -30,9 +33,8 @@ const TAMANHOS = [[390, 844], [915, 412]];
 // inicio: o que só aparece na tela de começo; entrar: do começo até uma tela de dentro (começar uma partida);
 // confirmar: o jogo pergunta antes de largar a partida (🏠 e Voltar) e o teste responde que sim;
 // fundo: jogos de várias telas, onde o Voltar volta uma tela por vez (diretriz): o 🏠 é testado lá do fundo;
-// avisaAntesDeSair: na tela de começo o 1º Voltar avisa "toque de novo para sair" e só o 2º sai (diretriz)
 const JOGOS = [
-  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#btToque', avisaAntesDeSair: true,
+  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#btToque',
     entrar: async (pg) => { await pg.click('#btToque'); await pg.waitForTimeout(300); },
     fundo: async (pg) => { await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar');
       await pg.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 }); await pg.click('#localComecar'); await pg.waitForTimeout(1500); } },
@@ -155,7 +157,10 @@ for (const j of JOGOS) {
         await esperarInicio(pg, j, onde + ' (Voltar)');
         assert.ok(pg.url().startsWith(base + j.url.split('?')[0]), onde + ': o Voltar saiu do jogo (' + pg.url() + ')');
         // Voltar na tela de começo: sai do jogo (para a estante, de onde veio)
-        if (j.avisaAntesDeSair) { await pg.goBack().catch(() => {}); await pg.waitForTimeout(400); }
+        // 1º Voltar na tela de começo: não sai, avisa "toque de novo para sair" (diretriz; todos os jogos)
+        await pg.goBack().catch(() => {}); await pg.waitForTimeout(400);
+        assert.ok(pg.url().startsWith(base + j.url.split('?')[0]), onde + ': o 1º Voltar na tela de começo saiu direto do jogo');
+        assert.ok(await pg.evaluate(() => !!document.querySelector('.bolinho-voltar.ver, #avisoSair.ativo')), onde + ': o 1º Voltar na tela de começo não avisou');
         await pg.goBack().catch(() => {});
         await pg.waitForURL(base, { timeout: 5000 }).catch(() => assert.fail(onde + ': o Voltar na tela de começo não saiu do jogo (' + pg.url() + ')'));
         // 🚪 numa aba comum: vai para a estante
@@ -167,6 +172,29 @@ for (const j of JOGOS) {
     }
   });
 }
+
+test('navegação padrão: Voltar que pula entradas do jogo (Chrome) cai na guarda e volta ao começo, sem fechar', async () => {
+  for (const j of JOGOS.filter((x) => x.id !== 'baguncolandia')) {
+    const onde = j.id + ' (guarda)';
+    const { ctx, pg } = await abrir(390, 844);
+    try {
+      await irAoInicio(pg, j);                       // aberto direto, sem a estante antes (como pelo ícone instalado)
+      await pg.keyboard.press('Shift');               // o primeiro toque da pessoa arma a guarda
+      const naGuarda = await pg.evaluate(() => ({ g: !!(history.state && history.state.bolinhoGuarda), n: history.length }));
+      assert.ok(naGuarda.g, onde + ': o primeiro toque não pôs a guarda no histórico');
+      await j.entrar(pg);
+      if (j.fundo) await j.fundo(pg);
+      await pg.waitForSelector('.bolinho-nav .bn-casa:not([hidden])', { timeout: 3000 });
+      // o Chrome pula as entradas que o jogo criou: o Voltar cai direto na guarda
+      const pular = await pg.evaluate(() => history.length) - naGuarda.n;
+      assert.ok(pular >= 1, onde + ': o jogo não pôs nenhuma entrada no histórico ao entrar');
+      await pg.evaluate((k) => history.go(-k), pular); await pg.waitForTimeout(400);
+      if (j.confirmar && await visivel(pg, j.confirmar.janela)) await pg.click(j.confirmar.sim);
+      await esperarInicio(pg, j, onde);
+      assert.ok(pg.url().startsWith(base + j.url.split('?')[0]), onde + ': saiu do jogo');
+    } finally { await ctx.close(); }
+  }
+});
 
 test('navegação padrão: 🚪 com a partida rolando pergunta antes de sair (Campo Minado)', async () => {
   const j = JOGOS.find((x) => x.id === 'campo-minado');
