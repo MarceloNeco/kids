@@ -219,6 +219,8 @@
     em3d('furgao', { id: 'furgao', grupo: 'terra', nome: ['Furgão de Surfe', 'Surf Van', 'Furgoneta de Surf'], w: 900, h: 1000, vel: 0.99, curva: 1.0 }),
     em3d('escolar', { id: 'escolar', quadros: 8, grupo: 'terra', nome: ['Ônibus Escolar', 'School Bus', 'Autobús Escolar'], w: 1000, h: 1100, vel: 0.95, curva: 0.96 }),
     em3d('pelucias', { id: 'pelucias', quadros: 8, grupo: 'terra', nome: ['Caminhão de Pelúcias', 'Plush Claw Truck', 'Camión de Peluches'], w: 1000, h: 1060, vel: 0.96, curva: 0.98 }),
+    em3d('patins', { id: 'patins', capacete: true, semMotor: true, quadros: 12, grupo: 'moto', nome: ['Patins', 'Roller Skates', 'Patines'], w: 700, h: 1170, vel: 0.95, curva: 1.15 }),
+    em3d('guincho', { id: 'guincho', quadros: 8, grupo: 'terra', nome: ['Caminhão Guincho', 'Tow Truck', 'Camión Grúa'], w: 760, h: 1290, vel: 0.95, curva: 0.96 }),
     em3d('ovo', { id: 'ovo', quadros: 8, semPiloto: true, semMotor: true, grupo: 'moto', nome: ['Ovo Corredor', 'Running Egg', 'Huevo Corredor'], w: 720, h: 1000, vel: 0.97, curva: 1.14 }),
     em3d('aviao', { id: 'aviao', grupo: 'ar', nome: ['Aviãozinho', 'Little Plane', 'Avioncito'], w: 1500, h: 760, vel: 1, curva: 1.05 }),
     em3d('jato', { id: 'jato', grupo: 'ar', nome: ['Jato', 'Jet', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92 }),

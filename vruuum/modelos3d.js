@@ -592,6 +592,68 @@
       bola(cam, L, [0, 1.74, 0.88], 0.27, 0.24, 0.26, tres('#15131a'), -0.01);   // cabelo penteado
       bola(cam, L, [-0.4, 1.66, -0.35], 0.26, 0.24, 0.2, tres(tom(cor, -0.15)), -0.1);   // quem monta, nas costas (de lado, para ver o rosto dele)
       piloto(cam, L, [-0.4, 2.05, -0.35], 0.38, op);
+    } },
+
+    // ---------- 1.20.0 ----------
+    /* patins de 4 rodinhas (dono, 14/Nov/2026): uma pessoa de capacete patinando de verdade. A passada: uma perna
+       empurra para o lado e para trás enquanto a outra desliza; o corpo vai para cima da perna que desliza,
+       inclinado para a frente, e os braços balançam ao contrário das pernas. fase: um ciclo = uma passada de cada lado */
+    patins: { alt: 3.6, y: 1.2, larg: 0.5, comp: 0.6, montar: function (cam, L, cor, f, op) {
+      var s = Math.sin(f * PI * 2), sway = -s * 0.12, bob = Math.abs(s) * 0.05, ROUPA = tom(cor, -0.35), PELE = '#f2c9a0', BOTA = '#f4f4f8';
+      var hipC = [sway, 1.12 - bob, 0];
+      [-1, 1].forEach(function (l) {
+        var p = l < 0 ? s : -s, empurra = Math.max(0, p), volta = Math.max(0, -p);
+        var quadril = [l * 0.15 + sway, 1.12 - bob, 0];
+        var pe = [l * (0.2 + empurra * 0.42) + sway * 0.3, 0.2 + volta * 0.14, -empurra * 0.38 + volta * 0.1];
+        var joelho = [(quadril[0] + pe[0]) / 2 + l * 0.04, 0.66 + volta * 0.1, Math.max(quadril[2], pe[2]) + 0.26];
+        cano(cam, L, quadril, joelho, 0.13, 0.1, '#2a2d3a');   // coxa (bermuda)
+        bola(cam, L, joelho, 0.11, 0.1, 0.1, tres(cor), -0.01);   // joelheira
+        cano(cam, L, joelho, add(pe, [0, 0.12, 0.02]), 0.085, 0.07, PELE);   // canela
+        // o patins: bota, base, freio na frente e 4 rodinhas
+        caixa(cam, L, [pe[0], pe[1] + 0.1, pe[2] + 0.06], [0.22, 0.26, 0.44], BOTA, { tras: function (c) { retangulo(c, 0, 0, 100, 18, cor); }, esq: function (c) { retangulo(c, 0, 0, 100, 18, cor); retangulo(c, 30, 45, 40, 10, cor); }, dir: function (c) { retangulo(c, 0, 0, 100, 18, cor); retangulo(c, 30, 45, 40, 10, cor); } });
+        caixa(cam, L, [pe[0], pe[1] - 0.06, pe[2] + 0.06], [0.2, 0.05, 0.48], '#9aa0a6');
+        bola(cam, L, [pe[0], pe[1] - 0.08, pe[2] + 0.33], 0.06, 0.06, 0.06, tres('#e63946'));
+        [-1, 1].forEach(function (lx) { [-0.1, 0.22].forEach(function (dz) { roda(cam, L, [pe[0] + lx * 0.1, pe[1] - 0.12, pe[2] + dz], 0.075, 0.07, '#ffd166'); }); });
+        // braço: balança ao contrário da perna e abre um pouco para o lado quando ela empurra
+        var ombro = [l * 0.27 + sway * 0.8, 1.78 - bob, 0.2], mao = [l * (0.42 + empurra * 0.18) + sway * 0.6, 1.3 - bob, 0.2 - p * 0.42];
+        var cotovelo = [(ombro[0] + mao[0]) / 2 + l * 0.08, (ombro[1] + mao[1]) / 2 - 0.02, (ombro[2] + mao[2]) / 2 - 0.05];
+        cano(cam, L, ombro, cotovelo, 0.08, 0.07, cor); cano(cam, L, cotovelo, mao, 0.065, 0.055, PELE);
+        bola(cam, L, cotovelo, 0.08, 0.08, 0.08, tres(ROUPA), -0.01);   // cotoveleira
+        bola(cam, L, mao, 0.07, 0.07, 0.07, tres(PELE));
+      });
+      bola(cam, L, hipC, 0.22, 0.16, 0.16, tres('#2a2d3a'));   // bermuda
+      bola(cam, L, [sway * 0.85, 1.5 - bob, 0.12], 0.25, 0.36, 0.19, tres(cor));   // tronco (camiseta), inclinado para a frente
+      caixa(cam, L, [sway * 0.85, 1.5 - bob, -0.08], [0.24, 0.08, 0.02], '#ffffff');   // listra nas costas
+      piloto(cam, L, [sway * 0.8, 2.12 - bob, 0.22], 0.34, op);
+    } },
+    /* caminhão guincho: cabine alta lá na frente (o piloto aparece pelo vidro de trás), carroceria com faixas de
+       atenção, braço do guincho em "A" (dois braços amarelos) com o cabo e o gancho balançando, giroflex piscando no
+       teto, chaminés cromadas e rodas grandes (duplas atrás) */
+    guincho: { alt: 4.6, y: 1.4, z: 0.4, larg: 1.25, comp: 3.0, montar: function (cam, L, cor, f, op) {
+      var AM = '#ffc20e', pisca = f % 0.5 < 0.25, bal = Math.sin(f * PI * 2) * 0.18;
+      var atencao = function (c) { retangulo(c, 0, 0, 100, 100, '#1b1b22'); c.fillStyle = AM; for (var k = -2; k < 8; k++) { c.beginPath(); c.moveTo(k * 16, 100); c.lineTo(k * 16 + 8, 100); c.lineTo(k * 16 + 28, 0); c.lineTo(k * 16 + 20, 0); c.closePath(); c.fill(); } };
+      caixa(cam, L, [0, 0.95, -0.9], [2.3, 0.5, 4.0], '#3a3a44', { tras: function (c) { atencao(c); lanternas(c); placa(c, 'GUINCHO'); }, esq: function (c) { retangulo(c, 0, 0, 100, 30, AM); }, dir: function (c) { retangulo(c, 0, 0, 100, 30, AM); } });   // carroceria
+      caixa(cam, L, [0, 1.75, 1.75], [2.4, 1.1, 1.5], cor, { esq: function (c) { texto(c, 'GUINCHO', 50, 70, 22, '#ffffff', '#1a1446'); }, dir: function (c) { texto(c, 'GUINCHO', 50, 70, 22, '#ffffff', '#1a1446'); }, tras: function (c) { retangulo(c, 0, 0, 100, 12, tom(cor, -0.3)); } });   // cabine (parte de baixo)
+      caixa(cam, L, [0, 2.65, 1.75], [2.4, 0.7, 1.5], '#26313f', { tras: function (c) { retangulo(c, 0, 0, 8, 100, cor); retangulo(c, 92, 0, 8, 100, cor); }, esq: function (c) { retangulo(c, 0, 0, 8, 100, cor); retangulo(c, 92, 0, 8, 100, cor); }, dir: function (c) { retangulo(c, 0, 0, 8, 100, cor); retangulo(c, 92, 0, 8, 100, cor); } }, { alfa: { tras: 0.45, frente: 0.5, esq: 0.55, dir: 0.55 }, sem: ['cima', 'baixo'] });   // vidros
+      caixa(cam, L, [0, 3.06, 1.75], [2.44, 0.12, 1.54], tom(cor, -0.2));   // teto
+      piloto(cam, L, [0, 2.6, 1.5], 0.45, op);
+      caixa(cam, L, [0, 1.35, 3.0], [2.3, 0.9, 1.1], cor, { frente: function (c) { retangulo(c, 15, 20, 70, 50, '#c9ced6'); [12, 88].forEach(function (x) { circulo(c, x, 40, 9, '#fff7c2'); }); } });   // capô
+      [-1, 1].forEach(function (l) {   // chaminés cromadas atrás da cabine
+        cano(cam, L, [l * 1.05, 1.3, 0.85], [l * 1.05, 3.5, 0.85], 0.09, 0.09, '#d9dde3');
+        bola(cam, L, [l * 1.05, 3.55, 0.85], 0.1, 0.05, 0.1, tres('#2a2a30'), -0.02);
+      });
+      [-0.6, 0, 0.6].forEach(function (x, k) { bola(cam, L, [x, 3.22, 1.9], 0.16, 0.1, 0.12, (pisca ? k !== 1 : k === 1) ? ['#fff3c0', '#ffb703', '#a06000'] : ['#8a6a30', '#5a4420', '#3a2a10'], -0.02); });   // giroflex
+      // braço do guincho em A: dos dois lados da carroceria até a ponta lá atrás, com o cabo e o gancho
+      var base = -0.2, ponta = [0, 2.9, -3.0];
+      [-1, 1].forEach(function (l) { cano(cam, L, [l * 0.75, 1.25, base], [l * 0.25, ponta[1], ponta[2]], 0.13, 0.09, AM); cano(cam, L, [l * 0.75, 1.25, base - 1.2], [l * 0.45, 2.1, -2.2], 0.07, 0.06, '#9aa0a6'); });
+      cano(cam, L, [-0.3, ponta[1], ponta[2]], [0.3, ponta[1], ponta[2]], 0.1, 0.1, AM);
+      bola(cam, L, ponta, 0.16, 0.16, 0.12, tres('#3a3a44'), -0.02);   // roldana
+      var gancho = [Math.sin(bal) * 0.9, ponta[1] - 1.25, ponta[2] - Math.abs(bal) * 0.3];
+      cano(cam, L, ponta, gancho, 0.025, 0.025, '#222');
+      bola(cam, L, add(gancho, [0, -0.08, 0]), 0.1, 0.12, 0.1, tres('#e63946'), -0.01);
+      cano(cam, L, add(gancho, [0, -0.15, 0]), add(gancho, [0.12, -0.38, 0]), 0.04, 0.04, '#9aa0a6');
+      cano(cam, L, add(gancho, [0.12, -0.38, 0]), add(gancho, [-0.06, -0.42, 0]), 0.04, 0.035, '#9aa0a6');
+      [[-1, -2.2], [1, -2.2], [-1, -1.1], [1, -1.1], [-1, 2.7], [1, 2.7]].forEach(function (w) { roda(cam, L, [w[0] * 1.08, 0.6, w[1]], 0.6, 0.48, '#c9ced6'); });
     } }
   };
 
