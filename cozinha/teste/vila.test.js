@@ -119,3 +119,42 @@ test('missão no Difícil: depois de pegar tudo de um lugar, volta para a vila, 
   assert.deepEqual(erros, [], 'erros no console');
   await ctx.close();
 });
+
+test('lugares por dentro (v0.9.0): vaca desenhada com a criança no banquinho e o balde; horta cercada; galinheiro de madeira; frutas de massinha; o ajudante anda até onde a criança toca', { timeout: 90000 }, async () => {
+  const r = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  const pg = r.pg;
+  await pg.goto(pg.url() + '&devagar');
+  await pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
+  await comecar(pg, 'medio', 'salada-frutas');
+  const entra = async l => { await pg.click('[data-lugar="' + l + '"]', { force: true }); await pg.waitForSelector('#lugar.ativa', { timeout: 8000 }); };
+  const sai = async () => { await pg.click('#lugar .voltar', { force: true }); await pg.waitForSelector('#mapa.ativa'); };
+  // fazendinha: a vaca grande, a criança no banquinho e o balde (o leite enche o balde enquanto segura)
+  await entra('vaca');
+  assert.equal(await pg.locator('.mimosa svg.vaca-svg .v-ubere').count(), 1, 'a Mimosa com o úbere');
+  assert.equal(await pg.locator('.ordenhador svg.ordenha-svg').count(), 1, 'a criança sentada tirando leite');
+  assert.equal(await pg.locator('.jarra.balde .leite-nivel').count(), 1, 'o balde');
+  await pg.locator('#btOrdenhar').dispatchEvent('pointerdown');
+  assert.equal(await pg.locator('.pasto.ordenhando').count(), 1, 'as mãos mexem e o leite cai enquanto segura');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.pasto .v-maos')).animationName), 'ordenhar');
+  await pg.locator('#btOrdenhar').dispatchEvent('pointerup'); await sai();
+  // horta: cercada, com o ajudante que anda até a planta tocada
+  await entra('horta');
+  assert.equal(await pg.locator('.canteiro.cercado .ajudante').count(), 1);
+  const aj = () => pg.evaluate(() => { const a = document.querySelector('.ajudante').getBoundingClientRect(); return [Math.round(a.left), Math.round(a.top)]; });
+  await pg.waitForTimeout(150);
+  const a0 = await aj();
+  const pl = await pg.locator('.canteiro .planta').last().boundingBox();
+  await pg.mouse.move(pl.x + pl.width / 2, pl.y + pl.height / 2); await pg.mouse.down(); await pg.mouse.up();
+  await pg.waitForTimeout(1100);
+  assert.notDeepEqual(await aj(), a0, 'o ajudante andou até a planta');
+  await sai();
+  // pomar: frutas desenhadas "de massinha"
+  await entra('pomar');
+  assert.ok(await pg.locator('.pomar .fruta .massinha svg').count() >= 4, 'frutas de massinha no pé');
+  assert.equal(await pg.locator('.pomar .ajudante').count(), 1);
+  await sai();
+  await entra('galinheiro');
+  assert.equal(await pg.locator('.poleiro.casinha-galinha .ajudante').count(), 1, 'galinheiro de madeira com o ajudante');
+  assert.deepEqual(r.erros, [], 'erros no console');
+  await r.ctx.close();
+});

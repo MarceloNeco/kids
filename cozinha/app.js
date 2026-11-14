@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.0';
+  var APP_VERSION = '0.9.0';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -602,6 +602,7 @@
     area.innerHTML = '<p class="instr">' + t('Cada fruta nasce na sua planta! Toque nas frutas maduras e coloridas. As verdinhas ainda precisam esperar.', 'Each fruit grows on its own plant! Tap the ripe, colourful fruit. The green ones still need to wait.') + '</p>' +
       '<div class="pomar"></div>';
     var pomar = qs(area, '.pomar');
+    ajudante(pomar, '.pe');
     tipos.forEach(function (tipo) {
       var pid = D.ingrediente[tipo].planta, pl = D.planta[pid];
       var pe = document.createElement('div'); pe.className = 'pe p-' + pid; pe.setAttribute('data-planta', pid);
@@ -639,6 +640,27 @@
     }, 1500 * V);
   };
 
+  // ajudante (v0.9.0): o bonequinho entra no lugar junto e anda até a planta, a árvore ou a galinha que a criança tocar
+  // (só enfeite: a brincadeira não espera por ele). Com "reduzir movimento" ele chega na hora.
+  function ajudante(caixa, seletor) {
+    caixa.classList.add('tem-ajudante');
+    var a = document.createElement('span'); a.className = 'ajudante'; a.setAttribute('aria-hidden', 'true'); a.innerHTML = VI.boneco(); caixa.appendChild(a);
+    var x = 0, tAnda = 0;
+    function por(nx, ny, dur) {
+      a.style.setProperty('--dur', dur + 's'); a.classList.toggle('esq', nx < x); x = nx;
+      a.style.left = nx + 'px'; a.style.top = ny + 'px';
+    }
+    requestAnimationFrame(function () { por(Math.min(40, caixa.clientWidth * 0.1), caixa.clientHeight - 4, 0); });
+    caixa.addEventListener('pointerdown', function (e) {
+      var el = e.target.closest(seletor); if (!el || !caixa.contains(el)) return;
+      var cr = caixa.getBoundingClientRect(), r = el.getBoundingClientRect();
+      var cx = r.left - cr.left + r.width / 2, nx = cx > caixa.clientWidth / 2 ? cx - r.width * 0.42 : cx + r.width * 0.42, ny = Math.min(caixa.clientHeight - 2, r.bottom - cr.top);
+      var dist = Math.abs(nx - x) + Math.abs(ny - (parseFloat(a.style.top) || 0)), dur = calmo() || VA < 1 ? 0 : Math.min(0.9, 0.15 + dist / 420);
+      a.classList.remove('puxa'); a.classList.add('anda'); por(nx, ny, dur);
+      clearTimeout(tAnda); tAnda = setTimeout(function () { a.classList.remove('anda'); void a.offsetWidth; a.classList.add('puxa'); }, dur * 1000);
+    });
+  }
+
   // Horta: cenoura e batata crescem EMBAIXO da terra (dá para ver pela terra) e se arrancam puxando 3 vezes;
   // tomate no tomateiro com estaca, alface (bola de folhas) e cheiro-verde em cima da terra: um toque colhe.
   MINI.horta = function (area) {
@@ -646,8 +668,9 @@
     var forma = function (id) { return D.planta[D.ingrediente[id].planta].forma; };
     var raiz = tipos.some(function (id) { return forma(id) === 'raiz'; }), cima = tipos.some(function (id) { return forma(id) !== 'raiz'; });
     area.innerHTML = '<p class="instr">' + (raiz ? t('O que cresce embaixo da terra: toque 3 vezes (ou puxe o dedo para cima) para arrancar. ', 'What grows under the ground: tap 3 times (or swipe up) to pull it out. ') : '') +
-      (cima ? t('O que cresce em cima da terra: um toque colhe.', 'What grows above the ground: one tap picks it.') : '') + '</p><div class="canteiro"></div>';
+      (cima ? t('O que cresce em cima da terra: um toque colhe.', 'What grows above the ground: one tap picks it.') : '') + '</p><div class="canteiro cercado"></div>';
     var cant = qs(area, '.canteiro');
+    ajudante(cant, '.planta');
     for (var i = 0; i < 6; i++) (function (i) {
       var tipo = tipos[i % tipos.length], f = forma(tipo), pl = D.planta[D.ingrediente[tipo].planta], vezes = f === 'raiz' ? 3 : 1;
       var b = document.createElement('button'); b.type = 'button'; b.className = 'planta f-' + f; b.setAttribute('data-ing', tipo);
@@ -683,8 +706,9 @@
 
   MINI.galinheiro = function (area) {
     var n = jogo.cfg.id === 'facil' || RAPIDO ? 3 : jogo.cfg.id === 'medio' ? 2 : 1;
-    area.innerHTML = '<p class="instr">' + t('Toque numa galinha para ela levantar. Se tiver ovo, pegue com cuidado!', 'Tap a hen so she stands up. If there is an egg, pick it up gently!') + '</p><div class="poleiro"></div>';
+    area.innerHTML = '<p class="instr">' + t('Toque numa galinha para ela levantar. Se tiver ovo, pegue com cuidado!', 'Tap a hen so she stands up. If there is an egg, pick it up gently!') + '</p><div class="poleiro casinha-galinha"></div>';
     var pol = qs(area, '.poleiro');
+    ajudante(pol, '.ninho');
     var ordem = embaralhar([0, 1, 2]);
     [0, 1, 2].forEach(function (i) {
       var temOvo = ordem.indexOf(i) < n;
@@ -705,9 +729,11 @@
   };
 
   MINI.vaca = function (area) {
-    area.innerHTML = '<p class="instr">' + t('Faça carinho na Mimosa e segure o botão para encher a xícara de leite.', 'Pet Mimosa and hold the button to fill the cup with milk.') + '</p>' +
-      '<div class="pasto"><button type="button" class="mimosa" aria-label="' + t('Fazer carinho na vaca', 'Pet the cow') + '">🐄</button>' +
-      '<div class="jarra-zona" aria-hidden="true"><span class="jorro-leite"></span><div class="jarra"><div class="leite-nivel"></div></div></div></div>' +
+    area.innerHTML = '<p class="instr">' + t('Faça carinho na Mimosa e segure o botão para tirar o leite no balde.', 'Pet Mimosa and hold the button to milk her into the bucket.') + '</p>' +
+      // v0.9.0: a Mimosa desenhada grande e a criança sentada no banquinho, tirando o leite no balde
+      '<div class="pasto pasto-v2"><button type="button" class="mimosa" aria-label="' + t('Fazer carinho na vaca', 'Pet the cow') + '">' + VI.vacaGrande() + '</button>' +
+      '<div class="jarra-zona" aria-hidden="true"><span class="jorro-leite"></span><div class="jarra balde"><div class="leite-nivel"></div></div></div>' +
+      '<span class="ordenhador" aria-hidden="true">' + VI.ordenha() + '</span></div>' +
       '<button type="button" class="grande bt-segurar" id="btOrdenhar">' + t('🥛 Segure para tirar o leite', '🥛 Hold to get the milk') + '<span class="barra"><span></span></span></button>';
     var vaca = qs(area, '.mimosa'), nivelEl = qs(area, '.leite-nivel'), bt = qs(area, '.bt-segurar'), barra = qs(bt, '.barra span'), pasto = qs(area, '.pasto');
     // o leite cai em jorro na xícara enquanto o dedo segura

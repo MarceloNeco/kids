@@ -221,6 +221,32 @@
   }
   function nuvem() { return '<svg class="nuvem-svg" viewBox="0 0 60 26" aria-hidden="true" focusable="false"><g fill="#fff" opacity=".92"><circle cx="16" cy="16" r="9"/><circle cx="28" cy="11" r="11"/><circle cx="42" cy="15" r="9"/><rect x="12" y="15" width="34" height="10" rx="5"/></g></svg>'; }
 
-  var API = { bloco: bloco, boneco: boneco, carro: carro, nuvem: nuvem, LUGARES_DESENHADOS: Object.keys(B) };
+  // a Mimosa grande, de lado (fazendinha, v0.9.0): manchas pretas, chifrinhos, focinho rosa, úbere com as tetinhas e o rabo
+  function vacaGrande() {
+    return '<svg class="vaca-svg" viewBox="0 0 200 140" aria-hidden="true" focusable="false">' +
+      '<ellipse cx="96" cy="132" rx="78" ry="6" fill="rgba(40,70,20,.25)"/>' +
+      '<g class="v-rabo2" style="transform-origin:34px 52px"><path d="M34 52 q-16 18 -12 46" stroke="#e8e8e8" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M22 96 q-4 8 3 10 q5 -4 -3 -10z" fill="#333"/></g>' +
+      ['48', '68', '118', '138'].map(function (x, i) { return '<rect x="' + x + '" y="88" width="13" height="40" rx="5" fill="' + (i % 2 ? '#f4f4f4' : '#e6e6e6') + '" stroke="#bbb"/><rect x="' + x + '" y="120" width="13" height="9" rx="3" fill="#5b4636"/>'; }).join('') +
+      '<path d="M34 50 C34 30 60 26 96 28 C130 30 152 32 156 54 C160 78 150 96 120 98 L60 98 C40 98 32 80 34 50Z" fill="#fff" stroke="#c9c9c9" stroke-width="2"/>' +
+      '<path d="M60 34 c12 -4 22 4 18 16 c-4 10 -18 8 -22 0 c-3 -6 -1 -12 4 -16z" fill="#333"/><path d="M108 52 c10 -6 24 0 20 14 c-4 10 -20 10 -24 2 c-2 -6 0 -12 4 -16z" fill="#333"/><path d="M128 32 c8 -2 16 4 12 10 c-6 4 -12 0 -12 -10z" fill="#333"/>' +
+      '<g class="v-ubere"><path d="M84 96 q14 16 28 0z" fill="#ffb3c1" stroke="#e58a9c" stroke-width="1.6"/><path d="M90 104 v8 M98 106 v8 M106 104 v8" stroke="#ff8fa3" stroke-width="4" stroke-linecap="round"/></g>' +
+      '<g class="v-cabeca" style="transform-origin:160px 52px"><path d="M150 40 C150 22 182 20 186 38 C190 52 186 72 176 76 C166 80 154 72 152 60Z" fill="#fff" stroke="#c9c9c9" stroke-width="2"/>' +
+      '<path d="M156 30 q-6 -10 -2 -16 M180 28 q6 -10 2 -16" stroke="#e9c27a" stroke-width="5" stroke-linecap="round" fill="none"/><ellipse cx="150" cy="38" rx="9" ry="5" fill="#fff" stroke="#c9c9c9" transform="rotate(-25 150 38)"/>' +
+      '<ellipse cx="174" cy="68" rx="14" ry="10" fill="#ffb3c1" stroke="#e58a9c"/><ellipse cx="169" cy="68" rx="2" ry="3" fill="#a3485a"/><ellipse cx="179" cy="68" rx="2" ry="3" fill="#a3485a"/>' +
+      '<path d="M162 44 q4 -4 8 0" stroke="#333" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M174 44 q4 -4 8 0" stroke="#333" stroke-width="2.4" fill="none" stroke-linecap="round"/><ellipse cx="160" cy="52" rx="3" ry="2" fill="#ff8fa3" opacity=".6"/></g>' +
+      '<circle cx="168" cy="82" r="4" fill="#ffd23f" stroke="#c9a800"/><path d="M164 78 q4 -6 8 0" stroke="#a0522d" stroke-width="2" fill="none"/></svg>';
+  }
+  // a criança sentada no banquinho tirando leite, com o balde (as mãos sobem e descem no CSS .ordenhando)
+  function ordenha() {
+    return '<svg class="ordenha-svg" viewBox="0 0 90 110" aria-hidden="true" focusable="false">' +
+      '<rect x="8" y="86" width="34" height="6" rx="3" fill="#c98a4b"/><path d="M14 92 l-4 16 M36 92 l4 16 M25 92 v16" stroke="#a8692f" stroke-width="4" stroke-linecap="round"/>' +
+      '<path d="M20 86 q0 -26 10 -30 q12 -2 16 6 l6 24z" fill="#ff8a3d" stroke="#d76b1f"/><path d="M40 84 h20 v8 h-20z" fill="#3a5a8c"/><path d="M58 84 v22" stroke="#3a5a8c" stroke-width="7" stroke-linecap="round"/>' +
+      '<g class="v-maos"><path d="M40 62 q14 4 24 -6" stroke="#ff8a3d" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="65" cy="55" r="5" fill="#f6c9a3" stroke="#d9a07a"/></g>' +
+      '<circle cx="32" cy="40" r="13" fill="#f6c9a3" stroke="#d9a07a"/><path d="M20 36 q2 -12 12 -12 q10 0 13 10 q-6 -4 -13 -3 q-6 -1 -12 5z" fill="#6b3e1f"/>' +
+      '<circle cx="38" cy="40" r="1.6" fill="#3b2412"/><path d="M36 46 q4 2 6 -1" stroke="#9b2c3c" stroke-width="1.4" fill="none" stroke-linecap="round"/><ellipse cx="41" cy="44" rx="2.4" ry="1.4" fill="#ff8fa3" opacity=".6"/>' +
+      '<circle cx="26" cy="18" r="5" fill="#fff" stroke="#e1d4c4"/><circle cx="36" cy="16" r="6" fill="#fff" stroke="#e1d4c4"/><rect x="22" y="20" width="18" height="6" rx="2" fill="#fff" stroke="#e1d4c4"/></svg>';
+  }
+
+  var API = { bloco: bloco, boneco: boneco, vacaGrande: vacaGrande, ordenha: ordenha, carro: carro, nuvem: nuvem, LUGARES_DESENHADOS: Object.keys(B) };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else raiz.CozinhaVila = API;
 })(typeof self !== 'undefined' ? self : this);
