@@ -180,8 +180,8 @@
     var parente = nJog === 1 && modoBase === 'bolas' ? { quem: 'pai' } : nJog === 1 && modoBase === 'pega' ? { quem: 'mae' } : null;
     if (parente) { parente.x = W * 0.72; parente.vx = 0; parente.fase = 'anda'; parente.t = 0; parente.chama = false; parente.fala = null; parente.falaAte = 0; parente.proxFala = 1.5; parente.dir = -1; }
     var A_PARENTE = 400, FALAS = {
-      pai: [['Toca pra mim!', 'Pass it to me!'], ['Aqui, aqui!', 'Over here!'], ['Joga pro papai!', 'Throw it to Dad!'], ['Vai, campeã(o)!', 'Go, champ!']],
-      mae: [['Olha ali um bichinho!', 'Look, a little critter!'], ['Pega, pega!', 'Catch it, catch it!'], ['Vem com a mamãe!', 'Come with Mom!'], ['Corre que ele foge!', 'Run, it will get away!']]
+      pai: [['Toca pra mim!', 'Pass it to me!', '¡Pásamela!'], ['Aqui, aqui!', 'Over here!', '¡Aquí, aquí!'], ['Joga pro papai!', 'Throw it to Dad!', '¡Pásasela a papá!'], ['Vai, campeã(o)!', 'Go, champ!', '¡Vamos, campeón!']],
+      mae: [['Olha ali um bichinho!', 'Look, a little critter!', '¡Mira, un bichito!'], ['Pega, pega!', 'Catch it, catch it!', '¡Cógelo, cógelo!'], ['Vem com a mamãe!', 'Come with Mom!', '¡Ven con mamá!'], ['Corre que ele foge!', 'Run, it’s getting away!', '¡Corre, que se escapa!']]
     };
     function falaParente(f, ms) { parente.fala = f; parente.falaAte = tempo + (ms || 1800); }
     function festaParente(f) { if (!parente) return; parente.fase = 'festa'; parente.t = 0; falaParente(f, 2000); }
@@ -203,8 +203,8 @@
       if (Math.abs(P.vx) > 20) P.dir = P.vx > 0 ? 1 : -1;
       if (alvo && P.fase !== 'bate' && Math.abs(alvo.x - P.x) < Math.max(55, alvo.raio)) {   // chegou: o papai bate na bola, a mamãe pega o bicho
         P.fase = 'bate'; P.t = 0; P.dir = alvo.x > P.x ? 1 : -1; P.alto = alvo.y < chao - 160;
-        if (mae) { acertou(0, alvo, 'pega', tempo, { x: P.x, y: alvo.y }); falaParente(['Peguei um!', 'Got one!']); }
-        else { alvo.vx = clamp((crianca - alvo.x) / 1.0, -620, 620); alvo.vy = -520; alvo.passe = tempo + 1200; falaParente(['Toma! Pega ela!', 'Here! Get it!']); }
+        if (mae) { acertou(0, alvo, 'pega', tempo, { x: P.x, y: alvo.y }); falaParente(['Peguei um!', 'Got one!', '¡He cogido uno!']); }
+        else { alvo.vx = clamp((crianca - alvo.x) / 1.0, -620, 620); alvo.vy = -520; alvo.passe = tempo + 1200; falaParente(['Toma! Pega ela!', 'Here! Get it!', '¡Toma! ¡Cógela!']); }
         emitir({ t: 'parente', quem: P.quem, x: P.x });
       }
       P.chama = !alvo && P.fase === 'anda' && Math.abs(P.vx) < 40;
@@ -538,7 +538,7 @@
         if (c.anda === 'buraco' && c.b.k < 0.35) return;   // ainda (ou já) dentro do buraco
         c.pego = true; var cn = canto(j, c); c.b.fase = 'pego'; c.b.t = 0; c.b.tx = cn.x; c.b.ty = cn.y;
         jg.pontos += mult(j, PONTOS.bicho); emitir({ t: 'pegou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.bicho, bicho: true });
-        if (parente && !(L0 && L0.x === parente.x)) festaParente(['Isso! Pegou!', 'Yes! You got it!']);
+        if (parente && !(L0 && L0.x === parente.x)) festaParente(['Isso! Pegou!', 'Yes! You got it!', '¡Eso es! ¡Lo has cogido!']);
       } else if (c.papel === 'heroi') {
         c.morta = true; c.como = 'pegou';
         var fig = figs.filter(function (f) { return f.id === c.fig; })[0], p = fig && fig.mascote ? PONTOS.mascote : PONTOS.heroi;
@@ -555,7 +555,7 @@
         c.tocadoAte = tempo + 400;
         var ux = c.x - L0.x, uy = c.y - L0.y, nn2 = Math.hypot(ux, uy) || 1;
         c.vx = ux / nn2 * 520 + (rnd() - 0.5) * 100; c.vy = uy / nn2 * 520 - 300;
-        if (parente && L0 && L0.x !== parente.x && rnd() < 0.25) festaParente(['Boa! Toca aqui!', 'Nice one! High five!']);
+        if (parente && L0 && L0.x !== parente.x && rnd() < 0.25) festaParente(['Boa! Toca aqui!', 'Nice one! High five!', '¡Muy bien! ¡Choca esos cinco!']);
         jg.pontos += mult(j, PONTOS.tocou); emitir({ t: 'tocou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.tocou });
       } else if (c.papel === 'bola' && !c.chutada) {
         chutar(c, dirX || 0, !!forte);
