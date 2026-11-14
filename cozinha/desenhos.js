@@ -25,6 +25,10 @@
     '<rect x="16" y="28" width="32" height="14" rx="4" fill="#6cc3ff"/><circle cx="24" cy="49" r="2.4" fill="#d6e6f5"/><circle cx="32" cy="50" r="2.4" fill="#d6e6f5"/><circle cx="40" cy="49" r="2.4" fill="#d6e6f5"/>');
 
   // ---------- utensílios ----------
+  S.gelatina = svg('<path d="M14 12h36l-3 44H17z" fill="#ff5e7e" stroke="#c42d4f" stroke-width="3" stroke-linejoin="round"/><path d="M14 12h36" stroke="#c42d4f" stroke-width="5" stroke-linecap="round"/>' +
+    '<ellipse cx="32" cy="36" rx="11" ry="9" fill="#fff" opacity=".9"/><path d="M25 38q7-8 14 0q-7 6-14 0z" fill="#e8344e"/><circle cx="29" cy="33" r="1.6" fill="#fff"/>');
+  S.grelha = svg('<rect x="6" y="18" width="52" height="34" rx="5" fill="#4a5568" stroke="#2d3748" stroke-width="3"/>' +
+    '<path d="M10 24h44M10 30h44M10 36h44M10 42h44M10 48h44" stroke="#a0aec0" stroke-width="2.4" stroke-linecap="round"/><path d="M2 30h6M56 30h6" stroke="#2d3748" stroke-width="4" stroke-linecap="round"/>');
   S.faca = '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M6 40c10-6 24-14 36-20 4-2 8 0 8 4 0 3-3 5-6 6L10 46c-3 1-6-3-4-6z" fill="#dfe6ee" stroke="#7d8a99" stroke-width="3" ' + T + '/>' +
     '<path d="M42 22l14-8a4 4 0 0 1 4 7L48 30" fill="#ff8a3d" stroke="#b85a1a" stroke-width="3" ' + T + '/></svg>';
   S.tabua = svg('<rect x="4" y="22" width="48" height="34" rx="10" fill="#d9a066" stroke="#8b5a2b" stroke-width="3"/><circle cx="46" cy="30" r="3" fill="#8b5a2b"/>' +
@@ -179,13 +183,18 @@
   function horta(id) { return HO[id] ? '<svg class="pl-desenho" viewBox="0 0 100 110" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">' + HO[id] + '</svg>' : ''; }
 
   var D = (typeof module !== 'undefined' && module.exports) ? require('./dados.js') : raiz.CozinhaDados;
-  function icone(id) {
+  // Ingrediente e receita têm foto de verdade (fotos/<id>.jpg, fotos livres da Wikimedia Commons; CREDITOS.md).
+  // icone(id) mostra a foto num círculo; icone(id, true) mostra o desenho/emoji (frutas no pé, legumes na terra).
+  function foto(id) { return (D.ingrediente[id] || D.receita[id]) ? 'fotos/' + id + '.jpg' : ''; }
+  function imgFoto(id, cls) { return '<span class="ic ic-foto' + (cls ? ' ' + cls : '') + '"><img src="' + foto(id) + '" alt="" draggable="false" decoding="async"></span>'; }
+  function icone(id, desenho) {
     var x = D.ingrediente[id] || D.utensilio[id];
     if (!x) return '';
+    if (!desenho && D.ingrediente[id]) return imgFoto(id);
     if (x.s && S[x.s]) return '<span class="ic ic-svg">' + S[x.s] + '</span>';
     return '<span class="ic">' + x.e + '</span>';
   }
 
-  var API = { S: S, icone: icone, planta: planta, FRUTOS: FRUTOS, fruto: fruto, horta: horta };
+  var API = { S: S, icone: icone, foto: foto, imgFoto: imgFoto, planta: planta, FRUTOS: FRUTOS, fruto: fruto, horta: horta };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else raiz.CozinhaDesenhos = API;
 })(typeof self !== 'undefined' ? self : this);

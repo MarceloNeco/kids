@@ -7,7 +7,14 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.5.0** (06/Nov/2026) — **tudo animado e mais de verdade**: despejar inclina PARA o recipiente
+Versão atual: **0.6.0** (14/Nov/2026) — **comida de verdade**: cada receita e cada ingrediente aparece com uma **foto
+de verdade** (fotos livres da Wikimedia Commons, em `fotos/`, guardadas para sem internet; créditos em `CREDITOS.md`):
+o pão de queijo é um pão de queijo e o queijo é um queijo. O menininho do final come a foto do prato, e a foto guardada
+também. Receitas novas: **gelatina com frutas** (a filha do dono adora) e **churrasquinho no espeto** (na grelha do
+fogão, com um adulto). Mais movimento: telas que entram deslizando, cartões e ingredientes que aparecem um depois do
+outro com pulinho, prato que gira na ficha, comidas da capa pulando em onda e o botão de começar com um anel de luz.
+As frutas no pé e os legumes na terra continuam desenhados (`icone(id, true)`). Esta é a **parte 1 de 3** do pedido do
+dono de 14/Nov/2026 (pendências 24 a 27). Na 0.5.0 — **tudo animado e mais de verdade**: despejar inclina PARA o recipiente
 e o jorro (leite, massa, suco, ovo) cai dentro enquanto ele enche; ingredientes caem na tigela (pedacinhos, nuvem de
 farinha, pacote que derrama, ovo que quebra); lavar as mãos com torneira, água, espuma e duas mãos esfregando; no fim
 um **menininho come o prato** (garfo e faquinha, mastiga, lambe os lábios, "Hmm!") e o botão **📷 Guardar a foto**
@@ -108,10 +115,11 @@ onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de
 | Ordem | na ordem da ficha | na ordem da ficha | **fichas misturadas**: a criança escolhe o próximo passo, e só vale o que faz sentido (não dá para servir antes de assar) |
 | Extra | — | 2 utensílios a mais na bancada | 4 a mais, passos a mais, um **imprevisto** (o cachorrinho Biscoito pega 1 ingrediente da cesta ao chegar em casa) e o **sol andando no céu** (7 min; passou, vira noite e a criança perde só 1 estrela) |
 
-## Receitas (12)
+## Receitas (14)
 
 Bolo de cenoura · Panqueca de banana · Salada de frutas · Vitamina de banana · Brigadeiro · Pizza caseira ·
-Sanduíche natural · Peixe assado com legumes · Omelete · Suco de laranja · Pão de queijo · Cookies de chocolate.
+Sanduíche natural · Peixe assado com legumes · Omelete · Suco de laranja · Pão de queijo · Cookies de chocolate ·
+Gelatina com frutas · Churrasquinho no espeto (v0.6.0; a carne vem do mercadinho, que é o açougue da vila por enquanto).
 Toda receita começa lavando as mãos e termina servindo.
 
 ## Arquivos
@@ -122,6 +130,7 @@ Toda receita começa lavando as mãos e termina servindo.
 | `dados.js` | **Receitas** (ingredientes, quantidades, passos), lugares, **plantas** (onde cada fruta e legume nasce de verdade), ingredientes (com a frase que ensina de onde vem), utensílios e níveis (incluindo o círculo e a velocidade dos peixes). Receita nova = uma entrada em `RECEITAS` (o comentário no topo explica os campos). |
 | `logica.js` | Regras sem tela: cesta, moedas e troco, favores, passos de cada nível e a ordem, imprevisto, estrelas, texto de cada passo em PT/EN. |
 | `cenas.js` | Cenas animadas em SVG/canvas, sem imagem: recipientes que enchem, a cena de despejar (inclina para o recipiente, jorro, nível), a pia com as mãos e a espuma, o menininho comendo (e a animação dele), a foto em PNG e as partículas (faíscas, terra, pó, pedacinhos). Não conhece as regras do jogo. |
+| `fotos/` | **Fotos de verdade** (v0.6.0): `fotos/<id>.jpg`, uma por receita e por ingrediente (320 × 320, JPG), da Wikimedia Commons com licença livre. `ART.icone(id)` mostra a foto do ingrediente num círculo; `ART.icone(id, true)` mostra o desenho/emoji (frutas no pé, legumes na terra). Foto nova = arquivo aqui + linha no `CREDITOS.md` + `sw.js` (o teste confere). |
 | `desenhos.js` | Desenhos em SVG feitos em código (utensílios, ingredientes sem emoji, faca sem ponta, ícone do app, as plantas do pomar e da horta e o lugar das frutas em cada planta). |
 | `app.js` | Telas, mini-jogos da vila, cozinha, receita pronta, progresso, voz, sons, música, service worker. `APP_VERSION`. |
 | `estilo.css` | Visual (fonte Fredoka da Rabiscolândia). |

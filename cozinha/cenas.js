@@ -18,8 +18,8 @@
   var COR = { peixe: '#a9c2d6', laranja: '#ff9f1a', banana: '#ffe27a', maca: '#f25c4a', morango: '#ff3b5c', uva: '#8e44ad', limao: '#e8e04a',
     cenoura: '#ff8a1a', tomate: '#e8432f', alface: '#7bc950', batata: '#e9c27a', cheiro: '#3fa34d', ovo: '#ffcf33', leite: '#ffffff',
     farinha: '#fbf3e4', acucar: '#ffffff', sal: '#f4f4f4', oleo: '#ffd84d', fermento: '#f3ead8', manteiga: '#ffe680', chocolate: '#6b3b1f',
-    leitecond: '#fff1d0', granulado: '#ff4fa3', queijo: '#ffd84d', pao: '#e0a96d', mel: '#f2a900', polvilho: '#ffffff' };
-  var JEITO = { farinha: 'po', acucar: 'po', sal: 'po', fermento: 'po', polvilho: 'po', leite: 'liquido', oleo: 'liquido', leitecond: 'liquido', mel: 'liquido', ovo: 'ovo', granulado: 'granulado' };
+    leitecond: '#fff1d0', granulado: '#ff4fa3', queijo: '#ffd84d', pao: '#e0a96d', mel: '#f2a900', polvilho: '#ffffff', 'gelatina-po': '#e8344e', carne: '#b8433a' };
+  var JEITO = { farinha: 'po', acucar: 'po', sal: 'po', fermento: 'po', polvilho: 'po', leite: 'liquido', oleo: 'liquido', leitecond: 'liquido', mel: 'liquido', ovo: 'ovo', granulado: 'granulado', 'gelatina-po': 'po' };
   function jeito(id) { return JEITO[id] || 'pedaco'; }
   function cor(id) { return COR[id] || '#f2c27a'; }
   // mistura de cores (média simples em RGB) para o que já está no recipiente
@@ -300,7 +300,10 @@
       '<rect x="20" y="206" width="220" height="44" rx="8" fill="#fff" stroke="#f0c48a" stroke-width="3"/>' +
       '<path d="M20,206 h220 v10 h-220z" fill="#e84a3c" opacity=".85"/><path d="M40,206 v44 M80,206 v44 M120,206 v44 M160,206 v44 M200,206 v44" stroke="#e84a3c" stroke-width="10" opacity=".25"/>' +
       '<ellipse cx="130" cy="222" rx="64" ry="16" fill="#e9dfd2"/><ellipse cx="130" cy="218" rx="62" ry="15" fill="#fff" stroke="' + c + '" stroke-width="4"/>' +
-      '<text class="comida" x="130" y="222" text-anchor="middle" font-size="46">' + comida + '</text>' +
+      (op.foto ? '<clipPath id="cpComida"><ellipse cx="130" cy="203" rx="50" ry="25"/></clipPath>' +   // foto de verdade do prato, em montinho
+        '<image class="comida comida-foto" href="' + op.foto + '" x="80" y="172" width="100" height="58" preserveAspectRatio="xMidYMid slice" clip-path="url(#cpComida)"/>' +
+        '<ellipse cx="130" cy="203" rx="50" ry="25" fill="none" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+        : '<text class="comida" x="130" y="222" text-anchor="middle" font-size="46">' + comida + '</text>') +
       '<g class="vapor" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".75"><path class="v1" d="M110,186 c-5,-6 5,-10 0,-16"/><path class="v2" d="M130,180 c-5,-6 5,-10 0,-16"/><path class="v3" d="M150,186 c-5,-6 5,-10 0,-16"/></g>' +
       '<g class="faiscas-m" fill="#ffc93c"><path class="s1" d="M60,196 l3,7 l7,3 l-7,3 l-3,7 l-3,-7 l-7,-3 l7,-3z"/><path class="s2" d="M200,190 l2.5,6 l6,2.5 l-6,2.5 l-2.5,6 l-2.5,-6 l-6,-2.5 l6,-2.5z"/><path class="s3" d="M218,150 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 l5,-2z" fill="#ff5e9c"/></g>' +
       // braço do garfo (este se mexe)
@@ -366,7 +369,7 @@
   }
 
   // ---------- a foto do prato pronto (canvas 1080 × 1350, PNG) ----------
-  // op: titulo (nome do jogo), receita, prato (emoji), cor, estrelas (0–3), linha (data e nível), rodape, hmm.
+  // op: titulo (nome do jogo), receita, prato (emoji), foto (endereço da foto do prato), cor, estrelas (0–3), linha (data e nível), rodape, hmm.
   function carregarSvg(texto) {
     return new Promise(function (ok, erro) {
       var img = new Image(), url = URL.createObjectURL(new Blob([texto], { type: 'image/svg+xml' }));
@@ -379,7 +382,11 @@
     var W = 1080, H = 1350, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     var x = cv.getContext('2d'), F = "'Fredoka', system-ui, sans-serif";
     var fontes = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('700 80px Fredoka'), document.fonts.load('600 40px Fredoka')]).catch(function () {}) : Promise.resolve();
-    return fontes.then(function () { return carregarSvg(menino({ cor: op.cor, prato: op.prato, hmm: op.hmm })).catch(function () { return null; }); }).then(function (img) {
+    // a foto do prato entra no desenho como data: (imagem dentro de SVG desenhado no canvas não busca arquivo de fora)
+    var dados = !op.foto ? Promise.resolve(null) : fetch(op.foto).then(function (r) { return r.ok ? r.blob() : null; }).then(function (bl) {
+      return bl && new Promise(function (ok) { var fr = new FileReader(); fr.onload = function () { ok(fr.result); }; fr.onerror = function () { ok(null); }; fr.readAsDataURL(bl); });
+    }).catch(function () { return null; });
+    return fontes.then(function () { return dados; }).then(function (url) { return carregarSvg(menino({ cor: op.cor, prato: op.prato, foto: url, hmm: op.hmm })).catch(function () { return null; }); }).then(function (img) {
       // fundo quentinho com confete
       var gr = x.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#fff7e6'); gr.addColorStop(1, '#ffd6a5'); x.fillStyle = gr; x.fillRect(0, 0, W, H);
       var CONF = ['#e84a3c', '#ff8a3d', '#ffc93c', '#2bb673', '#3aa0e8', '#8e6bff', '#ff5e9c'], s = 7;
