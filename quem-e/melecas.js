@@ -14,7 +14,8 @@
 
    3D (0.6.0, pedido do dono): imagens geradas no Higgsfield (Qwen-Image), fundo recortado, em melecas/<id>-<cara>.webp.
    QEMelecas.img(id, humor) → texto <img> com a imagem do humor (parada e falando usam a feliz, cada humor com a sua
-   animação). Se a imagem não carregar, a tela troca pelo SVG acima (app.js), que continua sendo a reserva. */
+   animação; a Pink Honey triste usa a "ops" dela, porque os créditos do Higgsfield acabaram antes dessa imagem).
+   Se a imagem não carregar, a tela troca pelo SVG acima (app.js), que continua sendo a reserva. */
 (function (raiz) {
   'use strict';
   var LISTA = [
@@ -101,13 +102,19 @@
 
   // qual imagem 3D cada humor usa
   var IMAGEM = { parada: 'feliz', feliz: 'feliz', falando: 'feliz', ops: 'ops', pensando: 'pensando', triste: 'triste' };
+  var TROCA = { pink: { triste: 'ops' } };
+  function imagem(id, humor) { return (TROCA[id] && TROCA[id][humor]) || IMAGEM[humor]; }
   function img(id, humor) {
     if (!CORES[id]) throw new Error('meleca desconhecida: ' + id);
     humor = IMAGEM[humor] ? humor : 'parada';
     return '<img class="qm-3d qm-' + id + ' ' + (ANIM[humor] || 'qm-respira') + (humor === 'falando' ? ' qm-fala' : '') +
-      '" src="melecas/' + id + '-' + IMAGEM[humor] + '.webp" alt="" draggable="false" data-meleca="' + id + '" data-humor="' + humor + '">';
+      '" src="melecas/' + id + '-' + imagem(id, humor) + '.webp" alt="" draggable="false" data-meleca="' + id + '" data-humor="' + humor + '">';
   }
-  function arquivos() { var l = []; LISTA.forEach(function (m) { ['feliz', 'ops', 'pensando', 'triste'].forEach(function (c) { l.push('melecas/' + m.id + '-' + c + '.webp'); }); }); return l; }
+  function arquivos() {
+    var l = [];
+    LISTA.forEach(function (m) { Object.keys(IMAGEM).forEach(function (h) { var a = 'melecas/' + m.id + '-' + imagem(m.id, h) + '.webp'; if (l.indexOf(a) < 0) l.push(a); }); });
+    return l;
+  }
 
   var M = { LISTA: LISTA, svg: svg, img: img, arquivos: arquivos };
   raiz.QEMelecas = M;
