@@ -93,7 +93,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 # Repositório kids — Bolinho de Chuva (brincadeiras para criança e família)
 
 - Publicado em **solverone.com.br/kids/** (GitHub Pages deste repositório; o domínio vem do Portal). A marca na tela é
-  **Bolinho de Chuva**; `kids` é só o nome curto do endereço.
+  **Bolinho de Chuva** (em inglês **Rainy Day Donuts**, em espanhol **Buñuelos de Lluvia** — dono, 14/Nov/2026; exceção à
+  regra de não traduzir nome de app; no código, `BolinhoIdioma.marca()`); `kids` é só o nome curto do endereço.
 - Veio do FeatureTesting e do Portal em 02/Nov/2026, **com o histórico**. Os endereços antigos
   (`/FeatureTesting/<jogo>/`, `/FeatureTesting/danca-na-sala.html`, `/bolinho-de-chuva/`) só redirecionam para cá:
   **não mexa nos jogos lá — é aqui.**
@@ -116,8 +117,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 ## Regras de cada jogo
 
 - **Idioma (dono, 14/Nov/2026; diretriz "três idiomas"): português (Brasil), inglês (EUA) e espanhol (Espanha), em tudo,
-  com tradução humanizada.** A escolha é feita **só na estante**, com bandeira desenhada (SVG) + sigla (🇧🇷 PT · 🇺🇸 EN ·
-  🇪🇸 ES), e vale para todos os jogos — **nenhum jogo tem botão de idioma próprio**. Peça comum: `idioma.js` (logo depois do
+  com tradução humanizada.** A escolha é feita **só na estante**, num **botão só** com o idioma atual (bandeira SVG + sigla);
+  tocando, ele pergunta se continua nesse idioma ou troca (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES) (dono, 14/Nov/2026), e vale para todos os jogos — **nenhum jogo tem botão de idioma próprio**. Peça comum: `idioma.js` (logo depois do
   `recursos.js`, na estante e em todo jogo): guarda a escolha em `localStorage` "bolinho:idioma"; o jogo lê
   `BolinhoIdioma.atual()` ('pt' | 'en' | 'es'), usa `BolinhoIdioma.t(pt, en, es)` e, na fala, `BolinhoIdioma.voz()`
   (pt-BR / en-US / es-ES), sempre com uma voz do mesmo idioma. Todo texto novo nasce nos três (`data-t="pt|en|es"`,
@@ -128,13 +129,16 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   no `ARQUIVOS` do `sw.js` e `BolinhoNav.iniciar({ jogo, noInicio, irParaInicio, emAndamento })` no `app.js` (detalhe no
   começo do arquivo). 🏠 só aparece fora da tela de começo e volta para ela; 🚪 sai (pergunta antes com partida rolando;
   vai para a estante `/kids/`). O Voltar do celular numa tela de dentro volta (o jogo que não cuida do histórico passa
-  `cuidarDoVoltar: true`). Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
+  `cuidarDoVoltar: true`); na tela de começo o 1º Voltar avisa "toque de novo para sair" e só o 2º sai, e a guarda do
+  histórico (posta no primeiro toque) faz o jogo voltar ao começo em vez de fechar quando o Chrome pula uma entrada (dono,
+  14/Nov/2026). Jogo com aviso próprio passa `guarda: false`. Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
   `bn-nav`/`bn-dentro` e as medidas `--nav-alto`/`--nav-largo` no `<html>`. Na TV (`?tv=`) a barra some. Vigia:
   `teste/navegacao.test.js`.
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
 - Testes: `node --test <jogo>/teste/*.test.js` (rodar da raiz deste repositório).
-- Jogo novo: pasta própria + entrada em `catalogo.js` + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
+- Jogo novo: pasta própria + entrada em `catalogo.js` (com `novo: 'AAAA-MM-DD'`, a data do dia: por 7 dias o cartão
+  ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" da estante, `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
   no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
@@ -147,6 +151,10 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   - Música feita no código (som de "Atari", 8 bits) **nunca toca com internet**, nem intercalada.
   - Prefira sempre gravações com instrumentos de verdade. Música gravada com som de videogame / 8 bits (chiptune) não
     entra na lista (deixe o arquivo na pasta, só tire da lista). Cada jogo continua com pelo menos 10 músicas.
+  - **Biblioteca de músicas (dono, 14/Nov/2026):** o botão 🎵 da estante lista todas as músicas gravadas dos jogos e da
+    rádio (`biblioteca.js` + `biblioteca-musicas.js`, gerado). Mudou a música de um jogo (ou jogo novo)? Ponha a lista dele
+    em `teste/listas-musica.js`, o crédito no `CREDITOS.md`/`LICENCAS.md` e rode `node ferramentas/biblioteca-musicas.js`.
+    Vigia: `teste/biblioteca-musicas.test.js`.
   - A favorita de cada jogo (`FAVORITAS` no `trilha.js`) é de instrumentos de verdade, animada, até 2,5 MB e o jogo a
     toca. Vigia: `teste/regra-musica.test.js`.
 

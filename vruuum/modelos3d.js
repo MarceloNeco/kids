@@ -90,7 +90,7 @@
     op = op || {};
     var M = 16, an = fatias.map(function (f) {
       var r = [], n = f.n || 3;
-      for (var k = 0; k < M; k++) { var a = k / M * PI * 2, cs = Math.cos(a), sn = Math.sin(a); r.push([f.w * (cs < 0 ? -1 : 1) * Math.pow(Math.abs(cs), 2 / n), f.y + f.h * (sn < 0 ? -1 : 1) * Math.pow(Math.abs(sn), 2 / n), f.z]); }
+      for (var k = 0; k < M; k++) { var a = k / M * PI * 2, cs = Math.cos(a), sn = Math.sin(a); r.push([(f.x || 0) + f.w * (cs < 0 ? -1 : 1) * Math.pow(Math.abs(cs), 2 / n), f.y + f.h * (sn < 0 ? -1 : 1) * Math.pow(Math.abs(sn), 2 / n), f.z]); }
       return r;
     });
     function face(q, centro, eixo, corF) {
@@ -105,11 +105,11 @@
     for (var i = 0; i < an.length - 1; i++) for (var k = 0; k < M; k++) {
       var q = [an[i][k], an[i][(k + 1) % M], an[i + 1][(k + 1) % M], an[i + 1][k]];
       var cq = mul(q.reduce(function (a, b) { return add(a, b); }, [0, 0, 0]), 0.25);
-      var f0 = fatias[i], f1 = fatias[i + 1], eixo = [0, (f0.y + f1.y) / 2, cq[2]];
+      var f0 = fatias[i], f1 = fatias[i + 1], eixo = [((f0.x || 0) + (f1.x || 0)) / 2, (f0.y + f1.y) / 2, cq[2]];
       face(q, cq, eixo, (op.pinta && op.pinta(k, cq)) || cor);
     }
     [0, an.length - 1].forEach(function (i) {   // tampas
-      var ft = fatias[i], centro = [0, ft.y, ft.z], fora = add(centro, [0, 0, i ? 1 : -1]);
+      var ft = fatias[i], centro = [ft.x || 0, ft.y, ft.z], fora = add(centro, [0, 0, i ? 1 : -1]);
       face(an[i].slice(), centro, sub(centro, sub(fora, centro)), (op.tampa && op.tampa(i)) || cor);
     });
   }
@@ -131,7 +131,9 @@
   }
   function luzHex(cor, n) { var k = 0.62 + 0.42 * Math.max(0, dot(n, LUZ)), c = hexRgb(cor); return '#' + c.map(function (v) { return ('0' + Math.min(255, Math.round(v * k)).toString(16)).slice(-2); }).join(''); }
   // roda: cilindro de 12 lados deitado no eixo x (pneu escuro e calota clara virada para fora)
+  var emBarco = false;   // no rio (1.18.0) as rodas recolhem e entram as boias (montar)
   function roda(cam, L, cen, r, larg, calota) {
+    if (emBarco) return;
     var N = 12, lado = cen[0] >= 0 ? 1 : -1, fora = [], dentro = [];
     for (var k = 0; k < N; k++) { var a = k / N * PI * 2; fora.push([cen[0] + lado * larg / 2, cen[1] + Math.cos(a) * r, cen[2] + Math.sin(a) * r]); dentro.push([cen[0] - lado * larg / 2, cen[1] + Math.cos(a) * r, cen[2] + Math.sin(a) * r]); }
     for (k = 0; k < N; k++) {
@@ -593,12 +595,25 @@
     } }
   };
 
+  /* virou barco: duas boias compridas (amarelas, com faixa vermelha e bico) dos lados, presas por hastes; ficam
+     um pouco para dentro da água (a espuma é desenhada por baixo, no desenho.js) */
+  function boias(cam, L, m) {
+    var x = m.larg + 0.12, c0 = -m.comp - 0.1, c1 = m.comp + 0.35, r = 0.28;
+    [-1, 1].forEach(function (l) {
+      casco(cam, L, [{ x: l * x, z: c0, y: 0.2, w: r * 0.75, h: r * 0.75, n: 2 }, { x: l * x, z: c0 + 0.4, y: 0.22, w: r, h: r, n: 2 }, { x: l * x, z: c1 - 0.6, y: 0.22, w: r, h: r, n: 2 }, { x: l * x, z: c1, y: 0.32, w: r * 0.25, h: r * 0.25, n: 2 }],
+        '#ffb703', { pinta: function (k) { return k === 4 || k === 12 ? '#e63946' : null; } });
+      [c0 * 0.55, c1 * 0.55].forEach(function (z) { cano(cam, L, [l * x, 0.4, z], [l * (x - 0.3), Math.max(0.75, m.y * 0.7), z], 0.05, 0.05, '#9aa0a6'); });
+    });
+  }
   function montar(id, x0, y0, W, H, cor, fase, lado, inclina, op) {
     var m = MODELOS[id], L = [], giro = Math.max(-1.2, Math.min(1.2, lado || 0)) * 0.62 + (op.orbita || 0);
     var cam = camera(x0, y0, W, H, giro, 0.3 - (inclina || 0) * 0.6, m.alt, m.y, m.z);
     if (!m.semSombra) sombra(cam, L, m.larg, m.comp);
     var o = { cabeca: op.cabeca, giro: op.giroCabeca, aqui: op.aqui, voo: op.voo, t: op.t };
+    emBarco = !!op.barco && m.larg > 0;
     m.montar(cam, L, cor || '#ff4fa3', ((fase || 0) % 1 + 1) % 1, o);
+    if (emBarco) boias(cam, L, m);
+    emBarco = false;
     L.sort(function (a, b) { return b.d - a.d; });
     return L;
   }

@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.39', APP_UPDATED = '14/11/2026';
+  var APP_VERSION = '0.8.41', APP_UPDATED = '14/11/2026';
   // o idioma vem da estante (../idioma.js): pt, en ou es; o jogo não tem botão de idioma próprio
   function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
   function T(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }
@@ -827,7 +827,7 @@
   function sairDoJogoLocal(destino) { TVApp.sairLocal(); if (CelApp.cel.streamLocal) CelApp.cel.streamLocal.getTracks().forEach(function (t) { t.stop(); }); tela(destino); }
   /* navegação padrão (../navegacao.js): 🏠 Início volta ao menu inicial de qualquer tela (era o ✕ do jogo no celular);
      🚪 Saída sai do jogo. O Voltar do celular continua fechando uma tela por vez. Na TV de verdade a barra some. */
-  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'baguncolandia', irParaInicio: function () { Nav.inicio(); },
+  if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'baguncolandia', guarda: false, irParaInicio: function () { Nav.inicio(); },
     noInicio: function () { return !!document.querySelector('#inicio.ativa, #desligado.ativa'); },
     emAndamento: function () { return (TVApp.tv.local && TVApp.tv.fase === 'jogando') || $('jogo').classList.contains('ativa'); },
     esconder: function () { return /[?&]tv=auto\b/.test(location.search) || ($('tv').classList.contains('ativa') && !TVApp.tv.local); } });
