@@ -55,6 +55,8 @@ const JOGOS = [
   { id: 'cozinha', url: 'cozinha/?teste', entrada: '#btEntrar', inicio: '#receitas',
     entrar: async (pg) => { await pg.click('#receitas [data-rec]'); await pg.waitForTimeout(500); },
     fundo: async (pg) => { await pg.click('#btBuscar'); await pg.waitForTimeout(500); } },
+  { id: 'glub-glub', url: 'glub-glub/?teste', inicio: '#btSozinho',
+    entrar: async (pg) => { await pg.click('#btSozinho'); await pg.click('#btJogar'); await pg.waitForTimeout(600); } },
   { id: 'danca-na-sala', url: 'danca-na-sala.html?teste', inicio: '#btSolo',
     entrar: async (pg) => { await pg.click('#btSolo'); await pg.fill('#nome', 'Lara').catch(() => {}); await pg.click('#btEntrar'); await pg.waitForSelector('#jogo.solo', { timeout: 15000 }); await pg.waitForTimeout(500); } },
 ];

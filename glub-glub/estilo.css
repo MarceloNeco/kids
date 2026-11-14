@@ -1,6 +1,134 @@
-/* GLUB GLUB — visual das telas (o lago é desenhado em canvas pelo arte.js) */
-html, body { margin: 0; height: 100%; background: #0b3f82; overflow: hidden; overscroll-behavior: none; }
-body { font-family: 'Fredoka', system-ui, sans-serif; color: #fff; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+/* GLUB GLUB — visual das telas (o lago é desenhado em canvas pelo arte.js, por trás de tudo) */
+@font-face { font-family: 'Fredoka'; src: url('../rabiscolandia/fontes/fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
+:root { --azul: #0b3f82; --amarelo: #ffd23f; --laranja: #ff9f1c; --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px); }
+html, body { margin: 0; height: 100%; background: var(--azul); overflow: hidden; overscroll-behavior: none; }
+body { font-family: 'Fredoka', system-ui, sans-serif; color: #fff; -webkit-user-select: none; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+button { font-family: inherit; cursor: pointer; touch-action: manipulation; }
+#lago { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+[hidden] { display: none !important; }
 .tela { display: none; position: fixed; inset: 0; }
 .tela.ativa { display: block; }
-#lago { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#menu.ativa, #album.ativa { display: flex; align-items: center; justify-content: center; }
+
+/* ---------- começo ---------- */
+.painel { width: min(560px, 94vw); max-height: 94vh; overflow: auto; box-sizing: border-box; padding: 14px 16px 10px; border-radius: 26px;
+  background: linear-gradient(180deg, rgba(10, 60, 130, .82), rgba(5, 30, 80, .88)); border: 2px solid rgba(255, 255, 255, .55);
+  box-shadow: 0 10px 40px rgba(0, 20, 60, .5), inset 0 2px 0 rgba(255, 255, 255, .25); text-align: center; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.logo { margin: 0 0 8px; font-size: clamp(38px, 9vw, 58px); line-height: 1; letter-spacing: 1px; font-weight: 700; }
+.logo span { display: inline-block; color: var(--amarelo); text-shadow: 0 3px 0 #c46a00, 0 6px 12px rgba(0, 0, 0, .35); animation: boia 2.4s ease-in-out infinite; }
+.logo span:nth-child(even) { color: #7ff0ff; text-shadow: 0 3px 0 #1a6fa0, 0 6px 12px rgba(0, 0, 0, .35); }
+.logo span:nth-child(1) { animation-delay: 0s } .logo span:nth-child(2) { animation-delay: .15s } .logo span:nth-child(3) { animation-delay: .3s } .logo span:nth-child(4) { animation-delay: .45s }
+.logo span:nth-child(5) { animation-delay: .6s } .logo span:nth-child(6) { animation-delay: .75s } .logo span:nth-child(7) { animation-delay: .9s } .logo span:nth-child(8) { animation-delay: 1.05s }
+@keyframes boia { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+@media (prefers-reduced-motion: reduce) { .logo span { animation: none } }
+.escolha, .linha { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; margin: 6px 0; }
+.rotulo { font-weight: 600; opacity: .9; margin-right: 2px; }
+.chip { min-height: 44px; padding: 6px 14px; border-radius: 999px; border: 2px solid rgba(255, 255, 255, .6); background: rgba(255, 255, 255, .12); color: #fff; font-size: 17px; font-weight: 600; }
+.chip[aria-checked="true"] { background: #fff; color: var(--azul); border-color: #fff; box-shadow: 0 0 0 3px rgba(255, 210, 63, .7); }
+.chip.verde[aria-checked="true"] { background: #7ee081; color: #10391a; }
+.chip.amarelo[aria-checked="true"] { background: var(--amarelo); color: #4a3200; }
+.chip.vermelho[aria-checked="true"] { background: #ff7a6b; color: #4a0c05; }
+.grande-chip { font-size: 20px; min-height: 52px; padding: 8px 22px; }
+.jogar { margin: 8px 0 4px; min-height: 56px; padding: 8px 34px; border: 0; border-radius: 999px; font-size: 26px; font-weight: 700; color: #4a2600;
+  background: linear-gradient(180deg, #ffe066, #ffb000); box-shadow: 0 5px 0 #c46a00, 0 8px 18px rgba(0, 0, 0, .3); }
+.jogar:disabled { filter: grayscale(.8); opacity: .55; }
+.jogar:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #c46a00; }
+.aviso { margin: 4px auto; max-width: 420px; padding: 6px 10px; border-radius: 12px; background: rgba(255, 210, 63, .2); font-size: 15px; }
+.rodape { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 4px; }
+.mini { min-width: 44px; min-height: 44px; padding: 4px 12px; border-radius: 14px; border: 1.5px solid rgba(255, 255, 255, .5); background: rgba(255, 255, 255, .14); color: #fff; font-size: 17px; font-weight: 600; }
+.ajuda { text-align: left; font-size: 15px; line-height: 1.35; background: rgba(0, 0, 0, .2); border-radius: 14px; padding: 4px 12px; margin-top: 6px; }
+.versao { margin: 6px 0 0; font-size: 12px; opacity: .65; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .painel { padding: 8px 14px 6px; width: min(640px, 80vw); }
+  .logo { font-size: 36px; margin-bottom: 2px; }
+  .escolha, .linha { margin: 3px 0; gap: 6px; }
+  .chip { min-height: 40px; font-size: 15px; padding: 4px 12px; }
+  .grande-chip { min-height: 44px; font-size: 17px; }
+  .jogar { min-height: 48px; font-size: 22px; margin: 4px 0 2px; }
+  .versao { display: none; }
+}
+
+/* ---------- jogo ---------- */
+#jogo { pointer-events: none; }
+#jogo .hud, #jogo .controles, #jogo .controles button { pointer-events: auto; }
+.hud { position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--st) + 6px); display: flex; gap: 8px; justify-content: center; align-items: flex-start; pointer-events: none !important; }
+/* o tocador de música vai para baixo do relógio durante a partida (no canto ele cobriria os botões da Lili) */
+body.jogando .trilha { right: auto; left: 50%; transform: translateX(-50%); bottom: auto; top: calc(var(--st) + 62px); }
+.placar { display: flex; flex-direction: column; align-items: center; min-width: 74px; padding: 4px 10px 6px; border-radius: 16px; background: rgba(5, 30, 80, .55);
+  border: 1.5px solid rgba(255, 255, 255, .45); text-shadow: 0 2px 2px rgba(0, 0, 0, .4); }
+.placar .nome { font-size: 13px; font-weight: 600; opacity: .9; }
+.placar b { font-size: 26px; line-height: 1; color: var(--amarelo); }
+.placar.dir b { color: #7ff0ff; }
+.placar.robo .nome::after { content: ' 🤖'; }
+.balde { display: flex; gap: 4px; margin-top: 3px; align-items: center; }
+.balde:empty { display: none; }
+.balde .item { position: relative; width: 30px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255, 255, 255, .15); }
+.balde .item img { max-width: 28px; max-height: 24px; }
+.balde .item i { position: absolute; right: -4px; bottom: -5px; min-width: 15px; height: 15px; border-radius: 8px; background: var(--laranja); color: #fff; font: 700 11px/15px system-ui, sans-serif; font-style: normal; text-align: center; }
+.balde .item.ok { background: rgba(126, 224, 129, .55); }
+.balde .item.ok i { background: #2e9e57; }
+.balde::before { content: '🪣'; font-size: 18px; }
+.relogio { min-width: 64px; padding: 4px 12px; border-radius: 999px; background: rgba(5, 30, 80, .65); border: 2px solid rgba(255, 255, 255, .6); font-size: 26px; font-weight: 700; text-align: center; }
+.relogio.pouco { color: #ff7a6b; animation: pisca .6s steps(2) infinite; }
+@keyframes pisca { 50% { opacity: .5 } }
+.faixa { position: absolute; left: 50%; top: 32%; transform: translateX(-50%); margin: 0; padding: 10px 22px; border-radius: 20px; font-size: clamp(22px, 5vw, 36px); font-weight: 700; color: #fff;
+  background: linear-gradient(180deg, rgba(46, 158, 87, .92), rgba(20, 100, 60, .92)); border: 2px solid #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, .35); white-space: nowrap; pointer-events: none; }
+.faixa.aviso-ruim { background: linear-gradient(180deg, rgba(120, 90, 40, .92), rgba(80, 60, 20, .92)); }
+.controles { position: absolute; bottom: calc(var(--sb) + 10px); display: flex; gap: 10px; align-items: flex-end; }
+.controles.esq { left: 10px; }
+.controles.dir { right: 10px; }
+.controles[hidden] { display: none; }
+.bt-pescar, .bt-subir { border: 0; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; -webkit-touch-callout: none; }
+.bt-pescar { width: 84px; height: 84px; font-size: 40px; background: radial-gradient(circle at 35% 30%, #ffe680, #ff9f1c 60%, #d06a00); box-shadow: 0 5px 0 #9a4a00, 0 8px 18px rgba(0, 0, 0, .35); }
+.bt-subir { width: 64px; height: 64px; font-size: 28px; background: radial-gradient(circle at 35% 30%, #b8f0ff, #3aa8e0 60%, #1a6fa0); box-shadow: 0 4px 0 #0f4a70, 0 7px 14px rgba(0, 0, 0, .3); }
+.bt-pescar:active, .bt-subir.segurando { transform: translateY(3px); filter: brightness(1.1); }
+/* sozinho com o celular em pé: os dois botões no meio de baixo */
+.sozinho .controles.esq { left: 50%; transform: translateX(-50%); }
+@media (orientation: landscape) and (max-height: 500px) {
+  .bt-pescar { width: 74px; height: 74px; font-size: 34px; }
+  .bt-subir { width: 58px; height: 58px; font-size: 24px; }
+  .sozinho .controles.esq { left: auto; right: 10px; transform: none; }
+}
+
+/* ---------- fim ---------- */
+.fim { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 20, 50, .55); z-index: 10; }
+.fim[hidden] { display: none; }
+.fim-caixa { width: min(480px, 92vw); max-height: 92vh; overflow: auto; box-sizing: border-box; padding: 14px 18px; border-radius: 26px; text-align: center;
+  background: linear-gradient(180deg, #1a6fc0, #0b3f82); border: 2px solid #fff; box-shadow: 0 12px 40px rgba(0, 0, 0, .45); }
+.fim-caixa h2 { margin: 2px 0 8px; font-size: 30px; color: var(--amarelo); text-shadow: 0 3px 0 #c46a00; }
+.fim-placar { display: flex; gap: 12px; justify-content: center; }
+.fim-placar .lado { flex: 1; padding: 6px; border-radius: 16px; background: rgba(255, 255, 255, .12); }
+.fim-placar .lado.venceu { background: rgba(255, 210, 63, .3); box-shadow: 0 0 0 3px var(--amarelo); }
+.fim-placar .lado b { display: block; font-size: 32px; }
+.fim-time { font-size: 20px; font-weight: 600; margin: 10px 0 6px; }
+.fim-novas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.fim-novas img { width: 52px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .4)); }
+.fim-botoes { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+@media (orientation: landscape) and (max-height: 500px) { .fim-caixa h2 { font-size: 24px; margin: 0 0 4px; } .fim-placar .lado b { font-size: 26px; } .fim-time { font-size: 17px; margin: 6px 0 4px; } }
+
+/* ---------- álbum ---------- */
+.album-caixa { width: min(900px, 96vw); max-height: calc(100vh - var(--nav-alto, 60px) - 12px); margin-top: calc(var(--nav-alto, 60px) - 20px); overflow: auto; box-sizing: border-box;
+  padding: 10px 14px; border-radius: 22px; background: rgba(5, 30, 80, .82); border: 2px solid rgba(255, 255, 255, .5); }
+.album-caixa h2 { margin: 2px 0; text-align: center; color: var(--amarelo); }
+.album-conta { text-align: center; margin: 0 0 8px; opacity: .9; }
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.figurinha { display: flex; flex-direction: column; align-items: center; padding: 6px 4px; border-radius: 14px; background: rgba(255, 255, 255, .1); border: 1.5px dashed rgba(255, 255, 255, .35); font-size: 13px; text-align: center; }
+.figurinha img { width: 84px; height: 62px; object-fit: contain; }
+.figurinha.tem { background: rgba(255, 255, 255, .2); border-style: solid; border-color: rgba(255, 210, 63, .8); }
+.figurinha:not(.tem) img { filter: brightness(0) opacity(.35); }
+.figurinha b { color: var(--amarelo); }
+.figurinha small { opacity: .8; }
+#desligado { display: none; padding: 30px; text-align: center; }
+#desligado:not([hidden]) { display: block; }
+/* celular em pé: em cima só o relógio (ao lado da barra 🏠/🚪); os placares e baldes descem para os cantos de baixo */
+@media (orientation: portrait) {
+  .hud { left: 0; right: 0; transform: none; }   /* sem transform: os placares "fixed" ficam presos à tela, não à caixa */
+  .placar { position: fixed; bottom: calc(var(--sb) + 10px); min-width: 64px; padding: 3px 7px 5px; }
+  .placar.esq { left: 6px; }
+  .placar.dir { right: 6px; }
+  .placar b { font-size: 22px; }
+  .balde .item { width: 26px; height: 22px; }
+  .balde .item img { max-width: 24px; max-height: 20px; }
+  .balde { flex-wrap: wrap; justify-content: center; max-width: 96px; }
+  .sozinho .controles.esq { bottom: calc(var(--sb) + 8px); }
+}

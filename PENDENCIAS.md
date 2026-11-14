@@ -58,3 +58,12 @@ interruptor em `recursos-do-app.json`. Antes de começar cada um, fazer uma entr
 | 32 | Batalha Naval online/pertinho: quem afunda pode ver o nome do navio trocado quando a frota tem dois do mesmo tamanho (precisa mandar o tipo do navio pela rede). | Batalha Naval 0.3.0 | 🟡 aberta |
 | 33 | Enigmatic: fotos mais realistas no lugar dos emojis (precisa de banco de fotos com licença livre; deixa o jogo mais pesado sem internet). | Dono, 06/Nov/2026 | 💡 ideia |
 | 34 | Mão na Massa: entrevistar a filha do dono para ajustar receitas, lugares e passos. | Dono | ⏸ aguardando o dono |
+
+## GLUB GLUB (pescaria, dono 13–14/Nov/2026)
+
+| # | Descrição | Origem | Situação |
+|---|---|---|---|
+| 35 | **GLUB GLUB**, jogo novo de pescaria (Juca e Lili, anzol em pêndulo, 30 bichos 3D, 3 níveis por jogador, sozinho ou em dois no mesmo aparelho, balde, bolhas de poder, “Limpa o Rio!”, álbum, 3 lugares × 3 horas do dia). Detalhe em `glub-glub/PENDENCIAS.md`. | Dono, 13/Nov/2026 | ✅ v0.1.0 (14/Nov/2026); ⏸ testar com as filhas |
+| 36 | GLUB GLUB na **TV** com celulares de controle (Entrega 2) e como **aplicativo na TV LG pelo free-my-tv**, com o celular de controle todo desenhado. | Dono, 14/Nov/2026 | 🟡 fase 2 |
+| 37 | GLUB GLUB **cada um no seu celular**, com código (Entrega 3). | Dono, 14/Nov/2026 | 🟡 |
+

@@ -106,6 +106,15 @@ mais**, e o bicho de cima nunca vale mais que o de baixo.
 - Música: **pelo menos 10 gravações** de instrumentos de verdade pelo `trilha.js`, das pastas `musicas/` que já existem
   (sem copiar arquivo), seguindo a regra da música; uma **favorita nova** `glub-glub` no `FAVORITAS` (animada, até 2,5 MB).
 
+## Mudança de rumo na arte (dono, 14/Nov/2026)
+
+Depois de duas amostras desenhadas no código ("ainda bem simples"), o dono escolheu **imagens 3D geradas com IA**: o
+modelo Qwen-Image (Apache-2.0), num computador alugado no Higgsfield (130 créditos ao todo, autorizados por ele), gerou
+os 30 bichos, prêmios, lixo, mergulhador, Juca e Lili; o fundo verde foi recortado e as imagens viraram WebP leves
+(`glub-glub/img/`, ~1,4 MB). O cenário (céu, serras, recife, raios de sol, bolhas) continua em código, com 3 lugares
+(roça, mar aberto, serra) × 3 horas do dia (dia, entardecer, noite). Bichos novos pedidos no caminho: peixe-palhaço,
+cirurgião-azul, água-viva, cavalo-marinho, morsa, orca, peixe-abissal e peixe-lanterna; alguns "fofos" (olhões).
+
 ## Padrões da casa (checklist "Jogo novo" do CLAUDE.md)
 
 Pasta própria com `index.html`, `app.js`, `estilo.css`, `sw.js`, `manifest.webmanifest`, ícones, `versoes.json`,

@@ -112,6 +112,14 @@
         "en": "My Little Big Chef"
       },
       "pagina": "cozinha/"
+    },
+    {
+      "id": "glub-glub",
+      "nome": {
+        "pt": "GLUB GLUB",
+        "en": "GLUB GLUB"
+      },
+      "pagina": "glub-glub/"
     }
   ]
 }
