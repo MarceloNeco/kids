@@ -120,9 +120,10 @@
     var c = { tipo: tipo, pele: um(r, CARACTERISTICAS.pele) };
     c.cabeloCor = idoso ? 'branco' : um(r, ['preto', 'castanho', 'loiro', 'ruivo']);
     if (med) {
-      var comp = masc ? ['curto', 'curto', 'medio', 'comprido'] : ['curto', 'medio', 'comprido', 'comprido'];
-      if (tipo === 'homem' || tipo === 'vovo') comp = comp.concat(['careca', 'careca']);
-      c.cabeloComp = um(r, comp);
+      // comprimento que combina com cada um (vovô de cabelo comprido parecia vovó no tabuleiro)
+      var COMP = { menino: ['curto', 'curto', 'medio'], menina: ['curto', 'medio', 'comprido', 'comprido'], homem: ['curto', 'curto', 'medio', 'careca', 'careca', 'comprido'],
+        mulher: ['curto', 'medio', 'comprido', 'comprido'], vovo: ['curto', 'careca', 'careca'], vova: ['curto', 'medio', 'medio'] };
+      c.cabeloComp = um(r, COMP[tipo]);
     } else {
       c.cabeloComp = masc ? 'curto' : 'comprido';
     }
