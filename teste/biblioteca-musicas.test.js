@@ -100,3 +100,44 @@ test('estante: 🎵 abre a biblioteca, ▶ toca, Voltar fecha sem sair da estant
     }
   } finally { await b.close(); srv.close(); }
 });
+
+test('Bolinho FM sem internet: a música guardada no aparelho toca; a que não está guardada avisa "precisa de internet"', async () => {
+  const { chromium } = require('playwright');
+  const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.mp3': 'audio/mpeg', '.webmanifest': 'application/manifest+json' };
+  const srv = http.createServer((q, r) => {
+    let p = decodeURIComponent(q.url.split('?')[0]);
+    if (!p.startsWith('/kids/')) { r.writeHead(404); return r.end(); }
+    p = p.slice(6); if (!p || p.endsWith('/')) p += 'index.html';
+    const f = path.join(raiz, p);
+    if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
+    r.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
+  });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const base = 'http://127.0.0.1:' + srv.address().port + '/kids/';
+  const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
+  try {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+    await ctx.addInitScript(() => { localStorage.setItem('bolinho:idioma', 'pt'); localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); });
+    await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+    const pg = await ctx.newPage(), erros = [];
+    pg.on('pageerror', (e) => erros.push(e.message));
+    await pg.goto(base); await pg.waitForTimeout(500);
+    // guarda a favorita da rádio, como o "Guardar todos" faz
+    assert.strictEqual(await pg.evaluate(() => Trilha.offline.guardar(['estante'])), 1, 'guardou a favorita da rádio');
+    await ctx.setOffline(true);
+    await pg.click('#btBiblioteca'); await pg.waitForSelector('.bib:not([hidden])');
+    const fav = '.bib li[data-jogo="estante"][data-a="/kids/musicas/cool-rock.mp3"]';
+    await pg.click(fav + ' >> .tocar');
+    await pg.waitForFunction((s) => document.querySelector(s).classList.contains('toca'), fav, { timeout: 5000 });
+    assert.ok(!(await pg.$(fav + ' em')) || !(await pg.textContent(fav + ' em')), 'a guardada não mostra "precisa de internet"');
+    const outra = '.bib li[data-jogo="estante"]:not([data-a="/kids/musicas/cool-rock.mp3"])';
+    await pg.click(outra + ' >> .tocar');
+    await pg.waitForFunction((s) => /precisa de internet/.test(document.querySelector(s).textContent), outra, { timeout: 5000 });
+    assert.ok(!(await pg.$eval(fav, (li) => li.classList.contains('toca'))), 'a anterior parou');
+    // de novo na guardada: volta a tocar (não fica presa no aviso)
+    await pg.click(fav + ' >> .tocar');
+    await pg.waitForFunction((s) => document.querySelector(s).classList.contains('toca'), fav, { timeout: 5000 });
+    assert.deepStrictEqual(erros, [], 'erro na página');
+    await ctx.close();
+  } finally { await b.close(); srv.close(); }
+});
