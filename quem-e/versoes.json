@@ -2,20 +2,37 @@
   "app": "quem-e",
   "versoes": [
     {
-      "versao": "0.3.0",
+      "versao": "0.3.1",
       "data": "14/Nov/2026",
-      "hora": "18:40:00",
+      "hora": "19:10:00",
       "pt": [
         "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante",
-        "🔮 As 127 perguntas da Meleca Adivinha e as do Duelo de Caras também em espanhol; a meleca fala no idioma escolhido"
+        "🔮 As perguntas da Meleca Adivinha e do Duelo de Caras (também as do corpo inteiro) em espanhol; a meleca fala no idioma escolhido"
       ],
       "en": [
         "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf",
-        "🔮 All 127 questions of The Slime Guesses and the Face Duel questions in Spanish too; the slime speaks the chosen language"
+        "🔮 The questions of The Slime Guesses and the Face Duel (whole-body ones too) in Spanish; the slime speaks the chosen language"
       ],
       "es": [
         "🌎 Ahora en tres idiomas: portugués, inglés y español, que se eligen en la estantería",
-        "🔮 Las 127 preguntas de El Slime Adivina y las del Duelo de Caras también en español; el slime habla en el idioma elegido"
+        "🔮 Las preguntas de El Slime Adivina y del Duelo de Caras (también las de cuerpo entero) en español; el slime habla en el idioma elegido"
+      ]
+    },
+    {
+      "versao": "0.3.0",
+      "data": "14/Nov/2026",
+      "hora": "14:09:20",
+      "pt": [
+        "🧍 Duelo de Caras com corpo inteiro: ligue o botão na escolha do nível",
+        "👗 Saia, short, calça, vestido, tênis, bota, sapato ou descalço, mochila e o que a pessoa segura (balão, bola, sorvete, livro, flor)",
+        "❓ Perguntas novas do corpo: \"Usa saia?\", \"Está descalço?\", \"Segura um balão?\"…",
+        "📚 A Meleca Adivinha conhece 792 personagens: chegaram jogos (Minecraft, Mario, Pokémon, Sonic, Zelda…), Gabby, Miraculous, Guerreiras do K-Pop, Pocoyo, PJ Masks e mais"
+      ],
+      "en": [
+        "🧍 Face Duel with the whole body: turn on the button when choosing the level",
+        "👗 Skirt, shorts, trousers, dress, sneakers, boots, shoes or barefoot, backpack and what the person holds (balloon, ball, ice cream, book, flower)",
+        "❓ New body questions: \"Wearing a skirt?\", \"Barefoot?\", \"Holding a balloon?\"…",
+        "📚 The Guessing Slime knows 792 characters: games arrived (Minecraft, Mario, Pokémon, Sonic, Zelda…), Gabby, Miraculous, K-Pop Demon Hunters, Pocoyo, PJ Masks and more"
       ]
     },
     {

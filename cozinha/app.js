@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.0';
+  var APP_VERSION = '0.11.0';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -410,7 +410,7 @@
     var u = L.lugaresUteis(jogo.precisa, jogo.cesta), ids = Object.keys(u);
     if (!jogo.cfg.moedas && u.mercado && !ids.some(function (l) { return NATUREZA.indexOf(l) >= 0; })) return 'mercado';
     ids.sort(function (a, b) {
-      var na = NATUREZA.indexOf(a) >= 0 ? 0 : a === 'mercado' ? 1 : 2, nb = NATUREZA.indexOf(b) >= 0 ? 0 : b === 'mercado' ? 1 : 2;
+      var na = NATUREZA.indexOf(a) >= 0 ? 0 : L.LOJAS.indexOf(a) >= 0 ? 1 : 2, nb = NATUREZA.indexOf(b) >= 0 ? 0 : L.LOJAS.indexOf(b) >= 0 ? 1 : 2;
       return na - nb || u[b].length - u[a].length || D.LUGARES.findIndex(function (l) { return l.id === a; }) - D.LUGARES.findIndex(function (l) { return l.id === b; });
     });
     if (jogo.favores <= 0) ids = ids.filter(function (l) { return l !== 'vizinha'; }).concat(ids.indexOf('vizinha') >= 0 ? ['vizinha'] : []);
@@ -441,7 +441,8 @@
       '<span class="nuvem n1" aria-hidden="true">' + VI.nuvem() + '</span><span class="nuvem n2" aria-hidden="true">' + VI.nuvem() + '</span>' +
       '<span class="carro" aria-hidden="true">' + VI.carro('#3aa0e8') + '</span><span class="boneco" aria-hidden="true">' + VI.boneco() + '</span>';
     desenharCesta();
-    requestAnimationFrame(function () { desenharRuas(); porNaPorta(jogo.pos || 'casa'); });
+    if (atual === 'mapa') { desenharRuas(); porNaPorta(jogo.pos || 'casa'); }   // na hora (a tela já está visível) e de novo no próximo quadro
+    requestAnimationFrame(function () { if (atual === 'mapa' && jogo && !andando) { desenharRuas(); porNaPorta(jogo.pos || 'casa'); } });
   }
   // geometria da vila: porta de cada lugar (meio da rua embaixo dele) e as ruas de cima a baixo entre as colunas
   function geo() {
@@ -602,6 +603,7 @@
     area.innerHTML = '<p class="instr">' + t('Cada fruta nasce na sua planta! Toque nas frutas maduras e coloridas. As verdinhas ainda precisam esperar.', 'Each fruit grows on its own plant! Tap the ripe, colourful fruit. The green ones still need to wait.') + '</p>' +
       '<div class="pomar"></div>';
     var pomar = qs(area, '.pomar');
+    ajudante(pomar, '.pe');
     tipos.forEach(function (tipo) {
       var pid = D.ingrediente[tipo].planta, pl = D.planta[pid];
       var pe = document.createElement('div'); pe.className = 'pe p-' + pid; pe.setAttribute('data-planta', pid);
@@ -639,6 +641,27 @@
     }, 1500 * V);
   };
 
+  // ajudante (v0.9.0): o bonequinho entra no lugar junto e anda até a planta, a árvore ou a galinha que a criança tocar
+  // (só enfeite: a brincadeira não espera por ele). Com "reduzir movimento" ele chega na hora.
+  function ajudante(caixa, seletor) {
+    caixa.classList.add('tem-ajudante');
+    var a = document.createElement('span'); a.className = 'ajudante'; a.setAttribute('aria-hidden', 'true'); a.innerHTML = VI.boneco(); caixa.appendChild(a);
+    var x = 0, tAnda = 0;
+    function por(nx, ny, dur) {
+      a.style.setProperty('--dur', dur + 's'); a.classList.toggle('esq', nx < x); x = nx;
+      a.style.left = nx + 'px'; a.style.top = ny + 'px';
+    }
+    requestAnimationFrame(function () { por(Math.min(40, caixa.clientWidth * 0.1), caixa.clientHeight - 4, 0); });
+    caixa.addEventListener('pointerdown', function (e) {
+      var el = e.target.closest(seletor); if (!el || !caixa.contains(el)) return;
+      var cr = caixa.getBoundingClientRect(), r = el.getBoundingClientRect();
+      var cx = r.left - cr.left + r.width / 2, nx = cx > caixa.clientWidth / 2 ? cx - r.width * 0.42 : cx + r.width * 0.42, ny = Math.min(caixa.clientHeight - 2, r.bottom - cr.top);
+      var dist = Math.abs(nx - x) + Math.abs(ny - (parseFloat(a.style.top) || 0)), dur = calmo() || VA < 1 ? 0 : Math.min(0.9, 0.15 + dist / 420);
+      a.classList.remove('puxa'); a.classList.add('anda'); por(nx, ny, dur);
+      clearTimeout(tAnda); tAnda = setTimeout(function () { a.classList.remove('anda'); void a.offsetWidth; a.classList.add('puxa'); }, dur * 1000);
+    });
+  }
+
   // Horta: cenoura e batata crescem EMBAIXO da terra (dá para ver pela terra) e se arrancam puxando 3 vezes;
   // tomate no tomateiro com estaca, alface (bola de folhas) e cheiro-verde em cima da terra: um toque colhe.
   MINI.horta = function (area) {
@@ -646,8 +669,9 @@
     var forma = function (id) { return D.planta[D.ingrediente[id].planta].forma; };
     var raiz = tipos.some(function (id) { return forma(id) === 'raiz'; }), cima = tipos.some(function (id) { return forma(id) !== 'raiz'; });
     area.innerHTML = '<p class="instr">' + (raiz ? t('O que cresce embaixo da terra: toque 3 vezes (ou puxe o dedo para cima) para arrancar. ', 'What grows under the ground: tap 3 times (or swipe up) to pull it out. ') : '') +
-      (cima ? t('O que cresce em cima da terra: um toque colhe.', 'What grows above the ground: one tap picks it.') : '') + '</p><div class="canteiro"></div>';
+      (cima ? t('O que cresce em cima da terra: um toque colhe.', 'What grows above the ground: one tap picks it.') : '') + '</p><div class="canteiro cercado"></div>';
     var cant = qs(area, '.canteiro');
+    ajudante(cant, '.planta');
     for (var i = 0; i < 6; i++) (function (i) {
       var tipo = tipos[i % tipos.length], f = forma(tipo), pl = D.planta[D.ingrediente[tipo].planta], vezes = f === 'raiz' ? 3 : 1;
       var b = document.createElement('button'); b.type = 'button'; b.className = 'planta f-' + f; b.setAttribute('data-ing', tipo);
@@ -683,8 +707,9 @@
 
   MINI.galinheiro = function (area) {
     var n = jogo.cfg.id === 'facil' || RAPIDO ? 3 : jogo.cfg.id === 'medio' ? 2 : 1;
-    area.innerHTML = '<p class="instr">' + t('Toque numa galinha para ela levantar. Se tiver ovo, pegue com cuidado!', 'Tap a hen so she stands up. If there is an egg, pick it up gently!') + '</p><div class="poleiro"></div>';
+    area.innerHTML = '<p class="instr">' + t('Toque numa galinha para ela levantar. Se tiver ovo, pegue com cuidado!', 'Tap a hen so she stands up. If there is an egg, pick it up gently!') + '</p><div class="poleiro casinha-galinha"></div>';
     var pol = qs(area, '.poleiro');
+    ajudante(pol, '.ninho');
     var ordem = embaralhar([0, 1, 2]);
     [0, 1, 2].forEach(function (i) {
       var temOvo = ordem.indexOf(i) < n;
@@ -705,9 +730,11 @@
   };
 
   MINI.vaca = function (area) {
-    area.innerHTML = '<p class="instr">' + t('Faça carinho na Mimosa e segure o botão para encher a xícara de leite.', 'Pet Mimosa and hold the button to fill the cup with milk.') + '</p>' +
-      '<div class="pasto"><button type="button" class="mimosa" aria-label="' + t('Fazer carinho na vaca', 'Pet the cow') + '">🐄</button>' +
-      '<div class="jarra-zona" aria-hidden="true"><span class="jorro-leite"></span><div class="jarra"><div class="leite-nivel"></div></div></div></div>' +
+    area.innerHTML = '<p class="instr">' + t('Faça carinho na Mimosa e segure o botão para tirar o leite no balde.', 'Pet Mimosa and hold the button to milk her into the bucket.') + '</p>' +
+      // v0.9.0: a Mimosa desenhada grande e a criança sentada no banquinho, tirando o leite no balde
+      '<div class="pasto pasto-v2"><button type="button" class="mimosa" aria-label="' + t('Fazer carinho na vaca', 'Pet the cow') + '">' + VI.vacaGrande() + '</button>' +
+      '<div class="jarra-zona" aria-hidden="true"><span class="jorro-leite"></span><div class="jarra balde"><div class="leite-nivel"></div></div></div>' +
+      '<span class="ordenhador" aria-hidden="true">' + VI.ordenha() + '</span></div>' +
       '<button type="button" class="grande bt-segurar" id="btOrdenhar">' + t('🥛 Segure para tirar o leite', '🥛 Hold to get the milk') + '<span class="barra"><span></span></span></button>';
     var vaca = qs(area, '.mimosa'), nivelEl = qs(area, '.leite-nivel'), bt = qs(area, '.bt-segurar'), barra = qs(bt, '.barra span'), pasto = qs(area, '.pasto');
     // o leite cai em jorro na xícara enquanto o dedo segura
@@ -897,22 +924,52 @@
     };
   };
 
-  MINI.mercado = function (area) {
-    var nv = jogo.cfg;
+  // lojas (v0.10.0): o mercadinho do Seu Zé, a padaria do Seu Joaquim e a feira da Dona Rosa funcionam do mesmo jeito
+  // (de graça no Fácil; moedas e troco no Médio e no Difícil); cada uma vende as suas coisas (logica.vende)
+  // o mercadinho por dentro (v0.11.0, "achar os setores no mercado"): hortifrúti nos caixotes, geladeira, açougue,
+  // padaria e a mercearia nas prateleiras; o setor que tem algo da lista brilha (Fácil e Médio). Padaria e feira: uma
+  // banca só.
+  var SETORES = [
+    { id: 'hortifruti', e: '🥕', pt: 'Hortifrúti', en: 'Fruit & veg', tem: function (g) { return g.de === 'pomar' || g.de === 'horta'; } },
+    { id: 'geladeira', e: '🧊', pt: 'Geladeira', en: 'Fridge', tem: function (g) { return ['leite', 'manteiga', 'queijo', 'ovo'].indexOf(g.id) >= 0; } },
+    { id: 'acougue', e: '🥩', pt: 'Açougue', en: 'Butcher', tem: function (g) { return g.id === 'carne'; } },
+    { id: 'padaria', e: '🥖', pt: 'Padaria', en: 'Bakery', tem: function (g) { return g.id === 'pao'; } },
+    { id: 'mercearia', e: '🛒', pt: 'Mercearia', en: 'Pantry', tem: function () { return true; } }
+  ];
+  function setorDe(id) { var g = D.ingrediente[id]; for (var i = 0; i < SETORES.length; i++) if (SETORES[i].tem(g)) return SETORES[i]; return SETORES[SETORES.length - 1]; }
+  function prateleiraHtml(loja, itens, falta, nv) {
+    var k = 0;
+    function produto(id) {
+      var p = L.preco(id, nv);
+      return '<button type="button" class="produto' + (falta.indexOf(id) >= 0 && nv.brilho ? ' precisa' : '') + '" data-ing="' + id + '" style="--i:' + (k++) + '" aria-label="' + L.nomeIng(id, en()) + ' — ' + (p ? p + t(' moedas', ' coins') : t('grátis', 'free')) + '">' + icone(id) +
+        '<span class="pn">' + L.nomeIng(id, en()) + '</span><span class="preco">' + (p ? '💰 ' + p : t('grátis', 'free')) + '</span></button>';
+    }
+    if (loja !== 'mercado') return '<div class="prateleira banca-' + loja + '">' + itens.map(produto).join('') + '</div>';
+    return '<div class="prateleira mercado-setores">' + SETORES.map(function (st) {
+      var aqui = itens.filter(function (id) { return setorDe(id) === st; });
+      if (!aqui.length) return '';
+      var temFalta = nv.brilho && aqui.some(function (id) { return falta.indexOf(id) >= 0; });
+      return '<section class="setor s-' + st.id + (temFalta ? ' tem-falta' : '') + '" data-setor="' + st.id + '"><h4 class="placa">' + st.e + ' ' + tx(st) + (temFalta ? ' <span class="seta-setor" aria-hidden="true">⬇️</span>' : '') + '</h4>' +
+        '<div class="itens">' + aqui.map(produto).join('') + '</div></section>';
+    }).join('') + '</div>';
+  }
+  MINI.padaria = function (area) { MINI.mercado(area, 'padaria'); };
+  MINI.feira = function (area) { MINI.mercado(area, 'feira'); };
+  MINI.mercado = function (area, loja) {
+    loja = loja || 'mercado';
+    var nv = jogo.cfg, dono = D.lugar[loja].dono, ze = en() ? dono[1] : dono[0];
     var falta = L.faltando(jogo.precisa, jogo.cesta).map(function (r) { return r.id; });
-    var itens = D.INGREDIENTES.filter(function (g) { return g.preco > 0; }).map(function (g) { return g.id; });
+    var itens = D.INGREDIENTES.filter(function (g) { return L.vende(loja, g.id); }).map(function (g) { return g.id; });
+    area.classList.add('loja-' + loja);
     itens.sort(function (a, b) { return (falta.indexOf(a) < 0) - (falta.indexOf(b) < 0); });
-    area.innerHTML = '<div class="toldo" aria-hidden="true"></div><p class="instr">' + (nv.moedas ? t('Toque no que quer comprar e pague com as suas moedas. O Seu Zé dá o troco!', 'Tap what you want to buy and pay with your coins. Mr. Zé gives you the change!')
-      : t('Hoje o Seu Zé está dando tudo de presente! Toque no que precisa. 🎁', 'Today Mr. Zé is giving everything away! Tap what you need. 🎁')) + '</p>' +
-      '<div class="prateleira">' + itens.map(function (id, i) {
-        var p = L.preco(id, nv);
-        return '<button type="button" class="produto' + (falta.indexOf(id) >= 0 && nv.brilho ? ' precisa' : '') + '" data-ing="' + id + '" style="--i:' + i + '">' + icone(id) +
-          '<span class="pn">' + L.nomeIng(id, en()) + '</span><span class="preco">' + (p ? '💰 ' + p : t('grátis', 'free')) + '</span></button>';
-      }).join('') + '</div><div class="caixa" hidden></div><div class="ajudar-zona"></div>';
+    area.innerHTML = '<div class="toldo" aria-hidden="true"></div><p class="instr">' + (nv.moedas ? t('Toque no que quer comprar e pague com as suas moedas. ' + ze + ' dá o troco!', 'Tap what you want to buy and pay with your coins. ' + ze + ' gives you the change!')
+      : t('Hoje ' + ze + ' está dando tudo de presente! Toque no que precisa. 🎁', 'Today ' + ze + ' is giving everything away! Tap what you need. 🎁')) + '</p>' +
+      prateleiraHtml(loja, itens, falta, nv) + '<div class="caixa" hidden></div><div class="ajudar-zona"></div>';
+    ajudante(qs(area, '.prateleira'), '.produto');
     var caixa = qs(area, '.caixa');
     function mostrarAjudar() {
       var z = qs(area, '.ajudar-zona');
-      z.innerHTML = L.precisaAjudar(jogo, jogo.precisa, nv) ? '<button type="button" class="medio verde" id="btAjudar">' + t('🧹 Ajudar o Seu Zé a arrumar (+2 💰)', '🧹 Help Mr. Zé tidy up (+2 💰)') + '</button>' : '';
+      z.innerHTML = L.precisaAjudar(jogo, jogo.precisa, nv) ? '<button type="button" class="medio verde" id="btAjudar">' + t('🧹 Ajudar ' + (loja === 'feira' ? 'a ' : 'o ') + ze + ' a arrumar (+2 💰)', '🧹 Help ' + ze + ' tidy up (+2 💰)') + '</button>' : '';
       var b = qs(z, '#btAjudar'); if (b) b.addEventListener('click', ajudar);
     }
     function ajudar() {
@@ -932,7 +989,7 @@
     function abrirCaixa(id, de) {
       var p = L.preco(id, nv), naMao = [];
       var carteira = L.moedasPara(jogo.moedas);
-      if (jogo.moedas < p) { Som.toca('erro'); aviso(t('Suas moedas não dão para isso. Tente outro lugar, peça para a vizinha ou ajude o Seu Zé.', 'Your coins are not enough for that. Try another place, ask the neighbour or help Mr. Zé.'), 3600); mostrarAjudar(); return; }
+      if (jogo.moedas < p) { Som.toca('erro'); aviso(t('Suas moedas não dão para isso. Tente outro lugar, peça para a vizinha ou ajude ' + (loja === 'feira' ? 'a ' : 'o ') + ze + '.', 'Your coins are not enough for that. Try another place, ask the neighbour or help ' + ze + '.'), 3600); mostrarAjudar(); return; }
       caixa.hidden = false;
       function desenhar() {
         var soma = L.soma(naMao);
@@ -1068,6 +1125,7 @@
   function desenharCozinha() {
     limparCozinha();
     var cz = jogo.cz, p = passoAtual(), total = jogo.passos.length;
+    cz.indo = false;
     // ficha da receita
     var lista = jogo.cfg.fichas ? cz.feitos.map(function (id) { return jogo.passos.filter(function (x) { return x.id === id; })[0]; }) : jogo.passos;
     $('ficha').innerHTML = lista.map(function (x) {
@@ -1096,7 +1154,10 @@
         return '<button type="button" class="ficha-bt" data-passo="' + id + '">' + icone(x.u) + '<span>' + texto(x) + '</span></button>';
       }).join('') + '</div>';
     } else if (cz.fase === 'utensilio') {
-      palco.innerHTML = '<div class="pergunta"><span class="seta" aria-hidden="true">👇</span><p>' + t('Qual utensílio usar? Escolha embaixo.', 'Which tool do we use? Pick one below.') + '</p></div>';
+      // v0.11.0: a cozinha "casinha cortada" com o cozinheirinho; ao acertar o utensílio ele anda até a estação
+      var ep = VI.estacaoPos(cz.estacao || 'porta');
+      palco.innerHTML = '<div class="diorama">' + VI.cozinhaDiorama() + '<span class="chef-cz" aria-hidden="true" style="left:' + ep[0] + '%;top:' + ep[1] + '%">' + VI.boneco() + '</span></div>' +
+        '<div class="pergunta"><span class="seta" aria-hidden="true">👇</span><p>' + t('Qual utensílio usar? Escolha embaixo.', 'Which tool do we use? Pick one below.') + '</p></div>';
       if (jogo.cfg.dica === 'metade' && !brilha) agendarCz(function () { cz.dicaTempo = true; desenharCozinha(); }, 8000 * V);
     } else if (cz.fase === 'acao') montarAcao(p);
   }
@@ -1116,7 +1177,13 @@
     if (cz.fase === 'ficha') { aviso(t('Primeiro escolha a ficha do próximo passo. 🃏', 'First pick the card for the next step. 🃏'), 2000); return; }
     if (cz.fase !== 'utensilio') return;
     var u = b.getAttribute('data-u');
-    if (u === p.u) { Som.toca('toque'); cz.fase = 'acao'; limparCozinha(); desenharCozinha(); }
+    if (u === p.u) {
+      if (cz.indo) return;
+      Som.toca('toque');
+      var ir = function () { cz.indo = false; cz.fase = 'acao'; limparCozinha(); desenharCozinha(); };
+      var ms = chefAte(estacaoDe(p.u));
+      if (ms) { cz.indo = true; agendarCz(ir, ms); } else ir();
+    }
     else {
       erro(); cz.errosPasso++;
       b.classList.remove('treme'); void b.offsetWidth; b.classList.add('treme');
@@ -1126,6 +1193,25 @@
   });
   $('btLer').addEventListener('click', function () { var p = jogo && jogo.cz && passoAtual(); var v = pref.voz; pref.voz = true; falar(p ? texto(p) : $('passoTexto').textContent); pref.voz = v; });
 
+  // estação da cozinha de cada utensílio (onde o cozinheirinho vai ficar de pé no desenho)
+  function estacaoDe(u) {
+    if (u === 'pia') return 'pia';
+    if (['fogao', 'frigideira', 'panela', 'espatula', 'grelha', 'forno', 'forma'].indexOf(u) >= 0) return 'fogao';
+    if (u === 'geladeira') return 'geladeira';
+    if (u === 'prato' || u === 'copo') return 'mesa';
+    return 'bancada';
+  }
+  // anda até a estação; devolve quanto tempo leva (0 = chegou na hora: movimento reduzido, testes ou já está lá)
+  function chefAte(est) {
+    var cz = jogo.cz, de = cz.estacao || 'porta', chef = qs($('palco'), '.chef-cz'), dio = qs($('palco'), '.diorama');
+    cz.estacao = est;
+    if (!chef || de === est || calmo() || VA < 1) return 0;
+    var a = VI.estacaoPos(de), b = VI.estacaoPos(est), dist = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), ms = Math.round(Math.min(1100, 300 + dist * 14));
+    chef.style.setProperty('--dur', ms + 'ms'); chef.classList.toggle('esq', b[0] < a[0]); chef.classList.add('anda');
+    chef.style.left = b[0] + '%'; chef.style.top = b[1] + '%';
+    if (dio) dio.className = 'diorama em-' + est;
+    return ms + 120;
+  }
   function concluir() {
     var cz = jogo.cz; if (cz.fase !== 'acao') return;
     cz.fase = 'feito'; cz.feitos.push(cz.atual); Som.toca('ok');

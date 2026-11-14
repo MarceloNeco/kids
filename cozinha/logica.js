@@ -82,14 +82,26 @@
   function completa(precisa, cesta) { return faltando(precisa, cesta).length === 0; }
 
   // ---------- lugares ----------
+  // lojas da vila (v0.10.0): mercadinho (tudo o que tem preço), padaria (pão, leite, queijo, manteiga: "padaria") e
+  // feira (frutas e legumes, que também nascem no pomar e na horta)
+  var LOJAS = ['mercado', 'padaria', 'feira'];
+  function vende(loja, id) {
+    var g = D.ingrediente[id]; if (!g || !(g.preco > 0)) return false;
+    if (loja === 'mercado') return true;
+    if (loja === 'padaria') return !!g.padaria;
+    if (loja === 'feira') return g.de === 'pomar' || g.de === 'horta';
+    return false;
+  }
   function lugaresDe(id, nivel) {
     var g = D.ingrediente[id], l = [];
     if (!g) return l;
     if (g.de) l.push(g.de);
-    if (g.preco > 0) l.push('mercado');
+    LOJAS.forEach(function (loja) { if (vende(loja, id)) l.push(loja); });
     if (g.vizinha) l.push('vizinha');
     return l;
   }
+  // só se consegue comprando (em alguma loja): não nasce na natureza nem a vizinha empresta
+  function soCompra(id) { var l = lugaresDe(id); return l.length > 0 && l.every(function (x) { return LOJAS.indexOf(x) >= 0; }); }
   // menor número de lugares que juntos têm tudo (testa todas as combinações: são só 7 lugares)
   function lugaresMinimos(ids) {
     var lugs = D.LUGARES.filter(function (l) { return l.id !== 'casa'; }).map(function (l) { return l.id; });
@@ -113,7 +125,7 @@
   // o que só se consegue comprando (não tem na natureza nem com a vizinha)
   function custoSoMercado(rec, nivel, fator) {
     return ingredientesDoNivel(rec, nivel, fator).reduce(function (s, x) {
-      var l = lugaresDe(x.id); return l.length === 1 && l[0] === 'mercado' ? s + D.ingrediente[x.id].preco * x.q : s;
+      return soCompra(x.id) ? s + D.ingrediente[x.id].preco * x.q : s;
     }, 0);
   }
   function moedasIniciais(rec, nivel, fator) { var nv = nivelDe(nivel); return nv.moedas ? custoSoMercado(rec, nv, fator) + nv.margem : 0; }
@@ -141,7 +153,7 @@
   function precisaAjudar(estado, precisa, nivel) {
     var nv = nivelDe(nivel); if (!nv.moedas) return false;
     return faltando(precisa, estado.cesta).some(function (r) {
-      var l = lugaresDe(r.id); return l.length === 1 && l[0] === 'mercado' && estado.moedas < D.ingrediente[r.id].preco;
+      return soCompra(r.id) && estado.moedas < D.ingrediente[r.id].preco;
     });
   }
 
@@ -210,7 +222,7 @@
   }
 
   var L = {
-    ingredientesDoNivel: ingredientesDoNivel, passosDoNivel: passosDoNivel, quantidade: quantidade, maxPessoas: maxPessoas, fatorDe: fatorDe, alternarPessoa: alternarPessoa,
+    LOJAS: LOJAS, vende: vende, soCompra: soCompra, ingredientesDoNivel: ingredientesDoNivel, passosDoNivel: passosDoNivel, quantidade: quantidade, maxPessoas: maxPessoas, fatorDe: fatorDe, alternarPessoa: alternarPessoa,
     podeFazer: podeFazer, faltamAntes: faltamAntes, proximos: proximos, proximoNaOrdem: proximoNaOrdem, ordemValida: ordemValida,
     por: por, tirar: tirar, resumo: resumo, faltando: faltando, completa: completa,
     lugaresDe: lugaresDe, lugaresMinimos: lugaresMinimos, lugaresUteis: lugaresUteis,
