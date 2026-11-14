@@ -18,6 +18,7 @@
      BolinhoIdioma.t(pt, en, es)         → o texto do idioma escolhido (sem o espanhol, cai no português).
                                            Também aceita um objeto: t({ pt: '…', en: '…', es: '…' }).
      BolinhoIdioma.voz()                 → 'pt-BR' | 'en-US' | 'es-ES' (para a fala, SpeechSynthesisUtterance.lang)
+     BolinhoIdioma.marca()               → 'Bolinho de Chuva' | 'Rainy Day Donuts' | 'Buñuelos de Lluvia'
      BolinhoIdioma.escolher('en')        → troca, guarda e avisa
      BolinhoIdioma.aoMudar(function (codigo) { … })  → trocaram o idioma (nesta página ou noutra aba)
      BolinhoIdioma.ingles()              → atual() === 'en' (compatibilidade com o código antigo)
@@ -174,6 +175,8 @@
       return pt;
     },
     voz: function () { return info(atual).voz; },
+    // nome da marca em cada idioma (dono, 14/Nov/2026): Bolinho de Chuva · Rainy Day Donuts · Buñuelos de Lluvia
+    marca: function () { return atual === 'en' ? 'Rainy Day Donuts' : atual === 'es' ? 'Buñuelos de Lluvia' : 'Bolinho de Chuva'; },
     escolher: function (c) { escolher(c); },
     aoMudar: function (fn) { if (typeof fn === 'function') ouvintes.push(fn); },
     ingles: function () { return atual === 'en'; },

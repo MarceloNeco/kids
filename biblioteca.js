@@ -46,7 +46,7 @@
   var tocandoUrl = null, naHistoria = false;
 
   function nomeJogo(id) {
-    if (id === 'estante') return { nome: T('📻 Rádio do Bolinho', '📻 Bolinho radio', '📻 Radio del Bolinho'), img: null };
+    if (id === 'estante') return { nome: T('📻 Rádio do Bolinho', '📻 Rainy Day Donuts radio', '📻 Radio de Buñuelos de Lluvia'), img: null };
     var j = (window.BolinhoCatalogo && BolinhoCatalogo.jogos || []).filter(function (x) { return x.id === id; })[0];
     if (!j) return { nome: id, img: null };
     var n = j.nomes && j.nomes[lingua()] || j.nome;
