@@ -924,3 +924,8 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .lavar3d .limpinho { position: absolute; left: 50%; top: 55%; }
 .lavar3d .lv-bt { min-width: 12rem; }
 @media (orientation: landscape) and (max-height: 32rem) { .lavar3d .lv-cena { height: calc(100dvh - 12rem); min-height: 9rem; } .lavar3d .lv-instr { font-size: .9rem; } }
+
+/* cozinha 3D (cozinha3d.js, v0.13.0): o desenho ocupa a largura do palco */
+.palco .diorama.d3 { width: 100%; max-width: 30rem; aspect-ratio: 1.35; border-radius: 18px; overflow: hidden; background: linear-gradient(180deg, #fff8ee, #f3dcc0); }
+.palco .diorama.d3 canvas { width: 100% !important; height: 100% !important; display: block; }
+@media (orientation: landscape) and (max-height: 32rem) { .palco .diorama.d3 { max-width: 20rem; } }

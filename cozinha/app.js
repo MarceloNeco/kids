@@ -499,6 +499,8 @@
   // nos testes (?teste) fica a vila desenhada, para os testes antigos; ?teste&vila3d testa a cidade 3D
   // lavar as mãos em 3D (lavar3d.js); nos testes só com ?teste&lavar3d (os testes antigos usam a pia desenhada)
   function usaLavar3D() { return !!(window.Lavar3D && Lavar3D.suportado() && (!RAPIDO || /[?&]lavar3d\b/.test(location.search))); }
+  // cozinha em 3D (cozinha3d.js); nos testes só com ?teste&cozinha3d
+  function usaCozinha3D() { return !!(window.Cozinha3D && Cozinha3D.suportado() && (!RAPIDO || /[?&]cozinha3d\b/.test(location.search))); }
   function usa3D() { return !!(window.Cidade3D && Cidade3D.suportado() && !/[?&]vila2d\b/.test(location.search) && (!RAPIDO || /[?&]vila3d\b/.test(location.search))); }
   window.addEventListener('cidade3d-pronta', function () { if (atual === 'mapa' && jogo) desenharMapa(); });
   function desenharMapa() {
@@ -1259,9 +1261,10 @@
       }).join('') + '</div>';
     } else if (cz.fase === 'utensilio') {
       // v0.11.0: a cozinha "casinha cortada" com o cozinheirinho; ao acertar o utensílio ele anda até a estação
-      var ep = VI.estacaoPos(cz.estacao || 'porta');
-      palco.innerHTML = '<div class="diorama">' + VI.cozinhaDiorama() + '<span class="chef-cz" aria-hidden="true" style="left:' + ep[0] + '%;top:' + ep[1] + '%">' + VI.boneco() + '</span></div>' +
+      var ep = VI.estacaoPos(cz.estacao || 'porta'), c3 = usaCozinha3D();
+      palco.innerHTML = (c3 ? '<div class="diorama d3" aria-hidden="true"></div>' : '<div class="diorama">' + VI.cozinhaDiorama() + '<span class="chef-cz" aria-hidden="true" style="left:' + ep[0] + '%;top:' + ep[1] + '%">' + VI.boneco() + '</span></div>') +
         '<div class="pergunta"><span class="seta" aria-hidden="true">👇</span><p>' + t('Qual utensílio usar? Escolha embaixo.', 'Which tool do we use? Pick one below.', '¿Qué utensilio usamos? Elige uno abajo.') + '</p></div>';
+      if (c3) Cozinha3D.anexar(qs(palco, '.diorama'), cz.estacao || 'porta');
       if (jogo.cfg.dica === 'metade' && !brilha) agendarCz(function () { cz.dicaTempo = true; desenharCozinha(); }, 8000 * V);
     } else if (cz.fase === 'acao') montarAcao(p);
   }
@@ -1309,6 +1312,11 @@
   function chefAte(est) {
     var cz = jogo.cz, de = cz.estacao || 'porta', chef = qs($('palco'), '.chef-cz'), dio = qs($('palco'), '.diorama');
     cz.estacao = est;
+    if (dio && dio.classList.contains('d3')) {
+      if (de === est || calmo() || VA < 1) return 0;
+      Cozinha3D.ir(est);
+      return 1250;
+    }
     if (!chef || de === est || calmo() || VA < 1) return 0;
     var a = VI.estacaoPos(de), b = VI.estacaoPos(est), dist = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), ms = Math.round(Math.min(1100, 300 + dist * 14));
     chef.style.setProperty('--dur', ms + 'ms'); chef.classList.toggle('esq', b[0] < a[0]); chef.classList.add('anda');
