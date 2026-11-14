@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.22.0",
+      "data": "14/Nov/2026",
+      "hora": "17:40:00",
+      "pt": [
+        "🛹 Skate em 3D de verdade: o pé de trás rema no chão, os braços abrem para equilibrar e o shape tem rodinhas e tails; na curva aparece o lado. Menina de saia, menino de bermuda (também nos patins).",
+        "🐎 Cavalo, dinossauro, galinha e ovo levantam poeirinha correndo; a galinha solta penas quando pula."
+      ],
+      "en": [
+        "🛹 Skateboard in real 3D: the back foot pushes the ground, arms open for balance and the board has wheels and kicktails; you see its side in curves. Girls in skirts, boys in shorts (on roller skates too).",
+        "🐎 Horse, dinosaur, hen and egg kick up little dust clouds; the hen drops feathers when she jumps."
+      ],
+      "es": [
+        "🛹 Monopatín en 3D de verdad: el pie de atrás empuja el suelo, los brazos se abren para mantener el equilibrio y la tabla tiene ruedas y colas; en las curvas se ve de lado. Las niñas con falda y los niños con pantalón corto (también en los patines).",
+        "🐎 El caballo, el dinosaurio, la gallina y el huevo levantan polvillo al correr; la gallina suelta plumas cuando salta."
+      ]
+    },
+    {
       "versao": "1.21.0",
       "data": "14/Nov/2026",
       "hora": "17:10:00",

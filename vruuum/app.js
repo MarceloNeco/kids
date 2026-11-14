@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.21.0';
+  var APP_VERSION = '1.22.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
