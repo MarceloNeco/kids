@@ -260,3 +260,75 @@ for (const vp of [{ width: 360, height: 740 }, { width: 740, height: 360 }]) {
     await pg.ctx.close();
   });
 }
+
+test('jeito livre contra a meleca: sem escolher segredo, pergunta quando quer, vira com o dedo e "Vou adivinhar!"', async () => {
+  const pg = await abrir();
+  await pg.click('#btPink'); await pg.click('#btMeleca'); await pg.waitForSelector('#niveis.ativa');
+  assert.equal(await visivel(pg, '#jeito'), true);
+  await pg.click('#btLivre');
+  assert.equal(await pg.getAttribute('#btLivre', 'aria-pressed'), 'true');
+  await pg.click('#btFacil');
+  await pg.waitForSelector('#jogo.ativa');   // direto para o jogo: sem a tela do segredo
+  assert.equal(await visivel(pg, '#meuSegredo'), false);
+  assert.match(await pg.textContent('#btPalpite'), /Vou adivinhar/);
+  const seg = await pg.evaluate(() => QEDebug.estado().segredos[1]);
+  // duas perguntas seguidas; nada vira sozinho
+  for (let i = 0; i < 2; i++) {
+    await pg.click('#btPerguntar'); await pg.click('#perguntas button[data-p]');
+    await pg.waitForSelector('#acoes:not([hidden])');
+  }
+  assert.equal(await pg.evaluate(() => QEDebug.estado().feitas[0].length), 2);
+  assert.equal(await pg.evaluate(() => QEDebug.estado().dePe[0].every(Boolean)), true, 'no livre nada vira sozinho');
+  assert.equal(await pg.evaluate(() => QEDebug.aguardando().acao), 'livre');
+  // a resposta aparece na lista das já feitas
+  await pg.click('#btPerguntar');
+  assert.match(await pg.textContent('#perguntas .pergunta.feita'), /→ (Sim|Não)/);
+  await pg.click('#btFecharPerguntas');
+  // virar com o dedo
+  const outra = seg === 0 ? 1 : 0;
+  await pg.click(`#tabuleiro .carta[data-id="${outra}"]`);
+  assert.equal(await pg.evaluate(id => document.querySelector(`#tabuleiro .carta[data-id="${id}"]`).classList.contains('virada'), outra), true);
+  await pg.click(`#tabuleiro .carta[data-id="${outra}"]`);
+  // palpite errado: continua; certo: ganha
+  await pg.click('#btPalpite'); await pg.click(`#tabuleiro .carta[data-id="${outra}"]`); await pg.click('#btConfirmarPalpite');
+  assert.match(await pg.textContent('#balao'), /Não é/);
+  assert.equal(await pg.evaluate(() => QEDebug.estado().fase), 'jogo');
+  await pg.waitForSelector('#acoes:not([hidden])');
+  await pg.click('#btPalpite'); await pg.click(`#tabuleiro .carta[data-id="${seg}"]`); await pg.click('#btConfirmarPalpite');
+  await pg.waitForSelector('#fim:not([hidden])');
+  assert.match(await pg.textContent('#fimTitulo'), /Você acertou/);
+  assert.equal(await pg.locator('#fimCaras .fim-cara').count(), 1, 'só a carta da meleca');
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('jeito livre, cada um no seu celular: sem vez, pergunta em voz alta, palpite conferido no outro aparelho', async () => {
+  const a = await abrir();
+  await a.click('#btBlue'); await a.click('#btRede'); await a.waitForSelector('#rede.ativa');
+  await a.click('#btCriarSala'); await a.click('#btLivre'); await a.click('#btFacil');
+  await a.waitForSelector('#redeSala:not([hidden])');
+  const codigo = (await a.textContent('#codigoSala')).trim();
+  const b = await a.ctx.newPage(); const errosB = [];
+  b.on('pageerror', e => errosB.push(e.message));
+  await b.goto(base + '?teste&sala=' + codigo);
+  await b.waitForSelector('#segredo.ativa', { timeout: 10000 }); await a.waitForSelector('#segredo.ativa', { timeout: 10000 });
+  await a.click('#segredo .carta[data-id="2"]'); await a.click('#btConfirmarSegredo');
+  await b.click('#segredo .carta[data-id="5"]'); await b.click('#btConfirmarSegredo');
+  await a.waitForSelector('#jogo.ativa'); await b.waitForSelector('#jogo.ativa');
+  // os dois podem agir: sem vez, sem botão de perguntar
+  await a.waitForSelector('#acoes:not([hidden])'); await b.waitForSelector('#acoes:not([hidden])');
+  assert.equal(await visivel(a, '#btPerguntar'), false);
+  await a.click('#tabuleiro .carta[data-id="7"]'); await b.click('#tabuleiro .carta[data-id="8"]');
+  // A chuta errado: espera a resposta do outro aparelho; B fica sabendo
+  await a.click('#btPalpite'); await a.click('#tabuleiro .carta[data-id="4"]'); await a.click('#btConfirmarPalpite');
+  await a.waitForFunction(() => /Não é/.test(document.getElementById('balao').textContent), null, { timeout: 10000 });
+  await b.waitForFunction(() => /Errou/.test(document.getElementById('balao').textContent), null, { timeout: 10000 });
+  assert.equal(await a.evaluate(() => document.querySelector('#tabuleiro .carta[data-id="4"]').classList.contains('virada')), true);
+  // B acerta (o segredo de A é a carta 2)
+  await b.click('#btPalpite'); await b.click('#tabuleiro .carta[data-id="2"]'); await b.click('#btConfirmarPalpite');
+  await b.waitForSelector('#fim:not([hidden])', { timeout: 10000 }); await a.waitForSelector('#fim:not([hidden])', { timeout: 10000 });
+  assert.match(await b.textContent('#fimTitulo'), /Você acertou/);
+  await b.waitForFunction(() => !document.querySelector('#fimCaras .oculta'), null, { timeout: 10000 });
+  assert.deepEqual(a.erros(), []); assert.deepEqual(errosB, []);
+  await a.ctx.close();
+});
