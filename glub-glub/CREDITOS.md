@@ -2,7 +2,7 @@
 
 | O quê | De onde | Licença |
 |---|---|---|
-| Imagens 3D dos bichos, prêmios, lixo, mergulhador, Juca e Lili (`img/*.webp`) | geradas em 14/Nov/2026 especialmente para este jogo com o modelo **Qwen-Image** (Qwen/Qwen-Image), rodando num computador alugado no Higgsfield, a partir de descrições escritas para o GLUB GLUB (nenhuma imagem de outro jogo ou desenho foi usada como base); fundo recortado e convertido para WebP no próprio repositório | modelo sob **Apache-2.0**; as imagens são originais deste jogo, com a mesma licença do repositório |
+| Imagens 3D dos bichos, prêmios, lixo, mergulhador, Juca e Lili, e (v0.1.3) piranha, gigantes que brilham, Dragão-do-mar, menino e menina banhistas (`img/*.webp`) | geradas em 14/Nov/2026 especialmente para este jogo com o modelo **Qwen-Image** (Qwen/Qwen-Image), rodando num computador alugado no Higgsfield, a partir de descrições escritas para o GLUB GLUB (nenhuma imagem de outro jogo ou desenho foi usada como base); fundo recortado e convertido para WebP no próprio repositório | modelo sob **Apache-2.0**; as imagens são originais deste jogo, com a mesma licença do repositório |
 | Cenário (céu, serras, roça, mar, recife, raios de sol, bolhas), barco, ilhota, linha, anzol, bolhas de poder e o desenho de reserva de cada bicho | feitos em código para este jogo (`arte.js`) | mesma licença do repositório |
 | Ícone (`icone-192.png`, `icone-512.png`) | montado a partir da imagem 3D do peixe-palhaço deste jogo | mesma licença do repositório |
 | Fonte Fredoka (`../rabiscolandia/fontes/fredoka.woff2`, emprestada da Rabiscolândia) | Google Fonts, The Fredoka Project Authors | SIL Open Font License 1.1 (`../rabiscolandia/fontes/OFL.txt`) |
