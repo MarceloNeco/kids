@@ -98,8 +98,8 @@ test('fechar longe de tudo não pega nada; cada tentativa gasta uma ficha e não
 
 test('relógio: no médio, sem apertar, a garra desce sozinha quando o tempo acaba', () => {
   const m = M.nova({ nivel: 'medio', semente: 2, tipos: TIPOS });
-  assert.equal(m.tempo, 25);
-  for (let i = 0; i < 60 * 24; i++) m.passo(1 / 60);
+  assert.equal(m.tempo, 60, '1 minuto para mirar');
+  for (let i = 0; i < 60 * 59; i++) m.passo(1 / 60);
   assert.equal(m.fase, 'mirar');
   assert.ok(m.eventos.some(e => e.tipo === 'tique'), 'tique-taque nos últimos segundos');
   for (let i = 0; i < 60 * 1.2; i++) m.passo(1 / 60);

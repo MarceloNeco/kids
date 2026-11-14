@@ -212,7 +212,7 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 .opcao.destaque { background: var(--cor); color: var(--branco); }
 .op-titulo { display: block; font-size: 1.3rem; } .op-sub { display: block; font-size: .95rem; font-weight: 400; opacity: .95; }
 .op-grupo { font-weight: 700; color: var(--tinta2); margin: 6px 0 -4px; text-align: center; }
-#nivelAdivinha, #aprendidos { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+#nivelAdivinha, #aprendidos, #adulto { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
   padding: calc(70px + var(--st)) calc(16px + var(--sr)) calc(90px + var(--sb)) calc(16px + var(--sl)); }
 #adivinha { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; gap: 10px; text-align: center;
   padding: calc(64px + var(--st)) calc(12px + var(--sr)) calc(80px + var(--sb)) calc(12px + var(--sl)); }
@@ -292,3 +292,11 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 .qe-aviso { display: grid; gap: 12px; text-align: center; max-width: 26rem; }
 .qe-aviso h2 { margin: 0; font-size: 1.25rem; }
 .qe-aviso p { margin: 0; }
+/* ⚙️ área de adulto: o botão enche enquanto é segurado (3 s) */
+.adulto-bt { align-self: center; opacity: .75; position: relative; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.adulto-bt::after { content: ''; position: absolute; left: 0; bottom: 0; height: 100%; width: 0; background: rgba(255, 181, 46, .55); }
+.adulto-bt.segurando::after { width: 100%; transition: width 3s linear; }
+.criar-mais { display: grid; gap: 8px; justify-items: center; }
+.criar-mais .linha { flex-wrap: wrap; justify-content: center; }
+.criar-op[aria-checked="true"] { background: #fff3c4; border-color: var(--mel); }
+.criar-op[aria-checked="true"]::before { content: '✓ '; }

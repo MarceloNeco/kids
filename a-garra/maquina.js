@@ -23,13 +23,13 @@
   var CASA = { x: BX / 2, z: P - BZ / 2 };
   var LIM = { x0: 0.45, x1: L - 0.45, z0: 0.45, z1: P - 0.45 };
 
-  // cada nível: fichas, segundos para mirar (0 = sem relógio), quantos prêmios e de que tamanho, tol (quão perto do meio
+  // cada nível: fichas, segundos para mirar em cada tentativa (0 = sem relógio; 1 minuto no médio e no difícil, pedido do dono), quantos prêmios e de que tamanho, tol (quão perto do meio
   // a garra precisa fechar: 1 = até a borda) e cada (a garra vem forte mais ou menos 1 vez a cada "cada" tentativas;
   // depois de "cada − 1" tentativas sem prêmio, a próxima bem mirada vem forte com certeza)
   var NIVEIS = {
     facil: { fichas: 12, tempo: 0, qtd: 42, raio: [0.5, 0.58], tol: 0.9, cada: 4, vel: 1.5 },
-    medio: { fichas: 10, tempo: 25, qtd: 54, raio: [0.44, 0.52], tol: 0.75, cada: 7, vel: 1.7 },
-    dificil: { fichas: 10, tempo: 15, qtd: 70, raio: [0.38, 0.46], tol: 0.6, cada: 10, vel: 1.9 }
+    medio: { fichas: 10, tempo: 60, qtd: 54, raio: [0.44, 0.52], tol: 0.75, cada: 7, vel: 1.7 },
+    dificil: { fichas: 10, tempo: 60, qtd: 70, raio: [0.38, 0.46], tol: 0.6, cada: 10, vel: 1.9 }
   };
 
   function sorteador(semente) {   // mulberry32: a mesma semente faz a mesma máquina (testes e ?semente=)

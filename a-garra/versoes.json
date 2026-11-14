@@ -2,6 +2,20 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.4.2",
+      "data": "14/Nov/2026",
+      "hora": "14:01:46",
+      "pt": [
+        "⏱️ Mais tempo para mirar: 1 minuto em cada tentativa no médio e no difícil"
+      ],
+      "en": [
+        "⏱️ More time to aim: 1 minute for each try on medium and hard"
+      ],
+      "es": [
+        "⏱️ Más tiempo para apuntar: 1 minuto en cada intento en medio y difícil"
+      ]
+    },
+    {
       "versao": "0.4.1",
       "data": "14/Nov/2026",
       "hora": "12:44:20",

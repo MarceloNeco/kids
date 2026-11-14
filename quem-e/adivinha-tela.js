@@ -14,9 +14,7 @@
   // toda espera passa por aqui, para o 🏠 conseguir parar tudo de uma vez
   function depois(fn, ms) { var id = setTimeout(function () { timers = timers.filter(function (x) { return x !== id; }); fn(); }, A.TESTE ? 0 : ms); timers.push(id); }
   function parar() { timers.forEach(clearTimeout); timers = []; jogo = null; ensino = null; chuteAtual = null; }
-  var ENSINO = ['pessoa', 'bicho', 'real', 'masculino', 'feminino', 'crianca', 'idoso', 'brasileiro', 'fala', 'desenho', 'filme', 'canta', 'esporte',
-    'heroi', 'engracado', 'magia', 'grande', 'pequeno', 'cor-azul', 'cor-vermelho', 'cor-verde', 'cor-amarelo', 'cor-rosa', 'cor-preto', 'cor-branco', 'cor-marrom',
-    'oculos', 'loiro', 'cabelo-comprido', 'barba', 'chapeu', 'estimacao', 'escola'];
+  var AP = window.QEAprender;
 
   function normal(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim(); }
   function texto(id) { var p = Q.POR_ID[id]; return t(p.pt, p.en, p.es); }
@@ -67,13 +65,13 @@
   Array.prototype.forEach.call(document.querySelectorAll('#advRespostas .resp'), function (b) {
     b.addEventListener('click', function () {
       var r = b.getAttribute('data-r');
-      if (ensino) { ensino.historico.push({ id: ENSINO[ensino.i], r: r }); ensino.i++; passo(); return; }
+      if (ensino) { if (ensino.fase !== 'perguntas' || !ensino.atual) return; ensino.historico.push({ id: ensino.atual, r: r }); passo(); return; }
       if (!jogo || !jogo.responder(r)) return;
       humor('pensando'); depois(passo, 350);
     });
   });
   $('btAdvVoltar').addEventListener('click', function () {
-    if (ensino) { if (ensino.i > 0) { ensino.i--; ensino.historico.pop(); } passo(); return; }
+    if (ensino) { ensino.historico.pop(); passo(); return; }
     if (jogo && jogo.desfazer()) passo();
   });
 
@@ -86,6 +84,8 @@
       dizer(t('É O JOÃO ALVES! A lenda da casa! Qual João foi hoje?', "IT'S JOÃO ALVES! The family legend! Which João was it today?", '¡ES JOÃO ALVES! ¡La leyenda de la casa! ¿Qué João ha sido hoy?'));
       return;
     }
+    // acertou alguém que aprendeu: guarda as respostas desta partida também (assim ela fica cada vez mais esperta)
+    if (/^apr-/.test(p.id) && jogo) ap.ensinar({ nome: p.nome, emoji: '', nivel: nivel, historico: jogo.historico() });
     fim(t('Acertei! Era ', 'Got it! It was ', '¡He acertado! ¡Era ') + p.nome + '! 🎉', /^apr-/.test(p.id));
   });
   $('btErrou').addEventListener('click', function () {
@@ -124,6 +124,8 @@
       b.addEventListener('click', function () { emojiEscolhido = e; Array.prototype.forEach.call(box.children, function (x) { x.setAttribute('aria-checked', String(x === b)); }); });
       box.appendChild(b);
     });
+    $('advCriarMais').hidden = !paraEnsino;
+    if (paraEnsino) pintarCriarOps();
     $('btEnsinarSalvar').textContent = paraEnsino ? t('▶ Começar', '▶ Start', '▶ Empezar') : t('🧠 Ensinar a meleca', '🧠 Teach the slime', '🧠 Enseñar al slime');
     setTimeout(function () { $('advNome').focus(); }, 50);
   }
@@ -132,7 +134,7 @@
     if (!nome) { $('advNome').focus(); return; }
     if (ensino && ensino.fase === 'nome') {
       if (!/[0-9A-Za-zÀ-ÿ]/.test(nome)) { avisarNome(t('Escreva o nome com letras, por favor.', 'Please write the name with letters.', 'Escribe el nombre con letras, por favor.')); return; }
-      ensino.nome = nome; ensino.emoji = emojiEscolhido; ensino.fase = 'perguntas'; passo(); return;
+      ensino.nome = nome; ensino.emoji = emojiEscolhido; ensino.fase = 'perguntas'; $('advCriarMais').hidden = true; passo(); return;
     }
     if (!/[0-9A-Za-zÀ-ÿ]/.test(nome)) { avisarNome(t('Escreva o nome com letras, por favor.', 'Please write the name with letters.', 'Escribe el nombre con letras, por favor.')); return; }
     if (!jogo) return;
@@ -158,28 +160,44 @@
   $('btAdvDeNovo').addEventListener('click', function () { if (ensino) { comecarEnsino(); return; } novoJogo(); });
   $('btAdvNivel').addEventListener('click', function () { A.limparFesta(); A.mostrar('nivelAdivinha'); });
 
-  // ---------- ensinar alguém do zero (o pai cadastra a família) ----------
+  // ---------- criar personagem (área de adulto): a meleca escolhe as perguntas ----------
+  // Primeiro as do núcleo; depois só as que separam dos "parecidos" (quem ainda responde igual a tudo), até não
+  // sobrar nenhum. "Já chega" guarda antes. Família (🏠) fica só no aparelho; 🌎 pode ir para o jogo de todo mundo.
   $('btEnsinar').addEventListener('click', comecarEnsino);
   function comecarEnsino() {
-    ensino = { fase: 'nome', i: 0, historico: [] }; jogo = null; humorAgora = '';
+    ensino = { fase: 'nome', historico: [], familia: true, nivel: 'I', atual: null }; jogo = null; humorAgora = '';
     A.mostrar('adivinha'); mostrarBloco('advPerdi'); humor('parada'); $('advContador').textContent = '✏️';
-    var txt = t('Quem você quer me ensinar? Pode ser alguém da família!', 'Who do you want to teach me? It can be someone from your family!', '¿A quién quieres enseñarme? ¡Puede ser alguien de tu familia!');
+    var txt = t('Quem você quer me ensinar? Pode ser alguém da família ou um personagem que eu não conheço!', 'Who do you want to teach me? It can be someone from your family or a character I don\'t know!', '¿A quién quieres enseñarme? ¡Puede ser alguien de tu familia o un personaje que no conozco!');
     $('advPerdiTxt').textContent = txt; dizer(txt); montarForm(true);
   }
+  function pintarCriarOps() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-familia]'), function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-familia') === '1') === ensino.familia)); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-criar-nivel]'), function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-criar-nivel') === ensino.nivel)); });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-familia]'), function (b) { b.addEventListener('click', function () { if (!ensino) return; ensino.familia = b.getAttribute('data-familia') === '1'; pintarCriarOps(); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-criar-nivel]'), function (b) { b.addEventListener('click', function () { if (!ensino) return; ensino.nivel = b.getAttribute('data-criar-nivel'); pintarCriarOps(); }); });
+  // todo mundo que a meleca conhece (menos ele mesmo, se já foi ensinado antes)
+  function conhecidos(nome) { var n = normal(nome); return baseCorrigida().personagens.concat(ap.lista()).filter(function (p) { return normal(p.nome) !== n; }); }
   function passoEnsino() {
     if (ensino.fase !== 'perguntas') return;
-    if (ensino.i >= ENSINO.length) { terminarEnsino(); return; }
+    var resp = {}; ensino.historico.forEach(function (x) { resp[x.id] = x.r; });
+    var x = AP.proximaParaCriar({ personagens: conhecidos(ensino.nome), nivel: ensino.nivel, respostas: resp });
+    if (x.fim) { terminarEnsino(); return; }
+    ensino.atual = x.id; ensino.parecidos = x.parecidos.length;
     mostrarBloco('advRespostas'); humor('falando');
-    $('btJaChega').hidden = ensino.i < 6; $('btAdvVoltar').disabled = ensino.i === 0;
-    $('advContador').textContent = ensino.emoji + ' ' + ensino.nome + ' · ' + (ensino.i + 1) + '/' + ENSINO.length;
-    dizer(texto(ENSINO[ensino.i]));
+    $('btJaChega').hidden = !!Q.POR_ID[x.id].nucleo; $('btAdvVoltar').disabled = ensino.historico.length === 0;
+    $('advContador').textContent = ensino.emoji + ' ' + ensino.nome + ' · ' + (ensino.historico.length + 1) +
+      (Q.POR_ID[x.id].nucleo ? '' : ' · ' + t('parecidos: ', 'look-alikes: ', 'parecidos: ') + x.parecidos.length);
+    dizer(texto(x.id), true);
   }
   function terminarEnsino() {
-    var p = ap.ensinar({ nome: ensino.nome, emoji: ensino.emoji, nivel: 'I', historico: ensino.historico });
+    var p = ap.ensinar({ nome: ensino.nome, emoji: ensino.emoji, nivel: ensino.nivel, historico: ensino.historico, todos: !ensino.familia });
     $('btJaChega').hidden = true;
     if (!p || p.guardado === false) { ensino = null; fim(CHEIO(), false); return; }
     A.Som.ganhou();
-    fim(t('Pronto! Aprendi tudo sobre ', 'Done! I learned all about ', '¡Listo! Ya lo sé todo sobre ') + p.nome + t('. Agora tente me fazer adivinhar!', '. Now try to make me guess!', '. ¡Ahora intenta que lo adivine!'), true);
+    fim(t('Pronto! Aprendi tudo sobre ', 'Done! I learned all about ', '¡Listo! Ya lo sé todo sobre ') + p.nome + '. ' +
+      (p.todos ? t('🌎 Ele pode ir para o jogo de todo mundo (área de adulto). ', '🌎 They can go to everyone\'s game (grown-ups area). ', '🌎 Puede ir al juego de todo el mundo (zona de adultos). ') : '') +
+      t('Agora tente me fazer adivinhar!', 'Now try to make me guess!', '¡Ahora intenta que lo adivine!'), true);
     ensino = null;
   }
   var jaChega = document.createElement('button');
@@ -203,7 +221,12 @@
         if (b.getAttribute('data-certeza') !== '1') { b.setAttribute('data-certeza', '1'); b.textContent = t('Esquecer?', 'Forget?', '¿Olvidar?'); return; }
         ap.esquecer(p.id); pintarAprendidos();
       });
-      li.appendChild(nome); li.appendChild(niv); li.appendChild(b); ul.appendChild(li);
+      var f = document.createElement('button'); f.type = 'button'; f.className = 'mini apr-quem';
+      f.textContent = p.todos ? '🌎' : '🏠';
+      f.setAttribute('aria-label', p.todos ? t('Não é da família (pode ir para todos). Tocar: é da família', 'Not family (can go to everyone). Tap: family', 'No es de la familia (puede ir a todos). Tocar: es de la familia') : t('É da família (fica só aqui). Tocar: não é da família', 'Family (stays here). Tap: not family', 'Es de la familia (se queda aquí). Tocar: no es de la familia'));
+      f.title = f.getAttribute('aria-label');
+      f.addEventListener('click', function () { ap.marcarTodos(p.id, !p.todos); pintarAprendidos(); });
+      li.appendChild(nome); li.appendChild(niv); li.appendChild(f); li.appendChild(b); ul.appendChild(li);
     });
   }
   $('btExportar').addEventListener('click', function () {
@@ -233,6 +256,72 @@
     };
     leitor.readAsText(f);
   });
+
+  // ---------- área de adulto: segurar ⚙️ por 3 segundos e acertar uma conta escrita por extenso ----------
+  // Não guarda senha nenhuma: é só para criança pequena não entrar sem querer (padrão de app infantil).
+  var segurar = null, SEGURAR = A.TESTE ? 300 : 3000;
+  function soltar() { clearTimeout(segurar); segurar = null; $('btAreaAdulto').classList.remove('segurando'); }
+  function apertar(e) {
+    if (e && e.type === 'keydown' && (e.repeat || (e.key !== 'Enter' && e.key !== ' '))) return;
+    if (e && e.preventDefault && e.type !== 'pointerdown') e.preventDefault();
+    soltar(); $('btAreaAdulto').classList.add('segurando');
+    segurar = setTimeout(function () { soltar(); perguntarConta(); }, SEGURAR);
+  }
+  $('btAreaAdulto').addEventListener('pointerdown', apertar);
+  $('btAreaAdulto').addEventListener('keydown', apertar);
+  ['pointerup', 'pointerleave', 'pointercancel', 'keyup', 'blur'].forEach(function (ev) { $('btAreaAdulto').addEventListener(ev, function () { if (segurar) { soltar(); $('adultoDica').hidden = false; } }); });
+  $('btAreaAdulto').addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  var NUM = {
+    pt: ['', '', '', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove', 'dez', 'onze', 'doze', 'treze', 'catorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'],
+    en: ['', '', '', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'],
+    es: ['', '', '', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve']
+  };
+  var contaCerta = null;
+  function perguntarConta() {
+    if (!window.SolverJanela) return;
+    var a = 11 + Math.floor(Math.random() * 9), b = 3 + Math.floor(Math.random() * 7);
+    if (A.TESTE) { a = 12; b = 7; }
+    contaCerta = a * b;
+    var L = window.BolinhoIdioma && BolinhoIdioma.atual ? BolinhoIdioma.atual() : 'pt'; if (!NUM[L]) L = 'pt';
+    var caixa = document.createElement('div'); caixa.className = 'qe-aviso';
+    var h = document.createElement('h2'); h.textContent = t('⚙️ Área de adulto', '⚙️ Grown-ups area', '⚙️ Zona de adultos');
+    var p = document.createElement('p'); p.textContent = t('Quanto é ', 'What is ', '¿Cuánto es ') + NUM[L][a] + t(' vezes ', ' times ', ' por ') + NUM[L][b] + '?';
+    var campo = document.createElement('input'); campo.id = 'contaAdulto'; campo.type = 'text'; campo.inputMode = 'numeric'; campo.autocomplete = 'off'; campo.className = 'campo'; campo.setAttribute('aria-label', p.textContent);
+    var ok = document.createElement('button'); ok.type = 'button'; ok.className = 'grande'; ok.textContent = t('Entrar', 'Enter', 'Entrar');
+    var nao = document.createElement('button'); nao.type = 'button'; nao.className = 'medio-bt'; nao.textContent = t('Cancelar', 'Cancel', 'Cancelar');
+    var st = document.createElement('p'); st.className = 'status'; st.setAttribute('aria-live', 'polite');
+    [h, p, campo, ok, nao, st].forEach(function (x) { caixa.appendChild(x); });
+    var j = window.SolverJanela.abrir({ conteudo: caixa, classe: 'qe-janela' });
+    function conferir() {
+      if (parseInt(campo.value.replace(/\D/g, ''), 10) === contaCerta) { j.fechar('ok'); window.SolverJanela.quandoQuieto(function () { $('adultoStatus').textContent = ''; A.mostrar('adulto'); }); return; }
+      st.textContent = t('Hmm, não é. Essa área é para os adultos da casa. 🙂', "Hmm, that's not it. This area is for the grown-ups at home. 🙂", 'Mmm, no es. Esta zona es para los adultos de la casa. 🙂');
+      campo.value = ''; campo.focus();
+    }
+    ok.addEventListener('click', conferir);
+    campo.addEventListener('keydown', function (e) { if (e.key === 'Enter') conferir(); });
+    nao.addEventListener('click', function () { j.fechar('cancelar'); });
+    setTimeout(function () { campo.focus(); }, 50);
+  }
+  // 🌎 o arquivo com quem não é da família, para o responsável pelo Bolinho de Chuva pôr na lista de todo mundo
+  $('btParaTodos').addEventListener('click', function () {
+    var txt = ap.exportarParaTodos();
+    if (!txt) { $('adultoStatus').textContent = t('Ainda não há ninguém para todo mundo. Crie um personagem e marque 🌎 Não é da família (ou toque em 🏠 na lista do que a meleca aprendeu).', "Nobody for everyone yet. Create a character and choose 🌎 Not family (or tap 🏠 in the list of what the slime learned).", 'Todavía no hay nadie para todo el mundo. Crea un personaje y marca 🌎 No es de la familia (o toca 🏠 en la lista de lo que ha aprendido el slime).'); return; }
+    var d = new Date(), nome = 'quem-e-para-todos-' + d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) + '.json';
+    var pronto = t('📤 Arquivo pronto. Para entrar no jogo de todo mundo, mande este arquivo para o responsável pelo Bolinho de Chuva.', "📤 File ready. To get into everyone's game, send this file to whoever looks after Rainy Day Donuts.", '📤 Archivo listo. Para que entre en el juego de todo el mundo, manda este archivo al responsable de Buñuelos de Lluvia.');
+    entregarArquivo(txt, nome, function () { $('adultoStatus').textContent = pronto; });
+  });
+  function entregarArquivo(txt, nome, aoTerminar) {
+    try {
+      var arq = new File([txt], nome, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [arq] })) {
+        navigator.share({ files: [arq], title: t('Quem é?', 'Who Is It?', '¿Quién es?') }).then(aoTerminar).catch(function () {});
+        return;
+      }
+    } catch (e) { /* sem compartilhar: baixa */ }
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'application/json' })); a.download = nome;
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    aoTerminar();
+  }
 
   // ---------- voz animada (ElevenLabs, opcional) ----------
   $('btVozAnimada').addEventListener('click', abrirVoz);
@@ -278,6 +367,7 @@
   // usado pelos testes
   window.QEDebugAdv = {
     jogo: function () { return jogo; }, base: base, aprender: ap, chute: function () { return chuteAtual; },
+    ensino: function () { return ensino ? { fase: ensino.fase, atual: ensino.atual, n: ensino.historico.length, parecidos: ensino.parecidos } : null; },
     respostaDe: function (id, pergunta) { var p = base.personagens.filter(function (x) { return x.id === id; })[0]; var v = p && p.r[pergunta]; return v === undefined ? Q.POR_ID[pergunta].padrao : v; }
   };
 })();

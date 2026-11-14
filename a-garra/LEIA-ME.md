@@ -35,8 +35,8 @@ o botão PEGAR vira GRAB · COGER.
   em cima ou no caminho. Só de vez em quando vem **forte**: mirando bem, mais ou menos **1 a cada 4** tentativas no fácil,
   **1 a cada 7** no médio e **1 a cada 10** no difícil. Depois de muitas tentativas sem prêmio, a próxima bem mirada vem
   forte (garantia). A máquina lembra a contagem entre partidas (`bolinho:a-garra:contador`), como uma máquina de verdade.
-- **Nível**: fácil (12 fichas, sem relógio, prêmios grandes, anel de mira), médio (10 fichas, 25 s, anel de mira), difícil
-  (10 fichas, 15 s, prêmios menores, sem anel).
+- **Nível**: fácil (12 fichas, sem relógio, prêmios grandes, anel de mira), médio (10 fichas, 1 minuto para mirar
+  cada tentativa, anel de mira), difícil (10 fichas, 1 minuto, prêmios menores, sem anel). Antes da 0.4.2 eram 25 s e 15 s.
 
 ## Arquivos
 

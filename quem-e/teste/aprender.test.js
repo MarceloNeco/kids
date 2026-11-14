@@ -100,3 +100,68 @@ test('revisão: o que estava guardado e veio estragado é limpo ao abrir', () =>
   assert.deepEqual(l[0].r, { pessoa: 's', casa: 's' });
   assert.deepEqual(b.correcoes(), { pikachu: { voa: 'n' } });
 });
+
+test('área de adulto: quem não é da família (todos) vai no arquivo para todo mundo; a família nunca vai', () => {
+  const ap = AP.criar({ armazenamento: memoria() });
+  ap.ensinar({ nome: 'Vovó Cida', emoji: '👵', nivel: 'F', historico: hist });
+  const p = ap.ensinar({ nome: 'Capitão Bigode', emoji: '🧔', nivel: 'I', historico: hist, todos: true });
+  assert.equal(p.todos, true); assert.equal(p.r.casa, 'n');
+  assert.equal(ap.lista().find(x => x.nome === 'Vovó Cida').r.casa, 's');
+  const arq = JSON.parse(ap.exportarParaTodos());
+  assert.equal(arq.paraTodos, true); assert.deepEqual(arq.aprendidos.map(x => x.nome), ['Capitão Bigode']);
+  assert.equal(arq.correcoes, undefined, 'correções podem ter respostas da família');
+  // continua assim depois de recarregar, e dá para trocar
+  const de2 = AP.criar({ armazenamento: ap.armazenamento });
+  assert.equal(de2.lista().find(x => x.nome === 'Capitão Bigode').todos, true);
+  assert.equal(de2.marcarTodos(p.id, false), true);
+  assert.equal(de2.exportarParaTodos(), null);
+  assert.equal(de2.lista()[1].r.casa, 's');
+  // ensinar de novo sem dizer (depois de perder, por exemplo) não muda a marca
+  de2.marcarTodos(p.id, true);
+  de2.ensinar({ nome: 'capitão bigode', emoji: '', nivel: 'I', historico: [{ id: 'canta', r: 's' }] });
+  assert.equal(de2.lista()[1].todos, true);
+  // importar leva a marca
+  const outro = AP.criar({ armazenamento: memoria() });
+  outro.importar(de2.exportar());
+  assert.deepEqual(outro.lista().map(x => [x.nome, x.todos]), [['Vovó Cida', false], ['Capitão Bigode', true]]);
+});
+
+test('criar personagem: a meleca pergunta o núcleo e depois só o que separa dos parecidos, até ninguém responder igual', () => {
+  const nucleo = Q.PERGUNTAS.filter(p => p.nucleo && p.n === 'I').map(p => p.id);
+  const gente = [
+    { id: 'a', nome: 'A', niveis: 'IFA', r: { 'cor-azul': 's', oculos: 'n' } },
+    { id: 'b', nome: 'B', niveis: 'IFA', r: { 'cor-azul': 's', oculos: 's' } },
+    { id: 'c', nome: 'C', niveis: 'A', r: {} }
+  ];
+  const resp = {};
+  // as do núcleo vêm primeiro, uma por vez
+  let x = AP.proximaParaCriar({ personagens: gente, nivel: 'I', respostas: resp });
+  assert.equal(x.id, nucleo[0]);
+  for (const id of nucleo) resp[id] = '?';
+  x = AP.proximaParaCriar({ personagens: gente, nivel: 'I', respostas: resp });
+  assert.deepEqual(x.parecidos.map(p => p.id), ['a', 'b'], 'C só aparece no Adulto');
+  assert.equal(x.id, 'oculos', 'a pergunta que separa A de B');
+  resp.oculos = 's';
+  x = AP.proximaParaCriar({ personagens: gente, nivel: 'I', respostas: resp });
+  assert.deepEqual(x.parecidos.map(p => p.id), ['b']);
+  assert.notEqual(x.id, 'casa', 'família é a área de adulto que diz, não a pergunta');
+  // responder o contrário de B na pergunta que ela escolheu: não sobra ninguém igual
+  const vB = gente[1].r[x.id] || Q.POR_ID[x.id].padrao;
+  resp[x.id] = vB === 's' ? 'n' : 's';
+  x = AP.proximaParaCriar({ personagens: gente, nivel: 'I', respostas: resp });
+  assert.equal(x.fim, true); assert.deepEqual(x.parecidos, []);
+});
+
+test('criar com a lista de verdade: com as respostas de um personagem que existe, acaba sem parecidos de outro jeito', () => {
+  global.window = global;
+  const fs = require('fs'), path = require('path'), pasta = path.join(__dirname, '..', 'personagens');
+  for (const f of fs.readdirSync(pasta)) require(path.join(pasta, f));
+  const M = require('../adivinha.js');
+  const base = M.carregar(Object.values(global.QEPersonagens), Q.PERGUNTAS);
+  // "criar" alguém novo: um menino de desenho, azul, que voa — termina, e com poucas perguntas além do núcleo
+  const resp = {}, verdade = { pessoa: 's', desenho: 's', masculino: 's', 'cor-azul': 's', voa: 's', crianca: 's', real: 'n' };
+  let x, n = 0;
+  while (!(x = AP.proximaParaCriar({ personagens: base.personagens, nivel: 'F', respostas: resp })).fim && n < 130) { resp[x.id] = verdade[x.id] || 'n'; n++; }
+  assert.ok(x.fim, 'não terminou');
+  assert.ok(n < 110, 'perguntas demais: ' + n);
+});
