@@ -2,6 +2,20 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.43",
+      "data": "14/Nov/2026",
+      "hora": "18:00:00",
+      "pt": [
+        "↩️ O Voltar do celular no meio do jogo agora leva para a tela inicial, igual ao 🏠 (antes voltava para a tela do nome). Na tela inicial, o 1º Voltar avisa e o 2º sai."
+      ],
+      "en": [
+        "↩️ The phone's Back button in the middle of a game now takes you to the start screen, just like 🏠 (it used to go back to the name screen). On the start screen, the 1st Back warns you and the 2nd leaves."
+      ],
+      "es": [
+        "↩️ El botón Atrás del móvil en mitad del juego ahora lleva a la pantalla de inicio, igual que 🏠 (antes volvía a la pantalla del nombre). En la pantalla de inicio, el 1.er Atrás avisa y el 2.º sale."
+      ]
+    },
+    {
       "versao": "0.8.42",
       "data": "14/Nov/2026",
       "hora": "17:00:00",
