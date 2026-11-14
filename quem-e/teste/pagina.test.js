@@ -24,7 +24,7 @@ test('CSP sem script inline nem eval', () => {
 
 test('navegação padrão e versão', () => {
   assert.match(app, /BolinhoNav\.iniciar\(\{\s*jogo: 'quem-e'/);
-  assert.match(app, /var APP_VERSION = '0\.4\.2'/);
+  assert.match(app, /var APP_VERSION = '0\.5\.0'/);
 });
 
 test('trilha: pelo menos 10 músicas gravadas que existem', () => {
@@ -45,4 +45,10 @@ test('todo texto da tela tem PT, EN e ES; o idioma vem só da estante (sem botã
   assert.ok(!/navigator\.language/.test(app), 'o idioma é o da estante (BolinhoIdioma.atual)');
   const tela = fs.readFileSync(path.join(pasta, 'adivinha-tela.js'), 'utf8');
   for (const js of [app, tela]) for (const m of js.matchAll(/\bt\('([^']*)', ['"][^'"]*['"]\)/g)) assert.fail('t() sem o espanhol: ' + m[0]);
+});
+
+test('nenhum id repetido na página (dois botões com o mesmo id: um clique vira o outro)', () => {
+  const vistos = {};
+  for (const m of html.matchAll(/ id="([^"]+)"/g)) vistos[m[1]] = (vistos[m[1]] || 0) + 1;
+  assert.deepEqual(Object.keys(vistos).filter(k => vistos[k] > 1), []);
 });

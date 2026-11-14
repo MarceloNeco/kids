@@ -75,11 +75,20 @@
     <button id="btFamilia" class="grande nivel medio" type="button" data-nivel-adv="F"><span class="n-nome" data-t="👨‍👩‍👧 Família|👨‍👩‍👧 Family|👨‍👩‍👧 Familia"></span><span class="n-info" data-t="Tudo do Infantil e mais filmes, novelas e famosos da família toda|Everything in Kids plus movies, soap operas and famous people the whole family knows|Todo lo de Niños y además películas, telenovelas y famosos que conoce toda la familia"></span></button>
     <button id="btAdulto" class="grande nivel dificil" type="button" data-nivel-adv="A"><span class="n-nome" data-t="🧑 Adulto|🧑 Grown-ups|🧑 Adultos"></span><span class="n-info" data-t="A lista inteira, com perguntas mais difíceis|The whole list, with harder questions|La lista entera, con preguntas más difíciles"></span></button>
   </div>
-  <div class="linha">
-    <button id="btEnsinar" class="medio-bt" type="button" data-t="✏️ Ensinar alguém|✏️ Teach someone|✏️ Enseñar a alguien"></button>
-    <button id="btAprendidos" class="medio-bt" type="button" data-t="📦 O que a meleca aprendeu|📦 What the slime learned|📦 Lo que ha aprendido el slime"></button>
+  <button id="btAreaAdulto" class="mini adulto-bt" type="button" data-rotulo="Área de adulto: segure 3 segundos|Grown-ups area: hold for 3 seconds|Zona de adultos: mantén pulsado 3 segundos">⚙️</button>
+  <p id="adultoDica" class="dica" hidden data-t="⚙️ Área de adulto: segure o botão por 3 segundos.|⚙️ Grown-ups area: hold the button for 3 seconds.|⚙️ Zona de adultos: mantén pulsado el botón 3 segundos."></p>
+</section>
+
+<section id="adulto" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Área de adulto. Aqui você cria personagens e cuida do que eu aprendi. Sem internet e sem IA: fica tudo neste aparelho.|Grown-ups area. Here you create characters and look after what I learned. No internet and no AI: everything stays on this device.|Zona de adultos. Aquí creas personajes y cuidas de lo que he aprendido. Sin internet y sin IA: todo se queda en este aparato."></p></div>
+  <div class="opcoes">
+    <button id="btEnsinar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">✏️</span><span data-t="Criar personagem|Create a character|Crear un personaje"></span></button>
+    <button id="btAprendidos" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📦</span><span data-t="O que a meleca aprendeu|What the slime learned|Lo que ha aprendido el slime"></span></button>
+    <button id="btParaTodos" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🌎</span><span data-t="Mandar para o jogo de todo mundo|Send to everyone's game|Enviar al juego de todo el mundo"></span></button>
     <button id="btVozAnimada" class="medio-bt" type="button" data-t="🎙️ Voz animada|🎙️ Lively voice|🎙️ Voz animada"></button>
   </div>
+  <p class="dica" data-t="🌎 Só vai para o jogo de todo mundo quem NÃO é da família. Nomes da família ficam só nos seus aparelhos.|🌎 Only characters who are NOT family go to everyone's game. Family names stay only on your devices.|🌎 Solo va al juego de todo el mundo quien NO es de la familia. Los nombres de la familia se quedan solo en tus aparatos."></p>
+  <p id="adultoStatus" class="status" aria-live="polite"></p>
 </section>
 
 <section id="adivinha" class="tela" data-recurso="quem-e">
@@ -120,6 +129,17 @@
     <input id="advNome" class="campo" type="text" maxlength="40" autocomplete="off" list="advSugestoes">
     <datalist id="advSugestoes"></datalist>
     <div id="advEmojis" class="emojis" role="radiogroup"></div>
+    <div id="advCriarMais" class="criar-mais" hidden>
+      <div class="linha" role="radiogroup" data-rotulo="Para quem é|Who it is for|Para quién es">
+        <button class="medio-bt criar-op" type="button" role="radio" data-familia="1" data-t="🏠 É da família ou da casa|🏠 Family or home|🏠 Es de la familia o de casa"></button>
+        <button class="medio-bt criar-op" type="button" role="radio" data-familia="0" data-t="🌎 Não é da família|🌎 Not family|🌎 No es de la familia"></button>
+      </div>
+      <div class="linha" role="radiogroup" data-rotulo="Quem conhece|Who knows them|Quién lo conoce">
+        <button class="medio-bt criar-op" type="button" role="radio" data-criar-nivel="I" data-t="🧒 Criança conhece|🧒 Kids know it|🧒 Lo conocen los niños"></button>
+        <button class="medio-bt criar-op" type="button" role="radio" data-criar-nivel="F" data-t="👨‍👩‍👧 Família|👨‍👩‍👧 Family|👨‍👩‍👧 Familia"></button>
+        <button class="medio-bt criar-op" type="button" role="radio" data-criar-nivel="A" data-t="🧑 Só adulto|🧑 Grown-ups only|🧑 Solo adultos"></button>
+      </div>
+    </div>
     <div class="linha">
       <button id="btEnsinarSalvar" class="grande verde" type="button" data-t="🧠 Ensinar a meleca|🧠 Teach the slime|🧠 Enseñar al slime"></button>
       <button id="btEnsinarPular" class="medio-bt" type="button" data-t="Agora não|Not now|Ahora no"></button>

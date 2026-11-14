@@ -2,6 +2,29 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.5.0",
+      "data": "14/Nov/2026",
+      "hora": "16:38:03",
+      "pt": [
+        "⚙️ Área de adulto na Meleca Adivinha: segure o ⚙️ por 3 segundos e acerte a conta",
+        "✏️ Criar personagem: a meleca escolhe as perguntas sozinha, até saber diferenciar de todo mundo que ela conhece (sem IA, sem internet)",
+        "🏠/🌎 Diga se é da família (fica só nos seus aparelhos) ou não; quem não é da família pode ir para o jogo de todo mundo",
+        "🧠 Quando acerta alguém que aprendeu, a meleca guarda as respostas novas e fica mais esperta"
+      ],
+      "en": [
+        "⚙️ Grown-ups area in The Slime Guesses: hold ⚙️ for 3 seconds and solve the sum",
+        "✏️ Create a character: the slime picks the questions herself until she can tell them apart from everyone she knows (no AI, no internet)",
+        "🏠/🌎 Say whether they are family (stays only on your devices) or not; non-family characters can go to everyone's game",
+        "🧠 When she guesses someone she learned, the slime keeps the new answers and gets smarter"
+      ],
+      "es": [
+        "⚙️ Zona de adultos en El Slime Adivina: mantén pulsado ⚙️ 3 segundos y resuelve la cuenta",
+        "✏️ Crear un personaje: el slime elige las preguntas solo, hasta saber distinguirlo de todos los que conoce (sin IA, sin internet)",
+        "🏠/🌎 Indica si es de la familia (se queda solo en tus aparatos) o no; quien no es de la familia puede ir al juego de todo el mundo",
+        "🧠 Cuando acierta a alguien que ha aprendido, el slime guarda las respuestas nuevas y se vuelve más listo"
+      ]
+    },
+    {
       "versao": "0.4.2",
       "data": "14/Nov/2026",
       "hora": "15:54:23",

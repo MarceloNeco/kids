@@ -66,9 +66,14 @@ perguntas. Respostas: **Sim · Acho que sim · Não sei · Acho que não · Não
   respostas trocadas, acerta mais de 92% (`teste/adivinha-real.test.js`).
 - **João Alves**, a lenda da casa: está em `personagens/familia.js`; quando ela acerta, festa especial e "Qual João foi hoje?".
 - **Aprende** (`aprender.js`): quando perde, "Em quem você pensou?". Nome da lista pronta = guarda a correção; nome novo =
-  personagem novo (da casa). ✏️ **Ensinar alguém** cadastra alguém do zero respondendo perguntas. 📦 **O que a meleca
-  aprendeu**: esquecer, 📤 exportar e 📥 importar (para passar a outro celular). Tudo só neste aparelho
-  (`bolinho:quem-e:aprendidos`); nome da família nunca vai para a internet.
+  personagem novo (da casa). Acertou alguém que aprendeu: guarda as respostas daquela partida também. Tudo só neste
+  aparelho (`bolinho:quem-e:aprendidos`); nome da família nunca vai para a internet. **Sem IA** (dono, 14/Nov/2026).
+- **⚙️ Área de adulto** (0.5.0; na escolha do nível: segurar ⚙️ 3 s e acertar uma conta escrita por extenso, sem senha
+  guardada): ✏️ **Criar personagem** (nome, emoji, 🏠 família ou 🌎 não, quem conhece: criança / família / adulto; a
+  meleca pergunta primeiro o núcleo e depois só o que separa dos "parecidos", `QEAprender.proximaParaCriar`, até não
+  sobrar nenhum; "Já chega" guarda antes) · 📦 **O que a meleca aprendeu** (🏠/🌎, esquecer, 📤 exportar, 📥 importar) ·
+  🌎 **Mandar para o jogo de todo mundo** (arquivo `quem-e-para-todos-AAAA-MM-DD.json` só com quem não é da família, sem
+  as correções; o dono manda o arquivo na conversa e ele vira entradas em `personagens/`) · 🎙️ Voz animada.
 - **Voz** (`voz.js`): a do aparelho sempre; 🎙️ **Voz animada** (ElevenLabs) é opcional, com a chave da pessoa no cofre comum
   (`../cofre.js`, `ia:elevenlabs`); cada fala fica guardada (Cache Storage `falas-quem-e`, fora do prefixo que o sw.js apaga a cada versão) e repete sem gastar e sem internet.
 
