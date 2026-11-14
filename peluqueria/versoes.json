@@ -1,6 +1,7 @@
 {
   "app": "peluqueria",
   "versoes": [
+    {"versao": "0.6.14", "data": "14/Nov/2026", "hora": "17:50:00", "pt": ["🎵 As músicas desligadas na Biblioteca de músicas da estante não tocam mais no jogo."], "en": ["🎵 Songs turned off in the shelf's Music library no longer play in the game."], "es": ["🎵 Las canciones desactivadas en la Biblioteca de música de la estantería ya no suenan en el juego."]},
     {
       "versao": "0.6.13",
       "data": "14/Nov/2026",

@@ -138,7 +138,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
 - Testes: `node --test <jogo>/teste/*.test.js` (rodar da raiz deste repositório).
 - Jogo novo: pasta própria + entrada em `catalogo.js` (com `novo: 'AAAA-MM-DD'`, a data do dia: por 7 dias o cartão
-  ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" da estante, `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
+  ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" toda vez que a estante abre (não ao voltar de um jogo), até "Não mostrar mais esta
+  mensagem", `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
   no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
@@ -154,7 +155,9 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   - **Biblioteca de músicas (dono, 14/Nov/2026):** o botão 🎵 da estante lista todas as músicas gravadas dos jogos e da
     rádio (`biblioteca.js` + `biblioteca-musicas.js`, gerado). Mudou a música de um jogo (ou jogo novo)? Ponha a lista dele
     em `teste/listas-musica.js`, o crédito no `CREDITOS.md`/`LICENCAS.md` e rode `node ferramentas/biblioteca-musicas.js`.
-    Vigia: `teste/biblioteca-musicas.test.js`.
+    Em cada música, "✓ No jogo" / "🚫 Fora" tira a música do repertório daquele jogo no aparelho (`Trilha.desligar`;
+    `Trilha.embaralhar` já pula as desligadas; tocador próprio pergunta `Trilha.desligada(jogo, url)`; todas fora = toca
+    todas). Vigia: `teste/biblioteca-musicas.test.js`.
   - A favorita de cada jogo (`FAVORITAS` no `trilha.js`) é de instrumentos de verdade, animada, até 2,5 MB e o jogo a
     toca. Vigia: `teste/regra-musica.test.js`.
 

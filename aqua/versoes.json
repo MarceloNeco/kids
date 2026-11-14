@@ -2,6 +2,26 @@
   "app": "aqua",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "14/Nov/2026",
+      "hora": "19:30:00",
+      "pt": [
+        "🖼️ Fundo novo em carrossel: a cada frasco fechado, a cena de trás troca devagar",
+        "📸 10 cenas de graça, fotos de verdade (cachoeira, praia, flores, floresta, balões) e desenhos animados (chuva com arco-íris, jardim com borboletas, vaga-lumes, pôr do sol, nuvens com pipa)",
+        "🛍️ Na lojinha, os cenários viraram pacotes: Fundo do mar, Festa junina e Espaço põem mais 2 cenas cada no carrossel"
+      ],
+      "en": [
+        "🖼️ New carousel background: every closed bottle slowly changes the scene behind",
+        "📸 10 free scenes, real photos (waterfall, beach, flowers, forest, balloons) and animated drawings (rain with a rainbow, garden with butterflies, fireflies, sunset, clouds with a kite)",
+        "🛍️ In the shop, backdrops became packs: Under the sea, June party and Outer space each add 2 more scenes to the carousel"
+      ],
+      "es": [
+        "🖼️ Nuevo fondo en carrusel: cada frasco cerrado cambia despacio la escena de atrás",
+        "📸 10 escenas gratis, fotos de verdad (cascada, playa, flores, bosque, globos) y dibujos animados (lluvia con arcoíris, jardín con mariposas, luciérnagas, atardecer, nubes con cometa)",
+        "🛍️ En la tiendecita, los escenarios se volvieron paquetes: Fondo del mar, Fiesta junina y Espacio agregan 2 escenas más cada uno al carrusel"
+      ]
+    },
+    {
       "versao": "0.2.0",
       "data": "14/Nov/2026",
       "hora": "18:20:00",
