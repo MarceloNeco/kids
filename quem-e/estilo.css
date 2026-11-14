@@ -206,3 +206,4 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+.lista-perguntas .vazio { font-weight: 600; text-align: center; padding: 10px; }

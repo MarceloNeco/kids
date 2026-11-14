@@ -76,7 +76,7 @@
     var s = op.dados ? JSON.parse(JSON.stringify(op.dados)) : {
       codigo: op.codigo, id: op.id, host: !!op.host, eu: op.host ? 0 : 1, outro: null,
       nivel: op.host ? op.nivel : null, semente: op.host ? op.semente >>> 0 : null,
-      segredo: null, outroPronto: false, log: [], revelado: null, cheia: false, saiu: false
+      segredo: null, outroPronto: false, log: [], dePe: null, revelado: null, cheia: false, saiu: false
     };
     var partida = null, ultimo = agora(), ultPulso = 0, ultOi = 0, aplicando = false;
 
@@ -103,6 +103,8 @@
       aplicando = true;
       s.log.forEach(function (e) { aplicar(e); });
       aplicando = false;
+      // as cartas que a pessoa virou no próprio tabuleiro (não vão pela rede, só ficam guardadas aqui)
+      if (s.dePe && s.dePe.length === partida.tabuleiro.caras.length) partida.estado.dePe[s.eu] = s.dePe.slice();
     }
     if (s.nivel) montar();
 
@@ -134,6 +136,8 @@
       outroAqui: function () { return !!s.outro && agora() - ultimo < TEMPO.ausente; },
       esperando: function () { return !partida; },
       temOutro: function () { return !!s.outro; },
+      host: function () { return s.host; },
+      guardarTabuleiro: function (dePe) { var n = JSON.stringify(dePe); if (n !== JSON.stringify(s.dePe)) { s.dePe = dePe.slice(); salvar(); } },
 
       // a tela pede: 'segredo' { c } · 'pergunta' { p } · 'resposta' { r } · 'fimvez' · 'palpite' { c }
       agir: function (k, d) {
@@ -179,7 +183,7 @@
         }
         if (m.t === 'ev' && partida) receberEvento(m.e);
         else if (m.t === 'pulso') { if (m.n < s.log.length) for (var i = m.n; i < s.log.length; i++) mandar({ t: 'ev', e: s.log[i] }); }
-        else if (m.t === 'revelar') { if (partida && partida.estado.fase === 'fim' && s.revelado === null) { s.revelado = m.c; salvar(); avisar(); } }
+        else if (m.t === 'revelar') { if (partida && partida.estado.fase === 'fim' && s.revelado === null && m.c < partida.tabuleiro.caras.length) { s.revelado = m.c; salvar(); avisar(); } }
         else if (m.t === 'tchau') { ultimo = 0; avisar(); }
         if (antes) avisar();
       },
@@ -196,6 +200,7 @@
       },
       sair: function () { mandar({ t: 'tchau' }); s.saiu = true; salvar(); }
     };
+    if (s.host && !op.dados) salvar();   // quem cria já guarda: recarregar antes do amigo entrar continua dono da sala
     return sala;
   }
 

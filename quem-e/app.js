@@ -112,7 +112,7 @@
   }
   function voltarInicio() { if (dentro) { try { history.back(); } catch (e) { aoVoltar(); } } else aoVoltar(); }
   function aoVoltar() {
-    dentro = false; clearTimeout(timerMeleca); calar(); sairDaSala(); partida = null; fecharSobreposicoes(); mostrar('inicio');
+    dentro = false; clearTimeout(timerMeleca); calar(); sairDaSala(); partida = null; desligarLupa(); fecharSobreposicoes(); mostrar('inicio');
     setTimeout(function () { $(pref.meleca === 'blue' ? 'btBlue' : 'btPink').focus(); }, 30);
   }
   window.addEventListener('popstate', function () { if (dentro) aoVoltar(); });
@@ -210,8 +210,9 @@
 
   // ---------- partida ----------
   var escolhido = null, quemSegura = 0, palpiteSel = null, autoDescartou = false, timerMeleca = null;
+  function desligarLupa() { lupa = false; $('btLupa').setAttribute('aria-pressed', 'false'); $('tabuleiro').classList.remove('com-lupa'); }
   function novaPartida() {
-    clearTimeout(timerMeleca); fecharSobreposicoes();
+    clearTimeout(timerMeleca); fecharSobreposicoes(); desligarLupa();
     var semente = TESTE ? 1234 : Math.floor(Math.random() * 1e9);
     partida = QP.criar({ modo: modo, nivel: nivel, semente: semente, rnd: TESTE ? L.sorteio(5) : Math.random });
     montarGrade($('gradeSegredo')); montarGrade($('tabuleiro'));
@@ -256,10 +257,10 @@
   }
 
   function tocarCarta(grade, id) {
-    if (grade === 'gradeSegredo') { if (lupa) { abrirLupa(id); return; } escolhido = id; Som.virar(); pintarSegredo(); return; }
+    if (grade === 'gradeSegredo') { escolhido = id; Som.virar(); pintarSegredo(); return; }
     if (!partida || partida.estado.fase !== 'jogo') return;
-    if (lupa) { abrirLupa(id); return; }
     var a = partida.aguardando(), eu = quemVe();
+    if (lupa && !palpitando()) { abrirLupa(id); return; }
     if (palpitando()) {
       if (!partida.estado.dePe[eu][id]) partida.virar(eu, id);   // palpite numa virada: desvira e vale
       palpiteSel = id; Som.virar(); pintar(); return;
@@ -289,6 +290,7 @@
     var ms = $('meuSegredo'), chave = e.segredos[eu] + '|' + pref.lingua;
     if (e.segredos[eu] !== null && ms.getAttribute('data-chave') !== chave) { ms.setAttribute('data-chave', chave); ms.innerHTML = caraMini(e.segredos[eu]) + '<span class="rotulo">' + escapar(t('Meu', 'Mine')) + '</span>';
       $('meuNome').textContent = t('Meu personagem: ', 'My character: ') + partida.tabuleiro.caras[e.segredos[eu]].nome; }
+    if (modo === 'rede' && sala) sala.guardarTabuleiro(e.dePe[eu]);
     // painel
     var seu = humano(a);
     $('acoes').hidden = !(seu && a.acao === 'perguntar') || !$('perguntas').hidden || palpitando();
@@ -308,9 +310,13 @@
     setTimeout(ajustarTudo, 0);
   }
 
+  // um recado que fica no balão por alguns segundos (passa na frente do texto normal)
+  var recado = null;
+  function dizer(txt, ms) { recado = { txt: txt, ate: Date.now() + (ms || 3500) }; $('balao').textContent = txt; setTimeout(function () { if (recado && Date.now() >= recado.ate) { recado = null; pintar(); } }, (ms || 3500) + 50); }
   function pintarBalao(a) {
     if (!a) return;
     var b = $('balao');
+    if (recado && Date.now() < recado.ate) { b.textContent = recado.txt; return; }
     if (modo === 'rede') {
       if (!sala.outroAqui()) { b.textContent = t('📶 Esperando a outra pessoa voltar…', '📶 Waiting for the other player to come back…'); return; }
       if (a.jogador !== sala.eu) {
@@ -368,10 +374,12 @@
   function pintarPerguntas() {
     var eu = quemVe(), e = partida.estado, lista = $('listaPerguntas'), vivas = e.dePe[eu].filter(Boolean).length;
     lista.innerHTML = '';
+    var mostradas = 0;
     GRUPOS.forEach(function (g) {
       var ps = L.PERGUNTAS.filter(function (p) { return p.grupo === g[0] && partida.tabuleiro.perguntas.indexOf(p.id) >= 0; });
       if (!ps.length) return;
       var h = document.createElement('h3'); h.textContent = t(g[1], g[2]); lista.appendChild(h);
+      var antes = lista.children.length;
       ps.forEach(function (p) {
         var feita = e.feitas[eu].indexOf(p.id) >= 0, u = L.utilidade(partida.tabuleiro.caras, e.dePe[eu], p.id), inutil = !feita && (u === 0 || u === vivas);
         if (nivel === 'facil' && (inutil || feita)) return;
@@ -388,7 +396,13 @@
         o.addEventListener('click', function () { var v = pref.voz; pref.voz = true; falar(t(p.pt, p.en)); pref.voz = v; });
         linha.appendChild(b); linha.appendChild(o); lista.appendChild(linha);
       });
+      if (lista.children.length === antes) lista.removeChild(h); else mostradas += lista.children.length - antes;
     });
+    if (!mostradas) {
+      var v = document.createElement('p'); v.className = 'vazio';
+      v.textContent = t('Nenhuma pergunta ajuda agora. Toque em ← e depois em 🎯 É este! para escolher a cara.', 'No question helps now. Tap ← and then 🎯 This one! to pick the face.');
+      lista.appendChild(v);
+    }
   }
   function perguntar(id) {
     var eu = quemVe();
@@ -436,6 +450,7 @@
     if (palpiteSel === null) return;
     var eu = quemVe(), id = palpiteSel, nome = partida.tabuleiro.caras[id].nome;
     palpiteSel = null; $('palpitando').hidden = true;
+    if (modo === 'rede') palpiteMeu = nome;
     var r = modo === 'rede' ? (sala.agir('palpite', { c: id }), { pendente: true }) : partida.palpite(eu, id);
     if (r.pendente) { $('balao').textContent = t('Será que é ', 'Could it be ') + nome + t('? Esperando a resposta…', '? Waiting for the answer…'); falar(t('Será que é ', 'Could it be ') + nome + '?'); }
     else if (!r.acertou) {
@@ -516,7 +531,7 @@
     falar($('fimTitulo').textContent);
   }
   $('btDeNovo').addEventListener('click', function () { if (modo === 'rede') { $('fim').hidden = true; limparFesta(); sairDaSala(); telaRede(); return; } novaPartida(); });
-  $('btOutroNivel').addEventListener('click', function () { $('fim').hidden = true; limparFesta(); partida = null; mostrar('niveis'); });
+  $('btOutroNivel').addEventListener('click', function () { $('fim').hidden = true; limparFesta(); partida = null; if (modo === 'rede') { telaRede(); return; } mostrar('niveis'); });
 
   function festa() {
     if (CALMO) return;
@@ -534,7 +549,7 @@
   // ---------- cada um no seu celular (rede.js) ----------
   // a partida em rede fica guardada na ABA (sessionStorage): recarregar volta para ela; duas abas no mesmo aparelho
   // não se confundem. O endereço ganha ?sala=ABCD para recarregar voltar à mesma sala.
-  var sala = null, canal = null, relogio = null, CH_REDE = 'bolinho:quem-e:rede';
+  var sala = null, canal = null, relogio = null, CH_REDE = 'bolinho:quem-e:rede', palpiteMeu = null, palpiteVisto = '';
   function lerSessao() { try { var v = sessionStorage.getItem(CH_REDE); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function gravarSessao(v) { try { if (v) sessionStorage.setItem(CH_REDE, JSON.stringify(v)); else sessionStorage.removeItem(CH_REDE); } catch (e) { /* sem espaço */ } }
   function enderecoSala(cod) {
@@ -568,10 +583,14 @@
     cod = String(cod || '').toUpperCase().replace(/[^A-Z]/g, '');
     if (cod.length !== 4) { $('redeStatus').textContent = t('O código tem 4 letras. Confira e tente de novo.', 'The code has 4 letters. Check it and try again.'); return; }
     modo = 'rede';
-    var guardado = lerSessao();
-    conectar(cod, guardado && guardado.codigo === cod ? { dados: guardado.dados } : { id: REDE.idNovo(), codigo: cod, host: false });
-    $('redeStatus').textContent = t('Procurando a partida ', 'Looking for game ') + cod + '…';
+    var guardado = lerSessao(), volta = guardado && guardado.codigo === cod && guardado.dados;
+    // primeiro a tela de espera; se a partida já existe, conectar() leva direto para ela
+    if (volta && volta.host && !volta.outro) {
+      $('redeInicio').hidden = true; $('redeSala').hidden = false; $('codigoSala').textContent = cod;
+      $('redeStatus').textContent = t('Esperando alguém entrar com o código…', 'Waiting for someone to join with the code…');
+    } else $('redeStatus').textContent = t('Procurando a partida ', 'Looking for game ') + cod + '…';
     if (atual !== 'rede') mostrar('rede');
+    conectar(cod, volta ? { dados: guardado.dados } : { id: REDE.idNovo(), codigo: cod, host: false });
   }
   function conectar(codigo, op) {
     sala = REDE.criar({
@@ -607,7 +626,7 @@
     if (!sala) return;
     if (sala.cheia()) { $('redeStatus').textContent = t('Essa partida já tem dois jogadores. Peça um código novo.', 'That game already has two players. Ask for a new code.'); return; }
     if (sala.partida && partida !== sala.partida && sala.temOutro()) {
-      partida = sala.partida; nivel = partida.nivel;
+      partida = sala.partida; nivel = partida.nivel; desligarLupa(); palpiteMeu = null; palpiteVisto = '';
       montarGrade($('gradeSegredo')); montarGrade($('tabuleiro'));
       humorAtual = ''; humor('parada'); $('meuSegredo').removeAttribute('data-chave'); fimMostrado = false;
       var e = partida.estado;
@@ -616,6 +635,17 @@
       comecarJogo(); return;
     }
     if (!partida) return;
+    var e2 = partida.estado;
+    // o veredito do meu palpite chegou: errei? (acertar abre a tela do fim)
+    if (palpiteMeu && e2.passo !== 'veredito') {
+      if (e2.fase === 'jogo') { dizer(t('Não é ', "It's not ") + palpiteMeu + '! 😅'); Som.erro(); humor('ops'); falar(t('Não é ', "It's not ") + palpiteMeu + '!'); }
+      palpiteMeu = null;
+    }
+    // a outra pessoa chutou o meu e errou
+    if (e2.ultima && e2.ultima.palpite !== undefined && e2.ultima.quem !== sala.eu && e2.fase === 'jogo') {
+      var chave = e2.ultima.palpite + ':' + e2.feitas[1 - sala.eu].length + ':' + JSON.stringify(e2.dePe[sala.eu]).length;
+      if (chave !== palpiteVisto) { palpiteVisto = chave; dizer(t('A outra pessoa achou que era ', 'The other player guessed ') + partida.tabuleiro.caras[e2.ultima.palpite].nome + t('. Errou! Sua vez 🎉', '. Wrong! Your turn 🎉')); humor('feliz'); }
+    }
     if (atual === 'segredo' && partida.estado.fase !== 'segredo') { comecarJogo(); return; }
     if (atual === 'jogo') pintar();
     if (partida.estado.fase === 'fim') mostrarFim();
@@ -658,7 +688,8 @@
     aguardando: function () { return partida && partida.aguardando(); },
     estado: function () { return partida && partida.estado; },
     respostaCerta: function () { var a = partida.aguardando(); return L.responder(partida.tabuleiro.caras[partida.estado.segredos[a.jogador]], partida.estado.ultima.pergunta); },
-    quantasDescartar: function () { return partida.quantasDescartar(quemVe()); }
+    quantasDescartar: function () { return partida.quantasDescartar(quemVe()); },
+    temSala: function () { return !!sala; }
   };
 })();
 
