@@ -31,6 +31,35 @@ fases e código são próprios. O dono joga o MAGIC SORT e mandou um print como 
 - **Frasco embaçado** (🌫️): as camadas de baixo aparecem cinzentas com "?" até virarem a de cima. Só passa o pedaço
   que está à vista.
 
+## Cubo d'Água (desde a 0.4.0)
+
+- No começo, a criança escolhe **🧪 Frascos** ou **🧊 Cubo d'Água** (fica guardado). O cubo é um 3×3 em 3D: cubinhos de
+  vidro escuro com uma pastilha de "líquido" colorido em cada face (nome nosso: "Cubo Mágico" é o nome popular do
+  brinquedo de uma marca).
+- **Arrastar fora do cubo** (ou com dois dedos) gira o cubo inteiro. **Pôr o dedo num cubinho e arrastar** gira a fatia
+  dele, acompanhando o dedo; soltando com mais de uns 17°, a fatia completa o giro, senão volta. **Tocar num cubinho**
+  marca ele (contorno amarelo) e mostra as setas ⬅⬆⬇➡, que giram a fatia (sem precisar arrastar).
+- Cada face montada brilha e troca a cena do fundo em carrossel. Tudo montado = fim de fase, com estrelas e gotinhas
+  (progresso guardado à parte dos frascos; gotinhas e lojinha são as mesmas).
+- Níveis (giros que embaralham): Fácil 1 a 3 (só fatias de fora); Médio 4 a 8 (fatias do meio a partir da fase 11);
+  Difícil 10 a 25. Sempre com solução: o cubo nasce montado e é embaralhado com giros de verdade.
+- Ajudas: ↩️ desfazer (Fácil sem limite, Médio 10, Difícil 5), 💡 dica (a fatia certa balança para o lado do giro;
+  Fácil sem limite, Médio 3, Difícil 1) e 🔄 recomeçar. 3 estrelas sem ajuda; 2 usando desfazer ou dica.
+- Regras em `cubo-motor.js` (sem tela, testado no Node); 3D em `cubo3d.js` com o three.js (`libs/`, MIT), carregado só
+  quando a criança abre o cubo.
+
+## Sem saída (desde a 0.4.0)
+
+- Toda fase começa com solução. A criança pode fazer jogadas que deixam as cores **sem saída** (não dá mais para
+  terminar daquele jeito), desde que ainda dê para voltar.
+- **Dá para voltar** quando sobra ajuda que salva: ↩️ desfazer suficiente para voltar todas as jogadas feitas desde que
+  ficou sem saída, ou o 🔀 embaralhar (sempre mistura de um jeito com solução), ou o ➕ frasco extra (se ele resolver).
+- **Não dá mais = perdeu**: aparece "Ops! Ficou sem saída", com um "tum" e uma sanfona triste, e a fase recomeça
+  (ajudas cheias de novo). No Fácil o desfazer não tem limite, então nunca perde.
+- **No Fácil e no Médio**, antes da jogada que deixa sem saída, o jogo pergunta **"Tem certeza?"** ("Não, vou pensar" /
+  "Fazer mesmo assim"). Depois dela, avisa quantas jogadas voltar. No Difícil não pergunta nem avisa: seria uma dica.
+- Quem decide é o resolvedor (`AquaMotor.temSaida`), a cada jogada; no Difícil leva no máximo uns 30 milésimos de segundo.
+
 ## Ajudas (nunca custam nada; voltam cheias a cada fase)
 
 | Ajuda | Fácil | Médio | Difícil |
@@ -95,6 +124,9 @@ fases e código são próprios. O dono joga o MAGIC SORT e mandou um print como 
 | `som.js` | Efeitos sonoros gravados (`sons/`), tocados pelo WebAudio; reserva feita na hora se a gravação não abrir. |
 | `fundo.js` | O fundo em carrossel: a lista das 16 cenas, as 8 cenas desenhadas, as partículas sobre as fotos e a transição. |
 | `cenas/` | As 8 fotos do fundo (WebP, até 1280 px). Créditos no `CREDITOS.md`. |
+| `cubo-motor.js` | As regras do Cubo d'Água, sem tela: 54 pastilhas, giros, faces montadas, fases e o caminho da dica. |
+| `cubo3d.js` | O Cubo d'Água em 3D (three.js): cubinhos de vidro, pastilhas brilhantes, toque, arrasto, setas, animação. |
+| `libs/` | three.js r170 (MIT). |
 | `app.js` | A tela: toques, animação do despejo, ajudas, estrelas, gotinhas, lojinha, música (12 gravadas pela trilha comum). |
 | `estilo.css` | Visual (fonte Fredoka da Rabiscolândia), as camadas do fundo em carrossel, o zoom lento e o véu. |
 | `sw.js` | Guarda o jogo no aparelho (sem internet). Subir `VERSAO` a cada versão. |

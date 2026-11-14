@@ -15,7 +15,7 @@
 
    AquaMotor.semente(n) · config(nivel, fase) · gerar(nivel, fase) · novoEstado(fase) · quantoDespeja(est, de, para)
    · despejar(est, de, para) · pronto(frasco, cap) · venceu(est) · temJogada(est) · resolver(frascos, cap, limite)
-   · plano(est) · depois(frascos, cap, de, para) · escrito(frascos) · embaralhar(est, rng) · frascoExtra(est) · copiar(est) */
+   · plano(est) · temSaida(frascos, cap) · depois(frascos, cap, de, para) · escrito(frascos) · embaralhar(est, rng) · frascoExtra(est) · copiar(est) */
 (function (raiz) {
   'use strict';
   var M = {};
@@ -192,6 +192,12 @@
   M.plano = function (est) {
     var r = M.resolver(est.frascos, est.cap, 40000);
     return r.passos && r.passos.length ? r.passos : null;
+  };
+  // a arrumação ainda tem saída? (quando o resolvedor não consegue decidir dentro do limite, conta como "tem": o jogo
+  // nunca diz que a criança ficou sem saída sem ter certeza)
+  M.temSaida = function (frascos, cap) {
+    var r = M.resolver(frascos, cap, 40000);
+    return !!r.passos || r.esgotou;
   };
   // como os frascos ficam depois da jogada inteira (a cor de cima toda, sem contar frasco embaçado)
   M.depois = function (frascos, cap, de, para) {

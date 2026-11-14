@@ -2,6 +2,26 @@
   "app": "aqua",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "14/Nov/2026",
+      "hora": "21:00:00",
+      "pt": [
+        "🧊 Brincadeira nova: Cubo d'Água, um cubo 3×3 em 3D de vidro e líquidos coloridos. Arraste para girar o cubo e as fatias, ou toque num cubinho e use as setas",
+        "🤔 No Fácil e no Médio, antes de uma jogada que deixa as cores sem saída, o jogo pergunta \"Tem certeza?\"",
+        "↩️ Pode seguir jogando sem saída enquanto der para voltar com as ajudas; se não der mais, é \"Ops! Ficou sem saída\", com sanfona, e a fase recomeça"
+      ],
+      "en": [
+        "🧊 New game: Water Cube, a 3D 3×3 cube made of glass and colorful liquids. Drag to turn the cube and its slices, or tap a little cube and use the arrows",
+        "🤔 On Easy and Medium, before a move that leaves the colors with no way out, the game asks \"Are you sure?\"",
+        "↩️ You can keep playing with no way out as long as the helpers can take you back; if they can't, it's \"Oops! No way out\", with an accordion, and the stage starts over"
+      ],
+      "es": [
+        "🧊 Juego nuevo: Cubo de Agua, un cubo 3×3 en 3D de cristal y líquidos de colores. Arrastra para girar el cubo y sus capas, o toca un cubito y usa las flechas",
+        "🤔 En Fácil y en Medio, antes de una jugada que deja los colores sin salida, el juego pregunta \"¿Seguro?\"",
+        "↩️ Puedes seguir jugando sin salida mientras las ayudas te permitan volver; si ya no se puede, sale \"¡Vaya! Sin salida\", con acordeón, y la fase empieza de nuevo"
+      ]
+    },
+    {
       "versao": "0.3.0",
       "data": "14/Nov/2026",
       "hora": "19:30:00",
