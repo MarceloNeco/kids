@@ -4,7 +4,7 @@
    Guarda só neste aparelho (localStorage "bolinho:quem-e:pref"): idioma, sons, voz e a meleca escolhida. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.2';
+  var APP_VERSION = '0.2.3';
   var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026';
   var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };
@@ -80,6 +80,16 @@
   }
   function calar() { if (voz) voz.calar(); }
 
+  // ---------- o jeito das melecas: as duas são SUPER bagunceiras (dono, 14/Nov/2026) ----------
+  var ZOEIRA = {
+    sim: [['Sim! Splash! 💦', 'Yes! Splash! 💦'], ['Siiim! Que bagunça boa! 🎉', 'Yesss! What a great mess! 🎉'], ['Sim! Ploft! 💥', 'Yes! Ploft! 💥']],
+    nao: [['Não! Ploft! 💥', 'No! Ploft! 💥'], ['Nããão! 🙃', 'Nooo! 🙃'], ['Não! Escorreguei de rir! 🫠', 'No! I slipped laughing! 🫠']],
+    sei: [['Ploft! Já sei! 🤩', 'Ploft! I know! 🤩'], ['Splash! Acho que descobri! 🤩', 'Splash! I think I got it! 🤩'], ['Hihihi, já sei quem é! 🤩', "Hehehe, I know who it is! 🤩"]],
+    pensa: [['Hmm… deixa eu remexer a meleca… 🤔', 'Hmm… let me stir my goo… 🤔'], ['Hmm… pensando gosmento… 🤔', 'Hmm… gooey thinking… 🤔'], ['Hmm… espera que eu tô escorregando nas ideias… 🤔', 'Hmm… hold on, my ideas are slippery… 🤔']]
+  };
+  function zoeira(tipo) { var l = ZOEIRA[tipo], x = l[Math.floor(Math.random() * l.length)]; return t(x[0], x[1]); }
+  function oiMeleca() { return pref.meleca === 'blue' ? t('Oi! Eu sou o Melekento Blue, o mais bagunceiro da casa! Splash!', "Hi! I'm Melekento Blue, the messiest one in the house! Splash!") : t('Oi! Eu sou a Pink Honey, a mais bagunceira da casa! Ploft!', "Hi! I'm Pink Honey, the messiest one in the house! Ploft!"); }
+
   // ---------- melecas na tela ----------
   var nMel = 0;
   function melecaSvg(id, humor) { return MEL.svg(id, humor, { id: 'mx' + (nMel++) }); }
@@ -121,7 +131,7 @@
   ['btBlue', 'btPink'].forEach(function (id) {
     $(id).addEventListener('click', function () {
       pref.meleca = $(id).getAttribute('data-meleca'); salvarPref(); pintarMelecas(); traduzir(); Som.gosma();
-      falar(pref.meleca === 'blue' ? t('Oi! Eu sou o Melekento Blue!', "Hi! I'm Melekento Blue!") : t('Oi! Eu sou a Pink Honey!', "Hi! I'm Pink Honey!"));
+      falar(oiMeleca());
       mostrar('modos');
     });
   });
@@ -129,7 +139,13 @@
   $('btPassar').addEventListener('click', function () { modo = 'passar'; mostrar('niveis'); });
   $('btRede').addEventListener('click', function () { modo = 'rede'; telaRede(); });
   Array.prototype.forEach.call(document.querySelectorAll('.nivel'), function (b) {
-    b.addEventListener('click', function () { nivel = b.getAttribute('data-nivel'); if (modo === 'rede') criarSala(); else novaPartida(); telaCheia(); });
+    b.addEventListener('click', function () {
+      nivel = b.getAttribute('data-nivel');
+      if (modo === 'rede') criarSala();
+      else if (modo === 'passar') pedirNomes();
+      else novaPartida();
+      telaCheia();
+    });
   });
 
   function telaCheia() {
@@ -215,10 +231,18 @@
     quemSegura = 0; humorAtual = ''; humor('parada'); $('meuSegredo').removeAttribute('data-chave');
     irParaSegredo(0);
   }
+  // passando o aparelho: o nome de cada um (guardado só neste aparelho, nas preferências)
+  function limparNome(s) { return String(s || '').replace(/[<>&"'`\\]/g, '').replace(/\s+/g, ' ').trim().slice(0, 16); }
+  function pedirNomes() {
+    var n = Array.isArray(pref.nomes) ? pref.nomes : [];
+    $('nome1').value = n[0] || ''; $('nome2').value = n[1] || '';
+    mostrar('nomes'); setTimeout(function () { $('nome1').focus(); }, 50);
+  }
+  $('btNomesOk').addEventListener('click', function () { pref.nomes = [limparNome($('nome1').value), limparNome($('nome2').value)]; salvarPref(); novaPartida(); });
   function nomeJogador(j) {
     if (modo === 'rede') return j === sala.eu ? t('Você', 'You') : t('A outra pessoa', 'The other player');
     if (modo === 'meleca') return j === 0 ? t('Você', 'You') : nomeMeleca();
-    return t('Jogador ', 'Player ') + (j + 1);
+    return (Array.isArray(pref.nomes) && pref.nomes[j]) || t('Jogador ', 'Player ') + (j + 1);
   }
 
   function irParaSegredo(j) {
@@ -321,7 +345,7 @@
       }
     }
     if (modo === 'meleca' && a.jogador === 1) {
-      if (a.acao === 'perguntar') { b.textContent = t('Hmm… deixa eu pensar 🤔', 'Hmm… let me think 🤔'); humor('pensando'); }
+      if (a.acao === 'perguntar') { humor('pensando'); }
       return;
     }
     if (a.acao === 'perguntar') {
@@ -332,8 +356,11 @@
     }
   }
 
+  var perguntaFalada = null;
   function pintarResponder(a) {
     var p = partida.estado.ultima.pergunta;
+    // quem vai responder ouve a pergunta (ajuda quem ainda não lê); contra a meleca ela já falou a dela
+    if (modo !== 'meleca' && perguntaFalada !== partida.estado.ultima) { perguntaFalada = partida.estado.ultima; falar(textoPergunta(p)); }
     var quem = modo !== 'meleca' ? nomeJogador(1 - a.jogador) + t(' quer saber:', ' wants to know:')
       : pref.meleca === 'blue' ? t('O Melekento Blue quer saber:', 'Melekento Blue wants to know:') : t('A Pink Honey quer saber:', 'Pink Honey wants to know:');
     $('pergFeita').innerHTML = '';
@@ -463,16 +490,17 @@
     if (modo !== 'meleca' || !partida || partida.estado.fase !== 'jogo') return;
     var a = partida.aguardando(); if (!a || a.jogador !== 1) return;
     timerMeleca = setTimeout(jogadaMeleca, a.acao === 'responder' ? ESPERA.responder : ESPERA.pensar);
-    if (a.acao === 'perguntar') { $('balao').textContent = t('Hmm… deixa eu pensar 🤔', 'Hmm… let me think 🤔'); humor('pensando'); }
+    if (a.acao === 'perguntar') { $('balao').textContent = zoeira('pensa'); humor('pensando'); }
   }
   function jogadaMeleca() {
     if (!partida || atual !== 'jogo') return;
     var r = partida.vezDaMeleca(); if (!r) return;
     var b = $('balao');
     if (r.tipo === 'resposta') {
-      b.textContent = r.resposta ? t('Sim! 👍', 'Yes! 👍') : t('Não! 👎', 'No! 👎');
+      var fala = zoeira(r.resposta ? 'sim' : 'nao');
+      b.textContent = fala;
       humor('falando'); if (r.resposta) Som.sim(); else Som.nao();
-      falar(r.resposta ? t('Sim!', 'Yes!') : t('Não!', 'No!'));
+      falar(fala);
     } else if (r.tipo === 'pergunta') {
       b.textContent = t('Minha vez! ', 'My turn! ') + textoPergunta(r.id);
       humor('falando'); Som.gosma(); falar(t('Minha vez! ', 'My turn! ') + textoPergunta(r.id));
@@ -493,6 +521,7 @@
     quemSegura = -1; depoisCortina = function () { quemSegura = j; depois(); };
     $('cortinaTitulo').textContent = t('Passe o aparelho para ', 'Pass the device to ') + nomeJogador(j);
     $('cortinaTexto').textContent = t('Sem espiar o tabuleiro do outro! 🙈', "No peeking at the other board! 🙈");
+    falar(t('Passa o celular para ', 'Pass the phone to ') + nomeJogador(j) + t('! Sem espiar, hein?', '! No peeking!'), true);
     $('cortina').hidden = false; $('btCortina').focus();
   }
   $('btCortina').addEventListener('click', function () { $('cortina').hidden = true; var f = depoisCortina; depoisCortina = null; if (f) f(); });
@@ -681,7 +710,7 @@
   // peças para a segunda brincadeira (adivinha-tela.js)
   window.QEApp = {
     t: t, en: en, pref: pref, salvarPref: salvarPref, mostrar: mostrar, falar: falar, calar: calar, Som: Som, festa: festa, limparFesta: limparFesta,
-    melecaSvg: melecaSvg, nomeMeleca: nomeMeleca, voz: voz, telaCheia: telaCheia, atual: function () { return atual; }, TESTE: TESTE, CALMO: CALMO
+    melecaSvg: melecaSvg, nomeMeleca: nomeMeleca, zoeira: zoeira, oiMeleca: oiMeleca, voz: voz, telaCheia: telaCheia, atual: function () { return atual; }, TESTE: TESTE, CALMO: CALMO
   };
   $('btAdivinha').addEventListener('click', function () { mostrar('nivelAdivinha'); });
 

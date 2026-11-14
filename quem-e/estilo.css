@@ -69,7 +69,7 @@ button:disabled { cursor: default; opacity: .5; }
 .versao { font-size: .85rem; color: var(--tinta2); }
 
 /* ---------- modos, níveis e rede ---------- */
-#modos, #niveis, #rede { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+#modos, #niveis, #rede, #nomes { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
   padding: calc(70px + var(--st)) calc(16px + var(--sr)) calc(90px + var(--sb)) calc(16px + var(--sl)); }
 .conversa { display: flex; align-items: center; gap: 8px; }
 .meleca-mini { width: 76px; height: 76px; flex: 0 0 auto; display: block; }
@@ -272,3 +272,4 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
   .meleca-grande { width: min(32vw, 20vh, 150px); }
   .adv-fala { padding: 10px 14px; }
 }
+.rotulo-campo { font-weight: 700; margin-bottom: -6px; }

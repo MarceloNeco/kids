@@ -196,3 +196,37 @@ test('sem internet depois da primeira visita: contra a meleca funciona e o celul
   assert.deepEqual(erros, []);
   await ctx.close();
 });
+
+test('passando o aparelho: nomes de quem joga, a meleca avisa a troca e lê a pergunta em voz alta', async () => {
+  const ctx = await browser.newContext({ locale: 'pt-BR', viewport: { width: 390, height: 844 }, hasTouch: true });
+  await ctx.addInitScript(() => {
+    window.__falas = [];
+    const S = function (t) { this.text = t; };
+    window.SpeechSynthesisUtterance = S;
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: u => { window.__falas.push(u.text); setTimeout(() => u.onend && u.onend(), 5); }, cancel: () => {}, getVoices: () => [{ name: 'Local', lang: 'pt-BR', localService: true }], speaking: false, addEventListener: () => {} } });
+  });
+  const pg = await ctx.newPage(); const erros = [];
+  pg.on('pageerror', e => erros.push(e.message));
+  await pg.goto(base + '?teste'); await pg.waitForFunction(() => window.QEDebug && window.QEDebug.pronto);
+  await pg.click('#btBlue'); await pg.click('#btPassar'); await pg.click('#btFacil');
+  await pg.waitForSelector('#nomes.ativa');
+  await pg.fill('#nome1', 'Ana'); await pg.fill('#nome2', 'Bia'); await pg.click('#btNomesOk');
+  await pg.waitForSelector('#segredo.ativa');
+  assert.match(await pg.textContent('#tituloSegredo'), /Ana/);
+  await pg.click('#segredo .carta[data-id="0"]'); await pg.click('#btConfirmarSegredo');
+  await pg.waitForSelector('#cortina:not([hidden])');
+  assert.match(await pg.textContent('#cortinaTitulo'), /Bia/);
+  await pg.waitForFunction(() => window.__falas.some(f => /Bia/.test(f)), null, { timeout: 3000 });
+  await pg.click('#btCortina');
+  await pg.click('#segredo .carta[data-id="1"]'); await pg.click('#btConfirmarSegredo');
+  await pg.click('#btCortina');
+  await pg.click('#btPerguntar'); await pg.click('#perguntas button[data-p]:not(.inutil)');
+  const pergunta = await pg.evaluate(() => { const id = QEDebug.estado().ultima.pergunta; return QELogica.pergunta(id).pt; });
+  await pg.click('#btCortina');
+  await pg.waitForSelector('#responder:not([hidden])');
+  await pg.waitForFunction(p => window.__falas.filter(f => f.includes(p.replace(/[\u{1F000}-\u{1FAFF}]/gu, '').trim())).length >= 2, pergunta, { timeout: 3000 });
+  assert.deepEqual(erros, []);
+  // os nomes ficam guardados só neste aparelho e voltam na próxima partida
+  assert.deepEqual(await pg.evaluate(() => JSON.parse(localStorage.getItem('bolinho:quem-e:pref')).nomes), ['Ana', 'Bia']);
+  await ctx.close();
+});
