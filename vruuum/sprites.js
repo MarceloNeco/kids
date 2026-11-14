@@ -417,6 +417,44 @@
     poli(c, [W * 0.02, H, W * 0.16, H * 0.06, W * 0.12, H * 0.06, W * -0.02, H], '#c79a2e');
   }
 
+  // ---------- 1.17.0: no rio (desenhos próprios) ----------
+  function ondinha(c, W, H, y, larg) {   // espuma em volta do que boia
+    c.fillStyle = 'rgba(255,255,255,.85)'; c.beginPath(); c.ellipse ? c.ellipse(W / 2, y, larg, H * 0.06, 0, 0, Math.PI * 2) : c.arc(W / 2, y, larg, 0, Math.PI * 2); c.fill();
+    c.fillStyle = 'rgba(160,225,255,.9)'; c.beginPath(); c.ellipse ? c.ellipse(W / 2, y, larg * 0.8, H * 0.035, 0, 0, Math.PI * 2) : c.arc(W / 2, y, larg * 0.8, 0, Math.PI * 2); c.fill();
+  }
+  function boia(c, W, H) {   // boia listrada vermelha e branca, com luzinha em cima
+    ondinha(c, W, H, H * 0.9, W * 0.48);
+    c.fillStyle = grad(c, 0, H, '#ff5a5a', '#b5121b'); c.beginPath(); c.moveTo(W * 0.22, H * 0.9); c.lineTo(W * 0.36, H * 0.2); c.lineTo(W * 0.64, H * 0.2); c.lineTo(W * 0.78, H * 0.9); c.closePath(); c.fill();
+    [0.42, 0.66].forEach(function (y) { poli(c, [W * (0.36 - (y - 0.2) * 0.2), H * y, W * (0.64 + (y - 0.2) * 0.2), H * y, W * (0.66 + (y - 0.2) * 0.2), H * (y + 0.1), W * (0.34 - (y - 0.2) * 0.2), H * (y + 0.1)], '#ffffff'); });
+    caixa(c, W * 0.44, H * 0.06, W * 0.12, H * 0.16, W * 0.03, '#3a3a44');
+    brilho(c, '#fff3a0', W * 0.2); circ(c, W * 0.5, H * 0.06, W * 0.09, '#fff3a0'); c.shadowBlur = 0;
+  }
+  function redemoinho(c, W, H) {   // redemoinho na água: gira o barco (como a lama no chão)
+    oval(c, W * 0.5, H * 0.55, W * 0.48, H * 0.42, '#1b6fa8'); oval(c, W * 0.5, H * 0.55, W * 0.32, H * 0.28, '#14507d'); oval(c, W * 0.5, H * 0.55, W * 0.14, H * 0.12, '#0b2f4d');
+    c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = H * 0.06; c.lineCap = 'round';
+    for (var k = 0; k < 3; k++) { c.beginPath(); for (var q = 0; q <= 24; q++) { var a = k * 2.1 + q / 24 * 4, r = 0.46 - q / 24 * 0.36; var x = W * (0.5 + Math.cos(a) * r), y = H * (0.55 + Math.sin(a) * r * 0.85); if (q) c.lineTo(x, y); else c.moveTo(x, y); } c.stroke(); }
+  }
+  function setasAgua(c, W, H) {   // setas de turbo azuis brilhando, em pé na água
+    ondinha(c, W, H, H * 0.95, W * 0.5);
+    brilho(c, '#3ee8ff', W * 0.06);
+    [0, 1, 2].forEach(function (k) {   // três setas para a frente (para cima), uma atrás da outra
+      var y = H * (0.62 - k * 0.24), cor = k === 1 ? '#7cf9ff' : '#3a86ff', cx = W / 2, a = W * 0.36, b = H * 0.22, g = H * 0.1;
+      poli(c, [cx - a, y + b, cx, y - b * 0.3, cx + a, y + b, cx + a, y + b + g, cx, y - b * 0.3 + g, cx - a, y + b + g], cor);
+      poli(c, [cx - a * 0.8, y + b * 0.95, cx, y - b * 0.15, cx + a * 0.8, y + b * 0.95, cx + a * 0.8, y + b * 0.95 + g * 0.35, cx, y - b * 0.15 + g * 0.35, cx - a * 0.8, y + b * 0.95 + g * 0.35], 'rgba(255,255,255,.75)');
+    });
+    c.shadowBlur = 0;
+  }
+  function tom(cor, f) { var n = parseInt(cor.slice(1), 16); return 'rgb(' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (v) { return Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f)); }).join(',') + ')'; }
+  function lancha(c, W, H, cor) {   // lanchinha do trânsito do rio, de trás, com a esteira de espuma
+    ondinha(c, W, H, H * 0.86, W * 0.5);
+    c.fillStyle = grad(c, H * 0.35, H * 0.88, tom(cor, 0.25), tom(cor, -0.3));
+    c.beginPath(); c.moveTo(W * 0.08, H * 0.42); c.lineTo(W * 0.92, H * 0.42); c.lineTo(W * 0.82, H * 0.86); c.lineTo(W * 0.18, H * 0.86); c.closePath(); c.fill();
+    caixa(c, W * 0.06, H * 0.38, W * 0.88, H * 0.07, H * 0.03, '#ffffff');
+    poli(c, [W * 0.3, H * 0.38, W * 0.38, H * 0.12, W * 0.62, H * 0.12, W * 0.7, H * 0.38], 'rgba(160,215,255,.85)');
+    caixa(c, W * 0.44, H * 0.5, W * 0.12, H * 0.3, W * 0.02, '#3a3a44');   // motor de popa
+    caixa(c, W * 0.2, H * 0.55, W * 0.14, H * 0.06, H * 0.02, '#ff2a2a'); caixa(c, W * 0.66, H * 0.55, W * 0.14, H * 0.06, H * 0.02, '#ff2a2a');
+  }
+
   // ---------- carros (vistos de trás) ----------
   function carroTras(c, W, H, cor, emoji, especial) {
     sombra(c, W, H, 0.48);
@@ -709,6 +747,8 @@
       balao: fazer(1300, 1800, balao, 220), estrelaNeon: fazer(560, 560, estrelaNeon, 128), turboNeon: fazer(1250, 900, turboNeon, 220), oleo: fazer(1100, 280, oleo, 180), nuvemFofa: fazer(3200, 1500, function (c, W, H) { nuvemFofa(c, W, H, false); }, 320), nuvemNoite: fazer(3200, 1500, function (c, W, H) { nuvemFofa(c, W, H, true); }, 320)
     };
     ['#e63946', '#2a9d8f', '#f4a261', '#457b9d', '#8ac926'].forEach(function (cor, k) { b['carro' + k] = fazer(800, 640, function (c, W, H) { carroTras(c, W, H, cor, null, false); }, 180); });
+    b.boia = fazer(500, 900, boia, 110); b.redemoinho = fazer(1300, 360, redemoinho, 200); b.setas = fazer(1300, 700, setasAgua, 220);
+    ['#e63946', '#2a9d8f', '#f4a261', '#457b9d', '#8ac926'].forEach(function (cor, k) { b['lancha' + k] = fazer(900, 700, function (c, W, H) { lancha(c, W, H, cor); }, 180); });
     ['#e63946', '#2a9d8f', '#f4a261', '#457b9d', '#8ac926'].forEach(function (cor, k) { b['aviaoTrafego' + k] = fazer(1300, 650, function (c, W, H) { aviaoTrafego(c, W, H, cor); }, 200); });
     b.fundos = {}; Object.keys(FUNDOS).forEach(function (k) { var cv = document.createElement('canvas'); cv.width = 1024; cv.height = 256; FUNDOS[k](cv.getContext('2d'), 1024, 256); b.fundos[k] = cv; });
     var n = document.createElement('canvas'); n.width = 1024; n.height = 200; nuvens(n.getContext('2d'), 1024, 200); b.nuvens = n;

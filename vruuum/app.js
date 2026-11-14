@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.16.0';
+  var APP_VERSION = '1.17.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -423,9 +423,9 @@
     requestAnimationFrame(quadro);
   }
 
-  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1 };
+  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1, agua: 1 };
   // o aparelho treme junto (celular e tablet que deixam; iPhone não deixa): milissegundos de vibração e de pausa
-  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120] };
+  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120], agua: [40, 30, 40] };
   function tremer(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) { /* sem vibrar */ } }
   function tratar(ev) {
     if (ev.tipo === 'vai') mov.fimCalibrar();   // no 3-2-1 só descobre o sinal do sensor; o meio é o reto de verdade
