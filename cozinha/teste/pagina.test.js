@@ -223,18 +223,25 @@ function vozDeMentira() {
     speak(u) { window.__falas.push({ text: u.text, lang: u.lang, rate: u.rate, pitch: u.pitch, voz: u.voice && u.voice.name }); setTimeout(() => { u.dispatchEvent(new Event('end')); if (u.onend) u.onend(); }, 20); } });
   Object.defineProperty(window, 'speechSynthesis', { value: ss, configurable: true });
   window.SpeechSynthesisUtterance = Fala;
+  // a voz gravada da Dona Cida (voz/cida-*.mp3, v0.6.1): anota o arquivo em vez de tocar
+  window.__audios = [];
+  const play0 = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function () {
+    if (!/\/voz\//.test(this.src)) return play0.call(this);
+    window.__audios.push(this.src.split('/').pop()); setTimeout(() => this.dispatchEvent(new Event('ended')), 30); return Promise.resolve();
+  };
 }
 const falas = pg => pg.evaluate(() => window.__falas);
+const audios = pg => pg.evaluate(() => window.__audios);
 const daVovo = f => f.rate === 0.9 && f.pitch === 1.2;
 
-test('Dona Cida fala: ao chegar, ao emprestar, no tchau e quando acabam os favores (voz de vovó, PT)', { timeout: 60000 }, async () => {
+test('Dona Cida fala com a VOZ GRAVADA de mulher: ao chegar, ao emprestar, no tchau e quando acabam os favores (PT)', { timeout: 60000 }, async () => {
   const { ctx, pg, erros } = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true }, vozDeMentira);
   await comecar(pg, 'medio', 'brigadeiro');
   await noLugar(pg, 'vizinha');
-  let f = (await falas(pg)).filter(daVovo);
-  assert.equal(f.length, 1, 'falou ao chegar');
-  assert.match(f[0].text, /que bom te ver/);
-  assert.equal(f[0].lang, 'pt-BR'); assert.equal(f[0].voz, 'Google português do Brasil', 'escolhe uma voz feminina em português');
+  await pg.waitForTimeout(100);
+  assert.deepEqual(await audios(pg), ['cida-oi.mp3'], 'falou ao chegar, com a gravação');
+  assert.equal((await falas(pg)).length, 0, 'em português não usa a voz do aparelho (que no Samsung era de homem)');
   assert.match(await pg.textContent('.casinha .balao'), /que bom te ver/, 'o balão mostra a fala');
   // os 3 favores do Médio, cada um com o obrigado
   for (const ing of ['manteiga', 'acucar', 'ovo']) {
@@ -243,11 +250,11 @@ test('Dona Cida fala: ao chegar, ao emprestar, no tchau e quando acabam os favor
   }
   await pg.click('.pedido[data-ing="mel"]');
   await pg.waitForTimeout(100);
-  f = (await falas(pg)).filter(daVovo).map(x => x.text);
-  assert.ok(f.some(x => /Aqui está 1 colher de manteiga/.test(x)), 'falou ao emprestar');
-  assert.ok(f.some(x => /De nada.*Tchau/.test(x)), 'agradece e se despede');
-  assert.ok(f.some(x => /acabaram os favores/.test(x)), 'avisa que acabaram os favores');
-  assert.match(f[f.length - 1], /já emprestei bastante/, 'sem favores: fala quando a criança pede de novo');
+  const a = await audios(pg);
+  for (const x of ['cida-aqui-manteiga.mp3', 'cida-aqui-acucar.mp3', 'cida-aqui-ovo.mp3', 'cida-tchau.mp3']) assert.ok(a.includes(x), 'falou ' + x);
+  assert.ok(a.includes('cida-tchau-fim.mp3'), 'avisa que acabaram os favores');
+  assert.equal(a[a.length - 1], 'cida-bastante.mp3', 'sem favores: fala quando a criança pede de novo');
+  assert.equal((await falas(pg)).length, 0);
   assert.equal(await tem(pg, 'mel'), 0);
   assert.match(await pg.textContent('.casinha .balao'), /já emprestei bastante/);
   assert.deepEqual(erros, [], 'erros no console');
@@ -273,6 +280,7 @@ test('Dona Cida em inglês fala em inglês; com a voz desligada ela não fala (s
   await pg.click('.pedido[data-ing="ovo"]'); await pg.click('#btObrigado');
   await pg.waitForTimeout(100);
   assert.equal((await falas(pg)).length, antes, 'com a voz desligada, ninguém fala');
+  assert.deepEqual(await audios(pg), [], 'nem a gravação');
   assert.match(await pg.textContent('.casinha .balao'), /welcome/, 'mas o balão mostra o que ela disse');
   assert.deepEqual(erros, [], 'erros no console');
   await ctx.close();

@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.0';
+  var APP_VERSION = '0.6.1';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -134,18 +134,51 @@
     var lista = vozesDaLingua(), nome = vozGuardada();
     return lista.filter(function (v) { return v.name === nome; })[0] || lista[0] || null;
   }
+  // v0.6.1: em português a Dona Cida fala com a VOZ GRAVADA (voz/cida-*.mp3, voz feminina "Dora" do Kokoro, licença
+  // Apache 2.0; CREDITOS.md): é sempre de mulher, em qualquer aparelho, e funciona sem internet. É o padrão; o 👵🔁 passa
+  // para as vozes do aparelho e volta para a gravada. Em inglês (ainda escondido) continua a voz do aparelho.
+  var GRAVADA = 'gravada';
+  function usaGravada() { return !en() && (vozGuardada() || GRAVADA) === GRAVADA; }
+  var somVovo = null, filaVovo = [];
+  // toca a frase gravada (chave = voz/cida-<chave>.mp3). fila: espera a anterior acabar. aoFim: quando terminar.
+  // Se o arquivo não tocar (aparelho sem suporte), devolve false e quem chamou usa a voz do aparelho.
+  function tocarVovo(chave, fila, aoFim, seFalhar) {
+    if (!window.Audio) return false;
+    if (fila && somVovo && !somVovo.ended && !somVovo.paused) { filaVovo.push([chave, aoFim, seFalhar]); return true; }
+    pararVovo();
+    var a = new Audio('voz/cida-' + chave + '.mp3'); somVovo = a;
+    if (window.Trilha) Trilha.volume(0.3);
+    var fim = function () {
+      if (somVovo !== a) return;
+      somVovo = null; if (aoFim) aoFim();
+      var prox = filaVovo.shift();
+      if (prox) tocarVovo(prox[0], false, prox[1], prox[2]); else if (window.Trilha) Trilha.volume(null);
+    };
+    // não tocou (arquivo que não abriu, aparelho que não deixa): fala com a voz do aparelho
+    var falhou = function () { if (somVovo !== a) return; if (seFalhar) { var f = seFalhar; seFalhar = null; f(); } fim(); };
+    a.addEventListener('ended', fim); a.addEventListener('error', falhou);
+    try { var pr = a.play(); if (pr && pr.catch) pr.catch(falhou); } catch (e) { falhou(); }
+    return true;
+  }
+  function pararVovo() {
+    filaVovo = [];
+    if (somVovo) { var a = somVovo; somVovo = null; try { a.pause(); } catch (e) { /* ok */ } if (window.Trilha) Trilha.volume(null); }
+  }
   function jeitoVovo(v) { return v && generoVoz(v) === 'f' ? { rate: 0.9, pitch: 1.2 } : { rate: 0.88, pitch: 1.45 }; }
   // 👵🔁 trocar a voz da vovó: passa para a próxima voz do aparelho, guarda e fala uma frase de exemplo
   function trocarVozVovo() {
-    var lista = vozesDaLingua(), atualV = vozDaVovo();
-    if (lista.length < 2) aviso(t('👵 Este aparelho só tem esta voz. Ela fala mais fininha para parecer uma vovó.', '👵 This device only has this voice. It speaks a bit higher to sound like a grandma.'), 3200, true);
-    var nova = lista.length ? lista[(lista.indexOf(atualV) + 1) % lista.length] : null;
-    if (nova) {
-      var g = ler(CH_VOZ, {}) || {}; g[en() ? 'en' : 'pt'] = nova.name; gravar(CH_VOZ, g);
-      if (lista.length > 1) aviso(t('👵 Voz da vovó: ', "👵 Grandma's voice: ") + nova.name + ' (' + (lista.indexOf(nova) + 1) + '/' + lista.length + ')', 2600, true);
-    }
-    var j = jeitoVovo(nova), v = pref.voz; pref.voz = true;
-    falar(t('Oi, meu bem! Assim está boa a minha voz de vovó?', 'Hello, sweetie! Does my grandma voice sound nice like this?'), { rate: j.rate, pitch: j.pitch, voz: nova });
+    var lista = vozesDaLingua(), g = ler(CH_VOZ, {}) || {}, k = en() ? 'en' : 'pt';
+    // em português a primeira opção é a voz gravada; depois cada voz do aparelho
+    var opcoes = (en() ? [] : [GRAVADA]).concat(lista.map(function (v) { return v.name; }));
+    if (!opcoes.length) return;
+    var agora = usaGravada() ? GRAVADA : (vozDaVovo() || {}).name, i = opcoes.indexOf(agora);
+    var nova = opcoes[(i + 1) % opcoes.length];
+    g[k] = nova; gravar(CH_VOZ, g);
+    if (opcoes.length < 2) aviso(t('👵 Este aparelho só tem esta voz. Ela fala mais fininha para parecer uma vovó.', '👵 This device only has this voice. It speaks a bit higher to sound like a grandma.'), 3200, true);
+    else aviso(t('👵 Voz da vovó: ', "👵 Grandma's voice: ") + (nova === GRAVADA ? t('gravada da Dona Cida', "Mrs. Cida's recorded voice") : nova) + ' (' + (opcoes.indexOf(nova) + 1) + '/' + opcoes.length + ')', 2600, true);
+    if (nova === GRAVADA) { tocarVovo('exemplo'); return; }
+    var vz = lista.filter(function (v) { return v.name === nova; })[0], j = jeitoVovo(vz), v = pref.voz; pref.voz = true;
+    falar(t('Oi, meu bem! Assim está boa a minha voz de vovó?', 'Hello, sweetie! Does my grandma voice sound nice like this?'), { rate: j.rate, pitch: j.pitch, voz: vz });
     pref.voz = v;
   }
 
@@ -809,9 +842,18 @@
     var balao = qs(area, '.balao'), mao = qs(area, '.na-mao'), bt = qs(area, '#btObrigado'), cida = qs(area, '.cida'), falando = null;
     // a Dona Cida fala em voz alta (se a voz 🗣️ estiver ligada), com voz de vovó: mais devagar e mais fininha;
     // o balão mostra sempre o que ela disse. fila = espera o aviso anterior acabar de ser lido.
-    function fala(pt, ing, fila) {
+    function fala(pt, ing, fila, chave) {
       var txt = t(pt, ing);
       balao.textContent = txt; balao.classList.remove('novo'); void balao.offsetWidth; balao.classList.add('novo');
+      if (chave && pref.voz && usaGravada()) {
+        if (!fila && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ }
+        var marca = {}; falando = marca; cida.classList.add('falando');
+        if (tocarVovo(chave, fila, function () { if (falando === marca) { falando = null; cida.classList.remove('falando'); } }, function () { falarAparelho(); })) return;
+      }
+      falarAparelho(fila);
+    }
+    function falarAparelho(fila) {
+      var txt = balao.textContent;
       var vv = vozDaVovo(), jv = jeitoVovo(vv);
       var u = falar(txt, { rate: jv.rate, pitch: jv.pitch, voz: vv, fila: fila });
       if (!u) return;
@@ -821,29 +863,29 @@
       agendar(acabou, 1500 + txt.length * 110);   // alguns aparelhos não avisam quando a fala acaba
     }
     function favores() { qs(area, '.favores-txt').textContent = t('💛 Favores hoje: ' + jogo.favores, '💛 Favours today: ' + jogo.favores); }
-    if (jogo.favores > 0) fala('Oi, meu bem, que bom te ver! Precisa de alguma coisa emprestada? 😊', 'Hello, sweetie, how nice to see you! Do you need to borrow something? 😊');
-    else fala('Oi, meu bem! Hoje eu já emprestei tudo o que podia. Tente o mercadinho! 😊', 'Hello, sweetie! I have already lent all I could today. Try the shop! 😊');
+    if (jogo.favores > 0) fala('Oi, meu bem, que bom te ver! Precisa de alguma coisa emprestada? 😊', 'Hello, sweetie, how nice to see you! Do you need to borrow something? 😊', false, 'oi');
+    else fala('Oi, meu bem! Hoje eu já emprestei tudo o que podia. Tente o mercadinho! 😊', 'Hello, sweetie! I have already lent all I could today. Try the shop! 😊', false, 'oi-sem');
     favores();
     qs(area, '.bt-voz-vovo').addEventListener('click', trocarVozVovo);
     // saiu da casa no meio da fala: a vovó para de falar
-    fimLugar.push(function () { if (falando && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ } });
+    fimLugar.push(function () { pararVovo(); if (falando && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ } });
     qs(area, '.pedidos').addEventListener('click', function (e) {
       var b = e.target.closest('.pedido'); if (!b) return;
       var id = b.getAttribute('data-ing'), r = L.pedirFavor(jogo, id);
       if (r.ok) {
-        fala('Claro, meu bem! Aqui está 1 ' + L.nomeIng(id, false) + '. 😊', 'Of course, sweetie! Here is 1 ' + L.nomeIng(id, true) + '. 😊');
+        fala('Claro, meu bem! Aqui está 1 ' + L.nomeIng(id, false) + '. 😊', 'Of course, sweetie! Here is 1 ' + L.nomeIng(id, true) + '. 😊', false, 'aqui-' + id);
         mao.innerHTML = icone(id); bt.hidden = false; bt.focus(); Som.toca('toque');
         qsa(area, '.pedido').forEach(function (x) { x.disabled = true; });
-        agendar(function () { if (jogo.pendente) fala('Como é que se diz? 😉', 'What do we say? 😉'); }, 4500 * V);
+        agendar(function () { if (jogo.pendente) fala('Como é que se diz? 😉', 'What do we say? 😉', false, 'diz'); }, 4500 * V);
       } else if (r.motivo === 'sem-favor') {
-        fala('Hoje eu já emprestei bastante! Tente o mercadinho ou outro lugar. 😊', 'I have lent a lot today! Try the shop or another place. 😊'); Som.toca('erro');
+        fala('Hoje eu já emprestei bastante! Tente o mercadinho ou outro lugar. 😊', 'I have lent a lot today! Try the shop or another place. 😊', false, 'bastante'); Som.toca('erro');
       }
     });
     bt.addEventListener('click', function () {
       var r = L.agradecer(jogo); if (!r.ok) return;
       bt.hidden = true; recebeu(r.id, mao); mao.innerHTML = '';
-      if (jogo.favores > 0) fala('De nada, meu bem! Volte sempre. Tchau, tchau! 💛', 'You are welcome, sweetie! Come back any time. Bye-bye! 💛', true);
-      else fala('De nada, meu bem! Agora acabaram os favores de hoje. Tchau, tchau! 💛', 'You are welcome, sweetie! That was my last favour for today. Bye-bye! 💛', true);
+      if (jogo.favores > 0) fala('De nada, meu bem! Volte sempre. Tchau, tchau! 💛', 'You are welcome, sweetie! Come back any time. Bye-bye! 💛', true, 'tchau');
+      else fala('De nada, meu bem! Agora acabaram os favores de hoje. Tchau, tchau! 💛', 'You are welcome, sweetie! That was my last favour for today. Bye-bye! 💛', true, 'tchau-fim');
       favores();
       qsa(area, '.pedido').forEach(function (x) { x.disabled = false; });
       desenharCarteira();

@@ -7,7 +7,7 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.6.0** (14/Nov/2026) — **comida de verdade**: cada receita e cada ingrediente aparece com uma **foto
+Versão atual: **0.6.1** (14/Nov/2026) — a **Dona Cida fala com voz de mulher gravada** (`voz/cida-*.mp3`, voz livre "Dora" do Kokoro, Apache 2.0), igual em todo aparelho e sem internet; o 👵🔁 alterna entre a gravada e as vozes do aparelho. Na 0.6.0 — **comida de verdade**: cada receita e cada ingrediente aparece com uma **foto
 de verdade** (fotos livres da Wikimedia Commons, em `fotos/`, guardadas para sem internet; créditos em `CREDITOS.md`):
 o pão de queijo é um pão de queijo e o queijo é um queijo. O menininho do final come a foto do prato, e a foto guardada
 também. Receitas novas: **gelatina com frutas** (a filha do dono adora) e **churrasquinho no espeto** (na grelha do
@@ -68,7 +68,7 @@ onde vem cada coisa), pescaria com hora certa e músicas só com instrumentos de
      alta** (voz do próprio aparelho, funciona sem internet) quando a criança chega, quando empresta, quando pede o
      obrigado, quando se despede e quando acabam os favores, e o balão mostra o que ela disse. Voz de vovó
      (v0.5.0; no Samsung do dono ela falava com voz de homem): escolhe primeiro uma voz **feminina** do português do
-     Brasil (nomes conhecidos como Luciana, Francisca, Maria, Vitória, Fernanda, Thalita, Leila, Raquel, Camila,
+     Brasil — **desde a v0.6.1 isso só vale quando a família escolhe uma voz do aparelho no 👵🔁; o padrão em português é a voz gravada** (nomes conhecidos como Luciana, Francisca, Maria, Vitória, Fernanda, Thalita, Leila, Raquel, Camila,
      "feminina", "female", Google português do Brasil; no Android os códigos `pt-br-x-afs` e `pt-br-x-pte`), depois
      uma desconhecida e por último as **masculinas** (Daniel, Antônio, Ricardo, Felipe, "masculina", "male",
      `pt-br-x-ptd`, `pt-br-x-ptz`). Voz feminina: um pouco mais devagar (0,9) e mais fininha (1,2); voz masculina ou
