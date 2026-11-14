@@ -2,6 +2,19 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.15.0",
+      "data": "14/Nov/2026",
+      "hora": "01:35:00",
+      "pt": [
+        "🧊 Mais veículos em 3D de verdade: Clássico, GT, Superesportivo, Kart, Monstrão, Moto e Conversível. Na curva aparece a lateral e no morro dá para ver o teto; pelo vidro dá para ver o piloto.",
+        "🛷 O Trenó do Papai Noel também em 3D: as renas galopando no ar (a do nariz vermelho na frente), o Papai Noel do lado e o saco de presentes."
+      ],
+      "en": [
+        "🧊 More rides in real 3D: Classic, GT, Supercar, Kart, Monster Truck, Motorbike and Convertible. In curves you see the side and on hills you see the roof; the driver shows through the glass.",
+        "🛷 Santa's Sleigh in 3D too: the reindeer galloping in the air (the red-nosed one in front), Santa beside you and the bag of presents."
+      ]
+    },
+    {
       "versao": "1.14.0",
       "data": "14/Nov/2026",
       "hora": "01:20:00",

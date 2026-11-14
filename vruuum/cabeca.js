@@ -231,8 +231,8 @@
     if (!v || !v.cab || !v.janela || v.semPiloto || W < 6 || !raiz.document) return;   // o Ovo é ele mesmo o piloto
     var e = estado(t, semente || 0, periodo || 7), cx = onde ? onde.x : x0 + v.cab[0] * W, cy = onde ? onde.y : y0 + v.cab[1] * H, r = onde ? onde.r : v.cab[2] * H / 2;
     var capCor = null, rabo = info.personagem && info.personagem.rabo;
-    if (v.capacete) { var je = v.janela.elipse; cx = x0 + je[0] * W; cy = y0 + je[1] * H; r = je[2] * W; capCor = info.cor || '#ff7b00'; }
-    if (v.capacete && !e.giro) { if (rabo) rabo(c, cx, cy, r, 0, t + (semente || 0)); return; }   // de costas, o capacete do desenho já é a nuca
+    if (v.capacete) { capCor = info.cor || '#ff7b00'; if (!onde) { var je = v.janela.elipse; cx = x0 + je[0] * W; cy = y0 + je[1] * H; r = je[2] * W; } }
+    if (v.capacete && !e.giro && !onde) { if (rabo) rabo(c, cx, cy, r, 0, t + (semente || 0)); return; }   // de costas, o capacete do desenho já é a nuca
     var pc = pele(info, 'costas', capCor), pf = pele(info, 'frente', capCor) || pc;
     if (!pc) return;
     var inclina = e.sorriso > 0 ? Math.sin(e.sorriso * Math.PI) * 0.12 * (e.giro > 0 ? 1 : -1) : 0;   // inclina a cabeça ao sorrir
