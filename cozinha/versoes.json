@@ -2,9 +2,22 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.6.1",
+      "data": "14/Nov/2026",
+      "hora": "09:40:00",
+      "pt": [
+        "👵 A Dona Cida agora fala com voz de mulher gravada, igual em todo celular e sem internet (no Samsung ela falava com voz de homem).",
+        "🔁 O botão 👵🔁 alterna entre a voz gravada da vovó e as vozes do aparelho, e volta para a gravada."
+      ],
+      "en": [
+        "👵 Mrs. Cida now speaks with a recorded woman's voice, the same on every phone and offline (on Samsung she sounded like a man).",
+        "🔁 The 👵🔁 button switches between grandma's recorded voice and the device voices, and back to the recorded one."
+      ]
+    },
+    {
       "versao": "0.6.0",
       "data": "14/Nov/2026",
-      "hora": "HORA",
+      "hora": "04:30:00",
       "pt": [
         "📸 Comida de verdade: cada receita e cada ingrediente agora aparece com uma foto de verdade (fotos livres da Wikimedia Commons). O pão de queijo é um pão de queijo, e o queijo é um queijo!",
         "🍮 Receitas novas: gelatina com frutas e churrasquinho no espeto (o fogo é sempre com um adulto).",
