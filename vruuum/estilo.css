@@ -103,8 +103,24 @@ a { color: var(--ciano); }
 /* 🏠 e 🚪 (../navegacao.js) no canto de cima: o placar desenhado na pista começa embaixo deles */
 .bn-nav #sondaBorda { padding-top: max(env(safe-area-inset-top), calc(var(--nav-alto) - 6px)); }
 
-.opcoes.mundos { flex-wrap: wrap; justify-content: center; }
-.opcoes.mundos .opcao { font-size: .9rem; padding: 6px 10px; }
+/* 1.24.0: três botões numa linha só (nível e visual), espremendo a letra no celular estreito */
+.opcoes.linha3 { flex-wrap: nowrap; width: min(560px, calc(100vw - 32px)); }
+.opcoes.linha3 .opcao { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: clamp(.82rem, 3.7vw, 1.15rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* cenários: fileira de fotinhos para arrastar (no celular cabem 2 e um pedacinho do próximo); em tela larga, grade */
+.grupo-mundos { width: 100%; }
+.mundos-trilho { display: flex; gap: 10px; width: calc(100% + 32px); margin: 0 -16px; padding: 4px 16px 10px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.mundos-trilho::-webkit-scrollbar { display: none; }
+.cartao-mundo { position: relative; flex: 0 0 calc((100% - 32px - 20px) / 2.25); scroll-snap-align: start; display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 4px 4px 6px; border-radius: 16px; background: var(--card); border: 3px solid transparent; }
+.cartao-mundo canvas { width: 100%; aspect-ratio: 16 / 10; height: auto; border-radius: 11px; display: block; background: #1a1446; }
+.cartao-mundo span { font-size: .88rem; font-weight: 600; line-height: 1.15; min-height: 2.3em; display: flex; align-items: center; justify-content: center; text-align: center; }
+.cartao-mundo[aria-pressed="true"] { border-color: var(--ouro); background: rgba(255,209,102,.18); box-shadow: 0 0 16px rgba(255,209,102,.35); }
+.cartao-mundo .ordem { position: absolute; top: 8px; right: 8px; min-width: 26px; height: 26px; border-radius: 13px; background: var(--ouro); color: #1a1446; font-size: .95rem; line-height: 26px; }
+.cartao-mundo .ordem:empty { display: none; }
+.mundos-trilho.treme .cartao-mundo { animation: tremeCenario 1s ease-in-out 1; }
+@keyframes tremeCenario { 0%, 100% { transform: none; } 25% { transform: translateX(-34px); } 50% { transform: none; } 72% { transform: translateX(-14px); } }
+@media (min-width: 640px) { .cartao-mundo { flex-basis: calc((100% - 32px - 40px) / 4.25); } }
+@media (min-width: 1000px) { .mundos-trilho { flex-wrap: wrap; justify-content: center; overflow: visible; width: min(1100px, 100%); margin: 0 auto; padding: 4px 0 10px; } .cartao-mundo { flex: 0 0 160px; } }
+@media (prefers-reduced-motion: reduce) { .mundos-trilho.treme .cartao-mundo { animation: none; } }
 .podio { width: min(620px, 94vw); height: auto; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
 .resultado { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 .cartao { background: var(--card); border: 2px solid var(--borda); border-radius: 20px; padding: 14px 22px; min-width: 200px; display: grid; gap: 4px; }

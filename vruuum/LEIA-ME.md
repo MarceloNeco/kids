@@ -315,3 +315,12 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `rastro()` no `modelos3d.js` (bolinhas ficando para trás) e `luzinha()` nos que voam: rastros nas asas do avião e do
   jato, luzes de navegação piscando, clarão do motor do jato, luz do helicóptero, purpurina do trenó e nariz da rena,
   pintas da arara e olhos do morcego.
+
+## 1.24.0 — menu: cenários com fotinho e botões numa linha (dono, 14/Nov/2026, print do menu)
+
+- Nível, visual e como dirigir: `.opcoes.linha3` (os botões numa linha só, a letra encolhe no celular estreito).
+- Cenários: `#mundosEsc.mundos-trilho`, cartões `.cartao-mundo` com uma fotinho tirada do próprio jogo
+  (`fotosDosMundos()` no `app.js`: desenha um instante da corrida em cada mundo quando o menu é montado e devolve a
+  demonstração do fundo), o nome embaixo e o número da ordem quando há mais de um escolhido. No celular cabem 2¼ e
+  arrasta de lado (com uma tremidinha ao abrir o menu, `tremerCenarios()`); de 640 px, 4¼; de 1000 px, grade com
+  todos. Ordem sorteada a cada vez que o jogo abre (🎲 Surpresa sempre primeiro).

@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.23.0';
+  var APP_VERSION = '1.24.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -58,6 +58,7 @@
     var comDemo = id === 'entrada' || id === 'menu';
     document.body.classList.toggle('com-demo', comDemo); document.body.classList.toggle('demo-menu', id === 'menu');
     if (comDemo && !demo) try { iniciarDemo(); } catch (e) { demo = null; }
+    if (id === 'menu') setTimeout(tremerCenarios, 900);
   }
   var estadoTela = 'entrada';
 
@@ -120,6 +121,32 @@
   var montado = false, editando = 0, animPrevia = 0;
   // rotulo: texto, ou a lista [pt, en, es] (aí o traduzir() troca junto com o idioma)
   function botao(classe, rotulo, fn) { var b = document.createElement('button'); b.type = 'button'; b.className = classe; if (Array.isArray(rotulo)) { b.setAttribute('data-aria', rotulo.join('|')); rotulo = tn(rotulo); } b.setAttribute('aria-label', rotulo); b.addEventListener('click', fn); return b; }
+  /* fotinho de cada cenário (1.24.0): o próprio jogo desenha um instante da corrida naquele mundo, uma vez, quando o
+     menu é montado; depois a corrida de demonstração do fundo volta a ser a dela */
+  function fotosDosMundos() {
+    if (!M.novaCorrida || !D.desenhar) return;
+    var jf = [{ cor: '#ff4fa3', piloto: '🐱', veic: 'classico', foto: null, personagem: null, corpo: 'menina' }];
+    Array.prototype.forEach.call(document.querySelectorAll('.cartao-mundo'), function (b) {
+      var m = b.getAttribute('data-mundo'), cv = b.querySelector('canvas'), c = cv.getContext('2d');
+      if (!m) {   // 🎲 Surpresa: as cores de todos os mundos e um dado grande
+        var g = c.createLinearGradient(0, 0, cv.width, cv.height); ['#ff4fa3', '#ffd166', '#2bf4ff', '#7b2cbf'].forEach(function (k, i) { g.addColorStop(i / 3, k); });
+        c.fillStyle = g; c.fillRect(0, 0, cv.width, cv.height); c.font = '110px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🎲', cv.width / 2, cv.height / 2 + 6);
+        return;
+      }
+      try {
+        var e = M.novaCorrida('crianca', 7, 1, [], [m]), j = e.jogadores[0];
+        j.mod = { vel: 1, curva: 1 }; e.fase = 'corrida'; e.t = 5; j.z = 70 * window.VruuumPista.SEG; j.vel = e.pista.cfg.velMax * 0.8;
+        D.preparar(e, jf, lingua, 'colorido');
+        D.desenhar(c, cv.width, cv.height, e, { toque: false, jogadores: jf, margem: {}, semPlacar: true });
+      } catch (err) { /* sem foto: fica só o nome */ }
+    });
+    if (demo) D.preparar(demo.e, demo.jogs, lingua, pref.visual);
+  }
+  // a fileira de cenários dá uma tremidinha para mostrar que tem mais para o lado (quando cabe tudo, não treme)
+  function tremerCenarios() {
+    var t = $('mundosEsc'); if (!t || t.scrollWidth <= t.clientWidth + 4) return;
+    t.classList.remove('treme'); void t.offsetWidth; t.classList.add('treme');
+  }
   function montarMenu() {
     if (!montado) {
       montado = true;
@@ -158,17 +185,24 @@
         var cv = document.createElement('canvas'); cv.width = cv.height = 80; p.frente(cv.getContext('2d'), 40, 46, 26); b.appendChild(cv);
         $('bichos').appendChild(b);
       });
-      // cenários: toque para escolher (até 4, na ordem do toque); 🎲 Surpresa = o jogo sorteia
-      [''].concat(window.VruuumPista.MUNDOS).forEach(function (m) {
-        var tm = m && D.TEMAS[m], b = botao('opcao', m ? tm.nome : ['Surpresa', 'Surprise', 'Sorpresa'], function () {
+      // cenários (1.24.0, dono): fileira de fotinhos com o nome embaixo, para arrastar com o dedo; a ordem é sorteada
+      // cada vez que o jogo abre (🎲 Surpresa sempre no começo). Toque para escolher (até 4, na ordem do toque).
+      var ordemM = window.VruuumPista.MUNDOS.slice();
+      for (var q = ordemM.length - 1; q > 0; q--) { var r = Math.floor(Math.random() * (q + 1)), tq = ordemM[q]; ordemM[q] = ordemM[r]; ordemM[r] = tq; }
+      [''].concat(ordemM).forEach(function (m) {
+        var tm = m && D.TEMAS[m], b = botao('cartao-mundo', m ? tm.nome : ['Surpresa', 'Surprise', 'Sorpresa'], function () {
           if (!m) pref.mundos = [];
           else if (pref.mundos.indexOf(m) >= 0) pref.mundos.splice(pref.mundos.indexOf(m), 1);
           else { pref.mundos.push(m); if (pref.mundos.length > 4) pref.mundos.shift(); }
           salvar(); Som.tocar('clique'); marcar();
         });
-        b.setAttribute('data-mundo', m); b.setAttribute('data-t', m ? tm.nome.map(function (n) { return tm.emoji + ' ' + n; }).join('|') : '🎲 Surpresa|🎲 Surprise|🎲 Sorpresa');
+        b.setAttribute('data-mundo', m);
+        var cv = document.createElement('canvas'); cv.width = 320; cv.height = 200; b.appendChild(cv);
+        var ord = document.createElement('b'); ord.className = 'ordem'; b.appendChild(ord);
+        var leg = document.createElement('span'); leg.setAttribute('data-t', m ? tm.nome.map(function (n) { return tm.emoji + ' ' + n; }).join('|') : '🎲 Surpresa|🎲 Surprise|🎲 Sorpresa'); b.appendChild(leg);
         $('mundosEsc').appendChild(b);
       });
+      fotosDosMundos();
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
         b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); });
       });
@@ -273,7 +307,11 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-controle]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-controle') === pref.controle)); });
     $('dicaMaos').hidden = pref.controle !== 'maos';
     Array.prototype.forEach.call(document.querySelectorAll('[data-visual]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-visual') === pref.visual)); });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-mundo]'), function (b) { var m = b.getAttribute('data-mundo'); b.setAttribute('aria-pressed', String(m === '' ? !pref.mundos.length : pref.mundos.indexOf(m) >= 0)); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-mundo]'), function (b) {
+      var m = b.getAttribute('data-mundo'), k = m ? pref.mundos.indexOf(m) : -1, o = b.querySelector('.ordem');
+      b.setAttribute('aria-pressed', String(m === '' ? !pref.mundos.length : k >= 0));
+      if (o) o.textContent = k >= 0 && pref.mundos.length > 1 ? String(k + 1) : '';   // a ordem dos escolhidos na corrida
+    });
     if (editando >= pref.jogadores) editando = 0;
     var c = pref.carros[editando], v = VE.achar(c.veic);
     $('abas').hidden = pref.jogadores < 2;
