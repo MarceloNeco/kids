@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.42', APP_UPDATED = '14/11/2026';
+  var APP_VERSION = '0.8.43', APP_UPDATED = '14/11/2026';
   // o idioma vem da estante (../idioma.js): pt, en ou es; o jogo não tem botão de idioma próprio
   function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
   function T(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }
@@ -541,11 +541,11 @@
       if (!cel.toque && (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.RTCPeerConnection)) { erro.textContent = T('Este navegador não deixa usar a câmera. Abra no Chrome ou no Safari.', 'This browser cannot use the camera. Open it in Chrome or Safari.', 'Este navegador no deja usar la cámara. Ábrelo en Chrome o en Safari.'); erro.style.display = 'block'; return; }
       try { localStorage.setItem('bagunca:nome', nome); if (!cel.local) localStorage.setItem('bagunca:codigo', cod); } catch (e) {}
       $('btEntrar').disabled = true; Som.iniciar(); Voz.liberar();
-      if (cel.toque) { TVApp.iniciar({ local: true, toque: true, nome: nome, gesto: true }); TVApp.comando(Object.assign({ acao: 'config' }, cel.cfg, { celulares: 1 })); mandarBonecos(); Nav.abrir(function () { sairDoJogoLocal('entrar'); }); $('btEntrar').disabled = false; return; }
+      if (cel.toque) { TVApp.iniciar({ local: true, toque: true, nome: nome, gesto: true }); TVApp.comando(Object.assign({ acao: 'config' }, cel.cfg, { celulares: 1 })); mandarBonecos(); Nav.abrir(function () { sairDoJogoLocal('entrar'); Nav.inicio(); }); /* Voltar no meio do jogo = 🏠: vai para a tela inicial (dono, 14/Nov/2026) */ $('btEntrar').disabled = false; return; }
       if (cel.local) { entrarLocal(nome, erro); return; }
       cel.sala = Sala.celular({ nome: nome, codigo: cod, video: $('cam'), T: T, aoStatus: status, aoTV: daTV, aoConectado: function () { Som.tocar('ok'); mandarConfig(); }, aoCamera: function (c) { $('cam').style.transform = 'scaleX(-1)'; }, aoCameras: cameras });
       cel.sala.pronto.then(function () {
-        tela('jogo'); Nav.abrir(sair); $('jogoNome').textContent = nome; $('jogoCodigo').textContent = cod; status(T('Procurando a TV…', 'Looking for the TV…', 'Buscando la TV…'));
+        tela('jogo'); Nav.abrir(function () { sair(); Nav.inicio(); }); /* Voltar = 🏠: tela inicial */ $('jogoNome').textContent = nome; $('jogoCodigo').textContent = cod; status(T('Procurando a TV…', 'Looking for the TV…', 'Buscando la TV…'));
         cel.visao = Sala.criarVisao($('cam')); cel.timer = setInterval(medir, 100);
         mandarConfig();
       }).catch(function (e) { $('btEntrar').disabled = false; erro.textContent = (e && e.name === 'NotAllowedError') ? T('Você precisa permitir a câmera.', 'You need to allow the camera.', 'Tienes que permitir la cámara.') : T('Não deu para conectar: ', 'Could not connect: ', 'No se pudo conectar: ') + (e && e.message || e); erro.style.display = 'block'; });
@@ -565,7 +565,7 @@
         var v = document.createElement('video'); v.autoplay = true; v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.srcObject = s; v.play().catch(function () {});
         cel.streamLocal = s; cel.videoLocal = v; cel.ladoLocal = 'user'; cel.visao = Sala.criarVisao(v);
         TVApp.iniciar({ local: true, visao: cel.visao, video: v, nome: nome, gesto: true, esqueleto: cel.esqueleto && Esqueleto.pronto() });
-        TVApp.comando(Object.assign({ acao: 'config' }, cel.cfg, { celulares: 1 })); mandarBonecos(); Nav.abrir(function () { sairDoJogoLocal('entrar'); });
+        TVApp.comando(Object.assign({ acao: 'config' }, cel.cfg, { celulares: 1 })); mandarBonecos(); Nav.abrir(function () { sairDoJogoLocal('entrar'); Nav.inicio(); }); /* Voltar no meio do jogo = 🏠: vai para a tela inicial (dono, 14/Nov/2026) */
         $('btEntrar').disabled = false;
       }).catch(function (e) { $('btEntrar').disabled = false; erro.textContent = (e && e.name === 'NotAllowedError') ? T('Você precisa permitir a câmera.', 'You need to allow the camera.', 'Tienes que permitir la cámara.') : T('Não deu: ', 'Failed: ', 'No funcionó: ') + (e && e.message || e); erro.style.display = 'block'; });
     }
