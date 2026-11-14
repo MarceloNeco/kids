@@ -7,7 +7,7 @@
   Este endereço (/kids/sw.js) é o mesmo da antiga página /kids do Portal: quem já tinha, atualiza sozinho.
   A cada mudança na estante, suba a VERSAO.
 */
-var VERSAO = 40;
+var VERSAO = 42;
 var PASTA = (self.registration.scope.replace(/\/$/, '').split('/').pop() || 'raiz');
 var PREFIXO = 'dgo-' + PASTA + '-';
 var CACHE = PREFIXO + 'v' + VERSAO;
@@ -35,13 +35,16 @@ self.addEventListener('fetch', function (e) {
   var escopo = new URL(self.registration.scope);
   // Só o que é do próprio Bolinho (/kids/...). As páginas de cada jogo seguem com o service worker do jogo.
   if (req.method !== 'GET' || url.origin !== escopo.origin || url.pathname.indexOf(escopo.pathname) !== 0) return;
+  // A cópia guardada vem SÓ da gaveta da estante (CACHE). caches.match sem gaveta procurava em todas, inclusive nas dos
+  // jogos instalados, e trazia uma peça comum antiga (ex.: idioma.js velho) quando a internet demorava: a estante saía
+  // com os três idiomas misturados (dono, 14/Nov/2026).
   // Música não passa por aqui: arquivo grande, tocado em pedaços pelo navegador; vem sempre da internet.
   if (/\.mp3$/i.test(url.pathname)) return;
   e.respondWith(new Promise(function (resolve) {
     var respondeu = false;
     function daCopia() {
       if (respondeu) return;
-      caches.match(req, { ignoreSearch: true }).then(function (r) {
+      caches.open(CACHE).then(function (c) { return c.match(req, { ignoreSearch: true }); }).then(function (r) {
         if (respondeu) return;
         if (r) { respondeu = true; resolve(r); }
       });
@@ -53,7 +56,7 @@ self.addEventListener('fetch', function (e) {
       if (!respondeu) { respondeu = true; resolve(r); }
     }).catch(function () {
       clearTimeout(prazo);
-      caches.match(req, { ignoreSearch: true }).then(function (r) {
+      caches.open(CACHE).then(function (c) { return c.match(req, { ignoreSearch: true }); }).then(function (r) {
         if (!respondeu) { respondeu = true; resolve(r || Response.error()); }
       });
     });

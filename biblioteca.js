@@ -61,7 +61,10 @@
   function montar() {
     var jogos = BolinhoBiblioteca.jogos, unicas = {};
     jogos.forEach(function (j) { j.musicas.forEach(function (m) { unicas[m.a] = 1; }); });
-    var h = '<div class="bib-c"><div class="bib-topo"><h2 id="bibTitulo">' + T('🎵 Biblioteca de músicas', '🎵 Music library', '🎵 Biblioteca de música') + '</h2>' +
+    // título com o mesmo radinho tocando do botão (Bolinho FM)
+    var radio = bt.querySelector('.radinho'), fm = T('Bolinho FM', 'Rainy Day FM', 'Buñuelos FM');
+    var h = '<div class="bib-c"><div class="bib-topo"><h2 id="bibTitulo">' + (radio ? radio.outerHTML : '') + '<span><span class="fm">' + fm + '</span><small>' +
+      T('Biblioteca de músicas', 'Music library', 'Biblioteca de música') + '</small></span></h2>' +
       '<button type="button" class="bib-x" aria-label="' + T('Fechar', 'Close', 'Cerrar') + '">✕</button></div>' +
       '<p class="bib-sub">' + T('Todas as músicas que tocam nos jogos e na rádio: ', 'Every song played in the games and on the radio: ', 'Todas las canciones que suenan en los juegos y en la radio: ') +
       Object.keys(unicas).length + T(' músicas. Toque ▶ para ouvir. Não quer uma música num jogo? Toque em "✓ No jogo" e ela fica fora.', ' songs. Tap ▶ to listen. Don\'t want a song in a game? Tap "✓ In game" to leave it out.', ' canciones. Toca ▶ para escucharla. ¿No quieres una canción en un juego? Toca "✓ En el juego" y se queda fuera.') + '</p>';
