@@ -287,12 +287,16 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
   .resp { min-height: 44px; font-size: 1.05rem; }
   .adv-voltar { position: static; }
 }
-/* respostas em duas colunas: Sim | Não, Acho que sim | Acho que não, Não sei | ↩️ (cabe em celular baixinho) */
-.adv-respostas { grid-template-columns: 1fr 1fr; }
-.resp.sim { order: 1; } .resp.nao { order: 2; } .resp.psim { order: 3; } .resp.pnao { order: 4; } .resp.nsei { order: 5; }
-.adv-respostas .adv-voltar { order: 6; position: static; justify-self: center; align-self: center; }
-.adv-respostas #btJaChega { order: 7; grid-column: 1 / -1; }
-.resp.sim, .resp.nao { min-height: 60px; font-size: 1.3rem; }
+/* respostas numa escala só, de um lado ao outro (dono, 14/Nov/2026):
+   Sim, com certeza · Acho que sim · Não sei · Acho que não · Não, com certeza — do verde ao vermelho; ↩️ embaixo */
+.adv-respostas { grid-template-columns: repeat(5, 1fr); gap: 5px; width: min(100%, 34rem); }
+.resp { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 2px; min-height: 84px;
+  font-size: clamp(.74rem, 3.1vw, .95rem); line-height: 1.12; border-radius: 16px; }
+.resp-emoji { font-size: clamp(1.5rem, 7vw, 2rem); line-height: 1; }
+.resp.sim, .resp.nao { border-width: 4px; }
+.resp.sim { background: #5fd38a; } .resp.psim { background: #b6ecc8; } .resp.nsei { background: #f3eefe; } .resp.pnao { background: #ffc4c4; } .resp.nao { background: #ff8080; }
+.adv-respostas .adv-voltar { grid-column: 1 / -1; position: static; justify-self: center; align-self: center; }
+.adv-respostas #btJaChega { grid-column: 1 / -1; }
 @media (max-height: 700px) and (orientation: portrait) {
   #adivinha { padding-top: calc(56px + var(--st)); gap: 6px; }
   .meleca-grande { width: min(32vw, 20vh, 150px); }

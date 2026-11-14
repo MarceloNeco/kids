@@ -45,7 +45,7 @@
     P('canta', 'I', 'faz', 'Canta?', 'Does it sing?', '¿Canta?', N),
     P('musica', 'I', 'faz', 'É famoso por causa de música?', 'Is it famous for music?', '¿Es famoso por la música?', N),
     P('esporte', 'I', 'faz', 'É famoso por esporte?', 'Is it famous for sports?', '¿Es famoso por el deporte?', N),
-    P('heroi', 'I', 'faz', 'É super-herói ou herói da história?', 'Is it a superhero or the hero of the story?', '¿Es un superhéroe o el héroe de la historia?', N),
+    P('heroi', 'I', 'faz', 'É o herói ou o personagem principal da história?', 'Is it the hero or the main character of the story?', '¿Es el héroe o el protagonista de la historia?', N),
     P('vilao', 'I', 'faz', 'É vilão (malvado)?', 'Is it a villain (bad guy)?', '¿Es un villano (un malo)?', N),
     P('magia', 'I', 'faz', 'Tem poderes mágicos ou superpoderes?', 'Does it have magic or superpowers?', '¿Tiene poderes mágicos o superpoderes?', N),
     P('voa', 'I', 'faz', 'Voa?', 'Does it fly?', '¿Vuela?', N),
