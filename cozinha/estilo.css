@@ -645,7 +645,7 @@ a { color: #1d6fb8; }
 .missao:empty { display: none; }
 .vila { position: relative; gap: 30px 18px; padding: 8px 12px 34px; overflow: hidden; border-radius: 28px;
   background: #a4dd7e radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .25) 0 5px, transparent 6px) 0 0 / 70px 70px; box-shadow: inset 0 0 0 6px #86cf5c; }
-.vila .lugar { background: none; border: 0; box-shadow: none; overflow: visible; min-height: clamp(6.4rem, calc((100dvh - 22rem) / 4), 9.5rem); padding: 0 2px 0; z-index: 1; justify-content: flex-end; }
+.vila .lugar { background: none; border: 0; box-shadow: none; overflow: visible; min-height: clamp(6rem, calc((100dvh - 21rem) / 5), 9rem); padding: 0 2px 0; z-index: 1; justify-content: flex-end; }
 .vila .lugar:active { transform: scale(.96); }
 .vila .lugar .cena { position: absolute; inset: 0 0 1.1rem; display: flex; align-items: flex-end; justify-content: center; }
 .vila .lugar .cena .bloco { width: 100%; height: 100%; overflow: visible; }
@@ -690,13 +690,13 @@ a { color: #1d6fb8; }
 .bloco .v-cida-janela { animation: espia 4s ease-in-out infinite; }
 @keyframes espia { 0%, 70%, 100% { transform: translateY(0); } 80%, 92% { transform: translateY(-2px); } }
 .cesta .item.ok::after { content: '✔'; color: var(--verde); font-weight: 700; margin-left: 2px; }
-@media (min-width: 46rem) { .vila .lugar { min-height: clamp(7rem, calc((100dvh - 17rem) / 2), 11rem); } }
+@media (min-width: 46rem) { .vila { grid-template-columns: repeat(5, minmax(0, 1fr)); } .vila .lugar { min-height: clamp(7rem, calc((100dvh - 17rem) / 2), 11rem); } }   /* 10 lugares (v0.10.0): 5 colunas */
 @media (orientation: landscape) and (max-height: 32rem) {
   .missao { font-size: .85rem; padding: 3px 10px; border-width: 2px; }
-  .vila { gap: 22px 14px; padding: 4px 10px 24px; }
+  .vila { gap: 22px 12px; padding: 4px 10px 24px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .vila .lugar { min-height: max(4.6rem, calc((100dvh - 14.2rem) / 2)); }
   .vila .lugar .cena { inset: 0 0 .95rem; }
-  .vila .lugar .nome { font-size: .78rem; padding: 0 6px; }
+  .vila .lugar .nome { font-size: .74rem; padding: 0 5px; line-height: 1.05; }
   .vila .lugar .seta { font-size: 1.3rem; }
   .vila .boneco { width: 28px; height: 39px; margin: -36px 0 0 -14px; }
 }
@@ -787,3 +787,11 @@ a { color: #1d6fb8; }
   clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .poleiro.casinha-galinha::after { content: ''; position: absolute; left: 47%; top: -1.9rem; width: 1.6rem; height: 1.4rem; background: #bfe9ff; border: 3px solid #fff; border-radius: 4px; }
 @media (orientation: landscape) and (max-height: 32rem) { .pasto.pasto-v2 { width: min(100%, calc((100dvh - 9.5rem) * 1.7)); justify-self: center; } }
+
+/* lojas (v0.10.0): o toldo de cada uma; a feira tem bandeirinhas */
+.loja-padaria .toldo { background: repeating-linear-gradient(90deg, #e84a3c 0 18px, #fff 18px 36px); }
+.loja-feira .toldo { background: repeating-linear-gradient(90deg, #2bb673 0 18px, #fff 18px 36px); }
+.loja-feira .toldo::after { content: '🚩🟨🟩🟦🟥🟨🟩🟦'; display: block; text-align: center; font-size: .8rem; letter-spacing: .6rem; margin-top: 2px; opacity: .9; }
+.bloco .v-bandeira { transform-box: fill-box; transform-origin: 50% 0; animation: bandeira 1.4s ease-in-out infinite alternate; }
+.bloco .v-bandeira:nth-child(2n) { animation-delay: -.7s; }
+@keyframes bandeira { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }

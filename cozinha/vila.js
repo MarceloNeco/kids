@@ -167,6 +167,53 @@
       '<path d="M' + (pc[0] - 13) + ' ' + (pc[1] - 16) + ' q13 -20 26 0" fill="none" stroke="#fff6e0" stroke-width="3.4" stroke-linecap="round"/>' + bola(pc[0] - 7, pc[1] - 18, 4, '#e8432f') + bola(pc[0] + 2, pc[1] - 19, 4, '#7bc950');
     return h;
   };
+  B.padaria = function () {
+    var h = base('#9fd38a');
+    h += poli([P(0.1, 0.72), P(0.9, 0.72), P(0.9, 0.95), P(0.1, 0.95)], '#e9e2d0');
+    h += caixa(0.2, 0.2, 0.8, 0.7, 38, '#e9a66b');
+    h += naE(0.7, 0.4, 0.56, 0, 22, '#7a4a2a', CONT) + naE(0.7, 0.58, 0.76, 8, 24, '#fff6e0', ' stroke="#fff" stroke-width="1.6"');
+    // pãezinhos na vitrine
+    [0.62, 0.67, 0.72].forEach(function (u) { var p = P(u, 0.7, 13); h += '<ellipse cx="' + p[0] + '" cy="' + p[1] + '" rx="3.4" ry="2.2" fill="#d98b3a" stroke="#a65e1e" stroke-width=".8"/>'; });
+    h += janelaE(0.7, 0.24, 0.36, 8, 22) + janelaD(0.8, 0.3, 0.6, 8, 24);
+    for (var i = 0; i < 8; i++) { var a = 0.2 + i * 0.075, b = a + 0.075; h += poli([P(a, 0.7, 30), P(b, 0.7, 30), P(b, 0.8, 22), P(a, 0.8, 22)], i % 2 ? '#fff' : '#e84a3c', CONT); }
+    var pl = P(0.22, 0.7, 36);
+    h += '<text x="0" y="0" transform="matrix(.894 .447 0 1 ' + pl[0] + ' ' + pl[1] + ')" font-family="Fredoka, system-ui, sans-serif" font-weight="700" font-size="9.5" fill="#7a3b12">PADARIA</text>';
+    // pão gigante no telhado (bisnaga com cortes)
+    var pc = P(0.5, 0.44, 38);
+    h += '<g class="v-pao"><ellipse cx="' + pc[0] + '" cy="' + (pc[1] - 8) + '" rx="26" ry="10" fill="#e0a050" stroke="#a65e1e" stroke-width="1.5"/><ellipse cx="' + (pc[0] - 6) + '" cy="' + (pc[1] - 12) + '" rx="12" ry="3" fill="#f6c27a" opacity=".8"/>' +
+      [-14, -4, 6, 16].map(function (dx) { return '<path d="M' + (pc[0] + dx - 3) + ' ' + (pc[1] - 13) + ' q4 3 6 8" stroke="#a65e1e" stroke-width="1.6" fill="none" stroke-linecap="round"/>'; }).join('') + '</g>';
+    // chaminé do forno com fumacinha cheirosa
+    var pf = P(0.72, 0.3, 50);
+    h += caixa(0.68, 0.26, 0.76, 0.34, 14, '#b85a3a', 38) + '<g class="v-fumaca" fill="#fff">' + [0, 1, 2].map(function (i) { return '<circle class="v-f' + i + '" cx="' + pf[0] + '" cy="' + (pf[1] - 2) + '" r="' + (3.5 + i) + '" opacity=".8"/>'; }).join('') + '</g>';
+    return h;
+  };
+  B.feira = function () {
+    var h = base('#e9d9b0');
+    // bandeirinhas de festa entre dois postes
+    var a1 = P(0.04, 0.96, 0), a2 = P(0.04, 0.96, 58), b1 = P(0.96, 0.04, 0), b2 = P(0.96, 0.04, 58);
+    h += '<path d="M' + a1.join(' ') + ' L' + a2.join(' ') + ' M' + b1.join(' ') + ' L' + b2.join(' ') + '" stroke="#8a5a2b" stroke-width="2.4"/>';
+    var cores = ['#e84a3c', '#ffc93c', '#2bb673', '#3aa0e8', '#ff5e9c', '#8e6bff'];
+    for (var k = 0; k < 9; k++) {
+      var f = k / 8, x = a2[0] + (b2[0] - a2[0]) * f, y = a2[1] + (b2[1] - a2[1]) * f + Math.sin(f * Math.PI) * 9;
+      h += '<path class="v-bandeira" d="M' + q(x - 3) + ' ' + q(y) + ' h6 l-3 6z" fill="' + cores[k % cores.length] + '"/>';
+    }
+    h += '<path d="M' + a2.join(' ') + ' Q' + q((a2[0] + b2[0]) / 2) + ' ' + q((a2[1] + b2[1]) / 2 + 10) + ' ' + b2.join(' ') + '" stroke="#888" stroke-width=".8" fill="none"/>';
+    // três barracas com toldo listrado e as frutas e legumes empilhados
+    function barraca(u, v, cor, frutas) {
+      var r = '';
+      [[u, v], [u + 0.26, v], [u, v + 0.18], [u + 0.26, v + 0.18]].forEach(function (o) { var p0 = P(o[0], o[1], 0), p1 = P(o[0], o[1], 26); r += '<line x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + p1[0] + '" y2="' + p1[1] + '" stroke="#8a8a8a" stroke-width="1.6"/>'; });
+      r += caixa(u, v + 0.02, u + 0.26, v + 0.18, 9, '#c98a4b');
+      frutas.forEach(function (fr, i) { var p = P(u + 0.06 + i * 0.07, v + 0.1, 11); r += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.2" fill="' + fr + '"/><circle cx="' + (p[0] + 2.6) + '" cy="' + (p[1] - 1.6) + '" r="2.8" fill="' + fr + '"/>'; });
+      for (var i = 0; i < 4; i++) { var a = u - 0.02 + i * 0.075, b = a + 0.075; r += poli([P(a, v - 0.02, 30), P(b, v - 0.02, 30), P(b, v + 0.2, 24), P(a, v + 0.2, 24)], i % 2 ? '#fff' : cor, CONT); }
+      return r;
+    }
+    h += barraca(0.16, 0.14, '#2b8fd6', ['#ff9a1f', '#e8342e', '#ffd23f']);
+    h += barraca(0.56, 0.32, '#2bb673', ['#7bc950', '#ff8a1a', '#8e2c6b']);
+    h += barraca(0.2, 0.58, '#e84a3c', ['#e8432f', '#ffe27a', '#3fa34d']);
+    // a melancia aberta no chão
+    var pm = P(0.78, 0.78, 0); h += '<path d="M' + (pm[0] - 9) + ' ' + (pm[1] - 4) + ' a9 7 0 0 0 18 0z" fill="#2e8b3a"/><path d="M' + (pm[0] - 7.5) + ' ' + (pm[1] - 4) + ' a7.5 5.5 0 0 0 15 0z" fill="#ff4f5e"/>';
+    return h;
+  };
   B.vizinha = function () {
     var h = base();
     h += caixa(0.24, 0.24, 0.72, 0.66, 30, '#ffb6c9');
