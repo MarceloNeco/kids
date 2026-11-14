@@ -104,7 +104,7 @@
     for (var k = 0; k < 70; k++) { s0 = (s0 * 9301 + 49297) % 233280; var x = s0 / 233280 * cv.width; s0 = (s0 * 9301 + 49297) % 233280; var y = cv.height * (0.55 + s0 / 233280 * 0.45); c.fillStyle = k % 3 ? 'rgba(255,209,102,.8)' : 'rgba(43,244,255,.7)'; c.fillRect(x, y, 2, 2); }
     fundosNoite[nome] = cv; return cv;
   }
-  var NAO_ESCURECE = { blocoOuro: 1, poste: 1, predio: 1, palmeiraNeon: 1, tocha: 1, pocoLava: 1, cristal: 1, arvoreLuz: 1, cogumeloLuz: 1, florLanterna: 1 };
+  var NAO_ESCURECE = { blocoOuro: 1, poste: 1, predio: 1, palmeiraNeon: 1, tocha: 1, pocoLava: 1, cristal: 1, arvoreLuz: 1, cogumeloLuz: 1, florLanterna: 1, setaD: 1, setaE: 1 };
   function enfeiteSpr(tipo, nS) { var b = base[tipo]; if (!b || !nS || NAO_ESCURECE[tipo]) return b; return S.escurecido(tipo, b, 0.6); }
   var ITEM_NEON = { estrela: 'estrelaNeon', turbo: 'turboNeon', lama: 'oleo' };
 
@@ -137,6 +137,14 @@
   // no rio (1.18.0): o cone vira boia, a lama vira redemoinho, o turbo vira setas e o trânsito vira lancha
   var NA_AGUA = { cone: 'boia', lama: 'redemoinho', turbo: 'setas' };
   function sprAgua(tipo) { if (NA_AGUA[tipo]) return NA_AGUA[tipo]; if (tipo.indexOf('carro') === 0) return 'lancha' + tipo.slice(5); if (tipo === 'onibus') return 'lancha3'; return tipo; }
+  /* paredões de rocha (1.19.0): dos dois lados da estrada, em 3D (cada pedaço é uma face inclinada que acompanha as
+     curvas e os morros), com camadas de pedra, o pico recortado e a luz batendo mais de um lado. cores: face, camadas, pico */
+  var PAREDE = {
+    canion: [[200, 96, 56], [232, 140, 88], [255, 196, 140]], templo: [[104, 120, 84], [80, 96, 64], [150, 176, 110]],
+    lava: [[64, 44, 50], [255, 106, 26], [120, 80, 84]], neve: [[214, 226, 242], [176, 196, 222], [255, 255, 255]],
+    outro: [[150, 120, 96], [120, 96, 78], [200, 176, 150]]
+  };
+  function alturaParede(i, lado) { return 5400 + 2600 * Math.sin(i * 0.09 + lado * 1.7) + 1300 * Math.sin(i * 0.29 + lado) + 350 * Math.sin(i * 0.9 + lado * 2.1); }
   var AGUA = [[30, 159, 214], [42, 176, 228]], AGUA_NOITE = [12, 52, 98], MARGEM = [[214, 186, 128], [190, 160, 104]];
   // espuma branca em volta de quem está boiando
   function espuma(c, x, y, dw) {
@@ -223,7 +231,7 @@
     else if (ev.tipo === 'vira' && ev.dracula) texto(vs, t('🧛 Conde Drácula!', '🧛 Count Dracula!', '🧛 ¡Conde Drácula!'), '#ff4d6d', 1.3);
     else if (ev.tipo === 'pulo' && VEIC[ev.j] && VEIC[ev.j].galinha) texto(vs, t('Cocoricóóó!', 'Cock-a-doodle-doo!', '¡Quiquiriquííí!'), '#ffffff', 1.4);
     else if (ev.tipo === 'looping') texto(vs, 'LOOPING!', '#ff4fd8', 1.8);
-    else if (ev.tipo === 'agua') { var vA = VEIC[ev.j] || {}; texto(vs, vA.cavalo || vA.galinha || vA.id === 'ovo' ? t('🌊 Nadando!', '🌊 Swimming!', '🌊 ¡A nadar!') : vA.bracos ? t('🏄 Surfando!', '🏄 Surfing!', '🏄 ¡A surfear!') : t('🌊 Virou barco!', '🌊 Boat mode!', '🌊 ¡Ahora eres un barco!'), '#7cf9ff', 1.6); for (k = 0; k < 16; k++) vs.parts.push({ tipo: 'gota', cor: k % 2 ? '#ffffff' : '#7cd6ff', x: (Math.random() - 0.5) * 0.6, y: -0.1, vx: (Math.random() - 0.5) * 2.6, vy: -1.8 - Math.random(), vida: 0.9, max: 0.9 }); }
+    else if (ev.tipo === 'agua') { var vA = VEIC[ev.j] || {}; texto(vs, vA.cavalo || vA.galinha || vA.id === 'ovo' ? t('🌊 Nadando!', '🌊 Swimming!', '🌊 ¡A nadar!') : vA.bracos || vA.id === 'patins' ? t('🏄 Surfando!', '🏄 Surfing!', '🏄 ¡A surfear!') : t('🌊 Virou barco!', '🌊 Boat mode!', '🌊 ¡Ahora eres un barco!'), '#7cf9ff', 1.6); for (k = 0; k < 16; k++) vs.parts.push({ tipo: 'gota', cor: k % 2 ? '#ffffff' : '#7cd6ff', x: (Math.random() - 0.5) * 0.6, y: -0.1, vx: (Math.random() - 0.5) * 2.6, vy: -1.8 - Math.random(), vida: 0.9, max: 0.9 }); }
     else if (ev.tipo === 'terra') texto(vs, t('🚗 De volta à estrada!', '🚗 Back on the road!', '🚗 ¡De vuelta a la carretera!'), '#ffffff', 1.1);
     else if (ev.tipo === 'loopFeito') { texto(vs, t('Que looping!', 'What a loop!', '¡Menudo looping!'), '#c6ff3d', 1.5); fogos(vs, 2); confete(vs, 25, 'cima'); }
     else if (ev.tipo === 'perdeu') { for (var k = 0; k < Math.min(ev.q, 6); k++) vs.parts.push({ tipo: 'est', x: 0, y: -0.2, vx: (Math.random() - 0.5) * 2.4, vy: -1.8 - Math.random(), vida: 1.2, max: 1.2 }); }
@@ -485,6 +493,30 @@
     // enfeites, coisas, trânsito e o outro jogador, do longe para o perto
     var outro = e.jogadores.length === 2 ? e.jogadores[1 - ji] : null, oSeg = outro ? Math.floor(outro.z / SEG) : -1;
     var primeiro = 0; while (primeiro < cnt && aZ[primeiro] <= PROF) primeiro++;
+    function paredoes(c, idx, s, n, pista, nt, nevoa, cnt) {
+      var cor = PAREDE[pista.mundos[s.mundo]] || PAREDE.outro, fn = Math.max(0, (n - cnt * 0.35) / (cnt * 0.65)), fog = Math.min(0.85, Math.pow(fn, 1.3) * 0.85);
+      var X1 = aX[n], Y1 = aY[n], S1 = aS[n], X2 = aX[n + 1], Y2 = aY[n + 1], S2 = aS[n + 1], cl = aClip[n];
+      var noite = [20, 18, 40];
+      [-1, 1].forEach(function (l) {
+        var h1 = alturaParede(idx, l), h2 = alturaParede(idx + 1, l), luz = l < 0 ? 1.08 : 0.78, tom = function (c3, k) { return css(mixRgb(mixRgb(c3.map(function (v) { return Math.min(255, v * k); }), noite, nt * 0.75), nevoa, fog)); };
+        var b1 = X1 + l * S1 * LARG * K * 1.75, b2 = X2 + l * S2 * LARG * K * 1.75, t1 = X1 + l * S1 * LARG * K * 2.6, t2 = X2 + l * S2 * LARG * K * 2.6;
+        var y1 = Math.min(Y1, cl), y2 = Math.min(Y2, cl), yt1 = Math.min(Y1 - S1 * h1 * KY, cl), yt2 = Math.min(Y2 - S2 * h2 * KY, cl);
+        if (y1 <= yt1 && y2 <= yt2) return;
+        poligono(c, b1, y1, b2, y2, t2, yt2, t1, yt1, tom(cor[0], luz * (idx % 2 ? 1 : 0.94)));
+        if (fog < 0.6) [0.3, 0.62].forEach(function (f, k) {   // camadas de pedra
+          var fa = f, fb = f + 0.07, ya1 = Y1 - S1 * h1 * KY * fa, yb1 = Y1 - S1 * h1 * KY * fb, ya2 = Y2 - S2 * h2 * KY * fa, yb2 = Y2 - S2 * h2 * KY * fb;
+          var xa1 = b1 + (t1 - b1) * fa, xb1 = b1 + (t1 - b1) * fb, xa2 = b2 + (t2 - b2) * fa, xb2 = b2 + (t2 - b2) * fb;
+          poligono(c, xa1, Math.min(ya1, cl), xa2, Math.min(ya2, cl), xb2, Math.min(yb2, cl), xb1, Math.min(yb1, cl), tom(cor[1], luz * (k ? 0.92 : 1)));
+        });
+        var ct1 = Y1 - S1 * h1 * KY, ct2 = Y2 - S2 * h2 * KY, cc1 = ct1 + S1 * 500 * KY, cc2 = ct2 + S2 * 500 * KY;   // pico mais claro (borda iluminada)
+        poligono(c, t1, Math.min(ct1, cl), t2, Math.min(ct2, cl), t2 - l * S2 * LARG * K * 0.08, Math.min(cc2, cl), t1 - l * S1 * LARG * K * 0.08, Math.min(cc1, cl), tom(cor[2], luz));
+        if (fog < 0.5) {   // sombra no pé do paredão
+          var sb = 0.12; c.globalAlpha = 0.35 * (1 - fog);
+          poligono(c, b1, y1, b2, y2, b2 + (t2 - b2) * sb, Math.min(Y2 - S2 * h2 * KY * sb, cl), b1 + (t1 - b1) * sb, Math.min(Y1 - S1 * h1 * KY * sb, cl), '#000');
+          c.globalAlpha = 1;
+        }
+      });
+    }
     var dentroTunel = !!segs[baseI].tunel;
     var arcoFeito = {};
     for (n = cnt - 1; n >= 0; n--) {
@@ -506,11 +538,14 @@
         var temB = n + 1 < cnt && aZ[n + 1] > PROF && segs[idx + 1] && segs[idx + 1].tunel === s.tunel;
         tunel(c, s, idx, { x: sx, y: sy, e: esc, eY: escY }, temB ? { x: aX[n + 1], y: aY[n + 1], e: aS[n + 1] * K, eY: aS[n + 1] * KY } : (segs[idx + 1] && !segs[idx + 1].tunel && n + 1 < cnt ? { x: aX[n + 1], y: aY[n + 1], e: aS[n + 1] * K, eY: aS[n + 1] * KY } : null), w, h, voa, NEON[pista.mundos[s.mundo]], pista, nevoa, n === primeiro && dentroTunel);
       }
+      if (s.parede && !voa && n + 1 < cnt && aZ[n + 1] > PROF) paredoes(c, idx, s, n, pista, ntS, nevoa, cnt);
       // postes e pórticos de neon acendem aos poucos com a noite (e somem aos poucos de dia)
       if (ntS > 0.02 && !s.tunel && n > 2 && idx % 8 === 0) { c.globalAlpha = ntS; postesNeon(c, idx, sx, sy, esc, clip, NEON[pista.mundos[s.mundo]], w, escY); c.globalAlpha = 1; }
       if (ntS > 0.02 && !s.tunel && n > 3 && idx % 48 === 24) { c.globalAlpha = ntS; portico(c, idx, sx, voa ? syAr : sy, esc, voa ? 0 : clip, NEON[pista.mundos[s.mundo]], w, escY, voa); c.globalAlpha = 1; }
       for (k2 = 0; n > 3 && k2 < s.enfeites.length; k2++) {   // enfeite colado na câmera taparia a tela
-        var en = s.enfeites[k2], arco = en.tipo === 'portal' || en.tipo === 'chegada' || en.tipo === 'largada', spr = en.tipo === 'portal' ? portais[en.mundo] : en.tipo === 'chegada' ? chegada : en.tipo === 'largada' ? largada : enfeiteSpr(en.tipo, ntS >= 0.5);
+        var en = s.enfeites[k2];
+        if (s.parede && !voa && Math.abs(en.x) > 1.6) continue;   // atrás do paredão
+        var arco = en.tipo === 'portal' || en.tipo === 'chegada' || en.tipo === 'largada', spr = en.tipo === 'portal' ? portais[en.mundo] : en.tipo === 'chegada' ? chegada : en.tipo === 'largada' ? largada : enfeiteSpr(en.tipo, ntS >= 0.5);
         if (!spr) continue;
         if (voa && arco) sprite(c, spr, esc, sx + esc * en.x * LARG, syAr + escY * 1900, 0, w);   // no céu, o portal fica na altura do voo
         else if (!arco && ntS > 0.02 && ntS < 0.98) {   // na troca dia/noite: o enfeite claro e o escurecido se misturam
@@ -1160,7 +1195,7 @@
     c.save();
     c.translate(g.cx, chao - lift);
     // avião inclina bem nas curvas; moto deita um pouco; carro quase nada
-    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'skate') ? 0.22 : vv && vv.cavalo ? 0.04 : 0.07);
+    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'skate' || vv.id === 'patins') ? 0.22 : vv && vv.cavalo ? 0.04 : 0.07);
     var derr = j.derrapa > 0 && !voa, nivD = derr ? M2().nivelDerrapa(j.derrapa) : 0;
     if (derr && !naAgua && !(vv && vv.cavalo)) { c.restore(); marcasPneu(c, g, h, cw, j.ladoDerrapa, lift); c.save(); c.translate(g.cx, chao - lift); }
     c.rotate(vs.lado * inclina + (derr ? j.ladoDerrapa * 0.14 : 0) + (j.rodando > 0 ? Math.sin(j.rodando * 22) * 0.25 : 0));

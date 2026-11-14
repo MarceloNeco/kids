@@ -93,7 +93,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 # Repositório kids — Bolinho de Chuva (brincadeiras para criança e família)
 
 - Publicado em **solverone.com.br/kids/** (GitHub Pages deste repositório; o domínio vem do Portal). A marca na tela é
-  **Bolinho de Chuva**; `kids` é só o nome curto do endereço.
+  **Bolinho de Chuva** (em inglês **Rainy Day Donuts**, em espanhol **Buñuelos de Lluvia** — dono, 14/Nov/2026; exceção à
+  regra de não traduzir nome de app; no código, `BolinhoIdioma.marca()`); `kids` é só o nome curto do endereço.
 - Veio do FeatureTesting e do Portal em 02/Nov/2026, **com o histórico**. Os endereços antigos
   (`/FeatureTesting/<jogo>/`, `/FeatureTesting/danca-na-sala.html`, `/bolinho-de-chuva/`) só redirecionam para cá:
   **não mexa nos jogos lá — é aqui.**
@@ -136,7 +137,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
 - Testes: `node --test <jogo>/teste/*.test.js` (rodar da raiz deste repositório).
-- Jogo novo: pasta própria + entrada em `catalogo.js` + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
+- Jogo novo: pasta própria + entrada em `catalogo.js` (com `novo: 'AAAA-MM-DD'`, a data do dia: por 7 dias o cartão
+  ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" da estante, `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
   no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**

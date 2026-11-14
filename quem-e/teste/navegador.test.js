@@ -141,6 +141,14 @@ test('lupa abre a cara grande e fecha com Esc; 🏠 volta ao começo', async () 
   await pg.ctx.close();
 });
 
+test('começo: as duas melecas lado a lado até em celular estreito (340 px)', async () => {
+  const pg = await abrir({ width: 340, height: 720 });
+  const r = await pg.evaluate(() => [...document.querySelectorAll('.meleca-bt')].map(b => b.getBoundingClientRect()));
+  assert.equal(Math.round(r[0].top), Math.round(r[1].top), 'uma embaixo da outra');
+  assert.ok(r[1].right <= 340, 'saiu da tela');
+  await pg.ctx.close();
+});
+
 test('cada um no seu celular: duas abas jogam pelo código', async () => {
   const a = await abrir();
   await a.click('#btBlue'); await a.click('#btRede'); await a.waitForSelector('#rede.ativa');

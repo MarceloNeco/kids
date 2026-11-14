@@ -444,6 +444,19 @@
     });
     c.shadowBlur = 0;
   }
+  // placa de curva (1.19.0): painel escuro com borda de neon e três setas brilhando, em dois pés
+  function setaCurva(c, W, H, dir) {
+    caixa(c, W * 0.2, H * 0.62, W * 0.06, H * 0.38, W * 0.02, '#2a2a36'); caixa(c, W * 0.74, H * 0.62, W * 0.06, H * 0.38, W * 0.02, '#2a2a36');
+    brilho(c, '#7b5cff', W * 0.05); caixa(c, W * 0.03, H * 0.05, W * 0.94, H * 0.6, W * 0.06, '#5a3cff'); c.shadowBlur = 0;
+    caixa(c, W * 0.06, H * 0.09, W * 0.88, H * 0.52, W * 0.05, '#151233');
+    c.save(); if (dir < 0) { c.translate(W, 0); c.scale(-1, 1); }
+    brilho(c, '#3ee8ff', W * 0.06);
+    [0, 1, 2].forEach(function (k) {
+      var x = W * (0.2 + k * 0.24), y = H * 0.35, a = W * 0.1, b = H * 0.2, g = W * 0.08, cor = ['#3a86ff', '#3ee8ff', '#c6f6ff'][k];
+      poli(c, [x, y - b, x + g, y - b, x + g + a, y, x + g, y + b, x, y + b, x + a, y], cor);
+    });
+    c.shadowBlur = 0; c.restore();
+  }
   function tom(cor, f) { var n = parseInt(cor.slice(1), 16); return 'rgb(' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (v) { return Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f)); }).join(',') + ')'; }
   function lancha(c, W, H, cor) {   // lanchinha do trânsito do rio, de trás, com a esteira de espuma
     ondinha(c, W, H, H * 0.86, W * 0.5);
@@ -747,6 +760,7 @@
       balao: fazer(1300, 1800, balao, 220), estrelaNeon: fazer(560, 560, estrelaNeon, 128), turboNeon: fazer(1250, 900, turboNeon, 220), oleo: fazer(1100, 280, oleo, 180), nuvemFofa: fazer(3200, 1500, function (c, W, H) { nuvemFofa(c, W, H, false); }, 320), nuvemNoite: fazer(3200, 1500, function (c, W, H) { nuvemFofa(c, W, H, true); }, 320)
     };
     ['#e63946', '#2a9d8f', '#f4a261', '#457b9d', '#8ac926'].forEach(function (cor, k) { b['carro' + k] = fazer(800, 640, function (c, W, H) { carroTras(c, W, H, cor, null, false); }, 180); });
+    b.setaD = fazer(1300, 1100, function (c, W, H) { setaCurva(c, W, H, 1); }, 200); b.setaE = fazer(1300, 1100, function (c, W, H) { setaCurva(c, W, H, -1); }, 200);
     b.boia = fazer(500, 900, boia, 110); b.redemoinho = fazer(1300, 360, redemoinho, 200); b.setas = fazer(1300, 700, setasAgua, 220);
     ['#e63946', '#2a9d8f', '#f4a261', '#457b9d', '#8ac926'].forEach(function (cor, k) { b['lancha' + k] = fazer(900, 700, function (c, W, H) { lancha(c, W, H, cor); }, 180); });
     ['#e63946', '#2a9d8f', '#f4a261', '#457b9d', '#8ac926'].forEach(function (cor, k) { b['aviaoTrafego' + k] = fazer(1300, 650, function (c, W, H) { aviaoTrafego(c, W, H, cor); }, 200); });

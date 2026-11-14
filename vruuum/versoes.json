@@ -2,6 +2,40 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.20.0",
+      "data": "14/Nov/2026",
+      "hora": "16:40:00",
+      "pt": [
+        "🛼 Patins novo: uma pessoa de capacete patinando com patins de 4 rodinhas, com a passada de verdade (uma perna empurra para o lado enquanto a outra desliza, e os braços balançam), joelheiras e cotoveleiras.",
+        "🚛 Caminhão Guincho novo: cabine alta, braço amarelo do guincho com o gancho balançando, giroflex piscando no teto, chaminés cromadas e rodas grandes."
+      ],
+      "en": [
+        "🛼 New Roller Skates: a person in a helmet skating on 4-wheel roller skates, with a real stride (one leg pushes out while the other glides, arms swinging), knee and elbow pads.",
+        "🚛 New Tow Truck: tall cab, yellow tow boom with a swinging hook, flashing beacons on the roof, chrome stacks and big wheels."
+      ],
+      "es": [
+        "🛼 Patines nuevos: una persona con casco patinando con patines de 4 ruedas, con la zancada de verdad (una pierna empuja hacia el lado mientras la otra se desliza, y los brazos se balancean), rodilleras y coderas.",
+        "🚛 Camión Grúa nuevo: cabina alta, brazo amarillo de la grúa con el gancho balanceándose, rotativo parpadeando en el techo, chimeneas cromadas y ruedas grandes."
+      ]
+    },
+    {
+      "versao": "1.19.0",
+      "data": "14/Nov/2026",
+      "hora": "16:10:00",
+      "pt": [
+        "⛰️ Paredões de rocha em 3D dos dois lados da pista, no Cânion, no Templo, na Lava, na Neve e em todos os rios: com camadas de pedra, picos recortados e luz batendo de um lado, acompanhando as curvas e os morros.",
+        "➡️ Placas com setas de neon nas curvas, do lado de fora, mostrando para onde a pista vai."
+      ],
+      "en": [
+        "⛰️ 3D rock walls on both sides of the track in the Canyon, Temple, Lava, Snow and on every river: rock layers, jagged peaks and light hitting one side, following the curves and hills.",
+        "➡️ Neon arrow signs on the outside of curves, showing where the track goes."
+      ],
+      "es": [
+        "⛰️ Paredes de roca en 3D a los dos lados de la pista en el Cañón, el Templo, la Lava, la Nieve y en todos los ríos: capas de piedra, picos recortados y la luz dando de un lado, siguiendo las curvas y las cuestas.",
+        "➡️ Carteles con flechas de neón en el lado de fuera de las curvas, que enseñan hacia dónde va la pista."
+      ]
+    },
+    {
       "versao": "1.18.0",
       "data": "14/Nov/2026",
       "hora": "15:45:00",
