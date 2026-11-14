@@ -96,7 +96,7 @@
     { id: 'quem-e', nomes: { en: "Who Is It?", es: "¿Quién es?" }, nome: 'Quem é?', ico: '🫧', img: '/kids/quem-e/icone.svg', cor: '#ff5fa8', url: '/kids/quem-e/',
       texto: 'Pense em alguém e a meleca adivinha! Mais de 660 personagens, e ela aprende quem não conhece. E o Duelo de Caras: cada um escolhe uma cara em segredo e pergunta "usa óculos?", "tem coroa?" até descobrir a do outro. Com o Melekento Blue e a Pink Honey.',
       en: "Think of someone and the slime guesses who it is! More than 660 characters, and it learns the ones it doesn't know. Plus Face Duel: each player picks a secret face and asks \"glasses?\", \"a crown?\" until they find the other one's. With Melekento Blue and Pink Honey.",
-      es: "¡Piensa en alguien y el moco adivina quién es! Más de 660 personajes, y aprende los que no conoce. Y el Duelo de Caras: cada uno elige una cara en secreto y pregunta \"¿lleva gafas?\", \"¿tiene corona?\" hasta descubrir la del otro. Con Melekento Blue y Pink Honey.",
+      es: "¡Piensa en alguien y el slime adivina quién es! Más de 660 personajes, y aprende los que no conoce. Y el Duelo de Caras: cada uno elige una cara en secreto y pregunta \"¿lleva gafas?\", \"¿tiene corona?\" hasta descubrir la del otro. Con Melekento Blue y Pink Honey.",
       tag: '▶ Adivinhar / Guess / Adivinar', instalar: true },
     { id: 'contador-de-historias', nomes: { en: "Storyteller", es: "Cuentacuentos" }, nome: 'Contador de Histórias', ico: '📖', cor: '#3ee8ff', url: '/contador-de-historias/',
       texto: 'Histórias para dormir: um acervo para ler e ouvir, e a criação de histórias novas com os nomes da sua família.',
