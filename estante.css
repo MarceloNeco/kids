@@ -27,13 +27,40 @@ footer b{color:var(--ouro)}
 #debug{position:fixed;left:1rem;bottom:1rem;max-width:90vw;background:rgba(0,0,0,.8);color:#c6ff3d;font:.9rem/1.4 monospace;padding:.8rem 1rem;border-radius:12px;z-index:9;white-space:pre-wrap;text-align:left}
 @media (prefers-reduced-motion:reduce){.card{transition:none}}
 /* Idioma da estante e de todos os jogos: 🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES (idioma.js monta os botões) */
-.wrap>.barra-topo{display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;padding-top:.6rem}
+.wrap>.barra-topo{display:flex;justify-content:flex-start;align-items:center;gap:.5rem;flex-wrap:nowrap;padding-top:.6rem}
 .barra-topo>.idiomas-topo{display:flex;gap:.4rem;flex-wrap:wrap;margin-left:auto}
 .bt-biblioteca{min-height:44px;padding:.35rem .9rem;border-radius:999px;border:1px solid #3a2f73;background:rgba(34,27,77,.8);color:#f3f0ff;font:inherit;font-weight:800;font-size:.95rem;cursor:pointer}
 .bt-biblioteca:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 .marca .pt,.marca .en,.marca .es{font-size:inherit;filter:none}
-@media (max-width:440px){.barra-topo .bolinho-idiomas button{min-width:0;padding:.3rem .5rem;gap:.3rem}.barra-topo .bt-biblioteca{padding:.35rem .65rem}.barra-topo{gap:.35rem}}
+/* 🎵 Músicas e o idioma sempre numa linha só (dono, 14/Nov/2026), até com a letra grande do celular:
+   no celular a letra acompanha a largura da tela (vw não cresce com o "tamanho da fonte" do Android) */
+.barra-topo .bt-biblioteca,.barra-topo .bi-atual{white-space:nowrap;flex:0 1 auto;min-width:0}
+@media (max-width:440px){.barra-topo{gap:.3rem}.barra-topo .bt-biblioteca,.barra-topo .bolinho-idiomas .bi-atual{padding:.3rem .55rem;gap:.25rem;font-size:min(.95rem,3.6vw)}.barra-topo .bolinho-idiomas .bi-atual .bd img{width:22px;height:17px}}
 .wrap>.idiomas-topo{display:flex;justify-content:flex-end;padding-top:.6rem}
 
 /* ✨ Novo: jogo que entrou na estante nos últimos 7 dias (catalogo.js, campo novo) */
 .novo-selo{display:inline-block;vertical-align:middle;margin-left:.5rem;padding:.2rem .6rem;border-radius:999px;background:#ffd166;color:#1a1446;font-weight:800;font-size:.8rem;box-shadow:0 0 14px rgba(255,209,102,.6)}
+
+/* Bolinho FM (dono, 14/Nov/2026): o botão da biblioteca de músicas é um radinho tocando, com notas subindo */
+.bt-biblioteca{display:inline-flex;align-items:center;gap:.45rem;overflow:visible}
+.radinho{position:relative;display:inline-block;flex:none;width:30px;height:24px;line-height:0}
+.radinho svg{width:100%;height:100%;animation:radinho-pula 1.2s ease-in-out infinite;transform-origin:50% 100%}
+.radinho i{position:absolute;left:8px;top:-2px;font-style:normal;font-weight:900;font-size:13px;line-height:1;color:#c6ff3d;opacity:0;
+  text-shadow:0 0 6px rgba(198,255,61,.6);animation:radinho-nota 2.4s ease-out infinite;pointer-events:none}
+.radinho i:nth-of-type(2){left:15px;color:#3ee8ff;text-shadow:0 0 6px rgba(62,232,255,.6);animation-delay:.8s}
+.radinho i:nth-of-type(3){left:2px;color:#ffd166;text-shadow:0 0 6px rgba(255,209,102,.6);animation-delay:1.6s}
+@keyframes radinho-nota{0%{transform:translate(0,6px) scale(.6) rotate(-10deg);opacity:0}20%{opacity:1}100%{transform:translate(9px,-20px) scale(1.15) rotate(12deg);opacity:0}}
+@keyframes radinho-pula{0%,100%{transform:scale(1,1)}50%{transform:scale(1.04,.95)}}
+@media (prefers-reduced-motion:reduce){.radinho svg,.radinho i{animation:none}.radinho i:first-of-type{opacity:1;transform:translate(6px,-8px)}}
+.bib-topo h2{display:flex;align-items:center;gap:.6rem}
+.bib-topo h2 .radinho{width:42px;height:34px}
+.bib-topo h2 .radinho i{font-size:16px}
+.bib-topo h2 small{display:block;font-size:.85rem;font-weight:600;color:#b3acd6}
+
+/* Proteção: se o idioma.js não rodou (ou veio uma cópia antiga sem a classe idioma-*), mostra só o português */
+html:not(.idioma-pt):not(.idioma-en):not(.idioma-es) .en,html:not(.idioma-pt):not(.idioma-en):not(.idioma-es) .es{display:none!important}
+
+/* Janela aberta (Bolinho FM, novidades, instalar): a página de trás não rola, nem com o dedo nem com dois dedos no
+   touchpad, mesmo quando a janela já chegou ao fim (dono, 14/Nov/2026; diretriz das janelas) */
+html.trava-fundo,html.trava-fundo body{overflow:hidden!important;overscroll-behavior:none}
+.bib,.nov,.nov-c,.bc-fundo,.bc-passos,.bc-corpo{overscroll-behavior:contain}

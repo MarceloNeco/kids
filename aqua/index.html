@@ -41,6 +41,11 @@
     <p data-t="🌫️ No Médio e no Difícil aparecem frascos embaçados: as cores de baixo ficam escondidas até a de cima sair.|🌫️ On Medium and Hard some bottles are foggy: the lower colors stay hidden until the top one leaves.|🌫️ En Medio y en Difícil hay frascos empañados: los colores de abajo quedan escondidos hasta que sale el de arriba."></p>
     <p data-t="🧰 Ajudas, embaixo da tela: ↩️ desfazer, 💡 dica, 🔀 embaralhar e ➕ mais um frasco. Elas nunca custam nada e voltam cheias a cada fase.|🧰 Helpers, at the bottom: ↩️ undo, 💡 hint, 🔀 shuffle and ➕ one more bottle. They never cost anything and refill every stage.|🧰 Ayudas, abajo en la pantalla: ↩️ deshacer, 💡 pista, 🔀 mezclar y ➕ un frasco más. Nunca cuestan nada y se llenan otra vez en cada fase."></p>
     <p data-t="⭐ Sem usar ajuda, a fase vale 3 estrelas. Cada fase dá gotinhas 💧 para trocar por frascos e cenários na lojinha (tudo de brincadeira, sem dinheiro).|⭐ With no helpers, the stage is worth 3 stars. Each stage gives droplets 💧 to trade for bottles and backdrops in the little shop (all pretend, no money).|⭐ Sin usar ayudas, la fase vale 3 estrellas. Cada fase te da gotitas 💧 para cambiar por frascos y escenarios en la tiendecita (todo es de juego, sin dinero)."></p>
+    <p data-t="🧊 No Cubo d'Água, arraste o dedo fora do cubo para virar ele inteiro. Ponha o dedo num cubinho e arraste para girar a fatia dele; ou toque no cubinho e use as setas. Monte cada face com uma cor só!|🧊 In the Water Cube, drag outside the cube to turn the whole cube. Put your finger on a little cube and drag to turn its slice; or tap it and use the arrows. Make every face a single color!|🧊 En el Cubo de Agua, arrastra el dedo fuera del cubo para girarlo entero. Pon el dedo en un cubito y arrastra para girar su capa; o tócalo y usa las flechas. ¡Deja cada cara de un solo color!"></p>
+  </div>
+  <div class="modos" role="radiogroup" data-rotulo="Escolha a brincadeira|Choose the game|Elige el juego">
+    <button id="btModoFrascos" class="modo" type="button" role="radio" aria-checked="true" data-modo="frascos" data-t="🧪 Frascos|🧪 Bottles|🧪 Frascos"></button>
+    <button id="btModoCubo" class="modo" type="button" role="radio" aria-checked="false" data-modo="cubo" data-t="🧊 Cubo d'Água|🧊 Water Cube|🧊 Cubo de Agua"></button>
   </div>
   <div class="niveis">
     <button id="btFacil" class="nivel facil" type="button" data-nivel="facil">
@@ -87,6 +92,28 @@
   </div>
 </section>
 
+<section id="cubo" class="tela" data-recurso="aqua">
+  <div class="barra">
+    <span class="placa" id="placaFaseCubo"></span>
+    <span class="placa gotas" id="placaGotasCubo"><span aria-hidden="true">💧</span><span id="gotasCubo">0</span></span>
+    <button id="btReiniciarCubo" class="mini" type="button" data-rotulo="Recomeçar a fase|Restart the stage|Empezar la fase de nuevo">🔄</button>
+  </div>
+  <div id="areaCubo" class="area area-cubo">
+    <p id="carregaCubo" class="carrega" data-t="Montando o cubo…|Building the cube…|Montando el cubo…"></p>
+    <p id="avisoCubo" class="aviso" role="status" aria-live="polite" hidden></p>
+  </div>
+  <div class="ajudas" role="group" data-rotulo="Ajudas|Helpers|Ayudas">
+    <button id="btDesfazerCubo" class="aj" type="button" data-rotulo="Desfazer o último giro|Undo the last turn|Deshacer el último giro"><span class="aj-ico" aria-hidden="true">↩️</span><span class="aj-n" id="nDesfazerCubo"></span></button>
+    <button id="btDicaCubo" class="aj" type="button" data-rotulo="Dica: a fatia certa balança|Hint: the right slice wiggles|Pista: la capa correcta se mueve"><span class="aj-ico" aria-hidden="true">💡</span><span class="aj-n" id="nDicaCubo"></span></button>
+    <div id="setas" class="setas" role="group" data-rotulo="Girar a fatia marcada|Turn the marked slice|Girar la capa marcada" hidden>
+      <button id="setaEsq" class="aj seta" type="button" data-dx="-1" data-dy="0" data-rotulo="Girar para a esquerda|Turn left|Girar a la izquierda">⬅️</button>
+      <button id="setaCima" class="aj seta" type="button" data-dx="0" data-dy="-1" data-rotulo="Girar para cima|Turn up|Girar hacia arriba">⬆️</button>
+      <button id="setaBaixo" class="aj seta" type="button" data-dx="0" data-dy="1" data-rotulo="Girar para baixo|Turn down|Girar hacia abajo">⬇️</button>
+      <button id="setaDir" class="aj seta" type="button" data-dx="1" data-dy="0" data-rotulo="Girar para a direita|Turn right|Girar a la derecha">➡️</button>
+    </div>
+  </div>
+</section>
+
 <section id="loja" class="tela" data-recurso="aqua">
   <div class="loja-topo">
     <h2 data-t="🛍️ Lojinha de brincadeira|🛍️ Pretend shop|🛍️ Tiendecita de juego"></h2>
@@ -115,7 +142,32 @@
   </div>
 </div>
 
+<div id="confirma" class="fim" hidden role="alertdialog" aria-modal="true" aria-labelledby="confTitulo" aria-describedby="confTexto">
+  <div class="cartao">
+    <div class="fim-estrelas" aria-hidden="true">🤔</div>
+    <h2 id="confTitulo" data-t="Tem certeza?|Are you sure?|¿Seguro?"></h2>
+    <p id="confTexto" data-t="Com essa jogada as cores ficam sem saída. Depois, só dá para arrumar voltando com ↩️ desfazer.|With this move the colors get stuck with no way out. After that, you can only fix it by going back with ↩️ undo.|Con esta jugada los colores se quedan sin salida. Después, solo se arregla volviendo con ↩️ deshacer."></p>
+    <div class="fim-botoes">
+      <button id="btConfNao" class="grande" type="button" data-t="🤔 Não, vou pensar|🤔 No, let me think|🤔 No, me lo pienso"></button>
+      <button id="btConfSim" class="medio-bt" type="button" data-t="Fazer mesmo assim|Do it anyway|Hacerlo igualmente"></button>
+    </div>
+  </div>
+</div>
+
+<div id="falhou" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="falhouTitulo">
+  <div class="cartao">
+    <div class="fim-estrelas" aria-hidden="true">💦</div>
+    <h2 id="falhouTitulo" data-t="Ops! Ficou sem saída|Oops! No way out|¡Vaya! Sin salida"></h2>
+    <p data-t="As cores se misturaram de um jeito que não dá mais para arrumar, e não sobrou ajuda para voltar. Vamos tentar de novo?|The colors got mixed in a way that can't be sorted anymore, and there are no helpers left to go back. Shall we try again?|Los colores se han mezclado de una forma que ya no se puede ordenar, y no quedan ayudas para volver. ¿Lo intentamos otra vez?"></p>
+    <div class="fim-botoes">
+      <button id="btFalhouDeNovo" class="grande" type="button" data-t="🔄 Tentar de novo|🔄 Try again|🔄 Intentarlo otra vez"></button>
+      <button id="btFalhouNiveis" class="medio-bt" type="button" data-t="🏡 Escolher nível|🏡 Choose level|🏡 Elegir nivel"></button>
+    </div>
+  </div>
+</div>
+
 <script src="motor.js"></script>
+<script src="cubo-motor.js"></script>
 <script src="som.js"></script>
 <script src="desenho.js"></script>
 <script src="fundo.js"></script>

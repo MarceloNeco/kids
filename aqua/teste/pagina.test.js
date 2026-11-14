@@ -66,7 +66,7 @@ test('menu: nome, três níveis, lojinha, versão, sem erro e sem pedido para fo
   assert.equal((await pg.textContent('h1')).trim(), 'AQUA');
   for (const id of ['#btFacil', '#btMedio', '#btDificil', '#btLoja']) assert.ok(await pg.isVisible(id), id);
   assert.match(await pg.textContent('#recFacil'), /Fase 1/);
-  assert.match(await pg.textContent('#versao'), /Versão 0\.3\.0 · 14\/Nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /Versão 0\.4\.0 · 14\/Nov\/2026/);
   assert.match(await pg.textContent('#versao'), /sem anúncios e sem compras/);
   assert.equal(await pg.$('#btLingua'), null, 'o idioma é escolhido só na estante');
   await pg.click('#btAjuda'); assert.ok(await pg.isVisible('#ajuda'));
@@ -317,6 +317,280 @@ test('reduzir movimento: a cena troca na hora, sem transição, sem zoom e sem p
   await pg.ctx.close();
 });
 
+// ---------- sem saída (dono, 14/Nov/2026) ----------
+// acha, pelas regras do jogo, uma jogada que deixa a fase sem saída (andando pelo caminho da solução até aparecer uma)
+async function jogadaRuim(pg) {
+  for (let n = 0; n < 60; n++) {
+    await assentar(pg);
+    const r = await pg.evaluate(() => {
+      const e = AquaApp.estado();
+      if (!AquaMotor.temSaida(e.frascos, e.cap)) return { ja: true };
+      for (let i = 0; i < e.frascos.length; i++) for (let j = 0; j < e.frascos.length; j++) {
+        if (!AquaMotor.quantoDespeja(e, i, j)) continue;
+        const c = AquaMotor.copiar(e); AquaMotor.despejar(c, i, j);
+        if (!AquaMotor.temSaida(c.frascos, c.cap)) return { ruim: [i, j] };
+      }
+      // nenhuma jogada ruim agora: procura uma jogada boa (que mantém a saída) depois da qual exista uma ruim
+      const jogadas = (x) => { const l = []; for (let i = 0; i < x.frascos.length; i++) for (let j = 0; j < x.frascos.length; j++) if (AquaMotor.quantoDespeja(x, i, j)) l.push([i, j]); return l; };
+      for (const m1 of jogadas(e)) {
+        const c1 = AquaMotor.copiar(e); AquaMotor.despejar(c1, m1[0], m1[1]);
+        if (!AquaMotor.temSaida(c1.frascos, c1.cap)) continue;
+        for (const m2 of jogadas(c1)) { const c2 = AquaMotor.copiar(c1); AquaMotor.despejar(c2, m2[0], m2[1]); if (!AquaMotor.temSaida(c2.frascos, c2.cap)) return { boa: m1 }; }
+      }
+      return { boa: AquaMotor.plano(e)[0] };
+    });
+    if (r.ruim) return r.ruim;
+    await pg.click('#frasco-' + r.boa[0]); await pg.click('#frasco-' + r.boa[1]);
+  }
+  throw new Error('não achei jogada que deixa sem saída');
+}
+async function qualquerJogada(pg) {
+  await assentar(pg);
+  const p = await pg.evaluate(() => { const e = AquaApp.estado(); for (let i = 0; i < e.frascos.length; i++) for (let j = 0; j < e.frascos.length; j++) if (AquaMotor.quantoDespeja(e, i, j)) return [i, j]; return null; });
+  if (p) { await pg.click('#frasco-' + p[0]); await pg.click('#frasco-' + p[1]); }
+  return p;
+}
+
+test('sem saída no Médio: "Tem certeza?" antes da jogada ruim; "Não" desiste, "Fazer mesmo assim" faz; dá para voltar com desfazer', async () => {
+  const pg = await abrir(null, { fase: { facil: 1, medio: 12, dificil: 1 } });
+  await pg.click('#btMedio'); await pg.waitForFunction(() => AquaApp.lay());
+  const ruim = await jogadaRuim(pg);
+  const antes = await frascos(pg);
+  await pg.click('#frasco-' + ruim[0]); await pg.click('#frasco-' + ruim[1]);
+  await pg.waitForSelector('#confirma:not([hidden])', { timeout: 2000 });
+  assert.match(await pg.textContent('#confirma'), /Tem certeza\?[^]*sem saída/);
+  await pg.click('#btConfNao');
+  assert.equal(await pg.isVisible('#confirma'), false);
+  assert.deepEqual(await frascos(pg), antes, '"Não" não mexe em nada');
+  // agora faz mesmo assim
+  await pg.click('#frasco-' + ruim[0]); await pg.click('#frasco-' + ruim[1]);
+  await pg.waitForSelector('#confirma:not([hidden])');
+  await pg.click('#btConfSim'); await assentar(pg);
+  assert.notDeepEqual(await frascos(pg), antes);
+  assert.equal(await pg.evaluate(() => AquaApp.semSaida()), 1);
+  assert.match(await pg.textContent('#aviso'), /Sem saída agora! Volte 1 jogada com ↩️ desfazer/);
+  assert.equal(await pg.evaluate(() => AquaApp.perdeu()), false, 'ainda dá para voltar: não perdeu');
+  await pg.click('#btDesfazer'); await assentar(pg);
+  assert.deepEqual(await frascos(pg), antes, 'voltou');
+  assert.equal(await pg.evaluate(() => AquaApp.semSaida()), 0);
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('sem saída: pode seguir jogando sem saída enquanto der para voltar; passou do que dá para desfazer (sem outra ajuda) = "Falhou!"', async () => {
+  const pg = await abrir(null, { fase: { facil: 1, medio: 12, dificil: 1 } });
+  await pg.click('#btMedio'); await pg.waitForFunction(() => AquaApp.lay());
+  // sem embaralhar e sem frasco extra; sobram 2 desfazer
+  await pg.evaluate(() => { const u = AquaApp.usos(); u.embaralhar = 2; u.extra = 1; u.desfazer = 3; });
+  const ruim = await jogadaRuim(pg);
+  await pg.click('#frasco-' + ruim[0]); await pg.click('#frasco-' + ruim[1]);
+  await pg.click('#btConfSim'); await assentar(pg);
+  assert.equal(await pg.evaluate(() => AquaApp.semSaida()), 1);
+  assert.ok(await qualquerJogada(pg), 'tem jogada para seguir'); await assentar(pg);
+  const n = await pg.evaluate(() => AquaApp.semSaida());
+  if (n === 2) {
+    assert.equal(await pg.evaluate(() => AquaApp.perdeu()), false, '2 jogadas sem saída e 2 desfazer: ainda dá');
+    assert.ok(await qualquerJogada(pg)); await assentar(pg);
+  }
+  await pg.waitForFunction(() => AquaApp.perdeu(), null, { timeout: 3000 });
+  await pg.waitForSelector('#falhou:not([hidden])', { timeout: 3000 });
+  assert.match(await pg.textContent('#falhou'), /Ops! Ficou sem saída/);
+  // com a janela aberta, os frascos e as ajudas não respondem
+  const f = await frascos(pg);
+  await pg.evaluate(() => document.getElementById('frasco-0').click());
+  assert.deepEqual(await frascos(pg), f);
+  await pg.click('#btFalhouDeNovo');
+  assert.equal(await pg.isVisible('#falhou'), false);
+  assert.equal(await pg.evaluate(() => AquaApp.perdeu()), false);
+  assert.deepEqual(await pg.evaluate(() => AquaApp.usos()), { desfazer: 0, dica: 0, embaralhar: 0, extra: 0 }, 'ajudas cheias de novo');
+  assert.ok(await pg.evaluate(() => AquaMotor.temSaida(AquaApp.estado().frascos, AquaApp.estado().cap)), 'recomeçou com solução');
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('sem saída: com 🔀 embaralhar sobrando nunca perde; no Difícil não pergunta antes, e perde na hora sem nenhuma ajuda', async () => {
+  let pg = await abrir(null, { fase: { facil: 1, medio: 12, dificil: 1 } });
+  await pg.click('#btMedio'); await pg.waitForFunction(() => AquaApp.lay());
+  await pg.evaluate(() => { const u = AquaApp.usos(); u.desfazer = 5; u.extra = 1; });   // só sobra embaralhar
+  let ruim = await jogadaRuim(pg);
+  await pg.click('#frasco-' + ruim[0]); await pg.click('#frasco-' + ruim[1]); await pg.click('#btConfSim'); await assentar(pg);
+  for (let k = 0; k < 3; k++) { if (!(await qualquerJogada(pg))) break; await assentar(pg); }
+  await pg.waitForTimeout(400);
+  assert.equal(await pg.evaluate(() => AquaApp.perdeu()), false, 'o embaralhar ainda salva');
+  await pg.click('#btEmbaralhar');
+  assert.ok(await pg.evaluate(() => AquaMotor.temSaida(AquaApp.estado().frascos, AquaApp.estado().cap)), 'embaralhou com solução');
+  await pg.ctx.close();
+  // Difícil, sem ajuda nenhuma: a jogada ruim não pergunta e já perde
+  pg = await abrir(null, { fase: { facil: 1, medio: 1, dificil: 5 } });
+  await pg.click('#btDificil'); await pg.waitForFunction(() => AquaApp.lay());
+  await pg.evaluate(() => { const u = AquaApp.usos(); u.desfazer = 3; u.embaralhar = 1; u.extra = 1; });
+  ruim = await jogadaRuim(pg);
+  await pg.click('#frasco-' + ruim[0]); await pg.click('#frasco-' + ruim[1]);
+  await pg.waitForTimeout(200);
+  assert.equal(await pg.isVisible('#confirma'), false, 'no Difícil não pergunta');
+  await pg.waitForSelector('#falhou:not([hidden])', { timeout: 3000 });
+  await pg.click('#btFalhouNiveis'); await pg.waitForSelector('#menu', { state: 'visible' });
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('sem saída no Fácil: pergunta antes, mas nunca perde (desfazer sem limite)', async () => {
+  const pg = await abrir(null, { fase: { facil: 25, medio: 1, dificil: 1 } });
+  await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
+  await pg.evaluate(() => { const u = AquaApp.usos(); u.embaralhar = 3; u.extra = 2; });
+  const ruim = await jogadaRuim(pg);
+  await pg.click('#frasco-' + ruim[0]); await pg.click('#frasco-' + ruim[1]);
+  await pg.waitForSelector('#confirma:not([hidden])');
+  await pg.click('#btConfSim'); await assentar(pg);
+  for (let k = 0; k < 6; k++) { if (!(await qualquerJogada(pg))) break; await assentar(pg); }
+  await pg.waitForTimeout(400);
+  assert.equal(await pg.evaluate(() => AquaApp.perdeu()), false);
+  assert.equal(await pg.isVisible('#falhou'), false);
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+// ---------- Cubo d'Água (desde a 0.4.0) ----------
+async function abrirCubo(pg, nivel) {
+  await pg.click('#btModoCubo');
+  await pg.click(nivel || '#btMedio');
+  await pg.waitForFunction(() => window.AquaCubo && AquaApp.cubo() && document.querySelector('#areaCubo canvas'), null, { timeout: 20000 });
+  await pg.waitForFunction(() => !AquaCubo.ocupado());
+}
+const parado = (pg) => pg.waitForFunction(() => !AquaCubo.ocupado(), null, { timeout: 15000 });
+const pastilhaDeFrente = (pg) => pg.evaluate(() => { let melhor = null; for (const p of AquaApp.cubo().pastilhas) { const q = AquaCubo.projetar(p.id); if (q && (!melhor || q.deFrente > melhor.deFrente)) melhor = q; } return melhor; });
+
+test('cubo: escolher 🧊 Cubo d\'Água no começo (fica guardado), abrir em 3D com o cubo embaralhado e o fundo em carrossel', async () => {
+  const pg = await abrir();
+  assert.equal(await pg.getAttribute('#btModoFrascos', 'aria-checked'), 'true');
+  await pg.click('#btModoCubo');
+  assert.equal(await pg.getAttribute('#btModoCubo', 'aria-checked'), 'true');
+  assert.match(await pg.textContent('#menu .sub'), /Gire as fatias do cubo/);
+  assert.match(await pg.textContent('#btMedio'), /4 a 8 giros/);
+  assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem('aqua.pref')).modo), 'cubo');
+  await pg.click('#btMedio');
+  await pg.waitForFunction(() => window.AquaCubo && AquaApp.cubo() && document.querySelector('#areaCubo canvas'), null, { timeout: 20000 });
+  assert.equal(await pg.evaluate(() => AquaApp.tela()), 'cubo');
+  assert.equal(await pg.textContent('#placaFaseCubo'), 'Fase 1');
+  assert.ok(await pg.evaluate(() => !CuboMotor.pronto(AquaApp.cubo())), 'começa embaralhado');
+  assert.equal(await pg.evaluate(() => AquaCubo.diferencas()), 0, 'o desenho 3D é igual às regras');
+  assert.ok(await pg.evaluate(() => document.querySelector('#cubo #cenario')), 'o fundo em carrossel veio para a tela do cubo');
+  const r = await pg.evaluate(() => { const c = document.querySelector('#areaCubo canvas').getBoundingClientRect(); return { w: c.width, h: c.height }; });
+  assert.ok(r.w > 300 && r.h > 400, 'o cubo ocupa a área: ' + JSON.stringify(r));
+  // voltar ao começo e de novo: o menu continua no cubo
+  await pg.click('.bolinho-nav .bn-casa'); await pg.waitForSelector('#menu', { state: 'visible' });
+  assert.equal(await pg.getAttribute('#btModoCubo', 'aria-checked'), 'true');
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('cubo: arrastar o dedo num cubinho gira a fatia; arrastar fora gira o cubo inteiro (sem contar giro)', async () => {
+  const pg = await abrir(CELULAR);
+  await abrirCubo(pg);
+  const a = await pastilhaDeFrente(pg);
+  await pg.mouse.move(a.x, a.y); await pg.mouse.down();
+  for (let i = 1; i <= 12; i++) { await pg.mouse.move(a.x + i * 9, a.y + 1); await pg.waitForTimeout(16); }
+  await pg.mouse.up(); await parado(pg);
+  assert.equal(await pg.evaluate(() => AquaApp.cubo().giros.length), 1, 'girou uma fatia');
+  assert.equal(await pg.evaluate(() => AquaCubo.diferencas()), 0);
+  // arrasto curtinho: a fatia volta e não conta
+  const b = await pastilhaDeFrente(pg);
+  await pg.mouse.move(b.x, b.y); await pg.mouse.down();
+  for (let i = 1; i <= 3; i++) { await pg.mouse.move(b.x, b.y + i * 6); await pg.waitForTimeout(16); }
+  await pg.mouse.up(); await parado(pg);
+  assert.equal(await pg.evaluate(() => AquaApp.cubo().giros.length), 1, 'arrasto curto não gira');
+  // fora do cubo: gira o cubo inteiro
+  const antes = await pastilhaDeFrente(pg);
+  await pg.mouse.move(25, 230); await pg.mouse.down();
+  for (let i = 1; i <= 10; i++) { await pg.mouse.move(25 + i * 10, 230 + i * 2); await pg.waitForTimeout(16); }
+  await pg.mouse.up(); await pg.waitForTimeout(200);
+  assert.equal(await pg.evaluate(() => AquaApp.cubo().giros.length), 1);
+  const depois = await pastilhaDeFrente(pg);
+  assert.ok(Math.hypot(depois.x - antes.x, depois.y - antes.y) > 5 || depois.deFrente !== antes.deFrente, 'o cubo virou');
+  assert.equal(await pg.evaluate(() => AquaCubo.diferencas()), 0);
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('cubo: tocar num cubinho marca ele e mostra as setas; a seta gira a fatia; desfazer volta; dica balança sem girar', async () => {
+  const pg = await abrir(CELULAR);
+  await abrirCubo(pg);
+  assert.equal(await pg.isVisible('#setas'), false);
+  const a = await pastilhaDeFrente(pg);
+  await pg.mouse.click(a.x, a.y); await pg.waitForTimeout(200);
+  assert.ok(await pg.evaluate(() => AquaCubo.marcado()));
+  assert.ok(await pg.isVisible('#setas'));
+  for (const s of ['#setaEsq', '#setaCima', '#setaBaixo', '#setaDir']) {
+    const r = await pg.evaluate((s) => { const b = document.querySelector(s).getBoundingClientRect(); return { l: b.left, r: b.right, t: b.top, b: b.bottom, w: b.width }; }, s);
+    assert.ok(r.l >= 0 && r.r <= 390 && r.t >= 0 && r.b <= 844 && r.w >= 44, s + ' fora da tela ou pequena');
+    assert.equal(await pg.evaluate((s) => { const b = document.querySelector(s).getBoundingClientRect(); return document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2) === document.querySelector(s); }, s), true, s + ' coberta');
+  }
+  await pg.click('#setaDir'); await parado(pg);
+  assert.equal(await pg.evaluate(() => AquaApp.cubo().giros.length), 1);
+  assert.ok(await pg.evaluate(() => AquaCubo.marcado()), 'continua marcado para girar de novo');
+  await pg.click('#setaCima'); await parado(pg);
+  assert.equal(await pg.evaluate(() => AquaApp.cubo().giros.length), 2);
+  assert.equal(await pg.evaluate(() => AquaCubo.diferencas()), 0);
+  const antes = await pg.evaluate(() => JSON.stringify(AquaApp.cubo().pastilhas));
+  await pg.click('#btDesfazerCubo'); await parado(pg);
+  assert.equal(await pg.evaluate(() => AquaApp.cubo().giros.length), 1);
+  assert.notEqual(await pg.evaluate(() => JSON.stringify(AquaApp.cubo().pastilhas)), antes);
+  assert.equal(await pg.evaluate(() => AquaApp.cuboUsos().desfazer), 1);
+  assert.match(await pg.getAttribute('#btDesfazerCubo', 'aria-label'), /restam 9/);
+  const p0 = await pg.evaluate(() => JSON.stringify(AquaApp.cubo().pastilhas));
+  await pg.click('#btDicaCubo');
+  assert.ok(await pg.evaluate(() => AquaCubo.ocupado()), 'a fatia da dica balança');
+  await parado(pg);
+  assert.equal(await pg.evaluate(() => JSON.stringify(AquaApp.cubo().pastilhas)), p0, 'a dica não gira de verdade');
+  assert.match(await pg.textContent('#avisoCubo'), /fatia que balançou/);
+  assert.equal(await pg.evaluate(() => AquaApp.cuboUsos().dica), 1);
+  assert.equal(await pg.evaluate(() => AquaCubo.diferencas()), 0);
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('cubo: montar todas as faces = fim de fase com estrelas e gotinhas, guardado à parte dos frascos; próxima fase', async () => {
+  const pg = await abrir(CELULAR, { gotas: 5 });
+  await abrirCubo(pg, '#btFacil');
+  const caminho = await pg.evaluate(() => CuboMotor.caminho(AquaApp.cubo()));
+  for (const g of caminho) { await parado(pg); assert.ok(await pg.evaluate((g) => AquaCubo.girar(g), g)); }
+  await pg.waitForSelector('#fim:not([hidden])', { timeout: 15000 });
+  assert.equal(await pg.locator('#fimEstrelas .acesa').count(), 3);
+  assert.match(await pg.textContent('#fimGotas'), /\+30 gotinhas/);
+  const g = await pg.evaluate(() => JSON.parse(localStorage.getItem('aqua.pref')));
+  assert.equal(g.gotas, 35); assert.equal(g.cubo.fase.facil, 2); assert.deepEqual(g.cubo.estrelas.facil, [3]);
+  assert.equal(g.fase.facil, 1, 'a fase dos frascos não muda');
+  await pg.click('#btProxima');
+  await parado(pg);
+  assert.equal(await pg.textContent('#placaFaseCubo'), 'Fase 2');
+  assert.equal(await pg.evaluate(() => AquaApp.cuboFase()), 2);
+  assert.ok(await pg.evaluate(() => !CuboMotor.pronto(AquaApp.cubo())));
+  assert.equal(await pg.evaluate(() => AquaCubo.diferencas()), 0);
+  await pg.click('.bolinho-nav .bn-casa'); await pg.waitForSelector('#menu', { state: 'visible' });
+  assert.match(await pg.textContent('#recFacil'), /Fase 2 · ⭐ 3/);
+  await pg.click('#btModoFrascos');
+  assert.match(await pg.textContent('#recFacil'), /^Fase 1$/);
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('cubo: celular deitado e computador: o cubo, a barra e as ajudas cabem na tela, sem rolar', async () => {
+  for (const [w, h] of [[844, 390], [1280, 800], [360, 640]]) {
+    const pg = await abrir({ viewport: { width: w, height: h }, hasTouch: true, isMobile: w <= 915, deviceScaleFactor: 1 });
+    await abrirCubo(pg);
+    const r = await pg.evaluate(() => {
+      const cx = (e) => { const b = e.getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom }; };
+      return { sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight, bts: [...document.querySelectorAll('#cubo .aj:not(.seta), #cubo .barra > *')].map(cx),
+        pastilhas: AquaApp.cubo().pastilhas.map(p => AquaCubo.projetar(p.id)).filter(q => q.deFrente > 0.2) };
+    });
+    assert.ok(r.sw <= w && r.sh <= h, w + '×' + h + ': rola');
+    for (const b of r.bts) assert.ok(b.l >= -0.5 && b.t >= -0.5 && b.r <= w + 0.5 && b.b <= h + 0.5, w + '×' + h + ': botão fora da tela');
+    for (const q of r.pastilhas) assert.ok(q.x > 0 && q.x < w && q.y > 0 && q.y < h, w + '×' + h + ': o cubo sai da tela');
+    assert.deepEqual(pg.erros(), []);
+    await pg.ctx.close();
+  }
+});
+
 // telas onde tudo tem de caber: celular pequeno, celular em pé e deitado, tablet Fire, computador
 const TAMANHOS = [[360, 640], [390, 844], [412, 915], [844, 390], [915, 412], [800, 1280], [1280, 800], [1366, 768]];
 for (const [w, h] of TAMANHOS) {
@@ -330,7 +604,7 @@ for (const [w, h] of TAMANHOS) {
       const r = await pg.evaluate(() => {
         const cx = (e) => { const b = e.getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom, w: b.width, h: b.height }; };
         return { sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight, frascos: [...document.querySelectorAll('.frasco')].map(cx),
-          ajudas: [...document.querySelectorAll('.aj')].map(cx), barra: [...document.querySelectorAll('#jogo .barra > *')].map(cx), nav: cx(document.querySelector('.bolinho-nav')), s: AquaApp.lay().s };
+          ajudas: [...document.querySelectorAll('#jogo .aj')].map(cx), barra: [...document.querySelectorAll('#jogo .barra > *')].map(cx), nav: cx(document.querySelector('.bolinho-nav')), s: AquaApp.lay().s };
       });
       const onde = n + ' ' + w + '×' + h;
       assert.ok(r.sw <= w && r.sh <= h, onde + ': a página rola');
@@ -398,8 +672,8 @@ test('teclado: Tab chega nos frascos e Enter joga', async () => {
 test('sons gravados: o jogo carrega as gravações da pasta sons/ no primeiro toque', async () => {
   const pg = await abrir();
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
-  await pg.waitForFunction(() => AquaSom.carregadas().length >= 6, null, { timeout: 8000 });
-  assert.deepEqual((await pg.evaluate(() => AquaSom.carregadas())).sort(), ['aplausos', 'brilho', 'despejar', 'erro', 'glub', 'rolha', 'vidro']);
+  await pg.waitForFunction(() => AquaSom.carregadas().length >= 7, null, { timeout: 8000 });
+  assert.deepEqual((await pg.evaluate(() => AquaSom.carregadas())).sort(), ['aplausos', 'brilho', 'despejar', 'erro', 'glub', 'rolha', 'sanfona', 'vidro']);
   await pg.ctx.close();
 });
 
@@ -419,7 +693,7 @@ test('inglês escolhido na estante: o jogo abre em inglês, sem botão de idioma
   assert.equal(await pg.$('#btLingua'), null);
   assert.match(await pg.textContent('.sub'), /Pour the colors/);
   assert.match(await pg.textContent('#recFacil'), /Stage 1/);
-  assert.match(await pg.textContent('#versao'), /Version 0\.3\.0 · Nov\/14\/2026/);
+  assert.match(await pg.textContent('#versao'), /Version 0\.4\.0 · Nov\/14\/2026/);
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
   assert.equal(await pg.textContent('#placaFase'), 'Stage 1');
   assert.match(await pg.getAttribute('#frasco-0', 'aria-label'), /^Bottle 1: top to bottom: /);
@@ -434,7 +708,7 @@ test('espanhol escolhido na estante: menu, jogo, ajudas, fim de fase e lojinha e
   assert.equal(await pg.textContent('#btFacil .n-nome'), '🫧 Fácil');
   assert.equal(await pg.textContent('#btMedio .n-nome'), '🧪 Medio');
   assert.match(await pg.textContent('#recFacil'), /Fase 1/);
-  assert.match(await pg.textContent('#versao'), /Versión 0\.3\.0 · 14\/nov\/2026 · Música: .* sin anuncios y sin compras/);
+  assert.match(await pg.textContent('#versao'), /Versión 0\.4\.0 · 14\/nov\/2026 · Música: .* sin anuncios y sin compras/);
   assert.equal(await pg.getAttribute('#btAjuda', 'aria-label'), 'Cómo jugar');
   await pg.click('#btAjuda'); assert.match(await pg.textContent('#ajuda'), /Nunca cuestan nada/);
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
@@ -468,7 +742,7 @@ test('sem internet: depois da primeira visita o jogo abre e joga pela cópia gua
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
   const p = await pg.evaluate(() => AquaMotor.plano(AquaApp.estado())[0]);
   await pg.click('#frasco-' + p[0]); await pg.click('#frasco-' + p[1]);
-  await pg.waitForFunction(() => AquaSom.carregadas().length >= 6, null, { timeout: 8000 });   // os efeitos também vêm da cópia
+  await pg.waitForFunction(() => AquaSom.carregadas().length >= 7, null, { timeout: 8000 });   // os efeitos também vêm da cópia
   // as fotos do fundo também abrem sem internet
   for (const id of ['cachoeira', 'praia', 'baloes']) {
     await pg.evaluate((id) => AquaFundo.mostrar(id, false), id);

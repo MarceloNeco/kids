@@ -61,7 +61,10 @@
   function montar() {
     var jogos = BolinhoBiblioteca.jogos, unicas = {};
     jogos.forEach(function (j) { j.musicas.forEach(function (m) { unicas[m.a] = 1; }); });
-    var h = '<div class="bib-c"><div class="bib-topo"><h2 id="bibTitulo">' + T('🎵 Biblioteca de músicas', '🎵 Music library', '🎵 Biblioteca de música') + '</h2>' +
+    // título com o mesmo radinho tocando do botão (Bolinho FM)
+    var radio = bt.querySelector('.radinho'), fm = T('Bolinho FM', 'Rainy Day FM', 'Buñuelos FM');
+    var h = '<div class="bib-c"><div class="bib-topo"><h2 id="bibTitulo">' + (radio ? radio.outerHTML : '') + '<span><span class="fm">' + fm + '</span><small>' +
+      T('Biblioteca de músicas', 'Music library', 'Biblioteca de música') + '</small></span></h2>' +
       '<button type="button" class="bib-x" aria-label="' + T('Fechar', 'Close', 'Cerrar') + '">✕</button></div>' +
       '<p class="bib-sub">' + T('Todas as músicas que tocam nos jogos e na rádio: ', 'Every song played in the games and on the radio: ', 'Todas las canciones que suenan en los juegos y en la radio: ') +
       Object.keys(unicas).length + T(' músicas. Toque ▶ para ouvir. Não quer uma música num jogo? Toque em "✓ No jogo" e ela fica fora.', ' songs. Tap ▶ to listen. Don\'t want a song in a game? Tap "✓ In game" to leave it out.', ' canciones. Toca ▶ para escucharla. ¿No quieres una canción en un juego? Toca "✓ En el juego" y se queda fuera.') + '</p>';
@@ -110,17 +113,22 @@
   ['play', 'pause', 'ended'].forEach(function (ev) { audio.addEventListener(ev, function () { marcar(); }); });
   audio.addEventListener('error', function () { marcar(true); });
 
+  // trava a página de trás enquanto a janela está aberta (dono, 14/Nov/2026: rolar até o fim da janela não pode mexer o fundo)
+  function travarFundo(sim) {
+    var h = document.documentElement, n = Math.max(0, (+h.getAttribute('data-travas') || 0) + (sim ? 1 : -1));
+    h.setAttribute('data-travas', n); h.classList.toggle('trava-fundo', n > 0);
+  }
   function abrir() {
     montar();
     painel.hidden = false;
-    d.body.classList.add('bib-aberta');
+    d.body.classList.add('bib-aberta'); travarFundo(true);
     painel.querySelector('.bib-x').focus();
     try { history.pushState({ bolinhoBiblioteca: 1 }, ''); naHistoria = true; } catch (e) { naHistoria = false; }
   }
   function fechar(pelaHistoria) {
     if (painel.hidden) return;
     painel.hidden = true;
-    d.body.classList.remove('bib-aberta');
+    d.body.classList.remove('bib-aberta'); travarFundo(false);
     audio.pause();
     if (naHistoria && !pelaHistoria) { naHistoria = false; history.back(); }
     naHistoria = false;

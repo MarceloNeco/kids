@@ -10,8 +10,9 @@
     (beforeinstallprompt): o toque instala na hora.
   - Onde o navegador não tem essa janela (iPhone, Mac, Firefox, tablet Fire da Amazon, TV, navegador
     dentro de outro app), o toque abre o passo a passo daquele aparelho, detectado sem perguntar.
-  - Já aberto como aplicativo, o botão some. "Já instalei" esconde por 30 dias (se o navegador voltar a
-    oferecer a instalação, é porque não está instalado, e o botão volta na hora).
+  - Já aberto como aplicativo (pelo ícone), o botão some. No navegador, se o Chrome disser que o Bolinho já está
+    instalado neste aparelho (getInstalledRelatedApps), também some. No navegador ele fica sempre à vista ("Já instalei" só o
+    esconde nesta visita): é o único botão de instalar da estante.
   Enquanto a janela de passos está aberta, <body> ganha a classe "bc-modal" (o kids.js deixa as
   setas e o OK do controle para ela).
 
@@ -43,7 +44,14 @@
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   }
 
-  var comoApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: minimal-ui)').matches)) || navigator.standalone === true;
+  var janelaDeApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: minimal-ui)').matches)) || navigator.standalone === true;
+  // Janela de app não quer dizer "o Bolinho já está instalado": aberta pela 🚪 de um JOGO instalado sozinho (outro app),
+  // a estante aparece dentro da janela do jogo (com a barrinha ✕ em cima). Só é o app do Bolinho quando abriu pelo ícone
+  // dele: o manifest abre em "?app=1" e a aba guarda a marca (dono, 14/Nov/2026: "apaguei o ícone e não achei a opção").
+  var MARCA_APP = 'bolinho:app:' + location.pathname;
+  if (janelaDeApp && /[?&]app=1\b/.test(location.search)) { try { sessionStorage.setItem(MARCA_APP, '1'); } catch (e) {} }
+  var comoApp = janelaDeApp && (function () { try { return sessionStorage.getItem(MARCA_APP) === '1'; } catch (e) { return true; } })();
+  var dentroDeOutroApp = janelaDeApp && !comoApp;
   if (comoApp) return;
 
   var css = '' +
@@ -124,9 +132,7 @@
   document.body.insertBefore(barra, document.body.firstChild);
   var botao = barra.querySelector('button');
   var texto = barra.querySelector('span');
-  // "Já instalei" esconde por 30 dias (antes era para sempre, e quem tocou sem querer nunca mais achava o botão)
-  function escondidoPorEscolha() { var v = Number(ler()); return v > 1 && Date.now() - v < 30 * 864e5; }
-  if (escondidoPorEscolha() && !FILA) barra.hidden = true;
+  // No navegador o botão fica sempre à vista (dono, 14/Nov/2026: um botão só, e que não suma); só some aberto pelo ícone.
 
   var fundo = document.createElement('div');
   fundo.className = 'bc-fundo';
@@ -139,6 +145,18 @@
   document.body.appendChild(fundo);
   var corpo = fundo.querySelector('.bc-corpo');
 
+  // Já instalado neste aparelho? No Chrome do Android (e do computador) o site pode perguntar ao navegador
+  // (getInstalledRelatedApps + "related_applications" no manifest). Instalado = a barra não aparece, nem no navegador
+  // (dono, 14/Nov/2026: "o site não reconhece que tem uma instância local"). Onde o navegador não sabe responder
+  // (iPhone, Firefox), a barra continua.
+  if (navigator.getInstalledRelatedApps && !FILA) {
+    try {
+      navigator.getInstalledRelatedApps().then(function (apps) {
+        if (apps && apps.length && !pedido) { gravar('1'); barra.hidden = true; }
+      }).catch(function () {});
+    } catch (e) { /* navegador sem a pergunta */ }
+  }
+
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     pedido = e;
@@ -149,7 +167,7 @@
 
   function pronto() {
     botao.className = 'bc-btn ok';
-    texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el icono ') + NOME;   // o ícone instalado se chama assim
+    texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el icono ') + NOME + (android ? T(' (ou na lista de apps)', ' (or in the app list)', ' (o en la lista de apps)') : '');   // o ícone instalado se chama assim
     if (FILA) { barra.hidden = false; rotuloProx(true); return; }   // na fila, a barra fica para seguir ao próximo
     setTimeout(function () { barra.hidden = true; }, 6000);
   }
@@ -197,6 +215,15 @@
   // Passo a passo de cada aparelho, no idioma escolhido na estante (idioma.js).
   function passos() {
     var N = NOME;
+    if (dentroDeOutroApp) return T('<p>O ' + N + ' abriu por dentro de outro app (o atalho do Portal ou um jogo instalado). Daqui não dá para instalar: abra no navegador.</p>' +
+      '<ol><li>' + (ios ? 'Abra o <b>Safari</b> e digite <b>solverone.com.br/kids</b>.' : 'Toque nos <b>três pontinhos ⋮</b> lá em cima, ao lado do ✕, e escolha <b>Abrir no Chrome</b>. Ou abra o app do Chrome e digite <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>Lá, toque em <b>Instalar o Bolinho</b>, no topo.</li></ol>',
+      '<p>' + N + ' opened inside another app (the Portal shortcut or an installed game). It can\'t be installed from here: open it in the browser.</p>' +
+      '<ol><li>' + (ios ? 'Open <b>Safari</b> and type <b>solverone.com.br/kids</b>.' : 'Tap the <b>three dots ⋮</b> at the top, next to the ✕, and choose <b>Open in Chrome</b>. Or open the Chrome app and type <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>There, tap <b>Install</b> at the top.</li></ol>',
+      '<p>' + N + ' se abrió dentro de otra app (el acceso directo del Portal o un juego instalado). Desde aquí no se puede instalar: ábrelo en el navegador.</p>' +
+      '<ol><li>' + (ios ? 'Abre <b>Safari</b> y escribe <b>solverone.com.br/kids</b>.' : 'Toca los <b>tres puntitos ⋮</b> arriba, junto a la ✕, y elige <b>Abrir en Chrome</b>. O abre la app de Chrome y escribe <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>Allí, toca <b>Instalar</b> arriba.</li></ol>');
     if (tv) return T('<p>Na TV não existe "instalar" pelo navegador, mas dá para deixar o ' + N + ' a um clique:</p>' +
       '<ol><li>Com esta página aberta, aperte o botão de <b>menu</b> do navegador da TV (às vezes é a engrenagem ou os <b>três pontinhos</b>).</li>' +
       '<li>Escolha <b>Adicionar aos favoritos</b> (em algumas TVs aparece <b>Fixar na tela inicial</b> ou <b>Adicionar à página inicial</b>: use esse, se tiver).</li>' +
@@ -269,18 +296,20 @@
       '<p>Has abierto esta página dentro de otra app (WhatsApp, Instagram…). Para instalarla, ábrela en Chrome:</p>' +
       '<ol><li>Toca <b>Abrir en Chrome</b> (botón de abajo) o los <b>tres puntitos ⋮</b> y <b>Abrir en el navegador</b>.</li>' +
       '<li>En Chrome, toca <b>Instalar la aplicación</b>, arriba de la página.</li></ol>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
-    if (android) return T('<ol><li>Toque nos <b>três pontinhos ⋮</b> do navegador (no canto de cima ou de baixo).</li>' +
-      '<li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
-      '<li>Confirme em <b>Instalar</b>. O ícone aparece junto dos seus apps.</li></ol>' +
-      '<p class="aviso">Se essa opção não aparecer, talvez já esteja instalado: procure o ícone <b>' + N + '</b> nos seus apps.</p>',
-      '<ol><li>Tap the browser\'s <b>three dots ⋮</b> (in the top or bottom corner).</li>' +
-      '<li>Tap <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
-      '<li>Confirm with <b>Install</b>. The icon shows up with your other apps.</li></ol>' +
-      '<p class="aviso">If you can\'t see that option, it may already be installed: look for the <b>' + N + '</b> icon in your apps.</p>',
-      '<ol><li>Toca los <b>tres puntitos ⋮</b> del navegador (arriba o abajo).</li>' +
-      '<li>Toca <b>Instalar app</b> o <b>Añadir a la pantalla de inicio</b>.</li>' +
-      '<li>Confirma con <b>Instalar</b>. El icono aparece junto a tus apps.</li></ol>' +
-      '<p class="aviso">Si no aparece esa opción, quizá ya esté instalada: busca el icono <b>' + N + '</b> en tus apps.</p>');
+    // Android sem a janela de instalar do Chrome: ou abriu por um link de outro app (janelinha com ✕ em cima, onde o
+    // Chrome não instala), ou já está instalado (no Samsung o ícone vai para a gaveta de apps, não para a tela inicial)
+    if (android) return T('<ol><li>Se em cima da página aparece um <b>✕</b> (a página abriu dentro de outro app, como o atalho do Portal), toque nos <b>três pontinhos ⋮</b> ao lado do ✕ e escolha <b>Abrir no Chrome</b>. Os próximos passos são lá no Chrome.</li>' +
+      '<li>No Chrome, toque nos <b>três pontinhos ⋮</b> (no canto de cima) e em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
+      '<li>Confirme em <b>Instalar</b>.</li></ol>' +
+      '<p class="aviso">Apagar o ícone da tela inicial não desinstala: o ' + N + ' continua instalado na lista de apps (por isso o Chrome não oferece instalar de novo). Não achou o ícone? Arraste a tela inicial para cima para abrir a <b>lista de apps</b> e procure <b>' + N + '</b>. Segure o dedo em cima dele e arraste para a tela inicial.</p>',
+      '<ol><li>If you see an <b>✕</b> at the top of the page (it opened inside another app, like the Portal shortcut), tap the <b>three dots ⋮</b> next to the ✕ and choose <b>Open in Chrome</b>. The next steps happen there in Chrome.</li>' +
+      '<li>In Chrome, tap the <b>three dots ⋮</b> (top corner) and <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
+      '<li>Confirm with <b>Install</b>.</li></ol>' +
+      '<p class="aviso">Removing the icon from the home screen doesn\'t uninstall it: ' + N + ' is still installed in the app list (that\'s why Chrome won\'t offer to install it again). Can\'t find the icon? Swipe up on the home screen to open the <b>app list</b> and look for <b>' + N + '</b>. Hold your finger on it and drag it to the home screen.</p>',
+      '<ol><li>Si arriba de la página aparece una <b>✕</b> (se abrió dentro de otra app, como el acceso directo del Portal), toca los <b>tres puntitos ⋮</b> junto a la ✕ y elige <b>Abrir en Chrome</b>. Los siguientes pasos son allí, en Chrome.</li>' +
+      '<li>En Chrome, toca los <b>tres puntitos ⋮</b> (arriba) y <b>Instalar aplicación</b> o <b>Añadir a la pantalla de inicio</b>.</li>' +
+      '<li>Confirma con <b>Instalar</b>.</li></ol>' +
+      '<p class="aviso">Quitar el icono de la pantalla de inicio no lo desinstala: ' + N + ' sigue instalado en la lista de apps (por eso Chrome no ofrece instalarlo otra vez). ¿No encuentras el icono? Desliza hacia arriba en la pantalla de inicio para abrir la <b>lista de apps</b> y busca <b>' + N + '</b>. Mantén el dedo encima y arrástralo a la pantalla de inicio.</p>');   // sem botão "Abrir no Chrome": dentro da janelinha com ✕ ele só recarrega a página (dono, 14/Nov/2026)
     if (macSafari) return T('<ol><li>No menu do topo da tela, clique em <b>Arquivo</b>.</li>' +
       '<li>Clique em <b>Adicionar ao Dock</b> e em <b>Adicionar</b>.</li></ol>',
       '<ol><li>In the menu at the top of the screen, click <b>File</b>.</li>' +
@@ -321,10 +350,15 @@
 
   // Janela de passos: abre com movimento curto, fecha no ✕, no Esc, tocando fora e no Voltar do celular.
   var naHistoria = false;
+  // trava a página de trás enquanto a janela está aberta (dono, 14/Nov/2026: rolar até o fim da janela não pode mexer o fundo)
+  function travarFundo(sim) {
+    var h = document.documentElement, n = Math.max(0, (+h.getAttribute('data-travas') || 0) + (sim ? 1 : -1));
+    h.setAttribute('data-travas', n); h.classList.toggle('trava-fundo', n > 0);
+  }
   function abrir() {
     corpo.innerHTML = passos();
     fundo.hidden = false;
-    document.body.classList.add('bc-modal');
+    document.body.classList.add('bc-modal'); travarFundo(true);
     requestAnimationFrame(function () { fundo.classList.add('aberto'); });
     fundo.querySelector('.bc-fechar').focus();
     try { history.pushState({ bcPassos: 1 }, ''); naHistoria = true; } catch (e) {}
@@ -333,7 +367,7 @@
     if (fundo.hidden) return;
     fundo.classList.remove('aberto');
     fundo.hidden = true;
-    document.body.classList.remove('bc-modal');
+    document.body.classList.remove('bc-modal'); travarFundo(false);
     if (!barra.hidden) botao.focus();
     if (naHistoria && !pelaHistoria) { naHistoria = false; history.back(); }
     naHistoria = false;
@@ -343,9 +377,9 @@
   fundo.addEventListener('click', function (e) { if (e.target === fundo) fechar(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.keyCode === 27) fechar(); });
   fundo.querySelector('.bc-ja').addEventListener('click', function () {
-    gravar(String(Date.now())); fechar();
+    gravar('1'); fechar();
     if (FILA) return pronto();
-    barra.hidden = true;
+    barra.hidden = true;   // só nesta visita
   });
 
   botao.addEventListener('click', function () {

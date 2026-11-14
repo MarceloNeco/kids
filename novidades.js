@@ -77,14 +77,19 @@
       '<button type="button" class="nunca">' + T('Não mostrar mais esta mensagem', "Don't show this message again", 'No volver a mostrar este mensaje') + '</button></div>';
   }
   function naoMostrarMais() { marcar(novos.map(function (j) { return j.id + '@' + j.novo; })); }
+  // trava a página de trás enquanto a janela está aberta (dono, 14/Nov/2026: rolar até o fim da janela não pode mexer o fundo)
+  function travarFundo(sim) {
+    var h = document.documentElement, n = Math.max(0, (+h.getAttribute('data-travas') || 0) + (sim ? 1 : -1));
+    h.setAttribute('data-travas', n); h.classList.toggle('trava-fundo', n > 0);
+  }
   function abrir() {
     montar();
-    caixa.hidden = false;
+    caixa.hidden = false; travarFundo(true);
     caixa.querySelector('.ok').focus();
   }
   function fechar() {
     if (caixa.hidden) return;
-    caixa.hidden = true;
+    caixa.hidden = true; travarFundo(false);
   }
   caixa.addEventListener('click', function (e) {
     if (e.target.closest('.nunca')) { naoMostrarMais(); return fechar(); }

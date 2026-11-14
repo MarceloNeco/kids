@@ -2,7 +2,7 @@
 // - é a primeira coisa da página, numa linha só, com a frase do aparelho (celular, tablet, computador; na TV, "Deixar
 //   o Bolinho na TV") e no idioma escolhido;
 // - no iPhone (sem janela de instalar do navegador) o toque abre o passo a passo daquele aparelho;
-// - "Já instalei" esconde por 30 dias, não para sempre (marca antiga "1" volta a mostrar).
+// - um botão de instalar só, sempre à vista no navegador ("Já instalei" esconde só na visita); some aberto pelo ícone.
 // Rodar da raiz do repositório: node --test teste/instalar.test.js
 const test = require('node:test');
 const assert = require('node:assert');
@@ -25,7 +25,7 @@ const ESPERA = {
   computador: ['Instalar o Bolinho no computador', 'Install Rainy Day Donuts on your computer', 'Instalar Buñuelos de Lluvia en el ordenador']
 };
 
-test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 3 idiomas; Já instalei esconde 30 dias', async () => {
+test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 3 idiomas; um botão só, sempre à vista no navegador', async () => {
   const { chromium } = require('playwright');
   const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
   const srv = http.createServer((q, r) => {
@@ -69,10 +69,62 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
         await ctx.close();
       }
     }
-    // marca de "Já instalei" de hoje: escondido; antiga ("1", de antes) ou de 31 dias: o botão volta
-    for (const [marca, escondido] of [[String(Date.now()), true], ['1', false], [String(Date.now() - 31 * 864e5), false]]) {
-      const { ctx, pg } = await abrir(UA.celular, 'pt', marca);
-      assert.strictEqual(await pg.$eval('.bc-inst', (e) => e.hidden), escondido, 'marca ' + marca);
+    // um botão de instalar só (a barra de cima), sempre à vista no navegador, mesmo com marca de "Já instalei"
+    {
+      const { ctx, pg } = await abrir(UA.iphone, 'pt', String(Date.now()));
+      assert.ok(!(await pg.$eval('.bc-inst', (e) => e.hidden)), 'a barra de instalar continua à vista');
+      assert.strictEqual(await pg.$$eval('.bc-btn, .bt-instalar', (b) => b.length), 1, 'um botão de instalar só');
+      await ctx.close();
+    }
+    // já instalado neste aparelho (o Chrome responde getInstalledRelatedApps): a barra some também no navegador
+    for (const [instalado, deveVer] of [[true, false], [false, true]]) {
+      const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, userAgent: UA.celular, locale: 'pt-BR', serviceWorkers: 'block' });
+      await ctx.addInitScript((i) => { localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); navigator.getInstalledRelatedApps = () => Promise.resolve(i ? [{ platform: 'webapp', url: location.origin + '/kids/manifest.webmanifest' }] : []); }, instalado);
+      await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+      const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(400);
+      assert.strictEqual(!(await pg.$eval('.bc-inst', (e) => e.hidden)), deveVer, instalado ? 'já instalado: sem barra no navegador' : 'não instalado: barra à vista');
+      await ctx.close();
+    }
+    assert.match(fs.readFileSync(path.join(raiz, 'manifest.webmanifest'), 'utf8'), /"related_applications": \[\{ "platform": "webapp", "url": "https:\/\/solverone\.com\.br\/kids\/manifest\.webmanifest" \}\]/, 'manifest diz qual é o app (webapp)');
+    // janela de app: pelo ícone do Bolinho (?app=1) some tudo; dentro da janela de um JOGO instalado (🚪 do jogo leva à
+    // estante, sem ?app=1) o botão aparece e ensina a abrir no Chrome para instalar
+    {
+      const janela = async (url) => {
+        const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, userAgent: UA.celular, locale: 'pt-BR', serviceWorkers: 'block' });
+        await ctx.addInitScript(() => {
+          localStorage.setItem('bolinho:novidades-ocultas', '["*"]');
+          const mm = window.matchMedia.bind(window);
+          window.matchMedia = (q) => /display-mode:\s*standalone/.test(q) ? { matches: true, media: q, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} } : mm(q);
+        });
+        await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+        const pg = await ctx.newPage(); await pg.goto(url); await pg.waitForTimeout(400);
+        return { ctx, pg };
+      };
+      let { ctx, pg } = await janela(base + '?app=1');
+      assert.strictEqual(await pg.$('.bc-inst'), null, 'pelo ícone do Bolinho: sem barra de instalar');
+      await pg.goto(base); await pg.waitForTimeout(300);   // voltou para a estante (sem ?app=1) na mesma janela do app
+      assert.strictEqual(await pg.$('.bc-inst'), null, 'continua sendo o app do Bolinho');
+      await ctx.close();
+      ({ ctx, pg } = await janela(base));
+      assert.ok(await pg.isVisible('.bc-btn'), 'dentro de um jogo instalado: o botão aparece');
+      await pg.click('.bc-btn');
+      await pg.waitForSelector('.bc-fundo:not([hidden])');
+      assert.match(await pg.textContent('.bc-corpo'), /por dentro de outro app/);
+      assert.match(await pg.textContent('.bc-corpo'), /três pontinhos ⋮.*Abrir no Chrome/, 'ensina o ⋮ → Abrir no Chrome (o link intent só recarregava a página)');
+      assert.strictEqual(await pg.$('.bc-corpo a.bc-forte'), null, 'sem o botão que só recarregava');
+      await ctx.close();
+      assert.match(fs.readFileSync(path.join(raiz, 'manifest.webmanifest'), 'utf8'), /"start_url": "\.\/\?app=1"/, 'o ícone abre com ?app=1');
+    }
+    // 🎵 Músicas e o idioma numa linha só, até em celular estreito e com a letra grande do Android
+    for (const [w, letra] of [[390, 16], [360, 21], [320, 21]]) {
+      const ctx = await b.newContext({ viewport: { width: w, height: 700 }, userAgent: UA.celular, locale: 'pt-BR', serviceWorkers: 'block' });
+      await ctx.addInitScript((f) => { localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); document.addEventListener('DOMContentLoaded', () => { document.documentElement.style.fontSize = f + 'px'; }); }, letra);
+      await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+      const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(400);
+      const r = await pg.$$eval('.barra-topo .bt-biblioteca, .barra-topo .bi-atual', (bs) => bs.map((x) => { const c = x.getBoundingClientRect(); return { t: Math.round(c.top), r: c.right, cortado: x.scrollWidth > x.clientWidth + 1 }; }));
+      assert.strictEqual(r.length, 2, w + ': os dois botões');
+      assert.ok(r.every((x) => x.t === r[0].t), w + ' px, letra ' + letra + ': na mesma linha ' + JSON.stringify(r));
+      assert.ok(r.every((x) => !x.cortado && x.r <= w), w + ' px: nenhum cortado nem para fora da tela');
       await ctx.close();
     }
   } finally { await b.close(); srv.close(); }
