@@ -2,6 +2,23 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.21.0",
+      "data": "14/Nov/2026",
+      "hora": "17:56:48",
+      "pt": [
+        "🎵 Mais 17 músicas na rádio (37 no total): pop, funk e dance animados, sem voz.",
+        "💃 O desfile agora toca músicas de passarela: umas chiques e animadas, outras mais calmas e emocionantes."
+      ],
+      "en": [
+        "🎵 17 more songs on the radio (37 in all): upbeat pop, funk and dance, no vocals.",
+        "💃 The runway now plays catwalk songs: some chic and upbeat, others calmer and more moving."
+      ],
+      "es": [
+        "🎵 17 canciones más en la radio (37 en total): pop, funk y dance animados, sin voz.",
+        "💃 El desfile ahora suena con música de pasarela: unas elegantes y animadas, otras más tranquilas y emocionantes."
+      ]
+    },
+    {
       "versao": "0.20.0",
       "data": "14/Nov/2026",
       "hora": "17:23:24",

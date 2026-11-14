@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.20.0';
+  var APP_VERSION = '0.21.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -834,7 +834,7 @@
     $('desfileRecorde').hidden = !recorde;
     $('btProximo').textContent = d ? t('▶ Próximo desafio', '▶ Next challenge', '▶ Siguiente desafío') : t('🎨 Continuar brincando', '🎨 Keep playing', '🎨 Seguir jugando');
     $('btMaisUm').hidden = !d;
-    Som.proxima();
+    Som.desfile();
     if (CALMO) { Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 500); }
     ponte('desfile', { d: modo || '', est: r ? r.estrelas : 0 });
   }

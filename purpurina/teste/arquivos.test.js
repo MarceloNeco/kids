@@ -76,7 +76,16 @@ test('músicas: toda música da rádio existe, está no sw.js e tem crédito em 
   assert.ok(urls.length >= 20, 'pelo menos 20 músicas');
   assert.equal(urls[0], 'musicas/disco-medusae.mp3', 'a de abertura continua sendo a primeira');
   assert.deepEqual(doSw, urls, 'a mesma lista no sw.js');
-  urls.forEach(u => { assert.ok(fs.existsSync(path.join(pasta, u)), u + ' existe'); assert.ok(lic.includes('`' + u.split('/')[1] + '`'), u + ' tem crédito'); });
+  urls.forEach(u => {
+    assert.ok(fs.existsSync(path.join(pasta, u)), u + ' existe');
+    // as da pasta da Purpurina têm crédito aqui; as tocadas da pasta de outro jogo, no CREDITOS.md de lá
+    const outro = (f) => { const a = path.join(pasta, u.split('/musicas/')[0], f); return fs.existsSync(a) ? fs.readFileSync(a, 'utf8') : ''; };
+    const cred = u.startsWith('../') ? outro('CREDITOS.md') + outro('musicas/LICENCAS.md') : lic;
+    assert.ok(cred.includes(u.split('/').pop()), u + ' tem crédito');
+  });
+  const desfile = require('../som.js').PurpurinaSom.GRAVADAS.filter(g => g.desfile);
+  assert.ok(desfile.length >= 6, 'pelo menos 6 de passarela (desfile)');
+  assert.match(ler('app.js'), /Som\.desfile\(\)/, 'o desfile sorteia uma de passarela');
   const sobrando = fs.readdirSync(path.join(pasta, 'musicas')).filter(f => f.endsWith('.mp3') && !urls.includes('musicas/' + f));
   assert.deepEqual(sobrando, ['laserpack.mp3'], 'nenhum MP3 fora da rádio (só a Laserpack, que saiu na 0.17.3: som de videogame)');
 });
