@@ -497,6 +497,8 @@
   }
   // cidade 3D de verdade (cidade3d.js, v0.12.0) quando o aparelho tem 3D; senão (ou com ?vila2d) a vila desenhada de antes
   // nos testes (?teste) fica a vila desenhada, para os testes antigos; ?teste&vila3d testa a cidade 3D
+  // lavar as mãos em 3D (lavar3d.js); nos testes só com ?teste&lavar3d (os testes antigos usam a pia desenhada)
+  function usaLavar3D() { return !!(window.Lavar3D && Lavar3D.suportado() && (!RAPIDO || /[?&]lavar3d\b/.test(location.search))); }
   function usa3D() { return !!(window.Cidade3D && Cidade3D.suportado() && !/[?&]vila2d\b/.test(location.search) && (!RAPIDO || /[?&]vila3d\b/.test(location.search))); }
   window.addEventListener('cidade3d-pronta', function () { if (atual === 'mapa' && jogo) desenharMapa(); });
   function desenharMapa() {
@@ -1376,7 +1378,21 @@
     var palco = $('palco'), a = p.a, nv = jogo.cfg;
     palco.className = 'palco acao-' + a;
     var big = function (id) { return '<div class="grandao">' + icone(id) + '</div>'; };
-    if (a === 'lavar') {
+    if (a === 'lavar' && !p.ing.length && usaLavar3D()) {
+      // v0.12.0: lavar as mãos em 3D (lavar3d.js): a criança sobe no banquinho, abre a torneira, molha, passa sabão,
+      // esfrega (círculos com o dedo), enxágua, fecha a torneira e seca na toalha
+      var pararL = Lavar3D.montar(palco, { calmo: calmo(), rapido: VA < 1, voltas: 1.5, aoFim: function () { Som.toca('pega'); concluir(); }, textos: {
+        subir: [t('Suba no banquinho para alcançar a pia', 'Climb onto the stool to reach the sink', 'Súbete al taburete para llegar al lavabo'), t('🪜 Subir', '🪜 Climb up', '🪜 Subir')],
+        abrir: [t('Abra a torneira', 'Turn on the tap', 'Abre el grifo'), t('🚰 Abrir a torneira', '🚰 Turn on the tap', '🚰 Abrir el grifo')],
+        molhar: [t('Molhe as mãos na água', 'Wet your hands in the water', 'Mójate las manos en el agua'), t('💧 Molhar', '💧 Wet', '💧 Mojar')],
+        sabao: [t('Aperte o sabonete', 'Press the soap', 'Aprieta el jabón'), t('🧴 Sabonete', '🧴 Soap', '🧴 Jabón')],
+        esfregar: [t('Esfregue as mãos: faça círculos com o dedo na pia 🔄', 'Scrub your hands: make circles on the sink with your finger 🔄', 'Frótate las manos: haz círculos con el dedo en el lavabo 🔄'), ''],
+        enxaguar: [t('Agora enxágue a espuma', 'Now rinse the foam off', 'Ahora aclara la espuma'), t('💦 Enxaguar', '💦 Rinse', '💦 Aclarar')],
+        fechar: [t('Feche a torneira para não gastar água', 'Turn off the tap to save water', 'Cierra el grifo para no gastar agua'), t('🚰 Fechar', '🚰 Turn off', '🚰 Cerrar')],
+        secar: [t('Seque as mãos na toalha', 'Dry your hands on the towel', 'Sécate las manos con la toalla'), t('🧺 Secar', '🧺 Dry', '🧺 Secar')],
+        fim: [t('Mãos limpinhas! ✨', 'Squeaky clean hands! ✨', '¡Manos limpiecitas! ✨')] } });
+      fimCz.push(pararL);
+    } else if (a === 'lavar') {
       // pia com a torneira aberta: as duas mãos (ou o que está sendo lavado) esfregam junto com o dedo, a espuma
       // aparece aos poucos e, no fim, a água leva a espuma e brilha: "Mãos limpinhas!"
       var maos = !p.ing.length;

@@ -217,7 +217,7 @@
   // v0.12.0: ícones em 3D (render/<id>.webp para ingredientes e render/u-<id>.webp para utensílios), feitos no Higgsfield
   // (modelo Qwen-Image, licença Apache 2.0) com o fundo tirado; CREDITOS.md. RENDER lista os que já existem.
   var RENDER = {};
-  ('alface banana batata cenoura cheiro farinha jabuticaba laranja leite limao maca morango ovo peixe queijo tomate u-liquidificador uva')
+  ('acucar alface banana batata carne cenoura cheiro chocolate farinha fermento gelatina-po granulado jabuticaba laranja leite leitecond limao maca manteiga mel morango oleo ovo pao peixe polvilho queijo sal tomate u-liquidificador uva')
     .split(' ').forEach(function (k) { RENDER[k] = true; });
   function render(id) { var k = D.ingrediente[id] ? id : 'u-' + id; return RENDER[k] ? 'render/' + k + '.webp' : ''; }
   function icone(id, desenho) {
