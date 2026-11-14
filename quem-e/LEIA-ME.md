@@ -33,13 +33,33 @@ vira e a vez passa. Acertou, ganhou.
 | `caras.js` | desenha cada cara em SVG (busto), com versão detalhada para a lupa |
 | `melecas.js` | as duas melecas em SVG, com 6 humores (animação no CSS) |
 | `rede.js` | dois aparelhos: diário numerado dos eventos, pulso que reenvia o que faltou, segredo só no aparelho do dono; canal Supabase Realtime (`?teste` = BroadcastChannel) |
-| `app.js` | a tela inteira; `APP_VERSION` |
+| `app.js` | a tela do Duelo e o começo; `APP_VERSION` |
+| `adivinha-perguntas.js`, `adivinha.js`, `aprender.js`, `voz.js`, `adivinha-tela.js`, `personagens/` | A Meleca Adivinha (perguntas, motor, aprender, voz, tela, lista pronta) |
 | `sw.js`, `manifest.webmanifest`, ícones | instalar e abrir sem internet |
 | `teste/` | `logica`, `caras`, `melecas`, `partida`, `rede` (Node) · `pagina`, `arquivos` · `navegador` (Playwright: partidas inteiras, telas pequenas, lupa, duas abas em rede) · `folha-caras.html` (conferência visual das caras, fora do jogo) |
 
 Testes: `node --test quem-e/teste/*.test.js` (rodar da raiz do repositório).
 
+## A Meleca Adivinha (v0.2.0)
+
+A pessoa pensa em alguém (de desenho, de filme, famoso, um bicho, uma coisa ou alguém da casa) e a meleca descobre com
+perguntas. Respostas: **Sim · Acho que sim · Não sei · Acho que não · Não**, e ↩️ volta uma pergunta.
+
+- **Níveis:** 🧒 Infantil (só perguntas fáceis e personagens que criança conhece) · 👨‍👩‍👧 Família · 🧑 Adulto (a lista inteira).
+- **Lista pronta:** 667 personagens em `personagens/*.js` (familia, disney, desenhos, filmes, musica, famosos, mundo) e 134
+  perguntas em `adivinha-perguntas.js`. Só nome e emoji, nunca foto.
+- **Como ela pensa** (`adivinha.js`): chance para cada personagem, que cai com respostas que não combinam (com sobra, para
+  aguentar resposta errada); a próxima pergunta é a que mais divide os mais prováveis; chuta quando tem certeza ou nas
+  perguntas 20, 30 e 40; até 4 chutes. Respondendo certo, acerta todo mundo da lista com umas 11 perguntas; com 10% das
+  respostas trocadas, acerta mais de 92% (`teste/adivinha-real.test.js`).
+- **João Alves**, a lenda da casa: está em `personagens/familia.js`; quando ela acerta, festa especial e "Qual João foi hoje?".
+- **Aprende** (`aprender.js`): quando perde, "Em quem você pensou?". Nome da lista pronta = guarda a correção; nome novo =
+  personagem novo (da casa). ✏️ **Ensinar alguém** cadastra alguém do zero respondendo perguntas. 📦 **O que a meleca
+  aprendeu**: esquecer, 📤 exportar e 📥 importar (para passar a outro celular). Tudo só neste aparelho
+  (`bolinho:quem-e:aprendidos`); nome da família nunca vai para a internet.
+- **Voz** (`voz.js`): a do aparelho sempre; 🎙️ **Voz animada** (ElevenLabs) é opcional, com a chave da pessoa no cofre comum
+  (`../cofre.js`, `ia:elevenlabs`); cada fala fica guardada (Cache Storage `quem-e-voz`) e repete sem gastar e sem internet.
+
 ## Próxima brincadeira
 
-**A Meleca Adivinha** (você pensa em alguém e a meleca descobre): especificação em
-`docs/superpowers/specs/2026-11-14-quem-e-design.md`, seção 12.
+Corpo inteiro no Duelo de Caras, Jogar pertinho e o resto em `PENDENCIAS.md`.

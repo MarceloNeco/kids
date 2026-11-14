@@ -82,8 +82,8 @@ test('quando perde, aprende alguém novo e guarda só no aparelho', async () => 
   await pg.click('#btFamilia');
   for (let i = 0; i < 300; i++) {
     if (await pg.locator('#advPerdi:not([hidden])').count()) break;
-    if (await pg.locator('#advChute:not([hidden])').count()) { await pg.click('#btErrou'); continue; }
-    if (await pg.locator('#advRespostas:not([hidden])').count()) await pg.click('#advRespostas .resp[data-r="?"]'); else await pg.waitForTimeout(20);
+    if (await pg.locator('#advChute:not([hidden])').count()) { await pg.click('#btErrou', { timeout: 1000 }).catch(() => {}); continue; }
+    if (await pg.locator('#advRespostas:not([hidden])').count()) await pg.click('#advRespostas .resp[data-r="?"]', { timeout: 1000 }).catch(() => {}); else await pg.waitForTimeout(20);
   }
   await pg.waitForSelector('#advPerdi:not([hidden])');
   await pg.fill('#advNome', 'Meu irmão Theo'); await pg.click('#advEmojis .emoji-bt >> nth=1');

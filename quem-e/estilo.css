@@ -261,3 +261,14 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
   .resp { min-height: 44px; font-size: 1.05rem; }
   .adv-voltar { position: static; }
 }
+/* respostas em duas colunas: Sim | Não, Acho que sim | Acho que não, Não sei | ↩️ (cabe em celular baixinho) */
+.adv-respostas { grid-template-columns: 1fr 1fr; }
+.resp.sim { order: 1; } .resp.nao { order: 2; } .resp.psim { order: 3; } .resp.pnao { order: 4; } .resp.nsei { order: 5; }
+.adv-respostas .adv-voltar { order: 6; position: static; justify-self: center; align-self: center; }
+.adv-respostas #btJaChega { order: 7; grid-column: 1 / -1; }
+.resp.sim, .resp.nao { min-height: 60px; font-size: 1.3rem; }
+@media (max-height: 700px) and (orientation: portrait) {
+  #adivinha { padding-top: calc(56px + var(--st)); gap: 6px; }
+  .meleca-grande { width: min(32vw, 20vh, 150px); }
+  .adv-fala { padding: 10px 14px; }
+}
