@@ -303,13 +303,13 @@
       'capa:s chapeu:s forte:p antigo:n recente:s t-star-wars:s'],
     ['homem-de-ferro', 'Homem de Ferro', '🦾', 'IFA',
       'real:n bicho:n coisa:n idoso:n brasileiro:n fala:s desenho:p filme:s serie:n livro:s videogame:n internet:n ' +
-      'tv:n disney:p canta:n musica:n esporte:n heroi:s vilao:n magia:n voa:s engracado:n realeza:n cor-azul:n ' +
+      'tv:n disney:p canta:n musica:n esporte:n heroi:s vilao:n magia:? voa:s engracado:n realeza:n cor-azul:n ' +
       'cor-vermelho:s cor-verde:n cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n ' +
       'ator:n politico:n rabo:n pelo:n pessoa:s masculino:s feminino:n crianca:n vestido:n robo:p rico:s cientista:s ' +
       'barba:s capa:p forte:s careca:n oculos:p estrangeiro-eua:s antigo:q recente:p t-marvel:s'],
     ['capitao-america', 'Capitão América', '🛡️', 'IFA',
       'real:n bicho:n coisa:n idoso:n brasileiro:n fala:s desenho:p filme:s serie:n livro:s videogame:n internet:n ' +
-      'tv:n disney:p canta:n musica:n esporte:n heroi:s vilao:n magia:n voa:n engracado:n realeza:n cor-azul:s ' +
+      'tv:n disney:p canta:n musica:n esporte:n heroi:s vilao:n magia:? voa:n engracado:n realeza:n cor-azul:s ' +
       'cor-vermelho:p cor-verde:n cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n ' +
       'ator:n politico:n rabo:n pelo:n pessoa:s masculino:s feminino:n crianca:n vestido:n forte:s arma:p loiro:s ' +
       'capa:p chapeu:p careca:n barba:n historia:p estrangeiro-eua:s antigo:q recente:p t-marvel:s'],
@@ -339,7 +339,7 @@
       'forte:p inseto:p estrangeiro-eua:s antigo:s recente:p t-marvel:s'],
     ['pantera-negra', 'Pantera Negra', '🐆', 'IFA',
       'real:n bicho:n coisa:n idoso:n brasileiro:n fala:s desenho:q filme:s serie:n livro:s videogame:n internet:n ' +
-      'tv:n disney:p canta:n musica:n esporte:n heroi:s vilao:n magia:n voa:n engracado:n realeza:s cor-azul:n ' +
+      'tv:n disney:p canta:n musica:n esporte:n heroi:s vilao:n magia:? voa:n engracado:n realeza:s cor-azul:n ' +
       'cor-vermelho:n cor-verde:n cor-amarelo:n cor-rosa:n cor-preto:s cor-branco:n cor-marrom:n grande:n pequeno:n ' +
       'ator:n politico:n rabo:n pelo:n pessoa:s masculino:s feminino:n crianca:n vestido:n forte:s rapido:p rico:s ' +
       'capa:s gato:q careca:n antigo:n recente:s t-marvel:s'],
@@ -387,7 +387,7 @@
       'ruivo:p cabelo-comprido:s europa:p antigo:n recente:s t-marvel:s'],
     ['batman', 'Batman', '🦇', 'IFA',
       'real:n bicho:n coisa:n idoso:n brasileiro:n fala:s desenho:p filme:s serie:n livro:s videogame:n internet:n ' +
-      'tv:n disney:n canta:n musica:n esporte:n heroi:s vilao:n magia:n voa:n engracado:n realeza:n cor-azul:n ' +
+      'tv:n disney:n canta:n musica:n esporte:n heroi:s vilao:n magia:? voa:n engracado:n realeza:n cor-azul:n ' +
       'cor-vermelho:n cor-verde:n cor-amarelo:n cor-rosa:n cor-preto:s cor-branco:n cor-marrom:n grande:n pequeno:n ' +
       'ator:n politico:n rabo:n pelo:n pessoa:s masculino:s feminino:n crianca:n vestido:n detetive:s rico:s ' +
       'veiculo:s capa:s forte:s orelhas:p careca:n antigo:s recente:n estrangeiro-eua:s t-dc:s'],
@@ -453,7 +453,7 @@
       'cientista:s chapeu:s arma:s barba:p historia:p careca:n oculos:n estrangeiro-eua:s antigo:s recente:n'],
     ['chaves', 'Chaves', '🛢️', 'IFA',
       'real:n bicho:n coisa:n idoso:n brasileiro:n fala:s desenho:p filme:n serie:s livro:n videogame:n internet:n ' +
-      'tv:n disney:n canta:n musica:n esporte:n heroi:n vilao:n magia:n voa:n engracado:s realeza:n cor-azul:n ' +
+      'tv:n disney:n canta:n musica:n esporte:n heroi:p vilao:n magia:n voa:n engracado:s realeza:n cor-azul:n ' +
       'cor-vermelho:n cor-verde:n cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n ' +
       'ator:n politico:n rabo:n pelo:n pessoa:s masculino:s feminino:n crianca:s vestido:n barba:n careca:n chapeu:s ' +
       'rico:n escola:s comida:n oculos:n antigo:s recente:n estrangeiro-eua:n europa:n t-chaves:s'],
@@ -508,7 +508,7 @@
     ['chapolin', 'Chapolin Colorado', '🐞', 'IFA',
       'real:n bicho:n coisa:n idoso:n brasileiro:n fala:s desenho:q filme:n serie:s livro:n videogame:n internet:n ' +
       'tv:n disney:n canta:n musica:n esporte:n heroi:s vilao:n magia:p voa:n engracado:s realeza:n cor-azul:n ' +
-      'cor-vermelho:s cor-verde:n cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:p ' +
+      'cor-vermelho:s cor-verde:n cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:q ' +
       'ator:n politico:n rabo:n pelo:n pessoa:s masculino:s feminino:n crianca:n vestido:n arma:s chapeu:s inseto:q ' +
       'capa:n antigo:s recente:n estrangeiro-eua:n europa:n t-chaves:s'],
     ['eleven', 'Eleven (Stranger Things)', '🧇', 'FA',

@@ -221,7 +221,7 @@
       'dancar:n'],
     ['xuxa', 'Xuxa', '💋', 'IFA',
       'real:s pessoa:s bicho:n coisa:n crianca:n idoso:n fala:s desenho:n filme:s serie:q livro:n videogame:n internet:n tv:s ' +
-      'disney:n canta:s musica:s esporte:n heroi:n vilao:n magia:n voa:n engracado:p realeza:q cor-azul:? cor-vermelho:? cor-verde:? cor-amarelo:? ' +
+      'disney:n canta:s musica:s esporte:n heroi:n vilao:n magia:n voa:n engracado:p realeza:? cor-azul:? cor-vermelho:? cor-verde:? cor-amarelo:? ' +
       'cor-rosa:p cor-preto:? cor-branco:p cor-marrom:? grande:n pequeno:n vivo:s historia:n ator:p oscar:n rico:s futebol:n politico:n masculino:n ' +
       'feminino:s brasileiro:s estrangeiro-eua:n europa:n antigo:s recente:n loiro:s cabelo-comprido:s dancar:p casado:s chapeu:? oculos:n careca:n'],
     ['anitta', 'Anitta', '💃', 'IFA',
@@ -245,13 +245,13 @@
       'cor-rosa:? cor-preto:? cor-branco:? cor-marrom:? grande:n pequeno:n vivo:s historia:n ator:n oscar:n rico:s futebol:n politico:n masculino:n ' +
       'feminino:s brasileiro:s estrangeiro-eua:n europa:n antigo:s recente:n dancar:s festa:p casado:s cabelo-comprido:p loiro:q oculos:n careca:n'],
     ['sandy', 'Sandy (Sandy & Junior)', '🎤', 'FA',
-      'real:s pessoa:s bicho:n coisa:n crianca:p idoso:n fala:s desenho:n filme:p serie:p livro:n videogame:n internet:n tv:n ' +
+      'real:s pessoa:s bicho:n coisa:n crianca:q idoso:n fala:s desenho:n filme:p serie:p livro:n videogame:n internet:n tv:n ' +
       'disney:n canta:s musica:s esporte:n heroi:n vilao:n magia:n voa:n engracado:q realeza:n cor-azul:? cor-vermelho:? cor-verde:? cor-amarelo:? ' +
       'cor-rosa:? cor-preto:? cor-branco:? cor-marrom:? grande:n pequeno:n vivo:s historia:n ator:p oscar:n rico:s futebol:n politico:n masculino:n ' +
       'feminino:s brasileiro:s estrangeiro-eua:n europa:n antigo:s recente:n cabelo-comprido:s casado:? loiro:q dancar:q oculos:n careca:n'],
     ['roberto-carlos', 'Roberto Carlos', '🌹', 'FA',
       'real:s pessoa:s bicho:n coisa:n crianca:n idoso:p fala:s desenho:n filme:q serie:q livro:n videogame:n internet:n tv:p ' +
-      'disney:n canta:s musica:s esporte:n heroi:n vilao:n magia:n voa:n engracado:q realeza:q cor-azul:p cor-vermelho:? cor-verde:? cor-amarelo:? ' +
+      'disney:n canta:s musica:s esporte:n heroi:n vilao:n magia:n voa:n engracado:q realeza:? cor-azul:p cor-vermelho:? cor-verde:? cor-amarelo:? ' +
       'cor-rosa:? cor-preto:? cor-branco:p cor-marrom:? grande:n pequeno:n vivo:s historia:n ator:n oscar:n rico:s futebol:n politico:n masculino:s ' +
       'feminino:n brasileiro:s estrangeiro-eua:n europa:n antigo:s recente:n festa:p cabelo-comprido:p casado:s barba:n oculos:n careca:n loiro:n dancar:n'],
     ['tim-maia', 'Tim Maia', '🎷', 'FA',

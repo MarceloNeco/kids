@@ -460,7 +460,7 @@
       'engracado:? realeza:n cor-azul:n cor-vermelho:n cor-verde:s cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n ' +
       'cor-marrom:n grande:n pequeno:n chapeu:s ruivo:p arma:s antigo:s recente:n pirata:p'],
     ['sininho', 'Sininho', '🧚', 'IFA',
-      'real:n pessoa:p bicho:n coisa:n masculino:n feminino:s crianca:n idoso:n brasileiro:n fala:n desenho:s filme:p ' +
+      'real:n pessoa:p bicho:n coisa:n masculino:n feminino:s crianca:n idoso:n brasileiro:n fala:? desenho:s filme:p ' +
       'serie:p livro:s videogame:q internet:n tv:n disney:s canta:n musica:n esporte:n heroi:p vilao:n magia:s voa:s ' +
       'engracado:? realeza:n cor-azul:n cor-vermelho:n cor-verde:s cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n ' +
       'cor-marrom:n grande:n pequeno:s loiro:s vestido:s antigo:s recente:n chapeu-magico:s'],

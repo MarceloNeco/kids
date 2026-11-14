@@ -99,7 +99,7 @@
       'cor-marrom:? grande:n pequeno:n cabelo-comprido:p forte:p vivo:s antigo:n recente:s historia:n ator:n dancar:n ' +
       'futebol:n corrida:n cientista:n pintor:n politico:n oscar:n estrangeiro-eua:n europa:n espaco:n'],
     ['rayssa-leal', 'Rayssa Leal', '🛹', 'IFA',
-      'real:s pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:p idoso:n brasileiro:s fala:s desenho:n filme:q ' +
+      'real:s pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:? idoso:n brasileiro:s fala:s desenho:n filme:q ' +
       'serie:q livro:n videogame:n internet:p tv:n disney:n canta:n musica:n esporte:s heroi:n vilao:n magia:n voa:n ' +
       'engracado:n realeza:n cor-azul:? cor-vermelho:? cor-verde:? cor-amarelo:? cor-rosa:? cor-preto:? cor-branco:? ' +
       'cor-marrom:? grande:n pequeno:n cabelo-comprido:s rapido:p vivo:s antigo:n recente:s historia:n ator:n ' +

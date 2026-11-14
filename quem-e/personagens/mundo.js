@@ -558,25 +558,25 @@
       'cor-preto:n cor-branco:n cor-marrom:n grande:p pequeno:n rabo:p pelo:s rapido:p forte:s cachorro:p ' +
       'monstro:s robo:n espaco:n escola:n folclore:s festa:p'],
     ['papai-noel', 'Papai Noel', '🎅', 'IFA',
-      'real:q pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s desenho:s ' +
+      'real:? pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s desenho:s ' +
       'filme:s serie:? livro:? videogame:n internet:n tv:n disney:n canta:? musica:n esporte:n heroi:p vilao:n ' +
       'magia:p voa:p engracado:p realeza:n cor-azul:n cor-vermelho:s cor-verde:n cor-amarelo:n cor-rosa:n ' +
       'cor-preto:n cor-branco:s cor-marrom:n grande:q pequeno:n chapeu:s barba:s rapido:? forte:? robo:n ' +
       'espaco:n veiculo:s escola:n casado:s folclore:s festa:s'],
     ['mamae-noel', 'Mamãe Noel', '🤶', 'IFA',
-      'real:q pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:n idoso:s brasileiro:n fala:s desenho:p ' +
+      'real:? pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:n idoso:s brasileiro:n fala:s desenho:p ' +
       'filme:p serie:? livro:? videogame:n internet:n tv:n disney:n canta:? musica:n esporte:n heroi:? vilao:n ' +
       'magia:p voa:q engracado:? realeza:n cor-azul:n cor-vermelho:s cor-verde:n cor-amarelo:n cor-rosa:n ' +
       'cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n chapeu:p oculos:p vestido:p robo:n espaco:n ' +
       'escola:n casado:s folclore:s festa:s'],
     ['coelhinho-da-pascoa', 'Coelhinho da Páscoa', '🐰', 'IFA',
-      'real:q pessoa:n bicho:s coisa:n masculino:p feminino:q crianca:? idoso:n brasileiro:? fala:p desenho:p ' +
+      'real:? pessoa:n bicho:s coisa:n masculino:p feminino:q crianca:? idoso:n brasileiro:? fala:p desenho:p ' +
       'filme:? serie:? livro:? videogame:n internet:n tv:n disney:n canta:? musica:n esporte:n heroi:p vilao:n ' +
       'magia:p voa:n engracado:? realeza:n cor-azul:n cor-vermelho:n cor-verde:n cor-amarelo:n cor-rosa:p ' +
       'cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n rabo:p pelo:s orelhas:s rapido:p robo:n espaco:n ' +
       'escola:n folclore:p festa:s'],
     ['fada-do-dente', 'Fada do Dente', '🧚', 'IFA',
-      'real:q pessoa:q bicho:n coisa:n masculino:n feminino:s crianca:n idoso:n brasileiro:n fala:p desenho:? ' +
+      'real:? pessoa:q bicho:n coisa:n masculino:n feminino:s crianca:n idoso:n brasileiro:n fala:p desenho:? ' +
       'filme:? serie:? livro:? videogame:n internet:n tv:n disney:n canta:? musica:n esporte:n heroi:p vilao:n ' +
       'magia:s voa:s engracado:? realeza:n cor-azul:? cor-vermelho:n cor-verde:n cor-amarelo:n cor-rosa:p ' +
       'cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:p arma:p robo:n espaco:n escola:n chapeu-magico:s ' +

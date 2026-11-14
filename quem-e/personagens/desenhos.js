@@ -348,7 +348,7 @@
       'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s desenho:s ' +
       'filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n heroi:q vilao:n ' +
       'magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:s cor-verde:n cor-amarelo:n cor-rosa:s ' +
-      'cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n rabo:s vestido:s robo:n fazenda:q antigo:n ' +
+      'cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n rabo:s vestido:s robo:n fazenda:? antigo:n ' +
       'recente:n europa:s escola:p familia-grande:p t-peppa:s'],
     ['george-peppa', 'George', '🦖', 'IFA',
       'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:q desenho:s ' +
@@ -392,7 +392,7 @@
       'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:n idoso:n brasileiro:n fala:s desenho:s ' +
       'filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n heroi:p vilao:n ' +
       'magia:n voa:n engracado:s realeza:n cor-azul:n cor-vermelho:n cor-verde:n cor-amarelo:n cor-rosa:n ' +
-      'cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n chapeu:s rabo:s pelo:s forte:p agua:p robo:n ' +
+      'cor-preto:n cor-branco:p cor-marrom:s grande:n pequeno:n chapeu:s rabo:s pelo:s forte:p agua:p robo:n ' +
       'antigo:s cientista:s estrangeiro-eua:s t-bob:s'],
     ['homer', 'Homer Simpson', '🍩', 'FA',
       'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:n brasileiro:n fala:s desenho:s ' +
