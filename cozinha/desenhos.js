@@ -151,7 +151,25 @@
       return '<path d="M' + (x - 3.5) + ' 30 Q' + (x - 5 + dx * 0.4) + ' 16 ' + (x + dx - 1.5) + ' 5 L' + (x + dx + 1.8) + ' 4.5 Q' + (x + 3 + dx * 0.4) + ' 16 ' + (x + 3.5) + ' 30 Z" fill="#ffd23f" stroke="#b88a00" stroke-width="1.3" stroke-linejoin="round"/>' +
         '<path d="M' + (x + dx - 1.4) + ' 5.6 L' + (x + dx + 1.6) + ' 5" stroke="#5c3a1a" stroke-width="2.2" stroke-linecap="round"/>';
     }).join('') + '</svg>';
-  function fruto(ing) { return ing === 'banana' ? '<span class="ic ic-svg">' + S.penca + '</span>' : null; }
+  // frutas "de massinha" (v0.9.0, referência do dono): bolinhas gordinhas com gradiente, brilho e folhinha, no pé
+  function grad(id, cor, claro, escuro) { return '<radialGradient id="' + id + '" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="' + claro + '"/><stop offset=".55" stop-color="' + cor + '"/><stop offset="1" stop-color="' + escuro + '"/></radialGradient>'; }
+  function brilho(x, y) { return '<ellipse cx="' + x + '" cy="' + y + '" rx="4.5" ry="3" fill="#fff" opacity=".55" transform="rotate(-30 ' + x + ' ' + y + ')"/>'; }
+  var FOLHA = '<path d="M33 9 q9 -7 16 -2 q-7 7 -16 2z" fill="#4caf50" stroke="#2e7d32" stroke-width="1"/><path d="M32 6 v6" stroke="#6b4423" stroke-width="2.4" stroke-linecap="round"/>';
+  var MASSINHA = {
+    laranja: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gLar', '#ff9a1f', '#ffd27a', '#e06a00') + '</defs><circle cx="32" cy="36" r="24" fill="url(#gLar)"/>' + brilho(23, 26) + '<circle cx="32" cy="14" r="2" fill="#8a5a2b"/>' + FOLHA + '</svg>',
+    maca: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gMac', '#e8342e', '#ff8f80', '#a11a16') + '</defs><path d="M32 16 C18 8 6 20 9 36 C12 54 24 60 32 56 C40 60 52 54 55 36 C58 20 46 8 32 16Z" fill="url(#gMac)"/>' + brilho(21, 26) + FOLHA + '</svg>',
+    limao: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gLim', '#ffe03a', '#fff6a8', '#c9a800') + '</defs><ellipse cx="32" cy="36" rx="26" ry="19" fill="url(#gLim)"/><path d="M5 36 l-3 0 M59 36 l3 0" stroke="#c9a800" stroke-width="4" stroke-linecap="round"/>' + brilho(22, 28) + FOLHA + '</svg>',
+    morango: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gMor', '#ff2f4f', '#ff9aa8', '#b3001f') + '</defs><path d="M32 60 C14 46 8 30 14 20 C20 12 44 12 50 20 C56 30 50 46 32 60Z" fill="url(#gMor)"/>' +
+      [[22, 26], [32, 24], [42, 26], [26, 36], [38, 36], [32, 46], [20, 32], [44, 32]].map(function (p) { return '<ellipse cx="' + p[0] + '" cy="' + p[1] + '" rx="1.4" ry="2" fill="#ffe38a"/>'; }).join('') +
+      '<path d="M16 18 q8 2 16 -6 q8 8 16 6 q-4 6 -16 4 q-12 2 -16 -4z" fill="#3fae4a" stroke="#2e7d32" stroke-width="1"/>' + brilho(22, 24) + '</svg>',
+    uva: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs>' + grad('gUva', '#8e44ad', '#d6a6f0', '#4a1a63') + '</defs>' +
+      [[22, 20], [34, 19], [46, 21], [16, 31], [28, 31], [40, 31], [52, 32], [22, 42], [34, 42], [46, 42], [28, 52], [40, 52], [34, 61]].map(function (p) { return '<circle cx="' + p[0] + '" cy="' + (p[1] - 2) + '" r="7" fill="url(#gUva)"/>'; }).join('') +
+      '<path d="M34 12 v-8" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/><path d="M36 8 q12 -8 20 0 q-10 8 -20 0z" fill="#4caf50"/>' + brilho(19, 16) + '</svg>'
+  };
+  function fruto(ing) {
+    if (ing === 'banana') return '<span class="ic ic-svg">' + S.penca + '</span>';
+    return MASSINHA[ing] ? '<span class="ic ic-svg massinha">' + MASSINHA[ing] + '</span>' : null;
+  }
 
   // horta: a planta (com o legume, quando ele fica embaixo da terra) e o que se colhe
   var HO = {};
