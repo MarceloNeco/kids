@@ -258,7 +258,7 @@ test('espanhol escolhido na estante: perguntas, falas e voz em espanhol, e apren
   await pg.click('#btFamilia'); await pg.waitForSelector('#adivinha.ativa');
   await pg.waitForFunction(() => /^¿.*\?$/.test(document.getElementById('advPergunta').textContent));
   assert.equal((await pg.textContent('#advRespostas .resp[data-r="s"] .resp-txt')).trim(), 'Sí, seguro');
-  assert.equal((await pg.textContent('#advRespostas .resp[data-r="?"]')).trim(), '🤷 No lo sé');
+  assert.equal((await pg.textContent('#advRespostas .resp[data-r="?"] .resp-txt')).trim(), 'No lo sé');
   await pg.waitForFunction(() => window.__falas.some(f => /^¿/.test(f.texto)));
   const falas = await pg.evaluate(() => window.__falas);
   assert.ok(falas.every(f => f.lang === 'es-ES' && f.voz === 'ES'), JSON.stringify(falas.slice(0, 3)));

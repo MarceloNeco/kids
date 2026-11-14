@@ -26,7 +26,9 @@
     P('coisa', 'I', 'oque', 'É uma coisa (um objeto, uma comida, um lugar)?', 'Is it a thing (an object, a food, a place)?', '¿Es una cosa (un objeto, una comida, un lugar)?', N),
     P('masculino', 'I', 'oque', 'É masculino (menino, homem ou velhinho)?', 'Is it male (a boy, a man or an old man)?', '¿Es masculino (un chico, un hombre o un abuelito)?', N),
     P('feminino', 'I', 'oque', 'É feminino (menina, mulher ou velhinha)?', 'Is it female (a girl, a woman or an old woman)?', '¿Es femenino (una chica, una mujer o una abuelita)?', N),
-    P('crianca', 'I', 'oque', 'É criança (ou filhote)?', 'Is it a child (or a baby animal)?', '¿Es un niño o una niña (o una cría de animal)?', N),
+    P('crianca', 'I', 'oque', 'É criança (até uns 12 anos, ou filhote de bicho)?', 'Is it a child (up to about 12, or a baby animal)?', '¿Es un niño o una niña (hasta unos 12 años, o una cría de animal)?', N),
+    // adolescente (dono, 14/Nov/2026: a Merida de Valente não é criança nem adulta): sem resposta guardada = "não sei"
+    P('adolescente', 'I', 'oque', 'É adolescente (entre 13 e 19 anos)?', 'Is it a teenager (13 to 19 years old)?', '¿Es adolescente (entre 13 y 19 años)?'),
     P('idoso', 'I', 'oque', 'É idoso (velhinho ou velhinha)?', 'Is it old (an old man or an old woman)?', '¿Es mayor (un abuelito o una abuelita)?', N),
     P('brasileiro', 'I', 'oque', 'É do Brasil?', 'Is it from Brazil?', '¿Es de Brasil?', N),
     P('fala', 'I', 'oque', 'Fala como gente?', 'Does it talk like people?', '¿Habla como las personas?', N),
