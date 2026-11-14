@@ -2,6 +2,40 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.19.0",
+      "data": "14/Nov/2026",
+      "hora": "16:10:00",
+      "pt": [
+        "⛰️ Paredões de rocha em 3D dos dois lados da pista, no Cânion, no Templo, na Lava, na Neve e em todos os rios: com camadas de pedra, picos recortados e luz batendo de um lado, acompanhando as curvas e os morros.",
+        "➡️ Placas com setas de neon nas curvas, do lado de fora, mostrando para onde a pista vai."
+      ],
+      "en": [
+        "⛰️ 3D rock walls on both sides of the track in the Canyon, Temple, Lava, Snow and on every river: rock layers, jagged peaks and light hitting one side, following the curves and hills.",
+        "➡️ Neon arrow signs on the outside of curves, showing where the track goes."
+      ],
+      "es": [
+        "⛰️ Paredes de roca en 3D a los dos lados de la pista en el Cañón, el Templo, la Lava, la Nieve y en todos los ríos: capas de piedra, picos recortados y la luz dando de un lado, siguiendo las curvas y las cuestas.",
+        "➡️ Carteles con flechas de neón en el lado de fuera de las curvas, que enseñan hacia dónde va la pista."
+      ]
+    },
+    {
+      "versao": "1.18.0",
+      "data": "14/Nov/2026",
+      "hora": "15:45:00",
+      "pt": [
+        "🌊 Rios na pista: a estrada vira água e o veículo vira barco, com boias amarelas no lugar das rodas, espuma e borrifos (os bichos nadam). Na água tem boias, redemoinhos, setas azuis de turbo e lanchinhas.",
+        "🗺️ Mapinha redondo no canto: a pista inteira vista de cima, com os rios em azul, a chegada e a bolinha de cada um."
+      ],
+      "en": [
+        "🌊 Rivers on the track: the road turns into water and your ride turns into a boat, with yellow floats instead of wheels, foam and spray (animals swim). On the water there are buoys, whirlpools, blue turbo arrows and little speedboats.",
+        "🗺️ Little round map in the corner: the whole track from above, with rivers in blue, the finish and a dot for everyone."
+      ],
+      "es": [
+        "🌊 Ríos en la pista: la carretera se convierte en agua y tu vehículo en un barco, con flotadores amarillos en vez de ruedas, espuma y salpicaduras (los animales nadan). En el agua hay boyas, remolinos, flechas azules de turbo y lanchas pequeñas.",
+        "🗺️ Mapa redondo en la esquina: toda la pista vista desde arriba, con los ríos en azul, la meta y un puntito para cada uno."
+      ]
+    },
+    {
       "versao": "1.17.0",
       "data": "14/Nov/2026",
       "hora": "15:20:00",

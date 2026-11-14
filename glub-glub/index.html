@@ -23,28 +23,36 @@
 <canvas id="lago" aria-label="Lago do GLUB GLUB" data-rotulo="Lago do GLUB GLUB|GLUB GLUB lake|Lago de GLUB GLUB"></canvas>
 
 <section id="menu" class="tela ativa" data-recurso="glub-glub">
-  <div class="painel">
     <h1 class="logo" aria-label="GLUB GLUB"><span>G</span><span>L</span><span>U</span><span>B</span> <span>G</span><span>L</span><span>U</span><span>B</span></h1>
-    <div class="escolha" role="radiogroup" aria-label="Jeito de jogar" data-rotulo="Jeito de jogar|Game mode|Modo de juego">
-      <button id="btSozinho" class="chip grande-chip" type="button" role="radio" aria-checked="true" data-modo="sozinho" data-t="🎣 Sozinho|🎣 Solo|🎣 Solo"></button>
-      <button id="btDois" class="chip grande-chip" type="button" role="radio" aria-checked="false" data-modo="dois" data-t="👫 Em dois|👫 Two players|👫 Dos jugadores"></button>
+  <div class="painel">
+    <div class="grupo" role="radiogroup" aria-label="Jeito de jogar" data-rotulo="Jeito de jogar|Game mode|Modo de juego">
+      <div class="seg">
+        <button id="btSozinho" class="chip grande-chip" type="button" role="radio" aria-checked="true" data-modo="sozinho" data-t="🎣 Sozinho|🎣 Solo|🎣 Solo"></button>
+        <button id="btDois" class="chip grande-chip" type="button" role="radio" aria-checked="false" data-modo="dois" data-t="👫 Em dois|👫 Two players|👫 Dos jugadores"></button>
+      </div>
     </div>
-    <div id="linhaSozinho" class="linha">
+    <div id="linhaSozinho" class="grupo">
       <span class="rotulo" data-t="Quem pesca?|Who's fishing?|¿Quién pesca?"></span>
-      <button class="chip" type="button" role="radio" data-quem="juca" aria-checked="true">👦 Juca</button>
-      <button class="chip" type="button" role="radio" data-quem="lili" aria-checked="false">👧 Lili</button>
+      <div class="seg" role="radiogroup">
+        <button class="chip" type="button" role="radio" data-quem="juca" aria-checked="true">👦 Juca</button>
+        <button class="chip" type="button" role="radio" data-quem="lili" aria-checked="false">👧 Lili</button>
+      </div>
     </div>
-    <div class="linha" id="linhaNivel0">
+    <div class="grupo" id="linhaNivel0">
       <span class="rotulo" id="rotuloNivel0" data-t="Nível|Level|Nivel"></span>
-      <button class="chip verde" type="button" role="radio" data-nivel-j="0" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
-      <button class="chip amarelo" type="button" role="radio" data-nivel-j="0" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
-      <button class="chip vermelho" type="button" role="radio" data-nivel-j="0" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      <div class="seg" role="radiogroup">
+        <button class="chip verde" type="button" role="radio" data-nivel-j="0" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+        <button class="chip amarelo" type="button" role="radio" data-nivel-j="0" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+        <button class="chip vermelho" type="button" role="radio" data-nivel-j="0" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      </div>
     </div>
-    <div class="linha" id="linhaNivel1" hidden>
+    <div class="grupo" id="linhaNivel1" hidden>
       <span class="rotulo" data-t="Nível da Lili|Lili's level|Nivel de Lili"></span>
-      <button class="chip verde" type="button" role="radio" data-nivel-j="1" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
-      <button class="chip amarelo" type="button" role="radio" data-nivel-j="1" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
-      <button class="chip vermelho" type="button" role="radio" data-nivel-j="1" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      <div class="seg" role="radiogroup">
+        <button class="chip verde" type="button" role="radio" data-nivel-j="1" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+        <button class="chip amarelo" type="button" role="radio" data-nivel-j="1" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+        <button class="chip vermelho" type="button" role="radio" data-nivel-j="1" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      </div>
     </div>
     <p id="avisoDeitar" class="aviso" hidden data-t="📱↻ Deite o celular para jogar em dois: cada um segura um lado.|📱↻ Turn the phone sideways to play together: each of you holds one side.|📱↻ Pon el móvil en horizontal para jugar dos: cada uno sujeta un lado."></p>
     <button id="btJogar" class="jogar" type="button" data-t="▶ Pescar!|▶ Let's fish!|▶ ¡A pescar!"></button>

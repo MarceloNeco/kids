@@ -351,3 +351,33 @@ test('cenários escolhidos no menu entram primeiro, na ordem; os que faltam são
   assert.equal(new Set(p.mundos).size, 4);
   assert.deepEqual(P.montar('normal', 9, ['blocos', 'lava', 'praia', 'templo', 'neon']).mundos, ['blocos', 'lava', 'praia', 'templo']);
 });
+
+test('rio: trechos de água longe dos túneis e loopings; ao entrar vira barco e na saída volta a ser carro', () => {
+  for (const [nivel, n] of [['crianca', 1], ['normal', 2], ['turbo', 2]]) for (let s = 1; s < 8; s++) {
+    const p = P.montar(nivel, s * 101);
+    assert.equal(p.rios.length, n, nivel + ' ' + s);
+    p.rios.forEach(([a, b]) => {
+      for (let i = a; i < b; i++) assert.ok(p.segs[i].agua && !p.segs[i].tunel && !p.segs[i].loop);
+      assert.ok(a > 260 && b < p.chegada - 60);
+    });
+  }
+  const e = M.novaCorrida('normal', 7, 1);
+  e.fase = 'corrida';
+  const j = e.jogadores[0], r = e.pista.rios[0];
+  j.z = (r[0] - 3) * P.SEG; j.vel = 3000;
+  for (let i = r[0] - 3; i < r[1] + 3; i++) e.pista.segs[i].coisas = [];
+  const ev = correr(e, [{ dir: 0 }], (r[1] - r[0] + 10) * P.SEG / 3000 + 1);
+  assert.ok(ev.some(x => x.tipo === 'agua'));
+  assert.ok(ev.some(x => x.tipo === 'terra'));
+  assert.ok(ev.findIndex(x => x.tipo === 'agua') < ev.findIndex(x => x.tipo === 'terra'));
+});
+
+test('paredões: nos rios e nos mundos de pedra, nunca no túnel nem no looping; setas do lado de fora das curvas', () => {
+  for (let s = 1; s < 8; s++) {
+    const p = P.montar('normal', s * 131);
+    p.segs.forEach(sg => { if (sg.agua) assert.ok(sg.parede); if (sg.parede) assert.ok(!sg.tunel && !sg.loop); });
+    const setas = p.segs.filter(sg => sg.enfeites.some(e => e.tipo === 'setaD' || e.tipo === 'setaE'));
+    assert.ok(setas.length > 10);
+    setas.forEach(sg => { const e = sg.enfeites.find(x => x.tipo.startsWith('seta')); assert.equal(e.tipo === 'setaD', sg.curva > 0); assert.ok(e.x * sg.curva < 0); });
+  }
+});

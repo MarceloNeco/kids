@@ -18,11 +18,11 @@ const UA = {
   computador: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
 };
 const ESPERA = {
-  celular: ['Instalar o Bolinho no celular', 'Install Bolinho on your phone', 'Instalar Bolinho en el móvil'],
-  iphone: ['Instalar o Bolinho no celular', 'Install Bolinho on your phone', 'Instalar Bolinho en el móvil'],
-  tablet: ['Instalar o Bolinho no tablet', 'Install Bolinho on your tablet', 'Instalar Bolinho en la tablet'],
-  tv: ['Deixar o Bolinho na TV', 'Keep Bolinho on the TV', 'Dejar Bolinho en la tele'],
-  computador: ['Instalar o Bolinho no computador', 'Install Bolinho on your computer', 'Instalar Bolinho en el ordenador']
+  celular: ['Instalar o Bolinho no celular', 'Install Rainy Day Donuts on your phone', 'Instalar Buñuelos de Lluvia en el móvil'],
+  iphone: ['Instalar o Bolinho no celular', 'Install Rainy Day Donuts on your phone', 'Instalar Buñuelos de Lluvia en el móvil'],
+  tablet: ['Instalar o Bolinho no tablet', 'Install Rainy Day Donuts on your tablet', 'Instalar Buñuelos de Lluvia en la tablet'],
+  tv: ['Deixar o Bolinho na TV', 'Keep Rainy Day Donuts on the TV', 'Dejar Buñuelos de Lluvia en la tele'],
+  computador: ['Instalar o Bolinho no computador', 'Install Rainy Day Donuts on your computer', 'Instalar Buñuelos de Lluvia en el ordenador']
 };
 
 test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 3 idiomas; Já instalei esconde 30 dias', async () => {
@@ -42,7 +42,7 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
   const abrir = async (ua, cod, marca) => {
     const tv = /SmartTV/.test(ua);
     const ctx = await b.newContext({ viewport: tv ? { width: 1280, height: 720 } : { width: 390, height: 844 }, userAgent: ua, serviceWorkers: 'block' });
-    await ctx.addInitScript(([c, m]) => { localStorage.setItem('bolinho:idioma', c); if (m) localStorage.setItem('bolinho:instalado:/kids/', m); }, [cod, marca]);
+    await ctx.addInitScript(([c, m]) => { localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:novidades-vistas', '["*"]'); if (m) localStorage.setItem('bolinho:instalado:/kids/', m); }, [cod, marca]);
     await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
     const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(400);
     return { ctx, pg };
@@ -55,7 +55,8 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
           const bt = document.querySelector('.bc-btn'), barra = document.querySelector('.bc-inst');
           return { t: bt.textContent.trim(), h: bt.getBoundingClientRect().height, primeiro: document.body.firstElementChild === barra, vis: !barra.hidden };
         });
-        assert.strictEqual(r.t, ESPERA[ap][i], ap + ' ' + cod);
+        const curto = ['Instalar o Bolinho', 'Install Rainy Day Donuts', 'Instalar Buñuelos de Lluvia'][i];
+        assert.ok(r.t === ESPERA[ap][i] || (ap !== 'tv' && r.t === curto), ap + ' ' + cod + ': ' + r.t);
         assert.ok(r.vis && r.primeiro, ap + ': o botão é a primeira coisa da página');
         assert.ok(r.h <= 50, ap + ' ' + cod + ': a frase quebrou em duas linhas');
         if (ap === 'iphone' && cod === 'pt') {

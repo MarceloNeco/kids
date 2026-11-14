@@ -2,6 +2,26 @@
   "app": "glub-glub",
   "versoes": [
     {
+      "versao": "0.1.2",
+      "data": "14/Nov/2026",
+      "hora": "12:40:50",
+      "pt": [
+        "🧭 Começo arrumado: cada escolha numa linha só (sozinho ou em dois, Juca ou Lili, nível), e o lago vivo aparece atrás, com peixes, raios de sol e bolhas",
+        "🎣 A linha de pescar ficou mais grossa e com contorno, fácil de ver no celular",
+        "📱 Celular em pé: os placares e os baldes ficam acima dos botões"
+      ],
+      "en": [
+        "🧭 Tidier start screen: each choice on a single row (solo or two players, Juca or Lili, level), with the living lake showing behind it — fish, sunbeams and bubbles",
+        "🎣 The fishing line is thicker and outlined, easy to see on a phone",
+        "📱 Phone held upright: scores and buckets sit above the buttons"
+      ],
+      "es": [
+        "🧭 Pantalla de inicio ordenada: cada opción en una sola fila (solo o dos jugadores, Juca o Lili, nivel) y detrás se ve el lago vivo, con peces, rayos de sol y burbujas",
+        "🎣 El sedal es más grueso y con contorno, fácil de ver en el móvil",
+        "📱 Móvil en vertical: los marcadores y los cubos quedan por encima de los botones"
+      ]
+    },
+    {
       "versao": "0.1.1",
       "data": "14/Nov/2026",
       "hora": "16:20:00",

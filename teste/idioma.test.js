@@ -40,6 +40,7 @@ test.after(async () => { if (browser) await browser.close(); if (srv) srv.close(
 
 async function contexto(locale) {
   const ctx = await browser.newContext({ locale: locale || 'pt-BR', viewport: { width: 1000, height: 900 }, serviceWorkers: 'block' });
+  await ctx.addInitScript(() => localStorage.setItem('bolinho:novidades-vistas', '["*"]'));   // sem a janela de novidades por cima
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());   // nada de internet de verdade (YouTube, CDN)
   return ctx;
 }
@@ -92,6 +93,32 @@ test('estante: um botão com o idioma atual; tocando, continua ou troca; a escol
     await pg.reload({ waitUntil: 'load' }); await assentar(pg);
     assert.equal(await pg.evaluate(() => BolinhoIdioma.atual()), 'es', 'escolha guardada');
   } finally { await ctx.close(); }
+});
+
+test('estante: a caixinha dos idiomas abre inteira dentro da tela (botão à direita ou à esquerda, celular estreito)', async () => {
+  for (const [w, h] of [[390, 844], [320, 640], [844, 390]]) {
+    for (const lado of ['direita', 'esquerda']) {
+      const ctx = await contexto('pt-BR');
+      await ctx.close();
+      const c2 = await browser.newContext({ locale: 'pt-BR', viewport: { width: w, height: h }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
+      await c2.addInitScript(() => localStorage.setItem('bolinho:novidades-vistas', '["*"]'));
+      await c2.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+      const pg = await c2.newPage();
+      try {
+        await pg.goto(base, { waitUntil: 'load' }); await assentar(pg);
+        // como no celular do dono (página antiga guardada): o botão no canto esquerdo
+        if (lado === 'esquerda') await pg.evaluate(() => { const g = document.querySelector('[data-idiomas]'); g.style.cssText = 'position:fixed;left:8px;top:96px;margin:0;z-index:20'; });
+        await pg.tap('[data-idiomas] .bi-atual');
+        const r = await pg.$eval('[data-idiomas] .bi-menu', (m) => { const b = m.getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom }; });
+        const onde = w + '×' + h + ' botão à ' + lado + ' ' + JSON.stringify(r);
+        assert.ok(r.l >= 0 && r.t >= 0 && r.r <= w && r.b <= h, 'a caixinha sai da tela: ' + onde);
+        const ops = await pg.$$eval('[data-idiomas] .bi-op', (os) => os.map((o) => { const b = o.getBoundingClientRect(); return b.left >= 0 && b.right <= innerWidth && o.textContent.trim().length > 0; }));
+        assert.deepStrictEqual(ops, [true, true, true], 'opções inteiras à vista: ' + onde);
+        await pg.tap('[data-idiomas] .bi-op[data-idioma="en"]');
+        assert.strictEqual(await pg.evaluate(() => BolinhoIdioma.atual()), 'en', 'trocar funciona: ' + onde);
+      } finally { await c2.close(); }
+    }
+  }
 });
 
 for (const jogo of JOGOS) {

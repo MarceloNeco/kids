@@ -259,3 +259,19 @@ test('nos três idiomas nada sai da tela no celular, em pé e deitado (começo, 
     await pg.ctx.close();
   }
 });
+
+test('menu do começo: cada grupo numa linha só (celular em pé) e o lago à vista atrás', async () => {
+  for (const largura of [360, 390]) {
+    const pg = await abrir({ viewport: { width: largura, height: 800 }, hasTouch: true, isMobile: true });
+    for (const grupo of [['#btSozinho', '#btDois'], ['[data-quem="juca"]', '[data-quem="lili"]'], ['[data-nivel-j="0"][data-nivel="facil"]', '[data-nivel-j="0"][data-nivel="medio"]', '[data-nivel-j="0"][data-nivel="dificil"]']]) {
+      const ys = [];
+      for (const s of grupo) { const b = await caixa(pg, s); assert.ok(b.x >= 0 && b.x + b.w <= largura, s + ' fora da tela'); ys.push(Math.round(b.y)); }
+      assert.ok(Math.max(...ys) - Math.min(...ys) <= 2, largura + 'px: ' + grupo.join(' ') + ' em linhas diferentes: ' + ys);
+    }
+    const nav = await caixa(pg, '.bolinho-nav'), logo = await caixa(pg, '.logo span:first-child');   // as letras (a caixa do título começa na borda)
+    assert.ok(!cruza(nav, logo), 'o nome GLUB GLUB está embaixo do botão Saída');
+    const painel = await caixa(pg, '.painel');
+    assert.ok(painel.h <= 800 * 0.62, 'a caixa do menu cobre o lago: ' + painel.h + 'px');
+    await pg.ctx.close();
+  }
+});

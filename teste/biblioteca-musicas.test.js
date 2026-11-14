@@ -41,7 +41,7 @@ test('estante: 🎵 abre a biblioteca, ▶ toca, Voltar fecha sem sair da estant
   try {
     for (const [cod, titulo] of [['pt', /Biblioteca de músicas/], ['en', /Music library/], ['es', /Biblioteca de música/]]) {
       const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-      await ctx.addInitScript((c) => localStorage.setItem('bolinho:idioma', c), cod);
+      await ctx.addInitScript((c) => { localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:novidades-vistas', '["*"]'); }, cod);
       await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
       const pg = await ctx.newPage(), erros = [];
       pg.on('pageerror', (e) => erros.push(e.message));

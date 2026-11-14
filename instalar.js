@@ -132,7 +132,7 @@
   fundo.className = 'bc-fundo';
   fundo.hidden = true;
   fundo.innerHTML = '<div class="bc-passos" role="dialog" aria-modal="true" aria-labelledby="bcTitulo">' +
-    '<div class="bc-topo"><img src="' + ICONE + '" alt=""><h2 id="bcTitulo">' + T('Instalar o ', 'Install ', 'Instalar ') + NOME + '</h2>' +
+    '<div class="bc-topo"><img src="' + ICONE + '" alt=""><h2 id="bcTitulo">' + T('Instalar o ', 'Install ', 'Instalar ') + nomeIdioma() + '</h2>' +
     '<button type="button" class="bc-fechar" aria-label="' + T('Fechar', 'Close', 'Cerrar') + '">✕</button></div>' +
     '<div class="bc-corpo"></div>' +
     '<div class="bc-botoes"><button type="button" class="bc-leve bc-ja"><span class="pt">✓ Já instalei</span><span class="en">✓ I installed it</span><span class="es">✓ Ya la he instalado</span></button></div></div>';
@@ -149,7 +149,7 @@
 
   function pronto() {
     botao.className = 'bc-btn ok';
-    texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el icono ') + NOME;
+    texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el icono ') + NOME;   // o ícone instalado se chama assim
     if (FILA) { barra.hidden = false; rotuloProx(true); return; }   // na fila, a barra fica para seguir ao próximo
     setTimeout(function () { barra.hidden = true; }, 6000);
   }
@@ -168,14 +168,25 @@
   var tablet = fire || /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) || (android && !/Mobile/.test(ua));
   var computador = !tv && !ios && !android && !fire;
   // Uma frase curta, do jeito de cada aparelho (dono, 14/Nov/2026: simples, fácil e para qualquer aparelho)
-  var CURTO = NOME.replace(/ de Chuva$/, '');   // na frase do botão, curto para caber numa linha do celular
+  // nome da marca no idioma escolhido (Bolinho de Chuva · Rainy Day Donuts · Buñuelos de Lluvia); na frase do botão, o
+  // curto em português ("Bolinho") para caber numa linha do celular
+  function ehBolinho() { return NOME === 'Bolinho de Chuva'; }
+  function nomeIdioma() { return ehBolinho() && window.BolinhoIdioma ? BolinhoIdioma.marca() : NOME; }
+  function curto() { var n = nomeIdioma(); return n === 'Bolinho de Chuva' ? 'Bolinho' : n; }
   function rotulo() {
-    if (tv) return T('Deixar o ' + CURTO + ' na TV', 'Keep ' + CURTO + ' on the TV', 'Dejar ' + CURTO + ' en la tele');
-    if (tablet) return T('Instalar o ' + CURTO + ' no tablet', 'Install ' + CURTO + ' on your tablet', 'Instalar ' + CURTO + ' en la tablet');
-    if (computador) return T('Instalar o ' + CURTO + ' no computador', 'Install ' + CURTO + ' on your computer', 'Instalar ' + CURTO + ' en el ordenador');
-    return T('Instalar o ' + CURTO + ' no celular', 'Install ' + CURTO + ' on your phone', 'Instalar ' + CURTO + ' en el móvil');
+    if (tv) return T('Deixar o ' + curto() + ' na TV', 'Keep ' + curto() + ' on the TV', 'Dejar ' + curto() + ' en la tele');
+    if (tablet) return T('Instalar o ' + curto() + ' no tablet', 'Install ' + curto() + ' on your tablet', 'Instalar ' + curto() + ' en la tablet');
+    if (computador) return T('Instalar o ' + curto() + ' no computador', 'Install ' + curto() + ' on your computer', 'Instalar ' + curto() + ' en el ordenador');
+    return T('Instalar o ' + curto() + ' no celular', 'Install ' + curto() + ' on your phone', 'Instalar ' + curto() + ' en el móvil');
   }
-  function pintarRotulo() { if (!botao.classList.contains('ok')) texto.textContent = rotulo(); }
+  // sem caber numa linha (nome comprido em inglês/espanhol num celular estreito): só "Instalar <nome>"
+  function curtinho() { return tv ? rotulo() : T('Instalar o ', 'Install ', 'Instalar ') + curto(); }
+  function pintarRotulo() {
+    if (botao.classList.contains('ok')) return;
+    texto.textContent = rotulo();
+    if (botao.getBoundingClientRect().height > 52) texto.textContent = curtinho();
+  }
+  window.addEventListener('resize', pintarRotulo);
   pintarRotulo();
   if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(pintarRotulo);
 
