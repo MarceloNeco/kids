@@ -2,6 +2,29 @@
   "app": "glub-glub",
   "versoes": [
     {
+      "versao": "0.1.3",
+      "data": "14/Nov/2026",
+      "hora": "13:23:40",
+      "pt": [
+        "🎉 Rodada especial sorteada em cada partida: ♻️ Limpa o Rio (com rede, pega até 3 lixos), 🛟 Socorro na Água (jogue boias para o menino e a menina), 🐢 Leva os Filhotes (até a mamãe tartaruga), ⭐ Chuva de Estrelas e 🐉 O Gigante (3 acertos)",
+        "🐟 Piranhas: se a linha encostar no cardume, elas cortam: o bicho foge e a vara fica 2 segundos sem anzol",
+        "✨ Gigantes que brilham no escuro passam no fundo: lula-gigante, água-viva gigante e peixe-dragão",
+        "🏊 Quem vale mais nada um pouco mais rápido, sempre na medida do nível"
+      ],
+      "en": [
+        "🎉 A surprise special round every game: ♻️ Clean the River (with a net, up to 3 pieces of trash), 🛟 Rescue Time (throw life rings to the swimmers), 🐢 Baby Turtles (take them to mom), ⭐ Star Shower and 🐉 The Giant (3 hits)",
+        "🐟 Piranhas: if your line touches the school, they cut it, the fish gets away and your rod has no hook for 2 seconds",
+        "✨ Giants that glow in the dark swim by down deep: giant squid, giant jellyfish and dragonfish",
+        "🏊 The more a fish is worth, the faster it swims, always matching the level"
+      ],
+      "es": [
+        "🎉 Una ronda especial sorpresa en cada partida: ♻️ Limpia el río (con red, hasta 3 basuras), 🛟 Socorro en el agua (lanza flotadores a los bañistas), 🐢 Las tortuguitas (llévalas con su mamá), ⭐ Lluvia de estrellas y 🐉 El Gigante (3 golpes)",
+        "🐟 Pirañas: si el sedal toca el banco, lo cortan, el pez se escapa y la caña se queda 2 segundos sin anzuelo",
+        "✨ Gigantes que brillan en la oscuridad pasan por el fondo: calamar gigante, medusa gigante y pez dragón",
+        "🏊 Cuanto más vale un pez, más rápido nada, siempre a la medida del nivel"
+      ]
+    },
+    {
       "versao": "0.1.2",
       "data": "14/Nov/2026",
       "hora": "12:40:50",

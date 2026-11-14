@@ -2,6 +2,40 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.21.0",
+      "data": "14/Nov/2026",
+      "hora": "17:10:00",
+      "pt": [
+        "✨ Carros mais caprichados: rodas girando de verdade (com raios e pneu andando), pintura brilhando com reflexo de luz, lanternas acesas e fumacinha saindo do escapamento.",
+        "🏎️ Clássico, GT e Superesportivo com carroceria arredondada; Caminhão Guincho com o giroflex iluminando em volta."
+      ],
+      "en": [
+        "✨ Fancier cars: wheels that really spin (spokes and rolling tires), shiny paint that catches the light, glowing tail lights and little puffs of exhaust smoke.",
+        "🏎️ Classic, GT and Supercar with rounded bodies; the Tow Truck's beacons light up around it."
+      ],
+      "es": [
+        "✨ Coches más cuidados: ruedas que giran de verdad (con radios y neumáticos rodando), pintura brillante con reflejos de luz, pilotos encendidos y humito saliendo del tubo de escape.",
+        "🏎️ Clásico, GT y Superdeportivo con carrocería redondeada; el rotativo del Camión Grúa ilumina alrededor."
+      ]
+    },
+    {
+      "versao": "1.20.0",
+      "data": "14/Nov/2026",
+      "hora": "16:40:00",
+      "pt": [
+        "🛼 Patins novo: uma pessoa de capacete patinando com patins de 4 rodinhas, com a passada de verdade (uma perna empurra para o lado enquanto a outra desliza, e os braços balançam), joelheiras e cotoveleiras.",
+        "🚛 Caminhão Guincho novo: cabine alta, braço amarelo do guincho com o gancho balançando, giroflex piscando no teto, chaminés cromadas e rodas grandes."
+      ],
+      "en": [
+        "🛼 New Roller Skates: a person in a helmet skating on 4-wheel roller skates, with a real stride (one leg pushes out while the other glides, arms swinging), knee and elbow pads.",
+        "🚛 New Tow Truck: tall cab, yellow tow boom with a swinging hook, flashing beacons on the roof, chrome stacks and big wheels."
+      ],
+      "es": [
+        "🛼 Patines nuevos: una persona con casco patinando con patines de 4 ruedas, con la zancada de verdad (una pierna empuja hacia el lado mientras la otra se desliza, y los brazos se balancean), rodilleras y coderas.",
+        "🚛 Camión Grúa nuevo: cabina alta, brazo amarillo de la grúa con el gancho balanceándose, rotativo parpadeando en el techo, chimeneas cromadas y ruedas grandes."
+      ]
+    },
+    {
       "versao": "1.19.0",
       "data": "14/Nov/2026",
       "hora": "16:10:00",

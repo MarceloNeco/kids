@@ -8,7 +8,7 @@ const server=http.createServer((req,res)=>{let p=decodeURIComponent(req.url.spli
 let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas++;};
 (async()=>{ await new Promise(r=>server.listen(0,r)); const base='http://127.0.0.1:'+server.address().port+'/baguncolandia/'; const b=await chromium.launch(); const pg=await b.newPage({viewport:{width:860,height:420},deviceScaleFactor:2,locale:'pt-BR'}); const erros=[]; pg.on('pageerror',e=>erros.push(e.message));
  await pg.goto(base+'?teste'); await pg.evaluate(()=>localStorage.setItem('bagunca:bonecoDedo','1')); await pg.reload(); await pg.waitForTimeout(300);
- await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(1200);
+ await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(1200);
  await pg.click('#localModos button[data-v="pula"]'); await pg.waitForTimeout(200);
  conf(!/undefined/.test(await pg.textContent('#lobbyResumo')), 'Pula e abaixa: sem "undefined" ('+(await pg.textContent('#lobbyResumo'))+')');
  await pg.click('#localModos button[data-v="bolas"]'); await pg.waitForTimeout(200);
@@ -31,7 +31,7 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
  conf(cv>100, 'o quadro continua sendo desenhado durante as reações');
  const nomes=await pg.evaluate(()=>window.BaguncaApp.TVApp.tv.nomes);
  conf(nomes.join('|')==='Lara|Júlia', 'no jogo, os nomes são '+nomes.join(' e '));
- await pg.goto(base+'?teste'); await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(1200); await pg.click('#localPessoas'); await pg.waitForTimeout(400);
+ await pg.goto(base+'?teste'); await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(1200); await pg.click('#localPessoas'); await pg.waitForTimeout(400);
  conf(await pg.inputValue('#nome2')==='Júlia', 'na volta, o último nome (Júlia) já vem escrito');
  conf(!erros.length,'sem erro de JavaScript '+erros.join(' | '));
  await b.close(); server.close(); process.exitCode=falhas?1:0; })();

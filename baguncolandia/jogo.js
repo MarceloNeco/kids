@@ -424,7 +424,8 @@
       // poderes vencendo
       jogadores.forEach(function (jg, j) { if (jg.poder && tempo > jg.poderAte) { jg.poder = null; emitir({ t: 'poder', j: j, poder: null }); } if (jg.combo && tempo > jg.comboAte) jg.combo = 0; });
       if (duracao && tempo >= duracao * 1000) terminar();
-      else if (jogadores.every(function (jg) { return jg.vidas <= 0; })) terminar();
+      // não morre (dono, 14/Nov/2026): a rodada só acaba quando o tempo zera; acabaram os corações, os 3 voltam e a brincadeira continua
+      jogadores.forEach(function (jg, j) { if (jg.vidas <= 0) { jg.vidas = 3; emitir({ t: 'vida', j: j, vidas: 3, voltaram: true }); } });
     }
 
     /* 🐰 bichos do Pega-pega: entram e ficam à vista (nunca escondidos), esperam uns segundos e vão embora se ninguém pega.

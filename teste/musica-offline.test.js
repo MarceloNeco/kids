@@ -105,7 +105,7 @@ test('Guardar todos guarda as 15 favoritas; sem internet a rádio, a Bagunçolâ
 
     // (3) sem internet nos jogos
     await pg.goto(base + 'baguncolandia/?teste');
-    await pg.click('#btToque'); await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(2500);
+    await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(2500);
     assert.ok(await pg.evaluate(() => Som.tocandoArquivo()), 'Bagunçolândia: música gravada tocando');
     assert.strictEqual(await tocandoBlob(pg), 'blob:', 'Bagunçolândia sem internet');
 

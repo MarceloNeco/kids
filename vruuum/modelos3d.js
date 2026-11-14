@@ -79,9 +79,38 @@
       var q = fc[2].map(cam.pt), dm = (q[0].d + q[1].d + q[2].d + q[3].d) / 4;
       var corF = (op.cores && op.cores[fc[0]]) || cor;
       var alfaF = op.alfa != null && typeof op.alfa === 'object' ? op.alfa[fc[0]] : op.alfa;
-      L.push({ d: dm + (op.vies || 0), f: function (c) { poligono(c, q, luzDe(corF, fc[1]), des[fc[0]], alfaF); } });
+      var corL = verniz(luzDe(corF, fc[1]), fc[1], centro, cam);
+      L.push({ d: dm + (op.vies || 0), f: function (c) { poligono(c, q, corL, des[fc[0]], alfaF); } });
     });
   }
+  // brilho de verniz (1.21.0): a face que reflete a luz para a câmera fica mais clara, como pintura de carro
+  function verniz(rgbCor, n, centro, cam) {
+    var meio = norm(add(norm(sub(cam.pos, centro)), LUZ)), b = Math.pow(Math.max(0, dot(n, meio)), 18) * 0.42;
+    if (b < 0.01) return rgbCor;
+    var v = rgbCor.match(/\d+/g).map(Number);
+    return rgb(v.map(function (x) { return x + (255 - x) * b; }));
+  }
+  // luz acesa (lanterna, farol, giroflex): um brilho redondo somado por cima
+  function luzinha(cam, L, p, r, cor, forca) {
+    var q = cam.pt(p);
+    L.push({ d: q.d - 0.3, f: function (c) {
+      var R = r * q.s; if (R < 0.5) return;
+      c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = forca == null ? 0.55 : forca;
+      var g = c.createRadialGradient(q.x, q.y, 0, q.x, q.y, R); g.addColorStop(0, cor); g.addColorStop(1, 'rgba(0,0,0,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(q.x, q.y, R, 0, PI * 2); c.fill(); c.restore();
+    } });
+  }
+  // fumacinha do escapamento: três baforadas indo para trás, crescendo e sumindo
+  function fumaca(cam, L, p) {
+    for (var k = 0; k < 3; k++) {
+      var f = (relogio * 1.6 + k / 3) % 1, q = cam.pt(add(p, [Math.sin(k * 2.1 + relogio) * 0.1 * f, 0.15 * f, -1.1 * f]));
+      (function (q, f) { L.push({ d: q.d + 0.05, f: function (c) {
+        var R = (0.08 + f * 0.28) * q.s; if (R < 0.5) return;
+        c.globalAlpha = 0.45 * (1 - f); c.fillStyle = '#d8dbe6'; c.beginPath(); c.arc(q.x, q.y, R, 0, PI * 2); c.fill(); c.globalAlpha = 1;
+      } }); })(q, f);
+    }
+  }
+  var relogio = 0;   // segundos (op.t), para rodas, fumaça e luzes andarem
   /* casco (1.16.0): carroceria arredondada feita de fatias ao longo do carro (como as cavernas de um barco). Cada fatia
      { z, y (meio), w e h (meia largura e meia altura), n (quanto mais alto, mais quadrada) } vira um anel de 16 pontos;
      anéis vizinhos são ligados por faces pequenas, cada uma com a sua luz e um brilho de verniz. pinta(k, p) pode
@@ -140,12 +169,20 @@
       var a2 = (k + 0.5) / N * PI * 2, n = [0, Math.cos(a2), Math.sin(a2)], quad = [fora[k], fora[(k + 1) % N], dentro[(k + 1) % N], dentro[k]];
       var cq = mul(quad.reduce(function (a, b) { return add(a, b); }, [0, 0, 0]), 0.25);
       if (!cam.ve(cq, n)) continue;
-      (function (qd, nn) { var q = qd.map(cam.pt); L.push({ d: (q[0].d + q[2].d) / 2, f: function (c) { poligono(c, q, luzDe('#1d1d24', nn)); } }); })(quad, n);
+      var sulco = (k + Math.floor(relogio * 9)) % 2;   // os sulcos do pneu andam: a roda está girando
+      (function (qd, nn, sc) { var q = qd.map(cam.pt); L.push({ d: (q[0].d + q[2].d) / 2, f: function (c) { poligono(c, q, luzDe(sc ? '#2a2a33' : '#16161c', nn)); } }); })(quad, n, sulco);
     }
     var nf = [lado, 0, 0], cf = [cen[0] + lado * larg / 2, cen[1], cen[2]];
     if (cam.ve(cf, nf)) {
       var qf = fora.map(cam.pt), qc = fora.map(function (p) { return cam.pt(add(cf, mul(sub(p, cf), 0.55))); });
-      L.push({ d: cam.pt(cf).d - 0.01, f: function (c) { poligono(c, qf, luzDe('#26262e', nf)); poligono(c, qc, luzDe(calota || '#c9ced6', nf)); } });
+      var giroR = -relogio * 9 * lado, raios = [0, 1, 2, 3, 4].map(function (k) { var a = giroR + k / 5 * PI * 2; return cam.pt(add(cf, [lado * 0.005, Math.cos(a) * r * 0.5, Math.sin(a) * r * 0.5])); }), c0 = cam.pt(add(cf, [lado * 0.005, 0, 0]));
+      var corC = luzDe(calota || '#c9ced6', nf);
+      L.push({ d: cam.pt(cf).d - 0.01, f: function (c) {
+        poligono(c, qf, luzDe('#26262e', nf)); poligono(c, qc, corC);
+        c.strokeStyle = 'rgba(40,40,52,.55)'; c.lineWidth = Math.max(1, r * c0.s * 0.12); c.lineCap = 'round';
+        c.beginPath(); raios.forEach(function (p) { c.moveTo(c0.x, c0.y); c.lineTo(p.x, p.y); }); c.stroke();
+        c.fillStyle = 'rgba(40,40,52,.7)'; c.beginPath(); c.arc(c0.x, c0.y, Math.max(1, r * c0.s * 0.12), 0, PI * 2); c.fill();
+      } });
     }
   }
   // bola esticada (raios rx, ry, rz), com sombreado redondo
@@ -212,6 +249,7 @@
       caixa(cam, L, [0, 0.38, -2.25], [2.1, 0.22, 0.2], '#c9ced6');   // para-choque
       [[-0.65, 2.36], [0.65, 2.36]].forEach(function (b) { caixa(cam, L, [b[0], b[1], 0], [0.08, 0.1, 3.2], '#3a3a44'); });   // rack
       bola(cam, L, [0, 2.48, 0], 0.42, 0.07, 2.4, tres('#ff4fa3'));   // prancha
+      [-0.85, 0.85].forEach(function (x) { luzinha(cam, L, [x, 0.95, -2.22], 0.5, '#ff4fd8', 0.45); }); fumaca(cam, L, [0.6, 0.35, -2.3]);
       [[-1, -1.4], [1, -1.4], [-1, 1.4], [1, 1.4]].forEach(function (w) { roda(cam, L, [w[0] * 0.95, 0.42, w[1]], 0.42, 0.32); });
     } },
     escolar: { alt: 4.2, y: 1.2, z: -2.2, larg: 1.15, comp: 3.6, montar: function (cam, L, cor, f, op) {
@@ -229,6 +267,7 @@
       [[-0.85, pisca], [0.85, !pisca]].forEach(function (l) { bola(cam, L, [l[0], 2.62, -3.65], 0.16, 0.16, 0.08, l[1] ? ['#ffb3b3', '#ff2a2a', '#a00'] : ['#7a3a3a', '#4a1a1a', '#2a0a0a'], -0.05); });
       var abre = Math.max(0, Math.sin(f * PI * 2));   // placa de PARE abrindo do lado esquerdo
       caixa(cam, L, [-1.25 - abre * 0.45, 1.45, 2.2], [0.06 + abre * 0.9, 0.62, 0.62 * (1 - abre * 0.9) + 0.06], '#e63946', { esq: function (c) { texto(c, 'PARE', 50, 52, 24, '#ffffff'); }, tras: function (c) { texto(c, 'PARE', 50, 52, 24, '#ffffff'); } });
+      [-0.85, 0.85].forEach(function (l, k) { if (k ? !pisca : pisca) luzinha(cam, L, [l, 2.62, -3.7], 0.6, '#ff3030', 0.6); }); fumaca(cam, L, [0.8, 0.35, -3.8]);
       [[-1, -2.5], [1, -2.5], [-1, 2.3], [1, 2.3]].forEach(function (w) { roda(cam, L, [w[0] * 1.05, 0.48, w[1]], 0.48, 0.36); });
     } },
     pelucias: { alt: 4.0, y: 1.2, z: -1.0, larg: 1.15, comp: 3.2, montar: function (cam, L, cor, f, op) {
@@ -243,6 +282,7 @@
       caixa(cam, L, [0, 1.85, -1.1], [2.3, 1.7, 4.0], '#dff4ff', null, { alfa: 0.28, sem: ['baixo'], vies: -0.2 });   // o vidro (transparente)
       caixa(cam, L, [0, 2.78, -1.1], [2.5, 0.16, 4.2], '#ffffff', { cima: function (c) { for (var q = 0; q < 10; q++) retangulo(c, q * 10, 0, 5, 100, '#e8336f'); }, tras: function (c) { for (var q = 0; q < 10; q++) retangulo(c, q * 10, 0, 5, 100, '#e8336f'); }, esq: function (c) { for (var q = 0; q < 10; q++) retangulo(c, q * 10, 0, 5, 100, '#e8336f'); }, dir: function (c) { for (var q = 0; q < 10; q++) retangulo(c, q * 10, 0, 5, 100, '#e8336f'); } });   // toldo listrado
       [-1, 1].forEach(function (l) { caixa(cam, L, [l * 1.25, 2.3, 2.6], [0.18, 2.2, 0.18], '#d6dbe2', { tras: function (c) { for (var q = 0; q < 6; q++) circulo(c, 50, 10 + q * 16, 12, '#1b1b22'); } }); });   // chaminés de bolinha
+      fumaca(cam, L, [-1.25, 3.4, 2.6]); fumaca(cam, L, [1.25, 3.4, 2.6]);
       [[-1, -2.2], [1, -2.2], [-1, 2.1], [1, 2.1]].forEach(function (w) { roda(cam, L, [w[0] * 1.08, 0.45, w[1]], 0.45, 0.34, '#f4f4f4'); });
     } },
     pipoca: { alt: 3.3, y: 0.9, larg: 0.9, comp: 1.4, montar: function (cam, L, cor, f, op) {
@@ -276,6 +316,7 @@
       [[-0.5, 1.95, -0.6], [0.4, 2.0, -0.3], [0, 2.1, 0.4], [-0.6, 1.85, 0.6], [0.7, 1.8, 0.5], [0.2, 1.9, -0.9], [-0.9, 1.6, -0.2], [0.9, 1.65, -0.7]].forEach(function (g) { bola(cam, L, g, 0.07, 0.03, 0.1, ['#ffffff', '#fff3d6', '#e0cfa0'], -0.12); });
       piloto(cam, L, [0, 2.15, -0.3], 0.42, op);   // o piloto aparece numa escotilha no alto do pão
       bola(cam, L, [0, 2.0, -0.3], 0.5, 0.08, 0.5, tres('#26313f'), 0.02);
+      fumaca(cam, L, [0, 0.45, -2.0]);
       [[-1, -1.25], [1, -1.25], [-1, 1.25], [1, 1.25]].forEach(function (w) { roda(cam, L, [w[0] * 1.05, 0.42, w[1]], 0.42, 0.3); });
     } },
     // o Ovo correndo, sem carro (Humpty Dumpty, cantiga antiga; desenho próprio): corpo de ovo, gravata-borboleta,
@@ -325,46 +366,55 @@
     // ---------- 1.15.0: os carros antigos e o trenó também em 3D (dono: "o trenó e os carros também podiam aparecer a lateral") ----------
     classico: { alt: 3.3, y: 0.95, larg: 1.05, comp: 2.25, montar: function (cam, L, cor, f, op) {
       var esc = tom(cor, -0.35), cla = tom(cor, 0.3);
-      var lado = function (c) { retangulo(c, 0, 30, 100, 6, cla); retangulo(c, 44, 8, 2, 70, esc); retangulo(c, 34, 44, 8, 3, '#e9e9f0'); };
-      caixa(cam, L, [0, 0.72, 0], [2.0, 0.66, 4.3], cor, {
-        tras: function (c) { [6, 78].forEach(function (x) { retangulo(c, x, 22, 16, 22, '#e01e1e'); retangulo(c, x + 2, 24, 12, 6, '#ffb3b3'); }); placa(c, 'VRUUM'); retangulo(c, 30, 30, 40, 4, cla); },
-        frente: function (c) { [16, 84].forEach(function (x) { circulo(c, x, 32, 11, '#fff7c2'); }); retangulo(c, 34, 24, 32, 20, '#2a2a30'); },
-        esq: lado, dir: lado
-      });
+      // 1.21.0: carroceria arredondada (casco), com friso claro dos lados
+      casco(cam, L, [
+        { z: -2.2, y: 0.72, w: 0.9, h: 0.28, n: 3 }, { z: -1.9, y: 0.74, w: 1.0, h: 0.34, n: 3.4 }, { z: -0.5, y: 0.75, w: 1.0, h: 0.35, n: 3.6 },
+        { z: 1.0, y: 0.73, w: 1.0, h: 0.34, n: 3.6 }, { z: 1.9, y: 0.69, w: 0.98, h: 0.3, n: 3.2 }, { z: 2.25, y: 0.63, w: 0.85, h: 0.22, n: 2.8 }
+      ], cor, { pinta: function (k) { return k === 0 || k === 8 ? cla : null; } });
       var pil = function (c) { retangulo(c, 0, 0, 7, 100, cor); retangulo(c, 93, 0, 7, 100, cor); };
       tronco(cam, L, [0, 1.45, -0.3], [1.86, 2.5], [1.56, 1.6, -0.1], 0.8, '#8fcbec', { tras: pil, frente: pil, esq: pil, dir: pil, cima: function (c) { retangulo(c, 0, 0, 100, 100, cor); retangulo(c, 0, 0, 100, 12, cla); } }, { alfa: { tras: 0.45, frente: 0.45, esq: 0.5, dir: 0.5 }, sem: ['baixo'] });
       piloto(cam, L, [0, 1.42, -0.45], 0.4, op);
-      [-2.2, 2.2].forEach(function (z) { caixa(cam, L, [0, 0.45, z], [2.08, 0.18, 0.14], '#d9dde3'); });   // para-choques cromados
+      [-0.62, 0.62].forEach(function (x) { bola(cam, L, [x, 0.8, -2.22], 0.16, 0.1, 0.04, ['#ffd0d0', '#ff2a2a', '#9a0010'], -0.02); luzinha(cam, L, [x, 0.8, -2.25], 0.5, '#ff3030'); });
+      caixa(cam, L, [0, 0.66, -2.24], [0.5, 0.15, 0.02], '#ffffff', { tras: function (c) { texto(c, 'VRUUM', 50, 52, 34, '#1a1446'); } });
+      [-2.22, 2.22].forEach(function (z) { caixa(cam, L, [0, 0.45, z], [2.08, 0.16, 0.12], '#d9dde3'); });   // para-choques cromados
+      [-0.6, 0.6].forEach(function (x) { bola(cam, L, [x, 0.7, 2.25], 0.15, 0.12, 0.05, ['#ffffff', '#fff7c2', '#c9b870'], -0.02); });
+      bola(cam, L, [0.55, 0.38, -2.25], 0.06, 0.06, 0.06, ['#e9edf2', '#9aa0a6', '#3a3a44'], -0.03); fumaca(cam, L, [0.55, 0.38, -2.3]);
       [[-1, -1.35], [1, -1.35], [-1, 1.35], [1, 1.35]].forEach(function (w) { roda(cam, L, [w[0] * 0.95, 0.4, w[1]], 0.4, 0.3); });
     } },
     gt: { alt: 3.1, y: 0.8, larg: 1.1, comp: 2.3, montar: function (cam, L, cor, f, op) {
-      var esc = tom(cor, -0.4), cla = tom(cor, 0.3);
-      tronco(cam, L, [0, 0.62, 0], [2.14, 4.5], [2.0, 4.2, 0], 0.62, cor, {
-        tras: function (c) { retangulo(c, 6, 30, 88, 12, '#d81b1b'); circulo(c, 12, 36, 8, '#ff2a2a'); circulo(c, 88, 36, 8, '#ff2a2a'); texto(c, 'G T', 50, 58, 14, 'rgba(255,255,255,.9)'); placa(c, 'VRUUM'); circulo(c, 42, 92, 4, '#9aa0a6'); circulo(c, 58, 92, 4, '#9aa0a6'); },
-        frente: function (c) { [14, 86].forEach(function (x) { circulo(c, x, 34, 9, '#fff7c2'); }); },
-        esq: function (c) { retangulo(c, 0, 40, 100, 5, cla); circulo(c, 22, 30, 10, '#ffffff'); texto(c, '7', 22, 31, 14, '#1a1446'); },
-        dir: function (c) { retangulo(c, 0, 40, 100, 5, cla); circulo(c, 78, 30, 10, '#ffffff'); texto(c, '7', 78, 31, 14, '#1a1446'); },
-        cima: function (c) { retangulo(c, 40, 0, 7, 100, '#ffffff'); retangulo(c, 53, 0, 7, 100, '#ffffff'); }
-      });
+      var esc = tom(cor, -0.4);
+      // 1.21.0: traseira redonda e baixa (casco), duas faixas brancas por cima
+      casco(cam, L, [
+        { z: -2.25, y: 0.62, w: 0.9, h: 0.22, n: 2.4 }, { z: -1.9, y: 0.66, w: 1.07, h: 0.32, n: 2.6 }, { z: -1.0, y: 0.67, w: 1.1, h: 0.33, n: 2.8 },
+        { z: 0.5, y: 0.63, w: 1.02, h: 0.3, n: 2.8 }, { z: 1.6, y: 0.6, w: 1.05, h: 0.3, n: 2.6 }, { z: 2.25, y: 0.52, w: 0.8, h: 0.18, n: 2.2 }
+      ], cor, { pinta: function (k, p) { return (k === 3 || k === 4) && Math.abs(p[0]) > 0.06 && Math.abs(p[0]) < 0.32 ? '#ffffff' : null; } });
       var pil = function (c) { retangulo(c, 0, 0, 8, 100, cor); retangulo(c, 92, 0, 8, 100, cor); };
       tronco(cam, L, [0, 1.28, 0.1], [1.8, 2.3], [1.3, 1.0, -0.25], 0.7, '#8fcbec', { tras: pil, frente: pil, esq: pil, dir: pil, cima: function (c) { retangulo(c, 0, 0, 100, 100, cor); retangulo(c, 40, 0, 7, 100, '#ffffff'); retangulo(c, 53, 0, 7, 100, '#ffffff'); } }, { alfa: { tras: 0.45, frente: 0.45, esq: 0.5, dir: 0.5 }, sem: ['baixo'] });
       piloto(cam, L, [0, 1.25, -0.05], 0.36, op, -0.4);
-      caixa(cam, L, [0, 0.97, -2.1], [1.9, 0.08, 0.32], esc);   // rabinho de pato
+      caixa(cam, L, [0, 0.93, -2.05], [1.85, 0.07, 0.3], esc);   // rabinho de pato
+      for (var k = 0; k < 7; k++) bola(cam, L, [-0.66 + k * 0.22, 0.7, -2.22], 0.11, 0.05, 0.03, ['#ffb3b3', '#e01e1e', '#8a0010'], -0.02);   // lanterna em faixa
+      [-0.68, 0.68].forEach(function (x) { luzinha(cam, L, [x, 0.7, -2.26], 0.45, '#ff3030'); });
+      caixa(cam, L, [0, 0.52, -2.22], [0.5, 0.14, 0.02], '#ffffff', { tras: function (c) { texto(c, 'G T', 50, 52, 50, '#1a1446'); } });
+      [-0.16, 0.16].forEach(function (x) { bola(cam, L, [x, 0.4, -2.2], 0.06, 0.06, 0.06, ['#e9edf2', '#9aa0a6', '#3a3a44'], -0.03); });
+      fumaca(cam, L, [0, 0.4, -2.3]);
       [[-1, -1.4, 0.44], [1, -1.4, 0.44], [-1, 1.4, 0.4], [1, 1.4, 0.4]].forEach(function (w) { roda(cam, L, [w[0] * 1.0, w[2], w[1]], w[2], 0.34); });
     } },
     super: { alt: 3.0, y: 0.75, larg: 1.2, comp: 2.4, montar: function (cam, L, cor, f, op) {
       var esc = tom(cor, -0.4), cla = tom(cor, 0.3);
-      var lado = function (c) { c.fillStyle = '#1b1b22'; c.beginPath(); c.moveTo(20, 30); c.lineTo(48, 26); c.lineTo(44, 70); c.lineTo(24, 74); c.closePath(); c.fill(); retangulo(c, 0, 82, 100, 6, cla); };
-      tronco(cam, L, [0, 0.55, 0], [2.36, 4.7], [2.2, 4.3, -0.05], 0.52, cor, {
-        tras: function (c) { [10, 24, 76, 90].forEach(function (x) { circulo(c, x, 36, 7, '#ff2a2a'); circulo(c, x - 2, 34, 2.5, 'rgba(255,230,230,.8)'); }); retangulo(c, 34, 26, 32, 22, '#141418'); for (var k = 0; k < 6; k++) retangulo(c, 36 + k * 5.5, 27, 1.5, 20, '#33333c'); retangulo(c, 8, 64, 84, 30, '#1b1b22'); [16, 28, 72, 84].forEach(function (x) { circulo(c, x, 78, 5, '#9aa0a6'); circulo(c, x, 78, 3, '#2a2a30'); }); },
-        frente: function (c) { [16, 84].forEach(function (x) { retangulo(c, x - 10, 24, 20, 8, '#fff7c2'); }); },
-        esq: lado, dir: lado
-      });
+      // 1.21.0: cunha arredondada (casco), entradas de ar pretas dos lados
+      casco(cam, L, [
+        { z: -2.35, y: 0.6, w: 1.0, h: 0.24, n: 3 }, { z: -2.0, y: 0.62, w: 1.18, h: 0.3, n: 3.2 }, { z: -0.8, y: 0.6, w: 1.18, h: 0.3, n: 3.2 },
+        { z: 0.6, y: 0.52, w: 1.1, h: 0.26, n: 3 }, { z: 1.7, y: 0.44, w: 1.05, h: 0.2, n: 2.6 }, { z: 2.35, y: 0.36, w: 0.85, h: 0.12, n: 2.2 }
+      ], cor, { pinta: function (k, p) { return (k === 0 || k === 8 || k === 1 || k === 7) && p[2] > -1.5 && p[2] < -0.3 ? '#1b1b22' : null; } });
       var pil = function (c) { retangulo(c, 0, 0, 6, 100, cor); retangulo(c, 94, 0, 6, 100, cor); };
       tronco(cam, L, [0, 1.08, 0.25], [1.7, 2.1], [1.2, 0.9, -0.2], 0.56, '#7fbde6', { tras: pil, frente: pil, esq: pil, dir: pil, cima: function (c) { retangulo(c, 0, 0, 100, 100, cor); } }, { alfa: { tras: 0.45, frente: 0.45, esq: 0.5, dir: 0.5 }, sem: ['baixo'] });
       piloto(cam, L, [0, 1.0, 0.05], 0.34, op, -0.6);
-      [-0.75, 0.75].forEach(function (x) { caixa(cam, L, [x, 0.9, -2.0], [0.08, 0.2, 0.1], '#1b1b22'); });   // pés do aerofólio (baixinho: o piloto aparece por cima)
+      [-0.75, 0.75].forEach(function (x) { caixa(cam, L, [x, 0.9, -2.0], [0.08, 0.2, 0.1], '#1b1b22'); });   // pés do aerofólio
       caixa(cam, L, [0, 1.02, -2.05], [2.3, 0.07, 0.55], esc, { cima: function (c) { retangulo(c, 0, 0, 100, 30, cla); } });   // aerofólio
+      [-0.82, -0.55, 0.55, 0.82].forEach(function (x) { bola(cam, L, [x, 0.66, -2.34], 0.09, 0.09, 0.03, ['#ffd0d0', '#ff2a2a', '#9a0010'], -0.02); luzinha(cam, L, [x, 0.66, -2.37], 0.35, '#ff3030', 0.4); });
+      caixa(cam, L, [0, 0.42, -2.3], [1.7, 0.14, 0.12], '#1b1b22');   // difusor
+      [-0.5, -0.32, 0.32, 0.5].forEach(function (x) { bola(cam, L, [x, 0.42, -2.37], 0.06, 0.06, 0.04, ['#e9edf2', '#9aa0a6', '#3a3a44'], -0.03); });
+      fumaca(cam, L, [-0.41, 0.42, -2.4]); fumaca(cam, L, [0.41, 0.42, -2.4]);
       [[-1, -1.45, 0.42], [1, -1.45, 0.42], [-1, 1.5, 0.38], [1, 1.5, 0.38]].forEach(function (w) { roda(cam, L, [w[0] * 1.08, w[2], w[1]], w[2], 0.4, '#3a3a44'); });
     } },
     kart: { alt: 2.6, y: 0.65, larg: 1.0, comp: 1.5, montar: function (cam, L, cor, f, op) {
@@ -379,6 +429,7 @@
       [-1, 1].forEach(function (l) { cano(cam, L, [l * 0.3, 1.1, -0.3], [l * 0.22, 0.85, 0.35], 0.09, 0.07, esc); });   // braços no volante
       cano(cam, L, [0, 0.55, 0.2], [0, 0.85, 0.42], 0.04, 0.04, '#3a3a44'); bola(cam, L, [0, 0.88, 0.45], 0.24, 0.24, 0.05, tres('#26262e'));   // volante
       piloto(cam, L, [0, 1.5, -0.3], 0.4, op);
+      fumaca(cam, L, [0.6, 0.6, -1.4]);
       [[-1, -0.95, 0.4, 0.5], [1, -0.95, 0.4, 0.5], [-1, 0.95, 0.32, 0.36], [1, 0.95, 0.32, 0.36]].forEach(function (w) { roda(cam, L, [w[0] * 0.92, w[2], w[1]], w[2], w[3], '#ffd166'); });
     } },
     monstrao: { alt: 5.6, y: 1.9, larg: 1.55, comp: 2.5, montar: function (cam, L, cor, f, op) {
@@ -394,6 +445,7 @@
       caixa(cam, L, [0, 3.15, 0.3], [2.0, 0.1, 1.95], esc);   // teto
       piloto(cam, L, [0, 2.8, 0.1], 0.42, op);
       [-0.6, -0.2, 0.2, 0.6].forEach(function (x) { bola(cam, L, [x, 3.3, 0.9], 0.12, 0.12, 0.08, ['#ffffff', '#fff3a0', '#e0c050'], -0.05); });   // faróis no teto
+      [-0.95, 0.95].forEach(function (x) { luzinha(cam, L, [x, 2.0, -2.25], 0.6, '#ff3030'); }); fumaca(cam, L, [0.7, 1.2, -2.3]); fumaca(cam, L, [-0.7, 1.2, -2.3]);
       [[-1, -1.5], [1, -1.5], [-1, 1.5], [1, 1.5]].forEach(function (w) { roda(cam, L, [w[0] * 1.25, 0.95, w[1]], 0.95, 0.75, '#9aa0a6'); });
     } },
     moto: { alt: 3.4, y: 1.0, larg: 0.45, comp: 1.4, montar: function (cam, L, cor, f, op) {
@@ -439,6 +491,7 @@
       [[-0.56, 0.72], [-0.3, 0.74], [0.3, 0.74], [0.56, 0.72]].forEach(function (l) { bola(cam, L, [l[0], l[1], -2.24], 0.09, 0.09, 0.04, ['#ffd0d0', '#ff2a2a', '#9a0010'], -0.02); });
       [-0.5, -0.36, 0.36, 0.5].forEach(function (x) { bola(cam, L, [x, 0.45, -2.12], 0.06, 0.06, 0.06, [CROMO, '#9aa0a6', '#3a3a44'], -0.02); });
       caixa(cam, L, [0, 0.58, -2.21], [0.5, 0.14, 0.02], '#ffffff', { tras: function (c2) { texto(c2, '♥', 50, 52, 70, '#ff2a55'); } });
+      [-0.56, 0.56].forEach(function (x) { luzinha(cam, L, [x, 0.73, -2.27], 0.45, '#ff3030', 0.45); }); fumaca(cam, L, [0.43, 0.45, -2.2]);
       // frente: faróis redondos e a grade pequena
       [-0.55, 0.55].forEach(function (x) { bola(cam, L, [x, 0.62, 2.12], 0.13, 0.1, 0.08, ['#ffffff', '#fff7c2', '#c9b870'], -0.02); });
       // quem dirige
@@ -592,6 +645,70 @@
       bola(cam, L, [0, 1.74, 0.88], 0.27, 0.24, 0.26, tres('#15131a'), -0.01);   // cabelo penteado
       bola(cam, L, [-0.4, 1.66, -0.35], 0.26, 0.24, 0.2, tres(tom(cor, -0.15)), -0.1);   // quem monta, nas costas (de lado, para ver o rosto dele)
       piloto(cam, L, [-0.4, 2.05, -0.35], 0.38, op);
+    } },
+
+    // ---------- 1.20.0 ----------
+    /* patins de 4 rodinhas (dono, 14/Nov/2026): uma pessoa de capacete patinando de verdade. A passada: uma perna
+       empurra para o lado e para trás enquanto a outra desliza; o corpo vai para cima da perna que desliza,
+       inclinado para a frente, e os braços balançam ao contrário das pernas. fase: um ciclo = uma passada de cada lado */
+    patins: { alt: 3.6, y: 1.2, larg: 0.5, comp: 0.6, montar: function (cam, L, cor, f, op) {
+      var s = Math.sin(f * PI * 2), sway = -s * 0.12, bob = Math.abs(s) * 0.05, ROUPA = tom(cor, -0.35), PELE = '#f2c9a0', BOTA = '#f4f4f8';
+      var hipC = [sway, 1.12 - bob, 0];
+      [-1, 1].forEach(function (l) {
+        var p = l < 0 ? s : -s, empurra = Math.max(0, p), volta = Math.max(0, -p);
+        var quadril = [l * 0.15 + sway, 1.12 - bob, 0];
+        var pe = [l * (0.2 + empurra * 0.42) + sway * 0.3, 0.2 + volta * 0.14, -empurra * 0.38 + volta * 0.1];
+        var joelho = [(quadril[0] + pe[0]) / 2 + l * 0.04, 0.66 + volta * 0.1, Math.max(quadril[2], pe[2]) + 0.26];
+        cano(cam, L, quadril, joelho, 0.13, 0.1, '#2a2d3a');   // coxa (bermuda)
+        bola(cam, L, joelho, 0.11, 0.1, 0.1, tres(cor), -0.01);   // joelheira
+        cano(cam, L, joelho, add(pe, [0, 0.12, 0.02]), 0.085, 0.07, PELE);   // canela
+        // o patins: bota, base, freio na frente e 4 rodinhas
+        caixa(cam, L, [pe[0], pe[1] + 0.1, pe[2] + 0.06], [0.22, 0.26, 0.44], BOTA, { tras: function (c) { retangulo(c, 0, 0, 100, 18, cor); }, esq: function (c) { retangulo(c, 0, 0, 100, 18, cor); retangulo(c, 30, 45, 40, 10, cor); }, dir: function (c) { retangulo(c, 0, 0, 100, 18, cor); retangulo(c, 30, 45, 40, 10, cor); } });
+        caixa(cam, L, [pe[0], pe[1] - 0.06, pe[2] + 0.06], [0.2, 0.05, 0.48], '#9aa0a6');
+        bola(cam, L, [pe[0], pe[1] - 0.08, pe[2] + 0.33], 0.06, 0.06, 0.06, tres('#e63946'));
+        [-1, 1].forEach(function (lx) { [-0.1, 0.22].forEach(function (dz) { roda(cam, L, [pe[0] + lx * 0.1, pe[1] - 0.12, pe[2] + dz], 0.075, 0.07, '#ffd166'); }); });
+        // braço: balança ao contrário da perna e abre um pouco para o lado quando ela empurra
+        var ombro = [l * 0.27 + sway * 0.8, 1.78 - bob, 0.2], mao = [l * (0.42 + empurra * 0.18) + sway * 0.6, 1.3 - bob, 0.2 - p * 0.42];
+        var cotovelo = [(ombro[0] + mao[0]) / 2 + l * 0.08, (ombro[1] + mao[1]) / 2 - 0.02, (ombro[2] + mao[2]) / 2 - 0.05];
+        cano(cam, L, ombro, cotovelo, 0.08, 0.07, cor); cano(cam, L, cotovelo, mao, 0.065, 0.055, PELE);
+        bola(cam, L, cotovelo, 0.08, 0.08, 0.08, tres(ROUPA), -0.01);   // cotoveleira
+        bola(cam, L, mao, 0.07, 0.07, 0.07, tres(PELE));
+      });
+      bola(cam, L, hipC, 0.22, 0.16, 0.16, tres('#2a2d3a'));   // bermuda
+      bola(cam, L, [sway * 0.85, 1.5 - bob, 0.12], 0.25, 0.36, 0.19, tres(cor));   // tronco (camiseta), inclinado para a frente
+      caixa(cam, L, [sway * 0.85, 1.5 - bob, -0.08], [0.24, 0.08, 0.02], '#ffffff');   // listra nas costas
+      piloto(cam, L, [sway * 0.8, 2.12 - bob, 0.22], 0.34, op);
+    } },
+    /* caminhão guincho: cabine alta lá na frente (o piloto aparece pelo vidro de trás), carroceria com faixas de
+       atenção, braço do guincho em "A" (dois braços amarelos) com o cabo e o gancho balançando, giroflex piscando no
+       teto, chaminés cromadas e rodas grandes (duplas atrás) */
+    guincho: { alt: 4.6, y: 1.4, z: 0.4, larg: 1.25, comp: 3.0, montar: function (cam, L, cor, f, op) {
+      var AM = '#ffc20e', pisca = f % 0.5 < 0.25, bal = Math.sin(f * PI * 2) * 0.18;
+      var atencao = function (c) { retangulo(c, 0, 0, 100, 100, '#1b1b22'); c.fillStyle = AM; for (var k = -2; k < 8; k++) { c.beginPath(); c.moveTo(k * 16, 100); c.lineTo(k * 16 + 8, 100); c.lineTo(k * 16 + 28, 0); c.lineTo(k * 16 + 20, 0); c.closePath(); c.fill(); } };
+      caixa(cam, L, [0, 0.95, -0.9], [2.3, 0.5, 4.0], '#3a3a44', { tras: function (c) { atencao(c); lanternas(c); placa(c, 'GUINCHO'); }, esq: function (c) { retangulo(c, 0, 0, 100, 30, AM); }, dir: function (c) { retangulo(c, 0, 0, 100, 30, AM); } });   // carroceria
+      caixa(cam, L, [0, 1.75, 1.75], [2.4, 1.1, 1.5], cor, { esq: function (c) { texto(c, 'GUINCHO', 50, 70, 22, '#ffffff', '#1a1446'); }, dir: function (c) { texto(c, 'GUINCHO', 50, 70, 22, '#ffffff', '#1a1446'); }, tras: function (c) { retangulo(c, 0, 0, 100, 12, tom(cor, -0.3)); } });   // cabine (parte de baixo)
+      caixa(cam, L, [0, 2.65, 1.75], [2.4, 0.7, 1.5], '#26313f', { tras: function (c) { retangulo(c, 0, 0, 8, 100, cor); retangulo(c, 92, 0, 8, 100, cor); }, esq: function (c) { retangulo(c, 0, 0, 8, 100, cor); retangulo(c, 92, 0, 8, 100, cor); }, dir: function (c) { retangulo(c, 0, 0, 8, 100, cor); retangulo(c, 92, 0, 8, 100, cor); } }, { alfa: { tras: 0.45, frente: 0.5, esq: 0.55, dir: 0.55 }, sem: ['cima', 'baixo'] });   // vidros
+      caixa(cam, L, [0, 3.06, 1.75], [2.44, 0.12, 1.54], tom(cor, -0.2));   // teto
+      piloto(cam, L, [0, 2.6, 1.5], 0.45, op);
+      caixa(cam, L, [0, 1.35, 3.0], [2.3, 0.9, 1.1], cor, { frente: function (c) { retangulo(c, 15, 20, 70, 50, '#c9ced6'); [12, 88].forEach(function (x) { circulo(c, x, 40, 9, '#fff7c2'); }); } });   // capô
+      [-1, 1].forEach(function (l) {   // chaminés cromadas atrás da cabine
+        cano(cam, L, [l * 1.05, 1.3, 0.85], [l * 1.05, 3.5, 0.85], 0.09, 0.09, '#d9dde3');
+        bola(cam, L, [l * 1.05, 3.55, 0.85], 0.1, 0.05, 0.1, tres('#2a2a30'), -0.02);
+      });
+      [-0.6, 0, 0.6].forEach(function (x, k) { bola(cam, L, [x, 3.22, 1.9], 0.16, 0.1, 0.12, (pisca ? k !== 1 : k === 1) ? ['#fff3c0', '#ffb703', '#a06000'] : ['#8a6a30', '#5a4420', '#3a2a10'], -0.02); });   // giroflex
+      // braço do guincho em A: dos dois lados da carroceria até a ponta lá atrás, com o cabo e o gancho
+      var base = -0.2, ponta = [0, 2.9, -3.0];
+      [-1, 1].forEach(function (l) { cano(cam, L, [l * 0.75, 1.25, base], [l * 0.25, ponta[1], ponta[2]], 0.13, 0.09, AM); cano(cam, L, [l * 0.75, 1.25, base - 1.2], [l * 0.45, 2.1, -2.2], 0.07, 0.06, '#9aa0a6'); });
+      cano(cam, L, [-0.3, ponta[1], ponta[2]], [0.3, ponta[1], ponta[2]], 0.1, 0.1, AM);
+      bola(cam, L, ponta, 0.16, 0.16, 0.12, tres('#3a3a44'), -0.02);   // roldana
+      var gancho = [Math.sin(bal) * 0.9, ponta[1] - 1.25, ponta[2] - Math.abs(bal) * 0.3];
+      cano(cam, L, ponta, gancho, 0.025, 0.025, '#222');
+      bola(cam, L, add(gancho, [0, -0.08, 0]), 0.1, 0.12, 0.1, tres('#e63946'), -0.01);
+      cano(cam, L, add(gancho, [0, -0.15, 0]), add(gancho, [0.12, -0.38, 0]), 0.04, 0.04, '#9aa0a6');
+      cano(cam, L, add(gancho, [0.12, -0.38, 0]), add(gancho, [-0.06, -0.42, 0]), 0.04, 0.035, '#9aa0a6');
+      [-0.6, 0, 0.6].forEach(function (x, k) { if (pisca ? k !== 1 : k === 1) luzinha(cam, L, [x, 3.25, 1.9], 0.9, '#ffb703', 0.6); });   // giroflex acendendo em volta
+      [-1.05, 1.05].forEach(function (x) { fumaca(cam, L, [x, 3.6, 0.85]); });
+      [[-1, -2.2], [1, -2.2], [-1, -1.1], [1, -1.1], [-1, 2.7], [1, 2.7]].forEach(function (w) { roda(cam, L, [w[0] * 1.08, 0.6, w[1]], 0.6, 0.48, '#c9ced6'); });
     } }
   };
 
@@ -610,6 +727,7 @@
     var cam = camera(x0, y0, W, H, giro, 0.3 - (inclina || 0) * 0.6, m.alt, m.y, m.z);
     if (!m.semSombra) sombra(cam, L, m.larg, m.comp);
     var o = { cabeca: op.cabeca, giro: op.giroCabeca, aqui: op.aqui, voo: op.voo, t: op.t };
+    relogio = op.t || 0;
     emBarco = !!op.barco && m.larg > 0;
     m.montar(cam, L, cor || '#ff4fa3', ((fase || 0) % 1 + 1) % 1, o);
     if (emBarco) boias(cam, L, m);

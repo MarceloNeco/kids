@@ -53,7 +53,7 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 - O veículo escolhido fica **sempre à vista**: em pé, preso no topo da tela enquanto as opções rolam; deitado, de um
   lado, com as opções do outro. O botão 🏁 Correr fica preso embaixo. Com 2 jogadores, abas Jogador 1 e Jogador 2.
-- **24 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
+- **26 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
 
 | Grupo | Veículos |
 |---|---|
@@ -179,7 +179,7 @@ No arquivo baixado (📲 Guardar no celular) tocam só as feitas pelo jogo, para
 | `estilo.css` | visual, paleta Bolinho de Chuva, fonte Fredoka. |
 | `pista.js` | **puro**: monta a estrada com semente (retas, curvas, morros, mundos), espalha estrelas, cones, lama, turbos, rampas, enfeites e o trânsito. Níveis em `NIVEIS`. |
 | `motor.js` | **puro**: regras da corrida (volante, curva, acelerar, grama, coisas da pista, batidas, chegada) e lista de eventos para som e efeitos. |
-| `veiculos.js` | a garagem: os 24 veículos
+| `veiculos.js` | a garagem: os 26 veículos
 | `modelos3d.js` | veículos em 3D de verdade (caixas, rodas cilíndricas, bolas, vidro transparente e desenhos nas faces): furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer, galinha e o Ovo Corredor; giram de lado na curva e inclinam no morro | (desenho, nome, grupo, velocidade e curva), testada no Node. |
 | `cavalo.js` | o cavalo galopando com quem monta, montado em 3D com peças simples (gira de lado nas curvas); galope testado no Node. |
 | `sprites.js` | todos os desenhos, feitos em código uma vez num canvas escondido. |
@@ -287,3 +287,18 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   está atrás deles), com camadas, pico claro e sombra no pé; cores em `PAREDE`, altura em `alturaParede()`. Enfeite
   atrás do paredão não é desenhado. Custo medido: cerca de 2 ms a mais por quadro (1280×720, sem placa de vídeo).
 - `sprites.js`: `setaCurva()` (placa escura, borda e setas de neon).
+
+## 1.20.0 — Patins e Caminhão Guincho (dono, 14/Nov/2026)
+
+- `modelos3d.js`: `patins` (pessoa de capacete, a passada calculada da fase: perna que empurra para o lado e para
+  trás, a outra deslizando, corpo indo para cima dela, braços ao contrário das pernas; patins com 4 rodinhas e freio)
+  e `guincho` (cabine com vidro, braço em "A", cabo e gancho balançando, giroflex, chaminés, rodas duplas atrás).
+- `veiculos.js`: 26 veículos. Patins tem `capacete` (o `cabeca.js` desenha o capacete na cabeça do modelo) e inclina
+  na curva como a moto e o skate. No rio a patinadora "surfa".
+
+## 1.21.0 — carros mais caprichados (1ª rodada de "todos os veículos com mais qualidade", dono, 14/Nov/2026)
+
+- `modelos3d.js`, valendo para todo modelo: `verniz()` (brilho de pintura nas caixas), rodas girando (`relogio` = op.t:
+  sulcos do pneu andando e 5 raios na calota), `luzinha()` (brilho somado de lanterna/farol/giroflex) e `fumaca()`.
+- Clássico, GT e Superesportivo refeitos com `casco()` (arredondados). Luzes e fumaça nos outros carros.
+- Próximas rodadas: montarias (cavalo, dinossauro, galinha, ovo, skate, patins) e os que voam.

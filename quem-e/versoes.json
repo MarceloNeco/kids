@@ -2,6 +2,20 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.4.2",
+      "data": "14/Nov/2026",
+      "hora": "15:54:23",
+      "pt": [
+        "🫶 As duas melecas ficam lado a lado na tela de começo, também nos celulares mais estreitos"
+      ],
+      "en": [
+        "🫶 The two slimes stand side by side on the start screen, on narrow phones too"
+      ],
+      "es": [
+        "🫶 Los dos slimes quedan uno al lado del otro en la pantalla de inicio, también en los móviles más estrechos"
+      ]
+    },
+    {
       "versao": "0.4.1",
       "data": "14/Nov/2026",
       "hora": "20:15:00",
