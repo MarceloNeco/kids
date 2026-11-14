@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="AQUA">
+  <defs>
+    <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9f4f1"/><stop offset="1" stop-color="#5fc7d4"/></linearGradient>
+    <clipPath id="vidro"><path d="M206 96v52c-46 10-62 40-62 78v158c0 44 34 72 112 72s112-28 112-72V226c0-38-16-68-62-78V96z"/></clipPath>
+  </defs>
+  <rect width="512" height="512" fill="url(#ceu)"/>
+  <circle cx="92" cy="110" r="30" fill="#fff" opacity=".55"/><circle cx="430" cy="170" r="20" fill="#fff" opacity=".5"/><circle cx="418" cy="402" r="34" fill="#fff" opacity=".35"/><circle cx="86" cy="392" r="16" fill="#fff" opacity=".45"/>
+  <g clip-path="url(#vidro)">
+    <rect x="130" y="80" width="252" height="400" fill="#ffffff" opacity=".45"/>
+    <rect x="130" y="372" width="252" height="100" fill="#9340e0"/>
+    <rect x="130" y="298" width="252" height="76" fill="#17c3c9"/>
+    <rect x="130" y="224" width="252" height="76" fill="#ffce1f"/>
+    <path d="M130 232c30-16 54 12 84 0s54-14 84-2 54 12 84 0v-64H130z" fill="#ff5d73"/>
+    <rect x="130" y="168" width="252" height="52" fill="#ff5d73"/>
+    <path d="M130 168c30-14 54 10 84 0s54-12 84-2 54 10 84 0v-90H130z" fill="#ffffff" opacity=".45"/>
+    <circle cx="228" cy="418" r="9" fill="#fff" opacity=".55"/><circle cx="290" cy="336" r="6" fill="#fff" opacity=".6"/><circle cx="246" cy="262" r="7" fill="#fff" opacity=".55"/>
+    <rect x="166" y="186" width="20" height="230" rx="10" fill="#fff" opacity=".6"/>
+  </g>
+  <path d="M206 96v52c-46 10-62 40-62 78v158c0 44 34 72 112 72s112-28 112-72V226c0-38-16-68-62-78V96z" fill="none" stroke="#17324d" stroke-width="14" stroke-linejoin="round"/>
+  <rect x="190" y="74" width="132" height="30" rx="15" fill="#fff" stroke="#17324d" stroke-width="12"/>
+</svg>
