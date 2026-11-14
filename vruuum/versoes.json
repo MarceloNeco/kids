@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.17.0",
+      "data": "14/Nov/2026",
+      "hora": "15:20:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante. O jogo abre no idioma escolhido lá e não tem mais botão de idioma próprio."
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, picked on the home page. The game opens in the language chosen there and no longer has its own language button."
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la página de inicio. El juego se abre en el idioma elegido allí y ya no tiene su propio botón de idioma."
+      ]
+    },
+    {
       "versao": "1.16.0",
       "data": "14/Nov/2026",
       "hora": "01:51:00",
