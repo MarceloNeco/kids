@@ -19,7 +19,7 @@ body {
   font-family: var(--fonte); color: var(--tinta); overflow-x: hidden; -webkit-tap-highlight-color: transparent;
   background-color: var(--menta);
   background-image: radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .7) 0 14px, transparent 15px),
-    radial-gradient(circle at 86% 12%, rgba(255, 95, 168, .18) 0 26px, transparent 27px),
+    radial-gradient(circle at 86% 12%, rgba(255, 95, 168, .3) 0 26px, transparent 27px),
     radial-gradient(circle at 78% 88%, rgba(46, 139, 255, .16) 0 34px, transparent 35px),
     radial-gradient(circle at 8% 82%, rgba(255, 181, 46, .2) 0 20px, transparent 21px);
   background-attachment: fixed;
@@ -43,19 +43,18 @@ button:disabled { cursor: default; opacity: .5; }
 .linha { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
 
 /* ---------- começo ---------- */
-#inicio { position: relative; min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+#inicio { position: relative; min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center;
   padding: calc(64px + var(--st)) calc(16px + var(--sr)) calc(90px + var(--sb)) calc(16px + var(--sl)); }
 .faixa { position: absolute; top: calc(8px + var(--st)); right: calc(8px + var(--sr)); display: flex; gap: 6px; z-index: 2; }
-.logo { font-size: clamp(3.2rem, 17vw, 6.5rem); font-weight: 700; line-height: .9; letter-spacing: -.02em; color: var(--branco);
-  -webkit-text-stroke: 3px var(--tinta); paint-order: stroke fill; text-shadow: 0 6px 0 var(--tinta); display: inline-flex; align-items: flex-end; }
-.logo-txt { background: linear-gradient(180deg, #8fd0ff 0%, var(--blue) 45%, var(--pink) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 3px var(--tinta); }
-/* o "?" de meleca: um gancho de geleia e uma gota que pinga embaixo */
-.logo-gota { position: relative; width: .62em; height: 1em; margin-left: .04em; }
-.logo-gota::before { content: ''; position: absolute; left: .02em; top: .02em; width: .5em; height: .56em; border: .14em solid var(--pink); border-left-color: transparent;
-  border-bottom-color: transparent; border-radius: 50%; transform: rotate(45deg); filter: drop-shadow(0 .05em 0 var(--tinta)); }
-.logo-gota::after { content: ''; position: absolute; left: .2em; bottom: .02em; width: .2em; height: .26em; background: var(--blue); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  border: 3px solid var(--tinta); animation: pinga 2.4s ease-in-out infinite; }
-@keyframes pinga { 0%, 60%, 100% { transform: translateY(0) scaleY(1); } 75% { transform: translateY(.08em) scaleY(1.25); } }
+.logo { font-size: clamp(3.2rem, 17vw, 6.5rem); font-weight: 700; line-height: 1; letter-spacing: -.02em; display: inline-flex; align-items: baseline; gap: .06em;
+  filter: drop-shadow(0 6px 0 var(--tinta)); }
+.logo-txt { background: linear-gradient(180deg, #9fd8ff 0%, var(--blue) 50%, var(--blue2) 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 3px var(--tinta); paint-order: stroke fill; }
+/* o "?" de meleca: rosa, com uma gota de geleia azul pingando embaixo */
+.logo-gota { position: relative; color: var(--pink); -webkit-text-stroke: 3px var(--tinta); paint-order: stroke fill; display: inline-block; transform: rotate(8deg); }
+.logo-gota::after { content: ''; position: absolute; left: 38%; top: 92%; width: .16em; height: .22em; background: var(--blue); border: 3px solid var(--tinta);
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; animation: pinga 2.4s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes pinga { 0%, 55%, 100% { transform: translateY(0) scaleY(.6); opacity: 0; } 65% { opacity: 1; } 85% { transform: translateY(.18em) scaleY(1.2); opacity: 1; } }
 .sub { font-size: 1.35rem; font-weight: 600; color: var(--tinta2); margin-top: -2px; }
 .pergunta-grande { font-size: 1.3rem; font-weight: 600; margin-top: 10px; }
 .melecas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
@@ -101,13 +100,16 @@ button:disabled { cursor: default; opacity: .5; }
 #jogo .conversa { min-width: 0; }
 #jogo .meleca-mini { width: 54px; height: 54px; }
 #jogo .balao { flex: 1; font-size: 1.05rem; padding: 6px 12px; }
-.meu-nome { font-weight: 700; font-size: 1.05rem; }
+.meu-nome { font-weight: 700; font-size: 1.05rem; flex: 1; min-width: 0; }
+.topo .lupa-bt { min-height: 48px; min-width: 48px; }
 #acoes { flex-wrap: nowrap; }
 #acoes .grande { flex: 1 1 auto; padding: 8px 10px; }
 .meu-segredo { position: relative; width: 52px; flex: 0 0 auto; padding: 0; border-radius: 12px; overflow: hidden; border: 3px solid var(--cor); background: var(--branco); box-shadow: 0 3px 0 var(--tinta); }
 .meu-segredo .mini-cara .nome { display: none; }
 .meu-segredo .rotulo { position: absolute; left: 0; right: 0; bottom: 0; font-size: .7rem; font-weight: 700; background: var(--cor); color: var(--branco); }
-.area { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 4px; }
+.area { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 4px; touch-action: pan-x pan-y; }
+/* segurar o dedo numa carta abre a lupa: sem seleção de texto nem menu do celular */
+.carta { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .tabuleiro { display: grid; grid-template-columns: repeat(var(--colunas, 4), var(--carta, 70px)); gap: var(--gap, 6px); justify-content: center; align-content: center; }
 
 .carta { width: var(--carta, 70px); height: calc(var(--carta, 70px) * 1.38); min-height: 0; min-width: 0; position: relative; perspective: 600px; padding: 0; }
@@ -180,6 +182,15 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 
 /* ---------- celular deitado: tabuleiro à esquerda, conversa e painel à direita ---------- */
 @media (orientation: landscape) and (max-height: 600px) {
+  /* começo: logo à esquerda, as duas melecas à direita, tudo na primeira tela */
+  #inicio { display: none; padding-top: calc(52px + var(--st)); padding-bottom: calc(70px + var(--sb)); }
+  #inicio.ativa { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "logo melecas" "sub melecas" "perg melecas" "resto resto"; align-items: center; column-gap: 24px; row-gap: 6px; }
+  #inicio .logo { grid-area: logo; font-size: clamp(2.6rem, 17vh, 4.6rem); justify-self: center; }
+  #inicio .sub { grid-area: sub; }
+  #inicio .pergunta-grande { grid-area: perg; margin: 0; }
+  #inicio .melecas { grid-area: melecas; flex-wrap: nowrap; }
+  #inicio .meleca-bt { width: min(24vw, 30vh, 170px); }
+  #inicio .ajuda, #inicio #btInstalar, #inicio .versao { grid-column: 1 / -1; justify-self: center; }
   #segredo, #jogo { display: none; flex-direction: row; flex-wrap: wrap; }
   #segredo.ativa, #jogo.ativa { display: grid; grid-template-columns: 1fr minmax(190px, 30vw); grid-template-rows: auto 1fr; grid-template-areas: "area topo" "area painel"; gap: 4px 8px; }
   .topo { grid-area: topo; }
