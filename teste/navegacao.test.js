@@ -52,6 +52,8 @@ const JOGOS = [
     entrar: async (pg) => { await pg.click('#btFacil'); await pg.waitForTimeout(600); } },
   { id: 'labirinto', url: 'labirinto/?teste', inicio: '#btJogar',
     entrar: async (pg) => { await pg.click('#btJogar'); await pg.waitForTimeout(800); } },
+  { id: 'a-garra', url: 'a-garra/?teste', inicio: '#btJogar',
+    entrar: async (pg) => { await pg.click('#btJogar'); await pg.waitForTimeout(500); } },
   { id: 'cozinha', url: 'cozinha/?teste', entrada: '#btEntrar', inicio: '#receitas',
     entrar: async (pg) => { await pg.click('#receitas [data-rec]'); await pg.waitForTimeout(500); },
     fundo: async (pg) => { await pg.click('#btBuscar'); await pg.waitForTimeout(500); } },
