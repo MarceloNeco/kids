@@ -40,7 +40,9 @@
 
   /* ================= CORPO EM PÉ =================
      origem no meio dos pés; A = altura total; o = { balanco, andando, bE, bD, pulando, ts, pose }
-     pose: 'festa' (acertou: rosto de alegria e brilhos) ou 'dor' (pegou algo ruim: mãos na cabeça, careta, suor).
+     pose: 'festa' (acertou: rosto de alegria e brilhos) ou 'dor' (pegou algo ruim: mãos na cabeça, careta, suor) ou
+     'triste' (papai/mamãe vendo a criança se machucar: mãos na cabeça, olhos caídos, boca para baixo).
+     palmas: fase (rad) → as duas mãos batem palmas na frente do peito (a mamãe comemorando).
      Proporções de criança: cabeça 0.40A, tronco 0.27A, pernas 0.22A, pescoço curto. */
   function corpoEmPe(ctx, cfg, A, o) {
     cfg = normalizar(cfg); o = o || {};
@@ -79,12 +81,23 @@
         ctx.strokeStyle = tom(cfg.pele, 0.8); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(hx, hy, L * 1.05, 0, 6.2832); ctx.stroke();
       });
     }
-    if (o.pose !== 'dor') bracos();
+    function palmas() {   // mãos se encontram na frente do peito e abrem de novo
+      var gap = tw * (0.06 + 0.32 * Math.abs(Math.sin(o.palmas)));
+      [-1, 1].forEach(function (s) {
+        var ox = s * tw * 0.52, oy = ty + th * 0.18, ex = s * tw * 0.8, ey = oy + A * 0.07, hx = s * gap, hy = ty + th * 0.05;
+        ctx.strokeStyle = cfg.roupa === 'armadura' ? '#b0bec5' : cor; ctx.lineWidth = L * 1.4; ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ex, ey); ctx.stroke();
+        ctx.strokeStyle = cfg.pele; ctx.lineWidth = L; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(hx, hy); ctx.stroke();
+        ctx.fillStyle = cfg.pele; ctx.beginPath(); ctx.ellipse(hx, hy, L * 0.8, L * 1.05, 0, 0, 6.2832); ctx.fill();
+        ctx.strokeStyle = tom(cfg.pele, 0.8); ctx.lineWidth = 1; ctx.stroke();
+      });
+    }
+    var maosCabeca = o.pose === 'dor' || o.pose === 'triste';
+    if (!maosCabeca) { if (o.palmas != null) palmas(); else bracos(); }
     // pescoço + cabeça (balança de leve ao andar; na dor, chacoalha)
     ctx.fillStyle = cfg.pele; ctx.fillRect(-L * 0.6, ty - L * 0.6, L * 1.2, L * 1.2);
-    ctx.save(); ctx.translate(0, ty - hs * 0.46 + Math.abs(bal) * 2); ctx.rotate(bal * 0.06 + (o.pose === 'dor' ? Math.sin(ts / 45) * 0.08 : o.pose === 'brava' ? Math.sin(ts / 140) * 0.12 : 0));
+    ctx.save(); ctx.translate(0, ty - hs * 0.46 + Math.abs(bal) * 2 + (o.pose === 'triste' ? hs * 0.03 : 0)); ctx.rotate(bal * 0.06 + (o.pose === 'dor' ? Math.sin(ts / 45) * 0.08 : o.pose === 'brava' ? Math.sin(ts / 140) * 0.12 : o.pose === 'triste' ? Math.sin(ts / 260) * 0.07 : 0));   // triste: cabeça baixa, balançando devagar ("ai, ai")
     cabeca(ctx, cfg, hs, ts, o.pose); if (o.costas) nuca(ctx, cfg, hs); enfeitesDaPose(ctx, hs, o.pose, ts); ctx.restore();
-    if (o.pose === 'dor') maosNaCabeca();
+    if (maosCabeca) maosNaCabeca();
     ctx.restore();
   }
   /* ---------- de LADO (andando): olha para a direita (quem chama espelha para a esquerda) ----------
@@ -125,7 +138,7 @@
       ctx.strokeStyle = tras ? tom(cfg.pele, 0.88) : cfg.pele; ctx.lineWidth = L; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(hx, hy); ctx.stroke();
       ctx.fillStyle = tras ? tom(cfg.pele, 0.88) : cfg.pele; ctx.beginPath(); ctx.arc(hx, hy, L * 0.95, 0, 6.2832); ctx.fill();
     }
-    var bal = o.chute != null ? -0.6 + o.chute * 1.2 : o.andando && !o.noAr ? Math.sin(f) * 0.6 : 0, angTras = o.cima ? Math.PI * 0.92 : (o.noAr ? 2.2 : -bal + 0.1), angFrente = o.cima ? Math.PI * 0.82 : (o.noAr ? 2.5 : bal + 0.15);
+    var bal = o.chute != null ? -0.6 + o.chute * 1.2 : o.andando && !o.noAr ? Math.sin(f) * 0.6 : 0, angTras = o.cima ? Math.PI * 0.92 : (o.noAr ? -2.45 : -bal + 0.1), angFrente = o.cima ? Math.PI * 0.82 : (o.noAr ? -2.15 : bal + 0.15);   // no ar: braços para cima e para trás (não tapam o rosto)
     if (ab) { angTras += (0.55 - angTras) * ab; angFrente += (1.05 - angFrente) * ab; }   // abaixando: braços para a frente, mãos perto dos joelhos (equilíbrio)
     if (cfg.acessorio === 'asas') asas(ctx, A, ombroY + th * 0.3, o.ts || 0);
     desenhaBraco(angTras, true);
@@ -338,6 +351,17 @@
       ctx.save(); ctx.fillStyle = cfg.pele; ctx.beginPath(); ctx.ellipse(0, R * 0.57, R * 0.3, R * 0.2, 0, 0, 6.2832); ctx.fill();
       ctx.strokeStyle = tom(cfg.corCabelo, 0.8); ctx.lineWidth = R * 0.07; ctx.lineCap = 'round'; [-1, 1].forEach(function (s) { ctx.beginPath(); ctx.moveTo(s * R * 0.56, -R * 0.4); ctx.lineTo(s * R * 0.16, -R * 0.24); ctx.stroke(); });
       ctx.fillStyle = '#7a1f2e'; ctx.beginPath(); ctx.ellipse(0, R * 0.56, R * 0.11, R * 0.14, 0, 0, 6.2832); ctx.fill();
+      ctx.restore(); return;
+    }
+    if (expr === 'triste') {   // olhos caídos (pálpebra por cima), sobrancelhas de preocupação e boquinha para baixo
+      ctx.save(); ctx.fillStyle = cfg.pele;
+      [-1, 1].forEach(function (s) { var ex = s * R * 0.36; ctx.beginPath(); ctx.ellipse(ex, -R * 0.13, R * 0.24, R * 0.17, s * 0.21, 0, 6.2832); ctx.fill(); });
+      ctx.beginPath(); ctx.ellipse(0, R * 0.57, R * 0.3, R * 0.22, 0, 0, 6.2832); ctx.fill();
+      ctx.strokeStyle = tom(cfg.pele, 0.6); ctx.lineWidth = R * 0.04; ctx.lineCap = 'round';
+      [-1, 1].forEach(function (s) { var ex = s * R * 0.36; ctx.beginPath(); ctx.moveTo(ex - R * 0.19, -R * 0.03 - s * R * 0.04); ctx.lineTo(ex + R * 0.19, -R * 0.03 + s * R * 0.04); ctx.stroke(); });   // pálpebra caída para fora (canto de fora mais baixo)
+      ctx.strokeStyle = tom(cfg.corCabelo, 0.85); ctx.lineWidth = R * 0.06; [-1, 1].forEach(function (s) { ctx.beginPath(); ctx.moveTo(s * R * 0.14, -R * 0.4); ctx.quadraticCurveTo(s * R * 0.32, -R * 0.36, s * R * 0.52, -R * 0.24); ctx.stroke(); });   // pontas de dentro levantadas
+      ctx.strokeStyle = '#8b3a4a'; ctx.lineWidth = R * 0.06; ctx.beginPath(); ctx.moveTo(-R * 0.2, R * 0.64); ctx.quadraticCurveTo(0, R * 0.46, R * 0.2, R * 0.64); ctx.stroke();   // boca para baixo
+      ctx.fillStyle = 'rgba(120,200,255,.9)'; ctx.beginPath(); ctx.moveTo(R * 0.42, R * 0.1); ctx.quadraticCurveTo(R * 0.52, R * 0.28, R * 0.42, R * 0.32); ctx.quadraticCurveTo(R * 0.32, R * 0.28, R * 0.42, R * 0.1); ctx.fill();   // lagriminha
       ctx.restore(); return;
     }
     if (expr !== 'festa' && expr !== 'dor') return;

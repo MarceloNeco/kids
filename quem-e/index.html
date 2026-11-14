@@ -157,6 +157,7 @@
       </div>
     </div>
     <p class="dica" data-t="📡 Os dois celulares precisam de internet (Wi-Fi ou dados).|📡 Both phones need internet (Wi-Fi or data).|📡 Los dos móviles necesitan internet (wifi o datos)."></p>
+    <button id="btPerto" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📶</span><span data-t="Jogar pertinho (sem internet)|Play nearby (no internet)|Jugar de cerca (sin internet)"></span></button>
   </div>
   <div id="redeSala" class="opcoes" hidden>
     <p class="dica" data-t="Código da partida|Game code|Código de la partida"></p>
@@ -164,6 +165,53 @@
     <button id="btConvidar" class="grande" type="button" data-t="📤 Mandar convite|📤 Send invite|📤 Mandar invitación"></button>
   </div>
   <p id="redeStatus" class="status" aria-live="polite"></p>
+</section>
+
+<section id="perto" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Sem internet? Dá para jogar com os dois celulares pertinho!|No internet? Play with the two phones close together!|¿No hay internet? ¡Podéis jugar con los dos móviles juntitos!"></p></div>
+  <div class="opcoes">
+    <ol class="passos">
+      <li data-t="📱📶 Um celular liga o Roteador Wi-Fi (também chamado Ponto de acesso ou Hotspot), mesmo em modo avião.|📱📶 One phone turns on its Wi-Fi hotspot (also called Mobile hotspot or Access point), even in airplane mode.|📱📶 Un móvil activa el punto de acceso wifi (también llamado compartir conexión o zona wifi), incluso en modo avión."></li>
+      <li data-t="📱➡️📶 O outro conecta nesse Wi-Fi. Se ele perguntar se quer continuar numa rede sem internet, toque em Sim.|📱➡️📶 The other one joins that Wi-Fi. If it asks whether to stay on a network without internet, tap Yes.|📱➡️📶 El otro se conecta a esa wifi. Si pregunta si quieres seguir en una red sin internet, toca Sí."></li>
+      <li data-t="🔳➡️📷 Um mostra o código, o outro lê com a câmera, e depois ao contrário.|🔳➡️📷 One shows the code, the other scans it with the camera, and then the other way round.|🔳➡️📷 Uno enseña el código, el otro lo lee con la cámara, y luego al revés."></li>
+    </ol>
+    <p class="dica" data-t="🍎 iPhone quase nunca liga o Roteador em modo avião: deixe um Android ser o roteador. O jogo vai pedir a câmera: toque em Permitir.|🍎 iPhones usually can't turn on the hotspot in airplane mode: let an Android be the hotspot. The game will ask for the camera: tap Allow.|🍎 El iPhone casi nunca puede activar el punto de acceso en modo avión: que un Android comparta la conexión. El juego pedirá la cámara: toca Permitir."></p>
+    <button id="btPertoCriar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">➕</span><span data-t="Criar partida pertinho|Create nearby game|Crear partida de cerca"></span></button>
+    <button id="btPertoEntrar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📷</span><span data-t="Entrar pertinho (ler o código)|Join nearby (scan the code)|Entrar de cerca (leer el código)"></span></button>
+  </div>
+  <p id="pertoMsg" class="status" aria-live="polite"></p>
+</section>
+
+<section id="pertoCodigo" class="tela" data-recurso="quem-e">
+  <div class="perto-caixa">
+    <h2 id="pertoCodTitulo" class="perto-titulo"></h2>
+    <p id="pertoCodDica" class="dica"></p>
+    <div class="qr-caixa"><canvas id="pertoQR" class="qr" role="img" data-rotulo="Código QR|QR code|Código QR" hidden></canvas></div>
+    <p id="pertoCodStatus" class="status" aria-live="polite"></p>
+    <button id="btPertoLerResposta" class="grande" type="button" hidden data-t="📷 Agora ler o código do outro celular|📷 Now scan the other phone's code|📷 Ahora leer el código del otro móvil"></button>
+    <button id="btPertoDeNovo" class="medio-bt" type="button" hidden data-t="🔄 Começar de novo|🔄 Start over|🔄 Empezar de nuevo"></button>
+    <details class="texto-codigo">
+      <summary data-t="Sem câmera? Ver o código em texto|No camera? See the code as text|¿No hay cámara? Ver el código en texto"></summary>
+      <p id="pertoCodTexto" class="codigo-texto"></p>
+      <button id="btPertoCopiar" class="medio-bt" type="button" data-t="📋 Copiar o código|📋 Copy the code|📋 Copiar el código"></button>
+    </details>
+    <button id="btPertoCancelar1" class="medio-bt" type="button" data-t="✖ Cancelar|✖ Cancel|✖ Cancelar"></button>
+  </div>
+</section>
+
+<section id="pertoLer" class="tela" data-recurso="quem-e">
+  <div class="perto-caixa">
+    <h2 id="pertoLerTitulo" class="perto-titulo"></h2>
+    <p id="pertoLerDica" class="dica"></p>
+    <div class="camera-caixa"><video id="pertoVideo" class="camera" playsinline muted autoplay></video><div class="mira-qr" aria-hidden="true"></div></div>
+    <p id="pertoLerStatus" class="status" aria-live="polite"></p>
+    <details id="pertoColarCaixa" class="texto-codigo">
+      <summary data-t="⌨️ Colar o código em texto|⌨️ Paste the code as text|⌨️ Pegar el código en texto"></summary>
+      <textarea id="pertoColar" rows="3" autocomplete="off" spellcheck="false" data-rotulo="Código|Code|Código"></textarea>
+      <button id="btPertoUsar" class="medio-bt" type="button" data-t="✅ Usar este código|✅ Use this code|✅ Usar este código"></button>
+    </details>
+    <button id="btPertoCancelar2" class="medio-bt" type="button" data-t="✖ Cancelar|✖ Cancel|✖ Cancelar"></button>
+  </div>
 </section>
 
 <section id="niveis" class="tela" data-recurso="quem-e">
@@ -258,6 +306,8 @@
 <script src="caras.js"></script>
 <script src="melecas.js"></script>
 <script src="rede.js"></script>
+<script src="../batalha-naval/pertinho.js" data-fora-do-arquivo></script>
+<script src="../batalha-naval/qr.js" data-fora-do-arquivo></script>
 <script src="adivinha-perguntas.js"></script>
 <script src="adivinha.js"></script>
 <script src="aprender.js"></script>
