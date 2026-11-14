@@ -33,3 +33,4 @@ footer b{color:var(--ouro)}
 .bt-biblioteca:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 .marca .pt,.marca .en,.marca .es{font-size:inherit;filter:none}
 @media (max-width:440px){.barra-topo .bolinho-idiomas button{min-width:0;padding:.3rem .5rem;gap:.3rem}.barra-topo .bt-biblioteca{padding:.35rem .65rem}.barra-topo{gap:.35rem}}
+.wrap>.idiomas-topo{display:flex;justify-content:flex-end;padding-top:.6rem}
