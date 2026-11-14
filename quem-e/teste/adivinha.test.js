@@ -80,7 +80,7 @@ test('"não sei" não muda as chances; desfazer volta exatamente', () => {
   assert.deepEqual(j.historico().map(h => h.id), [a.id]);
 });
 
-test('nunca repete pergunta; depois de 3 chutes errados, perde e pede ajuda', () => {
+test('nunca repete pergunta; depois de 4 chutes errados, perde e pede ajuda', () => {
   const { perguntas, lista } = mundo(17);
   const base = A.carregar([lista], perguntas);
   const j = A.criar({ base, nivel: 'A', rnd: sorteio(4) });
@@ -92,7 +92,7 @@ test('nunca repete pergunta; depois de 3 chutes errados, perde e pede ajuda', ()
     else fim = a;
   }
   assert.equal(fim && fim.tipo, 'perdi');
-  assert.ok(chutes <= 3);
+  assert.ok(chutes <= 4);
 });
 
 test('personagem aprendido entra na disputa no nível certo', () => {

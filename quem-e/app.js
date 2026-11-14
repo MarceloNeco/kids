@@ -4,7 +4,7 @@
    Guarda só neste aparelho (localStorage "bolinho:quem-e:pref"): idioma, sons, voz e a meleca escolhida. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0';
+  var APP_VERSION = '0.2.0';
   var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026';
   var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };
@@ -68,22 +68,17 @@
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarBotoes(); Som.sim(); });
   $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarBotoes(); if (pref.voz) falar(t('Voz ligada!', 'Voice on!')); else calar(); });
 
-  // ---------- voz do aparelho (a meleca fala) ----------
+  // ---------- voz da meleca (voz.js: voz do aparelho ou, se a pessoa ligar, ElevenLabs com a chave do cofre) ----------
   // Melekento Blue fala mais grosso e borbulhante; Pink Honey mais fininho. Sem voz no aparelho, segue só com texto.
-  function falar(txt) {
-    if (!pref.voz || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
-    try {
-      var limpo = String(txt).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').trim();
-      if (!limpo) return;
-      speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(limpo);
-      u.lang = en() ? 'en-US' : 'pt-BR';
-      u.rate = pref.meleca === 'blue' ? 1.0 : 1.08; u.pitch = pref.meleca === 'blue' ? 0.75 : 1.5;
-      if (window.Trilha) { Trilha.volume(0.3); u.onend = u.onerror = function () { setTimeout(function () { try { if (!speechSynthesis.speaking) Trilha.volume(null); } catch (e) { /* ok */ } }, 150); }; }
-      setTimeout(function () { try { speechSynthesis.speak(u); } catch (e) { /* sem voz */ } }, 60);
-    } catch (e) { /* sem voz */ }
+  // privado = nome que a família ensinou: nunca vai para a internet.
+  var voz = window.QEVoz ? QEVoz.criar(QEVoz.ambienteDoNavegador(function () { return pref.lingua; })) : null;
+  if (voz) { voz.usarEleven(!!pref.eleven); if (pref.vozBlue) voz.definirVoz('blue', pref.vozBlue); if (pref.vozPink) voz.definirVoz('pink', pref.vozPink); }
+  function falar(txt, privado) {
+    if (!pref.voz || !voz) return;
+    if (window.Trilha) Trilha.volume(0.3);
+    voz.falar(txt, { meleca: pref.meleca, privado: !!privado }).then(function () { if (window.Trilha) Trilha.volume(null); });
   }
-  function calar() { try { speechSynthesis.cancel(); } catch (e) { /* ok */ } }
+  function calar() { if (voz) voz.calar(); }
 
   // ---------- melecas na tela ----------
   var nMel = 0;
@@ -681,6 +676,13 @@
   pintarMelecas(); pintarBotoes(); traduzir();
   // convite: ?sala=ABCD entra direto na partida
   (function () { var m = /[?&]sala=([A-Za-z]{4})\b/.exec(location.search); if (m) entrarSala(m[1]); })();
+
+  // peças para a segunda brincadeira (adivinha-tela.js)
+  window.QEApp = {
+    t: t, en: en, pref: pref, salvarPref: salvarPref, mostrar: mostrar, falar: falar, calar: calar, Som: Som, festa: festa, limparFesta: limparFesta,
+    melecaSvg: melecaSvg, nomeMeleca: nomeMeleca, voz: voz, telaCheia: telaCheia, atual: function () { return atual; }, TESTE: TESTE, CALMO: CALMO
+  };
+  $('btAdivinha').addEventListener('click', function () { mostrar('nivelAdivinha'); });
 
   // usado pelos testes
   window.QEDebug = {

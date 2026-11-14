@@ -207,3 +207,57 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 .lista-perguntas .vazio { font-weight: 600; text-align: center; padding: 10px; }
+
+/* ---------- A Meleca Adivinha ---------- */
+.opcao.destaque { background: var(--cor); color: var(--branco); }
+.op-titulo { display: block; font-size: 1.3rem; } .op-sub { display: block; font-size: .95rem; font-weight: 400; opacity: .95; }
+.op-grupo { font-weight: 700; color: var(--tinta2); margin: 6px 0 -4px; text-align: center; }
+#nivelAdivinha, #aprendidos { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  padding: calc(70px + var(--st)) calc(16px + var(--sr)) calc(90px + var(--sb)) calc(16px + var(--sl)); }
+#adivinha { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+  padding: calc(64px + var(--st)) calc(12px + var(--sr)) calc(80px + var(--sb)) calc(12px + var(--sl)); }
+.adv-topo { min-height: 1.6em; }
+.adv-contador { font-weight: 700; color: var(--tinta2); }
+.adv-palco { display: flex; flex-direction: column; align-items: center; gap: 6px; width: min(100%, 30rem); }
+.meleca-grande { width: min(42vw, 30vh, 200px); aspect-ratio: 1; display: block; }
+.meleca-grande svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.adv-fala { position: relative; background: var(--branco); border: 4px solid var(--tinta); border-radius: 26px; padding: 14px 18px; width: 100%; box-shadow: 0 6px 0 var(--tinta); }
+.adv-fala::before { content: ''; position: absolute; left: 50%; top: -16px; margin-left: -12px; border: 12px solid transparent; border-bottom: 14px solid var(--tinta); border-top: 0; }
+.adv-pergunta { font-size: clamp(1.25rem, 5.4vw, 1.7rem); font-weight: 700; line-height: 1.25; }
+.adv-respostas { display: grid; gap: 8px; width: min(100%, 26rem); position: relative; }
+.resp { min-height: 52px; border-radius: 18px; border: 3px solid var(--tinta); font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 0 var(--tinta); color: var(--tinta); }
+.resp:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tinta); }
+.resp.sim { background: #8be3a8; } .resp.psim { background: #d4f5df; } .resp.nsei { background: #f3eefe; } .resp.pnao { background: #ffe0e0; } .resp.nao { background: #ff9a9a; }
+.adv-voltar { position: absolute; left: -56px; top: 0; }
+@media (max-width: 520px) { .adv-voltar { position: static; justify-self: center; } }
+.adv-chute { display: grid; gap: 10px; justify-items: center; width: min(100%, 26rem); }
+.adv-chute-txt { font-size: 1.3rem; font-weight: 700; }
+.adv-emoji { font-size: 4.5rem; line-height: 1; }
+.adv-nome { font-size: 2rem; font-weight: 700; color: var(--cor); -webkit-text-stroke: 1.5px var(--tinta); paint-order: stroke fill; }
+.campo { width: 100%; min-height: 52px; font: 600 1.2rem var(--fonte); color: var(--tinta); border: 3px solid var(--tinta); border-radius: 16px; padding: 6px 12px; background: var(--branco); }
+.campo:focus-visible { outline: 3px solid var(--mel); outline-offset: 2px; }
+.emojis { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.emoji-bt { font-size: 1.6rem; border-radius: 14px; border: 2px solid transparent; background: var(--branco); }
+.emoji-bt[aria-checked="true"] { border-color: var(--tinta); background: #fff3c4; }
+.joao { justify-content: flex-start; }
+.lista-aprendidos { list-style: none; display: grid; gap: 8px; width: min(100%, 28rem); }
+.lista-aprendidos li { display: flex; align-items: center; gap: 10px; background: var(--branco); border: 3px solid var(--tinta); border-radius: 16px; padding: 6px 10px; }
+.lista-aprendidos .vazio { justify-content: center; font-weight: 600; }
+.apr-nome { flex: 1; font-weight: 700; font-size: 1.15rem; text-align: left; } .apr-nivel { font-size: .85rem; color: var(--tinta2); }
+.arquivo-bt { display: inline-flex; align-items: center; cursor: pointer; }
+.arquivo-bt input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.arquivo-bt:focus-within { outline: 3px solid var(--mel); outline-offset: 2px; }
+.voz-caixa { display: grid; gap: 10px; }
+.voz-caixa h2 { font-size: 1.3rem; }
+.voz-liga { display: flex; align-items: center; gap: 8px; font-weight: 700; min-height: 44px; }
+.voz-liga input { width: 26px; height: 26px; }
+.passos { padding-left: 1.4em; display: grid; gap: 4px; }
+.voz-caixa a.medio-bt { text-decoration: none; color: var(--tinta); display: inline-flex; align-items: center; justify-self: start; }
+@media (orientation: landscape) and (max-height: 600px) {
+  #adivinha.ativa { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "topo topo" "palco botoes"; align-items: center; column-gap: 18px; padding-top: calc(52px + var(--st)); }
+  .adv-topo { grid-area: topo; } .adv-palco { grid-area: palco; width: min(44vw, 22rem); }
+  .adv-respostas, .adv-chute { grid-area: botoes; justify-self: center; }
+  .meleca-grande { width: min(26vh, 120px); }
+  .resp { min-height: 44px; font-size: 1.05rem; }
+  .adv-voltar { position: static; }
+}

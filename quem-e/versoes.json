@@ -2,6 +2,27 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "14/Nov/2026",
+      "hora": "03:46:15",
+      "pt": [
+        "🔮 A Meleca Adivinha: pense em alguém e a meleca descobre com perguntas (Sim, Acho que sim, Não sei, Acho que não, Não)",
+        "📚 Mais de 660 personagens: desenhos, filmes, novelas, músicas, famosos, bichos, folclore e coisas",
+        "🧒👨‍👩‍👧🧑 Três níveis: Infantil, Família e Adulto",
+        "🚕 O João Alves, a lenda da casa, com festa especial",
+        "🧠 Quando perde, a meleca aprende quem era (fica só neste aparelho; dá para passar a outro celular)",
+        "🎙️ Voz animada opcional (ElevenLabs), com a chave guardada no cofre"
+      ],
+      "en": [
+        "🔮 The Slime Guesses: think of someone and the slime finds out with questions (Yes, Probably, Don't know, Probably not, No)",
+        "📚 Over 660 characters: cartoons, movies, soap operas, music, famous people, animals, folklore and things",
+        "🧒👨‍👩‍👧🧑 Three levels: Kids, Family and Grown-ups",
+        "🚕 João Alves, the family legend, with a special celebration",
+        "🧠 When it loses, the slime learns who it was (stays on this device; can be moved to another phone)",
+        "🎙️ Optional lively voice (ElevenLabs), with the key kept in the vault"
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "14/Nov/2026",
       "hora": "02:43:57",

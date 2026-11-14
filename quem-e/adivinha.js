@@ -10,7 +10,7 @@
    - A próxima pergunta é a que mais divide os mais prováveis (ganho de informação), entre as perguntas do nível que
      ainda não foram feitas.
    - Chuta quando o primeiro está bem à frente (chance ≥ 85% e 3 vezes o segundo), ou ao chegar em 20, 30 e 40
-     perguntas. Errou o chute: aquele sai da disputa e ela continua. Depois de 3 chutes errados (ou 45 perguntas),
+     perguntas. Errou o chute: aquele sai da disputa e ela continua. Depois de 4 chutes errados (ou 50 perguntas),
      ela perde e pede para aprender ("Em quem você pensou?").
 
    QEAdivinha.carregar(listas, perguntas) → base { personagens, perguntas }   (listas = arrays no formato de personagens/)
@@ -22,7 +22,7 @@
   'use strict';
   var VALOR = { s: 1, p: 0.75, '?': 0.5, q: 0.25, n: 0 };
   var ORDEM = { I: 0, F: 1, A: 2 };
-  var SOBRA = 0.06, TOPO = 90, CERTEZA = 0.85, FOLGA = 3, MAX_CHUTES = 3, MAX_PERGUNTAS = 45, MARCOS = [20, 30, 40];
+  var SOBRA = 0.12, TOPO = 90, CERTEZA = 0.85, FOLGA = 3, MAX_CHUTES = 4, MAX_PERGUNTAS = 50, MARCOS = [20, 30, 40];
 
   function respostas(txt) {
     var r = {};
