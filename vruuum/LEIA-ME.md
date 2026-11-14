@@ -309,3 +309,9 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   desenhos de costas do skatista e os braços ao vivo (`bracos`/`bracosSkate` no `desenho.js`). `op.corpo` chega aos
   modelos 3D (`infoPiloto(..., corpo)`): menina de saia no skate e nos patins.
 - `poeira()` no `desenho.js` para cavalo, dinossauro, galinha e ovo; penas voando quando a galinha pula.
+
+## 1.23.0 — os que voam caprichados (rodada 3 de 3)
+
+- `rastro()` no `modelos3d.js` (bolinhas ficando para trás) e `luzinha()` nos que voam: rastros nas asas do avião e do
+  jato, luzes de navegação piscando, clarão do motor do jato, luz do helicóptero, purpurina do trenó e nariz da rena,
+  pintas da arara e olhos do morcego.
