@@ -359,6 +359,10 @@
       bola(cam, L, [0, 2.3, 1.28], 0.08, 0.06, 0.16, tres('#f4a300'), -0.02);   // bico
       bola(cam, L, [0, 2.12, 1.15], 0.06, 0.12, 0.05, tres('#e63946'), -0.01);   // barbela
       [-1, 1].forEach(function (l) { bola(cam, L, [l * 0.24, 2.4, 1.08], 0.05, 0.06, 0.04, ['#333', '#111', '#000'], -0.02); });
+      if (voo) for (var pk = 0; pk < 5; pk++) {   // pulando: penas soltas voando em volta (1.22.0)
+        var pf = (relogio * 0.9 + pk / 5) % 1, pa = pk * 1.3 + relogio * 2, pp = [Math.cos(pa) * (0.6 + pf), 1.2 + pf * 1.4, Math.sin(pa) * 0.6 - pf * 1.2];
+        chapa(cam, L, [pp, add(pp, [0.12 * Math.cos(pa * 3), 0.04, 0.05]), add(pp, [0.1, -0.08, 0.02])], '#ffffff', { alfa: 1 - pf });
+      }
       bola(cam, L, [0, 1.95, -0.05], 0.22, 0.24, 0.17, tres(cor), -0.2);   // quem monta: o corpo
       piloto(cam, L, [0, 2.38, -0.1], 0.36, op);
     } },
@@ -659,7 +663,7 @@
         var quadril = [l * 0.15 + sway, 1.12 - bob, 0];
         var pe = [l * (0.2 + empurra * 0.42) + sway * 0.3, 0.2 + volta * 0.14, -empurra * 0.38 + volta * 0.1];
         var joelho = [(quadril[0] + pe[0]) / 2 + l * 0.04, 0.66 + volta * 0.1, Math.max(quadril[2], pe[2]) + 0.26];
-        cano(cam, L, quadril, joelho, 0.13, 0.1, '#2a2d3a');   // coxa (bermuda)
+        cano(cam, L, quadril, joelho, 0.13, 0.1, op.corpo === 'menina' ? PELE : '#2a2d3a');   // coxa (de saia, a perna aparece)
         bola(cam, L, joelho, 0.11, 0.1, 0.1, tres(cor), -0.01);   // joelheira
         cano(cam, L, joelho, add(pe, [0, 0.12, 0.02]), 0.085, 0.07, PELE);   // canela
         // o patins: bota, base, freio na frente e 4 rodinhas
@@ -674,7 +678,8 @@
         bola(cam, L, cotovelo, 0.08, 0.08, 0.08, tres(ROUPA), -0.01);   // cotoveleira
         bola(cam, L, mao, 0.07, 0.07, 0.07, tres(PELE));
       });
-      bola(cam, L, hipC, 0.22, 0.16, 0.16, tres('#2a2d3a'));   // bermuda
+      if (op.corpo === 'menina') tronco(cam, L, [hipC[0], hipC[1] - 0.04, hipC[2]], [0.6, 0.5], [0.36, 0.3, 0], 0.3, tom(cor, 0.25));   // saia rodada
+      else bola(cam, L, hipC, 0.22, 0.16, 0.16, tres('#2a2d3a'));   // bermuda
       bola(cam, L, [sway * 0.85, 1.5 - bob, 0.12], 0.25, 0.36, 0.19, tres(cor));   // tronco (camiseta), inclinado para a frente
       caixa(cam, L, [sway * 0.85, 1.5 - bob, -0.08], [0.24, 0.08, 0.02], '#ffffff');   // listra nas costas
       piloto(cam, L, [sway * 0.8, 2.12 - bob, 0.22], 0.34, op);
@@ -709,6 +714,40 @@
       [-0.6, 0, 0.6].forEach(function (x, k) { if (pisca ? k !== 1 : k === 1) luzinha(cam, L, [x, 3.25, 1.9], 0.9, '#ffb703', 0.6); });   // giroflex acendendo em volta
       [-1.05, 1.05].forEach(function (x) { fumaca(cam, L, [x, 3.6, 0.85]); });
       [[-1, -2.2], [1, -2.2], [-1, -1.1], [1, -1.1], [-1, 2.7], [1, 2.7]].forEach(function (w) { roda(cam, L, [w[0] * 1.08, 0.6, w[1]], 0.6, 0.48, '#c9ced6'); });
+    } },
+    /* skate em 3D (1.22.0; antes era um desenho de costas em quadros): o pé da frente fica no shape e o de trás rema.
+       fase (como o faseSkate do desenho.js): 0 a 0,45 o pé de trás empurra o chão (vai para trás); 0,45 a 0,65 levanta
+       e volta; 0,65 a 1 descansa no tail, deslizando. Os braços abrem para equilibrar. Menina de saia, menino de bermuda */
+    skate: { alt: 3.6, y: 1.15, larg: 0.4, comp: 0.9, montar: function (cam, L, cor, f, op) {
+      var PELE = '#f2c9a0', esc = tom(cor, -0.35), pe2, agacha, u;
+      if (f < 0.45) { u = f / 0.45; pe2 = [0.3, 0.07, 0.2 - u * 0.95]; agacha = 0.14; }
+      else if (f < 0.65) { u = (f - 0.45) / 0.2; pe2 = [0.3 - u * 0.12, 0.07 + Math.sin(u * PI) * 0.22 + u * 0.24, -0.75 + u * 0.2]; agacha = 0.1; }
+      else { pe2 = [0.14, 0.31, -0.55]; agacha = 0.03; }
+      // o shape: lixa preta em cima, desenho na cor por baixo, tails levantados, eixos e 4 rodinhas
+      caixa(cam, L, [0, 0.24, 0], [0.5, 0.05, 1.4], '#222228', { cima: function (c) { retangulo(c, 0, 0, 100, 100, '#1b1b22'); }, baixo: function (c) { retangulo(c, 0, 0, 100, 100, cor); for (var k = 0; k < 5; k++) circulo(c, 50, 10 + k * 20, 8, '#ffffff'); }, tras: function (c) { retangulo(c, 0, 0, 100, 100, esc); } });
+      [-1, 1].forEach(function (l) {
+        chapa(cam, L, [[-0.25, 0.265, l * 0.7], [0.25, 0.265, l * 0.7], [0.23, 0.36, l * 0.88], [-0.23, 0.36, l * 0.88]], '#1b1b22', { verso: cor });   // tail
+        caixa(cam, L, [0, 0.16, l * 0.5], [0.42, 0.05, 0.08], '#b8bec8');
+        [-1, 1].forEach(function (lx) { roda(cam, L, [lx * 0.21, 0.09, l * 0.5], 0.085, 0.08, cor); });
+      });
+      var quadril = [0, 1.02 - agacha, -0.05];
+      [[-1, [-0.08, 0.31, 0.38]], [1, pe2]].forEach(function (pl) {
+        var l = pl[0], pe = pl[1], q = [l * 0.13, quadril[1], quadril[2]];
+        var joelho = [(q[0] + pe[0]) / 2 + l * 0.05, (q[1] + pe[1]) / 2 + 0.02, Math.max(q[2], pe[2]) + 0.2 + agacha * 0.8];
+        cano(cam, L, q, joelho, 0.11, 0.09, op.corpo === 'menina' ? PELE : '#2a2d3a');
+        cano(cam, L, joelho, add(pe, [0, 0.1, 0]), 0.085, 0.07, PELE);
+        caixa(cam, L, add(pe, [0, 0.05, 0.05]), [0.2, 0.12, 0.34], '#f4f4f8', { esq: function (c) { retangulo(c, 0, 55, 100, 14, cor); }, dir: function (c) { retangulo(c, 0, 55, 100, 14, cor); }, tras: function (c) { retangulo(c, 0, 70, 100, 30, '#c9ced6'); } });   // tênis
+      });
+      if (op.corpo === 'menina') tronco(cam, L, [0, quadril[1] - 0.05, quadril[2]], [0.62, 0.5], [0.38, 0.32, 0], 0.32, tom(cor, 0.25), { tras: function (c) { retangulo(c, 0, 80, 100, 20, '#ffffff'); } });   // saia rodada
+      else bola(cam, L, quadril, 0.24, 0.17, 0.17, tres('#2a2d3a'));   // bermuda
+      var corpoY = 1.45 - agacha;
+      bola(cam, L, [0, corpoY, 0.04], 0.25, 0.34, 0.18, tres(cor));   // camiseta
+      [-1, 1].forEach(function (l) {   // braços abertos para equilibrar, balançando com a remada
+        var bal = Math.sin(f * PI * 2) * l, om = [l * 0.24, corpoY + 0.24, 0.05], mao = [l * (0.62 + Math.max(0, bal) * 0.08), corpoY - 0.05 + bal * 0.08, 0.1 + bal * 0.22];
+        var cot = [(om[0] + mao[0]) / 2, (om[1] + mao[1]) / 2 - 0.08, (om[2] + mao[2]) / 2];
+        cano(cam, L, om, cot, 0.075, 0.065, cor); cano(cam, L, cot, mao, 0.06, 0.05, PELE); bola(cam, L, mao, 0.065, 0.065, 0.065, tres(PELE));
+      });
+      piloto(cam, L, [0, corpoY + 0.6, 0.1], 0.34, op);
     } }
   };
 
@@ -726,7 +765,7 @@
     var m = MODELOS[id], L = [], giro = Math.max(-1.2, Math.min(1.2, lado || 0)) * 0.62 + (op.orbita || 0);
     var cam = camera(x0, y0, W, H, giro, 0.3 - (inclina || 0) * 0.6, m.alt, m.y, m.z);
     if (!m.semSombra) sombra(cam, L, m.larg, m.comp);
-    var o = { cabeca: op.cabeca, giro: op.giroCabeca, aqui: op.aqui, voo: op.voo, t: op.t };
+    var o = { cabeca: op.cabeca, giro: op.giroCabeca, aqui: op.aqui, voo: op.voo, t: op.t, corpo: op.corpo };
     relogio = op.t || 0;
     emBarco = !!op.barco && m.larg > 0;
     m.montar(cam, L, cor || '#ff4fa3', ((fase || 0) % 1 + 1) % 1, o);
@@ -741,7 +780,7 @@
     for (var k = 0; k < L.length; k++) L[k].f(c);
   }
   // quadro parado de costas (rivais e miniatura da garagem)
-  function desenhar(id) { return function (c, W, H, cor, emoji, fase) { vivo(c, id, 0, 0, W, H, cor, fase, 0, 0, {}); }; }
+  function desenhar(id) { return function (c, W, H, cor, emoji, fase, corpo) { vivo(c, id, 0, 0, W, H, cor, fase, 0, 0, { corpo: corpo }); }; }
 
   // onde fica a cabeça do piloto (para os quadros parados dos rivais e da garagem)
   function cabeca(id, x0, y0, W, H, fase, lado, inclina) { var onde = null; montar(id, x0, y0, W, H, '#ff4fa3', fase, lado, inclina, { aqui: function (o) { onde = o; } }); return onde; }

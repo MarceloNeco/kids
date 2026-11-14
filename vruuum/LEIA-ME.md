@@ -302,3 +302,10 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   sulcos do pneu andando e 5 raios na calota), `luzinha()` (brilho somado de lanterna/farol/giroflex) e `fumaca()`.
 - Clássico, GT e Superesportivo refeitos com `casco()` (arredondados). Luzes e fumaça nos outros carros.
 - Próximas rodadas: montarias (cavalo, dinossauro, galinha, ovo, skate, patins) e os que voam.
+
+## 1.22.0 — montarias caprichadas (rodada 2 de 3)
+
+- Skate virou modelo 3D (`skate` no `modelos3d.js`, a remada pela fase do `faseSkate`); saíram do `veiculos.js` os
+  desenhos de costas do skatista e os braços ao vivo (`bracos`/`bracosSkate` no `desenho.js`). `op.corpo` chega aos
+  modelos 3D (`infoPiloto(..., corpo)`): menina de saia no skate e nos patins.
+- `poeira()` no `desenho.js` para cavalo, dinossauro, galinha e ovo; penas voando quando a galinha pula.
