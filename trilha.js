@@ -65,7 +65,8 @@
     'batalha-naval': 'vruuum/musicas/heroic-age.mp3',
     enigmas: 'baguncolandia/musicas/happy-whistling-ukulele.mp3',
     labirinto: 'peluqueria/musicas/beachfront-celebration.mp3',
-    cozinha: 'rabiscolandia/musicas/mariachi-snooze.mp3'
+    cozinha: 'rabiscolandia/musicas/mariachi-snooze.mp3',
+    'quem-e': 'rabiscolandia/musicas/fluffing-a-duck.mp3'
   };
   O.FAVORITAS = {};
   Object.keys(FAV).forEach(function (k) { O.FAVORITAS[k] = completo(FAV[k]); });

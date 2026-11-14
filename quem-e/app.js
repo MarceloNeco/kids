@@ -636,7 +636,7 @@
     { a: '../rabiscolandia/musicas/batty-mcfaddin.mp3', t: 'Batty McFaddin', au: 'Kevin MacLeod', lic: 'CC BY' },
     { a: '../peluqueria/musicas/feelin-good.mp3', t: 'Feelin Good', au: 'Kevin MacLeod', lic: 'CC BY 4.0' },
     { a: '../peluqueria/musicas/stringed-disco.mp3', t: 'Stringed Disco', au: 'Kevin MacLeod', lic: 'CC BY 4.0' },
-    { a: '../baguncolandia/musicas/hippety-hop.mp3', t: 'Hippety Hop', au: 'Alexander Nakarada', lic: 'CC0' },
+    { a: '../baguncolandia/musicas/ukulele-song.mp3', t: 'Ukulele Song', au: 'Rafael Krux', lic: 'CC0' },
     { a: '../baguncolandia/musicas/my-giant-bunny-friend.mp3', t: 'My Giant Bunny Friend', au: 'Bryan Teoh', lic: 'CC0' },
     { a: '../baguncolandia/musicas/happy-whistling-ukulele.mp3', t: 'Happy Whistling Ukulele', au: 'Rafael Krux', lic: 'CC0' }
   ];

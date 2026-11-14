@@ -174,3 +174,25 @@ test('cada um no seu celular: duas abas jogam pelo código', async () => {
   assert.deepEqual(a.erros(), []); assert.deepEqual(errosB, []);
   await a.ctx.close();
 });
+
+test('sem internet depois da primeira visita: contra a meleca funciona e o celular-a-celular avisa', async () => {
+  const ctx = await browser.newContext({ locale: 'pt-BR', viewport: { width: 390, height: 844 } });
+  const pg = await ctx.newPage(); const erros = [];
+  pg.on('pageerror', e => erros.push(e.message));
+  await pg.goto(base);
+  await pg.evaluate(() => navigator.serviceWorker.ready);
+  await pg.reload(); await pg.waitForFunction(() => !!navigator.serviceWorker.controller);
+  await pg.waitForTimeout(800);
+  await ctx.setOffline(true);
+  await pg.reload();
+  await pg.waitForFunction(() => window.QEDebug && window.QEDebug.pronto);
+  await pg.click('#btPink'); await pg.click('#btMeleca'); await pg.click('#btFacil');
+  await pg.waitForSelector('#segredo.ativa');
+  assert.ok(await pg.locator('#gradeSegredo .carta').count() === 12);
+  await pg.goBack().catch(() => {});
+  await pg.waitForSelector('#inicio.ativa');
+  await pg.click('#btPink'); await pg.click('#btRede');
+  assert.match(await pg.textContent('#redeStatus'), /Sem internet/);
+  assert.deepEqual(erros, []);
+  await ctx.close();
+});

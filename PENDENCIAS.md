@@ -58,3 +58,11 @@ interruptor em `recursos-do-app.json`. Antes de começar cada um, fazer uma entr
 | 32 | Batalha Naval online/pertinho: quem afunda pode ver o nome do navio trocado quando a frota tem dois do mesmo tamanho (precisa mandar o tipo do navio pela rede). | Batalha Naval 0.3.0 | 🟡 aberta |
 | 33 | Enigmatic: fotos mais realistas no lugar dos emojis (precisa de banco de fotos com licença livre; deixa o jogo mais pesado sem internet). | Dono, 06/Nov/2026 | 💡 ideia |
 | 34 | Mão na Massa: entrevistar a filha do dono para ajustar receitas, lugares e passos. | Dono | ⏸ aguardando o dono |
+
+## Quem é? (dono, 14/Nov/2026)
+
+| # | Descrição | Origem | Situação |
+|---|---|---|---|
+| 35 | **Quem é?**: jogo de adivinhar com o Melekento Blue e a Pink Honey (as massinhas das filhas), inspirado no formato "pense em alguém e eu descubro", com identidade própria. Primeira brincadeira: **Duelo de Caras** (cada um escolhe uma cara desenhada em segredo e pergunta até descobrir a do outro; contra a meleca, passando o aparelho ou cada um no seu celular). | Dono, 14/Nov/2026 | ✅ v0.1.0 (14/Nov/2026); pendências em `quem-e/PENDENCIAS.md` |
+| 36 | **Quem é? — A Meleca Adivinha**: a pessoa pensa em alguém e a meleca descobre (lista grande, aprende quando erra, João Alves, Infantil/Família/Adulto, voz ElevenLabs opcional). | Dono, 14/Nov/2026 | 🔵 em seguida |
+| 37 | Mandar a **foto das massinhas** (Melekento Blue e Pink Honey) para ajustar o desenho das melecas. | Dono, 14/Nov/2026 | ⏸ aguardando o dono |

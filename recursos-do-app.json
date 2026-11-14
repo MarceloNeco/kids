@@ -112,6 +112,14 @@
         "en": "My Little Big Chef"
       },
       "pagina": "cozinha/"
+    },
+    {
+      "id": "quem-e",
+      "nome": {
+        "pt": "Quem é? (Duelo de Caras)",
+        "en": "Who Is It? (Face Duel)"
+      },
+      "pagina": "quem-e/"
     }
   ]
 }
