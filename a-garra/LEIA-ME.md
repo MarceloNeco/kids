@@ -1,39 +1,48 @@
-# A Garra — máquina de pegar bichinho de pelúcia
+# A-GARRA — máquina de pegar bichinho em 3D
 
-Brincadeira do Bolinho de Chuva (solverone.com.br/kids/a-garra/). A criança leva a garra, aperta **PEGAR** e tenta
-levar um bichinho de pelúcia até o buraco do prêmio. Pedido do dono em 14/Nov/2026, com fotos de máquinas de um
-fliperama como inspiração.
+Brincadeira do Bolinho de Chuva (solverone.com.br/kids/a-garra/). Pedido do dono em 14/Nov/2026, com fotos de máquinas de
+um fliperama como referência. A 0.1.0 era em 2D e pegava sempre; o dono pediu (14/Nov/2026): **3D**, ver de cima com zoom,
+controle ⬆⬇⬅➡ + botão de agarrar, **a garra não pega toda vez** (como as de verdade), mais fiel às fotos e **várias
+máquinas**: hambúrgueres, bichinhos que mexem, insetos. Isso é a 0.2.0.
 
 ## Como se brinca
 
-- **Máquina**: Cabine vermelha (como uma cabine de telefone), Neon verde (parede de tijolo e luz neon) ou Estrelas azul.
-  Só muda o visual.
-- **Nível**:
-  - Fácil: 10 fichas, sem relógio, bichinhos grandes, e a garra nunca deixa cair (basta fechar em cima do bichinho).
-  - Médio: 10 fichas, 20 s para mirar, a garra precisa fechar mais perto do meio e às vezes escorrega no caminho.
-  - Difícil: 8 fichas, 12 s, bichinhos menores, a garra é mais fraca.
-- **Controles**: segurar ⬅ ➡ (ou arrastar o dedo na máquina) e apertar PEGAR. No computador e no controle da TV:
-  setas e espaço/Enter. Deitado, a "alavanca" fica à esquerda e o botão à direita, como na máquina de verdade.
-- A garra desce, fecha, sobe e leva o bichinho até o buraco. Se fechar perto da borda, empurra o bichinho ("Quase!").
-- **Coleção** (🧸 Minha coleção): 12 bichinhos e a **estrela dourada** rara (uma por máquina). Fica guardada no aparelho.
-- Fim da partida: estrelas (★★★ com metade das fichas virando prêmio), o que veio e o recorde de cada nível.
+- **Máquina** (cada uma é um jogo, com a sua coleção e um prêmio dourado raro):
+  - **Cabine de Telefone** (vermelha, como a das fotos): pelúcias — ursinho, coelhinha, gatinho, cachorrinho, ovelhinha,
+    pinguim, unicórnio, sapinho, porquinha, panda, patinho e girafinha.
+  - **Neon** (preta, tubos de neon verde e amarelo, parede de tijolo, letreiro de LED que corre): **bichinhos que mexem** —
+    balançam, respiram, piscam e, de vez em quando, os de cima dão um pulinho no monte.
+  - **Estrelas** (azul, com hexágonos): **insetos** — joaninha, abelha, borboleta, besouro, lagarta, libélula, formiga e
+    vaga-lume (que brilha); as asas batem.
+  - **Lanchonete** (vermelha e creme, chão quadriculado, cardápio na parede): **hambúrgueres** (x-burguer, x-salada,
+    x-bacon, duplo, x-frango, burguer verde, x-tudo), cachorro-quente, batata frita e milk-shake.
+- **Controle**: ⬅ ➡ para os lados, ⬆ para o fundo, ⬇ para a frente (segurar), e **PEGAR**. Também dá para **tocar no
+  prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
+- **Câmera**: 🎥 troca entre de frente, de cima e de lado; 🔍 aproxima (perto, a câmera acompanha a garra); arrastar o dedo
+  na máquina gira; dois dedos aproximam.
+- **Regra da garra** (igual às máquinas de verdade): quase sempre ela fecha **fraca** e solta — logo ao subir, no tranco lá
+  em cima ou no caminho. Só de vez em quando vem **forte**: mirando bem, mais ou menos **1 a cada 4** tentativas no fácil,
+  **1 a cada 7** no médio e **1 a cada 10** no difícil. Depois de muitas tentativas sem prêmio, a próxima bem mirada vem
+  forte (garantia). A máquina lembra a contagem entre partidas (`bolinho:a-garra:contador`), como uma máquina de verdade.
+- **Nível**: fácil (12 fichas, sem relógio, prêmios grandes, anel de mira), médio (10 fichas, 25 s, anel de mira), difícil
+  (10 fichas, 15 s, prêmios menores, sem anel).
 
 ## Arquivos
 
 | Arquivo | O que é |
 |---|---|
-| `index.html` | Telas: menu, jogo, coleção, fim e "descansando" (interruptor desligado). |
-| `maquina.js` | A máquina por dentro, sem desenho: bichinhos como bolinhas com física simples (o que fica parado "dorme" para a pilha não derreter), a garra (mirar → descer → fechar → subir → levar → soltar), fichas, relógio e os ajustes de cada nível (`NIVEIS`). Roda no Node para os testes. |
-| `desenho.js` | Tudo o que se vê, desenhado em código: as três máquinas, a garra e os 13 bichinhos. |
+| `index.html` | Telas: menu, jogo, coleção, fim, "sem 3D" e "descansando" (interruptor desligado). |
+| `maquina.js` | A máquina por dentro, sem desenho (roda no Node para os testes): prêmios como bolas com física 3D (o que fica parado "dorme" para o monte não derreter), a garra (mirar → descer → fechar → subir → levar → soltar), a **regra de pagamento** (`NIVEIS`: `cada`, `tol`), fichas, relógio, pulos dos vivos. |
+| `premios3d.js` | Os prêmios em 3D, montados com peças simples; uma geometria por tipo com as cores nos vértices; olhos que piscam e asas que batem. `MAQUINAS` lista as máquinas e os prêmios. |
+| `cenario3d.js` | As quatro máquinas em 3D (gabinete, vidro, trilhos, carrinho, cabo enrolado, garra de 3 dedos, buraco de acrílico, painel com alavanca, botão e visor, letreiros e paredes desenhadas em canvas) e as luzes. |
+| `app.js` | Telas, controles, câmera, coleção, recordes, fim. `APP_VERSION` aqui. Módulo (`type="module"`). |
 | `som.js` | Efeitos feitos na hora (WebAudio). |
-| `app.js` | Telas, controles, desenho a cada quadro, coleção, recordes e fim. `APP_VERSION` aqui. |
-| `estilo.css` | Visual (em pé e deitado). |
-| `sw.js`, `manifest.webmanifest`, `icone*` | Instalar e jogar sem internet. |
-| `versoes.json` | O que mudou em cada versão (PT/EN). |
+| `libs/` | Three.js r187 (MIT), sem mudança. |
+| `estilo.css`, `sw.js`, `manifest.webmanifest`, `icone*`, `versoes.json` | Visual, sem internet, instalar, versões. |
 | `teste/` | `node --test a-garra/teste/*.test.js` (da raiz do repositório). |
 
-Guardado no aparelho (`localStorage`): `bolinho:a-garra:pref` (máquina, nível, sons), `bolinho:a-garra:colecao`,
-`bolinho:a-garra:recordes`. Nada sai do aparelho; sem login e sem banco.
+Guardado no aparelho (`localStorage`): `bolinho:a-garra:pref`, `bolinho:a-garra:colecao`, `bolinho:a-garra:recordes`,
+`bolinho:a-garra:contador`. Nada sai do aparelho; sem login e sem banco.
 
-Interruptor no RootifyONE: app **Bolinho de Chuva** (`kids`) → **A Garra** (`a-garra`).
+Interruptor no RootifyONE: app **Bolinho de Chuva** (`kids`) → **A-GARRA** (`a-garra`).
 Com `?teste` aparece `window.GarraDebug`; `?semente=N` repete a mesma máquina.

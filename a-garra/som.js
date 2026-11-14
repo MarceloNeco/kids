@@ -1,6 +1,6 @@
-/* A Garra — efeitos sonoros feitos na hora (WebAudio), sem arquivo nenhum.
+/* A-GARRA — efeitos sonoros feitos na hora (WebAudio), sem arquivo nenhum.
    Som.ligar(true|false) · Som.toque() · Som.ficha() · Som.motor(liga) · Som.descer() · Som.fechar() · Som.pegou() ·
-   Som.errou() · Som.escorregou() · Som.ganhou(raro) · Som.tique() · Som.fim(estrelas)
+   Som.errou() · Som.escorregou() · Som.ganhou(raro) · Som.pulo() · Som.tique() · Som.fim(estrelas)
    A música de fundo é a trilha comum (../trilha.js); estes são só os efeitos. */
 (function (raiz) {
   'use strict';
@@ -50,6 +50,7 @@
       [262, 330, 392].forEach(function (f) { nota(f, 0.55, 0.8, 'sine', 0.07); });
       if (raro) [1319, 1568, 2093, 2637].forEach(function (f, k) { nota(f, 0.8 + k * 0.07, 0.4, 'sine', 0.07); });
     },
+    pulo: function () { nota(300, 0, 0.18, 'sine', 0.06, 700); },
     tique: function () { nota(1200, 0, 0.05, 'square', 0.04); },
     fim: function (estrelas) {
       if (!estrelas) { nota(392, 0, 0.3, 'triangle', 0.1); nota(330, 0.3, 0.5, 'triangle', 0.1); return; }

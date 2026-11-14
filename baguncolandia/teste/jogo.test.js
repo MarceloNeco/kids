@@ -454,11 +454,11 @@ test('⚽ chute reto entra no gol', () => {
   const ev = []; for (let t = 0; t < 1500; t += 16) { p.avancar(16); ev.push(...p.eventos()); }
   assert.ok(ev.some(e => e.t === 'gol'), 'GOOOL');
 });
-test('⚽ chute para a esquerda derruba o papai na piscina de bolinhas; ele sobe e senta de novo', () => {
+test('⚽ chute para a esquerda derruba o vovô na piscina de bolinhas; ele sobe e senta de novo', () => {
   const p = chutaPartida(); const b = chuteEm(p, -1);
-  assert.equal(b.mira, 'pai');
+  assert.equal(b.mira, 'vovo');
   const ev = []; for (let t = 0; t < 1500; t += 16) { p.avancar(16); ev.push(...p.eventos()); }
-  const tq = ev.find(e => e.t === 'tanque'); assert.ok(tq && tq.quem === 'pai', 'acertou o alvo do papai');
+  const tq = ev.find(e => e.t === 'tanque'); assert.ok(tq && tq.quem === 'vovo', 'acertou o alvo do vovô');
   const pai = p.estado().tanques[0]; assert.notEqual(pai.fase, 'sentado');
   rodar(p, 4500); assert.equal(pai.fase, 'sentado', 'subiu a escadinha e sentou');
   const q = chutaPartida(); const b2 = chuteEm(q, 1); assert.equal(b2.mira, 'mae');
@@ -468,4 +468,22 @@ test('⚽ fora do Chuta-chuta não tem piscina de bolinhas', () => { const p = p
 test('🐰 sem terra (praia, cidade) não aparece toupeira nem minhoca', () => {
   const p = partida({ modo: 'pega', figuras: FIGS.concat([BICHOS[2]]), semBuraco: true }); p.comecar();
   rodar(p, 6000); assert.ok(!bichos(p).length, 'toupeira não apareceu');
+});
+
+/* 👨 o papai joga junto no Chuta-chuta */
+test('👨 o papai corre até a bola, chuta (devolve para a criança ou no gol) e pede a bola quando está parado', () => {
+  const p = partida({ modo: 'chuta' }); p.comecar(); limpar(p);
+  p.corpo(0, { x: 0.05, y: 0.1, w: 0.2, h: 0.8 }, 1000);   // criança à esquerda
+  const P = () => p.estado().papai;
+  assert.ok(P(), 'o papai está em campo');
+  let pediu = false; for (let t = 0; t < 3000; t += 16) { p.avancar(16); limpar(p); pediu = pediu || !!P().fala; }
+  assert.ok(pediu, 'pediu a bola');
+  const bola = p.lancar({ fig: 'bola', x: 700, y: 680 - 34 - 10, vx: 0, estilo: 'rola' }, 0);
+  let chutou = false; for (let t = 0; t < 3000 && !chutou; t += 16) { p.avancar(16); const cs = p.estado().coisas; for (let i = cs.length - 1; i >= 0; i--) if (cs[i] !== bola) cs.splice(i, 1); chutou = p.eventos().some((e) => e.t === 'papai'); }
+  assert.ok(chutou, 'o papai chutou');
+  assert.ok(bola.chutada || bola.vx < -100, 'mandou para o gol ou devolveu para a criança (à esquerda)');
+});
+test('👨 o papai só joga no Chuta-chuta com 1 pessoa', () => {
+  assert.equal(partida({ modo: 'chuta', jogadores: 2 }).estado().papai, null);
+  assert.equal(partida({ modo: 'corta' }).estado().papai, null);
 });
