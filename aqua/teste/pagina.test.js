@@ -66,7 +66,7 @@ test('menu: nome, três níveis, lojinha, versão, sem erro e sem pedido para fo
   assert.equal((await pg.textContent('h1')).trim(), 'AQUA');
   for (const id of ['#btFacil', '#btMedio', '#btDificil', '#btLoja']) assert.ok(await pg.isVisible(id), id);
   assert.match(await pg.textContent('#recFacil'), /Fase 1/);
-  assert.match(await pg.textContent('#versao'), /Versão 0\.2\.0 · 14\/Nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /Versão 0\.3\.0 · 14\/Nov\/2026/);
   assert.match(await pg.textContent('#versao'), /sem anúncios e sem compras/);
   assert.equal(await pg.$('#btLingua'), null, 'o idioma é escolhido só na estante');
   await pg.click('#btAjuda'); assert.ok(await pg.isVisible('#ajuda'));
@@ -223,28 +223,97 @@ test('travou: sem jogada possível o jogo avisa e chama as ajudas', async () => 
   await pg.ctx.close();
 });
 
-test('lojinha de brincadeira: sem gotinha não leva; com gotinha troca, usa, e o jogo fica com o frasco e o cenário novos', async () => {
+test('lojinha de brincadeira: frascos trocam e ficam em uso; cenários são pacotes de cenas que entram no carrossel do fundo', async () => {
   const pg = await abrir(null, { gotas: 150 });
   await pg.click('#btLoja'); await pg.waitForSelector('#loja', { state: 'visible' });
   assert.equal(await pg.textContent('#gotasLoja'), '150');
-  assert.equal(await pg.locator('#lojaFrascos .item').count(), 6); assert.equal(await pg.locator('#lojaCenarios .item').count(), 4);
+  assert.equal(await pg.locator('#lojaFrascos .item').count(), 6); assert.equal(await pg.locator('#lojaCenarios .item').count(), 3, 'três pacotes: mar, junina e espaço');
   assert.match(await pg.textContent('#loja'), /nada custa dinheiro/);
+  assert.match(await pg.textContent('#loja'), /10 cenas já vêm de graça/);
   assert.match(await pg.textContent('#item-tubinho'), /em uso/);
   await pg.click('#item-foguete');                       // 240: não dá
   assert.equal(await pg.textContent('#gotasLoja'), '150'); assert.match(await pg.textContent('#item-foguete'), /faltam 90/);
   await pg.click('#item-potinho');                       // 60
   assert.equal(await pg.textContent('#gotasLoja'), '90'); assert.match(await pg.textContent('#item-potinho'), /em uso/); assert.match(await pg.textContent('#item-tubinho'), /usar/);
+  assert.match(await pg.textContent('#item-mar'), /Recife de corais · Peixes e tartarugas/);
   await pg.click('#item-mar');                           // 80
-  assert.equal(await pg.textContent('#gotasLoja'), '10'); assert.match(await pg.textContent('#item-mar'), /em uso/);
-  await pg.click('#item-tubinho'); assert.equal(await pg.textContent('#gotasLoja'), '10', 'voltar para o que já tem não custa nada');
-  await pg.click('#item-potinho');
+  assert.equal(await pg.textContent('#gotasLoja'), '10'); assert.match(await pg.textContent('#item-mar'), /no carrossel/);
+  await pg.click('#item-mar'); assert.equal(await pg.textContent('#gotasLoja'), '10', 'pacote que já tem não cobra de novo');
+  await pg.click('#item-junina'); assert.equal(await pg.textContent('#gotasLoja'), '10'); assert.match(await pg.textContent('#item-junina'), /faltam 140/);
   const g = await pg.evaluate(() => JSON.parse(localStorage.getItem('aqua.pref')));
-  assert.equal(g.gotas, 10); assert.equal(g.frasco, 'potinho'); assert.equal(g.cenario, 'mar'); assert.deepEqual(g.tem.frascos.sort(), ['potinho', 'tubinho']);
+  assert.equal(g.gotas, 10); assert.equal(g.frasco, 'potinho'); assert.deepEqual(g.tem.frascos.sort(), ['potinho', 'tubinho']); assert.deepEqual(g.tem.cenarios.sort(), ['chuva', 'mar']);
+  assert.equal(g.cenario, undefined);
   await pg.click('#btLojaVoltar'); await pg.waitForSelector('#menu', { state: 'visible' });
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
-  assert.ok(await pg.evaluate(() => document.getElementById('jogo').classList.contains('cen-mar')));
+  const cenas = await pg.evaluate(() => AquaApp.cenas());
+  assert.equal(cenas.length, 12, '10 de graça + 2 do Fundo do mar');
+  assert.ok(cenas.includes('recife') && cenas.includes('mar') && !cenas.includes('junina'));
   assert.equal(await pg.evaluate(() => AquaApp.lay().md.modelo), 'potinho');
   assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('fundo em carrossel: 10 cenas de graça, foto e desenho alternados; fechar um frasco troca a cena com transição', async () => {
+  const pg = await abrir();
+  await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
+  const cenas = await pg.evaluate(() => AquaApp.cenas());
+  assert.deepEqual(cenas, ['cachoeira', 'chuva', 'praia', 'jardim', 'flores', 'vagalumes', 'floresta', 'montanhas', 'baloes', 'nuvens']);
+  const tipos = await pg.evaluate((cs) => cs.map(c => AquaFundo.cena(c).tipo), cenas);
+  for (let i = 0; i < tipos.length; i++) assert.equal(tipos[i], i % 2 ? 'desenho' : 'foto');
+  const primeira = await pg.evaluate(() => AquaApp.cena());
+  assert.equal(primeira, cenas[3], 'fácil fase 1 começa na cena 3 (fase × 3)');
+  assert.equal(await pg.locator('#cenario .cn-camada').count(), 1);
+  // joga até fechar o primeiro frasco
+  await assentar(pg);
+  const plano = await pg.evaluate(() => AquaMotor.plano(AquaApp.estado()));
+  let fechou = false;
+  for (const p of plano) {
+    await pg.click('#frasco-' + p[0]); await pg.click('#frasco-' + p[1]); await assentar(pg);
+    if (await pg.evaluate((c) => AquaApp.cena() !== c, primeira)) { fechou = true; break; }
+  }
+  assert.ok(fechou, 'fechar um frasco trocou a cena');
+  assert.equal(await pg.evaluate(() => AquaApp.cena()), cenas[4]);
+  assert.equal(await pg.locator('#cenario .cn-camada').count(), 2, 'as duas cenas juntas durante a transição');
+  await pg.waitForFunction(() => document.querySelectorAll('#cenario .cn-camada').length === 1, null, { timeout: 3000 });
+  assert.equal(await pg.getAttribute('#cenario .cn-camada', 'data-cena'), cenas[4]);
+  // o fundo nunca pega o toque: no meio de cada frasco quem responde é o botão do frasco
+  const tocaFrasco = await pg.evaluate(() => [...document.querySelectorAll('.frasco')].every(b => { const r = b.getBoundingClientRect(); return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === b; }));
+  assert.ok(tocaFrasco);
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.getElementById('cenario')).pointerEvents), 'none');
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('fundo: cada cena aparece, as fotos carregam e os desenhos pintam alguma coisa (16 cenas, com todos os pacotes)', async () => {
+  const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 }, { tem: { frascos: [], cenarios: ['mar', 'junina', 'espaco'] } });
+  await pg.click('#btMedio'); await pg.waitForFunction(() => AquaApp.lay());
+  const cenas = await pg.evaluate(() => AquaApp.cenas());
+  assert.equal(cenas.length, 16);
+  for (const id of cenas) {
+    await pg.evaluate((id) => AquaFundo.mostrar(id, false), id);
+    const tipo = await pg.evaluate((id) => AquaFundo.cena(id).tipo, id);
+    if (tipo === 'foto') {
+      await pg.waitForFunction(() => { const i = [...document.querySelectorAll('#cenario .cn-camada')].pop().querySelector('img'); return i && i.complete && i.naturalWidth > 0; }, null, { timeout: 8000 })
+        .catch(() => assert.fail(id + ': a foto não carregou'));
+      const larg = await pg.evaluate(() => [...document.querySelectorAll('#cenario .cn-camada')].pop().querySelector('img').naturalWidth);
+      assert.ok(larg >= 900, id + ': foto pequena demais (' + larg + ')');
+    } else {
+      const cores = await pg.evaluate(() => { const c = [...document.querySelectorAll('#cenario .cn-camada')].pop().querySelector('canvas'); const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; const s = new Set(); for (let i = 0; i < d.length; i += 400) s.add(d[i] >> 4 << 8 | d[i + 1] >> 4 << 4 | d[i + 2] >> 4); return s.size; });
+      assert.ok(cores > 25, id + ': desenho quase vazio (' + cores + ' cores)');
+    }
+  }
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+
+test('reduzir movimento: a cena troca na hora, sem transição, sem zoom e sem partículas', async () => {
+  const pg = await abrir(Object.assign({}, CELULAR, { reducedMotion: 'reduce' }));
+  await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
+  await pg.evaluate(() => AquaFundo.mostrar('cachoeira', true));
+  assert.equal(await pg.locator('#cenario .cn-camada').count(), 1, 'trocou sem transição');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('#cenario img')).animationName), 'none');
+  await pg.waitForTimeout(600);
+  assert.equal(await pg.evaluate(() => AquaFundo.particulas()), 0);
   await pg.ctx.close();
 });
 
@@ -346,11 +415,11 @@ async function abrirEm(lingua, ctxOp) {
 }
 test('inglês escolhido na estante: o jogo abre em inglês, sem botão de idioma', async () => {
   const pg = await abrirEm('en');
-  assert.equal(await pg.getAttribute('html', 'lang'), 'en');
+  assert.match(await pg.getAttribute('html', 'lang'), /^en(-US)?$/);   // a peça comum (../idioma.js) usa en-US
   assert.equal(await pg.$('#btLingua'), null);
   assert.match(await pg.textContent('.sub'), /Pour the colors/);
   assert.match(await pg.textContent('#recFacil'), /Stage 1/);
-  assert.match(await pg.textContent('#versao'), /Version 0\.2\.0 · Nov\/14\/2026/);
+  assert.match(await pg.textContent('#versao'), /Version 0\.3\.0 · Nov\/14\/2026/);
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
   assert.equal(await pg.textContent('#placaFase'), 'Stage 1');
   assert.match(await pg.getAttribute('#frasco-0', 'aria-label'), /^Bottle 1: top to bottom: /);
@@ -360,12 +429,12 @@ test('inglês escolhido na estante: o jogo abre em inglês, sem botão de idioma
 });
 test('espanhol escolhido na estante: menu, jogo, ajudas, fim de fase e lojinha em espanhol', async () => {
   const pg = await abrirEm('es');
-  assert.equal(await pg.getAttribute('html', 'lang'), 'es');
+  assert.match(await pg.getAttribute('html', 'lang'), /^es(-ES)?$/);   // a peça comum (../idioma.js) usa es-ES
   assert.match(await pg.textContent('.sub'), /Pasa los colores/);
   assert.equal(await pg.textContent('#btFacil .n-nome'), '🫧 Fácil');
   assert.equal(await pg.textContent('#btMedio .n-nome'), '🧪 Medio');
   assert.match(await pg.textContent('#recFacil'), /Fase 1/);
-  assert.match(await pg.textContent('#versao'), /Versión 0\.2\.0 · 14\/nov\/2026 · Música: .* sin anuncios y sin compras/);
+  assert.match(await pg.textContent('#versao'), /Versión 0\.3\.0 · 14\/nov\/2026 · Música: .* sin anuncios y sin compras/);
   assert.equal(await pg.getAttribute('#btAjuda', 'aria-label'), 'Cómo jugar');
   await pg.click('#btAjuda'); assert.match(await pg.textContent('#ajuda'), /Nunca cuestan nada/);
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
@@ -379,7 +448,8 @@ test('espanhol escolhido na estante: menu, jogo, ajudas, fim de fase e lojinha e
   assert.match(await pg.textContent('#fimGotas'), /gotitas$/);
   assert.equal(await pg.textContent('#btProxima'), 'Siguiente fase ▶');
   await pg.click('#btNiveis'); await pg.click('#btLoja');
-  assert.match(await pg.textContent('#lojaCenarios'), /Tarde de lluvia.*en uso/);
+  assert.match(await pg.textContent('#lojaCenarios'), /Fondo del mar.*Arrecife de coral · Peces y tortugas.*faltan/);
+  assert.match(await pg.textContent('#loja'), /10 escenas vienen gratis/);
   assert.match(await pg.textContent('#lojaFrascos'), /Tubito/);
   assert.deepEqual(pg.erros(), []);
   await pg.ctx.close();
@@ -391,7 +461,7 @@ test('sem internet: depois da primeira visita o jogo abre e joga pela cópia gua
   pg.on('pageerror', e => erros.push(e.message));
   await pg.goto(base + '?teste');
   await pg.evaluate(() => navigator.serviceWorker.ready);
-  await pg.waitForFunction(async () => { const ks = await caches.keys(); const k = ks.find(x => x.indexOf('aqua-v') === 0); if (!k) return false; const c = await caches.open(k); return (await c.keys()).length >= 20; }, null, { timeout: 15000 });
+  await pg.waitForFunction(async () => { const ks = await caches.keys(); const k = ks.find(x => x.indexOf('aqua-v') === 0); if (!k) return false; const c = await caches.open(k); return (await c.keys()).length >= 30; }, null, { timeout: 15000 });
   await ctx.setOffline(true);
   await pg.reload(); await pg.waitForFunction(() => window.AquaApp);
   assert.equal((await pg.textContent('h1')).trim(), 'AQUA');
@@ -399,6 +469,12 @@ test('sem internet: depois da primeira visita o jogo abre e joga pela cópia gua
   const p = await pg.evaluate(() => AquaMotor.plano(AquaApp.estado())[0]);
   await pg.click('#frasco-' + p[0]); await pg.click('#frasco-' + p[1]);
   await pg.waitForFunction(() => AquaSom.carregadas().length >= 6, null, { timeout: 8000 });   // os efeitos também vêm da cópia
+  // as fotos do fundo também abrem sem internet
+  for (const id of ['cachoeira', 'praia', 'baloes']) {
+    await pg.evaluate((id) => AquaFundo.mostrar(id, false), id);
+    await pg.waitForFunction(() => { const i = [...document.querySelectorAll('#cenario .cn-camada')].pop().querySelector('img'); return i && i.complete && i.naturalWidth > 0; }, null, { timeout: 8000 })
+      .catch(() => assert.fail(id + ': a foto não abriu sem internet'));
+  }
   assert.deepEqual(erros, []);
   await ctx.close();
 });

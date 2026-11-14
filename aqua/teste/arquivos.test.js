@@ -6,7 +6,7 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.0 de 14/Nov/2026', () => {
+test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.3.0 de 14/Nov/2026', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const j = JSON.parse(ler('versoes.json'));
@@ -18,7 +18,7 @@ test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
   assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
   assert.equal(ler('app.js').match(/APP_DATA = '([^']+)'/)[1], v.data);
-  assert.equal(a, '0.2.0'); assert.equal(v.data, '14/Nov/2026');
+  assert.equal(a, '0.3.0'); assert.equal(v.data, '14/Nov/2026');
 });
 
 test('sw.js guarda todos os arquivos publicados (e os de fora, com ../)', () => {
@@ -32,6 +32,7 @@ test('sw.js guarda todos os arquivos publicados (e os de fora, com ../)', () => 
   assert.match(sw, /indexOf\('aqua-'\) === 0/, 'só apaga os caches do próprio jogo');
   assert.match(sw, /\\\.mp3\$\/i\.test\(url\.pathname\) && !efeito\) return;/, 'não mexe nas músicas (só guarda os efeitos da pasta sons/)');
   for (const f of fs.readdirSync(path.join(pasta, 'sons'))) assert.ok(lista.includes('sons/' + f), 'sw.js não guarda: sons/' + f);
+  for (const f of fs.readdirSync(path.join(pasta, 'cenas'))) assert.ok(lista.includes('cenas/' + f), 'sw.js não guarda: cenas/' + f);
 });
 
 test('manifest: instalável, escopo da pasta, ícones existem', () => {
@@ -115,6 +116,40 @@ test('sem anúncio, sem compra, sem rede de fora: o jogo só fala com a própria
     assert.ok(!/adsbygoogle|googletag|doubleclick|PaymentRequest|checkout|R\$\s*\d/i.test(s), f + ' parece ter anúncio ou compra');
   }
   assert.match(ler('index.html'), /default-src 'self'/);
+});
+
+test('fotos do fundo: as 8 que o fundo.js mostra existem, são leves e têm crédito no CREDITOS.md', () => {
+  const F = require('../fundo.js'), cred = ler('CREDITOS.md');
+  const fotos = F.CENAS.filter(c => c.tipo === 'foto');
+  assert.equal(fotos.length, 8);
+  let total = 0;
+  for (const c of fotos) {
+    assert.ok(fs.existsSync(path.join(pasta, c.img)), 'falta ' + c.img);
+    const tam = fs.statSync(path.join(pasta, c.img)).size; total += tam;
+    assert.ok(tam < 450 * 1024, c.img + ' tem ' + Math.round(tam / 1024) + ' KB');
+    assert.ok(cred.includes('`' + c.img + '`'), 'sem crédito no CREDITOS.md: ' + c.img);
+  }
+  assert.ok(total < 2.5 * 1048576, 'fotos somam ' + (total / 1048576).toFixed(1) + ' MB');
+  assert.deepEqual(fs.readdirSync(path.join(pasta, 'cenas')).sort(), fotos.map(c => c.img.slice(6)).sort(), 'nenhuma foto sobrando na pasta');
+});
+
+test('fundo: 10 cenas de graça (5 fotos e 5 desenhos), 3 pacotes de 2, todo desenho tem código e todo nome nas 3 línguas', () => {
+  const F = require('../fundo.js');
+  const gratis = F.CENAS.filter(c => !c.pacote);
+  assert.equal(gratis.length, 10);
+  assert.equal(gratis.filter(c => c.tipo === 'foto').length, 5);
+  assert.deepEqual(Object.keys(F.PACOTES).sort(), ['espaco', 'junina', 'mar']);
+  for (const [p, ids] of Object.entries(F.PACOTES)) {
+    assert.equal(ids.length, 2);
+    assert.deepEqual(ids.map(i => F.cena(i).tipo).sort(), ['desenho', 'foto'], p);
+    for (const i of ids) assert.equal(F.cena(i).pacote, p);
+  }
+  for (const c of F.CENAS) {
+    assert.equal(c.nome.length, 3, c.id + ': nome nas 3 línguas');
+    if (c.tipo === 'desenho') assert.ok(F.DESENHOS[c.id] && F.DESENHOS[c.id].fixo && F.DESENHOS[c.id].vivo, c.id + ': desenho sem código');
+    assert.ok(['chuva', 'mar', 'junina', 'espaco'].includes(c.tema), c.id + ': tema');
+  }
+  assert.equal(F.lista([]).length, 10); assert.equal(F.lista(['mar', 'junina', 'espaco']).length, 16);
 });
 
 test('nenhum segredo nem dado pessoal no código', () => {
