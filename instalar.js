@@ -43,7 +43,14 @@
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   }
 
-  var comoApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: minimal-ui)').matches)) || navigator.standalone === true;
+  var janelaDeApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: minimal-ui)').matches)) || navigator.standalone === true;
+  // Janela de app não quer dizer "o Bolinho já está instalado": aberta pela 🚪 de um JOGO instalado sozinho (outro app),
+  // a estante aparece dentro da janela do jogo (com a barrinha ✕ em cima). Só é o app do Bolinho quando abriu pelo ícone
+  // dele: o manifest abre em "?app=1" e a aba guarda a marca (dono, 14/Nov/2026: "apaguei o ícone e não achei a opção").
+  var MARCA_APP = 'bolinho:app:' + location.pathname;
+  if (janelaDeApp && /[?&]app=1\b/.test(location.search)) { try { sessionStorage.setItem(MARCA_APP, '1'); } catch (e) {} }
+  var comoApp = janelaDeApp && (function () { try { return sessionStorage.getItem(MARCA_APP) === '1'; } catch (e) { return true; } })();
+  var dentroDeOutroApp = janelaDeApp && !comoApp;
   if (comoApp) return;
 
   var css = '' +
@@ -197,6 +204,16 @@
   // Passo a passo de cada aparelho, no idioma escolhido na estante (idioma.js).
   function passos() {
     var N = NOME;
+    if (dentroDeOutroApp) return T('<p>Você abriu o ' + N + ' por dentro de um jogo instalado. Daqui não dá para instalar: abra o ' + N + ' no navegador.</p>' +
+      '<ol><li>' + (ios ? 'Abra o <b>Safari</b> e digite <b>solverone.com.br/kids</b>.' : 'Toque em <b>Abrir no Chrome</b> (botão abaixo) ou abra o Chrome e digite <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>Lá, toque em <b>📲 Instalar</b>.</li></ol>',
+      '<p>You opened ' + N + ' from inside an installed game. It can\'t be installed from here: open ' + N + ' in the browser.</p>' +
+      '<ol><li>' + (ios ? 'Open <b>Safari</b> and type <b>solverone.com.br/kids</b>.' : 'Tap <b>Open in Chrome</b> (button below), or open Chrome and type <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>There, tap <b>📲 Install</b>.</li></ol>',
+      '<p>Has abierto ' + N + ' desde dentro de un juego instalado. Desde aquí no se puede instalar: abre ' + N + ' en el navegador.</p>' +
+      '<ol><li>' + (ios ? 'Abre <b>Safari</b> y escribe <b>solverone.com.br/kids</b>.' : 'Toca <b>Abrir en Chrome</b> (botón de abajo) o abre Chrome y escribe <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>Allí, toca <b>📲 Instalar</b>.</li></ol>') +
+      (ios ? '' : '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>');
     if (tv) return T('<p>Na TV não existe "instalar" pelo navegador, mas dá para deixar o ' + N + ' a um clique:</p>' +
       '<ol><li>Com esta página aberta, aperte o botão de <b>menu</b> do navegador da TV (às vezes é a engrenagem ou os <b>três pontinhos</b>).</li>' +
       '<li>Escolha <b>Adicionar aos favoritos</b> (em algumas TVs aparece <b>Fixar na tela inicial</b> ou <b>Adicionar à página inicial</b>: use esse, se tiver).</li>' +

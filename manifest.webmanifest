@@ -4,7 +4,7 @@
   "short_name": "Bolinho",
   "description": "Brincadeiras para criança e família da SolverONE. / SolverONE family games and stories.",
   "lang": "pt-BR",
-  "start_url": "./",
+  "start_url": "./?app=1",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
