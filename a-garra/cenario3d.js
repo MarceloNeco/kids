@@ -15,7 +15,8 @@ const TEMAS = {
   telefone: { corpo: '#c8102e', escuro: '#8e0a20', fundo: '#2a1a1e', chao: '#3a1020', luz: '#ffe9d6', neon: null, borda: '#c8102e' },
   neon: { corpo: '#111214', escuro: '#050506', fundo: '#202322', chao: '#141a17', luz: '#e8fff0', neon: '#39ff6a', neon2: '#ffd400', borda: '#1a1a1a' },
   estrelas: { corpo: '#1d2c78', escuro: '#101a4d', fundo: '#1f3a8f', chao: '#1a2160', luz: '#e6efff', neon: '#3aa0ff', neon2: '#7ef9ff', borda: '#c9a24a' },
-  lanchonete: { corpo: '#d62839', escuro: '#9c1b28', fundo: '#fff3df', chao: '#ffffff', luz: '#fff7e0', neon: '#ffd166', neon2: '#ff7ab8', borda: '#fff3df' }
+  lanchonete: { corpo: '#d62839', escuro: '#9c1b28', fundo: '#fff3df', chao: '#ffffff', luz: '#fff7e0', neon: '#ffd166', neon2: '#ff7ab8', borda: '#fff3df' },
+  bichos: { corpo: '#e9ecef', escuro: '#b8bec6', fundo: '#e8e2d8', chao: '#efe3cf', luz: '#fff4e2', neon: '#7ef9ff', neon2: '#ffb3d1', borda: '#c9ced6' }
 };
 
 /* ---------- desenhos em canvas (texturas) ---------- */
@@ -67,6 +68,12 @@ function insetoIcone(g, x, y, s, qual) {
   else if (qual === 1) { g.fillStyle = '#ffcf2e'; g.beginPath(); g.ellipse(x, y, s * 0.42, s * 0.32, 0, 0, 7); g.fill(); g.fillStyle = '#17141c'; [-0.12, 0.08].forEach((a) => g.fillRect(x + a * s, y - s * 0.3, s * 0.08, s * 0.6)); g.fillStyle = 'rgba(230,247,255,.85)'; g.beginPath(); g.ellipse(x - s * 0.1, y - s * 0.38, s * 0.15, s * 0.25, -0.4, 0, 7); g.ellipse(x + s * 0.12, y - s * 0.38, s * 0.15, s * 0.25, 0.4, 0, 7); g.fill(); }
   else { g.fillStyle = '#ff7ab8'; g.beginPath(); g.ellipse(x - s * 0.25, y - s * 0.12, s * 0.25, s * 0.3, -0.5, 0, 7); g.ellipse(x + s * 0.25, y - s * 0.12, s * 0.25, s * 0.3, 0.5, 0, 7); g.fill(); g.fillStyle = '#ffd166'; g.beginPath(); g.ellipse(x - s * 0.18, y + s * 0.22, s * 0.16, s * 0.18, 0.4, 0, 7); g.ellipse(x + s * 0.18, y + s * 0.22, s * 0.16, s * 0.18, -0.4, 0, 7); g.fill(); g.fillStyle = '#4a2c6e'; g.fillRect(x - s * 0.04, y - s * 0.35, s * 0.08, s * 0.7); }
 }
+function patinha(g, x, y, s, cor, giro) {
+  g.save(); g.translate(x, y); g.rotate(giro || 0); g.fillStyle = cor;
+  g.beginPath(); g.ellipse(0, s * 0.35, s * 0.55, s * 0.45, 0, 0, 7); g.fill();
+  [[-0.55, -0.25], [-0.2, -0.6], [0.2, -0.6], [0.55, -0.25]].forEach(([a, b]) => { g.beginPath(); g.ellipse(a * s, b * s, s * 0.2, s * 0.26, a * 0.5, 0, 7); g.fill(); });
+  g.restore();
+}
 function burguerIcone(g, x, y, s) {
   g.fillStyle = '#f0a94e'; g.beginPath(); g.ellipse(x, y - s * 0.12, s * 0.5, s * 0.3, 0, Math.PI, 0); g.fill();
   g.fillStyle = '#7ed957'; g.fillRect(x - s * 0.52, y - s * 0.12, s * 1.04, s * 0.08);
@@ -94,6 +101,13 @@ function fundoDe(tema) {
         hexagono(g, x * w, y * h, 95); g.fillStyle = '#3a2f8f'; g.fill(); g.lineWidth = 8; g.strokeStyle = '#7ef9ff'; g.stroke(); insetoIcone(g, x * w, y * h, 110, q);
       });
       texto(g, 'INSETOS OFICIAIS DA A-GARRA', w / 2, h * 0.6, '700 46px Fredoka, system-ui, sans-serif', 'rgba(255,255,255,.75)');
+    } else if (tema === 'bichos') {   // parede clara de pet shop, com patinhas e uma janelinha de luzes do fliperama
+      const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#f4efe6'); gr.addColorStop(1, '#ddd3c4'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 18; i++) patinha(g, 80 + (i * 173) % (w - 160), 90 + (i * 97) % (h * 0.55), 22 + (i % 3) * 6, 'rgba(160,130,100,.25)', i * 0.7);
+      g.fillStyle = '#2a2f3a'; g.fillRect(w * 0.55, h * 0.12, w * 0.32, h * 0.26);
+      for (let i = 0; i < 26; i++) { g.fillStyle = ['#ff4fd8', '#7ef9ff', '#ffd400', '#39ff6a'][i % 4]; g.globalAlpha = 0.5; g.beginPath(); g.arc(w * 0.57 + (i * 37) % (w * 0.28), h * 0.15 + (i * 53) % (h * 0.2), 6 + (i % 3) * 4, 0, 7); g.fill(); }
+      g.globalAlpha = 1; g.strokeStyle = '#c9ced6'; g.lineWidth = 12; g.strokeRect(w * 0.55, h * 0.12, w * 0.32, h * 0.26);
+      texto(g, 'BICHOS DE VERDADE', w * 0.3, h * 0.24, '700 50px Fredoka, system-ui, sans-serif', '#a07850');
     } else {
       for (let y = 0; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff3df' : '#ffe0b8'; g.fillRect(x, y, 64, 64); }
       g.fillStyle = '#2a1a12'; g.fillRect(w * 0.14, h * 0.1, w * 0.72, h * 0.42); g.strokeStyle = '#c98b4a'; g.lineWidth = 14; g.strokeRect(w * 0.14, h * 0.1, w * 0.72, h * 0.42);
@@ -108,6 +122,7 @@ function placaDe(tema) {
     if (tema === 'telefone') { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, w, h); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#111'); estrela(g, 90, h / 2, 50, 22, '#c8102e'); estrela(g, w - 90, h / 2, 50, 22, '#c8102e'); }
     else if (tema === 'neon') { g.fillStyle = '#050505'; g.fillRect(0, 0, w, h); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#c6ffd4', '#39ff6a'); }
     else if (tema === 'estrelas') { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2b3aa0'); gr.addColorStop(1, '#101a4d'); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 30; i++) estrela(g, (i * 137) % w, (i * 71) % h, 6, 2.5, 'rgba(255,240,180,.7)'); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c'); }
+    else if (tema === 'bichos') { g.fillStyle = '#f4f6f8'; g.fillRect(0, 0, w, h); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#4a3a2c'); patinha(g, 110, h / 2, 46, '#b5652e', -0.3); patinha(g, w - 110, h / 2, 46, '#1d1715', 0.3); }
     else { g.fillStyle = '#d62839'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 64) { g.fillStyle = (x / 64) % 2 ? '#fff' : '#d62839'; g.fillRect(x, h - 40, 64, 40); } texto(g, 'A-GARRA', w / 2, h / 2 - 12, '800 140px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020'); burguerIcone(g, 110, h / 2, 110); burguerIcone(g, w - 110, h / 2, 110); }
   });
 }
@@ -121,13 +136,14 @@ function frenteBase(tema) {
     if (tema === 'telefone') { bandeira(g, 40, 520, 230, 250); bandeira(g, w - 270, 520, 230, 250); }
     if (tema === 'neon') { g.save(); brilho(g, '#39ff6a', 22); g.strokeStyle = '#39ff6a'; g.lineWidth = 12; g.strokeRect(40, 40, w - 80, h - 80); g.restore(); texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a'); }
     if (tema === 'estrelas') { for (let i = 0; i < 80; i++) estrela(g, (i * 97) % w, (i * 151) % h, 6 + (i % 3) * 3, 2.6, 'rgba(255,240,180,.8)'); texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c'); }
+    if (tema === 'bichos') { for (let i = 0; i < 10; i++) patinha(g, 480 + (i * 131) % 500, 520 + (i * 89) % 420, 26, 'rgba(120,100,80,.3)', i); texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#4a3a2c'); }
     if (tema === 'lanchonete') { for (let y = 640; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff' : '#111'; g.fillRect(x, y, 64, 64); } texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020'); }
     // portinha do prêmio (embaixo do buraco, à esquerda)
     const px = 50, py = 120, pw = 330, ph = 330;
-    g.fillStyle = tema === 'lanchonete' ? '#fff3df' : tema === 'telefone' ? '#a00d24' : '#0b0b0b'; g.fillRect(px - 14, py - 14, pw + 28, ph + 28);
+    g.fillStyle = tema === 'lanchonete' || tema === 'bichos' ? '#fff3df' : tema === 'telefone' ? '#a00d24' : '#0b0b0b'; g.fillRect(px - 14, py - 14, pw + 28, ph + 28);
     g.fillStyle = '#050505'; g.fillRect(px, py, pw, ph * 0.62);
     if (tema === 'telefone') for (let i = 0; i < 6; i++) for (let j = 0; j < 2; j++) { g.fillStyle = (i + j) % 2 ? '#fff' : '#111'; g.fillRect(px + i * pw / 6, py + ph * 0.66 + j * 28, pw / 6, 28); }
-    texto(g, 'PRÊMIO', px + pw / 2, py + ph * 0.9, '800 64px Fredoka, system-ui, sans-serif', tema === 'neon' ? '#39ff6a' : tema === 'estrelas' ? '#ffd166' : tema === 'lanchonete' ? '#d62839' : '#ffffff');
+    texto(g, 'PRÊMIO', px + pw / 2, py + ph * 0.9, '800 64px Fredoka, system-ui, sans-serif', tema === 'neon' ? '#39ff6a' : tema === 'estrelas' ? '#ffd166' : tema === 'lanchonete' ? '#d62839' : tema === 'bichos' ? '#4a3a2c' : '#ffffff');
   });
 }
 
@@ -157,6 +173,10 @@ export function montarMaquina(cena, tema, M) {
   /* por dentro: chão (sem o buraco), fundo, laterais, teto com LED */
   const chaoTex = textura(512, 512, (g, w, h) => {
     if (tema === 'lanchonete') { for (let y = 0; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#111' : '#f5f5f5'; g.fillRect(x, y, 64, 64); } }
+    else if (tema === 'bichos') {   // cobertor fofinho, como o do vídeo dos filhotes
+      g.fillStyle = '#efe3cf'; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 9000; i++) { const x = (i * 7919) % w, y = (i * 104729) % h, c = 200 + (i * 31) % 50; g.fillStyle = 'rgba(' + c + ',' + (c - 18) + ',' + (c - 45) + ',.55)'; g.beginPath(); g.arc(x, y, 2 + (i % 4), 0, 7); g.fill(); }
+    }
     else { g.fillStyle = T.chao; g.fillRect(0, 0, w, h); }
   });
   const matChao = new THREE.MeshStandardMaterial({ map: chaoTex, roughness: 0.85 });
@@ -169,7 +189,7 @@ export function montarMaquina(cena, tema, M) {
   fundo.receiveShadow = true;
   // laterais: vidro (a cabine tem a grade vermelha; as outras, espelho escuro)
   for (const x of [-0.01, L + 0.01]) {
-    plano(tema === 'telefone' ? matVidro : new THREE.MeshStandardMaterial({ color: T.fundo, roughness: 0.2, metalness: 0.5, transparent: true, opacity: 0.55 }), P, A, [x, A / 2, P / 2], [0, Math.PI / 2, 0]);
+    plano(matVidro, P, A, [x, A / 2, P / 2], [0, Math.PI / 2, 0]);   // vidro: dá para ver de lado a profundidade da garra
     if (tema === 'telefone') {
       for (let i = 1; i < 6; i++) caixa(matCorpo, x - 0.04, i * A / 6 - 0.04, 0, x + 0.04, i * A / 6 + 0.04, P);
       for (let i = 1; i < 3; i++) caixa(matCorpo, x - 0.04, 0, i * P / 3 - 0.04, x + 0.04, A, i * P / 3 + 0.04);

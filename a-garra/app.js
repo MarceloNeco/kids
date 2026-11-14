@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.2.0', APP_DATA = '14/Nov/2026';
+const APP_VERSION = '0.3.0', APP_DATA = '14/Nov/2026';
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -107,7 +107,8 @@ if (render) {
   render.toneMapping = THREE.ACESFilmicToneMapping; render.toneMappingExposure = 1.05;
 }
 const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 120);
-const VISTAS = [{ yaw: 0, pitch: 0.42 }, { yaw: 0, pitch: 1.2 }, { yaw: 0.85, pitch: 0.5 }];   // frente (um pouco de cima), de cima, de lado
+const VISTAS = [{ yaw: 0, pitch: 0.42 }, { yaw: 0, pitch: 1.2 }, { yaw: 1.5, pitch: 0.28 }];   // frente (um pouco de cima), de cima, bem de lado
+const GIRO = 1.65;   // até onde a câmera gira para cada lado (um pouco mais que de lado, para ver a profundidade da garra)
 let cam = { yaw: 0, pitch: 0.42, zoom: 1, vista: 0 }, camAlvo = new THREE.Vector3(MED.L / 2, 2.2, MED.P / 2);
 let cena = null, maq = null, objetos = [], m = null, raycaster = new THREE.Raycaster();
 let porta = null, avisoT = 0, ultimoQuadro = 0, fichasIni = 0, fimT = null, velocidade = 1, apertando = { dx: 0, dz: 0 }, botaoApertado = 0;
@@ -129,7 +130,8 @@ function novaPartida() {
   if (!render) { mostrar('semTresD'); $('semTresD').hidden = false; return; }
   limparCena();
   const def = MAQUINAS[pref.maquina];
-  m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, semente: SEMENTE_URL ? +SEMENTE_URL : undefined, semGanhar: contador[chaveConta()] || 0 });
+  m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam, qtdFator: def.andam ? 0.32 : 1, raioFator: def.andam ? 1.12 : 1,
+    semente: SEMENTE_URL ? +SEMENTE_URL : undefined, semGanhar: contador[chaveConta()] || 0 });
   cena = new THREE.Scene(); cena.background = new THREE.Color('#0b0a14'); cena.fog = new THREE.Fog('#0b0a14', 22, 45);
   maq = montarMaquina(cena, pref.maquina, MED);
   objetos = m.premios.map((p) => { const o = criarPremio(p.tipo); o.userData.id = p.id; cena.add(o); return o; });
@@ -167,7 +169,7 @@ function posicionarCamera() {
   camera.lookAt(camAlvo);
 }
 $('btCamera').addEventListener('click', () => { cam.vista = (cam.vista + 1) % VISTAS.length; Object.assign(cam, VISTAS[cam.vista]); Som.toque();
-  aviso([t('🎥 De frente', '🎥 Front'), t('🎥 De cima', '🎥 Top'), t('🎥 De lado', '🎥 Side')][cam.vista], 1.2); });
+  aviso([t('🎥 De frente', '🎥 Front'), t('🎥 De cima', '🎥 Top'), t('🎥 De lado: veja a profundidade da garra', '🎥 Side: check the claw depth')][cam.vista], 1.6); });
 const zoomEm = (k) => { cam.zoom = Math.max(0.42, Math.min(1.35, cam.zoom * k)); };
 $('btMais').addEventListener('click', () => zoomEm(1 / 1.25));
 $('btMenos').addEventListener('click', () => zoomEm(1.25));
@@ -203,7 +205,7 @@ cv.addEventListener('pointermove', (e) => {
   if (gesto.tipo === 'pinca' && dedos.size === 2) { const [a, b] = [...dedos.values()]; cam.zoom = Math.max(0.42, Math.min(1.35, gesto.zoom * gesto.d0 / Math.max(20, Math.hypot(a.x - b.x, a.y - b.y)))); return; }
   const dx = e.clientX - gesto.x0, dy = e.clientY - gesto.y0;
   if (gesto.tipo === 'toque' && Math.hypot(dx, dy) > 12) gesto.tipo = 'girar';
-  if (gesto.tipo === 'girar') { cam.yaw = Math.max(-1.1, Math.min(1.1, gesto.yaw - dx * 0.006)); cam.pitch = Math.max(0.08, Math.min(1.35, gesto.pitch + dy * 0.005)); }
+  if (gesto.tipo === 'girar') { cam.yaw = Math.max(-GIRO, Math.min(GIRO, gesto.yaw - dx * 0.007)); cam.pitch = Math.max(0.05, Math.min(1.35, gesto.pitch + dy * 0.005)); }
 });
 function soltarDedo(e) {
   if (!dedos.has(e.pointerId)) return;
@@ -277,7 +279,7 @@ function miniatura(tipo) {
     const d = new THREE.DirectionalLight('#ffffff', 2.2); d.position.set(2, 4, 5); mini.cena.add(d);
     mini.cam.position.set(0, 1.1, 5.2); mini.cam.lookAt(0, 0, 0);
   }
-  const o = criarPremio(tipo); o.rotation.y = -0.35; if (/joaninha|abelha|besouro|lagarta|libelula|formiga|vagalume|borboleta/.test(tipo)) o.rotation.x = 0.5;
+  const o = criarPremio(tipo); o.rotation.y = MAQUINAS.bichos.tipos.includes(tipo.replace(/-dourad[oa]$/, '')) || /^salsicha/.test(tipo) ? 0.6 : -0.35; if (/joaninha|abelha|besouro|lagarta|libelula|formiga|vagalume|borboleta/.test(tipo)) o.rotation.x = 0.5;
   mini.cena.add(o); mini.r.render(mini.cena, mini.cam); minis[tipo] = mini.r.domElement.toDataURL('image/png'); mini.cena.remove(o);
   return minis[tipo];
 }
@@ -343,13 +345,14 @@ function quadro(agora) {
   if (fimT != null) { fimT -= dt; if (fimT <= 0) { fimT = null; abrirFim(); } }
   botaoApertado = Math.max(0, botaoApertado - dt);
   // prêmios: posição e giro da física, olhos piscando, asas batendo, vivos se mexendo
-  const vivos = !!MAQUINAS[pref.maquina].vivos;
+  const vivos = !!MAQUINAS[pref.maquina].vivos, escala = MAQUINAS[pref.maquina].andam ? 1.4 : 1;
   m.premios.forEach((p, i) => {
     const o = objetos[i];
     o.visible = !(p.ganho && p.y < -p.r * 1.4);
     if (!o.visible) return;
-    o.position.set(p.x, p.y, p.z); o.quaternion.set(p.q[0], p.q[1], p.q[2], p.q[3]); o.scale.setScalar(p.r);
-    if (!calmo) animar(o, seg, vivos && !p.preso, p.preso);
+    // os bichos de verdade aparecem maiores que a bola da física (são compridos), mas a bola continua cabendo no buraco
+    o.position.set(p.x, p.y + (escala > 1 ? p.r * 0.12 : 0), p.z); o.quaternion.set(p.q[0], p.q[1], p.q[2], p.q[3]); o.scale.setScalar(p.r * escala);
+    if (!calmo) animar(o, seg, vivos && !p.preso, p.preso, p.passeio > 0);
   });
   // o prêmio ganho aparece na portinha da frente
   if (porta) {

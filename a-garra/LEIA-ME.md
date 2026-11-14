@@ -1,7 +1,7 @@
 # A-GARRA — máquina de pegar bichinho em 3D
 
 Brincadeira do Bolinho de Chuva (solverone.com.br/kids/a-garra/). Pedido do dono em 14/Nov/2026, com fotos de máquinas de
-um fliperama como referência. A 0.1.0 era em 2D e pegava sempre; o dono pediu (14/Nov/2026): **3D**, ver de cima com zoom,
+um fliperama como referência (e, na 0.3.0, imagens de um vídeo de filhotes de salsicha numa máquina). A 0.1.0 era em 2D e pegava sempre; o dono pediu (14/Nov/2026): **3D**, ver de cima com zoom,
 controle ⬆⬇⬅➡ + botão de agarrar, **a garra não pega toda vez** (como as de verdade), mais fiel às fotos e **várias
 máquinas**: hambúrgueres, bichinhos que mexem, insetos. Isso é a 0.2.0.
 
@@ -16,9 +16,16 @@ máquinas**: hambúrgueres, bichinhos que mexem, insetos. Isso é a 0.2.0.
     vaga-lume (que brilha); as asas batem.
   - **Lanchonete** (vermelha e creme, chão quadriculado, cardápio na parede): **hambúrgueres** (x-burguer, x-salada,
     x-bacon, duplo, x-frango, burguer verde, x-tudo), cachorro-quente, batata frita e milk-shake.
+  - **Bichos de Verdade** (0.3.0; branca e prateada, cobertor fofinho no chão, como no vídeo de filhotes que o dono mandou):
+    bichos com jeito de bicho de verdade — filhotes de **salsicha** (preto e caramelo, caramelo e malhado), labrador, gato
+    rajado, coelho, porquinho-da-índia, pinguim-imperador, pato, jabuti e leãozinho. Ficam de pé, **andam pelo cobertor**,
+    olham em volta, abanam o rabo e respiram; na garra, esperneiam. São menos e maiores (o desenho é maior que a bola da
+    física, que continua cabendo no buraco). Raro: o salsicha dourado.
 - **Controle**: ⬅ ➡ para os lados, ⬆ para o fundo, ⬇ para a frente (segurar), e **PEGAR**. Também dá para **tocar no
   prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
-- **Câmera**: 🎥 troca entre de frente, de cima e de lado; 🔍 aproxima (perto, a câmera acompanha a garra); arrastar o dedo
+- **Sortido**: cada partida tem outra mistura (cada tipo pelo menos uma vez, o resto sorteado), outro total, outro formato de
+  monte (um "pico" sorteado) e prêmios caídos de jeitos variados (de costas, de lado, de cabeça para baixo).
+- **Câmera**: 🎥 troca entre de frente, de cima e bem de lado (as laterais são de vidro, para ver a profundidade da garra); 🔍 aproxima (perto, a câmera acompanha a garra); arrastar o dedo
   na máquina gira; dois dedos aproximam.
 - **Regra da garra** (igual às máquinas de verdade): quase sempre ela fecha **fraca** e solta — logo ao subir, no tranco lá
   em cima ou no caminho. Só de vez em quando vem **forte**: mirando bem, mais ou menos **1 a cada 4** tentativas no fácil,

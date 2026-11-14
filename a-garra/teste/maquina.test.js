@@ -27,7 +27,8 @@ function sorteador(s) { return () => { s = (s * 16807) % 2147483647; return s / 
 test('o monte assenta: ninguém no buraco, ninguém fora do vidro, e não desmorona sozinho', () => {
   for (const nivel of ['facil', 'medio', 'dificil']) for (let s = 1; s <= 6; s++) {
     const m = M.nova({ nivel, semente: s, tipos: TIPOS, raro: 'estrela' });
-    assert.equal(m.premios.length, m.cfg.qtd);
+    assert.ok(m.premios.length >= m.cfg.qtd * 0.85 && m.premios.length <= m.cfg.qtd * 1.15, 'quantos: ' + m.premios.length);
+    for (const t of TIPOS) assert.ok(m.premios.some(p => p.tipo === t), 'todo tipo aparece: ' + t);
     assert.equal(m.premios.filter(p => p.tipo === 'estrela').length, 1, 'um prêmio raro');
     for (const p of m.premios) {
       assert.ok(!noBuraco(p), nivel + ' ' + s + ': prêmio no buraco');
@@ -124,4 +125,37 @@ test('bichinhos vivos: os de cima dão pulinhos sozinhos, sem cair no buraco', (
   for (let i = 0; i < 60 * 20; i++) m.passo(1 / 60);
   assert.ok(m.eventos.filter(e => e.tipo === 'pulo').length >= 2, 'pularam');
   assert.equal(m.ganhos.length, 0, 'pulo não vira prêmio');
+});
+
+test('sortido: cada partida tem outra mistura, outro monte e prêmios caídos de jeitos diferentes', () => {
+  const contar = (m) => TIPOS.map(t => m.premios.filter(p => p.tipo === t).length).join(',');
+  const misturas = new Set(), totais = new Set();
+  for (let s = 1; s <= 8; s++) { const m = M.nova({ nivel: 'medio', semente: s, tipos: TIPOS }); misturas.add(contar(m)); totais.add(m.premios.length); }
+  assert.ok(misturas.size >= 7, 'misturas diferentes: ' + [...misturas].join(' | '));
+  assert.ok(totais.size >= 3, 'quantidades diferentes: ' + [...totais].join(','));
+  // poses: muitos caídos (o "para cima" do prêmio longe do para cima do mundo)
+  const m = M.nova({ nivel: 'medio', semente: 3, tipos: TIPOS });
+  const cima = (q) => { const [x, y, z, w] = q; return 1 - 2 * (x * x + z * z); };   // y do eixo y do prêmio
+  assert.ok(m.premios.filter(p => cima(p.q) < 0.3).length >= m.premios.length * 0.2, 'tem prêmio deitado/de cabeça para baixo');
+});
+
+test('bichos que andam: ficam de pé, dão voltinhas pelo monte e não caem no buraco sozinhos', () => {
+  const m = M.nova({ nivel: 'facil', semente: 6, tipos: TIPOS, andam: true });
+  const cima = (q) => { const [x, y, z, w] = q; return 1 - 2 * (x * x + z * z); };
+  assert.ok(m.premios.every(p => cima(p.q) > 0.999), 'todos de pé');
+  const antes = m.premios.map(p => [p.x, p.z]);
+  let andando = 0;
+  for (let i = 0; i < 60 * 25; i++) { m.passo(1 / 60); if (m.premios.some(p => p.passeio > 0)) andando++; }
+  assert.ok(m.eventos.filter(e => e.tipo === 'anda').length >= 3, 'andaram');
+  assert.ok(andando > 60, 'ficaram andando um tempo');
+  assert.ok(m.premios.some((p, i) => Math.hypot(p.x - antes[i][0], p.z - antes[i][1]) > 0.5), 'mudaram de lugar');
+  assert.ok(m.premios.every(p => cima(p.q) > 0.999), 'continuam de pé');
+  assert.equal(m.ganhos.length, 0, 'andar não vira prêmio');
+});
+
+test('todo prêmio cabe no buraco (senão nunca dá para ganhar), também os bichos de verdade, maiores', () => {
+  for (const nivel of ['facil', 'medio', 'dificil']) for (const op of [{}, { andam: true, qtdFator: 0.32, raioFator: 1.12 }]) for (let s = 1; s <= 15; s++) {
+    const m = M.nova(Object.assign({ nivel, semente: s, tipos: TIPOS }, op));
+    for (const p of m.premios) assert.ok(2 * p.r < Math.min(BX, BZ), nivel + ': prêmio de raio ' + p.r.toFixed(2) + ' não cabe no buraco');
+  }
 });

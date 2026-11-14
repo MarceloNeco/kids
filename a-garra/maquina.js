@@ -4,12 +4,13 @@
    Sem desenho e sem tela: roda igual no navegador e no Node (testes em teste/maquina.test.js).
 
    Uso:
-     var m = Maquina.nova({ nivel: 'dificil', tipos: ['urso', ...], raro: 'urso-dourado', vivos: false, semente: 7 });
+     var m = Maquina.nova({ nivel: 'dificil', tipos: ['urso', ...], raro: 'urso-dourado', vivos: false, andam: false, semente: 7 });
+     (vivos: os de cima dão pulinhos; andam: os bichos ficam de pé e, de vez em quando, dão uma voltinha pelo monte)
      m.mover(dx, dz)     segurar as setas (-1, 0 ou 1 em cada eixo; 0, 0 = soltou)   m.irPara(x, z) levar até (dedo)
      m.pegar()           desce a garra (só na fase "mirar")                          m.passo(dt)    anda dt segundos
      m.fase              'mirar' 'descer' 'fechar' 'subir' 'levar' 'soltar' 'voltar' 'fim'
      m.garra             { x, y, z, abertura (0 fechada a 1 aberta), premio, forca ('forte' | 'fraca' | null) }
-     m.premios           [{ id, tipo, x, y, z, r, q: [x, y, z, w] (giro), dorme, preso, ganho }]
+     m.premios           [{ id, tipo, x, y, z, r, q: [x, y, z, w] (giro), yaw, passeio (> 0 = andando), dorme, preso, ganho }]
      m.ganhos [tipo, ...]   m.fichas   m.tempo   m.semGanhar (tentativas desde o último prêmio)
      m.eventos           fila que o app esvazia: { tipo: 'ficha' | 'pegou' | 'raspou' | 'errou' | 'escorregou' |
                          'ganhou' | 'pulo' | 'tique' | 'fim', ... }
@@ -46,26 +47,40 @@
     op = op || {};
     var nivel = NIVEIS[op.nivel] ? op.nivel : 'facil';
     var cfg = Object.assign({}, NIVEIS[nivel], op.ajustes || {});
+    if (op.qtdFator) cfg.qtd = Math.round(cfg.qtd * op.qtdFator);   // ex.: os bichos que andam são menos e maiores, soltos no chão
+    if (op.raioFator) cfg.raio = cfg.raio.map(function (r) { return r * op.raioFator; });
     var rnd = sorteador(op.semente != null ? op.semente : Math.floor(Math.random() * 1e9));
     var tiposBase = (op.tipos && op.tipos.length) ? op.tipos : ['bola'];
     var m = {
-      nivel: nivel, cfg: cfg, fase: 'mirar', fichas: cfg.fichas, tempo: cfg.tempo, t: 0, vivos: !!op.vivos,
+      nivel: nivel, cfg: cfg, fase: 'mirar', fichas: cfg.fichas, tempo: cfg.tempo, t: 0, vivos: !!op.vivos, andam: !!op.andam,
       garra: { x: CASA.x, y: TRILHO, z: CASA.z, abertura: 0.2, premio: null, forca: null, vx: 0, vz: 0, balanco: [0, 0], vb: [0, 0] },
       premios: [], ganhos: [], eventos: [], esvaziou: false, semGanhar: op.semGanhar || 0,
       _dx: 0, _dz: 0, _alvo: null, _fase: 0, _queda: null, _tique: -1, _rnd: rnd
     };
 
-    /* ---------- os prêmios: jogados de cima, assentados e conferidos ---------- */
-    var tipos = [];
-    for (var i = 0; i < cfg.qtd - (op.raro ? 1 : 0); i++) tipos.push(tiposBase[i % tiposBase.length]);
-    for (i = tipos.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), x = tipos[i]; tipos[i] = tipos[j]; tipos[j] = x; }
+    /* ---------- os prêmios: sortidos (cada partida é diferente), jogados de cima, assentados e conferidos ---------- */
+    // quantos: o total varia um pouco; cada tipo aparece pelo menos uma vez e o resto é sorteado com pesos sorteados
+    // (numa partida tem muito ursinho, na outra quase nenhum); o monte tem um "pico" sorteado (mais alto no fundo, num lado...)
+    var total = Math.round(cfg.qtd * (0.88 + rnd() * 0.24)) - (op.raro ? 1 : 0);
+    var pesos = tiposBase.map(function () { return 0.25 + rnd() * rnd() * 3; }), soma = pesos.reduce(function (a, b) { return a + b; }, 0);
+    var tipos = tiposBase.slice(0, total);
+    for (var i = tipos.length; i < total; i++) {
+      var sorte = rnd() * soma, j = 0;
+      while (j < pesos.length - 1 && sorte > pesos[j]) { sorte -= pesos[j]; j++; }
+      tipos.push(tiposBase[j]);
+    }
+    for (i = tipos.length - 1; i > 0; i--) { j = Math.floor(rnd() * (i + 1)); var x = tipos[i]; tipos[i] = tipos[j]; tipos[j] = x; }
     if (op.raro) tipos.splice(Math.floor(rnd() * tipos.length), 0, op.raro);
+    m._monte = { x: BX + 0.8 + rnd() * (L - BX - 1.6), z: 0.6 + rnd() * (P - 1.4), forca: 0.25 + rnd() * 0.5 };
     tipos.forEach(function (tipo, k) {
-      var r = cfg.raio[0] + rnd() * (cfg.raio[1] - cfg.raio[0]);
-      var p = { id: k, tipo: tipo, r: r, vx: 0, vy: 0, vz: 0, preso: false, dorme: false, sono: 0, ganho: false,
-        q: girar([0, 0, 0, 1], [0, 1, 0], rnd() * Math.PI * 2) };
-      p.q = girar(p.q, [1, 0, 0], (rnd() - 0.5) * 1.2);
-      soltarDeCima(p, rnd, k);
+      var r = (cfg.raio[0] + rnd() * (cfg.raio[1] - cfg.raio[0])) * (rnd() < 0.12 ? 1.15 : 1);
+      var p = { id: k, tipo: tipo, r: r, vx: 0, vy: 0, vz: 0, preso: false, dorme: false, sono: 0, ganho: false, yaw: rnd() * Math.PI * 2 };
+      p.q = girar([0, 0, 0, 1], [0, 1, 0], p.yaw);
+      if (!m.andam) {
+        if (rnd() < 0.45) p.q = giroQualquer(rnd);   // caído de qualquer jeito: de costas, de lado, de cabeça para baixo
+        else p.q = girar(p.q, [1, 0, 0], (rnd() - 0.5) * 1.4);
+      }
+      soltarDeCima(p, rnd, k, m._monte);
       m.premios.push(p);
     });
     // assentar com as paredes do buraco até o teto; depois, com as paredes de verdade, quem cair no buraco volta para cima
@@ -76,10 +91,10 @@
       for (i = 0; i < 240 * 3; i++) fisica(m, 1 / 240, 'conferir');
       var fugiram = m.premios.filter(noBuraco);
       if (!fugiram.length) break;
-      fugiram.forEach(function (p) { soltarDeCima(p, rnd, 0); });
+      fugiram.forEach(function (p) { soltarDeCima(p, rnd, 0, m._monte); });
       for (i = 0; i < 240 * 3; i++) fisica(m, 1 / 240, 'assentar');
     }
-    m.premios.forEach(function (p) { p.vx = p.vy = p.vz = 0; p.dorme = true; p.proximoPulo = 2 + rnd() * 6; });
+    m.premios.forEach(function (p) { p.vx = p.vy = p.vz = 0; p.dorme = true; p.proximoPulo = 2 + rnd() * 6; p.proximoPasseio = 1 + rnd() * 6; p.passeio = 0; });
 
     m.mover = function (dx, dz) { m._dx = Math.sign(dx || 0); m._dz = Math.sign(dz || 0); if (m._dx || m._dz) m._alvo = null; };
     m.irPara = function (x, z) { m._alvo = x == null ? null : { x: x, z: z }; if (x != null) { m._dx = 0; m._dz = 0; } };
@@ -93,9 +108,12 @@
     m.limites = LIM;
     return m;
   }
-  function soltarDeCima(p, rnd, k) {
+  function soltarDeCima(p, rnd, k, monte) {
     var area = (L * P - BX * BZ);
-    do { p.x = p.r + rnd() * (L - 2 * p.r); p.z = p.r + rnd() * (P - 2 * p.r); } while (p.x < BX + p.r && p.z > P - BZ - p.r);
+    do {
+      p.x = p.r + rnd() * (L - 2 * p.r); p.z = p.r + rnd() * (P - 2 * p.r);
+      if (monte && rnd() < monte.forca) { p.x += (monte.x - p.x) * rnd() * 0.8; p.z += (monte.z - p.z) * rnd() * 0.8; }   // puxa para o pico do monte
+    } while (p.x < BX + p.r && p.z > P - BZ - p.r);
     p.y = 1 + (k / Math.max(1, area)) * 1.4 + rnd() * 2.5;
     p.vx = p.vy = p.vz = 0;
   }
@@ -183,8 +201,33 @@
       acordar(p); p.vy = 5 + rnd() * 2; p.vx = 0.6 + rnd() * 0.6; p.vz = -(0.3 + rnd() * 0.6);
       m.eventos.push({ tipo: 'pulo', premio: p.tipo, id: p.id });
     });
+    // bichos que andam (Zoológico): de vez em quando um que está por cima levanta e dá uma voltinha pelo monte
+    if (m.andam && m.fase !== 'fim') m.premios.forEach(function (p) {
+      if (p.ganho || p.preso) { p.passeio = 0; return; }
+      if (p.passeio > 0) {
+        p.passeio -= dt;
+        var perto = Math.hypot(p.x - g.x, p.z - g.z) < 1.1 && (m.fase === 'descer' || m.fase === 'fechar');
+        if (perto) p.passeio = 0;
+        // longe do buraco e das paredes: vira para o outro lado
+        if (p.x < BX + 0.8 && p.z > P - BZ - 0.8) p.yaw = Math.atan2(1, -1);
+        if (p.x < p.r + 0.15) p.yaw = Math.atan2(1, Math.cos(p.yaw)); else if (p.x > L - p.r - 0.15) p.yaw = Math.atan2(-1, Math.cos(p.yaw));
+        if (p.z < p.r + 0.15) p.yaw = Math.atan2(Math.sin(p.yaw), 1); else if (p.z > P - p.r - 0.15) p.yaw = Math.atan2(Math.sin(p.yaw), -1);
+        if (p.passeio > 0) { acordar(p); p.vx = Math.sin(p.yaw) * 0.75; p.vz = Math.cos(p.yaw) * 0.75; }
+        else { p.vx = 0; p.vz = 0; }
+        return;
+      }
+      if (!p.dorme) return;
+      p.proximoPasseio -= dt;
+      if (p.proximoPasseio > 0) return;
+      p.proximoPasseio = 2 + rnd() * 6;
+      var livre = !m.premios.some(function (q) { return q !== p && !q.ganho && q.y > p.y && Math.hypot(q.x - p.x, q.z - p.z) < p.r + q.r; });
+      if (!livre || Math.hypot(p.x - g.x, p.z - g.z) < 1.1) return;
+      p.yaw = rnd() * Math.PI * 2; p.passeio = 1.2 + rnd() * 1.8; acordar(p);
+      m.eventos.push({ tipo: 'anda', premio: p.tipo, id: p.id });
+    });
     var n = Math.max(1, Math.ceil(dt * 240));
     for (var i = 0; i < n; i++) fisica(m, dt / n, null);
+    if (m.andam) m.premios.forEach(function (p) { if (!p.ganho) p.q = girar([0, 0, 0, 1], [0, 1, 0], p.yaw); });   // sempre de pé
   }
 
   // a garra fechou: pega ou não pega, e se pega, decide já se vem forte ou se vai soltar (e quando)
@@ -243,7 +286,7 @@
       p.vy -= G * dt; var arrasto = 1 - 0.5 * dt; p.vx *= arrasto; p.vz *= arrasto;
       p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
       var w = Math.hypot(p.vx, p.vz);
-      if (w > 0.01) p.q = girar(p.q, [p.vz / w, 0, -p.vx / w], w * dt / p.r);   // rola
+      if (w > 0.01 && !m.andam) p.q = girar(p.q, [p.vz / w, 0, -p.vx / w], w * dt / p.r);   // rola (os bichos que andam ficam de pé)
     }
     if (!acordados && !m.garra.premio) return;   // tudo dormindo: nada a fazer
     var paredes = [[BX - 0.03, 0, P - BZ, BX + 0.03, ab, P], [0, 0, P - BZ - 0.03, BX, ab, P - BZ + 0.03]];
@@ -318,6 +361,10 @@
   /* ---------- contas ---------- */
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function dist3(p, c) { var dx = p.x - c[0], dy = p.y - c[1], dz = p.z - c[2]; return Math.sqrt(dx * dx + dy * dy + dz * dz); }
+  function giroQualquer(rnd) {   // um giro qualquer, todos com a mesma chance (Shoemake)
+    var u1 = rnd(), u2 = rnd() * Math.PI * 2, u3 = rnd() * Math.PI * 2, a = Math.sqrt(1 - u1), b = Math.sqrt(u1);
+    return [a * Math.sin(u2), a * Math.cos(u2), b * Math.sin(u3), b * Math.cos(u3)];
+  }
   function girar(q, eixo, ang) {   // gira o quatérnio q em volta de um eixo do mundo: rot * q
     var s = Math.sin(ang / 2), rx = eixo[0] * s, ry = eixo[1] * s, rz = eixo[2] * s, rw = Math.cos(ang / 2);
     var x = rw * q[0] + rx * q[3] + ry * q[2] - rz * q[1];
