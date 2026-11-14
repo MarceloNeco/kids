@@ -218,7 +218,7 @@
       trave(ctx, estado.trave, ts);
     }
     if (estado.tanques) seguro('tanques', function () { tanques(ctx, estado.tanques, ts); });
-    if (estado.papai) seguro('papai', function () { papaiCampo(ctx, estado.papai, jogs, ts, dt); });
+    if (estado.parente) seguro('parente', function () { parenteCampo(ctx, estado.parente, jogs, ts, dt); });
     // rastro de luz onde a pessoa se mexe
     jogs.forEach(function (jg, j) {
       var pts = jg.rastro; if (!pts || pts.length < 1) return;
@@ -373,12 +373,11 @@
 
   /* ⚽ piscina de bolinhas dos lados do gol: torre com escadinha, cadeirinha que dobra, alvo no braço, papai e mamãe */
   var PAI = { cabeca: 'menino', cabelo: 'curto', corCabelo: '#3e2723', cor: '#1e88e5', roupa: 'camiseta', acessorio: 'nenhum', sapato: '#37474f', pele: '#f1c27d' };
-  var VOVO = { cabeca: 'menino', cabelo: 'careca', corCabelo: '#eeeeee', cor: '#6d4c41', roupa: 'camiseta', acessorio: 'oculos', sapato: '#3e2723', pele: '#f1c27d' };
   var MAE = { cabeca: 'menina', cabelo: 'coque', corCabelo: '#5d4037', cor: '#8e24aa', roupa: 'vestido', acessorio: 'nenhum', sapato: '#37474f', pele: '#ffd9b3' };
   var CORES_BOLINHAS = ['#ff5252', '#ffd166', '#3ee8ff', '#c6ff3d', '#ff4fa3', '#8e5bff', '#ff9800'];
   function tanques(ctx, lista, ts) {
     lista.forEach(function (k) {
-      var L = k.lado, cx = k.x, topoP = 548, fundoP = 652, assento = 330, poste = cx - L * 105, escada = cx + L * 118, A = 250, cfg = k.quem === 'vovo' ? VOVO : k.quem === 'pai' ? PAI : MAE, B = root.Boneco;
+      var L = k.lado, cx = k.x, topoP = 548, fundoP = 652, assento = 330, poste = cx - L * 105, escada = cx + L * 118, A = 250, cfg = k.quem === 'pai' ? PAI : MAE, B = root.Boneco;
       var u = k.t, dobra = k.fase === 'caindo' ? Math.min(1, u / 0.25) : k.fase === 'piscina' ? 1 : k.fase === 'subindo' ? Math.max(0, 1 - u / 1.9 * 1.4) : 0;
       ctx.save(); ctx.lineCap = 'round';
       // poste, braço do alvo e o alvo (vira um pouquinho quando acertam)
@@ -407,21 +406,24 @@
       ctx.fillStyle = 'rgba(41,182,246,.92)'; arred(ctx, cx - 135, topoP + 8, 270, fundoP - topoP - 8, 18); ctx.fill();
       ctx.strokeStyle = '#0288d1'; ctx.lineWidth = 5; ctx.stroke();
       for (var f = 0; f < 18; f++) { ctx.fillStyle = CORES_BOLINHAS[(f + 3) % CORES_BOLINHAS.length]; ctx.beginPath(); ctx.arc(cx - 115 + (f * 29) % 230, topoP + 6 + (f % 2) * 6, 12, Math.PI, 0); ctx.fill(); }
-      ctx.fillStyle = '#fff'; ctx.font = '700 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.fillText(k.quem === 'vovo' ? T('Vovô', 'Grandpa') : k.quem === 'pai' ? T('Papai', 'Dad') : T('Mamãe', 'Mom'), cx, fundoP - 22);
+      ctx.fillStyle = '#fff'; ctx.font = '700 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.fillText(k.quem === 'pai' ? T('Papai', 'Dad') : T('Mamãe', 'Mom'), cx, fundoP - 22);
       ctx.restore();
     });
   }
 
-  /* 👨 o papai no campo: corre de lado, chuta, acena pedindo a bola e comemora gol */
-  function papaiCampo(ctx, P, jogs, ts, dt) {
+  /* 👨👩 quem joga junto: o papai na 🎳 Bagunça de bolas (corre de lado, bate na bola, acena pedindo) e a mamãe no 🎈
+     Pega-pega (corre atrás dos bichos e pega um de vez em quando); os dois comemoram com a criança */
+  function parenteCampo(ctx, P, jogs, ts, dt) {
     var B = root.Boneco, jg = jogs[0]; if (!B || !jg) return;
     var r = jg.raia, Ac = jg.vai ? jg.vai.A : r.h * 0.42, A = Math.min(420, Ac * 1.3), chao = r.y + r.h * 0.86, anda = Math.abs(P.vx) > 40;
-    D.papaiFase = (D.papaiFase || 0) + Math.abs(P.vx) / (A * 0.6) * 6.2832 * dt;
+    var cfg = P.quem === 'mae' ? MAE : PAI;
+    D.parenteFase = (D.parenteFase || 0) + Math.abs(P.vx) / (A * 0.6) * 6.2832 * dt;
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(P.x, chao + 4, A * 0.2, A * 0.05, 0, 0, 6.2832); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(P.x, chao);
-    if (P.fase === 'chuta') { ctx.scale(P.dir, 1); B.corpoLado(ctx, PAI, A, { chute: Math.min(1, P.t / 0.18), ts: ts }); }
-    else if (anda && P.fase !== 'festa') { ctx.scale(P.vx < 0 ? -1 : 1, 1); B.corpoLado(ctx, PAI, A, { fase: D.papaiFase, andando: true, ts: ts }); }
-    else B.corpoEmPe(ctx, PAI, A, { bE: P.fase === 'festa' ? 1 : 0.12, bD: P.fase === 'festa' ? 1 : P.chama ? 0.6 + 0.4 * Math.sin(ts / 120) : 0.2, pose: P.fase === 'festa' ? 'festa' : null, balanco: 0, ts: ts });   // parado: acena pedindo a bola
+    if (P.fase === 'bate' && !P.alto && P.quem === 'pai') { ctx.scale(P.dir, 1); B.corpoLado(ctx, cfg, A, { chute: Math.min(1, P.t / 0.18), ts: ts }); }   // bola baixa: devolve com o pé
+    else if (P.fase === 'bate') B.corpoEmPe(ctx, cfg, A, { bE: 1, bD: 1, balanco: 0, ts: ts });   // bola alta / bicho: pega com as mãos para cima
+    else if (anda && P.fase !== 'festa') { ctx.scale(P.vx < 0 ? -1 : 1, 1); B.corpoLado(ctx, cfg, A, { fase: D.parenteFase, andando: true, ts: ts }); }
+    else B.corpoEmPe(ctx, cfg, A, { bE: P.fase === 'festa' ? 1 : 0.12, bD: P.fase === 'festa' ? 1 : P.chama ? 0.6 + 0.4 * Math.sin(ts / 120) : 0.2, pose: P.fase === 'festa' ? 'festa' : null, balanco: 0, ts: ts });   // parado: acena pedindo a bola
     ctx.restore();
     if (P.fala) {   // balão de fala em cima da cabeça
       var txt = T(P.fala[0], P.fala[1]); ctx.save(); ctx.font = '700 26px ' + D.fonte; var tw = ctx.measureText(txt).width + 32, bx = Math.max(10, Math.min(W - tw - 10, P.x - tw / 2)), by = chao - A - 70;
