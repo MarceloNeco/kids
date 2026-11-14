@@ -77,3 +77,28 @@ test('v0.12.1: ➕ aproxima sem a cidade fugir para o canto, o dedo arrasta a ci
   assert.deepEqual(erros.filter(e => !/GL Driver|GPU stall|WebGL/.test(e)), [], 'erros no console');
   await ctx.close();
 });
+
+test('v0.12.2: a cidade não fica branca — perguntar se tem 3D não abre tela 3D nova e, se o aparelho apagar a cidade, ela volta (ou vira a vila desenhada)', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 915, height: 412 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  await pg.goto(pg.url() + '&vila3d');
+  await pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
+  await comecar(pg, 'medio', 'panqueca');
+  await pg.waitForFunction(() => window.Cidade3D && document.querySelector('#vila.vila3d canvas'), null, { timeout: 15000 });
+  const perdida = () => pg.evaluate(() => { const c = document.querySelector('#vila.vila3d canvas'); const gl = c && (c.getContext('webgl2') || c.getContext('webgl')); return !gl || gl.isContextLost(); });
+  // o jogo pergunta "tem 3D?" muitas vezes (a cada volta para a cidade): isso não pode gastar as telas 3D do aparelho
+  await pg.evaluate(() => { for (let i = 0; i < 40; i++) { Cidade3D.suportado(); window.Lavar3D && Lavar3D.suportado(); window.Cozinha3D && Cozinha3D.suportado(); } });
+  await pg.waitForTimeout(300);
+  assert.equal(await perdida(), false, 'a cidade continua desenhada');
+  // o aparelho apagou a cidade e devolveu: ela é montada de novo
+  await pg.evaluate(() => { const c = document.querySelector('#vila.vila3d canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); window.__ext = gl.getExtension('WEBGL_lose_context'); window.__ext.loseContext(); });
+  await pg.waitForTimeout(200);
+  await pg.evaluate(() => window.__ext.restoreContext());
+  await pg.waitForFunction(() => { const c = document.querySelector('#vila.vila3d canvas'); const gl = c && (c.getContext('webgl2') || c.getContext('webgl')); return gl && !gl.isContextLost(); }, null, { timeout: 8000 });
+  // apagou e não devolveu: vira a vila desenhada (sem tela branca)
+  await pg.evaluate(() => { const c = document.querySelector('#vila.vila3d canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); gl.getExtension('WEBGL_lose_context').loseContext(); });
+  await pg.waitForFunction(() => !document.querySelector('#vila').classList.contains('vila3d') && document.querySelectorAll('#vila .lugar .cena').length === 10, null, { timeout: 8000 });
+  await pg.click('[data-lugar="mercado"]');
+  await pg.waitForSelector('#lugar.ativa', { timeout: 8000 });
+  assert.deepEqual(erros.filter(e => !/GL Driver|GPU stall|WebGL|CONTEXT_LOST/i.test(e)), [], 'erros no console');
+  await ctx.close();
+});
