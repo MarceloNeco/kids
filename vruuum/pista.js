@@ -34,9 +34,9 @@
 
   // pedacos: tamanho da corrida (~100 s em velocidade cheia); obst: quanto obstáculo (0 a 1)
   var NIVEIS = {
-    crianca: { loops: 1, pedacos: 3600, velMax: 7200, obst: 0.35, carros: 6, tuneis: 2, velCarro: [0.25, 0.4], perdeCarro: 1, perdeCone: 0, curva: 0.6, morro: 0.5, centrifuga: 0.12, limiteX: 1.3, ajuda: true },
-    normal: { loops: 2, pedacos: 4800, velMax: 9600, obst: 0.7, carros: 14, tuneis: 3, velCarro: [0.3, 0.55], perdeCarro: 3, perdeCone: 1, curva: 1, morro: 1, centrifuga: 0.25, limiteX: 1.5, ajuda: false },
-    turbo: { loops: 3, pedacos: 6000, velMax: 12000, obst: 1, carros: 24, tuneis: 4, velCarro: [0.32, 0.65], perdeCarro: 5, perdeCone: 2, curva: 1.3, morro: 1.2, centrifuga: 0.32, limiteX: 1.6, ajuda: false }
+    crianca: { loops: 1, pedacos: 3600, velMax: 7200, obst: 0.35, carros: 6, tuneis: 2, rios: 1, velCarro: [0.25, 0.4], perdeCarro: 1, perdeCone: 0, curva: 0.6, morro: 0.5, centrifuga: 0.12, limiteX: 1.3, ajuda: true },
+    normal: { loops: 2, pedacos: 4800, velMax: 9600, obst: 0.7, carros: 14, tuneis: 3, rios: 2, velCarro: [0.3, 0.55], perdeCarro: 3, perdeCone: 1, curva: 1, morro: 1, centrifuga: 0.25, limiteX: 1.5, ajuda: false },
+    turbo: { loops: 3, pedacos: 6000, velMax: 12000, obst: 1, carros: 24, tuneis: 4, rios: 2, velCarro: [0.32, 0.65], perdeCarro: 5, perdeCone: 2, curva: 1.3, morro: 1.2, centrifuga: 0.32, limiteX: 1.6, ajuda: false }
   };
 
   // sorteio com semente (mulberry32): mesma semente, mesma sequência
@@ -174,7 +174,21 @@
       segs[t[0]].entrada = true;
     });
 
-    return { segs: segs, chegada: chegada, tuneis: tuneis, loops: loops, zChegada: chegada * SEG, comprimento: segs.length * SEG, nivel: NIVEIS[nivel] ? nivel : 'normal', cfg: cfg, mundos: ordem, carros: carros, semente: semente };
+    // rios (1.18.0, vídeo do dono): trechos em que a estrada vira água e os veículos viram barco. Longe dos túneis,
+    // dos loopings, dos portais, da largada e da chegada. Na água o cone vira boia, a lama vira redemoinho e o turbo
+    // vira setas de turbo (desenho.js); a regra do jogo é a mesma.
+    var rios = []; tentativas = 0;
+    while (rios.length < (cfg.rios || 0) && tentativas++ < 80) {
+      var rIni = inteiro(300, chegada - 260), rFim = rIni + inteiro(110, 160), okR = true;
+      rios.concat(tuneis).forEach(function (t) { if (rFim > t[0] - 60 && rIni < t[1] + 60) okR = false; });
+      for (var qr = 1; qr < 4; qr++) { var pr = portas[qr]; if (pr > rIni - 30 && pr < rFim + 30) okR = false; }
+      if (loops.some(function (l) { return rFim > l.ini - 60 && rIni < l.fim + 60; })) okR = false;
+      if (okR) rios.push([rIni, rFim]);
+    }
+    rios.sort(function (a, b) { return a[0] - b[0]; });
+    rios.forEach(function (t, k) { for (var i3 = t[0]; i3 < t[1]; i3++) segs[i3].agua = k + 1; });
+
+    return { segs: segs, chegada: chegada, tuneis: tuneis, rios: rios, loops: loops, zChegada: chegada * SEG, comprimento: segs.length * SEG, nivel: NIVEIS[nivel] ? nivel : 'normal', cfg: cfg, mundos: ordem, carros: carros, semente: semente };
   }
 
   function achar(pista, z) {

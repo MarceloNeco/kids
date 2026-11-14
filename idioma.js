@@ -60,12 +60,12 @@
     'font-size:.95rem;letter-spacing:.03em;cursor:pointer}' +
     '.bolinho-idiomas .bi-atual .seta{font-size:.75em;opacity:.8}' +
     '.bolinho-idiomas .bd{display:inline-flex;line-height:0}.bolinho-idiomas .bd img{display:block;width:26px;height:20px;object-fit:cover;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.35)}' +
-    '.bolinho-idiomas .bi-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:40;min-width:17.5rem;max-width:calc(100vw - 24px);padding:.6rem;border-radius:18px;' +
+    '.bolinho-idiomas .bi-menu{position:fixed;left:12px;top:12px;z-index:2147483001;width:min(18.5rem,calc(100vw - 24px));box-sizing:border-box;padding:.6rem;border-radius:18px;' +
     'background:#1a1446;border:1px solid #3a2f73;box-shadow:0 12px 30px rgba(0,0,0,.5);display:grid;gap:.4rem}' +
     '.bolinho-idiomas .bi-menu[hidden]{display:none}' +
     '.bolinho-idiomas .bi-menu p{margin:.1rem .3rem .3rem;color:#b3acd6;font-size:.9rem;font-weight:600}' +
     '.bolinho-idiomas .bi-op{width:100%;justify-content:flex-start;border-radius:14px;font-weight:700;letter-spacing:0}' +
-    '.bolinho-idiomas .bi-op .nm{flex:1;text-align:left;white-space:nowrap}.bolinho-idiomas .bi-op .ok{white-space:nowrap;font-size:.85em}' +
+    '.bolinho-idiomas .bi-op .nm{flex:1;min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bolinho-idiomas .bi-op .ok{white-space:nowrap;font-size:.85em}' +
     '.bolinho-idiomas .bi-op[aria-checked="true"]{background:#c6ff3d;color:#1a1446;border-color:#c6ff3d}' +
     '.bolinho-idiomas button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}';
   (d.head || d.documentElement).appendChild(estilo);
@@ -105,6 +105,20 @@
       ops[k].querySelector('.ok').textContent = atualEste ? T('✓ continuar', '✓ keep', '✓ seguir') : '';
     }
   }
+  // a caixinha das opções sempre inteira dentro da tela, onde quer que o botão esteja (dono, 14/Nov/2026: no celular ela
+  // abria para fora da tela): logo abaixo do botão, alinhada a ele e empurrada para dentro pelas bordas
+  function posicionar(bt, m) {
+    var r = bt.getBoundingClientRect(), W = raiz.innerWidth, H = raiz.innerHeight, w = m.offsetWidth, h = m.offsetHeight, folga = 12;
+    var x = r.right - w;                                   // alinhada pela direita do botão…
+    if (r.left + w <= W - folga && r.left < W / 2) x = r.left;   // …ou pela esquerda, se o botão está à esquerda
+    x = Math.max(folga, Math.min(x, W - w - folga));
+    var y = r.bottom + 6;
+    if (y + h > H - folga && r.top - 6 - h >= folga) y = r.top - 6 - h;   // sem espaço embaixo: abre para cima
+    y = Math.max(folga, Math.min(y, H - h - folga));
+    m.style.left = Math.round(x) + 'px'; m.style.top = Math.round(y) + 'px';
+  }
+  raiz.addEventListener('resize', function () { fecharMenus(false); });
+  raiz.addEventListener('scroll', function () { fecharMenus(false); }, true);
   function fecharMenus(foco) {
     var gs = d.querySelectorAll('.bolinho-idiomas');
     for (var i = 0; i < gs.length; i++) {
@@ -136,7 +150,7 @@
       bt.addEventListener('click', function (e) {
         var m = e.currentTarget.parentNode.querySelector('.bi-menu'), abrir = m.hidden;
         fecharMenus(false);
-        if (abrir) { m.hidden = false; e.currentTarget.setAttribute('aria-expanded', 'true'); var c = m.querySelector('[aria-checked="true"]'); if (c) c.focus(); }
+        if (abrir) { m.hidden = false; e.currentTarget.setAttribute('aria-expanded', 'true'); posicionar(e.currentTarget, m); var c = m.querySelector('[aria-checked="true"]'); if (c) c.focus(); }
       });
       alvo.appendChild(bt); alvo.appendChild(menu);
     }
