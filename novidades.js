@@ -1,8 +1,10 @@
 /* ✨ Novidades da semana (pedido do dono, 14/Nov/2026): quando entra jogo novo na estante, em vez de um aviso seco de
    "atualize", aparece uma janela bonita com os jogos novos — ícone, nome, uma frase e ▶ para jogar.
    - Jogo novo = campo "novo" do catalogo.js com data de até 7 dias (BolinhoCatalogo.novos()).
-   - Aparece uma vez por jogo novo neste aparelho (localStorage "bolinho:novidades-vistas"); "👍 Legal!", ✕, Esc e
-     tocar fora fecham e marcam como vistos. (Sem entrada no histórico: ela abre sozinha, sem toque, e o Chrome pularia
+   - Aparece toda vez que o Bolinho abre, enquanto houver jogo novo (dono, 14/Nov/2026), até a pessoa tocar em
+     "Não mostrar mais esta mensagem" (guarda os jogos em localStorage "bolinho:novidades-vistas"; jogo novo depois
+     aparece de novo). "👍 Legal!", ✕, Esc e tocar fora só fecham nesta visita (sessionStorage), para a janela não
+     voltar a cada volta de um jogo para a estante. (Sem entrada no histórico: ela abre sozinha, sem toque, e o Chrome pularia
      uma entrada criada sem toque — o Voltar sairia da estante.)
    - Na TV (?tv=) não aparece por cima sozinha: os cartões já têm o selo "✨ Novo".
    - Textos em PT/EN/ES pelo idioma.js. */
@@ -16,6 +18,8 @@
   function vistos() { try { return JSON.parse(localStorage.getItem(CHAVE) || '[]') || []; } catch (e) { return []; } }
   function marcar(ids) { try { localStorage.setItem(CHAVE, JSON.stringify(vistos().concat(ids).filter(function (x, i, a) { return a.indexOf(x) === i; }).slice(-60))); } catch (e) {} }
   if (vistos().indexOf('*') >= 0) return;   // "*" = não mostrar (os testes de outras partes da estante usam)
+  // fechada nesta visita (Legal!, ✕, tocar fora): volta na próxima vez que abrir o Bolinho, não a cada volta de um jogo
+  try { if (sessionStorage.getItem('bolinho:novidades-sessao')) return; } catch (e) {}
   var novos = C.novos().filter(function (j) { return vistos().indexOf(j.id + '@' + j.novo) < 0; });
   if (!novos.length) return;
 
@@ -42,7 +46,8 @@
     '.nov .tx span{display:block;color:#cfc9ee;font-size:.88rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}' +
     '.nov .jg{flex:none;padding:.45rem .8rem;border-radius:999px;background:#c6ff3d;color:#1a1446;font-weight:800;font-size:.9rem}' +
     '.nov .ok{display:block;width:100%;margin-top:1rem;min-height:48px;border:0;border-radius:999px;background:linear-gradient(90deg,#c6ff3d,#3ee8ff);color:#1a1446;font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}' +
-    '.nov .ok:focus-visible,.nov-x:focus-visible{outline:3px solid #ffd166;outline-offset:2px}';
+    '.nov .nunca{display:block;width:100%;margin-top:.5rem;min-height:44px;border:0;background:none;color:#b3acd6;font:inherit;font-size:.92rem;text-decoration:underline;cursor:pointer}' +
+    '.nov .ok:focus-visible,.nov-x:focus-visible,.nov .nunca:focus-visible{outline:3px solid #ffd166;outline-offset:2px}';
   d.head.appendChild(css);
 
   var caixa = d.createElement('div');
@@ -63,9 +68,11 @@
         '<span class="tx"><b>' + esc(nome) + '</b><span>' + esc(txt) + '</span></span>' +
         '<span class="jg">' + T('▶ Jogar', '▶ Play', '▶ Jugar') + '</span></a></li>';
     });
-    caixa.innerHTML = h + '</ul><button type="button" class="ok">' + T('👍 Legal!', '👍 Cool!', '👍 ¡Genial!') + '</button></div>';
+    caixa.innerHTML = h + '</ul><button type="button" class="ok">' + T('👍 Legal!', '👍 Cool!', '👍 ¡Genial!') + '</button>' +
+      '<button type="button" class="nunca">' + T('Não mostrar mais esta mensagem', "Don't show this message again", 'No volver a mostrar este mensaje') + '</button></div>';
   }
-  function vistoTudo() { marcar(novos.map(function (j) { return j.id + '@' + j.novo; })); }
+  function naoMostrarMais() { marcar(novos.map(function (j) { return j.id + '@' + j.novo; })); }
+  function fechadaNestaVisita() { try { sessionStorage.setItem('bolinho:novidades-sessao', '1'); } catch (e) {} }
   function abrir() {
     montar();
     caixa.hidden = false;
@@ -73,11 +80,12 @@
   }
   function fechar() {
     if (caixa.hidden) return;
-    caixa.hidden = true; vistoTudo();
+    caixa.hidden = true; fechadaNestaVisita();
   }
   caixa.addEventListener('click', function (e) {
+    if (e.target.closest('.nunca')) { naoMostrarMais(); return fechar(); }
     if (e.target === caixa || e.target.closest('.nov-x') || e.target.closest('.ok')) return fechar();
-    if (e.target.closest('li a')) vistoTudo();   // vai para o jogo: já viu
+    if (e.target.closest('li a')) fechadaNestaVisita();   // foi jogar: nesta visita não aparece de novo
   });
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !caixa.hidden) fechar(); });
   if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function () { if (!caixa.hidden) montar(); });
