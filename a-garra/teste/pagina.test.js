@@ -78,7 +78,7 @@ test('celular: tocar no prêmio leva a garra; com a garra forte ele vem, vai par
     // coleção: uma aba por máquina, a da lanchonete mostra o que veio; continua lá depois de recarregar
     await pg.click('#btFimColecao');
     assert.equal(await pg.isVisible('#colecao'), true);
-    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 4);
+    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 5);
     assert.equal(await pg.$$eval('#prateleira .item', l => l.length), 11);
     assert.ok(await pg.$$eval('#prateleira .item:not(.falta)', l => l.length) >= 1);
     await pg.reload(); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
@@ -125,26 +125,35 @@ test('computador: setas e espaço jogam; 🎥 troca a câmera, 🔍 aproxima e a
     const c0 = await pg.evaluate(() => GarraDebug.camera());
     await pg.click('#btCamera');
     assert.ok((await pg.evaluate(() => GarraDebug.camera())).pitch > c0.pitch + 0.5, 'de cima');
+    await pg.click('#btCamera');
+    assert.ok((await pg.evaluate(() => GarraDebug.camera())).yaw > 1.4, 'bem de lado');
+    await pg.click('#btCamera');
     await pg.click('#btMais');
     assert.ok((await pg.evaluate(() => GarraDebug.camera())).zoom < c0.zoom, 'zoom');
     const r = await pg.locator('#tela').boundingBox();
     await pg.mouse.move(r.x + r.width / 2, r.y + r.height / 2); await pg.mouse.down(); await pg.mouse.move(r.x + r.width / 2 - 150, r.y + r.height / 2, { steps: 6 }); await pg.mouse.up();
     assert.ok(Math.abs((await pg.evaluate(() => GarraDebug.camera())).yaw) > 0.3, 'arrastar gira a câmera');
+    await pg.mouse.move(r.x + r.width / 2, r.y + r.height / 2); await pg.mouse.down(); await pg.mouse.move(r.x + r.width / 2 - 600, r.y + r.height / 2, { steps: 8 }); await pg.mouse.up();
+    assert.ok(Math.abs((await pg.evaluate(() => GarraDebug.camera())).yaw) > 1.55, 'gira até ver de lado');
+    // (o relógio do difícil é curto e o navegador de teste é lento: a ficha é comparada logo antes do espaço)
+    await pg.evaluate(() => GarraDebug.fichas(10));
+    await pg.waitForFunction(() => GarraDebug.estado().fase === 'mirar', null, { timeout: 30000 });
+    const antes = (await est(pg)).fichas;
     await pg.keyboard.press('Space');
     await pg.waitForFunction(() => GarraDebug.estado().fase !== 'mirar');
-    assert.equal((await est(pg)).fichas, 9);
+    assert.equal((await est(pg)).fichas, antes - 1);
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
 });
 
-test('as 4 máquinas abrem sem erro, cada uma com os seus prêmios', async () => {
+test('as 5 máquinas abrem sem erro, cada uma com os seus prêmios (os bichos de verdade são menos, soltos no cobertor)', async () => {
   const pg = await abrir(FONE, '&semente=2');
   try {
-    for (const [mq, qtd] of [['telefone', 42], ['neon', 42], ['estrelas', 42], ['lanchonete', 42]]) {
+    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17]]) {
       await pg.goto(base + '?teste&semente=2'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
       await jogar(pg, mq, 'facil');
       const e = await est(pg);
-      assert.equal(e.maquina, mq); assert.equal(e.premios, qtd);
+      assert.equal(e.maquina, mq); assert.ok(e.premios >= min && e.premios <= max, mq + ': ' + e.premios + ' prêmios');
     }
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }

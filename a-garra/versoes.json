@@ -2,6 +2,21 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "14/Nov/2026",
+      "hora": "03:58:15",
+      "pt": [
+        "🐕 Máquina nova: Bichos de Verdade — filhotes de salsicha, gato, coelho, porquinho-da-índia, pinguim, pato, jabuti e leãozinho, que andam pelo cobertor, olham em volta, abanam o rabo e esperneiam na garra",
+        "🎥 A câmera gira até ver a máquina bem de lado (laterais de vidro), para conferir a profundidade da garra",
+        "🎲 Cada partida é diferente: outra mistura de prêmios, outro formato de monte e bichinhos caídos de jeitos variados"
+      ],
+      "en": [
+        "🐕 New machine: Real Animals — dachshund puppies, cat, rabbit, guinea pig, penguin, duck, tortoise and lion cub that walk on the blanket, look around, wag their tails and kick in the claw",
+        "🎥 The camera turns all the way to the side (glass sides) to check the claw depth",
+        "🎲 Every game is different: another mix of prizes, another pile shape and plushies lying in all sorts of ways"
+      ]
+    },
+    {
       "versao": "0.2.0",
       "data": "14/Nov/2026",
       "hora": "03:10:44",
