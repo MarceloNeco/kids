@@ -4,7 +4,7 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 
 | # | O quê | Origem | Situação |
 |---|---|---|---|
-| 1 | Primeira versão (Entrega 1): pêndulo e mergulho no ângulo, 30 bichos 3D, 3 níveis por jogador, sozinho e dois no mesmo aparelho, balde, bolhas de poder, “Limpa o Rio!”, álbum, 3 lugares × 3 horas do dia, música, sem internet e instalável. | dono, 13–14/Nov/2026 | ✅ v0.1.0 |
+| 1 | Primeira versão (Entrega 1): pêndulo e mergulho no ângulo, 28 bichos e prêmios em 3D, 3 níveis por jogador, sozinho e dois no mesmo aparelho, balde, bolhas de poder, “Limpa o Rio!”, álbum, 3 lugares × 3 horas do dia, música, sem internet e instalável. | dono, 13–14/Nov/2026 | ✅ v0.1.0 |
 | 2 | **Entrega 2 — TV**: o lago na TV e 1 ou 2 celulares/tablets como controle (só 🎣 e ⬆️), pela “sala” de código de 4 letras dos outros jogos; o toque manda o ângulo do anzol junto (`GlubRegras.pescar(E, j, ang)` já aceita). | dono, 14/Nov/2026 | 🟡 |
 | 3 | **TV como aplicativo instalado na LG**, pelo free-my-tv (como os atalhos `tv-lg*`), com o **celular de controle todo desenhado** (botões grandes, o personagem e o balde de cada um). | dono, 14/Nov/2026 | 🟡 (fase 2) |
 | 4 | **Entrega 3 — cada um no seu celular**, com código, como a Batalha Naval (`rede.js`). | dono, 14/Nov/2026 | 🟡 |

@@ -867,26 +867,39 @@
   function carregarImagens(base) {
     if (typeof Image === 'undefined') return;
     R.BICHOS.map(function (b) { return b.id; }).concat(['juca', 'lili', 'mergulhador']).filter(function (id) { return id !== 'sacola'; }).forEach(function (id) {   // a sacolinha continua desenhada no código
-      var im = new Image(); im.onload = function () { IMG[id] = im; A.sprites = {}; }; im.src = base + id + '.webp';
+      var im = new Image(); im.onload = function () { IMG[id] = im; esquecer(id + ':'); }; im.src = base + id + '.webp';
     });
   }
   // a tira de quadros de um bicho num tamanho (px de comprimento): cada quadro com as nadadeiras numa fase, o corpo
   // ondulando (colunas de 1 px deslocadas por uma onda que corre da cabeça para o rabo) e o brilho dos bichos do fundo
+  // tiras guardadas: quando uma imagem chega, só as tiras daquele bicho são refeitas (antes, todas eram jogadas fora a
+  // cada imagem, e o celular simples engasgava); as telas que saem são zeradas na hora (o iPhone demora a soltar a memória)
+  var feitas = 0, rascunho = [null, null];
+  function esquecer(prefixo) {
+    Object.keys(A.sprites).forEach(function (k) { if (!prefixo || k.indexOf(prefixo) === 0) { A.sprites[k].cv.width = 0; delete A.sprites[k]; } });
+  }
+  function rascunhoDe(i, w, h) {
+    var c = rascunho[i];
+    if (!c) c = rascunho[i] = tela(w, h);
+    if (c.width < w || c.height < h) { c.width = Math.max(c.width, Math.ceil(w)); c.height = Math.max(c.height, Math.ceil(h)); }
+    return c;
+  }
   function sprite(id, comp) {
     var chave = id + ':' + Math.round(comp), sp = A.sprites[chave];
     if (sp) return sp;
+    feitas++;
     var d = R.POR_ID[id] || { alt: 0.5 }, im = IMG[id], prop = im ? im.naturalHeight / im.naturalWidth : 1, iw = comp * 1.08 / Math.max(1, prop), ih = iw * prop;   // em pé (cavalo-marinho, água-viva): a altura é que vale o comprimento
     var w = Math.ceil(comp * 1.6), h = Math.ceil(im ? Math.max(ih * 1.3, comp * 0.5) : comp * (ALTURA[id] || Math.max(0.95, d.alt * 1.9)));
-    var cv = tela(w * QUADROS, h), c = cv.getContext('2d'), b1 = tela(w, h), c1 = b1.getContext('2d'), b2 = tela(w, h), c2 = b2.getContext('2d');
+    var cv = tela(w * QUADROS, h), c = cv.getContext('2d'), b1 = rascunhoDe(0, w, h), c1 = b1.getContext('2d'), b2 = rascunhoDe(1, w, h), c2 = b2.getContext('2d');
     var onda = (ONDA[id] != null ? ONDA[id] : 0.045) * (im ? 1.25 : 1), brilho = BRILHO[id], cabeca = w / 2 + comp * 0.5;
     for (var q = 0; q < QUADROS; q++) {
-      c1.clearRect(0, 0, w, h); c1.save(); c1.translate(w / 2, h / 2);
+      c1.clearRect(0, 0, b1.width, b1.height); c1.save(); c1.translate(w / 2, h / 2);
       if (im) { var resp = 1 + 0.03 * Math.sin(q / QUADROS * TAU); c1.scale(1, resp); c1.drawImage(im, -iw / 2, -ih / 2, iw, ih); }   // a imagem 3D "respira" e ondula
       else { c1.scale(comp / 100, comp / 100); pintarBicho(c1, id, q / QUADROS); }
       c1.restore();
       var fonte = b1;
-      if (brilho) { c2.clearRect(0, 0, w, h); c2.shadowColor = brilho; c2.shadowBlur = Math.max(4, comp * 0.07); c2.drawImage(b1, 0, 0); c2.shadowBlur = 0; fonte = b2; }
-      if (!onda) { c.drawImage(fonte, w * q, 0); continue; }
+      if (brilho) { c2.clearRect(0, 0, b2.width, b2.height); c2.shadowColor = brilho; c2.shadowBlur = Math.max(4, comp * 0.07); c2.drawImage(b1, 0, 0, w, h, 0, 0, w, h); c2.shadowBlur = 0; fonte = b2; }
+      if (!onda) { c.drawImage(fonte, 0, 0, w, h, w * q, 0, w, h); continue; }
       var fase = q / QUADROS * TAU;
       for (var x = 0; x < w; x++) {
         var tt = Math.max(0, Math.min(1.25, (cabeca - x) / comp));
@@ -1070,7 +1083,7 @@
     if (!A.carregou) { A.carregou = true; carregarImagens(op.imagens || 'img/'); }
     A.dpr = Math.min(2, dpr || 1); A.s = alt / H; A.W = H * larg / alt; A.sup = A.W >= H ? 270 : 230;
     canvas.width = Math.round(larg * A.dpr); canvas.height = Math.round(alt * A.dpr);
-    A.sprites = {}; A.fundo = pintarFundo(); prepararVivos();
+    esquecer(); A.fundo = pintarFundo(); prepararVivos();
     return { s: A.s, W: A.W };
   }
   function quadro(c, E, t) {
@@ -1111,5 +1124,5 @@
     bicho(c, 'pacu', tam * 0.5, tam * 0.58, tam * 0.78, 1, 0.2);
   }
 
-  raiz.GlubArte = { PERIODOS: Object.keys(PERIODOS), CENARIOS: ['roca', 'mar', 'serra'], preparar: preparar, quadro: quadro, bicho: bicho, icone: icone, lugar: lugar };
+  raiz.GlubArte = { estatisticas: function () { return { feitas: feitas, guardadas: Object.keys(A.sprites).length, imagens: Object.keys(IMG).length }; }, PERIODOS: Object.keys(PERIODOS), CENARIOS: ['roca', 'mar', 'serra'], preparar: preparar, quadro: quadro, bicho: bicho, icone: icone, lugar: lugar };
 })(this);

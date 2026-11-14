@@ -259,7 +259,7 @@
       else if (e.tipo === 'poder') { Som.poder(); faixa({ rede: t('🕸️ Rede da vovó!', "🕸️ Grandma's net!"), ligeiro: t('⚡ Anzol ligeiro!', '⚡ Quick hook!'), minhoca: t('🪱 Minhoca dourada!', '🪱 Golden worm!') }[e.poder], 1500); }
       else if (e.tipo === 'bonus') { Som.bonus(); faixa(t('♻️ Limpa o Rio! Pesque o lixo!', '♻️ Clean the River! Fish out the trash!'), 2400, true); }
       else if (e.tipo === 'bonusFim') { Som.rioLimpo(); faixa(t('Rio limpo! 🌿', 'Clean river! 🌿'), 2000); }
-      else if (e.tipo === 'fim') { setTimeout(function () { if (E) mostrarFim(); }, 1700); }
+      else if (e.tipo === 'fim') { faixa(t('⏱ Acabou o tempo!', "⏱ Time's up!"), 1500); }
     });
   }
   function mostrarFim() {
@@ -316,6 +316,7 @@
       var ev = R.passo(L, dt);
       if (L === E) {
         tratar(ev); pintarHud();
+        if (E.encerrado && !E.fimMostrado) { E.fimMostrado = true; mostrarFim(); }   // depois da folga de 1,5 s do último peixe
         if (E.j.some(function (J) { return J.anzol.fase === 'sobe' && J.anzol.presos.length; }) && tm - ultimaCarretilha > 0.12) { ultimaCarretilha = tm; Som.carretilha(); }
       }
       if (L === enfeite && enfeite.acabou) novoLagoDeEnfeite();
@@ -343,7 +344,7 @@
         fases: E ? E.j.map(function (J) { return J.anzol.fase; }) : [], niveis: E ? E.j.map(function (J) { return J.nivel; }) : [],
         tempo: E ? E.tempo : null, pontos: E ? E.j.map(function (J) { return J.pontos; }) : [], bichos: E ? E.bichos.length : 0, bonus: E ? !!E.bonus : false };
     },
-    pescar: function (j) { pescar(j); }, subir: function (j, s) { subir(j, s); },
+    pescar: function (j) { pescar(j); }, subir: function (j, s) { subir(j, s); }, irMenu: function () { irMenu(); },
     avancar: function (seg) { for (var s = 0; s < seg; s += 0.05) tratar(R.passo(E, 0.05)); pintarHud(true); },
     // põe um bicho bem embaixo do anzol de quem joga e pesca (para testar o álbum)
     pescarUm: function (id) {

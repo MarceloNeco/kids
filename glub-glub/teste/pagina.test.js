@@ -156,3 +156,41 @@ test('nível de cada jogador no modo dois: cada um escolhe o seu', async () => {
   assert.deepEqual((await est(pg)).niveis, ['facil', 'dificil']);
   await pg.ctx.close();
 });
+
+test('celular simples: as tiras dos bichos não são refeitas a cada imagem que termina de carregar', async () => {
+  const pg = await abrir(DEITADO);
+  await pg.waitForTimeout(3500);   // todas as imagens chegam nesse tempo
+  const e = await pg.evaluate(() => GlubArte.estatisticas());
+  assert.ok(e.feitas <= e.guardadas + 40, `refez demais: ${e.feitas} tiras feitas para ${e.guardadas} guardadas`);
+  await pg.ctx.close();
+});
+
+test('tela de fim: só depois da folga e nunca por cima de uma partida nova', async () => {
+  const pg = await abrir(DEITADO);
+  await jogarDois(pg);
+  await pg.evaluate(() => GlubDebug.avancar(60.2));   // acabou o tempo, mas a folga de 1,5 s ainda corre
+  assert.equal(await pg.isVisible('#fim'), false, 'fim apareceu antes da folga');
+  await pg.evaluate(() => GlubDebug.irMenu());
+  await pg.click('#btDois'); await pg.click('#btJogar');
+  await pg.waitForTimeout(2500);
+  assert.equal(await pg.isVisible('#fim'), false, 'o fim da partida velha abriu por cima da nova');
+  await pg.ctx.close();
+});
+
+test('tablet em pé em dois: placares e baldes à vista, fora dos botões', async () => {
+  const pg = await abrir({ viewport: { width: 820, height: 1180 }, hasTouch: true, isMobile: true });
+  await jogarDois(pg);
+  for (const p of ['#placar0', '#placar1']) for (const b of ['#pescar0', '#subir0', '#pescar1', '#subir1'])
+    assert.ok(!cruza(await caixa(pg, p), await caixa(pg, b)), p + ' embaixo de ' + b);
+  await pg.ctx.close();
+});
+
+test('faixa "Limpa o Rio!" inteira na tela do celular em pé', async () => {
+  const pg = await abrir(FONE);
+  await jogarSozinho(pg);
+  await pg.evaluate(() => GlubDebug.avancar(28.5));
+  await pg.waitForSelector('#faixa:not([hidden])');
+  const f = await caixa(pg, '#faixa');
+  assert.ok(f.x >= 0 && f.x + f.w <= 390, 'faixa cortada: ' + JSON.stringify(f));
+  await pg.ctx.close();
+});
