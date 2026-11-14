@@ -35,10 +35,10 @@
     { id: 'mar', tipo: 'desenho', pacote: 'mar', tema: 'mar', nome: ['Peixes e tartarugas', 'Fish and turtles', 'Peces y tortugas'] },
     { id: 'bandeirinhas', tipo: 'foto', pacote: 'junina', img: 'cenas/foto-bandeirinhas.webp', foco: '50% 30%', part: 'confete', tema: 'chuva', nome: ['Bandeirinhas no céu', 'Party flags in the sky', 'Banderitas en el cielo'] },
     { id: 'junina', tipo: 'desenho', pacote: 'junina', tema: 'junina', nome: ['Fogueira e bandeirinhas', 'Bonfire and party flags', 'Fogata y banderitas'] },
-    { id: 'pilares', tipo: 'foto', pacote: 'espaco', img: 'cenas/foto-pilares.webp', foco: '50% 50%', part: 'estrelas', tema: 'espaco', nome: ['Nebulosa vista pelo Hubble', 'Nebula seen by Hubble', 'Nebulosa vista por el Hubble'] },
+    { id: 'nebulosa', tipo: 'foto', pacote: 'espaco', img: 'cenas/foto-nebulosa.webp', foco: '60% 45%', part: 'estrelas', tema: 'espaco', nome: ['Nebulosa da Bolha (Hubble)', 'Bubble Nebula (Hubble)', 'Nebulosa de la Burbuja (Hubble)'] },
     { id: 'planetas', tipo: 'desenho', pacote: 'espaco', tema: 'espaco', nome: ['Planetas e foguete', 'Planets and a rocket', 'Planetas y cohete'] }
   ];
-  F.PACOTES = { mar: ['recife', 'mar'], junina: ['bandeirinhas', 'junina'], espaco: ['pilares', 'planetas'] };
+  F.PACOTES = { mar: ['recife', 'mar'], junina: ['bandeirinhas', 'junina'], espaco: ['nebulosa', 'planetas'] };
   var ESCURO = { espaco: 1 };          // véu escuro (cena de noite) em vez do claro
   function cena(id) { for (var i = 0; i < F.CENAS.length; i++) if (F.CENAS[i].id === id) return F.CENAS[i]; return null; }
   F.cena = cena;

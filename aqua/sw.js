@@ -6,7 +6,7 @@
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
 var VERSAO = '0.3.0';
 var CACHE = 'aqua-v' + VERSAO;
-var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'motor.js', 'som.js', 'desenho.js', 'fundo.js', 'app.js', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', 'sons/despejar.mp3', 'sons/glub.mp3', 'sons/rolha.mp3', 'sons/vidro.mp3', 'sons/brilho.mp3', 'sons/aplausos.mp3', 'sons/erro.mp3', 'cenas/foto-cachoeira.webp', 'cenas/foto-praia.webp', 'cenas/foto-flores.webp', 'cenas/foto-floresta.webp', 'cenas/foto-baloes.webp', 'cenas/foto-recife.webp', 'cenas/foto-bandeirinhas.webp', 'cenas/foto-pilares.webp', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
+var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'motor.js', 'som.js', 'desenho.js', 'fundo.js', 'app.js', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', 'sons/despejar.mp3', 'sons/glub.mp3', 'sons/rolha.mp3', 'sons/vidro.mp3', 'sons/brilho.mp3', 'sons/aplausos.mp3', 'sons/erro.mp3', 'cenas/foto-cachoeira.webp', 'cenas/foto-praia.webp', 'cenas/foto-flores.webp', 'cenas/foto-floresta.webp', 'cenas/foto-baloes.webp', 'cenas/foto-recife.webp', 'cenas/foto-bandeirinhas.webp', 'cenas/foto-nebulosa.webp', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
 });
