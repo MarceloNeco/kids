@@ -84,6 +84,7 @@ const LISTAS = {
   labirinto: () => [...ler('labirinto/app.js').matchAll(/a: '\.\.\/([^']+\.mp3)'/g)].map(m => m[1]),
   'a-garra': () => [...ler('a-garra/app.js').matchAll(/a: '\.\.\/([^']+\.mp3)'/g)].map(m => m[1]),
   cozinha: () => [...ler('cozinha/app.js').matchAll(/a: ([MB]) \+ '([a-z0-9-]+\.mp3)'/g)].map(m => (m[1] === 'M' ? 'rabiscolandia' : 'baguncolandia') + '/musicas/' + m[2]),
+  aqua: () => [...ler('aqua/app.js').matchAll(/a: M_ \+ '([a-z0-9-]+\.mp3)'/g)].map(m => 'purpurina/musicas/' + m[1]),
   enigmas: () => [...ler('enigmas/app.js').matchAll(/a: M \+ '([a-z0-9-]+\.mp3)'/g)].map(m => 'baguncolandia/musicas/' + m[1])
 };
 
@@ -275,7 +276,7 @@ test('no navegador: Campo Minado e Labirinto dão a volta com a favorita no fim;
   try {
     const ctx = await b.newContext({ serviceWorkers: 'block', locale: 'pt-BR' });
     const pg = await ctx.newPage(); const erros = []; pg.on('pageerror', e => erros.push(e.message));
-    for (const jogo of ['campo-minado', 'labirinto']) {
+    for (const jogo of ['campo-minado', 'labirinto', 'aqua']) {
       for (let vez = 0; vez < 3; vez++) {
         await pg.goto(base + jogo + '/'); await pg.waitForSelector('.trilha');
         const r = await pg.evaluate(async () => {

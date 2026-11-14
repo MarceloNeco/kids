@@ -1,0 +1,26 @@
+{
+  "app": "aqua",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "14/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "💧 Nasceu o AQUA: despeje as cores de um frasco no outro até cada frasco ficar de uma cor só",
+        "🫧 Três níveis (Fácil, Médio e Difícil) com fases sem fim, cada vez mais difíceis e sempre com solução",
+        "🌫️ Frascos embaçados no Médio e no Difícil: as cores de baixo ficam escondidas",
+        "🧰 Ajudas que nunca custam nada: desfazer, dica, embaralhar, mais um frasco e recomeçar",
+        "⭐ Estrelas por fase e gotinhas para trocar por frascos e cenários na lojinha de brincadeira",
+        "🎵 12 músicas animadas e sons gravados de verdade; funciona sem internet, em pé e deitado"
+      ],
+      "en": [
+        "💧 AQUA is born: pour the colors from bottle to bottle until each bottle holds just one color",
+        "🫧 Three levels (Easy, Medium and Hard) with endless stages, harder and harder and always solvable",
+        "🌫️ Foggy bottles on Medium and Hard: the lower colors stay hidden",
+        "🧰 Helpers that never cost anything: undo, hint, shuffle, one more bottle and restart",
+        "⭐ Stars per stage and droplets to trade for bottles and backdrops in the pretend shop",
+        "🎵 12 lively songs and real recorded sounds; works offline, upright and sideways"
+      ]
+    }
+  ]
+}

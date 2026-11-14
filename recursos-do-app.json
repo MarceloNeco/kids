@@ -120,6 +120,14 @@
         "en": "The Claw Machine"
       },
       "pagina": "a-garra/"
+    },
+    {
+      "id": "aqua",
+      "nome": {
+        "pt": "AQUA",
+        "en": "AQUA"
+      },
+      "pagina": "aqua/"
     }
   ]
 }
