@@ -69,6 +69,17 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
         await ctx.close();
       }
     }
+    // botão fixo "📲 Instalar" ao lado do 🎵 Músicas: sempre à vista no navegador, mesmo depois de "Já instalei"
+    {
+      const { ctx, pg } = await abrir(UA.iphone, 'pt', String(Date.now()));
+      assert.ok(await pg.$eval('.bc-inst', (e) => e.hidden), 'a barra de cima está escondida (Já instalei hoje)');
+      assert.ok(await pg.isVisible('.barra-topo .bt-instalar'), 'o botão fixo continua à vista');
+      assert.match(await pg.textContent('.barra-topo .bt-instalar'), /Instalar/);
+      await pg.click('.barra-topo .bt-instalar');
+      await pg.waitForSelector('.bc-fundo:not([hidden])');
+      assert.match(await pg.textContent('.bc-corpo'), /Adicionar à Tela de Início/, 'abre o passo a passo do aparelho');
+      await ctx.close();
+    }
     // marca de "Já instalei" de hoje: escondido; antiga ("1", de antes) ou de 31 dias: o botão volta
     for (const [marca, escondido] of [[String(Date.now()), true], ['1', false], [String(Date.now() - 31 * 864e5), false]]) {
       const { ctx, pg } = await abrir(UA.celular, 'pt', marca);

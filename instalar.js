@@ -348,6 +348,18 @@
     barra.hidden = true;
   });
 
+  // Botão fixo "📲 Instalar" ao lado do 🎵 Músicas da estante (dono, 14/Nov/2026: "não tô achando o instalador"):
+  // a barra de cima some depois de "Já instalei" ou de instalar; este fica sempre à vista no navegador.
+  var topo = document.querySelector('.barra-topo');
+  if (topo && !FLUTUANTE && !SO_COM) {
+    var fixo = document.createElement('button');
+    fixo.type = 'button'; fixo.className = 'bt-instalar';
+    fixo.innerHTML = '<span class="pt">📲 Instalar</span><span class="en">📲 Install</span><span class="es">📲 Instalar</span>';
+    fixo.addEventListener('click', function () { botao.click(); });
+    var musicas = topo.querySelector('#btBiblioteca');
+    topo.insertBefore(fixo, musicas ? musicas.nextSibling : topo.firstChild);
+  }
+
   botao.addEventListener('click', function () {
     if (!pedido) { abrir(); return; }
     var p = pedido;
