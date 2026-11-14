@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.19.0';
+  var APP_VERSION = '0.20.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -940,12 +940,38 @@
   document.addEventListener('visibilitychange', function () { Som.dormir(document.hidden); });
 
   // ---------- guardar no celular: instalar (atalho) ou baixar o arquivo do jogo ----------
+  /* 📲 Instalar (dono, 14/Nov/2026: "não instalou um ícone no celular e agora eu não acho ele"): o botão fica sempre à vista
+     no navegador. Com a janela de instalar do Chrome, o toque instala na hora; sem ela (já instalado, iPhone, Samsung,
+     link de outro app), abre o passo a passo comum do Bolinho (../instalar.js), que ensina a achar o ícone na lista de apps.
+     Aberta pelo ícone (janela de app), o botão some. */
   var pedidoInstalar = null;
-  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedidoInstalar = e; $('btInstalar').hidden = false; });
+  var JANELA_APP = !!(window.matchMedia && (matchMedia('(display-mode: standalone)').matches || (matchMedia('(display-mode: fullscreen)').matches && !document.fullscreenElement))) || navigator.standalone === true;
+  function rotuloInstalar(ja) {
+    $('btInstalar').setAttribute('data-t', ja ? '✓ Já instalado: onde está o ícone?|✓ Already installed: where is the icon?|✓ Ya instalada: ¿dónde está el icono?' : '📲 Instalar no celular (com ícone)|📲 Install on the phone (with icon)|📲 Instalar en el móvil (con icono)');
+    $('btInstalar').textContent = t.apply(null, $('btInstalar').getAttribute('data-t').split('|'));
+  }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedidoInstalar = e; rotuloInstalar(false); });
+  window.addEventListener('appinstalled', function () { pedidoInstalar = null; rotuloInstalar(true); });
+  // o Chrome do Android diz se a Purpurina já está instalada aqui (related_applications no manifest)
+  if (navigator.getInstalledRelatedApps) {
+    try { navigator.getInstalledRelatedApps().then(function (a) { if (a && a.length && !pedidoInstalar) rotuloInstalar(true); }).catch(function () {}); } catch (e) { /* sem a pergunta */ }
+  }
+  function passoAPasso() {
+    var abre = function () { var b = document.querySelector('.bc-inst .bc-btn'); if (b) b.click(); };
+    if (document.querySelector('.bc-inst')) return abre();
+    var s = document.createElement('script');
+    s.src = '../instalar.js';
+    s.setAttribute('data-nome', 'Purpurina'); s.setAttribute('data-icone', 'icone-192.png');
+    s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
+    s.onload = function () { var bar = document.querySelector('.bc-inst'); if (bar) bar.hidden = true; abre(); };
+    document.body.appendChild(s);
+  }
+  $('btInstalar').hidden = JANELA_APP;
   $('btInstalar').addEventListener('click', function () {
-    if (!pedidoInstalar) return;
-    pedidoInstalar.prompt();
-    pedidoInstalar.userChoice.then(function () { pedidoInstalar = null; $('btInstalar').hidden = true; }).catch(function () {});
+    if (!pedidoInstalar) return passoAPasso();
+    var p = pedidoInstalar; pedidoInstalar = null;   // a janela do navegador só pode ser usada uma vez
+    p.prompt();
+    p.userChoice.then(function (r) { if (r && r.outcome === 'accepted') rotuloInstalar(true); }).catch(function () {});
   });
   var EM_ARQUIVO = !!window.JOGO_EM_ARQUIVO || location.protocol === 'file:' || location.protocol === 'content:';
   if (EM_ARQUIVO || !window.BaixarJogo) $('guardar').hidden = true;
@@ -955,7 +981,7 @@
     var aviso = $('baixarAviso');
     aviso.textContent = t('Preparando o arquivo…', 'Preparing the file…', 'Preparando el archivo…');
     BaixarJogo.baixar('purpurina.html').then(function () {
-      aviso.textContent = t('Pronto! O arquivo purpurina.html foi para os Downloads. Toque nele para brincar, mesmo sem internet. (Os looks guardados ficam separados dos do site.)', 'Done! purpurina.html went to Downloads. Tap it to play, even offline. (Saved looks stay separate from the website ones.)', '¡Listo! El archivo purpurina.html se ha guardado en Descargas. Tócalo para jugar, incluso sin internet. (Los looks guardados van aparte de los de la web).');
+      aviso.textContent = t('Pronto! O arquivo purpurina.html foi para os Downloads (é só um arquivo, não cria ícone; cada toque faz mais uma cópia). Toque nele para brincar, mesmo sem internet. (Os looks guardados ficam separados dos do site.)', 'Done! purpurina.html went to Downloads (it is just a file, no icon; each tap makes another copy). Tap it to play, even offline. (Saved looks stay separate from the website ones.)', '¡Listo! El archivo purpurina.html se ha guardado en Descargas (es solo un archivo, sin icono; cada toque hace otra copia). Tócalo para jugar, incluso sin internet. (Los looks guardados van aparte de los de la web).');
     }).catch(function () {
       aviso.textContent = t('Não deu para baixar agora. Abra o jogo com internet e tente de novo.', "Couldn't download now. Open the game online and try again.", "No se ha podido descargar ahora. Abre el juego con internet e inténtalo otra vez.");
     });

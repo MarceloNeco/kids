@@ -46,6 +46,7 @@ ul { list-style: none; }
 .grande:active { transform: translateY(3px); box-shadow: 0 3px 0 #b0306f; }
 .medio { background: var(--card); border: 2px solid var(--borda); border-radius: 16px; padding: 0 18px; font-size: 1.08rem; font-weight: 600; }
 .medio.forte { background: linear-gradient(180deg, #ffe08a, #ffbf3a); color: #4a2400; border-color: #e09a1a; }
+.medio.leve { background: transparent; font-size: .95rem; opacity: .85; }
 .bolha { display: inline-block; min-width: 1.6em; padding: 0 .4em; border-radius: 999px; background: var(--rosa); color: #fff; font-size: .9rem; }
 .ajuda { max-width: 600px; background: var(--card); border-radius: 18px; padding: 14px 16px; line-height: 1.45; text-align: left; display: grid; gap: 8px; }
 .guardar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 560px; }
