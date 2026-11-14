@@ -2,6 +2,20 @@
   "app": "glub-glub",
   "versoes": [
     {
+      "versao": "0.1.1",
+      "data": "14/Nov/2026",
+      "hora": "16:20:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante (o jogo não tem mais botão de idioma próprio)"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf (the game no longer has its own language button)"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, que se eligen en la estantería (el juego ya no tiene su propio botón de idioma)"
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "14/Nov/2026",
       "hora": "11:07:56",

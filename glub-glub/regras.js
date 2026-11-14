@@ -7,7 +7,7 @@
    vazio. ⬆️ segurando = sobe mais rápido; ⬆️ na descida = desiste. Os pontos entram quando o bicho chega ao balde.
 
    GlubRegras.NIVEIS                      facil | medio | dificil (ver NIVEIS abaixo)
-   GlubRegras.BICHOS                      { id, nome: {pt, en}, faixa, pontos, tam, peso, tipo, alt, raro? }
+   GlubRegras.BICHOS                      { id, nome: {pt, en, es}, faixa, pontos, tam, peso, tipo, alt, raro? }
    GlubRegras.criar({ semente, aspecto, jogadores: [{ lado, nivel, robo }] })  → E
    GlubRegras.passo(E, dt)                → eventos: fisgou | pegou | vazio | balde | poder | bonus | bonusFim | fim
    GlubRegras.pescar(E, j, ang?)          → true se o mergulho começou (ang de fora: TV e rede, entregas 2 e 3)
@@ -31,45 +31,45 @@
   };
   var ORDEM = ['facil', 'medio', 'dificil'];
 
-  function b(id, pt, en, faixa, pontos, tam, peso, tipo, alt, raro) {
-    var o = { id: id, nome: { pt: pt, en: en }, faixa: faixa, pontos: pontos, tam: tam, peso: peso, tipo: tipo, alt: alt || 0.5 };
+  function b(id, pt, en, es, faixa, pontos, tam, peso, tipo, alt, raro) {
+    var o = { id: id, nome: { pt: pt, en: en, es: es }, faixa: faixa, pontos: pontos, tam: tam, peso: peso, tipo: tipo, alt: alt || 0.5 };
     if (raro) o.raro = true;
     return o;
   }
   var BICHOS = [
-    b('lambari', 'Lambari', 'Lambari', 1, 1, 0.048, 1, 'bicho', 0.63),
-    b('piaba', 'Piaba', 'Piaba', 1, 1, 0.044, 1, 'bicho', 0.67),
-    b('palhaco', 'Peixe-palhaço', 'Clownfish', 1, 2, 0.05, 1, 'bicho', 0.63),
-    b('agua-viva', 'Água-viva', 'Jellyfish', 1, 3, 0.075, 1, 'bicho', 1.0),
-    b('cirurgiao', 'Cirurgião-azul', 'Blue tang', 1, 3, 0.06, 1, 'bicho', 0.59),
-    b('tilapia', 'Tilápia', 'Tilapia', 1, 2, 0.062, 1, 'bicho', 0.53),
-    b('baiacu', 'Baiacu', 'Pufferfish', 1, 3, 0.06, 1, 'bicho', 0.83),
-    b('traira', 'Traíra', 'Wolf fish', 2, 5, 0.078, 2, 'bicho', 0.52),
-    b('pacu', 'Pacu', 'Pacu', 2, 5, 0.074, 2, 'bicho', 0.87),
-    b('cavalo-marinho', 'Cavalo-marinho', 'Seahorse', 2, 6, 0.075, 1, 'bicho', 1.0),
-    b('bagre', 'Bagre', 'Catfish', 2, 6, 0.082, 2, 'bicho', 0.58),
-    b('tartaruga', 'Tartaruga', 'Turtle', 2, 8, 0.085, 3, 'bicho', 0.65),
-    b('bota', 'Bota velha', 'Old boot', 3, 1, 0.06, 1, 'premio', 0.92),
-    b('garrafa', 'Garrafa com bilhete', 'Message in a bottle', 3, 10, 0.06, 1, 'premio', 0.38),
-    b('bau', 'Baú', 'Treasure chest', 3, 15, 0.08, 2, 'premio', 0.77),
-    b('polvo', 'Polvo', 'Octopus', 4, 12, 0.09, 3, 'bicho', 0.86),
-    b('lagosta', 'Lagosta', 'Lobster', 4, 15, 0.095, 3, 'bicho', 0.72),
-    b('caranguejo', 'Caranguejo gigante', 'Giant crab', 4, 20, 0.1, 3, 'bicho', 0.68),
-    b('morsa', 'Morsa', 'Walrus', 4, 22, 0.13, 5, 'bicho', 0.76),
-    b('tubarao', 'Tubarão', 'Shark', 4, 25, 0.14, 4, 'bicho', 0.68),
-    b('martelo', 'Tubarão-martelo', 'Hammerhead shark', 4, 30, 0.14, 4, 'bicho', 0.67),
-    b('tubarao-baleia', 'Tubarão-baleia', 'Whale shark', 5, 40, 0.19, 5, 'bicho', 0.39),
-    b('abissal', 'Peixe-abissal', 'Abyssal fish', 5, 42, 0.1, 4, 'bicho', 0.88),
-    b('lanterna', 'Peixe-lanterna', 'Anglerfish', 5, 45, 0.11, 4, 'bicho', 0.9),
-    b('orca', 'Orca', 'Orca', 5, 50, 0.17, 5, 'bicho', 0.64),
-    b('baleia', 'Baleia', 'Whale', 5, 60, 0.22, 5, 'bicho', 0.56),
-    b('sereia', 'Sereia Iara', 'Iara the mermaid', 5, 80, 0.14, 4, 'bicho', 0.64),
-    b('pirarucu', 'Pirarucu Dourado', 'Golden Arapaima', 6, 500, 0.17, 5, 'bicho', 0.46, true),
-    b('pet', 'Garrafa PET', 'Plastic bottle', 0, 3, 0.055, 1, 'lixo', 0.45),
-    b('lata', 'Lata', 'Can', 0, 3, 0.045, 1, 'lixo', 0.75),
-    b('sacola', 'Sacolinha', 'Plastic bag', 0, 4, 0.06, 1, 'lixo', 0.8),
-    b('chinelo', 'Chinelo', 'Flip-flop', 0, 5, 0.06, 1, 'lixo', 0.5),
-    b('pneu', 'Pneu velho', 'Old tire', 0, 8, 0.08, 2, 'lixo', 0.9)
+    b('lambari', 'Lambari', 'Lambari', 'Lambari', 1, 1, 0.048, 1, 'bicho', 0.63),
+    b('piaba', 'Piaba', 'Piaba', 'Piaba', 1, 1, 0.044, 1, 'bicho', 0.67),
+    b('palhaco', 'Peixe-palhaço', 'Clownfish', 'Pez payaso', 1, 2, 0.05, 1, 'bicho', 0.63),
+    b('agua-viva', 'Água-viva', 'Jellyfish', 'Medusa', 1, 3, 0.075, 1, 'bicho', 1.0),
+    b('cirurgiao', 'Cirurgião-azul', 'Blue tang', 'Pez cirujano', 1, 3, 0.06, 1, 'bicho', 0.59),
+    b('tilapia', 'Tilápia', 'Tilapia', 'Tilapia', 1, 2, 0.062, 1, 'bicho', 0.53),
+    b('baiacu', 'Baiacu', 'Pufferfish', 'Pez globo', 1, 3, 0.06, 1, 'bicho', 0.83),
+    b('traira', 'Traíra', 'Wolf fish', 'Pez lobo', 2, 5, 0.078, 2, 'bicho', 0.52),
+    b('pacu', 'Pacu', 'Pacu', 'Pacú', 2, 5, 0.074, 2, 'bicho', 0.87),
+    b('cavalo-marinho', 'Cavalo-marinho', 'Seahorse', 'Caballito de mar', 2, 6, 0.075, 1, 'bicho', 1.0),
+    b('bagre', 'Bagre', 'Catfish', 'Pez gato', 2, 6, 0.082, 2, 'bicho', 0.58),
+    b('tartaruga', 'Tartaruga', 'Turtle', 'Tortuga', 2, 8, 0.085, 3, 'bicho', 0.65),
+    b('bota', 'Bota velha', 'Old boot', 'Bota vieja', 3, 1, 0.06, 1, 'premio', 0.92),
+    b('garrafa', 'Garrafa com bilhete', 'Message in a bottle', 'Botella con mensaje', 3, 10, 0.06, 1, 'premio', 0.38),
+    b('bau', 'Baú', 'Treasure chest', 'Cofre del tesoro', 3, 15, 0.08, 2, 'premio', 0.77),
+    b('polvo', 'Polvo', 'Octopus', 'Pulpo', 4, 12, 0.09, 3, 'bicho', 0.86),
+    b('lagosta', 'Lagosta', 'Lobster', 'Langosta', 4, 15, 0.095, 3, 'bicho', 0.72),
+    b('caranguejo', 'Caranguejo gigante', 'Giant crab', 'Cangrejo gigante', 4, 20, 0.1, 3, 'bicho', 0.68),
+    b('morsa', 'Morsa', 'Walrus', 'Morsa', 4, 22, 0.13, 5, 'bicho', 0.76),
+    b('tubarao', 'Tubarão', 'Shark', 'Tiburón', 4, 25, 0.14, 4, 'bicho', 0.68),
+    b('martelo', 'Tubarão-martelo', 'Hammerhead shark', 'Tiburón martillo', 4, 30, 0.14, 4, 'bicho', 0.67),
+    b('tubarao-baleia', 'Tubarão-baleia', 'Whale shark', 'Tiburón ballena', 5, 40, 0.19, 5, 'bicho', 0.39),
+    b('abissal', 'Peixe-abissal', 'Abyssal fish', 'Pez abisal', 5, 42, 0.1, 4, 'bicho', 0.88),
+    b('lanterna', 'Peixe-lanterna', 'Anglerfish', 'Pez linterna', 5, 45, 0.11, 4, 'bicho', 0.9),
+    b('orca', 'Orca', 'Orca', 'Orca', 5, 50, 0.17, 5, 'bicho', 0.64),
+    b('baleia', 'Baleia', 'Whale', 'Ballena', 5, 60, 0.22, 5, 'bicho', 0.56),
+    b('sereia', 'Sereia Iara', 'Iara the mermaid', 'La sirena Iara', 5, 80, 0.14, 4, 'bicho', 0.64),
+    b('pirarucu', 'Pirarucu Dourado', 'Golden Arapaima', 'Arapaima Dorado', 6, 500, 0.17, 5, 'bicho', 0.46, true),
+    b('pet', 'Garrafa PET', 'Plastic bottle', 'Botella de plástico', 0, 3, 0.055, 1, 'lixo', 0.45),
+    b('lata', 'Lata', 'Can', 'Lata', 0, 3, 0.045, 1, 'lixo', 0.75),
+    b('sacola', 'Sacolinha', 'Plastic bag', 'Bolsa de plástico', 0, 4, 0.06, 1, 'lixo', 0.8),
+    b('chinelo', 'Chinelo', 'Flip-flop', 'Chancla', 0, 5, 0.06, 1, 'lixo', 0.5),
+    b('pneu', 'Pneu velho', 'Old tire', 'Neumático viejo', 0, 8, 0.08, 2, 'lixo', 0.9)
   ];
   var POR_ID = {};
   BICHOS.forEach(function (x) { POR_ID[x.id] = x; });

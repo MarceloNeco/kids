@@ -120,13 +120,13 @@ test('os dois anzóis no mesmo bicho: fica com quem encostou primeiro', () => {
   assert.equal(ev[0].j, 0);
 });
 
-test('mais fundo vale mais (bichos), e todo bicho tem nome PT e EN', () => {
+test('mais fundo vale mais (bichos), e todo bicho tem nome PT, EN e ES', () => {
   const bichos = R.BICHOS.filter(b => b.tipo === 'bicho');
   for (let f = 1; f < 6; f++) {
     const daqui = bichos.filter(b => b.faixa === f).map(b => b.pontos), debaixo = bichos.filter(b => b.faixa > f).map(b => b.pontos);
     if (daqui.length && debaixo.length) assert.ok(Math.max(...daqui) <= Math.min(...debaixo), 'faixa ' + f);
   }
-  for (const b of R.BICHOS) assert.ok(b.nome.pt && b.nome.en, b.id);
+  for (const b of R.BICHOS) assert.ok(b.nome.pt && b.nome.en && b.nome.es, b.id);
   assert.equal(R.BICHOS.find(b => b.raro).pontos, 500);
 });
 

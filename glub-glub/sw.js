@@ -4,7 +4,7 @@
    sem internet a trilha pula as que não abrem e some, e o jogo segue com os efeitos).
    Cache com o nome do app: só apaga caches "glub-glub-" (nunca os dos outros jogos da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.1.0';
+var VERSAO = '0.1.1';
 var CACHE = 'glub-glub-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'regras.js', 'arte.js', 'som.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../instalar.js',
   'img/abissal.webp', 'img/agua-viva.webp', 'img/bagre.webp', 'img/baiacu.webp', 'img/baleia.webp', 'img/bau.webp', 'img/bota.webp', 'img/caranguejo.webp', 'img/cavalo-marinho.webp', 'img/chinelo.webp', 'img/cirurgiao.webp', 'img/garrafa.webp', 'img/juca.webp', 'img/lagosta.webp', 'img/lambari.webp', 'img/lanterna.webp', 'img/lata.webp', 'img/lili.webp', 'img/martelo.webp', 'img/mergulhador.webp', 'img/morsa.webp', 'img/orca.webp', 'img/pacu.webp', 'img/palhaco.webp', 'img/pet.webp', 'img/piaba.webp', 'img/pirarucu.webp', 'img/pneu.webp', 'img/polvo.webp', 'img/sereia.webp', 'img/tartaruga.webp', 'img/tilapia.webp', 'img/traira.webp', 'img/tubarao-baleia.webp', 'img/tubarao.webp'];
