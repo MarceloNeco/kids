@@ -1,39 +1,11 @@
 # Músicas gravadas — licenças
 
-A rádio da Purpurina (0.18.0) toca 21 músicas com instrumentos de verdade, todas animadas e sem voz: 14 compostas para o
-próprio jogo e 7 do Kevin MacLeod. No desfile toca uma das 6 de passarela (umas animadas, umas mais emocionantes). O
-jogo mostra o nome, o autor e a licença enquanto toca. As que saíram da rádio continuam nesta pasta porque outros jogos
-do Bolinho de Chuva tocam elas.
+A rádio da Purpurina toca 21 músicas gravadas, todas animadas, de dança e pop, sem voz (disco, house, funk,
+electro-pop e synth-pop dos anos 80), de licença livre. As feitas pelo próprio jogo (`som.js`) tocam só no arquivo
+baixado, que não leva MP3. O jogo mostra o nome da música, o autor e a licença enquanto toca.
 
-Alterações em todas: volume igualado (−15 LUFS), MP3 de 96 kbps; nas mais longas, corte com final suave.
-
-## Compostas para a Purpurina (14/Nov/2026) — uso livre, inclusive comercial, sem custo
-
-Geradas especialmente para este jogo com o **ACE-Step** (modelo aberto de música, código e pesos sob a licença
-**Apache-2.0**, https://github.com/ace-step/ACE-Step), num computador alugado no Higgsfield, a partir de descrições de
-estilo escritas para a Purpurina (pop de festa e dance-pop em tom maior; no desfile, house de passarela e synth-pop
-emocionante). Nenhuma música existente foi usada como base, nenhuma voz, nenhuma letra. A licença Apache-2.0 não põe
-restrição sobre o que o modelo gera: as músicas são do jogo, para usar, vender e distribuir sem pagar nada.
-
-Cada uma foi gerada em 3 versões e ficou a melhor pela medição por computador (o separador de voz Demucs conferiu que
-não há canto; ritmo, tom maior e energia). Ninguém ouviu antes de publicar: se alguma não agradar, ela sai.
-
-| Arquivo | Música | Onde toca |
-|---|---|---|
-| `sexta-a-noite.mp3` | Sexta à Noite (dance-pop de festa, sax) | rádio |
-| `verao-neon.mp3` | Verão Neon (electropop de verão) | rádio |
-| `fogos-no-ceu.mp3` | Fogos no Céu (hino pop, piano e cordas) | rádio |
-| `sonho-adolescente.mp3` | Sonho Adolescente (pop rock, guitarras) | rádio |
-| `doce-purpurina.mp3` | Doce Purpurina (bubblegum pop) | rádio |
-| `disco-rosa.mp3` | Disco Rosa (nu disco, baixo funk) | rádio |
-| `brilho-total.mp3` | Brilho Total (piano house) | rádio |
-| `festa-no-quarto.mp3` | Festa no Quarto (funk pop, metais) | rádio |
-| `passarela-de-luz.mp3` | Passarela de Luz (deep house de passarela) | desfile |
-| `holofotes.mp3` | Holofotes (electropop de desfile) | desfile |
-| `grande-final.mp3` | Grande Final (dance-pop de celebração) | desfile |
-| `seja-voce.mp3` | Seja Você (synth-pop emocionante) | desfile |
-| `coracao-eletrico.mp3` | Coração Elétrico (electropop sonhador) | desfile |
-| `estrela-que-brilha.mp3` | Estrela que Brilha (pop cinematográfico) | desfile |
+Alterações em todas: volume igualado (normalização para −15 LUFS), conversão para MP3 de 96 kbps (para tocar leve em
+todo celular) e, nas mais longas, corte em 3min30 com 5 s de final suave.
 
 ## Kevin MacLeod (incompetech.com) — CC BY 4.0
 

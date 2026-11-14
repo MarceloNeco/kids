@@ -296,21 +296,12 @@
   function mostrarPartes() { naParte = false; desenharGrupos(); zoomDaParte(); chegar($('cats')); }
   function sairDaParte() { if (parteNoHist) { parteNoHist = false; ignorar++; history.back(); } }
   $('btPartes').addEventListener('click', function () { Som.tocar('clique'); if (parteNoHist) history.back(); else mostrarPartes(); });
-  /* ícone 3D da aba ou da parte (img/<id>.webp, gerados para o jogo); sem a imagem (arquivo baixado, ainda não guardada
-     sem internet), fica o emoji de sempre */
-  function icone3d(el, id, emoji) {
-    el.textContent = emoji;
-    if (window.JOGO_EM_ARQUIVO) return;
-    var im = new Image(); im.alt = ''; im.className = 'i3d'; im.decoding = 'async';
-    im.addEventListener('load', function () { el.textContent = ''; el.appendChild(im); });
-    im.src = 'img/' + id + '.webp';
-  }
   function desenharGrupos() {
     var caixa = $('grupos'); caixa.innerHTML = '';
     P.GRUPOS.forEach(function (g) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'grupo-bt'; b.setAttribute('role', 'tab');
       b.setAttribute('aria-selected', String(g.id === grupoAtual)); b.setAttribute('aria-label', N(g));
-      var i = document.createElement('span'); i.className = 'i'; icone3d(i, 'g-' + g.id, g.ico);
+      var i = document.createElement('span'); i.className = 'i'; i.textContent = g.ico;
       var tx = document.createElement('span'); tx.className = 't'; tx.textContent = N(g); tx.setAttribute('data-curto', g.curto ? N(g.curto) : '');
       b.appendChild(i); b.appendChild(tx);
       b.addEventListener('click', function () { grupoAtual = g.id; Som.tocar('aba'); sairDaParte(); naParte = false; desenharGrupos(); desenharOpcoes(); zoomDaParte(); chegar($('cats'), $('cores'), $('estilos')); });
@@ -331,7 +322,7 @@
     cats.forEach(function (c) {
       // botão quadradinho (desenho em cima, nome embaixo): todas as partes ficam à vista, nada escondido para o lado
       var b = document.createElement('button'); b.type = 'button'; b.className = 'cat-bt';
-      var ci = document.createElement('span'); ci.className = 'i'; icone3d(ci, c.id, c.ico); var ct = document.createElement('span'); ct.textContent = N(c);
+      var ci = document.createElement('span'); ci.className = 'i'; ci.textContent = c.ico; var ct = document.createElement('span'); ct.textContent = N(c);
       b.appendChild(ci); b.appendChild(ct);
       b.setAttribute('aria-pressed', String(c.id === catPorGrupo[grupoAtual]));
       b.addEventListener('click', function () { catPorGrupo[grupoAtual] = c.id; Som.tocar('clique'); entrarNaParte(); desenharGrupos(); desenharOpcoes(); $('opcoes').scrollTop = 0; zoomDaParte(); chegar($('cores'), $('estilos')); });
@@ -843,7 +834,7 @@
     $('desfileRecorde').hidden = !recorde;
     $('btProximo').textContent = d ? t('▶ Próximo desafio', '▶ Next challenge', '▶ Siguiente desafío') : t('🎨 Continuar brincando', '🎨 Keep playing', '🎨 Seguir jugando');
     $('btMaisUm').hidden = !d;
-    Som.desfile();   // uma das músicas de passarela (animada ou emocionante)
+    Som.proxima();
     if (CALMO) { Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 500); }
     ponte('desfile', { d: modo || '', est: r ? r.estrelas : 0 });
   }
