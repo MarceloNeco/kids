@@ -215,16 +215,15 @@
   // Passo a passo de cada aparelho, no idioma escolhido na estante (idioma.js).
   function passos() {
     var N = NOME;
-    if (dentroDeOutroApp) return T('<p>Você abriu o ' + N + ' por dentro de um jogo instalado. Daqui não dá para instalar: abra o ' + N + ' no navegador.</p>' +
-      '<ol><li>' + (ios ? 'Abra o <b>Safari</b> e digite <b>solverone.com.br/kids</b>.' : 'Toque em <b>Abrir no Chrome</b> (botão abaixo) ou abra o Chrome e digite <b>solverone.com.br/kids</b>.') + '</li>' +
-      '<li>Lá, toque em <b>📲 Instalar</b>.</li></ol>',
-      '<p>You opened ' + N + ' from inside an installed game. It can\'t be installed from here: open ' + N + ' in the browser.</p>' +
-      '<ol><li>' + (ios ? 'Open <b>Safari</b> and type <b>solverone.com.br/kids</b>.' : 'Tap <b>Open in Chrome</b> (button below), or open Chrome and type <b>solverone.com.br/kids</b>.') + '</li>' +
-      '<li>There, tap <b>📲 Install</b>.</li></ol>',
-      '<p>Has abierto ' + N + ' desde dentro de un juego instalado. Desde aquí no se puede instalar: abre ' + N + ' en el navegador.</p>' +
-      '<ol><li>' + (ios ? 'Abre <b>Safari</b> y escribe <b>solverone.com.br/kids</b>.' : 'Toca <b>Abrir en Chrome</b> (botón de abajo) o abre Chrome y escribe <b>solverone.com.br/kids</b>.') + '</li>' +
-      '<li>Allí, toca <b>📲 Instalar</b>.</li></ol>') +
-      (ios ? '' : '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>');
+    if (dentroDeOutroApp) return T('<p>O ' + N + ' abriu por dentro de outro app (o atalho do Portal ou um jogo instalado). Daqui não dá para instalar: abra no navegador.</p>' +
+      '<ol><li>' + (ios ? 'Abra o <b>Safari</b> e digite <b>solverone.com.br/kids</b>.' : 'Toque nos <b>três pontinhos ⋮</b> lá em cima, ao lado do ✕, e escolha <b>Abrir no Chrome</b>. Ou abra o app do Chrome e digite <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>Lá, toque em <b>Instalar o Bolinho</b>, no topo.</li></ol>',
+      '<p>' + N + ' opened inside another app (the Portal shortcut or an installed game). It can\'t be installed from here: open it in the browser.</p>' +
+      '<ol><li>' + (ios ? 'Open <b>Safari</b> and type <b>solverone.com.br/kids</b>.' : 'Tap the <b>three dots ⋮</b> at the top, next to the ✕, and choose <b>Open in Chrome</b>. Or open the Chrome app and type <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>There, tap <b>Install</b> at the top.</li></ol>',
+      '<p>' + N + ' se abrió dentro de otra app (el acceso directo del Portal o un juego instalado). Desde aquí no se puede instalar: ábrelo en el navegador.</p>' +
+      '<ol><li>' + (ios ? 'Abre <b>Safari</b> y escribe <b>solverone.com.br/kids</b>.' : 'Toca los <b>tres puntitos ⋮</b> arriba, junto a la ✕, y elige <b>Abrir en Chrome</b>. O abre la app de Chrome y escribe <b>solverone.com.br/kids</b>.') + '</li>' +
+      '<li>Allí, toca <b>Instalar</b> arriba.</li></ol>');
     if (tv) return T('<p>Na TV não existe "instalar" pelo navegador, mas dá para deixar o ' + N + ' a um clique:</p>' +
       '<ol><li>Com esta página aberta, aperte o botão de <b>menu</b> do navegador da TV (às vezes é a engrenagem ou os <b>três pontinhos</b>).</li>' +
       '<li>Escolha <b>Adicionar aos favoritos</b> (em algumas TVs aparece <b>Fixar na tela inicial</b> ou <b>Adicionar à página inicial</b>: use esse, se tiver).</li>' +
@@ -299,18 +298,18 @@
       '<li>En Chrome, toca <b>Instalar la aplicación</b>, arriba de la página.</li></ol>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
     // Android sem a janela de instalar do Chrome: ou abriu por um link de outro app (janelinha com ✕ em cima, onde o
     // Chrome não instala), ou já está instalado (no Samsung o ícone vai para a gaveta de apps, não para a tela inicial)
-    if (android) return T('<ol><li>Se em cima da página aparece um <b>✕</b> (você abriu por um link de outro app), toque em <b>Abrir no Chrome</b> (botão abaixo) e faça os passos lá.</li>' +
+    if (android) return T('<ol><li>Se em cima da página aparece um <b>✕</b> (a página abriu dentro de outro app, como o atalho do Portal), toque nos <b>três pontinhos ⋮</b> ao lado do ✕ e escolha <b>Abrir no Chrome</b>. Os próximos passos são lá no Chrome.</li>' +
       '<li>No Chrome, toque nos <b>três pontinhos ⋮</b> (no canto de cima) e em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
       '<li>Confirme em <b>Instalar</b>.</li></ol>' +
       '<p class="aviso">Apagar o ícone da tela inicial não desinstala: o ' + N + ' continua instalado na lista de apps (por isso o Chrome não oferece instalar de novo). Não achou o ícone? Arraste a tela inicial para cima para abrir a <b>lista de apps</b> e procure <b>' + N + '</b>. Segure o dedo em cima dele e arraste para a tela inicial.</p>',
-      '<ol><li>If you see an <b>✕</b> at the top of the page (you opened it from a link in another app), tap <b>Open in Chrome</b> (button below) and do the steps there.</li>' +
+      '<ol><li>If you see an <b>✕</b> at the top of the page (it opened inside another app, like the Portal shortcut), tap the <b>three dots ⋮</b> next to the ✕ and choose <b>Open in Chrome</b>. The next steps happen there in Chrome.</li>' +
       '<li>In Chrome, tap the <b>three dots ⋮</b> (top corner) and <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
       '<li>Confirm with <b>Install</b>.</li></ol>' +
       '<p class="aviso">Removing the icon from the home screen doesn\'t uninstall it: ' + N + ' is still installed in the app list (that\'s why Chrome won\'t offer to install it again). Can\'t find the icon? Swipe up on the home screen to open the <b>app list</b> and look for <b>' + N + '</b>. Hold your finger on it and drag it to the home screen.</p>',
-      '<ol><li>Si arriba de la página aparece una <b>✕</b> (lo abriste desde un enlace de otra app), toca <b>Abrir en Chrome</b> (botón de abajo) y haz los pasos allí.</li>' +
+      '<ol><li>Si arriba de la página aparece una <b>✕</b> (se abrió dentro de otra app, como el acceso directo del Portal), toca los <b>tres puntitos ⋮</b> junto a la ✕ y elige <b>Abrir en Chrome</b>. Los siguientes pasos son allí, en Chrome.</li>' +
       '<li>En Chrome, toca los <b>tres puntitos ⋮</b> (arriba) y <b>Instalar aplicación</b> o <b>Añadir a la pantalla de inicio</b>.</li>' +
       '<li>Confirma con <b>Instalar</b>.</li></ol>' +
-      '<p class="aviso">Quitar el icono de la pantalla de inicio no lo desinstala: ' + N + ' sigue instalado en la lista de apps (por eso Chrome no ofrece instalarlo otra vez). ¿No encuentras el icono? Desliza hacia arriba en la pantalla de inicio para abrir la <b>lista de apps</b> y busca <b>' + N + '</b>. Mantén el dedo encima y arrástralo a la pantalla de inicio.</p>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
+      '<p class="aviso">Quitar el icono de la pantalla de inicio no lo desinstala: ' + N + ' sigue instalado en la lista de apps (por eso Chrome no ofrece instalarlo otra vez). ¿No encuentras el icono? Desliza hacia arriba en la pantalla de inicio para abrir la <b>lista de apps</b> y busca <b>' + N + '</b>. Mantén el dedo encima y arrástralo a la pantalla de inicio.</p>');   // sem botão "Abrir no Chrome": dentro da janelinha com ✕ ele só recarrega a página (dono, 14/Nov/2026)
     if (macSafari) return T('<ol><li>No menu do topo da tela, clique em <b>Arquivo</b>.</li>' +
       '<li>Clique em <b>Adicionar ao Dock</b> e em <b>Adicionar</b>.</li></ol>',
       '<ol><li>In the menu at the top of the screen, click <b>File</b>.</li>' +

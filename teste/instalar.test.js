@@ -109,8 +109,9 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
       assert.ok(await pg.isVisible('.bc-btn'), 'dentro de um jogo instalado: o botão aparece');
       await pg.click('.bc-btn');
       await pg.waitForSelector('.bc-fundo:not([hidden])');
-      assert.match(await pg.textContent('.bc-corpo'), /por dentro de um jogo instalado/);
-      assert.match(await pg.getAttribute('.bc-corpo a.bc-forte', 'href'), /^intent:\/\//, 'botão Abrir no Chrome');
+      assert.match(await pg.textContent('.bc-corpo'), /por dentro de outro app/);
+      assert.match(await pg.textContent('.bc-corpo'), /três pontinhos ⋮.*Abrir no Chrome/, 'ensina o ⋮ → Abrir no Chrome (o link intent só recarregava a página)');
+      assert.strictEqual(await pg.$('.bc-corpo a.bc-forte'), null, 'sem o botão que só recarregava');
       await ctx.close();
       assert.match(fs.readFileSync(path.join(raiz, 'manifest.webmanifest'), 'utf8'), /"start_url": "\.\/\?app=1"/, 'o ícone abre com ?app=1');
     }
