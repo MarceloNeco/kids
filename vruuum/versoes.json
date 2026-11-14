@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.21.0",
+      "data": "14/Nov/2026",
+      "hora": "17:10:00",
+      "pt": [
+        "✨ Carros mais caprichados: rodas girando de verdade (com raios e pneu andando), pintura brilhando com reflexo de luz, lanternas acesas e fumacinha saindo do escapamento.",
+        "🏎️ Clássico, GT e Superesportivo com carroceria arredondada; Caminhão Guincho com o giroflex iluminando em volta."
+      ],
+      "en": [
+        "✨ Fancier cars: wheels that really spin (spokes and rolling tires), shiny paint that catches the light, glowing tail lights and little puffs of exhaust smoke.",
+        "🏎️ Classic, GT and Supercar with rounded bodies; the Tow Truck's beacons light up around it."
+      ],
+      "es": [
+        "✨ Coches más cuidados: ruedas que giran de verdad (con radios y neumáticos rodando), pintura brillante con reflejos de luz, pilotos encendidos y humito saliendo del tubo de escape.",
+        "🏎️ Clásico, GT y Superdeportivo con carrocería redondeada; el rotativo del Camión Grúa ilumina alrededor."
+      ]
+    },
+    {
       "versao": "1.20.0",
       "data": "14/Nov/2026",
       "hora": "16:40:00",
