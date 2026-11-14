@@ -39,10 +39,14 @@
   var BICHOS = [
     b('lambari', 'Lambari', 'Lambari', 1, 1, 0.048, 1, 'bicho', 0.42),
     b('piaba', 'Piaba', 'Piaba', 1, 1, 0.044, 1, 'bicho', 0.42),
+    b('palhaco', 'Peixe-palhaço', 'Clownfish', 1, 2, 0.05, 1, 'bicho', 0.6),
+    b('agua-viva', 'Água-viva', 'Jellyfish', 1, 3, 0.075, 1, 'bicho', 0.85),
+    b('cirurgiao', 'Cirurgião-azul', 'Blue tang', 1, 3, 0.06, 1, 'bicho', 0.65),
     b('tilapia', 'Tilápia', 'Tilapia', 1, 2, 0.062, 1, 'bicho', 0.55),
     b('baiacu', 'Baiacu', 'Pufferfish', 1, 3, 0.06, 1, 'bicho', 0.8),
     b('traira', 'Traíra', 'Wolf fish', 2, 5, 0.078, 2, 'bicho', 0.4),
     b('pacu', 'Pacu', 'Pacu', 2, 5, 0.074, 2, 'bicho', 0.7),
+    b('cavalo-marinho', 'Cavalo-marinho', 'Seahorse', 2, 6, 0.075, 1, 'bicho', 0.9),
     b('bagre', 'Bagre', 'Catfish', 2, 6, 0.082, 2, 'bicho', 0.4),
     b('tartaruga', 'Tartaruga', 'Turtle', 2, 8, 0.085, 3, 'bicho', 0.6),
     b('bota', 'Bota velha', 'Old boot', 3, 1, 0.06, 1, 'premio', 0.85),
@@ -51,9 +55,13 @@
     b('polvo', 'Polvo', 'Octopus', 4, 12, 0.09, 3, 'bicho', 0.85),
     b('lagosta', 'Lagosta', 'Lobster', 4, 15, 0.095, 3, 'bicho', 0.5),
     b('caranguejo', 'Caranguejo gigante', 'Giant crab', 4, 20, 0.1, 3, 'bicho', 0.6),
+    b('morsa', 'Morsa', 'Walrus', 4, 22, 0.13, 5, 'bicho', 0.6),
     b('tubarao', 'Tubarão', 'Shark', 4, 25, 0.14, 4, 'bicho', 0.4),
     b('martelo', 'Tubarão-martelo', 'Hammerhead shark', 4, 30, 0.14, 4, 'bicho', 0.45),
     b('tubarao-baleia', 'Tubarão-baleia', 'Whale shark', 5, 40, 0.19, 5, 'bicho', 0.4),
+    b('abissal', 'Peixe-abissal', 'Abyssal fish', 5, 42, 0.1, 4, 'bicho', 0.6),
+    b('lanterna', 'Peixe-lanterna', 'Anglerfish', 5, 45, 0.11, 4, 'bicho', 0.75),
+    b('orca', 'Orca', 'Orca', 5, 50, 0.17, 5, 'bicho', 0.42),
     b('baleia', 'Baleia', 'Whale', 5, 60, 0.22, 5, 'bicho', 0.45),
     b('sereia', 'Sereia Iara', 'Iara the mermaid', 5, 80, 0.14, 4, 'bicho', 0.55),
     b('pirarucu', 'Pirarucu Dourado', 'Golden Arapaima', 6, 500, 0.17, 5, 'bicho', 0.35, true),
@@ -65,6 +73,9 @@
   ];
   var POR_ID = {};
   BICHOS.forEach(function (x) { POR_ID[x.id] = x; });
+  // os que nadam devagar (fração da velocidade da faixa)
+  var LENTOS = { orca: 0.8, baleia: 0.7, 'agua-viva': 0.35, 'cavalo-marinho': 0.3, tartaruga: 0.7, polvo: 0.6, lagosta: 0.6, caranguejo: 0.5, morsa: 0.7 };
+  Object.keys(LENTOS).forEach(function (id) { POR_ID[id].lento = LENTOS[id]; });
   // linhas de cada faixa, em fração da profundidade da água (0 = superfície, 1 = fundo)
   var LINHAS = { 1: [0.08, 0.16, 0.24], 2: [0.34, 0.43], 3: [0.53], 4: [0.63, 0.72], 5: [0.82], 6: [0.92] };
   var VEL_FAIXA = { 1: 1, 2: 0.8, 3: 0, 4: 0.5, 5: 0.32, 6: 0.28 };
@@ -90,7 +101,7 @@
     E.bichos.push(o);
     return o;
   }
-  function velDe(E, faixa) { return E.nv.vel * VEL_FAIXA[faixa] * (0.8 + E.rnd() * 0.4); }
+  function velDe(E, faixa, id) { return E.nv.vel * VEL_FAIXA[faixa] * (0.8 + E.rnd() * 0.4) * ((id && POR_ID[id].lento) || 1); }
   function povoar(E) {
     var n = E.cardume, n1 = Math.ceil(n * 0.6), cont = { 1: n1, 2: n - n1, 3: 4, 4: 4, 5: 2 };
     [1, 2, 3, 4, 5].forEach(function (f) {
@@ -98,7 +109,7 @@
       for (var i = 0; i < cont[f]; i++) {
         var d = f === 3 ? lista[i % lista.length] : sortear(E, lista);
         var x = (i + 0.3 + E.rnd() * 0.4) / cont[f] * E.W, linha = linhas[i % linhas.length];
-        novoBicho(E, d.id, x, linha, (i + f) % 2 ? 1 : -1, velDe(E, f));
+        novoBicho(E, d.id, x, linha, (i + f) % 2 ? 1 : -1, velDe(E, f, d.id));
       }
     });
   }
@@ -115,7 +126,7 @@
     var linhas = LINHAS[faixa], linha = linhas[Math.floor(E.rnd() * linhas.length)];
     if (faixa === 3) { novoBicho(E, d.id, (0.1 + E.rnd() * 0.8) * E.W, linha, 1, 0); return; }
     var dir = E.rnd() < 0.5 ? 1 : -1, r = d.tam * H * E.esc / 2;
-    novoBicho(E, d.id, dir > 0 ? -r : E.W + r, linha, dir, velDe(E, faixa));
+    novoBicho(E, d.id, dir > 0 ? -r : E.W + r, linha, dir, velDe(E, faixa, d.id));
   }
   function moverBichos(E, h) {
     var z = E.nv.zigue;
@@ -140,7 +151,7 @@
         o.fy += Math.max(-0.12 * h, Math.min(0.12 * h, alvo - o.fy));
         if (E.t >= o.minhoca && Math.abs(o.fy - o.fy0) < 1e-3) { o.fy = o.fy0; o.minhoca = 0; }
       }
-      o.y = fundoY(E, o.fy) + (z ? Math.sin(E.t * o.wf * 1.7 + o.fase) * z * 12 : 0) + (o.faixa === 3 ? Math.sin(E.t + o.fase) * 3 : 0);
+      o.y = fundoY(E, o.fy) + Math.sin(E.t * o.wf * 1.1 + o.fase) * (4 + z * 10) + (o.faixa === 3 ? Math.sin(E.t + o.fase) * 3 : 0);
     }
   }
   // deitado, a tela é baixinha: os bichos ficam maiores (E.esc) para dar para ver os detalhes; o toque e o desenho usam o mesmo tamanho
@@ -374,7 +385,7 @@
     return { pontos: p, time: p.reduce(function (s, x) { return s + x; }, 0), vencedor: p[0] === p[1] ? -1 : p[0] > p[1] ? 0 : 1 };
   }
   function colocar(E, id, x, y, op) {
-    var d = POR_ID[id], v = op && typeof op.vel === 'number' ? op.vel : velDe(E, Math.max(1, d.faixa));
+    var d = POR_ID[id], v = op && typeof op.vel === 'number' ? op.vel : velDe(E, Math.max(1, d.faixa), id);
     return novoBicho(E, id, x, (y - E.sup) / (H - E.sup), 1, v);
   }
 
