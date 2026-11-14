@@ -2,6 +2,35 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.21.0",
+      "data": "14/Nov/2026",
+      "hora": "17:56:48",
+      "pt": [
+        "🎵 Mais 17 músicas na rádio (37 no total): pop, funk e dance animados, sem voz.",
+        "💃 O desfile agora toca músicas de passarela: umas chiques e animadas, outras mais calmas e emocionantes.",
+        "🎶 O botão de música mostra como está agora: 🎶 tocando, 🔕 sem música (estava ao contrário).",
+        "🧸 Na tela de brincar, os botões de música saíram de cima da boneca e foram para a linha do título; os botões de cima cabem numa linha só.",
+        "🎵 Na tela de música aparece só o nome da música, numa linha.",
+        "🗑️ Saiu o botão de baixar um arquivo do jogo: o jeito certo é 📲 Instalar."
+      ],
+      "en": [
+        "🎵 17 more songs on the radio (37 in all): upbeat pop, funk and dance, no vocals.",
+        "💃 The runway now plays catwalk songs: some chic and upbeat, others calmer and more moving.",
+        "🎶 The music button shows the current state: 🎶 playing, 🔕 no music (it was backwards).",
+        "🧸 On the play screen, the music buttons moved off the doll to the title line; the top buttons fit on one line.",
+        "🎵 The music screen shows just the song name, on one line.",
+        "🗑️ The download-a-file button is gone: the right way is 📲 Install."
+      ],
+      "es": [
+        "🎵 17 canciones más en la radio (37 en total): pop, funk y dance animados, sin voz.",
+        "💃 El desfile ahora suena con música de pasarela: unas elegantes y animadas, otras más tranquilas y emocionantes.",
+        "🎶 El botón de música muestra cómo está ahora: 🎶 sonando, 🔕 sin música (estaba al revés).",
+        "🧸 En la pantalla de juego, los botones de música salen de encima de la muñeca y pasan a la línea del título; los botones de arriba caben en una sola línea.",
+        "🎵 En la pantalla de música solo aparece el nombre de la canción, en una línea.",
+        "🗑️ Se ha quitado el botón de descargar un archivo del juego: lo correcto es 📲 Instalar."
+      ]
+    },
+    {
       "versao": "0.20.0",
       "data": "14/Nov/2026",
       "hora": "17:23:24",
