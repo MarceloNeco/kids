@@ -4,21 +4,21 @@ const assert = require('node:assert/strict');
 const P = require('../pecas.js');
 const V = require('../visual.js');
 
-test('catálogo: nomes em PT e EN, ids únicos, cores válidas', () => {
+test('catálogo: nomes em PT, EN e ES, ids únicos, cores válidas', () => {
   const ids = new Set();
   for (const c of P.CATEGORIAS) {
     assert.ok(!ids.has(c.id), 'categoria repetida ' + c.id); ids.add(c.id);
-    assert.ok(c.pt && c.en, 'categoria sem nome ' + c.id);
+    assert.ok(c.pt && c.en && c.es, 'categoria sem nome ' + c.id);
     assert.ok(P.GRUPOS.some(g => g.id === c.grupo), 'grupo desconhecido ' + c.grupo);
     assert.ok(c.opcoes || c.cores, 'categoria vazia ' + c.id);
     if (c.cores) assert.ok(P.CORES[c.cores], 'paleta desconhecida ' + c.cores);
     if (c.opcoes) {
       const ops = new Set();
-      for (const o of c.opcoes) { assert.ok(o.pt && o.en, c.id + '/' + o.id + ' sem nome'); assert.ok(!ops.has(o.id), 'opção repetida ' + c.id + '/' + o.id); ops.add(o.id); }
+      for (const o of c.opcoes) { assert.ok(o.pt && o.en && o.es, c.id + '/' + o.id + ' sem nome'); assert.ok(!ops.has(o.id), 'opção repetida ' + c.id + '/' + o.id); ops.add(o.id); }
       if (ops.has('nenhum')) assert.equal(c.opcoes[0].id, 'nenhum', '"nenhum" vem primeiro em ' + c.id);
     }
   }
-  for (const k in P.CORES) for (const c of P.CORES[k]) { assert.match(c.hex, /^#[0-9a-f]{6}$/i, k + '/' + c.id); assert.ok(c.pt && c.en); }
+  for (const k in P.CORES) for (const c of P.CORES[k]) { assert.match(c.hex, /^#[0-9a-f]{6}$/i, k + '/' + c.id); assert.ok(c.pt && c.en && c.es, k + '/' + c.id + ' sem nome'); }
 });
 
 test('padrão: toda categoria tem valor válido', () => {
@@ -97,10 +97,17 @@ test('desafio praia completo dá 3 estrelas', () => {
   assert.equal(V.avaliar(e, 'praia').estrelas, 3);
 });
 
-test('resumo para leitor de tela em PT e EN', () => {
+test('resumo para leitor de tela em PT, EN e ES', () => {
   const e = V.aplicar(V.novo(), 'batom', 'gloss');
   assert.match(V.resumo(e, 'pt'), /^Seu visual: .*gloss/);
   assert.match(V.resumo(e, 'en'), /^Your look: /);
+  assert.match(V.resumo(e, 'es'), /^Tu look: .*gloss.*\. Escenario: /);
+  assert.ok(!/undefined/.test(V.resumo(e, 'es')), 'resumo em espanhol sem nome faltando');
+});
+
+test('grupos, nomes curtos e desafios (com as dicas) em PT, EN e ES', () => {
+  for (const g of P.GRUPOS) { assert.ok(g.pt && g.en && g.es, 'aba ' + g.id); if (g.curto) assert.ok(g.curto.pt && g.curto.en && g.curto.es, 'aba curta ' + g.id); }
+  for (const d of P.DESAFIOS) { assert.ok(d.pt && d.en && d.es, 'desafio ' + d.id); for (const x of d.dicas) assert.ok(x.pt && x.en && x.es, 'dica de ' + d.id); }
 });
 
 test('toda parte que dá para tirar tem a opção 🚫 (nenhum), menos as do corpo (pele, rosto, nariz, olhos, cabelo…) e cenário', () => {

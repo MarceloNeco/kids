@@ -152,14 +152,15 @@
 
   // frase curta do visual, para leitor de tela (aria-label do desenho)
   function resumo(e, lingua) {
-    var L = lingua === 'en' ? 'en' : 'pt', partes = [];
+    var L = lingua === 'en' || lingua === 'es' ? lingua : 'pt', partes = [];
     ['vestido', 'blusa', 'saia', 'calca', 'sapatos', 'cabeca', 'laco', 'oculos', 'colar', 'brincos', 'pulseira', 'anel', 'broche', 'bolsa', 'batom', 'sombra', 'cilios', 'glitter', 'adesivo', 'mechas'].forEach(function (id) {
       if (!visivel(e, id)) return;
       var op = P.opcao(id, e[id]), cat = P.categoria(id), c = cat.cores ? P.cor(cat.cores, e[id + 'Cor']) : null;
       if (op) partes.push((op[L] + (c && id !== 'glitter' ? ' ' + c[L].toLowerCase() : '')).toLowerCase());
     });
     var cen = P.opcao('cenario', e.cenario);
-    return (L === 'en' ? 'Your look: ' : 'Seu visual: ') + partes.join(', ') + (cen ? (L === 'en' ? '. Scene: ' : '. Cenário: ') + cen[L].toLowerCase() : '') + '.';
+    var txt = { pt: ['Seu visual: ', '. Cenário: '], en: ['Your look: ', '. Scene: '], es: ['Tu look: ', '. Escenario: '] }[L];
+    return txt[0] + partes.join(', ') + (cen ? txt[1] + cen[L].toLowerCase() : '') + '.';
   }
 
   var API = { novo: novo, aplicar: aplicar, visivel: visivel, limpar: limpar, surpresa: surpresa, semente: semente,

@@ -50,7 +50,7 @@ Endereço: https://solverone.com.br/kids/labirinto/
 | `app.js` | Telas, câmera, toques, pinça, teclado, festa, recordes (`localStorage`: `bolinho:labirinto:pref` e `bolinho:labirinto:recordes`). `APP_VERSION`. |
 | `sw.js` | Sem internet (cache `labirinto-v…`). `VERSAO`. |
 | `manifest.webmanifest`, `icone.svg`, `icone-192.png`, `icone-512.png` | Instalar (ícone original, feito em SVG e exportado para PNG). |
-| `versoes.json` | Novidades de cada versão (PT/EN). |
+| `versoes.json` | Novidades de cada versão (PT/EN/ES). |
 | `teste/` | Testes: `node --test labirinto/teste/*.test.js` (da raiz do repositório kids). |
 
 Peças da raiz usadas com `../`: `recursos.js`, `atualizar.js`, `telacheia.js`, `trilha.js`, `instalar.js` (só com
@@ -59,4 +59,7 @@ Peças da raiz usadas com `../`: `recursos.js`, `atualizar.js`, `telacheia.js`, 
 ## Para testar no computador
 
 `?teste` liga o `window.LabirintoDebug`; `?semente=123` fixa o labirinto; `?missao=1` ou `?missao=0` força a missão.
+Idioma: português, inglês ou espanhol, escolhido só na estante (`../idioma.js`); o jogo não tem botão de idioma. Textos com
+`data-t="pt|en|es"`, rótulos (aria-label) com `data-rotulo="pt|en|es"` e `t(pt, en, es)` no `app.js`.
+
 A cada versão: subir `APP_VERSION` (app.js), `VERSAO` (sw.js) e a entrada nova em `versoes.json` — os testes conferem.

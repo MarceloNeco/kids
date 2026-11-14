@@ -201,10 +201,10 @@
 
   /* ---------- itens da missão (unidade: 1 = tamanho do item) ---------- */
   var ITENS = [
-    { pt: 'o osso', en: 'the bone', em: '🦴' },
-    { pt: 'a chave', en: 'the key', em: '🔑' },
-    { pt: 'a estrela', en: 'the star', em: '⭐' },
-    { pt: 'o tesouro', en: 'the treasure', em: '💎' }
+    { pt: 'o osso', en: 'the bone', es: 'el hueso', em: '🦴' },
+    { pt: 'a chave', en: 'the key', es: 'la llave', em: '🔑' },
+    { pt: 'a estrela', en: 'the star', es: 'la estrella', em: '⭐' },
+    { pt: 'o tesouro', en: 'the treasure', es: 'el tesoro', em: '💎' }
   ];
   function estrela(ctx, x, y, r, pontas) {
     ctx.beginPath();

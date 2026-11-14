@@ -6,15 +6,16 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.2.4 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.3.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.2.4'); assert.equal(a, s); assert.equal(v.versao, a);
-  assert.equal(v.data, '07/Nov/2026');
-  assert.match(ler('app.js'), /APP_DATA = '07\/Nov\/2026'/);
-  for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
+  assert.equal(a, '0.3.0'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(v.data, '14/Nov/2026');
+  assert.match(ler('app.js'), /APP_DATA = '14\/Nov\/2026'/);
+  for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
+  assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
 });
 
 test('sw.js guarda todos os arquivos publicados, cache com o nome da pasta', () => {
@@ -28,7 +29,7 @@ test('sw.js guarda todos os arquivos publicados, cache com o nome da pasta', () 
   for (const f of ['../trilha.js', '../recursos.js', '../atualizar.js', '../telacheia.js', '../rabiscolandia/fontes/fredoka.woff2']) assert.ok(lista.includes(f), 'sw.js não guarda ' + f);
 });
 
-test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN', () => {
+test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES, sem botão de idioma próprio', () => {
   const html = ler('index.html');
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
@@ -38,7 +39,10 @@ test('index.html: CSP sem script inline, scripts existem, interruptor e textos P
   assert.match(html, /<script src="\.\.\/telacheia\.js" data-fora-do-arquivo>/);
   assert.match(html, /<script src="\.\.\/trilha\.js">/);
   assert.match(html, /data-recurso="labirinto"/);
-  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'texto sem as três línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-rotulo="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'rótulo sem as três línguas: ' + m[1]);
+  assert.ok(!/aria-label="[^"]* \/ [^"]*"/.test(html), 'rótulo PT / EN sem data-rotulo');
+  assert.ok(!/id="btLingua"/.test(html), 'o idioma é escolhido só na estante');
   assert.match(ler('app.js'), /s\.src = '\.\.\/instalar\.js'/);
 });
 
