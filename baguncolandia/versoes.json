@@ -2,6 +2,19 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.34",
+      "data": "14/Nov/2026",
+      "hora": "10:00:00",
+      "pt": [
+        "👨 Chuta-chuta: o papai joga junto! Ele corre de lado atrás da bola, com as pernas mexendo, sorri e pede a bola acenando (\"Toca pra mim!\", \"Chuta pro papai!\"). Quando a bola chega nele, chuta: quase sempre devolve para você chutar (\"Toma! Agora chuta!\") e de vez em quando manda para o gol. Gol de vocês dois: ele comemora junto.",
+        "👴 Na piscina de bolinhas, quem senta na cadeirinha do lado esquerdo agora é o vovô (a mamãe continua do outro lado)."
+      ],
+      "en": [
+        "👨 Kick: Dad plays along! He runs sideways after the ball, legs moving, smiles and waves asking for the ball (\"Pass it to me!\", \"Kick it to Dad!\"). When the ball reaches him he kicks it: almost always back to you (\"Here! Now kick it!\") and now and then at the goal. Any goal: he celebrates with you.",
+        "👴 In the ball pit, Grandpa now sits on the left folding seat (Mom is still on the other side)."
+      ]
+    },
+    {
       "versao": "0.8.33",
       "data": "07/Nov/2026",
       "hora": "12:00:00",
