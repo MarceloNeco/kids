@@ -281,8 +281,10 @@
       E.bonus.prox = E.t + 1.2;
       var x = 0, livre = false;
       for (var k = 0; k < 8 && !livre; k++) {   // longe dos outros banhistas
-        x = (0.12 + E.rnd() * 0.76) * E.W;
-        livre = !E.bichos.some(function (q) { return q.tipo === 'banhista' && Math.abs(q.x - x) < 150; });
+        // longe dos barcos e (deitado) do placar, que fica em cima, no meio
+        var faixas = E.W >= H ? [[0.22, 0.32], [0.68, 0.78]] : [[0.38, 0.62]], fz = faixas[Math.floor(E.rnd() * faixas.length)];
+        x = (fz[0] + E.rnd() * (fz[1] - fz[0])) * E.W;
+        livre = !E.bichos.some(function (q) { return q.tipo === 'banhista' && Math.abs(q.x - x) < 110; });
       }
       if (livre) novoBicho(E, sortear(E, ['menino', 'menina']), x, 0, 1, 0);
     } else if (tipo === 'filhotes' && quantos('filhote') < 4) {
