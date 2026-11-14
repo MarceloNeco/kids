@@ -2,6 +2,25 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.7.0",
+      "data": "14/Nov/2026",
+      "hora": "11:30:00",
+      "pt": [
+        "🏘️ Vila nova em 3D: cada lugar é um bloquinho com a sua casinha (celeiro com cata-vento girando, galinheiro com rampa, mercado com toldo e uma cesta gigante no telhado, pomar e horta cercados, rio com peixe pulando), com ruas, carrinho passando e nuvens.",
+        "🧑‍🍳 O cozinheirinho sai de casa e anda pela rua até o lugar que você tocar, e entra pela porta.",
+        "👉 Faixa da missão: diz o que buscar agora e onde, e uma seta pula em cima do lugar (Fácil e Médio).",
+        "➡️ Pegou tudo de um lugar? Ele segue sozinho para o próximo e, com a cesta cheia, vai para casa cozinhar (Fácil e Médio).",
+        "✔ Na cesta, o que já está completo ganha um ✔."
+      ],
+      "en": [
+        "🏘️ New 3D village: every place is a little block with its own building (red barn with a spinning windmill, hen house with a ramp, shop with a striped awning and a giant basket on the roof, fenced orchard and garden, a river with a jumping fish), with streets, a passing car and clouds.",
+        "🧑‍🍳 The little chef leaves home and walks down the street to the place you tap, and goes in through the door.",
+        "👉 Mission banner: says what to get now and where, and an arrow bounces over the place (Easy and Medium).",
+        "➡️ Got everything from a place? The chef heads to the next one by himself and, with a full basket, goes home to cook (Easy and Medium).",
+        "✔ In the basket, complete items get a ✔."
+      ]
+    },
+    {
       "versao": "0.6.1",
       "data": "14/Nov/2026",
       "hora": "09:40:00",
