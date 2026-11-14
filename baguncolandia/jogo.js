@@ -176,19 +176,61 @@
     ] : null;
     /* 👨👩 quem joga junto (só com 1 pessoa): na 🎳 Bagunça de bolas o PAPAI corre atrás da bola que está mais perto dele e
        devolve batendo nela em direção à criança; no 🎈 Pega-pega a MAMÃE corre atrás dos bichos (um pouco mais devagar que a
-       criança) e pega um de vez em quando. Os dois correm de lado, pedem/chamam com balão e comemoram com a criança. */
-    var parente = nJog === 1 && modoBase === 'bolas' ? { quem: 'pai' } : nJog === 1 && modoBase === 'pega' ? { quem: 'mae' } : null;
-    if (parente) { parente.x = W * 0.72; parente.vx = 0; parente.fase = 'anda'; parente.t = 0; parente.chama = false; parente.fala = null; parente.falaAte = 0; parente.proxFala = 1.5; parente.dir = -1; }
-    var A_PARENTE = 400, FALAS = {
+       criança) e pega um de vez em quando; no 🪵 Pula e abaixa os DOIS brincam junto (papai à direita, que vê o tronco/galho
+       primeiro, e mamãe à esquerda): pulam o tronco e abaixam do galho com o mesmo movimento do boneco. Correm de lado,
+       pedem/chamam com balão e reagem: a criança acerta → comemoram (cada um do seu jeito); se machuca → mão na cabeça, tristes. */
+    var parentes = [];
+    function novoParente(quem, x) { return { quem: quem, x: x, casa: x, vx: 0, y: 0, vy: 0, abaixa: false, fase: 'anda', t: 0, chama: false, fala: null, falaAte: 0, proxFala: 1.5, dir: -1, reacao: null, reacaoT: 0 }; }
+    if (nJog === 1 && modoBase === 'bolas') parentes.push(novoParente('pai', W * 0.72));
+    if (nJog === 1 && modoBase === 'pega') parentes.push(novoParente('mae', W * 0.72));
+    if (nJog === 1 && modoBase === 'pula') { parentes.push(novoParente('pai', W * 0.86)); parentes.push(novoParente('mae', W * 0.14)); }
+    var A_PARENTE = 400, G_PARENTE = 2600, FALAS = {
       pai: [['Toca pra mim!', 'Pass it to me!'], ['Aqui, aqui!', 'Over here!'], ['Joga pro papai!', 'Throw it to Dad!'], ['Vai, campeã(o)!', 'Go, champ!']],
-      mae: [['Olha ali um bichinho!', 'Look, a little critter!'], ['Pega, pega!', 'Catch it, catch it!'], ['Vem com a mamãe!', 'Come with Mom!'], ['Corre que ele foge!', 'Run, it will get away!']]
+      mae: [['Olha ali um bichinho!', 'Look, a little critter!'], ['Pega, pega!', 'Catch it, catch it!'], ['Vem com a mamãe!', 'Come with Mom!'], ['Corre que ele foge!', 'Run, it will get away!']],
+      paiPula: [['Pula comigo!', 'Jump with me!'], ['Faz igual ao papai!', 'Do like Dad!'], ['Olha o papai!', 'Watch Dad!']],
+      maePula: [['Abaixa junto com a mamãe!', 'Duck with Mom!'], ['Você consegue!', 'You can do it!'], ['Presta atenção!', 'Watch out!']]
     };
-    function falaParente(f, ms) { parente.fala = f; parente.falaAte = tempo + (ms || 1800); }
-    function festaParente(f) { if (!parente) return; parente.fase = 'festa'; parente.t = 0; falaParente(f, 2000); }
+    var REACOES = {   // o que cada um fala quando a criança acerta ou se machuca
+      festa: { pai: [['Isso aí, campeã(o)!', "That's it, champ!"], ['Boa! Toca aqui!', 'Nice! High five!'], ['Uhuuu!', 'Woohoo!']], mae: [['Muito bem, meu amor!', 'Well done, sweetie!'], ['Que lindo!', 'Beautiful!'], ['Parabéns!', 'Congrats!']] },
+      triste: { pai: [['Ih! Machucou?', 'Oops! Did it hurt?'], ['Ai, essa doeu!', 'Ouch, that hurt!']], mae: [['Ai, coitadinho(a)!', 'Aww, poor thing!'], ['Tudo bem, meu amor?', 'Are you okay, sweetie?']] }
+    };
+    function falaParente(P, f, ms) { P.fala = f; P.falaAte = tempo + (ms || 1800); }
+    function sorteia(L) { return L[Math.floor(rnd() * L.length)]; }
+    /* reação de quem está junto (no campo e sentado na piscina de bolinhas): 'festa' ou 'triste' */
+    function reagir(tipo, f) {
+      (parentes || []).forEach(function (P) { P.reacao = tipo; P.reacaoT = tipo === 'festa' ? 1.6 : 1.8; falaParente(P, f || sorteia(REACOES[tipo][P.quem]), 2000); });
+      if (tanques) tanques.forEach(function (k) { if (k.fase === 'sentado') { k.reacao = tipo; k.reacaoT = tipo === 'festa' ? 1.6 : 1.8; } });
+    }
+    function festaParente(f) { if (parentes.length) reagir('festa', f); }
     function passoParente(dt) {
-      if (!parente) return;
-      var P = parente, mae = P.quem === 'mae', crianca = raia(0).x + jogadores[0].corpo.x * raia(0).w, chao = H * 0.86, alcance = chao - A_PARENTE * 1.15;
-      P.t += dt; if ((P.fase === 'bate' && P.t > 0.4) || (P.fase === 'festa' && P.t > 1.4)) { P.fase = 'anda'; P.t = 0; }
+      if (tanques) tanques.forEach(function (k) { if (k.reacaoT > 0 && (k.reacaoT -= dt) <= 0) k.reacao = null; });
+      parentes.forEach(function (P) {
+        P.t += dt; if (P.fase === 'bate' && P.t > 0.4) { P.fase = 'anda'; P.t = 0; }
+        if (P.reacaoT > 0 && (P.reacaoT -= dt) <= 0) P.reacao = null;
+        if (modoBase === 'pula') passoParentePula(P, dt); else passoParenteCampo(P, dt);
+      });
+    }
+    /* 🪵 no Pula e abaixa: fica no seu lugar e pula o tronco / abaixa do galho na hora certa (nunca erra) */
+    function passoParentePula(P, dt) {
+      var querAbaixar = false, falou = P.fala && tempo < P.falaAte;
+      coisas.forEach(function (c) {
+        if (c.estilo !== 'obstaculo' || c.j !== 0) return;
+        var dx = (c.x - P.x) * (c.vx < 0 ? 1 : -1), v = Math.abs(c.vx) || 1, meio = c.w / 2 + 40;   // dx > 0: ainda vem vindo
+        if (c.tipo === 'baixo' && !c['pulou_' + P.quem] && P.y === 0 && dx < v * 0.36 + 10 && dx > -meio) {   // tronco: pula para passar no alto do pulo
+          c['pulou_' + P.quem] = true; P.vy = -Math.sqrt(2 * G_PARENTE * 190); P.dir = c.vx < 0 ? 1 : -1;
+          if (!falou && rnd() < 0.5) falaParente(P, P.quem === 'pai' ? ['Upa!', 'Hop!'] : ['Pula!', 'Jump!'], 900);
+        }
+        if (c.tipo === 'alto' && dx < meio + v * 0.18 && dx > -meio - 30) { querAbaixar = true; P.dir = c.vx < 0 ? 1 : -1; }   // galho: abaixa antes de chegar e só levanta depois que passou
+      });
+      if (querAbaixar && !P.abaixa && !falou && rnd() < 0.5) falaParente(P, P.quem === 'pai' ? ['Abaixa!', 'Duck!'] : ['Cuidado, abaixa!', 'Careful, duck!'], 900);
+      P.abaixa = querAbaixar && P.y === 0;
+      if (P.y < 0 || P.vy < 0) { P.vy += G_PARENTE * dt; P.y = Math.min(0, P.y + P.vy * dt); if (P.y === 0) P.vy = 0; }
+      P.vx = 0; P.x = P.casa;
+      P.chama = !P.abaixa && P.y === 0 && !P.reacao;
+      if (P.chama && tempo / 1000 > P.proxFala) { P.proxFala = tempo / 1000 + 6 + rnd() * 4; falaParente(P, sorteia(FALAS[P.quem + 'Pula']), 2000); }
+    }
+    function passoParenteCampo(P, dt) {
+      var mae = P.quem === 'mae', crianca = raia(0).x + jogadores[0].corpo.x * raia(0).w, chao = H * 0.86, alcance = chao - A_PARENTE * 1.15;
       var alvo = null, dm = 1e9;
       coisas.forEach(function (c) {
         if (c.morta || c.j !== 0) return;
@@ -198,17 +240,19 @@
       });
       var lado = crianca < W / 2 ? 1 : -1, alvoX = alvo ? alvo.x - Math.sign(crianca - alvo.x || 1) * 30 : clamp(crianca + lado * 380, A_PARENTE * 0.3, W - A_PARENTE * 0.3);
       var vmax = mae ? W / 3.2 : W / 2.2, dx = alvoX - P.x;   // a mamãe é um pouco mais devagar: quem mais pega é a criança
-      if (P.fase !== 'bate') { P.vx += clamp(clamp(dx * 5, -vmax, vmax) - P.vx, -4000 * dt, 4000 * dt); P.x = clamp(P.x + P.vx * dt, A_PARENTE * 0.25, W - A_PARENTE * 0.25); }
+      if (P.reacao) P.vx *= 0.8;   // comemorando ou triste: para um pouquinho
+      else if (P.fase !== 'bate') { P.vx += clamp(clamp(dx * 5, -vmax, vmax) - P.vx, -4000 * dt, 4000 * dt); }
       else P.vx *= 0.8;
+      P.x = clamp(P.x + P.vx * dt, A_PARENTE * 0.25, W - A_PARENTE * 0.25);
       if (Math.abs(P.vx) > 20) P.dir = P.vx > 0 ? 1 : -1;
-      if (alvo && P.fase !== 'bate' && Math.abs(alvo.x - P.x) < Math.max(55, alvo.raio)) {   // chegou: o papai bate na bola, a mamãe pega o bicho
+      if (alvo && P.fase !== 'bate' && !P.reacao && Math.abs(alvo.x - P.x) < Math.max(55, alvo.raio)) {   // chegou: o papai bate na bola, a mamãe pega o bicho
         P.fase = 'bate'; P.t = 0; P.dir = alvo.x > P.x ? 1 : -1; P.alto = alvo.y < chao - 160;
-        if (mae) { acertou(0, alvo, 'pega', tempo, { x: P.x, y: alvo.y }); falaParente(['Peguei um!', 'Got one!']); }
-        else { alvo.vx = clamp((crianca - alvo.x) / 1.0, -620, 620); alvo.vy = -520; alvo.passe = tempo + 1200; falaParente(['Toma! Pega ela!', 'Here! Get it!']); }
+        if (mae) { acertou(0, alvo, 'pega', tempo, { x: P.x, y: alvo.y }); falaParente(P, ['Peguei um!', 'Got one!']); }
+        else { alvo.vx = clamp((crianca - alvo.x) / 1.0, -620, 620); alvo.vy = -520; alvo.passe = tempo + 1200; falaParente(P, ['Toma! Pega ela!', 'Here! Get it!']); }
         emitir({ t: 'parente', quem: P.quem, x: P.x });
       }
-      P.chama = !alvo && P.fase === 'anda' && Math.abs(P.vx) < 40;
-      if (P.chama && tempo / 1000 > P.proxFala) { P.proxFala = tempo / 1000 + 5 + rnd() * 3; var L = FALAS[P.quem]; falaParente(L[Math.floor(rnd() * L.length)], 2000); }
+      P.chama = !alvo && P.fase === 'anda' && !P.reacao && Math.abs(P.vx) < 40;
+      if (P.chama && tempo / 1000 > P.proxFala) { P.proxFala = tempo / 1000 + 5 + rnd() * 3; falaParente(P, sorteia(FALAS[P.quem]), 2000); }
     }
     var TEMPO_TANQUE = { caindo: 0.55, piscina: 1.7, subindo: 1.9 };
     function passoTanques(dt) {
@@ -230,7 +274,11 @@
     function porPapel(papel) { return figs.filter(function (f) { return f.papel === papel; }); }
     function sortear(lista) { return lista.length ? lista[Math.floor(rnd() * lista.length) % lista.length] : null; }
 
-    function emitir(e) { eventos.push(e); }
+    function emitir(e) {
+      eventos.push(e);
+      if (e.j === 0 && (e.t === 'bateu' || (e.t === 'vilao' && e.vida))) reagir('triste');   // a criança se machucou
+      else if (e.t === 'gol' || e.t === 'tanque' || e.t === 'chutou' || (e.t === 'desviou' && e.j === 0)) reagir('festa');   // acertou
+    }
 
     function lancar(o, j) {
       var fig = typeof o.fig === 'string' ? figs.filter(function (f) { return f.id === o.fig; })[0] : o.fig;
@@ -538,7 +586,7 @@
         if (c.anda === 'buraco' && c.b.k < 0.35) return;   // ainda (ou já) dentro do buraco
         c.pego = true; var cn = canto(j, c); c.b.fase = 'pego'; c.b.t = 0; c.b.tx = cn.x; c.b.ty = cn.y;
         jg.pontos += mult(j, PONTOS.bicho); emitir({ t: 'pegou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.bicho, bicho: true });
-        if (parente && !(L0 && L0.x === parente.x)) festaParente(['Isso! Pegou!', 'Yes! You got it!']);
+        if (parentes.length && !parentes.some(function (P) { return L0 && L0.x === P.x; })) festaParente(['Isso! Pegou!', 'Yes! You got it!']);   // não comemora o bicho que a própria mamãe pegou
       } else if (c.papel === 'heroi') {
         c.morta = true; c.como = 'pegou';
         var fig = figs.filter(function (f) { return f.id === c.fig; })[0], p = fig && fig.mascote ? PONTOS.mascote : PONTOS.heroi;
@@ -555,7 +603,7 @@
         c.tocadoAte = tempo + 400;
         var ux = c.x - L0.x, uy = c.y - L0.y, nn2 = Math.hypot(ux, uy) || 1;
         c.vx = ux / nn2 * 520 + (rnd() - 0.5) * 100; c.vy = uy / nn2 * 520 - 300;
-        if (parente && L0 && L0.x !== parente.x && rnd() < 0.25) festaParente(['Boa! Toca aqui!', 'Nice one! High five!']);
+        if (parentes.length && L0 && !parentes.some(function (P) { return L0.x === P.x; }) && rnd() < 0.25) festaParente(['Boa! Toca aqui!', 'Nice one! High five!']);
         jg.pontos += mult(j, PONTOS.tocou); emitir({ t: 'tocou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.tocou });
       } else if (c.papel === 'bola' && !c.chutada) {
         chutar(c, dirX || 0, !!forte);
@@ -608,7 +656,7 @@
       return {
         fase: fase, modo: modoAtual, modoBase: modoBase, tempo: tempo, restante: duracao ? Math.max(0, Math.ceil((duracao * 1000 - tempo) / 1000)) : null,
         jogadores: jogadores.map(function (jg, j) { var r = raia(j); return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: jg.combo, poder: jg.poder, poderAte: jg.poderAte, lento: jg.lento > tempo, raia: r, zonaChute: jg.zonaChute, rastro: jg.rastro.slice(-8), corpo: jg.corpo, vai: jg.vai ? { x: jg.vai.x, y: jg.vai.y, vx: jg.vai.vx, A: VAI.A, cima: corpoVai(j).cima, alvo: jg.vai.alvo } : null, invencivel: jg.invencivelAte > tempo, esqueleto: jg.esq && tempo - 0 >= 0 ? jg.esq.k : null }; }),
-        coisas: coisas, trave: trave, bpm: bpm, tanques: tanques, parente: parente ? { quem: parente.quem, x: parente.x, vx: parente.vx, fase: parente.fase, t: parente.t, alto: parente.alto, chama: parente.chama, dir: parente.dir, fala: tempo < parente.falaAte ? parente.fala : null } : null
+        coisas: coisas, trave: trave, bpm: bpm, tanques: tanques, parentes: parentes.map(function (P) { return { quem: P.quem, x: P.x, y: P.y, vx: P.vx, abaixa: P.abaixa, fase: P.fase, t: P.t, alto: P.alto, chama: P.chama, dir: P.dir, reacao: P.reacao, fala: tempo < P.falaAte ? P.fala : null }; })
       };
     }
     function batida(novoBpm) { bpm = novoBpm ? clamp(novoBpm, 40, 220) : 0; ultimaBatida = tempo; }
