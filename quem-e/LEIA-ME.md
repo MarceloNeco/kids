@@ -2,7 +2,10 @@
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE), em **solverone.com.br/kids/quem-e/**. Sem login, sem cadastro.
 Os anfitriões são as massinhas das filhas do dono: o **Melekento Blue** (geleia azul de espuma) e a **Pink Honey**
-(melequinha rosa que escorre mel). O nome em inglês, escondido por enquanto, é *Who Is It?*.
+(melequinha rosa que escorre mel). Em inglês o jogo se chama *Who Is It?* e em espanhol *¿Quién es?*
+("A Meleca Adivinha" = *The Slime Guesses* / *El Slime Adivina*). O idioma (português, inglês ou espanhol) é escolhido
+só na estante (`../idioma.js`); os nomes dos personagens ficam iguais, as perguntas e falas mudam, e a voz do aparelho
+usada é sempre a do idioma escolhido.
 
 ## Duelo de Caras (v0.1.0)
 

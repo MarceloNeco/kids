@@ -24,7 +24,7 @@ test('CSP sem script inline nem eval', () => {
 
 test('navegação padrão e versão', () => {
   assert.match(app, /BolinhoNav\.iniciar\(\{\s*jogo: 'quem-e'/);
-  assert.match(app, /var APP_VERSION = '0\.2\.3'/);
+  assert.match(app, /var APP_VERSION = '0\.3\.0'/);
 });
 
 test('trilha: pelo menos 10 músicas gravadas que existem', () => {
@@ -39,7 +39,10 @@ test('nada de nome de marca de terceiros', () => {
   assert.ok(!/cara a cara|akinator|guess who/i.test(tudo));
 });
 
-test('todo texto da tela tem PT e EN', () => {
-  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.strictEqual(m[1].split('|').length, 2, m[1]);
-  for (const m of app.matchAll(/\bt\('([^']*)', '([^']*)'\)/g)) assert.ok(m[1] && m[2], m[0]);
+test('todo texto da tela tem PT, EN e ES; o idioma vem só da estante (sem botão próprio)', () => {
+  for (const m of html.matchAll(/data-(?:t|rotulo|dica)="([^"]*)"/g)) assert.strictEqual(m[1].split('|').length, 3, m[1]);
+  assert.ok(!html.includes('btLingua') && !app.includes('btLingua'), 'botão de idioma próprio');
+  assert.ok(!/navigator\.language/.test(app), 'o idioma é o da estante (BolinhoIdioma.atual)');
+  const tela = fs.readFileSync(path.join(pasta, 'adivinha-tela.js'), 'utf8');
+  for (const js of [app, tela]) for (const m of js.matchAll(/\bt\('([^']*)', ['"][^'"]*['"]\)/g)) assert.fail('t() sem o espanhol: ' + m[0]);
 });

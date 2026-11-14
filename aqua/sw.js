@@ -4,7 +4,7 @@
    Músicas gravadas (*.mp3 da pasta da Purpurina): o service worker não mexe (o navegador busca direto).
    Cache com o nome do app: só apaga caches "aqua-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.1.0';
+var VERSAO = '0.2.0';
 var CACHE = 'aqua-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'motor.js', 'som.js', 'desenho.js', 'app.js', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', 'sons/despejar.mp3', 'sons/glub.mp3', 'sons/rolha.mp3', 'sons/vidro.mp3', 'sons/brilho.mp3', 'sons/aplausos.mp3', 'sons/erro.mp3', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
 self.addEventListener('install', function (e) {

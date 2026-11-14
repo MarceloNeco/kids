@@ -1,11 +1,12 @@
 /* Quem é? — a tela do Duelo de Caras: escolher a meleca, o modo e o nível, escolher o segredo, perguntar, responder,
    descartar, dar o palpite, lupa, cortina do "passando o aparelho", fim, sons, voz e música.
    As regras ficam em partida.js e logica.js; os desenhos em caras.js e melecas.js.
-   Guarda só neste aparelho (localStorage "bolinho:quem-e:pref"): idioma, sons, voz e a meleca escolhida. */
+   O idioma é o escolhido na estante (../idioma.js). Guarda só neste aparelho (localStorage "bolinho:quem-e:pref"): sons,
+   voz e a meleca escolhida. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.3';
-  var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026';
+  var APP_VERSION = '0.3.0';
+  var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026', APP_DATA_ES = '14/nov/2026';
   var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -15,28 +16,29 @@
   function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem espaço: segue sem guardar */ } }
   var pref = ler('bolinho:quem-e:pref', null) || {};
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';   // o idioma escolhido na estante (../idioma.js)
+  delete pref.lingua;
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (typeof pref.voz !== 'boolean') pref.voz = true;   // voz começa ligada (no Fácil ajuda quem ainda não lê)
   if (pref.meleca !== 'blue' && pref.meleca !== 'pink') pref.meleca = 'pink';
   function salvarPref() { gravar('bolinho:quem-e:pref', pref); }
 
   // ---------- idioma ----------
-  function en() { return pref.lingua === 'en'; }
-  function t(pt, ingl) { return en() ? ingl : pt; }
+  function en() { return lingua === 'en'; }
+  function t(pt, ingl, es) { return lingua === 'en' ? ingl : lingua === 'es' ? (es != null ? es : pt) : pt; }
+  function parte(v) { var p = v.split('|'), i = { pt: 0, en: 1, es: 2 }[lingua]; return p[i] != null ? p[i] : p[0]; }
   function nomeMeleca() { return pref.meleca === 'blue' ? 'Melekento Blue' : 'Pink Honey'; }
   function traduzir() {
-    document.documentElement.lang = en() ? 'en' : 'pt-BR';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = en() ? p[1] : p[0]; });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var p = el.getAttribute('data-rotulo').split('|'); var r = en() ? p[1] : p[0]; el.setAttribute('aria-label', r); el.title = r; });
-    $('btLingua').textContent = en() ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + (en() ? APP_DATA_EN : APP_DATA);
-    $('txtMeleca').textContent = t('Contra a ', 'Against ') + nomeMeleca();
-    $('balaoModos').textContent = t('Oba! Como vamos jogar?', 'Yay! How shall we play?');
+    document.documentElement.lang = { pt: 'pt-BR', en: 'en', es: 'es' }[lingua];
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { el.textContent = parte(el.getAttribute('data-t')); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var r = parte(el.getAttribute('data-rotulo')); el.setAttribute('aria-label', r); el.title = r; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dica]'), function (el) { el.placeholder = parte(el.getAttribute('data-dica')); });
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, APP_DATA_EN, APP_DATA_ES);
+    $('txtMeleca').textContent = t('Contra a ', 'Against ', 'Contra ') + nomeMeleca();
+    $('balaoModos').textContent = t('Oba! Como vamos jogar?', 'Yay! How shall we play?', '¡Yupi! ¿Cómo vamos a jugar?');
     if (partida) pintar();
   }
-  $('btLingua').addEventListener('click', function () { pref.lingua = en() ? 'pt' : 'en'; salvarPref(); traduzir(); });
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); });
   $('btAjuda').addEventListener('click', function () { var aj = $('ajuda'); aj.hidden = !aj.hidden; this.setAttribute('aria-expanded', String(!aj.hidden)); });
 
   // ---------- sons (feitos na hora, sem arquivo) ----------
@@ -66,12 +68,12 @@
     var v = $('btVoz'); v.textContent = pref.voz ? '🗣️' : '🤐'; v.setAttribute('aria-pressed', String(pref.voz));
   }
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarBotoes(); Som.sim(); });
-  $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarBotoes(); if (pref.voz) falar(t('Voz ligada!', 'Voice on!')); else calar(); });
+  $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarBotoes(); if (pref.voz) falar(t('Voz ligada!', 'Voice on!', '¡Voz encendida!')); else calar(); });
 
   // ---------- voz da meleca (voz.js: voz do aparelho ou, se a pessoa ligar, ElevenLabs com a chave do cofre) ----------
   // Melekento Blue fala mais grosso e borbulhante; Pink Honey mais fininho. Sem voz no aparelho, segue só com texto.
   // privado = nome que a família ensinou: nunca vai para a internet.
-  var voz = window.QEVoz ? QEVoz.criar(QEVoz.ambienteDoNavegador(function () { return pref.lingua; })) : null;
+  var voz = window.QEVoz ? QEVoz.criar(QEVoz.ambienteDoNavegador(function () { return lingua; })) : null;
   if (voz) { voz.usarEleven(!!pref.eleven); if (pref.vozBlue) voz.definirVoz('blue', pref.vozBlue); if (pref.vozPink) voz.definirVoz('pink', pref.vozPink); }
   function falar(txt, privado) {
     if (!pref.voz || !voz) return;
@@ -82,13 +84,13 @@
 
   // ---------- o jeito das melecas: as duas são SUPER bagunceiras (dono, 14/Nov/2026) ----------
   var ZOEIRA = {
-    sim: [['Sim! Splash! 💦', 'Yes! Splash! 💦'], ['Siiim! Que bagunça boa! 🎉', 'Yesss! What a great mess! 🎉'], ['Sim! Ploft! 💥', 'Yes! Ploft! 💥']],
-    nao: [['Não! Ploft! 💥', 'No! Ploft! 💥'], ['Nããão! 🙃', 'Nooo! 🙃'], ['Não! Escorreguei de rir! 🫠', 'No! I slipped laughing! 🫠']],
-    sei: [['Ploft! Já sei! 🤩', 'Ploft! I know! 🤩'], ['Splash! Acho que descobri! 🤩', 'Splash! I think I got it! 🤩'], ['Hihihi, já sei quem é! 🤩', "Hehehe, I know who it is! 🤩"]],
-    pensa: [['Hmm… deixa eu remexer a meleca… 🤔', 'Hmm… let me stir my goo… 🤔'], ['Hmm… pensando gosmento… 🤔', 'Hmm… gooey thinking… 🤔'], ['Hmm… espera que eu tô escorregando nas ideias… 🤔', 'Hmm… hold on, my ideas are slippery… 🤔']]
+    sim: [['Sim! Splash! 💦', 'Yes! Splash! 💦', '¡Sí! ¡Splash! 💦'], ['Siiim! Que bagunça boa! 🎉', 'Yesss! What a great mess! 🎉', '¡Síííí! ¡Qué lío más divertido! 🎉'], ['Sim! Ploft! 💥', 'Yes! Ploft! 💥', '¡Sí! ¡Ploft! 💥']],
+    nao: [['Não! Ploft! 💥', 'No! Ploft! 💥', '¡No! ¡Ploft! 💥'], ['Nããão! 🙃', 'Nooo! 🙃', '¡Nooo! 🙃'], ['Não! Escorreguei de rir! 🫠', 'No! I slipped laughing! 🫠', '¡No! ¡Me he resbalado de la risa! 🫠']],
+    sei: [['Ploft! Já sei! 🤩', 'Ploft! I know! 🤩', '¡Ploft! ¡Ya lo sé! 🤩'], ['Splash! Acho que descobri! 🤩', 'Splash! I think I got it! 🤩', '¡Splash! ¡Creo que lo he descubierto! 🤩'], ['Hihihi, já sei quem é! 🤩', "Hehehe, I know who it is! 🤩", '¡Jijiji, ya sé quién es! 🤩']],
+    pensa: [['Hmm… deixa eu remexer a meleca… 🤔', 'Hmm… let me stir my goo… 🤔', 'Mmm… déjame remover mi slime… 🤔'], ['Hmm… pensando gosmento… 🤔', 'Hmm… gooey thinking… 🤔', 'Mmm… pensando pegajoso… 🤔'], ['Hmm… espera que eu tô escorregando nas ideias… 🤔', 'Hmm… hold on, my ideas are slippery… 🤔', 'Mmm… espera, que se me resbalan las ideas… 🤔']]
   };
-  function zoeira(tipo) { var l = ZOEIRA[tipo], x = l[Math.floor(Math.random() * l.length)]; return t(x[0], x[1]); }
-  function oiMeleca() { return pref.meleca === 'blue' ? t('Oi! Eu sou o Melekento Blue, o mais bagunceiro da casa! Splash!', "Hi! I'm Melekento Blue, the messiest one in the house! Splash!") : t('Oi! Eu sou a Pink Honey, a mais bagunceira da casa! Ploft!', "Hi! I'm Pink Honey, the messiest one in the house! Ploft!"); }
+  function zoeira(tipo) { var l = ZOEIRA[tipo], x = l[Math.floor(Math.random() * l.length)]; return t(x[0], x[1], x[2]); }
+  function oiMeleca() { return pref.meleca === 'blue' ? t('Oi! Eu sou o Melekento Blue, o mais bagunceiro da casa! Splash!', "Hi! I'm Melekento Blue, the messiest one in the house! Splash!", '¡Hola! Soy Melekento Blue, ¡el más travieso de la casa! ¡Splash!') : t('Oi! Eu sou a Pink Honey, a mais bagunceira da casa! Ploft!', "Hi! I'm Pink Honey, the messiest one in the house! Ploft!", '¡Hola! Soy Pink Honey, ¡la más traviesa de la casa! ¡Ploft!'); }
 
   // ---------- melecas na tela ----------
   var nMel = 0;
@@ -215,7 +217,7 @@
     caixa.className = 'lupa';
     caixa.innerHTML = CARAS.svg(c, { id: 'lupa', grande: true }) + '<p class="lupa-nome"></p><button type="button" class="grande lupa-fechar"></button>';
     caixa.querySelector('.lupa-nome').textContent = c.nome;
-    var bt = caixa.querySelector('.lupa-fechar'); bt.textContent = t('Fechar', 'Close');
+    var bt = caixa.querySelector('.lupa-fechar'); bt.textContent = t('Fechar', 'Close', 'Cerrar');
     var j = SolverJanela.abrir({ conteudo: caixa, classe: 'qe-janela' });
     bt.addEventListener('click', function () { j.fechar('ok'); });
   }
@@ -240,22 +242,22 @@
   }
   $('btNomesOk').addEventListener('click', function () { pref.nomes = [limparNome($('nome1').value), limparNome($('nome2').value)]; salvarPref(); novaPartida(); });
   function nomeJogador(j) {
-    if (modo === 'rede') return j === sala.eu ? t('Você', 'You') : t('A outra pessoa', 'The other player');
-    if (modo === 'meleca') return j === 0 ? t('Você', 'You') : nomeMeleca();
-    return (Array.isArray(pref.nomes) && pref.nomes[j]) || t('Jogador ', 'Player ') + (j + 1);
+    if (modo === 'rede') return j === sala.eu ? t('Você', 'You', 'Tú') : t('A outra pessoa', 'The other player', 'La otra persona');
+    if (modo === 'meleca') return j === 0 ? t('Você', 'You', 'Tú') : nomeMeleca();
+    return (Array.isArray(pref.nomes) && pref.nomes[j]) || t('Jogador ', 'Player ', 'Jugador ') + (j + 1);
   }
 
   function irParaSegredo(j) {
     escolhido = null; quemSegura = j; $('btSortear').disabled = false;
-    $('tituloSegredo').textContent = modo === 'passar' ? nomeJogador(j) + t(': escolha o seu personagem secreto 🤫', ': pick your secret character 🤫') : t('Escolha o seu personagem secreto 🤫', 'Pick your secret character 🤫');
+    $('tituloSegredo').textContent = modo === 'passar' ? nomeJogador(j) + t(': escolha o seu personagem secreto 🤫', ': pick your secret character 🤫', ': elige tu personaje secreto 🤫') : t('Escolha o seu personagem secreto 🤫', 'Pick your secret character 🤫', 'Elige tu personaje secreto 🤫');
     pintarSegredo(); mostrar('segredo');
-    if (modo === 'meleca') falar(t('Escolha o seu personagem secreto. Eu não vou olhar!', "Pick your secret character. I won't peek!"));
+    if (modo === 'meleca') falar(t('Escolha o seu personagem secreto. Eu não vou olhar!', "Pick your secret character. I won't peek!", 'Elige tu personaje secreto. ¡Yo no voy a mirar!'));
   }
   function pintarSegredo() {
     Array.prototype.forEach.call($('gradeSegredo').children, function (b) { b.classList.toggle('escolhida', +b.getAttribute('data-id') === escolhido); });
     var bt = $('btConfirmarSegredo');
     bt.disabled = escolhido === null;
-    bt.textContent = escolhido === null ? t('Escolha uma cara', 'Pick a face') : t('🤫 Escolhi ', '🤫 I picked ') + partida.tabuleiro.caras[escolhido].nome;
+    bt.textContent = escolhido === null ? t('Escolha uma cara', 'Pick a face', 'Elige una cara') : t('🤫 Escolhi ', '🤫 I picked ', '🤫 He elegido a ') + partida.tabuleiro.caras[escolhido].nome;
   }
   $('btSortear').addEventListener('click', function () { escolhido = Math.floor(Math.random() * partida.tabuleiro.caras.length); Som.virar(); pintarSegredo(); });
   $('btConfirmarSegredo').addEventListener('click', function () {
@@ -272,7 +274,7 @@
   });
   function comecarJogo() {
     autoDescartou = false; palpiteSel = null; fecharPainelPerguntas(); mostrar('jogo');
-    if (modo === 'meleca') { quemSegura = 0; falar(t('Pronto! Eu também escolhi o meu. Você começa!', 'Ready! I picked mine too. You go first!')); }
+    if (modo === 'meleca') { quemSegura = 0; falar(t('Pronto! Eu também escolhi o meu. Você começa!', 'Ready! I picked mine too. You go first!', '¡Listo! Yo también he elegido el mío. ¡Empiezas tú!')); }
     pintar();
   }
 
@@ -294,7 +296,7 @@
   function humano(a) { return !!a && (modo === 'meleca' ? a.jogador === 0 : modo === 'rede' ? a.jogador === sala.eu : true); }
   function palpitando() { return !$('palpitando').hidden; }
 
-  function textoPergunta(id) { var p = L.pergunta(id); return t(p.pt, p.en); }
+  function textoPergunta(id) { var p = L.pergunta(id); return t(p.pt, p.en, p.es); }
 
   function pintar() {
     if (!partida || atual !== 'jogo') return;
@@ -307,9 +309,9 @@
       b.classList.toggle('virada', !e.dePe[eu][id]);
       b.classList.toggle('escolhida', palpitando() && palpiteSel === id);
     });
-    var ms = $('meuSegredo'), chave = e.segredos[eu] + '|' + pref.lingua;
-    if (e.segredos[eu] !== null && ms.getAttribute('data-chave') !== chave) { ms.setAttribute('data-chave', chave); ms.innerHTML = caraMini(e.segredos[eu]) + '<span class="rotulo">' + escapar(t('Meu', 'Mine')) + '</span>';
-      $('meuNome').textContent = t('Meu personagem: ', 'My character: ') + partida.tabuleiro.caras[e.segredos[eu]].nome; }
+    var ms = $('meuSegredo'), chave = e.segredos[eu] + '|' + lingua;
+    if (e.segredos[eu] !== null && ms.getAttribute('data-chave') !== chave) { ms.setAttribute('data-chave', chave); ms.innerHTML = caraMini(e.segredos[eu]) + '<span class="rotulo">' + escapar(t('Meu', 'Mine', 'Mío')) + '</span>';
+      $('meuNome').textContent = t('Meu personagem: ', 'My character: ', 'Mi personaje: ') + partida.tabuleiro.caras[e.segredos[eu]].nome; }
     if (modo === 'rede' && sala) sala.guardarTabuleiro(e.dePe[eu]);
     // painel
     var seu = humano(a);
@@ -322,7 +324,7 @@
     if (!$('descartar').hidden) pintarDescartar(eu);
     if (palpitando()) {
       var bp = $('btConfirmarPalpite'); bp.disabled = palpiteSel === null;
-      bp.textContent = palpiteSel === null ? t('Escolha a cara', 'Pick the face') : t('É ', "It's ") + partida.tabuleiro.caras[palpiteSel].nome + '!';
+      bp.textContent = palpiteSel === null ? t('Escolha a cara', 'Pick the face', 'Elige la cara') : t('É ', "It's ", '¡Es ') + partida.tabuleiro.caras[palpiteSel].nome + '!';
     }
     if (!$('perguntas').hidden) pintarPerguntas();
     pintarBalao(a);
@@ -338,9 +340,9 @@
     var b = $('balao');
     if (recado && Date.now() < recado.ate) { b.textContent = recado.txt; return; }
     if (modo === 'rede') {
-      if (!sala.outroAqui()) { b.textContent = t('📶 Esperando a outra pessoa voltar…', '📶 Waiting for the other player to come back…'); return; }
+      if (!sala.outroAqui()) { b.textContent = t('📶 Esperando a outra pessoa voltar…', '📶 Waiting for the other player to come back…', '📶 Esperando a que vuelva la otra persona…'); return; }
       if (a.jogador !== sala.eu) {
-        b.textContent = a.acao === 'responder' ? t('Esperando a resposta…', 'Waiting for the answer…') : a.acao === 'veredito' ? b.textContent : t('Vez da outra pessoa. Espere um pouquinho…', "The other player's turn. Hang on…");
+        b.textContent = a.acao === 'responder' ? t('Esperando a resposta…', 'Waiting for the answer…', 'Esperando la respuesta…') : a.acao === 'veredito' ? b.textContent : t('Vez da outra pessoa. Espere um pouquinho…', "The other player's turn. Hang on…", 'Le toca a la otra persona. Espera un poquito…');
         humor('pensando'); return;
       }
     }
@@ -349,10 +351,10 @@
       return;
     }
     if (a.acao === 'perguntar') {
-      b.textContent = modo === 'meleca' ? t('Sua vez! Pergunte ou dê o seu palpite.', 'Your turn! Ask or make your guess.') : nomeJogador(a.jogador) + t(', sua vez!', ", it's your turn!");
+      b.textContent = modo === 'meleca' ? t('Sua vez! Pergunte ou dê o seu palpite.', 'Your turn! Ask or make your guess.', '¡Te toca! Pregunta o di quién crees que es.') : nomeJogador(a.jogador) + t(', sua vez!', ", it's your turn!", ', ¡te toca!');
       humor('parada');
     } else if (a.acao === 'descartar' && modo === 'passar') {
-      b.textContent = nomeJogador(a.jogador) + t(', descarte quem não serve.', ', flip down who doesn\'t fit.');
+      b.textContent = nomeJogador(a.jogador) + t(', descarte quem não serve.', ', flip down who doesn\'t fit.', ', baja a los que no sirven.');
     }
   }
 
@@ -361,8 +363,8 @@
     var p = partida.estado.ultima.pergunta;
     // quem vai responder ouve a pergunta (ajuda quem ainda não lê); contra a meleca ela já falou a dela
     if (modo !== 'meleca' && perguntaFalada !== partida.estado.ultima) { perguntaFalada = partida.estado.ultima; falar(textoPergunta(p)); }
-    var quem = modo !== 'meleca' ? nomeJogador(1 - a.jogador) + t(' quer saber:', ' wants to know:')
-      : pref.meleca === 'blue' ? t('O Melekento Blue quer saber:', 'Melekento Blue wants to know:') : t('A Pink Honey quer saber:', 'Pink Honey wants to know:');
+    var quem = modo !== 'meleca' ? nomeJogador(1 - a.jogador) + t(' quer saber:', ' wants to know:', ' quiere saber:')
+      : pref.meleca === 'blue' ? t('O Melekento Blue quer saber:', 'Melekento Blue wants to know:', 'Melekento Blue quiere saber:') : t('A Pink Honey quer saber:', 'Pink Honey wants to know:', 'Pink Honey quiere saber:');
     $('pergFeita').innerHTML = '';
     var q = document.createElement('span'); q.className = 'quem'; q.textContent = quem;
     var tx = document.createElement('strong'); tx.textContent = L.pergunta(p).ico + ' ' + textoPergunta(p);
@@ -371,7 +373,7 @@
 
   function pintarDescartar(eu) {
     var e = partida.estado, p = L.pergunta(e.ultima.pergunta), r = e.ultima.resposta;
-    $('respVeio').textContent = (r ? t('Resposta: Sim! 👍 ', 'Answer: Yes! 👍 ') : t('Resposta: Não! 👎 ', 'Answer: No! 👎 ')) + t(p.pt, p.en);
+    $('respVeio').textContent = (r ? t('Resposta: Sim! 👍 ', 'Answer: Yes! 👍 ', 'Respuesta: ¡Sí! 👍 ') : t('Resposta: Não! 👎 ', 'Answer: No! 👎 ', 'Respuesta: ¡No! 👎 ')) + t(p.pt, p.en, p.es);
     var qtd = partida.quantasDescartar(eu), bt = $('btDescartar');
     if (nivel === 'facil' && !autoDescartou) {
       autoDescartou = true;
@@ -380,17 +382,17 @@
     if (nivel === 'facil') { bt.hidden = true; return; }
     bt.hidden = false;
     bt.disabled = !qtd;
-    bt.textContent = qtd ? '🗑️ ' + textoDescarte(p, r) : t('Nenhuma para descartar', 'Nothing to flip down');
+    bt.textContent = qtd ? '🗑️ ' + textoDescarte(p, r) : t('Nenhuma para descartar', 'Nothing to flip down', 'No hay ninguna para bajar');
   }
   // "Descartar quem tem cabelo comprido" (a resposta foi Não) / "Descartar quem não tem cabelo comprido" (foi Sim)
   function textoDescarte(p, r) {
     var cor = /^roupa-/.test(p.id) ? p.pt.replace(/^A roupa é (.*)\?$/, 'está de roupa $1') : null;
     var pred = cor || (p.pt.charAt(0).toLowerCase() + p.pt.slice(1)).replace(/\?$/, '');
-    return t((r ? 'Descartar quem não ' : 'Descartar quem ') + pred, 'Flip down everyone who doesn\'t fit');
+    return t((r ? 'Descartar quem não ' : 'Descartar quem ') + pred, 'Flip down everyone who doesn\'t fit', 'Bajar a todos los que no sirven');
   }
 
   // ---------- perguntar ----------
-  var GRUPOS = [['quem', '👤 Quem é', '👤 Who'], ['cabelo', '💇 Cabelo', '💇 Hair'], ['rosto', '👀 Rosto', '👀 Face'], ['cabeca', '🎩 Na cabeça', '🎩 On the head'], ['joias', '💎 Joias', '💎 Jewelry'], ['roupa', '👕 Roupa', '👕 Clothes']];
+  var GRUPOS = [['quem', '👤 Quem é', '👤 Who', '👤 Quién es'], ['cabelo', '💇 Cabelo', '💇 Hair', '💇 Pelo'], ['rosto', '👀 Rosto', '👀 Face', '👀 Cara'], ['cabeca', '🎩 Na cabeça', '🎩 On the head', '🎩 En la cabeza'], ['joias', '💎 Joias', '💎 Jewelry', '💎 Joyas'], ['roupa', '👕 Roupa', '👕 Clothes', '👕 Ropa']];
   $('btPerguntar').addEventListener('click', function () { $('perguntas').hidden = false; pintar(); $('listaPerguntas').scrollTop = 0; });
   $('btFecharPerguntas').addEventListener('click', function () { fecharPainelPerguntas(); pintar(); });
   function fecharPainelPerguntas() { $('perguntas').hidden = true; }
@@ -401,7 +403,7 @@
     GRUPOS.forEach(function (g) {
       var ps = L.PERGUNTAS.filter(function (p) { return p.grupo === g[0] && partida.tabuleiro.perguntas.indexOf(p.id) >= 0; });
       if (!ps.length) return;
-      var h = document.createElement('h3'); h.textContent = t(g[1], g[2]); lista.appendChild(h);
+      var h = document.createElement('h3'); h.textContent = t(g[1], g[2], g[3]); lista.appendChild(h);
       var antes = lista.children.length;
       ps.forEach(function (p) {
         var feita = e.feitas[eu].indexOf(p.id) >= 0, u = L.utilidade(partida.tabuleiro.caras, e.dePe[eu], p.id), inutil = !feita && (u === 0 || u === vivas);
@@ -412,18 +414,18 @@
         if (!feita) b.setAttribute('data-p', p.id);
         b.innerHTML = '<span class="p-ico" aria-hidden="true"></span><span class="p-txt"></span>';
         b.querySelector('.p-ico').textContent = feita ? '✓' : p.ico;
-        b.querySelector('.p-txt').textContent = t(p.pt, p.en) + (inutil ? t(' · essa não ajuda mais', " · won't help now") : '');
+        b.querySelector('.p-txt').textContent = t(p.pt, p.en, p.es) + (inutil ? t(' · essa não ajuda mais', " · won't help now", ' · esta ya no ayuda') : '');
         b.addEventListener('click', function () { perguntar(p.id); });
         var o = document.createElement('button'); o.type = 'button'; o.className = 'ouvir mini'; o.textContent = '🔊';
-        o.setAttribute('aria-label', t('Ouvir: ', 'Listen: ') + t(p.pt, p.en));
-        o.addEventListener('click', function () { var v = pref.voz; pref.voz = true; falar(t(p.pt, p.en)); pref.voz = v; });
+        o.setAttribute('aria-label', t('Ouvir: ', 'Listen: ', 'Escuchar: ') + t(p.pt, p.en, p.es));
+        o.addEventListener('click', function () { var v = pref.voz; pref.voz = true; falar(t(p.pt, p.en, p.es)); pref.voz = v; });
         linha.appendChild(b); linha.appendChild(o); lista.appendChild(linha);
       });
       if (lista.children.length === antes) lista.removeChild(h); else mostradas += lista.children.length - antes;
     });
     if (!mostradas) {
       var v = document.createElement('p'); v.className = 'vazio';
-      v.textContent = t('Nenhuma pergunta ajuda agora. Toque em ← e depois em 🎯 É este! para escolher a cara.', 'No question helps now. Tap ← and then 🎯 This one! to pick the face.');
+      v.textContent = t('Nenhuma pergunta ajuda agora. Toque em ← e depois em 🎯 É este! para escolher a cara.', 'No question helps now. Tap ← and then 🎯 This one! to pick the face.', 'Ya ninguna pregunta ayuda. Toca ← y luego 🎯 ¡Es este! para elegir la cara.');
       lista.appendChild(v);
     }
   }
@@ -444,15 +446,15 @@
       var o = $('olhaDeNovo'); o.hidden = false;
       o.innerHTML = '';
       o.appendChild(document.createRange().createContextualFragment(caraMini(partida.estado.segredos[a.jogador], 'pisca')));
-      var s = document.createElement('span'); s.textContent = t('Olha de novo o seu personagem com calma: ', 'Take another look at your character: ') + textoPergunta(partida.estado.ultima.pergunta);
+      var s = document.createElement('span'); s.textContent = t('Olha de novo o seu personagem com calma: ', 'Take another look at your character: ', 'Mira otra vez a tu personaje con calma: ') + textoPergunta(partida.estado.ultima.pergunta);
       o.appendChild(s);
       Som.erro(); humor('ops');
-      falar(t('Olha de novo com calma!', 'Take another look!'));
+      falar(t('Olha de novo com calma!', 'Take another look!', '¡Mira otra vez con calma!'));
       return;
     }
     $('olhaDeNovo').hidden = true;
     if (r) Som.sim(); else Som.nao();
-    if (modo === 'meleca') $('balao').textContent = r ? t('Sim! Anotado 📝', 'Yes! Got it 📝') : t('Não! Anotado 📝', 'No! Got it 📝');
+    if (modo === 'meleca') $('balao').textContent = r ? t('Sim! Anotado 📝', 'Yes! Got it 📝', '¡Sí! Anotado 📝') : t('Não! Anotado 📝', 'No! Got it 📝', '¡No! Anotado 📝');
     pintar(); agendarMeleca();
   }
   $('btSim').addEventListener('click', function () { responder(true); });
@@ -475,11 +477,11 @@
     palpiteSel = null; $('palpitando').hidden = true;
     if (modo === 'rede') palpiteMeu = nome;
     var r = modo === 'rede' ? (sala.agir('palpite', { c: id }), { pendente: true }) : partida.palpite(eu, id);
-    if (r.pendente) { $('balao').textContent = t('Será que é ', 'Could it be ') + nome + t('? Esperando a resposta…', '? Waiting for the answer…'); falar(t('Será que é ', 'Could it be ') + nome + '?'); }
+    if (r.pendente) { $('balao').textContent = t('Será que é ', 'Could it be ', '¿Será ') + nome + t('? Esperando a resposta…', '? Waiting for the answer…', '? Esperando la respuesta…'); falar(t('Será que é ', 'Could it be ', '¿Será ') + nome + '?'); }
     else if (!r.acertou) {
       Som.erro(); humor(modo === 'meleca' ? 'feliz' : 'ops');
-      $('balao').textContent = t('Não é ', "It's not ") + nome + '! 😅';
-      falar(t('Não é ', "It's not ") + nome + '!');
+      $('balao').textContent = t('Não é ', "It's not ", '¡No es ') + nome + '! 😅';
+      falar(t('Não é ', "It's not ", '¡No es ') + nome + '!');
     }
     pintar(); agendarMeleca();
   });
@@ -502,15 +504,15 @@
       humor('falando'); if (r.resposta) Som.sim(); else Som.nao();
       falar(fala);
     } else if (r.tipo === 'pergunta') {
-      b.textContent = t('Minha vez! ', 'My turn! ') + textoPergunta(r.id);
-      humor('falando'); Som.gosma(); falar(t('Minha vez! ', 'My turn! ') + textoPergunta(r.id));
+      b.textContent = t('Minha vez! ', 'My turn! ', '¡Me toca! ') + textoPergunta(r.id);
+      humor('falando'); Som.gosma(); falar(t('Minha vez! ', 'My turn! ', '¡Me toca! ') + textoPergunta(r.id));
     } else if (r.tipo === 'descartou') {
       var resta = partida.estado.dePe[1].filter(Boolean).length;
-      b.textContent = t('Virei ', 'I flipped ') + r.ids.length + t(' no meu tabuleiro. Ainda tenho ', ' on my board. I still have ') + resta + t(' de pé. Sua vez!', ' standing. Your turn!');
+      b.textContent = t('Virei ', 'I flipped ', 'He bajado ') + r.ids.length + t(' no meu tabuleiro. Ainda tenho ', ' on my board. I still have ', ' en mi tablero. Todavía me quedan ') + resta + t(' de pé. Sua vez!', ' standing. Your turn!', ' de pie. ¡Te toca!');
       humor('parada');
     } else if (r.tipo === 'palpite') {
       var nome = partida.tabuleiro.caras[r.idCara].nome;
-      if (!r.acertou) { b.textContent = t('Acho que é ', 'I think it\'s ') + nome + t('… errei! 😅 Sua vez.', '… wrong! 😅 Your turn.'); humor('ops'); Som.erro(); falar(t('É o ', 'Is it ') + nome + t('? Ah, errei!', '? Oh, wrong!')); }
+      if (!r.acertou) { b.textContent = t('Acho que é ', 'I think it\'s ', 'Creo que es ') + nome + t('… errei! 😅 Sua vez.', '… wrong! 😅 Your turn.', '… ¡me he equivocado! 😅 Te toca.'); humor('ops'); Som.erro(); falar(t('É o ', 'Is it ', '¿Es ') + nome + t('? Ah, errei!', '? Oh, wrong!', '? ¡Ay, me he equivocado!')); }
     }
     pintar(); agendarMeleca();
   }
@@ -519,9 +521,9 @@
   var depoisCortina = null;
   function cortina(j, depois) {
     quemSegura = -1; depoisCortina = function () { quemSegura = j; depois(); };
-    $('cortinaTitulo').textContent = t('Passe o aparelho para ', 'Pass the device to ') + nomeJogador(j);
-    $('cortinaTexto').textContent = t('Sem espiar o tabuleiro do outro! 🙈', "No peeking at the other board! 🙈");
-    falar(t('Passa o celular para ', 'Pass the phone to ') + nomeJogador(j) + t('! Sem espiar, hein?', '! No peeking!'), true);
+    $('cortinaTitulo').textContent = t('Passe o aparelho para ', 'Pass the device to ', 'Pásale el móvil a ') + nomeJogador(j);
+    $('cortinaTexto').textContent = t('Sem espiar o tabuleiro do outro! 🙈', "No peeking at the other board! 🙈", '¡Sin espiar el tablero del otro! 🙈');
+    falar(t('Passa o celular para ', 'Pass the phone to ', '¡Pásale el móvil a ') + nomeJogador(j) + t('! Sem espiar, hein?', '! No peeking!', '! Y sin espiar, ¿eh?'), true);
     $('cortina').hidden = false; $('btCortina').focus();
   }
   $('btCortina').addEventListener('click', function () { $('cortina').hidden = true; var f = depoisCortina; depoisCortina = null; if (f) f(); });
@@ -535,10 +537,10 @@
     var e = partida.estado, v = e.vencedor, ganhouHumano = modo === 'meleca' ? v === 0 : modo === 'rede' ? v === sala.eu : true;
     var alvo = partida.tabuleiro.caras[e.ultima.palpite].nome;   // quem ganhou acertou o palpite: era o segredo do outro
     $('fimTitulo').textContent = modo === 'rede'
-      ? (v === sala.eu ? t('Você acertou! 🎉 Era ', 'You got it! 🎉 It was ') + alvo + '!' : t('A outra pessoa acertou! Era ', 'The other player got it! It was ') + alvo + '.')
+      ? (v === sala.eu ? t('Você acertou! 🎉 Era ', 'You got it! 🎉 It was ', '¡Has acertado! 🎉 ¡Era ') + alvo + '!' : t('A outra pessoa acertou! Era ', 'The other player got it! It was ', '¡La otra persona ha acertado! Era ') + alvo + '.')
       : modo === 'meleca'
-      ? (v === 0 ? t('Você acertou! 🎉 Era ', 'You got it! 🎉 It was ') + alvo + '!' : t('Eu acertei! Era ', 'I got it! It was ') + alvo + t('! Quer a revanche?', '! Want a rematch?'))
-      : nomeJogador(v) + t(' ganhou! 🎉 Era ', ' wins! 🎉 It was ') + alvo + '!';
+      ? (v === 0 ? t('Você acertou! 🎉 Era ', 'You got it! 🎉 It was ', '¡Has acertado! 🎉 ¡Era ') + alvo + '!' : t('Eu acertei! Era ', 'I got it! It was ', '¡He acertado! ¡Era ') + alvo + t('! Quer a revanche?', '! Want a rematch?', '! ¿Quieres la revancha?'))
+      : t('', '', '¡') + nomeJogador(v) + t(' ganhou! 🎉 Era ', ' wins! 🎉 It was ', ' ha ganado! 🎉 ¡Era ') + alvo + '!';
     $('fimMeleca').innerHTML = melecaSvg(pref.meleca, modo === 'meleca' && v === 0 ? 'triste' : 'feliz');
     var caras = $('fimCaras'); caras.innerHTML = '';
     [0, 1].forEach(function (j) {
@@ -583,7 +585,7 @@
   function telaRede() {
     sairDaSala();
     $('redeInicio').hidden = false; $('redeSala').hidden = true; $('codigo').value = '';
-    $('redeStatus').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Sem internet, jogue "Passando o aparelho" ou contra a meleca.', '📡 No internet right now. Offline, play "Pass the device" or against the slime.') : '';
+    $('redeStatus').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Sem internet, jogue "Passando o aparelho" ou contra a meleca.', '📡 No internet right now. Offline, play "Pass the device" or against the slime.', '📡 Ahora no hay internet. Sin internet, juega a "Pasando el móvil" o contra el slime.') : '';
     mostrar('rede');
   }
   $('btCriarSala').addEventListener('click', function () { mostrar('niveis'); });
@@ -592,8 +594,8 @@
   $('codigo').addEventListener('input', function () { this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); });
   $('btConvidar').addEventListener('click', function () {
     var link = location.origin + location.pathname + '?sala=' + sala.codigo;
-    var txt = t('Vamos jogar Quem é? Entre na partida ', "Let's play Who Is It? Join game ") + sala.codigo + ': ' + link;
-    if (navigator.share) navigator.share({ title: 'Quem é?', text: txt }).catch(function () {});
+    var txt = t('Vamos jogar Quem é? Entre na partida ', "Let's play Who Is It? Join game ", '¡Juguemos a «¿Quién es?»! Entra en la partida ') + sala.codigo + ': ' + link;
+    if (navigator.share) navigator.share({ title: t('Quem é?', 'Who Is It?', '¿Quién es?'), text: txt }).catch(function () {});
     else window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
   });
 
@@ -601,19 +603,19 @@
     var codigo = REDE.codigoNovo(), semente = Math.floor(Math.random() * 4e9);
     conectar(codigo, { id: REDE.idNovo(), codigo: codigo, host: true, nivel: nivel, semente: semente });
     $('redeInicio').hidden = true; $('redeSala').hidden = false; $('codigoSala').textContent = codigo;
-    $('redeStatus').textContent = t('Esperando alguém entrar com o código…', 'Waiting for someone to join with the code…');
+    $('redeStatus').textContent = t('Esperando alguém entrar com o código…', 'Waiting for someone to join with the code…', 'Esperando a que alguien entre con el código…');
     mostrar('rede');
   }
   function entrarSala(cod) {
     cod = String(cod || '').toUpperCase().replace(/[^A-Z]/g, '');
-    if (cod.length !== 4) { $('redeStatus').textContent = t('O código tem 4 letras. Confira e tente de novo.', 'The code has 4 letters. Check it and try again.'); return; }
+    if (cod.length !== 4) { $('redeStatus').textContent = t('O código tem 4 letras. Confira e tente de novo.', 'The code has 4 letters. Check it and try again.', 'El código tiene 4 letras. Revísalo e inténtalo otra vez.'); return; }
     modo = 'rede';
     var guardado = lerSessao(), volta = guardado && guardado.codigo === cod && guardado.dados;
     // primeiro a tela de espera; se a partida já existe, conectar() leva direto para ela
     if (volta && volta.host && !volta.outro) {
       $('redeInicio').hidden = true; $('redeSala').hidden = false; $('codigoSala').textContent = cod;
-      $('redeStatus').textContent = t('Esperando alguém entrar com o código…', 'Waiting for someone to join with the code…');
-    } else $('redeStatus').textContent = t('Procurando a partida ', 'Looking for game ') + cod + '…';
+      $('redeStatus').textContent = t('Esperando alguém entrar com o código…', 'Waiting for someone to join with the code…', 'Esperando a que alguien entre con el código…');
+    } else $('redeStatus').textContent = t('Procurando a partida ', 'Looking for game ', 'Buscando la partida ') + cod + '…';
     if (atual !== 'rede') mostrar('rede');
     conectar(cod, volta ? { dados: guardado.dados } : { id: REDE.idNovo(), codigo: cod, host: false });
   }
@@ -635,7 +637,7 @@
       .then(function (c) { if (sala !== minha) { c.fechar(); return; } canal = c; minha.tique(); })
       .catch(function () {
         if (sala !== minha) return;
-        $('redeStatus').textContent = t('📡 Não deu para conectar. Confira a internet: vou tentar de novo.', "📡 Couldn't connect. Check the internet: trying again.");
+        $('redeStatus').textContent = t('📡 Não deu para conectar. Confira a internet: vou tentar de novo.', "📡 Couldn't connect. Check the internet: trying again.", '📡 No se ha podido conectar. Revisa la conexión a internet: lo intento otra vez.');
         setTimeout(function () { if (sala === minha) abrirCanal(codigo); }, 4000);
       });
   }
@@ -649,7 +651,7 @@
   }
   function redeMudou() {
     if (!sala) return;
-    if (sala.cheia()) { $('redeStatus').textContent = t('Essa partida já tem dois jogadores. Peça um código novo.', 'That game already has two players. Ask for a new code.'); return; }
+    if (sala.cheia()) { $('redeStatus').textContent = t('Essa partida já tem dois jogadores. Peça um código novo.', 'That game already has two players. Ask for a new code.', 'Esa partida ya tiene dos jugadores. Pide un código nuevo.'); return; }
     if (sala.partida && partida !== sala.partida && sala.temOutro()) {
       partida = sala.partida; nivel = partida.nivel; desligarLupa(); palpiteMeu = null; palpiteVisto = '';
       montarGrade($('gradeSegredo')); montarGrade($('tabuleiro'));
@@ -663,20 +665,20 @@
     var e2 = partida.estado;
     // o veredito do meu palpite chegou: errei? (acertar abre a tela do fim)
     if (palpiteMeu && e2.passo !== 'veredito') {
-      if (e2.fase === 'jogo') { dizer(t('Não é ', "It's not ") + palpiteMeu + '! 😅'); Som.erro(); humor('ops'); falar(t('Não é ', "It's not ") + palpiteMeu + '!'); }
+      if (e2.fase === 'jogo') { dizer(t('Não é ', "It's not ", '¡No es ') + palpiteMeu + '! 😅'); Som.erro(); humor('ops'); falar(t('Não é ', "It's not ", '¡No es ') + palpiteMeu + '!'); }
       palpiteMeu = null;
     }
     // a outra pessoa chutou o meu e errou
     if (e2.ultima && e2.ultima.palpite !== undefined && e2.ultima.quem !== sala.eu && e2.fase === 'jogo') {
       var chave = e2.ultima.palpite + ':' + e2.feitas[1 - sala.eu].length + ':' + JSON.stringify(e2.dePe[sala.eu]).length;
-      if (chave !== palpiteVisto) { palpiteVisto = chave; dizer(t('A outra pessoa achou que era ', 'The other player guessed ') + partida.tabuleiro.caras[e2.ultima.palpite].nome + t('. Errou! Sua vez 🎉', '. Wrong! Your turn 🎉')); humor('feliz'); }
+      if (chave !== palpiteVisto) { palpiteVisto = chave; dizer(t('A outra pessoa achou que era ', 'The other player guessed ', 'La otra persona ha dicho que era ') + partida.tabuleiro.caras[e2.ultima.palpite].nome + t('. Errou! Sua vez 🎉', '. Wrong! Your turn 🎉', '. ¡Ha fallado! Te toca 🎉')); humor('feliz'); }
     }
     if (atual === 'segredo' && partida.estado.fase !== 'segredo') { comecarJogo(); return; }
     if (atual === 'jogo') pintar();
     if (partida.estado.fase === 'fim') mostrarFim();
   }
   function esperarOutroSegredo() {
-    $('tituloSegredo').textContent = t('Pronto! Esperando a outra pessoa escolher… 🤫', 'Done! Waiting for the other player to pick… 🤫');
+    $('tituloSegredo').textContent = t('Pronto! Esperando a outra pessoa escolher… 🤫', 'Done! Waiting for the other player to pick… 🤫', '¡Listo! Esperando a que la otra persona elija… 🤫');
     $('btConfirmarSegredo').disabled = true; $('btSortear').disabled = true;
   }
 

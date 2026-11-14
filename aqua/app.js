@@ -1,11 +1,11 @@
 /* AQUA — a tela: níveis, fases, toques nos frascos, o despejo animado, as ajudas (desfazer, dica, embaralhar, frasco
    extra, recomeçar), estrelas, gotinhas, a lojinha de brincadeira, sons, fim de fase e instalar.
    As regras, o gerador de fases e o resolvedor são do motor.js; o desenho dos frascos é do desenho.js; os sons, do som.js.
-   Guarda só neste aparelho (localStorage "aqua.pref"): idioma, sons, desenho nas cores, a fase de cada nível, as
+   O idioma é o escolhido na estante (../idioma.js). Guarda só neste aparelho (localStorage "aqua.pref"): sons, desenho nas cores, a fase de cada nível, as
    estrelas, as gotinhas e o que já foi trocado na lojinha. Sem dinheiro, sem anúncio, sem conta. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0';
+  var APP_VERSION = '0.2.0';
   var APP_DATA = '14/Nov/2026';
   var M = window.AquaMotor, D = window.AquaDesenho, Som = window.AquaSom;
   var $ = function (id) { return document.getElementById(id); };
@@ -16,8 +16,8 @@
   function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   var pref = ler('aqua.pref', null) || {};
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';   // o idioma escolhido na estante (../idioma.js)
+  delete pref.lingua;
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (typeof pref.simbolos !== 'boolean') pref.simbolos = false;
   if (!pref.fase || typeof pref.fase !== 'object') pref.fase = {};
@@ -38,27 +38,28 @@
   Som.ligar(pref.efeitos);
 
   // ---------- idioma ----------
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
-  var NOME_NIVEL = { facil: ['Fácil', 'Easy'], medio: ['Médio', 'Medium'], dificil: ['Difícil', 'Hard'] };
+  var IDX = { pt: 0, en: 1, es: 2 };
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' ? es : pt; }
+  function parte(v) { var p = v.split('|'); return p[IDX[lingua]] != null ? p[IDX[lingua]] : p[0]; }
+  var NOME_NIVEL = { facil: ['Fácil', 'Easy', 'Fácil'], medio: ['Médio', 'Medium', 'Medio'], dificil: ['Difícil', 'Hard', 'Difícil'] };
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var p = el.getAttribute('data-rotulo').split('|'); var r = pref.lingua === 'en' ? p[1] : p[0]; el.setAttribute('aria-label', r); el.title = r; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + (pref.lingua === 'en' ? 'Nov/14/2026' : APP_DATA) +
-      t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY · sem anúncios e sem compras', ' · Music: Kevin MacLeod (incompetech.com), CC BY · no ads, no purchases');
+    document.documentElement.lang = { pt: 'pt-BR', en: 'en', es: 'es' }[lingua];
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { el.textContent = parte(el.getAttribute('data-t')); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var r = parte(el.getAttribute('data-rotulo')); el.setAttribute('aria-label', r); el.title = r; });
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, 'Nov/14/2026', '14/nov/2026') +
+      t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY · sem anúncios e sem compras', ' · Music: Kevin MacLeod (incompetech.com), CC BY · no ads, no purchases', ' · Música: Kevin MacLeod (incompetech.com), CC BY · sin anuncios y sin compras');
     pintarEfeitos(); pintarMenu();
     if (est) { pintarBarra(); pintarAjudas(); rotular(); }
     if (atual === 'loja') montarLoja();
   }
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); });
   $('btAjuda').addEventListener('click', function () {
     var aj = $('ajuda'); aj.hidden = !aj.hidden; this.setAttribute('aria-expanded', String(!aj.hidden));
     if (!aj.hidden) aj.scrollIntoView({ block: 'nearest', behavior: CALMO ? 'auto' : 'smooth' });
   });
   function pintarEfeitos() {
     var b = $('btEfeitos'); b.textContent = pref.efeitos ? '🔊' : '🔈'; b.setAttribute('aria-pressed', String(pref.efeitos));
-    b.title = pref.efeitos ? t('Sons ligados', 'Sounds on') : t('Sons desligados', 'Sounds off');
+    b.title = pref.efeitos ? t('Sons ligados', 'Sounds on', 'Sonidos encendidos') : t('Sons desligados', 'Sounds off', 'Sonidos apagados');
     $('btSimbolos').setAttribute('aria-pressed', String(pref.simbolos));
   }
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; Som.ligar(pref.efeitos); salvarPref(); pintarEfeitos(); Som.acordar(); Som.vidro(); });
@@ -70,14 +71,14 @@
   function pintarMenu() {
     M.NIVEIS.forEach(function (n) {
       var e = somaEstrelas(n);
-      $(REC_ID[n]).textContent = t('Fase ', 'Stage ') + pref.fase[n] + (e ? ' · ⭐ ' + e : '');
+      $(REC_ID[n]).textContent = t('Fase ', 'Stage ', 'Fase ') + pref.fase[n] + (e ? ' · ⭐ ' + e : '');
     });
     pintarGotas();
   }
   function pintarGotas() {
     ['gotasMenuN', 'gotasJogo', 'gotasLoja'].forEach(function (id) { $(id).textContent = String(pref.gotas); });
-    $('gotasMenu').setAttribute('aria-label', t('Gotinhas: ', 'Droplets: ') + pref.gotas);
-    $('placaGotas').setAttribute('aria-label', t('Gotinhas: ', 'Droplets: ') + pref.gotas);
+    $('gotasMenu').setAttribute('aria-label', t('Gotinhas: ', 'Droplets: ', 'Gotitas: ') + pref.gotas);
+    $('placaGotas').setAttribute('aria-label', t('Gotinhas: ', 'Droplets: ', 'Gotitas: ') + pref.gotas);
   }
 
   // ---------- telas e o botão Voltar do celular ----------
@@ -149,8 +150,8 @@
   function pararTudo() { anims = []; faiscas = []; dicaPar = null; plano = null; sel = -1; Som.pararDespejo(); esconderAviso(); clearTimeout(esperaFim); }
 
   function pintarBarra() {
-    $('placaFase').textContent = t('Fase ', 'Stage ') + fase;
-    $('placaFase').setAttribute('aria-label', t('Nível ', 'Level ') + t(NOME_NIVEL[nivel][0], NOME_NIVEL[nivel][1]) + t(', fase ', ', stage ') + fase);
+    $('placaFase').textContent = t('Fase ', 'Stage ', 'Fase ') + fase;
+    $('placaFase').setAttribute('aria-label', t('Nível ', 'Level ', 'Nivel ') + t(NOME_NIVEL[nivel][0], NOME_NIVEL[nivel][1], NOME_NIVEL[nivel][2]) + t(', fase ', ', stage ', ', fase ') + fase);
     pintarGotas();
   }
   function resta(tipo) { return LIMITES[nivel][tipo] - usos[tipo]; }
@@ -160,15 +161,15 @@
       $(a[2]).textContent = r === Infinity ? '∞' : String(r);
       b.classList.toggle('vazia', r <= 0 || (a[0] === 'desfazer' && !hist.length));
       // o leitor de tela ouve quantas restam; o botão continua tocável mesmo zerado (ele explica que acabou)
-      var rot = b.getAttribute('data-rotulo').split('|')[pref.lingua === 'en' ? 1 : 0];
-      b.setAttribute('aria-label', rot + (r === Infinity ? t(' (sem limite)', ' (no limit)') : t(' (restam ', ' (') + r + t(')', ' left)')));
+      var rot = parte(b.getAttribute('data-rotulo'));
+      b.setAttribute('aria-label', rot + (r === Infinity ? t(' (sem limite)', ' (no limit)', ' (sin límite)') : t(' (restam ', ' (', ' (quedan ') + r + t(')', ' left)', ')')));
     });
   }
 
   // ---------- os botões invisíveis em cima de cada frasco (toque, teclado e leitor de tela) ----------
   function montarBotoes() {
     caixa.innerHTML = ''; botoes = [];
-    caixa.setAttribute('aria-label', t('Frascos', 'Bottles'));
+    caixa.setAttribute('aria-label', t('Frascos', 'Bottles', 'Frascos'));
     est.frascos.forEach(function (f, i) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'frasco'; b.id = 'frasco-' + i; b.setAttribute('data-i', i);
@@ -177,20 +178,20 @@
     });
     rotular();
   }
-  function nomeCor(c) { return t(D.CORES[c].pt, D.CORES[c].en); }
+  function nomeCor(c) { return t(D.CORES[c].pt, D.CORES[c].en, D.CORES[c].es); }
   function rotular() {
     if (!est) return;
     est.frascos.forEach(function (f, i) {
       var b = botoes[i]; if (!b) return;
       var s;
-      if (!f.length) s = t('vazio', 'empty');
-      else if (M.pronto(f, est.cap)) s = t('pronto, todo ', 'done, all ') + nomeCor(f[0]);
+      if (!f.length) s = t('vazio', 'empty', 'vacío');
+      else if (M.pronto(f, est.cap)) s = t('pronto, todo ', 'done, all ', 'listo, todo ') + nomeCor(f[0]);
       else {
         var nomes = [];
-        for (var k = f.length - 1; k >= 0; k--) nomes.push(est.vistos[i][k] ? nomeCor(f[k]) : t('escondida', 'hidden'));
-        s = t('de cima para baixo: ', 'top to bottom: ') + nomes.join(', ');
+        for (var k = f.length - 1; k >= 0; k--) nomes.push(est.vistos[i][k] ? nomeCor(f[k]) : t('escondida', 'hidden', 'escondido'));
+        s = t('de cima para baixo: ', 'top to bottom: ', 'de arriba abajo: ') + nomes.join(', ');
       }
-      b.setAttribute('aria-label', t('Frasco ', 'Bottle ') + (i + 1) + (i === sel ? t(' (levantado)', ' (lifted)') : '') + ': ' + s);
+      b.setAttribute('aria-label', t('Frasco ', 'Bottle ', 'Frasco ') + (i + 1) + (i === sel ? t(' (levantado)', ' (lifted)', ' (levantado)') : '') + ': ' + s);
       b.setAttribute('aria-pressed', String(i === sel));
     });
   }
@@ -296,7 +297,7 @@
     lista.forEach(concluir);
   }
   function travou() {
-    aviso(t('Travou! Use ↩️ desfazer, 🔀 embaralhar ou ➕ mais um frasco.', 'Stuck! Use ↩️ undo, 🔀 shuffle or ➕ one more bottle.'));
+    aviso(t('Travou! Use ↩️ desfazer, 🔀 embaralhar ou ➕ mais um frasco.', 'Stuck! Use ↩️ undo, 🔀 shuffle or ➕ one more bottle.', '¡No quedan jugadas! Usa ↩️ deshacer, 🔀 mezclar o ➕ un frasco más.'));
     chamarAjudas();
   }
   function chamarAjudas() {
@@ -310,15 +311,15 @@
 
   // ---------- ajudas ----------
   function acabou(tipo) {
-    var nomes = { desfazer: ['os desfazer', 'undos'], dica: ['as dicas', 'hints'], embaralhar: ['os embaralhar', 'shuffles'], extra: ['os frascos extras', 'extra bottles'] };
-    aviso(t('Acabaram ' + nomes[tipo][0] + ' desta fase. Na próxima fase voltam todos!', 'No more ' + nomes[tipo][1] + ' in this stage. They all come back in the next one!'));
+    var nomes = { desfazer: ['os desfazer', 'undos', 'las veces de deshacer'], dica: ['as dicas', 'hints', 'las pistas'], embaralhar: ['os embaralhar', 'shuffles', 'las mezclas'], extra: ['os frascos extras', 'extra bottles', 'los frascos extra'] };
+    aviso(t('Acabaram ' + nomes[tipo][0] + ' desta fase. Na próxima fase voltam todos!', 'No more ' + nomes[tipo][1] + ' in this stage. They all come back in the next one!', 'Se han acabado ' + nomes[tipo][2] + ' de esta fase. ¡En la próxima fase vuelven!'));
     Som.erro();
   }
   function prepararAjuda() { Som.acordar(); parado = 0; if (anims.length) terminarAnims(); return !!est && !fimDeFase; }
 
   $('btDesfazer').addEventListener('click', function () {
     if (!prepararAjuda()) return;
-    if (!hist.length) { aviso(t('Ainda não tem jogada para desfazer.', 'There is no move to undo yet.')); return; }
+    if (!hist.length) { aviso(t('Ainda não tem jogada para desfazer.', 'There is no move to undo yet.', 'Todavía no hay ninguna jugada para deshacer.')); return; }
     if (resta('desfazer') <= 0) { acabou('desfazer'); return; }
     var antes = hist.pop(), extras = est.extras;
     while (antes.frascos.length < est.frascos.length) { antes.frascos.push([]); antes.vistos.push([]); }   // o frasco extra continua
@@ -338,12 +339,12 @@
     if (!plano || !plano.length || !M.quantoDespeja(est, plano[0][0], plano[0][1])) plano = M.plano(est);
     var p = plano && plano[0];
     if (!p) {
-      if (!sozinha) { aviso(t('Deste jeito não dá mais para terminar. Use ↩️ desfazer, 🔀 embaralhar ou ➕ mais um frasco.', 'This way it cannot be finished anymore. Use ↩️ undo, 🔀 shuffle or ➕ one more bottle.')); chamarAjudas(); }
+      if (!sozinha) { aviso(t('Deste jeito não dá mais para terminar. Use ↩️ desfazer, 🔀 embaralhar ou ➕ mais um frasco.', 'This way it cannot be finished anymore. Use ↩️ undo, 🔀 shuffle or ➕ one more bottle.', 'Así ya no se puede terminar. Usa ↩️ deshacer, 🔀 mezclar o ➕ un frasco más.')); chamarAjudas(); }
       return false;
     }
     if (sel >= 0) soltar(true);
     dicaPar = p; dicaSozinha = sozinha; dicaAte = relogio + (sozinha ? 9999 : 5);
-    if (!sozinha) { Som.brilho(); aviso(t('Despeje o frasco ', 'Pour bottle ') + (p[0] + 1) + t(' no frasco ', ' into bottle ') + (p[1] + 1) + '.'); }
+    if (!sozinha) { Som.brilho(); aviso(t('Despeje o frasco ', 'Pour bottle ', 'Vierte el frasco ') + (p[0] + 1) + t(' no frasco ', ' into bottle ', ' en el frasco ') + (p[1] + 1) + '.'); }
     pedirQuadro(); return true;
   }
 
@@ -351,7 +352,7 @@
     if (!prepararAjuda()) return;
     if (resta('embaralhar') <= 0) { acabou('embaralhar'); return; }
     if (sel >= 0) soltar(true);
-    if (!M.embaralhar(est, rng)) { aviso(t('Não deu para embaralhar agora.', 'Could not shuffle right now.')); return; }
+    if (!M.embaralhar(est, rng)) { aviso(t('Não deu para embaralhar agora.', 'Could not shuffle right now.', 'Ahora no se ha podido mezclar.')); return; }
     usos.embaralhar++; hist = []; dicaPar = null; plano = null; esconderAviso();
     est.frascos.forEach(function (f, i) { if (!M.pronto(f, est.cap)) { vb[i].treme = 1; balancar(i, 0.14); vb[i].revela = 0.6; } });
     Som.despejar(0.5); setTimeout(function () { Som.glub(); }, 300 / VEL);
@@ -383,11 +384,11 @@
     if (!CALMO) confete();
     $('fimEstrelas').innerHTML = '';
     for (var e = 1; e <= 3; e++) { var sp = document.createElement('span'); sp.textContent = '⭐'; sp.className = e <= estrelas ? 'acesa' : 'apagada'; sp.style.animationDelay = (e * 0.18) + 's'; $('fimEstrelas').appendChild(sp); }
-    $('fimEstrelas').setAttribute('aria-label', estrelas + t(' de 3 estrelas', ' of 3 stars'));
-    $('fimTitulo').textContent = [t('Conseguiu!', 'You did it!'), t('Muito bem!', 'Well done!'), t('Perfeito!', 'Perfect!')][estrelas - 1];
-    $('fimTexto').textContent = estrelas === 3 ? t('Fase ' + fase + ' sem nenhuma ajuda. Que capricho!', 'Stage ' + fase + ' with no helpers at all. Brilliant!')
-      : t('Fase ' + fase + ' pronta. Sem usar as ajudas ela vale 3 estrelas.', 'Stage ' + fase + ' done. With no helpers it is worth 3 stars.');
-    $('fimGotas').textContent = '💧 +' + ganho + t(' gotinhas', ' droplets');
+    $('fimEstrelas').setAttribute('aria-label', estrelas + t(' de 3 estrelas', ' of 3 stars', ' de 3 estrellas'));
+    $('fimTitulo').textContent = [t('Conseguiu!', 'You did it!', '¡Lo has conseguido!'), t('Muito bem!', 'Well done!', '¡Muy bien!'), t('Perfeito!', 'Perfect!', '¡Perfecto!')][estrelas - 1];
+    $('fimTexto').textContent = estrelas === 3 ? t('Fase ' + fase + ' sem nenhuma ajuda. Que capricho!', 'Stage ' + fase + ' with no helpers at all. Brilliant!', 'Fase ' + fase + ' sin ninguna ayuda. ¡Qué bien lo hiciste!')
+      : t('Fase ' + fase + ' pronta. Sem usar as ajudas ela vale 3 estrelas.', 'Stage ' + fase + ' done. With no helpers it is worth 3 stars.', 'Fase ' + fase + ' lista. Sin usar ayudas vale 3 estrellas.');
+    $('fimGotas').textContent = '💧 +' + ganho + t(' gotinhas', ' droplets', ' gotitas');
     $('fim').hidden = false;
     setTimeout(function () { $('btProxima').focus(); }, 60);
     pedirQuadro();
@@ -558,9 +559,9 @@
       var b = document.createElement('button'); b.type = 'button'; b.className = 'item' + (usando ? ' usando' : '') + (!tem && falta > 0 ? ' caro' : '');
       b.id = 'item-' + id; b.setAttribute('aria-pressed', String(usando));
       b.appendChild(amostra(id));
-      var n = document.createElement('span'); n.className = 'item-nome'; n.textContent = t(it.pt, it.en); b.appendChild(n);
+      var n = document.createElement('span'); n.className = 'item-nome'; n.textContent = t(it.pt, it.en, it.es); b.appendChild(n);
       var e = document.createElement('span'); e.className = 'item-estado';
-      e.textContent = usando ? t('✔ em uso', '✔ in use') : tem ? t('usar', 'use') : falta > 0 ? '💧 ' + it.preco + t(' · faltam ', ' · need ') + falta : '💧 ' + it.preco + t(' · trocar', ' · get it');
+      e.textContent = usando ? t('✔ em uso', '✔ in use', '✔ en uso') : tem ? t('usar', 'use', 'usar') : falta > 0 ? '💧 ' + it.preco + t(' · faltam ', ' · need ', ' · faltan ') + falta : '💧 ' + it.preco + t(' · trocar', ' · get it', ' · cambiar');
       b.appendChild(e);
       b.addEventListener('click', function () {
         Som.acordar();

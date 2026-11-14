@@ -2,7 +2,7 @@
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE). Frascos de vidro com camadas de líquidos coloridos: a criança
 despeja a cor de cima de um frasco no outro até cada frasco ficar de uma cor só. Sem login, sem anúncio, sem compra, e
-**sem internet** depois de aberto uma vez. O nome é o mesmo em português e em inglês: **AQUA**.
+**sem internet** depois de aberto uma vez. O nome é o mesmo em português, inglês e espanhol: **AQUA**.
 
 Endereço: https://solverone.com.br/kids/aqua/
 
@@ -66,8 +66,8 @@ fases e código são próprios. O dono joga o MAGIC SORT e mandou um print como 
 - Celular **em pé e deitado**, tablet e computador: os frascos se arrumam em fileiras do maior tamanho que couber
   (deitado, as ajudas vão para a direita).
 - Com "reduzir movimento" ligado no aparelho: sem balanço, bolhas nem confete (o despejo continua, é ele que mostra a jogada).
-- 🏠 Início e 🚪 Saída no canto de cima (peça comum `../navegacao.js`). Só português por enquanto; o inglês está
-  pronto e aparece com o interruptor `ingles` do RootifyONE.
+- 🏠 Início e 🚪 Saída no canto de cima (peça comum `../navegacao.js`). Português, inglês e espanhol: o idioma é
+  escolhido só na estante (`../idioma.js`), sem botão no jogo.
 
 ## Arquivos
 
@@ -83,7 +83,7 @@ fases e código são próprios. O dono joga o MAGIC SORT e mandou um print como 
 | `sons/` | Os efeitos gravados (água, bolha, rolha, vidro, sininho, aplausos). Créditos no `CREDITOS.md`. |
 | `teste/` | `motor.test.js` (regras e 400 fases por nível), `arquivos.test.js` (versão, sw, créditos), `pagina.test.js` (o jogo no navegador). |
 
-Guardado no aparelho: `localStorage` `aqua.pref` (idioma, sons, desenho nas cores, fase de cada nível, estrelas,
+Guardado no aparelho: `localStorage` `aqua.pref` (sons, desenho nas cores, fase de cada nível, estrelas,
 gotinhas, itens da lojinha) e `bolinho:aqua:trilha-mudo` (música desligada). Nenhum dado pessoal.
 
 ## Testes
