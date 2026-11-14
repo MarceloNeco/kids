@@ -43,7 +43,7 @@ vira e a vez passa. Acertou, ganhou.
 | `logica.js` | motor sem tela: características, perguntas por nível, sorteio do tabuleiro (semente), a meleca-computador |
 | `partida.js` | regras da vez (perguntar, responder conferido, descartar, pronto, palpite) para os três modos |
 | `caras.js` | desenha cada cara em SVG (busto), com versão detalhada para a lupa |
-| `melecas.js` | as duas melecas em SVG, com 6 humores (animação no CSS) |
+| `melecas.js`, `melecas/*.webp` | as duas melecas em 3D (imagens geradas no Higgsfield, 0.6.0; `QEMelecas.img`) com o SVG de 6 humores como reserva (animação no CSS) |
 | `rede.js` | dois aparelhos: diário numerado dos eventos, pulso que reenvia o que faltou, segredo só no aparelho do dono; canal Supabase Realtime (`?teste` = BroadcastChannel) |
 | `app.js` | a tela do Duelo e o começo; `APP_VERSION` |
 | `adivinha-perguntas.js`, `adivinha.js`, `aprender.js`, `voz.js`, `adivinha-tela.js`, `personagens/` | A Meleca Adivinha (perguntas, motor, aprender, voz, tela, lista pronta) |

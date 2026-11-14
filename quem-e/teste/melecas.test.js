@@ -40,3 +40,20 @@ test('classe de animação por humor', () => {
   assert.ok(M.svg('pink', 'ops', { id: 'a' }).includes('qm-treme'));
   assert.ok(M.svg('pink', 'parada', { id: 'a' }).includes('qm-respira'));
 });
+
+test('melecas em 3D: cada humor tem imagem guardada no jogo, leve, e entra no sw.js para jogar sem internet', () => {
+  const fs = require('fs'), path = require('path');
+  const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  for (const m of M.LISTA) for (const h of ['parada', 'feliz', 'ops', 'pensando', 'falando', 'triste']) {
+    const tag = M.img(m.id, h), src = /src="([^"]+)"/.exec(tag)[1];
+    assert.ok(/^<img class="qm-3d /.test(tag) && tag.includes('data-humor="' + h + '"'), tag);
+    assert.ok(fs.existsSync(path.join(__dirname, '..', src)), 'falta ' + src);
+  }
+  for (const a of M.arquivos()) {
+    const tam = fs.statSync(path.join(__dirname, '..', a)).size;
+    assert.ok(tam < 120000, a + ' grande demais: ' + tam);
+    assert.ok(sw.includes("'" + a + "'"), a + ' fora do sw.js');
+  }
+  assert.ok(M.img('blue', 'falando').includes('qm-fala'));
+  assert.ok(M.img('pink', 'ops').includes('qm-treme'));
+});

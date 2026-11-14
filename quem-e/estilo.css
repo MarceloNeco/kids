@@ -300,3 +300,9 @@ dialog.qe-janela::backdrop { background: rgba(58, 20, 80, .55); }
 .criar-mais .linha { flex-wrap: wrap; justify-content: center; }
 .criar-op[aria-checked="true"] { background: #fff3c4; border-color: var(--mel); }
 .criar-op[aria-checked="true"]::before { content: '✓ '; }
+/* melecas em 3D (melecas/*.webp): o mesmo lugar do SVG; falando = um balancinho */
+.qm-3d { width: 100%; height: 100%; object-fit: contain; display: block; -webkit-user-drag: none; user-select: none; }
+.qm-3d.qm-respira, .qm-3d.qm-pula, .qm-3d.qm-treme { transform-box: border-box; }
+.qm-3d.qm-fala { animation: fala .5s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes fala { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.03, .96); } }
+@media (prefers-reduced-motion: reduce) { .qm-3d.qm-fala { animation: none; } }
