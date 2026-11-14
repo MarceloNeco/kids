@@ -5,6 +5,10 @@ um fliperama como referência (e, na 0.3.0, imagens de um vídeo de filhotes de 
 controle ⬆⬇⬅➡ + botão de agarrar, **a garra não pega toda vez** (como as de verdade), mais fiel às fotos e **várias
 máquinas**: hambúrgueres, bichinhos que mexem, insetos. Isso é a 0.2.0.
 
+Idioma (0.4.0): português, inglês ou espanhol, o escolhido na estante (`../idioma.js`), sem botão de idioma no jogo. O
+nome muda com o idioma: **A-GARRA** · **THE CLAW** · **LA GARRA** (na tela, nos letreiros das máquinas e no letreiro de LED);
+o botão PEGAR vira GRAB · COGER.
+
 ## Como se brinca
 
 - **Máquina** (cada uma é um jogo, com a sua coleção e um prêmio dourado raro):

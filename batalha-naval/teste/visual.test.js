@@ -58,12 +58,12 @@ async function abrir(op = {}, url = base + '?teste') {
 }
 const celulas = nv => Array.from({ length: nv.tam }, (_, i) => nv.h ? [nv.x + i, nv.y] : [nv.x, nv.y + i]);
 
-test('tipos de navio: cada nível tem nomes diferentes, sempre com submarino e destróier, em PT e EN', () => {
+test('tipos de navio: cada nível tem nomes diferentes, sempre com submarino e destróier, em PT, EN e ES', () => {
   for (const nivel of Object.keys(L.NIVEIS)) {
     const tams = L.NIVEIS[nivel].frota, tipos = tams.map((_, i) => Nav.tipo(tams, i));
     assert.equal(new Set(tipos).size, tipos.length, 'nome repetido no ' + nivel + ': ' + tipos);
     assert.ok(tipos.includes('submarino') && tipos.includes('destroier'), nivel + ': ' + tipos);
-    tipos.forEach((t, i) => { assert.equal(Nav.TIPOS[t].tam, tams[i]); assert.ok(Nav.TIPOS[t].pt && Nav.TIPOS[t].en); });
+    tipos.forEach((t, i) => { assert.equal(Nav.TIPOS[t].tam, tams[i]); assert.ok(Nav.TIPOS[t].pt && Nav.TIPOS[t].en && Nav.TIPOS[t].es); });
   }
   assert.deepEqual(Nav.tipo(L.NIVEIS.dificil.frota, 0), 'porta');
   assert.equal(Nav.daFrota([{ x: 0, y: 0, tam: 3, h: true }, { x: 0, y: 2, tam: 3, h: false }], { x: 0, y: 2, tam: 3, h: false }), 'fragata');
@@ -95,12 +95,14 @@ test('cada tipo de navio desenhado em SVG, deitado e em pé, ocupando exatamente
     };
     for (let y = 0; y < 7; y++) await toque(6, y);                    // os 7 deitados, um por linha (longe do botão de tela cheia)
     conferir(await medir(), true);
-    // na bandeja: desenho + nome em PT, e em EN
+    // na bandeja: desenho + nome em PT, e em EN e ES (o idioma escolhido na estante)
     assert.deepEqual(await pg.$$eval('#arrPecas .peca', l => l.map(b => !!b.querySelector('svg.navio-svg'))), [true, true, true, true, true, true, true]);
     assert.match(await pg.textContent('#arrPecas'), /Porta-aviões.*Encouraçado.*Cruzador.*Submarino.*Fragata.*Destróier.*Lancha-patrulha/s);
-    await pg.click('#btLingua');
+    await pg.evaluate(() => BolinhoIdioma.escolher('en'));
     assert.match(await pg.textContent('#arrPecas'), /Aircraft carrier.*Battleship.*Cruiser.*Submarine.*Frigate.*Destroyer.*Patrol boat/s);
-    await pg.click('#btLingua');
+    await pg.evaluate(() => BolinhoIdioma.escolher('es'));
+    assert.match(await pg.textContent('#arrPecas'), /Portaaviones.*Acorazado.*Crucero.*Submarino.*Fragata.*Destructor.*Lancha patrullera/s);
+    await pg.evaluate(() => BolinhoIdioma.escolher('pt'));
     await pg.click('#btLimpar'); await pg.click('#btGirar');             // agora em pé
     await pg.$eval('#arrTab', el => el.scrollIntoView({ block: 'center' }));
     for (let x = 0; x < 7; x++) await toque(x, 0);

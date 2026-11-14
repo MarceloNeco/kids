@@ -173,3 +173,21 @@ test('Voltar do celular e 🏠 voltam ao menu', async () => {
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
 });
+
+test('três idiomas, escolhidos na estante: nome, botões e prêmios no idioma certo, sem botão de idioma próprio', async () => {
+  for (const [cod, logo, pegar, lang, premio] of [['pt', 'A-GARRA', 'PEGAR', 'pt-BR', 'Ursinho'], ['en', 'THE CLAW', 'GRAB', 'en', 'Teddy'], ['es', 'LA GARRA', 'COGER', 'es', 'Osito']]) {
+    const ctx = await browser.newContext(Object.assign({ locale: cod === 'pt' ? 'en-US' : 'pt-BR' }, FONE));
+    await ctx.addInitScript((c) => { localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:a-garra:colecao', JSON.stringify({ urso: 1 })); }, cod);
+    await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+    const pg = await ctx.newPage();
+    try {
+      await pg.goto(base + '?teste'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
+      assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma');
+      assert.equal(await pg.evaluate(() => document.documentElement.lang), lang);
+      assert.equal((await pg.textContent('#logo')).replace(/ /g, ' '), logo);
+      assert.equal(await pg.textContent('#btPegar'), pegar);
+      await pg.click('#btColecao');
+      assert.ok((await pg.textContent('#prateleira')).includes(premio), cod + ': prêmio com o nome no idioma');
+    } finally { await ctx.close(); }
+  }
+});

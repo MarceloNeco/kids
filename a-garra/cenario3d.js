@@ -36,7 +36,10 @@ function tijolos(g, w, h, base, linha, luz) {
   }
 }
 function brilho(g, cor, blur) { g.shadowColor = cor; g.shadowBlur = blur; }
-function texto(g, txt, x, y, fonte, cor, sombra) { g.font = fonte; g.textAlign = 'center'; g.textBaseline = 'middle'; if (sombra) brilho(g, sombra, 18); g.fillStyle = cor; g.fillText(txt, x, y); g.shadowBlur = 0; }
+function texto(g, txt, x, y, fonte, cor, sombra, larg) { g.font = fonte; g.textAlign = 'center'; g.textBaseline = 'middle'; if (sombra) brilho(g, sombra, 18); g.fillStyle = cor; if (larg) g.fillText(txt, x, y, larg); else g.fillText(txt, x, y); g.shadowBlur = 0; }
+// letreiros no idioma escolhido na estante (../idioma.js); a máquina é montada de novo a cada partida
+const tx = (pt, en, es) => (window.BolinhoIdioma ? window.BolinhoIdioma.t(pt, en, es) : pt);
+const NOME = () => tx('A-GARRA', 'THE CLAW', 'LA GARRA');
 function estrela(g, x, y, r, ri, cor) { g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? ri : r; g[i ? 'lineTo' : 'moveTo'](x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.closePath(); g.fillStyle = cor; g.fill(); }
 function hexagono(g, x, y, r) { g.beginPath(); for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + i * Math.PI / 3; g[i ? 'lineTo' : 'moveTo'](x + Math.cos(a) * r, y + Math.sin(a) * r); } g.closePath(); }
 function bandeira(g, x, y, w, h) {   // bandeira do Reino Unido (símbolo nacional), simplificada
@@ -92,7 +95,7 @@ function fundoDe(tema) {
     } else if (tema === 'neon') {
       tijolos(g, w, h, '#232625', '#0f1110', '#3a3f3d');
       ursoNeon(g, w * 0.3, h * 0.36, 110, '#7ef9ff'); coracaoNeon(g, w * 0.74, h * 0.28, 70, '#ff4fd8');
-      texto(g, 'A-GARRA', w * 0.7, h * 0.52, '700 64px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a');
+      texto(g, NOME(), w * 0.7, h * 0.52, '700 64px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a', 560);
     } else if (tema === 'estrelas') {
       const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#24318f'); gr.addColorStop(1, '#141c5c'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
       for (let i = 0; i < 160; i++) { g.globalAlpha = 0.3 + (i % 5) * 0.14; estrela(g, (i * 97) % w, (i * 151) % h, 3 + (i % 3) * 2, 1.4, '#fff7c2'); }
@@ -100,50 +103,50 @@ function fundoDe(tema) {
       [[0.3, 0.22, 0], [0.5, 0.22, 1], [0.7, 0.22, 2], [0.4, 0.42, 1], [0.6, 0.42, 0]].forEach(([x, y, q]) => {
         hexagono(g, x * w, y * h, 95); g.fillStyle = '#3a2f8f'; g.fill(); g.lineWidth = 8; g.strokeStyle = '#7ef9ff'; g.stroke(); insetoIcone(g, x * w, y * h, 110, q);
       });
-      texto(g, 'INSETOS OFICIAIS DA A-GARRA', w / 2, h * 0.6, '700 46px Fredoka, system-ui, sans-serif', 'rgba(255,255,255,.75)');
+      texto(g, tx('INSETOS OFICIAIS DA A-GARRA', 'OFFICIAL BUGS OF THE CLAW', 'INSECTOS OFICIALES DE LA GARRA'), w / 2, h * 0.6, '700 46px Fredoka, system-ui, sans-serif', 'rgba(255,255,255,.75)', null, w * 0.92);
     } else if (tema === 'bichos') {   // parede clara de pet shop, com patinhas e uma janelinha de luzes do fliperama
       const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#f4efe6'); gr.addColorStop(1, '#ddd3c4'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
       for (let i = 0; i < 18; i++) patinha(g, 80 + (i * 173) % (w - 160), 90 + (i * 97) % (h * 0.55), 22 + (i % 3) * 6, 'rgba(160,130,100,.25)', i * 0.7);
       g.fillStyle = '#2a2f3a'; g.fillRect(w * 0.55, h * 0.12, w * 0.32, h * 0.26);
       for (let i = 0; i < 26; i++) { g.fillStyle = ['#ff4fd8', '#7ef9ff', '#ffd400', '#39ff6a'][i % 4]; g.globalAlpha = 0.5; g.beginPath(); g.arc(w * 0.57 + (i * 37) % (w * 0.28), h * 0.15 + (i * 53) % (h * 0.2), 6 + (i % 3) * 4, 0, 7); g.fill(); }
       g.globalAlpha = 1; g.strokeStyle = '#c9ced6'; g.lineWidth = 12; g.strokeRect(w * 0.55, h * 0.12, w * 0.32, h * 0.26);
-      texto(g, 'BICHOS DE VERDADE', w * 0.3, h * 0.24, '700 50px Fredoka, system-ui, sans-serif', '#a07850');
+      texto(g, tx('BICHOS DE VERDADE', 'REAL ANIMALS', 'ANIMALES DE VERDAD'), w * 0.3, h * 0.24, '700 50px Fredoka, system-ui, sans-serif', '#a07850', null, w * 0.48);
     } else {
       for (let y = 0; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff3df' : '#ffe0b8'; g.fillRect(x, y, 64, 64); }
       g.fillStyle = '#2a1a12'; g.fillRect(w * 0.14, h * 0.1, w * 0.72, h * 0.42); g.strokeStyle = '#c98b4a'; g.lineWidth = 14; g.strokeRect(w * 0.14, h * 0.1, w * 0.72, h * 0.42);
-      texto(g, 'CARDÁPIO', w / 2, h * 0.16, '700 56px Fredoka, system-ui, sans-serif', '#ffd166');
-      for (let i = 0; i < 3; i++) { burguerIcone(g, w * (0.3 + i * 0.2), h * 0.3, 90); texto(g, ['X-SALADA', 'X-BACON', 'DUPLO'][i], w * (0.3 + i * 0.2), h * 0.42, '600 30px Fredoka, system-ui, sans-serif', '#ffffff'); }
+      texto(g, tx('CARDÁPIO', 'MENU', 'CARTA'), w / 2, h * 0.16, '700 56px Fredoka, system-ui, sans-serif', '#ffd166');
+      for (let i = 0; i < 3; i++) { burguerIcone(g, w * (0.3 + i * 0.2), h * 0.3, 90); texto(g, [tx('X-SALADA', 'SALAD', 'ENSALADA'), tx('X-BACON', 'BACON', 'BEICON'), tx('DUPLO', 'DOUBLE', 'DOBLE')][i], w * (0.3 + i * 0.2), h * 0.42, '600 30px Fredoka, system-ui, sans-serif', '#ffffff', null, w * 0.18); }
       g.save(); brilho(g, '#ff7ab8', 14); g.strokeStyle = '#ff7ab8'; g.lineWidth = 6; g.strokeRect(w * 0.1, h * 0.06, w * 0.8, h * 0.5); g.restore();
     }
   });
 }
 function placaDe(tema) {
   return textura(1024, 256, (g, w, h) => {
-    if (tema === 'telefone') { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, w, h); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#111'); estrela(g, 90, h / 2, 50, 22, '#c8102e'); estrela(g, w - 90, h / 2, 50, 22, '#c8102e'); }
-    else if (tema === 'neon') { g.fillStyle = '#050505'; g.fillRect(0, 0, w, h); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#c6ffd4', '#39ff6a'); }
-    else if (tema === 'estrelas') { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2b3aa0'); gr.addColorStop(1, '#101a4d'); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 30; i++) estrela(g, (i * 137) % w, (i * 71) % h, 6, 2.5, 'rgba(255,240,180,.7)'); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c'); }
-    else if (tema === 'bichos') { g.fillStyle = '#f4f6f8'; g.fillRect(0, 0, w, h); texto(g, 'A-GARRA', w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#4a3a2c'); patinha(g, 110, h / 2, 46, '#b5652e', -0.3); patinha(g, w - 110, h / 2, 46, '#1d1715', 0.3); }
-    else { g.fillStyle = '#d62839'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 64) { g.fillStyle = (x / 64) % 2 ? '#fff' : '#d62839'; g.fillRect(x, h - 40, 64, 40); } texto(g, 'A-GARRA', w / 2, h / 2 - 12, '800 140px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020'); burguerIcone(g, 110, h / 2, 110); burguerIcone(g, w - 110, h / 2, 110); }
+    if (tema === 'telefone') { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, w, h); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#111', null, w * 0.7); estrela(g, 90, h / 2, 50, 22, '#c8102e'); estrela(g, w - 90, h / 2, 50, 22, '#c8102e'); }
+    else if (tema === 'neon') { g.fillStyle = '#050505'; g.fillRect(0, 0, w, h); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#c6ffd4', '#39ff6a', w * 0.9); }
+    else if (tema === 'estrelas') { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2b3aa0'); gr.addColorStop(1, '#101a4d'); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 30; i++) estrela(g, (i * 137) % w, (i * 71) % h, 6, 2.5, 'rgba(255,240,180,.7)'); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', w * 0.9); }
+    else if (tema === 'bichos') { g.fillStyle = '#f4f6f8'; g.fillRect(0, 0, w, h); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#4a3a2c', null, w * 0.66); patinha(g, 110, h / 2, 46, '#b5652e', -0.3); patinha(g, w - 110, h / 2, 46, '#1d1715', 0.3); }
+    else { g.fillStyle = '#d62839'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 64) { g.fillStyle = (x / 64) % 2 ? '#fff' : '#d62839'; g.fillRect(x, h - 40, 64, 40); } texto(g, NOME(), w / 2, h / 2 - 12, '800 140px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', w * 0.6); burguerIcone(g, 110, h / 2, 110); burguerIcone(g, w - 110, h / 2, 110); }
   });
 }
 function laterais(tema) {   // a placa "TELEFONE" das laterais da cabine
-  return textura(512, 128, (g, w, h) => { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, w, h); texto(g, 'TELEFONE', w / 2, h / 2 + 4, '800 78px Fredoka, system-ui, sans-serif', '#111'); });
+  return textura(512, 128, (g, w, h) => { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, w, h); texto(g, tx('TELEFONE', 'TELEPHONE', 'TELÉFONO'), w / 2, h / 2 + 4, '800 78px Fredoka, system-ui, sans-serif', '#111', null, w * 0.92); });
 }
 function frenteBase(tema) {
   return textura(1024, 1024, (g, w, h) => {
     const T = TEMAS[tema];
     g.fillStyle = T.corpo; g.fillRect(0, 0, w, h);
     if (tema === 'telefone') { bandeira(g, 40, 520, 230, 250); bandeira(g, w - 270, 520, 230, 250); }
-    if (tema === 'neon') { g.save(); brilho(g, '#39ff6a', 22); g.strokeStyle = '#39ff6a'; g.lineWidth = 12; g.strokeRect(40, 40, w - 80, h - 80); g.restore(); texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a'); }
-    if (tema === 'estrelas') { for (let i = 0; i < 80; i++) estrela(g, (i * 97) % w, (i * 151) % h, 6 + (i % 3) * 3, 2.6, 'rgba(255,240,180,.8)'); texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c'); }
-    if (tema === 'bichos') { for (let i = 0; i < 10; i++) patinha(g, 480 + (i * 131) % 500, 520 + (i * 89) % 420, 26, 'rgba(120,100,80,.3)', i); texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#4a3a2c'); }
-    if (tema === 'lanchonete') { for (let y = 640; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff' : '#111'; g.fillRect(x, y, 64, 64); } texto(g, 'A-GARRA', w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020'); }
+    if (tema === 'neon') { g.save(); brilho(g, '#39ff6a', 22); g.strokeStyle = '#39ff6a'; g.lineWidth = 12; g.strokeRect(40, 40, w - 80, h - 80); g.restore(); texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a', 500); }
+    if (tema === 'estrelas') { for (let i = 0; i < 80; i++) estrela(g, (i * 97) % w, (i * 151) % h, 6 + (i % 3) * 3, 2.6, 'rgba(255,240,180,.8)'); texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', 500); }
+    if (tema === 'bichos') { for (let i = 0; i < 10; i++) patinha(g, 480 + (i * 131) % 500, 520 + (i * 89) % 420, 26, 'rgba(120,100,80,.3)', i); texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#4a3a2c', null, 500); }
+    if (tema === 'lanchonete') { for (let y = 640; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff' : '#111'; g.fillRect(x, y, 64, 64); } texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', 500); }
     // portinha do prêmio (embaixo do buraco, à esquerda)
     const px = 50, py = 120, pw = 330, ph = 330;
     g.fillStyle = tema === 'lanchonete' || tema === 'bichos' ? '#fff3df' : tema === 'telefone' ? '#a00d24' : '#0b0b0b'; g.fillRect(px - 14, py - 14, pw + 28, ph + 28);
     g.fillStyle = '#050505'; g.fillRect(px, py, pw, ph * 0.62);
     if (tema === 'telefone') for (let i = 0; i < 6; i++) for (let j = 0; j < 2; j++) { g.fillStyle = (i + j) % 2 ? '#fff' : '#111'; g.fillRect(px + i * pw / 6, py + ph * 0.66 + j * 28, pw / 6, 28); }
-    texto(g, 'PRÊMIO', px + pw / 2, py + ph * 0.9, '800 64px Fredoka, system-ui, sans-serif', tema === 'neon' ? '#39ff6a' : tema === 'estrelas' ? '#ffd166' : tema === 'lanchonete' ? '#d62839' : tema === 'bichos' ? '#4a3a2c' : '#ffffff');
+    texto(g, tx('PRÊMIO', 'PRIZE', 'PREMIO'), px + pw / 2, py + ph * 0.9, '800 64px Fredoka, system-ui, sans-serif', tema === 'neon' ? '#39ff6a' : tema === 'estrelas' ? '#ffd166' : tema === 'lanchonete' ? '#d62839' : tema === 'bichos' ? '#4a3a2c' : '#ffffff');
   });
 }
 
@@ -296,7 +299,7 @@ export function montarMaquina(cena, tema, M) {
   function desenharLed(t) {
     const g = ledTex.userData.g, w = 1024, h = 128;
     g.fillStyle = '#020302'; g.fillRect(0, 0, w, h);
-    const msg = '  A-GARRA  ★  PEGUE O SEU BICHINHO  ★  ', larg = msg.length * 46, desl = (t * 140) % larg;
+    const msg = tx('  A-GARRA  ★  PEGUE O SEU BICHINHO  ★  ', '  THE CLAW  ★  GRAB YOUR CRITTER  ★  ', '  LA GARRA  ★  COGE TU PELUCHE  ★  '), larg = msg.length * 46, desl = (t * 140) % larg;
     g.font = '800 92px Fredoka, system-ui, sans-serif'; g.textBaseline = 'middle';
     for (let k = -1; k < 3; k++) { const cores = ['#39ff6a', '#ff4fd8', '#7ef9ff', '#ffd400']; g.fillStyle = cores[(k + 4) % 4]; g.fillText(msg, k * larg - desl, h / 2 + 4); }
     g.fillStyle = 'rgba(0,0,0,.55)'; for (let x = 0; x < w; x += 8) g.fillRect(x, 0, 3, h); for (let y = 0; y < h; y += 8) g.fillRect(0, y, w, 3);   // pontinhos de LED
