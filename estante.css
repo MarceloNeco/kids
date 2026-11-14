@@ -40,3 +40,19 @@ footer b{color:var(--ouro)}
 
 /* ✨ Novo: jogo que entrou na estante nos últimos 7 dias (catalogo.js, campo novo) */
 .novo-selo{display:inline-block;vertical-align:middle;margin-left:.5rem;padding:.2rem .6rem;border-radius:999px;background:#ffd166;color:#1a1446;font-weight:800;font-size:.8rem;box-shadow:0 0 14px rgba(255,209,102,.6)}
+
+/* Bolinho FM (dono, 14/Nov/2026): o botão da biblioteca de músicas é um radinho tocando, com notas subindo */
+.bt-biblioteca{display:inline-flex;align-items:center;gap:.45rem;overflow:visible}
+.radinho{position:relative;display:inline-block;flex:none;width:30px;height:24px;line-height:0}
+.radinho svg{width:100%;height:100%;animation:radinho-pula 1.2s ease-in-out infinite;transform-origin:50% 100%}
+.radinho i{position:absolute;left:8px;top:-2px;font-style:normal;font-weight:900;font-size:13px;line-height:1;color:#c6ff3d;opacity:0;
+  text-shadow:0 0 6px rgba(198,255,61,.6);animation:radinho-nota 2.4s ease-out infinite;pointer-events:none}
+.radinho i:nth-of-type(2){left:15px;color:#3ee8ff;text-shadow:0 0 6px rgba(62,232,255,.6);animation-delay:.8s}
+.radinho i:nth-of-type(3){left:2px;color:#ffd166;text-shadow:0 0 6px rgba(255,209,102,.6);animation-delay:1.6s}
+@keyframes radinho-nota{0%{transform:translate(0,6px) scale(.6) rotate(-10deg);opacity:0}20%{opacity:1}100%{transform:translate(9px,-20px) scale(1.15) rotate(12deg);opacity:0}}
+@keyframes radinho-pula{0%,100%{transform:scale(1,1)}50%{transform:scale(1.04,.95)}}
+@media (prefers-reduced-motion:reduce){.radinho svg,.radinho i{animation:none}.radinho i:first-of-type{opacity:1;transform:translate(6px,-8px)}}
+.bib-topo h2{display:flex;align-items:center;gap:.6rem}
+.bib-topo h2 .radinho{width:42px;height:34px}
+.bib-topo h2 .radinho i{font-size:16px}
+.bib-topo h2 small{display:block;font-size:.85rem;font-weight:600;color:#b3acd6}
