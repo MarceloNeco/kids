@@ -143,12 +143,12 @@
         tri(st, '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…', '⬇ Saving ' + (i + 1) + ' of ' + instalaveis.length + ': ' + nome + '…', '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…');
       }).then(function (n) {
         return guardarMusicas(function (i, total) {
-          tri(st, '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '…', '🎵 Saving the favourite songs: ' + (i + 1) + ' of ' + total + '…', '🎵 Guardando las canciones favoritas: ' + (i + 1) + ' de ' + total + '…');
+          tri(st, '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '…', '🎵 Saving the favorite songs: ' + (i + 1) + ' of ' + total + '…', '🎵 Guardando las canciones favoritas: ' + (i + 1) + ' de ' + total + '…');
         }).then(function (m) { return { n: n, m: m }; });
       }).then(function (r) {
         var n = r.n, m = r.m;
         var musicas = m.total ? ' 🎵 ' + m.feitas + ' de ' + m.total + ' músicas favoritas guardadas: tocam até sem internet.' : '';
-        var musicasEn = m.total ? ' 🎵 ' + m.feitas + ' of ' + m.total + ' favourite songs saved: they play even without the internet.' : '';
+        var musicasEn = m.total ? ' 🎵 ' + m.feitas + ' of ' + m.total + ' favorite songs saved: they play even without the internet.' : '';
         var musicasEs = m.total ? ' 🎵 ' + m.feitas + ' de ' + m.total + ' canciones favoritas guardadas: suenan incluso sin internet.' : '';
         bGuardar.disabled = false;
         if (n === instalaveis.length && m.feitas === m.total) {
