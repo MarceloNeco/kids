@@ -94,7 +94,14 @@
 
   // ---------- melecas na tela ----------
   var nMel = 0;
-  function melecaSvg(id, humor) { return MEL.svg(id, humor, { id: 'mx' + (nMel++) }); }
+  // a meleca em 3D (melecas/*.webp); se a imagem não carregar, o desenho em SVG entra no lugar
+  function melecaSvg(id, humor) { return MEL.img ? MEL.img(id, humor) : MEL.svg(id, humor, { id: 'mx' + (nMel++) }); }
+  document.addEventListener('error', function (e) {
+    var el = e.target;
+    if (!el || el.tagName !== 'IMG' || !el.classList.contains('qm-3d') || !el.parentNode) return;
+    var tmp = document.createElement('span'); tmp.innerHTML = MEL.svg(el.getAttribute('data-meleca'), el.getAttribute('data-humor'), { id: 'mx' + (nMel++) });
+    el.parentNode.replaceChild(tmp.firstChild, el);
+  }, true);
   function pintarMelecas() {
     $('btBlue').querySelector('.meleca-img').innerHTML = melecaSvg('blue', pref.meleca === 'blue' ? 'feliz' : 'parada');
     $('btPink').querySelector('.meleca-img').innerHTML = melecaSvg('pink', pref.meleca === 'pink' ? 'feliz' : 'parada');
