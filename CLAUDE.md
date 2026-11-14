@@ -149,6 +149,10 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   - Música feita no código (som de "Atari", 8 bits) **nunca toca com internet**, nem intercalada.
   - Prefira sempre gravações com instrumentos de verdade. Música gravada com som de videogame / 8 bits (chiptune) não
     entra na lista (deixe o arquivo na pasta, só tire da lista). Cada jogo continua com pelo menos 10 músicas.
+  - **Biblioteca de músicas (dono, 14/Nov/2026):** o botão 🎵 da estante lista todas as músicas gravadas dos jogos e da
+    rádio (`biblioteca.js` + `biblioteca-musicas.js`, gerado). Mudou a música de um jogo (ou jogo novo)? Ponha a lista dele
+    em `teste/listas-musica.js`, o crédito no `CREDITOS.md`/`LICENCAS.md` e rode `node ferramentas/biblioteca-musicas.js`.
+    Vigia: `teste/biblioteca-musicas.test.js`.
   - A favorita de cada jogo (`FAVORITAS` no `trilha.js`) é de instrumentos de verdade, animada, até 2,5 MB e o jogo a
     toca. Vigia: `teste/regra-musica.test.js`.
 
