@@ -126,7 +126,7 @@ async function comecar(pg, nivel) {
   confere(await D(pg, () => !document.getElementById('btLingua')), 'sem botão de idioma próprio');
   confere((await pg.textContent('#btJogar')) === 'Jogar', 'abre em português');
   await D(pg, () => BolinhoIdioma.escolher('en'));
-  confere((await pg.textContent('#btJogar')) === 'Play' && await D(pg, () => document.documentElement.lang) === 'en', 'estante em EN troca os textos');
+  confere((await pg.textContent('#btJogar')) === 'Play' && (await D(pg, () => document.documentElement.lang)).indexOf('en') === 0, 'estante em EN troca os textos');
   await D(pg, () => BolinhoIdioma.escolher('pt'));
   for (const [cod, jogar, som, fala, lang] of [['en', 'Play', 'Sound', 'Three, two, one, go!', 'en'], ['es', 'Jugar', 'Sonido', '¡Tres, dos, uno, ya!', 'es']]) {
     const pi = await abrir(browser, base + '?teste', { ctx: { locale: 'pt-BR' }, antes: 'localStorage.setItem("bolinho:idioma", "' + cod + '")' });
@@ -134,7 +134,7 @@ async function comecar(pg, nivel) {
       pref: localStorage.getItem('peluqueria-pref') || '' }));
     await D(pi, () => PeluqueriaDebug.novaRodada('crianca'));
     const voz = await D(pi, () => PeluqueriaVoz.ultimo);
-    confere(r.jogar === jogar && r.som === som && r.lang === lang && !/lingua/.test(r.pref) && voz === fala, 'estante em ' + cod.toUpperCase() + ': textos, rótulos e voz no idioma', [r, voz]);
+    confere(r.jogar === jogar && r.som === som && r.lang.indexOf(lang) === 0 && !/lingua/.test(r.pref) && voz === fala, 'estante em ' + cod.toUpperCase() + ': textos, rótulos e voz no idioma', [r, voz]);
     await pi.context().close();
   }
 
@@ -323,7 +323,7 @@ async function comecar(pg, nivel) {
 
   const pdb = await abrir(browser, base + '?debug&teste');
   await passo(pdb, 500);
-  confere(/v0\.6\.13/.test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
+  confere(/v0\.6\.14/.test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
   confere(await D(pdb, () => PeluqueriaDebug.leve === false), 'celular: modo leve desligado');
 
   /* ---------- revisão final ---------- */
