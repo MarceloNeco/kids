@@ -138,7 +138,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
 - Testes: `node --test <jogo>/teste/*.test.js` (rodar da raiz deste repositório).
 - Jogo novo: pasta própria + entrada em `catalogo.js` (com `novo: 'AAAA-MM-DD'`, a data do dia: por 7 dias o cartão
-  ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" da estante, `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
+  ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" da estante a cada visita, até a pessoa tocar em "Não mostrar mais esta
+  mensagem", `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
   no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
