@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.12.0';
+  var APP_VERSION = '1.13.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -29,6 +29,7 @@
   if (pref.controle !== 'maos') pref.controle = 'toque';
   if (pref.rivais !== 'sem') pref.rivais = 'com';
   var PE = window.VruuumPersonagens;
+  if (!Array.isArray(pref.mundos)) pref.mundos = [];   // cenários escolhidos (vazio = surpresa)
   if (['neon', 'colorido', 'misto'].indexOf(pref.visual) < 0 || !pref.visualV2) { pref.visual = 'misto'; pref.visualV2 = true; }   // misto: alterna dia e noite (padrão desde a 1.0)
   D.definirEstilo(pref.visual);
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
@@ -88,9 +89,11 @@
     var ent = e.jogadores.map(function (j, k) { return pilotoDemo(e, j, k); });
     M.atualizar(e, ent, dt); e.eventos.forEach(function (ev) { D.evento(ev, e); }); D.passo(dt, e, ent);
     demo.tCena += dt;
+    e.jogadores.forEach(function (j) { if (e.fase === 'corrida' && j.turbo <= 0 && Math.random() < dt * 0.25) j.turbo = 2.5; });   // turbo de vez em quando: linhas de velocidade e fogo
     if (demo.tCena > 5 && e.fase === 'corrida') {   // corte de câmera
       demo.tCena = 0; demo.cena++;
       var l = e.pista.loops && e.pista.loops[demo.cena % e.pista.loops.length];
+      e.jogadores.forEach(function (j) { j.turbo = 2.5; });
       if (demo.cena % 3 === 2 && l) e.jogadores.forEach(function (j, k) { j.z = (l.ini - 45 - k * 6) * window.VruuumPista.SEG; j.vel = e.pista.cfg.velMax; j.x = k ? 0.3 : -0.3; });
       if (e.jogadores[0].z > e.pista.zChegada - 30000) { demo = null; iniciarDemo(); return; }
     }
@@ -147,6 +150,17 @@
         b.setAttribute('data-personagem', p.id); b.title = p.nome[0];
         var cv = document.createElement('canvas'); cv.width = cv.height = 80; p.frente(cv.getContext('2d'), 40, 46, 26); b.appendChild(cv);
         $('bichos').appendChild(b);
+      });
+      // cenários: toque para escolher (até 4, na ordem do toque); 🎲 Surpresa = o jogo sorteia
+      [''].concat(window.VruuumPista.MUNDOS).forEach(function (m) {
+        var tm = m && D.TEMAS[m], b = botao('opcao', m ? tm.nome[0] : 'Surpresa', function () {
+          if (!m) pref.mundos = [];
+          else if (pref.mundos.indexOf(m) >= 0) pref.mundos.splice(pref.mundos.indexOf(m), 1);
+          else { pref.mundos.push(m); if (pref.mundos.length > 4) pref.mundos.shift(); }
+          salvar(); Som.tocar('clique'); marcar();
+        });
+        b.setAttribute('data-mundo', m); b.setAttribute('data-t', m ? tm.emoji + ' ' + tm.nome[0] + '|' + tm.emoji + ' ' + tm.nome[1] : '🎲 Surpresa|🎲 Surprise');
+        $('mundosEsc').appendChild(b);
       });
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
         b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); });
@@ -252,6 +266,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-controle]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-controle') === pref.controle)); });
     $('dicaMaos').hidden = pref.controle !== 'maos';
     Array.prototype.forEach.call(document.querySelectorAll('[data-visual]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-visual') === pref.visual)); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-mundo]'), function (b) { var m = b.getAttribute('data-mundo'); b.setAttribute('aria-pressed', String(m === '' ? !pref.mundos.length : pref.mundos.indexOf(m) >= 0)); });
     if (editando >= pref.jogadores) editando = 0;
     var c = pref.carros[editando], v = VE.achar(c.veic);
     $('abas').hidden = pref.jogadores < 2;
@@ -328,12 +343,15 @@
     var configs = [];
     if (pref.rivais === 'com' && PE) {
       var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return VE.voa(v.id) === voa1; });
+      // 1.13.0: ninguém repetido — nem o personagem, nem o veículo de quem joga (escolheu a galinha, não corre contra galinha)
+      var livres = opcoes.filter(function (v) { return jogs.every(function (j) { return j.veic !== v.id; }); });
+      for (var q = livres.length - 1; q > 0; q--) { var w = Math.floor(Math.random() * (q + 1)), tq = livres[q]; livres[q] = livres[w]; livres[w] = tq; }
       PE.sortear(pref.jogadores === 1 ? 5 : 3, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {   // 1.11.0: mais rivais, disputa de perto
-        var v = opcoes[Math.floor(Math.random() * opcoes.length)];
+        var v = livres.length ? livres[k % livres.length] : opcoes[k % opcoes.length];
         configs.push({ id: p.id, veic: v.id, cor: p.cor || D.CORES[(k + 3) % D.CORES.length], mod: { vel: v.vel, curva: v.curva } });
       });
     }
-    estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs);
+    estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs, pref.mundos);
     estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id) }; });
     D.preparar(estado, jogs, pref.lingua, pref.visual);
     tela('jogo'); redimensionar();

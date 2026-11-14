@@ -344,3 +344,10 @@ test('looping: em todos os níveis, longe de portal e túnel; passa sozinho e ga
   assert.ok(ev.some(x => x.tipo === 'loopFeito'));
   assert.equal(j.loopings, 1);
 });
+
+test('cenários escolhidos no menu entram primeiro, na ordem; os que faltam são sorteados', () => {
+  const p = P.montar('normal', 9, ['lanche', 'neve']);
+  assert.deepEqual(p.mundos.slice(0, 2), ['lanche', 'neve']);
+  assert.equal(new Set(p.mundos).size, 4);
+  assert.deepEqual(P.montar('normal', 9, ['blocos', 'lava', 'praia', 'templo', 'neon']).mundos, ['blocos', 'lava', 'praia', 'templo']);
+});

@@ -2,6 +2,27 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.13.0",
+      "data": "14/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "🧊 Veículos novos em 3D de verdade: furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer e galinha. Na curva aparece a lateral e na descida dá para ver o teto; pelas janelas de vidro dá para ver o piloto.",
+        "🥚 Ovo Corredor: o ovo da cantiga antiga correndo sozinho, sem carro.",
+        "🎥 Volta de 360°: no 3-2-1 e quando chega, a câmera dá uma volta inteira pelo cenário.",
+        "🗺️ Escolha os cenários da corrida no menu (até 4) ou deixe na surpresa.",
+        "🚫 Sem rivais repetidos: ninguém corre com o mesmo veículo que você.",
+        "🛣️ Abertura com a estrada correndo, mais clara e com turbo."
+      ],
+      "en": [
+        "🧊 New rides in real 3D: surf van, school bus, plush truck, popcorn, ice cream, burger and hen. In curves you see the side, going downhill you see the roof, and you can see the driver through the glass windows.",
+        "🥚 Running Egg: the egg from the old nursery rhyme running on its own, no car.",
+        "🎥 360° spin: on the 3-2-1 and at the finish, the camera goes all the way around the scene.",
+        "🗺️ Pick the race worlds in the menu (up to 4) or leave it as a surprise.",
+        "🚫 No repeated rivals: nobody races with the same ride as you.",
+        "🛣️ Intro with the road rushing by, brighter and with turbo."
+      ]
+    },
+    {
       "versao": "1.12.0",
       "data": "13/Nov/2026",
       "hora": "23:30:00",

@@ -53,7 +53,7 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 - O veículo escolhido fica **sempre à vista**: em pé, preso no topo da tela enquanto as opções rolam; deitado, de um
   lado, com as opções do outro. O botão 🏁 Correr fica preso embaixo. Com 2 jogadores, abas Jogador 1 e Jogador 2.
-- **23 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
+- **24 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
 
 | Grupo | Veículos |
 |---|---|
@@ -179,7 +179,8 @@ No arquivo baixado (📲 Guardar no celular) tocam só as feitas pelo jogo, para
 | `estilo.css` | visual, paleta Bolinho de Chuva, fonte Fredoka. |
 | `pista.js` | **puro**: monta a estrada com semente (retas, curvas, morros, mundos), espalha estrelas, cones, lama, turbos, rampas, enfeites e o trânsito. Níveis em `NIVEIS`. |
 | `motor.js` | **puro**: regras da corrida (volante, curva, acelerar, grama, coisas da pista, batidas, chegada) e lista de eventos para som e efeitos. |
-| `veiculos.js` | a garagem: os 23 veículos (desenho, nome, grupo, velocidade e curva), testada no Node. |
+| `veiculos.js` | a garagem: os 24 veículos
+| `modelos3d.js` | veículos em 3D de verdade (caixas, rodas cilíndricas, bolas, vidro transparente e desenhos nas faces): furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer, galinha e o Ovo Corredor; giram de lado na curva e inclinam no morro | (desenho, nome, grupo, velocidade e curva), testada no Node. |
 | `cavalo.js` | o cavalo galopando com quem monta, montado em 3D com peças simples (gira de lado nas curvas); galope testado no Node. |
 | `sprites.js` | todos os desenhos, feitos em código uma vez num canvas escondido. |
 | `desenho.js` | a estrada em 3D (pseudo-3D por pedaços), céu, fundo, enfeites, carros, efeitos, placar e tela dividida. |
@@ -226,4 +227,16 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - **Carrinho de pipoca**, **carrinho de sorvete** e **carro-hambúrguer**.
 - Mundos **Cidade do Lanche** (toalha xadrez, hambúrgueres gigantes, batata, milkshake) e **Mundo dos Blocos** (cubos; nada do Minecraft);
   chocolate, pudim e taça de sorvete também na Terra dos Doces; **balões de emoji** aparecem de vez em quando em todo mundo.
+
+## 1.13.0 — veículos em 3D, volta de 360°, cenários à escolha
+
+- **3D de verdade** (`modelos3d.js`): furgão de surfe, ônibus escolar, caminhão de pelúcias, carrinhos de pipoca e de sorvete,
+  carro-hambúrguer e galinha. Na curva aparece a lateral; no morro e no pulo o veículo inclina (descendo dá para ver o teto).
+  Janelas de vidro transparente: o piloto aparece lá dentro. Os quadros parados (rivais e garagem) saem do mesmo modelo.
+- **Ovo Corredor**: o Humpty Dumpty da cantiga inglesa (domínio público), correndo sem carro; ele mesmo é o piloto.
+- **Volta de 360°** (`vistaOrbita` em `desenho.js`): no 3-2-1 e logo depois da chegada a câmera gira em volta de quem joga
+  e termina na câmera do jogo. Quem é 3D gira de verdade; os outros dão uma meia-volta curta.
+- **Cenários à escolha** no menu (até 4, na ordem do toque; 🎲 Surpresa = sorteio). **Rivais sem repetição**: nenhum corre
+  com o mesmo veículo de quem joga, nem com o mesmo de outro rival.
+- Abertura mais clara e com turbo de vez em quando (linhas de velocidade).
 
