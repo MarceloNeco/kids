@@ -3,13 +3,14 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const V = require('../veiculos.js');
 
-test('24 veículos, ids únicos, nome em PT e EN, grupo que existe', () => {
+test('24 veículos, ids únicos, nome em PT, EN e ES, grupo que existe', () => {
   assert.equal(V.LISTA.length, 24);
   assert.equal(new Set(V.LISTA.map(v => v.id)).size, 24);
   const grupos = V.GRUPOS.map(g => g.id);
+  for (const g of V.GRUPOS) assert.equal(g.nome.length, 3, g.id);
   for (const v of V.LISTA) {
     assert.ok(grupos.includes(v.grupo), v.id);
-    assert.equal(v.nome.length, 2, v.id);
+    assert.equal(v.nome.length, 3, v.id); assert.ok(v.nome.every(Boolean), v.id);
     assert.equal(typeof v.desenhar, 'function', v.id);
     assert.ok(v.w > 0 && v.h > 0, v.id);
   }

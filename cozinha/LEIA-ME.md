@@ -1,4 +1,4 @@
-# Mão na Massa (My Little Big Chef) — juntar os ingredientes e cozinhar uma receita
+# Mão na Massa (My Little Big Chef · Manos a la Masa) — juntar os ingredientes e cozinhar uma receita
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE). **Ideia da filha do dono.** A criança escolhe uma receita,
 sai pela vila para juntar os ingredientes (pescando, colhendo, puxando da horta, pegando ovos, tirando leite, comprando
@@ -7,7 +7,12 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.11.0** (14/Nov/2026) — **parte 3**: o **mercadinho por dentro** com setores (`SETORES`: hortifrúti,
+Versão atual: **0.11.1** (14/Nov/2026) — **três idiomas**: português, inglês (EUA) e espanhol (da Espanha), escolhidos só
+na estante (`../idioma.js`, `BolinhoIdioma.atual()`); o jogo não tem mais botão de idioma nem guarda o idioma nas
+preferências. Textos com `t(pt, en, es)`, `data-t="pt|en|es"`, `data-rotulo` (aria-label) e listas `[pt, en, es]` em
+`dados.js`; `logica.textoPasso(..., 'pt'|'en'|'es')`. Nome em espanhol: **Manos a la Masa**. A Dona Cida fala com a
+voz gravada só em português; em inglês e espanhol usa a voz de mulher do aparelho daquela língua (en-US, es-ES
+primeiro) e o 👵🔁 gira só entre as vozes dessa língua (sem voz da língua, só `u.lang`). Na 0.11.0 — **parte 3**: o **mercadinho por dentro** com setores (`SETORES`: hortifrúti,
 geladeira, açougue, padaria, mercearia; o que tem algo da lista brilha; deitado, cada produto só com foto e preço); a
 **cozinha "casinha cortada"** (`vila.cozinhaDiorama`) aparece no palco enquanto a criança escolhe o utensílio, e ao
 acertar o cozinheirinho anda até a estação (`estacaoDe`: pia, fogão, geladeira, bancada, mesa; `chefAte`); utensílios

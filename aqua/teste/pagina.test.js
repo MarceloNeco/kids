@@ -8,11 +8,8 @@ const http = require('http');
 const fs = require('fs');
 const raiz = path.resolve(__dirname, '..', '..');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.mp3': 'audio/mpeg', '.md': 'text/plain' };
-let ingles = false;
 const server = http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html';
-  // interruptor "ingles" do RootifyONE (../idioma.js): só ligado no teste do inglês
-  if (p === '/solverone-dados/recursos/kids.json') { if (!ingles) { res.writeHead(404); res.end(); return; } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{"recursos":{"ingles":{"ligado":true}}}'); return; }
   const f = path.join(raiz, p);
   if (!f.startsWith(raiz) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
   res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res);
@@ -69,9 +66,9 @@ test('menu: nome, três níveis, lojinha, versão, sem erro e sem pedido para fo
   assert.equal((await pg.textContent('h1')).trim(), 'AQUA');
   for (const id of ['#btFacil', '#btMedio', '#btDificil', '#btLoja']) assert.ok(await pg.isVisible(id), id);
   assert.match(await pg.textContent('#recFacil'), /Fase 1/);
-  assert.match(await pg.textContent('#versao'), /Versão 0\.1\.0 · 14\/Nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /Versão 0\.2\.0 · 14\/Nov\/2026/);
   assert.match(await pg.textContent('#versao'), /sem anúncios e sem compras/);
-  assert.equal(await pg.evaluate(() => getComputedStyle(document.getElementById('btLingua')).display), 'none', 'sem o interruptor, só português');
+  assert.equal(await pg.$('#btLingua'), null, 'o idioma é escolhido só na estante');
   await pg.click('#btAjuda'); assert.ok(await pg.isVisible('#ajuda'));
   assert.match(await pg.textContent('#ajuda'), /nunca custam nada/);
   await pg.waitForTimeout(600);
@@ -337,21 +334,55 @@ test('sons gravados: o jogo carrega as gravações da pasta sons/ no primeiro to
   await pg.ctx.close();
 });
 
-test('inglês só com o interruptor "ingles" ligado: aí o botão de idioma aparece e troca os textos', async () => {
-  ingles = true;
-  try {
-    const pg = await abrir({ viewport: { width: 390, height: 844 }, locale: 'pt-BR' });
-    await pg.waitForFunction(() => !document.documentElement.classList.contains('sem-ingles'), null, { timeout: 8000 });
-    await pg.click('#btLingua');
-    assert.equal(await pg.getAttribute('html', 'lang'), 'en');
-    assert.match(await pg.textContent('.sub'), /Pour the colors/);
-    assert.match(await pg.textContent('#recFacil'), /Stage 1/);
-    await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
-    assert.equal(await pg.textContent('#placaFase'), 'Stage 1');
-    assert.match(await pg.getAttribute('#frasco-0', 'aria-label'), /^Bottle 1: top to bottom: /);
-    assert.deepEqual(pg.erros(), []);
-    await pg.ctx.close();
-  } finally { ingles = false; }
+// o idioma vem da estante (../idioma.js, localStorage "bolinho:idioma"): o jogo não tem botão de idioma próprio
+async function abrirEm(lingua, ctxOp) {
+  const ctx = await browser.newContext(Object.assign({ locale: 'pt-BR', serviceWorkers: 'block' }, ctxOp || CELULAR));
+  await ctx.addInitScript((c) => { try { localStorage.setItem('bolinho:idioma', c); } catch (e) { /* sem armazenamento */ } }, lingua);
+  const pg = await ctx.newPage(); const erros = [];
+  pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
+  await pg.goto(base + '?teste'); await pg.waitForFunction(() => window.AquaApp);
+  pg.erros = () => erros; pg.ctx = ctx;
+  return pg;
+}
+test('inglês escolhido na estante: o jogo abre em inglês, sem botão de idioma', async () => {
+  const pg = await abrirEm('en');
+  assert.equal(await pg.getAttribute('html', 'lang'), 'en');
+  assert.equal(await pg.$('#btLingua'), null);
+  assert.match(await pg.textContent('.sub'), /Pour the colors/);
+  assert.match(await pg.textContent('#recFacil'), /Stage 1/);
+  assert.match(await pg.textContent('#versao'), /Version 0\.2\.0 · Nov\/14\/2026/);
+  await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
+  assert.equal(await pg.textContent('#placaFase'), 'Stage 1');
+  assert.match(await pg.getAttribute('#frasco-0', 'aria-label'), /^Bottle 1: top to bottom: /);
+  assert.equal(await pg.getAttribute('#btDica', 'aria-label'), 'Hint: shows a good move (no limit)');
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
+});
+test('espanhol escolhido na estante: menu, jogo, ajudas, fim de fase e lojinha em espanhol', async () => {
+  const pg = await abrirEm('es');
+  assert.equal(await pg.getAttribute('html', 'lang'), 'es');
+  assert.match(await pg.textContent('.sub'), /Pasa los colores/);
+  assert.equal(await pg.textContent('#btFacil .n-nome'), '🫧 Fácil');
+  assert.equal(await pg.textContent('#btMedio .n-nome'), '🧪 Medio');
+  assert.match(await pg.textContent('#recFacil'), /Fase 1/);
+  assert.match(await pg.textContent('#versao'), /Versión 0\.2\.0 · 14\/nov\/2026 · Música: .* sin anuncios y sin compras/);
+  assert.equal(await pg.getAttribute('#btAjuda', 'aria-label'), 'Cómo jugar');
+  await pg.click('#btAjuda'); assert.match(await pg.textContent('#ajuda'), /Nunca cuestan nada/);
+  await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
+  assert.equal(await pg.getAttribute('#placaFase', 'aria-label'), 'Nivel Fácil, fase 1');
+  assert.match(await pg.getAttribute('#frasco-0', 'aria-label'), /^Frasco 1: de arriba abajo: /);
+  assert.equal(await pg.getAttribute('#btDica', 'aria-label'), 'Pista: muestra una buena jugada (sin límite)');
+  await pg.click('#btDesfazer'); assert.match(await pg.textContent('#aviso'), /Todavía no hay ninguna jugada/);
+  await resolver(pg);
+  await pg.waitForSelector('#fim:not([hidden])');
+  assert.equal(await pg.textContent('#fimTitulo'), '¡Perfecto!');
+  assert.match(await pg.textContent('#fimGotas'), /gotitas$/);
+  assert.equal(await pg.textContent('#btProxima'), 'Siguiente fase ▶');
+  await pg.click('#btNiveis'); await pg.click('#btLoja');
+  assert.match(await pg.textContent('#lojaCenarios'), /Tarde de lluvia.*en uso/);
+  assert.match(await pg.textContent('#lojaFrascos'), /Tubito/);
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
 });
 
 test('sem internet: depois da primeira visita o jogo abre e joga pela cópia guardada (service worker)', async () => {

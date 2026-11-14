@@ -11,8 +11,9 @@ test('versão igual nos três lugares', () => {
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
   assert.equal(a, s); assert.equal(v.versao, a);
-  for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
+  for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
+  assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
   const m = ler('index.html').match(/<meta name="versao" content="([\d.]+)">/);
   assert.ok(m, 'index.html sem <meta name="versao">');
   assert.equal(m[1], a, 'index.html (a página confere a versão do código e recarrega se forem diferentes)');
@@ -26,13 +27,17 @@ test('sw.js guarda todos os arquivos publicados', () => {
   for (const f of publicados) assert.ok(lista.includes(f), 'sw.js não guarda: ' + f);
 });
 
-test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN', () => {
+test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES, sem botão de idioma', () => {
   const html = ler('index.html');
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script>(?!\s*<\/script>)/.test(html) && !/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
   for (const m of html.matchAll(/<script src="([^"]+)"/g)) if (!m[1].startsWith('../')) assert.ok(fs.existsSync(path.join(pasta, m[1])), m[1]);
   assert.match(html, /data-recurso="vruuum"/);
-  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'texto sem os três idiomas: ' + m[1]);
+  for (const m of html.matchAll(/data-aria="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'rótulo sem os três idiomas: ' + m[1]);
+  assert.ok(!/aria-label="[^"]* \/ [^"]*"/.test(html), 'rótulo com PT / EN juntos: use data-aria="pt|en|es"');
+  assert.ok(!html.includes('btLingua') && !ler('app.js').includes('btLingua'), 'o idioma é escolhido só na estante');
+  assert.ok(!ler('app.js').includes('navigator.language'), 'o idioma vem do ../idioma.js');
 });
 
 test('ids usados no app.js existem no index.html', () => {

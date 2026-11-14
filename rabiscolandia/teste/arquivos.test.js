@@ -11,8 +11,9 @@ test('versão igual nos três lugares', () => {
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
   assert.equal(a, s); assert.equal(v.versao, a);
-  for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
+  for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
+  assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
 });
 
 test('sw.js guarda todos os arquivos publicados', () => {
@@ -23,13 +24,16 @@ test('sw.js guarda todos os arquivos publicados', () => {
   for (const f of publicados) assert.ok(lista.includes(f), 'sw.js não guarda: ' + f);
 });
 
-test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN', () => {
+test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES', () => {
   const html = ler('index.html');
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
   for (const m of html.matchAll(/<script src="([^"]+)"/g)) assert.ok(fs.existsSync(path.join(pasta, m[1])), m[1]);
   assert.match(html, /data-recurso="rabiscolandia"/);
-  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'texto sem as três línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-rotulo="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'rótulo sem as três línguas: ' + m[1]);
+  assert.ok(!/aria-label="[^"]* \/ [^"]*"/.test(html), 'rótulo "PT / EN" fixo: use data-rotulo="PT|EN|ES"');
+  assert.ok(!html.includes('id="btLingua"'), 'o idioma é escolhido só na estante: nada de botão de idioma no jogo');
 });
 
 test('ids usados no app.js e no tv.js existem no index.html', () => {
@@ -37,11 +41,22 @@ test('ids usados no app.js e no tv.js existem no index.html', () => {
   for (const f of ['app.js', 'tv.js']) for (const m of ler(f).matchAll(/\$\('([A-Za-z0-9]+)'\)/g)) assert.ok(html.includes('id="' + m[1] + '"'), f + ': falta id ' + m[1]);
 });
 
-test('textos t(pt, en) do app e da TV sempre nas duas línguas', () => {
-  for (const f of ['app.js', 'tv.js']) {
+test('textos t(pt, en, es) do app, da TV e do passo a passo sempre nas três línguas', () => {
+  const S = "'(?:[^'\\\\]|\\\\.)*'";
+  for (const f of ['app.js', 'tv.js', 'tour.js']) {
     const js = ler(f);
     for (const m of js.matchAll(/\bt\('((?:[^'\\]|\\.)*)'\s*\)/g)) assert.fail(f + ': t() só com uma língua: ' + m[1]);
+    for (const m of js.matchAll(new RegExp('\\bt\\(\\s*' + S + '\\s*,\\s*' + S + '\\s*\\)', 'g'))) assert.fail(f + ': t() sem o espanhol: ' + m[0]);
   }
+});
+
+test('idioma vem da estante (BolinhoIdioma) e a voz fala no idioma escolhido', () => {
+  const app = ler('app.js'), tour = ler('tour.js');
+  assert.match(app, /BolinhoIdioma\.atual\(\)/);
+  assert.match(app, /BolinhoIdioma\.aoMudar\(/);
+  assert.ok(!/navigator\.language/.test(app), 'o jogo não adivinha mais o idioma');
+  assert.ok(!/pref\.lingua\s*=/.test(app), 'o jogo não guarda mais o idioma nas preferências');
+  assert.match(tour, /BolinhoIdioma\.voz\(\)/);
 });
 
 test('interruptor rabiscolandia no recursos-do-app.json do Feature Tester', () => {

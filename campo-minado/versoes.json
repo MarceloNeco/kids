@@ -2,6 +2,20 @@
   "app": "campo-minado",
   "versoes": [
     {
+      "versao": "0.2.5",
+      "data": "14/Nov/2026",
+      "hora": "15:30:00",
+      "pt": [
+        "🇧🇷🇺🇸🇪🇸 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante"
+      ],
+      "en": [
+        "🇧🇷🇺🇸🇪🇸 Now in three languages: Portuguese, English and Spanish, chosen on the shelf"
+      ],
+      "es": [
+        "🇧🇷🇺🇸🇪🇸 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería"
+      ]
+    },
+    {
       "versao": "0.2.4",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

@@ -12,53 +12,53 @@
   var EU = '🖍️';
   // alvo: seletor CSS (ou lista de seletores: o balão aponta para o conjunto). Sem alvo: balão no meio da tela.
   var COMUM_INICIO = [
-    { pt: 'Oi! Eu sou o Rabisquinho! Vou te mostrar como brincar aqui. Toque na tela para continuar.', en: 'Hi! I am Scribbly! I will show you how to play here. Tap the screen to continue.' }
+    { pt: 'Oi! Eu sou o Rabisquinho! Vou te mostrar como brincar aqui. Toque na tela para continuar.', en: 'Hi! I\'m Scribbly! I\'ll show you how to play. Tap the screen to keep going.', es: '¡Hola! ¡Soy Rabisquinho! Te voy a enseñar a jugar aquí. Toca la pantalla para seguir.' }
   ];
   var PASSOS = {
     livre: COMUM_INICIO.concat([
-      { alvo: '#tela', pt: 'Esta é a sua folha. Desenhe com o dedo! Com dois dedos você chega perto ou se afasta.', en: 'This is your sheet. Draw with your finger! Use two fingers to zoom in or out.' },
-      { alvo: '.ferramenta[data-f="pinceis"]', pt: 'Aqui fica o pincel. Toque de novo nele para ver todos, até os pincéis mágicos que se mexem sozinhos!', en: 'This is your brush. Tap it again to see them all, even magic brushes that move by themselves!' },
-      { alvo: '.grossura', pt: 'Estes traços escolhem a grossura: do fininho ao bem grosso. É só tocar no que você quiser.', en: 'These lines choose the thickness: from very thin to very thick. Just tap the one you want.' },
-      { alvo: '#cores .cor', pt: 'Toque numa bolinha para trocar a cor. O arco-íris no fim tem todas as cores do mundo!', en: 'Tap a dot to change the color. The rainbow at the end has every color in the world!' },
-      { alvo: '.ferramenta[data-f="balde"]', pt: 'O balde de tinta pinta um pedaço inteiro de uma vez.', en: 'The paint bucket fills a whole area at once.' },
-      { alvo: '.ferramenta[data-f="borracha"]', pt: 'A borracha apaga os traços, os adesivos e os desenhos que se mexem.', en: 'The eraser erases lines, stickers and moving drawings.' },
-      { alvo: '.ferramenta[data-f="adesivo"]', pt: 'Adesivos! Muitos deles se mexem. Escolha um e toque na folha para colar.', en: 'Stickers! Many of them move. Pick one and tap the sheet to stick it.' },
-      { alvo: '.ferramenta[data-f="mover"]', pt: 'Com a mãozinha você arrasta um adesivo para outro lugar.', en: 'With the little hand you drag a sticker somewhere else.' },
-      { alvo: '.ferramenta[data-f="fundo"]', pt: 'Aqui você troca o fundo: praia, espaço, fundo do mar, ou até uma foto sua.', en: 'Here you change the background: beach, space, under the sea, or even your own photo.' },
-      { alvo: '#btDesfazer', pt: 'Errou? Este botão desfaz o último traço.', en: 'Made a mistake? This button undoes the last stroke.' },
-      { alvo: '#btMao', pt: 'Aqui você desenha com a mão na frente da câmera: mão aberta mira, mão fechada desenha!', en: 'Here you draw with your hand in front of the camera: open hand aims, closed hand draws!' },
-      { alvo: '#btMusica2', pt: 'Aqui você escolhe as músicas, ou desliga a música.', en: 'Here you choose the songs, or turn the music off.' },
-      { alvo: '#btFoto', pt: 'Tire uma foto do seu desenho para guardar ou mandar para alguém.', en: 'Take a photo of your drawing to keep it or send it to someone.' },
-      { alvo: '#btLimpar', pt: 'Este começa tudo de novo. Não se preocupa: dá para desfazer.', en: 'This one starts over. Do not worry: you can undo it.' },
-      { alvo: '.bolinho-nav .bn-casa', pt: 'A casinha volta para o começo. Seu desenho fica guardado em Meus desenhos.', en: 'The little house goes back to the start. Your drawing is saved in My drawings.' },
-      { alvo: '#btTour', pt: 'Pronto! Se quiser me ver de novo, toque no ponto de interrogação. Agora é com você!', en: 'All done! To see me again, tap the question mark. Now it is your turn!' }
+      { alvo: '#tela', pt: 'Esta é a sua folha. Desenhe com o dedo! Com dois dedos você chega perto ou se afasta.', en: 'This is your page. Draw with your finger! Use two fingers to zoom in or out.', es: 'Esta es tu hoja. ¡Dibuja con el dedo! Con dos dedos te acercas o te alejas.' },
+      { alvo: '.ferramenta[data-f="pinceis"]', pt: 'Aqui fica o pincel. Toque de novo nele para ver todos, até os pincéis mágicos que se mexem sozinhos!', en: 'This is your brush. Tap it again to see them all, even magic brushes that move by themselves!', es: 'Aquí está el pincel. ¡Tócalo otra vez para verlos todos, hasta los pinceles mágicos que se mueven solos!' },
+      { alvo: '.grossura', pt: 'Estes traços escolhem a grossura: do fininho ao bem grosso. É só tocar no que você quiser.', en: 'These lines choose the thickness: from very thin to very thick. Just tap the one you want.', es: 'Estos trazos eligen el grosor: del más finito al más grueso. Solo toca el que quieras.' },
+      { alvo: '#cores .cor', pt: 'Toque numa bolinha para trocar a cor. O arco-íris no fim tem todas as cores do mundo!', en: 'Tap a dot to change the color. The rainbow at the end has every color in the world!', es: 'Toca una bolita para cambiar el color. ¡El arcoíris del final tiene todos los colores del mundo!' },
+      { alvo: '.ferramenta[data-f="balde"]', pt: 'O balde de tinta pinta um pedaço inteiro de uma vez.', en: 'The paint bucket fills a whole area at once.', es: 'El cubo de pintura pinta una parte entera de una vez.' },
+      { alvo: '.ferramenta[data-f="borracha"]', pt: 'A borracha apaga os traços, os adesivos e os desenhos que se mexem.', en: 'The eraser erases lines, stickers and moving drawings.', es: 'La goma borra los trazos, las pegatinas y los dibujos que se mueven.' },
+      { alvo: '.ferramenta[data-f="adesivo"]', pt: 'Adesivos! Muitos deles se mexem. Escolha um e toque na folha para colar.', en: 'Stickers! Many of them move. Pick one and tap the page to stick it.', es: '¡Pegatinas! Muchas se mueven. Elige una y toca la hoja para pegarla.' },
+      { alvo: '.ferramenta[data-f="mover"]', pt: 'Com a mãozinha você arrasta um adesivo para outro lugar.', en: 'With the little hand you drag a sticker somewhere else.', es: 'Con la manita arrastras una pegatina a otro lugar.' },
+      { alvo: '.ferramenta[data-f="fundo"]', pt: 'Aqui você troca o fundo: praia, espaço, fundo do mar, ou até uma foto sua.', en: 'Here you change the background: beach, space, under the sea, or even your own photo.', es: 'Aquí cambias el fondo: playa, espacio, fondo del mar, o hasta una foto tuya.' },
+      { alvo: '#btDesfazer', pt: 'Errou? Este botão desfaz o último traço.', en: 'Made a mistake? This button undoes the last stroke.', es: '¿Te has equivocado? Este botón deshace el último trazo.' },
+      { alvo: '#btMao', pt: 'Aqui você desenha com a mão na frente da câmera: mão aberta mira, mão fechada desenha!', en: 'Here you draw with your hand in front of the camera: open hand aims, closed hand draws!', es: 'Aquí dibujas con la mano delante de la cámara: ¡mano abierta apunta, mano cerrada dibuja!' },
+      { alvo: '#btMusica2', pt: 'Aqui você escolhe as músicas, ou desliga a música.', en: 'Here you choose the songs, or turn the music off.', es: 'Aquí eliges las canciones, o apagas la música.' },
+      { alvo: '#btFoto', pt: 'Tire uma foto do seu desenho para guardar ou mandar para alguém.', en: 'Take a photo of your drawing to keep it or send it to someone.', es: 'Hazle una foto a tu dibujo para guardarlo o mandárselo a alguien.' },
+      { alvo: '#btLimpar', pt: 'Este começa tudo de novo. Não se preocupa: dá para desfazer.', en: 'This one starts over. Don\'t worry: you can undo it.', es: 'Este empieza todo de nuevo. No te preocupes: se puede deshacer.' },
+      { alvo: '.bolinho-nav .bn-casa', pt: 'A casinha volta para o começo. Seu desenho fica guardado em Meus desenhos.', en: 'The little house goes back to the start. Your drawing is saved in My drawings.', es: 'La casita vuelve al inicio. Tu dibujo queda guardado en Mis dibujos.' },
+      { alvo: '#btTour', pt: 'Pronto! Se quiser me ver de novo, toque no ponto de interrogação. Agora é com você!', en: 'All done! To see me again, tap the question mark. Now it\'s your turn!', es: '¡Listo! Si quieres verme otra vez, toca el signo de interrogación. ¡Ahora te toca a ti!' }
     ]),
     colorir: COMUM_INICIO.concat([
-      { alvo: '#tela', pt: 'Este é um desenho para colorir. Pinte com o dedo, do jeito que quiser!', en: 'This is a picture to color. Paint it with your finger, any way you like!' },
-      { alvo: '.ferramenta[data-f="balde"]', pt: 'O balde pinta um pedaço inteiro sem passar da linha. Escolha a cor e toque dentro do desenho.', en: 'The bucket paints a whole part without going over the line. Pick a color and tap inside the picture.' },
-      { alvo: '#cores .cor', pt: 'As primeiras cores são as do desenho. Mas você pode usar qualquer uma!', en: 'The first colors are the picture colors. But you can use any color!' },
-      { alvo: '#btColinha', pt: 'O olhinho mostra a colinha: como o desenho pode ficar.', en: 'The little eyes show the cheat sheet: how the picture can look.' },
-      { alvo: '#btVariacao', pt: 'A paleta troca as cores da colinha: noite, doce, outono e mais.', en: 'The palette changes the cheat sheet colors: night, candy, autumn and more.' },
-      { alvo: '.ferramenta[data-f="pinceis"]', pt: 'Você também pode usar os pincéis, até os mágicos que se mexem!', en: 'You can also use the brushes, even the magic ones that move!' },
-      { alvo: '#btTour', pt: 'Pronto! Para me ver de novo, toque no ponto de interrogação. Boa pintura!', en: 'All done! To see me again, tap the question mark. Happy painting!' }
+      { alvo: '#tela', pt: 'Este é um desenho para colorir. Pinte com o dedo, do jeito que quiser!', en: 'This is a picture to color. Paint it with your finger, any way you like!', es: 'Este es un dibujo para colorear. ¡Píntalo con el dedo, como tú quieras!' },
+      { alvo: '.ferramenta[data-f="balde"]', pt: 'O balde pinta um pedaço inteiro sem passar da linha. Escolha a cor e toque dentro do desenho.', en: 'The bucket paints a whole part without going over the line. Pick a color and tap inside the picture.', es: 'El cubo pinta una parte entera sin salirse de la línea. Elige el color y toca dentro del dibujo.' },
+      { alvo: '#cores .cor', pt: 'As primeiras cores são as do desenho. Mas você pode usar qualquer uma!', en: 'The first colors are the picture colors. But you can use any color!', es: 'Los primeros colores son los del dibujo. ¡Pero puedes usar el que quieras!' },
+      { alvo: '#btColinha', pt: 'O olhinho mostra a colinha: como o desenho pode ficar.', en: 'The little eyes show the cheat sheet: how the picture could look.', es: 'Los ojitos muestran el modelo: cómo puede quedar el dibujo.' },
+      { alvo: '#btVariacao', pt: 'A paleta troca as cores da colinha: noite, doce, outono e mais.', en: 'The palette changes the cheat sheet colors: night, candy, autumn and more.', es: 'La paleta cambia los colores del modelo: noche, dulce, otoño y más.' },
+      { alvo: '.ferramenta[data-f="pinceis"]', pt: 'Você também pode usar os pincéis, até os mágicos que se mexem!', en: 'You can also use the brushes, even the magic ones that move!', es: '¡También puedes usar los pinceles, hasta los mágicos que se mueven!' },
+      { alvo: '#btTour', pt: 'Pronto! Para me ver de novo, toque no ponto de interrogação. Boa pintura!', en: 'All done! To see me again, tap the question mark. Happy painting!', es: '¡Listo! Para verme otra vez, toca el signo de interrogación. ¡A pintar!' }
     ]),
     numeros: COMUM_INICIO.concat([
-      { alvo: '#paleta', pt: 'Cada cor tem um número. Escolha uma cor nesta faixa de bolinhas.', en: 'Each color has a number. Pick a color in this row of dots.' },
-      { alvo: '#tela', pt: 'Depois toque nas partes que têm o mesmo número. As partes cinzas são da cor escolhida.', en: 'Then tap the parts with the same number. The gray parts are for the chosen color.' },
-      { alvo: '#tela', pt: 'Os números são pequenos? Use dois dedos para chegar pertinho. Um dedo arrasta o desenho.', en: 'Numbers too small? Use two fingers to zoom in. One finger moves the picture.' },
-      { alvo: '#btDica', pt: 'A varinha mágica mostra uma parte que ainda falta pintar.', en: 'The magic wand shows a part still left to paint.' },
-      { alvo: '#btColinha', pt: 'O olhinho mostra como vai ficar no final.', en: 'The little eyes show how it will look at the end.' },
-      { alvo: '#btTour', pt: 'Quando terminar tudo, tem festa de fogos! Para me ver de novo, toque no ponto de interrogação.', en: 'When you finish everything, there are fireworks! To see me again, tap the question mark.' }
+      { alvo: '#paleta', pt: 'Cada cor tem um número. Escolha uma cor nesta faixa de bolinhas.', en: 'Each color has a number. Pick a color in this row of dots.', es: 'Cada color tiene un número. Elige un color en esta fila de bolitas.' },
+      { alvo: '#tela', pt: 'Depois toque nas partes que têm o mesmo número. As partes cinzas são da cor escolhida.', en: 'Then tap the parts with the same number. The gray parts are for the chosen color.', es: 'Después toca las partes que tienen el mismo número. Las partes grises son del color elegido.' },
+      { alvo: '#tela', pt: 'Os números são pequenos? Use dois dedos para chegar pertinho. Um dedo arrasta o desenho.', en: 'Numbers too small? Use two fingers to zoom in. One finger moves the picture.', es: '¿Los números son pequeños? Usa dos dedos para acercarte. Un dedo mueve el dibujo.' },
+      { alvo: '#btDica', pt: 'A varinha mágica mostra uma parte que ainda falta pintar.', en: 'The magic wand shows a part still left to paint.', es: 'La varita mágica muestra una parte que todavía falta pintar.' },
+      { alvo: '#btColinha', pt: 'O olhinho mostra como vai ficar no final.', en: 'The little eyes show how it will look at the end.', es: 'Los ojitos muestran cómo va a quedar al final.' },
+      { alvo: '#btTour', pt: 'Quando terminar tudo, tem festa de fogos! Para me ver de novo, toque no ponto de interrogação.', en: 'When you finish everything, there are fireworks! To see me again, tap the question mark.', es: '¡Cuando termines todo, hay fiesta de fuegos artificiales! Para verme otra vez, toca el signo de interrogación.' }
     ])
   };
 
-  // ---------- voz: a do próprio aparelho, em português do Brasil ----------
+  // ---------- voz: a do próprio aparelho, no idioma escolhido na estante (português, inglês ou espanhol) ----------
   var vozes = [];
   function carregarVozes() { try { vozes = raiz.speechSynthesis ? raiz.speechSynthesis.getVoices() : []; } catch (e) { vozes = []; } }
   if (raiz.speechSynthesis) { carregarVozes(); try { raiz.speechSynthesis.addEventListener('voiceschanged', carregarVozes); } catch (e) { /* navegador velho */ } setTimeout(carregarVozes, 900); }
   function escolherVoz(lingua) {
     var norm = function (l) { return (l || '').replace('_', '-').toLowerCase(); };
-    var quer = lingua === 'en' ? 'en' : 'pt', exata = lingua === 'en' ? 'en-us' : 'pt-br';
+    var quer = lingua === 'en' || lingua === 'es' ? lingua : 'pt', exata = { pt: 'pt-br', en: 'en-us', es: 'es-es' }[quer];
     var lista = vozes.filter(function (v) { return norm(v.lang).indexOf(quer) === 0 || (quer === 'pt' && norm(v.lang).indexOf('por') === 0); });
     var natural = /natural|online|neural|enhanced|premium|wavenet|google/i;
     lista.sort(function (a, b) { return (norm(b.lang) === exata) - (norm(a.lang) === exata) || natural.test(b.name) - natural.test(a.name); });
@@ -71,7 +71,7 @@
     setTimeout(function () {   // o Chrome perde a fala colada no cancel(): espera um pouquinho
       try {
         var u = new SpeechSynthesisUtterance(semEmoji(txt));
-        u.lang = lingua === 'en' ? 'en-US' : 'pt-BR';
+        u.lang = raiz.BolinhoIdioma ? raiz.BolinhoIdioma.voz() : ({ en: 'en-US', es: 'es-ES' }[lingua] || 'pt-BR');
         var v = escolherVoz(lingua); if (v) u.voice = v;
         u.rate = 1; u.pitch = 1.15;   // um pouquinho mais agudo: voz de personagem simpático
         s.speak(u);
@@ -120,7 +120,7 @@
     if (n >= atual.lista.length) { terminar(); return; }
     atual.i = n; mostrar();
   }
-  function texto(p) { var t = atual.op.t; return t ? t(p.pt, p.en) : p.pt; }
+  function texto(p) { var t = atual.op.t; return t ? t(p.pt, p.en, p.es) : p.pt; }
   function mostrar() {
     var p = atual.lista[atual.i], t = atual.op.t || function (a) { return a; };
     if (atual.op.antes) { try { atual.op.antes(p); } catch (e) { /* ok */ } }
@@ -131,13 +131,13 @@
     var cab = el('div', 'tour-cab'); cab.appendChild(el('span', 'tour-eu', EU)); cab.appendChild(el('b', '', 'Rabisquinho')); b.appendChild(cab);
     var fala = el('p', 'tour-fala', texto(p)); b.appendChild(fala);
     var botoes = el('div', 'tour-botoes');
-    var voz = el('button', 'tour-bt', atual.op.voz === false ? '🔇' : '🔊'); voz.type = 'button'; voz.setAttribute('aria-label', t('Ligar ou desligar a voz', 'Voice on or off'));
+    var voz = el('button', 'tour-bt', atual.op.voz === false ? '🔇' : '🔊'); voz.type = 'button'; voz.setAttribute('aria-label', t('Ligar ou desligar a voz', 'Voice on or off', 'Encender o apagar la voz'));
     voz.addEventListener('click', function () { atual.op.voz = atual.op.voz === false; voz.textContent = atual.op.voz === false ? '🔇' : '🔊'; if (atual.op.aoMudarVoz) atual.op.aoMudarVoz(atual.op.voz !== false); if (atual.op.voz === false) calar(); else falar(texto(p), atual.op.lingua); });
-    var ant = el('button', 'tour-bt', '◀'); ant.type = 'button'; ant.disabled = atual.i === 0; ant.setAttribute('aria-label', t('Voltar', 'Back')); ant.addEventListener('click', function () { ir(-1); });
+    var ant = el('button', 'tour-bt', '◀'); ant.type = 'button'; ant.disabled = atual.i === 0; ant.setAttribute('aria-label', t('Voltar', 'Back', 'Atrás')); ant.addEventListener('click', function () { ir(-1); });
     var pos = el('span', 'tour-pos', (atual.i + 1) + ' / ' + atual.lista.length);
     var ult = atual.i === atual.lista.length - 1;
-    var prx = el('button', 'tour-bt forte', ult ? t('Vamos lá! ✨', 'Let\'s go! ✨') : '▶'); prx.type = 'button'; prx.setAttribute('aria-label', ult ? t('Terminar', 'Finish') : t('Próximo', 'Next')); prx.addEventListener('click', function () { ir(1); });
-    var sair = el('button', 'tour-bt', '✕'); sair.type = 'button'; sair.setAttribute('aria-label', t('Sair do passo a passo', 'Leave the tour')); sair.addEventListener('click', function () { terminar(); });
+    var prx = el('button', 'tour-bt forte', ult ? t('Vamos lá! ✨', 'Let\'s go! ✨', '¡Vamos! ✨') : '▶'); prx.type = 'button'; prx.setAttribute('aria-label', ult ? t('Terminar', 'Finish', 'Terminar') : t('Próximo', 'Next', 'Siguiente')); prx.addEventListener('click', function () { ir(1); });
+    var sair = el('button', 'tour-bt', '✕'); sair.type = 'button'; sair.setAttribute('aria-label', t('Sair do passo a passo', 'Leave the tour', 'Salir del paso a paso')); sair.addEventListener('click', function () { terminar(); });
     botoes.appendChild(voz); botoes.appendChild(ant); botoes.appendChild(pos); botoes.appendChild(prx); botoes.appendChild(sair);
     b.appendChild(botoes);
     b.classList.remove('pula'); void b.offsetWidth; b.classList.add('pula');   // reinicia a animação de "pulo"

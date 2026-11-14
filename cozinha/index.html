@@ -10,10 +10,10 @@
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#ff8a3d">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="description" content="Escolha uma receita, junte os ingredientes pela vila (pescar, colher, puxar da horta, pegar ovos, tirar leite, comprar no mercadinho ou pedir para a vizinha) e cozinhe passo a passo. / Pick a recipe, gather the ingredients around the village (fish, pick fruit, pull veggies, collect eggs, get milk, buy at the shop or borrow from the neighbour) and cook step by step.">
+<meta name="description" content="Escolha uma receita, junte os ingredientes pela vila (pescar, colher, puxar da horta, pegar ovos, tirar leite, comprar no mercadinho ou pedir para a vizinha) e cozinhe passo a passo. / Pick a recipe, gather the ingredients around the village (fish, pick fruit, pull veggies, collect eggs, get milk, buy at the shop or borrow from the neighbor) and cook step by step. / Elige una receta, junta los ingredientes por el pueblo y cocina paso a paso.">
 <link rel="stylesheet" href="estilo.css">
 <!--
-  Mão na Massa (em inglês, My Little Big Chef; a pasta continua cozinha/) — brincadeira da família Bolinho de Chuva (SolverONE). Ideia da filha do dono.
+  Mão na Massa (em inglês, My Little Big Chef; em espanhol, Manos a la Masa; a pasta continua cozinha/) — brincadeira da família Bolinho de Chuva (SolverONE). Ideia da filha do dono.
   Escolher uma receita, juntar os ingredientes na vila e cozinhar na cozinha de casa, em 3 níveis.
   Sem login, sem banco, sem cookie: progresso e preferências ficam só no aparelho (localStorage).
   Nada de script inline: a CSP acima não permite. Mapa dos arquivos: LEIA-ME.md.
@@ -25,31 +25,30 @@
 <section id="entrada" class="tela ativa" data-recurso="cozinha">
   <div class="enfeite" aria-hidden="true">🥕 🍓 🥚 🧀 🍌 🍅 🐟 🥛</div>
   <div id="iconeEntrada" class="icone-entrada" aria-hidden="true"></div>
-  <h1 class="logo" aria-label="Mão na Massa" data-logo="Mão na Massa|My Little Big Chef"><span class="palavra"><span>M</span><span>ã</span><span>o</span></span> <span class="palavra"><span>n</span><span>a</span></span> <span class="palavra"><span>M</span><span>a</span><span>s</span><span>s</span><span>a</span></span></h1>
-  <p class="sub" data-t="junte os ingredientes pela vila e cozinhe uma receita gostosa|gather the ingredients around the village and cook a yummy recipe"></p>
-  <button id="btEntrar" class="grande" type="button" data-t="👩‍🍳 Toque para começar!|👩‍🍳 Tap to start!"></button>
-  <p class="dica" data-t="Aumente o volume para ouvir a música 🎵|Turn the volume up for the music 🎵"></p>
+  <h1 class="logo" aria-label="Mão na Massa" data-logo="Mão na Massa|My Little Big Chef|Manos a la Masa"><span class="palavra"><span>M</span><span>ã</span><span>o</span></span> <span class="palavra"><span>n</span><span>a</span></span> <span class="palavra"><span>M</span><span>a</span><span>s</span><span>s</span><span>a</span></span></h1>
+  <p class="sub" data-t="junte os ingredientes pela vila e cozinhe uma receita gostosa|gather the ingredients around the village and cook a yummy recipe|junta los ingredientes por el pueblo y cocina una receta riquísima"></p>
+  <button id="btEntrar" class="grande" type="button" data-t="👩‍🍳 Toque para começar!|👩‍🍳 Tap to start!|👩‍🍳 ¡Toca para empezar!"></button>
+  <p class="dica" data-t="Aumente o volume para ouvir a música 🎵|Turn the volume up for the music 🎵|Sube el volumen para oír la música 🎵"></p>
 </section>
 
 <section id="menu" class="tela" data-recurso="cozinha">
   <div class="faixa">
-    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
-    <button id="btVoz" class="mini" type="button" aria-label="Ler em voz alta / Read aloud">🗣️</button>
-    <button id="btEfeitos" class="mini" type="button" aria-label="Sons / Sounds">🔔</button>
-    <button id="btVozVovo" class="mini" type="button" aria-label="Trocar a voz da vovó / Change grandma's voice" title="🔁 Trocar a voz da vovó / Change grandma's voice">👵🔁</button>
-    <button id="btAjuda" class="mini" type="button" aria-label="Como brincar / How to play" aria-expanded="false">❓</button>
+    <button id="btVoz" class="mini" type="button" aria-label="Ler em voz alta / Read aloud" data-rotulo="Ler em voz alta|Read aloud|Leer en voz alta">🗣️</button>
+    <button id="btEfeitos" class="mini" type="button" aria-label="Sons / Sounds" data-rotulo="Sons|Sounds|Sonidos">🔔</button>
+    <button id="btVozVovo" class="mini" type="button" aria-label="Trocar a voz da vovó / Change grandma's voice" title="🔁 Trocar a voz da vovó / Change grandma's voice" data-rotulo="Trocar a voz da vovó|Change grandma's voice|Cambiar la voz de la abuelita">👵🔁</button>
+    <button id="btAjuda" class="mini" type="button" aria-label="Como brincar / How to play" data-rotulo="Como brincar|How to play|Cómo jugar" aria-expanded="false">❓</button>
   </div>
-  <h1 class="logo pequeno" aria-label="Mão na Massa" data-logo="Mão na Massa|My Little Big Chef"><span class="palavra"><span>M</span><span>ã</span><span>o</span></span> <span class="palavra"><span>n</span><span>a</span></span> <span class="palavra"><span>M</span><span>a</span><span>s</span><span>s</span><span>a</span></span></h1>
+  <h1 class="logo pequeno" aria-label="Mão na Massa" data-logo="Mão na Massa|My Little Big Chef|Manos a la Masa"><span class="palavra"><span>M</span><span>ã</span><span>o</span></span> <span class="palavra"><span>n</span><span>a</span></span> <span class="palavra"><span>M</span><span>a</span><span>s</span><span>s</span><span>a</span></span></h1>
   <div id="ajuda" class="ajuda" hidden>
-    <p data-t="1️⃣ Escolha o nível e uma receita. A ficha mostra os ingredientes e quanto precisa de cada um.|1️⃣ Pick a level and a recipe. The card shows the ingredients and how much of each you need."></p>
-    <p data-t="2️⃣ Na vila, visite os lugares: pesque no rio, colha frutas maduras no pomar, puxe legumes da horta, pegue ovos no galinheiro, tire leite na fazendinha, compre no mercadinho ou peça para a vizinha (e diga obrigado!).|2️⃣ In the village, visit the places: fish at the river, pick ripe fruit in the orchard, pull veggies in the garden, collect eggs in the hen house, get milk at the farm, buy at the shop or ask the neighbour (and say thank you!)."></p>
-    <p data-t="3️⃣ A cesta embaixo mostra o que já tem e o que falta. Com tudo na cesta, vá para 🏠 Casa.|3️⃣ The basket at the bottom shows what you have and what is missing. With everything in the basket, go 🏠 Home."></p>
-    <p data-t="4️⃣ Na cozinha, escolha o utensílio certo e faça cada passo: esfregar e mexer em círculos, deslizar o dedo para cortar, segurar para bater, esperar o forno.|4️⃣ In the kitchen, pick the right tool and do each step: scrub and stir in circles, swipe to cut, hold to blend, wait for the oven."></p>
-    <p data-t="🧑‍🍳 Na cozinha de verdade, fogão, forno, faca e liquidificador só com um adulto junto.|🧑‍🍳 In a real kitchen, stove, oven, knife and blender only with a grown-up."></p>
+    <p data-t="1️⃣ Escolha o nível e uma receita. A ficha mostra os ingredientes e quanto precisa de cada um.|1️⃣ Pick a level and a recipe. The card shows the ingredients and how much of each you need.|1️⃣ Elige el nivel y una receta. La ficha muestra los ingredientes y cuánto necesitas de cada uno."></p>
+    <p data-t="2️⃣ Na vila, visite os lugares: pesque no rio, colha frutas maduras no pomar, puxe legumes da horta, pegue ovos no galinheiro, tire leite na fazendinha, compre no mercadinho ou peça para a vizinha (e diga obrigado!).|2️⃣ In the village, visit the places: fish at the river, pick ripe fruit in the orchard, pull veggies in the garden, collect eggs in the hen house, get milk at the farm, buy at the shop or ask the neighbor (and say thank you!).|2️⃣ En el pueblo, visita los lugares: pesca en el río, coge fruta madura en el huerto, saca verduras de la huerta, coge huevos en el gallinero, ordeña la vaca en la granjita, compra en la tiendecita o pídele a la vecina (¡y dale las gracias!)."></p>
+    <p data-t="3️⃣ A cesta embaixo mostra o que já tem e o que falta. Com tudo na cesta, vá para 🏠 Casa.|3️⃣ The basket at the bottom shows what you have and what is missing. With everything in the basket, go 🏠 Home.|3️⃣ La cesta de abajo muestra lo que ya tienes y lo que falta. Con todo en la cesta, ve a 🏠 Casa."></p>
+    <p data-t="4️⃣ Na cozinha, escolha o utensílio certo e faça cada passo: esfregar e mexer em círculos, deslizar o dedo para cortar, segurar para bater, esperar o forno.|4️⃣ In the kitchen, pick the right tool and do each step: scrub and stir in circles, swipe to cut, hold to blend, wait for the oven.|4️⃣ En la cocina, elige el utensilio correcto y haz cada paso: frotar y remover en círculos, deslizar el dedo para cortar, mantener pulsado para batir, esperar el horno."></p>
+    <p data-t="🧑‍🍳 Na cozinha de verdade, fogão, forno, faca e liquidificador só com um adulto junto.|🧑‍🍳 In a real kitchen, stove, oven, knife and blender only with a grown-up.|🧑‍🍳 En una cocina de verdad, el fogón, el horno, el cuchillo y la batidora, solo con un adulto."></p>
   </div>
-  <h2 class="titulo" data-t="Escolha o nível|Pick a level"></h2>
+  <h2 class="titulo" data-t="Escolha o nível|Pick a level|Elige el nivel"></h2>
   <div id="niveis" class="niveis" role="radiogroup"></div>
-  <h2 class="titulo" data-t="Escolha a receita|Pick a recipe"></h2>
+  <h2 class="titulo" data-t="Escolha a receita|Pick a recipe|Elige la receta"></h2>
   <div id="receitas" class="receitas"></div>
   <p id="versao" class="versao"></p>
 </section>
@@ -61,20 +60,20 @@
   <div class="ficha-receita">
     <div id="recPrato" class="prato-grande" aria-hidden="true"></div>
     <p id="recNivel" class="selo"></p>
-    <h3 class="tit-familia" data-t="👨‍👩‍👧 Quem vai comer? Toque para chamar.|👨‍👩‍👧 Who is eating? Tap to invite."></h3>
-    <div id="recFamilia" class="familia-escolha" role="group" aria-label="Quem vai comer / Who is eating"></div>
+    <h3 class="tit-familia" data-t="👨‍👩‍👧 Quem vai comer? Toque para chamar.|👨‍👩‍👧 Who is eating? Tap to invite.|👨‍👩‍👧 ¿Quién va a comer? Toca para invitar."></h3>
+    <div id="recFamilia" class="familia-escolha" role="group" aria-label="Quem vai comer / Who is eating" data-rotulo="Quem vai comer|Who is eating|Quién va a comer"></div>
     <p id="recPorcao" class="porcao"></p>
-    <h3 data-t="🧺 Você vai precisar de:|🧺 You will need:"></h3>
+    <h3 data-t="🧺 Você vai precisar de:|🧺 You will need:|🧺 Vas a necesitar:"></h3>
     <ul id="recIngredientes" class="lista-ing"></ul>
     <p id="recBolsa" class="bolsa"></p>
     <p id="recPassos" class="dica"></p>
   </div>
-  <button id="btBuscar" class="grande" type="button" data-t="🧺 Vamos buscar!|🧺 Let's go get them!"></button>
+  <button id="btBuscar" class="grande" type="button" data-t="🧺 Vamos buscar!|🧺 Let's go get them!|🧺 ¡Vamos a buscarlos!"></button>
 </section>
 
 <section id="mapa" class="tela" data-recurso="cozinha">
   <div class="cabeca">
-    <button class="voltar mini" type="button" aria-label="Voltar / Back">←</button>
+    <button class="voltar mini" type="button" aria-label="Voltar / Back" data-rotulo="Voltar|Back|Volver">←</button>
     <h2 id="mapaTitulo"></h2>
     <div class="carteira" id="carteiraMapa"></div>
   </div>
@@ -86,7 +85,7 @@
 
 <section id="lugar" class="tela" data-recurso="cozinha">
   <div class="cabeca">
-    <button class="voltar mini" type="button" aria-label="Voltar para a vila / Back to the village">←</button>
+    <button class="voltar mini" type="button" aria-label="Voltar para a vila / Back to the village" data-rotulo="Voltar para a vila|Back to the village|Volver al pueblo">←</button>
     <h2 id="lugarTitulo"></h2>
     <div class="carteira" id="carteiraLugar"></div>
   </div>
@@ -97,18 +96,18 @@
 
 <section id="cozinha" class="tela" data-recurso="cozinha">
   <div class="cabeca">
-    <button class="voltar mini" type="button" aria-label="Voltar para a vila / Back to the village">←</button>
+    <button class="voltar mini" type="button" aria-label="Voltar para a vila / Back to the village" data-rotulo="Voltar para a vila|Back to the village|Volver al pueblo">←</button>
     <h2 id="czTitulo"></h2>
-    <button id="btLer" class="mini" type="button" aria-label="Ler o passo / Read the step">🔊</button>
+    <button id="btLer" class="mini" type="button" aria-label="Ler o passo / Read the step" data-rotulo="Ler o passo|Read the step|Leer el paso">🔊</button>
   </div>
   <div class="cz-corpo">
-    <ol id="ficha" class="ficha" aria-label="Passos / Steps"></ol>
+    <ol id="ficha" class="ficha" aria-label="Passos / Steps" data-rotulo="Passos|Steps|Pasos"></ol>
     <div class="bancada">
       <p id="passoNum" class="passo-num"></p>
       <p id="passoTexto" class="passo-texto" aria-live="polite"></p>
       <p id="dicaAdulto" class="dica-adulto" hidden></p>
       <div id="palco" class="palco"></div>
-      <div id="utensilios" class="utensilios" aria-label="Utensílios / Kitchen tools"></div>
+      <div id="utensilios" class="utensilios" aria-label="Utensílios / Kitchen tools" data-rotulo="Utensílios|Kitchen tools|Utensilios"></div>
     </div>
   </div>
 </section>
@@ -121,15 +120,15 @@
   <p id="prontoEstrelas" class="estrelas"></p>
   <p id="prontoNota" class="dica"></p>
   <div class="linha-botoes">
-    <button id="btFoto" class="medio foto" type="button" data-t="📷 Guardar a foto|📷 Save the photo"></button>
-    <button id="btDeNovo" class="medio" type="button" data-t="🔁 Fazer de novo|🔁 Cook it again"></button>
-    <button id="btOutra" class="medio verde" type="button" data-t="📖 Outra receita|📖 Another recipe"></button>
+    <button id="btFoto" class="medio foto" type="button" data-t="📷 Guardar a foto|📷 Save the photo|📷 Guardar la foto"></button>
+    <button id="btDeNovo" class="medio" type="button" data-t="🔁 Fazer de novo|🔁 Cook it again|🔁 Cocinarla otra vez"></button>
+    <button id="btOutra" class="medio verde" type="button" data-t="📖 Outra receita|📖 Another recipe|📖 Otra receta"></button>
   </div>
   <article id="cartao" class="cartao-receita"></article>
 </section>
 
 <section id="desligado" class="tela" hidden>
-  <p class="grande-texto" data-t="Esta brincadeira está desligada agora. Volte mais tarde! 💛|This game is turned off right now. Come back later! 💛"></p>
+  <p class="grande-texto" data-t="Esta brincadeira está desligada agora. Volte mais tarde! 💛|This game is turned off right now. Come back later! 💛|Este juego está apagado ahora. ¡Vuelve más tarde! 💛"></p>
 </section>
 
 <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>

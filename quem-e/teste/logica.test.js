@@ -78,7 +78,7 @@ test('perguntas úteis: Sim em 2 até 2/3 das caras (95% das sementes); sempre e
   }
 });
 
-test('perguntas por nível: acumulam e cada uma tem texto PT/EN, ícone e grupo', () => {
+test('perguntas por nível: acumulam e cada uma tem texto PT/EN/ES, ícone e grupo', () => {
   const f = L.perguntasDoNivel('facil').map(p => p.id), m = L.perguntasDoNivel('medio').map(p => p.id), d = L.perguntasDoNivel('dificil').map(p => p.id);
   for (const id of f) assert.ok(m.includes(id) && d.includes(id));
   for (const id of m) assert.ok(d.includes(id));
@@ -86,8 +86,8 @@ test('perguntas por nível: acumulam e cada uma tem texto PT/EN, ícone e grupo'
   for (const id of ['comprido', 'careca', 'peruca', 'barba', 'bigode', 'brinco', 'colar', 'nariz', 'roupa-azul']) { assert.ok(m.includes(id), id); assert.ok(!f.includes(id), id); }
   for (const id of ['bone', 'coroa', 'oculos-escuros', 'olhos-azuis', 'sardas']) { assert.ok(d.includes(id), id); assert.ok(!m.includes(id), id); }
   for (const p of L.PERGUNTAS) {
-    assert.ok(p.pt && p.en && p.ico && ['quem', 'cabelo', 'rosto', 'cabeca', 'joias', 'roupa', 'corpo'].includes(p.grupo), p.id);
-    assert.ok(/\?$/.test(p.pt) && /\?$/.test(p.en), 'interrogação: ' + p.id);
+    assert.ok(p.pt && p.en && p.es && p.ico && ['quem', 'cabelo', 'rosto', 'cabeca', 'joias', 'roupa', 'corpo'].includes(p.grupo), p.id);
+    assert.ok(/\?$/.test(p.pt) && /\?$/.test(p.en) && /^¿.*\?$/.test(p.es), 'interrogação: ' + p.id);
   }
 });
 

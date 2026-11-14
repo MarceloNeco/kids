@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.3.0', APP_DATA = '14/Nov/2026';
+const APP_VERSION = '0.4.0', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -35,22 +35,31 @@ const MUSICAS = [
 const CH_PREF = 'bolinho:a-garra:pref', CH_COL = 'bolinho:a-garra:colecao', CH_REC = 'bolinho:a-garra:recordes', CH_CONTA = 'bolinho:a-garra:contador';
 const lerJSON = (k, pad) => { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : pad; } catch (e) { return pad; } };
 const gravarJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem espaço: segue sem guardar */ } };
-const pref = Object.assign({ maquina: 'telefone', nivel: 'facil', lingua: /^en/i.test(navigator.language || '') ? 'en' : 'pt', efeitos: true }, lerJSON(CH_PREF, {}));
+const pref = Object.assign({ maquina: 'telefone', nivel: 'facil', efeitos: true }, lerJSON(CH_PREF, {}));
+delete pref.lingua;   // o idioma agora vem só da estante (../idioma.js), não fica mais nas preferências do jogo
 if (!MAQUINAS[pref.maquina]) pref.maquina = 'telefone';
 if (!NIVEIS.includes(pref.nivel)) pref.nivel = 'facil';
-if (window.BolinhoIdioma && !window.BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
 const salvarPref = () => gravarJSON(CH_PREF, pref);
 // colecao[tipo] = quantos; contador[maquina-nivel] = tentativas desde o último prêmio (a máquina "lembra", como a de verdade)
 const colecao = lerJSON(CH_COL, {}), recordes = lerJSON(CH_REC, {}), contador = lerJSON(CH_CONTA, {});
 
-const t = (pt, en) => (pref.lingua === 'en' ? en : pt);
-const nome = (tipo) => { const n = NOMES[tipo] || [tipo, tipo]; return t(n[0], n[1]); };
+// idioma: o escolhido na estante (../idioma.js): 'pt', 'en' ou 'es'
+const lingua = () => (window.BolinhoIdioma ? window.BolinhoIdioma.atual() : 'pt');
+const IDX = { pt: 0, en: 1, es: 2 };
+const t = (pt, en, es) => { const l = lingua(); return l === 'en' ? en : l === 'es' && es != null ? es : pt; };
+const nome = (tipo) => { const n = NOMES[tipo] || [tipo, tipo, tipo]; return t(n[0], n[1], n[2]); };
+const LOGO = ['A-GARRA', 'THE CLAW', 'LA GARRA'];
 const todosDe = (id) => MAQUINAS[id].tipos.concat([MAQUINAS[id].raro]);
 function traduzir() {
-  document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-  document.querySelectorAll('[data-t]').forEach((el) => { const p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-  $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-  $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + APP_DATA;
+  const l = lingua(), i = IDX[l];
+  document.documentElement.lang = l === 'en' ? 'en' : l === 'es' ? 'es' : 'pt-BR';
+  document.querySelectorAll('[data-t]').forEach((el) => { const p = el.getAttribute('data-t').split('|'); el.textContent = p[i] != null ? p[i] : p[0]; });
+  document.querySelectorAll('[data-rotulo]').forEach((el) => { const p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', p[i] != null ? p[i] : p[0]); });
+  // o nome na tela (uma letra por pedacinho, o separador em amarelo): A-GARRA · THE CLAW · LA GARRA
+  const logo = $('logo'); logo.setAttribute('aria-label', LOGO[i]); logo.textContent = '';
+  [...LOGO[i]].forEach((c) => { const s = document.createElement('span'); if (c === '-' || c === ' ') { s.className = 'sep'; s.textContent = c === ' ' ? '\u00a0' : c; } else s.textContent = c; logo.appendChild(s); });
+  document.title = LOGO[i] + ' — Bolinho de Chuva · SolverONE';
+  $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + APP_DATA[i];
   pintarMenu();
   if (telaAtual === 'colecao') pintarColecao();
 }
@@ -73,7 +82,7 @@ function pintarMenu() {
 }
 document.querySelectorAll('#maquinas [data-maquina]').forEach((b) => b.addEventListener('click', () => { pref.maquina = b.getAttribute('data-maquina'); salvarPref(); pintarMenu(); Som.toque(); }));
 document.querySelectorAll('#niveis [data-nivel]').forEach((b) => b.addEventListener('click', () => { pref.nivel = b.getAttribute('data-nivel'); salvarPref(); pintarMenu(); Som.toque(); }));
-$('btLingua').addEventListener('click', () => { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
+if (window.BolinhoIdioma) window.BolinhoIdioma.aoMudar(() => traduzir());   // trocaram o idioma na estante (outra aba)
 function pintarEfeitos() { $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔈'; $('btEfeitos').setAttribute('aria-pressed', String(!!pref.efeitos)); Som.ligar(pref.efeitos); }
 $('btEfeitos').addEventListener('click', () => { pref.efeitos = !pref.efeitos; salvarPref(); pintarEfeitos(); Som.toque(); });
 $('btAjuda').addEventListener('click', () => { const a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
@@ -139,7 +148,7 @@ function novaPartida() {
   $('infoTempo').hidden = !m.cfg.tempo;
   medir(); cam = Object.assign({}, VISTAS[0], { zoom: camera.aspect > 1.2 ? 0.8 : 1, vista: 0 });   // deitado: um pouco mais perto
   pintarBarra();
-  aviso(t('Leve a garra e aperte PEGAR!', 'Move the claw and press GRAB!'), 2.4);
+  aviso(t('Leve a garra e aperte PEGAR!', 'Move the claw and press GRAB!', '¡Mueve la garra y pulsa COGER!'), 2.4);
 }
 function parar() { Som.motor(false); if (m) { m.mover(0, 0); m.irPara(null); } apertando = { dx: 0, dz: 0 }; }
 function pintarBarra() {
@@ -169,7 +178,7 @@ function posicionarCamera() {
   camera.lookAt(camAlvo);
 }
 $('btCamera').addEventListener('click', () => { cam.vista = (cam.vista + 1) % VISTAS.length; Object.assign(cam, VISTAS[cam.vista]); Som.toque();
-  aviso([t('🎥 De frente', '🎥 Front'), t('🎥 De cima', '🎥 Top'), t('🎥 De lado: veja a profundidade da garra', '🎥 Side: check the claw depth')][cam.vista], 1.6); });
+  aviso([t('🎥 De frente', '🎥 Front', '🎥 De frente'), t('🎥 De cima', '🎥 Top', '🎥 Desde arriba'), t('🎥 De lado: veja a profundidade da garra', '🎥 Side: check the claw depth', '🎥 De lado: mira la profundidad de la garra')][cam.vista], 1.6); });
 const zoomEm = (k) => { cam.zoom = Math.max(0.42, Math.min(1.35, cam.zoom * k)); };
 $('btMais').addEventListener('click', () => zoomEm(1 / 1.25));
 $('btMenos').addEventListener('click', () => zoomEm(1.25));
@@ -243,10 +252,10 @@ function eventos() {
     const ev = m.eventos.shift();
     if (ev.tipo === 'ficha') { Som.ficha(); setTimeout(() => Som.descer(), 120); }
     else if (ev.tipo === 'tique') Som.tique();
-    else if (ev.tipo === 'pegou') { Som.fechar(); Som.pegou(); aviso(ev.premio === MAQUINAS[pref.maquina].raro ? t('⭐ Pegou o dourado!', '⭐ Got the golden one!') : t('Pegou! Segura, garra!', 'Got it! Hold on, claw!'), 1.4); }
-    else if (ev.tipo === 'raspou') { Som.fechar(); Som.errou(); aviso(t('Quase! Mire no meio.', 'So close! Aim at the middle.'), 1.8); }
-    else if (ev.tipo === 'errou') { Som.fechar(); Som.errou(); aviso(t('Não pegou nada…', 'Nothing this time…'), 1.6); }
-    else if (ev.tipo === 'escorregou') { Som.escorregou(); aviso(t('Ih, a garra soltou!', 'Oops, the claw let go!'), 1.8); }
+    else if (ev.tipo === 'pegou') { Som.fechar(); Som.pegou(); aviso(ev.premio === MAQUINAS[pref.maquina].raro ? t('⭐ Pegou o dourado!', '⭐ Got the golden one!', '⭐ ¡Has cogido el dorado!') : t('Pegou! Segura, garra!', 'Got it! Hold on, claw!', '¡Lo has cogido! ¡Aguanta, garra!'), 1.4); }
+    else if (ev.tipo === 'raspou') { Som.fechar(); Som.errou(); aviso(t('Quase! Mire no meio.', 'So close! Aim at the middle.', '¡Casi! Apunta al centro.'), 1.8); }
+    else if (ev.tipo === 'errou') { Som.fechar(); Som.errou(); aviso(t('Não pegou nada…', 'Nothing this time…', 'Esta vez no ha cogido nada…'), 1.6); }
+    else if (ev.tipo === 'escorregou') { Som.escorregou(); aviso(t('Ih, a garra soltou!', 'Oops, the claw let go!', '¡Uy, la garra lo ha soltado!'), 1.8); }
     else if (ev.tipo === 'pulo') Som.pulo && Som.pulo();
     else if (ev.tipo === 'ganhou') ganhou(ev.premio);
     else if (ev.tipo === 'fim') { Som.motor(false); fimT = 1.2; }
@@ -289,15 +298,16 @@ const estrelasDe = (n) => (n === 0 ? 0 : n >= 3 ? 3 : n);
 function abrirFim() {
   const n = m.ganhos.length, e = estrelasDe(n), chave = chaveConta();
   if (n > (recordes[chave] || 0)) { recordes[chave] = n; gravarJSON(CH_REC, recordes); }
-  $('fimTitulo').textContent = m.esvaziou ? t('Você esvaziou a máquina!', 'You emptied the machine!') : n ? t('Acabaram as fichas!', 'Out of tokens!') : t('Quase! A garra é difícil mesmo…', 'So close! The claw is tricky…');
+  $('fimTitulo').textContent = m.esvaziou ? t('Você esvaziou a máquina!', 'You emptied the machine!', '¡Has vaciado la máquina!') : n ? t('Acabaram as fichas!', 'Out of tokens!', '¡Se han acabado las fichas!') : t('Quase! A garra é difícil mesmo…', 'So close! The claw is tricky…', '¡Casi! Esta garra es muy difícil…');
   $('fimEstrelas').textContent = '★★★'.slice(0, e) + '☆☆☆'.slice(0, 3 - e);
-  $('fimEstrelas').setAttribute('aria-label', t(e + ' estrelas', e + ' stars'));
+  $('fimEstrelas').setAttribute('aria-label', t(e + ' estrelas', e + ' stars', e + ' estrellas'));
   const caixa = $('fimPremios'); caixa.textContent = '';
   m.ganhos.forEach((tipo) => { const i = document.createElement('img'); i.src = miniatura(tipo); i.alt = nome(tipo); caixa.appendChild(i); });
   const usadas = fichasIni - m.fichas;
   $('fimTexto').textContent = n
-    ? t('Você pegou ' + n + (n === 1 ? ' prêmio' : ' prêmios') + ' com ' + usadas + (usadas === 1 ? ' ficha.' : ' fichas.'), 'You got ' + n + (n === 1 ? ' prize' : ' prizes') + ' with ' + usadas + (usadas === 1 ? ' token.' : ' tokens.'))
-    : t('Na máquina de verdade também é assim: a garra só vem forte de vez em quando. Tente de novo!', 'Real machines are like this too: the claw is only strong once in a while. Try again!');
+    ? t('Você pegou ' + n + (n === 1 ? ' prêmio' : ' prêmios') + ' com ' + usadas + (usadas === 1 ? ' ficha.' : ' fichas.'), 'You got ' + n + (n === 1 ? ' prize' : ' prizes') + ' with ' + usadas + (usadas === 1 ? ' token.' : ' tokens.'),
+      'Has conseguido ' + n + (n === 1 ? ' premio' : ' premios') + ' con ' + usadas + (usadas === 1 ? ' ficha.' : ' fichas.'))
+    : t('Na máquina de verdade também é assim: a garra só vem forte de vez em quando. Tente de novo!', 'Real machines are like this too: the claw is only strong once in a while. Try again!', 'En las máquinas de verdad también pasa: la garra solo viene fuerte de vez en cuando. ¡Inténtalo otra vez!');
   $('fim').hidden = false;
   Som.fim(e);
   setTimeout(() => $('btDeNovo').focus(), 50);
@@ -313,7 +323,7 @@ function pintarColecao() {
   const abas = $('abas'); abas.textContent = '';
   IDS.forEach((id) => {
     const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(id === colecaoAba)); b.setAttribute('data-aba', id);
-    b.textContent = t(MAQUINAS[id].nome[0], MAQUINAS[id].nome[1]) + ' ' + quantos(id) + '/' + todosDe(id).length;
+    b.textContent = t(MAQUINAS[id].nome[0], MAQUINAS[id].nome[1], MAQUINAS[id].nome[2]) + ' ' + quantos(id) + '/' + todosDe(id).length;
     b.addEventListener('click', () => { colecaoAba = id; Som.toque(); pintarColecao(); });
     abas.appendChild(b);
   });
@@ -327,7 +337,7 @@ function pintarColecao() {
     d.append(img, n, k); p.appendChild(d);
   });
   const n = quantos(colecaoAba), tot = todosDe(colecaoAba).length;
-  $('colecaoResumo').textContent = n === tot ? t('Coleção completa! 🎉', 'Collection complete! 🎉') : t('Você tem ' + n + ' de ' + tot, 'You have ' + n + ' of ' + tot);
+  $('colecaoResumo').textContent = n === tot ? t('Coleção completa! 🎉', 'Collection complete! 🎉', '¡Colección completa! 🎉') : t('Você tem ' + n + ' de ' + tot, 'You have ' + n + ' of ' + tot, 'Tienes ' + n + ' de ' + tot);
 }
 
 /* ---------- a cada quadro ---------- */

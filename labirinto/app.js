@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.4', APP_DATA = '07/Nov/2026';
+  var APP_VERSION = '0.3.0', APP_DATA = '14/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search;
   var TESTE = /[?&]teste\b/.test(BUSCA);
@@ -36,17 +36,24 @@
   var CH_PREF = 'bolinho:labirinto:pref', CH_REC = 'bolinho:labirinto:recordes';
   function lerJSON(k, pad) { try { var v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : pad; } catch (e) { return pad; } }
   function gravarJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  var pref = Object.assign({ forma: 'quadrado', nivel: 'facil', modo: 'andar', lingua: /^en/i.test(navigator.language || '') ? 'en' : 'pt', efeitos: true, surpresa: 0 }, lerJSON(CH_PREF, {}));
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  var pref = Object.assign({ forma: 'quadrado', nivel: 'facil', modo: 'andar', efeitos: true, surpresa: 0 }, lerJSON(CH_PREF, {}));
+  delete pref.lingua;   // o idioma não fica mais aqui: vem da estante (../idioma.js)
+  // português, inglês ou espanhol, escolhido só na estante; o jogo não tem botão de idioma próprio
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';
   function salvarPref() { gravarJSON(CH_PREF, pref); }
   var recordes = lerJSON(CH_REC, {});
 
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' ? (es != null ? es : pt) : pt; }
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + APP_DATA;
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
+    document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = t(p[0], p[1], p[2]); });
+    document.querySelectorAll('[data-rotulo]').forEach(function (el) { var p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', t(p[0], p[1], p[2])); });
+    // o nome do jogo em cada idioma (Labirinto · Maze · Laberinto), com as letras pulando do mesmo jeito
+    var nome = t('Labirinto', 'Maze', 'Laberinto'), logo = document.querySelector('#menu .logo');
+    if (logo.getAttribute('aria-label') !== nome) { logo.setAttribute('aria-label', nome); logo.innerHTML = nome.split('').map(function (c) { return '<span>' + c + '</span>'; }).join(''); }
+    document.title = nome + ' — Bolinho de Chuva · SolverONE';
+    var d = APP_DATA.split('/');   // 14/Nov/2026 · Nov/14/2026 · 14/nov/2026
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, d[1] + '/' + d[0] + '/' + d[2], d[0] + '/' + d[1].toLowerCase() + '/' + d[2]);
     pintarRecordes();
     if (jogo) atualizarMissao();
   }
@@ -65,14 +72,13 @@
       formas.forEach(function (f) { var r = recordes[f + '-' + nv]; if (r && r.e > melhor) melhor = r.e; });
       var el = document.querySelector('[data-rec="' + nv + '"]');
       el.textContent = estrelasTexto(melhor);
-      el.setAttribute('aria-label', melhor ? t(melhor + ' estrelas', melhor + ' stars') : '');
+      el.setAttribute('aria-label', melhor ? t(melhor + ' estrelas', melhor + ' stars', melhor + ' estrellas') : '');
     });
   }
   function pintarMenu() { marcar('formas', 'data-forma', pref.forma); marcar('niveis', 'data-nivel', pref.nivel); marcar('modos', 'data-modo', pref.modo); pintarRecordes(); }
   document.querySelectorAll('#formas [data-forma]').forEach(function (b) { b.addEventListener('click', function () { pref.forma = b.getAttribute('data-forma'); salvarPref(); pintarMenu(); Som.toque(); }); });
   document.querySelectorAll('#niveis [data-nivel]').forEach(function (b) { b.addEventListener('click', function () { pref.nivel = b.getAttribute('data-nivel'); salvarPref(); pintarMenu(); Som.toque(); }); });
   document.querySelectorAll('#modos [data-modo]').forEach(function (b) { b.addEventListener('click', function () { pref.modo = b.getAttribute('data-modo'); salvarPref(); pintarMenu(); Som.toque(); }); });
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
   function pintarEfeitos() {
     $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔈';
     $('btEfeitos').setAttribute('aria-pressed', String(!!pref.efeitos));
@@ -198,11 +204,11 @@
     $('jogo').style.background = 'radial-gradient(circle at 50% 45%, ' + fundo[0] + ', ' + fundo[1] + ')';
     $('jogo').classList.toggle('desenho', jogo.modo === 'desenhar');
     $('btModo').textContent = jogo.modo === 'andar' ? '✏️' : '🐶';
-    $('btModo').setAttribute('aria-label', jogo.modo === 'andar' ? t('Trocar para desenhar o caminho', 'Switch to drawing the path') : t('Trocar para levar o cachorrinho', 'Switch to walking the puppy'));
+    $('btModo').setAttribute('aria-label', jogo.modo === 'andar' ? t('Trocar para desenhar o caminho', 'Switch to drawing the path', 'Cambiar a dibujar el camino') : t('Trocar para levar o cachorrinho', 'Switch to walking the puppy', 'Cambiar a llevar al perrito'));
     $('relogio').textContent = '0:00';
     comecarIntro();
-    if (jogo.modo === 'desenhar') dica(t('Arraste o cachorrinho pelo caminho ✏️', 'Drag the puppy along the path ✏️'), 3500);
-    else dica(t('Toque onde o cachorrinho consegue ver, em linha reta 🐶', 'Tap where the puppy can see in a straight line 🐶'), 3500);
+    if (jogo.modo === 'desenhar') dica(t('Arraste o cachorrinho pelo caminho ✏️', 'Drag the puppy along the path ✏️', 'Arrastra al perrito por el camino ✏️'), 3500);
+    else dica(t('Toque onde o cachorrinho consegue ver, em linha reta 🐶', 'Tap where the puppy can see in a straight line 🐶', 'Toca donde el perrito pueda ver en línea recta 🐶'), 3500);
   }
 
   // abertura em 3D: a câmera vem do alto, girando e chegando perto, e as paredes sobem de dentro para fora
@@ -237,11 +243,11 @@
   function itemInfo() { return Desenho.ITENS[jogo.L.tipoItem]; }
   function atualizarMissao() {
     var L = jogo.L, it = itemInfo(), el = $('missao'), txt;
-    if (jogo.venceu) txt = t('🎉 Você conseguiu!', '🎉 You did it!');
-    else if (L.item >= 0 && !jogo.P.pegouItem) txt = t('Missão: pegue ' + it.pt + ' ' + it.em + ' no meio e depois ache a saída!', 'Mission: grab ' + it.en + ' ' + it.em + ' in the middle, then find the exit!');
-    else if (L.item >= 0) txt = t('A saída abriu! Corra para lá 🚪✨', 'The exit is open! Run there 🚪✨');
-    else if (L.bordaSaida < 0) txt = t('Chegue até a bandeira no meio 🏁', 'Reach the flag in the middle 🏁');
-    else txt = t('Ache a saída 🏁', 'Find the exit 🏁');
+    if (jogo.venceu) txt = t('🎉 Você conseguiu!', '🎉 You did it!', '🎉 ¡Lo has conseguido!');
+    else if (L.item >= 0 && !jogo.P.pegouItem) txt = t('Missão: pegue ' + it.pt + ' ' + it.em + ' no meio e depois ache a saída!', 'Mission: grab ' + it.en + ' ' + it.em + ' in the middle, then find the exit!', 'Misión: coge ' + it.es + ' ' + it.em + ' del medio y luego encuentra la salida.');
+    else if (L.item >= 0) txt = t('A saída abriu! Corra para lá 🚪✨', 'The exit is open! Run there 🚪✨', '¡La salida se ha abierto! Corre hacia allí 🚪✨');
+    else if (L.bordaSaida < 0) txt = t('Chegue até a bandeira no meio 🏁', 'Reach the flag in the middle 🏁', 'Llega hasta la bandera del medio 🏁');
+    else txt = t('Ache a saída 🏁', 'Find the exit 🏁', 'Encuentra la salida 🏁');
     el.textContent = txt;
     el.classList.toggle('pronta', L.item >= 0 && jogo.P.pegouItem);
   }
@@ -265,7 +271,7 @@
     Som.item(); pulsarMissao();
     jogo.cao.puloT = agora();
     var it = itemInfo();
-    dica(t('Você pegou ' + it.pt + '! ' + it.em + ' A saída abriu!', 'You got ' + it.en + '! ' + it.em + ' The exit is open!'), 2600);
+    dica(t('Você pegou ' + it.pt + '! ' + it.em + ' A saída abriu!', 'You got ' + it.en + '! ' + it.em + ' The exit is open!', '¡Has cogido ' + it.es + '! ' + it.em + ' ¡La salida se ha abierto!'), 2600);
     if (calmo) { jogo.portaT = agora() - 2000; return; }
     var s = centroTela(jogo.L.item);
     jogo.part.explosao(s[0], s[1], 70, 320);
@@ -275,7 +281,7 @@
     if (agora() - jogo.trancadaT < 1200) return;
     jogo.trancadaT = agora(); Som.trancada();
     var it = itemInfo();
-    dica(t('🔒 A saída está trancada! Pegue primeiro ' + it.pt + ' ' + it.em, '🔒 The exit is locked! First grab ' + it.en + ' ' + it.em), 2600);
+    dica(t('🔒 A saída está trancada! Pegue primeiro ' + it.pt + ' ' + it.em, '🔒 The exit is locked! First grab ' + it.en + ' ' + it.em, '🔒 ¡La salida está cerrada con llave! Primero coge ' + it.es + ' ' + it.em), 2600);
   }
   function vitoria() {
     var g = jogo; g.venceu = true; acao = null;
@@ -300,13 +306,13 @@
     var r = jogo.resultado, el = $('fimEstrelas');
     el.innerHTML = '';
     for (var i = 0; i < 3; i++) { var s = document.createElement('span'); s.textContent = '⭐'; if (i >= r.estrelas) s.className = 'apagada'; el.appendChild(s); }
-    el.setAttribute('aria-label', t(r.estrelas + ' de 3 estrelas', r.estrelas + ' of 3 stars'));
-    $('fimTexto').textContent = t('Tempo: ', 'Time: ') + relogioTexto(r.tempo) + (r.novo ? t(' · Novo recorde! 🏆', ' · New record! 🏆') : '');
+    el.setAttribute('aria-label', t(r.estrelas + ' de 3 estrelas', r.estrelas + ' of 3 stars', r.estrelas + ' de 3 estrellas'));
+    $('fimTexto').textContent = t('Tempo: ', 'Time: ', 'Tiempo: ') + relogioTexto(r.tempo) + (r.novo ? t(' · Novo recorde! 🏆', ' · New record! 🏆', ' · ¡Nuevo récord! 🏆') : '');
     $('btMaisDificil').hidden = jogo.L.nivel === 'dificil';
     $('fim').hidden = false; traduzirFim();
     $('btDeNovo').focus();
   }
-  function traduzirFim() { document.querySelectorAll('#fim [data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; }); }
+  function traduzirFim() { document.querySelectorAll('#fim [data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = t(p[0], p[1], p[2]); }); }
   function fecharFim() { $('fim').hidden = true; }
 
   /* ---------- cachorrinho andando ---------- */
@@ -351,7 +357,7 @@
     g.visao = { t0: ag, casas: Regras.visiveis(g.L, olho) };
     if (ag - g.cao.hmmT < 700) return;
     g.cao.hmmT = ag; Som.hmm();
-    dica(t('Hmm? Daqui ele não vê até lá. Toque onde brilhar ✨', 'Hmm? He can\'t see that far from here. Tap where it glows ✨'), 2200);
+    dica(t('Hmm? Daqui ele não vê até lá. Toque onde brilhar ✨', 'Hmm? The puppy can\'t see that far from here. Tap where it glows ✨', '¿Mmm? Desde aquí no ve hasta allá. Toca donde brille ✨'), 2200);
   }
   function posEntre(a, b, u) {
     var A = jogo.L.celulas[a], B = jogo.L.celulas[b];
@@ -421,7 +427,7 @@
       visitar(p, r.pt, false);
     }
     if (r.bateu && !jogo.venceu) {
-      if (!jogo.bloqueado) { jogo.bateT = agora(); Som.bate(); if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {} dica(t('Ops, parede! Volte o dedo até a ponta da linha ✨', 'Oops, a wall! Bring your finger back to the tip of the line ✨'), 2400); }
+      if (!jogo.bloqueado) { jogo.bateT = agora(); Som.bate(); if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {} dica(t('Ops, parede! Volte o dedo até a ponta da linha ✨', 'Oops, a wall! Bring your finger back to the tip of the line ✨', '¡Uy, pared! Vuelve con el dedo a la punta de la línea ✨'), 2400); }
       jogo.bloqueado = true;
     }
   }
@@ -483,7 +489,7 @@
       if (c >= 0) { ligarRelogio(); acao.alvo = c; acao.trilha.push(c); mirar(c, false); }
     } else {
       acao = { id: e.pointerId, novoTraco: true, esperando: !pertoDaPonta(w), sx: e.clientX, sy: e.clientY };
-      if (acao.esperando) { jogo.dicaPontaT = agora(); dica(t('Comece pela ponta da linha, onde está o cachorrinho 🐶', 'Start from the tip of the line, where the puppy is 🐶'), 2400); }
+      if (acao.esperando) { jogo.dicaPontaT = agora(); dica(t('Comece pela ponta da linha, onde está o cachorrinho 🐶', 'Start from the tip of the line, where the puppy is 🐶', 'Empieza por la punta de la línea, donde está el perrito 🐶'), 2400); }
       else { jogo.bloqueado = false; ligarRelogio(); estender(w); }
     }
   });
@@ -725,6 +731,8 @@
 
   if (window.SolverRecursos && !SolverRecursos.ligado('labirinto', true)) { mostrar('desligado'); $('desligado').hidden = false; traduzir(); return; }
   pintarEfeitos(); pintarMenu(); traduzir();
+  // trocaram o idioma na estante aberta noutra aba: os textos trocam na hora
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); if (!$('fim').hidden) traduzirFim(); });
   if (window.Trilha) Trilha.iniciar({ jogo: 'labirinto', creditos: 'CREDITOS.md', volume: 0.45, musicas: MUSICAS });
   requestAnimationFrame(quadro);
 

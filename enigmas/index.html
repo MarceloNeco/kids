@@ -23,49 +23,48 @@
 
 <section id="inicio" class="tela ativa" data-recurso="enigmas">
   <div class="faixa">
-    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
-    <button id="btEfeitos" class="mini" type="button" aria-pressed="true" aria-label="Sons / Sounds">🔔</button>
-    <button id="btVoz" class="mini" type="button" aria-pressed="true" aria-label="Voz / Voice">🗣️</button>
+    <button id="btEfeitos" class="mini" type="button" aria-pressed="true" aria-label="Sons" data-rotulo="Sons|Sounds|Sonidos">🔔</button>
+    <button id="btVoz" class="mini" type="button" aria-pressed="true" aria-label="Voz" data-rotulo="Voz|Voice|Voz">🗣️</button>
   </div>
   <h1 class="titulo" aria-label="Enigmatic"><span class="t1">Enigma</span><span class="t2">tic</span></h1>
-  <p class="sub" data-t="Ligue cada desenho ao que combina com ele|Link each picture to the one that goes with it"></p>
+  <p class="sub" data-t="Ligue cada desenho ao que combina com ele|Link each picture to the one that goes with it|Une cada dibujo con el que va con él"></p>
 
   <div class="niveis">
     <button id="btFacil" class="nivel facil" type="button" data-nivel="facil">
       <span class="n-emo" aria-hidden="true">🐣</span>
-      <span class="n-nome" data-t="Fácil|Easy"></span>
-      <span class="n-idade" data-t="3 a 5 anos · 3 ou 4 pares|ages 3–5 · 3 or 4 pairs"></span>
+      <span class="n-nome" data-t="Fácil|Easy|Fácil"></span>
+      <span class="n-idade" data-t="3 a 5 anos · 3 ou 4 pares|ages 3–5 · 3 or 4 pairs|de 3 a 5 años · 3 o 4 parejas"></span>
       <span class="n-prog" id="progFacil"></span>
     </button>
     <button id="btMedio" class="nivel medio" type="button" data-nivel="medio">
       <span class="n-emo" aria-hidden="true">🦊</span>
-      <span class="n-nome" data-t="Médio|Medium"></span>
-      <span class="n-idade" data-t="5 a 9 anos · 5 a 7 pares|ages 5–9 · 5 to 7 pairs"></span>
+      <span class="n-nome" data-t="Médio|Medium|Medio"></span>
+      <span class="n-idade" data-t="5 a 9 anos · 5 a 7 pares|ages 5–9 · 5 to 7 pairs|de 5 a 9 años · de 5 a 7 parejas"></span>
       <span class="n-prog" id="progMedio"></span>
     </button>
     <button id="btDificil" class="nivel dificil" type="button" data-nivel="dificil">
       <span class="n-emo" aria-hidden="true">🦉</span>
-      <span class="n-nome" data-t="Difícil|Hard"></span>
-      <span class="n-idade" data-t="10 anos ou mais · 4 pares de pensar|ages 10+ · 4 pairs that make you think"></span>
+      <span class="n-nome" data-t="Difícil|Hard|Difícil"></span>
+      <span class="n-idade" data-t="10 anos ou mais · 4 pares de pensar|ages 10+ · 4 pairs that make you think|10 años o más · 4 parejas para pensar"></span>
       <span class="n-prog" id="progDificil"></span>
     </button>
   </div>
 
   <div class="como">
-    <h2 data-t="Como brincar|How to play"></h2>
+    <h2 data-t="Como brincar|How to play|Cómo se juega"></h2>
     <ol>
-      <li data-t="Arraste o dedo de um desenho da esquerda até o desenho da direita que combina com ele.|Drag your finger from a picture on the left to the picture on the right that goes with it."></li>
-      <li data-t="Ou toque num desenho e depois no outro. No teclado: setas e Enter.|Or tap one picture and then the other. On a keyboard: arrows and Enter."></li>
-      <li data-t="Acertou? O risco de giz fica. Errou? Ele se apaga sozinho, é só tentar de novo!|Got it? The chalk line stays. Missed? It rubs itself out, just try again!"></li>
-      <li data-t="Ligou tudo? Ganha estrelas ⭐ e vem o próximo enigma. 💡 mostra um par quando ficar difícil.|Linked them all? You earn stars ⭐ and the next puzzle comes. 💡 shows one pair when it gets tricky."></li>
-      <li data-t="🔤 esconde as palavras: só os desenhos. Toque num desenho para ver a palavra.|🔤 hides the words: pictures only. Touch a picture to see its word."></li>
+      <li data-t="Arraste o dedo de um desenho da esquerda até o desenho da direita que combina com ele.|Drag your finger from a picture on the left to the picture on the right that goes with it.|Arrastra el dedo desde un dibujo de la izquierda hasta el dibujo de la derecha que va con él."></li>
+      <li data-t="Ou toque num desenho e depois no outro. No teclado: setas e Enter.|Or tap one picture and then the other. On a keyboard: arrows and Enter.|O toca un dibujo y luego el otro. Con teclado: flechas y Enter."></li>
+      <li data-t="Acertou? O risco de giz fica. Errou? Ele se apaga sozinho, é só tentar de novo!|Got it? The chalk line stays. Missed? It rubs itself out, just try again!|¿Acertaste? La raya de tiza se queda. ¿Fallaste? Se borra sola, ¡solo tienes que volver a intentarlo!"></li>
+      <li data-t="Ligou tudo? Ganha estrelas ⭐ e vem o próximo enigma. 💡 mostra um par quando ficar difícil.|Linked them all? You earn stars ⭐ and the next puzzle comes. 💡 shows one pair when it gets tricky.|¿Lo has unido todo? Ganas estrellas ⭐ y llega el siguiente enigma. 💡 te enseña una pareja cuando se pone difícil."></li>
+      <li data-t="🔤 esconde as palavras: só os desenhos. Toque num desenho para ver a palavra.|🔤 hides the words: pictures only. Touch a picture to see its word.|🔤 esconde las palabras: solo los dibujos. Toca un dibujo para ver su palabra."></li>
     </ol>
   </div>
   <div class="rodape">
-    <button id="btInstalar" class="mini largo" type="button" hidden data-t="📲 Instalar|📲 Install"></button>
-    <button id="btZerar" class="mini largo" type="button" data-t="↺ Começar do zero|↺ Start over"></button>
+    <button id="btInstalar" class="mini largo" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
+    <button id="btZerar" class="mini largo" type="button" data-t="↺ Começar do zero|↺ Start over|↺ Empezar de cero"></button>
   </div>
-  <p class="versao"><span data-t="Versão|Version"></span> <span id="versao"></span> · <a href="CREDITOS.md" target="_blank" rel="noopener" data-t="créditos|credits"></a></p>
+  <p class="versao"><span data-t="Versão|Version|Versión"></span> <span id="versao"></span> · <a href="CREDITOS.md" target="_blank" rel="noopener" data-t="créditos|credits|créditos"></a></p>
 </section>
 
 <section id="jogo" class="tela" data-recurso="enigmas">
@@ -74,14 +73,14 @@
       <span id="nomeNivel" class="nome-nivel"></span>
       <span id="contador" class="contador"></span>
     </div>
-    <button id="btPalavras" class="mini" type="button" aria-pressed="true" aria-label="Mostrar palavras / Show words">🔤</button>
-    <button id="btDica" class="mini" type="button" aria-label="Mostrar um par / Show one pair">💡</button>
+    <button id="btPalavras" class="mini" type="button" aria-pressed="true" aria-label="Mostrar palavras" data-rotulo="Mostrar palavras|Show words|Mostrar palabras">🔤</button>
+    <button id="btDica" class="mini" type="button" aria-label="Mostrar um par" data-rotulo="Mostrar um par|Show one pair|Mostrar una pareja">💡</button>
     <span id="estrelasTopo" class="estrelas-topo" aria-live="polite"></span>
   </header>
   <p id="pista" class="pista"></p>
   <div id="lousa" class="lousa">
-    <div id="colEsq" class="coluna esq" role="group" aria-label="Esquerda / Left"></div>
-    <div id="colDir" class="coluna dir" role="group" aria-label="Direita / Right"></div>
+    <div id="colEsq" class="coluna esq" role="group" aria-label="Esquerda" data-rotulo="Esquerda|Left|Izquierda"></div>
+    <div id="colDir" class="coluna dir" role="group" aria-label="Direita" data-rotulo="Direita|Right|Derecha"></div>
     <svg id="giz" class="giz" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="texturaGiz" x="-10%" y="-30%" width="120%" height="160%">

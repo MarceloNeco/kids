@@ -3,12 +3,23 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.38', APP_UPDATED = '14/11/2026';
-  var EN = /^en/i.test(navigator.language || '') && !(window.BolinhoIdioma && !BolinhoIdioma.ingles());   // só português sem o interruptor "ingles" (../idioma.js)
-  function T(pt, en) { return EN ? en : pt; }
+  var APP_VERSION = '0.8.39', APP_UPDATED = '14/11/2026';
+  // o idioma vem da estante (../idioma.js): pt, en ou es; o jogo não tem botão de idioma próprio
+  function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
+  function T(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }
   var $ = function (id) { return document.getElementById(id); };
-  document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = T(p[0], p[1] || p[0]); });
-  document.querySelectorAll('[data-ph]').forEach(function (el) { var p = el.getAttribute('data-ph').split('|'); el.placeholder = T(p[0], p[1] || p[0]); });
+  // textos fixos da página: data-t (texto), data-ph (placeholder), data-title e data-aria, sempre "pt|en|es"
+  function traduzirPagina() {
+    document.documentElement.lang = { pt: 'pt-BR', en: 'en', es: 'es' }[lingua()] || 'pt-BR';
+    document.title = T('Bagunçolândia', 'Mayhemland', 'Alborotolandia') + ' — Bolinho de Chuva · SolverONE';
+    function tres(el, atr) { var p = el.getAttribute(atr).split('|'); return T(p[0], p[1] || p[0], p[2]); }
+    document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = tres(el, 'data-t'); });
+    document.querySelectorAll('[data-ph]').forEach(function (el) { el.placeholder = tres(el, 'data-ph'); });
+    document.querySelectorAll('[data-title]').forEach(function (el) { el.title = tres(el, 'data-title'); });
+    document.querySelectorAll('[data-aria]').forEach(function (el) { el.setAttribute('aria-label', tres(el, 'data-aria')); });
+  }
+  traduzirPagina();
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(traduzirPagina);
   $('ver').textContent = 'v' + APP_VERSION + ' · ' + APP_UPDATED;
   document.querySelectorAll('.ver2').forEach(function (e) { e.textContent = 'v' + APP_VERSION; });
   function tela(id) { document.querySelectorAll('.tela').forEach(function (s) { s.classList.toggle('ativa', s.id === id); }); }
@@ -25,7 +36,7 @@
     function armar() { if (guarda) return; guarda = true; try { history.pushState({ bagunca: 'guarda' }, ''); } catch (e) {} }
     document.addEventListener('pointerdown', armar, true); document.addEventListener('keydown', armar, true);
     function avisarSaida() {
-      var a = $('avisoSair'); a.textContent = T('Toque em Voltar de novo para sair da Bagunçolândia', 'Tap Back again to leave Mayhemland');
+      var a = $('avisoSair'); a.textContent = T('Toque em Voltar de novo para sair da Bagunçolândia', 'Tap Back again to leave Mayhemland', 'Toca Atrás otra vez para salir de Alborotolandia');
       a.classList.add('ativo'); clearTimeout(avisoTimer); avisoTimer = setTimeout(function () { a.classList.remove('ativo'); }, 2500);
     }
     window.addEventListener('popstate', function () {
@@ -49,8 +60,8 @@
   function aplicarSom(mudo, semMusica) {
     SOM.mudo = !!mudo; SOM.semMusica = !!semMusica; Som.mudo(SOM.mudo); Som.semMusica(SOM.semMusica);
     try { localStorage.setItem('bagunca:mudo', SOM.mudo ? '1' : '0'); localStorage.setItem('bagunca:semMusica', SOM.semMusica ? '1' : '0'); } catch (e) {}
-    document.querySelectorAll('.btMudo').forEach(function (b) { b.textContent = SOM.mudo ? '🔇' : '🔊'; b.setAttribute('aria-pressed', SOM.mudo ? 'true' : 'false'); b.setAttribute('aria-label', SOM.mudo ? T('Ligar o som', 'Sound on') : T('Deixar tudo mudo', 'Mute everything')); b.title = b.getAttribute('aria-label'); });
-    document.querySelectorAll('.btMusica').forEach(function (b) { b.classList.toggle('off', SOM.semMusica); b.setAttribute('aria-pressed', SOM.semMusica ? 'true' : 'false'); b.setAttribute('aria-label', SOM.semMusica ? T('Ligar a música', 'Music on') : T('Desligar a música', 'Music off')); b.title = b.getAttribute('aria-label'); });
+    document.querySelectorAll('.btMudo').forEach(function (b) { b.textContent = SOM.mudo ? '🔇' : '🔊'; b.setAttribute('aria-pressed', SOM.mudo ? 'true' : 'false'); b.setAttribute('aria-label', SOM.mudo ? T('Ligar o som', 'Sound on', 'Activar el sonido') : T('Deixar tudo mudo', 'Mute everything', 'Silenciar todo')); b.title = b.getAttribute('aria-label'); });
+    document.querySelectorAll('.btMusica').forEach(function (b) { b.classList.toggle('off', SOM.semMusica); b.setAttribute('aria-pressed', SOM.semMusica ? 'true' : 'false'); b.setAttribute('aria-label', SOM.semMusica ? T('Ligar a música', 'Music on', 'Poner la música') : T('Desligar a música', 'Music off', 'Quitar la música')); b.title = b.getAttribute('aria-label'); });
     aoMudarSom.forEach(function (f) { try { f(); } catch (e) {} });
   }
   aplicarSom(SOM.mudo, SOM.semMusica);
@@ -69,38 +80,38 @@
 
     try { tv.nome2 = localStorage.getItem('bagunca:nome2') || ''; } catch (e) { tv.nome2 = ''; }   // 2ª pessoa no mesmo aparelho: o último nome usado volta sozinho
     var limpaLegenda = 0;
-    function dizer(pt, en) {
-      Desenho.legenda(T(pt, en), '#fff', false);
+    function dizer(pt, en, es) {
+      Desenho.legenda(T(pt, en, es), '#fff', false);
       clearTimeout(limpaLegenda); if (tv.fase === 'jogando') limpaLegenda = setTimeout(function () { if (tv.fase === 'jogando') Desenho.legenda(null); }, 1500);
       // a TV fala sempre que tiver voz; se ela abriu sem toque (atalho /kids) não dá para garantir que o som saia,
       // então o celular fala também. TV sem voz: só o celular.
       if (SOM.mudo) return;   // tudo mudo: só a legenda
-      var tvFalou = Voz.disponivel() && Voz.falar(pt, en);
+      var tvFalou = Voz.disponivel() && Voz.falar(pt, en, es);
       if (tvFalou && (tv.vozLiberada || tv.local)) return;
-      if (tv.sala && tv.jog[0]) tv.sala.mandarPara(tv.jog[0].id, { t: 'cmd', acao: 'fale', texto: T(pt, en) });
+      if (tv.sala && tv.jog[0]) tv.sala.mandarPara(tv.jog[0].id, { t: 'cmd', acao: 'fale', texto: T(pt, en, es), textos: [pt, en, es] });   // o celular fala no idioma dele
     }
 
     /* ---- carregamento 0–100 % ---- */
     function carregar() {
       cheia('tvCarregando'); tv.fase = 'carregando';
       var passos = [
-        { pt: 'Preparando a fonte…', en: 'Loading the font…', f: function () { return (document.fonts && document.fonts.load) ? document.fonts.load('700 40px Fredoka') : Promise.resolve(); } },
-        { pt: 'Procurando as suas imagens…', en: 'Looking for your images…', f: function () { return Figuras.carregarMeus('meus/personagens.json'); } },
-        { pt: 'Desenhando frutas e doces…', en: 'Drawing fruit and sweets…', f: function () { return Promise.all(Figuras.lista().filter(function (f) { return f.papel === 'fruta' || f.papel === 'doce' || f.papel === 'bola'; }).map(function (f) { return Figuras.rasterizar(f, Math.min(256, Math.round(f.raio * 2.3))); })); } },
-        { pt: 'Chamando a turma…', en: 'Calling the crew…', f: function () { return Promise.all(Figuras.lista().filter(function (f) { return f.papel === 'heroi' || f.papel === 'vilao' || f.papel === 'poder'; }).map(function (f) { return Figuras.rasterizar(f, Math.min(256, Math.round(f.raio * 2.3))); })); } },
-        { pt: 'Afinando os sons…', en: 'Tuning the sounds…', f: function () { return new Promise(function (ok) { setTimeout(ok, 250); }); } },
-        { pt: tv.local ? 'Ligando a câmera…' : 'Abrindo a sala…', en: tv.local ? 'Starting the camera…' : 'Opening the room…', f: function () { return tv.local ? Promise.resolve() : (TESTE ? Promise.resolve() : abrirSala()); } }
+        { pt: 'Preparando a fonte…', en: 'Loading the font…', es: 'Preparando la letra…', f: function () { return (document.fonts && document.fonts.load) ? document.fonts.load('700 40px Fredoka') : Promise.resolve(); } },
+        { pt: 'Procurando as suas imagens…', en: 'Looking for your images…', es: 'Buscando tus imágenes…', f: function () { return Figuras.carregarMeus('meus/personagens.json'); } },
+        { pt: 'Desenhando frutas e doces…', en: 'Drawing fruit and sweets…', es: 'Dibujando frutas y dulces…', f: function () { return Promise.all(Figuras.lista().filter(function (f) { return f.papel === 'fruta' || f.papel === 'doce' || f.papel === 'bola'; }).map(function (f) { return Figuras.rasterizar(f, Math.min(256, Math.round(f.raio * 2.3))); })); } },
+        { pt: 'Chamando a turma…', en: 'Calling the crew…', es: 'Llamando a la pandilla…', f: function () { return Promise.all(Figuras.lista().filter(function (f) { return f.papel === 'heroi' || f.papel === 'vilao' || f.papel === 'poder'; }).map(function (f) { return Figuras.rasterizar(f, Math.min(256, Math.round(f.raio * 2.3))); })); } },
+        { pt: 'Afinando os sons…', en: 'Tuning the sounds…', es: 'Afinando los sonidos…', f: function () { return new Promise(function (ok) { setTimeout(ok, 250); }); } },
+        { pt: tv.local ? 'Ligando a câmera…' : 'Abrindo a sala…', en: tv.local ? 'Starting the camera…' : 'Opening the room…', es: tv.local ? 'Encendiendo la cámara…' : 'Abriendo la sala…', f: function () { return tv.local ? Promise.resolve() : (TESTE ? Promise.resolve() : abrirSala()); } }
       ];
       var feito = 0, total = passos.length;
       function mostrar(p, txt) { $('pct').textContent = p; $('barra').style.width = p + '%'; $('encheRect').setAttribute('y', 100 - p); $('encheRect').setAttribute('height', p); if (txt) $('carregandoTxt').textContent = txt; }
-      mostrar(0, T(passos[0].pt, passos[0].en));
+      mostrar(0, T(passos[0].pt, passos[0].en, passos[0].es));
       return passos.reduce(function (cadeia, p, i) {
         return cadeia.then(function () {
-          mostrar(Math.round(i / total * 100), T(p.pt, p.en));
+          mostrar(Math.round(i / total * 100), T(p.pt, p.en, p.es));
           var anim = setInterval(function () { var alvo = Math.round((i + 0.8) / total * 100), atual = +$('pct').textContent; if (atual < alvo) mostrar(atual + 1); }, 60);
           return Promise.resolve().then(p.f).catch(function (e) { console.warn('carregar', p.pt, e); }).then(function () { clearInterval(anim); feito++; mostrar(Math.round(feito / total * 100)); });
         });
-      }, Promise.resolve()).then(function () { mostrar(100, T('Pronto!', 'Ready!')); return new Promise(function (ok) { setTimeout(ok, 500); }); });
+      }, Promise.resolve()).then(function () { mostrar(100, T('Pronto!', 'Ready!', '¡Listo!')); return new Promise(function (ok) { setTimeout(ok, 500); }); });
     }
 
     function abrirSala() {
@@ -112,9 +123,9 @@
         aoDados: function (id, d) { dados(id, d); },
         aoComando: comando
       });
-      $('tvCodigo').textContent = tv.sala.codigo; $('tvCanto').textContent = T('Código: ', 'Code: ') + tv.sala.codigo;
+      $('tvCodigo').textContent = tv.sala.codigo; $('tvCanto').textContent = T('Código: ', 'Code: ', 'Código: ') + tv.sala.codigo;
       return tv.sala.pronto.then(function () { setInterval(estadoParaCelulares, 1000); }).catch(function () {
-        $('tvEspera').textContent = T('Sem conexão com o servidor de pareamento. Confira a internet da TV e recarregue.', 'No connection to the pairing server. Check the TV internet and reload.');
+        $('tvEspera').textContent = T('Sem conexão com o servidor de pareamento. Confira a internet da TV e recarregue.', 'No connection to the pairing server. Check the TV internet and reload.', 'No hay conexión con el servidor para emparejar. Comprueba el internet de la TV y vuelve a cargar.');
       });
     }
     function porId(id) { return tv.jog.filter(function (j) { return j.id === id; })[0]; }
@@ -171,14 +182,14 @@
       function comBonecos(d, chave) { var w = document.createElement('div'); w.className = 'bonecos'; var n = tv.cfg.jogadores === 2 && (tv.local || tv.cfg.celulares === 1) ? 2 : 1; for (var k = 0; k < n; k++) { var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, n === 1)); } d.appendChild(w); }
       function umBoneco(d, chave, k) { var w = document.createElement('div'); w.className = 'bonecos'; var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, !(tv.local && tv.cfg.jogadores === 2))); d.appendChild(w); }
       var dois = tv.local && tv.cfg.jogadores === 2;
-      if (tv.local) for (var q = 0; q < (dois ? 2 : 1); q++) { var dq = document.createElement('div'); dq.className = 'jog'; dq.style.setProperty('--cor', cores[q]); umBoneco(dq, 'local', q); dq.classList.add('trocavel'); dq.title = T('Toque para trocar o boneco', 'Tap to change the avatar'); dq.onclick = (function (qq) { return function () { CelApp.trocarBoneco(dois ? qq : ((tv.bonecos.local || {}).eu || 0)); }; })(q); var nq = document.createElement('span'); if (q === 1) nq.id = 'lobbyNomeJ2'; nq.textContent = q === 0 ? (tv.nome1 || T('Você', 'You')) : (tv.nome2 || T('2ª pessoa', '2nd player')); dq.appendChild(nq); L.appendChild(dq); }
+      if (tv.local) for (var q = 0; q < (dois ? 2 : 1); q++) { var dq = document.createElement('div'); dq.className = 'jog'; dq.style.setProperty('--cor', cores[q]); umBoneco(dq, 'local', q); dq.classList.add('trocavel'); dq.title = T('Toque para trocar o boneco', 'Tap to change the avatar', 'Toca para cambiar el muñeco'); dq.onclick = (function (qq) { return function () { CelApp.trocarBoneco(dois ? qq : ((tv.bonecos.local || {}).eu || 0)); }; })(q); var nq = document.createElement('span'); if (q === 1) nq.id = 'lobbyNomeJ2'; nq.textContent = q === 0 ? (tv.nome1 || T('Você', 'You', 'Tú')) : (tv.nome2 || T('2ª pessoa', '2nd player', '2.ª persona')); dq.appendChild(nq); L.appendChild(dq); }
       $('lobbyNome2').style.display = dois ? '' : 'none';
       if (dois) { $('nome2').value = tv.nome2; if (!tv.nome2) setTimeout(function () { $('nome2').focus(); }, 300); }
       tv.jog.forEach(function (j, i) {
         var d = document.createElement('div'); d.className = 'jog'; d.style.setProperty('--cor', cores[i] || '#fff');
-        if (!(tv.cfg.celulares === 1 && i > 0)) comBonecos(d, j.id); d.appendChild(document.createTextNode(j.nome)); var s = document.createElement('small'); s.textContent = j.ligado ? T('📱 conectado', '📱 connected') : T('⏳ conectando…', '⏳ connecting…'); d.appendChild(s); L.appendChild(d);
+        if (!(tv.cfg.celulares === 1 && i > 0)) comBonecos(d, j.id); d.appendChild(document.createTextNode(j.nome)); var s = document.createElement('small'); s.textContent = j.ligado ? T('📱 conectado', '📱 connected', '📱 conectado') : T('⏳ conectando…', '⏳ connecting…', '⏳ conectando…'); d.appendChild(s); L.appendChild(d);
       });
-      if (!tv.local && tv.cfg.celulares === 2 && tv.jog.length < 2) { var v = document.createElement('div'); v.className = 'vazio'; v.textContent = T('Esperando o 2º celular (mesmo código)…', 'Waiting for the 2nd phone (same code)…'); L.appendChild(v); }
+      if (!tv.local && tv.cfg.celulares === 2 && tv.jog.length < 2) { var v = document.createElement('div'); v.className = 'vazio'; v.textContent = T('Esperando o 2º celular (mesmo código)…', 'Waiting for the 2nd phone (same code)…', 'Esperando el 2.º móvil (mismo código)…'); L.appendChild(v); }
       resumo();
       Som.musica(true);
     }
@@ -189,13 +200,13 @@
     }
     function duracaoDe(c) { return c.modo === 'bagunca' && c.duracao && c.duracao < 90 ? 90 : c.duracao; }   // 🧸 o boneco anda até o dedo: a rodada da bagunça tem pelo menos 90 s
     function resumo() {
-      var c = tv.cfg, m = { corta: T('🍉 Corta-corta', '🍉 Slice'), pega: T('🎈 Pega-pega', '🎈 Catch'), chuta: T('⚽ Chuta-chuta', '⚽ Kick'), pula: T('🪵 Pula e abaixa', '🪵 Jump and duck'), bolas: T('🎳 Bagunça de bolas', '🎳 Ball mayhem'), mistura: T('🎪 Bagunça total', '🎪 Total mayhem'), bagunca: T('🧸 Bagunça na casa (6 lugares)', '🧸 House mayhem (6 places)'), arrumar: T('🧹 Arrumar a casa', '🧹 Tidy up the house') }[c.modo] || '';
-      var dd = duracaoDe(c), d = dd ? (dd >= 120 ? '2 min' : dd + ' s') : T('🎵 a música inteira', '🎵 the whole song');
-      var n = { crianca: T('Criança', 'Kids'), normal: 'Normal', maluco: T('Maluco', 'Crazy') }[c.dificuldade];
-      var amb = c.ambiente === 'paisagem' ? T('🏞️ paisagem', '🏞️ landscape') : T('📷 câmera', '📷 camera');
-      var pc = tv.toque && window.matchMedia && matchMedia('(pointer: fine)').matches, teclado = (c.modo === 'bagunca' || vaiLigado()) ? (c.modo === 'bagunca' ? T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump (or use the mouse). Enter pauses.') : T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam, ↓ abaixa (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump, ↓ ducks (or use the mouse). Enter pauses.')) : T('🖱️ No computador, o mouse é o dedo: clique e arraste. Para jogar com as setas, escolha 💪 Difícil.', '🖱️ On a computer the mouse is your finger: click and drag. To play with the arrow keys, choose 💪 Hard.');
-      $('lobbyDica').textContent = c.jogadores !== 2 ? (pc && c.modo !== 'arrumar' && c.modo !== 'pula' ? teclado : '') : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.');
-      $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people') : T(' pessoa', ' person')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones') : T(' celular', ' phone'))) + ' · ' + d + ' · ' + n + (vaiLigado() ? T(' · 💪 difícil: o boneco vai até lá', ' · 💪 hard: the avatar goes there') : tv.toque && JEITO_MODOS.indexOf(c.modo) >= 0 ? T(' · 😊 fácil: o dedo pega na hora', ' · 😊 easy: your finger catches right away') : '');
+      var c = tv.cfg, m = { corta: T('🍉 Corta-corta', '🍉 Slice', '🍉 Corta-corta'), pega: T('🎈 Pega-pega', '🎈 Catch', '🎈 Pilla-pilla'), chuta: T('⚽ Chuta-chuta', '⚽ Kick', '⚽ Chuta-chuta'), pula: T('🪵 Pula e abaixa', '🪵 Jump and duck', '🪵 Salta y agáchate'), bolas: T('🎳 Bagunça de bolas', '🎳 Ball mayhem', '🎳 Alboroto de pelotas'), mistura: T('🎪 Bagunça total', '🎪 Total mayhem', '🎪 Alboroto total'), bagunca: T('🧸 Bagunça na casa (6 lugares)', '🧸 House mayhem (6 places)', '🧸 Alboroto en casa (6 lugares)'), arrumar: T('🧹 Arrumar a casa', '🧹 Tidy up the house', '🧹 Ordenar la casa') }[c.modo] || '';
+      var dd = duracaoDe(c), d = dd ? (dd >= 120 ? '2 min' : dd + ' s') : T('🎵 a música inteira', '🎵 the whole song', '🎵 toda la canción');
+      var n = { crianca: T('Criança', 'Kids', 'Niños'), normal: 'Normal', maluco: T('Maluco', 'Crazy', 'Loco') }[c.dificuldade];
+      var amb = c.ambiente === 'paisagem' ? T('🏞️ paisagem', '🏞️ landscape', '🏞️ paisaje') : T('📷 câmera', '📷 camera', '📷 cámara');
+      var pc = tv.toque && window.matchMedia && matchMedia('(pointer: fine)').matches, teclado = (c.modo === 'bagunca' || vaiLigado()) ? (c.modo === 'bagunca' ? T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump (or use the mouse). Enter pauses.', '⌨️ En el ordenador: ← → caminan, ↑ o Espacio saltan (o usa el ratón). Enter pausa.') : T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam, ↓ abaixa (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump, ↓ ducks (or use the mouse). Enter pauses.', '⌨️ En el ordenador: ← → caminan, ↑ o Espacio saltan, ↓ se agacha (o usa el ratón). Enter pausa.')) : T('🖱️ No computador, o mouse é o dedo: clique e arraste. Para jogar com as setas, escolha 💪 Difícil.', '🖱️ On a computer the mouse is your finger: click and drag. To play with the arrow keys, choose 💪 Hard.', '🖱️ En el ordenador, el ratón es tu dedo: haz clic y arrastra. Para jugar con las flechas, elige 💪 Difícil.');
+      $('lobbyDica').textContent = c.jogadores !== 2 ? (pc && c.modo !== 'arrumar' && c.modo !== 'pula' ? teclado : '') : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.', '👥 Dos personas: cada una juega en una mitad de la pantalla, una a la izquierda y otra a la derecha.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.', '👥 Dos personas: pónganse lado a lado frente a la cámara, una a la izquierda y otra a la derecha.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.', '👥 Dos personas: cada una con su móvil grabando.');
+      $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people', ' personas') : T(' pessoa', ' person', ' persona')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones', ' móviles') : T(' celular', ' phone', ' móvil'))) + ' · ' + d + ' · ' + n + (vaiLigado() ? T(' · 💪 difícil: o boneco vai até lá', ' · 💪 hard: the avatar goes there', ' · 💪 difícil: el muñeco va hasta allí') : tv.toque && JEITO_MODOS.indexOf(c.modo) >= 0 ? T(' · 😊 fácil: o dedo pega na hora', ' · 😊 easy: your finger catches right away', ' · 😊 fácil: tu dedo coge al instante') : '');
       if (tv.toque) botaoJeito();
     }
     var estadoBroadcastEm = 0;
@@ -238,8 +249,8 @@
       cheia(''); tv.podio = null;
       tv.faixa = tv.faixa ? (tv.faixa % (Som.FAIXAS - 1)) + 1 : 1;   // uma música por rodada, nunca a mesma da anterior (a ordem já vem sorteada no som.js, com a favorita por último)
       if (tv.tocando) Som.musica(false); else Som.musica(true, tv.faixa);   // tocando YouTube: ele é a música
-      tv.nomes = tv.local ? (tv.cfg.jogadores === 2 ? [tv.nome1 || T('Esquerda', 'Left'), tv.nome2 || T('Direita', 'Right')] : [tv.nomes[0] || T('Você', 'You')]) : (tv.cfg.celulares === 1 && tv.cfg.jogadores === 2 ? [tv.jog[0].nome + ' 1', tv.jog[0].nome + ' 2'] : tv.jog.slice(0, tv.cfg.jogadores).map(function (j) { return j.nome; }));
-      if (tv.cfg.celulares === 1 && tv.cfg.jogadores === 2 && !tv.local) tv.nomes = [T('Esquerda', 'Left'), T('Direita', 'Right')];
+      tv.nomes = tv.local ? (tv.cfg.jogadores === 2 ? [tv.nome1 || T('Esquerda', 'Left', 'Izquierda'), tv.nome2 || T('Direita', 'Right', 'Derecha')] : [tv.nomes[0] || T('Você', 'You', 'Tú')]) : (tv.cfg.celulares === 1 && tv.cfg.jogadores === 2 ? [tv.jog[0].nome + ' 1', tv.jog[0].nome + ' 2'] : tv.jog.slice(0, tv.cfg.jogadores).map(function (j) { return j.nome; }));
+      if (tv.cfg.celulares === 1 && tv.cfg.jogadores === 2 && !tv.local) tv.nomes = [T('Esquerda', 'Left', 'Izquierda'), T('Direita', 'Right', 'Derecha')];
       Desenho.nomes(tv.nomes); aplicarBonecos();
       calibrar().then(function () { if (soCalibrar) { lobby(); return; } return contagem().then(rodada); });
     }
@@ -254,17 +265,17 @@
     function calibrarUm(item) {
       return new Promise(function (ok) {
         var nome = tv.nomes[item.j] || '';
-        if (tv.cfg.jogadores > 1) dizer(nome + ', ' + 'sua vez!', nome + ', your turn!');
+        if (tv.cfg.jogadores > 1) dizer(nome + ', ' + 'sua vez!', nome + ', your turn!', '¡' + nome + ', te toca!');
         var acabou = false;
-        function fim(caixa) { if (acabou) return; acabou = true; tv.caixas[item.j] = caixa; tv.calib = null; Som.tocar('ok'); dizer(Calibrar.TEXTOS.fim.pt, Calibrar.TEXTOS.fim.en); setTimeout(ok, 1200); }
+        function fim(caixa) { if (acabou) return; acabou = true; tv.caixas[item.j] = caixa; tv.calib = null; Som.tocar('ok'); dizer(Calibrar.TEXTOS.fim.pt, Calibrar.TEXTOS.fim.en, Calibrar.TEXTOS.fim.es); setTimeout(ok, 1200); }
         function passo(p, estado, d) {
-          if (estado === 'espera') { var t = Calibrar.TEXTOS[p], n = d && d.n ? d.n : (Calibrar.PASSOS.indexOf(p) + 1); dizer(t.pt, t.en); Desenho.legenda(n + '/' + Calibrar.PASSOS.length + ' · ' + T(t.pt, t.en), '#ff5252', true); }
-          else if (estado === 'ok') { Som.tocar('pegou'); Desenho.legenda(T(p === 'parado' ? Calibrar.TEXTOS.vi.pt : Calibrar.TEXTOS.ok.pt, p === 'parado' ? Calibrar.TEXTOS.vi.en : Calibrar.TEXTOS.ok.en), '#c6ff3d', false); if (p === 'parado') dizer(Calibrar.TEXTOS.vi.pt, Calibrar.TEXTOS.vi.en); }
-          else if (estado === 'pulado') { Desenho.legenda(T(Calibrar.TEXTOS.pulado.pt, Calibrar.TEXTOS.pulado.en), '#ffd166', false); }
+          if (estado === 'espera') { var t = Calibrar.TEXTOS[p], n = d && d.n ? d.n : (Calibrar.PASSOS.indexOf(p) + 1); dizer(t.pt, t.en, t.es); Desenho.legenda(n + '/' + Calibrar.PASSOS.length + ' · ' + T(t.pt, t.en, t.es), '#ff5252', true); }
+          else if (estado === 'ok') { Som.tocar('pegou'); Desenho.legenda(T(p === 'parado' ? Calibrar.TEXTOS.vi.pt : Calibrar.TEXTOS.ok.pt, p === 'parado' ? Calibrar.TEXTOS.vi.en : Calibrar.TEXTOS.ok.en, p === 'parado' ? Calibrar.TEXTOS.vi.es : Calibrar.TEXTOS.ok.es), '#c6ff3d', false); if (p === 'parado') dizer(Calibrar.TEXTOS.vi.pt, Calibrar.TEXTOS.vi.en, Calibrar.TEXTOS.vi.es); }
+          else if (estado === 'pulado') { Desenho.legenda(T(Calibrar.TEXTOS.pulado.pt, Calibrar.TEXTOS.pulado.en, Calibrar.TEXTOS.pulado.es), '#ffd166', false); }
         }
         if (item.local || TESTE) {
           if (item.local && tv.toque) { fim({ x: 0.4, y: 0.1, w: 0.2, h: 0.8 }); return; }
-          if (item.local && tv.esqueletoLigado) { Desenho.legenda(T('🦴 Esqueleto ligado: sem calibração. Fique de frente para a câmera.', '🦴 Skeleton on: no calibration. Face the camera.'), '#c6ff3d'); setTimeout(function () { fim(null); }, 1800); return; }
+          if (item.local && tv.esqueletoLigado) { Desenho.legenda(T('🦴 Esqueleto ligado: sem calibração. Fique de frente para a câmera.', '🦴 Skeleton on: no calibration. Face the camera.', '🦴 Esqueleto activado: sin calibrar. Ponte de frente a la cámara.'), '#c6ff3d'); setTimeout(function () { fim(null); }, 1800); return; }
           if (TESTE) { tv.calib = { pular: function () { fim(null); } }; setTimeout(function () { fim({ x: 0.2, y: 0.05, w: 0.6, h: 0.9 }); }, 300); return; }
           tv.calib = Calibrar.iniciar({ visao: tv.visaoLocal, aoPasso: passo, aoFim: fim });
           tv.calib._pular = tv.calib.pular;
@@ -274,7 +285,7 @@
           tv.calib = { pular: function () { tv.sala.mandarPara(cel.id, { t: 'cmd', acao: 'pularCalibracao' }); }, aoCal: function (c) { if (c.passo === 'fim') fim(c.caixa); else passo(c.passo, c.ok ? 'ok' : (c.passo === 'pulado' ? 'pulado' : 'espera'), c); } };
           tv.calib.cel = cel.id;
           var mandou = tv.sala.mandarPara(cel.id, { t: 'cmd', acao: 'calibrar', faixa: item.faixa ? item.faixa.join(',') : '' });
-          if (!mandou) { Desenho.legenda(T('Sem canal direto com o celular. Vamos sem calibrar.', 'No direct link to the phone. Going without calibration.'), '#ffd166'); setTimeout(function () { fim(null); }, 1500); }
+          if (!mandou) { Desenho.legenda(T('Sem canal direto com o celular. Vamos sem calibrar.', 'No direct link to the phone. Going without calibration.', 'No hay conexión directa con el móvil. Jugamos sin calibrar.'), '#ffd166'); setTimeout(function () { fim(null); }, 1500); }
           setTimeout(function () { fim(null); }, 75000);   // rede de segurança
         }
       });
@@ -284,14 +295,14 @@
       tv.fase = 'contagem';
       return new Promise(function (ok) {
         var n = 3;
-        function tic() { if (n > 0) { Desenho.contagem(n); Som.tocar('tic'); n--; setTimeout(tic, 800); } else { Desenho.contagem(null); Desenho.texto(T('VAI!', 'GO!'), 640, 360, '#c6ff3d', 120, true); Som.tocar('vai'); ok(); } }
+        function tic() { if (n > 0) { Desenho.contagem(n); Som.tocar('tic'); n--; setTimeout(tic, 800); } else { Desenho.contagem(null); Desenho.texto(T('VAI!', 'GO!', '¡YA!'), 640, 360, '#c6ff3d', 120, true); Som.tocar('vai'); ok(); } }
         tic();
       });
     }
     /* setinhas ◀ ▶ do 🧸 Bagunça: mostram o nome do cômodo vizinho */
     function navCasa() {
       var casa = !!(tv.partida && tv.partida.vizinhos); $('tv').classList.toggle('casa', casa); $('tv').classList.toggle('arrumando', !!tv.arrumando); if (!casa) return;
-      var v = tv.partida.vizinhos(); $('casaAnt').querySelector('span').textContent = T(Casa.NOMES[v.ant][0], Casa.NOMES[v.ant][1]); $('casaProx').querySelector('span').textContent = T(Casa.NOMES[v.prox][0], Casa.NOMES[v.prox][1]);
+      var v = tv.partida.vizinhos(); $('casaAnt').querySelector('span').textContent = T(Casa.NOMES[v.ant][0], Casa.NOMES[v.ant][1], Casa.NOMES[v.ant][2]); $('casaProx').querySelector('span').textContent = T(Casa.NOMES[v.prox][0], Casa.NOMES[v.prox][1], Casa.NOMES[v.prox][2]);
     }
     function rodada() {
       var figs = Figuras.lista(tv.cfg.turmas);
@@ -305,7 +316,7 @@
       Desenho.limpar();
       tv.arrumando = tv.cfg.modo === 'arrumar'; $('tv').classList.remove('podearrumar');
       $('tv').classList.toggle('paisagem', tv.cfg.ambiente === 'paisagem' || tv.cfg.modo === 'bagunca' || tv.arrumando); navCasa();
-      tv.partida.comecar(); tv.fase = 'jogando'; if (tv.cfg.modo === 'bagunca') { if (tv.toque) dizer('Hora da bagunça! Toque onde o boneco deve ir.', 'Mayhem time! Tap where the avatar should go.'); else dizer('Hora da bagunça! Bata em tudo!', 'Mayhem time! Hit everything!'); } else if (tv.arrumando) dizer('Hora de arrumar! Arraste cada coisa para o lugar dela.', 'Tidy-up time! Drag each thing back to its place.');   // na fase de jogo a legenda some sozinha tv.fimMusica = false; $('tv').classList.add('jogando');
+      tv.partida.comecar(); tv.fase = 'jogando'; if (tv.cfg.modo === 'bagunca') { if (tv.toque) dizer('Hora da bagunça! Toque onde o boneco deve ir.', 'Mayhem time! Tap where the avatar should go.', '¡Hora del alboroto! Toca donde debe ir el muñeco.'); else dizer('Hora da bagunça! Bata em tudo!', 'Mayhem time! Hit everything!', '¡Hora del alboroto! ¡Dale a todo!'); } else if (tv.arrumando) dizer('Hora de arrumar! Arraste cada coisa para o lugar dela.', 'Tidy-up time! Drag each thing back to its place.', '¡Hora de ordenar! Arrastra cada cosa a su sitio.');   // na fase de jogo a legenda some sozinha tv.fimMusica = false; $('tv').classList.add('jogando');
       if (tv.cfg.duracao === 0 && tv.player && !tv.tocando) { try { tv.player.playVideo(); } catch (e) {} }
       window.BaguncaDebug = tv;   // só para testes automáticos (nada de segredo aqui)
     }
@@ -328,7 +339,7 @@
       $('tv').classList.toggle('jogando', rodando); $('tv').classList.toggle('pausa', tv.fase === 'pausa');
       if (tv.local) { var lp = $('localPausa'), txt = tv.fase === 'pausa' ? '▶' : '⏸'; if (lp.textContent !== txt) lp.textContent = txt; }
       if (tv.debug) depurar(ts);
-      if (estado && estado.fase === 'fim' && tv.fase !== 'fim') { $('tv').classList.toggle('podearrumar', !!(tv.toque && tv.partida && tv.partida.arrumar && !tv.arrumando)); tv.fase = 'fim'; $('tv').classList.remove('jogando'); tv.podio = estado; Som.tocar('fim'); dizer('Acabou! Muito bem!', 'Time’s up! Well done!'); setTimeout(function () { if (tv.fase === 'fim') Desenho.legenda(tv.toque ? T('Quer jogar com o corpo todo? Chame a TV! ▶ joga de novo', 'Want to play with your whole body? Get the TV! ▶ plays again') : T('Toque em ▶ para jogar de novo', 'Tap ▶ to play again'), '#ffd166'); }, 2500); }
+      if (estado && estado.fase === 'fim' && tv.fase !== 'fim') { $('tv').classList.toggle('podearrumar', !!(tv.toque && tv.partida && tv.partida.arrumar && !tv.arrumando)); tv.fase = 'fim'; $('tv').classList.remove('jogando'); tv.podio = estado; Som.tocar('fim'); dizer('Acabou! Muito bem!', 'Time’s up! Well done!', '¡Se acabó! ¡Muy bien!'); setTimeout(function () { if (tv.fase === 'fim') Desenho.legenda(tv.toque ? T('Quer jogar com o corpo todo? Chame a TV! ▶ joga de novo', 'Want to play with your whole body? Get the TV! ▶ plays again', '¿Quieres jugar con todo el cuerpo? ¡Usa la TV! ▶ juega otra vez') : T('Toque em ▶ para jogar de novo', 'Tap ▶ to play again', 'Toca ▶ para jugar otra vez'), '#ffd166'); }, 2500); }
       if (tv.fase === 'fim' && tv.podio) { var ordem = tv.podio.jogadores.map(function (j, i) { return { j: i, pontos: j.pontos }; }).sort(function (a, b) { return b.pontos - a.pontos; }); Desenho.podio(null, ordem, tv.nomes, ts); }
     }
     /* ?debug na TV: caixa no canto com navegador, modo leve, quadros/s e os últimos erros (para o dono fotografar) */
@@ -341,24 +352,24 @@
     var somAte = {};
     function som(ev) {
       if (ev.t === 'casa' && ev.troca) navCasa();   // andou até a porta: as setinhas mostram os vizinhos novos
-      if (ev.t === 'casa' && ev.fala) { var ag2 = performance.now(); if (ag2 > (somAte.fala || 0)) { somAte.fala = ag2 + 2500; dizer(ev.fala[0], ev.fala[1]); } }   // papagaio e a mamãe falam (com legenda)
+      if (ev.t === 'casa' && ev.fala) { var ag2 = performance.now(); if (ag2 > (somAte.fala || 0)) { somAte.fala = ag2 + 2500; dizer(ev.fala[0], ev.fala[1], ev.fala[2]); } }   // papagaio e a mamãe falam (com legenda)
       if (ev.t === 'casa') { if (!ev.som) return; var agora = performance.now(); if (agora < (somAte[ev.som] || 0)) return; somAte[ev.som] = agora + (ev.silencioso ? 120 : 60); Som.tocar(ev.som); return; }   // 🧸 Bagunça: um som por coisa (sem embolar)
-      if (ev.t === 'bagunca100') { Som.tocar('fim'); dizer('Bagunça total!', 'Total mayhem!'); return; }
+      if (ev.t === 'bagunca100') { Som.tocar('fim'); dizer('Bagunça total!', 'Total mayhem!', '¡Alboroto total!'); return; }
       if (ev.t === 'corte') Som.tocar('corte');
       else if (ev.t === 'pegou') Som.tocar(ev.mascote ? 'mascote' : 'pegou');
       else if (ev.t === 'chutou') Som.tocar('chute');
       else if (ev.t === 'gol') Som.tocar('gol');
       else if (ev.t === 'parente') Som.tocar('boing');   // 👨👩 o papai bateu na bola / a mamãe pegou um bicho
-      else if (ev.t === 'tanque') { Som.tocar('agua'); Som.tocar('gol'); dizer(ev.quem === 'pai' ? 'Tchibum! O papai caiu!' : 'Tchibum! A mamãe caiu!', ev.quem === 'pai' ? 'Splash! Dad fell in!' : 'Splash! Mom fell in!'); }
+      else if (ev.t === 'tanque') { Som.tocar('agua'); Som.tocar('gol'); dizer(ev.quem === 'pai' ? 'Tchibum! O papai caiu!' : 'Tchibum! A mamãe caiu!', ev.quem === 'pai' ? 'Splash! Dad fell in!' : 'Splash! Mom fell in!', ev.quem === 'pai' ? '¡Chapuzón! ¡Papá se cayó!' : '¡Chapuzón! ¡Mamá se cayó!'); }
       else if (ev.t === 'vilao') Som.tocar(ev.fig === 'bombeta' ? 'bomba' : 'vilao');
       else if (ev.t === 'combo') Som.tocar('combo');
       else if (ev.t === 'poder' && ev.poder) Som.tocar('poder');
       else if (ev.t === 'perdeu') Som.tocar('perdeu');
-      else if (ev.t === 'aviso') { Som.tocar('tic'); dizer(ev.tipo === 'baixo' ? 'Pula!' : 'Abaixa!', ev.tipo === 'baixo' ? 'Jump!' : 'Duck!'); }
+      else if (ev.t === 'aviso') { Som.tocar('tic'); dizer(ev.tipo === 'baixo' ? 'Pula!' : 'Abaixa!', ev.tipo === 'baixo' ? 'Jump!' : 'Duck!', ev.tipo === 'baixo' ? '¡Salta!' : '¡Agáchate!'); }
       else if (ev.t === 'bateu') Som.tocar('vilao');
       else if (ev.t === 'desviou') Som.tocar('ok');
       else if (ev.t === 'tocou') Som.tocar('chute');
-      else if (ev.t === 'troca') dizer({ corta: 'Agora corta!', pega: 'Agora pega!', chuta: 'Agora chuta!', pula: 'Agora pula e abaixa!', bolas: 'Bagunça de bolas!' }[ev.modo], { corta: 'Now slice!', pega: 'Now catch!', chuta: 'Now kick!', pula: 'Now jump and duck!', bolas: 'Ball mayhem!' }[ev.modo]);
+      else if (ev.t === 'troca') dizer({ corta: 'Agora corta!', pega: 'Agora pega!', chuta: 'Agora chuta!', pula: 'Agora pula e abaixa!', bolas: 'Bagunça de bolas!' }[ev.modo], { corta: 'Now slice!', pega: 'Now catch!', chuta: 'Now kick!', pula: 'Now jump and duck!', bolas: 'Ball mayhem!' }[ev.modo], { corta: '¡Ahora corta!', pega: '¡Ahora coge!', chuta: '¡Ahora patea!', pula: '¡Ahora salta y agáchate!', bolas: '¡Alboroto de pelotas!' }[ev.modo]);
     }
 
     /* ---- YouTube na TV (igual ao Dança) ---- */
@@ -388,7 +399,7 @@
       if (ev.data === YT.PlayerState.ENDED && tv.partida && tv.fase === 'jogando' && tv.cfg.duracao === 0) tv.partida.terminar();
     }
     function ytErro(ev) {
-      var c = ev.data, msg = (c === 101 || c === 150) ? T('Esse clipe não deixa tocar fora do YouTube. Pulando…', 'That clip cannot play outside YouTube. Skipping…') : (c === 100) ? T('Vídeo indisponível ou privado.', 'Video unavailable or private.') : (c === 2) ? T('Playlist privada ou link inválido.', 'Private playlist or bad link.') : T('Erro do YouTube ', 'YouTube error ') + c;
+      var c = ev.data, msg = (c === 101 || c === 150) ? T('Esse clipe não deixa tocar fora do YouTube. Pulando…', 'That clip cannot play outside YouTube. Skipping…', 'Este vídeo no se puede reproducir fuera de YouTube. Pasando al siguiente…') : (c === 100) ? T('Vídeo indisponível ou privado.', 'Video unavailable or private.', 'Vídeo no disponible o privado.') : (c === 2) ? T('Playlist privada ou link inválido.', 'Private playlist or bad link.', 'Lista privada o enlace no válido.') : T('Erro do YouTube ', 'YouTube error ', 'Error de YouTube ') + c;
       tv.titulo = msg; $('tvTitulo').style.display = 'block'; $('tvTitulo').textContent = '⚠️ ' + msg;
       try { if (tv.player.getPlaylist && (tv.player.getPlaylist() || []).length > 1) setTimeout(function () { tv.player.nextVideo(); }, 1500); } catch (e) {}
     }
@@ -414,7 +425,7 @@
       Desenho.iniciar($('tvCanvas'), { nomes: [] });
       Som.iniciar(); Voz.liberar(); tv.vozLiberada = !!opts.gesto;
       tv.toque = !!opts.toque; $('tv').classList.toggle('toque', tv.toque); Desenho.dedo(tv.toque); Desenho.iconesDireita(tv.local);
-      if (tv.local) { tv.visaoLocal = opts.visao || null; tv.videoLocal = opts.video || null; tv.esqueletoLigado = !!opts.esqueleto; tv.nome1 = opts.nome || ''; tv.nomes = opts.nomes || [opts.nome || T('Você', 'You')]; if (opts.video) $('tvFundo').appendChild(opts.video); }
+      if (tv.local) { tv.visaoLocal = opts.visao || null; tv.videoLocal = opts.video || null; tv.esqueletoLigado = !!opts.esqueleto; tv.nome1 = opts.nome || ''; tv.nomes = opts.nomes || [opts.nome || T('Você', 'You', 'Tú')]; if (opts.video) $('tvFundo').appendChild(opts.video); }
       if (tv.toque) { ligarToque(); try { tv.mostrarBoneco = localStorage.getItem('bagunca:bonecoDedo') === '1'; } catch (e) { tv.mostrarBoneco = false; } } else tv.mostrarBoneco = true;   // no dedo o boneco começa escondido
       $('localBoneco').classList.toggle('ativo', !!tv.mostrarBoneco); Desenho.mostrarBoneco(tv.mostrarBoneco);
       try { if (!tv.local && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); } catch (e) {}
@@ -432,7 +443,7 @@
       // 🧹 depois do 🧸 Bagunça: a mesma bagunça (em todos os cômodos que visitaram) vira arrumação
       $('localArrumar').onclick = function () { if (!tv.partida || !tv.partida.arrumar || tv.fase !== 'fim') return; tv.partida.arrumar(); if (tv.partida.dicas) tv.partida.dicas(dicasLigadas()); tv.arrumando = true; tv.podio = null; tv.fase = 'jogando'; $('tv').classList.remove('podearrumar'); Desenho.legenda(null); navCasa(); };
       $('casaProx').onclick = function () { comando({ acao: 'casa', dir: 1 }); };
-      $('nome2').addEventListener('input', function () { tv.nome2 = $('nome2').value.replace(/\s+/g, ' ').trim().slice(0, 14); try { localStorage.setItem('bagunca:nome2', tv.nome2); } catch (e) {} var c = $('lobbyNomeJ2'); if (c) c.textContent = tv.nome2 || T('2ª pessoa', '2nd player'); });
+      $('nome2').addEventListener('input', function () { tv.nome2 = $('nome2').value.replace(/\s+/g, ' ').trim().slice(0, 14); try { localStorage.setItem('bagunca:nome2', tv.nome2); } catch (e) {} var c = $('lobbyNomeJ2'); if (c) c.textContent = tv.nome2 || T('2ª pessoa', '2nd player', '2.ª persona'); });
       $('localMusica').onclick = function () { aplicarSom(SOM.mudo, !SOM.semMusica); };
       $('localCamera').onclick = function () { CelApp.trocarCameraLocal(); };
       $('localJeito').onclick = function () { try { localStorage.setItem('bagunca:jeito', jeitoVai() ? 'dedo' : 'vai'); } catch (e) {} botaoJeito(); resumo(); };
@@ -497,9 +508,9 @@
     var JEITO_MODOS = ['corta', 'pega', 'chuta', 'bolas', 'mistura'];
     function jeitoVai() { try { return localStorage.getItem('bagunca:jeito') === 'vai'; } catch (e) { return false; } }
     function vaiLigado() { return !!tv.toque && jeitoVai() && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0; }
-    function botaoJeito() { var v = jeitoVai(), b = $('localJeito'); b.classList.toggle('ativo', v); b.querySelector('span').textContent = v ? T('Difícil', 'Hard') : T('Fácil', 'Easy'); b.firstChild.textContent = v ? '💪 ' : '😊 '; b.title = v ? T('Difícil: o boneco anda (e pula) até onde você segura o dedo. Toque para Fácil.', 'Hard: the avatar walks (and jumps) to where you hold your finger. Tap for Easy.') : T('Fácil: o dedo pega e corta na hora. Toque para Difícil.', 'Easy: your finger catches and slices right away. Tap for Hard.'); $('tv').classList.toggle('jeitoOk', !!tv.toque && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0); }
+    function botaoJeito() { var v = jeitoVai(), b = $('localJeito'); b.classList.toggle('ativo', v); b.querySelector('span').textContent = v ? T('Difícil', 'Hard', 'Difícil') : T('Fácil', 'Easy', 'Fácil'); b.firstChild.textContent = v ? '💪 ' : '😊 '; b.title = v ? T('Difícil: o boneco anda (e pula) até onde você segura o dedo. Toque para Fácil.', 'Hard: the avatar walks (and jumps) to where you hold your finger. Tap for Easy.', 'Difícil: el muñeco camina (y salta) hasta donde dejas el dedo. Toca para Fácil.') : T('Fácil: o dedo pega e corta na hora. Toque para Difícil.', 'Easy: your finger catches and slices right away. Tap for Hard.', 'Fácil: tu dedo coge y corta al instante. Toca para Difícil.'); $('tv').classList.toggle('jeitoOk', !!tv.toque && JEITO_MODOS.indexOf(tv.cfg.modo) >= 0); }
     function dicasLigadas() { try { return localStorage.getItem('bagunca:dicas') !== '0'; } catch (e) { return true; } }
-    function botaoDica() { var v = dicasLigadas(); $('casaDica').classList.toggle('ativo', v); $('casaDica').querySelector('span').textContent = v ? T('Dicas: sim', 'Hints: on') : T('Dicas: não', 'Hints: off'); }
+    function botaoDica() { var v = dicasLigadas(); $('casaDica').classList.toggle('ativo', v); $('casaDica').querySelector('span').textContent = v ? T('Dicas: sim', 'Hints: on', 'Pistas: sí') : T('Dicas: não', 'Hints: off', 'Pistas: no'); }
     function sairLocal() {
       dedos = {}; tv.dedoCorpo = {}; tv.toque = false; $('tv').classList.remove('toque');
       cancelAnimationFrame(tv.raf); tv.raf = 0; tv.partida = null; tv.fase = 'carregando'; Som.musica(false); Desenho.legenda(null);
@@ -526,18 +537,18 @@
 
     function entrar() {
       var nome = $('nome').value.trim(), cod = cel.local ? 'SOLO' : $('codigo').value.trim().toUpperCase(), erro = $('entrarErro'); erro.style.display = 'none';
-      if (!nome || (!cel.local && !/^[A-Z]{4}$/.test(cod))) { erro.textContent = T('Digite o nome e as 4 letras do código.', 'Type the name and the 4-letter code.'); erro.style.display = 'block'; return; }
-      if (!cel.toque && (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.RTCPeerConnection)) { erro.textContent = T('Este navegador não deixa usar a câmera. Abra no Chrome ou no Safari.', 'This browser cannot use the camera. Open it in Chrome or Safari.'); erro.style.display = 'block'; return; }
+      if (!nome || (!cel.local && !/^[A-Z]{4}$/.test(cod))) { erro.textContent = T('Digite o nome e as 4 letras do código.', 'Type the name and the 4-letter code.', 'Escribe el nombre y las 4 letras del código.'); erro.style.display = 'block'; return; }
+      if (!cel.toque && (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.RTCPeerConnection)) { erro.textContent = T('Este navegador não deixa usar a câmera. Abra no Chrome ou no Safari.', 'This browser cannot use the camera. Open it in Chrome or Safari.', 'Este navegador no deja usar la cámara. Ábrelo en Chrome o en Safari.'); erro.style.display = 'block'; return; }
       try { localStorage.setItem('bagunca:nome', nome); if (!cel.local) localStorage.setItem('bagunca:codigo', cod); } catch (e) {}
       $('btEntrar').disabled = true; Som.iniciar(); Voz.liberar();
       if (cel.toque) { TVApp.iniciar({ local: true, toque: true, nome: nome, gesto: true }); TVApp.comando(Object.assign({ acao: 'config' }, cel.cfg, { celulares: 1 })); mandarBonecos(); Nav.abrir(function () { sairDoJogoLocal('entrar'); }); $('btEntrar').disabled = false; return; }
       if (cel.local) { entrarLocal(nome, erro); return; }
       cel.sala = Sala.celular({ nome: nome, codigo: cod, video: $('cam'), T: T, aoStatus: status, aoTV: daTV, aoConectado: function () { Som.tocar('ok'); mandarConfig(); }, aoCamera: function (c) { $('cam').style.transform = 'scaleX(-1)'; }, aoCameras: cameras });
       cel.sala.pronto.then(function () {
-        tela('jogo'); Nav.abrir(sair); $('jogoNome').textContent = nome; $('jogoCodigo').textContent = cod; status(T('Procurando a TV…', 'Looking for the TV…'));
+        tela('jogo'); Nav.abrir(sair); $('jogoNome').textContent = nome; $('jogoCodigo').textContent = cod; status(T('Procurando a TV…', 'Looking for the TV…', 'Buscando la TV…'));
         cel.visao = Sala.criarVisao($('cam')); cel.timer = setInterval(medir, 100);
         mandarConfig();
-      }).catch(function (e) { $('btEntrar').disabled = false; erro.textContent = (e && e.name === 'NotAllowedError') ? T('Você precisa permitir a câmera.', 'You need to allow the camera.') : T('Não deu para conectar: ', 'Could not connect: ') + (e && e.message || e); erro.style.display = 'block'; });
+      }).catch(function (e) { $('btEntrar').disabled = false; erro.textContent = (e && e.name === 'NotAllowedError') ? T('Você precisa permitir a câmera.', 'You need to allow the camera.', 'Tienes que permitir la cámara.') : T('Não deu para conectar: ', 'Could not connect: ', 'No se pudo conectar: ') + (e && e.message || e); erro.style.display = 'block'; });
     }
     /* só o celular: a TV roda aqui mesmo, com a câmera deste aparelho */
     function trocarCameraLocal() {
@@ -547,7 +558,7 @@
         cel.streamLocal.getTracks().forEach(function (t) { t.stop(); });
         cel.streamLocal = s; cel.ladoLocal = lado; cel.videoLocal.srcObject = s; cel.videoLocal.play().catch(function () {});
         cel.visao.zerar(); TVApp.espelhar(lado === 'user');
-      }).catch(function () { Desenho.legenda(T('Este aparelho só tem uma câmera.', 'This device has only one camera.'), '#ffd166'); });
+      }).catch(function () { Desenho.legenda(T('Este aparelho só tem uma câmera.', 'This device has only one camera.', 'Este dispositivo solo tiene una cámara.'), '#ffd166'); });
     }
     function entrarLocal(nome, erro) {
       navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 360 } }, audio: false }).catch(function () { return navigator.mediaDevices.getUserMedia({ video: true, audio: false }); }).then(function (s) {
@@ -556,17 +567,17 @@
         TVApp.iniciar({ local: true, visao: cel.visao, video: v, nome: nome, gesto: true, esqueleto: cel.esqueleto && Esqueleto.pronto() });
         TVApp.comando(Object.assign({ acao: 'config' }, cel.cfg, { celulares: 1 })); mandarBonecos(); Nav.abrir(function () { sairDoJogoLocal('entrar'); });
         $('btEntrar').disabled = false;
-      }).catch(function (e) { $('btEntrar').disabled = false; erro.textContent = (e && e.name === 'NotAllowedError') ? T('Você precisa permitir a câmera.', 'You need to allow the camera.') : T('Não deu: ', 'Failed: ') + (e && e.message || e); erro.style.display = 'block'; });
+      }).catch(function (e) { $('btEntrar').disabled = false; erro.textContent = (e && e.name === 'NotAllowedError') ? T('Você precisa permitir a câmera.', 'You need to allow the camera.', 'Tienes que permitir la cámara.') : T('Não deu: ', 'Failed: ', 'No funcionó: ') + (e && e.message || e); erro.style.display = 'block'; });
     }
     /* ---- esqueleto por IA no celular ---- */
     function alternarEsqueleto() {
       if (cel.esqueleto) { cel.esqueleto = false; $('btEsqueleto').classList.remove('ativo'); $('esqBox').style.display = 'none'; try { localStorage.setItem('bagunca:esqueleto', '0'); } catch (e) {} return; }
-      if (!Esqueleto.pronto() && !confirm(T('Baixar o esqueleto por IA agora? São uns 20 MB, uma vez só (melhor no Wi-Fi).', 'Download the AI skeleton now? About 20 MB, once (best on Wi-Fi).'))) return;
-      $('btEsqueleto').disabled = true; $('esqBox').style.display = ''; $('esqTxt').textContent = T('baixando…', 'downloading…'); $('esqBarra').style.width = '5%';
+      if (!Esqueleto.pronto() && !confirm(T('Baixar o esqueleto por IA agora? São uns 20 MB, uma vez só (melhor no Wi-Fi).', 'Download the AI skeleton now? About 20 MB, once (best on Wi-Fi).', '¿Descargar ahora el esqueleto por IA? Son unos 20 MB, una sola vez (mejor con Wi-Fi).'))) return;
+      $('btEsqueleto').disabled = true; $('esqBox').style.display = ''; $('esqTxt').textContent = T('baixando…', 'downloading…', 'descargando…'); $('esqBarra').style.width = '5%';
       Esqueleto.carregar({ aoProgresso: function (p) { $('esqBarra').style.width = Math.round(p * 100) + '%'; } }).then(function () {
-        cel.esqueleto = true; $('btEsqueleto').classList.add('ativo'); $('esqTxt').textContent = T('ligado ✓', 'on ✓'); try { localStorage.setItem('bagunca:esqueleto', '1'); } catch (e) {}
+        cel.esqueleto = true; $('btEsqueleto').classList.add('ativo'); $('esqTxt').textContent = T('ligado ✓', 'on ✓', 'activado ✓'); try { localStorage.setItem('bagunca:esqueleto', '1'); } catch (e) {}
         if (cel.local) TVApp.tv.esqueletoLigado = true;
-      }).catch(function (e) { $('esqTxt').textContent = ''; $('esqBox').style.display = 'none'; status(T('O esqueleto não carregou: ', 'The skeleton did not load: ') + (e && e.message || e), 'erro'); })
+      }).catch(function (e) { $('esqTxt').textContent = ''; $('esqBox').style.display = 'none'; status(T('O esqueleto não carregou: ', 'The skeleton did not load: ', 'El esqueleto no cargó: ') + (e && e.message || e), 'erro'); })
         .then(function () { $('btEsqueleto').disabled = false; });
     }
     $('btEsqueleto').onclick = alternarEsqueleto;
@@ -588,27 +599,27 @@
     function daTV(m) {
       if (m.t === 'estado') { cel.estado = m; mostrarEstado(m); if ((m.fase === 'lobby' || m.fase === 'fim' || m.fase === 'capa') && cel.sala && !cel.sala.conectado()) cel.sala.reentrar(); return; }
       if (m.t !== 'cmd') return;
-      if (m.acao === 'fale') { if (!SOM.mudo) Voz.falar(m.texto, m.texto); return; }
+      if (m.acao === 'fale') { if (!SOM.mudo) { var ts3 = m.textos || []; Voz.falar(ts3[0] || m.texto, ts3[1] || m.texto, ts3[2] || ts3[0] || m.texto); } return; }
       if (m.acao === 'calibrar') { calibrar(m.faixa); return; }
       if (m.acao === 'pularCalibracao') { if (cel.calib) cel.calib.pular(); return; }
     }
     function calibrar(faixaTxt) {
       if (cel.calib) cel.calib.parar();
-      if (cel.esqueleto && Esqueleto.pronto()) { $('calTxt').textContent = '🦴 ' + T('Esqueleto ligado: sem calibração', 'Skeleton on: no calibration'); $('calTxt').className = 'cal ok'; cel.sala.enviarDados({ e: 0, p: [], cal: { passo: 'fim', ok: true, caixa: null } }); return; }
+      if (cel.esqueleto && Esqueleto.pronto()) { $('calTxt').textContent = '🦴 ' + T('Esqueleto ligado: sem calibração', 'Skeleton on: no calibration', 'Esqueleto activado: sin calibrar'); $('calTxt').className = 'cal ok'; cel.sala.enviarDados({ e: 0, p: [], cal: { passo: 'fim', ok: true, caixa: null } }); return; }
       var faixa = faixaTxt ? faixaTxt.split(',').map(Number) : null;
       $('btPularCal').style.display = '';
       cel.calib = Calibrar.iniciar({ visao: cel.visao, faixa: faixa,
         aoPasso: function (p, estado, d) {
           if (estado === 'medindo') return;
-          var t = Calibrar.TEXTOS[p], txt = estado === 'ok' ? '✅ ' + T(t.pt, t.en) : estado === 'pulado' ? '⏭ ' + T(t.pt, t.en) : '🔴 ' + T(t.pt, t.en);
+          var t = Calibrar.TEXTOS[p], txt = estado === 'ok' ? '✅ ' + T(t.pt, t.en, t.es) : estado === 'pulado' ? '⏭ ' + T(t.pt, t.en, t.es) : '🔴 ' + T(t.pt, t.en, t.es);
           $('calTxt').textContent = txt; $('calTxt').className = 'cal ' + (estado === 'ok' ? 'ok' : 'espera');
           cel.sala.enviarDados({ e: 0, p: [], cal: { passo: p, ok: estado === 'ok', caixa: d.caixa || null, n: d.n || 0 } });
         },
-        aoFim: function (caixa) { cel.calib = null; $('btPularCal').style.display = 'none'; $('calTxt').textContent = '✅ ' + T('Pronto!', 'Ready!'); $('calTxt').className = 'cal ok'; cel.sala.enviarDados({ e: 0, p: [], cal: { passo: 'fim', ok: true, caixa: caixa } }); setTimeout(function () { $('calTxt').textContent = ''; }, 3000); }
+        aoFim: function (caixa) { cel.calib = null; $('btPularCal').style.display = 'none'; $('calTxt').textContent = '✅ ' + T('Pronto!', 'Ready!', '¡Listo!'); $('calTxt').className = 'cal ok'; cel.sala.enviarDados({ e: 0, p: [], cal: { passo: 'fim', ok: true, caixa: caixa } }); setTimeout(function () { $('calTxt').textContent = ''; }, 3000); }
       });
     }
     function cameras(lista, atual) { var c = lista[atual]; $('camNome').textContent = lista.length > 1 ? (atual + 1) + '/' + lista.length + ' ' + nomeCamera(c && c.label || '') : nomeCamera(c && c.label || ''); }
-    function nomeCamera(label) { var l = label.toLowerCase(); if (/ultra|wide|0\.5|grande/.test(l)) return T('grande-angular', 'wide-angle'); if (/tele|zoom/.test(l)) return 'tele'; if (/front|user/.test(l)) return T('frontal', 'front'); if (/back|rear|environment/.test(l)) return T('traseira', 'back'); return label.slice(0, 22); }
+    function nomeCamera(label) { var l = label.toLowerCase(); if (/ultra|wide|0\.5|grande/.test(l)) return T('grande-angular', 'wide-angle', 'gran angular'); if (/tele|zoom/.test(l)) return 'tele'; if (/front|user/.test(l)) return T('frontal', 'front', 'frontal'); if (/back|rear|environment/.test(l)) return T('traseira', 'back', 'trasera'); return label.slice(0, 22); }
 
     function mostrarEstado(m) {
       var p = $('placar'); while (p.firstChild) p.removeChild(p.firstChild);
@@ -620,10 +631,10 @@
       $('btComecar').disabled = !(f === 'lobby' || f === 'fim' || f === 'capa');
       $('btPausa').disabled = !(f === 'jogando' || f === 'pausa'); $('btParar').disabled = !(f === 'jogando' || f === 'pausa');
       if (m.tocando) status('🎵 ' + (m.titulo || ''), 'ok');
-      else if (f === 'jogando') status(T('Jogando! 🎮', 'Playing! 🎮'), 'ok');
-      else if (f === 'calibrando') status(T('Calibrando… siga a voz', 'Calibrating… follow the voice'), 'ok');
-      else if (f === 'fim') status(T('Acabou! Toque em ▶ para jogar de novo', 'Done! Tap ▶ to play again'), 'ok');
-      else if (cel.sala && cel.sala.conectado()) status(T('Ao vivo na TV ✅ — toque em ▶ Começar', 'Live on the TV ✅ — tap ▶ Start'), 'ok');
+      else if (f === 'jogando') status(T('Jogando! 🎮', 'Playing! 🎮', '¡Jugando! 🎮'), 'ok');
+      else if (f === 'calibrando') status(T('Calibrando… siga a voz', 'Calibrating… follow the voice', 'Calibrando… sigue la voz'), 'ok');
+      else if (f === 'fim') status(T('Acabou! Toque em ▶ para jogar de novo', 'Done! Tap ▶ to play again', '¡Se acabó! Toca ▶ para jugar otra vez'), 'ok');
+      else if (cel.sala && cel.sala.conectado()) status(T('Ao vivo na TV ✅ — toque em ▶ Começar', 'Live on the TV ✅ — tap ▶ Start', 'En directo en la TV ✅ — toca ▶ Empezar'), 'ok');
     }
     function comando(m) { if (cel.local) TVApp.comando(m); else if (cel.sala) cel.sala.comando(m); }
     function mandarConfig() { comando(Object.assign({ acao: 'config' }, cel.cfg)); mandarBonecos(); if (!cel.local) comando({ acao: 'som', semSom: SOM.mudo, semMusica: SOM.semMusica }); }
@@ -632,21 +643,21 @@
     /* ---- música (YouTube) ---- */
     function tocarLink(link) {
       link = link || $('link').value; var pl = idPlaylist(link);
-      if (pl) { comando({ acao: 'playlist', lista: pl }); $('link').value = ''; status(T('Mandei a playlist para a TV…', 'Sent the playlist to the TV…'), 'ok'); oembed('https://www.youtube.com/playlist?list=' + pl).then(function (j) { guardarHist('list:' + pl, (j && j.title) || (T('Playlist ', 'Playlist ') + pl.slice(0, 6) + '…')); }); return; }
-      var id = idYouTube(link); if (!id) { status(T('Não achei um link do YouTube aí.', 'That is not a YouTube link.'), 'erro'); return; }
+      if (pl) { comando({ acao: 'playlist', lista: pl }); $('link').value = ''; status(T('Mandei a playlist para a TV…', 'Sent the playlist to the TV…', 'He enviado la lista a la TV…'), 'ok'); oembed('https://www.youtube.com/playlist?list=' + pl).then(function (j) { guardarHist('list:' + pl, (j && j.title) || (T('Playlist ', 'Playlist ', 'Lista ') + pl.slice(0, 6) + '…')); }); return; }
+      var id = idYouTube(link); if (!id) { status(T('Não achei um link do YouTube aí.', 'That is not a YouTube link.', 'Eso no parece un enlace de YouTube.'), 'erro'); return; }
       $('btTocarLink').disabled = true;
-      oembed('https://www.youtube.com/watch?v=' + id).then(function (j) { var titulo = (j && j.title) || id; comando({ acao: 'carregar', video: id, titulo: titulo }); guardarHist(id, titulo); $('link').value = ''; $('btTocarLink').disabled = false; status(T('Mandei tocar: ', 'Sent to play: ') + titulo, 'ok'); });
+      oembed('https://www.youtube.com/watch?v=' + id).then(function (j) { var titulo = (j && j.title) || id; comando({ acao: 'carregar', video: id, titulo: titulo }); guardarHist(id, titulo); $('link').value = ''; $('btTocarLink').disabled = false; status(T('Mandei tocar: ', 'Sent to play: ', 'He puesto: ') + titulo, 'ok'); });
     }
     function oembed(url) { return fetch('https://www.youtube.com/oembed?url=' + encodeURIComponent(url) + '&format=json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
     function lerHist() { try { return JSON.parse(localStorage.getItem('bagunca:hist') || '[]'); } catch (e) { return []; } }
     function guardarHist(id, titulo) { var h = lerHist().filter(function (x) { return x.id !== id; }); h.unshift({ id: id, titulo: String(titulo).slice(0, 120) }); try { localStorage.setItem('bagunca:hist', JSON.stringify(h.slice(0, 30))); } catch (e) {} desenharHist(); }
     function desenharHist() {
       var h = lerHist(), d = $('hist'); while (d.firstChild) d.removeChild(d.firstChild); if (!h.length) return;
-      var t = document.createElement('div'); t.className = 'muted'; t.textContent = T('Suas músicas (segure para tirar)', 'Your songs (hold to remove)'); d.appendChild(t);
+      var t = document.createElement('div'); t.className = 'muted'; t.textContent = T('Suas músicas (segure para tirar)', 'Your songs (hold to remove)', 'Tus canciones (mantén pulsado para quitar)'); d.appendChild(t);
       h.forEach(function (x) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'sec'; var pl = x.id.indexOf('list:') === 0; b.textContent = (pl ? '📜 ' : '🎵 ') + x.titulo;
         b.onclick = function () { tocarLink(pl ? 'https://www.youtube.com/playlist?list=' + x.id.slice(5) : x.id); };
-        var seg; b.addEventListener('touchstart', function () { seg = setTimeout(function () { if (confirm(T('Tirar da lista?', 'Remove from the list?') + ' ' + x.titulo)) { try { localStorage.setItem('bagunca:hist', JSON.stringify(lerHist().filter(function (y) { return y.id !== x.id; }))); } catch (e) {} desenharHist(); } }, 700); }, { passive: true });
+        var seg; b.addEventListener('touchstart', function () { seg = setTimeout(function () { if (confirm(T('Tirar da lista?', 'Remove from the list?', '¿Quitar de la lista?') + ' ' + x.titulo)) { try { localStorage.setItem('bagunca:hist', JSON.stringify(lerHist().filter(function (y) { return y.id !== x.id; }))); } catch (e) {} desenharHist(); } }, 700); }, { passive: true });
         b.addEventListener('touchend', function () { clearTimeout(seg); }); b.addEventListener('touchmove', function () { clearTimeout(seg); });
         d.appendChild(b);
       });
@@ -658,7 +669,7 @@
       if (!ids.length) { d.style.display = 'none'; listaDesenhada = ''; return; }
       d.style.display = ''; var chave = ids.join(',') + '|' + m.indice + '|' + Object.keys(titulos).length; if (chave === listaDesenhada) return; listaDesenhada = chave;
       while (d.firstChild) d.removeChild(d.firstChild);
-      var t = document.createElement('div'); t.className = 'muted'; t.textContent = T('Playlist (toque para tocar)', 'Playlist (tap to play)'); d.appendChild(t);
+      var t = document.createElement('div'); t.className = 'muted'; t.textContent = T('Playlist (toque para tocar)', 'Playlist (tap to play)', 'Lista (toca para escuchar)'); d.appendChild(t);
       ids.forEach(function (id, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'sec' + (i === m.indice ? ' atual' : ''); b.textContent = (i === m.indice ? '▶️ ' : (i + 1) + '. ') + (titulos[id] || '…'); b.onclick = function () { comando({ acao: 'indice', i: i }); }; d.appendChild(b); });
       buscarTitulos(ids);
     }
@@ -674,7 +685,7 @@
     function guardarBonecos() { try { localStorage.setItem('bagunca:bonecos', JSON.stringify(cel.bonecos)); } catch (e) {} }
     function mandarBonecos() { comando({ acao: 'boneco', j: 0, boneco: cel.bonecos[0], eu: cel.quem === 0 }); comando({ acao: 'boneco', j: 1, boneco: cel.bonecos[1], eu: cel.quem === 1 }); }   // eu: o que joga quando é 1 pessoa
     var NOMES_CABECA = { menino: ['Menino', 'Boy'], menina: ['Menina', 'Girl'], pano: ['Boneco de pano', 'Rag doll'], elfo: ['Elfo', 'Elf'], hobbit: ['Pequenino', 'Halfling'], mago: ['Mago', 'Wizard'], cavaleiro: ['Cavaleiro', 'Knight'], robo: ['Robô', 'Robot'] };
-    var NOMES_CABELO = { curto: ['Curto', 'Short'], espetado: ['Espetado', 'Spiky'], franja: ['Franja', 'Fringe'], longo: ['Longo', 'Long'], cacheado: ['Cacheado', 'Curly'], trancas: ['Tranças', 'Braids'], coque: ['Coque', 'Bun'], maria: ['Maria-chiquinha', 'Pigtails'], careca: ['Sem cabelo', 'No hair'] };
+    var NOMES_CABELO = { curto: ['Curto', 'Short', 'Corto'], espetado: ['Espetado', 'Spiky', 'De punta'], franja: ['Franja', 'Fringe', 'Flequillo'], longo: ['Longo', 'Long', 'Largo'], cacheado: ['Cacheado', 'Curly', 'Rizado'], trancas: ['Tranças', 'Braids', 'Trenzas'], coque: ['Coque', 'Bun', 'Moño'], maria: ['Maria-chiquinha', 'Pigtails', 'Coletas'], careca: ['Sem cabelo', 'No hair', 'Sin pelo'] };
     function montarPicker(container) {
       while (container.firstChild) container.removeChild(container.firstChild);
       function linha(rotulo) { var d = document.createElement('div'); d.className = 'linha'; var sp = document.createElement('span'); sp.textContent = rotulo; d.appendChild(sp); container.appendChild(d); return d; }
@@ -684,8 +695,8 @@
         return g;
       }
       var prev = document.createElement('div'); prev.className = 'previa'; var cv = document.createElement('canvas'); cv.width = 300; cv.height = 400; prev.appendChild(cv); container.appendChild(prev);
-      var quem = linha(T('Quem', 'Who')); grupo(quem, [{ v: 0, t: T('Boneco 1', 'Avatar 1') }, { v: 1, t: T('Boneco 2', 'Avatar 2') }], function () { return cel.quem; }, function (v) { cel.quem = v; try { localStorage.setItem('bagunca:quem', String(v)); } catch (e) {} mandarBonecos(); montarPicker(container); }, 'grupo quem');
-      var expl = document.createElement('small'); expl.className = 'quemDica'; expl.textContent = T('Jogando sozinho, joga o boneco aberto aqui. Com 2 pessoas: Boneco 1 é a 1ª pessoa e Boneco 2 é a 2ª.', 'Playing alone, the avatar open here plays. With 2 players: Avatar 1 is the 1st player and Avatar 2 the 2nd.'); quem.appendChild(expl);
+      var quem = linha(T('Quem', 'Who', 'Quién')); grupo(quem, [{ v: 0, t: T('Boneco 1', 'Avatar 1', 'Muñeco 1') }, { v: 1, t: T('Boneco 2', 'Avatar 2', 'Muñeco 2') }], function () { return cel.quem; }, function (v) { cel.quem = v; try { localStorage.setItem('bagunca:quem', String(v)); } catch (e) {} mandarBonecos(); montarPicker(container); }, 'grupo quem');
+      var expl = document.createElement('small'); expl.className = 'quemDica'; expl.textContent = T('Jogando sozinho, joga o boneco aberto aqui. Com 2 pessoas: Boneco 1 é a 1ª pessoa e Boneco 2 é a 2ª.', 'Playing alone, the avatar open here plays. With 2 players: Avatar 1 is the 1st player and Avatar 2 the 2nd.', 'Si juegas solo, juega el muñeco abierto aquí. Con 2 personas: el Muñeco 1 es la 1.ª persona y el Muñeco 2, la 2.ª.'); quem.appendChild(expl);
       var atual = function () { return cel.bonecos[cel.quem]; };
       function muda(k, v) {
         atual()[k] = v;
@@ -696,12 +707,12 @@
         guardarBonecos(); mandarBonecos();
         if (k === 'cabeca') { var y = window.scrollY; montarPicker(container); window.scrollTo(0, y); }
       }
-      var cab = linha(T('Cabeça', 'Head')); var cabs = document.createElement('div'); cabs.className = 'cabecas'; cab.appendChild(cabs);
+      var cab = linha(T('Cabeça', 'Head', 'Cabeza')); var cabs = document.createElement('div'); cabs.className = 'cabecas'; cab.appendChild(cabs);
       var cabecasHumanas = Boneco.CABECAS.map(function (id) { return { id: id, humana: true, nome: NOMES_CABECA[id] }; });
-      var cabecasTurma = Figuras.lista().filter(function (f) { return f.papel === 'heroi'; }).map(function (f) { return { id: f.id, fig: f, nome: [f.nome.pt, f.nome.en] }; });
+      var cabecasTurma = Figuras.lista().filter(function (f) { return f.papel === 'heroi'; }).map(function (f) { return { id: f.id, fig: f, nome: [f.nome.pt, f.nome.en, f.nome.es] }; });
       var botoesCabeca = [];
       cabecasHumanas.concat(cabecasTurma).forEach(function (c) {
-        var b = document.createElement('button'); b.type = 'button'; b.className = 'sec opt' + (c.id === atual().cabeca ? ' ativo' : ''); b.title = T(c.nome[0], c.nome[1]) + (c.fig && c.fig.menina ? ' 👧' : '');
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'sec opt' + (c.id === atual().cabeca ? ' ativo' : ''); b.title = T(c.nome[0], c.nome[1], c.nome[2]) + (c.fig && c.fig.menina ? ' 👧' : '');
         if (c.humana) { var mini = document.createElement('canvas'); mini.width = mini.height = 96; b.appendChild(mini); b._mini = mini; b._id = c.id; }
         else { var im2 = document.createElement('img'); im2.src = c.fig.img || ('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(c.fig.svg)); im2.alt = b.title; b.appendChild(im2); }
         b.onclick = function () { cabs.querySelectorAll('button').forEach(function (x) { x.classList.remove('ativo'); }); b.classList.add('ativo'); muda('cabeca', c.id); };
@@ -709,13 +720,13 @@
       });
       function atualizarCabecas() { botoesCabeca.forEach(function (b) { if (b._mini) Desenho.previaCabeca(b._mini, Object.assign({}, atual(), { cabeca: b._id, acessorio: 'nenhum', cabelo: b._id === 'menino' ? 'curto' : b._id === 'menina' ? 'longo' : b._id === 'hobbit' ? 'cacheado' : b._id === 'elfo' ? 'longo' : atual().cabelo })); }); }
       atualizarCabecas();
-      grupo(linha(T('Cabelo', 'Hair')), Boneco.CABELOS.map(function (id) { return { v: id, t: T(NOMES_CABELO[id][0], NOMES_CABELO[id][1]) }; }), function () { return atual().cabelo; }, function (v) { muda('cabelo', v); atualizarCabecas(); });
-      grupo(linha(T('Cor do cabelo', 'Hair colour')), CORES_CABELO.map(function (c) { return { v: c, cor: c }; }), function () { return atual().corCabelo; }, function (v) { muda('corCabelo', v); atualizarCabecas(); }, 'cores');
-      grupo(linha(T('Pele', 'Skin')), CORES_PELE.map(function (c) { return { v: c, cor: c }; }), function () { return atual().pele; }, function (v) { muda('pele', v); atualizarCabecas(); }, 'cores');
-      grupo(linha(T('Roupa', 'Outfit')), [{ v: 'camiseta', t: T('👕 Camiseta', '👕 T-shirt') }, { v: 'vestido', t: T('👗 Vestido', '👗 Dress') }, { v: 'macacao', t: T('🧥 Macacão', '🧥 Overalls') }, { v: 'capa', t: T('🦸 Capa', '🦸 Cape') }, { v: 'tunica', t: T('🧝 Túnica', '🧝 Tunic') }, { v: 'armadura', t: T('🛡️ Armadura', '🛡️ Armour') }], function () { return atual().roupa; }, function (v) { muda('roupa', v); });
-      grupo(linha(T('Cor da roupa', 'Outfit colour')), CORES_ROUPA.map(function (c) { return { v: c, cor: c }; }), function () { return atual().cor; }, function (v) { muda('cor', v); atualizarCabecas(); }, 'cores');
-      grupo(linha(T('Acessório', 'Accessory')), [{ v: 'nenhum', t: T('Nada', 'None') }, { v: 'laco', t: '🎀' }, { v: 'coroa', t: '👑' }, { v: 'tiara', t: '💎' }, { v: 'oculos', t: '🕶️' }, { v: 'bone', t: '🧢' }, { v: 'chapeu', t: '🎉' }, { v: 'asas', t: '🪽' }, { v: 'flor', t: '🌸' }], function () { return atual().acessorio; }, function (v) { muda('acessorio', v); });
-      grupo(linha(T('Sapato', 'Shoes')), CORES_SAPATO.map(function (c) { return { v: c, cor: c }; }), function () { return atual().sapato; }, function (v) { muda('sapato', v); }, 'cores');
+      grupo(linha(T('Cabelo', 'Hair', 'Pelo')), Boneco.CABELOS.map(function (id) { return { v: id, t: T(NOMES_CABELO[id][0], NOMES_CABELO[id][1], NOMES_CABELO[id][2]) }; }), function () { return atual().cabelo; }, function (v) { muda('cabelo', v); atualizarCabecas(); });
+      grupo(linha(T('Cor do cabelo', 'Hair colour', 'Color del pelo')), CORES_CABELO.map(function (c) { return { v: c, cor: c }; }), function () { return atual().corCabelo; }, function (v) { muda('corCabelo', v); atualizarCabecas(); }, 'cores');
+      grupo(linha(T('Pele', 'Skin', 'Piel')), CORES_PELE.map(function (c) { return { v: c, cor: c }; }), function () { return atual().pele; }, function (v) { muda('pele', v); atualizarCabecas(); }, 'cores');
+      grupo(linha(T('Roupa', 'Outfit', 'Ropa')), [{ v: 'camiseta', t: T('👕 Camiseta', '👕 T-shirt', '👕 Camiseta') }, { v: 'vestido', t: T('👗 Vestido', '👗 Dress', '👗 Vestido') }, { v: 'macacao', t: T('🧥 Macacão', '🧥 Overalls', '🧥 Peto') }, { v: 'capa', t: T('🦸 Capa', '🦸 Cape', '🦸 Capa') }, { v: 'tunica', t: T('🧝 Túnica', '🧝 Tunic', '🧝 Túnica') }, { v: 'armadura', t: T('🛡️ Armadura', '🛡️ Armour', '🛡️ Armadura') }], function () { return atual().roupa; }, function (v) { muda('roupa', v); });
+      grupo(linha(T('Cor da roupa', 'Outfit colour', 'Color de la ropa')), CORES_ROUPA.map(function (c) { return { v: c, cor: c }; }), function () { return atual().cor; }, function (v) { muda('cor', v); atualizarCabecas(); }, 'cores');
+      grupo(linha(T('Acessório', 'Accessory', 'Accesorio')), [{ v: 'nenhum', t: T('Nada', 'None', 'Nada') }, { v: 'laco', t: '🎀' }, { v: 'coroa', t: '👑' }, { v: 'tiara', t: '💎' }, { v: 'oculos', t: '🕶️' }, { v: 'bone', t: '🧢' }, { v: 'chapeu', t: '🎉' }, { v: 'asas', t: '🪽' }, { v: 'flor', t: '🌸' }], function () { return atual().acessorio; }, function (v) { muda('acessorio', v); });
+      grupo(linha(T('Sapato', 'Shoes', 'Zapatos')), CORES_SAPATO.map(function (c) { return { v: c, cor: c }; }), function () { return atual().sapato; }, function (v) { muda('sapato', v); }, 'cores');
       var vivo = function (ts) { if (!document.body.contains(cv)) return; if (container.closest('details').open) { try { Desenho.previa(cv, atual(), ts); } catch (e) { var cx = cv.getContext('2d'); cx.fillStyle = '#ff5252'; cx.font = '14px sans-serif'; cx.fillText('Erro: ' + (e && e.message || e), 8, 20); } } requestAnimationFrame(vivo); }; requestAnimationFrame(vivo);
     }
     document.querySelectorAll('details.boneco .picker').forEach(montarPicker);
@@ -728,8 +739,8 @@
         aoBatida: function () { if (cel.sala) cel.sala.enviarDados({ e: 0, p: [], b: 1 }); else if (cel.local) Desenho.pulso(); },
         aoBpm: function (bpm) { $('bpmTxt').textContent = bpm + ' bpm'; if (cel.sala && cel.sala.enviarDados({ e: 0, p: [], bpm: bpm })) return; comando({ acao: 'bpm', bpm: bpm }); },
         aoNivel: function (n) { $('nivel').style.width = Math.round(n * 100) + '%'; }
-      }).then(function (b) { cel.batida = b; $('btBatida').classList.add('ativo'); $('nivelBox').style.display = ''; $('bpmTxt').textContent = T('ouvindo…', 'listening…'); })
-        .catch(function (e) { status((e && e.name === 'NotAllowedError') ? T('Você precisa permitir o microfone.', 'You need to allow the microphone.') : T('Microfone não deu: ', 'Microphone failed: ') + (e && e.message || e), 'erro'); })
+      }).then(function (b) { cel.batida = b; $('btBatida').classList.add('ativo'); $('nivelBox').style.display = ''; $('bpmTxt').textContent = T('ouvindo…', 'listening…', 'escuchando…'); })
+        .catch(function (e) { status((e && e.name === 'NotAllowedError') ? T('Você precisa permitir o microfone.', 'You need to allow the microphone.', 'Tienes que permitir el micrófono.') : T('Microfone não deu: ', 'Microphone failed: ', 'El micrófono falló: ') + (e && e.message || e), 'erro'); })
         .then(function () { $('btBatida').disabled = false; });
     }
     /* ---- Spotify (controle remoto) ---- */
@@ -740,14 +751,14 @@
       if (dentro) spotifyCarregar();
     }
     function spotifyCarregar() {
-      Spotify.aparelhos().then(function (ds) { var sel = $('spAparelho'); while (sel.firstChild) sel.removeChild(sel.firstChild); ds.forEach(function (d) { var o = document.createElement('option'); o.value = d.id; o.textContent = (d.is_active ? '▶ ' : '') + d.name + ' (' + d.type + ')'; if (d.is_active) o.selected = true; sel.appendChild(o); }); if (!ds.length) { var o2 = document.createElement('option'); o2.value = ''; o2.textContent = T('Abra o Spotify em algum aparelho', 'Open Spotify on some device'); sel.appendChild(o2); } }).catch(spotifyErro);
+      Spotify.aparelhos().then(function (ds) { var sel = $('spAparelho'); while (sel.firstChild) sel.removeChild(sel.firstChild); ds.forEach(function (d) { var o = document.createElement('option'); o.value = d.id; o.textContent = (d.is_active ? '▶ ' : '') + d.name + ' (' + d.type + ')'; if (d.is_active) o.selected = true; sel.appendChild(o); }); if (!ds.length) { var o2 = document.createElement('option'); o2.value = ''; o2.textContent = T('Abra o Spotify em algum aparelho', 'Open Spotify on some device', 'Abre Spotify en algún dispositivo'); sel.appendChild(o2); } }).catch(spotifyErro);
       Spotify.playlists().then(function (ps) { var d = $('spPlaylists'); while (d.firstChild) d.removeChild(d.firstChild); ps.forEach(function (p) { var b = document.createElement('button'); b.type = 'button'; b.className = 'sec'; b.textContent = '📜 ' + p.nome; b.onclick = function () { Spotify.tocar(p.uri, $('spAparelho').value).then(function () { setTimeout(spotifyTocando, 1200); }).catch(spotifyErro); }; d.appendChild(b); }); }).catch(spotifyErro);
       spotifyTocando();
     }
     function spotifyTocando() {
-      Spotify.tocando().then(function (t) { var txt = t ? (t.tocando ? '🎵 ' : '⏸ ') + t.nome + ' — ' + t.artista : T('Nada tocando', 'Nothing playing'); $('spTocando').textContent = txt; comando({ acao: 'musica', texto: t ? t.nome + ' — ' + t.artista : '' }); }).catch(spotifyErro);
+      Spotify.tocando().then(function (t) { var txt = t ? (t.tocando ? '🎵 ' : '⏸ ') + t.nome + ' — ' + t.artista : T('Nada tocando', 'Nothing playing', 'No suena nada'); $('spTocando').textContent = txt; comando({ acao: 'musica', texto: t ? t.nome + ' — ' + t.artista : '' }); }).catch(spotifyErro);
     }
-    function spotifyErro(e) { var m = (e && e.message) || ''; status(m === 'premium' ? T('O Spotify só deixa controlar com conta Premium.', 'Spotify only allows remote control with a Premium account.') : m === 'não entrou' ? T('Entre no Spotify de novo.', 'Sign in to Spotify again.') : T('Spotify: ', 'Spotify: ') + m, 'erro'); if (m === 'não entrou') spotifyUI(); }
+    function spotifyErro(e) { var m = (e && e.message) || ''; status(m === 'premium' ? T('O Spotify só deixa controlar com conta Premium.', 'Spotify only allows remote control with a Premium account.', 'Spotify solo deja controlarlo con una cuenta Premium.') : m === 'não entrou' ? T('Entre no Spotify de novo.', 'Sign in to Spotify again.', 'Vuelve a entrar en Spotify.') : T('Spotify: ', 'Spotify: ', 'Spotify: ') + m, 'erro'); if (m === 'não entrou') spotifyUI(); }
     $('btBatida').onclick = alternarBatida;
     $('btSpotify').onclick = function () { $('btSpotify').disabled = true; Spotify.entrar().then(spotifyUI).catch(spotifyErro).then(function () { $('btSpotify').disabled = false; }); };
     $('btSpotifySair').onclick = function () { Spotify.sair(); spotifyUI(); };
@@ -779,7 +790,7 @@
     $('btMusica').onclick = function () { mandarSom(SOM.mudo, !SOM.semMusica); };
     $('btTocarLink').onclick = function () { tocarLink(); };
     $('link').addEventListener('keydown', function (e) { if (e.key === 'Enter') tocarLink(); });
-    $('btBuscar').onclick = function () { window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(T('música animada para crianças dançar', 'kids dance songs')), '_blank', 'noopener'); };
+    $('btBuscar').onclick = function () { window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(T('música animada para crianças dançar', 'kids dance songs', 'canciones infantiles para bailar')), '_blank', 'noopener'); };
     $('btPlayPausa').onclick = function () { comando({ acao: 'pausa' }); };
     $('btReiniciar').onclick = function () { comando({ acao: 'reiniciar' }); };
     $('btProxima').onclick = function () { comando({ acao: 'proxima' }); };
@@ -810,9 +821,9 @@
 
   /* ---------- papel ---------- */
   $('btTV').onclick = function () { TVApp.iniciar({ gesto: true }); };
-  $('btCel').onclick = function () { CelApp.cel.local = false; CelApp.cel.toque = false; $('codigo').style.display = ''; $('lblCodigo').style.display = ''; $('btEntrar').textContent = T('Entrar e ligar a câmera', 'Join and start the camera'); tela('entrar'); Nav.abrir(function () { tela('inicio'); }); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; $('codigo').value = localStorage.getItem('bagunca:codigo') || ''; } catch (e) {} ($('nome').value ? $('codigo') : $('nome')).focus(); };
-  $('btToque').onclick = function () { CelApp.cel.local = true; CelApp.cel.toque = true; tela('entrar'); Nav.abrir(function () { tela('inicio'); }); $('codigo').style.display = 'none'; $('lblCodigo').style.display = 'none'; $('btEntrar').textContent = T('Começar', 'Start'); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; } catch (e) {} $('nome').focus(); };
-  $('btSolo').onclick = function () { CelApp.cel.toque = false; CelApp.cel.local = true; tela('entrar'); Nav.abrir(function () { tela('inicio'); }); $('codigo').style.display = 'none'; $('lblCodigo').style.display = 'none'; $('btEntrar').textContent = T('Começar', 'Start'); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; } catch (e) {} $('nome').focus(); };
+  $('btCel').onclick = function () { CelApp.cel.local = false; CelApp.cel.toque = false; $('codigo').style.display = ''; $('lblCodigo').style.display = ''; $('btEntrar').textContent = T('Entrar e ligar a câmera', 'Join and start the camera', 'Entrar y encender la cámara'); tela('entrar'); Nav.abrir(function () { tela('inicio'); }); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; $('codigo').value = localStorage.getItem('bagunca:codigo') || ''; } catch (e) {} ($('nome').value ? $('codigo') : $('nome')).focus(); };
+  $('btToque').onclick = function () { CelApp.cel.local = true; CelApp.cel.toque = true; tela('entrar'); Nav.abrir(function () { tela('inicio'); }); $('codigo').style.display = 'none'; $('lblCodigo').style.display = 'none'; $('btEntrar').textContent = T('Começar', 'Start', 'Empezar'); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; } catch (e) {} $('nome').focus(); };
+  $('btSolo').onclick = function () { CelApp.cel.toque = false; CelApp.cel.local = true; tela('entrar'); Nav.abrir(function () { tela('inicio'); }); $('codigo').style.display = 'none'; $('lblCodigo').style.display = 'none'; $('btEntrar').textContent = T('Começar', 'Start', 'Empezar'); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; } catch (e) {} $('nome').focus(); };
   function sairDoJogoLocal(destino) { TVApp.sairLocal(); if (CelApp.cel.streamLocal) CelApp.cel.streamLocal.getTracks().forEach(function (t) { t.stop(); }); tela(destino); }
   /* navegação padrão (../navegacao.js): 🏠 Início volta ao menu inicial de qualquer tela (era o ✕ do jogo no celular);
      🚪 Saída sai do jogo. O Voltar do celular continua fechando uma tela por vez. Na TV de verdade a barra some. */

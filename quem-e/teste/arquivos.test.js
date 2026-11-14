@@ -12,9 +12,10 @@ test('versão igual nos três lugares (app.js, sw.js e versoes.json)', () => {
   const j = JSON.parse(ler('versoes.json')), v = j.versoes[0];
   assert.equal(j.app, 'quem-e');
   assert.equal(a, s); assert.equal(v.versao, a);
-  for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
+  for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.match(v.data, /^\d{2}\/[A-Z][a-z]{2}\/\d{4}$/);
   assert.equal(v.pt.length, v.en.length);
+  assert.equal(v.pt.length, v.es.length);
   assert.equal(ler('app.js').match(/APP_DATA = '([^']+)'/)[1], v.data);
 });
 

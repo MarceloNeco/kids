@@ -12,7 +12,7 @@
      - toda pergunta que aparece tem "Sim" em pelo menos 2 caras e no máximo 2/3 delas. Se o sorteio não consegue em
        200 tentativas, aceita o melhor com pelo menos 1 (nunca falha);
      - duas caras nunca respondem igual a todas as perguntas do nível (todo mundo pode ser descoberto).
-   AS PERGUNTAS: PERGUNTAS (texto PT/EN, ícone, grupo e o teste). perguntasDoNivel acumula: o Médio tem as do Fácil.
+   AS PERGUNTAS: PERGUNTAS (texto PT/EN/ES, ícone, grupo e o teste). perguntasDoNivel acumula: o Médio tem as do Fácil.
    A MELECA: escolherPerguntaMeleca decide a jogada do computador. Fácil pergunta ao acaso e chuta com 2 sobrando;
    Médio quase sempre faz a boa pergunta; Difícil sempre a pergunta que divide o que sobrou mais perto da metade. */
 (function (raiz) {
@@ -49,71 +49,71 @@
   function temCabelo(c) { return !c.peruca && c.cabeloComp !== 'careca'; }
 
   // ---------- as perguntas ----------
-  function P(id, nivel, grupo, ico, pt, en, teste) { return { id: id, nivel: nivel, grupo: grupo, ico: ico, pt: pt, en: en, teste: teste }; }
-  var CORES_CABELO = { preto: ['preto', 'black'], castanho: ['castanho', 'brown'], loiro: ['loiro', 'blond'], ruivo: ['ruivo', 'red'], branco: ['branco', 'white'] };
-  var CORES_ROUPA = { vermelho: ['vermelha', 'red', '❤️'], azul: ['azul', 'blue', '💙'], verde: ['verde', 'green', '💚'], amarelo: ['amarela', 'yellow', '💛'], roxo: ['roxa', 'purple', '💜'], laranja: ['laranja', 'orange', '🧡'] };
-  var CABECA = { bone: ['de boné', 'wearing a cap', '🧢'], chapeu: ['de chapéu', 'wearing a hat', '🎩'], coroa: ['de coroa', 'wearing a crown', '👑'], laco: ['de laço', 'wearing a bow', '🎀'], tiara: ['de tiara', 'wearing a headband', '💫'] };
-  var OCULOS = { grau: ['óculos de grau', 'regular glasses', '👓'], escuros: ['óculos escuros', 'sunglasses', '🕶️'], coloridos: ['óculos coloridos', 'colorful glasses', '🌈'] };
-  var OLHOS = { castanhos: ['castanhos', 'brown', '🟤'], azuis: ['azuis', 'blue', '🔵'], verdes: ['verdes', 'green', '🟢'] };
+  function P(id, nivel, grupo, ico, pt, en, es, teste) { return { id: id, nivel: nivel, grupo: grupo, ico: ico, pt: pt, en: en, es: es, teste: teste }; }
+  var CORES_CABELO = { preto: ['preto', 'black', 'negro'], castanho: ['castanho', 'brown', 'castaño'], loiro: ['loiro', 'blond', 'rubio'], ruivo: ['ruivo', 'red', 'rojo'], branco: ['branco', 'white', 'blanco'] };
+  var CORES_ROUPA = { vermelho: ['vermelha', 'red', '❤️', 'roja'], azul: ['azul', 'blue', '💙', 'azul'], verde: ['verde', 'green', '💚', 'verde'], amarelo: ['amarela', 'yellow', '💛', 'amarilla'], roxo: ['roxa', 'purple', '💜', 'morada'], laranja: ['laranja', 'orange', '🧡', 'naranja'] };
+  var CABECA = { bone: ['de boné', 'wearing a cap', '🧢', 'gorra'], chapeu: ['de chapéu', 'wearing a hat', '🎩', 'sombrero'], coroa: ['de coroa', 'wearing a crown', '👑', 'corona'], laco: ['de laço', 'wearing a bow', '🎀', 'un lazo'], tiara: ['de tiara', 'wearing a headband', '💫', 'diadema'] };
+  var OCULOS = { grau: ['óculos de grau', 'regular glasses', '👓', 'gafas normales'], escuros: ['óculos escuros', 'sunglasses', '🕶️', 'gafas de sol'], coloridos: ['óculos coloridos', 'colorful glasses', '🌈', 'gafas de colores'] };
+  var OLHOS = { castanhos: ['castanhos', 'brown', '🟤', 'marrones'], azuis: ['azuis', 'blue', '🔵', 'azules'], verdes: ['verdes', 'green', '🟢', 'verdes'] };
 
   var PERGUNTAS = [
-    P('crianca', 'facil', 'quem', '🧒', 'É criança?', 'Is it a child?', function (c) { return c.tipo === 'menino' || c.tipo === 'menina'; }),
-    P('adulto', 'facil', 'quem', '🧑', 'É adulto?', 'Is it a grown-up?', function (c) { return c.tipo === 'homem' || c.tipo === 'mulher'; }),
-    P('idoso', 'facil', 'quem', '👴', 'É vovô ou vovó?', 'Is it a grandpa or grandma?', function (c) { return c.tipo === 'vovo' || c.tipo === 'vova'; }),
-    P('masculino', 'facil', 'quem', '👦', 'É menino ou homem?', 'Is it a boy or a man?', ehMasc),
-    P('feminino', 'facil', 'quem', '👧', 'É menina ou mulher?', 'Is it a girl or a woman?', function (c) { return !ehMasc(c); })
+    P('crianca', 'facil', 'quem', '🧒', 'É criança?', 'Is it a child?', '¿Es un niño o una niña?', function (c) { return c.tipo === 'menino' || c.tipo === 'menina'; }),
+    P('adulto', 'facil', 'quem', '🧑', 'É adulto?', 'Is it a grown-up?', '¿Es una persona adulta?', function (c) { return c.tipo === 'homem' || c.tipo === 'mulher'; }),
+    P('idoso', 'facil', 'quem', '👴', 'É vovô ou vovó?', 'Is it a grandpa or grandma?', '¿Es un abuelo o una abuela?', function (c) { return c.tipo === 'vovo' || c.tipo === 'vova'; }),
+    P('masculino', 'facil', 'quem', '👦', 'É menino ou homem?', 'Is it a boy or a man?', '¿Es un chico o un hombre?', ehMasc),
+    P('feminino', 'facil', 'quem', '👧', 'É menina ou mulher?', 'Is it a girl or a woman?', '¿Es una chica o una mujer?', function (c) { return !ehMasc(c); })
   ];
   Object.keys(CORES_CABELO).forEach(function (cor) {
     var t = CORES_CABELO[cor];
-    PERGUNTAS.push(P('cabelo-' + cor, 'facil', 'cabelo', '💇', 'Tem cabelo ' + t[0] + '?', 'Does it have ' + t[1] + ' hair?', function (c) { return temCabelo(c) && c.cabeloCor === cor; }));
+    PERGUNTAS.push(P('cabelo-' + cor, 'facil', 'cabelo', '💇', 'Tem cabelo ' + t[0] + '?', 'Does it have ' + t[1] + ' hair?', '¿Tiene el pelo ' + t[2] + '?', function (c) { return temCabelo(c) && c.cabeloCor === cor; }));
   });
   PERGUNTAS.push(
-    P('oculos', 'facil', 'rosto', '👓', 'Usa óculos?', 'Is it wearing glasses?', function (c) { return c.oculos !== 'nenhum'; }),
-    P('algo-cabeca', 'facil', 'cabeca', '🎩', 'Tem alguma coisa na cabeça?', 'Is there something on its head?', function (c) { return c.cabeca !== 'nada'; }),
-    P('comprido', 'medio', 'cabelo', '💁', 'Tem cabelo comprido?', 'Does it have long hair?', function (c) { return temCabelo(c) && c.cabeloComp === 'comprido'; }),
-    P('curto', 'medio', 'cabelo', '✂️', 'Tem cabelo curtinho?', 'Does it have short hair?', function (c) { return temCabelo(c) && c.cabeloComp === 'curto'; }),
-    P('careca', 'medio', 'cabelo', '🥚', 'É careca?', 'Is it bald?', function (c) { return c.cabeloComp === 'careca'; }),
-    P('peruca', 'medio', 'cabelo', '🌈', 'Está de peruca colorida?', 'Is it wearing a colorful wig?', function (c) { return !!c.peruca; }),
-    P('barba', 'medio', 'rosto', '🧔', 'Tem barba?', 'Does it have a beard?', function (c) { return c.pelos === 'barba'; }),
-    P('bigode', 'medio', 'rosto', '🥸', 'Tem bigode?', 'Does it have a mustache?', function (c) { return c.pelos === 'bigode'; }),
-    P('nariz', 'medio', 'rosto', '🤡', 'Está de nariz de palhaço?', 'Is it wearing a clown nose?', function (c) { return !!c.nariz; }),
-    P('brinco', 'medio', 'joias', '💎', 'Usa brinco?', 'Is it wearing earrings?', function (c) { return !!c.brinco; }),
-    P('colar', 'medio', 'joias', '📿', 'Usa colar?', 'Is it wearing a necklace?', function (c) { return !!c.colar; })
+    P('oculos', 'facil', 'rosto', '👓', 'Usa óculos?', 'Is it wearing glasses?', '¿Lleva gafas?', function (c) { return c.oculos !== 'nenhum'; }),
+    P('algo-cabeca', 'facil', 'cabeca', '🎩', 'Tem alguma coisa na cabeça?', 'Is there something on its head?', '¿Lleva algo en la cabeza?', function (c) { return c.cabeca !== 'nada'; }),
+    P('comprido', 'medio', 'cabelo', '💁', 'Tem cabelo comprido?', 'Does it have long hair?', '¿Tiene el pelo largo?', function (c) { return temCabelo(c) && c.cabeloComp === 'comprido'; }),
+    P('curto', 'medio', 'cabelo', '✂️', 'Tem cabelo curtinho?', 'Does it have short hair?', '¿Tiene el pelo cortito?', function (c) { return temCabelo(c) && c.cabeloComp === 'curto'; }),
+    P('careca', 'medio', 'cabelo', '🥚', 'É careca?', 'Is it bald?', '¿Es calvo?', function (c) { return c.cabeloComp === 'careca'; }),
+    P('peruca', 'medio', 'cabelo', '🌈', 'Está de peruca colorida?', 'Is it wearing a colorful wig?', '¿Lleva una peluca de colores?', function (c) { return !!c.peruca; }),
+    P('barba', 'medio', 'rosto', '🧔', 'Tem barba?', 'Does it have a beard?', '¿Tiene barba?', function (c) { return c.pelos === 'barba'; }),
+    P('bigode', 'medio', 'rosto', '🥸', 'Tem bigode?', 'Does it have a mustache?', '¿Tiene bigote?', function (c) { return c.pelos === 'bigode'; }),
+    P('nariz', 'medio', 'rosto', '🤡', 'Está de nariz de palhaço?', 'Is it wearing a clown nose?', '¿Lleva nariz de payaso?', function (c) { return !!c.nariz; }),
+    P('brinco', 'medio', 'joias', '💎', 'Usa brinco?', 'Is it wearing earrings?', '¿Lleva pendientes?', function (c) { return !!c.brinco; }),
+    P('colar', 'medio', 'joias', '📿', 'Usa colar?', 'Is it wearing a necklace?', '¿Lleva collar?', function (c) { return !!c.colar; })
   );
   Object.keys(CORES_ROUPA).forEach(function (cor) {
     var t = CORES_ROUPA[cor];
-    PERGUNTAS.push(P('roupa-' + cor, 'medio', 'roupa', t[2], 'A roupa é ' + t[0] + '?', 'Are its clothes ' + t[1] + '?', function (c) { return c.roupaCor === cor; }));
+    PERGUNTAS.push(P('roupa-' + cor, 'medio', 'roupa', t[2], 'A roupa é ' + t[0] + '?', 'Are its clothes ' + t[1] + '?', '¿La ropa es ' + t[3] + '?', function (c) { return c.roupaCor === cor; }));
   });
   Object.keys(CABECA).forEach(function (k) {
     var t = CABECA[k];
-    PERGUNTAS.push(P(k, 'dificil', 'cabeca', t[2], 'Está ' + t[0] + '?', 'Is it ' + t[1] + '?', function (c) { return c.cabeca === k; }));
+    PERGUNTAS.push(P(k, 'dificil', 'cabeca', t[2], 'Está ' + t[0] + '?', 'Is it ' + t[1] + '?', '¿Lleva ' + t[3] + '?', function (c) { return c.cabeca === k; }));
   });
   Object.keys(OCULOS).forEach(function (k) {
     var t = OCULOS[k];
-    PERGUNTAS.push(P('oculos-' + k, 'dificil', 'rosto', t[2], 'Usa ' + t[0] + '?', 'Is it wearing ' + t[1] + '?', function (c) { return c.oculos === k; }));
+    PERGUNTAS.push(P('oculos-' + k, 'dificil', 'rosto', t[2], 'Usa ' + t[0] + '?', 'Is it wearing ' + t[1] + '?', '¿Lleva ' + t[3] + '?', function (c) { return c.oculos === k; }));
   });
   Object.keys(OLHOS).forEach(function (k) {
     var t = OLHOS[k];
-    PERGUNTAS.push(P('olhos-' + k, 'dificil', 'rosto', t[2], 'Tem olhos ' + t[0] + '?', 'Does it have ' + t[1] + ' eyes?', function (c) { return c.olhos === k; }));
+    PERGUNTAS.push(P('olhos-' + k, 'dificil', 'rosto', t[2], 'Tem olhos ' + t[0] + '?', 'Does it have ' + t[1] + ' eyes?', '¿Tiene los ojos ' + t[3] + '?', function (c) { return c.olhos === k; }));
   });
-  PERGUNTAS.push(P('sardas', 'dificil', 'rosto', '🟠', 'Tem sardas?', 'Does it have freckles?', function (c) { return !!c.sardas; }));
+  PERGUNTAS.push(P('sardas', 'dificil', 'rosto', '🟠', 'Tem sardas?', 'Does it have freckles?', '¿Tiene pecas?', function (c) { return !!c.sardas; }));
   // corpo inteiro: só entram quando o tabuleiro é de corpo inteiro (perguntasDoNivel(nivel, true))
-  function PC(id, nivel, ico, pt, en, teste) { var p = P(id, nivel, 'corpo', ico, pt, en, teste); p.corpo = true; return p; }
+  function PC(id, nivel, ico, pt, en, es, teste) { var p = P(id, nivel, 'corpo', ico, pt, en, es, teste); p.corpo = true; return p; }
   PERGUNTAS.push(
-    PC('calca', 'facil', '👖', 'Está de calça?', 'Wearing trousers?', function (c) { return c.baixo === 'calca'; }),
-    PC('short', 'facil', '🩳', 'Está de short?', 'Wearing shorts?', function (c) { return c.baixo === 'short'; }),
-    PC('saia', 'facil', '👗', 'Está de saia?', 'Wearing a skirt?', function (c) { return c.baixo === 'saia'; }),
-    PC('vestido', 'facil', '👗', 'Está de vestido?', 'Wearing a dress?', function (c) { return c.baixo === 'vestido'; }),
-    PC('descalco', 'facil', '🦶', 'Está descalço?', 'Is it barefoot?', function (c) { return c.calcado === 'descalco'; }),
-    PC('tenis', 'medio', '👟', 'Está de tênis?', 'Wearing sneakers?', function (c) { return c.calcado === 'tenis'; }),
-    PC('bota', 'medio', '👢', 'Está de bota?', 'Wearing boots?', function (c) { return c.calcado === 'bota'; }),
-    PC('mochila', 'medio', '🎒', 'Está de mochila?', 'Wearing a backpack?', function (c) { return !!c.mochila; }),
-    PC('segura', 'medio', '✋', 'Está segurando alguma coisa?', 'Holding something?', function (c) { return !!c.segura; }),
-    PC('segura-balao', 'dificil', '🎈', 'Está segurando um balão?', 'Holding a balloon?', function (c) { return c.segura === 'balao'; }),
-    PC('segura-bola', 'dificil', '⚽', 'Está segurando uma bola?', 'Holding a ball?', function (c) { return c.segura === 'bola'; }),
-    PC('segura-sorvete', 'dificil', '🍦', 'Está segurando um sorvete?', 'Holding an ice cream?', function (c) { return c.segura === 'sorvete'; }),
-    PC('segura-livro', 'dificil', '📕', 'Está segurando um livro?', 'Holding a book?', function (c) { return c.segura === 'livro'; }),
-    PC('segura-flor', 'dificil', '🌷', 'Está segurando uma flor?', 'Holding a flower?', function (c) { return c.segura === 'flor'; })
+    PC('calca', 'facil', '👖', 'Está de calça?', 'Is it wearing pants?', '¿Lleva pantalón largo?', function (c) { return c.baixo === 'calca'; }),
+    PC('short', 'facil', '🩳', 'Está de short?', 'Is it wearing shorts?', '¿Lleva pantalón corto?', function (c) { return c.baixo === 'short'; }),
+    PC('saia', 'facil', '👗', 'Está de saia?', 'Is it wearing a skirt?', '¿Lleva falda?', function (c) { return c.baixo === 'saia'; }),
+    PC('vestido', 'facil', '👗', 'Está de vestido?', 'Is it wearing a dress?', '¿Lleva vestido?', function (c) { return c.baixo === 'vestido'; }),
+    PC('descalco', 'facil', '🦶', 'Está descalço?', 'Is it barefoot?', '¿Va sin zapatos?', function (c) { return c.calcado === 'descalco'; }),
+    PC('tenis', 'medio', '👟', 'Está de tênis?', 'Is it wearing sneakers?', '¿Lleva zapatillas de deporte?', function (c) { return c.calcado === 'tenis'; }),
+    PC('bota', 'medio', '👢', 'Está de bota?', 'Is it wearing boots?', '¿Lleva botas?', function (c) { return c.calcado === 'bota'; }),
+    PC('mochila', 'medio', '🎒', 'Está de mochila?', 'Is it carrying a backpack?', '¿Lleva mochila?', function (c) { return !!c.mochila; }),
+    PC('segura', 'medio', '✋', 'Está segurando alguma coisa?', 'Is it holding something?', '¿Tiene algo en la mano?', function (c) { return !!c.segura; }),
+    PC('segura-balao', 'dificil', '🎈', 'Está segurando um balão?', 'Is it holding a balloon?', '¿Tiene un globo en la mano?', function (c) { return c.segura === 'balao'; }),
+    PC('segura-bola', 'dificil', '⚽', 'Está segurando uma bola?', 'Is it holding a ball?', '¿Tiene una pelota en la mano?', function (c) { return c.segura === 'bola'; }),
+    PC('segura-sorvete', 'dificil', '🍦', 'Está segurando um sorvete?', 'Is it holding an ice cream?', '¿Tiene un helado en la mano?', function (c) { return c.segura === 'sorvete'; }),
+    PC('segura-livro', 'dificil', '📕', 'Está segurando um livro?', 'Is it holding a book?', '¿Tiene un libro en la mano?', function (c) { return c.segura === 'livro'; }),
+    PC('segura-flor', 'dificil', '🌷', 'Está segurando uma flor?', 'Is it holding a flower?', '¿Tiene una flor en la mano?', function (c) { return c.segura === 'flor'; })
   );
 
   var POR_ID = {};

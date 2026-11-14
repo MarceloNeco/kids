@@ -9,11 +9,11 @@ const html = fs.readFileSync(path.join(pasta, 'index.html'), 'utf8');
 const app = fs.readFileSync(path.join(pasta, 'app.js'), 'utf8');
 const nav = fs.readFileSync(path.join(pasta, '..', 'navegacao.js'), 'utf8');   // o 🏠 da barra comum (navegação padrão)
 
-test('três passeios, cada balão em português e inglês', () => {
+test('três passeios, cada balão em português, inglês e espanhol', () => {
   for (const q of ['livre', 'colorir', 'numeros']) {
     const l = T.PASSOS[q];
     assert.ok(l && l.length >= 6, 'passeio curto: ' + q);
-    for (const p of l) { assert.ok(p.pt && p.pt.length > 10, 'sem PT'); assert.ok(p.en && p.en.length > 10, 'sem EN'); assert.ok(p.pt.length < 220, 'balão longo demais para criança: ' + p.pt); }
+    for (const p of l) { assert.ok(p.pt && p.pt.length > 10, 'sem PT'); assert.ok(p.en && p.en.length > 10, 'sem EN'); assert.ok(p.es && p.es.length > 10, 'sem ES'); assert.ok(p.es.length < 220, 'balão longo demais para criança: ' + p.es); assert.ok(p.pt.length < 220, 'balão longo demais para criança: ' + p.pt); }
   }
 });
 

@@ -2,6 +2,20 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "14/Nov/2026",
+      "hora": "15:25:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante (e os letreiros das máquinas também)"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, picked on the shelf (the machine signs too)"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería (y los carteles de las máquinas también)"
+      ]
+    },
+    {
       "versao": "0.3.0",
       "data": "14/Nov/2026",
       "hora": "03:58:15",

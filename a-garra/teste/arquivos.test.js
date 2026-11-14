@@ -6,15 +6,16 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.3.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.4.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.3.0'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(a, '0.4.0'); assert.equal(a, s); assert.equal(v.versao, a);
   assert.equal(v.data, '14/Nov/2026');
-  assert.match(ler('app.js'), /APP_DATA = '14\/Nov\/2026'/);
-  for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
+  assert.match(ler('app.js'), /APP_DATA = \['14\/Nov\/2026', 'Nov\/14\/2026', '14\/nov\/2026'\]/);
+  for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
+  assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
 });
 
 test('sw.js guarda todos os arquivos publicados, cache com o nome da pasta', () => {
@@ -28,7 +29,7 @@ test('sw.js guarda todos os arquivos publicados, cache com o nome da pasta', () 
   for (const f of ['../trilha.js', '../recursos.js', '../atualizar.js', '../telacheia.js', '../rabiscolandia/fontes/fredoka.woff2']) assert.ok(lista.includes(f), 'sw.js não guarda ' + f);
 });
 
-test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN', () => {
+test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES, sem botão de idioma', () => {
   const html = ler('index.html');
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
@@ -38,7 +39,9 @@ test('index.html: CSP sem script inline, scripts existem, interruptor e textos P
   assert.match(html, /<script src="\.\.\/telacheia\.js" data-fora-do-arquivo>/);
   assert.match(html, /<script src="\.\.\/trilha\.js">/);
   assert.match(html, /data-recurso="a-garra"/);
-  for (const m of html.matchAll(/data-t="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-(?:t|rotulo)="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'texto sem os três idiomas: ' + m[1]);
+  assert.ok(!/btLingua/.test(html + ler('app.js')), 'o idioma vem só da estante: nada de botão próprio');
+  assert.ok(!/navigator\.language/.test(ler('app.js')), 'nada de adivinhar o idioma pelo aparelho');
   assert.match(ler('app.js'), /s\.src = '\.\.\/instalar\.js'/);
 });
 
@@ -47,8 +50,12 @@ test('ids usados no app.js existem no index.html', () => {
   for (const m of ler('app.js').matchAll(/\$\('([A-Za-z0-9]+)'\)/g)) assert.ok(html.includes('id="' + m[1] + '"'), 'falta id ' + m[1]);
 });
 
-test('textos t(pt, en) sempre nas duas línguas', () => {
+test('textos t(pt, en, es) sempre nos três idiomas, e os nomes dos prêmios e das máquinas também', () => {
   for (const m of ler('app.js').matchAll(/\bt\('((?:[^'\\]|\\.)*)'\s*\)/g)) assert.fail('t() só com uma língua: ' + m[1]);
+  for (const m of ler('app.js').matchAll(/\bt\(\s*'(?:[^'\\]|\\.)*'\s*,\s*'(?:[^'\\]|\\.)*'\s*\)/g)) assert.fail('t() sem o espanhol: ' + m[0]);
+  const p3 = ler('premios3d.js'), nomes = p3.slice(p3.indexOf('export const NOMES'), p3.indexOf('};', p3.indexOf('export const NOMES')));
+  for (const m of nomes.matchAll(/\[('[^']*'(?:, '[^']*')*)\]/g)) assert.equal(m[1].split("', '").length, 3, 'prêmio sem os três idiomas: ' + m[1]);
+  for (const m of p3.matchAll(/(nome|prem): \[([^\]]*)\]/g)) assert.equal(m[2].split(',').length, 3, 'máquina sem os três idiomas: ' + m[0]);
 });
 
 test('manifest e ícones', () => {

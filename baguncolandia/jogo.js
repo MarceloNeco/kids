@@ -185,14 +185,14 @@
     if (nJog === 1 && modoBase === 'pega') parentes.push(novoParente('mae', W * 0.72));
     if (nJog === 1 && modoBase === 'pula') { parentes.push(novoParente('pai', W * 0.86)); parentes.push(novoParente('mae', W * 0.14)); }
     var A_PARENTE = 400, G_PARENTE = 2600, FALAS = {
-      pai: [['Toca pra mim!', 'Pass it to me!'], ['Aqui, aqui!', 'Over here!'], ['Joga pro papai!', 'Throw it to Dad!'], ['Vai, campeã(o)!', 'Go, champ!']],
-      mae: [['Olha ali um bichinho!', 'Look, a little critter!'], ['Pega, pega!', 'Catch it, catch it!'], ['Vem com a mamãe!', 'Come with Mom!'], ['Corre que ele foge!', 'Run, it will get away!']],
-      paiPula: [['Pula comigo!', 'Jump with me!'], ['Faz igual ao papai!', 'Do like Dad!'], ['Olha o papai!', 'Watch Dad!']],
-      maePula: [['Abaixa junto com a mamãe!', 'Duck with Mom!'], ['Você consegue!', 'You can do it!'], ['Presta atenção!', 'Watch out!']]
+      pai: [['Toca pra mim!', 'Pass it to me!', '¡Pásamela!'], ['Aqui, aqui!', 'Over here!', '¡Aquí, aquí!'], ['Joga pro papai!', 'Throw it to Dad!', '¡Pásasela a papá!'], ['Vai, campeã(o)!', 'Go, champ!', '¡Vamos, campeón!']],
+      mae: [['Olha ali um bichinho!', 'Look, a little critter!', '¡Mira, un bichito!'], ['Pega, pega!', 'Catch it, catch it!', '¡Cógelo, cógelo!'], ['Vem com a mamãe!', 'Come with Mom!', '¡Ven con mamá!'], ['Corre que ele foge!', 'Run, it’s getting away!', '¡Corre, que se escapa!']],
+      paiPula: [['Pula comigo!', 'Jump with me!', '¡Salta conmigo!'], ['Faz igual ao papai!', 'Do like Dad!', '¡Haz como papá!'], ['Olha o papai!', 'Watch Dad!', '¡Mira a papá!']],
+      maePula: [['Abaixa junto com a mamãe!', 'Duck with Mom!', '¡Agáchate con mamá!'], ['Você consegue!', 'You can do it!', '¡Tú puedes!'], ['Presta atenção!', 'Watch out!', '¡Atención!']]
     };
     var REACOES = {   // o que cada um fala quando a criança acerta ou se machuca
-      festa: { pai: [['Isso aí, campeã(o)!', "That's it, champ!"], ['Boa! Toca aqui!', 'Nice! High five!'], ['Uhuuu!', 'Woohoo!']], mae: [['Muito bem, meu amor!', 'Well done, sweetie!'], ['Que lindo!', 'Beautiful!'], ['Parabéns!', 'Congrats!']] },
-      triste: { pai: [['Ih! Machucou?', 'Oops! Did it hurt?'], ['Ai, essa doeu!', 'Ouch, that hurt!']], mae: [['Ai, coitadinho(a)!', 'Aww, poor thing!'], ['Tudo bem, meu amor?', 'Are you okay, sweetie?']] }
+      festa: { pai: [['Isso aí, campeã(o)!', "That's it, champ!", '¡Eso es, campeón!'], ['Boa! Toca aqui!', 'Nice! High five!', '¡Muy bien! ¡Choca esos cinco!'], ['Uhuuu!', 'Woohoo!', '¡Yujuuu!']], mae: [['Muito bem, meu amor!', 'Well done, sweetie!', '¡Muy bien, cariño!'], ['Que lindo!', 'Beautiful!', '¡Qué bonito!'], ['Parabéns!', 'Congrats!', '¡Enhorabuena!']] },
+      triste: { pai: [['Ih! Machucou?', 'Oops! Did it hurt?', '¡Uy! ¿Te has hecho daño?'], ['Ai, essa doeu!', 'Ouch, that hurt!', '¡Ay, eso ha dolido!']], mae: [['Ai, coitadinho(a)!', 'Aww, poor thing!', '¡Ay, pobrecito!'], ['Tudo bem, meu amor?', 'Are you okay, sweetie?', '¿Estás bien, cariño?']] }
     };
     function falaParente(P, f, ms) { P.fala = f; P.falaAte = tempo + (ms || 1800); }
     function sorteia(L) { return L[Math.floor(rnd() * L.length)]; }
@@ -218,11 +218,11 @@
         var dx = (c.x - P.x) * (c.vx < 0 ? 1 : -1), v = Math.abs(c.vx) || 1, meio = c.w / 2 + 40;   // dx > 0: ainda vem vindo
         if (c.tipo === 'baixo' && !c['pulou_' + P.quem] && P.y === 0 && dx < v * 0.36 + 10 && dx > -meio) {   // tronco: pula para passar no alto do pulo
           c['pulou_' + P.quem] = true; P.vy = -Math.sqrt(2 * G_PARENTE * 190); P.dir = c.vx < 0 ? 1 : -1;
-          if (!falou && rnd() < 0.5) falaParente(P, P.quem === 'pai' ? ['Upa!', 'Hop!'] : ['Pula!', 'Jump!'], 900);
+          if (!falou && rnd() < 0.5) falaParente(P, P.quem === 'pai' ? ['Upa!', 'Hop!', '¡Hop!'] : ['Pula!', 'Jump!', '¡Salta!'], 900);
         }
         if (c.tipo === 'alto' && dx < meio + v * 0.18 && dx > -meio - 30) { querAbaixar = true; P.dir = c.vx < 0 ? 1 : -1; }   // galho: abaixa antes de chegar e só levanta depois que passou
       });
-      if (querAbaixar && !P.abaixa && !falou && rnd() < 0.5) falaParente(P, P.quem === 'pai' ? ['Abaixa!', 'Duck!'] : ['Cuidado, abaixa!', 'Careful, duck!'], 900);
+      if (querAbaixar && !P.abaixa && !falou && rnd() < 0.5) falaParente(P, P.quem === 'pai' ? ['Abaixa!', 'Duck!', '¡Agáchate!'] : ['Cuidado, abaixa!', 'Careful, duck!', '¡Cuidado, agáchate!'], 900);
       P.abaixa = querAbaixar && P.y === 0;
       if (P.y < 0 || P.vy < 0) { P.vy += G_PARENTE * dt; P.y = Math.min(0, P.y + P.vy * dt); if (P.y === 0) P.vy = 0; }
       P.vx = 0; P.x = P.casa;
@@ -247,8 +247,8 @@
       if (Math.abs(P.vx) > 20) P.dir = P.vx > 0 ? 1 : -1;
       if (alvo && P.fase !== 'bate' && !P.reacao && Math.abs(alvo.x - P.x) < Math.max(55, alvo.raio)) {   // chegou: o papai bate na bola, a mamãe pega o bicho
         P.fase = 'bate'; P.t = 0; P.dir = alvo.x > P.x ? 1 : -1; P.alto = alvo.y < chao - 160;
-        if (mae) { acertou(0, alvo, 'pega', tempo, { x: P.x, y: alvo.y }); falaParente(P, ['Peguei um!', 'Got one!']); }
-        else { alvo.vx = clamp((crianca - alvo.x) / 1.0, -620, 620); alvo.vy = -520; alvo.passe = tempo + 1200; falaParente(P, ['Toma! Pega ela!', 'Here! Get it!']); }
+        if (mae) { acertou(0, alvo, 'pega', tempo, { x: P.x, y: alvo.y }); falaParente(P, ['Peguei um!', 'Got one!', '¡He cogido uno!']); }
+        else { alvo.vx = clamp((crianca - alvo.x) / 1.0, -620, 620); alvo.vy = -520; alvo.passe = tempo + 1200; falaParente(P, ['Toma! Pega ela!', 'Here! Get it!', '¡Toma! ¡Cógela!']); }
         emitir({ t: 'parente', quem: P.quem, x: P.x });
       }
       P.chama = !alvo && P.fase === 'anda' && !P.reacao && Math.abs(P.vx) < 40;
@@ -586,7 +586,7 @@
         if (c.anda === 'buraco' && c.b.k < 0.35) return;   // ainda (ou já) dentro do buraco
         c.pego = true; var cn = canto(j, c); c.b.fase = 'pego'; c.b.t = 0; c.b.tx = cn.x; c.b.ty = cn.y;
         jg.pontos += mult(j, PONTOS.bicho); emitir({ t: 'pegou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.bicho, bicho: true });
-        if (parentes.length && !parentes.some(function (P) { return L0 && L0.x === P.x; })) festaParente(['Isso! Pegou!', 'Yes! You got it!']);   // não comemora o bicho que a própria mamãe pegou
+        if (parentes.length && !parentes.some(function (P) { return L0 && L0.x === P.x; })) festaParente(['Isso! Pegou!', 'Yes! You got it!', '¡Eso es! ¡Lo has cogido!']);   // não comemora o bicho que a própria mamãe pegou
       } else if (c.papel === 'heroi') {
         c.morta = true; c.como = 'pegou';
         var fig = figs.filter(function (f) { return f.id === c.fig; })[0], p = fig && fig.mascote ? PONTOS.mascote : PONTOS.heroi;
@@ -603,7 +603,7 @@
         c.tocadoAte = tempo + 400;
         var ux = c.x - L0.x, uy = c.y - L0.y, nn2 = Math.hypot(ux, uy) || 1;
         c.vx = ux / nn2 * 520 + (rnd() - 0.5) * 100; c.vy = uy / nn2 * 520 - 300;
-        if (parentes.length && L0 && !parentes.some(function (P) { return L0.x === P.x; }) && rnd() < 0.25) festaParente(['Boa! Toca aqui!', 'Nice one! High five!']);
+        if (parentes.length && L0 && !parentes.some(function (P) { return L0.x === P.x; }) && rnd() < 0.25) festaParente(['Boa! Toca aqui!', 'Nice one! High five!', '¡Muy bien! ¡Choca esos cinco!']);
         jg.pontos += mult(j, PONTOS.tocou); emitir({ t: 'tocou', id: c.id, j: j, fig: c.fig, x: c.x, y: c.y, pontos: PONTOS.tocou });
       } else if (c.papel === 'bola' && !c.chutada) {
         chutar(c, dirX || 0, !!forte);

@@ -3,11 +3,11 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const P = require('../personagens.js');
 
-test('24 personagens, ids únicos, nome PT/EN, origem e desenhos de frente e costas', () => {
+test('24 personagens, ids únicos, nome PT/EN/ES, origem e desenhos de frente e costas', () => {
   assert.equal(P.LISTA.length, 24);
   assert.equal(new Set(P.LISTA.map(p => p.id)).size, 24);
   for (const p of P.LISTA) {
-    assert.equal(p.nome.length, 2, p.id); assert.ok(p.origem, p.id);
+    assert.equal(p.nome.length, 3, p.id); assert.ok(p.nome.every(Boolean), p.id); assert.ok(p.origem, p.id);
     assert.equal(typeof p.frente, 'function'); assert.equal(typeof p.costas, 'function');
   }
 });

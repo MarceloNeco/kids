@@ -14,39 +14,39 @@
 
   // 12 cores bem diferentes entre si, cada uma com nome e um desenho (para quem confunde as cores)
   D.CORES = [
-    { hex: '#ef3b55', pt: 'vermelho', en: 'red', sim: '♥' },
-    { hex: '#ff8a1f', pt: 'laranja', en: 'orange', sim: '▲' },
-    { hex: '#ffd21f', pt: 'amarelo', en: 'yellow', sim: '★' },
-    { hex: '#9bdc28', pt: 'verde-limão', en: 'lime', sim: '✿' },
-    { hex: '#17a05b', pt: 'verde', en: 'green', sim: '■' },
-    { hex: '#17c3c9', pt: 'turquesa', en: 'turquoise', sim: '◆' },
-    { hex: '#2f7bf0', pt: 'azul', en: 'blue', sim: '●' },
-    { hex: '#9340e0', pt: 'roxo', en: 'purple', sim: '☾' },
-    { hex: '#ff72b6', pt: 'rosa', en: 'pink', sim: '✚' },
-    { hex: '#8c5736', pt: 'marrom', en: 'brown', sim: '♪' },
-    { hex: '#9aa9b8', pt: 'cinza', en: 'gray', sim: '☂' },
-    { hex: '#3b2b52', pt: 'jabuticaba', en: 'dark plum', sim: '✖' }
+    { hex: '#ef3b55', pt: 'vermelho', en: 'red', es: 'rojo', sim: '♥' },
+    { hex: '#ff8a1f', pt: 'laranja', en: 'orange', es: 'naranja', sim: '▲' },
+    { hex: '#ffd21f', pt: 'amarelo', en: 'yellow', es: 'amarillo', sim: '★' },
+    { hex: '#9bdc28', pt: 'verde-limão', en: 'lime', es: 'verde limón', sim: '✿' },
+    { hex: '#17a05b', pt: 'verde', en: 'green', es: 'verde', sim: '■' },
+    { hex: '#17c3c9', pt: 'turquesa', en: 'turquoise', es: 'turquesa', sim: '◆' },
+    { hex: '#2f7bf0', pt: 'azul', en: 'blue', es: 'azul', sim: '●' },
+    { hex: '#9340e0', pt: 'roxo', en: 'purple', es: 'morado', sim: '☾' },
+    { hex: '#ff72b6', pt: 'rosa', en: 'pink', es: 'rosa', sim: '✚' },
+    { hex: '#8c5736', pt: 'marrom', en: 'brown', es: 'marrón', sim: '♪' },
+    { hex: '#9aa9b8', pt: 'cinza', en: 'gray', es: 'gris', sim: '☂' },
+    { hex: '#3b2b52', pt: 'jabuticaba', en: 'dark plum', es: 'ciruela', sim: '✖' }
   ];
   D.EMBACADO = '#d9e2ee';
 
   // modelos de frasco da lojinha (só aparência). w = largura do corpo; nw/nk = largura e altura do gargalo;
   // ombro = altura da curva entre o corpo e o gargalo; r = canto do fundo; bojo = barriga para os lados
   D.FRASCOS = {
-    tubinho: { pt: 'Tubinho', en: 'Little tube', preco: 0, w: 44, nw: 30, nk: 12, ombro: 10, r: 20, bojo: 0 },
-    potinho: { pt: 'Potinho', en: 'Little jar', preco: 60, w: 54, nw: 46, nk: 10, ombro: 6, r: 10, bojo: 0 },
-    leiteira: { pt: 'Garrafa de leite', en: 'Milk bottle', preco: 90, w: 50, nw: 26, nk: 16, ombro: 26, r: 9, bojo: 0 },
-    pocao: { pt: 'Poção', en: 'Potion', preco: 120, w: 50, nw: 22, nk: 18, ombro: 14, r: 23, bojo: 5 },
-    gatinho: { pt: 'Gatinho', en: 'Kitty', preco: 180, w: 52, nw: 42, nk: 22, ombro: 6, r: 16, bojo: 0 },
-    foguete: { pt: 'Foguete', en: 'Rocket', preco: 240, w: 46, nw: 14, nk: 6, ombro: 36, r: 7, bojo: 0 }
+    tubinho: { pt: 'Tubinho', en: 'Little tube', es: 'Tubito', preco: 0, w: 44, nw: 30, nk: 12, ombro: 10, r: 20, bojo: 0 },
+    potinho: { pt: 'Potinho', en: 'Little jar', es: 'Tarrito', preco: 60, w: 54, nw: 46, nk: 10, ombro: 6, r: 10, bojo: 0 },
+    leiteira: { pt: 'Garrafa de leite', en: 'Milk bottle', es: 'Botella de leche', preco: 90, w: 50, nw: 26, nk: 16, ombro: 26, r: 9, bojo: 0 },
+    pocao: { pt: 'Poção', en: 'Potion', es: 'Poción', preco: 120, w: 50, nw: 22, nk: 18, ombro: 14, r: 23, bojo: 5 },
+    gatinho: { pt: 'Gatinho', en: 'Kitty', es: 'Gatito', preco: 180, w: 52, nw: 42, nk: 22, ombro: 6, r: 16, bojo: 0 },
+    foguete: { pt: 'Foguete', en: 'Rocket', es: 'Cohete', preco: 240, w: 46, nw: 14, nk: 6, ombro: 36, r: 7, bojo: 0 }
   };
   D.ORDEM_FRASCOS = ['tubinho', 'potinho', 'leiteira', 'pocao', 'gatinho', 'foguete'];
 
   // cenários da lojinha: o fundo é do estilo.css (classe cen-<id> no jogo); aqui ficam as cores do vidro e da prateleira
   D.CENARIOS = {
-    chuva: { pt: 'Tarde de chuva', en: 'Rainy afternoon', preco: 0, traco: 'rgba(18,62,92,.82)', vidro: 'rgba(255,255,255,.30)', tabua: ['#e0a56a', '#b9793f', '#7d4c22'] },
-    mar: { pt: 'Fundo do mar', en: 'Under the sea', preco: 80, traco: 'rgba(232,250,255,.9)', vidro: 'rgba(255,255,255,.16)', tabua: ['#ffd9a8', '#f2a36b', '#b8603a'] },
-    junina: { pt: 'Festa junina', en: 'June party', preco: 150, traco: 'rgba(74,36,16,.85)', vidro: 'rgba(255,255,255,.34)', tabua: ['#f6c56f', '#d99a3c', '#8f5a1c'] },
-    espaco: { pt: 'Espaço', en: 'Outer space', preco: 200, traco: 'rgba(226,214,255,.92)', vidro: 'rgba(255,255,255,.12)', tabua: ['#c9c2e6', '#8c83b8', '#514a7a'] }
+    chuva: { pt: 'Tarde de chuva', en: 'Rainy afternoon', es: 'Tarde de lluvia', preco: 0, traco: 'rgba(18,62,92,.82)', vidro: 'rgba(255,255,255,.30)', tabua: ['#e0a56a', '#b9793f', '#7d4c22'] },
+    mar: { pt: 'Fundo do mar', en: 'Under the sea', es: 'Fondo del mar', preco: 80, traco: 'rgba(232,250,255,.9)', vidro: 'rgba(255,255,255,.16)', tabua: ['#ffd9a8', '#f2a36b', '#b8603a'] },
+    junina: { pt: 'Festa junina', en: 'June party', es: 'Fiesta junina', preco: 150, traco: 'rgba(74,36,16,.85)', vidro: 'rgba(255,255,255,.34)', tabua: ['#f6c56f', '#d99a3c', '#8f5a1c'] },
+    espaco: { pt: 'Espaço', en: 'Outer space', es: 'Espacio', preco: 200, traco: 'rgba(226,214,255,.92)', vidro: 'rgba(255,255,255,.12)', tabua: ['#c9c2e6', '#8c83b8', '#514a7a'] }
   };
   D.ORDEM_CENARIOS = ['chuva', 'mar', 'junina', 'espaco'];
 

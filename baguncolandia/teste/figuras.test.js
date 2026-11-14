@@ -10,7 +10,7 @@ test('catálogo tem todos os papéis, ids únicos e SVG fechado', () => {
   assert.equal(new Set(ids).size, ids.length);
   todas.forEach(f => {
     assert.ok(f.svg.startsWith('<svg') && f.svg.endsWith('</svg>'), f.id);
-    assert.ok(f.nome.pt && f.nome.en, f.id);
+    assert.ok(f.nome.pt && f.nome.en && f.nome.es, f.id);
     assert.ok(f.raio >= 30 && f.raio <= 70, f.id);
     assert.ok(!/<script/i.test(f.svg), f.id);
   });

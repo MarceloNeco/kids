@@ -5,7 +5,7 @@
    (para voltar se a página recarregar). Nada de dado pessoal: só o apelido que a pessoa digitar. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.3';
+  var APP_VERSION = '0.4.0';
   var L = window.BNLogica, R = window.BNRede;
   var Som = window.BNSom || { iniciar: function () {}, ligar: function () {}, efeito: function () {} };
   var Nav = window.BNNavios;
@@ -28,20 +28,23 @@
   function ler(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function gravar(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem espaço */ } }
   var pref = ler(CH_PREF) || {};
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = /^pt/i.test(navigator.language || 'pt') ? 'pt' : 'en';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  delete pref.lingua;   // o idioma agora vem só da estante (../idioma.js), não fica mais nas preferências do jogo
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (typeof pref.nome !== 'string') pref.nome = '';
   function salvarPref() { gravar(CH_PREF, pref); }
 
-  // ---------- idioma ----------
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
-  function N(x) { return x ? (pref.lingua === 'en' ? x.en : x.pt) : ''; }
+  // ---------- idioma (português, inglês ou espanhol: o escolhido na estante, ../idioma.js) ----------
+  function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
+  function t(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' && es != null ? es : pt; }
+  function N(x) { return x ? t(x.pt, x.en, x.es) : ''; }
+  var IDX = { pt: 0, en: 1, es: 2 };
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + t('07/Nov/2026', 'Nov/07/2026');
+    var l = lingua();
+    document.documentElement.lang = l === 'en' ? 'en' : l === 'es' ? 'es' : 'pt-BR';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = p[IDX[l]] != null ? p[IDX[l]] : p[0]; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', p[IDX[l]] != null ? p[IDX[l]] : p[0]); });
+    document.title = t('Batalha Naval', 'Sea Battle', 'Batalla Naval') + ' — Bolinho de Chuva · SolverONE';
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t('14/Nov/2026', 'Nov/14/2026', '14/nov/2026');
     if (jogo && (atual === 'jogo' || atual === 'sala')) desenhar();
     if (atual === 'arrumar' && arr) pintarArr();
     atualizarInicio();
@@ -125,7 +128,7 @@
   function vibrar(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* sem vibrar */ } }
 
   // ---------- botões de cima ----------
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function () { traduzir(); });   // trocaram o idioma na estante (outra aba)
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); aplicarSom(); Som.efeito('toque'); });
   $('btAjuda').addEventListener('click', function () {
     if (atual !== 'inicio') mostrar('inicio');
@@ -162,7 +165,7 @@
   function enderecoSala(c) { try { history.replaceState(history.state, '', location.pathname + (c ? '?sala=' + c + (TESTE ? '&teste' : '') : (TESTE ? '?teste' : ''))); } catch (e) { /* ok */ } }
   function atualizarInicio() {
     var d = salvoRede(), b = $('btVoltarRede');
-    b.hidden = !d || !!jogo; if (d) b.textContent = t('⚓ Voltar para a partida ', '⚓ Back to game ') + d.codigo;
+    b.hidden = !d || !!jogo; if (d) b.textContent = t('⚓ Voltar para a partida ', '⚓ Back to game ', '⚓ Volver a la partida ') + d.codigo;
     $('avisoSemNet').hidden = navigator.onLine !== false;
   }
   window.addEventListener('online', atualizarInicio); window.addEventListener('offline', atualizarInicio);
@@ -172,7 +175,7 @@
   $('btAmigos').addEventListener('click', function () { abrirAmigos(''); });
   function escolherNivel(para) {
     nivelPara = para;
-    $('nivelTitulo').textContent = para === 'criar' || para === 'perto' ? t('Escolha o nível da partida', 'Pick the game level') : t('Escolha o nível', 'Pick the level');
+    $('nivelTitulo').textContent = para === 'criar' || para === 'perto' ? t('Escolha o nível da partida', 'Pick the game level', 'Elige el nivel de la partida') : t('Escolha o nível', 'Pick the level', 'Elige el nivel');
     Array.prototype.forEach.call(document.querySelectorAll('.so-pc'), function (el) { el.hidden = para !== 'pc'; });
     mostrar('nivel');
   }
@@ -208,7 +211,7 @@
   }
   function proximoLivre() { for (var i = 0; i < arr.frota.length; i++) if (!arr.frota[i]) return i; return -1; }
   function por(i, nv) {
-    if (!L.cabe(arr.frota, arr.n, nv, i)) { Som.efeito('erro'); aviso(t('Não cabe aí: tem outro navio no caminho.', "It doesn't fit there: another ship is in the way.")); return false; }
+    if (!L.cabe(arr.frota, arr.n, nv, i)) { Som.efeito('erro'); aviso(t('Não cabe aí: tem outro navio no caminho.', "It doesn't fit there: another ship is in the way.", 'No cabe ahí: hay otro barco en el camino.')); return false; }
     arr.frota[i] = nv; Som.efeito('por'); vibrar(15);
     arr.sel = proximoLivre();
     return true;
@@ -217,7 +220,7 @@
     var nv = arr.frota[i]; if (!nv) return;
     var novo = ajustar({ x: nv.x, y: nv.y, tam: nv.tam, h: !nv.h });
     if (L.cabe(arr.frota, arr.n, novo, i)) { arr.frota[i] = novo; Som.efeito('girar'); }
-    else { Som.efeito('erro'); aviso(t('Não dá para girar aí. Arraste para outro lugar.', "Can't turn it there. Drag it somewhere else.")); }
+    else { Som.efeito('erro'); aviso(t('Não dá para girar aí. Arraste para outro lugar.', "Can't turn it there. Drag it somewhere else.", 'No se puede girar ahí. Arrástralo a otro lugar.')); }
   }
   function celulaDoPonto(cx, cy) {
     // pela posição real das casas (A1 e B2), para o dedo cair na casa certa em qualquer tamanho de tela
@@ -259,7 +262,7 @@
     else if (d.fonte === 'vazio' && arr.sel >= 0) {
       var tam = arr.tams[arr.sel], velho = arr.frota[arr.sel];
       por(arr.sel, ajustar({ x: d.c.x, y: d.c.y, tam: tam, h: velho ? velho.h : arr.h }));
-    } else if (d.fonte === 'vazio') aviso(t('Escolha um navio aqui embaixo primeiro.', 'Pick a ship below first.'));
+    } else if (d.fonte === 'vazio') aviso(t('Escolha um navio aqui embaixo primeiro.', 'Pick a ship below first.', 'Primero elige un barco aquí abajo.'));
     pintarArr();
   }
   document.addEventListener('pointerup', fimArraste);
@@ -302,13 +305,13 @@
       b.className = 'peca' + (i === arr.sel ? ' sel' : '') + (arr.frota[i] ? ' posto' : ''); b.setAttribute('data-i', i);
       var casco = document.createElement('div'); casco.className = 'casco'; casco.style.setProperty('--t', tam); casco.appendChild(Nav.svg(tipo, true));
       var nm = document.createElement('span'); nm.textContent = N(Nav.TIPOS[tipo]);
-      var sm = document.createElement('small'); sm.textContent = tam + t(' casas', ' squares'); nm.appendChild(sm);
+      var sm = document.createElement('small'); sm.textContent = tam + t(' casas', ' squares', ' casillas'); nm.appendChild(sm);
       b.appendChild(casco); b.appendChild(nm);
-      b.setAttribute('aria-label', N(Nav.TIPOS[tipo]) + ', ' + tam + t(' casas', ' squares') + (arr.frota[i] ? t(', no mar', ', placed') : ''));
+      b.setAttribute('aria-label', N(Nav.TIPOS[tipo]) + ', ' + tam + t(' casas', ' squares', ' casillas') + (arr.frota[i] ? t(', no mar', ', placed', ', en el mar') : ''));
       pecas.appendChild(b);
     }); });
     var selPosto = arr.sel >= 0 && arr.frota[arr.sel], h = selPosto ? arr.frota[arr.sel].h : arr.h;
-    $('btGirar').textContent = '🔄 ' + t('Girar', 'Turn') + (h ? ' ↔' : ' ↕');
+    $('btGirar').textContent = '🔄 ' + t('Girar', 'Turn', 'Girar') + (h ? ' ↔' : ' ↕');
     $('btPronto').disabled = proximoLivre() >= 0;
   }
 
@@ -337,7 +340,7 @@
     (o.fantasma || []).forEach(function (nv) { L.celulas(nv).forEach(function (c, k) { if (!v[c[1]][c[0]]) cls[c[1]][c[0]] += classesNavio(nv, k) + ' fantasma'; }); });
     (o.frota || []).forEach(function (nv) { L.celulas(nv).forEach(function (c, k) { cls[c[1]][c[0]] = 'c' + classesNavio(nv, k); }); });
     o.vista.afundados.forEach(function (nv) { L.celulas(nv).forEach(function (c, k) { cls[c[1]][c[0]] = 'c' + classesNavio(nv, k); }); });
-    var NOME_EST = ['', t('água', 'water'), t('acerto', 'hit'), t('afundado', 'sunk')];
+    var NOME_EST = ['', t('água', 'water', 'agua'), t('acerto', 'hit', 'tocado'), t('afundado', 'sunk', 'hundido')];
     for (y = 0; y < n; y++) for (x = 0; x < n; x++) {
       var st = v[y][x];
       if (st === 1) cls[y][x] = 'c agua'; else if (st === 2) cls[y][x] += ' acerto'; else if (st === 3) cls[y][x] += ' afundado';
@@ -417,7 +420,7 @@
   // ======================= A PARTIDA (todas) =======================
   var jogo = null;        // { modo: 'pc' | 'passa' | 'rede', ... }
   var alvoSel = -1;
-  function nomeJ(j, i) { return (j[i] && j[i].nome) || t('Jogador ', 'Player ') + (i + 1); }
+  function nomeJ(j, i) { return (j[i] && j[i].nome) || t('Jogador ', 'Player ', 'Jugador ') + (i + 1); }
   // tudo o que a tela precisa, do mesmo jeito nos três modos
   function dados() {
     var g = jogo;
@@ -452,7 +455,7 @@
     desenharJogo();
   }
   // refaz um pedaço da tela só quando o conteúdo muda (refazer botões toda hora perde o toque de quem está apertando)
-  function refazer(el, chave, fn) { chave = pref.lingua + '|' + chave; if (el._chave === chave) return; el._chave = chave; el.innerHTML = ''; fn(el); }
+  function refazer(el, chave, fn) { chave = lingua() + '|' + chave; if (el._chave === chave) return; el._chave = chave; el.innerHTML = ''; fn(el); }
   function desenharJogo() {
     var g = jogo, d = dados(), n = L.NIVEIS[d.nivel].n, opos = escolherAlvo(d), eu = d.eu;
     // banner (de quem é a vez, sempre grande)
@@ -463,7 +466,7 @@
     refazer($('fila'), JSON.stringify([d.j, d.vez, d.fase, eu, g.modo]), function (fila) { d.j.forEach(function (p, i) {
       var c = document.createElement('span'); c.style.setProperty('--cor', CORES[i]);
       c.className = (i === d.vez && d.fase === 'jogo' ? 'vez' : '') + (p.f ? ' fora' : '') + (p.s ? ' saiu' : '');
-      c.textContent = (i === d.vez && d.fase === 'jogo' ? '▶ ' : '') + nomeJ(d.j, i) + (i === eu && g.modo === 'rede' ? t(' (você)', ' (you)') : '') + (p.f ? ' 💀' : p.s ? ' 🚪' : p.au ? ' 📡' : '');
+      c.textContent = (i === d.vez && d.fase === 'jogo' ? '▶ ' : '') + nomeJ(d.j, i) + (i === eu && g.modo === 'rede' ? t(' (você)', ' (you)', ' (tú)') : '') + (p.f ? ' 💀' : p.s ? ' 🚪' : p.au ? ' 📡' : '');
       fila.appendChild(c);
     }); });
     // anfitrião: continuar sem quem sumiu
@@ -471,7 +474,7 @@
     $('semEle').hidden = !ausentes.length;
     refazer($('semEle'), JSON.stringify(ausentes) + d.j.map(function (p) { return p.nome; }).join(), function (sem) { ausentes.forEach(function (i) {
       var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'medio';
-      bt.textContent = t('➡️ Continuar sem ', '➡️ Go on without ') + nomeJ(d.j, i);
+      bt.textContent = t('➡️ Continuar sem ', '➡️ Go on without ', '➡️ Seguir sin ') + nomeJ(d.j, i);
       bt.addEventListener('click', function () { if (jogo === g) g.p.continuarSem(i); });
       sem.appendChild(bt);
     }); });
@@ -487,7 +490,7 @@
     // mares
     montar($('tabAlvo'), n, true); montar($('tabMeu'), n, false);
     var ult = d.log.length ? d.log[d.log.length - 1] : null;
-    $('tituloAlvo').textContent = (g.modo === 'pc' ? '🤖 ' + t('Mar do computador', "Computer's sea") : '🎯 ' + t('Mar de ', "Sea of ") + nomeJ(d.j, alvoSel)) + ' · 🚢 ' + restantes(d, alvoSel);
+    $('tituloAlvo').textContent = (g.modo === 'pc' ? '🤖 ' + t('Mar do computador', "Computer's sea", 'Mar del ordenador') : '🎯 ' + t('Mar de ', "Sea of ", 'Mar de ') + nomeJ(d.j, alvoSel)) + ' · 🚢 ' + restantes(d, alvoSel);
     var va = L.vista(d.log, alvoSel, n), navA = va.afundados.map(function (nv) { return { nv: nv, tipo: tipoNoMar(d, alvoSel, nv), cls: 'afundado' }; });
     (d.revel[alvoSel] || []).forEach(function (nv) {      // no fim: os navios que sobraram, clarinhos
       if (!L.celulas(nv).every(function (c) { return va.v[c[1]][c[0]] === 3; })) navA.push({ nv: nv, tipo: Nav.daFrota(d.revel[alvoSel], nv), cls: 'fantasma' });
@@ -496,7 +499,7 @@
     var mostraMeu = eu >= 0;
     $('tabMeu').parentNode.hidden = !mostraMeu;
     if (mostraMeu) {
-      $('tituloMeu').textContent = '🛡️ ' + (g.modo === 'passa' ? t('Mar de ', 'Sea of ') + nomeJ(d.j, eu) : t('Seu mar', 'Your sea'));
+      $('tituloMeu').textContent = '🛡️ ' + (g.modo === 'passa' ? t('Mar de ', 'Sea of ', 'Mar de ') + nomeJ(d.j, eu) : t('Seu mar', 'Your sea', 'Tu mar'));
       var vm = L.vista(d.log, eu, n), minha = d.frota || [], tams = minha.map(function (nv) { return nv.tam; });
       var afund = minha.map(function (nv) { return L.celulas(nv).every(function (c) { return vm.v[c[1]][c[0]] === 3; }); });
       pintar($('tabMeu'), n, { vista: vm, frota: minha, pode: false, ultimo: ult && ult[1] === eu ? [ult[2], ult[3]] : null,
@@ -506,7 +509,7 @@
         info.appendChild(s);
       }); });
     }
-    $('ultimo').textContent = ult ? nomeJ(d.j, ult[0]) + ' → ' + nomeJ(d.j, ult[1]) + ' ' + L.coord(ult[2], ult[3]) + ': ' + ['💦 ' + t('água', 'water'), '💥 ' + t('acertou', 'hit'), '🚢 ' + t('afundou', 'sunk')][ult[4]] : '';
+    $('ultimo').textContent = ult ? nomeJ(d.j, ult[0]) + ' → ' + nomeJ(d.j, ult[1]) + ' ' + L.coord(ult[2], ult[3]) + ': ' + ['💦 ' + t('água', 'water', 'agua'), '💥 ' + t('acertou', 'hit', 'tocado'), '🚢 ' + t('afundou', 'sunk', 'hundido')][ult[4]] : '';
     // tiros novos: animação, som e o estouro no meio da tela
     if (g.vistos == null || g.vistos > d.log.length) g.vistos = d.log.length;
     if (d.log.length > g.vistos) { var novo = d.log[d.log.length - 1]; g.vistos = d.log.length; mostrarTiro(d, novo); }
@@ -515,12 +518,12 @@
     if (d.fase === 'fim') {
       fc.hidden = false;
       var ganhei = d.venc === eu, nomeV = d.venc >= 0 ? nomeJ(d.j, d.venc) : '';
-      $('fimTitulo').textContent = g.modo === 'pc' ? (ganhei ? t('🏆 Você venceu!', '🏆 You won!') : t('🤖 O computador venceu desta vez!', '🤖 The computer won this time!'))
-        : g.modo === 'rede' && ganhei ? t('🏆 Você venceu!', '🏆 You won!') : '🏆 ' + nomeV + t(' venceu!', ' won!');
-      $('fimTexto').textContent = t('Partida de ', 'Game of ') + d.log.length + t(' tiros. As frotas que sobraram aparecem clarinhas no mar.', ' shots. The fleets left afloat show up faded in the sea.');
+      $('fimTitulo').textContent = g.modo === 'pc' ? (ganhei ? t('🏆 Você venceu!', '🏆 You won!', '🏆 ¡Has ganado!') : t('🤖 O computador venceu desta vez!', '🤖 The computer won this time!', '🤖 ¡Esta vez ha ganado el ordenador!'))
+        : g.modo === 'rede' && ganhei ? t('🏆 Você venceu!', '🏆 You won!', '🏆 ¡Has ganado!') : '🏆 ' + t('', '', '¡') + nomeV + t(' venceu!', ' won!', ' ha ganado!');
+      $('fimTexto').textContent = t('Partida de ', 'This game took ', 'La partida ha tenido ') + d.log.length + t(' tiros. As frotas que sobraram aparecem clarinhas no mar.', ' shots. The fleets left afloat show up faded in the sea.', ' disparos. Las flotas que quedan aparecen más claras en el mar.');
       var bt = $('btDeNovo');
-      if (g.modo === 'rede') { bt.hidden = !d.host; bt.textContent = t('🔁 Jogar de novo (mesma turma)', '🔁 Play again (same group)'); if (!d.host) $('fimTexto').textContent += ' ' + t('Quem criou a sala pode começar outra partida.', 'Whoever created the room can start another game.'); }
-      else { bt.hidden = false; bt.textContent = t('🔁 Jogar de novo', '🔁 Play again'); }
+      if (g.modo === 'rede') { bt.hidden = !d.host; bt.textContent = t('🔁 Jogar de novo (mesma turma)', '🔁 Play again (same group)', '🔁 Jugar otra vez (mismo grupo)'); if (!d.host) $('fimTexto').textContent += ' ' + t('Quem criou a sala pode começar outra partida.', 'Whoever created the room can start another game.', 'Quien ha creado la sala puede empezar otra partida.'); }
+      else { bt.hidden = false; bt.textContent = t('🔁 Jogar de novo', '🔁 Play again', '🔁 Jugar otra vez'); }
       if (!g.fimMostrado) {
         g.fimMostrado = true;
         var festa = g.modo === 'passa' || ganhei;
@@ -532,28 +535,28 @@
   function textoBanner(d) {
     var g = jogo, eu = d.eu, nv = nomeJ(d.j, d.vez);
     if (d.fase === 'fim') {
-      if (d.venc < 0) return { txt: t('Fim da partida', 'Game over'), classe: 'fim' };
-      return { txt: d.venc === eu && g.modo !== 'passa' ? t('🏆 Você venceu!', '🏆 You won!') : g.modo === 'pc' ? t('🤖 O computador venceu!', '🤖 The computer won!') : '🏆 ' + nomeJ(d.j, d.venc) + t(' venceu!', ' won!'), classe: 'fim' };
+      if (d.venc < 0) return { txt: t('Fim da partida', 'Game over', 'Fin de la partida'), classe: 'fim' };
+      return { txt: d.venc === eu && g.modo !== 'passa' ? t('🏆 Você venceu!', '🏆 You won!', '🏆 ¡Has ganado!') : g.modo === 'pc' ? t('🤖 O computador venceu!', '🤖 The computer won!', '🤖 ¡Ha ganado el ordenador!') : '🏆 ' + t('', '', '¡') + nomeJ(d.j, d.venc) + t(' venceu!', ' won!', ' ha ganado!'), classe: 'fim' };
     }
     if (g.modo === 'rede') {
       var semAnf = g.p.semAnfitriao();
-      if (!g.conectado && g.perto) return { txt: t('📡 Sem conexão com o outro aparelho', '📡 Not connected to the other device'), sub: t('Liguem de novo trocando os códigos.', 'Link again by swapping the codes.'), classe: 'alerta' };
-      if (!g.conectado) return { txt: t('📡 Conectando…', '📡 Connecting…'), classe: 'alerta' };
-      if (semAnf > 8000) return { txt: t('📡 Procurando o anfitrião…', '📡 Looking for the host…'), sub: t('A partida continua sozinha quando a conexão voltar.', 'The game goes on by itself when the connection is back.'), classe: 'alerta' };
-      if (eu >= 0 && !ativoJ(d.j[eu])) return { txt: t('💀 Sua frota afundou!', '💀 Your fleet sank!'), sub: t('Torça pelos outros 👀 · vez de ', 'Cheer for the others 👀 · turn: ') + nv, classe: 'fora' };
+      if (!g.conectado && g.perto) return { txt: t('📡 Sem conexão com o outro aparelho', '📡 Not connected to the other device', '📡 Sin conexión con el otro dispositivo'), sub: t('Liguem de novo trocando os códigos.', 'Link again by swapping the codes.', 'Volved a conectaros intercambiando los códigos.'), classe: 'alerta' };
+      if (!g.conectado) return { txt: t('📡 Conectando…', '📡 Connecting…', '📡 Conectando…'), classe: 'alerta' };
+      if (semAnf > 8000) return { txt: t('📡 Procurando o anfitrião…', '📡 Looking for the host…', '📡 Buscando al anfitrión…'), sub: t('A partida continua sozinha quando a conexão voltar.', 'The game goes on by itself when the connection is back.', 'La partida sigue sola cuando vuelva la conexión.'), classe: 'alerta' };
+      if (eu >= 0 && !ativoJ(d.j[eu])) return { txt: t('💀 Sua frota afundou!', '💀 Your fleet sank!', '💀 ¡Tu flota se ha hundido!'), sub: t('Torça pelos outros 👀 · vez de ', 'Cheer for the others 👀 · turn: ', 'Anima a los demás 👀 · turno de ') + nv, classe: 'fora' };
     }
     if (d.vez === eu) {
-      if (d.pend) return { txt: '💣 ' + t('Tiro em ', 'Shot at ') + L.coord(d.pend.x, d.pend.y) + '…', sub: t('esperando ', 'waiting for ') + nomeJ(d.j, d.pend.alvo) + t(' responder', ' to answer'), classe: 'espera' };
-      if (g.modo !== 'rede' && g.ocupado) return { txt: t('👀 Veja o que aconteceu…', '👀 See what happened…'), classe: 'espera' };
+      if (d.pend) return { txt: '💣 ' + t('Tiro em ', 'Shot at ', 'Disparo en ') + L.coord(d.pend.x, d.pend.y) + '…', sub: t('esperando ', 'waiting for ', 'esperando que ') + nomeJ(d.j, d.pend.alvo) + t(' responder', ' to answer', ' responda'), classe: 'espera' };
+      if (g.modo !== 'rede' && g.ocupado) return { txt: t('👀 Veja o que aconteceu…', '👀 See what happened…', '👀 Mira lo que ha pasado…'), classe: 'espera' };
       var outros = d.j.filter(function (p, i) { return i !== eu && ativoJ(p); }).length;
       var alvoAus = d.j[alvoSel] && d.j[alvoSel].au;
-      if (alvoAus) return { txt: '📡 ' + nomeJ(d.j, alvoSel) + t(' saiu da conexão', ' lost connection'), sub: t('Esperando voltar…', 'Waiting for them to come back…'), classe: 'alerta' };
-      return { txt: (g.modo === 'passa' ? '🎯 ' + nv + t(', sua vez!', ', your turn!') : t('🎯 Sua vez!', '🎯 Your turn!')),
-        sub: outros > 1 ? t('Escolha um adversário e toque no mar dele', "Pick an opponent and tap their sea") : t('Toque num quadradinho do mar de ', 'Tap a square in the sea of ') + nomeJ(d.j, alvoSel), classe: 'minha' };
+      if (alvoAus) return { txt: '📡 ' + nomeJ(d.j, alvoSel) + t(' saiu da conexão', ' lost connection', ' ha perdido la conexión'), sub: t('Esperando voltar…', 'Waiting for them to come back…', 'Esperando que vuelva…'), classe: 'alerta' };
+      return { txt: (g.modo === 'passa' ? '🎯 ' + nv + t(', sua vez!', ', your turn!', ', ¡tu turno!') : t('🎯 Sua vez!', '🎯 Your turn!', '🎯 ¡Tu turno!')),
+        sub: outros > 1 ? t('Escolha um adversário e toque no mar dele', "Pick an opponent and tap their sea", 'Elige un rival y toca su mar') : t('Toque num quadradinho do mar de ', 'Tap a square in the sea of ', 'Toca una casilla del mar de ') + nomeJ(d.j, alvoSel), classe: 'minha' };
     }
-    if (g.modo === 'pc') return { txt: t('🤖 O computador está mirando…', '🤖 The computer is aiming…'), classe: 'outro', cor: CORES[1] };
-    if (d.j[d.vez] && d.j[d.vez].au) return { txt: '📡 ' + nv + t(' saiu da conexão', ' lost connection'), sub: t('Esperando voltar…', 'Waiting for them to come back…'), classe: 'alerta' };
-    return { txt: '⏳ ' + t('Vez de ', 'Turn: ') + nv, sub: t('Espere a sua vez 🙂', 'Wait for your turn 🙂'), classe: 'outro', cor: CORES[d.vez] };
+    if (g.modo === 'pc') return { txt: t('🤖 O computador está mirando…', '🤖 The computer is aiming…', '🤖 El ordenador está apuntando…'), classe: 'outro', cor: CORES[1] };
+    if (d.j[d.vez] && d.j[d.vez].au) return { txt: '📡 ' + nv + t(' saiu da conexão', ' lost connection', ' ha perdido la conexión'), sub: t('Esperando voltar…', 'Waiting for them to come back…', 'Esperando que vuelva…'), classe: 'alerta' };
+    return { txt: '⏳ ' + t('Vez de ', 'Turn: ', 'Turno de ') + nv, sub: t('Espere a sua vez 🙂', 'Wait for your turn 🙂', 'Espera tu turno 🙂'), classe: 'outro', cor: CORES[d.vez] };
   }
   // um tiro novo: o míssil voa até a casa (o resultado só aparece quando ele chega), depois respingo, explosão ou o
   // navio afundando, o som, o tremor e a faixa no meio da tela. Com "menos movimento" no aparelho: só a marca e o som.
@@ -581,10 +584,10 @@
         }
       }
       var yc = tab ? centroCasa(tab, x, y).y : null;
-      if (rc === 0) estouro('💦 ' + t('Água!', 'Water!'), quem + ' → ' + c, 'agua', '', yc);
-      else if (rc === 1) estouro('💥 ' + t('Acertou!', 'Hit!'), emMim && jogo.modo !== 'passa' ? quem + t(' acertou seu navio em ', ' hit your ship at ') + c : quem + ' → ' + c, 'acerto', '', yc);
-      else estouro('💥 ' + t('AFUNDOU!', 'SUNK!'), quem + ' → ' + c, 'afundou',
-        emMim && jogo.modo !== 'passa' ? (Nav.TIPOS[tipo].fem ? t('Sua ', 'Your ') : t('Seu ', 'Your ')) + nomeNavio : jogo.modo === 'pc' ? nomeNavio : t(nomeNavio + ' de ' + deQuem, deQuem + '’s ' + nomeNavio), yc);
+      if (rc === 0) estouro('💦 ' + t('Água!', 'Water!', '¡Agua!'), quem + ' → ' + c, 'agua', '', yc);
+      else if (rc === 1) estouro('💥 ' + t('Acertou!', 'Hit!', '¡Tocado!'), emMim && jogo.modo !== 'passa' ? quem + t(' acertou seu navio em ', ' hit your ship at ', ' ha tocado tu barco en ') + c : quem + ' → ' + c, 'acerto', '', yc);
+      else estouro('💥 ' + t('AFUNDOU!', 'SUNK!', '¡HUNDIDO!'), quem + ' → ' + c, 'afundou',
+        emMim && jogo.modo !== 'passa' ? (Nav.TIPOS[tipo].fem ? t('Sua ', 'Your ', 'Tu ') : t('Seu ', 'Your ', 'Tu ')) + nomeNavio : jogo.modo === 'pc' ? nomeNavio : t(nomeNavio + ' de ' + deQuem, deQuem + '’s ' + nomeNavio, nomeNavio + ' de ' + deQuem), yc);
       Som.efeito(['agua', 'acerto', 'afundou'][rc]);
       if (rc && (meu || emMim)) vibrar(rc === 2 ? [90, 50, 140, 50, 240] : 80);
     }
@@ -612,22 +615,22 @@
   // ======================= LOCAL: contra o computador e passar o aparelho =======================
   function novoLocal(modo, nivel) {
     sairDoJogo();
-    var j = modo === 'pc' ? [{ nome: t('Você', 'You') }, { nome: t('Computador', 'Computer') }] : [{ nome: t('Jogador 1', 'Player 1') }, { nome: t('Jogador 2', 'Player 2') }];
+    var j = modo === 'pc' ? [{ nome: t('Você', 'You', 'Tú') }, { nome: t('Computador', 'Computer', 'Ordenador') }] : [{ nome: t('Jogador 1', 'Player 1', 'Jugador 1') }, { nome: t('Jogador 2', 'Player 2', 'Jugador 2') }];
     jogo = { modo: modo, nivel: nivel, j: j, frotas: [null, null], log: [], vez: 0, eu: 0, fase: 'arrumar', venc: -1, ocupado: false, vistos: null };
     alvoSel = 1;
     if (modo === 'pc') {
       jogo.ia = L.IA(nivel); jogo.frotas[1] = L.aleatoria(nivel);
-      abrirArrumar({ nivel: nivel, titulo: t('⚓ Arrume sua frota', '⚓ Place your fleet'), aoPronto: function (f) { jogo.frotas[0] = f; comecarLocal(); } });
+      abrirArrumar({ nivel: nivel, titulo: t('⚓ Arrume sua frota', '⚓ Place your fleet', '⚓ Coloca tu flota'), aoPronto: function (f) { jogo.frotas[0] = f; comecarLocal(); } });
       return;
     }
     var g = jogo;
-    cortina(t('Jogador 1: arrume sua frota', 'Player 1: place your fleet'), t('O Jogador 2 não pode olhar! 🙈', 'Player 2, no peeking! 🙈'), function () {
-      abrirArrumar({ nivel: nivel, titulo: t('⚓ Frota do Jogador 1', '⚓ Player 1 fleet'), aoPronto: function (f) {
+    cortina(t('Jogador 1: arrume sua frota', 'Player 1: place your fleet', 'Jugador 1: coloca tu flota'), t('O Jogador 2 não pode olhar! 🙈', 'Player 2, no peeking! 🙈', '¡El Jugador 2 no puede mirar! 🙈'), function () {
+      abrirArrumar({ nivel: nivel, titulo: t('⚓ Frota do Jogador 1', '⚓ Player 1 fleet', '⚓ Flota del Jugador 1'), aoPronto: function (f) {
         g.frotas[0] = f;
-        cortina(t('Passe o aparelho para o Jogador 2', 'Pass the device to Player 2'), t('Jogador 2: arrume sua frota. O Jogador 1 não pode olhar! 🙈', 'Player 2: place your fleet. Player 1, no peeking! 🙈'), function () {
-          abrirArrumar({ nivel: nivel, titulo: t('⚓ Frota do Jogador 2', '⚓ Player 2 fleet'), aoPronto: function (f2) {
+        cortina(t('Passe o aparelho para o Jogador 2', 'Pass the device to Player 2', 'Pasa el dispositivo al Jugador 2'), t('Jogador 2: arrume sua frota. O Jogador 1 não pode olhar! 🙈', 'Player 2: place your fleet. Player 1, no peeking! 🙈', 'Jugador 2: coloca tu flota. ¡El Jugador 1 no puede mirar! 🙈'), function () {
+          abrirArrumar({ nivel: nivel, titulo: t('⚓ Frota do Jogador 2', '⚓ Player 2 fleet', '⚓ Flota del Jugador 2'), aoPronto: function (f2) {
             g.frotas[1] = f2;
-            cortina(t('Passe o aparelho para o Jogador 1', 'Pass the device to Player 1'), t('O Jogador 1 começa atirando.', 'Player 1 fires first.'), comecarLocal);
+            cortina(t('Passe o aparelho para o Jogador 1', 'Pass the device to Player 1', 'Pasa el dispositivo al Jugador 1'), t('O Jogador 1 começa atirando.', 'Player 1 fires first.', 'El Jugador 1 dispara primero.'), comecarLocal);
           } });
         });
       } });
@@ -636,7 +639,7 @@
   function comecarLocal() {
     var g = jogo; g.fase = 'jogo'; g.vez = 0; g.eu = 0; alvoSel = 1; g.vistos = 0;
     mostrar('jogo'); desenhar();
-    estouro(t('⚔️ Começou!', '⚔️ Battle on!'), '', 'vez');
+    estouro(t('⚔️ Começou!', '⚔️ Battle on!', '⚔️ ¡Empieza la batalla!'), '', 'vez');
     setTimeout(function () { if (jogo === g) Som.efeito('comecou'); }, 700 * RAPIDO);
   }
   function atirarLocal(b, x, y) {
@@ -657,7 +660,7 @@
       g.ocupado = false; g.vez = b;
       if (g.modo === 'pc') { desenhar(); if (g.vez === 1) setTimeout(function () { if (jogo === g) vezDoComputador(); }, 700 * RAPIDO); else Som.efeito('vez'); }
       else {
-        cortina(t('Passe o aparelho para ', 'Pass the device to ') + nomeJ(g.j, b), t('Vez de ', 'Turn: ') + nomeJ(g.j, b) + t('. Quem atirou agora não olha! 🙈', '. The other player, no peeking! 🙈'), function () {
+        cortina(t('Passe o aparelho para ', 'Pass the device to ', 'Pasa el dispositivo a ') + nomeJ(g.j, b), t('Vez de ', 'Turn: ', 'Turno de ') + nomeJ(g.j, b) + t('. Quem atirou agora não olha! 🙈', '. The other player, no peeking! 🙈', '. ¡Quien acaba de disparar no mira! 🙈'), function () {
           if (jogo !== g) return;
           g.eu = b; alvoSel = a; desenhar(); Som.efeito('vez');
         });
@@ -675,7 +678,7 @@
   function abrirAmigos(codigo) {
     $('nome').value = pref.nome || '';
     $('codigo').value = codigo || '';
-    $('amigosMsg').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Conecte no Wi-Fi ou nos dados para jogar com amigos.', '📡 No internet right now. Connect to Wi-Fi or data to play with friends.') : '';
+    $('amigosMsg').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Conecte no Wi-Fi ou nos dados para jogar com amigos.', '📡 No internet right now. Connect to Wi-Fi or data to play with friends.', '📡 Ahora no hay internet. Conéctate al Wi-Fi o a los datos para jugar con amigos.') : '';
     mostrar('amigos');
     // no computador o cursor já vai para o nome; no celular não (o teclado subiria antes de escolher criar ou entrar)
     if (!(('ontouchstart' in window) || navigator.maxTouchPoints > 0)) $('nome').focus();
@@ -686,7 +689,7 @@
   $('formEntrar').addEventListener('submit', function (e) {
     e.preventDefault();
     var c = $('codigo').value.trim().toUpperCase();
-    if (!/^[A-Z]{4}$/.test(c)) { $('amigosMsg').textContent = t('O código tem 4 letras (quem criou a partida vê na tela).', 'The code has 4 letters (whoever created the game sees it on screen).'); $('codigo').focus(); return; }
+    if (!/^[A-Z]{4}$/.test(c)) { $('amigosMsg').textContent = t('O código tem 4 letras (quem criou a partida vê na tela).', 'The code has 4 letters (whoever created the game sees it on screen).', 'El código tiene 4 letras (quien ha creado la partida lo ve en la pantalla).'); $('codigo').focus(); return; }
     var nome = guardarNome();
     conectar({ id: R.idNovo(), nome: nome, codigo: c, host: false });
   });
@@ -716,9 +719,9 @@
       desenhar();
     }).catch(function () {
       if (jogo !== g) return;
-      abrirJanela({ titulo: t('📡 Não consegui conectar', "📡 Couldn't connect"),
-        texto: t('Jogar com amigos em aparelhos diferentes precisa de internet. Confira o Wi-Fi ou os dados e tente de novo. Sem internet, dá para jogar pertinho (📶, no mesmo Wi-Fi), contra o computador ou passando o aparelho.', 'Playing with friends on different devices needs internet. Check Wi-Fi or data and try again. Offline, you can play nearby (📶, same Wi-Fi), against the computer or pass the device.'),
-        botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again'), fn: function () { conectar({ dados: g.p.exportar() }); } }, { t: t('Voltar', 'Back'), fn: function () { sairDoJogo(true); mostrar('inicio'); } }] });
+      abrirJanela({ titulo: t('📡 Não consegui conectar', "📡 Couldn't connect", '📡 No he podido conectar'),
+        texto: t('Jogar com amigos em aparelhos diferentes precisa de internet. Confira o Wi-Fi ou os dados e tente de novo. Sem internet, dá para jogar pertinho (📶, no mesmo Wi-Fi), contra o computador ou passando o aparelho.', 'Playing with friends on different devices needs internet. Check Wi-Fi or data and try again. Offline, you can play nearby (📶, same Wi-Fi), against the computer or pass the device.', 'Para jugar con amigos en dispositivos diferentes hace falta internet. Revisa el Wi-Fi o los datos e inténtalo otra vez. Sin internet, puedes jugar de cerca (📶, en el mismo Wi-Fi), contra el ordenador o pasando el dispositivo.'),
+        botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again', '🔄 Intentar otra vez'), fn: function () { conectar({ dados: g.p.exportar() }); } }, { t: t('Voltar', 'Back', 'Volver'), fn: function () { sairDoJogo(true); mostrar('inicio'); } }] });
     });
   }
   function abrirCanal(g) {
@@ -760,9 +763,9 @@
     var g = jogo; if (!g) { mostrar('inicio'); return; }
     var fim = g.modo === 'rede' ? g.p.estado().fase === 'fim' : g.fase === 'fim';
     if (fim) { sairDoJogo(); mostrar('inicio'); return; }
-    abrirJanela({ titulo: t('Sair da partida?', 'Leave the game?'),
-      texto: g.modo === 'rede' ? t('Os outros continuam sem você.', 'The others go on without you.') : t('A partida vai acabar.', 'The game will end.'),
-      botoes: [{ t: t('🚪 Sim, sair', '🚪 Yes, leave'), fn: function () { sairDoJogo(); mostrar('inicio'); } }, { t: t('Continuar jogando', 'Keep playing') }] });
+    abrirJanela({ titulo: t('Sair da partida?', 'Leave the game?', '¿Salir de la partida?'),
+      texto: g.modo === 'rede' ? t('Os outros continuam sem você.', 'The others go on without you.', 'Los demás siguen sin ti.') : t('A partida vai acabar.', 'The game will end.', 'La partida se va a terminar.'),
+      botoes: [{ t: t('🚪 Sim, sair', '🚪 Yes, leave', '🚪 Sí, salir'), fn: function () { sairDoJogo(); mostrar('inicio'); } }, { t: t('Continuar jogando', 'Keep playing', 'Seguir jugando') }] });
   }
   $('btSairSala').addEventListener('click', confirmarSair);
   $('btInicioFim').addEventListener('click', function () { sairDoJogo(); mostrar('inicio'); });
@@ -775,14 +778,14 @@
   function linkConvite(c) { return location.origin + location.pathname + '?sala=' + c; }
   $('btCompartilhar').addEventListener('click', function () {
     if (!jogo || jogo.modo !== 'rede') return;
-    var url = linkConvite(jogo.codigo), txt = t('Vem jogar Batalha Naval comigo! Código: ', 'Come play Sea Battle with me! Code: ') + jogo.codigo;
-    if (navigator.share) navigator.share({ title: t('Batalha Naval', 'Sea Battle'), text: txt, url: url }).catch(function () { /* cancelou */ });
+    var url = linkConvite(jogo.codigo), txt = t('Vem jogar Batalha Naval comigo! Código: ', 'Come play Sea Battle with me! Code: ', '¡Ven a jugar Batalla Naval conmigo! Código: ') + jogo.codigo;
+    if (navigator.share) navigator.share({ title: t('Batalha Naval', 'Sea Battle', 'Batalla Naval'), text: txt, url: url }).catch(function () { /* cancelou */ });
     else copiar(url);
   });
   $('btCopiar').addEventListener('click', function () { if (jogo && jogo.modo === 'rede') copiar(linkConvite(jogo.codigo)); });
   function copiar(url) {
-    var ok = function () { aviso(t('🔗 Link copiado! Cole na conversa com quem vai jogar.', '🔗 Link copied! Paste it in a chat with the other players.')); };
-    var manual = function () { var s = window.getSelection(), r = document.createRange(); r.selectNodeContents($('salaLink')); s.removeAllRanges(); s.addRange(r); aviso(t('Copie o link que ficou marcado.', 'Copy the highlighted link.')); };
+    var ok = function () { aviso(t('🔗 Link copiado! Cole na conversa com quem vai jogar.', '🔗 Link copied! Paste it in a chat with the other players.', '🔗 ¡Enlace copiado! Pégalo en el chat con quien vaya a jugar.')); };
+    var manual = function () { var s = window.getSelection(), r = document.createRange(); r.selectNodeContents($('salaLink')); s.removeAllRanges(); s.addRange(r); aviso(t('Copie o link que ficou marcado.', 'Copy the highlighted link.', 'Copia el enlace que ha quedado marcado.')); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, manual); else manual();
   }
 
@@ -790,8 +793,8 @@
     var g = jogo, p = g.p, s = p.estado(), eu = p.meu();
     if (s.nao) {
       sairDoJogo(true); guardarRede(null); enderecoSala(null); mostrar('inicio');
-      abrirJanela({ titulo: s.nao === 'cheia' ? t('A sala está cheia', 'The room is full') : t('Essa partida já começou', 'That game already started'),
-        texto: s.nao === 'cheia' ? t('Cabem até 4 jogadores por partida. Crie outra partida para vocês.', 'Up to 4 players per game. Create another game for your group.') : t('Espere acabar e peça para quem criou tocar em Jogar de novo — ou crie outra partida.', 'Wait for it to end and ask the creator to tap Play again — or create another game.') });
+      abrirJanela({ titulo: s.nao === 'cheia' ? t('A sala está cheia', 'The room is full', 'La sala está llena') : t('Essa partida já começou', 'That game already started', 'Esa partida ya ha empezado'),
+        texto: s.nao === 'cheia' ? t('Cabem até 4 jogadores por partida. Crie outra partida para vocês.', 'Up to 4 players per game. Create another game for your group.', 'Caben hasta 4 jugadores por partida. Cread otra partida para vosotros.') : t('Espere acabar e peça para quem criou tocar em Jogar de novo — ou crie outra partida.', 'Wait for it to end and ask the creator to tap Play again — or create another game.', 'Espera a que termine y pide a quien la ha creado que pulse Jugar otra vez, o crea otra partida.') });
       return;
     }
     if (s.saiu) return;
@@ -802,12 +805,12 @@
     } else {
       if (atual !== 'jogo') {
         mostrar('jogo');
-        if (g.ultimaFase === 'sala') { setTimeout(function () { estouro(t('⚔️ Começou!', '⚔️ Battle on!'), '', 'vez'); Som.efeito('comecou'); }, 50); }
+        if (g.ultimaFase === 'sala') { setTimeout(function () { estouro(t('⚔️ Começou!', '⚔️ Battle on!', '⚔️ ¡Empieza la batalla!'), '', 'vez'); Som.efeito('comecou'); }, 50); }
       }
       var antesVez = g.ultimaVez;
       desenharJogo();
       if (s.fase === 'jogo' && s.vez === eu && antesVez !== eu && g.ultimaFase) {
-        setTimeout(function () { if (jogo === g && g.p.estado().vez === eu && !g.p.estado().pend) { estouro(t('🎯 Sua vez!', '🎯 Your turn!'), '', 'vez'); Som.efeito('vez'); vibrar(60); } }, 1500 * RAPIDO);
+        setTimeout(function () { if (jogo === g && g.p.estado().vez === eu && !g.p.estado().pend) { estouro(t('🎯 Sua vez!', '🎯 Your turn!', '🎯 ¡Tu turno!'), '', 'vez'); Som.efeito('vez'); vibrar(60); } }, 1500 * RAPIDO);
       }
       g.ultimaVez = s.vez;
     }
@@ -820,30 +823,30 @@
     var lista = $('salaLista'); lista.innerHTML = '';
     s.j.forEach(function (pj, i) {
       var li = document.createElement('li'); li.style.setProperty('--cor', CORES[i]);
-      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = (i === s.h ? '👑 ' : '') + nomeJ(s.j, i) + (i === eu ? t(' (você)', ' (you)') : '');
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = (i === s.h ? '👑 ' : '') + nomeJ(s.j, i) + (i === eu ? t(' (você)', ' (you)', ' (tú)') : '');
       var st = document.createElement('span'); st.className = 'st';
-      st.textContent = pj.au ? t('📡 sem conexão', '📡 offline') : pj.p ? t('✅ pronto', '✅ ready') : t('⚓ arrumando', '⚓ placing');
+      st.textContent = pj.au ? t('📡 sem conexão', '📡 offline', '📡 sin conexión') : pj.p ? t('✅ pronto', '✅ ready', '✅ listo') : t('⚓ arrumando', '⚓ placing', '⚓ colocando');
       li.appendChild(nm); li.appendChild(st); lista.appendChild(li);
     });
     var status = $('salaStatus'), bA = $('btArrumar'), bC = $('btComecar');
     bA.hidden = eu < 0; bC.hidden = !p.souHost();
-    if (!g.conectado) status.textContent = g.perto ? t('📡 Sem conexão com o outro aparelho.', '📡 Not connected to the other device.') : t('📡 Conectando…', '📡 Connecting…');
-    else if (eu < 0) status.textContent = Date.now() - g.desde > 10000 ? t('🤔 Ninguém respondeu nesse código ainda. Confira as 4 letras com quem criou a partida (ela precisa estar com o jogo aberto).', '🤔 No one answered on that code yet. Check the 4 letters with whoever created the game (they need the game open).') : t('Entrando na sala…', 'Joining the room…');
-    else if (p.semAnfitriao() > 8000) status.textContent = t('📡 Sem notícias de quem criou a sala…', '📡 No news from the room creator…');
+    if (!g.conectado) status.textContent = g.perto ? t('📡 Sem conexão com o outro aparelho.', '📡 Not connected to the other device.', '📡 Sin conexión con el otro dispositivo.') : t('📡 Conectando…', '📡 Connecting…', '📡 Conectando…');
+    else if (eu < 0) status.textContent = Date.now() - g.desde > 10000 ? t('🤔 Ninguém respondeu nesse código ainda. Confira as 4 letras com quem criou a partida (ela precisa estar com o jogo aberto).', '🤔 No one answered on that code yet. Check the 4 letters with whoever created the game (they need the game open).', '🤔 Nadie ha respondido con ese código todavía. Revisa las 4 letras con quien ha creado la partida (tiene que tener el juego abierto).') : t('Entrando na sala…', 'Joining the room…', 'Entrando en la sala…');
+    else if (p.semAnfitriao() > 8000) status.textContent = t('📡 Sem notícias de quem criou a sala…', '📡 No news from the room creator…', '📡 No hay noticias de quien ha creado la sala…');
     else if (p.souHost()) {
       var prontos = s.j.filter(function (x) { return x.p; }).length;
-      status.textContent = s.j.length < 2 ? t('Esperando mais alguém entrar (mínimo 2 jogadores).', 'Waiting for someone else to join (at least 2 players).')
-        : prontos < s.j.length ? t('Esperando todos arrumarem a frota (', 'Waiting for everyone to place their fleet (') + prontos + t(' de ', ' of ') + s.j.length + ').'
-        : t('Todos prontos! Toque em Começar a batalha.', 'Everyone is ready! Tap Start the battle.');
-    } else status.textContent = s.j[eu].p ? t('✅ Sua frota está pronta. Quando todos estiverem prontos, ', '✅ Your fleet is ready. When everyone is ready, ') + nomeJ(s.j, s.h) + t(' começa a batalha.', ' starts the battle.') : t('Arrume sua frota e toque em Pronto.', 'Place your fleet and tap Ready.');
-    bA.textContent = eu >= 0 && s.j[eu].p ? t('✏️ Mudar minha frota', '✏️ Change my fleet') : t('⚓ Arrumar minha frota', '⚓ Place my fleet');
+      status.textContent = s.j.length < 2 ? t('Esperando mais alguém entrar (mínimo 2 jogadores).', 'Waiting for someone else to join (at least 2 players).', 'Esperando que entre alguien más (mínimo 2 jugadores).')
+        : prontos < s.j.length ? t('Esperando todos arrumarem a frota (', 'Waiting for everyone to place their fleet (', 'Esperando que todos coloquen su flota (') + prontos + t(' de ', ' of ', ' de ') + s.j.length + ').'
+        : t('Todos prontos! Toque em Começar a batalha.', 'Everyone is ready! Tap Start the battle.', '¡Todos listos! Toca Empezar la batalla.');
+    } else status.textContent = s.j[eu].p ? t('✅ Sua frota está pronta. Quando todos estiverem prontos, ', '✅ Your fleet is ready. When everyone is ready, ', '✅ Tu flota está lista. Cuando todos estén listos, ') + nomeJ(s.j, s.h) + t(' começa a batalha.', ' starts the battle.', ' empieza la batalla.') : t('Arrume sua frota e toque em Pronto.', 'Place your fleet and tap Ready.', 'Coloca tu flota y toca Listo.');
+    bA.textContent = eu >= 0 && s.j[eu].p ? t('✏️ Mudar minha frota', '✏️ Change my fleet', '✏️ Cambiar mi flota') : t('⚓ Arrumar minha frota', '⚓ Place my fleet', '⚓ Colocar mi flota');
     bC.disabled = !p.podeComecar();
   }
   $('btArrumar').addEventListener('click', function () {
     var g = jogo; if (!g || g.modo !== 'rede') return;
     var s = g.p.estado(), eu = g.p.meu(); if (eu < 0) return;
     if (s.j[eu].p) g.p.pronto(false);
-    abrirArrumar({ nivel: s.nivel, frota: s.frota, titulo: '⚓ ' + t('Sua frota', 'Your fleet') + ' · ' + N(L.NIVEIS[s.nivel]) + ' ' + L.NIVEIS[s.nivel].n + '×' + L.NIVEIS[s.nivel].n,
+    abrirArrumar({ nivel: s.nivel, frota: s.frota, titulo: '⚓ ' + t('Sua frota', 'Your fleet', 'Tu flota') + ' · ' + N(L.NIVEIS[s.nivel]) + ' ' + L.NIVEIS[s.nivel].n + '×' + L.NIVEIS[s.nivel].n,
       aoPronto: function (f) { if (jogo !== g) return; g.p.definirFrota(f); g.p.pronto(true); mostrar('sala'); desenhar(); } });
   });
   $('btComecar').addEventListener('click', function () { if (jogo && jogo.modo === 'rede') jogo.p.comecar(); });
@@ -862,7 +865,7 @@
   }
   function abrirPerto() {
     $('nomePerto').value = pref.nome || '';
-    $('pertoMsg').textContent = P.temWebRTC() ? '' : t('😕 Este navegador não consegue ligar dois aparelhos direto. Use o Chrome (Android) ou o Safari (iPhone) atualizados.', "😕 This browser can't link two devices directly. Use an up-to-date Chrome (Android) or Safari (iPhone).");
+    $('pertoMsg').textContent = P.temWebRTC() ? '' : t('😕 Este navegador não consegue ligar dois aparelhos direto. Use o Chrome (Android) ou o Safari (iPhone) atualizados.', "😕 This browser can't link two devices directly. Use an up-to-date Chrome (Android) or Safari (iPhone).", '😕 Este navegador no puede conectar dos dispositivos directamente. Usa Chrome (Android) o Safari (iPhone) actualizados.');
     mostrar('perto');
   }
   function nomePerto() { pref.nome = R.nome($('nomePerto').value); salvarPref(); return pref.nome; }
@@ -888,7 +891,7 @@
 
   function telaCodigo(s, titulo, dica) {
     $('pertoCodTitulo').textContent = titulo; $('pertoCodDica').textContent = dica;
-    $('pertoCodStatus').textContent = t('⏳ Preparando o código…', '⏳ Getting the code ready…');
+    $('pertoCodStatus').textContent = t('⏳ Preparando o código…', '⏳ Getting the code ready…', '⏳ Preparando el código…');
     $('pertoCodTexto').textContent = ''; $('btPertoLerResposta').hidden = true; $('btPertoDeNovo').hidden = true;
     var cv = $('pertoQR'); cv.width = cv.height = 1; cv.hidden = true;
     mostrar('pertoCodigo');
@@ -896,12 +899,12 @@
   function mostrarQR(s, codigo, status) {
     s.codigo = codigo; $('pertoCodTexto').textContent = codigo; $('pertoCodStatus').textContent = status;
     return Q.desenhar($('pertoQR'), codigo).then(function (info) { if (perto !== s) return; s.qr = info; $('pertoQR').hidden = false; },
-      function () { if (perto === s) $('pertoCodStatus').textContent = t('😕 Não consegui desenhar o QR. Use o código em texto aqui embaixo.', "😕 Couldn't draw the QR. Use the text code below."); });
+      function () { if (perto === s) $('pertoCodStatus').textContent = t('😕 Não consegui desenhar o QR. Use o código em texto aqui embaixo.', "😕 Couldn't draw the QR. Use the text code below.", '😕 No he podido dibujar el QR. Usa el código en texto de aquí abajo.'); });
   }
   $('btPertoCopiar').addEventListener('click', function () {
     var txt = $('pertoCodTexto').textContent; if (!txt) return;
-    var ok = function () { aviso(t('📋 Código copiado!', '📋 Code copied!')); };
-    var manual = function () { var sel = window.getSelection(), r = document.createRange(); r.selectNodeContents($('pertoCodTexto')); sel.removeAllRanges(); sel.addRange(r); aviso(t('Copie o código que ficou marcado.', 'Copy the highlighted code.')); };
+    var ok = function () { aviso(t('📋 Código copiado!', '📋 Code copied!', '📋 ¡Código copiado!')); };
+    var manual = function () { var sel = window.getSelection(), r = document.createRange(); r.selectNodeContents($('pertoCodTexto')); sel.removeAllRanges(); sel.addRange(r); aviso(t('Copie o código que ficou marcado.', 'Copy the highlighted code.', 'Copia el código que ha quedado marcado.')); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, manual); else manual();
   });
 
@@ -910,42 +913,42 @@
     limparPerto(perto);
     var s = perto = { papel: 'criar', nivel: nivel, g: g || null, etapa: 'oferta' };
     if (g) g.religando = true;
-    telaCodigo(s, t('1️⃣ Mostre este código para o outro aparelho', '1️⃣ Show this code to the other device'),
-      t('No outro aparelho: 📶 Jogar pertinho → 📷 Entrar pertinho, e aponte a câmera para este quadrado.', 'On the other device: 📶 Play nearby → 📷 Join nearby, and point the camera at this square.'));
-    $('pertoCodStatus').textContent = t('⏳ Preparando o código… (se pedir a câmera, toque em Permitir)', '⏳ Getting the code ready… (if it asks for the camera, tap Allow)');
+    telaCodigo(s, t('1️⃣ Mostre este código para o outro aparelho', '1️⃣ Show this code to the other device', '1️⃣ Muestra este código al otro dispositivo'),
+      t('No outro aparelho: 📶 Jogar pertinho → 📷 Entrar pertinho, e aponte a câmera para este quadrado.', 'On the other device: 📶 Play nearby → 📷 Join nearby, and point the camera at this square.', 'En el otro dispositivo: 📶 Jugar de cerca → 📷 Entrar de cerca, y apunta la cámara a este cuadrado.'));
+    $('pertoCodStatus').textContent = t('⏳ Preparando o código… (se pedir a câmera, toque em Permitir)', '⏳ Getting the code ready… (if it asks for the camera, tap Allow)', '⏳ Preparando el código… (si pide la cámara, toca Permitir)');
     P.criar({ camera: true }).then(function (ses) {
       if (perto !== s) { ses.fechar(); return; }
       s.ses = ses;
       ses.aberta.then(function (cx) { conectou(s, cx); }, function () { falhouPerto(s); });
-      mostrarQR(s, ses.codigo, t('Quando o outro aparelho mostrar o código dele, toque no botão aqui embaixo.', 'When the other device shows its code, tap the button below.'));
+      mostrarQR(s, ses.codigo, t('Quando o outro aparelho mostrar o código dele, toque no botão aqui embaixo.', 'When the other device shows its code, tap the button below.', 'Cuando el otro dispositivo muestre su código, toca el botón de aquí abajo.'));
       $('btPertoLerResposta').hidden = false;
     }, function (e) { erroPerto(s, e); });
   }
   $('btPertoLerResposta').addEventListener('click', function () {
     var s = perto; if (!s || s.papel !== 'criar' || !s.ses) return;
     s.etapa = 'lerResposta';
-    abrirLeitor(s, t('3️⃣ Leia o código do outro aparelho', "3️⃣ Scan the other device's code"), t('Aponte a câmera para o quadrado que apareceu no outro aparelho.', 'Point the camera at the square on the other device.'));
+    abrirLeitor(s, t('3️⃣ Leia o código do outro aparelho', "3️⃣ Scan the other device's code", '3️⃣ Lee el código del otro dispositivo'), t('Aponte a câmera para o quadrado que apareceu no outro aparelho.', 'Point the camera at the square on the other device.', 'Apunta la cámara al cuadrado que ha aparecido en el otro dispositivo.'));
   });
   // quem entra
   function pertoEntrar(g) {
     limparPerto(perto);
     var s = perto = { papel: 'entrar', g: g || null, etapa: 'lerOferta' };
     if (g) g.religando = true;
-    abrirLeitor(s, t('2️⃣ Leia o código de quem criou', '2️⃣ Scan the creator’s code'), t('Aponte a câmera para o quadrado preto e branco na tela do outro aparelho.', 'Point the camera at the black and white square on the other device.'));
+    abrirLeitor(s, t('2️⃣ Leia o código de quem criou', '2️⃣ Scan the creator’s code', '2️⃣ Lee el código de quien ha creado la partida'), t('Aponte a câmera para o quadrado preto e branco na tela do outro aparelho.', 'Point the camera at the black and white square on the other device.', 'Apunta la cámara al cuadrado blanco y negro en la pantalla del otro dispositivo.'));
   }
   function abrirLeitor(s, titulo, dica) {
     $('pertoLerTitulo').textContent = titulo; $('pertoLerDica').textContent = dica;
-    $('pertoLerStatus').textContent = t('📷 Abrindo a câmera…', '📷 Opening the camera…');
+    $('pertoLerStatus').textContent = t('📷 Abrindo a câmera…', '📷 Opening the camera…', '📷 Abriendo la cámara…');
     $('pertoColar').value = ''; $('pertoVideo').hidden = false;
     mostrar('pertoLer');
     Q.ler($('pertoVideo'), lerCodigo).then(function (leitor) {
       if (perto !== s) { leitor.parar(); return; }
-      s.leitor = leitor; if (!s.avisou && (s.etapa === 'lerOferta' || s.etapa === 'lerResposta')) $('pertoLerStatus').textContent = t('🔎 Procurando o código…', '🔎 Looking for the code…');
+      s.leitor = leitor; if (!s.avisou && (s.etapa === 'lerOferta' || s.etapa === 'lerResposta')) $('pertoLerStatus').textContent = t('🔎 Procurando o código…', '🔎 Looking for the code…', '🔎 Buscando el código…');
     }, function (e) {
       if (perto !== s) return;
       $('pertoLerStatus').textContent = e.codigo === 'negado'
-        ? t('📷 A câmera não foi liberada. Libere a câmera para este site (no cadeado ao lado do endereço) ou cole o código em texto aqui embaixo.', '📷 The camera was not allowed. Allow the camera for this site (padlock next to the address) or paste the text code below.')
-        : t('📷 Não achei a câmera. Cole o código em texto aqui embaixo.', "📷 Couldn't find a camera. Paste the text code below.");
+        ? t('📷 A câmera não foi liberada. Libere a câmera para este site (no cadeado ao lado do endereço) ou cole o código em texto aqui embaixo.', '📷 The camera was not allowed. Allow the camera for this site (padlock next to the address) or paste the text code below.', '📷 No se ha dado permiso a la cámara. Permite la cámara para este sitio (en el candado junto a la dirección) o pega el código en texto aquí abajo.')
+        : t('📷 Não achei a câmera. Cole o código em texto aqui embaixo.', "📷 Couldn't find a camera. Paste the text code below.", '📷 No he encontrado la cámara. Pega el código en texto aquí abajo.');
       $('pertoColarCaixa').open = true;
     });
   }
@@ -963,7 +966,7 @@
       s.etapa = 'conectando';
       if (s.leitor) { s.leitor.parar(); s.leitor = null; }
       $('pertoVideo').hidden = true;
-      $('pertoLerStatus').textContent = t('🔗 Código lido! Ligando os dois aparelhos…', '🔗 Code scanned! Linking the two devices…');
+      $('pertoLerStatus').textContent = t('🔗 Código lido! Ligando os dois aparelhos…', '🔗 Code scanned! Linking the two devices…', '🔗 ¡Código leído! Conectando los dos dispositivos…');
       s.ses.aceitar(texto).then(function () {
         if (perto !== s) return;
         s.tempo = setTimeout(function () { if (perto === s && !s.conectou) falhouPerto(s); }, ESPERA_ABRIR);
@@ -971,19 +974,19 @@
       return true;
     }
     s.etapa = 'resposta';
-    $('pertoLerStatus').textContent = t('✅ Código lido! Preparando a resposta…', '✅ Code scanned! Getting the answer ready…');
+    $('pertoLerStatus').textContent = t('✅ Código lido! Preparando a resposta…', '✅ Code scanned! Getting the answer ready…', '✅ ¡Código leído! Preparando la respuesta…');
     // a câmera continua ligada enquanto o aparelho junta os endereços (assim ele mostra o endereço de verdade na rede)
     P.entrar(texto, { camera: !s.leitor }).then(function (ses) {
       if (s.leitor) { s.leitor.parar(); s.leitor = null; }
       if (perto !== s) { ses.fechar(); return; }
       s.ses = ses;
       ses.aberta.then(function (cx) { conectou(s, cx); }, function () { falhouPerto(s); });
-      telaCodigo(s, t('4️⃣ Agora mostre este código para quem criou', '4️⃣ Now show this code to the creator'),
-        t('Quem criou toca em "📷 Agora ler o código do outro celular" e aponta a câmera para cá.', 'The creator taps "📷 Now scan the other phone\'s code" and points the camera here.'));
-      mostrarQR(s, ses.codigo, t('⏳ Esperando o outro aparelho ler este código…', '⏳ Waiting for the other device to scan this code…'));
+      telaCodigo(s, t('4️⃣ Agora mostre este código para quem criou', '4️⃣ Now show this code to the creator', '4️⃣ Ahora muestra este código a quien ha creado la partida'),
+        t('Quem criou toca em "📷 Agora ler o código do outro celular" e aponta a câmera para cá.', 'The creator taps "📷 Now scan the other phone\'s code" and points the camera here.', 'Quien ha creado la partida pulsa "📷 Ahora leer el código del otro móvil" y apunta la cámara hacia aquí.'));
+      mostrarQR(s, ses.codigo, t('⏳ Esperando o outro aparelho ler este código…', '⏳ Waiting for the other device to scan this code…', '⏳ Esperando que el otro dispositivo lea este código…'));
       s.dica = setTimeout(function () {
         if (perto !== s || s.conectou) return;
-        $('pertoCodStatus').textContent = t('🤔 Ainda não ligou. Confira: os dois estão no MESMO Wi-Fi (o do celular-roteador)? Wi-Fi de avião, hotel ou loja costuma não deixar um aparelho ver o outro. Se quem criou já leu este código, toque em Começar de novo nos dois.', "🤔 Not linked yet. Check: are both on the SAME Wi-Fi (the hotspot phone's)? Plane, hotel or shop Wi-Fi often doesn't let devices see each other. If the creator already scanned this code, tap Start over on both.");
+        $('pertoCodStatus').textContent = t('🤔 Ainda não ligou. Confira: os dois estão no MESMO Wi-Fi (o do celular-roteador)? Wi-Fi de avião, hotel ou loja costuma não deixar um aparelho ver o outro. Se quem criou já leu este código, toque em Começar de novo nos dois.', "🤔 Not linked yet. Check: are both on the SAME Wi-Fi (the hotspot phone's)? Plane, hotel or shop Wi-Fi often doesn't let devices see each other. If the creator already scanned this code, tap Start over on both.", '🤔 Todavía no se han conectado. Revisa: ¿los dos estáis en el MISMO Wi-Fi (el del móvil que comparte la conexión)? El Wi-Fi de avión, hotel o tienda no suele dejar que un dispositivo vea al otro. Si quien ha creado la partida ya ha leído este código, pulsad Empezar de nuevo en los dos.');
         $('btPertoDeNovo').hidden = false;
       }, ESPERA_DICA);
     }, function (e) { if (s.leitor) { s.leitor.parar(); s.leitor = null; } erroPerto(s, e); });
@@ -991,30 +994,29 @@
   }
   function avisoCodigo(cod) {
     if (perto) perto.avisou = true;          // a câmera terminando de abrir não apaga este aviso
-    $('pertoLerStatus').textContent = cod === 'versao' ? t('⚠️ Esse código é de outra versão da Batalha Naval. Abram o jogo com internet nos dois aparelhos para atualizar e tentem de novo.', '⚠️ That code is from another version of Sea Battle. Open the game with internet on both devices to update, then try again.')
-      : cod === 'resposta' ? t('⚠️ Esse é o código de resposta. Leia o código que aparece no aparelho de quem criou a partida.', "⚠️ That's an answer code. Scan the code on the device of whoever created the game.")
-      : cod === 'oferta' ? t('⚠️ Esse é o código de criar partida. Leia o código que o OUTRO aparelho mostra depois de ler o seu.', "⚠️ That's a create-game code. Scan the code the OTHER device shows after scanning yours.")
-      : t('⚠️ Esse não é um código da Batalha Naval. Aponte para o quadrado preto e branco na tela do outro aparelho.', "⚠️ That's not a Sea Battle code. Point at the black and white square on the other device.");
+    $('pertoLerStatus').textContent = cod === 'versao' ? t('⚠️ Esse código é de outra versão da Batalha Naval. Abram o jogo com internet nos dois aparelhos para atualizar e tentem de novo.', '⚠️ That code is from another version of Sea Battle. Open the game with internet on both devices to update, then try again.', '⚠️ Ese código es de otra versión de Batalla Naval. Abrid el juego con internet en los dos dispositivos para actualizarlo e intentadlo otra vez.')
+      : cod === 'resposta' ? t('⚠️ Esse é o código de resposta. Leia o código que aparece no aparelho de quem criou a partida.', "⚠️ That's an answer code. Scan the code on the device of whoever created the game.", '⚠️ Ese es el código de respuesta. Lee el código que aparece en el dispositivo de quien ha creado la partida.')
+      : cod === 'oferta' ? t('⚠️ Esse é o código de criar partida. Leia o código que o OUTRO aparelho mostra depois de ler o seu.', "⚠️ That's a create-game code. Scan the code the OTHER device shows after scanning yours.", '⚠️ Ese es el código para crear la partida. Lee el código que muestra el OTRO dispositivo después de leer el tuyo.')
+      : t('⚠️ Esse não é um código da Batalha Naval. Aponte para o quadrado preto e branco na tela do outro aparelho.', "⚠️ That's not a Sea Battle code. Point at the black and white square on the other device.", '⚠️ Ese no es un código de Batalla Naval. Apunta al cuadrado blanco y negro en la pantalla del otro dispositivo.');
   }
   function erroPerto(s, e) {
     if (perto !== s) return;
     perto = null; limparPerto(s);
     var semRede = e && e.codigo === 'semrede';
-    abrirJanela({ titulo: semRede ? t('📶 Este aparelho não está em nenhum Wi-Fi', '📶 This device is not on any Wi-Fi') : t('😕 Não deu para preparar a ligação', "😕 Couldn't prepare the link"),
-      texto: semRede ? t('Ligue o Roteador Wi-Fi (Ponto de acesso) neste celular, ou conecte no Wi-Fi do outro, e tente de novo.', "Turn on this phone's Wi-Fi hotspot, or join the other one's Wi-Fi, and try again.")
-        : e && e.codigo === 'lixo' ? t('O código lido não funcionou. Tentem de novo do começo.', "The scanned code didn't work. Try again from the start.") : t('Tente de novo. Se continuar, feche e abra o jogo de novo.', 'Try again. If it keeps happening, close and reopen the game.'),
-      botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again'), fn: function () { if (s.papel === 'criar') pertoCriar(s.nivel, s.g); else pertoEntrar(s.g); } },
-        { t: t('Voltar', 'Back'), fn: function () { perto = s; cancelarPerto(); } }] });
+    abrirJanela({ titulo: semRede ? t('📶 Este aparelho não está em nenhum Wi-Fi', '📶 This device is not on any Wi-Fi', '📶 Este dispositivo no está en ningún Wi-Fi') : t('😕 Não deu para preparar a ligação', "😕 Couldn't prepare the link", '😕 No se pudo preparar la conexión'),
+      texto: semRede ? t('Ligue o Roteador Wi-Fi (Ponto de acesso) neste celular, ou conecte no Wi-Fi do outro, e tente de novo.', "Turn on this phone's Wi-Fi hotspot, or join the other one's Wi-Fi, and try again.", 'Activa el punto de acceso Wi-Fi en este móvil, o conéctate al Wi-Fi del otro, e inténtalo otra vez.')
+        : e && e.codigo === 'lixo' ? t('O código lido não funcionou. Tentem de novo do começo.', "The scanned code didn't work. Try again from the start.", 'El código leído no ha funcionado. Volved a intentarlo desde el principio.') : t('Tente de novo. Se continuar, feche e abra o jogo de novo.', 'Try again. If it keeps happening, close and reopen the game.', 'Inténtalo otra vez. Si sigue pasando, cierra el juego y ábrelo de nuevo.'),
+      botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again', '🔄 Intentar otra vez'), fn: function () { if (s.papel === 'criar') pertoCriar(s.nivel, s.g); else pertoEntrar(s.g); } },
+        { t: t('Voltar', 'Back', 'Volver'), fn: function () { perto = s; cancelarPerto(); } }] });
   }
   // não abriu a tempo (ou falhou): dizer o que costuma ser e deixar tentar de novo
   function falhouPerto(s) {
     if (perto !== s || s.conectou) return;
     perto = null; limparPerto(s);
-    abrirJanela({ titulo: t('📡 Os aparelhos não se acharam', "📡 The devices couldn't find each other"),
-      texto: t('O que costuma ser: 1) os dois não estão no MESMO Wi-Fi — o outro precisa estar conectado no Roteador Wi-Fi deste celular (ou os dois no mesmo Wi-Fi); 2) Wi-Fi de avião, hotel, loja ou escola costuma não deixar um aparelho ver o outro — use o Roteador de um dos celulares; 3) o código lido era de uma tentativa anterior. Toque em Tentar de novo nos dois aparelhos.',
-        'Usually: 1) the two are not on the SAME Wi-Fi — the other one must be joined to this phone\'s hotspot (or both on the same Wi-Fi); 2) plane, hotel, shop or school Wi-Fi often stops devices from seeing each other — use one phone\'s hotspot; 3) the scanned code was from an earlier try. Tap Try again on both devices.'),
-      botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again'), fn: function () { if (s.papel === 'criar') pertoCriar(s.nivel, s.g); else pertoEntrar(s.g); } },
-        { t: t('Voltar', 'Back'), fn: function () { perto = s; cancelarPerto(); } }] });
+    abrirJanela({ titulo: t('📡 Os aparelhos não se acharam', "📡 The devices couldn't find each other", '📡 Los dispositivos no se encontraron'),
+      texto: t('O que costuma ser: 1) os dois não estão no MESMO Wi-Fi — o outro precisa estar conectado no Roteador Wi-Fi deste celular (ou os dois no mesmo Wi-Fi); 2) Wi-Fi de avião, hotel, loja ou escola costuma não deixar um aparelho ver o outro — use o Roteador de um dos celulares; 3) o código lido era de uma tentativa anterior. Toque em Tentar de novo nos dois aparelhos.', 'Usually: 1) the two are not on the SAME Wi-Fi — the other one must be joined to this phone\'s hotspot (or both on the same Wi-Fi); 2) plane, hotel, shop or school Wi-Fi often stops devices from seeing each other — use one phone\'s hotspot; 3) the scanned code was from an earlier try. Tap Try again on both devices.', 'Lo que suele pasar: 1) los dos no estáis en el MISMO Wi-Fi: el otro tiene que estar conectado al punto de acceso de este móvil (o los dos al mismo Wi-Fi); 2) el Wi-Fi de avión, hotel, tienda o colegio no suele dejar que un dispositivo vea al otro: usad el punto de acceso de uno de los móviles; 3) el código leído era de un intento anterior. Pulsad Intentar otra vez en los dos dispositivos.'),
+      botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again', '🔄 Intentar otra vez'), fn: function () { if (s.papel === 'criar') pertoCriar(s.nivel, s.g); else pertoEntrar(s.g); } },
+        { t: t('Voltar', 'Back', 'Volver'), fn: function () { perto = s; cancelarPerto(); } }] });
   }
   function conectou(s, cx) {
     if (perto !== s) { cx.fechar(); return; }
@@ -1024,7 +1026,7 @@
     if (g && jogo === g) {                 // reconectou: a mesma partida continua de onde parou
       g.religando = false;
       g.conexao = cx;
-      abrirCanal(g).then(function () { g.p.entrar(); manterTelaAcesa(true); mostrar(g.p.estado().fase === 'sala' ? 'sala' : 'jogo'); desenhar(); aviso(t('📶 Ligados de novo!', '📶 Linked again!')); });
+      abrirCanal(g).then(function () { g.p.entrar(); manterTelaAcesa(true); mostrar(g.p.estado().fase === 'sala' ? 'sala' : 'jogo'); desenhar(); aviso(t('📶 Ligados de novo!', '📶 Linked again!', '📶 ¡Conectados otra vez!')); });
       return;
     }
     conectar({ id: R.idNovo(), nome: pref.nome, codigo: 'PERTO', host: s.papel === 'criar', nivel: s.nivel, conexao: cx, papelPerto: s.papel });
@@ -1035,12 +1037,12 @@
     if (!deNovo) { g.conectado = false; var velho = g.canal; g.canal = null; if (velho) velho.fechar(); desenhar(); }
     if (g.p.estado().fase === 'fim' || g.p.estado().saiu) return;
     var criei = g.papelPerto === 'criar';
-    abrirJanela({ titulo: t('📡 A ligação com o outro aparelho caiu', '📡 The link to the other device dropped'),
-      texto: (criei ? t('Para continuar de onde parou, toque em Ligar de novo e mostre o código novo; no outro aparelho, tocar em Ligar de novo e ler o código.', 'To go on where you stopped, tap Link again and show the new code; on the other device, tap Link again and scan it.')
-        : t('Para continuar de onde parou, toque em Ligar de novo e leia o código novo que vai aparecer no aparelho de quem criou a partida (lá também tocam em Ligar de novo).', "To go on where you stopped, tap Link again and scan the new code that will show on the creator's device (they tap Link again too)."))
-        + ' ' + t('Os dois precisam continuar no mesmo Wi-Fi.', 'Both need to stay on the same Wi-Fi.'),
-      botoes: [{ t: t('🔁 Ligar de novo', '🔁 Link again'), fn: function () { if (jogo !== g) return; if (criei) pertoCriar(g.p.estado().nivel, g); else pertoEntrar(g); } },
-        { t: t('🚪 Sair da partida', '🚪 Leave game'), fn: function () { sairDoJogo(); mostrar('inicio'); } }] });
+    abrirJanela({ titulo: t('📡 A ligação com o outro aparelho caiu', '📡 The link to the other device dropped', '📡 Se ha cortado la conexión con el otro dispositivo'),
+      texto: (criei ? t('Para continuar de onde parou, toque em Ligar de novo e mostre o código novo; no outro aparelho, tocar em Ligar de novo e ler o código.', 'To go on where you stopped, tap Link again and show the new code; on the other device, tap Link again and scan it.', 'Para seguir donde lo habéis dejado, pulsa Conectar otra vez y muestra el código nuevo; en el otro dispositivo, que pulsen Conectar otra vez y lean el código.')
+        : t('Para continuar de onde parou, toque em Ligar de novo e leia o código novo que vai aparecer no aparelho de quem criou a partida (lá também tocam em Ligar de novo).', "To go on where you stopped, tap Link again and scan the new code that will show on the creator's device (they tap Link again too).", 'Para seguir donde lo habéis dejado, pulsa Conectar otra vez y lee el código nuevo que va a aparecer en el dispositivo de quien ha creado la partida (allí también pulsan Conectar otra vez).'))
+        + ' ' + t('Os dois precisam continuar no mesmo Wi-Fi.', 'Both need to stay on the same Wi-Fi.', 'Los dos tienen que seguir en el mismo Wi-Fi.'),
+      botoes: [{ t: t('🔁 Ligar de novo', '🔁 Link again', '🔁 Conectar otra vez'), fn: function () { if (jogo !== g) return; if (criei) pertoCriar(g.p.estado().nivel, g); else pertoEntrar(g); } },
+        { t: t('🚪 Sair da partida', '🚪 Leave game', '🚪 Salir de la partida'), fn: function () { sairDoJogo(); mostrar('inicio'); } }] });
   }
 
   // ---------- instalar e service worker ----------

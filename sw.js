@@ -7,7 +7,7 @@
   Este endereço (/kids/sw.js) é o mesmo da antiga página /kids do Portal: quem já tinha, atualiza sozinho.
   A cada mudança na estante, suba a VERSAO.
 */
-var VERSAO = 22;
+var VERSAO = 23;
 var PASTA = (self.registration.scope.replace(/\/$/, '').split('/').pop() || 'raiz');
 var PREFIXO = 'dgo-' + PASTA + '-';
 var CACHE = PREFIXO + 'v' + VERSAO;
@@ -15,7 +15,8 @@ var BASICO = ['./', 'manifest.webmanifest', 'estante.css', 'catalogo.js', 'jogos
   'radio.js', 'tela-cheia.js', 'icone-192.png', 'icone-512.png', 'icone-180.png',
   'campo-minado/icone.svg', 'batalha-naval/icone.svg', 'enigmas/icone.svg', 'labirinto/icone.svg', 'cozinha/icone.svg', 'a-garra/icone.svg', 'aqua/icone.svg', 'quem-e/icone.svg', 'glub-glub/icone-192.png',
   'cartoes-fundos.css', 'cartoes/baguncolandia.svg', 'cartoes/peluqueria.svg', 'cartoes/danca-na-sala.svg', 'cartoes/vruuum.svg',
-  'cartoes/purpurina.svg', 'cartoes/rabiscolandia.svg', 'cartoes/generico.svg', 'baguncolandia/icone.svg'];
+  'cartoes/purpurina.svg', 'cartoes/rabiscolandia.svg', 'cartoes/generico.svg', 'baguncolandia/icone.svg',
+  'bandeiras/br.svg', 'bandeiras/us.svg', 'bandeiras/es.svg'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(BASICO.map(function (u) { return c.add(u).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
