@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.35', APP_UPDATED = '14/11/2026';
+  var APP_VERSION = '0.8.36', APP_UPDATED = '14/11/2026';
   var EN = /^en/i.test(navigator.language || '') && !(window.BolinhoIdioma && !BolinhoIdioma.ingles());   // só português sem o interruptor "ingles" (../idioma.js)
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
