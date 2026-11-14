@@ -5,7 +5,8 @@
    API: window.Cozinha3D = { suportado(), anexar(el, estacao), ir(estacao, aoChegar), soltar() }. */
 import * as THREE from './libs/three.module.min.js';
 
-function suportado() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } }
+let tem3D = null;   // v0.12.2: pergunta uma vez só e devolve a tela de teste (senão a cidade 3D ficava branca)
+function suportado() { if (window.Cidade3D) return Cidade3D.suportado(); if (tem3D === null) { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); tem3D = !!gl; const x = gl && gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); } catch (e) { tem3D = false; } } return tem3D; }
 const M = {};
 function mat(cor, op) { const k = cor + JSON.stringify(op || {}); if (!M[k]) M[k] = new THREE.MeshStandardMaterial(Object.assign({ color: cor, roughness: 0.65 }, op || {})); return M[k]; }
 function sh(m) { m.castShadow = true; m.receiveShadow = true; return m; }

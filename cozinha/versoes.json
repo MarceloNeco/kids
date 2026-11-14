@@ -2,6 +2,23 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.12.2",
+      "data": "14/Nov/2026",
+      "hora": "20:30:00",
+      "pt": [
+        "🏙️ A cidade em 3D não fica mais branca: o jogo parou de abrir telas 3D escondidas (que gastavam o limite do aparelho) e, se o aparelho apagar a cidade, ela é montada de novo ou vira a vila desenhada.",
+        "📱 No tablet grande a cidade usa menos memória."
+      ],
+      "en": [
+        "🏙️ The 3D town no longer turns white: the game stopped opening hidden 3D screens (which used up the device's limit) and, if the device drops the town, it is rebuilt or switches to the drawn town.",
+        "📱 On big tablets the town uses less memory."
+      ],
+      "es": [
+        "🏙️ El pueblo en 3D ya no se queda en blanco: el juego dejó de abrir pantallas 3D ocultas (que agotaban el límite del aparato) y, si el aparato borra el pueblo, se vuelve a montar o pasa al pueblo dibujado.",
+        "📱 En tablets grandes el pueblo usa menos memoria."
+      ]
+    },
+    {
       "versao": "0.12.1",
       "data": "14/Nov/2026",
       "hora": "19:10:00",
