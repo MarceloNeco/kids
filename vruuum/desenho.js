@@ -695,15 +695,14 @@
     c.restore();
   }
 
-  // morcego <-> Conde Drácula: troca aos poucos, com uma nuvem de fumaça no meio da transformação
-  var draculas = {};
-  function morcegoDracula(c, obj, virado, spr, fase, cw, ch, cor, tt) {
+  // morcego <-> Drácula (1.16.0: os dois em 3D): um some enquanto o outro aparece, com um puf de fumaça roxa.
+  // vivo3d(id) desenha o modelo 3D com esse nome no lugar do veículo
+  function morcegoDracula(c, obj, virado, cw, ch, tt, vivo3d) {
     var dt = obj.tMorf ? Math.min(0.1, tt - obj.tMorf) : 0; obj.tMorf = tt;
     obj.morf = (obj.morf || 0) + ((virado ? 1 : 0) - (obj.morf || 0)) * Math.min(1, dt * 7);
     var m = obj.morf;
-    if (!draculas[cor]) draculas[cor] = S.fazer(1300, 1000, function (c2, W2, H2) { V().dracula(c2, W2, H2, cor, null); }, 300);
-    if (m < 0.98) { c.globalAlpha = 1 - m; c.drawImage(S.quadro(spr, fase).img, -cw / 2, -ch, cw, ch); }
-    if (m > 0.02) { c.globalAlpha = m; c.drawImage(draculas[cor].img, -cw / 2, -ch, cw, ch); }
+    if (m < 0.98) { c.globalAlpha = 1 - m; vivo3d('morcego'); }
+    if (m > 0.02) { c.globalAlpha = m; vivo3d('dracula'); }
     c.globalAlpha = 1;
     if (m > 0.08 && m < 0.92) {   // puf! fumaça roxa
       var f = Math.sin(m * Math.PI);
@@ -1119,11 +1118,10 @@
     if (derr && !(vv && vv.cavalo)) { c.restore(); marcasPneu(c, g, h, cw, j.ladoDerrapa, lift); c.save(); c.translate(g.cx, chao - lift); }
     c.rotate(vs.lado * inclina + (derr ? j.ladoDerrapa * 0.14 : 0) + (j.rodando > 0 ? Math.sin(j.rodando * 22) * 0.25 : 0));
     if (j.rodando > 0) c.scale(Math.max(0.25, Math.abs(Math.cos(j.rodando * 9))) * (Math.cos(j.rodando * 9) < 0 ? -1 : 1), 1);
-    extrasAntes(c, vv, cw, ch, tt);
     var faseQ = spr.quadros ? faseSkate(vs, j, e, vv) : 0, corJ = INFO[j.n] && INFO[j.n].cor, onde = null;
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'longe');
     if (vv && vv.cavalo && CAV()) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, INFO[j.n].corpo, tt, vv.bicho);   // ao vivo: de lado nas curvas
-    else if (vv && vv.dracula) morcegoDracula(c, vs, j.dracula, spr, faseQ, cw, ch, corJ, tt);
+    else if (vv && vv.dracula) morcegoDracula(c, vs, j.dracula, cw, ch, tt, function (id) { var v2 = Object.create(vv); v2.modelo = id; modeloVivo(c, v2, -cw / 2, -ch, cw, ch, INFO[j.n], faseQ, vs.lado, 0, j.n * 3.3, 7, 0); });
     else if (vv && vv.modelo && MOD()) {   // 3D: no morro inclina (subindo mostra a traseira de baixo, descendo mostra o teto) e no pulo empina
       var sg = P.achar(e.pista, j.z), alvoI = Math.atan((sg.p2.y - sg.p1.y) / SEG) * 1.4 + (j.pulo > 0 ? Math.sin(Math.PI * 2 * (1 - j.pulo / (j.puloMax || 1))) * 0.25 : 0);
       vs.incl = (vs.incl || 0) + (alvoI - (vs.incl || 0)) * 0.15;
@@ -1132,7 +1130,6 @@
     else c.drawImage((spr.quadros ? S.quadro(spr, faseQ) : spr).img, -cw / 2, -ch, cw, ch);
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'perto');
     if (!(vv && (vv.modelo || vv.semPiloto))) pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], j.n * 3.3, 7, onde);
-    extrasDepois(c, vv, cw, ch, tt, j.turbo > 0);
     if (j.turbo > 0 && !voa && !(vv && (vv.cavalo || vv.bracos))) fogoEscape(c, cw, ch, Math.min(1, j.turbo), j.foguete > 0);
     if (derr) faiscasDerrapa(c, cw, ch, nivD, j.ladoDerrapa);
     if (j.escudo > 0) bolhaEscudo(c, cw, ch, j.escudo, tt);
@@ -1145,30 +1142,6 @@
   }
 
   // partes que se mexem, desenhadas por cima do veículo (origem: meio da base do desenho)
-  function extrasAntes(c, vv, cw, ch, tt) {
-    if (!vv || !vv.helice) return;   // hélice girando na frente do avião (aparece em volta do corpo)
-    var cy0 = -ch * 0.44, r = cw * 0.14;
-    c.globalAlpha = 0.28; c.fillStyle = '#e8e8f0'; c.beginPath(); c.arc(0, cy0, r, 0, Math.PI * 2); c.fill();
-    c.globalAlpha = 0.6; c.strokeStyle = '#555'; c.lineWidth = Math.max(1, cw * 0.012);
-    var a = tt * 40; c.beginPath(); c.moveTo(Math.cos(a) * r, cy0 + Math.sin(a) * r); c.lineTo(-Math.cos(a) * r, cy0 - Math.sin(a) * r); c.stroke();
-    c.globalAlpha = 1;
-  }
-  function extrasDepois(c, vv, cw, ch, tt, turbo) {
-    if (!vv) return;
-    if (vv.rotor) {   // pás do helicóptero
-      var ry = -ch * 0.88, rx = cw * 0.78, rr = ch * 0.07;
-      c.globalAlpha = 0.25; c.fillStyle = '#dcdce6'; c.beginPath(); c.ellipse ? c.ellipse(0, ry, rx, rr, 0, 0, Math.PI * 2) : c.arc(0, ry, rx, 0, Math.PI * 2); c.fill();
-      c.globalAlpha = 0.8; c.strokeStyle = '#2a2a30'; c.lineWidth = Math.max(1.5, ch * 0.025);
-      for (var k = 0; k < 2; k++) { var a = tt * 18 + k * Math.PI / 2; c.beginPath(); c.moveTo(Math.cos(a) * rx, ry + Math.sin(a) * rr); c.lineTo(-Math.cos(a) * rx, ry - Math.sin(a) * rr); c.stroke(); }
-      c.globalAlpha = 1;
-    }
-    if (vv.fogo) {   // fogo do jato (azul e maior no turbo)
-      var fy = -ch * 0.38, fr = cw * (turbo ? 0.09 : 0.055) * (0.85 + Math.random() * 0.3);
-      var gr = c.createRadialGradient(0, fy, 0, 0, fy + fr * 0.6, fr * 1.8);
-      gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.3, turbo ? '#7fd3ff' : '#ffd166'); gr.addColorStop(0.7, turbo ? 'rgba(58,134,255,.6)' : 'rgba(255,123,0,.6)'); gr.addColorStop(1, 'rgba(255,80,0,0)');
-      c.fillStyle = gr; c.beginPath(); c.arc(0, fy + fr * 0.6, fr * 1.8, 0, Math.PI * 2); c.fill();
-    }
-  }
 
   function desenharEfeitos(c, vs, g, w, h) {
     var K = g.K, ox = g.cx, oy = g.cy + g.KY * 0.72;
@@ -1496,15 +1469,13 @@
     var cav = vv && vv.cavalo && CAV(), faseP = tt * (cav ? 1.7 : 0.8), ladoP = vv && (vv.bracos || vv.cavalo) ? Math.sin(tt * 0.9) * 0.9 : 0, onde = null;
     if (vv && vv.modelo) ladoP = 0;   // o 3D gira sozinho (o canvas não inclina)   // na garagem o skatista e o cavalo fazem curvas para os dois lados
     if (ladoP) c.rotate(ladoP * (cav ? 0.04 : 0.12));
-    extrasAntes(c, vv, cw, ch, tt);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'longe');
     if (cav) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, cor, faseP % 1, ladoP, corpo, tt, vv.bicho);
-    else if (vv && vv.dracula) morcegoDracula(c, cachePrevia, Math.sin(tt * 1.6) > 0.3, spr, faseP, cw, ch, cor, tt);   // na garagem ele vira e desvira
+    else if (vv && vv.dracula) morcegoDracula(c, cachePrevia, Math.sin(tt * 1.6) > 0.3, cw, ch, tt, function (id) { var v2 = Object.create(vv); v2.modelo = id; modeloVivo(c, v2, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), faseP % 1, Math.sin(tt * 0.7) * 1.4, Math.sin(tt * 0.5) * 0.25, 1.2, 4.5, 0); });   // na garagem ele vira e desvira
     else if (vv && vv.modelo && MOD()) modeloVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), faseP % 1, Math.sin(tt * 0.7) * 1.4, Math.sin(tt * 0.5) * 0.25, 1.2, 4.5, vv.galinha && Math.sin(tt * 1.3) > 0.7 ? 1 : 0);   // na garagem gira bem para mostrar os lados e o teto
     else c.drawImage(S.quadro(spr, faseP).img, -cw / 2, -ch, cw, ch);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'perto');
     if (!(vv && (vv.modelo || vv.semPiloto))) pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), 1.2, 4.5, onde);   // na garagem vira mais vezes
-    extrasDepois(c, vv, cw, ch, tt, false);
     c.restore();
   }
   // miniatura parada (cartões da garagem)

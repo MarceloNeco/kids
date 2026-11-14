@@ -259,3 +259,12 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - Kart e moto continuam com capacete: em 3D a cabeça vem do modelo (`onde`) e o `cabeca.js` desenha o capacete nela.
 - `piloto(..., vies)`: em carro baixo (GT, Super) o piloto é pintado por último, para a tampa de trás não tapar.
 - Ainda de costas: avião, jato, helicóptero, arara e morcego (e skate, cavalo e dinossauro, que já giram do seu jeito).
+
+## 1.16.0 — conversível esportivo e os que voam em 3D
+
+- Peças novas no `modelos3d.js`: `casco()` (carroceria arredondada feita de fatias, com brilho de verniz), `chapa()`
+  (peça fina dos dois lados: asa, cauda, capa; `verso` = cor do outro lado) e `disco()` (hélice e rotor girando).
+- Conversível Rosa refeito com `casco()`: baixo, comprido e arredondado, sem marca.
+- Avião, jato, helicóptero, arara, morcego e Drácula em 3D. A hélice, o rotor e o fogo do jato agora são do modelo
+  (saíram `extrasAntes`/`extrasDepois` do `desenho.js`); `morcegoDracula()` troca os dois modelos 3D com a fumaça.
+- Ainda do jeito antigo: o skate (o skatista em quadros); cavalo e dinossauro já giram pelo `cavalo.js`.
