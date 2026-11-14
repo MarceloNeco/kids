@@ -14,24 +14,30 @@
   var RODANDO = 0.9;       // segundos rodopiando depois de bater num carro
   var DEPOIS_DO_FIM = 3;   // segundos de festa depois que todos chegam
   // pontos (ninguém perde a corrida, mas o placar sobe e desce)
-  var PONTOS = { estrela: 100, estrelaAr: 200, turbo: 50, rampa: 50, checkpoint: 500, chegada: 1000, cone: -50, batida: -150 };
+  var PONTOS = { estrela: 100, estrelaAr: 200, turbo: 50, rampa: 50, checkpoint: 500, chegada: 1000, cone: -50, batida: -150, looping: 300, miniturbo: 40, splat: 150 };
+  // derrapagem: segurando para dentro numa curva, rápido. Ao soltar, um turbinho do tamanho da derrapagem
+  var DERRAPA = [0.6, 1.4, 2.4];          // segundos derrapando para o nível 1 (faísca azul), 2 (laranja), 3 (roxa)
+  var MINI_TURBO = [0, 0.7, 1.1, 1.6];    // segundos de turbo ao soltar, por nível
+  function nivelDerrapa(t) { return t >= DERRAPA[2] ? 3 : t >= DERRAPA[1] ? 2 : t >= DERRAPA[0] ? 1 : 0; }
+  // caixa surpresa: a roleta gira um pouquinho e o poder já vale sozinho (criança não precisa de botão)
+  var ROLETA = 1.1, ESCUDO = 6, FOGUETE = 3;
   var PONTOS_LUGAR = [800, 400, 200];   // 1º, 2º e 3º lugar na chegada
-  var TOQUE = { estrela: 0.28, cone: 0.24, lama: 0.3, turbo: 0.3, rampa: 0.3 };
+  var TOQUE = { estrela: 0.28, cone: 0.24, lama: 0.3, turbo: 0.3, rampa: 0.3, caixa: 0.33 };
 
   // rivais (personagens): configs = [{ id, veic, mod: { vel, curva } }]
-  function novaCorrida(nivel, semente, nJogadores, configs) {
-    var pista = P.montar(nivel, semente);
+  function novaCorrida(nivel, semente, nJogadores, configs, mundos) {
+    var pista = P.montar(nivel, semente, mundos);   // mundos: os cenários que a criança escolheu (os que faltam são sorteados)
     var n = nJogadores === 2 ? 2 : 1, jogadores = [];
     for (var k = 0; k < n; k++) {
-      jogadores.push({ n: k, x: n === 2 ? (k ? 0.4 : -0.4) : 0, z: 1000, vel: 0, estrelas: 0, pontos: 0, tCheck: 0, turbo: 0, pulo: 0, puloMax: 0, recarga: 0, rodando: 0, tremor: 0, chegou: false, tempo: 0, batidas: 0, mundo: 0, fora: false, empurrao: 0 });
+      jogadores.push({ n: k, x: n === 2 ? (k ? 0.4 : -0.4) : 0, z: 1000, vel: 0, estrelas: 0, pontos: 0, tCheck: 0, turbo: 0, pulo: 0, puloMax: 0, recarga: 0, rodando: 0, tremor: 0, chegou: false, tempo: 0, batidas: 0, mundo: 0, fora: false, empurrao: 0, derrapa: 0, ladoDerrapa: 0, roleta: 0, poder: null, escudo: 0, foguete: 0, loop: null, loopings: 0 });
     }
     return {
       pista: pista, jogadores: jogadores,
       carros: pista.carros.map(function (c) { return { z: c.z, x: c.x, vel: c.vel, tipo: c.tipo }; }),
-      fase: 'contagem', contagem: CONTAGEM, t: 0, depoisDoFim: 0, eventos: [],
+      fase: 'contagem', contagem: CONTAGEM, t: 0, depoisDoFim: 0, eventos: [], tiros: [],
       rivais: (configs || []).map(function (cf, k) {
         var faixa = P.FAIXAS[(k + 1) % 3];
-        return { r: k, id: cf.id, veic: cf.veic, cor: cf.cor, mod: cf.mod || {}, x: faixa, faixa: faixa, z: 1000 + (k % 2 ? -1 : 1) * SEG * (1 + k), vel: 0, garra: 0.94 + ((semente >> k) % 7) * 0.01, chegou: false, tempo: 0, lento: 0, pensa: 0 };
+        return { r: k, id: cf.id, veic: cf.veic, cor: cf.cor, mod: cf.mod || {}, x: faixa, faixa: faixa, z: 1000 + (k % 2 ? -1 : 1) * SEG * (1 + k), vel: 0, garra: 0.94 + ((semente >> k) % 7) * 0.01, chegou: false, tempo: 0, lento: 0, pensa: 0, turbo: 0, gosma: 0, proxTurbo: 4 + k * 1.7 };
       })
     };
   }
@@ -57,10 +63,15 @@
     var seg = P.achar(pista, j.z), pct = j.vel / max;
     var dir = Math.max(-1, Math.min(1, (ent && ent.dir) || 0));
     if (j.rodando > 0) { j.rodando = Math.max(0, j.rodando - dt); dir = 0; }
+    // looping (só no chão): o volante fica parado, a velocidade não cai e no fim ganha pontos
+    var lp = mod.voa ? null : P.noLoop(pista, j.z);
+    if (lp && j.loop !== lp) { j.loop = lp; j.pulo = 0; e.eventos.push({ tipo: 'looping', j: j.n }); }
+    else if (!lp && j.loop) { j.loop = null; j.loopings++; e.eventos.push({ tipo: 'loopFeito', j: j.n }); somar(e, j, PONTOS.looping, 'looping'); }
+    if (lp) { dir = 0; j.x = Math.max(-0.8, Math.min(0.8, j.x)); j.vel = Math.max(j.vel, max * 0.9); }
     if (j.chegou) dir *= 0.5;
     // botão PULAR: um pulinho que passa por cima de cone, lama e carrinho
     if (j.recarga > 0) j.recarga = Math.max(0, j.recarga - dt);
-    if (ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou) {
+    if (ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou && !lp) {
       j.pulo = j.puloMax = PULINHO; j.recarga = RECARGA; e.eventos.push({ tipo: 'pulo', j: j.n, manual: true });
     }
 
@@ -69,7 +80,22 @@
     // chegava a 1,5x o volante no Normal e 2,5x no Turbo, e o carro ia para o acostamento mesmo segurando)
     var dx = dt * 2 * Math.max(pct, 0.35) * (mod.curva || 1);
     var fora = Math.max(-FORA_MAX, Math.min(FORA_MAX, seg.curva * cfg.centrifuga));
-    j.x += dx * dir;
+    // derrapagem: numa curva forte, rápido, segurando para dentro. Derrapando, a curva puxa menos para fora
+    var derrapando = !mod.voa && !lp && j.pulo <= 0 && j.rodando <= 0 && !j.chegou && Math.abs(seg.curva) > 1.2 && dir * seg.curva > 0 && Math.abs(dir) > 0.5 && pct > 0.55;
+    if (derrapando) {
+      if (j.derrapa === 0) e.eventos.push({ tipo: 'derrapa', j: j.n });
+      var nAntes = nivelDerrapa(j.derrapa);
+      j.derrapa += dt; j.ladoDerrapa = dir > 0 ? 1 : -1; fora *= 0.5;
+      if (nivelDerrapa(j.derrapa) > nAntes) e.eventos.push({ tipo: 'faisca', j: j.n, nivel: nivelDerrapa(j.derrapa) });
+    } else if (j.derrapa > 0) {
+      var nv = nivelDerrapa(j.derrapa);
+      if (nv) { j.turbo = Math.max(j.turbo, MINI_TURBO[nv]); e.eventos.push({ tipo: 'miniturbo', j: j.n, nivel: nv }); somar(e, j, PONTOS.miniturbo * nv, 'miniturbo'); }
+      j.derrapa = 0; j.ladoDerrapa = 0;
+    }
+    if (j.derrapa > 0) {   // derrapando, o carro desliza de lado e segura na beirada de dentro da curva (não sai da pista)
+      var xd = j.x + dx * dir * 0.6;
+      j.x = dir > 0 ? Math.min(xd, Math.max(j.x, 0.85)) : Math.max(xd, Math.min(j.x, -0.85));
+    } else j.x += dx * dir;
     j.x -= dx * pct * fora;
     // nível Criança: sem mexer no volante, o carro volta sozinho para a estrada
     if (cfg.ajuda && !dir && Math.abs(j.x) > 0.8) j.x -= (j.x > 0 ? 1 : -1) * dt * 0.8;
@@ -91,6 +117,26 @@
     if (j.tremor > 0) j.tremor = Math.max(0, j.tremor - dt);
     if (j.pulo > 0) j.pulo = Math.max(0, j.pulo - dt);
     if (j.empurrao > 0) j.empurrao = Math.max(0, j.empurrao - dt);
+    if (j.escudo > 0) j.escudo = Math.max(0, j.escudo - dt);
+    if (j.foguete > 0) j.foguete = Math.max(0, j.foguete - dt);
+    if (j.roleta > 0) { j.roleta -= dt; if (j.roleta <= 0) { j.roleta = 0; usarPoder(e, j, max); } }
+    // morcego (1.11.1): perto de obstáculo vira o Conde Drácula (e volta a ser morcego quando passa); joga abóbora no rival da frente
+    if (mod.dracula) {
+      var iJ = Math.floor(j.z / SEG), perto = false;
+      for (var q = iJ + 1; q < iJ + 16 && !perto; q++) { var sq = pista.segs[q]; if (sq) for (var w = 0; w < sq.coisas.length; w++) { var cq = sq.coisas[w]; if ((cq.tipo === 'cone' || cq.tipo === 'lama') && !cq.pego[j.n] && Math.abs(cq.x - j.x) < 0.6) perto = true; } }
+      e.carros.forEach(function (cr) { if (cr.z > j.z && cr.z < j.z + SEG * 15 && Math.abs(cr.x - j.x) < 0.6) perto = true; });
+      e.rivais.forEach(function (rv) { if (rv.z > j.z && rv.z < j.z + SEG * 10 && Math.abs(rv.x - j.x) < 0.5) perto = true; });
+      if (perto !== !!j.dracula) { j.dracula = perto; e.eventos.push({ tipo: 'vira', j: j.n, dracula: perto }); }
+    }
+    if (mod.abobora && e.fase === 'corrida') {
+      j.tAbobora = (j.tAbobora == null ? 3 : j.tAbobora) - dt;
+      if (j.tAbobora <= 0) {
+        var alvoA = -1, dA = Infinity;
+        e.rivais.forEach(function (rv, k) { var d = rv.z - j.z; if (d > 0 && d < SEG * 70 && d < dA && !rv.chegou) { dA = d; alvoA = k; } });
+        if (alvoA >= 0) { e.tiros.push({ tipo: 'abobora', z: j.z + SEG, x: j.x, vel: Math.max(j.vel, max) * 1.5, alvo: alvoA, de: j.n, vida: 4 }); e.eventos.push({ tipo: 'abobora', j: j.n }); j.tAbobora = 4 + Math.random() * 2; }
+        else j.tAbobora = 1;
+      }
+    }
 
     var zAntes = j.z;
     j.z = Math.min(pista.comprimento - SEG, j.z + j.vel * dt);
@@ -112,8 +158,14 @@
           somar(e, j, noAr ? PONTOS.estrelaAr : PONTOS.estrela, 'estrela');
           continue;
         }
+        if (c.tipo === 'caixa') {   // caixa surpresa: pega mesmo pulando; com poder girando, a caixa só quebra
+          c.pego[j.n] = true; e.eventos.push({ tipo: 'caixa', j: j.n, nova: !j.roleta });
+          if (!j.roleta) j.roleta = ROLETA;
+          continue;
+        }
         if (noAr) continue;                               // no ar passa por cima de tudo
         c.pego[j.n] = true;
+        if (j.escudo > 0 && (c.tipo === 'cone' || c.tipo === 'lama')) { e.eventos.push({ tipo: 'escudoBate', j: j.n }); continue; }   // a bolha protege
         if (c.tipo === 'cone') {
           if (j.rodando > 0) continue;
           j.vel *= 0.5; j.batidas++; j.tremor = 0.4;
@@ -130,10 +182,14 @@
     }
 
     // trânsito: bater por trás deixa lento, rodopia e derruba estrelas
-    if (j.pulo <= 0 && j.rodando <= 0) {
+    if (j.pulo <= 0 && j.rodando <= 0 && !lp) {
       for (k = 0; k < e.carros.length; k++) {
         var car = e.carros[k];
         if (Math.abs(car.x - j.x) < 0.42 && j.z > car.z - SEG * 0.8 && j.z < car.z + SEG * 0.4 && j.vel > car.vel) {
+          if (j.escudo > 0) {   // com a bolha: o carrinho é jogado para o lado e ninguém perde nada
+            if (!car.pulou) { car.pulou = 1; car.x += (car.x >= j.x ? 1 : -1) * 0.5; e.eventos.push({ tipo: 'escudoBate', j: j.n }); }
+            continue;
+          }
           j.vel = car.vel * 0.6; j.z = car.z - SEG * 0.9; j.rodando = RODANDO; j.batidas++;
           e.eventos.push({ tipo: 'batida', j: j.n }); perder(e, j, cfg.perdeCarro); somar(e, j, PONTOS.batida, 'batida');
           break;
@@ -162,6 +218,33 @@
     }
   }
 
+  // ---------- poderes da caixa surpresa ----------
+  // escudo: bolha verde que protege de cone, lama e trânsito; foguete: turbo grande; gosma: uma bola de gosma
+  // que vai até o rival da frente e deixa ele lento (sem rival na frente, vira foguete)
+  function usarPoder(e, j, max) {
+    var opcoes = ['escudo', 'foguete'], alvo = -1, melhor = Infinity;
+    e.rivais.forEach(function (rv, k) { var d = rv.z - j.z; if (d > 0 && d < SEG * 80 && d < melhor && !rv.chegou) { melhor = d; alvo = k; } });
+    if (alvo >= 0) opcoes.push('gosma', 'gosma');
+    var p = opcoes[Math.floor(Math.random() * opcoes.length)];
+    j.poder = p; j.poderT = 2;
+    if (p === 'escudo') j.escudo = ESCUDO;
+    else if (p === 'foguete') { j.foguete = FOGUETE; j.turbo = Math.max(j.turbo, FOGUETE); }
+    else e.tiros.push({ z: j.z + SEG, x: j.x, vel: Math.max(j.vel, max) * 1.6, alvo: alvo, de: j.n, vida: 4 });
+    e.eventos.push({ tipo: 'poder', j: j.n, poder: p });
+  }
+  function moverTiros(e, dt) {
+    e.tiros = e.tiros.filter(function (tr) {
+      var rv = e.rivais[tr.alvo]; tr.vida -= dt;
+      if (!rv || tr.vida <= 0) return false;
+      tr.z += tr.vel * dt; tr.x += Math.max(-dt * 3, Math.min(dt * 3, rv.x - tr.x));
+      if (tr.z < rv.z - SEG * 0.3) return true;
+      rv.lento = Math.max(rv.lento, 1.8); rv.gosma = 2.6; rv.gosmaCor = tr.tipo === 'abobora' ? '#ff8c1a' : '#7ae03d';
+      var j = e.jogadores[tr.de]; if (j) somar(e, j, PONTOS.splat, 'splat');
+      e.eventos.push({ tipo: 'splat', j: tr.de, r: tr.alvo, abobora: tr.tipo === 'abobora' });
+      return false;
+    });
+  }
+
   // ---------- rivais ----------
   function bloqueado(e, i0, i1, x) {   // tem cone, lama ou carrinho nessa faixa entre os pedaços i0 e i1?
     var pista = e.pista;
@@ -176,9 +259,16 @@
     var pista = e.pista, cfg = pista.cfg, max = cfg.velMax * (rv.mod.vel || 1);
     var lider = e.jogadores.reduce(function (a, j) { return j.z > a.z ? j : a; }, e.jogadores[0]);
     // fica por perto dos jogadores: quem dispara segura, quem fica para trás acelera (corrida sempre disputada)
-    var d = (rv.z - lider.z) / SEG, f = d > 30 ? 0.84 : d < -30 ? 1.12 : 1 - d * 0.004;
+    var d = (rv.z - lider.z) / SEG, f = d > 18 ? 0.86 : d < -18 ? 1.15 : 1 - d * 0.006;
     var alvo = rv.chegou ? max * 0.3 : max * rv.garra * f;
+    // disputa de perto: de vez em quando um rival que está logo atrás dá um turbo e tenta passar
+    rv.proxTurbo -= dt;
+    if (rv.proxTurbo <= 0) { rv.proxTurbo = 5 + Math.random() * 6; if (d < 2 && d > -14 && !rv.chegou) { rv.turbo = 1.6; e.eventos.push({ tipo: 'turboRival', r: rv.r }); } }
+    if (rv.turbo > 0) { rv.turbo -= dt; alvo *= 1.35; }
+    if (rv.gosma > 0) rv.gosma -= dt;
     if (rv.lento > 0) { rv.lento -= dt; alvo *= 0.55; }
+    var lpR = P.noLoop(pista, rv.z);
+    if (lpR) alvo = Math.max(alvo, max * 0.95);
     rv.vel += Math.max(-max * 0.8 * dt, Math.min(max * 0.45 * dt, alvo - rv.vel));
     var i = Math.floor(rv.z / SEG);
     // decide a faixa um pouco antes: foge de cone, lama e carrinho (às vezes se distrai)
@@ -190,7 +280,7 @@
         if (livres.length) rv.faixa = livres.sort(function (a, b) { return Math.abs(a - rv.x) - Math.abs(b - rv.x); })[0];
       } else if (Math.random() < 0.02) rv.faixa = P.FAIXAS[Math.floor(Math.random() * 3)];
     }
-    var dx = rv.faixa - rv.x; rv.x += Math.max(-dt * 1.3, Math.min(dt * 1.3, dx));
+    var dx = (lpR ? Math.max(-0.7, Math.min(0.7, rv.faixa)) : rv.faixa) - rv.x; rv.x += Math.max(-dt * 1.3, Math.min(dt * 1.3, dx));
     var zAntes = rv.z; rv.z = Math.min(pista.comprimento - SEG, rv.z + rv.vel * dt);
     // se não desviou a tempo, o cone/lama segura (só o rival, a pista dele é a mesma de todos)
     for (var k = Math.floor(zAntes / SEG); k <= Math.floor(rv.z / SEG); k++) {
@@ -201,7 +291,7 @@
     // (antes ele voltava para a mesma faixa, encostava de novo e ficava tremendo do lado do jogador)
     if (rv.encostou > 0) rv.encostou -= dt;
     e.jogadores.forEach(function (j) {
-      if (j.pulo > 0 || Math.abs(j.z - rv.z) > SEG * 0.6 || Math.abs(j.x - rv.x) > 0.38) return;
+      if (j.pulo > 0 || lpR || Math.abs(j.z - rv.z) > SEG * 0.6 || Math.abs(j.x - rv.x) > 0.38) return;
       var lado = j.x <= rv.x ? -1 : 1, longe = P.FAIXAS.filter(function (fx) { return lado < 0 ? fx > j.x + 0.4 : fx < j.x - 0.4; });
       if (longe.length) rv.faixa = longe.sort(function (a, b) { return Math.abs(a - rv.x) - Math.abs(b - rv.x); })[0];
       if (rv.encostou > 0) return;
@@ -238,7 +328,10 @@
     e.carros.forEach(function (c) {
       c.z += c.vel * dt;
       if (c.z > pista.zChegada - 30 * SEG) c.z = 260 * SEG;
+      var lc = P.noLoop(pista, c.z + SEG * 10); if (lc) c.z = (lc.fim + 12) * SEG;   // o trânsito não entra no looping
+      if (c.pulou) { c.pulou += dt; if (c.pulou > 1.5) c.pulou = 0; }
     });
+    moverTiros(e, dt);
     e.jogadores.forEach(function (j) { moverJogador(e, j, entradas && entradas[j.n], dt); });
 
     // dois carros lado a lado: um empurrãozinho, sem perder nada
@@ -261,7 +354,7 @@
     return e;
   }
 
-  var VruuumMotor = { PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
+  var VruuumMotor = { nivelDerrapa: nivelDerrapa, DERRAPA: DERRAPA, MINI_TURBO: MINI_TURBO, ROLETA: ROLETA, ESCUDO: ESCUDO, FOGUETE: FOGUETE, usarPoder: usarPoder, PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumMotor;
   else raiz.VruuumMotor = VruuumMotor;
 })(this);

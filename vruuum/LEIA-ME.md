@@ -12,7 +12,7 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 - Toque em **🔑 Toque para ligar o motor!** (o navegador só deixa tocar som depois de um toque).
 - Escolha **1 ou 2 jogadores** (o jogo sempre abre com 1; com 2, a tela divide e a garagem tem "✕ Só 1 jogador"), o **nível**, a **cor do carro** e o **bichinho piloto**, e toque em **🏁 Correr!**.
-- Depois do 3‑2‑1‑VAI!, a corrida dura uns 2 minutos e passa por **4 mundos** (sorteados entre Praia, Floresta,
+- Depois do 3‑2‑1‑VAI!, a corrida dura uns 2 minutos e passa por **4 mundos** (2 fantásticos — Cânion do Deserto, Templo na Selva, Vulcão de Lava, Ilhas Flutuantes — e 2 entre Praia, Floresta,
   Terra dos Doces, Montanha de Neve e Cidade Neon), com um portal na entrada de cada um.
 - ⭐ **Estrela** = 1 ponto · 🌈 **Arco-íris** = TURBO por 2,5 s · rampa amarela = **pulão** (no ar dá para pegar as
   estrelas altas e passar por cima de tudo).
@@ -53,13 +53,13 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 - O veículo escolhido fica **sempre à vista**: em pé, preso no topo da tela enquanto as opções rolam; deitado, de um
   lado, com as opções do outro. O botão 🏁 Correr fica preso embaixo. Com 2 jogadores, abas Jogador 1 e Jogador 2.
-- **12 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
+- **24 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
 
 | Grupo | Veículos |
 |---|---|
-| 🚗 Carros | Clássico, Conversível Rosa, GT Redondo (traseira redonda), Superesportivo (largo, aerofólio), Kart, Monstrão |
-| 🏍️ Moto, skate e cavalo | Cavalo (galopando, montado em 3D em `cavalo.js`: de costas na reta, de lado nas curvas; quem monta acompanha macio), Moto (deita nas curvas) e Skate (menino de costas, um pé no shape e o outro empurrando a rua; quanto mais rápido, mais rema; deslizando fica de lado, pé esquerdo na frente; os braços seguem a curva: o de dentro desce, o de fora sobe) |
-| ✈️ No céu | Aviãozinho (hélice), Jato (fogo azul no turbo), Helicóptero (rotor girando) |
+| 🚗 Carros | Clássico, Conversível Rosa, GT Redondo (traseira redonda), Superesportivo (largo, aerofólio), Kart, Monstrão, Furgão de Surfe (degradê, prancha no teto), Ônibus Escolar (luzes piscando, placa de PARE), Caminhão de Pelúcias (máquina de pegar bichinho, pelúcias balançando e a garra passeando) |
+| 🏍️ Moto, skate e montarias | Dinossauro verde (o mesmo esqueleto 3D do cavalo, com espinhos roxos e rabo grosso), Cavalo (galopando, montado em 3D em `cavalo.js`: de costas na reta, de lado nas curvas; quem monta acompanha macio), Moto (deita nas curvas) e Skate (menino de costas, um pé no shape e o outro empurrando a rua; quanto mais rápido, mais rema; deslizando fica de lado, pé esquerdo na frente; os braços seguem a curva: o de dentro desce, o de fora sobe) |
+| ✈️ No céu | Aviãozinho (hélice), Jato (fogo azul no turbo), Helicóptero (rotor girando), Trenó do Papai Noel (renas puxando, a do nariz vermelho na frente, e o Papai Noel junto), Arara Gigante (batendo as asas) |
 
 - Cada um tem um jeito (barrinhas de velocidade e curvas), com diferenças pequenas, de no máximo uns 10%.
 - **Quem voa** segue um caminho de luzes no céu, com a estrada lá embaixo. Os obstáculos mudam: pássaros (no lugar dos
@@ -179,7 +179,8 @@ No arquivo baixado (📲 Guardar no celular) tocam só as feitas pelo jogo, para
 | `estilo.css` | visual, paleta Bolinho de Chuva, fonte Fredoka. |
 | `pista.js` | **puro**: monta a estrada com semente (retas, curvas, morros, mundos), espalha estrelas, cones, lama, turbos, rampas, enfeites e o trânsito. Níveis em `NIVEIS`. |
 | `motor.js` | **puro**: regras da corrida (volante, curva, acelerar, grama, coisas da pista, batidas, chegada) e lista de eventos para som e efeitos. |
-| `veiculos.js` | a garagem: os 12 veículos (desenho, nome, grupo, velocidade e curva), testada no Node. |
+| `veiculos.js` | a garagem: os 24 veículos
+| `modelos3d.js` | veículos em 3D de verdade (caixas, rodas cilíndricas, bolas, vidro transparente e desenhos nas faces): furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer, galinha e o Ovo Corredor; giram de lado na curva e inclinam no morro | (desenho, nome, grupo, velocidade e curva), testada no Node. |
 | `cavalo.js` | o cavalo galopando com quem monta, montado em 3D com peças simples (gira de lado nas curvas); galope testado no Node. |
 | `sprites.js` | todos os desenhos, feitos em código uma vez num canvas escondido. |
 | `desenho.js` | a estrada em 3D (pseudo-3D por pedaços), céu, fundo, enfeites, carros, efeitos, placar e tela dividida. |
@@ -203,3 +204,67 @@ avisam se diferirem). Arquivo novo entra na lista do `sw.js`. Interruptor do Roo
 ## Testar no computador
 
 Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8000/vruuum/ no navegador.
+
+## 1.11.0 — inspirado nos fliperamas (vídeos do dono)
+
+- **Apresentação**: atrás do logo animado (SVG) roda uma corrida de demonstração com cortes de câmera; o primeiro toque liga a música.
+- **Largada** com semáforo de 3 luzes e a frase "Pronto pra sentir a velocidade?" chegando aos pedaços.
+- **Loopings** (`pista.js` monta, `motor.js` segura o volante e dá +300; `desenho.js` desenha a fita em 3D de verdade: de longe é um arco
+  na estrada; dentro, a câmera gira junto e céu e chão trocam de lugar). A saída fica `LOOP_DESVIO` ao lado da entrada.
+- **Derrapagem**: numa curva forte, segurando para dentro, rápido; faíscas azul → laranja → roxa e marcas de pneu; ao soltar, mini-turbo.
+- **Caixas ❓** em bolhas: a roleta gira e o poder vale sozinho — 🛡️ bolha (protege de cone, lama e trânsito), 🚀 foguete, 🟢 gosma (vai até o rival da frente).
+- **Mais rivais** (5 com 1 jogador, 3 com 2), mais perto e com turbos para passar; **placar de fliperama** (rostinhos na ordem da corrida, poder no alto, velocímetro de ponteiro).
+- **Turbo** com linhas de velocidade e fogo no escapamento; **fogos de artifício**; estrelas brilhando; **pódio** no fim (estádio, torcida, holofotes, pontos subindo).
+- **Muitos barulhos** novos (`som.js`, inclusive o chiado do pneu) e o **aparelho tremendo** onde o navegador deixa (`navigator.vibrate`; iPhone não deixa).
+
+## 1.12.0 — sons de verdade, galinha, Drácula, lanches e blocos
+
+- **Sons gravados** (`sons/`, ~780 KB, créditos no `CREDITOS.md`): motor de carro (o ronco sobe com a velocidade), pneu cantando,
+  batidas, turbo, buzina, largada, aplausos, fogos e a voz de cada bicho. O som feito na hora só toca enquanto a gravação não carregou.
+  Bicho e skate não têm ronco de motor (`semMotor`); a buzina deles é a voz (`voz`: galo, cavalo, dino, arara, morcego).
+- **Galinha branca**: pula e bate as asas (desenhadas ao vivo) com cocoricó; cacareja enquanto corre.
+- **Morcego**: voa; perto de obstáculo vira o **Conde Drácula** (fumaça e risada) e depois volta; joga **abóboras** no rival da frente.
+- **Carrinho de pipoca**, **carrinho de sorvete** e **carro-hambúrguer**.
+- Mundos **Cidade do Lanche** (toalha xadrez, hambúrgueres gigantes, batata, milkshake) e **Mundo dos Blocos** (cubos; nada do Minecraft);
+  chocolate, pudim e taça de sorvete também na Terra dos Doces; **balões de emoji** aparecem de vez em quando em todo mundo.
+
+## 1.13.0 — veículos em 3D, volta de 360°, cenários à escolha
+
+- **3D de verdade** (`modelos3d.js`): furgão de surfe, ônibus escolar, caminhão de pelúcias, carrinhos de pipoca e de sorvete,
+  carro-hambúrguer e galinha. Na curva aparece a lateral; no morro e no pulo o veículo inclina (descendo dá para ver o teto).
+  Janelas de vidro transparente: o piloto aparece lá dentro. Os quadros parados (rivais e garagem) saem do mesmo modelo.
+- **Ovo Corredor**: o Humpty Dumpty da cantiga inglesa (domínio público), correndo sem carro; ele mesmo é o piloto.
+- **Volta de 360°** (`vistaOrbita` em `desenho.js`): no 3-2-1 e logo depois da chegada a câmera gira em volta de quem joga
+  e termina na câmera do jogo. Quem é 3D gira de verdade; os outros dão uma meia-volta curta.
+- **Cenários à escolha** no menu (até 4, na ordem do toque; 🎲 Surpresa = sorteio). **Rivais sem repetição**: nenhum corre
+  com o mesmo veículo de quem joga, nem com o mesmo de outro rival.
+- Abertura mais clara e com turbo de vez em quando (linhas de velocidade).
+
+
+## 1.14.0 — menu com a corrida atrás e música à escolha
+
+- A corrida de demonstração da abertura (`#demo`, agora fixa no `<body>`) continua rodando atrás do menu, com um véu um
+  pouco mais escuro e os botões meio transparentes (`body.com-demo` / `body.demo-menu`, ligados em `tela()` no `app.js`).
+  Na corrida e no fim ela para.
+- Grupo 🎵 Música no menu: ⏮ e ⏭ trocam; tocar no nome abre a lista inteira (na ordem em que vai tocar). A escolhida
+  continua na corrida seguinte; sem escolha, cada corrida começa uma música nova, como antes. `som.js` ganhou
+  `listaMusicas()`, `escolherMusica(k)` e `musicaAtual()`. Sem internet a regra da música não muda: toca só a favorita
+  guardada, e o menu avisa.
+
+## 1.15.0 — carros antigos e trenó em 3D
+
+- Clássico, GT, Superesportivo, Kart, Monstrão, Moto, Conversível e Trenó saíram do desenho de costas e viraram modelos
+  em `modelos3d.js` (entram em `veiculos.js` por `em3d(...)`, como os da 1.13.0). Peça nova: `tronco()` — caixa com o
+  topo menor e empurrado, para cabines com vidro inclinado; a luz de cada face sai da inclinação de verdade.
+- Kart e moto continuam com capacete: em 3D a cabeça vem do modelo (`onde`) e o `cabeca.js` desenha o capacete nela.
+- `piloto(..., vies)`: em carro baixo (GT, Super) o piloto é pintado por último, para a tampa de trás não tapar.
+- Ainda de costas: avião, jato, helicóptero, arara e morcego (e skate, cavalo e dinossauro, que já giram do seu jeito).
+
+## 1.16.0 — conversível esportivo e os que voam em 3D
+
+- Peças novas no `modelos3d.js`: `casco()` (carroceria arredondada feita de fatias, com brilho de verniz), `chapa()`
+  (peça fina dos dois lados: asa, cauda, capa; `verso` = cor do outro lado) e `disco()` (hélice e rotor girando).
+- Conversível Rosa refeito com `casco()`: baixo, comprido e arredondado, sem marca.
+- Avião, jato, helicóptero, arara, morcego e Drácula em 3D. A hélice, o rotor e o fogo do jato agora são do modelo
+  (saíram `extrasAntes`/`extrasDepois` do `desenho.js`); `morcegoDracula()` troca os dois modelos 3D com a fumaça.
+- Ainda do jeito antigo: o skate (o skatista em quadros); cavalo e dinossauro já giram pelo `cavalo.js`.

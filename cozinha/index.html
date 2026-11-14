@@ -61,6 +61,9 @@
   <div class="ficha-receita">
     <div id="recPrato" class="prato-grande" aria-hidden="true"></div>
     <p id="recNivel" class="selo"></p>
+    <h3 class="tit-familia" data-t="👨‍👩‍👧 Quem vai comer? Toque para chamar.|👨‍👩‍👧 Who is eating? Tap to invite."></h3>
+    <div id="recFamilia" class="familia-escolha" role="group" aria-label="Quem vai comer / Who is eating"></div>
+    <p id="recPorcao" class="porcao"></p>
     <h3 data-t="🧺 Você vai precisar de:|🧺 You will need:"></h3>
     <ul id="recIngredientes" class="lista-ing"></ul>
     <p id="recBolsa" class="bolsa"></p>
@@ -76,6 +79,7 @@
     <div class="carteira" id="carteiraMapa"></div>
   </div>
   <div id="sol" class="sol" hidden><span id="solBola" class="sol-bola">☀️</span></div>
+  <p id="missao" class="missao" aria-live="polite"></p>
   <div id="vila" class="vila"></div>
   <div id="cestaMapa" class="cesta" aria-live="polite"></div>
 </section>
@@ -112,6 +116,7 @@
 <section id="pronto" class="tela" data-recurso="cozinha">
   <div class="festa" aria-hidden="true"></div>
   <div id="prontoPrato" class="prato-final" aria-hidden="true"></div>
+  <div id="prontoFamilia" class="mesa-familia" aria-hidden="true" hidden></div>
   <h2 id="prontoTitulo" class="titulo-pronto"></h2>
   <p id="prontoEstrelas" class="estrelas"></p>
   <p id="prontoNota" class="dica"></p>
@@ -133,6 +138,7 @@
 <script src="logica.js"></script>
 <script src="desenhos.js"></script>
 <script src="cenas.js"></script>
+<script src="vila.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>
 <script src="../navegacao.js" data-fora-do-arquivo></script>

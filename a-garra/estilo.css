@@ -1,0 +1,164 @@
+/* A-GARRA — visual. Fonte Fredoka emprestada da Rabiscolândia (../rabiscolandia/fontes/). */
+@font-face { font-family: 'Fredoka'; src: url('../rabiscolandia/fontes/fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: 'Fredoka', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #f3f0ff;
+  background: radial-gradient(circle at 50% 0%, #26304a 0%, #0d0b1e 60%, #05040e 100%) fixed; overflow: hidden;
+  -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.tela { display: none; position: fixed; inset: 0; }
+.tela.ativa { display: flex; }
+
+/* ---------- menu ---------- */
+#menu { flex-direction: column; align-items: center; overflow-y: auto; padding: max(.6rem, env(safe-area-inset-top)) 1rem 5rem; gap: .35rem; }
+.faixa { display: flex; align-items: center; gap: .4rem; width: 100%; max-width: 44rem; }
+.espaco { flex: 1; }
+.mini {
+  min-width: 44px; min-height: 44px; padding: 0 .55rem; border: 0; border-radius: 14px; background: rgba(255,255,255,.12);
+  font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center; color: #fff;
+}
+.mini:active { transform: scale(.94); }
+.logo { margin: .1rem 0 0; font-size: clamp(2.6rem, 12vw, 4.2rem); font-weight: 700; letter-spacing: .02em; line-height: 1; white-space: nowrap; }
+.logo span { display: inline-block; animation: pula 2.4s ease-in-out infinite; color: #39ff6a; text-shadow: 0 0 14px rgba(57,255,106,.65), 0 4px 0 rgba(0,0,0,.35); }
+.logo span:nth-child(2) { color: #ffd400; text-shadow: 0 0 14px rgba(255,212,0,.6); }
+.logo span:nth-child(3) { animation-delay: .1s; } .logo span:nth-child(4) { animation-delay: .2s; } .logo span:nth-child(5) { animation-delay: .3s; }
+.logo span:nth-child(6) { animation-delay: .4s; } .logo span:nth-child(7) { animation-delay: .5s; }
+@keyframes pula { 0%, 70%, 100% { transform: translateY(0); } 80% { transform: translateY(-10px) rotate(-4deg); } 90% { transform: translateY(0) rotate(2deg); } }
+.ajuda { max-width: 38rem; background: rgba(255,255,255,.08); border-radius: 18px; padding: .3rem 1rem; font-size: 1rem; line-height: 1.4; }
+.titulo-escolha { margin: .5rem 0 .1rem; font-size: 1rem; font-weight: 600; color: #b9b2e6; text-transform: uppercase; letter-spacing: .08em; }
+.escolha { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; max-width: 44rem; }
+.maquinas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; max-width: 30rem; }
+.cartao-maquina {
+  border: 3px solid transparent; border-radius: 20px; padding: .55rem .4rem; display: flex; flex-direction: column; align-items: center; gap: .1rem;
+  min-height: 48px; color: #fff; transition: transform .15s ease-out; line-height: 1.15; text-align: center;
+}
+.cartao-maquina .ico { font-size: 1.9rem; }
+.cartao-maquina b { font-size: 1.05rem; }
+.cartao-maquina small { font-size: .85rem; opacity: .9; }
+.cartao-maquina.telefone { background: linear-gradient(160deg, #e01a3a, #8e0a20); }
+.cartao-maquina.neon { background: linear-gradient(160deg, #1b1d1c, #050505); box-shadow: inset 0 0 0 2px #39ff6a, 0 0 12px rgba(57,255,106,.35); }
+.cartao-maquina.estrelas { background: linear-gradient(160deg, #2b3aa0, #101a4d); }
+.cartao-maquina.lanchonete { background: linear-gradient(160deg, #e8414f, #9c1b28); }
+.cartao-maquina.bichos { background: linear-gradient(160deg, #c9a27a, #6b4a2b); grid-column: 1 / -1; }
+[aria-checked="true"].cartao-maquina { border-color: #ffd166; transform: translateY(-3px) scale(1.02); }
+.cartao-nivel {
+  border: 3px solid transparent; border-radius: 20px; padding: .45rem .7rem; font-weight: 600; font-size: 1.1rem;
+  min-width: 6rem; min-height: 48px; transition: transform .15s ease-out;
+}
+.cartao-nivel.verde { background: rgba(108,220,120,.22); } .cartao-nivel.amarelo { background: rgba(255,209,102,.22); } .cartao-nivel.vermelho { background: rgba(255,107,107,.24); }
+[aria-checked="true"].cartao-nivel { border-color: #fff; transform: translateY(-2px); }
+.recorde { color: #ffd166; min-height: 1.1em; }
+.grande {
+  margin-top: .7rem; min-height: 60px; padding: .6rem 2.2rem; border: 0; border-radius: 999px; font-size: 1.5rem; font-weight: 700; color: #0d1a10;
+  background: linear-gradient(90deg, #39ff6a, #ffd400); box-shadow: 0 8px 24px rgba(57,255,106,.3);
+}
+.grande:active { transform: scale(.96); }
+.medio { min-height: 48px; padding: .45rem 1.2rem; border: 0; border-radius: 999px; font-size: 1.1rem; font-weight: 600; background: rgba(255,255,255,.14); }
+.conta { color: #ffd166; }
+.versao { font-size: .8rem; color: #8d86c0; margin: .5rem 0 0; }
+
+/* ---------- jogo: em pé, máquina em cima e o controle embaixo (setas à esquerda, PEGAR à direita) ---------- */
+#jogo { display: none; }
+#jogo.ativa {
+  display: grid; grid-template-columns: 1fr auto; grid-template-rows: 1fr auto;
+  grid-template-areas: "palco palco" "cruz pegar";
+}
+.palco { grid-area: palco; position: relative; overflow: hidden; min-height: 0; }
+#tela { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.placar { position: absolute; left: .5rem; bottom: .5rem; display: flex; gap: .35rem; z-index: 3; pointer-events: none; }
+.info { font-size: 1.1rem; background: rgba(8,8,20,.7); border-radius: 999px; padding: .2rem .65rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.info b { font-weight: 700; }
+#infoTempo.pouco { background: #e63946; animation: pisca .5s ease-in-out infinite alternate; }
+@keyframes pisca { to { transform: scale(1.08); } }
+.camera { position: absolute; right: .5rem; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: .4rem; z-index: 3; }
+.camera .mini { background: rgba(8,8,20,.65); font-size: 1rem; }
+.aviso {
+  position: absolute; left: 50%; top: calc(var(--nav-alto, 3.6rem) + .2rem); transform: translateX(-50%); margin: 0; z-index: 3; pointer-events: none;
+  padding: .35rem 1rem; border-radius: 999px; background: rgba(13,10,43,.85); font-weight: 700; font-size: 1.15rem; white-space: nowrap;
+  opacity: 0; transition: opacity .25s;
+}
+.aviso.ver { opacity: 1; }
+.cruz {
+  grid-area: cruz; display: grid; grid-template-columns: repeat(3, 62px); grid-template-rows: repeat(3, 52px); gap: 2px;
+  grid-template-areas: ". cima ." "esq . dir" ". baixo ."; padding: .3rem .6rem max(.6rem, env(safe-area-inset-bottom));
+}
+#btCima { grid-area: cima; } #btEsq { grid-area: esq; } #btDir { grid-area: dir; } #btBaixo { grid-area: baixo; }
+.seta {
+  border: 0; border-radius: 16px; font-size: 1.6rem; color: #fff; touch-action: none;
+  background: linear-gradient(#4a4380, #2a245c); box-shadow: 0 4px 0 #17123a;
+}
+.seta.apertado, .seta:active { transform: translateY(3px); box-shadow: 0 1px 0 #17123a; }
+.pegar {
+  grid-area: pegar; align-self: center; justify-self: end; width: 130px; height: 130px; margin: 0 .8rem max(.6rem, env(safe-area-inset-bottom)) 0;
+  border: 0; border-radius: 50%; font-size: 1.6rem; font-weight: 800; color: #3a0612; touch-action: none;
+  background: radial-gradient(circle at 40% 30%, #ff9db3, #ff2d55 60%, #c2002f); box-shadow: 0 7px 0 #7d001f, 0 0 26px rgba(255,45,85,.55);
+}
+.pegar:active { transform: translateY(5px); box-shadow: 0 2px 0 #7d001f; }
+.pegar:disabled { filter: grayscale(.7) brightness(.7); }
+
+/* deitado (celular deitado, tablet e computador): setas à esquerda, máquina no meio, PEGAR à direita */
+@media (orientation: landscape) {
+  #jogo.ativa { grid-template-columns: auto 1fr auto; grid-template-rows: 1fr; grid-template-areas: "cruz palco pegar"; }
+  .cruz { align-self: end; padding-left: max(.6rem, env(safe-area-inset-left)); }
+  .pegar { align-self: end; margin-bottom: max(1rem, env(safe-area-inset-bottom)); margin-right: max(.8rem, env(safe-area-inset-right)); }
+}
+
+/* prêmio que acabou de cair no buraco */
+.ganhou { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 6; pointer-events: none; text-align: center; animation: aparece 1.8s ease-out forwards; }
+.ganhou img { width: 160px; height: 160px; display: block; margin: 0 auto; }
+.ganhou p { margin: 0; font-size: 1.5rem; font-weight: 700; background: rgba(13,10,43,.88); border-radius: 999px; padding: .2rem 1rem; white-space: nowrap; }
+@keyframes aparece { 0% { transform: translate(-50%, -20%) scale(.3); opacity: 0; } 18% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1); } 85% { opacity: 1; } 100% { transform: translate(-50%, -80%) scale(.9); opacity: 0; } }
+
+/* ---------- coleção ---------- */
+#colecao { flex-direction: column; align-items: center; overflow-y: auto; padding: max(.8rem, env(safe-area-inset-top)) 1rem 5rem; }
+.bn-nav #colecao { padding-top: var(--nav-alto); }
+.titulo-colecao { margin: .2rem 0; font-size: 1.8rem; }
+.abas { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; margin: .3rem 0; }
+.abas button { min-height: 44px; border: 2px solid transparent; border-radius: 999px; padding: .3rem .9rem; background: rgba(255,255,255,.12); font-weight: 600; }
+.abas button[aria-selected="true"] { border-color: #ffd166; background: rgba(255,209,102,.2); }
+.resumo { margin: .2rem 0 .6rem; color: #ffd166; font-weight: 600; }
+.prateleira { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: .6rem; width: 100%; max-width: 44rem; }
+.prateleira .item { background: rgba(255,255,255,.08); border-radius: 18px; padding: .4rem; text-align: center; border-bottom: 6px solid #6b4a2b; }
+.prateleira .item img { width: 88px; height: 88px; display: block; margin: 0 auto; }
+.prateleira .item.falta img { filter: brightness(0) opacity(.4); }
+.prateleira .nome { font-size: .95rem; font-weight: 600; }
+.prateleira .qtd { font-size: .85rem; color: #ffd166; min-height: 1.1em; }
+
+/* ---------- fim da partida ---------- */
+.fim { position: fixed; inset: 0; z-index: 20; background: rgba(8,6,26,.72); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.fim-caixa { background: #1d1a44; border-radius: 26px; padding: 1rem 1.2rem; max-width: 30rem; width: 100%; text-align: center; max-height: 100%; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.fim-caixa h2 { margin: .2rem 0; font-size: 1.6rem; }
+.fim-estrelas { margin: 0; font-size: 2.4rem; color: #ffd166; letter-spacing: .1em; }
+.fim-premios { display: flex; flex-wrap: wrap; justify-content: center; gap: .2rem; margin: .3rem 0; }
+.fim-premios img { width: 64px; height: 64px; }
+.fim-texto { margin: .3rem 0 .6rem; font-size: 1.1rem; }
+.fim-botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+.fim-botoes .grande { margin-top: 0; width: 100%; }
+
+#desligado, #semTresD { align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+
+/* tocador de música comum (../trilha.js): na hora de jogar ele sobe para o canto de cima, longe do botão PEGAR */
+body.jogando .trilha { top: max(.4rem, env(safe-area-inset-top)); bottom: auto; }
+
+/* celular deitado: o menu cabe sem rolar */
+@media (orientation: landscape) and (max-height: 520px) {
+  #menu { padding-top: .3rem; gap: .1rem; }
+  .bn-nav #menu .faixa { padding-left: var(--nav-largo); }
+  .logo { font-size: 2.2rem; margin-top: -2.6rem; }
+  .titulo-escolha { margin: .15rem 0 0; font-size: .8rem; }
+  .maquinas { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 52rem; }
+  .cartao-maquina.bichos { grid-column: auto; }
+  .cartao-maquina { padding: .25rem .3rem; }
+  .cartao-maquina .ico { font-size: 1.3rem; }
+  .cartao-maquina small { font-size: .75rem; }
+  .cartao-nivel { padding: .25rem .7rem; }
+  .grande { margin-top: .3rem; min-height: 50px; padding: .35rem 2rem; font-size: 1.3rem; }
+  #btColecao { position: absolute; right: 1rem; bottom: 1rem; }
+  .versao { position: absolute; left: 1rem; bottom: .4rem; margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .logo span, .ganhou { animation: none; } }

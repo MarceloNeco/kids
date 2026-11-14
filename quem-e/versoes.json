@@ -1,0 +1,86 @@
+{
+  "app": "quem-e",
+  "versoes": [
+    {
+      "versao": "0.2.3",
+      "data": "14/Nov/2026",
+      "hora": "10:04:06",
+      "pt": [
+        "🔁 Passando o aparelho: escreva o nome de quem joga (fica só neste aparelho)",
+        "🗣️ A meleca avisa em voz alta para quem passar o celular e lê a pergunta para quem vai responder",
+        "💥 O Melekento Blue e a Pink Honey ficaram bagunceiros: Splash! Ploft!"
+      ],
+      "en": [
+        "🔁 Pass the device: write each player's name (stays only on this device)",
+        "🗣️ The slime says out loud who gets the phone and reads the question to whoever answers",
+        "💥 Melekento Blue and Pink Honey got messy: Splash! Ploft!"
+      ]
+    },
+    {
+      "versao": "0.2.2",
+      "data": "14/Nov/2026",
+      "hora": "09:56:05",
+      "pt": [
+        "🩷 A Pink Honey igualzinha à massinha de verdade: rosa-choque, molinha, deitada, com a aba atrás da cabeça e o rabinho pontudo",
+        "💙 O Melekento Blue agora fica em pé, com dois pezinhos"
+      ],
+      "en": [
+        "🩷 Pink Honey just like the real toy: hot pink, squishy, lying down, with the flap behind her head and the pointy tail",
+        "💙 Melekento Blue now stands up on two little feet"
+      ]
+    },
+    {
+      "versao": "0.2.1",
+      "data": "14/Nov/2026",
+      "hora": "09:35:56",
+      "pt": [
+        "🚕 O João Alves do jeito que as meninas imaginam: atlético, forte, uns 45 anos, de óculos escuros, sem superpoder, muito inteligente e humilde"
+      ],
+      "en": [
+        "🚕 João Alves the way the girls imagine him: athletic, strong, about 45, with sunglasses, no superpowers, very smart and humble"
+      ]
+    },
+    {
+      "versao": "0.2.0",
+      "data": "14/Nov/2026",
+      "hora": "03:46:15",
+      "pt": [
+        "🔮 A Meleca Adivinha: pense em alguém e a meleca descobre com perguntas (Sim, Acho que sim, Não sei, Acho que não, Não)",
+        "📚 Mais de 660 personagens: desenhos, filmes, novelas, músicas, famosos, bichos, folclore e coisas",
+        "🧒👨‍👩‍👧🧑 Três níveis: Infantil, Família e Adulto",
+        "🚕 O João Alves, a lenda da casa, com festa especial",
+        "🧠 Quando perde, a meleca aprende quem era (fica só neste aparelho; dá para passar a outro celular)",
+        "🎙️ Voz animada opcional (ElevenLabs), com a chave guardada no cofre"
+      ],
+      "en": [
+        "🔮 The Slime Guesses: think of someone and the slime finds out with questions (Yes, Probably, Don't know, Probably not, No)",
+        "📚 Over 660 characters: cartoons, movies, soap operas, music, famous people, animals, folklore and things",
+        "🧒👨‍👩‍👧🧑 Three levels: Kids, Family and Grown-ups",
+        "🚕 João Alves, the family legend, with a special celebration",
+        "🧠 When it loses, the slime learns who it was (stays on this device; can be moved to another phone)",
+        "🎙️ Optional lively voice (ElevenLabs), with the key kept in the vault"
+      ]
+    },
+    {
+      "versao": "0.1.0",
+      "data": "14/Nov/2026",
+      "hora": "02:43:57",
+      "pt": [
+        "🎭 Nasce o Quem é? com a primeira brincadeira, o Duelo de Caras: cada um escolhe uma cara em segredo e pergunta até descobrir a do outro",
+        "🫧 O Melekento Blue e a Pink Honey conversam, reagem e jogam contra você",
+        "🐣🐥🦉 Três níveis: 12, 24 e 36 caras desenhadas, um tabuleiro novo a cada partida",
+        "🔁 Passando o aparelho, com cortina para ninguém espiar",
+        "📱 Cada um no seu celular: um cria a partida e manda o código de 4 letras (precisa de internet)",
+        "🔍 Lupa para ver cada cara de perto"
+      ],
+      "en": [
+        "🎭 Who Is It? is born with its first game, Face Duel: each player secretly picks a face and asks questions to find the other one",
+        "🫧 Melekento Blue and Pink Honey chat, react and play against you",
+        "🐣🐥🦉 Three levels: 12, 24 and 36 drawn faces, a new board every game",
+        "🔁 Pass the device, with a curtain so nobody peeks",
+        "📱 Each on their own phone: one creates the game and sends the 4-letter code (needs internet)",
+        "🔍 Magnifier to see every face up close"
+      ]
+    }
+  ]
+}

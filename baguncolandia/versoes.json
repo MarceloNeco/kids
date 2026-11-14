@@ -2,6 +2,45 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.36",
+      "data": "14/Nov/2026",
+      "hora": "12:00:00",
+      "pt": [
+        "🪵 Abaixar de verdade: quando você abaixa (no Pula e abaixa e em todo lugar que tem abaixar), o boneco não fica mais \"espremido\". Ele dobra os joelhos, inclina o corpo para a frente, levanta a cabeça e olha para cima, vendo o galho passar por cima. Com vestido, a saia cai por cima das pernas."
+      ],
+      "en": [
+        "🪵 Real ducking: when you duck (in Jump and duck and everywhere you can duck), the puppet is no longer \"squashed\". It bends its knees, leans forward, lifts its head and looks up, watching the branch go over it. With a dress, the skirt falls over the legs."
+      ]
+    },
+    {
+      "versao": "0.8.35",
+      "data": "14/Nov/2026",
+      "hora": "11:00:00",
+      "pt": [
+        "👨 O papai mudou de jogo: agora ele joga junto na 🎳 Bagunça de bolas (só com 1 pessoa). Corre de lado atrás da bola, sorri, pede a bola acenando (\"Toca pra mim!\", \"Joga pro papai!\") e, quando chega nela, bate de volta para você (\"Toma! Pega ela!\"). Quando você acerta a bola, ele comemora.",
+        "👩 No 🎈 Pega-pega a mamãe brinca junto: corre atrás dos bichinhos (um pouco mais devagar que você), pega um de vez em quando (\"Peguei um!\"), chama (\"Olha ali um bichinho!\") e comemora quando você pega.",
+        "⚽ O Chuta-chuta voltou a ser como antes: o papai (esquerda) e a mamãe (direita) sentadinhos nas cadeirinhas da piscina de bolinhas."
+      ],
+      "en": [
+        "👨 Dad changed games: now he plays along in 🎳 Ball mess (1 player only). He runs sideways after the ball, smiles, waves asking for it (\"Pass it to me!\", \"Throw it to Dad!\") and, when he reaches it, hits it back to you (\"Here! Get it!\"). When you hit a ball, he celebrates.",
+        "👩 In 🎈 Catch, Mom plays along: she runs after the critters (a little slower than you), catches one now and then (\"Got one!\"), calls you (\"Look, a little critter!\") and celebrates when you catch one.",
+        "⚽ Kick is back as before: Dad (left) and Mom (right) sitting on the ball-pit folding seats."
+      ]
+    },
+    {
+      "versao": "0.8.34",
+      "data": "14/Nov/2026",
+      "hora": "10:00:00",
+      "pt": [
+        "👨 Chuta-chuta: o papai joga junto! Ele corre de lado atrás da bola, com as pernas mexendo, sorri e pede a bola acenando (\"Toca pra mim!\", \"Chuta pro papai!\"). Quando a bola chega nele, chuta: quase sempre devolve para você chutar (\"Toma! Agora chuta!\") e de vez em quando manda para o gol. Gol de vocês dois: ele comemora junto.",
+        "👴 Na piscina de bolinhas, quem senta na cadeirinha do lado esquerdo agora é o vovô (a mamãe continua do outro lado)."
+      ],
+      "en": [
+        "👨 Kick: Dad plays along! He runs sideways after the ball, legs moving, smiles and waves asking for the ball (\"Pass it to me!\", \"Kick it to Dad!\"). When the ball reaches him he kicks it: almost always back to you (\"Here! Now kick it!\") and now and then at the goal. Any goal: he celebrates with you.",
+        "👴 In the ball pit, Grandpa now sits on the left folding seat (Mom is still on the other side)."
+      ]
+    },
+    {
       "versao": "0.8.33",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

@@ -79,8 +79,11 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   perguntar e conte o que mudou.
 - **Segurança**: nenhuma senha, chave de API, token ou segredo entra no código, no repositório, no chat ou em
   arquivo. Chaves de IA ficam só no cofre do navegador da pessoa. Se uma chave aparecer no chat, peça para revogar.
-- **Idioma**: textos para o usuário em PT e EN; instruções para o dono em português, passo a passo, como para
-  iniciante (ele não é desenvolvedor).
+- **Idioma** (dono, 14/Nov/2026): textos para o usuário em **PT (Brasil), EN (EUA) e ES (Espanha)**, tradução
+  humanizada; **um seletor só em todo lugar**, bandeira + sigla (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES), componente do módulo comum,
+  nunca toggle ou dropdown próprio; ES só aparece num app quando ele está 100 % traduzido (até lá, PT|EN). Detalhe na
+  diretriz, "Idioma e datas". Instruções para o dono em português, passo a passo, como para iniciante (ele não é
+  desenvolvedor).
 - **Entrega**: um `.zip` por app, nome `<NOME APP> <VERSAO> <dd-Mmm-aaaa> <HHhMMm>.zip`, arquivos soltos na
   raiz; atualizar `versoes.json`, a versão no código, o `sw.js` e `ARQUITETURA.md`/`PENDENCIAS.md`.
 - **Trabalho demorado** (foto, OCR, IA, importação, áudio) roda no módulo `Fundo`: nunca morre ao sair da tela,
@@ -103,7 +106,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   novo = uma entrada lá), `jogos.js`, `kids.js` (controle da TV), `instalar.js`, `radio.js`, `tela-cheia.js`,
   `estante.css`, `sw.js`, `manifest.webmanifest`, `musicas/`, `CREDITOS.md`.
 - Uma pasta por jogo: `baguncolandia/`, `peluqueria/`, `vruuum/`, `purpurina/`, `rabiscolandia/`, `campo-minado/`,
-  `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
+  `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, `aqua/`, `glub-glub/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
   (só português por enquanto; o inglês com o interruptor `ingles`),
   `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
@@ -154,3 +157,20 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   aplicável hoje" e o motivo em uma linha. Ganhando login, banco ou integração, o app já nasce cumprindo os pontos.
 - Em cada entrega, dizer no resumo o que o RootifyONE, o ArchONE ou o EaglePlanONE precisariam saber (integração nova ou
   removida, recurso/interruptor novo, item do roadmap concluído). Nada de integração nova sem a regra zero.
+
+## Várias conversas ao mesmo tempo (dono, 14/Nov/2026): cuidado com conflitos
+
+O dono mexe em vários jogos em paralelo, cada um numa conversa. Para uma não estragar o trabalho da outra:
+- **Comece do `main` mais novo** (`git fetch origin main` e o ramo de trabalho saindo dele) e **mexa só na pasta do seu
+  jogo**. Não altere pasta de outro jogo, nem "aproveite para arrumar" algo fora do pedido.
+- **Arquivos comuns da raiz** (`catalogo.js`, `recursos-do-app.json`, `sw.js`, `index.html`, `trilha.js`, `navegacao.js`,
+  `idioma.js`, `CLAUDE.md`, `ARQUITETURA.md`, `PENDENCIAS.md`, `teste/`): mudanças pequenas e só no que é seu (a sua
+  entrada no catálogo, o seu interruptor, a sua linha nas pendências). Nunca reescreva o arquivo inteiro.
+- **Antes de cada pull request**: busque o `main` de novo e **junte com merge** no seu ramo (nunca rebase nem force push).
+  Se der conflito, **mantenha os dois lados**. Em versões (`APP_VERSION`, `VERSAO`, `versoes.json`, `data-versao`), fique
+  com a do `main` e suba **uma acima** dela; no `versoes.json` a entrada nova vai por cima das que vieram do `main`.
+- **Depois de juntar**, rode de novo os testes do seu jogo e os vigias da raiz (`node --test teste/*.test.js`), um de cada
+  vez. Só publique com tudo passando.
+- **Pull requests pequenos e frequentes**, publicados assim que testados, para os outros pegarem logo o `main` novo.
+- Se um conflito mexer na lógica de outro jogo e não der para juntar sem perder algo, **pare e conte ao dono** em vez de
+  escolher um lado.

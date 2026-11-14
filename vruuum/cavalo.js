@@ -14,6 +14,8 @@
   var PELO = ['#c08a55', '#8d5a2e', '#60391a'], PRETO = ['#4a3426', '#24170f', '#0e0906'], CASCO = ['#6a6a70', '#3a3a40', '#1c1c20'];
   var PELE = ['#f8dcbc', '#f2c9a0', '#d39f74'], CALCA = ['#5577b4', '#36518a', '#1f3159'], BOTA = ['#8a5531', '#5a3218', '#341a0a'];
   var CABELO = ['#8a5a36', '#5a3a22', '#2e1c0f'];
+  // 1.11.0: o mesmo esqueleto vira um DINOSSAURO verde (espinhos roxos nas costas, rabo grosso e comprido, cabeção sorridente)
+  var DINO = ['#a6ec72', '#4caf50', '#2a6b2a'], ESPINHO = ['#e0a8ff', '#9b5de5', '#4a1f7a'], GARRA = ['#f4f1e8', '#cfc6a8', '#8a8066'];
   // câmera: distância (perspectiva), quanto olha de cima, quantas unidades cabem na altura e onde fica o chão
   var F = 7, PITCH = 0.22, ALT = 3.25, CHAO = 0.93, GIRO = 0.62;
 
@@ -123,8 +125,9 @@
 
   /* monta a lista de peças. fase < 0 = parado. lado: -1 (curva para a esquerda) a 1 (direita).
      Devolve também onde fica a cabeça de quem monta (centro e raio, na tela). */
-  function montar(x0, y0, W, H, cor, fase, lado, corpoPiloto, t) {
-    var yaw = Math.max(-1, Math.min(1, lado || 0)) * GIRO, cam = camera(x0, y0, W, H, yaw), L = [];
+  function montar(x0, y0, W, H, cor, fase, lado, corpoPiloto, t, bicho) {
+    var dino = bicho === 'dino', PELE_B = dino ? DINO : PELO, PATA = dino ? DINO : PRETO;
+    var yaw = lado && lado.yaw != null ? lado.yaw : Math.max(-1, Math.min(1, lado || 0)) * GIRO, cam = camera(x0, y0, W, H, yaw), L = [];   // {yaw}: giro livre (volta de 360° na largada)
     var cp = corpo(fase), C0 = [0, 1.2, 0];
     function B(p) { var q = gira(p, cp.inc, C0); return [q[0], q[1] + cp.sobe, q[2]]; }   // ponto preso ao corpo do cavalo
     var menina = corpoPiloto === 'menina', camisa = tres(cor), manta = [tom(cor, 0.45), tom(cor, 0.12), tom(cor, -0.35)];
@@ -137,24 +140,39 @@
       c.fill(); c.restore();
     } });
     // corpo: barriga, garupa (bem redonda vista de trás) e peito
-    bola(cam, L, B([0, 1.21, 0.0]), 0.31, 0.33, 0.72, cp.inc, PELO);
-    bola(cam, L, B([0, 1.27, -0.44]), 0.34, 0.34, 0.42, cp.inc, PELO);
-    bola(cam, L, B([0, 1.27, 0.5]), 0.27, 0.35, 0.34, cp.inc, PELO);
+    bola(cam, L, B([0, 1.21, 0.0]), dino ? 0.36 : 0.31, dino ? 0.36 : 0.33, 0.72, cp.inc, PELE_B);
+    bola(cam, L, B([0, 1.27, -0.44]), dino ? 0.38 : 0.34, 0.34, 0.42, cp.inc, PELE_B);
+    bola(cam, L, B([0, 1.27, 0.5]), 0.27, 0.35, 0.34, cp.inc, PELE_B);
     // pescoço e cabeça (balançam com o galope)
     var base = B([0, 1.42, 0.66]);
     function N(p) { return gira(B(p), cp.pesc, base); }
     var nuca = N([0, 2.02, 1.02]), focinho = N([0, 1.76, 1.4]);
-    cano(cam, L, base, N([0, 1.95, 1.0]), 0.21, 0.13, PELO);
-    cano(cam, L, N([0, 2.04, 1.06]), focinho, 0.12, 0.085, PELO, -0.02);
-    bola(cam, L, N([0, 1.75, 1.43]), 0.085, 0.075, 0.09, -0.6, [tom('#8d5a2e', 0.1), '#5e3a1c', '#2e1a0b'], -0.04);
-    [-1, 1].forEach(function (l) {
-      cano(cam, L, N([l * 0.055, 2.1, 1.03]), N([l * 0.075, 2.27, 0.99]), 0.038, 0.01, PELO, -0.03);
-      bola(cam, L, N([l * 0.1, 2.0, 1.14]), 0.022, 0.026, 0.02, 0, ['#555', '#151515', '#000'], -0.05);
-    });
+    if (dino) {   // pescoço grosso e cabeção redondo com olhões em cima e sorriso
+      cano(cam, L, base, N([0, 1.9, 1.0]), 0.24, 0.17, DINO);
+      bola(cam, L, N([0, 2.02, 1.16]), 0.21, 0.19, 0.24, -0.2, DINO, -0.02);
+      bola(cam, L, N([0, 1.94, 1.38]), 0.15, 0.12, 0.14, -0.3, DINO, -0.03);
+      [-1, 1].forEach(function (l) {
+        bola(cam, L, N([l * 0.1, 2.18, 1.12]), 0.07, 0.07, 0.06, 0, ['#ffffff', '#f0f0f0', '#c8c8c8'], -0.05);
+        bola(cam, L, N([l * 0.11, 2.19, 1.17]), 0.032, 0.035, 0.02, 0, ['#555', '#151515', '#000'], -0.07);
+        bola(cam, L, N([l * 0.05, 1.98, 1.5]), 0.018, 0.018, 0.01, 0, ['#2a6b2a', '#1d4a1d', '#0e250e'], -0.06);
+      });
+    } else {
+      cano(cam, L, base, N([0, 1.95, 1.0]), 0.21, 0.13, PELO);
+      cano(cam, L, N([0, 2.04, 1.06]), focinho, 0.12, 0.085, PELO, -0.02);
+      bola(cam, L, N([0, 1.75, 1.43]), 0.085, 0.075, 0.09, -0.6, [tom('#8d5a2e', 0.1), '#5e3a1c', '#2e1a0b'], -0.04);
+      [-1, 1].forEach(function (l) {
+        cano(cam, L, N([l * 0.055, 2.1, 1.03]), N([l * 0.075, 2.27, 0.99]), 0.038, 0.01, PELO, -0.03);
+        bola(cam, L, N([l * 0.1, 2.0, 1.14]), 0.022, 0.026, 0.02, 0, ['#555', '#151515', '#000'], -0.05);
+      });
+    }
     // crina: pela crista do pescoço, caindo para o lado direito, e o topete
-    var crista = [B([0, 1.62, 0.42]), N([0, 1.78, 0.68]), N([0, 1.95, 0.86]), N([0, 2.1, 1.0])];
-    fita(cam, L, crista, [0.05, 0.075, 0.07, 0.05], PRETO, -0.06);
-    for (var k = 0; k < 6; k++) {   // mechas caindo para o lado, balançando com o vento
+    var crista = [B([0, 1.62, 0.42]), N([0, 1.78, 0.68]), N([0, 1.95, 0.86]), N([0, 2.1, 1.0])], k;
+    if (dino) {   // espinhos roxos: do alto da cabeça, pelo pescoço e pelas costas (a sela fica no meio, sem espinho)
+      [N([0, 2.2, 1.08]), N([0, 2.08, 0.92]), N([0, 1.95, 0.78]), B([0, 1.66, 0.4]), B([0, 1.6, -0.42]), B([0, 1.58, -0.66])].forEach(function (b0, q) {
+        var alto = q < 3 ? 0.17 : 0.22; cano(cam, L, b0, soma(b0, [0, alto, -0.04]), 0.075, 0.008, ESPINHO, -0.05);
+      });
+    } else fita(cam, L, crista, [0.05, 0.075, 0.07, 0.05], PRETO, -0.06);
+    for (k = 0; k < (dino ? 0 : 6); k++) {   // mechas caindo para o lado, balançando com o vento
       var cr = N([0, 1.66 + k * 0.085, 0.47 + k * 0.1]), bal = 0.04 * Math.sin((t || 0) * 7 + k * 1.3);
       fita(cam, L, [cr, soma(cr, [0.07, -0.08, -0.05 + bal]), soma(cr, [0.1, -0.2, -0.1 + bal * 1.5])], [0.045, 0.035, 0.012], PRETO, -0.07);
     }
@@ -163,18 +181,25 @@
       var fr = pp[2], l = pp[1], pr = perna(fase, BATIDA[pp[0]], fr), j0 = B(fr ? [l * 0.14, 1.14, 0.52] : [l * 0.16, 1.24, -0.52]);
       var a1 = fr ? pr.ang : pr.ang - 0.3, a2 = (fr ? pr.ang : pr.ang + 0.42) - pr.dobra, a3 = a2 + (pr.dobra > 0.5 ? -0.6 : 0.45);
       var j1 = osso(j0, fr ? 0.54 : 0.62, a1, -l * 0.015), j2 = osso(j1, fr ? 0.38 : 0.41, a2, -l * 0.01), j3 = osso(j2, 0.13, a3);
-      cano(cam, L, j0, j1, fr ? 0.13 : 0.17, 0.068, PELO, fr ? 0 : 0.35);   // a coxa sai de baixo da garupa
-      cano(cam, L, j1, j2, 0.055, 0.045, PRETO);
-      cano(cam, L, j2, j3, 0.045, 0.052, PRETO, -0.01);
-      bola(cam, L, osso(j3, 0.03, a3), 0.058, 0.05, 0.065, -a3, CASCO, -0.02);
+      cano(cam, L, j0, j1, (fr ? 0.13 : 0.17) * (dino ? 1.25 : 1), dino ? 0.1 : 0.068, PELE_B, fr ? 0 : 0.35);   // a coxa sai de baixo da garupa
+      cano(cam, L, j1, j2, dino ? 0.1 : 0.055, dino ? 0.085 : 0.045, PATA);
+      cano(cam, L, j2, j3, dino ? 0.085 : 0.045, dino ? 0.09 : 0.052, PATA, -0.01);
+      bola(cam, L, osso(j3, 0.03, a3), dino ? 0.1 : 0.058, 0.05, dino ? 0.1 : 0.065, -a3, dino ? GARRA : CASCO, -0.02);
     });
     // rabo: sai da garupa e voa para trás no galope, balançando
     var raiz0 = B([0, 1.5, -0.86]), rabo = [];
-    for (k = 0; k <= 5; k++) {
-      var u = k / 5;
-      rabo.push([raiz0[0] + Math.sin(u * 2.4 + (t || 0) * 4) * 0.07 * u, raiz0[1] + 0.06 * Math.sin(u * PI) - u * 0.95 * (1 - 0.45 * cp.voo), raiz0[2] - u * (0.12 + 0.42 * cp.voo)]);
+    if (dino) {   // rabo de dinossauro: grosso, comprido, quase reto para trás, balançando de um lado para o outro
+      raiz0 = B([0, 1.3, -0.8]);
+      for (k = 0; k <= 5; k++) { var ud = k / 5; rabo.push([raiz0[0] + Math.sin((t || 0) * 5 + ud * 2) * 0.22 * ud, raiz0[1] - ud * 0.55, raiz0[2] - ud * 1.3]); }
+      fita(cam, L, rabo, [0.24, 0.2, 0.16, 0.11, 0.07, 0.02], DINO, -0.3);
+      [1, 2, 3].forEach(function (q) { var pr0 = rabo[q]; cano(cam, L, pr0, soma(pr0, [0, 0.17 - q * 0.03, -0.03]), 0.06, 0.006, ESPINHO, -0.32); });
+    } else {
+      for (k = 0; k <= 5; k++) {
+        var u = k / 5;
+        rabo.push([raiz0[0] + Math.sin(u * 2.4 + (t || 0) * 4) * 0.07 * u, raiz0[1] + 0.06 * Math.sin(u * PI) - u * 0.95 * (1 - 0.45 * cp.voo), raiz0[2] - u * (0.12 + 0.42 * cp.voo)]);
+      }
+      fita(cam, L, rabo, [0.06, 0.1, 0.13, 0.13, 0.1, 0.04], PRETO, -0.3, 'rgba(120,90,60,.45)');
     }
-    fita(cam, L, rabo, [0.06, 0.1, 0.13, 0.13, 0.1, 0.04], PRETO, -0.3, 'rgba(120,90,60,.45)');
     // manta (na cor escolhida) e sela de couro
     bola(cam, L, B([0, 1.43, 0.02]), 0.36, 0.16, 0.3, cp.inc, manta, -0.08);
     bola(cam, L, B([0, 1.55, 0.0]), 0.2, 0.07, 0.25, cp.inc, BOTA, -0.12);
@@ -227,18 +252,18 @@
   }
 
   // quadro parado (de costas) para a garagem e para os rivais: com uma cabeça neutra de cabelo, para quando está longe
-  function desenhar(c, W, H, cor, emoji, fase, corpoPiloto) {
-    var m = montar(0, 0, W, H, cor, fase == null ? 0.3 : fase, 0, corpoPiloto, 0), h = m.cabeca;
+  function desenhar(c, W, H, cor, emoji, fase, corpoPiloto, bicho) {
+    var m = montar(0, 0, W, H, cor, fase == null ? 0.3 : fase, 0, corpoPiloto, 0, bicho), h = m.cabeca;
     pintar(c, m);
     bolaTela(c, h.x, h.y, h.r, h.r, 0, CABELO);
   }
   // ao vivo (corrida e garagem): gira de lado nas curvas. Devolve onde desenhar a cabeça viva
-  function vivo(c, x0, y0, W, H, cor, fase, lado, corpoPiloto, t) {
-    var m = montar(x0, y0, W, H, cor, fase, lado, corpoPiloto, t);
+  function vivo(c, x0, y0, W, H, cor, fase, lado, corpoPiloto, t, bicho) {
+    var m = montar(x0, y0, W, H, cor, fase, lado, corpoPiloto, t, bicho);
     pintar(c, m);
     return m.cabeca;
   }
-  function cabeca(x0, y0, W, H, fase, lado) { return montar(x0, y0, W, H, '#ff4fa3', fase, lado, 'menina', 0).cabeca; }
+  function cabeca(x0, y0, W, H, fase, lado, bicho) { return montar(x0, y0, W, H, '#ff4fa3', fase, lado, 'menina', 0, bicho).cabeca; }
 
   var VruuumCavalo = { desenhar: desenhar, vivo: vivo, cabeca: cabeca, perna: perna, corpo: corpo, BATIDA: BATIDA, APOIO: APOIO };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumCavalo;

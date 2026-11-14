@@ -8,10 +8,22 @@
   function nivelDe(n) { return typeof n === 'string' ? D.nivel[n] : n; }
 
   // ---------- ingredientes e passos do nível ----------
-  function ingredientesDoNivel(rec, nivel) {
-    var nv = nivelDe(nivel);
-    if (nv.id === 'facil') return Object.keys(rec.facil).map(function (id) { return { id: id, q: rec.facil[id] }; });
-    return rec.ing.map(function (x) { return { id: x.id, q: x.q }; });
+  // fator = porções (v0.8.0): a receita serve 2 pessoas; para mais gente as quantidades multiplicam (fatorDe)
+  function ingredientesDoNivel(rec, nivel, fator) {
+    var nv = nivelDe(nivel), f = fator || 1;
+    if (nv.id === 'facil') return Object.keys(rec.facil).map(function (id) { return { id: id, q: rec.facil[id] * f }; });
+    return rec.ing.map(function (x) { return { id: x.id, q: x.q * f }; });
+  }
+  // ---------- família à mesa (v0.8.0) ----------
+  // quem vai comer: "eu" sempre; o nível limita quantos (Fácil 2, Médio 4, Difícil 6). Cada 2 pessoas = 1 porção.
+  function maxPessoas(nivel) { return nivelDe(nivel).pessoas || 2; }
+  function fatorDe(pessoas) { return Math.max(1, Math.ceil((pessoas || 1) / 2)); }
+  // liga/desliga alguém da família na lista escolhida, respeitando o máximo do nível (o mais antigo sai para dar lugar)
+  function alternarPessoa(lista, id, nivel) {
+    var l = lista.filter(function (x) { return x !== 'eu'; }), i = l.indexOf(id);
+    if (id === 'eu') return ['eu'].concat(l);
+    if (i >= 0) l.splice(i, 1); else { l.push(id); while (l.length + 1 > maxPessoas(nivel)) l.shift(); }
+    return ['eu'].concat(l);
   }
 
   function passosDoNivel(rec, nivel) {
@@ -35,8 +47,8 @@
     return lista;
   }
 
-  function quantidade(rec, nivel, id) {
-    var x = ingredientesDoNivel(rec, nivel).filter(function (i) { return i.id === id; })[0];
+  function quantidade(rec, nivel, id, fator) {
+    var x = ingredientesDoNivel(rec, nivel, fator).filter(function (i) { return i.id === id; })[0];
     return x ? x.q : 0;
   }
 
@@ -70,14 +82,26 @@
   function completa(precisa, cesta) { return faltando(precisa, cesta).length === 0; }
 
   // ---------- lugares ----------
+  // lojas da vila (v0.10.0): mercadinho (tudo o que tem preço), padaria (pão, leite, queijo, manteiga: "padaria") e
+  // feira (frutas e legumes, que também nascem no pomar e na horta)
+  var LOJAS = ['mercado', 'padaria', 'feira'];
+  function vende(loja, id) {
+    var g = D.ingrediente[id]; if (!g || !(g.preco > 0)) return false;
+    if (loja === 'mercado') return true;
+    if (loja === 'padaria') return !!g.padaria;
+    if (loja === 'feira') return g.de === 'pomar' || g.de === 'horta';
+    return false;
+  }
   function lugaresDe(id, nivel) {
     var g = D.ingrediente[id], l = [];
     if (!g) return l;
     if (g.de) l.push(g.de);
-    if (g.preco > 0) l.push('mercado');
+    LOJAS.forEach(function (loja) { if (vende(loja, id)) l.push(loja); });
     if (g.vizinha) l.push('vizinha');
     return l;
   }
+  // só se consegue comprando (em alguma loja): não nasce na natureza nem a vizinha empresta
+  function soCompra(id) { var l = lugaresDe(id); return l.length > 0 && l.every(function (x) { return LOJAS.indexOf(x) >= 0; }); }
   // menor número de lugares que juntos têm tudo (testa todas as combinações: são só 7 lugares)
   function lugaresMinimos(ids) {
     var lugs = D.LUGARES.filter(function (l) { return l.id !== 'casa'; }).map(function (l) { return l.id; });
@@ -99,12 +123,12 @@
   // ---------- moedas ----------
   function preco(id, nivel) { var nv = nivelDe(nivel); var g = D.ingrediente[id]; if (!g || !g.preco) return null; return nv.moedas ? g.preco : 0; }
   // o que só se consegue comprando (não tem na natureza nem com a vizinha)
-  function custoSoMercado(rec, nivel) {
-    return ingredientesDoNivel(rec, nivel).reduce(function (s, x) {
-      var l = lugaresDe(x.id); return l.length === 1 && l[0] === 'mercado' ? s + D.ingrediente[x.id].preco * x.q : s;
+  function custoSoMercado(rec, nivel, fator) {
+    return ingredientesDoNivel(rec, nivel, fator).reduce(function (s, x) {
+      return soCompra(x.id) ? s + D.ingrediente[x.id].preco * x.q : s;
     }, 0);
   }
-  function moedasIniciais(rec, nivel) { var nv = nivelDe(nivel); return nv.moedas ? custoSoMercado(rec, nv) + nv.margem : 0; }
+  function moedasIniciais(rec, nivel, fator) { var nv = nivelDe(nivel); return nv.moedas ? custoSoMercado(rec, nv, fator) + nv.margem : 0; }
   // moedas da carteira: de 5, de 2 e de 1 (o menor número de moedas)
   function moedasPara(valor) {
     var r = [], v = Math.max(0, Math.floor(valor));
@@ -129,7 +153,7 @@
   function precisaAjudar(estado, precisa, nivel) {
     var nv = nivelDe(nivel); if (!nv.moedas) return false;
     return faltando(precisa, estado.cesta).some(function (r) {
-      var l = lugaresDe(r.id); return l.length === 1 && l[0] === 'mercado' && estado.moedas < D.ingrediente[r.id].preco;
+      return soCompra(r.id) && estado.moedas < D.ingrediente[r.id].preco;
     });
   }
 
@@ -172,8 +196,8 @@
   function nomeIng(id, en, q) { var g = D.ingrediente[id], n = en ? g.en : g.pt; return q != null && q !== 1 ? n[1] : n[0]; }
   function juntar(l, en) { if (l.length <= 1) return l.join(''); return l.slice(0, -1).join(', ') + (en ? ' and ' : ' e ') + l[l.length - 1]; }
   function na(u, en) { return D.utensilio[u].na[en ? 1 : 0]; }
-  function textoPasso(p, rec, nivel, en) {
-    var q = function (id) { return quantidade(rec, nivel, id); };
+  function textoPasso(p, rec, nivel, en, fator) {
+    var q = function (id) { return quantidade(rec, nivel, id, fator); };
     var lista = juntar(p.ing.map(function (id) { return nomeQtd(id, q(id), en); }), en);
     // texto próprio da receita; num passo de pôr, a lista vem junto para a criança saber o que escolher
     if (en ? p.en : p.pt) return (en ? p.en : p.pt) + (p.a === 'por' && lista ? ': ' + lista : '');
@@ -198,7 +222,7 @@
   }
 
   var L = {
-    ingredientesDoNivel: ingredientesDoNivel, passosDoNivel: passosDoNivel, quantidade: quantidade,
+    LOJAS: LOJAS, vende: vende, soCompra: soCompra, ingredientesDoNivel: ingredientesDoNivel, passosDoNivel: passosDoNivel, quantidade: quantidade, maxPessoas: maxPessoas, fatorDe: fatorDe, alternarPessoa: alternarPessoa,
     podeFazer: podeFazer, faltamAntes: faltamAntes, proximos: proximos, proximoNaOrdem: proximoNaOrdem, ordemValida: ordemValida,
     por: por, tirar: tirar, resumo: resumo, faltando: faltando, completa: completa,
     lugaresDe: lugaresDe, lugaresMinimos: lugaresMinimos, lugaresUteis: lugaresUteis,

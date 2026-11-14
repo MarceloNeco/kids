@@ -218,6 +218,7 @@
       trave(ctx, estado.trave, ts);
     }
     if (estado.tanques) seguro('tanques', function () { tanques(ctx, estado.tanques, ts); });
+    if (estado.parente) seguro('parente', function () { parenteCampo(ctx, estado.parente, jogs, ts, dt); });
     // rastro de luz onde a pessoa se mexe
     jogs.forEach(function (jg, j) {
       var pts = jg.rastro; if (!pts || pts.length < 1) return;
@@ -285,6 +286,7 @@
     } else if (pose === 'dor') xd = x + Math.sin(ts / 35) * A * 0.02 * (1 - k);
     var alvoY = corpo.pulando ? -A * 0.5 : 0; av.y = V ? V.y : av.y == null ? 0 : av.y + (alvoY - av.y) * Math.min(1, dt * 12);   // 🧍 vai até lá: o pulo é o do motor
     var alvoAg = corpo.abaixado ? 0.6 : (V && V.agacha > 0) ? 0.9 : 1; av.ag = av.ag == null ? 1 : av.ag + (alvoAg - av.ag) * Math.min(1, dt * 10);
+    av.ab = (av.ab || 0) + ((corpo.abaixado ? 1 : 0) - (av.ab || 0)) * Math.min(1, dt * 14);   // abaixando: dobra os joelhos de verdade (não achata o boneco)
     av.passo = (av.passo || 0) + Math.min(14, Math.abs(av.vx) / 40) * dt * 8;
     av.vxs = (av.vxs || 0) + (av.vx - (av.vxs || 0)) * Math.min(1, dt * 10);   // velocidade suavizada (câmera e dedo)
     var vel = V ? V.vx : av.vxs;
@@ -302,10 +304,11 @@
     var y = av.y + pulo;
     if (V && V.alvo) { ctx.save(); var pul = 0.5 + 0.5 * Math.sin(ts / 120); ctx.strokeStyle = 'rgba(255,255,255,' + (0.5 + 0.4 * pul) + ')'; ctx.lineWidth = 4; ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.arc(V.alvo.x, V.alvo.y, 26 + pul * 6, 0, 6.2832); ctx.stroke(); ctx.restore(); }   // onde o dedo mandou ir
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(xd, chao + 4, A * 0.22 * Math.max(0.3, 1 + y / A * 0.6), A * 0.06, 0, 0, 6.2832); ctx.fill(); ctx.restore();
-    ctx.save(); ctx.translate(xd, chao + y); ctx.scale(1 + (1 - av.ag) * 0.35, av.ag);
+    ctx.save(); ctx.translate(xd, chao + y);
     if (jg.invencivel && !pose && Math.floor(ts / 90) % 2) ctx.globalAlpha = 0.45;
-    var lado = pose !== 'dor' && !(V && V.costas) && (Math.abs(vel) > 40 || (y < -5 && Math.abs(vel) > 10));   // andando (dedo, câmera ou teclado): de perfil   // andando a festa não vira de frente: sorri de lado   // andando (ou pulando para o lado): de perfil
-    if (lado) { var dir = vel < 0 ? -1 : 1; av.dir = dir; ctx.scale(dir, 1); root.Boneco.corpoLado(ctx, cfg, A, { fase: av.fase, andando: Math.abs(vel) > 40, agacha: V && V.agacha > 0 ? 1 : 0, noAr: y < -5, cima: (V && V.cima) || pose === 'festa' || av.bE > 0.6 || av.bD > 0.6, ts: ts, expr: pose }); }
+    var abaixa = av.ab > 0.02 ? av.ab : 0;
+    var lado = pose !== 'dor' && !(V && V.costas) && (Math.abs(vel) > 40 || (y < -5 && Math.abs(vel) > 10) || abaixa > 0);   // andando (dedo, câmera ou teclado): de perfil   // andando a festa não vira de frente: sorri de lado   // andando (ou pulando para o lado): de perfil
+    if (lado) { var dir = Math.abs(vel) > 40 || !abaixa ? (vel < 0 ? -1 : 1) : 1; av.dir = dir; ctx.scale(dir, 1); root.Boneco.corpoLado(ctx, cfg, A, { fase: av.fase, andando: Math.abs(vel) > 40, agacha: V && V.agacha > 0 ? 1 : 0, abaixa: abaixa, noAr: y < -5, cima: !abaixa && ((V && V.cima) || pose === 'festa' || av.bE > 0.6 || av.bD > 0.6), ts: ts, expr: pose }); }   // abaixado e parado: de lado, virado para onde vêm os galhos
     else root.Boneco.corpoEmPe(ctx, cfg, A, { balanco: pose ? 0 : balanco, andando: andando && !pose, bE: av.bE, bD: gesto >= 0 && gesto < 1.4 ? 0.55 + 0.45 * Math.sin(ts / 110) : av.bD, pulando: corpo.pulando || pulo < -A * 0.05, ts: ts, pose: pose, costas: !!(V && V.costas && !pose), agacha: V && V.agacha > 0 ? 1 : 0 });
     ctx.restore();
     ctx.save(); ctx.font = '600 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillStyle = cor; sombra(ctx, 'rgba(0,0,0,.8)', 6);
@@ -410,6 +413,27 @@
     });
   }
 
+  /* 👨👩 quem joga junto: o papai na 🎳 Bagunça de bolas (corre de lado, bate na bola, acena pedindo) e a mamãe no 🎈
+     Pega-pega (corre atrás dos bichos e pega um de vez em quando); os dois comemoram com a criança */
+  function parenteCampo(ctx, P, jogs, ts, dt) {
+    var B = root.Boneco, jg = jogs[0]; if (!B || !jg) return;
+    var r = jg.raia, Ac = jg.vai ? jg.vai.A : r.h * 0.42, A = Math.min(420, Ac * 1.3), chao = r.y + r.h * 0.86, anda = Math.abs(P.vx) > 40;
+    var cfg = P.quem === 'mae' ? MAE : PAI;
+    D.parenteFase = (D.parenteFase || 0) + Math.abs(P.vx) / (A * 0.6) * 6.2832 * dt;
+    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(P.x, chao + 4, A * 0.2, A * 0.05, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(P.x, chao);
+    if (P.fase === 'bate' && !P.alto && P.quem === 'pai') { ctx.scale(P.dir, 1); B.corpoLado(ctx, cfg, A, { chute: Math.min(1, P.t / 0.18), ts: ts }); }   // bola baixa: devolve com o pé
+    else if (P.fase === 'bate') B.corpoEmPe(ctx, cfg, A, { bE: 1, bD: 1, balanco: 0, ts: ts });   // bola alta / bicho: pega com as mãos para cima
+    else if (anda && P.fase !== 'festa') { ctx.scale(P.vx < 0 ? -1 : 1, 1); B.corpoLado(ctx, cfg, A, { fase: D.parenteFase, andando: true, ts: ts }); }
+    else B.corpoEmPe(ctx, cfg, A, { bE: P.fase === 'festa' ? 1 : 0.12, bD: P.fase === 'festa' ? 1 : P.chama ? 0.6 + 0.4 * Math.sin(ts / 120) : 0.2, pose: P.fase === 'festa' ? 'festa' : null, balanco: 0, ts: ts });   // parado: acena pedindo a bola
+    ctx.restore();
+    if (P.fala) {   // balão de fala em cima da cabeça
+      var txt = T(P.fala[0], P.fala[1]); ctx.save(); ctx.font = '700 26px ' + D.fonte; var tw = ctx.measureText(txt).width + 32, bx = Math.max(10, Math.min(W - tw - 10, P.x - tw / 2)), by = chao - A - 70;
+      ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.beginPath(); ctx.moveTo(bx + 20, by); ctx.arcTo(bx + tw, by, bx + tw, by + 48, 22); ctx.arcTo(bx + tw, by + 48, bx, by + 48, 22); ctx.arcTo(bx, by + 48, bx, by, 22); ctx.arcTo(bx, by, bx + tw, by, 22); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(P.x - 10, by + 46); ctx.lineTo(P.x, by + 66); ctx.lineTo(P.x + 12, by + 46); ctx.fill();
+      ctx.fillStyle = '#0d47a1'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, bx + tw / 2, by + 25); ctx.restore();
+    }
+  }
   function particulas(ctx, dt, dtMs) {
     for (var i = D.parts.length - 1; i >= 0; i--) {
       var p = D.parts[i]; p.vida -= dtMs; if (p.vida <= 0) { D.parts.splice(i, 1); continue; }

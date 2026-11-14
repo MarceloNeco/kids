@@ -27,6 +27,46 @@ a { color: var(--ciano); }
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 60%); mask-image: linear-gradient(180deg, transparent, #000 60%);
   animation: andar .5s linear infinite; }
 @keyframes andar { to { background-position: 50% 80px, 0 0; } }
+/* 1.11.0: apresentação — corrida de demonstração rodando atrás e o logo animado em SVG */
+/* 1.14.0: a demonstração fica fixa atrás da apresentação e do menu (só com body.com-demo); no menu, um véu um pouco
+   mais escuro para as letras continuarem fáceis de ler, e os botões meio transparentes para a corrida aparecer */
+.demo { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 0; }
+.demo-escuro { position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; display: none; z-index: 0; background: radial-gradient(ellipse at 50% 40%, rgba(11,10,31,.05), rgba(11,10,31,.5) 80%); transition: background .5s; }
+.com-demo .demo, .com-demo .demo-escuro { display: block; }
+.demo-menu .demo-escuro { background: linear-gradient(180deg, rgba(11,10,31,.35), rgba(11,10,31,.55) 45%, rgba(11,10,31,.7)); }
+#entrada, #menu { z-index: 1; }
+.demo-menu .opcao, .demo-menu .cartao-veic, .demo-menu .aba { background: rgba(34,27,77,.78); }
+.demo-menu .opcao[aria-pressed="true"], .demo-menu .cartao-veic[aria-pressed="true"] { background: rgba(70,52,40,.85); }
+.demo-menu .rotulo { color: #e4ddff; text-shadow: 0 1px 4px rgba(0,0,0,.8); }
+.demo-menu .logo.pequeno { animation: lgPula 1.6s ease-in-out infinite; }
+/* música no menu */
+.musica-esc { display: flex; align-items: center; gap: 8px; max-width: min(560px, 100%); }
+.mus-nome { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1rem; }
+.mus-lista { display: flex; flex-direction: column; gap: 4px; width: min(460px, 100%); max-height: 46vh; overflow-y: auto; padding: 6px; border-radius: 16px; background: rgba(20,16,56,.94); box-shadow: 0 0 0 2px var(--borda); }
+.mus-item { text-align: left; padding: 6px 12px; border-radius: 12px; background: transparent; font-size: .95rem; border: 2px solid transparent; }
+.mus-item[aria-pressed="true"] { border-color: var(--ouro); background: rgba(255,209,102,.16); }
+.logo-intro { position: relative; width: min(640px, 92vw, 112vh); margin: 0; line-height: 0; filter: drop-shadow(0 0 18px rgba(43,244,255,.55)); }
+.logo-intro svg { width: 100%; height: auto; overflow: visible; }
+.lg-texto { animation: lgEntra .9s cubic-bezier(.2,1.6,.4,1) both, lgPula 1.6s ease-in-out .9s infinite; transform-origin: 50% 60%; transform-box: fill-box; }
+.lg-riscos rect { animation: lgRisco .7s linear infinite; }
+.lg-riscos rect:nth-child(2) { animation-delay: -.2s; } .lg-riscos rect:nth-child(3) { animation-delay: -.45s; } .lg-riscos rect:nth-child(4) { animation-delay: -.6s; }
+.lg-chamas { animation: lgFogo .18s ease-in-out infinite alternate; transform-origin: 150px 135px; transform-box: view-box; }
+.lg-brilhos path { animation: lgBrilho 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 50%; }
+.lg-brilhos .b2 { animation-delay: .45s; } .lg-brilhos .b3 { animation-delay: .9s; }
+.frase-intro { font-style: italic; font-weight: 700; font-size: clamp(1.2rem, 5vw, 2rem); color: #d8ff3d; text-shadow: 0 0 10px #2bf4ff, 3px 3px 0 #7b2cbf; }
+.frase-intro span { display: inline-block; animation: lgPalavra .5s cubic-bezier(.2,1.6,.4,1) both; }
+.frase-intro span:nth-child(1) { animation-delay: .9s; } .frase-intro span:nth-child(2) { animation-delay: 1.4s; } .frase-intro span:nth-child(3) { animation-delay: 1.9s; }
+#entrada #btEntrar { animation: lgAparece .5s ease-out 2.4s both, lgPulsa 1.2s ease-in-out 3s infinite; }
+@keyframes lgAparece { from { opacity: 0; } to { opacity: 1; } }
+#entrada.saindo .logo-intro { animation: lgSai .45s ease-in both; }
+@keyframes lgEntra { from { transform: translateX(-120%) skewX(-25deg) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes lgPula { 50% { transform: scale(1.04) rotate(-1deg); } }
+@keyframes lgRisco { from { transform: translateX(120px); opacity: 0; } 30% { opacity: 1; } to { transform: translateX(-160px); opacity: 0; } }
+@keyframes lgFogo { from { transform: scaleX(.85) scaleY(.92); } to { transform: scaleX(1.12) scaleY(1.06); } }
+@keyframes lgBrilho { 0%, 100% { transform: scale(.2) rotate(0); opacity: 0; } 50% { transform: scale(1.1) rotate(45deg); opacity: 1; } }
+@keyframes lgPalavra { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes lgPulsa { 50% { transform: scale(1.04); } }
+@keyframes lgSai { to { transform: translateX(130%) skewX(-20deg); opacity: 0; } }
 
 .ajuda { max-width: 560px; background: var(--card); border-radius: 16px; padding: 14px 16px; color: var(--text); line-height: 1.45; text-align: left; display: grid; gap: 8px; }
 .grupo { display: flex; flex-direction: column; align-items: center; gap: 6px; }
@@ -63,6 +103,9 @@ a { color: var(--ciano); }
 /* 🏠 e 🚪 (../navegacao.js) no canto de cima: o placar desenhado na pista começa embaixo deles */
 .bn-nav #sondaBorda { padding-top: max(env(safe-area-inset-top), calc(var(--nav-alto) - 6px)); }
 
+.opcoes.mundos { flex-wrap: wrap; justify-content: center; }
+.opcoes.mundos .opcao { font-size: .9rem; padding: 6px 10px; }
+.podio { width: min(620px, 94vw); height: auto; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
 .resultado { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 .cartao { background: var(--card); border: 2px solid var(--borda); border-radius: 20px; padding: 14px 22px; min-width: 200px; display: grid; gap: 4px; }
 .cartao.vencedor { border-color: var(--ouro); box-shadow: 0 0 24px rgba(255,209,102,.35); }
@@ -75,7 +118,7 @@ a { color: var(--ciano); }
 /* TV: tudo um pouco maior para ver do sofá */
 .tv .opcao, .tv .medio { font-size: 1.4rem; }
 .tv .cor, .tv .bicho { width: 56px; height: 56px; }
-@media (prefers-reduced-motion: reduce) { .estrada-fundo { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .estrada-fundo, .lg-texto, .lg-riscos rect, .lg-chamas, .lg-brilhos path, .frase-intro span, #entrada #btEntrar, .demo-menu .logo.pequeno { animation: none; } }
 
 /* ---------- garagem: o veículo sempre à vista ---------- */
 .garagem { width: min(1000px, 100%); display: flex; flex-direction: column; gap: 10px; }

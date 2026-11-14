@@ -2,6 +2,106 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.10.0",
+      "data": "14/Nov/2026",
+      "hora": "15:30:00",
+      "pt": [
+        "🥖 Lugar novo na vila: a Padaria do Seu Joaquim, com um pão gigante no telhado e fumacinha do forno. Vende pão, leite, queijo e manteiga.",
+        "🍉 Lugar novo: a Feira da Dona Rosa, com barracas de toldo listrado e bandeirinhas. Vende frutas e legumes.",
+        "🍇 Receita nova: suco de jabuticaba. No pomar tem a jaboticabeira, e o jogo ensina que a jabuticaba nasce grudadinha no tronco!",
+        "🏘️ A vila agora tem 10 lugares."
+      ],
+      "en": [
+        "🥖 New place in the village: Mr. Joaquim's bakery, with a giant loaf on the roof and smoke from the oven. Sells bread, milk, cheese and butter.",
+        "🍉 New place: Mrs. Rosa's street market, with striped stalls and bunting. Sells fruit and vegetables.",
+        "🍇 New recipe: jabuticaba juice. The orchard has a jabuticaba tree, and the game teaches that the fruit grows stuck right on the trunk!",
+        "🏘️ The village now has 10 places."
+      ]
+    },
+    {
+      "versao": "0.9.0",
+      "data": "14/Nov/2026",
+      "hora": "14:10:00",
+      "pt": [
+        "🐄 Na fazendinha, a Mimosa agora é desenhada grande, e a criança senta no banquinho para tirar o leite no balde (as mãos mexem e o leite cai enquanto você segura).",
+        "🍓 No pomar, as frutas são de \"massinha\": gordinhas, brilhantes e com folhinha (laranja, maçã, limão, morango e uva).",
+        "🧑‍🍳 Na horta, no pomar e no galinheiro, o cozinheirinho entra junto e anda até a planta, a árvore ou a galinha que você tocar.",
+        "🪵 A horta ganhou cerquinha de madeira e o galinheiro ficou com cara de casinha, com telhado e janelinha."
+      ],
+      "en": [
+        "🐄 At the farm, Mimosa is now drawn big, and the child sits on a stool to milk her into a bucket (the hands move and the milk pours while you hold).",
+        "🍓 In the orchard, the fruits look like modelling clay: chubby, shiny and with a little leaf (orange, apple, lemon, strawberry and grapes).",
+        "🧑‍🍳 In the garden, the orchard and the hen house, the little chef comes along and walks to the plant, tree or hen you tap.",
+        "🪵 The garden got a wooden fence and the hen house looks like a little house, with a roof and a window."
+      ]
+    },
+    {
+      "versao": "0.8.0",
+      "data": "14/Nov/2026",
+      "hora": "12:40:00",
+      "pt": [
+        "👨‍👩‍👧 Quem vai comer? Na ficha da receita, toque na mamãe, no papai, na vovó, no vovô, no irmão, na irmã ou no bebê para chamar para a mesa.",
+        "🍽️ A receita serve 2 pessoas: com mais gente as quantidades crescem (receita x2, x3) e as moedas também. No Fácil cabem 2, no Médio 4 e no Difícil 6.",
+        "😋 No final, cada pessoa da família aparece à mesa com o seu prato de verdade, comendo junto com o menininho."
+      ],
+      "en": [
+        "👨‍👩‍👧 Who is eating? On the recipe card, tap Mom, Dad, Grandma, Grandpa, Brother, Sister or Baby to invite them to the table.",
+        "🍽️ A recipe serves 2: with more people the amounts grow (recipe x2, x3) and so do the coins. Easy fits 2, Medium 4 and Hard 6.",
+        "😋 At the end, everyone in the family sits at the table with their own real dish, eating with the little boy."
+      ]
+    },
+    {
+      "versao": "0.7.0",
+      "data": "14/Nov/2026",
+      "hora": "11:30:00",
+      "pt": [
+        "🏘️ Vila nova em 3D: cada lugar é um bloquinho com a sua casinha (celeiro com cata-vento girando, galinheiro com rampa, mercado com toldo e uma cesta gigante no telhado, pomar e horta cercados, rio com peixe pulando), com ruas, carrinho passando e nuvens.",
+        "🧑‍🍳 O cozinheirinho sai de casa e anda pela rua até o lugar que você tocar, e entra pela porta.",
+        "👉 Faixa da missão: diz o que buscar agora e onde, e uma seta pula em cima do lugar (Fácil e Médio).",
+        "➡️ Pegou tudo de um lugar? Ele segue sozinho para o próximo e, com a cesta cheia, vai para casa cozinhar (Fácil e Médio).",
+        "✔ Na cesta, o que já está completo ganha um ✔."
+      ],
+      "en": [
+        "🏘️ New 3D village: every place is a little block with its own building (red barn with a spinning windmill, hen house with a ramp, shop with a striped awning and a giant basket on the roof, fenced orchard and garden, a river with a jumping fish), with streets, a passing car and clouds.",
+        "🧑‍🍳 The little chef leaves home and walks down the street to the place you tap, and goes in through the door.",
+        "👉 Mission banner: says what to get now and where, and an arrow bounces over the place (Easy and Medium).",
+        "➡️ Got everything from a place? The chef heads to the next one by himself and, with a full basket, goes home to cook (Easy and Medium).",
+        "✔ In the basket, complete items get a ✔."
+      ]
+    },
+    {
+      "versao": "0.6.1",
+      "data": "14/Nov/2026",
+      "hora": "09:40:00",
+      "pt": [
+        "👵 A Dona Cida agora fala com voz de mulher gravada, igual em todo celular e sem internet (no Samsung ela falava com voz de homem).",
+        "🔁 O botão 👵🔁 alterna entre a voz gravada da vovó e as vozes do aparelho, e volta para a gravada."
+      ],
+      "en": [
+        "👵 Mrs. Cida now speaks with a recorded woman's voice, the same on every phone and offline (on Samsung she sounded like a man).",
+        "🔁 The 👵🔁 button switches between grandma's recorded voice and the device voices, and back to the recorded one."
+      ]
+    },
+    {
+      "versao": "0.6.0",
+      "data": "14/Nov/2026",
+      "hora": "04:30:00",
+      "pt": [
+        "📸 Comida de verdade: cada receita e cada ingrediente agora aparece com uma foto de verdade (fotos livres da Wikimedia Commons). O pão de queijo é um pão de queijo, e o queijo é um queijo!",
+        "🍮 Receitas novas: gelatina com frutas e churrasquinho no espeto (o fogo é sempre com um adulto).",
+        "😋 No final, o menininho come a foto do prato de verdade, e a foto guardada também mostra o prato de verdade.",
+        "✨ Mais movimento: as telas entram deslizando, as receitas e os ingredientes aparecem um depois do outro com pulinho, o prato gira na ficha, as comidas da capa pulam em onda e o botão de começar chama para ser tocado.",
+        "📶 As fotos ficam guardadas no aparelho: funciona sem internet."
+      ],
+      "en": [
+        "📸 Real food: every recipe and every ingredient now shows a real photo (free photos from Wikimedia Commons). Cheese bread looks like cheese bread, and cheese looks like cheese!",
+        "🍮 New recipes: fruit jelly and BBQ skewers (fire always with a grown-up).",
+        "😋 At the end, the little boy eats the real dish photo, and the saved picture shows the real dish too.",
+        "✨ More motion: screens slide in, recipes and ingredients pop in one after another, the plate spins on the recipe card, the food on the cover bounces in a wave and the start button invites a tap.",
+        "📶 Photos are stored on the device: works offline."
+      ]
+    },
+    {
       "versao": "0.5.1",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

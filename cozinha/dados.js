@@ -18,8 +18,10 @@
     { id: 'horta', e: '🌱', pt: 'Horta', en: 'Vegetable garden', faz: ['Puxar legumes', 'Pull veggies'] },
     { id: 'galinheiro', e: '🐔', pt: 'Galinheiro', en: 'Hen house', faz: ['Pegar ovos', 'Collect eggs'] },
     { id: 'vaca', e: '🐄', pt: 'Fazendinha da Mimosa', en: "Mimosa's little farm", faz: ['Tirar leite', 'Get milk'] },
-    { id: 'mercado', e: '🏪', pt: 'Mercadinho do Seu Zé', en: "Mr. Zé's shop", faz: ['Comprar', 'Buy'] },
+    { id: 'mercado', e: '🏪', pt: 'Mercadinho do Seu Zé', en: "Mr. Zé's shop", faz: ['Comprar', 'Buy'], dono: ['Seu Zé', 'Mr. Zé'] },
     { id: 'vizinha', e: '👵', pt: 'Dona Cida, a vizinha', en: 'Mrs. Cida next door', faz: ['Pedir emprestado', 'Borrow'] },
+    { id: 'padaria', e: '🥖', pt: 'Padaria do Seu Joaquim', en: "Mr. Joaquim's bakery", faz: ['Comprar pão', 'Buy bread'], dono: ['Seu Joaquim', 'Mr. Joaquim'] },
+    { id: 'feira', e: '🍉', pt: 'Feira da Dona Rosa', en: "Mrs. Rosa's street market", faz: ['Frutas e legumes', 'Fruit and veg'], dono: ['Dona Rosa', 'Mrs. Rosa'] },
     { id: 'casa', e: '🏠', pt: 'Casa', en: 'Home', faz: ['Cozinhar', 'Cook'] }
   ];
 
@@ -41,6 +43,8 @@
       fato: ['A uva nasce em cachos na parreira, uma planta que sobe e se enrola! 🍇', 'Grapes grow in bunches on a grapevine, a plant that climbs and curls! 🍇'] },
     { id: 'limao', e: '🍋', pt: ['limão', 'limões'], en: ['lemon', 'lemons'], de: 'pomar', preco: 1, planta: 'limoeiro',
       fato: ['O limão nasce no limoeiro, uma árvore com espinhos! 🍋', 'Lemons grow on the lemon tree, which has thorns! 🍋'] },
+    { id: 'jabuticaba', s: 'jabuticaba', pt: ['jabuticaba', 'jabuticabas'], en: ['jabuticaba', 'jabuticabas'], de: 'pomar', preco: 1, planta: 'jaboticabeira',
+      fato: ['A jabuticaba nasce grudadinha no tronco da jaboticabeira!', 'Jabuticabas grow stuck right on the trunk of the tree!'] },
     { id: 'cenoura', e: '🥕', pt: ['cenoura', 'cenouras'], en: ['carrot', 'carrots'], de: 'horta', preco: 1, planta: 'pe-cenoura',
       fato: ['A cenoura cresce embaixo da terra; em cima só aparecem as folhas! 🥕', 'Carrots grow under the ground; only the leaves show on top! 🥕'] },
     { id: 'tomate', e: '🍅', pt: ['tomate', 'tomates'], en: ['tomato', 'tomatoes'], de: 'horta', preco: 1, planta: 'tomateiro',
@@ -53,7 +57,7 @@
       fato: ['Cheiro-verde é salsinha com cebolinha, folhas cheirosas da horta! 🌿', 'Cheiro-verde is parsley and chives, tasty leaves from the garden! 🌿'] },
     { id: 'ovo', e: '🥚', pt: ['ovo', 'ovos'], en: ['egg', 'eggs'], de: 'galinheiro', preco: 1, vizinha: true,
       fato: ['A galinha bota o ovo no ninho de palha! 🥚', 'The hen lays her egg in a straw nest! 🥚'] },
-    { id: 'leite', e: '🥛', pt: ['xícara de leite', 'xícaras de leite'], en: ['cup of milk', 'cups of milk'], de: 'vaca', preco: 2, vizinha: true,
+    { id: 'leite', e: '🥛', padaria: true, pt: ['xícara de leite', 'xícaras de leite'], en: ['cup of milk', 'cups of milk'], de: 'vaca', preco: 2, vizinha: true,
       fato: ['O leite vem da vaca! 🐄', 'Milk comes from the cow! 🐄'] },
     { id: 'farinha', e: '🌾', pt: ['xícara de farinha', 'xícaras de farinha'], en: ['cup of flour', 'cups of flour'], preco: 1, vizinha: true,
       fato: ['A farinha é feita de trigo moído no moinho! 🌾', 'Flour is made from wheat ground at the mill! 🌾'] },
@@ -65,7 +69,7 @@
       fato: ['O óleo de cozinha é espremido de grãos, como a soja!', 'Cooking oil is pressed from seeds, like soybeans!'] },
     { id: 'fermento', s: 'fermento', pt: ['colher de fermento', 'colheres de fermento'], en: ['spoon of baking powder', 'spoons of baking powder'], preco: 1,
       fato: ['O fermento faz a massa crescer e ficar fofinha!', 'Baking powder makes the dough rise and get fluffy!'] },
-    { id: 'manteiga', s: 'manteiga', pt: ['colher de manteiga', 'colheres de manteiga'], en: ['spoon of butter', 'spoons of butter'], preco: 1, vizinha: true,
+    { id: 'manteiga', s: 'manteiga', padaria: true, pt: ['colher de manteiga', 'colheres de manteiga'], en: ['spoon of butter', 'spoons of butter'], preco: 1, vizinha: true,
       fato: ['A manteiga é feita da nata do leite, bem batida!', 'Butter is made by churning the cream from milk!'] },
     { id: 'chocolate', e: '🍫', pt: ['colher de chocolate', 'colheres de chocolate'], en: ['spoon of chocolate', 'spoons of chocolate'], preco: 2,
       fato: ['O chocolate é feito das sementes do cacau, que nasce no cacaueiro! 🍫', 'Chocolate is made from the seeds of the cacao tree! 🍫'] },
@@ -73,10 +77,14 @@
       fato: ['O leite condensado é leite cozido com açúcar até engrossar!', 'Condensed milk is milk cooked with sugar until it gets thick!'] },
     { id: 'granulado', s: 'granulado', pt: ['colher de granulado', 'colheres de granulado'], en: ['spoon of sprinkles', 'spoons of sprinkles'], preco: 1,
       fato: ['O granulado é feito de chocolate e açúcar!', 'Sprinkles are made of chocolate and sugar!'] },
-    { id: 'queijo', e: '🧀', pt: ['pedaço de queijo', 'pedaços de queijo'], en: ['piece of cheese', 'pieces of cheese'], preco: 2,
+    { id: 'queijo', e: '🧀', padaria: true, pt: ['pedaço de queijo', 'pedaços de queijo'], en: ['piece of cheese', 'pieces of cheese'], preco: 2,
       fato: ['O queijo é feito de leite! 🧀', 'Cheese is made from milk! 🧀'] },
-    { id: 'pao', e: '🍞', pt: ['fatia de pão', 'fatias de pão'], en: ['slice of bread', 'slices of bread'], preco: 1,
-      fato: ['O pão é feito de farinha, água e fermento, assado no forno! 🍞', 'Bread is made of flour, water and yeast, baked in the oven! 🍞'] },
+    { id: 'pao', e: '🍞', padaria: true, pt: ['fatia de pão', 'fatias de pão'], en: ['slice of bread', 'slices of bread'], preco: 1,
+      fato: ['O padeiro assa o pão no forno da padaria, com farinha, água e fermento! 🍞', 'The baker bakes bread in the bakery oven, with flour, water and yeast! 🍞'] },
+    { id: 'gelatina-po', s: 'gelatina', pt: ['pacotinho de gelatina', 'pacotinhos de gelatina'], en: ['packet of jelly', 'packets of jelly'], preco: 2,
+      fato: ['O pó some na água quente e, na geladeira, vira gelatina balançante!', 'The powder melts in hot water and turns wobbly in the fridge!'] },
+    { id: 'carne', e: '🥩', pt: ['pedaço de carne', 'pedaços de carne'], en: ['piece of meat', 'pieces of meat'], preco: 3,
+      fato: ['A carne vem do açougue, onde o açougueiro corta os pedaços! 🥩', 'Meat comes from the butcher, who cuts the pieces! 🥩'] },
     { id: 'polvilho', s: 'polvilho', pt: ['xícara de polvilho', 'xícaras de polvilho'], en: ['cup of tapioca flour', 'cups of tapioca flour'], preco: 2,
       fato: ['O polvilho é feito da mandioca, uma raiz!', 'Tapioca flour is made from cassava, a root!'] },
     { id: 'mel', e: '🍯', pt: ['colher de mel', 'colheres de mel'], en: ['spoon of honey', 'spoons of honey'], preco: 2, vizinha: true,
@@ -85,7 +93,7 @@
 
   // Plantas: onde cada fruta e cada legume nasce DE VERDADE (o jogo também ensina). Cada fruta só aparece na sua planta.
   // forma = como é desenhada (desenhos.js): arvore, bananeira (folhas compridas e cacho com o "coração" roxo),
-  // rasteira (baixinha, no chão), parreira (trepadeira numa armação de madeira), raiz (o legume fica EMBAIXO da terra
+  // rasteira (baixinha, no chão), parreira (trepadeira numa armação de madeira), tronco (a fruta nasce grudada no tronco: jaboticabeira), raiz (o legume fica EMBAIXO da terra
   // e se arranca puxando), estaca (planta amarrada numa estaca), cabeca (bola de folhas em cima da terra), touceira (maço de folhas).
   var PLANTAS = [
     { id: 'macieira', lugar: 'pomar', forma: 'arvore', pt: 'macieira', en: 'apple tree' },
@@ -94,6 +102,7 @@
     { id: 'bananeira', lugar: 'pomar', forma: 'bananeira', pt: 'bananeira', en: 'banana plant' },
     { id: 'morangueiro', lugar: 'pomar', forma: 'rasteira', pt: 'pé de morango', en: 'strawberry plant' },
     { id: 'parreira', lugar: 'pomar', forma: 'parreira', pt: 'parreira', en: 'grapevine' },
+    { id: 'jaboticabeira', lugar: 'pomar', forma: 'tronco', pt: 'jaboticabeira', en: 'jabuticaba tree' },
     { id: 'pe-cenoura', lugar: 'horta', forma: 'raiz', pt: 'pé de cenoura', en: 'carrot plant' },
     { id: 'pe-batata', lugar: 'horta', forma: 'raiz', pt: 'pé de batata', en: 'potato plant' },
     { id: 'tomateiro', lugar: 'horta', forma: 'estaca', pt: 'tomateiro', en: 'tomato plant' },
@@ -117,6 +126,8 @@
     { id: 'forma', s: 'forma', pt: 'Assadeira', en: 'Baking tray', na: ['na assadeira', 'on the baking tray'] },
     { id: 'forno', s: 'forno', pt: 'Forno', en: 'Oven', na: ['no forno', 'in the oven'], adulto: true },
     { id: 'geladeira', s: 'geladeira', pt: 'Geladeira', en: 'Fridge', na: ['na geladeira', 'in the fridge'] },
+    { id: 'grelha', s: 'grelha', pt: 'Grelha', en: 'Grill', na: ['na grelha', 'on the grill'] },
+    { id: 'espeto', e: '🍢', pt: 'Espeto', en: 'Skewer', na: ['no espeto', 'on the skewer'] },
     { id: 'relogio', e: '⏰', pt: 'Relógio', en: 'Timer', na: ['no relógio', 'on the timer'] },
     { id: 'maos', e: '🤲', pt: 'Mãos', en: 'Hands', na: ['com as mãos', 'with your hands'] },
     { id: 'prato', e: '🍽️', pt: 'Prato', en: 'Plate', na: ['no prato', 'on the plate'] },
@@ -133,12 +144,25 @@
   // zonaPeixe: metade da largura do círculo do anzol (fração do rio) — o peixe só é fisgado com o centro dentro dele;
   // velPeixe: velocidade média dos peixes (rio por segundo; cada peixe varia e muda de velocidade de vez em quando).
   var NIVEIS = [
-    { id: 'facil', n: 1, e: '🌱', pt: 'Fácil', en: 'Easy', moedas: null, margem: 0, favores: 5, dica: 'sempre', fichas: false, distratores: 0, evento: false, tempo: 0, brilho: true, madura: 0.75, zonaPeixe: 0.14, velPeixe: 0.1,
+    { id: 'facil', n: 1, e: '🌱', pt: 'Fácil', en: 'Easy', pessoas: 2, moedas: null, margem: 0, favores: 5, dica: 'sempre', fichas: false, distratores: 0, evento: false, tempo: 0, brilho: true, madura: 0.75, zonaPeixe: 0.14, velPeixe: 0.1,
       txt: ['Poucos ingredientes, tudo de graça e o passo certo brilhando.', 'Few ingredients, everything free and the right step glowing.'] },
-    { id: 'medio', n: 2, e: '🌻', pt: 'Médio', en: 'Medium', moedas: true, margem: 4, favores: 3, dica: 'metade', fichas: false, distratores: 2, evento: false, tempo: 0, brilho: true, madura: 0.5, zonaPeixe: 0.08, velPeixe: 0.16,
+    { id: 'medio', n: 2, e: '🌻', pt: 'Médio', en: 'Medium', pessoas: 4, moedas: true, margem: 4, favores: 3, dica: 'metade', fichas: false, distratores: 2, evento: false, tempo: 0, brilho: true, madura: 0.5, zonaPeixe: 0.08, velPeixe: 0.16,
       txt: ['Mais ingredientes, moedas para o mercado e menos ajuda.', 'More ingredients, coins for the shop and less help.'] },
-    { id: 'dificil', n: 3, e: '🌳', pt: 'Difícil', en: 'Hard', moedas: true, margem: 1, favores: 2, dica: 'erros', fichas: true, distratores: 4, evento: true, tempo: 420, brilho: false, madura: 0.35, zonaPeixe: 0.05, velPeixe: 0.22,
+    { id: 'dificil', n: 3, e: '🌳', pt: 'Difícil', en: 'Hard', pessoas: 6, moedas: true, margem: 1, favores: 2, dica: 'erros', fichas: true, distratores: 4, evento: true, tempo: 420, brilho: false, madura: 0.35, zonaPeixe: 0.05, velPeixe: 0.22,
       txt: ['Você escolhe a ordem dos passos, as moedas são contadas e o sol anda no céu.', 'You choose the order of the steps, coins are counted and the sun moves across the sky.'] }
+  ];
+
+  // Família à mesa (v0.8.0): quem pode comer a receita. "eu" (a criança) sempre come. A receita serve 2 pessoas; para
+  // mais gente as quantidades crescem (logica.fatorDe). cor = roupa; cabelo = jeito do desenho (cenas.familia).
+  var FAMILIA = [
+    { id: 'eu', pt: 'Eu', en: 'Me', cor: '#ff8a3d', cabelo: 'chef' },
+    { id: 'mamae', pt: 'Mamãe', en: 'Mom', cor: '#ff5e9c', cabelo: 'longo' },
+    { id: 'papai', pt: 'Papai', en: 'Dad', cor: '#3aa0e8', cabelo: 'curto' },
+    { id: 'vovo-a', pt: 'Vovó', en: 'Grandma', cor: '#8e6bff', cabelo: 'coque' },
+    { id: 'vovo-o', pt: 'Vovô', en: 'Grandpa', cor: '#2bb673', cabelo: 'careca' },
+    { id: 'irmao', pt: 'Irmão', en: 'Brother', cor: '#e84a3c', cabelo: 'bone' },
+    { id: 'irma', pt: 'Irmã', en: 'Sister', cor: '#ffc93c', cabelo: 'chiquinhas' },
+    { id: 'bebe', pt: 'Bebê', en: 'Baby', cor: '#7fd3ff', cabelo: 'bebe' }
   ];
 
   function P(id, a, u, o) { var p = { id: id, a: a, u: u }; if (o) for (var k in o) p[k] = o[k]; return p; }
@@ -313,11 +337,54 @@
         P('choc', 'por', 'tigela', { ing: ['chocolate'] }),
         P('bolinhas', 'maos', 'maos', { pt: 'Faça bolinhas e coloque na assadeira', en: 'Roll little balls and put them on the baking tray' }),
         P('assar', 'assar', 'forno'),
+        P('servir', 'servir', 'prato')] },
+
+    { id: 'gelatina', e: '🍮', cor: '#e8344e', pt: 'Gelatina com frutas', en: 'Fruit jelly',
+      ing: [{ id: 'gelatina-po', q: 1 }, { id: 'morango', q: 3 }, { id: 'uva', q: 1 }],
+      facil: { 'gelatina-po': 1, morango: 2 },
+      passos: [LAVAR(),
+        P('ligar', 'ligar', 'fogao', { em: 'panela', pt: 'Esquente a água na panela', en: 'Heat the water in the pot' }),
+        P('ferver', 'esperar', 'relogio', { pt: 'Espere a água ferver', en: 'Wait for the water to boil' }),
+        P('desligar', 'desligar', 'fogao'),
+        P('po', 'por', 'tigela', { ing: ['gelatina-po'], dep: [], pt: 'Coloque o pó de gelatina na tigela', en: 'Put the jelly powder in the bowl' }),
+        P('quente', 'despejar', 'tigela', { de: 'panela', dep: ['desligar', 'po'], pt: 'Despeje a água quente na tigela', en: 'Pour the hot water into the bowl' }),
+        P('mexer', 'mexer', 'colher', { em: 'tigela', pt: 'Mexa até o pó sumir', en: 'Stir until the powder disappears' }),
+        P('lavarF', 'lavar', 'pia', { ing: ['morango', 'uva'], dep: [], min: 2 }),
+        P('cortar', 'cortar', 'tabua', { ing: ['morango'], dep: ['lavarF'] }),
+        P('tacas', 'despejar', 'copo', { de: 'tigela', dep: ['mexer'], pt: 'Despeje a gelatina nas tacinhas', en: 'Pour the jelly into the little cups' }),
+        P('frutas', 'por', 'copo', { ing: ['morango', 'uva'], dep: ['tacas', 'cortar'], pt: 'Coloque as frutinhas na gelatina', en: 'Put the fruit into the jelly' }),
+        P('gelar', 'gelar', 'geladeira', { pt: 'Leve à geladeira até ficar firme e balançante', en: 'Put it in the fridge until it is firm and wobbly' }),
+        P('servir', 'servir', 'copo')] },
+
+    { id: 'suco-jabuticaba', e: '🍇', cor: '#5b2160', pt: 'Suco de jabuticaba', en: 'Jabuticaba juice',
+      ing: [{ id: 'jabuticaba', q: 6 }, { id: 'acucar', q: 1 }],
+      facil: { jabuticaba: 4 },
+      passos: [LAVAR(),
+        P('lavarJ', 'lavar', 'pia', { ing: ['jabuticaba'] }),
+        P('liq', 'por', 'liquidificador', { ing: ['jabuticaba', 'acucar'], pt: 'Coloque as jabuticabas e um copo de água no liquidificador', en: 'Put the jabuticabas and a glass of water in the blender' }),
+        P('bater', 'bater', 'liquidificador'),
+        P('coar', 'despejar', 'copo', { de: 'liquidificador', pt: 'Coe o suco e despeje no copo', en: 'Strain the juice and pour it into the glass' }),
+        P('gelar', 'gelar', 'geladeira', { min: 3, pt: 'Deixe o suco gelar um pouquinho', en: 'Let the juice chill for a little while' }),
+        P('servir', 'servir', 'copo')] },
+
+    { id: 'churrasco', e: '🍢', cor: '#c0392b', pt: 'Churrasquinho no espeto', en: 'BBQ skewers',
+      ing: [{ id: 'carne', q: 2 }, { id: 'tomate', q: 2 }, { id: 'sal', q: 1 }, { id: 'pao', q: 2 }],
+      facil: { carne: 2, tomate: 1 },
+      passos: [LAVAR(),
+        P('cortC', 'cortar', 'tabua', { ing: ['carne'], dep: [], pt: 'Corte a carne em cubinhos', en: 'Cut the meat into little cubes' }),
+        P('lavarT', 'lavar', 'pia', { ing: ['tomate'], dep: [], min: 2 }),
+        P('cortT', 'cortar', 'tabua', { ing: ['tomate'], dep: ['lavarT'] }),
+        P('temperar', 'por', 'tigela', { ing: ['carne', 'sal'], dep: ['cortC'], pt: 'Coloque a carne na tigela para temperar', en: 'Put the meat in the bowl to season it' }),
+        P('montar', 'por', 'espeto', { ing: ['carne', 'tomate'], dep: ['temperar', 'cortT'], pt: 'Monte o espetinho: carne, tomate, carne...', en: 'Build the skewer: meat, tomato, meat...' }),
+        P('ligar', 'ligar', 'fogao', { em: 'grelha' }),
+        P('grelhar', 'esperar', 'relogio', { pt: 'Deixe o espetinho dourar na grelha', en: 'Let the skewer brown on the grill' }),
+        P('desligar', 'desligar', 'fogao'),
+        P('pao', 'por', 'prato', { ing: ['pao'], dep: [], pt: 'Coloque o pãozinho no prato', en: 'Put the bread roll on the plate' }),
         P('servir', 'servir', 'prato')] }
   ];
 
-  var D = { LUGARES: LUGARES, PLANTAS: PLANTAS, INGREDIENTES: INGREDIENTES, UTENSILIOS: UTENSILIOS, ACOES: ACOES, NIVEIS: NIVEIS, RECEITAS: RECEITAS };
+  var D = { FAMILIA: FAMILIA, LUGARES: LUGARES, PLANTAS: PLANTAS, INGREDIENTES: INGREDIENTES, UTENSILIOS: UTENSILIOS, ACOES: ACOES, NIVEIS: NIVEIS, RECEITAS: RECEITAS };
   function porId(lista) { var m = {}; lista.forEach(function (x) { m[x.id] = x; }); return m; }
-  D.lugar = porId(LUGARES); D.planta = porId(PLANTAS); D.ingrediente = porId(INGREDIENTES); D.utensilio = porId(UTENSILIOS); D.nivel = porId(NIVEIS); D.receita = porId(RECEITAS);
+  D.pessoa = porId(FAMILIA); D.lugar = porId(LUGARES); D.planta = porId(PLANTAS); D.ingrediente = porId(INGREDIENTES); D.utensilio = porId(UTENSILIOS); D.nivel = porId(NIVEIS); D.receita = porId(RECEITAS);
   if (typeof module !== 'undefined' && module.exports) module.exports = D; else raiz.CozinhaDados = D;
 })(typeof self !== 'undefined' ? self : this);

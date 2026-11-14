@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>A-GARRA — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#0d0b1e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="A máquina de pegar bichinho em 3D: leve a garra para os lados, para frente e para trás, aperte PEGAR e torça para ela não soltar! Pelúcias, bichinhos que mexem, insetos e hambúrgueres. / The 3D claw machine: plushies, wiggly critters, bugs and burgers.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  A-GARRA — brincadeira da família Bolinho de Chuva (SolverONE · kids), em 3D (Three.js, em libs/).
+  A máquina por dentro (física e regra de pagamento) em maquina.js, os prêmios em premios3d.js, as máquinas em cenario3d.js,
+  os efeitos em som.js, as telas em app.js. Música: a trilha comum (../trilha.js). Sem login, sem banco: tudo fica no aparelho.
+  Nada de script inline: a CSP acima não permite. Mapa: LEIA-ME.md. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+
+<section id="menu" class="tela ativa" data-recurso="a-garra">
+  <div class="faixa">
+    <span class="espaco"></span>
+    <button id="btLingua" class="mini" type="button" aria-label="Idioma / Language">EN</button>
+    <button id="btEfeitos" class="mini" type="button" aria-label="Sons / Sounds">🔊</button>
+    <button id="btAjuda" class="mini" type="button" aria-label="Como brincar / How to play" aria-expanded="false">❓</button>
+  </div>
+  <h1 class="logo" aria-label="A-GARRA"><span>A</span><span>-</span><span>G</span><span>A</span><span>R</span><span>R</span><span>A</span></h1>
+  <div id="ajuda" class="ajuda" hidden>
+    <p data-t="🕹️ Leve a garra com as setas: ⬅ ➡ para os lados, ⬆ para o fundo e ⬇ para a frente. Ou toque no prêmio que você quer.|🕹️ Move the claw with the arrows: ⬅ ➡ sideways, ⬆ to the back and ⬇ to the front. Or tap the prize you want."></p>
+    <p data-t="✊ Aperte PEGAR: a garra desce, fecha, sobe e leva até o buraco do canto. Caiu no buraco? É seu!|✊ Press GRAB: the claw goes down, closes, goes up and carries it to the corner hole. Did it fall in? It's yours!"></p>
+    <p data-t="🎰 Igual à máquina de verdade: quase sempre a garra fica fraca e solta o prêmio. Só de vez em quando ela vem forte. Não desista!|🎰 Just like a real machine: most of the time the claw is weak and drops the prize. Only once in a while it comes strong. Don't give up!"></p>
+    <p data-t="🎥 Arraste o dedo na máquina para girar a câmera (dá para ver bem de lado), use 🔍 para aproximar e 🎥 para ver de frente, de cima ou de lado.|🎥 Drag on the machine to turn the camera (all the way to the side), use 🔍 to zoom and 🎥 to look from the front, top or side."></p>
+    <p data-t="🐕 Na máquina Bichos de Verdade, os filhotes andam pelo cobertor: espere ele parar e mire bem!|🐕 In the Real Animals machine the puppies walk around the blanket: wait for one to stop and aim well!"></p>
+  </div>
+
+  <h2 class="titulo-escolha" data-t="Máquina|Machine"></h2>
+  <div class="escolha maquinas" id="maquinas" role="radiogroup" aria-label="Máquina / Machine">
+    <button class="cartao-maquina telefone" type="button" role="radio" data-maquina="telefone" aria-checked="true"><span class="ico" aria-hidden="true">📞🧸</span><b data-t="Cabine de Telefone|Phone Booth"></b><small data-t="Pelúcias|Plushies"></small><small class="recorde" data-col="telefone"></small></button>
+    <button class="cartao-maquina neon" type="button" role="radio" data-maquina="neon" aria-checked="false"><span class="ico" aria-hidden="true">💚🦖</span><b data-t="Neon|Neon"></b><small data-t="Bichinhos que mexem|Wiggly critters"></small><small class="recorde" data-col="neon"></small></button>
+    <button class="cartao-maquina estrelas" type="button" role="radio" data-maquina="estrelas" aria-checked="false"><span class="ico" aria-hidden="true">⭐🐞</span><b data-t="Estrelas|Stars"></b><small data-t="Insetos|Bugs"></small><small class="recorde" data-col="estrelas"></small></button>
+    <button class="cartao-maquina lanchonete" type="button" role="radio" data-maquina="lanchonete" aria-checked="false"><span class="ico" aria-hidden="true">🍔🍟</span><b data-t="Lanchonete|Burger Bar"></b><small data-t="Hambúrgueres e lanches|Burgers and snacks"></small><small class="recorde" data-col="lanchonete"></small></button>
+    <button class="cartao-maquina bichos" type="button" role="radio" data-maquina="bichos" aria-checked="false"><span class="ico" aria-hidden="true">🐕🐈</span><b data-t="Bichos de Verdade|Real Animals"></b><small data-t="Filhotes que andam e se mexem|Puppies that walk and wiggle"></small><small class="recorde" data-col="bichos"></small></button>
+  </div>
+
+  <h2 class="titulo-escolha" data-t="Nível|Level"></h2>
+  <div class="escolha" id="niveis" role="radiogroup" aria-label="Nível / Level">
+    <button class="cartao-nivel verde" type="button" role="radio" data-nivel="facil" aria-checked="true"><span data-t="Fácil|Easy"></span></button>
+    <button class="cartao-nivel amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false"><span data-t="Médio|Medium"></span></button>
+    <button class="cartao-nivel vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false"><span data-t="Difícil|Hard"></span></button>
+  </div>
+
+  <button id="btJogar" class="grande" type="button" data-t="▶ Jogar!|▶ Play!"></button>
+  <button id="btColecao" class="medio" type="button"><span data-t="🧸 Minha coleção|🧸 My collection"></span> <span id="colecaoConta" class="conta"></span></button>
+  <button id="btInstalar" class="medio" type="button" hidden data-t="📲 Instalar|📲 Install"></button>
+  <p id="versao" class="versao"></p>
+</section>
+
+<section id="jogo" class="tela" data-recurso="a-garra">
+  <div id="palco" class="palco">
+    <canvas id="tela" aria-label="Máquina de pegar bichinho em 3D / 3D claw machine"></canvas>
+    <div class="placar" aria-live="off">
+      <span class="info" aria-label="Fichas / Tokens">🪙 <b id="fichas">10</b></span>
+      <span class="info" id="infoTempo" aria-label="Tempo / Time">⏱ <b id="tempo">20</b></span>
+      <span class="info" aria-label="Prêmios / Prizes">🧸 <b id="ganhos">0</b></span>
+    </div>
+    <div class="camera">
+      <button id="btCamera" class="mini" type="button" aria-label="Trocar a câmera / Change camera">🎥</button>
+      <button id="btMais" class="mini" type="button" aria-label="Aproximar / Zoom in">🔍+</button>
+      <button id="btMenos" class="mini" type="button" aria-label="Afastar / Zoom out">🔍−</button>
+    </div>
+    <p id="aviso" class="aviso" role="status" aria-live="polite"></p>
+    <div id="ganhou" class="ganhou" hidden aria-hidden="true"><img id="ganhouImg" alt=""><p id="ganhouNome"></p></div>
+  </div>
+  <div id="cruz" class="cruz" role="group" aria-label="Mover a garra / Move the claw">
+    <button id="btCima" class="seta" type="button" data-dx="0" data-dz="-1" aria-label="Para o fundo / Back">⬆</button>
+    <button id="btEsq" class="seta" type="button" data-dx="-1" data-dz="0" aria-label="Para a esquerda / Left">⬅</button>
+    <button id="btDir" class="seta" type="button" data-dx="1" data-dz="0" aria-label="Para a direita / Right">➡</button>
+    <button id="btBaixo" class="seta" type="button" data-dx="0" data-dz="1" aria-label="Para a frente / Front">⬇</button>
+  </div>
+  <button id="btPegar" class="pegar" type="button" data-t="PEGAR|GRAB"></button>
+</section>
+
+<section id="colecao" class="tela" data-recurso="a-garra">
+  <h2 class="titulo-colecao" data-t="🧸 Minha coleção|🧸 My collection"></h2>
+  <div id="abas" class="abas" role="tablist"></div>
+  <p id="colecaoResumo" class="resumo"></p>
+  <div id="prateleira" class="prateleira"></div>
+  <button id="btColecaoJogar" class="grande" type="button" data-t="▶ Jogar!|▶ Play!"></button>
+</section>
+
+<div id="fim" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
+  <div class="fim-caixa">
+    <h2 id="fimTitulo"></h2>
+    <p id="fimEstrelas" class="fim-estrelas" aria-label=""></p>
+    <div id="fimPremios" class="fim-premios"></div>
+    <p id="fimTexto" class="fim-texto"></p>
+    <div class="fim-botoes">
+      <button id="btDeNovo" class="grande" type="button" data-t="🔄 Jogar de novo|🔄 Play again"></button>
+      <button id="btFimColecao" class="medio" type="button" data-t="🧸 Coleção|🧸 Collection"></button>
+      <button id="btFimMenu" class="medio" type="button" data-t="🏠 Menu|🏠 Menu"></button>
+    </div>
+  </div>
+</div>
+
+<section id="semTresD" class="tela" hidden>
+  <h2 data-t="Este aparelho não consegue mostrar a máquina em 3D. Tente no navegador Chrome atualizado.|This device can't show the 3D machine. Try an up-to-date Chrome browser."></h2>
+</section>
+<section id="desligado" class="tela" hidden>
+  <h2 data-t="A-GARRA está descansando agora.|The Claw Machine is resting right now."></h2>
+</section>
+
+<script src="maquina.js"></script>
+<script src="som.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js"></script>
+<script src="app.js" type="module"></script>
+</body>
+</html>

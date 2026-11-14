@@ -2,6 +2,116 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.16.0",
+      "data": "14/Nov/2026",
+      "hora": "01:51:00",
+      "pt": [
+        "🏎️ Conversível Rosa novo: esportivo, baixinho e arredondado, com friso na cor escolhida, 4 lanternas redondas, bancos de couro e para-brisa cromado.",
+        "✈️ Agora os que voam também são 3D e mostram a lateral na curva: aviãozinho (com hélice girando), jato (com fogo no motor), helicóptero, arara gigante e o morcego, que vira um Conde Drácula 3D voando de capa aberta."
+      ],
+      "en": [
+        "🏎️ New Pink Convertible: sporty, low and rounded, with a stripe in the chosen color, 4 round tail lights, leather seats and a chrome windshield.",
+        "✈️ The flyers are 3D now too and show their side in curves: little plane (spinning propeller), jet (engine flame), helicopter, giant macaw and the bat, which turns into a 3D Count Dracula flying with his cape open."
+      ]
+    },
+    {
+      "versao": "1.15.0",
+      "data": "14/Nov/2026",
+      "hora": "01:35:00",
+      "pt": [
+        "🧊 Mais veículos em 3D de verdade: Clássico, GT, Superesportivo, Kart, Monstrão, Moto e Conversível. Na curva aparece a lateral e no morro dá para ver o teto; pelo vidro dá para ver o piloto.",
+        "🛷 O Trenó do Papai Noel também em 3D: as renas galopando no ar (a do nariz vermelho na frente), o Papai Noel do lado e o saco de presentes."
+      ],
+      "en": [
+        "🧊 More rides in real 3D: Classic, GT, Supercar, Kart, Monster Truck, Motorbike and Convertible. In curves you see the side and on hills you see the roof; the driver shows through the glass.",
+        "🛷 Santa's Sleigh in 3D too: the reindeer galloping in the air (the red-nosed one in front), Santa beside you and the bag of presents."
+      ]
+    },
+    {
+      "versao": "1.14.0",
+      "data": "14/Nov/2026",
+      "hora": "01:20:00",
+      "pt": [
+        "🏎️ O menu agora tem a corrida de demonstração rodando atrás, a mesma da abertura, sem parar quando você entra.",
+        "🎵 Escolha a música no menu: ⏮ e ⏭ para trocar, ou toque no nome para ver a lista inteira. A música escolhida continua tocando na corrida."
+      ],
+      "en": [
+        "🏎️ The menu now has the demo race running behind it, the same one from the opening, without stopping when you go in.",
+        "🎵 Pick the music in the menu: ⏮ and ⏭ to switch, or tap the name to see the whole list. The song you pick keeps playing in the race."
+      ]
+    },
+    {
+      "versao": "1.13.0",
+      "data": "14/Nov/2026",
+      "hora": "00:50:00",
+      "pt": [
+        "🧊 Veículos novos em 3D de verdade: furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer e galinha. Na curva aparece a lateral e na descida dá para ver o teto; pelas janelas de vidro dá para ver o piloto.",
+        "🥚 Ovo Corredor: o ovo da cantiga antiga correndo sozinho, sem carro.",
+        "🎥 Volta de 360°: no 3-2-1 e quando chega, a câmera dá uma volta inteira pelo cenário.",
+        "🗺️ Escolha os cenários da corrida no menu (até 4) ou deixe na surpresa.",
+        "🚫 Sem rivais repetidos: ninguém corre com o mesmo veículo que você.",
+        "🛣️ Abertura com a estrada correndo, mais clara e com turbo."
+      ],
+      "en": [
+        "🧊 New rides in real 3D: surf van, school bus, plush truck, popcorn, ice cream, burger and hen. In curves you see the side, going downhill you see the roof, and you can see the driver through the glass windows.",
+        "🥚 Running Egg: the egg from the old nursery rhyme running on its own, no car.",
+        "🎥 360° spin: on the 3-2-1 and at the finish, the camera goes all the way around the scene.",
+        "🗺️ Pick the race worlds in the menu (up to 4) or leave it as a surprise.",
+        "🚫 No repeated rivals: nobody races with the same ride as you.",
+        "🛣️ Intro with the road rushing by, brighter and with turbo."
+      ]
+    },
+    {
+      "versao": "1.12.0",
+      "data": "13/Nov/2026",
+      "hora": "23:30:00",
+      "pt": [
+        "🔊 Sons de verdade: motor de carro, pneu cantando, batidas, turbo, buzina, largada, aplausos e fogos são gravações (nada de som de videogame antigo).",
+        "🐔 Galinha branca: pula batendo as asas e faz cocoricó; cacareja enquanto corre.",
+        "🦇 Morcego: perto dos obstáculos vira o Conde Drácula (com fumaça e risada) e joga abóboras nos outros carrinhos.",
+        "🍿 Carrinho de pipoca, 🍦 carrinho de sorvete e 🍔 carro-hambúrguer.",
+        "🍔 Cidade do Lanche com hambúrgueres gigantes, batata e milkshake; chocolate, pudim e taça de sorvete na Terra dos Doces.",
+        "🧱 Mundo dos Blocos e balões de emoji pela pista.",
+        "🐴 Cada bicho tem a sua voz: o cavalo relincha, o dinossauro ruge, a arara canta (é a buzina deles)."
+      ],
+      "en": [
+        "🔊 Real sounds: car engine, screeching tires, crashes, turbo, horn, start beeps, applause and fireworks are recordings (no more old video game beeps).",
+        "🐔 White hen: jumps flapping her wings and crows; clucks while running.",
+        "🦇 Bat: near obstacles it turns into Count Dracula (with smoke and a laugh) and throws pumpkins at the other karts.",
+        "🍿 Popcorn cart, 🍦 ice cream cart and 🍔 burger car.",
+        "🍔 Burger Town with giant burgers, fries and milkshakes; chocolate, flan and sundaes in Candy Land.",
+        "🧱 Block World and emoji balloons along the road.",
+        "🐴 Every animal has its own voice: the horse neighs, the dinosaur roars, the macaw squawks (that's their horn)."
+      ]
+    },
+    {
+      "versao": "1.11.0",
+      "data": "13/Nov/2026",
+      "hora": "22:45:00",
+      "pt": [
+        "🎬 Apresentação: uma corrida de demonstração passa atrás do logo animado; o primeiro toque liga a música.",
+        "🚦 Largada com semáforo e a frase \"Pronto pra sentir a velocidade?\".",
+        "🌀 Loopings de verdade: a pista dá uma volta inteira e o mundo gira junto (+300 pontos).",
+        "💨 Derrapagem nas curvas com faíscas azuis, laranjas e roxas; ao soltar, mini-turbo.",
+        "❓ Caixas surpresa: bolha de escudo, foguete ou gosma no rival da frente.",
+        "🏁 Mais rivais disputando de perto, placar de fliperama, turbo com linhas de velocidade, fogos de artifício e pódio no final com torcida.",
+        "🌋 Mundos novos: Cânion do Deserto, Templo na Selva, Vulcão de Lava e Ilhas Flutuantes.",
+        "🦖 Veículos novos: Dinossauro, Arara Gigante, Trenó do Papai Noel com renas, Ônibus Escolar, Furgão de Surfe e Caminhão de Pelúcias.",
+        "🔊 Muitos barulhos novos e o celular tremendo nas batidas, turbos e loopings (onde o aparelho deixa)."
+      ],
+      "en": [
+        "🎬 Intro: a demo race runs behind the animated logo; the first tap starts the music.",
+        "🚦 Start with a traffic light and the line \"Ready to feel the speed?\".",
+        "🌀 Real loops: the road goes all the way around and the world spins with you (+300 points).",
+        "💨 Drifting in curves with blue, orange and purple sparks; let go for a mini turbo.",
+        "❓ Surprise boxes: shield bubble, rocket or goo on the racer ahead.",
+        "🏁 More rivals racing close, arcade scoreboard, turbo speed lines, fireworks and a podium with a cheering crowd at the end.",
+        "🌋 New worlds: Desert Canyon, Jungle Temple, Lava Volcano and Floating Islands.",
+        "🦖 New rides: Dinosaur, Giant Macaw, Santa's Sleigh with reindeer, School Bus, Surf Van and Plush Claw Truck.",
+        "🔊 Lots of new sounds and the phone shaking on crashes, turbos and loops (where the device allows it)."
+      ]
+    },
+    {
       "versao": "1.10.5",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

@@ -1,0 +1,172 @@
+/* AQUA — visual (família Bolinho de Chuva, fonte Fredoka da Rabiscolândia).
+   Ideia: uma prateleira de frascos numa tarde de chuva. Fundo claro, cor de água; as cores fortes são só as dos
+   líquidos. Menu e lojinha: rolam. Jogo: ocupa a tela toda, sem rolar; a barra fica em cima, as ajudas embaixo (ou à
+   direita, com o celular deitado) e os frascos no meio, do maior tamanho que couber.
+   Nada fica embaixo do recorte da câmera: env(safe-area-inset-*). Respeita "reduzir movimento". */
+@font-face { font-family: 'Fredoka'; src: url('../rabiscolandia/fontes/fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
+:root { --agua: #c9f4f1; --agua2: #7fd6dc; --fundo: #1aa6a6; --tinta: #17324d; --tinta2: #3d5a78; --papel: #ffffff; --coral: #ff5d73; --sol: #ffce1f;
+  --limao: #9bdc28; --turquesa: #17c3c9; --uva: #9340e0;
+  --fonte: 'Fredoka', system-ui, -apple-system, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sr: env(safe-area-inset-right, 0px); --sb: env(safe-area-inset-bottom, 0px); --sl: env(safe-area-inset-left, 0px);
+  color-scheme: only light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: var(--agua2); color: var(--tinta); font-family: var(--fonte); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+button { font-family: inherit; color: inherit; cursor: pointer; border: 0; min-height: 44px; min-width: 44px; touch-action: manipulation; }
+button:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+.tela { display: none; }
+.tela.ativa { display: flex; }
+
+/* ---------- menu ---------- */
+/* fundo: água clara com bolhas grandes paradas (desenhadas com gradientes, sem imagem) */
+#menu, #loja { position: relative; min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+  padding: calc(62px + var(--st)) calc(16px + var(--sr)) calc(80px + var(--sb)) calc(16px + var(--sl));
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .55) 0 26px, rgba(255, 255, 255, .18) 27px 30px, transparent 31px),
+    radial-gradient(circle at 88% 30%, rgba(255, 255, 255, .45) 0 40px, rgba(255, 255, 255, .16) 41px 45px, transparent 46px),
+    radial-gradient(circle at 22% 78%, rgba(255, 255, 255, .35) 0 54px, rgba(255, 255, 255, .14) 55px 60px, transparent 61px),
+    radial-gradient(circle at 80% 86%, rgba(255, 255, 255, .4) 0 18px, rgba(255, 255, 255, .16) 19px 22px, transparent 23px),
+    linear-gradient(var(--agua), var(--agua2)); }
+.faixa { position: absolute; top: calc(8px + var(--st)); right: calc(8px + var(--sr)); display: flex; gap: 6px; z-index: 2; }
+.mini { background: var(--papel); border-radius: 14px; font-size: 1.2rem; padding: 0 10px; border: 2px solid var(--tinta); color: var(--tinta); font-weight: 700; box-shadow: 0 3px 0 rgba(23, 50, 77, .3); }
+.mini[aria-pressed="true"] { background: var(--sol); }
+.mascote { width: 6.4rem; height: auto; border-radius: 26%; border: 3px solid var(--tinta); animation: boia 3.2s ease-in-out infinite; filter: drop-shadow(0 8px 0 rgba(23, 50, 77, .14)); }
+@keyframes boia { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(3deg); } }
+/* o nome: cada letra é um líquido de uma cor, com contorno de vidro */
+.logo { font-size: clamp(3.4rem, 17vw, 6.4rem); font-weight: 700; line-height: .95; letter-spacing: .04em; display: flex; gap: .04em; }
+.logo span { -webkit-text-stroke: .055em var(--tinta); paint-order: stroke fill; text-shadow: 0 .07em 0 rgba(23, 50, 77, .25); }
+.logo .l1 { color: var(--coral); } .logo .l2 { color: var(--sol); } .logo .l3 { color: var(--turquesa); } .logo .l4 { color: var(--uva); }
+.sub { color: var(--tinta); font-size: 1.15rem; max-width: 30rem; font-weight: 500; }
+.ajuda { max-width: 36rem; text-align: left; background: var(--papel); border: 2px solid var(--tinta); border-radius: 20px; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; line-height: 1.4; font-size: 1.05rem; }
+.ajuda h2 { font-size: 1.3rem; }
+.niveis { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 26rem; }
+.nivel { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 16px; border-radius: 22px; color: var(--tinta); border: 2.5px solid var(--tinta);
+  box-shadow: 0 6px 0 rgba(23, 50, 77, .35); transition: transform .12s; }
+.nivel:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(23, 50, 77, .35); }
+.nivel.facil { background: linear-gradient(#d9f59a, var(--limao)); }
+.nivel.medio { background: linear-gradient(#aef0f2, #4fd0e0); }
+.nivel.dificil { background: linear-gradient(#ffc0cb, #ff8496); }
+.n-nome { font-size: 1.6rem; font-weight: 700; }
+.n-info { font-size: 1rem; font-weight: 500; }
+.n-rec { font-size: .95rem; font-weight: 600; }
+.linha-loja { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.gotas { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 14px; border-radius: 999px; background: var(--papel); border: 2px solid var(--tinta); font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.medio-bt { background: var(--papel); border: 2px solid var(--tinta); border-radius: 18px; padding: 8px 18px; font-size: 1.1rem; font-weight: 600; box-shadow: 0 4px 0 rgba(23, 50, 77, .3); }
+.grande { background: linear-gradient(#ffe27a, var(--sol)); color: var(--tinta); border: 2.5px solid var(--tinta); border-radius: 22px; padding: 12px 24px; font-size: 1.3rem; font-weight: 700; box-shadow: 0 5px 0 rgba(23, 50, 77, .35); }
+.medio-bt:active, .grande:active, .mini:active { transform: translateY(2px); }
+.versao { color: var(--tinta2); font-size: .85rem; max-width: 34rem; }
+
+/* ---------- jogo ---------- */
+#jogo { position: fixed; inset: 0; flex-direction: column; gap: 4px; overflow: hidden; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  padding: calc(6px + var(--st)) calc(6px + var(--sr)) calc(8px + var(--sb)) calc(6px + var(--sl)); }
+/* o desenho ocupa a tela toda (o frasco que despeja pode passar por trás da barra); os toques são dos botões */
+#palco { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.barra { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 6px; min-height: 48px; }
+.bn-nav #jogo .barra { padding-left: var(--nav-largo); justify-content: flex-end; }
+.placa { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 12px; border-radius: 999px; background: rgba(255, 255, 255, .92); border: 2px solid var(--tinta); font-size: 1.05rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.area { position: relative; z-index: 1; flex: 1 1 auto; min-height: 0; touch-action: none; }
+.frascos { position: absolute; inset: 0; }
+.frasco { position: absolute; background: transparent; border-radius: 18px; touch-action: none; }
+.frasco:focus-visible { outline: 3px dashed var(--tinta); outline-offset: -2px; background: rgba(255, 255, 255, .18); }
+.aviso { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); z-index: 3; width: max-content; max-width: min(94%, 30rem); background: var(--tinta); color: #fff; border-radius: 16px; padding: 8px 14px;
+  font-size: 1rem; font-weight: 500; line-height: 1.3; text-align: center; box-shadow: 0 5px 0 rgba(0, 0, 0, .18); animation: desce .2s ease-out; pointer-events: none; }
+@keyframes desce { from { opacity: 0; transform: translate(-50%, 10px); } }
+/* as ajudas: à direita sobra um cantinho para a bolinha 🎵 da música (../trilha.js) */
+.ajudas { position: relative; z-index: 2; display: flex; justify-content: center; gap: 10px; padding-right: 44px; padding-left: 44px; }
+.aj { position: relative; width: 60px; height: 56px; border-radius: 18px; background: var(--papel); border: 2.5px solid var(--tinta); box-shadow: 0 5px 0 rgba(23, 50, 77, .4); font-size: 1.55rem; line-height: 1; }
+.aj:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(23, 50, 77, .4); }
+.aj-n { position: absolute; top: -9px; right: -8px; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 999px; background: var(--coral); color: #fff; border: 2px solid var(--tinta); font-size: .9rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.aj.vazia { background: #dfe8ee; }
+.aj.vazia .aj-ico { opacity: .4; }
+.aj.vazia .aj-n { background: #8fa1b3; }
+.aj.chama { animation: chama .5s ease-in-out 3; }
+@keyframes chama { 50% { transform: translateY(-8px) scale(1.1); background: var(--sol); } }
+/* a abinha comum "Tela inteira" (../telacheia.js): durante o jogo fica logo abaixo do 🏠 e da 🚪, fora das ajudas */
+body:has(#jogo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px); transform: none; }
+
+/* cenários (lojinha): o fundo da tela de jogar e a amostra na vitrine */
+.cen-chuva { background:
+  repeating-linear-gradient(104deg, transparent 0 46px, rgba(255, 255, 255, .22) 46px 48px, transparent 48px 97px),
+  radial-gradient(ellipse 70% 26% at 20% 0%, rgba(255, 255, 255, .8), transparent 70%),
+  radial-gradient(ellipse 60% 22% at 82% 4%, rgba(255, 255, 255, .7), transparent 70%),
+  linear-gradient(#bfeef2, #74cdd8); }
+.cen-mar { background:
+  radial-gradient(circle at 14% 72%, rgba(255, 255, 255, .22) 0 9px, transparent 10px),
+  radial-gradient(circle at 84% 58%, rgba(255, 255, 255, .2) 0 6px, transparent 7px),
+  radial-gradient(circle at 70% 88%, rgba(255, 255, 255, .18) 0 12px, transparent 13px),
+  repeating-linear-gradient(76deg, transparent 0 70px, rgba(255, 255, 255, .07) 70px 110px, transparent 110px 190px),
+  linear-gradient(#27a7c4, #0d5f8a 55%, #0a3f66); }
+.cen-junina { background:
+  conic-gradient(from 150deg at 50% 0, var(--coral) 0 60deg, transparent 60deg) 0 0 / 56px 40px repeat-x,
+  conic-gradient(from 150deg at 50% 0, var(--turquesa) 0 60deg, transparent 60deg) 28px 0 / 56px 40px repeat-x,
+  radial-gradient(circle at 80% 22%, rgba(255, 244, 190, .9) 0 34px, transparent 36px),
+  linear-gradient(#ffe6a8, #ffb469 70%, #f58a4b); }
+.cen-espaco { background:
+  radial-gradient(circle at 18% 22%, #fff 0 1.5px, transparent 2px), radial-gradient(circle at 72% 12%, #fff 0 1.2px, transparent 2px),
+  radial-gradient(circle at 44% 64%, #fff 0 1.4px, transparent 2px), radial-gradient(circle at 88% 74%, #fff 0 1.6px, transparent 2px),
+  radial-gradient(circle at 30% 88%, #fff 0 1.2px, transparent 2px), radial-gradient(circle at 60% 38%, #fff 0 1px, transparent 2px),
+  radial-gradient(circle at 84% 30%, #ffb86b 0 22px, #e8743a 23px 26px, transparent 27px),
+  radial-gradient(ellipse 60% 40% at 30% 40%, rgba(255, 114, 182, .35), transparent 70%),
+  linear-gradient(#3a2382, #1a0f4a); }
+
+/* ---------- lojinha ---------- */
+#loja { gap: 10px; padding-bottom: calc(40px + var(--sb)); }
+.loja-topo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.loja-topo h2 { font-size: 1.7rem; }
+.loja-sub { max-width: 34rem; font-size: 1rem; line-height: 1.35; }
+#loja h3 { font-size: 1.25rem; margin-top: 6px; }
+.vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 10px; width: 100%; max-width: 44rem; }
+.item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 18px; background: var(--papel); border: 2.5px solid var(--tinta); box-shadow: 0 5px 0 rgba(23, 50, 77, .3); }
+.item.usando { background: #fff4c2; border-color: #c98a00; }
+.item.caro .amostra { opacity: .55; }
+.item.nao { animation: nao .35s; }
+@keyframes nao { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.amostra { width: 84px; height: 150px; }
+.amostra.cena { height: 84px; border-radius: 14px; border: 2px solid var(--tinta); }
+.item-nome { font-weight: 700; font-size: 1rem; }
+.item-estado { font-size: .9rem; font-weight: 500; color: var(--tinta2); }
+
+/* ---------- fim de fase ---------- */
+.fim { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(10, 40, 60, .45); padding: 16px; }
+.cartao { background: var(--papel); border: 3px solid var(--tinta); border-radius: 28px; padding: 18px 22px; max-width: 24rem; width: 100%; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center;
+  box-shadow: 0 10px 0 rgba(23, 50, 77, .35); animation: sobe .3s cubic-bezier(.2, 1.4, .4, 1); max-height: 100%; overflow-y: auto; }
+@keyframes sobe { from { transform: translateY(40px) scale(.9); opacity: 0; } }
+.fim-estrelas { font-size: 2.8rem; line-height: 1; display: flex; gap: 6px; }
+.fim-estrelas .acesa { animation: estoura .45s cubic-bezier(.2, 1.6, .4, 1) backwards; }
+.fim-estrelas .apagada { filter: grayscale(1); opacity: .28; }
+@keyframes estoura { from { transform: scale(0) rotate(-40deg); } }
+.cartao h2 { font-size: 1.9rem; }
+.fim-gotas { font-size: 1.35rem; font-weight: 700; color: #0c7c8c; }
+.fim-botoes { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; width: 100%; }
+
+/* ---------- celular deitado: as ajudas vão para a direita e os frascos ficam com a altura quase toda ---------- */
+@media (orientation: landscape) and (max-height: 560px) {
+  #menu { gap: 6px; padding-top: calc(8px + var(--st)); padding-bottom: calc(60px + var(--sb)); }
+  #menu .mascote { display: none; }
+  .logo { font-size: 2.6rem; }
+  .sub { font-size: .95rem; max-width: 34rem; }
+  .niveis { flex-direction: row; max-width: 46rem; }
+  .nivel { flex: 1; padding: 8px 6px; }
+  .n-nome { font-size: 1.25rem; } .n-info { font-size: .82rem; } .n-rec { font-size: .85rem; }
+  #jogo { display: none; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; column-gap: 8px; padding-bottom: calc(6px + var(--sb)); }
+  #jogo.ativa { display: grid; }
+  .barra { grid-column: 1; min-height: 46px; }
+  .area { grid-column: 1; grid-row: 2; }
+  .ajudas { grid-column: 2; grid-row: 1 / span 2; flex-direction: column; justify-content: flex-start; gap: 12px; padding: 12px 8px 50px 6px; }
+  .aj { width: 56px; height: 50px; }
+  .fim-botoes { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .fim-botoes button { flex: 1 1 auto; }
+  .cartao { max-width: 36rem; gap: 4px; padding: 10px 18px; }
+  .fim-estrelas { font-size: 2rem; }
+  .cartao h2 { font-size: 1.4rem; }
+}
+@media (max-width: 370px) {
+  .placa { padding: 0 8px; font-size: .95rem; }
+  .ajudas { gap: 7px; padding-left: 0; }
+  .aj { width: 54px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascote, .aj.chama, .cartao, .fim-estrelas .acesa, .aviso, .item.nao { animation: none; }
+  .nivel, .aj { transition: none; }
+}

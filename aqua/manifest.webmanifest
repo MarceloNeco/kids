@@ -1,0 +1,17 @@
+{
+  "name": "AQUA — Bolinho de Chuva",
+  "short_name": "AQUA",
+  "description": "Despeje os líquidos coloridos de um frasco para o outro até cada frasco ficar de uma cor só. / Pour the colorful liquids from bottle to bottle until each one holds a single color.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#7fd6dc",
+  "theme_color": "#1aa6a6",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

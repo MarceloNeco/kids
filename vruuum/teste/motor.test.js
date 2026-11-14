@@ -277,3 +277,77 @@ test('em qualquer curva, segurando o volante para dentro o carro vence a força 
     }
   }
 });
+
+// ---------- 1.11.0: derrapagem, caixas surpresa, loopings e rivais ----------
+test('derrapagem: segurando para dentro na curva, solta e ganha mini-turbo do tamanho da derrapagem', () => {
+  const e = M.novaCorrida('normal', 5, 1);
+  e.fase = 'corrida';
+  const j = e.jogadores[0], max = e.pista.cfg.velMax;
+  for (let i = 30; i < 200; i++) e.pista.segs[i].curva = 3;
+  j.z = 30 * P.SEG; j.vel = max;
+  const ev = correr(e, [{ dir: 1 }], 1.6);
+  assert.ok(ev.some(x => x.tipo === 'derrapa'));
+  assert.deepEqual(ev.filter(x => x.tipo === 'faisca').map(x => x.nivel), [1, 2]);
+  const solta = correr(e, [{}], 0.05);
+  const mt = solta.find(x => x.tipo === 'miniturbo');
+  assert.ok(mt && mt.nivel === 2 && j.turbo > 0.9, JSON.stringify(mt));
+  assert.equal(M.nivelDerrapa(0.3), 0); assert.equal(M.nivelDerrapa(3), 3);
+});
+
+test('caixa surpresa: a roleta gira e o poder vale sozinho; a bolha protege do cone', () => {
+  const e = M.novaCorrida('normal', 5, 1);
+  e.fase = 'corrida';
+  const j = e.jogadores[0];
+  e.pista.segs[40].coisas.push({ tipo: 'caixa', x: 0, alt: P.ALT_CHAO, pego: [false, false] });
+  j.z = 39 * P.SEG; j.vel = 5000;
+  const ev = correr(e, [{}], M.ROLETA + 0.3);
+  assert.ok(ev.some(x => x.tipo === 'caixa'));
+  const p = ev.find(x => x.tipo === 'poder');
+  assert.ok(p && ['escudo', 'foguete'].includes(p.poder), 'sem rival na frente não vem gosma');
+  j.escudo = 3; j.estrelas = 5;
+  const s = Math.floor(j.z / P.SEG) + 3;
+  for (let q = s - 3; q < s + 60; q++) e.pista.segs[q].coisas = [];   // só o cone na frente (sem estrela no caminho)
+  e.pista.segs[s].coisas.push({ tipo: 'cone', x: j.x, alt: 0, pego: [false, false] });
+  const ev2 = correr(e, [{}], 0.5);
+  assert.ok(ev2.some(x => x.tipo === 'escudoBate'));
+  assert.ok(!ev2.some(x => x.tipo === 'cone'));
+  assert.equal(j.estrelas, 5);
+});
+
+test('gosma vai até o rival da frente e deixa ele lento', () => {
+  const e = M.novaCorrida('normal', 5, 1, [{ id: 'saci', veic: 'kart', mod: {} }]);
+  e.fase = 'corrida';
+  const j = e.jogadores[0], rv = e.rivais[0];
+  j.z = 100 * P.SEG; rv.z = 120 * P.SEG; j.vel = rv.vel = 6000;
+  e.tiros.push({ z: j.z + P.SEG, x: j.x, vel: 15000, alvo: 0, de: 0, vida: 4 });
+  const ev = correr(e, [{}], 1.5);
+  assert.ok(ev.some(x => x.tipo === 'splat'));
+  assert.ok(rv.gosma > 0 || rv.lento > 0);
+});
+
+test('looping: em todos os níveis, longe de portal e túnel; passa sozinho e ganha pontos', () => {
+  for (const nivel of ['crianca', 'normal', 'turbo']) {
+    const p = P.montar(nivel, 77);
+    assert.equal(p.loops.length, P.NIVEIS[nivel].loops, nivel);
+    for (const l of p.loops) {
+      for (let i = l.ini; i < l.fim; i++) { assert.equal(p.segs[i].curva, 0); assert.equal(p.segs[i].coisas.length, 0); assert.ok(!p.segs[i].tunel); }
+      assert.ok(!p.segs.slice(l.ini - 30, l.fim + 30).some(s => s.enfeites.some(en => en.tipo === 'portal')));
+    }
+    assert.equal(p.mundos.filter(m => P.FANTASTICOS.includes(m)).length, 2);
+  }
+  const e = M.novaCorrida('crianca', 77, 1);
+  e.fase = 'corrida';
+  const j = e.jogadores[0], l = e.pista.loops[0];
+  j.z = (l.ini - 3) * P.SEG; j.vel = 3000;
+  const ev = correr(e, [{ dir: 1 }], 6);
+  assert.ok(ev.some(x => x.tipo === 'looping'));
+  assert.ok(ev.some(x => x.tipo === 'loopFeito'));
+  assert.equal(j.loopings, 1);
+});
+
+test('cenários escolhidos no menu entram primeiro, na ordem; os que faltam são sorteados', () => {
+  const p = P.montar('normal', 9, ['lanche', 'neve']);
+  assert.deepEqual(p.mundos.slice(0, 2), ['lanche', 'neve']);
+  assert.equal(new Set(p.mundos).size, 4);
+  assert.deepEqual(P.montar('normal', 9, ['blocos', 'lava', 'praia', 'templo', 'neon']).mundos, ['blocos', 'lava', 'praia', 'templo']);
+});

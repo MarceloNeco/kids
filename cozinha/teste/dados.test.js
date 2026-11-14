@@ -115,12 +115,15 @@ test('dica de adulto: faca, fogão, forno e liquidificador avisam', () => {
 const ONDE = {
   banana: ['pomar', 'bananeira', 'bananeira'], maca: ['pomar', 'macieira', 'arvore'], laranja: ['pomar', 'laranjeira', 'arvore'],
   limao: ['pomar', 'limoeiro', 'arvore'], morango: ['pomar', 'morangueiro', 'rasteira'], uva: ['pomar', 'parreira', 'parreira'],
+  jabuticaba: ['pomar', 'jaboticabeira', 'tronco'],   // v0.10.0: grudada no tronco
   cenoura: ['horta', 'pe-cenoura', 'raiz'], batata: ['horta', 'pe-batata', 'raiz'], tomate: ['horta', 'tomateiro', 'estaca'],
   alface: ['horta', 'pe-alface', 'cabeca'], cheiro: ['horta', 'cheiro-verde', 'touceira'],
   ovo: ['galinheiro'], leite: ['vaca'], peixe: ['rio']
 };
 // o que é feito pelas pessoas não nasce em lugar nenhum da vila: vem do mercadinho (ou emprestado da vizinha)
-const FEITO_PELAS_PESSOAS = ['farinha', 'acucar', 'sal', 'oleo', 'fermento', 'manteiga', 'chocolate', 'leitecond', 'granulado', 'queijo', 'pao', 'polvilho', 'mel'];
+const FEITO_PELAS_PESSOAS = ['farinha', 'acucar', 'sal', 'oleo', 'fermento', 'manteiga', 'chocolate', 'leitecond', 'granulado', 'queijo', 'pao', 'polvilho', 'mel', 'gelatina-po'];
+// a carne (churrasquinho, v0.6.0) não nasce na vila: vem do açougue (no mercadinho)
+const DO_ACOUGUE = ['carne'];
 
 test('cada fruta e cada legume nasce na planta certa, e cada coisa vem do lugar certo da vila', () => {
   for (const [id, [lugar, planta, forma]] of Object.entries(ONDE)) {
@@ -141,7 +144,8 @@ test('cada fruta e cada legume nasce na planta certa, e cada coisa vem do lugar 
   }
   // todo ingrediente está numa das duas listas, e toda fruta/legume do pomar e da horta tem planta
   for (const g of D.INGREDIENTES) {
-    assert.ok(ONDE[g.id] || FEITO_PELAS_PESSOAS.includes(g.id), 'ingrediente novo sem lugar conferido no teste: ' + g.id);
+    assert.ok(ONDE[g.id] || FEITO_PELAS_PESSOAS.includes(g.id) || DO_ACOUGUE.includes(g.id), 'ingrediente novo sem lugar conferido no teste: ' + g.id);
+    if (DO_ACOUGUE.includes(g.id)) assert.ok(!g.de && !g.planta && g.preco > 0, g.id + ' vem do mercadinho');
     if (g.de === 'pomar' || g.de === 'horta') assert.ok(g.planta, g.id + ' sem planta');
   }
   // o legume que cresce embaixo da terra é só cenoura e batata

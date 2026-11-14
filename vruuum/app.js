@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.10.5';
+  var APP_VERSION = '1.16.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -29,6 +29,7 @@
   if (pref.controle !== 'maos') pref.controle = 'toque';
   if (pref.rivais !== 'sem') pref.rivais = 'com';
   var PE = window.VruuumPersonagens;
+  if (!Array.isArray(pref.mundos)) pref.mundos = [];   // cenários escolhidos (vazio = surpresa)
   if (['neon', 'colorido', 'misto'].indexOf(pref.visual) < 0 || !pref.visualV2) { pref.visual = 'misto'; pref.visualV2 = true; }   // misto: alterna dia e noite (padrão desde a 1.0)
   D.definirEstilo(pref.visual);
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
@@ -51,16 +52,65 @@
   function tela(id) {
     Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
     estadoTela = id;
+    // a corrida de demonstração fica atrás da apresentação e do menu (1.14.0); na corrida e no fim, some
+    var comDemo = id === 'entrada' || id === 'menu';
+    document.body.classList.toggle('com-demo', comDemo); document.body.classList.toggle('demo-menu', id === 'menu');
+    if (comDemo && !demo) try { iniciarDemo(); } catch (e) { demo = null; }
   }
   var estadoTela = 'entrada';
 
   if (window.SolverRecursos && !SolverRecursos.ligado('vruuum', true)) { tela('desligado'); traduzir(); return; }
 
-  // ---------- entrada ----------
+  // ---------- entrada: apresentação ----------
+  /* Atrás do logo roda uma corrida de demonstração (como no fliperama): dois pilotos sorteados correndo sozinhos,
+     com cortes de câmera a cada 5 s (um, o outro, e às vezes direto para um looping). O primeiro toque na tela já
+     liga a música; o botão entra no menu. */
+  var demo = null;
+  function iniciarDemo() {
+    var cv = $('demo'); if (!cv || demo || !PE || !M.novaCorrida) return;
+    var noChao = VE.LISTA.filter(function (v) { return !VE.voa(v.id); }).map(function (v) { return v.id; });
+    function sorteia(l) { return l[Math.floor(Math.random() * l.length)]; }
+    var ps = PE.sortear(7, []), configs = ps.slice(2).map(function (p) { var v = VE.achar(sorteia(noChao)); return { id: p.id, veic: v.id, cor: p.cor, mod: { vel: v.vel, curva: v.curva } }; });
+    var jd = ps.slice(0, 2).map(function (p, k) { return { cor: p.cor || D.CORES[k], piloto: D.PILOTOS[k], veic: sorteia(noChao), foto: null, personagem: p.id, corpo: PE.corpoDe(p.id) || 'menino' }; });
+    var e = M.novaCorrida('normal', (Date.now() % 100000) | 0, 2, configs);
+    e.jogadores.forEach(function (j, k) { var v = VE.achar(jd[k].veic); j.mod = { vel: v.vel, curva: v.curva }; j.x = k ? 0.66 : -0.66; });
+    D.preparar(e, jd, pref.lingua, pref.visual);
+    demo = { e: e, jogs: jd, cena: 0, tCena: 0, ultimo: performance.now(), faixas: [-0.66, 0.66], pensa: 0 };
+    requestAnimationFrame(passoDemo);
+  }
+  function pilotoDemo(e, j, k) {   // fica na faixa, foge de cone e lama, e às vezes troca de faixa (para ter curva e derrapagem)
+    var i = Math.floor(j.z / window.VruuumPista.SEG), alvo = demo.faixas[k];
+    var segs = e.pista.segs, ruim = function (fx) { for (var q = i + 2; q < i + 14 && q < segs.length; q++) for (var w = 0; w < segs[q].coisas.length; w++) { var co = segs[q].coisas[w]; if ((co.tipo === 'cone' || co.tipo === 'lama') && Math.abs(co.x - fx) < 0.35) return true; } return false; };
+    if (ruim(alvo)) { var livres = [-0.66, 0, 0.66].filter(function (fx) { return !ruim(fx); }); if (livres.length) demo.faixas[k] = alvo = livres[0]; }
+    var seg = segs[Math.min(segs.length - 1, i)];
+    return { dir: Math.max(-1, Math.min(1, (alvo - j.x) * 4 + seg.curva * 0.25)), pular: Math.random() < 0.004 };
+  }
+  function passoDemo(agora) {
+    if (!demo) return;
+    if (estadoTela !== 'entrada' && estadoTela !== 'menu') { demo = null; return; }
+    var cv = $('demo'), W2 = cv.clientWidth, H2 = cv.clientHeight, e = demo.e, dt = Math.min(0.05, Math.max(0, (agora - demo.ultimo) / 1000)); demo.ultimo = agora;
+    if (cv.width !== W2 || cv.height !== H2) { cv.width = W2; cv.height = H2; }
+    var ent = e.jogadores.map(function (j, k) { return pilotoDemo(e, j, k); });
+    M.atualizar(e, ent, dt); e.eventos.forEach(function (ev) { D.evento(ev, e); }); D.passo(dt, e, ent);
+    demo.tCena += dt;
+    e.jogadores.forEach(function (j) { if (e.fase === 'corrida' && j.turbo <= 0 && Math.random() < dt * 0.25) j.turbo = 2.5; });   // turbo de vez em quando: linhas de velocidade e fogo
+    if (demo.tCena > 5 && e.fase === 'corrida') {   // corte de câmera
+      demo.tCena = 0; demo.cena++;
+      var l = e.pista.loops && e.pista.loops[demo.cena % e.pista.loops.length];
+      e.jogadores.forEach(function (j) { j.turbo = 2.5; });
+      if (demo.cena % 3 === 2 && l) e.jogadores.forEach(function (j, k) { j.z = (l.ini - 45 - k * 6) * window.VruuumPista.SEG; j.vel = e.pista.cfg.velMax; j.x = k ? 0.3 : -0.3; });
+      if (e.jogadores[0].z > e.pista.zChegada - 30000) { demo = null; iniciarDemo(); return; }
+    }
+    D.desenhar(cv.getContext('2d'), W2, H2, e, { toque: false, jogadores: demo.jogs, margem: {}, so: demo.cena % 2, semPlacar: true });
+    requestAnimationFrame(passoDemo);
+  }
+  // o primeiro toque em qualquer lugar da apresentação já liga a música (o navegador só deixa tocar depois de um toque)
+  $('entrada').addEventListener('pointerdown', function () { if (estadoTela === 'entrada') { Som.iniciar(); Som.musica(true); } });
   function entrar() {
     if (estadoTela !== 'entrada') return;
-    Som.iniciar(); Som.tocar('clique'); Som.musica(true);
-    tela('menu'); montarMenu(); focarPrimeiro();
+    Som.iniciar(); Som.tocar('whoosh'); Som.musica(true);
+    $('entrada').classList.add('saindo');
+    setTimeout(function () { $('entrada').classList.remove('saindo'); tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
   }
   $('btEntrar').addEventListener('click', entrar);
 
@@ -104,6 +154,17 @@
         b.setAttribute('data-personagem', p.id); b.title = p.nome[0];
         var cv = document.createElement('canvas'); cv.width = cv.height = 80; p.frente(cv.getContext('2d'), 40, 46, 26); b.appendChild(cv);
         $('bichos').appendChild(b);
+      });
+      // cenários: toque para escolher (até 4, na ordem do toque); 🎲 Surpresa = o jogo sorteia
+      [''].concat(window.VruuumPista.MUNDOS).forEach(function (m) {
+        var tm = m && D.TEMAS[m], b = botao('opcao', m ? tm.nome[0] : 'Surpresa', function () {
+          if (!m) pref.mundos = [];
+          else if (pref.mundos.indexOf(m) >= 0) pref.mundos.splice(pref.mundos.indexOf(m), 1);
+          else { pref.mundos.push(m); if (pref.mundos.length > 4) pref.mundos.shift(); }
+          salvar(); Som.tocar('clique'); marcar();
+        });
+        b.setAttribute('data-mundo', m); b.setAttribute('data-t', m ? tm.emoji + ' ' + tm.nome[0] + '|' + tm.emoji + ' ' + tm.nome[1] : '🎲 Surpresa|🎲 Surprise');
+        $('mundosEsc').appendChild(b);
       });
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
         b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); });
@@ -209,6 +270,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-controle]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-controle') === pref.controle)); });
     $('dicaMaos').hidden = pref.controle !== 'maos';
     Array.prototype.forEach.call(document.querySelectorAll('[data-visual]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-visual') === pref.visual)); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-mundo]'), function (b) { var m = b.getAttribute('data-mundo'); b.setAttribute('aria-pressed', String(m === '' ? !pref.mundos.length : pref.mundos.indexOf(m) >= 0)); });
     if (editando >= pref.jogadores) editando = 0;
     var c = pref.carros[editando], v = VE.achar(c.veic);
     $('abas').hidden = pref.jogadores < 2;
@@ -285,19 +347,24 @@
     var configs = [];
     if (pref.rivais === 'com' && PE) {
       var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return VE.voa(v.id) === voa1; });
-      PE.sortear(pref.jogadores === 1 ? 3 : 2, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {
-        var v = opcoes[Math.floor(Math.random() * opcoes.length)];
+      // 1.13.0: ninguém repetido — nem o personagem, nem o veículo de quem joga (escolheu a galinha, não corre contra galinha)
+      var livres = opcoes.filter(function (v) { return jogs.every(function (j) { return j.veic !== v.id; }); });
+      for (var q = livres.length - 1; q > 0; q--) { var w = Math.floor(Math.random() * (q + 1)), tq = livres[q]; livres[q] = livres[w]; livres[w] = tq; }
+      PE.sortear(pref.jogadores === 1 ? 5 : 3, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {   // 1.11.0: mais rivais, disputa de perto
+        var v = livres.length ? livres[k % livres.length] : opcoes[k % opcoes.length];
         configs.push({ id: p.id, veic: v.id, cor: p.cor || D.CORES[(k + 3) % D.CORES.length], mod: { vel: v.vel, curva: v.curva } });
       });
     }
-    estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs);
-    estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva }; });
+    estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs, pref.mundos);
+    estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id) }; });
     D.preparar(estado, jogs, pref.lingua, pref.visual);
     tela('jogo'); redimensionar();
     $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false];
     lerBordas(); telaCheia(true);
     ligarMaos();
-    Som.proxima(); Som.musica(true);
+    // a música escolhida no menu continua na corrida; sem escolha, cada corrida começa uma música nova
+    if (musicaEscolhida) musicaEscolhida = false; else Som.proxima();
+    Som.musica(true);
     if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (l) { trava = l; }).catch(function () { /* sem trava de tela: segue normal */ });
     if (!rodando) { rodando = true; ultimo = performance.now(); requestAnimationFrame(quadro); }
   }
@@ -344,29 +411,47 @@
       for (var i = 0; i < estado.eventos.length; i++) tratar(estado.eventos[i]);
       D.passo(dt, estado, ent);
       var max = estado.pista.cfg.velMax;
-      Som.motor(estado.jogadores.map(function (j) { return estado.fase === 'contagem' ? 0.05 : Math.min(1.5, j.vel / max); }));
+      Som.motor(estado.jogadores.map(function (j, k) { var v = VE.achar(jogs[k].veic); return v && v.semMotor ? null : estado.fase === 'contagem' ? 0.05 : Math.min(1.5, j.vel / max); }));   // bicho e skate não roncam
+      estado.jogadores.forEach(function (j, k) {   // a galinha cacareja de vez em quando enquanto corre
+        if (jogs[k].veic !== 'galinha' || estado.fase !== 'corrida') return;
+        j.tCoco = (j.tCoco || 2) - dt; if (j.tCoco <= 0) { j.tCoco = 2.5 + Math.random() * 3; Som.tocar('galinha'); }
+      });
+      Som.chiado(estado.jogadores.map(function (j) { return j.derrapa > 0 ? Math.min(1, 0.5 + j.derrapa * 0.3) : 0; }));
     }
     D.desenhar(ctx, W, H, estado, { toque: TOQUE, jogadores: jogs, margem: bordas, botoes: $('btPausa').parentNode.offsetWidth || 0 });   // largura dos botões 🔄 🔊 ⏸ (a barra do caminho não passa por baixo)
     if (estado.fase === 'fim') { acabar(); return; }
     requestAnimationFrame(quadro);
   }
 
-  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1 };
+  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1 };
+  // o aparelho treme junto (celular e tablet que deixam; iPhone não deixa): milissegundos de vibração e de pausa
+  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120] };
+  function tremer(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) { /* sem vibrar */ } }
   function tratar(ev) {
     if (ev.tipo === 'vai') mov.fimCalibrar();   // no 3-2-1 só descobre o sinal do sensor; o meio é o reto de verdade
+    var vj = ev.j != null && jogs[ev.j] ? VE.achar(jogs[ev.j].veic) : null;
+    if (ev.tipo === 'vai') estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); if (v && v.voz) setTimeout(function () { Som.tocar(v.voz); }, 300 + k * 400); });   // cada bicho dá o seu grito na largada
+    if (ev.tipo === 'pulo' && vj && vj.galinha) { Som.tocar('galo'); Som.tocar('asas'); D.evento(ev, estado); return; }
+    if (ev.tipo === 'turbo' && vj && vj.id === 'dino') Som.tocar('dino');
+    if (ev.tipo === 'vira') { Som.tocar(ev.dracula ? 'dracula' : 'morcego'); D.evento(ev, estado); return; }
+    if (ev.tipo === 'abobora') { Som.tocar('plop'); return; }
+    if (ev.tipo === 'splat' && ev.abobora) { Som.tocar('abobora'); tremer([25]); D.evento(ev, estado); return; }
     if (ev.tipo === 'estrela' && ev.ar) Som.tocar('estrelaAr');
+    else if (ev.tipo === 'faisca' || ev.tipo === 'miniturbo') Som.tocar(ev.tipo, ev.nivel);
+    else if (ev.tipo === 'poder' && ev.poder === 'gosma') Som.tocar('gosma');
     else if (SONS[ev.tipo]) Som.tocar(ev.tipo);
-    if (ev.tipo === 'batida' && navigator.vibrate) try { navigator.vibrate(90); } catch (e) { /* sem vibrar */ }
+    if (TREME[ev.tipo] && (ev.j == null || ev.j === 0 || estado.jogadores.length === 1)) tremer(TREME[ev.tipo]);
     D.evento(ev, estado);
   }
   function buzinar(j) {
     if (!estado || pausado || estadoTela !== 'jogo' || j >= estado.jogadores.length) return;
-    Som.tocar('buzina', j); D.evento({ tipo: 'buzina', j: j }, estado);
+    var v = VE.achar(jogs[j].veic);
+    Som.tocar(v && v.voz ? v.voz : 'buzina', j); D.evento({ tipo: 'buzina', j: j }, estado);   // a buzina da galinha é o cocoricó, a do cavalo é o relincho...
   }
 
   function pausar() {
     if (!rodando || pausado || !estado || estado.fase === 'fim') return;
-    pausado = true; $('pausa').hidden = false; Som.motor([]); soltarTrava();
+    pausado = true; $('pausa').hidden = false; Som.motor([]); Som.chiado([]); soltarTrava();
     try { $('btContinuar').focus(); } catch (e) { /* foco opcional */ }
   }
   function continuar() {
@@ -375,7 +460,7 @@
     if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (l) { trava = l; }).catch(function () {});
   }
   function irMenu() {
-    rodando = false; pausado = false; Som.motor([]); Som.musica(true); soltarTrava(); telaCheia(false); pararMaos();
+    rodando = false; pausado = false; Som.motor([]); Som.chiado([]); Som.musica(true); soltarTrava(); telaCheia(false); pararMaos();
     tela('menu'); montarMenu(); focarPrimeiro();
   }
   $('btPausa').addEventListener('click', pausar);
@@ -429,7 +514,7 @@
 
   function tempoTxt(s) { var m = Math.floor(s / 60), r = Math.floor(s % 60); return m + ':' + (r < 10 ? '0' : '') + r; }
   function acabar() {
-    rodando = false; Som.motor([]); soltarTrava(); destravarTela(); pararMaos();
+    rodando = false; Som.motor([]); Som.chiado([]); soltarTrava(); destravarTela(); pararMaos();
     var total = 0;
     estado.pista.segs.forEach(function (s) { s.coisas.forEach(function (c) { if (c.tipo === 'estrela') total++; }); });
     var js = estado.jogadores, melhor = Math.max.apply(null, js.map(function (j) { return j.pontos || 0; }));
@@ -464,6 +549,10 @@
     $('recordeFim').textContent = D.milhar(Math.max(antes, melhor));
     Som.musica(true);
     tela('fim'); traduzir(); focarPrimeiro();
+    // pódio animado (estádio, torcida, fogos e os pontos subindo)
+    Som.tocar('torcida');
+    var t0 = performance.now();
+    (function animar() { if (estadoTela !== 'fim') return; D.podio($('podio'), estado, (performance.now() - t0) / 1000); requestAnimationFrame(animar); })();
   }
 
   // ---------- controles ----------
@@ -635,10 +724,35 @@
     });
   });
 
+  // ---------- música no menu (1.14.0): ⏮ ⏭ e a lista para escolher; na corrida continua a que estiver tocando ----------
+  var musicaEscolhida = false;
+  function pintarMusica(i) {
+    $('musNome').textContent = '🎵 ' + (i ? i.nome : t('Toque para escolher', 'Tap to choose')) + ' ▾';
+    $('musOff').hidden = navigator.onLine !== false;
+    var at = Som.musicaAtual();
+    Array.prototype.forEach.call($('musLista').children, function (b, k) { b.setAttribute('aria-pressed', k === at ? 'true' : 'false'); });
+  }
+  function escolherMusica(k) { Som.iniciar(); Som.escolherMusica(k); musicaEscolhida = true; }
+  $('musAnt').addEventListener('click', function () { escolherMusica(Som.musicaAtual() - 1); });
+  $('musProx').addEventListener('click', function () { escolherMusica(Som.musicaAtual() + 1); });
+  $('musNome').addEventListener('click', function () {
+    var l = $('musLista'), abrir = l.hidden;
+    if (abrir && !l.children.length) Som.listaMusicas().forEach(function (m, k) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'mus-item';
+      b.textContent = m.nome + ' · ' + m.autor.replace(/ \(.*\)$/, '');
+      b.addEventListener('click', function () { escolherMusica(k); l.hidden = true; $('musNome').setAttribute('aria-expanded', 'false'); });
+      l.appendChild(b);
+    });
+    l.hidden = !abrir; $('musNome').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    pintarMusica(Som.listaMusicas()[Som.musicaAtual()]);
+  });
+  window.addEventListener('online', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+  window.addEventListener('offline', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+
   // ---------- começo ----------
   $('ver').textContent = 'v' + APP_VERSION;
   // nome da música tocando, com autor e licença (as gravadas são CC BY-SA: o crédito aparece aqui)
-  Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); });
+  Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); pintarMusica(i); });
   // navegação padrão (../navegacao.js): 🏠 Início volta ao menu (da corrida e do fim); o Voltar do celular faz o mesmo
   // (a barra cuida do histórico: este jogo não mexia nele); 🚪 Saída sai do jogo, perguntando antes no meio da corrida
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'vruuum', cuidarDoVoltar: true,
@@ -647,6 +761,8 @@
   lerBordas();
   $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
   traduzir();
+  pintarMusica(Som.listaMusicas()[Som.musicaAtual()]);
+  try { iniciarDemo(); } catch (e) { demo = null; }   // apresentação: se algo falhar, fica a tela de entrada parada
   if (TV) setTimeout(function () { try { $('btEntrar').focus(); } catch (e) { /* ok */ } }, 200);
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
 })();

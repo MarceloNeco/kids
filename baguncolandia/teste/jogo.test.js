@@ -469,3 +469,31 @@ test('🐰 sem terra (praia, cidade) não aparece toupeira nem minhoca', () => {
   const p = partida({ modo: 'pega', figuras: FIGS.concat([BICHOS[2]]), semBuraco: true }); p.comecar();
   rodar(p, 6000); assert.ok(!bichos(p).length, 'toupeira não apareceu');
 });
+
+/* 👨👩 quem joga junto: o papai na Bagunça de bolas, a mamãe no Pega-pega */
+test('👨 na Bagunça de bolas o papai pede a bola, corre até ela e bate de volta para a criança', () => {
+  const p = partida({ modo: 'bolas' }); p.comecar(); limpar(p);
+  p.corpo(0, { x: 0.05, y: 0.1, w: 0.2, h: 0.8 }, 1000);   // criança à esquerda
+  const P = () => p.estado().parente;
+  assert.ok(P() && P().quem === 'pai', 'o papai está em campo');
+  let pediu = false; for (let t = 0; t < 3000; t += 16) { p.avancar(16); limpar(p); pediu = pediu || !!P().fala; }
+  assert.ok(pediu, 'pediu a bola');
+  const bola = p.lancar({ fig: 'bola', x: 900, y: 500, vx: 0, vy: 0, estilo: 'quica' }, 0);
+  let bateu = false; for (let t = 0; t < 3000 && !bateu; t += 16) { p.avancar(16); const cs = p.estado().coisas; for (let i = cs.length - 1; i >= 0; i--) if (cs[i] !== bola) cs.splice(i, 1); bateu = p.eventos().some((e) => e.t === 'parente' && e.quem === 'pai'); }
+  assert.ok(bateu, 'o papai bateu na bola');
+  assert.ok(bola.vx < -100, 'devolveu para a criança (à esquerda)');
+});
+test('👩 no Pega-pega a mamãe corre atrás dos bichos e pega um', () => {
+  const p = pegaPega({ figuras: FIGS.concat([BICHOS[0]]) }); limpar(p);
+  p.corpo(0, { x: 0.02, y: 0.1, w: 0.15, h: 0.8 }, 1000);   // criança longe, no canto esquerdo
+  assert.equal(p.estado().parente.quem, 'mae');
+  let foiMae = false; const pegou = ate(p, () => { foiMae = foiMae || p.eventos().some(e => e.t === 'parente' && e.quem === 'mae'); return foiMae; }, 20000);
+  assert.ok(pegou, 'a mamãe pegou um bicho');
+  assert.ok(p.estado().coisas.some(c => c.estilo === 'bicho' && c.pego), 'o bicho foi para o cantinho');
+});
+test('👨👩 quem joga junto só aparece com 1 pessoa, na Bagunça de bolas e no Pega-pega', () => {
+  assert.equal(partida({ modo: 'bolas', jogadores: 2 }).estado().parente, null);
+  assert.equal(partida({ modo: 'pega', jogadores: 2 }).estado().parente, null);
+  assert.equal(partida({ modo: 'chuta' }).estado().parente, null);
+  assert.equal(partida({ modo: 'corta' }).estado().parente, null);
+});
