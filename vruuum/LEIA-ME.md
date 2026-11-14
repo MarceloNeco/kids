@@ -240,3 +240,31 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   com o mesmo veículo de quem joga, nem com o mesmo de outro rival.
 - Abertura mais clara e com turbo de vez em quando (linhas de velocidade).
 
+
+## 1.14.0 — menu com a corrida atrás e música à escolha
+
+- A corrida de demonstração da abertura (`#demo`, agora fixa no `<body>`) continua rodando atrás do menu, com um véu um
+  pouco mais escuro e os botões meio transparentes (`body.com-demo` / `body.demo-menu`, ligados em `tela()` no `app.js`).
+  Na corrida e no fim ela para.
+- Grupo 🎵 Música no menu: ⏮ e ⏭ trocam; tocar no nome abre a lista inteira (na ordem em que vai tocar). A escolhida
+  continua na corrida seguinte; sem escolha, cada corrida começa uma música nova, como antes. `som.js` ganhou
+  `listaMusicas()`, `escolherMusica(k)` e `musicaAtual()`. Sem internet a regra da música não muda: toca só a favorita
+  guardada, e o menu avisa.
+
+## 1.15.0 — carros antigos e trenó em 3D
+
+- Clássico, GT, Superesportivo, Kart, Monstrão, Moto, Conversível e Trenó saíram do desenho de costas e viraram modelos
+  em `modelos3d.js` (entram em `veiculos.js` por `em3d(...)`, como os da 1.13.0). Peça nova: `tronco()` — caixa com o
+  topo menor e empurrado, para cabines com vidro inclinado; a luz de cada face sai da inclinação de verdade.
+- Kart e moto continuam com capacete: em 3D a cabeça vem do modelo (`onde`) e o `cabeca.js` desenha o capacete nela.
+- `piloto(..., vies)`: em carro baixo (GT, Super) o piloto é pintado por último, para a tampa de trás não tapar.
+- Ainda de costas: avião, jato, helicóptero, arara e morcego (e skate, cavalo e dinossauro, que já giram do seu jeito).
+
+## 1.16.0 — conversível esportivo e os que voam em 3D
+
+- Peças novas no `modelos3d.js`: `casco()` (carroceria arredondada feita de fatias, com brilho de verniz), `chapa()`
+  (peça fina dos dois lados: asa, cauda, capa; `verso` = cor do outro lado) e `disco()` (hélice e rotor girando).
+- Conversível Rosa refeito com `casco()`: baixo, comprido e arredondado, sem marca.
+- Avião, jato, helicóptero, arara, morcego e Drácula em 3D. A hélice, o rotor e o fogo do jato agora são do modelo
+  (saíram `extrasAntes`/`extrasDepois` do `desenho.js`); `morcegoDracula()` troca os dois modelos 3D com a fumaça.
+- Ainda do jeito antigo: o skate (o skatista em quadros); cavalo e dinossauro já giram pelo `cavalo.js`.

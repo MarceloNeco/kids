@@ -114,6 +114,22 @@
       "pagina": "cozinha/"
     },
     {
+      "id": "a-garra",
+      "nome": {
+        "pt": "A Garra",
+        "en": "The Claw Machine"
+      },
+      "pagina": "a-garra/"
+    },
+    {
+      "id": "aqua",
+      "nome": {
+        "pt": "AQUA",
+        "en": "AQUA"
+      },
+      "pagina": "aqua/"
+    },
+    {
       "id": "quem-e",
       "nome": {
         "pt": "Quem é? (Duelo de Caras)",

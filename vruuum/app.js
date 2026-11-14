@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.13.0';
+  var APP_VERSION = '1.16.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -52,6 +52,10 @@
   function tela(id) {
     Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
     estadoTela = id;
+    // a corrida de demonstração fica atrás da apresentação e do menu (1.14.0); na corrida e no fim, some
+    var comDemo = id === 'entrada' || id === 'menu';
+    document.body.classList.toggle('com-demo', comDemo); document.body.classList.toggle('demo-menu', id === 'menu');
+    if (comDemo && !demo) try { iniciarDemo(); } catch (e) { demo = null; }
   }
   var estadoTela = 'entrada';
 
@@ -83,7 +87,7 @@
   }
   function passoDemo(agora) {
     if (!demo) return;
-    if (estadoTela !== 'entrada') { demo = null; return; }
+    if (estadoTela !== 'entrada' && estadoTela !== 'menu') { demo = null; return; }
     var cv = $('demo'), W2 = cv.clientWidth, H2 = cv.clientHeight, e = demo.e, dt = Math.min(0.05, Math.max(0, (agora - demo.ultimo) / 1000)); demo.ultimo = agora;
     if (cv.width !== W2 || cv.height !== H2) { cv.width = W2; cv.height = H2; }
     var ent = e.jogadores.map(function (j, k) { return pilotoDemo(e, j, k); });
@@ -106,7 +110,7 @@
     if (estadoTela !== 'entrada') return;
     Som.iniciar(); Som.tocar('whoosh'); Som.musica(true);
     $('entrada').classList.add('saindo');
-    setTimeout(function () { $('entrada').classList.remove('saindo'); demo = null; tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
+    setTimeout(function () { $('entrada').classList.remove('saindo'); tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
   }
   $('btEntrar').addEventListener('click', entrar);
 
@@ -358,7 +362,9 @@
     $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false];
     lerBordas(); telaCheia(true);
     ligarMaos();
-    Som.proxima(); Som.musica(true);
+    // a música escolhida no menu continua na corrida; sem escolha, cada corrida começa uma música nova
+    if (musicaEscolhida) musicaEscolhida = false; else Som.proxima();
+    Som.musica(true);
     if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (l) { trava = l; }).catch(function () { /* sem trava de tela: segue normal */ });
     if (!rodando) { rodando = true; ultimo = performance.now(); requestAnimationFrame(quadro); }
   }
@@ -718,10 +724,35 @@
     });
   });
 
+  // ---------- música no menu (1.14.0): ⏮ ⏭ e a lista para escolher; na corrida continua a que estiver tocando ----------
+  var musicaEscolhida = false;
+  function pintarMusica(i) {
+    $('musNome').textContent = '🎵 ' + (i ? i.nome : t('Toque para escolher', 'Tap to choose')) + ' ▾';
+    $('musOff').hidden = navigator.onLine !== false;
+    var at = Som.musicaAtual();
+    Array.prototype.forEach.call($('musLista').children, function (b, k) { b.setAttribute('aria-pressed', k === at ? 'true' : 'false'); });
+  }
+  function escolherMusica(k) { Som.iniciar(); Som.escolherMusica(k); musicaEscolhida = true; }
+  $('musAnt').addEventListener('click', function () { escolherMusica(Som.musicaAtual() - 1); });
+  $('musProx').addEventListener('click', function () { escolherMusica(Som.musicaAtual() + 1); });
+  $('musNome').addEventListener('click', function () {
+    var l = $('musLista'), abrir = l.hidden;
+    if (abrir && !l.children.length) Som.listaMusicas().forEach(function (m, k) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'mus-item';
+      b.textContent = m.nome + ' · ' + m.autor.replace(/ \(.*\)$/, '');
+      b.addEventListener('click', function () { escolherMusica(k); l.hidden = true; $('musNome').setAttribute('aria-expanded', 'false'); });
+      l.appendChild(b);
+    });
+    l.hidden = !abrir; $('musNome').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    pintarMusica(Som.listaMusicas()[Som.musicaAtual()]);
+  });
+  window.addEventListener('online', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+  window.addEventListener('offline', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+
   // ---------- começo ----------
   $('ver').textContent = 'v' + APP_VERSION;
   // nome da música tocando, com autor e licença (as gravadas são CC BY-SA: o crédito aparece aqui)
-  Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); });
+  Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); pintarMusica(i); });
   // navegação padrão (../navegacao.js): 🏠 Início volta ao menu (da corrida e do fim); o Voltar do celular faz o mesmo
   // (a barra cuida do histórico: este jogo não mexia nele); 🚪 Saída sai do jogo, perguntando antes no meio da corrida
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'vruuum', cuidarDoVoltar: true,
@@ -730,6 +761,7 @@
   lerBordas();
   $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
   traduzir();
+  pintarMusica(Som.listaMusicas()[Som.musicaAtual()]);
   try { iniciarDemo(); } catch (e) { demo = null; }   // apresentação: se algo falhar, fica a tela de entrada parada
   if (TV) setTimeout(function () { try { $('btEntrar').focus(); } catch (e) { /* ok */ } }, 200);
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });

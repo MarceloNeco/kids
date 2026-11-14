@@ -194,6 +194,9 @@
   }
   // corrida nova: começa a próxima música do início
   function proxima() { tocarItem(atual + 1); }
+  // menu (1.14.0): a lista na ordem em que vai tocar, a que está tocando, e escolher uma (ou a anterior/próxima)
+  function listaMusicas() { if (!lista.length) montarLista(); return lista.map(info); }
+  function escolherMusica(k) { if (!ac) return; musicaLigada = true; tocarItem(k); }
   // app escondido (outra aba, tela apagada): silencia; ao voltar, continua
   function dormir(sim) {
     if (!ac) return;
@@ -294,5 +297,5 @@
   function alternar() { ligado = !ligado; if (mestre) mestre.gain.setTargetAtTime(ligado ? 0.8 : 0, ac.currentTime, 0.05); if (audio) audio.muted = !ligado; return ligado; }
   function parar() { musica(false); motor([]); chiado([]); }
 
-  raiz.VruuumSom = { iniciar: iniciar, tocar: tocar, motor: motor, musica: musica, proxima: proxima, aoTrocarMusica: function (fn) { aoTrocar = fn; if (atual >= 0 && lista[atual]) fn(info(lista[atual])); }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, parar: parar, chiado: chiado, ligado: function () { return ligado; } };
+  raiz.VruuumSom = { iniciar: iniciar, tocar: tocar, motor: motor, musica: musica, proxima: proxima, listaMusicas: listaMusicas, escolherMusica: escolherMusica, musicaAtual: function () { return atual; }, aoTrocarMusica: function (fn) { aoTrocar = fn; if (atual >= 0 && lista[atual]) fn(info(lista[atual])); }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, parar: parar, chiado: chiado, ligado: function () { return ligado; } };
 })(this);

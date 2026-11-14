@@ -2,9 +2,48 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.16.0",
+      "data": "14/Nov/2026",
+      "hora": "01:51:00",
+      "pt": [
+        "🏎️ Conversível Rosa novo: esportivo, baixinho e arredondado, com friso na cor escolhida, 4 lanternas redondas, bancos de couro e para-brisa cromado.",
+        "✈️ Agora os que voam também são 3D e mostram a lateral na curva: aviãozinho (com hélice girando), jato (com fogo no motor), helicóptero, arara gigante e o morcego, que vira um Conde Drácula 3D voando de capa aberta."
+      ],
+      "en": [
+        "🏎️ New Pink Convertible: sporty, low and rounded, with a stripe in the chosen color, 4 round tail lights, leather seats and a chrome windshield.",
+        "✈️ The flyers are 3D now too and show their side in curves: little plane (spinning propeller), jet (engine flame), helicopter, giant macaw and the bat, which turns into a 3D Count Dracula flying with his cape open."
+      ]
+    },
+    {
+      "versao": "1.15.0",
+      "data": "14/Nov/2026",
+      "hora": "01:35:00",
+      "pt": [
+        "🧊 Mais veículos em 3D de verdade: Clássico, GT, Superesportivo, Kart, Monstrão, Moto e Conversível. Na curva aparece a lateral e no morro dá para ver o teto; pelo vidro dá para ver o piloto.",
+        "🛷 O Trenó do Papai Noel também em 3D: as renas galopando no ar (a do nariz vermelho na frente), o Papai Noel do lado e o saco de presentes."
+      ],
+      "en": [
+        "🧊 More rides in real 3D: Classic, GT, Supercar, Kart, Monster Truck, Motorbike and Convertible. In curves you see the side and on hills you see the roof; the driver shows through the glass.",
+        "🛷 Santa's Sleigh in 3D too: the reindeer galloping in the air (the red-nosed one in front), Santa beside you and the bag of presents."
+      ]
+    },
+    {
+      "versao": "1.14.0",
+      "data": "14/Nov/2026",
+      "hora": "01:20:00",
+      "pt": [
+        "🏎️ O menu agora tem a corrida de demonstração rodando atrás, a mesma da abertura, sem parar quando você entra.",
+        "🎵 Escolha a música no menu: ⏮ e ⏭ para trocar, ou toque no nome para ver a lista inteira. A música escolhida continua tocando na corrida."
+      ],
+      "en": [
+        "🏎️ The menu now has the demo race running behind it, the same one from the opening, without stopping when you go in.",
+        "🎵 Pick the music in the menu: ⏮ and ⏭ to switch, or tap the name to see the whole list. The song you pick keeps playing in the race."
+      ]
+    },
+    {
       "versao": "1.13.0",
       "data": "14/Nov/2026",
-      "hora": "12:00:00",
+      "hora": "00:50:00",
       "pt": [
         "🧊 Veículos novos em 3D de verdade: furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer e galinha. Na curva aparece a lateral e na descida dá para ver o teto; pelas janelas de vidro dá para ver o piloto.",
         "🥚 Ovo Corredor: o ovo da cantiga antiga correndo sozinho, sem carro.",

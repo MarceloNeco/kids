@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#0b0a1f">
-<meta name="versao" content="1.13.0">
+<meta name="versao" content="1.16.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Corrida de carrinho para a família: desvie, pegue estrelas, pule rampas e passe por 4 mundos. 1 ou 2 jogadores. / Family kart race: dodge, grab stars, jump ramps across 4 worlds.">
 <link rel="stylesheet" href="estilo.css">
@@ -23,11 +23,13 @@
   Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
 -->
 </head>
-<body>
+<body class="com-demo">
+
+<!-- corrida de demonstração: atrás da apresentação e do menu (a mesma, sem cortar ao entrar no menu) -->
+<canvas id="demo" class="demo" aria-hidden="true"></canvas>
+<div class="demo-escuro" aria-hidden="true"></div>
 
 <section id="entrada" class="tela ativa" data-recurso="vruuum">
-  <canvas id="demo" class="demo" aria-hidden="true"></canvas>
-  <div class="demo-escuro" aria-hidden="true"></div>
   <!-- logo animado em SVG (leve): riscos de velocidade, chamas, letras em 3D entrando de lado e brilhos -->
   <h1 class="logo-intro"><svg viewBox="0 0 640 250" role="img" aria-label="Vruuum!">
     <defs>
@@ -102,6 +104,17 @@
   <div class="grupo">
     <p class="rotulo" data-t="Cenários da corrida (escolha até 4)|Race worlds (pick up to 4)"></p>
     <div id="mundosEsc" class="opcoes mundos" role="group" aria-label="Cenários / Worlds"></div>
+  </div>
+
+  <div class="grupo">
+    <p class="rotulo" data-t="🎵 Música|🎵 Music"></p>
+    <div class="musica-esc">
+      <button id="musAnt" class="mini" type="button" aria-label="Música anterior / Previous song">⏮</button>
+      <button id="musNome" class="opcao mus-nome" type="button" aria-expanded="false" aria-controls="musLista"></button>
+      <button id="musProx" class="mini" type="button" aria-label="Próxima música / Next song">⏭</button>
+    </div>
+    <div id="musLista" class="mus-lista" role="group" aria-label="Músicas / Songs" hidden></div>
+    <p id="musOff" class="dica" hidden data-t="Sem internet: toca só a música guardada no aparelho.|Offline: only the song saved on the device plays."></p>
   </div>
 
   <div class="grupo">
