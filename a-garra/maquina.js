@@ -1,31 +1,35 @@
-/* A Garra — a máquina por dentro: os bichinhos (bolinhas que caem, rolam e se empilham), a garra e as regras de cada
-   nível. Sem desenho e sem tela: roda igual no navegador e no Node (testes em teste/maquina.test.js).
+/* A-GARRA — a máquina por dentro, em 3D: os prêmios (bolas que caem, rolam, se empilham e "dormem" quando param), a
+   garra (anda para os lados e para frente/trás, desce, fecha, sobe e leva até o buraco) e a regra de pagamento,
+   igual à das máquinas de verdade: quase sempre a garra fecha FRACA e deixa cair; só de vez em quando vem FORTE.
+   Sem desenho e sem tela: roda igual no navegador e no Node (testes em teste/maquina.test.js).
 
    Uso:
-     var m = Maquina.nova({ nivel: 'facil', tema: 'cabine', semente: 7 });
-     m.mover(-1 | 0 | 1)   segurar ⬅/➡ (0 = soltou)          m.irPara(x | null)  levar a garra até x (dedo)
-     m.pegar()             desce a garra (só na fase "mirar")  m.passo(dt)         anda dt segundos
-     m.fase                'mirar' 'descer' 'fechar' 'subir' 'levar' 'soltar' 'voltar' 'fim'
-     m.garra               { x, y, abertura (0 fechada a 1 aberta), balanco, premio }
-     m.premios             [{ id, tipo, x, y, r, ang, preso }]   m.ganhos  [tipo, ...]   m.fichas   m.tempo
-     m.eventos             fila que o app esvazia a cada quadro: { tipo: 'pegou' | 'raspou' | 'errou' | 'escorregou' |
-                           'ganhou' | 'ficha' | 'tique' | 'fim', ... }
-   Medidas em "unidades da máquina": o vidro tem L × A por dentro, y cresce para baixo; o buraco do prêmio fica à
-   esquerda (0 até BURACO), separado dos bichinhos por uma mureta de acrílico (x = BURACO, do y = MURETA até o chão).
-   O chão só existe à direita da mureta: quem passa para o lado do buraco cai e vira prêmio. */
+     var m = Maquina.nova({ nivel: 'dificil', tipos: ['urso', ...], raro: 'urso-dourado', vivos: false, semente: 7 });
+     m.mover(dx, dz)     segurar as setas (-1, 0 ou 1 em cada eixo; 0, 0 = soltou)   m.irPara(x, z) levar até (dedo)
+     m.pegar()           desce a garra (só na fase "mirar")                          m.passo(dt)    anda dt segundos
+     m.fase              'mirar' 'descer' 'fechar' 'subir' 'levar' 'soltar' 'voltar' 'fim'
+     m.garra             { x, y, z, abertura (0 fechada a 1 aberta), premio, forca ('forte' | 'fraca' | null) }
+     m.premios           [{ id, tipo, x, y, z, r, q: [x, y, z, w] (giro), dorme, preso, ganho }]
+     m.ganhos [tipo, ...]   m.fichas   m.tempo   m.semGanhar (tentativas desde o último prêmio)
+     m.eventos           fila que o app esvazia: { tipo: 'ficha' | 'pegou' | 'raspou' | 'errou' | 'escorregou' |
+                         'ganhou' | 'pulo' | 'tique' | 'fim', ... }
+   Medidas (unidades da máquina, ~10 cm): o vidro tem L (x, esquerda → direita) × P (z, fundo → frente) × A (y, chão →
+   teto). O buraco do prêmio fica na frente, à esquerda (x < BX, z > P − BZ), cercado por duas paredes de acrílico de
+   altura AB; ali não tem chão: quem cai lá dentro é prêmio. */
 (function (raiz) {
   'use strict';
-  var L = 300, A = 400, BURACO = 74, MURETA = 240, TRILHO = 30, PERNA = 34, CASA = BURACO / 2, G = 1100;
+  var L = 6, P = 5, A = 7, BX = 1.5, BZ = 1.5, AB = 1.5, TRILHO = 6.3, PERNA = 0.9, G = 40;
+  var CASA = { x: BX / 2, z: P - BZ / 2 };
+  var LIM = { x0: 0.45, x1: L - 0.45, z0: 0.45, z1: P - 0.45 };
 
-  // ajustes de cada nível. tol: quão perto do meio do bichinho a garra precisa fechar (1 = até a borda);
-  // escorrega: chance de o bichinho cair no caminho (0 = a garra nunca solta); tempo: segundos para mirar (0 = sem pressa)
+  // cada nível: fichas, segundos para mirar (0 = sem relógio), quantos prêmios e de que tamanho, tol (quão perto do meio
+  // a garra precisa fechar: 1 = até a borda) e cada (a garra vem forte mais ou menos 1 vez a cada "cada" tentativas;
+  // depois de "cada − 1" tentativas sem prêmio, a próxima bem mirada vem forte com certeza)
   var NIVEIS = {
-    facil: { fichas: 10, tempo: 0, qtd: 12, raio: [30, 34], tol: 1.0, escorrega: 0, vel: 120 },
-    medio: { fichas: 10, tempo: 20, qtd: 16, raio: [26, 30], tol: 0.72, escorrega: 0.4, vel: 140 },
-    dificil: { fichas: 8, tempo: 12, qtd: 20, raio: [22, 27], tol: 0.52, escorrega: 0.7, vel: 160 }
+    facil: { fichas: 12, tempo: 0, qtd: 42, raio: [0.5, 0.58], tol: 0.9, cada: 4, vel: 1.5 },
+    medio: { fichas: 10, tempo: 25, qtd: 54, raio: [0.44, 0.52], tol: 0.75, cada: 7, vel: 1.7 },
+    dificil: { fichas: 10, tempo: 15, qtd: 70, raio: [0.38, 0.46], tol: 0.6, cada: 10, vel: 1.9 }
   };
-  var TIPOS = ['urso', 'coelho', 'gato', 'cachorro', 'sapo', 'pinguim', 'porquinho', 'panda', 'unicornio', 'dino', 'polvo', 'pintinho'];
-  var RARO = 'estrela';   // a estrela dourada: uma por máquina, difícil de achar
 
   function sorteador(semente) {   // mulberry32: a mesma semente faz a mesma máquina (testes e ?semente=)
     var s = (semente >>> 0) || 1;
@@ -43,68 +47,74 @@
     var nivel = NIVEIS[op.nivel] ? op.nivel : 'facil';
     var cfg = Object.assign({}, NIVEIS[nivel], op.ajustes || {});
     var rnd = sorteador(op.semente != null ? op.semente : Math.floor(Math.random() * 1e9));
+    var tiposBase = (op.tipos && op.tipos.length) ? op.tipos : ['bola'];
     var m = {
-      nivel: nivel, tema: op.tema || 'cabine', cfg: cfg, fase: 'mirar', fichas: cfg.fichas, tempo: cfg.tempo, t: 0,
-      garra: { x: CASA, y: TRILHO, abertura: 0.15, balanco: 0, vb: 0, premio: null, vx: 0 },
-      premios: [], ganhos: [], eventos: [], esvaziou: false,
-      _dir: 0, _alvo: null, _fase: 0, _aposta: null, _tique: -1
+      nivel: nivel, cfg: cfg, fase: 'mirar', fichas: cfg.fichas, tempo: cfg.tempo, t: 0, vivos: !!op.vivos,
+      garra: { x: CASA.x, y: TRILHO, z: CASA.z, abertura: 0.2, premio: null, forca: null, vx: 0, vz: 0, balanco: [0, 0], vb: [0, 0] },
+      premios: [], ganhos: [], eventos: [], esvaziou: false, semGanhar: op.semGanhar || 0,
+      _dx: 0, _dz: 0, _alvo: null, _fase: 0, _queda: null, _tique: -1, _rnd: rnd
     };
 
-    /* ---------- os bichinhos: arrumados em pilha e assentados ---------- */
+    /* ---------- os prêmios: jogados de cima, assentados e conferidos ---------- */
     var tipos = [];
-    for (var i = 0; i < cfg.qtd - 1; i++) tipos.push(TIPOS[i % TIPOS.length]);
+    for (var i = 0; i < cfg.qtd - (op.raro ? 1 : 0); i++) tipos.push(tiposBase[i % tiposBase.length]);
     for (i = tipos.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), x = tipos[i]; tipos[i] = tipos[j]; tipos[j] = x; }
-    tipos.splice(Math.floor(rnd() * tipos.length), 0, RARO);
-    var rMax = cfg.raio[1], cols = Math.max(1, Math.floor((L - BURACO - 6) / (2 * rMax))), lado = (L - BURACO - 6) / cols;
+    if (op.raro) tipos.splice(Math.floor(rnd() * tipos.length), 0, op.raro);
     tipos.forEach(function (tipo, k) {
       var r = cfg.raio[0] + rnd() * (cfg.raio[1] - cfg.raio[0]);
-      if (tipo === RARO) r = cfg.raio[0];
-      var c = k % cols, lin = Math.floor(k / cols);
-      m.premios.push({ id: k, tipo: tipo, r: r, x: BURACO + 3 + lado * (c + 0.5) + (rnd() - 0.5) * 8, y: A - rMax - lin * 2 * rMax - rnd() * 6,
-        vx: (rnd() - 0.5) * 30, vy: 0, ang: (rnd() - 0.5) * 0.8, preso: false });
+      var p = { id: k, tipo: tipo, r: r, vx: 0, vy: 0, vz: 0, preso: false, dorme: false, sono: 0, ganho: false,
+        q: girar([0, 0, 0, 1], [0, 1, 0], rnd() * Math.PI * 2) };
+      p.q = girar(p.q, [1, 0, 0], (rnd() - 0.5) * 1.2);
+      soltarDeCima(p, rnd, k);
+      m.premios.push(p);
     });
-    // assentar com a mureta "até o teto"; depois, com a mureta de verdade, quem rolar para o buraco volta para cima
+    // assentar com as paredes do buraco até o teto; depois, com as paredes de verdade, quem cair no buraco volta para cima
     // do monte, até a pilha ficar firme (ninguém vira prêmio antes de começar)
-    for (i = 0; i < 240 * 4; i++) fisica(m, 1 / 240, 'assentar');
+    for (i = 0; i < 240 * 5; i++) fisica(m, 1 / 240, 'assentar');
     for (var volta = 0; volta < 10; volta++) {
       m.premios.forEach(acordar);
       for (i = 0; i < 240 * 3; i++) fisica(m, 1 / 240, 'conferir');
-      var fugiram = m.premios.filter(function (p) { return p.x < BURACO; });
+      var fugiram = m.premios.filter(noBuraco);
       if (!fugiram.length) break;
-      fugiram.forEach(function (p) { p.x = L - p.r - rnd() * 40; p.y = -p.r; p.vx = 0; p.vy = 0; });
-      m.premios.forEach(acordar);
+      fugiram.forEach(function (p) { soltarDeCima(p, rnd, 0); });
       for (i = 0; i < 240 * 3; i++) fisica(m, 1 / 240, 'assentar');
     }
-    m.premios.forEach(function (p) { p.vx = 0; p.vy = 0; p.dorme = true; });
+    m.premios.forEach(function (p) { p.vx = p.vy = p.vz = 0; p.dorme = true; p.proximoPulo = 2 + rnd() * 6; });
 
-    m.mover = function (d) { m._dir = d > 0 ? 1 : d < 0 ? -1 : 0; if (m._dir) m._alvo = null; };
-    m.irPara = function (x) { m._alvo = x == null ? null : x; if (x != null) m._dir = 0; };
+    m.mover = function (dx, dz) { m._dx = Math.sign(dx || 0); m._dz = Math.sign(dz || 0); if (m._dx || m._dz) m._alvo = null; };
+    m.irPara = function (x, z) { m._alvo = x == null ? null : { x: x, z: z }; if (x != null) { m._dx = 0; m._dz = 0; } };
     m.pegar = function () {
       if (m.fase !== 'mirar') return false;
-      m.fase = 'descer'; m._dir = 0; m._alvo = null; m.garra.abertura = 1; m.fichas--;
+      m.fase = 'descer'; m._dx = m._dz = 0; m._alvo = null; m.garra.abertura = 1; m.fichas--;
       m.eventos.push({ tipo: 'ficha', fichas: m.fichas });
       return true;
     };
-    m.passo = function (dt) { passo(m, Math.min(dt, 0.05), rnd); };
-    m.limites = { min: CASA, max: L - 20 };
+    m.passo = function (dt) { passo(m, Math.min(dt, 0.05)); };
+    m.limites = LIM;
     return m;
   }
+  function soltarDeCima(p, rnd, k) {
+    var area = (L * P - BX * BZ);
+    do { p.x = p.r + rnd() * (L - 2 * p.r); p.z = p.r + rnd() * (P - 2 * p.r); } while (p.x < BX + p.r && p.z > P - BZ - p.r);
+    p.y = 1 + (k / Math.max(1, area)) * 1.4 + rnd() * 2.5;
+    p.vx = p.vy = p.vz = 0;
+  }
+  function noBuraco(p) { return p.x < BX && p.z > P - BZ; }
 
   /* ---------- a garra ---------- */
-  function passo(m, dt, rnd) {
-    var g = m.garra, cfg = m.cfg;
+  function passo(m, dt) {
+    var g = m.garra, cfg = m.cfg, rnd = m._rnd;
     m.t += dt;
+    g.vx = 0; g.vz = 0;
     if (m.fase === 'mirar') {
-      var vx = 0;
-      if (m._dir) vx = m._dir * cfg.vel;
-      else if (m._alvo != null) {
-        var d = Math.max(CASA, Math.min(L - 20, m._alvo)) - g.x;
-        vx = Math.abs(d) < 1 ? 0 : Math.sign(d) * Math.min(cfg.vel * 1.4, Math.abs(d) * 8);
-        if (!vx) g.x = Math.max(CASA, Math.min(L - 20, m._alvo));
+      if (m._dx || m._dz) { g.vx = m._dx * cfg.vel; g.vz = m._dz * cfg.vel; }
+      else if (m._alvo) {
+        var ax = clamp(m._alvo.x, LIM.x0, LIM.x1) - g.x, az = clamp(m._alvo.z, LIM.z0, LIM.z1) - g.z, d = Math.hypot(ax, az);
+        if (d < 0.01) { g.x += ax; g.z += az; }
+        else { var v = Math.min(cfg.vel * 1.3, d * 6); g.vx = ax / d * v; g.vz = az / d * v; }
       }
-      g.vx = vx;
-      g.x = Math.max(CASA, Math.min(L - 20, g.x + vx * dt));
-      g.abertura = Math.max(0.15, g.abertura - dt);
+      g.x = clamp(g.x + g.vx * dt, LIM.x0, LIM.x1); g.z = clamp(g.z + g.vz * dt, LIM.z0, LIM.z1);
+      g.abertura = Math.max(0.2, g.abertura - dt);
       if (cfg.tempo) {
         m.tempo = Math.max(0, m.tempo - dt);
         var s = Math.ceil(m.tempo);
@@ -112,150 +122,171 @@
         if (m.tempo <= 0) m.pegar();
       }
     } else if (m.fase === 'descer') {
-      g.vx = 0;
-      g.y += 165 * dt;
-      var ponta = g.y + PERNA, toca = null;
-      m.premios.forEach(function (p) {
-        if (p.preso || p.ganho || p.x < BURACO) return;
-        if (Math.hypot(p.x - g.x, p.y - ponta) < p.r * 0.92) toca = p;
-      });
-      if (toca || ponta >= A - 4) { m.fase = 'fechar'; m._fase = 0; }
+      g.y -= 1.7 * dt;
+      var ponta = [g.x, g.y - PERNA, g.z], toca = false;
+      m.premios.forEach(function (p) { if (!p.ganho && !p.preso && !noBuraco(p) && dist3(p, ponta) < p.r * 0.95) toca = true; });
+      // encostou: a garra ainda afunda um pouquinho no monte macio antes de fechar
+      if (toca && m._afunda == null) m._afunda = g.y - 0.3;
+      if ((m._afunda != null && g.y <= m._afunda) || ponta[1] <= 0.12) { m.fase = 'fechar'; m._fase = 0; m._afunda = null; }
     } else if (m.fase === 'fechar') {
       m._fase += dt;
-      g.abertura = Math.max(0, 1 - m._fase / 0.45);
-      if (m._fase >= 0.45) {
-        var ponta2 = g.y + PERNA, melhor = null, perto = null;
-        m.premios.forEach(function (p) {
-          if (p.preso || p.ganho || p.x < BURACO) return;   // o que já está caindo no buraco não se pega
-          var dx = Math.abs(p.x - g.x), dy = p.y - ponta2;
-          if (dy < -p.r * 0.6 || dy > p.r * 1.25) return;   // a ponta precisa estar entre o alto e o meio do bichinho
-          if (dx < p.r * cfg.tol && (!melhor || dx < Math.abs(melhor.x - g.x))) melhor = p;
-          else if (dx < p.r * 1.3 && (!perto || dx < Math.abs(perto.x - g.x))) perto = p;
-        });
-        if (melhor) {
-          var q = 1 - Math.abs(melhor.x - g.x) / (melhor.r * cfg.tol);
-          melhor.preso = true; melhor.dorme = false; melhor.vx = 0; melhor.vy = 0; g.premio = melhor;
-          acordarPerto(m, melhor, 14);   // quem estava encostado nele pode rolar
-          // a chance de escorregar, decidida agora: no tranco lá em cima ou num ponto do caminho
-          var chance = Math.min(0.9, cfg.escorrega * (1.5 - q));
-          m._aposta = rnd() < chance ? (rnd() < 0.5 ? 'tranco' : 0.25 + rnd() * 0.6) : null;
-          m.eventos.push({ tipo: 'pegou', premio: melhor.tipo, firme: q });
-        } else if (perto) {
-          acordar(perto); acordarPerto(m, perto, 10);
-          perto.vx += Math.sign(perto.x - g.x || 1) * 90; perto.vy -= 60;   // raspou: empurra o bichinho
-          m.eventos.push({ tipo: 'raspou', premio: perto.tipo });
-        } else m.eventos.push({ tipo: 'errou' });
-        m.fase = 'subir';
-      }
+      g.abertura = Math.max(0, 1 - m._fase / 0.5);
+      if (m._fase >= 0.5) fechou(m, rnd);
     } else if (m.fase === 'subir') {
-      g.y = Math.max(TRILHO, g.y - 130 * dt);
-      if (g.y <= TRILHO) {
-        if (g.premio && m._aposta === 'tranco') soltar(m, 'escorregou');
-        g.vb += (g.premio ? 1.6 : 0.6);
-        m.fase = 'levar'; m._ini = g.x;
+      var antes = g.y;
+      g.y = Math.min(TRILHO, g.y + 1.3 * dt);
+      m._subiu = (m._subiu || 0) + (g.y - antes);
+      if (g.premio && g.forca === 'fraca') g.abertura = Math.min(0.28, g.abertura + dt * 0.5);   // a garra fraca afrouxa
+      if (g.premio && m._queda === 'logo' && m._subiu > 0.55) soltar(m, 'escorregou');
+      if (g.y >= TRILHO) {
+        if (g.premio && m._queda === 'tranco') soltar(m, 'escorregou');
+        g.vb[0] += g.premio ? 1.2 : 0.4;
+        m.fase = 'levar'; m._ini = { x: g.x, z: g.z };
       }
     } else if (m.fase === 'levar') {
-      var antes = g.x;
-      g.x = Math.max(CASA, g.x - 115 * dt);
-      g.vx = (g.x - antes) / dt;
-      var feito = m._ini > CASA ? (m._ini - g.x) / (m._ini - CASA) : 1;
-      if (g.premio && typeof m._aposta === 'number' && feito >= m._aposta) soltar(m, 'escorregou');
-      if (g.x <= CASA) { m.fase = 'soltar'; m._fase = 0; g.vx = 0; }
+      var lx = CASA.x - g.x, lz = CASA.z - g.z, ld = Math.hypot(lx, lz);
+      if (ld < 0.02) { g.x = CASA.x; g.z = CASA.z; m.fase = 'soltar'; m._fase = 0; }
+      else { var vl = Math.min(1.4, ld * 5); g.vx = lx / ld * vl; g.vz = lz / ld * vl; g.x += g.vx * dt; g.z += g.vz * dt; }
+      var total = Math.hypot(m._ini.x - CASA.x, m._ini.z - CASA.z) || 1, feito = 1 - Math.hypot(g.x - CASA.x, g.z - CASA.z) / total;
+      if (g.premio && typeof m._queda === 'number' && feito >= m._queda) soltar(m, 'escorregou');
     } else if (m.fase === 'soltar') {
       m._fase += dt;
       g.abertura = Math.min(1, m._fase / 0.3);
       if (g.premio) soltar(m, null);
-      if (m._fase >= 1.1) { m.fase = 'voltar'; m._fase = 0; }
+      if (m._fase >= 1.0) { m.fase = 'voltar'; m._fase = 0; }
     } else if (m.fase === 'voltar') {
       m._fase += dt;
-      g.abertura = Math.max(0.15, 1 - m._fase * 2);
-      var parados = m.premios.every(function (p) { return p.ganho || (Math.abs(p.vx) < 25 && Math.abs(p.vy) < 25) || p.x < BURACO; });
-      if (m._fase >= 0.5 && (parados || m._fase > 2.5)) {
+      g.abertura = Math.max(0.2, 1 - m._fase * 2);
+      var parados = m.premios.every(function (p) { return p.ganho || p.dorme || noBuraco(p); });
+      if (m._fase >= 0.6 && (parados || m._fase > 3)) {
         var restam = m.premios.some(function (p) { return !p.ganho; });
         if (!restam) m.esvaziou = true;
         if (!m.fichas || !restam) { m.fase = 'fim'; m.eventos.push({ tipo: 'fim', ganhos: m.ganhos.length, esvaziou: m.esvaziou }); }
-        else { m.fase = 'mirar'; m.tempo = m.cfg.tempo; m._tique = -1; m._aposta = null; }
+        else { m.fase = 'mirar'; m.tempo = cfg.tempo; m._tique = -1; m._queda = null; g.forca = null; }
       }
     }
-    // balanço do que está pendurado (só enfeite e onde o bichinho fica)
-    g.vb += (-g.balanco * 30 - g.vb * 2.2) * dt - g.vx * 0.002;
-    g.balanco += g.vb * dt * 6;
-    g.balanco = Math.max(-1, Math.min(1, g.balanco));
-    if (g.premio) { g.premio.x = g.x + g.balanco * 4; g.premio.y = g.y + PERNA + g.premio.r * 0.25; }
+    // balanço do que está pendurado (enfeite e onde o prêmio fica)
+    for (var e = 0; e < 2; e++) {
+      var vel = e ? g.vz : g.vx;
+      g.vb[e] += (-g.balanco[e] * 30 - g.vb[e] * 2.4) * dt - vel * 0.05;
+      g.balanco[e] = clamp(g.balanco[e] + g.vb[e] * dt * 4, -0.35, 0.35);
+    }
+    if (g.premio) { var pr = g.premio; pr.x = g.x + g.balanco[0] * 0.5; pr.z = g.z + g.balanco[1] * 0.5; pr.y = g.y - PERNA + pr.r * 0.45; }
+    // bichinhos vivos: de vez em quando, um que está por cima dá um pulinho (para longe do buraco)
+    if (m.vivos && m.fase !== 'fim') m.premios.forEach(function (p) {
+      if (p.ganho || p.preso || !p.dorme) return;
+      p.proximoPulo -= dt;
+      if (p.proximoPulo > 0) return;
+      p.proximoPulo = 3 + rnd() * 7;
+      var livre = !m.premios.some(function (q) { return q !== p && !q.ganho && q.y > p.y && Math.hypot(q.x - p.x, q.z - p.z) < p.r + q.r; });
+      if (!livre || Math.hypot(p.x - g.x, p.z - g.z) < 0.8) return;
+      acordar(p); p.vy = 5 + rnd() * 2; p.vx = 0.6 + rnd() * 0.6; p.vz = -(0.3 + rnd() * 0.6);
+      m.eventos.push({ tipo: 'pulo', premio: p.tipo, id: p.id });
+    });
     var n = Math.max(1, Math.ceil(dt * 240));
-    for (var i = 0; i < n; i++) fisica(m, dt / n, false);
+    for (var i = 0; i < n; i++) fisica(m, dt / n, null);
+  }
+
+  // a garra fechou: pega ou não pega, e se pega, decide já se vem forte ou se vai soltar (e quando)
+  function fechou(m, rnd) {
+    var g = m.garra, cfg = m.cfg, ponta = g.y - PERNA, melhor = null, perto = null;
+    m.premios.forEach(function (p) {
+      if (p.preso || p.ganho || noBuraco(p)) return;
+      var d = Math.hypot(p.x - g.x, p.z - g.z), h = ponta - p.y;   // altura da ponta em relação ao meio do prêmio
+      if (h > p.r * 1.0 || h < -p.r * 0.7) return;   // a ponta precisa estar entre o alto e um pouco abaixo do meio
+      if (d < p.r * cfg.tol && (!melhor || d < melhor._d)) { melhor = p; p._d = d; }
+      else if (d < p.r * 1.4 && (!perto || d < perto._d)) { perto = p; p._d = d; }
+    });
+    m.semGanhar++;
+    if (melhor) {
+      var q = 1 - melhor._d / (melhor.r * cfg.tol);
+      var forte = q >= 0.3 && (rnd() < 1 / (3 * cfg.cada) || m.semGanhar >= cfg.cada + 1);
+      if (cfg.sempreForte) forte = true;
+      if (cfg.nuncaForte) forte = false;
+      melhor.preso = true; melhor.dorme = false; melhor.vx = melhor.vy = melhor.vz = 0; g.premio = melhor;
+      g.forca = forte ? 'forte' : 'fraca';
+      var sorte = rnd();
+      m._queda = forte ? null : sorte < 0.55 ? 'logo' : sorte < 0.85 ? 'tranco' : 0.2 + rnd() * 0.6;
+      m._subiu = 0;
+      acordarPerto(m, melhor, 0.2);
+      m.eventos.push({ tipo: 'pegou', premio: melhor.tipo, firme: q, forte: forte });
+    } else if (perto) {
+      acordar(perto); acordarPerto(m, perto, 0.15);
+      var ux = perto.x - g.x, uz = perto.z - g.z, ud = Math.hypot(ux, uz) || 1;
+      perto.vx += ux / ud * 1.4; perto.vz += uz / ud * 1.4; perto.vy += 1.2;   // raspou: empurra o prêmio
+      m.eventos.push({ tipo: 'raspou', premio: perto.tipo });
+    } else m.eventos.push({ tipo: 'errou' });
+    m.fase = 'subir'; m._subiu = 0;
   }
 
   function soltar(m, motivo) {
     var g = m.garra, p = g.premio;
     if (!p) return;
-    p.preso = false; p.vx = g.vx * 0.8; p.vy = 0; g.premio = null; m._aposta = null;
-    if (motivo) { g.abertura = 0.7; m.eventos.push({ tipo: motivo, premio: p.tipo }); }
+    p.preso = false; p.vx = g.vx * 0.8; p.vz = g.vz * 0.8; p.vy = 0; p.sono = 0; g.premio = null; m._queda = null;
+    if (motivo) { g.abertura = 0.55; m.eventos.push({ tipo: motivo, premio: p.tipo }); }
   }
 
-  /* ---------- física das bolinhas ---------- */
-  // Bolinhas sem atrito, empilhadas, iam escorregando devagar e a pilha "derretia". Por isso o bichinho parado DORME
-  // (fica fixo, como uma pelúcia de verdade presa no monte) e só acorda quando algo bate nele com força, quando a garra
-  // pega um vizinho ou quando o empurra (acordarPerto).
-  // modo: 'assentar' (mureta até o teto), 'conferir' (mureta de verdade, sem contar prêmio) ou nada (jogando)
+  /* ---------- física das bolas ---------- */
+  // Bolas sem atrito empilhadas vão escorregando devagar e o monte "derrete". Por isso a bola parada DORME (fica fixa,
+  // como a pelúcia presa no monte) e só acorda quando algo bate nela com força, quando a garra pega ou empurra perto dela.
+  // modo: 'assentar' (paredes do buraco até o teto), 'conferir' (paredes de verdade, sem contar prêmio) ou null (jogando)
   function fixo(p) { return p.preso || p.dorme; }
   function acordar(p) { if (p.dorme) { p.dorme = false; p.sono = 0; } }
   function acordarPerto(m, alvo, folga) {
-    m.premios.forEach(function (q) { if (q !== alvo && !q.ganho && Math.hypot(q.x - alvo.x, q.y - alvo.y) < q.r + alvo.r + folga) acordar(q); });
+    m.premios.forEach(function (q) { if (q !== alvo && !q.ganho && dist3(q, [alvo.x, alvo.y, alvo.z]) < q.r + alvo.r + folga) acordar(q); });
   }
   function fisica(m, dt, modo) {
-    var assentando = modo === 'assentar';
-    var ps = m.premios, i, j, p, q, acordados = 0;
+    var ps = m.premios, i, j, p, q, acordados = 0, ab = modo === 'assentar' ? A : AB;
     for (i = 0; i < ps.length; i++) {
       p = ps[i]; if (fixo(p) || p.ganho) continue;
       acordados++;
-      p.vy += G * dt; p.vx *= 1 - 0.4 * dt;
-      p.x += p.vx * dt; p.y += p.vy * dt;
-      p.ang += p.vx * dt / p.r;
+      p.vy -= G * dt; var arrasto = 1 - 0.5 * dt; p.vx *= arrasto; p.vz *= arrasto;
+      p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+      var w = Math.hypot(p.vx, p.vz);
+      if (w > 0.01) p.q = girar(p.q, [p.vz / w, 0, -p.vx / w], w * dt / p.r);   // rola
     }
-    if (!acordados && !(m.garra && m.garra.premio)) return;   // tudo dormindo: nada a fazer
+    if (!acordados && !m.garra.premio) return;   // tudo dormindo: nada a fazer
+    var paredes = [[BX - 0.03, 0, P - BZ, BX + 0.03, ab, P], [0, 0, P - BZ - 0.03, BX, ab, P - BZ + 0.03]];
     for (var it = 0; it < 3; it++) {
       for (i = 0; i < ps.length; i++) {
         p = ps[i]; if (p.ganho) continue;
         for (j = i + 1; j < ps.length; j++) {
           q = ps[j]; if (q.ganho || (fixo(p) && fixo(q))) continue;
-          var dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy), min = p.r + q.r;
+          var dx = q.x - p.x, dy = q.y - p.y, dz = q.z - p.z, min = p.r + q.r;
+          if (Math.abs(dx) >= min || Math.abs(dy) >= min || Math.abs(dz) >= min) continue;
+          var d = Math.sqrt(dx * dx + dy * dy + dz * dz);
           if (d >= min || d < 1e-6) continue;
-          var nx = dx / d, ny = dy / d, sobra = min - d;
-          var rv = (q.vx - p.vx) * nx + (q.vy - p.vy) * ny;
-          // batida forte (ou o bichinho da garra passando) acorda quem dorme
-          if (p.dorme && (q.preso || rv < -70)) acordar(p);
-          if (q.dorme && (p.preso || rv < -70)) acordar(q);
+          var nx = dx / d, ny = dy / d, nz = dz / d, sobra = min - d;
+          var rv = (q.vx - p.vx) * nx + (q.vy - p.vy) * ny + (q.vz - p.vz) * nz;
+          if (p.dorme && (q.preso || rv < -2.5)) acordar(p);   // batida forte (ou o prêmio da garra passando) acorda
+          if (q.dorme && (p.preso || rv < -2.5)) acordar(q);
           var wp = fixo(p) ? 0 : fixo(q) ? 1 : 0.5, wq = 1 - wp;
-          p.x -= nx * sobra * wp; p.y -= ny * sobra * wp; q.x += nx * sobra * wq; q.y += ny * sobra * wq;
+          p.x -= nx * sobra * wp; p.y -= ny * sobra * wp; p.z -= nz * sobra * wp;
+          q.x += nx * sobra * wq; q.y += ny * sobra * wq; q.z += nz * sobra * wq;
           if (rv < 0) {
             var imp = -rv * 1.1;   // quase sem quicar
-            p.vx -= nx * imp * wp; p.vy -= ny * imp * wp;
-            q.vx += nx * imp * wq; q.vy += ny * imp * wq;
+            p.vx -= nx * imp * wp; p.vy -= ny * imp * wp; p.vz -= nz * imp * wp;
+            q.vx += nx * imp * wq; q.vy += ny * imp * wq; q.vz += nz * imp * wq;
           }
-          // atrito entre os dois (pelúcia não escorrega muito)
-          var tx = -ny, ty = nx, tv = (q.vx - p.vx) * tx + (q.vy - p.vy) * ty;
-          if (!fixo(p)) { p.vx += tx * tv * 0.08 * wp * 2; p.vy += ty * tv * 0.08 * wp * 2; }
-          if (!fixo(q)) { q.vx -= tx * tv * 0.08 * wq * 2; q.vy -= ty * tv * 0.08 * wq * 2; }
+          // atrito (pelúcia não escorrega muito): tira um pouco da velocidade de lado entre os dois
+          var rx = q.vx - p.vx, ry = q.vy - p.vy, rz = q.vz - p.vz, rn = rx * nx + ry * ny + rz * nz;
+          rx -= rn * nx; ry -= rn * ny; rz -= rn * nz;
+          var f = 0.12;
+          p.vx += rx * f * wp; p.vy += ry * f * wp; p.vz += rz * f * wp;
+          q.vx -= rx * f * wq; q.vy -= ry * f * wq; q.vz -= rz * f * wq;
         }
       }
       for (i = 0; i < ps.length; i++) {
         p = ps[i]; if (fixo(p) || p.ganho) continue;
         if (p.x - p.r < 0) { p.x = p.r; p.vx = Math.abs(p.vx) * 0.2; }
         if (p.x + p.r > L) { p.x = L - p.r; p.vx = -Math.abs(p.vx) * 0.2; }
-        if (p.x >= BURACO && p.y + p.r > A) { p.y = A - p.r; if (p.vy > 0) p.vy = -p.vy * 0.12; if (Math.abs(p.vy) < 30) p.vy = 0; p.vx *= 0.9; }
-        // mureta: o segmento de (BURACO, topo) até (BURACO, A); assentando, ela vai até o teto
-        var topo = assentando ? -1000 : MURETA, cy = Math.max(topo, Math.min(A, p.y)), ddx = p.x - BURACO, ddy = p.y - cy, dd = Math.hypot(ddx, ddy);
-        if (dd < p.r) {
-          var ux, uy;
-          if (dd < 1e-6) { ux = p.x < BURACO ? -1 : 1; uy = 0; } else { ux = ddx / dd; uy = ddy / dd; }
-          p.x = BURACO + ux * p.r; p.y = cy + uy * p.r;
-          var vn = p.vx * ux + p.vy * uy;
-          if (vn < 0) { p.vx -= ux * vn * 1.15; p.vy -= uy * vn * 1.15; }
-        }
-        if (modo === 'conferir' && p.y - p.r > A + 4) { p.y = A + p.r + 4; p.vy = 0; p.vx = 0; continue; }   // espera no fundo do buraco
-        if (!modo && p.y - p.r > A + 4 && !p.ganho) {   // caiu pelo buraco: é prêmio!
-          p.ganho = true; m.ganhos.push(p.tipo);
+        if (p.z - p.r < 0) { p.z = p.r; p.vz = Math.abs(p.vz) * 0.2; }
+        if (p.z + p.r > P) { p.z = P - p.r; p.vz = -Math.abs(p.vz) * 0.2; }
+        if (!noBuraco(p) && p.y - p.r < 0) { p.y = p.r; if (p.vy < 0) p.vy = -p.vy * 0.1; if (Math.abs(p.vy) < 1) p.vy = 0; p.vx *= 0.9; p.vz *= 0.9; }
+        for (var k = 0; k < 2; k++) bater(p, paredes[k]);
+        if (modo === 'conferir' && p.y < -p.r * 2) { p.y = -p.r * 2; p.vx = p.vy = p.vz = 0; continue; }   // espera no fundo do buraco
+        if (!modo && p.y < -p.r * 1.5 && !p.ganho) {   // caiu pelo buraco: é prêmio!
+          p.ganho = true; m.ganhos.push(p.tipo); m.semGanhar = 0;
           m.eventos.push({ tipo: 'ganhou', premio: p.tipo, total: m.ganhos.length });
         }
       }
@@ -263,11 +294,40 @@
     // quem ficou quietinho por um tempo dorme (no buraco, nunca: tem que cair)
     for (i = 0; i < ps.length; i++) {
       p = ps[i]; if (fixo(p) || p.ganho) continue;
-      if (Math.hypot(p.vx, p.vy) < 12 && p.x >= BURACO) { p.sono = (p.sono || 0) + dt; if (p.sono > 0.35) { p.dorme = true; p.vx = 0; p.vy = 0; } }
+      if (Math.hypot(p.vx, p.vy, p.vz) < 0.35 && !noBuraco(p)) { p.sono += dt; if (p.sono > 0.35) { p.dorme = true; p.vx = p.vy = p.vz = 0; } }
       else p.sono = 0;
     }
   }
+  // bola contra uma caixa fina (parede de acrílico do buraco)
+  function bater(p, c) {
+    var cx = clamp(p.x, c[0], c[3]), cy = clamp(p.y, c[1], c[4]), cz = clamp(p.z, c[2], c[5]);
+    var dx = p.x - cx, dy = p.y - cy, dz = p.z - cz, d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (d >= p.r) return;
+    var nx, ny, nz;
+    if (d < 1e-6) {   // o centro está dentro da parede: sai para o lado mais perto
+      var lado = (c[3] - c[0] < c[5] - c[2]) ? 'x' : 'z';
+      nx = lado === 'x' ? (p.x < (c[0] + c[3]) / 2 ? -1 : 1) : 0; nz = lado === 'z' ? (p.z < (c[2] + c[5]) / 2 ? -1 : 1) : 0; ny = 0;
+      d = 0;
+    } else { nx = dx / d; ny = dy / d; nz = dz / d; }
+    var s = p.r - d;
+    p.x += nx * s; p.y += ny * s; p.z += nz * s;
+    var vn = p.vx * nx + p.vy * ny + p.vz * nz;
+    if (vn < 0) { p.vx -= nx * vn * 1.15; p.vy -= ny * vn * 1.15; p.vz -= nz * vn * 1.15; }
+  }
 
-  var M = { nova: nova, NIVEIS: NIVEIS, TIPOS: TIPOS, RARO: RARO, medidas: { L: L, A: A, BURACO: BURACO, MURETA: MURETA, TRILHO: TRILHO, PERNA: PERNA, CASA: CASA } };
+  /* ---------- contas ---------- */
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function dist3(p, c) { var dx = p.x - c[0], dy = p.y - c[1], dz = p.z - c[2]; return Math.sqrt(dx * dx + dy * dy + dz * dz); }
+  function girar(q, eixo, ang) {   // gira o quatérnio q em volta de um eixo do mundo: rot * q
+    var s = Math.sin(ang / 2), rx = eixo[0] * s, ry = eixo[1] * s, rz = eixo[2] * s, rw = Math.cos(ang / 2);
+    var x = rw * q[0] + rx * q[3] + ry * q[2] - rz * q[1];
+    var y = rw * q[1] - rx * q[2] + ry * q[3] + rz * q[0];
+    var z = rw * q[2] + rx * q[1] - ry * q[0] + rz * q[3];
+    var w = rw * q[3] - rx * q[0] - ry * q[1] - rz * q[2];
+    var l = Math.sqrt(x * x + y * y + z * z + w * w) || 1;
+    return [x / l, y / l, z / l, w / l];
+  }
+
+  var M = { nova: nova, NIVEIS: NIVEIS, medidas: { L: L, P: P, A: A, BX: BX, BZ: BZ, AB: AB, TRILHO: TRILHO, PERNA: PERNA, CASA: CASA, LIM: LIM } };
   if (typeof module !== 'undefined' && module.exports) module.exports = M; else raiz.Maquina = M;
 })(typeof self !== 'undefined' ? self : this);
