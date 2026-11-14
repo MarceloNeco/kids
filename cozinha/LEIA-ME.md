@@ -7,7 +7,13 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.6.1** (14/Nov/2026) — a **Dona Cida fala com voz de mulher gravada** (`voz/cida-*.mp3`, voz livre "Dora" do Kokoro, Apache 2.0), igual em todo aparelho e sem internet; o 👵🔁 alterna entre a gravada e as vozes do aparelho. Na 0.6.0 — **comida de verdade**: cada receita e cada ingrediente aparece com uma **foto
+Versão atual: **0.7.0** (14/Nov/2026) — **vila 3D em que se anda** (`vila.js`): cada lugar é um bloquinho isométrico
+com a sua construção e animações (cata-vento, peixe pulando, fumaça, galinha bicando, rabo da vaca), ruas entre os
+blocos com carrinho e nuvens; o **cozinheirinho** começa na porta de casa e anda pelas ruas até o lugar tocado (com
+movimento reduzido, entra direto). **Faixa da missão** (`#missao`) com o que buscar agora e onde, e uma seta em cima do
+lugar (Fácil e Médio; no Difícil só "Falta: ..."). **Missão fluida**: pegou tudo de um lugar, ele volta e segue sozinho
+para o próximo (natureza primeiro, depois mercadinho e vizinha) e, com a cesta cheia, vai para casa cozinhar (Fácil e
+Médio; no Difícil só volta à vila). Nos testes, o seguir sozinho só liga com `?teste&seguir`. Na 0.6.1 — a **Dona Cida fala com voz de mulher gravada** (`voz/cida-*.mp3`, voz livre "Dora" do Kokoro, Apache 2.0), igual em todo aparelho e sem internet; o 👵🔁 alterna entre a gravada e as vozes do aparelho. Na 0.6.0 — **comida de verdade**: cada receita e cada ingrediente aparece com uma **foto
 de verdade** (fotos livres da Wikimedia Commons, em `fotos/`, guardadas para sem internet; créditos em `CREDITOS.md`):
 o pão de queijo é um pão de queijo e o queijo é um queijo. O menininho do final come a foto do prato, e a foto guardada
 também. Receitas novas: **gelatina com frutas** (a filha do dono adora) e **churrasquinho no espeto** (na grelha do
@@ -131,6 +137,7 @@ Toda receita começa lavando as mãos e termina servindo.
 | `logica.js` | Regras sem tela: cesta, moedas e troco, favores, passos de cada nível e a ordem, imprevisto, estrelas, texto de cada passo em PT/EN. |
 | `cenas.js` | Cenas animadas em SVG/canvas, sem imagem: recipientes que enchem, a cena de despejar (inclina para o recipiente, jorro, nível), a pia com as mãos e a espuma, o menininho comendo (e a animação dele), a foto em PNG e as partículas (faíscas, terra, pó, pedacinhos). Não conhece as regras do jogo. |
 | `fotos/` | **Fotos de verdade** (v0.6.0): `fotos/<id>.jpg`, uma por receita e por ingrediente (320 × 320, JPG), da Wikimedia Commons com licença livre. `ART.icone(id)` mostra a foto do ingrediente num círculo; `ART.icone(id, true)` mostra o desenho/emoji (frutas no pé, legumes na terra). Foto nova = arquivo aqui + linha no `CREDITOS.md` + `sw.js` (o teste confere). |
+| `vila.js` | A vila "3D" (v0.7.0): o bloquinho isométrico de cada lugar (`bloco(id)`), o cozinheirinho que anda (`boneco()`), o carrinho e a nuvem, tudo em SVG feito no código. Classes com `v-` para não confundir com as peças dos mini-jogos. |
 | `desenhos.js` | Desenhos em SVG feitos em código (utensílios, ingredientes sem emoji, faca sem ponta, ícone do app, as plantas do pomar e da horta e o lugar das frutas em cada planta). |
 | `app.js` | Telas, mini-jogos da vila, cozinha, receita pronta, progresso, voz, sons, música, service worker. `APP_VERSION`. |
 | `estilo.css` | Visual (fonte Fredoka da Rabiscolândia). |
@@ -189,6 +196,7 @@ leva cerca de 4 minutos).
   ou utensílio inteiro na tela fica embaixo dela (na cozinha, em todas as posições da rolagem); **celular deitado**
   915 × 412 e 844 × 390: entrada, menu, ficha, vila, os 7 lugares, cozinha e pronto cabem, sem rolar para o lado, com
   os botões principais na tela (acima da cesta).
+- `vila.test.js` (v0.7.0) — cada lugar com o seu bloquinho; ruas; o cozinheirinho começa na porta de casa; faixa da missão e seta (Médio), sem seta no Difícil; ele anda com movimento (sai do lugar, pernas mexendo, entra) e entra direto com movimento reduzido; missão fluida no Fácil (segue sozinho para o próximo lugar e para casa) e no Difícil só volta à vila.
 - `voz.test.js` (v0.5.0) — vozes de mentira como no Android: escolhe `pt-br-x-afs` (feminina) e nunca
   `pt-br-x-ptd`/Daniel; só voz de homem → tom 1,45 e 0,88; voz desconhecida antes da masculina; 👵🔁 troca, fala o
   exemplo, guarda e continua depois de recarregar.
