@@ -4,7 +4,9 @@
    - Toca uma música por vez; ao tocar, pausa a rádio da estante.
    - Fecha no ✕, no Esc e no Voltar do celular (entrada no histórico ao abrir).
    - Textos em PT/EN/ES pelo idioma.js; os nomes das músicas ficam como o autor publicou.
-   - Sem internet, a música que não estiver guardada no aparelho avisa "precisa de internet". */
+   - Sem internet, a música que não estiver guardada no aparelho avisa "precisa de internet".
+   - "✓ No jogo" / "🚫 Fora" (dono, 14/Nov/2026): tira a música do repertório daquele jogo neste aparelho
+     (Trilha.desligar do trilha.js; o jogo não a toca mais; todas fora = o jogo toca todas, nunca fica mudo). */
 (function () {
   'use strict';
   var d = document, bt = d.getElementById('btBiblioteca');
@@ -28,7 +30,9 @@
     '.bib ol{list-style:none;margin:0;padding:0;display:grid;gap:.4rem}' +
     '.bib li{display:flex;align-items:center;gap:.7rem;padding:.45rem .6rem;border-radius:14px;background:rgba(34,27,77,.7);border:1px solid #3a2f73}' +
     '.bib li.toca{border-color:#c6ff3d;background:rgba(198,255,61,.12)}' +
-    '.bib li button{flex:none;width:44px;height:44px;border-radius:999px;border:0;background:#c6ff3d;color:#1a1446;font-size:1.05rem;cursor:pointer}' +
+    '.bib li .tocar{flex:none;width:44px;height:44px;border-radius:999px;border:0;background:#c6ff3d;color:#1a1446;font-size:1.05rem;cursor:pointer}' +
+    '.bib li .liga{flex:none;min-height:40px;padding:.3rem .65rem;border-radius:999px;border:1px solid #c6ff3d;background:transparent;color:#c6ff3d;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer;white-space:nowrap}' +
+    '.bib li.fora{opacity:.6}.bib li.fora .liga{border-color:#ff8fab;color:#ff8fab}.bib li.fora .nm b{text-decoration:line-through}' +
     '.bib li button:focus-visible,.bib-x:focus-visible{outline:3px solid #ffd166;outline-offset:2px}' +
     '.bib .nm{flex:1;min-width:0}' +
     '.bib .nm b{display:block;overflow-wrap:anywhere}' +
@@ -60,25 +64,30 @@
     var h = '<div class="bib-c"><div class="bib-topo"><h2 id="bibTitulo">' + T('🎵 Biblioteca de músicas', '🎵 Music library', '🎵 Biblioteca de música') + '</h2>' +
       '<button type="button" class="bib-x" aria-label="' + T('Fechar', 'Close', 'Cerrar') + '">✕</button></div>' +
       '<p class="bib-sub">' + T('Todas as músicas que tocam nos jogos e na rádio: ', 'Every song played in the games and on the radio: ', 'Todas las canciones que suenan en los juegos y en la radio: ') +
-      Object.keys(unicas).length + T(' músicas. Toque ▶ para ouvir.', ' songs. Tap ▶ to listen.', ' canciones. Toca ▶ para escucharla.') + '</p>';
+      Object.keys(unicas).length + T(' músicas. Toque ▶ para ouvir. Não quer uma música num jogo? Toque em "✓ No jogo" e ela fica fora.', ' songs. Tap ▶ to listen. Don\'t want a song in a game? Tap "✓ In game" to leave it out.', ' canciones. Toca ▶ para escucharla. ¿No quieres una canción en un juego? Toca "✓ En el juego" y se queda fuera.') + '</p>';
     jogos.forEach(function (j) {
       var n = nomeJogo(j.id);
       h += '<h3>' + (n.img ? '<img src="' + n.img + '" alt="">' : '') + esc(n.nome) + ' <small>· ' + j.musicas.length + '</small></h3><ol>';
       j.musicas.forEach(function (m) {
-        h += '<li data-a="' + esc(m.a) + '"><button type="button" aria-label="' + esc(T('Tocar ', 'Play ', 'Reproducir ') + m.t) + '">▶</button>' +
-          '<div class="nm"><b>' + esc(m.t) + '</b><span>' + esc(m.au) + (m.lic ? ' · ' + esc(licenca(m.lic)) : '') + '</span></div></li>';
+        var fora = desligada(j.id, m.a);
+        h += '<li data-a="' + esc(m.a) + '" data-jogo="' + esc(j.id) + '"' + (fora ? ' class="fora"' : '') + '><button type="button" class="tocar" aria-label="' + esc(T('Tocar ', 'Play ', 'Reproducir ') + m.t) + '">▶</button>' +
+          '<div class="nm"><b>' + esc(m.t) + '</b><span>' + esc(m.au) + (m.lic ? ' · ' + esc(licenca(m.lic)) : '') + '</span></div>' +
+          '<button type="button" class="liga" aria-pressed="' + !fora + '" aria-label="' + esc(T('Tocar no jogo: ', 'Plays in the game: ', 'Suena en el juego: ') + m.t) + '">' + rotuloLiga(fora, j.id) + '</button></li>';
       });
       h += '</ol>';
     });
     painel.innerHTML = h + '</div>';
     marcar();
   }
+  // música fora do repertório do jogo (Trilha.desligar, ../trilha.js): o jogo não toca mais, neste aparelho
+  function desligada(jogo, a) { return !!(window.Trilha && Trilha.desligada && Trilha.desligada(jogo, a)); }
+  function rotuloLiga(fora, jogo) { return fora ? T('🚫 Fora', '🚫 Off', '🚫 Fuera') : jogo === 'estante' ? T('✓ Na rádio', '✓ On radio', '✓ En la radio') : T('✓ No jogo', '✓ In game', '✓ En el juego'); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   function marcar(erro) {
     var lis = painel.querySelectorAll('li');
     for (var i = 0; i < lis.length; i++) {
-      var li = lis[i], meu = li.getAttribute('data-a') === tocandoUrl, b = li.querySelector('button');
+      var li = lis[i], meu = li.getAttribute('data-a') === tocandoUrl, b = li.querySelector('.tocar');
       var ativo = meu && !audio.paused;
       li.classList.toggle('toca', ativo);
       b.textContent = ativo ? '⏸' : '▶';
@@ -120,7 +129,14 @@
   bt.addEventListener('click', abrir);
   painel.addEventListener('click', function (e) {
     if (e.target.closest('.bib-x')) return fechar();
-    var b = e.target.closest('li button');
+    var lg = e.target.closest('li .liga');
+    if (lg && window.Trilha && Trilha.desligar) {
+      var li = lg.parentNode, j = li.getAttribute('data-jogo'), a = li.getAttribute('data-a'), fora = !desligada(j, a);
+      Trilha.desligar(j, a, fora);
+      li.classList.toggle('fora', fora); lg.setAttribute('aria-pressed', String(!fora)); lg.textContent = rotuloLiga(fora, j);
+      return;
+    }
+    var b = e.target.closest('li .tocar');
     if (b) tocar(b.parentNode.getAttribute('data-a'));
   });
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !painel.hidden) fechar(); });
