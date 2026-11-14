@@ -46,7 +46,7 @@ A pessoa pensa em alguém (de desenho, de filme, famoso, um bicho, uma coisa ou 
 perguntas. Respostas: **Sim · Acho que sim · Não sei · Acho que não · Não**, e ↩️ volta uma pergunta.
 
 - **Níveis:** 🧒 Infantil (só perguntas fáceis e personagens que criança conhece) · 👨‍👩‍👧 Família · 🧑 Adulto (a lista inteira).
-- **Lista pronta:** 667 personagens em `personagens/*.js` (familia, disney, desenhos, filmes, musica, famosos, mundo) e 134
+- **Lista pronta:** 667 personagens em `personagens/*.js` (familia, disney, desenhos, filmes, musica, famosos, mundo) e 127
   perguntas em `adivinha-perguntas.js`. Só nome e emoji, nunca foto.
 - **Como ela pensa** (`adivinha.js`): chance para cada personagem, que cai com respostas que não combinam (com sobra, para
   aguentar resposta errada); a próxima pergunta é a que mais divide os mais prováveis; chuta quando tem certeza ou nas
