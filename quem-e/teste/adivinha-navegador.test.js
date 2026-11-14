@@ -133,3 +133,41 @@ for (const vp of [{ width: 360, height: 640 }, { width: 740, height: 360 }]) {
     await ctx.close();
   });
 }
+
+test('revisão: 🏠 no meio da adivinhação para tudo; 🚪 pergunta antes de sair', async () => {
+  const { ctx, pg } = await abrirAdivinha();
+  await pg.click('#btFamilia'); await pg.waitForSelector('#advRespostas:not([hidden])');
+  assert.equal(await pg.evaluate(() => window.BolinhoNav && document.documentElement.classList.contains('bn-nav')), true);
+  await pg.click('#advRespostas .resp[data-r="s"]');
+  await pg.click('.bolinho-nav .bn-casa');
+  await pg.waitForSelector('#inicio.ativa');
+  await pg.waitForTimeout(1500);
+  assert.equal(await pg.evaluate(() => document.querySelector('.tela.ativa').id), 'inicio');
+  assert.equal(await pg.evaluate(() => QEDebugAdv.jogo()), null);
+  await pg.click('#btPink'); await pg.click('#btAdivinha'); await pg.click('#btFamilia'); await pg.waitForSelector('#advRespostas:not([hidden])');
+  await pg.click('.bolinho-nav .bn-saida');
+  await pg.waitForSelector('.bolinho-sair:not([hidden])', { timeout: 3000 });
+  await ctx.close();
+});
+
+test('revisão: nome que só tem símbolos não trava; "Não é" esconde o chute na hora', async () => {
+  const { ctx, pg } = await abrirAdivinha();
+  await pg.click('#btFamilia');
+  let viuChute = false;
+  for (let i = 0; i < 400; i++) {
+    if (await pg.locator('#advPerdi:not([hidden])').count()) break;
+    if (await pg.locator('#advChute:not([hidden])').count()) {
+      await pg.click('#btErrou', { timeout: 1000 }).catch(() => {});
+      if (!viuChute) { viuChute = true; assert.equal(await pg.locator('#advChute:not([hidden])').count(), 0, 'o chute continuou na tela depois do "Não é"'); }
+      continue;
+    }
+    if (await pg.locator('#advRespostas:not([hidden])').count()) await pg.click('#advRespostas .resp[data-r="?"]', { timeout: 1000 }).catch(() => {}); else await pg.waitForTimeout(20);
+  }
+  await pg.waitForSelector('#advPerdi:not([hidden])');
+  await pg.fill('#advNome', '<>"');
+  await pg.click('#btEnsinarSalvar');
+  await pg.waitForTimeout(200);
+  assert.equal(await pg.locator('#advPerdi:not([hidden])').count(), 1, 'saiu do formulário com nome inválido');
+  assert.deepEqual(pg.errosPg, []);
+  await ctx.close();
+});

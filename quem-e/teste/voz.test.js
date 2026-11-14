@@ -7,7 +7,7 @@ function ambiente(op = {}) {
   const reg = { fetches: [], faladas: [], tocadas: [], cache: new Map() };
   const amb = {
     online: op.online !== false,
-    cofre: { tem: n => !!op.chave && n === 'ia:elevenlabs', ler: n => Promise.resolve(op.chave || '') },
+    cofre: { tem: n => !!op.chave && n === 'ia:elevenlabs', ler: n => Promise.resolve(op.chave || ''), lerAgora: n => op.chave || '' },
     fetch: (url, o) => { reg.fetches.push({ url, o }); if (op.falha) return Promise.resolve({ ok: false, status: 429, blob: () => Promise.resolve(null) }); return Promise.resolve({ ok: true, status: 200, blob: () => Promise.resolve({ tamanho: 10 }), clone() { return this; } }); },
     caches: { open: () => Promise.resolve({ match: k => Promise.resolve(reg.cache.has(k) ? { blob: () => Promise.resolve(reg.cache.get(k)) } : undefined), put: (k, r) => r.blob().then(b => { reg.cache.set(k, b); }) }) },
     tocarAudio: blob => { reg.tocadas.push(blob); return Promise.resolve(); },
@@ -72,4 +72,46 @@ test('emoji sai do texto antes de falar', async () => {
   const v = V.criar(amb);
   await v.falar('🎉 Acertei! 👍', { meleca: 'pink' });
   assert.equal(reg.faladas[0].txt, 'Acertei!');
+});
+
+test('revisão: cofre trancado não pede o PIN no meio do jogo (voz do aparelho)', async () => {
+  const { amb, reg } = ambiente({ chave: 'sk_teste' });
+  let pediu = 0; amb.cofre = { tem: () => true, lerAgora: () => '', ler: () => { pediu++; return Promise.resolve('sk_teste'); } };
+  const v = V.criar(amb); v.usarEleven(true);
+  await v.falar('Oi!', { meleca: 'pink' });
+  assert.equal(pediu, 0);
+  assert.equal(reg.fetches.length, 0);
+  assert.equal(reg.faladas.length, 1);
+});
+
+test('revisão: fala atrasada não toca por cima da nova nem depois de calar', async () => {
+  const { amb, reg } = ambiente({ chave: 'sk_teste' });
+  amb.cofre = { tem: () => true, lerAgora: () => 'sk_teste', ler: () => Promise.resolve('sk_teste') };
+  const pendentes = [];
+  amb.fetch = (url, o) => { reg.fetches.push({ url, o }); return new Promise(ok => pendentes.push(() => ok({ ok: true, status: 200, blob: () => Promise.resolve({ txt: JSON.parse(o.body).text }), clone() { return this; } }))); };
+  const v = V.criar(amb); v.usarEleven(true);
+  const p1 = v.falar('Primeira', { meleca: 'pink' });
+  await new Promise(r => setTimeout(r, 5));
+  const p2 = v.falar('Segunda', { meleca: 'pink' });
+  await new Promise(r => setTimeout(r, 5));
+  pendentes[1](); await p2; pendentes[0](); await p1;
+  assert.deepEqual(reg.tocadas.map(b => b.txt), ['Segunda']);
+  const p3 = v.falar('Terceira', { meleca: 'pink' });
+  await new Promise(r => setTimeout(r, 5));
+  v.calar(); pendentes[2](); await p3;
+  assert.deepEqual(reg.tocadas.map(b => b.txt), ['Segunda']);
+});
+
+test('revisão: o cache de vozes não é apagado quando o jogo atualiza', () => {
+  const fs = require('fs'), path = require('path');
+  assert.ok(!V.CACHE.startsWith('quem-e-'), V.CACHE);
+});
+
+test('revisão: texto privado pede voz que funciona sem internet', async () => {
+  const { amb, reg } = ambiente();
+  const v = V.criar(amb);
+  await v.falar('Meu irmão Theo', { meleca: 'pink', privado: true });
+  await v.falar('É uma pessoa?', { meleca: 'pink' });
+  assert.equal(reg.faladas[0].jeito.soLocal, true);
+  assert.ok(!reg.faladas[1].jeito.soLocal);
 });

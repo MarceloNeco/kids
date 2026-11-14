@@ -44,7 +44,7 @@ test('esquecer, exportar e importar sem duplicar', () => {
   const b = AP.criar({ armazenamento: memoria() });
   b.ensinar({ nome: 'theo', emoji: '👦', nivel: 'I', historico: [{ id: 'oculos', r: 's' }] });
   const r = b.importar(arquivo);
-  assert.deepEqual(r, { novos: 1, juntados: 1, correcoes: 1 });
+  assert.deepEqual(r, { novos: 1, juntados: 1, correcoes: 1, guardado: true });
   assert.equal(b.lista().length, 2);
   assert.equal(b.lista().find(p => p.nome.toLowerCase() === 'theo').r.oculos, 's');
   assert.equal(b.importar(arquivo).novos, 0, 'importar de novo duplicou');
@@ -67,4 +67,36 @@ test('arquivo estranho na importação: limpa o que não presta e não quebra', 
   assert.deepEqual(Object.keys(z.r).sort(), ['casa', 'pessoa']);
   assert.deepEqual(b.correcoes(), { pikachu: { 'cor-amarelo': 's' } });
   for (const k of Object.keys(z.r)) assert.ok(Q.POR_ID[k]);
+});
+
+test('revisão: chaves herdadas (constructor, __proto__) não entram nem estragam nada', () => {
+  const b = AP.criar({ armazenamento: memoria() });
+  b.importar(JSON.stringify({ formato: 1, app: 'quem-e', aprendidos: [{ nome: 'Zé', niveis: 'IFA', r: { pessoa: 'constructor', canta: 'toString', constructor: 's' } }],
+    correcoes: { constructor: { real: 's' }, pikachu: { voa: 'hasOwnProperty' } } }));
+  assert.deepEqual(b.lista()[0].r, { casa: 's' });
+  assert.deepEqual(b.correcoes(), {});
+  assert.equal(Object.real, undefined, 'escreveu no Object global');
+  assert.equal(b.ensinar({ nome: 'x', nivel: 'toString', historico: [{ id: 'pessoa', r: 'valueOf' }] }).niveis, 'FA');
+});
+
+test('revisão: importação gigante tem limite; armazenamento cheio avisa', () => {
+  const b = AP.criar({ armazenamento: memoria() });
+  const muitos = []; for (let i = 0; i < 900; i++) muitos.push({ nome: 'Pessoa ' + i, niveis: 'IFA', r: { pessoa: 's' } });
+  const r = b.importar(JSON.stringify({ formato: 1, app: 'quem-e', aprendidos: muitos }));
+  assert.equal(r.novos, AP.LIMITE);
+  assert.equal(b.lista().length, AP.LIMITE);
+  assert.equal(b.ensinar({ nome: 'Mais um', nivel: 'I', historico: [] }), null, 'passou do limite');
+  const cheio = memoria(); cheio.setItem = () => { throw new Error('QuotaExceededError'); };
+  const c = AP.criar({ armazenamento: cheio });
+  assert.equal(c.ensinar({ nome: 'Theo', nivel: 'I', historico: [] }).guardado, false);
+});
+
+test('revisão: o que estava guardado e veio estragado é limpo ao abrir', () => {
+  const m = memoria();
+  m.setItem(AP.CHAVE, JSON.stringify({ aprendidos: [null, 5, { nome: '<b>Lia</b>', niveis: 'zz', r: { pessoa: 's', voa: 'x' } }], correcoes: { pikachu: { voa: 'n' }, '<x>': { voa: 's' } } }));
+  const b = AP.criar({ armazenamento: m });
+  const l = b.lista();
+  assert.equal(l.length, 1); assert.equal(l[0].nome, 'bLia/b'); assert.equal(l[0].niveis, 'FA');
+  assert.deepEqual(l[0].r, { pessoa: 's', casa: 's' });
+  assert.deepEqual(b.correcoes(), { pikachu: { voa: 'n' } });
 });

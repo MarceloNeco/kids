@@ -18,6 +18,9 @@
   var CHAVE = 'bolinho:quem-e:aprendidos';
   var NIVEIS = { I: 'IFA', F: 'FA', A: 'A' };
   var RESP = { s: 1, p: 1, '?': 1, q: 1, n: 1 };
+  var LIMITE = 500, MAX_TEXTO = 400000;   // no máximo 500 aprendidos; arquivo de importação até ~400 KB
+  function tem(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+  function idValido(id) { return typeof id === 'string' && /^[a-z0-9-]{1,40}$/.test(id) && !tem(Object.prototype, id); }
 
   function normal(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim(); }
   function limparNome(s) { return String(s || '').replace(/[<>&"'`\\\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 40); }
@@ -25,7 +28,7 @@
   function limparResp(r) {
     var out = {};
     if (!r || typeof r !== 'object') return out;
-    Object.keys(r).forEach(function (k) { if (Q.POR_ID[k] && RESP[r[k]] && r[k] !== '?') out[k] = r[k]; });
+    Object.keys(r).forEach(function (k) { if (tem(Q.POR_ID, k) && typeof r[k] === 'string' && tem(RESP, r[k]) && r[k] !== '?') out[k] = r[k]; });
     return out;
   }
   function abertos(a, b) { return (a + b).indexOf('I') >= 0 ? 'IFA' : (a + b).indexOf('F') >= 0 ? 'FA' : 'A'; }
@@ -33,20 +36,39 @@
 
   function criar(op) {
     var arm = op.armazenamento;
-    function ler() { try { var v = JSON.parse(arm.getItem(CHAVE) || 'null'); if (v && Array.isArray(v.aprendidos)) return v; } catch (e) { /* estragado: começa de novo */ } return { aprendidos: [], correcoes: {} }; }
-    var d = ler(); if (!d.correcoes || typeof d.correcoes !== 'object') d.correcoes = {};
-    function salvar() { try { arm.setItem(CHAVE, JSON.stringify(d)); } catch (e) { /* sem espaço */ } }
-    function achar(nome) { var n = normal(nome); for (var i = 0; i < d.aprendidos.length; i++) if (normal(d.aprendidos[i].nome) === n) return d.aprendidos[i]; return null; }
+    // o que estava guardado passa pela mesma limpeza da importação (pode ter vindo estragado)
+    function ler() {
+      var v = null; try { v = JSON.parse(arm.getItem(CHAVE) || 'null'); } catch (e) { v = null; }
+      var limpo = { aprendidos: [], correcoes: {} }, usados = {};
+      if (!v || typeof v !== 'object') return limpo;
+      (Array.isArray(v.aprendidos) ? v.aprendidos : []).slice(0, LIMITE).forEach(function (x) {
+        if (!x || typeof x !== 'object') return;
+        var nome = limparNome(x.nome); if (!nome) return;
+        var r = limparResp(x.r); r.casa = 's';
+        var id = idValido(x.id) && !usados[x.id] ? x.id : 'apr-' + slug(nome) + '-' + (limpo.aprendidos.length + 1); usados[id] = 1;
+        limpo.aprendidos.push({ id: id, nome: nome, emoji: limparEmoji(x.emoji), niveis: ['IFA', 'FA', 'A'].indexOf(x.niveis) >= 0 ? x.niveis : 'FA', r: r });
+      });
+      if (v.correcoes && typeof v.correcoes === 'object') Object.keys(v.correcoes).forEach(function (id) { if (!idValido(id)) return; var r = limparResp(v.correcoes[id]); if (Object.keys(r).length) limpo.correcoes[id] = r; });
+      return limpo;
+    }
+    var d = ler();
+    // devolve false quando não coube no aparelho (a tela avisa)
+    function salvar() { try { arm.setItem(CHAVE, JSON.stringify(d)); return true; } catch (e) { return false; } }
+    // nome (sem acento, minúsculo) → aprendido; ids usados (para não repetir id)
+    var porNome = new Map(), ids = new Set();
+    d.aprendidos.forEach(function (p) { porNome.set(normal(p.nome), p); ids.add(p.id); });
+    function achar(nome) { return porNome.get(normal(nome)) || null; }
     function doHistorico(h) { var r = {}; (h || []).forEach(function (x) { if (x && x.r !== '?') r[x.id] = x.r; }); return limparResp(r); }
     function juntar(p, r) { Object.keys(r).forEach(function (k) { p.r[k] = r[k]; }); }
 
     function guardar(nome, emoji, niveis, r) {
       nome = limparNome(nome); if (!nome) return null;
       var p = achar(nome), novo = !p;
+      if (novo && d.aprendidos.length >= LIMITE) return null;
       if (novo) {
-        var id = 'apr-' + slug(nome), k = 2; while (d.aprendidos.some(function (x) { return x.id === id; })) id = 'apr-' + slug(nome) + '-' + (k++);
+        var id = 'apr-' + slug(nome), k = 2; while (ids.has(id)) id = 'apr-' + slug(nome) + '-' + (k++);
         p = { id: id, nome: nome, emoji: limparEmoji(emoji), niveis: niveis, r: {} };
-        d.aprendidos.push(p);
+        d.aprendidos.push(p); porNome.set(normal(nome), p); ids.add(id);
       } else { p.niveis = abertos(p.niveis, niveis); if (emoji) p.emoji = limparEmoji(emoji); }
       juntar(p, r); p.r.casa = 's';
       return { p: p, novo: novo };
@@ -56,39 +78,43 @@
       armazenamento: arm,
       lista: function () { return d.aprendidos.map(function (p) { return { id: p.id, nome: p.nome, emoji: p.emoji, niveis: p.niveis, r: Object.assign({}, p.r) }; }); },
       ensinar: function (o) {
-        var g = guardar(o.nome, o.emoji, NIVEIS[o.nivel] || 'FA', doHistorico(o.historico)); if (!g) return null;
-        salvar(); return { id: g.p.id, nome: g.p.nome, emoji: g.p.emoji, niveis: g.p.niveis, r: Object.assign({}, g.p.r) };
+        var g = guardar(o.nome, o.emoji, tem(NIVEIS, o.nivel) ? NIVEIS[o.nivel] : 'FA', doHistorico(o.historico)); if (!g) return null;
+        var ok = salvar(); return { id: g.p.id, nome: g.p.nome, emoji: g.p.emoji, niveis: g.p.niveis, r: Object.assign({}, g.p.r), guardado: ok };
       },
       corrigir: function (id, historico) {
-        if (!/^[a-z0-9-]+$/.test(id)) return;
-        var c = d.correcoes[id] || (d.correcoes[id] = {});
+        if (!idValido(id)) return false;
+        var c = tem(d.correcoes, id) ? d.correcoes[id] : (d.correcoes[id] = {});
         var r = doHistorico(historico); Object.keys(r).forEach(function (k) { c[k] = r[k]; });
-        salvar();
+        return salvar();
       },
       correcoes: function () { return JSON.parse(JSON.stringify(d.correcoes)); },
-      esquecer: function (id) { d.aprendidos = d.aprendidos.filter(function (p) { return p.id !== id; }); delete d.correcoes[id]; salvar(); },
+      esquecer: function (id) {
+        d.aprendidos = d.aprendidos.filter(function (p) { if (p.id === id) { porNome.delete(normal(p.nome)); ids.delete(id); return false; } return true; });
+        if (tem(d.correcoes, id)) delete d.correcoes[id]; salvar();
+      },
       exportar: function () { return JSON.stringify({ formato: 1, app: 'quem-e', quando: new Date().toISOString(), aprendidos: d.aprendidos, correcoes: d.correcoes }); },
       importar: function (texto) {
+        if (typeof texto !== 'string' || texto.length > MAX_TEXTO) throw new Error('arquivo grande demais ou não é do Quem é?');
         var v; try { v = JSON.parse(texto); } catch (e) { throw new Error('arquivo não é do Quem é?'); }
         if (!v || v.app !== 'quem-e' || !Array.isArray(v.aprendidos)) throw new Error('arquivo não é do Quem é?');
         var res = { novos: 0, juntados: 0, correcoes: 0 };
-        v.aprendidos.forEach(function (x) {
+        v.aprendidos.slice(0, LIMITE).forEach(function (x) {
           if (!x || typeof x !== 'object') return;
           var niveis = ['IFA', 'FA', 'A'].indexOf(x.niveis) >= 0 ? x.niveis : 'FA';
           var g = guardar(x.nome, x.emoji, niveis, limparResp(x.r)); if (!g) return;
           if (g.novo) res.novos++; else res.juntados++;
         });
         if (v.correcoes && typeof v.correcoes === 'object') Object.keys(v.correcoes).forEach(function (id) {
-          if (!/^[a-z0-9-]+$/.test(id)) return;
+          if (!idValido(id)) return;
           var r = limparResp(v.correcoes[id]); if (!Object.keys(r).length) return;
-          var c = d.correcoes[id] || (d.correcoes[id] = {}); Object.keys(r).forEach(function (k) { c[k] = r[k]; }); res.correcoes++;
+          var c = tem(d.correcoes, id) ? d.correcoes[id] : (d.correcoes[id] = {}); Object.keys(r).forEach(function (k) { c[k] = r[k]; }); res.correcoes++;
         });
-        salvar(); return res;
+        res.guardado = salvar(); return res;
       }
     };
   }
 
-  var API = { criar: criar, CHAVE: CHAVE };
+  var API = { criar: criar, CHAVE: CHAVE, LIMITE: LIMITE };
   raiz.QEAprender = API;
   if (typeof module === 'object' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : globalThis);

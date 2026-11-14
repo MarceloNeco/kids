@@ -10,7 +10,10 @@
   var armazem = { getItem: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, setItem: function (k, v) { try { localStorage.setItem(k, v); } catch (e) { /* sem espaço */ } } };
   var ap = window.QEAprender.criar({ armazenamento: armazem });
   var EMOJIS = ['🙂', '👦', '👧', '👨', '👩', '👴', '👵', '👶', '🐶', '🐱', '🦸', '👸', '🤖', '🦄', '⭐', '❤️'];
-  var nivel = 'I', jogo = null, chuteAtual = null, ensino = null, emojiEscolhido = '🙂';
+  var nivel = 'I', jogo = null, chuteAtual = null, ensino = null, emojiEscolhido = '🙂', timers = [];
+  // toda espera passa por aqui, para o 🏠 conseguir parar tudo de uma vez
+  function depois(fn, ms) { var id = setTimeout(function () { timers = timers.filter(function (x) { return x !== id; }); fn(); }, A.TESTE ? 0 : ms); timers.push(id); }
+  function parar() { timers.forEach(clearTimeout); timers = []; jogo = null; ensino = null; chuteAtual = null; }
   var ENSINO = ['pessoa', 'bicho', 'real', 'masculino', 'feminino', 'crianca', 'idoso', 'brasileiro', 'fala', 'desenho', 'filme', 'canta', 'esporte',
     'heroi', 'engracado', 'magia', 'grande', 'pequeno', 'cor-azul', 'cor-vermelho', 'cor-verde', 'cor-amarelo', 'cor-rosa', 'cor-preto', 'cor-branco', 'cor-marrom',
     'oculos', 'loiro', 'cabelo-comprido', 'barba', 'chapeu', 'estimacao', 'escola'];
@@ -37,12 +40,14 @@
     jogo = M.criar({ base: baseCorrigida(), nivel: nivel, extras: ap.lista(), rnd: A.TESTE ? sorteio(7) : Math.random });
     humorAgora = ''; A.mostrar('adivinha'); $('btJaChega') && ($('btJaChega').hidden = true);
     dizer(t('Pensou em alguém? Então vamos lá!', 'Got someone in mind? Here we go!'));
-    setTimeout(passo, A.TESTE ? 0 : 900);
+    depois(passo, 900);
   }
   function sorteio(s) { s = s >>> 0 || 1; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
 
   function passo() {
+    if (A.atual() !== 'adivinha') return;
     if (ensino) { passoEnsino(); return; }
+    if (!jogo) return;
     var a = jogo.proxima(), n = jogo.estado().perguntas;
     if (a.tipo === 'pergunta') {
       mostrarBloco('advRespostas'); humor('falando');
@@ -64,7 +69,7 @@
       var r = b.getAttribute('data-r');
       if (ensino) { ensino.historico.push({ id: ENSINO[ensino.i], r: r }); ensino.i++; passo(); return; }
       if (!jogo || !jogo.responder(r)) return;
-      humor('pensando'); setTimeout(passo, A.TESTE ? 0 : 350);
+      humor('pensando'); depois(passo, 350);
     });
   });
   $('btAdvVoltar').addEventListener('click', function () {
@@ -74,7 +79,8 @@
 
   // ---------- o chute ----------
   $('btAcertou').addEventListener('click', function () {
-    var p = chuteAtual; chuteAtual = null; A.Som.ganhou(); A.festa(); humor('feliz');
+    var p = chuteAtual; if (!p) return;
+    chuteAtual = null; $('advChute').hidden = true; A.Som.ganhou(); A.festa(); humor('feliz');
     if (p.id === 'joao-alves') {
       mostrarBloco('advJoao'); $('advContador').textContent = '🚕🚕🚕';
       dizer(t('É O JOÃO ALVES! A lenda da casa! Qual João foi hoje?', "IT'S JOÃO ALVES! The family legend! Which João was it today?"));
@@ -83,9 +89,11 @@
     fim(t('Acertei! Era ', 'Got it! It was ') + p.nome + '! 🎉', /^apr-/.test(p.id));
   });
   $('btErrou').addEventListener('click', function () {
-    jogo.chuteErrado(); chuteAtual = null; humor('ops'); A.Som.erro();
+    if (!chuteAtual || !jogo) return;
+    jogo.chuteErrado(); chuteAtual = null; $('advChute').hidden = true; humor('ops'); A.Som.erro();
+    if (jogo.proxima().tipo === 'perdi') { passo(); return; }   // era o último chute: nada de "deixa eu perguntar mais"
     dizer(t('Ah, não é? Então deixa eu perguntar mais um pouco…', 'Not it? Then let me ask a bit more…'));
-    setTimeout(passo, A.TESTE ? 0 : 1300);
+    depois(passo, 1300);
   });
   var JOAO = {
     taxista: ['O taxista que achou a mala de dinheiro no carro! Clássico!', 'The taxi driver who found a bag of money in his car! A classic!'],
@@ -122,16 +130,25 @@
   $('btEnsinarSalvar').addEventListener('click', function () {
     var nome = $('advNome').value.replace(/\s+/g, ' ').trim();
     if (!nome) { $('advNome').focus(); return; }
-    if (ensino && ensino.fase === 'nome') { ensino.nome = nome; ensino.emoji = emojiEscolhido; ensino.fase = 'perguntas'; passo(); return; }
+    if (ensino && ensino.fase === 'nome') {
+      if (!/[0-9A-Za-zÀ-ÿ]/.test(nome)) { avisarNome(t('Escreva o nome com letras, por favor.', 'Please write the name with letters.')); return; }
+      ensino.nome = nome; ensino.emoji = emojiEscolhido; ensino.fase = 'perguntas'; passo(); return;
+    }
+    if (!/[0-9A-Za-zÀ-ÿ]/.test(nome)) { avisarNome(t('Escreva o nome com letras, por favor.', 'Please write the name with letters.')); return; }
+    if (!jogo) return;
     var n = normal(nome), daLista = base.personagens.filter(function (p) { return normal(p.nome) === n; })[0];
     if (daLista) {
-      ap.corrigir(daLista.id, jogo.historico());
+      if (ap.corrigir(daLista.id, jogo.historico()) === false) { avisarNome(CHEIO()); return; }
       fim(t('Obrigada! Da próxima vez eu acerto ', 'Thanks! Next time I will get ') + daLista.nome + '. 💪', false);
     } else {
       var p = ap.ensinar({ nome: nome, emoji: emojiEscolhido, nivel: nivel, historico: jogo.historico() });
+      if (!p) { avisarNome(t('Não deu para guardar: a meleca já aprendeu gente demais. Esqueça alguém em 📦 O que a meleca aprendeu.', 'Could not save: the slime already learned too many. Forget someone in 📦 What the slime learned.')); return; }
+      if (p.guardado === false) { avisarNome(CHEIO()); return; }
       fim(t('Aprendi! Agora eu conheço ', 'Learned it! Now I know ') + p.nome + '. 🧠', true);
     }
   });
+  function CHEIO() { return t('Não coube no aparelho (memória cheia). Esqueça alguém em 📦 O que a meleca aprendeu.', "It didn't fit on the device (storage full). Forget someone in 📦 What the slime learned."); }
+  function avisarNome(txt) { $('advPerdiTxt').textContent = txt; A.Som.erro(); $('advNome').focus(); }
   $('btEnsinarPular').addEventListener('click', function () { fim(t('Tudo bem! Vamos de novo?', 'No problem! Shall we play again?'), false); });
 
   function fim(txt, privado) {
@@ -159,7 +176,9 @@
   }
   function terminarEnsino() {
     var p = ap.ensinar({ nome: ensino.nome, emoji: ensino.emoji, nivel: 'I', historico: ensino.historico });
-    $('btJaChega').hidden = true; A.Som.ganhou();
+    $('btJaChega').hidden = true;
+    if (!p || p.guardado === false) { ensino = null; fim(CHEIO(), false); return; }
+    A.Som.ganhou();
     fim(t('Pronto! Aprendi tudo sobre ', 'Done! I learned all about ') + p.nome + t('. Agora tente me fazer adivinhar!', '. Now try to make me guess!'), true);
     ensino = null;
   }
@@ -191,7 +210,10 @@
     var txt = ap.exportar(), nome = 'quem-e-aprendidos.json';
     try {
       var arq = new File([txt], nome, { type: 'application/json' });
-      if (navigator.canShare && navigator.canShare({ files: [arq] })) { navigator.share({ files: [arq], title: 'Quem é?' }).catch(function () {}); return; }
+      if (navigator.canShare && navigator.canShare({ files: [arq] })) {
+        navigator.share({ files: [arq], title: 'Quem é?' }).then(function () { $('aprendidosStatus').textContent = t('Enviado. No outro celular, abra em 📥 Importar.', 'Sent. On the other phone, open it with 📥 Import.'); }).catch(function () {});
+        return;
+      }
     } catch (e) { /* sem compartilhar: baixa */ }
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'application/json' })); a.download = nome;
     document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
@@ -202,7 +224,10 @@
     if (f.size > 2e6) { $('aprendidosStatus').textContent = t('Esse arquivo é grande demais.', 'That file is too big.'); return; }
     var leitor = new FileReader();
     leitor.onload = function () {
-      try { var r = ap.importar(String(leitor.result)); $('aprendidosStatus').textContent = t('Pronto: ', 'Done: ') + r.novos + t(' novos, ', ' new, ') + r.juntados + t(' juntados.', ' merged.'); }
+      try {
+        var r = ap.importar(String(leitor.result));
+        $('aprendidosStatus').textContent = r.guardado === false ? CHEIO() : t('Pronto: ', 'Done: ') + r.novos + t(' novos, ', ' new, ') + r.juntados + t(' juntados e ', ' merged and ') + r.correcoes + t(' correções.', ' corrections.');
+      }
       catch (e) { $('aprendidosStatus').textContent = t('Esse arquivo não é do Quem é?. Use o que saiu em 📤 Exportar.', "That file isn't from Who Is It?. Use the one from 📤 Export."); }
       pintarAprendidos(); $('arqImportar').value = '';
     };
@@ -237,16 +262,19 @@
       var v = campo.value.trim(); if (!v || !C) { campo.focus(); return; }
       C.gravar('ia:elevenlabs', v).then(function () { campo.value = ''; pintarSt(); cx.checked = true; mudar(); }).catch(function () { st.textContent = t('O cofre ficou trancado. A chave não foi guardada.', 'The vault stayed locked. The key was not saved.'); });
     }, 'grande');
-    bt(t('🔊 Testar', '🔊 Test'), function () { A.falar(A.pref.meleca === 'blue' ? t('Oi! Eu sou o Melekento Blue!', "Hi! I'm Melekento Blue!") : t('Oi! Eu sou a Pink Honey!', "Hi! I'm Pink Honey!")); });
+    // o PIN do cofre só é pedido aqui (no jogo, cofre trancado = voz do aparelho)
+    function abrirCofre() { return C && C.tem('ia:elevenlabs') ? C.ler('ia:elevenlabs').catch(function () { return ''; }) : Promise.resolve(''); }
+    bt(t('🔊 Testar', '🔊 Test'), function () { abrirCofre().then(function () { A.falar(A.pref.meleca === 'blue' ? t('Oi! Eu sou o Melekento Blue!', "Hi! I'm Melekento Blue!") : t('Oi! Eu sou a Pink Honey!', "Hi! I'm Pink Honey!")); }); });
     if (C && C.tem('ia:elevenlabs')) bt(t('Apagar a chave', 'Delete the key'), function () { C.apagar('ia:elevenlabs').then(function () { pintarSt(); cx.checked = false; mudar(); }).catch(function () {}); });
     var fechar = bt(t('Fechar', 'Close'), function () { j.fechar('ok'); });
     function mudar() { A.pref.eleven = cx.checked; A.salvarPref(); if (A.voz) A.voz.usarEleven(cx.checked); }
-    cx.addEventListener('change', mudar);
+    cx.addEventListener('change', function () { mudar(); if (cx.checked) abrirCofre(); });
     linha('p', t('A chave é uma senha: nunca mande no chat ou por e-mail. Fica só no cofre deste aparelho.', 'The key is a password: never send it in a chat or email. It stays only in this device vault.'), 'dica');
     var j = window.SolverJanela.abrir({ conteudo: caixa, classe: 'qe-janela', temTexto: function () { return !!campo.value; } });
     void fechar;
   }
 
+  window.QEAdivinhaTela = { parar: parar, jogando: function () { return !!(jogo || ensino); } };
   // usado pelos testes
   window.QEDebugAdv = {
     jogo: function () { return jogo; }, base: base, aprender: ap, chute: function () { return chuteAtual; },

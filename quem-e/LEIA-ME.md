@@ -58,7 +58,7 @@ perguntas. Respostas: **Sim · Acho que sim · Não sei · Acho que não · Não
   aprendeu**: esquecer, 📤 exportar e 📥 importar (para passar a outro celular). Tudo só neste aparelho
   (`bolinho:quem-e:aprendidos`); nome da família nunca vai para a internet.
 - **Voz** (`voz.js`): a do aparelho sempre; 🎙️ **Voz animada** (ElevenLabs) é opcional, com a chave da pessoa no cofre comum
-  (`../cofre.js`, `ia:elevenlabs`); cada fala fica guardada (Cache Storage `quem-e-voz`) e repete sem gastar e sem internet.
+  (`../cofre.js`, `ia:elevenlabs`); cada fala fica guardada (Cache Storage `falas-quem-e`, fora do prefixo que o sw.js apaga a cada versão) e repete sem gastar e sem internet.
 
 ## Próxima brincadeira
 

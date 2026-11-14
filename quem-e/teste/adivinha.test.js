@@ -109,3 +109,43 @@ test('personagem aprendido entra na disputa no nível certo', () => {
   }
   assert.fail('não chutou o aprendido');
 });
+
+test('revisão: resposta estranha guardada não vira NaN e não estraga o jogo', () => {
+  const { perguntas, lista } = mundo(23);
+  const base = A.carregar([lista], perguntas);
+  const ruim = { id: 'apr-x', nome: 'X', emoji: '⭐', niveis: 'IFA', r: { q0: 'constructor', q1: 'toString' } };
+  const j = A.criar({ base, nivel: 'A', rnd: sorteio(8), extras: [ruim] });
+  for (let i = 0; i < 40; i++) { const a = j.proxima(); if (a.tipo === 'pergunta') j.responder(i % 2 ? 's' : 'n'); else if (a.tipo === 'chute') j.chuteErrado(); else break; }
+  assert.ok(j.chances().every(x => Number.isFinite(x)), 'chance NaN');
+  const ruim2 = { id: 'apr-y', nome: 'Y', emoji: '⭐', niveis: 'IFA', r: {} }; for (let i = 0; i < 66; i++) ruim2.r['q' + i] = 'constructor';
+  const alvo = base.personagens[3], j2 = A.criar({ base, nivel: 'A', rnd: sorteio(8), extras: [ruim2] });
+  let achou = false, perguntas2 = 0;
+  for (let i = 0; i < 100 && !achou; i++) { const a = j2.proxima(); if (a.tipo === 'perdi') break; if (a.tipo === 'chute') { if (a.personagem.id === alvo.id) achou = true; else j2.chuteErrado(); continue; } perguntas2++; const v = alvo.r[a.id]; j2.responder(v === undefined ? '?' : v); }
+  assert.ok(achou && perguntas2 >= 5, 'o personagem estragado atrapalhou: achou=' + achou + ' perguntas=' + perguntas2);
+  const r = jogar(base, 'A', base.personagens[3].id, sorteio(9), 0);
+  assert.ok(r.acertou);
+});
+
+test('revisão: desfazer depois de um chute errado não traz o chutado de volta', () => {
+  const { perguntas, lista } = mundo(29);
+  const base = A.carregar([lista], perguntas);
+  const alvo = base.personagens[10];
+  const j = A.criar({ base, nivel: 'A', rnd: sorteio(10) });
+  let rejeitado = null;
+  for (let i = 0; i < 100 && !rejeitado; i++) {
+    const a = j.proxima();
+    if (a.tipo === 'chute') { if (a.personagem.id !== alvo.id) { rejeitado = a.personagem.id; j.chuteErrado(); } else { j.chuteErrado(); rejeitado = a.personagem.id; } break; }
+    // responde como se fosse o primeiro mais provável, para forçar um chute que não é o alvo
+    j.responder(i % 2 ? 's' : 'n');
+  }
+  assert.ok(rejeitado);
+  const chutesAntes = j.estado().chutes;
+  j.desfazer();
+  assert.equal(j.estado().chutes, chutesAntes, 'desfazer devolveu o chute');
+  for (let i = 0; i < 100; i++) {
+    const a = j.proxima();
+    if (a.tipo === 'perdi') break;
+    if (a.tipo === 'chute') { assert.notEqual(a.personagem.id, rejeitado, 'chutou de novo quem já tinha errado'); j.chuteErrado(); continue; }
+    j.responder(i % 2 ? 's' : 'n');
+  }
+});

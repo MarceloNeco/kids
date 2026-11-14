@@ -21,6 +21,8 @@
 (function (raiz) {
   'use strict';
   var VALOR = { s: 1, p: 0.75, '?': 0.5, q: 0.25, n: 0 };
+  // só as 5 respostas valem (nada de "constructor", "toString"… que todo objeto tem escondido)
+  function valor(x) { return Object.prototype.hasOwnProperty.call(VALOR, x) ? VALOR[x] : null; }
   var ORDEM = { I: 0, F: 1, A: 2 };
   var SOBRA = 0.12, TOPO = 90, CERTEZA = 0.85, FOLGA = 3, MAX_CHUTES = 4, MAX_PERGUNTAS = 50, MARCOS = [20, 30, 40];
 
@@ -44,7 +46,7 @@
     var cand = base.personagens.concat(op.extras || []).filter(function (c) { return String(c.niveis).indexOf(nivel) >= 0; });
     var n = cand.length;
     // matriz de valores: val[i][k] = valor do personagem i na pergunta k
-    var val = cand.map(function (c) { return ps.map(function (p) { var x = c.r[p.id]; return VALOR[x === undefined ? p.padrao : x]; }); });
+    var val = cand.map(function (c) { return ps.map(function (p) { var x = Object.prototype.hasOwnProperty.call(c.r, p.id) ? valor(c.r[p.id]) : null; return x === null ? VALOR[p.padrao] : x; }); });
     var log = []; for (var i = 0; i < n; i++) log.push(0);
     var fora = []; for (i = 0; i < n; i++) fora.push(false);
     var feitas = {}, hist = [], atual = null, chutes = 0, ultimoChute = 0, estadoSalvo = [];
@@ -90,9 +92,9 @@
         return (atual = { tipo: 'pergunta', id: id });
       },
       responder: function (r) {
-        if (!atual || atual.tipo !== 'pergunta' || VALOR[r] === undefined) return false;
+        if (!atual || atual.tipo !== 'pergunta' || valor(r) === null) return false;
         var k = -1; for (var j = 0; j < ps.length; j++) if (ps[j].id === atual.id) k = j;
-        estadoSalvo.push({ log: log.slice(), fora: fora.slice(), chutes: chutes, ultimoChute: ultimoChute });
+        estadoSalvo.push({ log: log.slice() });
         if (r !== '?') { var u = VALOR[r]; for (var i = 0; i < n; i++) log[i] += Math.log(combina(u, val[i][k])); }
         feitas[atual.id] = true; hist.push({ id: atual.id, r: r }); atual = null;
         return true;
@@ -105,7 +107,8 @@
       desfazer: function () {
         if (!hist.length) return false;
         var h = hist.pop(), s = estadoSalvo.pop();
-        delete feitas[h.id]; log = s.log; fora = s.fora; chutes = s.chutes; ultimoChute = s.ultimoChute; atual = { tipo: 'pergunta', id: h.id };
+        // chute errado é um fato, não uma resposta: quem já foi chutado e errado continua fora, e o chute continua contado
+        delete feitas[h.id]; log = s.log; atual = { tipo: 'pergunta', id: h.id };
         return true;
       },
       historico: function () { return hist.map(function (h) { return { id: h.id, r: h.r }; }); },

@@ -107,12 +107,13 @@
   }
   function voltarInicio() { if (dentro) { try { history.back(); } catch (e) { aoVoltar(); } } else aoVoltar(); }
   function aoVoltar() {
-    dentro = false; clearTimeout(timerMeleca); calar(); sairDaSala(); partida = null; desligarLupa(); fecharSobreposicoes(); mostrar('inicio');
+    dentro = false; clearTimeout(timerMeleca); calar(); sairDaSala(); partida = null; desligarLupa();
+    if (window.QEAdivinhaTela) QEAdivinhaTela.parar(); fecharSobreposicoes(); mostrar('inicio');
     setTimeout(function () { $(pref.meleca === 'blue' ? 'btBlue' : 'btPink').focus(); }, 30);
   }
   window.addEventListener('popstate', function () { if (dentro) aoVoltar(); });
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'quem-e', noInicio: function () { return atual === 'inicio'; }, irParaInicio: voltarInicio,
-    emAndamento: function () { return !!partida && partida.estado.fase === 'jogo'; } });
+    emAndamento: function () { return (!!partida && partida.estado.fase === 'jogo') || (atual === 'adivinha' && !!window.QEAdivinhaTela && QEAdivinhaTela.jogando()); } });
   function fecharSobreposicoes() { $('fim').hidden = true; $('cortina').hidden = true; limparFesta(); }
 
   // ---------- começo: meleca, modo, nível ----------
