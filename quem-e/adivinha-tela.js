@@ -21,7 +21,13 @@
   function mostrarBloco(qual) { ['advRespostas', 'advChute', 'advJoao', 'advPerdi', 'advFim'].forEach(function (b) { $(b).hidden = b !== qual; }); }
   var nMeleca = 0, humorAgora = '';
   function humor(h) { if (h === humorAgora) return; humorAgora = h; $('advMeleca').innerHTML = A.melecaSvg(A.pref.meleca, h); nMeleca++; }
-  function dizer(txt, privado) { $('advPergunta').textContent = txt; A.falar(txt, privado); }
+  // a fala troca com animação (dono, 14/Nov/2026): a criança vê que veio pergunta nova, mesmo quando o texto é parecido
+  function animarFala() {
+    var f = document.querySelector('.adv-fala'), c = $('advContador');
+    [f, c].forEach(function (el) { el.classList.remove('sai', 'entra'); void el.offsetWidth; el.classList.add('entra'); });
+    Array.prototype.forEach.call(document.querySelectorAll('#advRespostas .resp.escolhida'), function (b) { b.classList.remove('escolhida'); });
+  }
+  function dizer(txt, privado) { $('advPergunta').textContent = txt; animarFala(); A.falar(txt, privado); }
 
   // a lista pronta com as correções deste aparelho
   function baseCorrigida() {
@@ -57,7 +63,7 @@
       $('advChuteEmoji').textContent = a.personagem.emoji; $('advChuteNome').textContent = a.personagem.nome;
       $('advContador').textContent = t('Hmm… já sei!', 'Hmm… I know!', 'Mmm… ¡ya lo sé!');
       A.falar(t('Você pensou em ', 'You thought of ', '¿Has pensado en ') + a.personagem.nome + '?', /^apr-/.test(a.personagem.id));
-      $('advPergunta').textContent = A.zoeira('sei');
+      $('advPergunta').textContent = A.zoeira('sei'); animarFala();
       $('btAcertou').focus();
     } else perdi();
   }
@@ -67,7 +73,8 @@
       var r = b.getAttribute('data-r');
       if (ensino) { if (ensino.fase !== 'perguntas' || !ensino.atual) return; ensino.historico.push({ id: ensino.atual, r: r }); passo(); return; }
       if (!jogo || !jogo.responder(r)) return;
-      humor('pensando'); depois(passo, 350);
+      b.classList.add('escolhida'); var f = document.querySelector('.adv-fala'); f.classList.remove('entra'); f.classList.add('sai');
+      humor('pensando'); depois(passo, 450);
     });
   });
   $('btAdvVoltar').addEventListener('click', function () {
