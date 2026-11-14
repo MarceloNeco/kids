@@ -5,7 +5,7 @@
    voz e a meleca escolhida. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.1';
+  var APP_VERSION = '0.4.2';
   var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026', APP_DATA_ES = '14/nov/2026';
   var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };

@@ -57,8 +57,8 @@ button:disabled { cursor: default; opacity: .5; }
 @keyframes pinga { 0%, 55%, 100% { transform: translateY(0) scaleY(.6); opacity: 0; } 65% { opacity: 1; } 85% { transform: translateY(.18em) scaleY(1.2); opacity: 1; } }
 .sub { font-size: 1.35rem; font-weight: 600; color: var(--tinta2); margin-top: -2px; }
 .pergunta-grande { font-size: 1.3rem; font-weight: 600; margin-top: 10px; }
-.melecas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.meleca-bt { width: min(44vw, 200px); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 12px; border-radius: 28px;
+.melecas { display: flex; gap: 12px; justify-content: center; flex-wrap: nowrap; width: 100%; }
+.meleca-bt { width: min(43vw, 200px); min-width: 0; flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 12px; border-radius: 28px;
   background: var(--branco); border: 4px solid var(--tinta); box-shadow: 0 6px 0 var(--tinta); transition: transform .15s ease; }
 .meleca-bt.blue[aria-pressed="true"] { background: #e3f1ff; } .meleca-bt.pink[aria-pressed="true"] { background: #ffe6f2; }
 .meleca-bt:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--tinta); }
