@@ -2,6 +2,21 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.35",
+      "data": "14/Nov/2026",
+      "hora": "11:00:00",
+      "pt": [
+        "👨 O papai mudou de jogo: agora ele joga junto na 🎳 Bagunça de bolas (só com 1 pessoa). Corre de lado atrás da bola, sorri, pede a bola acenando (\"Toca pra mim!\", \"Joga pro papai!\") e, quando chega nela, bate de volta para você (\"Toma! Pega ela!\"). Quando você acerta a bola, ele comemora.",
+        "👩 No 🎈 Pega-pega a mamãe brinca junto: corre atrás dos bichinhos (um pouco mais devagar que você), pega um de vez em quando (\"Peguei um!\"), chama (\"Olha ali um bichinho!\") e comemora quando você pega.",
+        "⚽ O Chuta-chuta voltou a ser como antes: o papai (esquerda) e a mamãe (direita) sentadinhos nas cadeirinhas da piscina de bolinhas."
+      ],
+      "en": [
+        "👨 Dad changed games: now he plays along in 🎳 Ball mess (1 player only). He runs sideways after the ball, smiles, waves asking for it (\"Pass it to me!\", \"Throw it to Dad!\") and, when he reaches it, hits it back to you (\"Here! Get it!\"). When you hit a ball, he celebrates.",
+        "👩 In 🎈 Catch, Mom plays along: she runs after the critters (a little slower than you), catches one now and then (\"Got one!\"), calls you (\"Look, a little critter!\") and celebrates when you catch one.",
+        "⚽ Kick is back as before: Dad (left) and Mom (right) sitting on the ball-pit folding seats."
+      ]
+    },
+    {
       "versao": "0.8.34",
       "data": "14/Nov/2026",
       "hora": "10:00:00",
