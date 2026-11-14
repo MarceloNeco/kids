@@ -93,7 +93,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 # Repositório kids — Bolinho de Chuva (brincadeiras para criança e família)
 
 - Publicado em **solverone.com.br/kids/** (GitHub Pages deste repositório; o domínio vem do Portal). A marca na tela é
-  **Bolinho de Chuva**; `kids` é só o nome curto do endereço.
+  **Bolinho de Chuva** (em inglês **Rainy Day Donuts**, em espanhol **Buñuelos de Lluvia** — dono, 14/Nov/2026; exceção à
+  regra de não traduzir nome de app; no código, `BolinhoIdioma.marca()`); `kids` é só o nome curto do endereço.
 - Veio do FeatureTesting e do Portal em 02/Nov/2026, **com o histórico**. Os endereços antigos
   (`/FeatureTesting/<jogo>/`, `/FeatureTesting/danca-na-sala.html`, `/bolinho-de-chuva/`) só redirecionam para cá:
   **não mexa nos jogos lá — é aqui.**

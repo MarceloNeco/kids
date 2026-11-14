@@ -54,8 +54,8 @@
   function montar() {
     var l = lingua(), h = '<div class="nov-c"><button type="button" class="nov-x" aria-label="' + T('Fechar', 'Close', 'Cerrar') + '">✕</button>' +
       '<h2 id="novTitulo">' + T('✨ Novidades da semana', '✨ New this week', '✨ Novedades de la semana') + '</h2>' +
-      '<p class="sub">' + (novos.length === 1 ? T('Chegou um jogo novo no Bolinho:', 'A new game just arrived at Bolinho:', 'Ha llegado un juego nuevo al Bolinho:')
-        : T('Chegaram ' + novos.length + ' jogos novos no Bolinho:', novos.length + ' new games just arrived at Bolinho:', 'Han llegado ' + novos.length + ' juegos nuevos al Bolinho:')) + '</p><ul>';
+      '<p class="sub">' + (novos.length === 1 ? T('Chegou um jogo novo no Bolinho:', 'A new game just arrived at Rainy Day Donuts:', 'Ha llegado un juego nuevo a Buñuelos de Lluvia:')
+        : T('Chegaram ' + novos.length + ' jogos novos no Bolinho:', novos.length + ' new games just arrived at Rainy Day Donuts:', 'Han llegado ' + novos.length + ' juegos nuevos a Buñuelos de Lluvia:')) + '</p><ul>';
     novos.forEach(function (j) {
       var nome = (j.nomes && j.nomes[l]) || j.nome, txt = l === 'en' ? (j.en || j.texto) : l === 'es' ? (j.es || j.texto) : j.texto;
       h += '<li><a href="' + esc(j.url) + '" style="--c:' + esc(j.cor) + '" data-jogo="' + esc(j.id) + '">' +
