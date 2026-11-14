@@ -1,4 +1,4 @@
-# Pendências — A-GARRA
+# Pendências — H-rraaa (pasta a-garra)
 
 Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ feita (com a versão) · 💡 ideia.
 
@@ -15,3 +15,5 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 9 | A biblioteca de 3D vem do jeito do pacote (2 arquivos, ~2,1 MB; ~420 KB compactados pelo site). Uma versão compactada (minificada) precisaria de uma ferramenta que não pude baixar aqui. | Entrega da 0.2.0 | 🟡 aberta |
 | 10 | Girar a máquina até ver bem de lado (profundidade da garra); prêmios diferentes e em posições diferentes a cada partida; categoria nova de bichos realistas que se mexem (como no vídeo dos filhotes de salsicha). | Dono, 14/Nov/2026 | ✅ 0.3.0 |
 | 11 | O vídeo do Instagram que o dono mandou não abre daqui (precisa de login); a máquina Bichos de Verdade foi feita pelas duas imagens do vídeo. Se o vídeo tiver mais ideias (sons, como a garra pega o filhote), contar. | Dono, 14/Nov/2026 | ⏸ aguardando o dono |
+| 12 | Trocar o nome do jogo para **H-rraaa**, com o H colorido. | Dono, 14/Nov/2026 | ✅ 0.4.1 |
+| 13 | Aparelho lento (sem placa de vídeo) travava a página a cada quadro 3D; o vigia de navegação falhava (pendência #45 da raiz). | Vigia `teste/navegacao.test.js`, 14/Nov/2026 | ✅ 0.4.1 |
