@@ -50,13 +50,29 @@ fases e código são próprios. O dono joga o MAGIC SORT e mandou um print como 
 - **⭐ Estrelas**: 3 sem nenhuma ajuda; 2 se usou só desfazer ou dica; 1 se usou embaralhar ou frasco extra.
   "Jogar esta de novo" deixa melhorar.
 
+## Fundo em carrossel (desde a 0.3.0)
+
+- Atrás dos frascos passa **uma cena de cada vez**. A cada frasco fechado com a rolha, a próxima cena entra devagar por
+  cima da anterior (1,8 s). Cada fase começa numa cena diferente.
+- **10 cenas de graça**, alternando foto e desenho: Cachoeira na mata, Tarde de chuva com arco-íris, Praia de água
+  clarinha, Jardim com borboletas, Campo de flores, Floresta à noite com vaga-lumes, Floresta com raios de sol,
+  Montanhas no pôr do sol, Céu com balões coloridos, Nuvens fofas com passarinhos e pipa.
+- Os pacotes da lojinha põem mais 2 cada: Recife de corais + Peixes e tartarugas; Bandeirinhas no céu + Fogueira e
+  bandeirinhas; Nebulosa vista pelo Hubble + Planetas e foguete. Com tudo, 16 cenas.
+- **Fotos** (pasta `cenas/`, licenças no `CREDITOS.md`): um pouco desfocadas, com um zoom bem lento e partículas por
+  cima (gotas, brilhos, pétalas, folhas, bolhas, confete, estrelas). **Desenhos** (no `fundo.js`): a cena se mexe
+  sozinha (nuvens, chuva, borboletas, vaga-lumes, peixes, fogueira, foguete...), pintada em meia resolução.
+- Um véu claro (escuro nas cenas de noite) fica entre o fundo e os frascos, para as cores dos líquidos continuarem
+  fáceis de ver; o fundo nunca pega o toque. Cada cena diz as cores do vidro e da prateleira (tema).
+- Com "reduzir movimento": troca na hora, sem zoom, sem partículas e com o desenho parado.
+
 ## Gotinhas 💧 e lojinha de brincadeira
 
 - Cada fase nova vencida dá **10 gotinhas por estrela** (10, 20 ou 30). Repetir uma fase dá 10 por estrela a mais
   que antes (no mínimo 2).
 - Na **🛍️ Lojinha** as gotinhas trocam por 6 modelos de frasco (Tubinho, Potinho, Garrafa de leite, Poção, Gatinho,
-  Foguete) e 4 cenários (Tarde de chuva, Fundo do mar, Festa junina, Espaço). **Só muda a aparência**: nada deixa o
-  jogo mais fácil, nada trava fase nenhuma.
+  Foguete) e por 3 **pacotes de cenas** para o fundo (Fundo do mar 💧80, Festa junina 💧150, Espaço 💧200), cada um com
+  uma foto e um desenho. **Só muda a aparência**: nada deixa o jogo mais fácil, nada trava fase nenhuma.
 - **Não existe dinheiro no jogo**: sem compra, sem anúncio, sem moeda paga. Tudo fica guardado só neste aparelho.
 
 ## Para todo mundo
@@ -77,8 +93,10 @@ fases e código são próprios. O dono joga o MAGIC SORT e mandou um print como 
 | `motor.js` | **As regras, sem tela**: despejo, frasco pronto, frasco embaçado, dificuldade de cada fase, gerador, resolvedor, caminho da dica, embaralhar, frasco extra. Roda igual no Node (testes). |
 | `desenho.js` | O desenho no canvas: vidro, líquido sempre nivelado (mesmo com o frasco inclinado), ondinha, bolhas, rolha, brilho, prateleira, fio do despejo. As 12 cores, os 6 modelos de frasco e os 4 cenários moram aqui. |
 | `som.js` | Efeitos sonoros gravados (`sons/`), tocados pelo WebAudio; reserva feita na hora se a gravação não abrir. |
+| `fundo.js` | O fundo em carrossel: a lista das 16 cenas, as 8 cenas desenhadas, as partículas sobre as fotos e a transição. |
+| `cenas/` | As 8 fotos do fundo (WebP, até 1280 px). Créditos no `CREDITOS.md`. |
 | `app.js` | A tela: toques, animação do despejo, ajudas, estrelas, gotinhas, lojinha, música (12 gravadas pela trilha comum). |
-| `estilo.css` | Visual (fonte Fredoka da Rabiscolândia) e os fundos dos cenários. |
+| `estilo.css` | Visual (fonte Fredoka da Rabiscolândia), as camadas do fundo em carrossel, o zoom lento e o véu. |
 | `sw.js` | Guarda o jogo no aparelho (sem internet). Subir `VERSAO` a cada versão. |
 | `sons/` | Os efeitos gravados (água, bolha, rolha, vidro, sininho, aplausos). Créditos no `CREDITOS.md`. |
 | `teste/` | `motor.test.js` (regras e 400 fases por nível), `arquivos.test.js` (versão, sw, créditos), `pagina.test.js` (o jogo no navegador). |

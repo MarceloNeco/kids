@@ -8,7 +8,7 @@ const DOIS = (n0 = 'facil', n1 = 'facil', r0 = false, r1 = true) =>
 // lago vazio e parado: nada de bicho novo, bolha, bicho raro nem robô atrapalhando
 function lagoVazio(op = {}) {
   const E = R.criar(Object.assign({ semente: 7, aspecto: 16 / 9, jogadores: DOIS('facil', 'facil', false, false) }, op));
-  E.bichos = []; E.repor = false; E.proxBolha = Infinity; E.proxRaro = Infinity; E.bonusFeito = true;
+  E.bichos = []; E.repor = false; E.proxBolha = Infinity; E.proxRaro = Infinity; E.proxPiranha = Infinity; E.bonusFeito = true;
   return E;
 }
 function rodar(E, seg, dt = 1 / 60) {
@@ -152,7 +152,7 @@ test('balde cheio: +10 s e um pedido novo', () => {
 });
 
 test('"Limpa o Rio!": uma vez, quando faltam 32 s, por 15 s, só lixo no lago', () => {
-  const E = R.criar({ semente: 3, aspecto: 16 / 9, jogadores: DOIS() });
+  const E = R.criar({ semente: 3, aspecto: 16 / 9, jogadores: DOIS(), rodada: 'limpa' });
   const ini = ateEvento(E, 'bonus', 61);
   assert.ok(ini && Math.abs(E.tempo - 32) < 0.05, 'começa com 32 s');
   rodar(E, 2);
@@ -249,4 +249,205 @@ test('bolha de poder: a rede pega até 3 bichos juntos', () => {
   ateEvento(E, 'fisgou');
   assert.equal(E.j[0].anzol.presos.length, 3);
   assert.equal(E.j[0].poder, null, 'a rede foi usada');
+});
+
+/* ---------- 0.1.3: rodadas especiais, piranhas, gigantes, fundo mais rápido ---------- */
+// lago vazio já dentro da rodada especial, sem nada novo aparecendo sozinho
+function naRodada(rodada) {
+  const E = lagoVazio({ rodada });
+  E.bonusFeito = false; E.tempo = 32.5;
+  const r = ateEvento(E, 'bonus', 2);
+  assert.ok(r && r.ev.rodada === rodada, 'começou a rodada ' + rodada);
+  E.bichos = E.bichos.filter(o => o.tipo === 'mae'); E.bonus.prox = Infinity; E.bonus.fim = E.t + 100;
+  return E;
+}
+
+test('rodada especial: sorteada em cada partida (as cinco aparecem) ou escolhida', () => {
+  const vistas = new Set();
+  for (let s = 1; s <= 60; s++) vistas.add(R.criar({ semente: s, aspecto: 16 / 9, jogadores: DOIS() }).rodada);
+  assert.deepEqual([...vistas].sort(), [...R.RODADAS].sort());
+  assert.equal(R.criar({ semente: 1, aspecto: 16 / 9, jogadores: DOIS(), rodada: 'gigante' }).rodada, 'gigante');
+});
+
+test('♻️ Limpa o Rio: a rede pega até 3 lixos de uma vez', () => {
+  const E = naRodada('limpa'), ang = 0.2, p = noCaminho(E, 0, ang, 400);
+  ['pet', 'lata', 'chinelo', 'pneu'].forEach((id, i) => R.colocar(E, id, p.x + (i - 1.5) * 40, p.y + (i % 2) * 20, { vel: 0 }));
+  const longe = R.colocar(E, 'lata', p.x + 600, p.y, { vel: 0 });   // longe da rede: fica
+  R.pescar(E, 0, ang);
+  const ev = rodar(E, 1.5).filter(e => e.tipo === 'fisgou');
+  assert.equal(ev.length, 3, 'pegou 3: ' + ev.map(e => e.bicho.id));
+  assert.equal(longe.preso, null);
+  assert.equal(E.j[0].poder, null, 'não gasta poder');
+});
+
+test('🛟 Socorro na Água: a boia cai onde a linha aponta; perto do banhista, ele é salvo e vai para a margem', () => {
+  const E = naRodada('socorro'), ang = 0.4, x = R.ondeCai(E, 0, ang);
+  const b = R.colocar(E, 'menina', x + 20, E.sup, { vel: 0 });
+  const longe = R.colocar(E, 'menino', x + 500, E.sup, { vel: 0 });
+  assert.ok(R.ondeCai(E, 0, 0.6) > R.ondeCai(E, 0, 0.2), 'mais inclinada, mais longe');
+  R.pescar(E, 0, ang);
+  assert.equal(E.j[0].anzol.fase, 'joga');
+  const r = ateEvento(E, 'salvou', 3);
+  assert.ok(r, 'salvou');
+  assert.equal(r.ev.id, 'menina'); assert.equal(E.j[0].pontos, 10);
+  assert.equal(b.salvo, 0); assert.equal(longe.salvo, undefined);
+  const x0 = b.x;
+  rodar(E, 1);
+  assert.equal(E.j[0].anzol.fase, 'balanca', 'a boia voltou');
+  assert.ok(b.x < x0, 'boiando para a margem do Juca');
+  rodar(E, 20);
+  assert.ok(!E.bichos.includes(b), 'chegou à margem');
+  // boia longe de todo mundo: volta vazia
+  R.pescar(E, 0, -0.6);
+  assert.ok(ateEvento(E, 'vazio', 3));
+});
+
+test('🐢 Leva os Filhotes: pesca o filhote e leva até a mamãe tartaruga', () => {
+  const E = naRodada('filhotes'), ang = 0.15;
+  const mae = E.bichos.find(o => o.tipo === 'mae');
+  assert.ok(mae, 'a mamãe está no fundo');
+  mae.v = 0;
+  const p = noCaminho(E, 0, ang, 150);
+  R.colocar(E, 'filhote', p.x, p.y, { vel: 0 });
+  R.pescar(E, 0, ang);
+  const f = ateEvento(E, 'filhote', 6);
+  assert.ok(f, 'filhote no anzol');
+  assert.equal(E.j[0].anzol.levando, 'filhote');
+  assert.equal(E.j[0].pontos, 0, 'ainda não vale');
+  // sem a mamãe no caminho: chega ao fundo e o filhote continua no anzol
+  mae.x = -9999;
+  R.pescar(E, 0, ang); assert.ok(ateEvento(E, 'vazio', 6)); rodar(E, 4);
+  assert.equal(E.j[0].anzol.levando, 'filhote');
+  const q = noCaminho(E, 0, ang, 500); mae.x = q.x; mae.fy = (q.y - E.sup) / (1000 - E.sup);
+  R.pescar(E, 0, ang);
+  const e = ateEvento(E, 'entregou', 6);
+  assert.ok(e, 'entregou');
+  assert.equal(E.j[0].pontos, 15); assert.equal(E.j[0].anzol.levando, null);
+  assert.ok(E.bichos.some(o => o.tipo === 'filhote' && o.entregue), 'o filhote nada com a mãe');
+});
+
+test('⭐ Chuva de Estrelas: as estrelas caem do céu, afundam devagar e valem pontos', () => {
+  const E = naRodada('estrelas');
+  E.bonus.prox = E.t; rodar(E, 2);
+  const es = E.bichos.filter(o => o.tipo === 'estrela');
+  assert.ok(es.length >= 3, 'caindo: ' + es.length);
+  const fy = es.map(o => o.fy); rodar(E, 0.5);
+  assert.ok(es.every((o, i) => o.fy > fy[i] || o.fy >= 0.96), 'afundam');
+  E.bonus.prox = Infinity; E.bichos = [];
+  const ang = 0, p = noCaminho(E, 0, ang, 300), o = R.colocar(E, 'estrela', p.x, p.y, { vel: 0 });
+  o.fy = 0.96; o.y = p.y; o.noFundo = E.t;
+  R.pescar(E, 0, ang);
+  const r = ateEvento(E, 'pegou', 8);
+  assert.ok(r && r.ev.bicho.id === 'estrela' && r.ev.pontos === 5);
+});
+
+test('🐉 O Gigante: precisa de 3 acertos; no terceiro, é pescado e vale muito', () => {
+  const E = naRodada('gigante');
+  E.bonus.prox = E.t; rodar(E, 1 / 60); E.bonus.prox = Infinity;
+  const g = E.bichos.find(o => o.tipo === 'chefe');
+  assert.ok(g, 'o gigante chegou');
+  g.v = 0;
+  const ang = 0.3, p = noCaminho(E, 0, ang, 480);
+  const pts = [];
+  for (let n = 1; n <= 3; n++) {
+    g.x = p.x; g.fy = (p.y - E.sup) / (1000 - E.sup);
+    R.pescar(E, 0, ang);
+    const r = ateEvento(E, n < 3 ? 'acertou' : 'chefe', 6);
+    assert.ok(r, 'acerto ' + n);
+    pts.push(E.j[0].pontos);
+    rodar(E, 4);
+  }
+  assert.deepEqual(pts, [10, 20, 120]);
+  assert.equal(g.vencido, true);
+});
+
+test('piranhas cortam a linha: o bicho preso foge e a vara fica 2 s sem anzol', () => {
+  const E = lagoVazio(), ang = 0;
+  const p = noCaminho(E, 0, ang, 500), q = noCaminho(E, 0, ang, 200);
+  const peixe = R.colocar(E, 'bagre', p.x, p.y, { vel: 0 });
+  R.pescar(E, 0, ang);
+  assert.ok(ateEvento(E, 'fisgou', 4));
+  const pir = R.colocar(E, 'piranha', q.x, q.y, { vel: 0 });
+  pir.tipo = 'piranha';
+  const r = ateEvento(E, 'cortou', 4);
+  assert.ok(r, 'cortou');
+  assert.equal(peixe.preso, null, 'o bagre fugiu');
+  assert.ok(E.bichos.includes(peixe));
+  assert.equal(E.j[0].anzol.fase, 'cortada');
+  assert.equal(R.pescar(E, 0, 0), false, 'sem anzol não pesca');
+  rodar(E, 2.1);
+  assert.equal(E.j[0].anzol.fase, 'balanca');
+  E.bichos = [];
+  assert.equal(R.pescar(E, 0, 0), true);
+});
+
+test('piranhas: nunca são pescadas; aparecem mais no difícil que no fácil', () => {
+  const E = lagoVazio(), ang = 0, p = noCaminho(E, 0, ang, 300);
+  R.colocar(E, 'piranha', p.x, p.y, { vel: 0 });
+  R.pescar(E, 0, ang);
+  const ev = rodar(E, 2);
+  assert.ok(ev.some(e => e.tipo === 'cortou') && !ev.some(e => e.tipo === 'fisgou'));
+  const conta = nivel => {
+    let n = 0;
+    for (let s = 1; s <= 6; s++) {
+      const L = R.criar({ semente: s, aspecto: 16 / 9, jogadores: DOIS(nivel, nivel, true, true) });
+      L.bonusFeito = true; L.tempo = 1e9;
+      n += rodar(L, 120, 1 / 30).filter(e => e.tipo === 'piranhas').length;
+    }
+    return n;
+  };
+  const f = conta('facil'), d = conta('dificil');
+  assert.ok(f >= 1 && d > f, 'fácil ' + f + ', difícil ' + d);
+  assert.ok(R.NIVEIS.dificil.piranha.n > R.NIVEIS.facil.piranha.n);
+});
+
+test('fundo mais rápido: quem vale mais nada um pouco mais rápido, na medida do nível', () => {
+  const media = (nivel, faixa) => {
+    const E = R.criar({ semente: 9, aspecto: 16 / 9, jogadores: DOIS(nivel, nivel) });
+    const vs = E.bichos.filter(o => o.faixa === faixa && o.tipo === 'bicho').map(o => o.v);
+    return vs.reduce((s, v) => s + v, 0) / vs.length;
+  };
+  for (const nv of R.ORDEM) assert.ok(media(nv, 5) > media(nv, 1), nv + ': fundo ' + media(nv, 5) + ' x raso ' + media(nv, 1));
+  assert.ok(media('dificil', 5) > media('facil', 5));
+});
+
+test('gigantes que brilham passam de vez em quando bem no fundo e valem muito', () => {
+  for (const id of R.GIGANTES) { const b = R.POR_ID[id]; assert.ok(b.raro && b.faixa === 5 && b.pontos >= 60, id); }
+  const vistos = new Set();
+  for (let s = 1; s <= 4; s++) {
+    const E = R.criar({ semente: s, aspecto: 16 / 9, jogadores: DOIS('medio', 'medio', true, true) });
+    E.bonusFeito = true; E.tempo = 1e9;
+    rodar(E, 200, 1 / 30).filter(e => e.tipo === 'raro').forEach(e => vistos.add(e.id));
+  }
+  assert.ok(R.GIGANTES.every(id => vistos.has(id)), 'vistos: ' + [...vistos]);
+});
+
+test('filhote ainda subindo quando a rodada acaba: o anzol não fica preso, volta a pescar', () => {
+  const E = naRodada('filhotes'), ang = 0.1, p = noCaminho(E, 0, ang, 400);
+  R.colocar(E, 'filhote', p.x, p.y, { vel: 0 });
+  R.pescar(E, 0, ang);
+  assert.ok(ateEvento(E, 'fisgou', 4));
+  E.bonus.fim = E.t;   // a rodada acaba com o filhote na linha
+  rodar(E, 5);
+  assert.equal(E.j[0].anzol.levando, null);
+  const q = noCaminho(E, 0, ang, 300);
+  E.bichos = []; R.colocar(E, 'lambari', q.x, q.y, { vel: 0 });
+  R.pescar(E, 0, ang);
+  assert.ok(ateEvento(E, 'fisgou', 4), 'pesca de novo');
+});
+
+test('rede da vovó na rodada dos filhotes: pega um filhote só', () => {
+  const E = naRodada('filhotes'), ang = 0.1, p = noCaminho(E, 0, ang, 300);
+  E.j[0].poder = { id: 'rede', ate: Infinity };
+  [-30, 0, 30].forEach(dx => R.colocar(E, 'filhote', p.x + dx, p.y, { vel: 0 }));
+  R.pescar(E, 0, ang);
+  assert.equal(rodar(E, 1.5).filter(e => e.tipo === 'fisgou').length, 1);
+});
+
+test('girar a tela com a boia no ar: ela cai dentro da tela, na água', () => {
+  const E = naRodada('socorro');
+  R.pescar(E, 0, 0.6); rodar(E, 0.3);
+  R.redimensionar(E, 9 / 16);
+  const a = E.j[0].anzol;
+  assert.ok(a.para.x <= E.W && a.para.y === E.sup + 6, JSON.stringify(a.para));
 });

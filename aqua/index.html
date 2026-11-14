@@ -37,6 +37,7 @@
     <p data-t="👆 Toque num frasco: ele levanta. Toque em outro: a cor de cima despeja nele.|👆 Tap a bottle: it lifts. Tap another one: the top color pours into it.|👆 Toca un frasco: se levanta. Toca otro: el color de arriba cae dentro de él."></p>
     <p data-t="🎨 Só dá para despejar num frasco vazio ou em cima da mesma cor, e só o quanto couber.|🎨 You can only pour into an empty bottle or onto the same color, and only as much as fits.|🎨 Solo puedes verter en un frasco vacío o encima del mismo color, y solo lo que quepa."></p>
     <p data-t="🍾 Quando um frasco fica cheio de uma cor só, ele ganha uma rolha. Feche todos para passar de fase!|🍾 When a bottle is full of one color, it gets a cork. Close them all to finish the stage!|🍾 Cuando un frasco se llena de un solo color, recibe un corcho. ¡Ciérralos todos para pasar de fase!"></p>
+    <p data-t="🖼️ A cada frasco fechado, o fundo troca de cena: fotos de verdade e desenhos animados.|🖼️ Every closed bottle changes the background scene: real photos and animated drawings.|🖼️ Cada frasco cerrado cambia la escena del fondo: fotos de verdad y dibujos animados."></p>
     <p data-t="🌫️ No Médio e no Difícil aparecem frascos embaçados: as cores de baixo ficam escondidas até a de cima sair.|🌫️ On Medium and Hard some bottles are foggy: the lower colors stay hidden until the top one leaves.|🌫️ En Medio y en Difícil hay frascos empañados: los colores de abajo quedan escondidos hasta que sale el de arriba."></p>
     <p data-t="🧰 Ajudas, embaixo da tela: ↩️ desfazer, 💡 dica, 🔀 embaralhar e ➕ mais um frasco. Elas nunca custam nada e voltam cheias a cada fase.|🧰 Helpers, at the bottom: ↩️ undo, 💡 hint, 🔀 shuffle and ➕ one more bottle. They never cost anything and refill every stage.|🧰 Ayudas, abajo en la pantalla: ↩️ deshacer, 💡 pista, 🔀 mezclar y ➕ un frasco más. Nunca cuestan nada y se llenan otra vez en cada fase."></p>
     <p data-t="⭐ Sem usar ajuda, a fase vale 3 estrelas. Cada fase dá gotinhas 💧 para trocar por frascos e cenários na lojinha (tudo de brincadeira, sem dinheiro).|⭐ With no helpers, the stage is worth 3 stars. Each stage gives droplets 💧 to trade for bottles and backdrops in the little shop (all pretend, no money).|⭐ Sin usar ayudas, la fase vale 3 estrellas. Cada fase te da gotitas 💧 para cambiar por frascos y escenarios en la tiendecita (todo es de juego, sin dinero)."></p>
@@ -67,6 +68,7 @@
 </section>
 
 <section id="jogo" class="tela" data-recurso="aqua">
+  <div id="cenario" class="cenario" aria-hidden="true"></div>
   <div class="barra">
     <span class="placa" id="placaFase"></span>
     <span class="placa gotas" id="placaGotas"><span aria-hidden="true">💧</span><span id="gotasJogo">0</span></span>
@@ -94,6 +96,7 @@
   <h3 data-t="Frascos|Bottles|Frascos"></h3>
   <div id="lojaFrascos" class="vitrine"></div>
   <h3 data-t="Cenários|Backdrops|Escenarios"></h3>
+  <p class="loja-sub" data-t="O fundo troca de cena a cada frasco fechado. 10 cenas já vêm de graça; cada pacote põe mais 2 no carrossel.|The background changes scene every time a bottle is closed. 10 scenes come free; each pack adds 2 more to the carousel.|El fondo cambia de escena cada vez que se cierra un frasco. 10 escenas vienen gratis; cada paquete agrega 2 más al carrusel."></p>
   <div id="lojaCenarios" class="vitrine"></div>
   <button id="btLojaVoltar" class="grande" type="button" data-t="✔ Pronto|✔ Done|✔ Listo"></button>
 </section>
@@ -115,6 +118,7 @@
 <script src="motor.js"></script>
 <script src="som.js"></script>
 <script src="desenho.js"></script>
+<script src="fundo.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>
 <script src="../navegacao.js" data-fora-do-arquivo></script>

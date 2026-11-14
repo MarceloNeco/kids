@@ -105,8 +105,8 @@ test('celular: as setas ⬅ ➡ ⬆ ⬇ levam a garra; no médio tem relógio e 
     await pg.waitForTimeout(200);
     const e4 = await est(pg);
     assert.ok(Math.hypot(e4.x - e3.x, e4.z - e3.z) < 0.05, 'soltou, parou');
-    await pg.evaluate(() => GarraDebug.velocidade(10));
-    await pg.waitForFunction(() => GarraDebug.estado().fase !== 'mirar', null, { timeout: 15000 });
+    await pg.evaluate(() => GarraDebug.velocidade(20));   // 1 minuto de relógio, acelerado
+    await pg.waitForFunction(() => GarraDebug.estado().fase !== 'mirar', null, { timeout: 30000 });
     assert.equal((await est(pg)).fichas, 9, 'o tempo acabou e gastou a ficha');
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
@@ -175,7 +175,7 @@ test('Voltar do celular e 🏠 voltam ao menu', async () => {
 });
 
 test('três idiomas, escolhidos na estante: nome, botões e prêmios no idioma certo, sem botão de idioma próprio', async () => {
-  for (const [cod, logo, pegar, lang, premio] of [['pt', 'A-GARRA', 'PEGAR', 'pt-BR', 'Ursinho'], ['en', 'THE CLAW', 'GRAB', 'en', 'Teddy'], ['es', 'LA GARRA', 'COGER', 'es', 'Osito']]) {
+  for (const [cod, logo, pegar, lang, premio] of [['pt', 'H-rraaa', 'PEGAR', 'pt-BR', 'Ursinho'], ['en', 'H-rraaa', 'GRAB', 'en', 'Teddy'], ['es', 'H-rraaa', 'COGER', 'es', 'Osito']]) {
     const ctx = await browser.newContext(Object.assign({ locale: cod === 'pt' ? 'en-US' : 'pt-BR' }, FONE));
     await ctx.addInitScript((c) => { localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:a-garra:colecao', JSON.stringify({ urso: 1 })); }, cod);
     await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
@@ -183,8 +183,10 @@ test('três idiomas, escolhidos na estante: nome, botões e prêmios no idioma c
     try {
       await pg.goto(base + '?teste'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
       assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma');
-      assert.equal(await pg.evaluate(() => document.documentElement.lang), lang);
+      assert.ok((await pg.evaluate(() => document.documentElement.lang)).startsWith(lang.slice(0, 2)), 'idioma da página');   // a peça comum (../idioma.js) usa pt-BR, en-US, es-ES
       assert.equal((await pg.textContent('#logo')).replace(/ /g, ' '), logo);
+      assert.equal(await pg.$eval('#logo span:first-child', (el) => el.className + ':' + el.textContent), 'h:H', 'o H é o colorido');
+      assert.equal(await pg.title(), 'H-rraaa — Bolinho de Chuva · SolverONE');
       assert.equal(await pg.textContent('#btPegar'), pegar);
       await pg.click('#btColecao');
       assert.ok((await pg.textContent('#prateleira')).includes(premio), cod + ': prêmio com o nome no idioma');

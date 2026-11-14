@@ -36,6 +36,7 @@
                                              <audio> deu erro), põe o blob: dela em audio.src. Promise<boolean>.
      Cada arquivo vira um blob: só uma vez por página e o mesmo endereço é reaproveitado (nenhum se acumula).
 
+   Trilha.desligada(jogo, url) / Trilha.desligar(jogo, url, sim) — música tirada do repertório do jogo na 🎵 Biblioteca
    Trilha.embaralhar(lista, jogo, endereco) (desde 06/Nov/2026) — a ordem com internet, para todo tocador do Bolinho
      (este, o radio.js e os som.js dos jogos antigos): devolve uma cópia da lista em ordem sorteada, com a favorita
      do jogo (Trilha.offline.FAVORITAS[jogo]) no fim. endereco(item) dá o MP3 de cada item (sem ele: item.a). */
@@ -104,9 +105,28 @@
     return pronto.then(function (b) { if (!b || audio.src !== antes) return false; audio.src = b; return true; }, function () { return false; });
   };
 
-  // ---------- a ordem com internet: sorteada, a favorita sempre por último ----------
+  // ---------- músicas desligadas na 🎵 Biblioteca da estante (dono, 14/Nov/2026) ----------
+  // localStorage "bolinho:musicas-desligadas" = { jogo: [endereço completo do mp3, …] }. Desligada = fora do repertório
+  // daquele jogo neste aparelho. Nunca deixa um jogo mudo: se todas estiverem desligadas, toca a lista inteira.
+  var CH_DESL = 'bolinho:musicas-desligadas';
+  function lerDesl() { try { return JSON.parse(localStorage.getItem(CH_DESL) || '{}') || {}; } catch (e) { return {}; } }
+  function absoluto(u) { try { return new URL(u, typeof location !== 'undefined' ? location.href : BASE).href; } catch (e) { return u; } }
+  T.desligadas = function (jogo) { return (lerDesl()[jogo] || []).slice(); };
+  T.desligada = function (jogo, url) { return T.desligadas(jogo).indexOf(absoluto(url)) >= 0; };
+  T.desligar = function (jogo, url, desligar) {
+    var d = lerDesl(), l = d[jogo] || [], u = absoluto(url), i = l.indexOf(u);
+    if (desligar && i < 0) l.push(u); else if (!desligar && i >= 0) l.splice(i, 1);
+    if (l.length) d[jogo] = l; else delete d[jogo];
+    try { localStorage.setItem(CH_DESL, JSON.stringify(d)); } catch (e) {}
+  };
+
+  // ---------- a ordem com internet: sorteada, a favorita sempre por último (sem as desligadas) ----------
   T.embaralhar = function (lista, jogo, endereco) {
-    var a = (lista || []).slice(), fav = O.FAVORITAS[jogo];
+    var a = (lista || []).slice(), fav = O.FAVORITAS[jogo], fora = T.desligadas(jogo);
+    if (fora.length) {
+      var ligadas = a.filter(function (m) { return fora.indexOf(absoluto(endereco ? endereco(m) : m.a)) < 0; });
+      if (ligadas.length) a = ligadas;
+    }
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; }
     if (!fav) return a;
     function eFav(m) { try { return new URL(endereco ? endereco(m) : m.a, typeof location !== 'undefined' ? location.href : BASE).href === fav; } catch (e) { return false; } }

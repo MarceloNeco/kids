@@ -1,4 +1,4 @@
-/* A-GARRA — efeitos sonoros feitos na hora (WebAudio), sem arquivo nenhum.
+/* H-rraaa (pasta a-garra) — efeitos sonoros feitos na hora (WebAudio), sem arquivo nenhum.
    Som.ligar(true|false) · Som.toque() · Som.ficha() · Som.motor(liga) · Som.descer() · Som.fechar() · Som.pegou() ·
    Som.errou() · Som.escorregou() · Som.ganhou(raro) · Som.pulo() · Som.tique() · Som.fim(estrelas)
    A música de fundo é a trilha comum (../trilha.js); estes são só os efeitos. */

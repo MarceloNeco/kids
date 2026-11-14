@@ -1,4 +1,4 @@
-/* A-GARRA — visual. Fonte Fredoka emprestada da Rabiscolândia (../rabiscolandia/fontes/). */
+/* H-rraaa (pasta a-garra) — visual. Fonte Fredoka emprestada da Rabiscolândia (../rabiscolandia/fontes/). */
 @font-face { font-family: 'Fredoka'; src: url('../rabiscolandia/fontes/fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
@@ -26,6 +26,14 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 .logo { margin: .1rem 0 0; font-size: clamp(2.6rem, 12vw, 4.2rem); font-weight: 700; letter-spacing: .02em; line-height: 1; white-space: nowrap; }
 .logo span { display: inline-block; animation: pula 2.4s ease-in-out infinite; color: #39ff6a; text-shadow: 0 0 14px rgba(57,255,106,.65), 0 4px 0 rgba(0,0,0,.35); }
 .logo span.sep { color: #ffd400; text-shadow: 0 0 14px rgba(255,212,0,.6); }
+/* o H do H-rraaa com as cores do arco-íris, correndo devagar */
+.logo span.h {
+  color: transparent; text-shadow: none; padding: 0 .04em;
+  background: linear-gradient(110deg, #ff3b3b, #ff9f1c, #ffe14d, #39ff6a, #3ec7ff, #9b5cff, #ff4fd8, #ff3b3b) 0 0 / 200% 100%;
+  -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 10px rgba(255,79,216,.55)) drop-shadow(0 4px 0 rgba(0,0,0,.35));
+  animation: pula 2.4s ease-in-out infinite, arcoiris 5s linear infinite;
+}
+@keyframes arcoiris { to { background-position: 200% 0; } }
 .logo span:nth-child(3) { animation-delay: .1s; } .logo span:nth-child(4) { animation-delay: .2s; } .logo span:nth-child(5) { animation-delay: .3s; }
 .logo span:nth-child(6) { animation-delay: .4s; } .logo span:nth-child(7) { animation-delay: .5s; } .logo span:nth-child(8) { animation-delay: .6s; }
 @keyframes pula { 0%, 70%, 100% { transform: translateY(0); } 80% { transform: translateY(-10px) rotate(-4deg); } 90% { transform: translateY(0) rotate(2deg); } }

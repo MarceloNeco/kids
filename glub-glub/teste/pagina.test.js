@@ -259,3 +259,52 @@ test('nos três idiomas nada sai da tela no celular, em pé e deitado (começo, 
     await pg.ctx.close();
   }
 });
+
+test('menu do começo: cada grupo numa linha só (celular em pé) e o lago à vista atrás', async () => {
+  for (const largura of [360, 390]) {
+    const pg = await abrir({ viewport: { width: largura, height: 800 }, hasTouch: true, isMobile: true });
+    for (const grupo of [['#btSozinho', '#btDois'], ['[data-quem="juca"]', '[data-quem="lili"]'], ['[data-nivel-j="0"][data-nivel="facil"]', '[data-nivel-j="0"][data-nivel="medio"]', '[data-nivel-j="0"][data-nivel="dificil"]']]) {
+      const ys = [];
+      for (const s of grupo) { const b = await caixa(pg, s); assert.ok(b.x >= 0 && b.x + b.w <= largura, s + ' fora da tela'); ys.push(Math.round(b.y)); }
+      assert.ok(Math.max(...ys) - Math.min(...ys) <= 2, largura + 'px: ' + grupo.join(' ') + ' em linhas diferentes: ' + ys);
+    }
+    const nav = await caixa(pg, '.bolinho-nav'), logo = await caixa(pg, '.logo span:first-child');   // as letras (a caixa do título começa na borda)
+    assert.ok(!cruza(nav, logo), 'o nome GLUB GLUB está embaixo do botão Saída');
+    const painel = await caixa(pg, '.painel');
+    assert.ok(painel.h <= 800 * 0.62, 'a caixa do menu cobre o lago: ' + painel.h + 'px');
+    await pg.ctx.close();
+  }
+});
+
+test('rodadas especiais: cada uma começa com a sua faixa, os seus bichos e o 🎣 funcionando, sem erro', async () => {
+  const ESPERA = { limpa: 'lixo', socorro: 'banhista', filhotes: 'mae', estrelas: 'estrela', gigante: 'chefe' };
+  for (const rodada of Object.keys(ESPERA)) {
+    const pg = await abrir(FONE, '&rodada=' + rodada);
+    await jogarSozinho(pg);
+    assert.equal((await est(pg)).rodada, rodada);
+    await pg.evaluate(() => GlubDebug.irRodada());
+    await pg.evaluate(() => GlubDebug.avancar(3.5));
+    const e = await est(pg);
+    assert.ok(e.bonus, rodada + ': rodada em andamento');
+    assert.ok(e.tipos.includes(ESPERA[rodada]), rodada + ': ' + e.tipos);
+    await pg.tap('#pescar0');
+    assert.ok(['desce', 'joga', 'sobe'].includes((await est(pg)).fases[0]), rodada + ': ' + (await est(pg)).fases[0]);
+    const f = await caixa(pg, '#faixa');
+    if (f.vis) assert.ok(f.x >= 0 && f.x + f.w <= 390, rodada + ': faixa cortada');
+    await pg.waitForTimeout(600);
+    assert.deepEqual(pg.erros, [], rodada);
+    await pg.ctx.close();
+  }
+});
+
+test('piranhas na tela: cortam a linha do jogador, e a vara volta a pescar depois', async () => {
+  const pg = await abrir(DEITADO);
+  await jogarSozinho(pg);
+  const r = await pg.evaluate(() => GlubDebug.cortar(0));
+  assert.equal(r, 'cortada');
+  await pg.waitForTimeout(300);
+  assert.deepEqual(pg.erros, []);
+  await pg.evaluate(() => GlubDebug.avancar(2.2));
+  assert.equal((await est(pg)).fases[0], 'balanca');
+  await pg.ctx.close();
+});

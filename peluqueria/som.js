@@ -204,6 +204,12 @@
       var F = root.Trilha && root.Trilha.offline && root.Trilha.offline.FAVORITAS.peluqueria;
       var eFav = function (k) { return !!F && F === new URL('musicas/' + lista[k].arquivo, root.location.href).href; };
       ordem = ordem.filter(function (k) { return !eFav(k); }).concat(ordem.filter(eFav));
+      // fora as músicas desligadas na 🎵 Biblioteca da estante (../trilha.js); todas desligadas = toca todas
+      var TR = root.Trilha;
+      if (TR && TR.desligada) {
+        var lig = ordem.filter(function (k) { return !TR.desligada('peluqueria', new URL('musicas/' + lista[k].arquivo, root.location.href).href); });
+        if (lig.length) ordem = lig;
+      }
     }
     var entrada = null;
     if (forcada) { entrada = forcada; forcada = null; }

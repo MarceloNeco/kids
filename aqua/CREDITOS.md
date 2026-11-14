@@ -50,6 +50,31 @@ Real recordings under free licenses, converted to mono MP3, trimmed and level-ad
 Enquanto uma gravação não carrega, o `som.js` toca um som de reserva feito na hora pelo próprio jogo (mesma licença
 do repositório).
 
+## Fotos do fundo / Background photos (`cenas/`, desde a 0.3.0)
+
+Fotos de verdade, de licença livre, que passam no fundo em carrossel. Todas foram reduzidas (até 1280 px) e convertidas
+para WebP; no jogo aparecem um pouco desfocadas, com zoom lento e partículas desenhadas por cima. As fotos com licença
+CC BY-SA continuam com a mesma licença nesta versão reduzida.
+Real photos under free licenses, shown in the background carousel. All were resized (up to 1280 px) and converted to
+WebP; photos under CC BY-SA keep that license in this resized version.
+
+| Arquivo / File | O que é / What it is | Origem / Source | Autor / Author | Licença / License |
+|---|---|---|---|---|
+| `cenas/foto-cachoeira.webp` | Cachoeira do Caracol, Canela (RS) / Caracol falls, Brazil | https://commons.wikimedia.org/wiki/File:Caracol_falls_(2_April_2008).jpg | Tiago Fioreze | **CC BY-SA 3.0** — https://creativecommons.org/licenses/by-sa/3.0 |
+| `cenas/foto-praia.webp` | Praia tropical em Malapascua, Filipinas / Tropical beach, Philippines | https://commons.wikimedia.org/wiki/File:Malapascua_(island),_Tropical_beach,_Philippines.jpg | Vyacheslav Argenberg | **CC BY 4.0** — https://creativecommons.org/licenses/by/4.0 |
+| `cenas/foto-flores.webp` | Flores do campo no Monte Rainier, EUA / Wildflowers at Mount Rainier | https://commons.wikimedia.org/wiki/File:During_peak_bloom_a_colorful_combination_of_wildflowers_bloom_together,_including_Sitka_valerian,_lupine,_and_magenta_paintbrush._(57071e16-bead-4548-b247-34de9d62c8c2).JPG | NPS Photo (U.S. National Park Service) | **domínio público / public domain** |
+| `cenas/foto-floresta.webp` | Floresta de Dinnammare, Sicília / Dinnammare forest, Sicily | https://commons.wikimedia.org/wiki/File:Dinnammare_forest.jpg | Gabrieleadvmusic | **CC BY-SA 4.0** — https://creativecommons.org/licenses/by-sa/4.0 |
+| `cenas/foto-baloes.webp` | Balões no Akita Sky Festa 2023, Japão / Hot air balloons, Japan | https://commons.wikimedia.org/wiki/File:Akita_Sky_Festa_2023-A.jpg | Rarisan | **CC BY-SA 4.0** — https://creativecommons.org/licenses/by-sa/4.0 |
+| `cenas/foto-recife.webp` (pacote Fundo do mar) | Corais no Flynn Reef, Grande Barreira de Coral / Coral outcrop, Great Barrier Reef | https://commons.wikimedia.org/wiki/File:Coral_Outcrop_Flynn_Reef.jpg | Toby Hudson | **CC BY-SA 3.0** — https://creativecommons.org/licenses/by-sa/3.0 |
+| `cenas/foto-bandeirinhas.webp` (pacote Festa junina) | Bandeirinhas de festa junina, São Paulo / June festival flags, São Paulo | https://commons.wikimedia.org/wiki/File:Santu%C3%A1rio_S%C3%A3o_Francisco_junho_2019_02.jpg | Cecioka | **CC BY-SA 4.0** — https://creativecommons.org/licenses/by-sa/4.0 |
+| `cenas/foto-nebulosa.webp` (pacote Espaço) | Nebulosa da Bolha (NGC 7635), Telescópio Hubble / Bubble Nebula, Hubble | https://images.nasa.gov/details/GSFC_20171208_Archive_e000383 | NASA, ESA e Hubble Heritage Team (STScI/AURA) | **domínio público** pela NASA (imagens da NASA não têm direitos autorais nos EUA); a parte da ESA é CC BY 4.0, com o crédito ao lado |
+
+## Cenas desenhadas / Drawn scenes
+
+As 8 cenas desenhadas do fundo (chuva com arco-íris, jardim, vaga-lumes, pôr do sol, nuvens com pipa, peixes e
+tartaruga, fogueira e bandeirinhas, planetas e foguete) são feitas no código do próprio jogo (`fundo.js`), com a mesma
+licença do repositório. The 8 drawn scenes are made in the game's own code (`fundo.js`).
+
 ## Fonte / Font
 
 Fredoka (`../rabiscolandia/fontes/fredoka.woff2`), SIL Open Font License 1.1; créditos em `../rabiscolandia/CREDITOS.md`.

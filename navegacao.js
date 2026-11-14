@@ -5,9 +5,16 @@
     - 🚪 Saída: sempre à vista; sai do jogo. Com uma partida rolando, pergunta antes. No aplicativo instalado tenta
       fechar a janela; se ela continuar aberta (ou numa aba do navegador, que não se fecha sozinha), vai para a
       estante do Bolinho de Chuva (/kids/).
-    - Voltar do celular: numa tela de dentro faz o mesmo que o 🏠; na tela de começo sai do jogo (volta para a página de
-      antes, normalmente a estante; no app instalado, fecha). A maioria dos jogos já cuida do Voltar (pushState/popstate);
-      quem não cuida passa cuidarDoVoltar: true e este arquivo põe uma entrada no histórico ao sair da tela de começo.
+    - Voltar do celular: numa tela de dentro faz o mesmo que o 🏠; na tela de começo NÃO sai direto (diretriz): avisa
+      "Toque em Voltar de novo para sair" e só o segundo Voltar sai (volta para a página de antes, normalmente a estante;
+      no app instalado, fecha). A maioria dos jogos já cuida do Voltar (pushState/popstate); quem não cuida passa
+      cuidarDoVoltar: true e este arquivo põe uma entrada no histórico ao sair da tela de começo.
+    - Guarda (dono, 14/Nov/2026: "o Voltar às vezes acaba com o progresso e cai na home do celular"): no primeiro toque
+      na tela de começo, este arquivo põe uma entrada de guarda no histórico (com toque, porque o Chrome do celular pula
+      as entradas criadas sem toque — era isso que fazia o Voltar atravessar o jogo e fechar o app). Se o Voltar chegar
+      na guarda com o jogo numa tela de dentro (alguma entrada do jogo foi pulada), o jogo volta ao começo em vez de
+      fechar. Na tela de começo, sair da guarda mostra o aviso; a guarda volta no próximo toque. O jogo que já faz o
+      próprio aviso passa guarda: false.
   Cada jogo inclui, no index.html, logo depois do idioma.js (sem defer: o app.js do jogo chama BolinhoNav.iniciar):
       <script src="../navegacao.js" data-fora-do-arquivo></script>
   põe '../navegacao.js' na lista ARQUIVOS do sw.js e, no app.js:
@@ -18,6 +25,7 @@
         emAndamento: function () { return partidaRolando; },      // opcional: pergunta antes de sair
         antesDeSair: function () { ... },                         // opcional: arrumar antes de sair (ex.: avisar a rede)
         cuidarDoVoltar: false,                                     // true = o jogo não mexe no histórico
+        guarda: true,                                              // false = o jogo já avisa "Voltar de novo para sair"
         posicao: 'topo-esquerda',                                  // ou 'topo-direita', se o canto esquerdo é do jogo
         desvio: { x: 0, y: 0 },                                    // opcional: afastar da borda (px)
         esconder: function () { return false; }                   // opcional: some (ex.: TV). Padrão: some com ?tv=
@@ -35,6 +43,8 @@
   var ESTANTE = (function () { try { return new URL('./', script && script.src ? script.src : location.href).href; } catch (e) { return '/kids/'; } })();
   var cfg = null, barra = null, btCasa = null, btSaida = null, aviso = null;
   var empurrado = false, ignorar = 0, ultimoInicio = null;
+  var guarda = false, naGuarda = false, avisoVoltar = null, avisoTimer = 0;
+  var hPush = history.pushState, hReplace = history.replaceState;
 
   function chamar(fn, padrao) { try { return typeof fn === 'function' ? fn() : padrao; } catch (e) { return padrao; } }
   function noInicio() { return !!chamar(cfg.noInicio, true); }
@@ -48,7 +58,12 @@
     return /[?&]tv=/.test(location.search);
   }
 
-  var CSS = '.bolinho-nav{position:fixed;z-index:2147482000;top:calc(env(safe-area-inset-top,0px) + 6px);' +
+  var CSS = '.bolinho-voltar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);z-index:2147482001;' +
+    'transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:calc(100% - 32px);padding:12px 18px;border-radius:999px;' +
+    'background:rgba(14,12,28,.92);color:#fff;border:1.5px solid rgba(255,255,255,.55);box-shadow:0 4px 16px rgba(0,0,0,.4);' +
+    'font:700 16px/1.25 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;text-align:center;transition:opacity .2s,transform .2s}' +
+    '.bolinho-voltar.ver{opacity:1;transform:translate(-50%,0)}' +
+    '.bolinho-nav{position:fixed;z-index:2147482000;top:calc(env(safe-area-inset-top,0px) + 6px);' +
     'display:flex;align-items:center;gap:2px;padding:2px;border-radius:999px;background:rgba(14,12,28,.78);' +
     'border:1.5px solid rgba(255,255,255,.55);box-shadow:0 2px 10px rgba(0,0,0,.35);' +
     '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);font:700 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
@@ -144,7 +159,45 @@
     if (!inicio && !empurrado) { empurrado = true; try { history.pushState({ bolinhoNav: 1 }, ''); } catch (e) { empurrado = false; } }
     else if (inicio && empurrado) { empurrado = false; ignorar++; history.back(); }   // o jogo voltou ao início sozinho
   }
-  raiz.addEventListener('popstate', function () {
+  // ---------- guarda do Voltar (todos os jogos, menos quem passa guarda: false) ----------
+  function usarGuarda() { return cfg && cfg.guarda !== false && !escondida(); }
+  // o jogo empilhou uma tela: saímos da guarda. replaceState em cima da guarda não pode apagar a marca dela.
+  try {
+    history.pushState = function () { naGuarda = false; return hPush.apply(history, arguments); };
+    history.replaceState = function (st, t, u) {
+      if (naGuarda) st = Object.assign({}, (st && typeof st === 'object') ? st : {}, { bolinhoGuarda: 1 });
+      return arguments.length > 2 ? hReplace.call(history, st, t, u) : hReplace.call(history, st, t);
+    };
+  } catch (e) { /* navegador antigo: fica sem guarda */ }
+  function armarGuarda() {
+    if (guarda || !usarGuarda() || !noInicio()) return;
+    guarda = true; naGuarda = true;
+    try { hPush.call(history, { bolinhoGuarda: 1 }, ''); } catch (e) { guarda = naGuarda = false; }
+  }
+  ['pointerdown', 'keydown'].forEach(function (ev) { d.addEventListener(ev, armarGuarda, true); });
+  function avisarVoltar() {
+    if (!avisoVoltar) {
+      avisoVoltar = d.createElement('div');
+      avisoVoltar.className = 'bolinho-voltar'; avisoVoltar.setAttribute('role', 'status'); avisoVoltar.setAttribute('aria-live', 'polite');
+      d.body.appendChild(avisoVoltar);
+    }
+    avisoVoltar.textContent = txt('↩️ Toque em Voltar de novo para sair', '↩️ Tap Back again to leave', '↩️ Toca Atrás otra vez para salir');
+    avisoVoltar.classList.add('ver');
+    clearTimeout(avisoTimer); avisoTimer = setTimeout(function () { avisoVoltar.classList.remove('ver'); }, 2500);
+  }
+  raiz.addEventListener('popstate', function (ev) {
+    if (cfg && usarGuarda()) {
+      var st = ev.state || history.state;
+      if (st && st.bolinhoGuarda) {
+        naGuarda = true;
+        // chegou na guarda: tudo do jogo acima dela já saiu. Se o jogo ficou numa tela de dentro (o Chrome pulou a
+        // entrada dele), volta ao começo em vez de deixar o próximo Voltar fechar o app.
+        setTimeout(function () { if (naGuarda && !noInicio()) { chamar(cfg.irParaInicio); atualizar(); } }, 0);
+      } else if (naGuarda) {
+        naGuarda = false; guarda = false;
+        if (!ignorar && noInicio()) avisarVoltar();   // saiu da guarda na tela de começo: o próximo Voltar sai
+      }
+    }
     if (aviso && !aviso.hidden) fecharAviso();
     if (!cfg || !cfg.cuidarDoVoltar) { setTimeout(atualizar, 0); return; }
     if (ignorar) { ignorar--; return; }

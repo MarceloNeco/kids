@@ -78,7 +78,7 @@
   var barra = document.createElement('div');
   barra.className = 'radio';
   barra.setAttribute('role', 'region');
-  barra.setAttribute('aria-label', T('Rádio do Bolinho', 'Bolinho radio', 'Radio del Bolinho'));
+  barra.setAttribute('aria-label', T('Rádio do Bolinho', 'Rainy Day Donuts radio', 'Radio de Buñuelos de Lluvia'));
   var bolinhas = '';
   for (var k = 0; k < MUSICAS.length; k++) bolinhas += '<button type="button" data-n="' + k + '" aria-label="' + (k + 1) + ': ' + MUSICAS[k].t + '"><i></i></button>';
   barra.innerHTML = '<div class="r-disco" aria-hidden="true"></div>' +
@@ -98,7 +98,7 @@
   function mostrar() {
     titulo.classList.add('troca');
     setTimeout(function () {
-      titulo.textContent = comecou ? MUSICAS[atual].t : T('🎸 Rock no Bolinho', '🎸 Rock at the Bolinho', '🎸 Rock en el Bolinho');
+      titulo.textContent = comecou ? MUSICAS[atual].t : T('🎸 Rock no Bolinho', '🎸 Rainy Day Rock', '🎸 Rock de Buñuelos de Lluvia');
       titulo.classList.remove('troca');
     }, 120);
     var m = MUSICAS[atual];

@@ -50,7 +50,7 @@
     splat: ['splat', 0.9], gosma: ['gosma', 0.8], looping: ['ronco', 0.8], loopFeito: ['aplausos', 0.55], fogos: ['fogos', 0.55], turboRival: ['ronco', 0.3, 1.1],
     torcida: ['aplausos', 0.8], whoosh: ['turbo', 0.55, 1.2], derrapa: ['tum', 0.15, 1.6], buzina: ['buzina', 0.8], escudo: ['escudo', 0.7], explosao: ['explosao', 0.7],
     galo: ['galo', 0.9], galinha: [Math.random() < 0.5 ? 'galinha1' : 'galinha2', 0.8], asas: ['asas', 0.7], cavalo: ['cavalo', 0.8], dino: ['dino', 0.85], arara: ['arara', 0.6],
-    morcego: ['morcego', 0.8], dracula: ['dracula', 0.85], pipoca: ['pipoca', 0.7], abobora: ['splat', 0.9, 0.75] };
+    morcego: ['morcego', 0.8], dracula: ['dracula', 0.85], pipoca: ['pipoca', 0.7], abobora: ['splat', 0.9, 0.75], agua: ['lama', 0.85, 1.25] };
   function tom(tipo, f, ini, dur, vol, fFim, destino) {
     if (!ac) return;
     var o = ac.createOscillator(), g = ac.createGain();

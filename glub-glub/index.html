@@ -23,28 +23,36 @@
 <canvas id="lago" aria-label="Lago do GLUB GLUB" data-rotulo="Lago do GLUB GLUB|GLUB GLUB lake|Lago de GLUB GLUB"></canvas>
 
 <section id="menu" class="tela ativa" data-recurso="glub-glub">
-  <div class="painel">
     <h1 class="logo" aria-label="GLUB GLUB"><span>G</span><span>L</span><span>U</span><span>B</span> <span>G</span><span>L</span><span>U</span><span>B</span></h1>
-    <div class="escolha" role="radiogroup" aria-label="Jeito de jogar" data-rotulo="Jeito de jogar|Game mode|Modo de juego">
-      <button id="btSozinho" class="chip grande-chip" type="button" role="radio" aria-checked="true" data-modo="sozinho" data-t="🎣 Sozinho|🎣 Solo|🎣 Solo"></button>
-      <button id="btDois" class="chip grande-chip" type="button" role="radio" aria-checked="false" data-modo="dois" data-t="👫 Em dois|👫 Two players|👫 Dos jugadores"></button>
+  <div class="painel">
+    <div class="grupo" role="radiogroup" aria-label="Jeito de jogar" data-rotulo="Jeito de jogar|Game mode|Modo de juego">
+      <div class="seg">
+        <button id="btSozinho" class="chip grande-chip" type="button" role="radio" aria-checked="true" data-modo="sozinho" data-t="🎣 Sozinho|🎣 Solo|🎣 Solo"></button>
+        <button id="btDois" class="chip grande-chip" type="button" role="radio" aria-checked="false" data-modo="dois" data-t="👫 Em dois|👫 Two players|👫 Dos jugadores"></button>
+      </div>
     </div>
-    <div id="linhaSozinho" class="linha">
+    <div id="linhaSozinho" class="grupo">
       <span class="rotulo" data-t="Quem pesca?|Who's fishing?|¿Quién pesca?"></span>
-      <button class="chip" type="button" role="radio" data-quem="juca" aria-checked="true">👦 Juca</button>
-      <button class="chip" type="button" role="radio" data-quem="lili" aria-checked="false">👧 Lili</button>
+      <div class="seg" role="radiogroup">
+        <button class="chip" type="button" role="radio" data-quem="juca" aria-checked="true">👦 Juca</button>
+        <button class="chip" type="button" role="radio" data-quem="lili" aria-checked="false">👧 Lili</button>
+      </div>
     </div>
-    <div class="linha" id="linhaNivel0">
+    <div class="grupo" id="linhaNivel0">
       <span class="rotulo" id="rotuloNivel0" data-t="Nível|Level|Nivel"></span>
-      <button class="chip verde" type="button" role="radio" data-nivel-j="0" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
-      <button class="chip amarelo" type="button" role="radio" data-nivel-j="0" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
-      <button class="chip vermelho" type="button" role="radio" data-nivel-j="0" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      <div class="seg" role="radiogroup">
+        <button class="chip verde" type="button" role="radio" data-nivel-j="0" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+        <button class="chip amarelo" type="button" role="radio" data-nivel-j="0" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+        <button class="chip vermelho" type="button" role="radio" data-nivel-j="0" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      </div>
     </div>
-    <div class="linha" id="linhaNivel1" hidden>
+    <div class="grupo" id="linhaNivel1" hidden>
       <span class="rotulo" data-t="Nível da Lili|Lili's level|Nivel de Lili"></span>
-      <button class="chip verde" type="button" role="radio" data-nivel-j="1" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
-      <button class="chip amarelo" type="button" role="radio" data-nivel-j="1" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
-      <button class="chip vermelho" type="button" role="radio" data-nivel-j="1" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      <div class="seg" role="radiogroup">
+        <button class="chip verde" type="button" role="radio" data-nivel-j="1" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+        <button class="chip amarelo" type="button" role="radio" data-nivel-j="1" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+        <button class="chip vermelho" type="button" role="radio" data-nivel-j="1" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      </div>
     </div>
     <p id="avisoDeitar" class="aviso" hidden data-t="📱↻ Deite o celular para jogar em dois: cada um segura um lado.|📱↻ Turn the phone sideways to play together: each of you holds one side.|📱↻ Pon el móvil en horizontal para jugar dos: cada uno sujeta un lado."></p>
     <button id="btJogar" class="jogar" type="button" data-t="▶ Pescar!|▶ Let's fish!|▶ ¡A pescar!"></button>
@@ -58,7 +66,7 @@
     <div id="ajuda" class="ajuda" hidden>
       <p data-t="🎣 O anzol balança sozinho. Aperte 🎣 e ele mergulha reto, para o lado em que estava, e pega o primeiro bicho que encostar.|🎣 The hook swings by itself. Press 🎣 and it dives straight, the way it was pointing, catching the first creature it touches.|🎣 El anzuelo se balancea solo. Pulsa 🎣 y se hunde recto, hacia el lado al que apuntaba, y coge lo primero que toque."></p>
       <p data-t="⬇ Quanto mais fundo, mais vale: o número em cima de cada bicho mostra os pontos. ⬆️ puxa mais rápido (e desiste, se você viu que vai pegar um peixinho).|⬇ The deeper, the more it's worth: the number over each creature shows its points. ⬆️ reels faster (or gives up, if you see a little fish in the way).|⬇ Cuanto más hondo, más vale: el número encima de cada animal indica sus puntos. ⬆️ recoge el sedal más rápido (y te deja rendirte si ves que va a picar un pececito)."></p>
-      <p data-t="🪣 Encha o balde com o que ele pede e ganhe tempo extra. Bolhas trazem poderes: 🕸️ rede, ⚡ anzol ligeiro e 🪱 minhoca dourada. No meio da partida tem o “Limpa o Rio!”: pesque o lixo!|🪣 Fill the bucket with what it asks for to win extra time. Bubbles bring powers: 🕸️ net, ⚡ quick hook and 🪱 golden worm. Halfway through comes “Clean the River!”: fish out the trash!|🪣 Llena el cubo con lo que pide y ganarás tiempo extra. Las burbujas traen poderes: 🕸️ red, ⚡ anzuelo veloz y 🪱 lombriz dorada. A mitad de partida llega “¡Limpia el río!”: ¡pesca la basura!"></p>
+      <p data-t="🪣 Encha o balde com o que ele pede e ganhe tempo extra. Bolhas trazem poderes: 🕸️ rede, ⚡ anzol ligeiro e 🪱 minhoca dourada. No meio da partida vem uma rodada surpresa: limpar o rio com a rede, jogar boias, levar filhotes, pegar estrelas ou acertar o gigante 3 vezes. Cuidado com as piranhas: elas cortam a linha!|🪣 Fill the bucket with what it asks for to win extra time. Bubbles bring powers: 🕸️ net, ⚡ quick hook and 🪱 golden worm. Halfway through comes a surprise round: clean the river with a net, throw life rings, carry baby turtles, catch stars or hit the giant 3 times. Watch out for piranhas: they cut the line!|🪣 Llena el cubo con lo que pide y ganarás tiempo extra. Las burbujas traen poderes: 🕸️ red, ⚡ anzuelo veloz y 🪱 lombriz dorada. A mitad de partida llega una ronda sorpresa: limpiar el río con la red, lanzar flotadores, llevar tortuguitas, coger estrellas o darle 3 veces al gigante. ¡Cuidado con las pirañas: cortan el sedal!"></p>
     </div>
     <p id="versao" class="versao"></p>
   </div>

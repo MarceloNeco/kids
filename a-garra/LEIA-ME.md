@@ -1,4 +1,4 @@
-# A-GARRA — máquina de pegar bichinho em 3D
+# H-rraaa (pasta a-garra) — máquina de pegar bichinho em 3D
 
 Brincadeira do Bolinho de Chuva (solverone.com.br/kids/a-garra/). Pedido do dono em 14/Nov/2026, com fotos de máquinas de
 um fliperama como referência (e, na 0.3.0, imagens de um vídeo de filhotes de salsicha numa máquina). A 0.1.0 era em 2D e pegava sempre; o dono pediu (14/Nov/2026): **3D**, ver de cima com zoom,
@@ -6,7 +6,7 @@ controle ⬆⬇⬅➡ + botão de agarrar, **a garra não pega toda vez** (como 
 máquinas**: hambúrgueres, bichinhos que mexem, insetos. Isso é a 0.2.0.
 
 Idioma (0.4.0): português, inglês ou espanhol, o escolhido na estante (`../idioma.js`), sem botão de idioma no jogo. O
-nome muda com o idioma: **A-GARRA** · **THE CLAW** · **LA GARRA** (na tela, nos letreiros das máquinas e no letreiro de LED);
+nome é **H-rraaa**, com o **H colorido** (arco-íris), igual nos três idiomas (desde a 0.4.1, pedido do dono: antes era A-GARRA · THE CLAW · LA GARRA), na tela, nos letreiros das máquinas, no adesivo do carrinho e no letreiro de LED;
 o botão PEGAR vira GRAB · COGER.
 
 ## Como se brinca
@@ -35,8 +35,8 @@ o botão PEGAR vira GRAB · COGER.
   em cima ou no caminho. Só de vez em quando vem **forte**: mirando bem, mais ou menos **1 a cada 4** tentativas no fácil,
   **1 a cada 7** no médio e **1 a cada 10** no difícil. Depois de muitas tentativas sem prêmio, a próxima bem mirada vem
   forte (garantia). A máquina lembra a contagem entre partidas (`bolinho:a-garra:contador`), como uma máquina de verdade.
-- **Nível**: fácil (12 fichas, sem relógio, prêmios grandes, anel de mira), médio (10 fichas, 25 s, anel de mira), difícil
-  (10 fichas, 15 s, prêmios menores, sem anel).
+- **Nível**: fácil (12 fichas, sem relógio, prêmios grandes, anel de mira), médio (10 fichas, 1 minuto para mirar
+  cada tentativa, anel de mira), difícil (10 fichas, 1 minuto, prêmios menores, sem anel). Antes da 0.4.2 eram 25 s e 15 s.
 
 ## Arquivos
 
@@ -55,5 +55,5 @@ o botão PEGAR vira GRAB · COGER.
 Guardado no aparelho (`localStorage`): `bolinho:a-garra:pref`, `bolinho:a-garra:colecao`, `bolinho:a-garra:recordes`,
 `bolinho:a-garra:contador`. Nada sai do aparelho; sem login e sem banco.
 
-Interruptor no RootifyONE: app **Bolinho de Chuva** (`kids`) → **A-GARRA** (`a-garra`).
+Interruptor no RootifyONE: app **Bolinho de Chuva** (`kids`) → **H-rraaa** (`a-garra`). A pasta, o endereço (`/kids/a-garra/`) e o que fica guardado no aparelho (`bolinho:a-garra:...`) continuam com o nome antigo, para ninguém perder a coleção nem o atalho instalado.
 Com `?teste` aparece `window.GarraDebug`; `?semente=N` repete a mesma máquina.

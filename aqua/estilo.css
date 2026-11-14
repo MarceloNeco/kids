@@ -85,30 +85,17 @@ button:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
 /* a abinha comum "Tela inteira" (../telacheia.js): durante o jogo fica logo abaixo do 🏠 e da 🚪, fora das ajudas */
 body:has(#jogo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px); transform: none; }
 
-/* cenários (lojinha): o fundo da tela de jogar e a amostra na vitrine */
-.cen-chuva { background:
-  repeating-linear-gradient(104deg, transparent 0 46px, rgba(255, 255, 255, .22) 46px 48px, transparent 48px 97px),
-  radial-gradient(ellipse 70% 26% at 20% 0%, rgba(255, 255, 255, .8), transparent 70%),
-  radial-gradient(ellipse 60% 22% at 82% 4%, rgba(255, 255, 255, .7), transparent 70%),
-  linear-gradient(#bfeef2, #74cdd8); }
-.cen-mar { background:
-  radial-gradient(circle at 14% 72%, rgba(255, 255, 255, .22) 0 9px, transparent 10px),
-  radial-gradient(circle at 84% 58%, rgba(255, 255, 255, .2) 0 6px, transparent 7px),
-  radial-gradient(circle at 70% 88%, rgba(255, 255, 255, .18) 0 12px, transparent 13px),
-  repeating-linear-gradient(76deg, transparent 0 70px, rgba(255, 255, 255, .07) 70px 110px, transparent 110px 190px),
-  linear-gradient(#27a7c4, #0d5f8a 55%, #0a3f66); }
-.cen-junina { background:
-  conic-gradient(from 150deg at 50% 0, var(--coral) 0 60deg, transparent 60deg) 0 0 / 56px 40px repeat-x,
-  conic-gradient(from 150deg at 50% 0, var(--turquesa) 0 60deg, transparent 60deg) 28px 0 / 56px 40px repeat-x,
-  radial-gradient(circle at 80% 22%, rgba(255, 244, 190, .9) 0 34px, transparent 36px),
-  linear-gradient(#ffe6a8, #ffb469 70%, #f58a4b); }
-.cen-espaco { background:
-  radial-gradient(circle at 18% 22%, #fff 0 1.5px, transparent 2px), radial-gradient(circle at 72% 12%, #fff 0 1.2px, transparent 2px),
-  radial-gradient(circle at 44% 64%, #fff 0 1.4px, transparent 2px), radial-gradient(circle at 88% 74%, #fff 0 1.6px, transparent 2px),
-  radial-gradient(circle at 30% 88%, #fff 0 1.2px, transparent 2px), radial-gradient(circle at 60% 38%, #fff 0 1px, transparent 2px),
-  radial-gradient(circle at 84% 30%, #ffb86b 0 22px, #e8743a 23px 26px, transparent 27px),
-  radial-gradient(ellipse 60% 40% at 30% 40%, rgba(255, 114, 182, .35), transparent 70%),
-  linear-gradient(#3a2382, #1a0f4a); }
+/* fundo em carrossel (fundo.js, desde a 0.3.0): uma cena de cada vez atrás dos frascos; a nova entra devagar por cima
+   da anterior. Fotos um pouco desfocadas e com zoom bem lento; véu claro (escuro nas cenas de noite) para os frascos
+   continuarem fáceis de ver. Com "reduzir movimento": sem transição e sem zoom. */
+.cenario { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--agua2); }
+.cn-camada { position: absolute; inset: 0; opacity: 0; transition: opacity 1.8s ease-in-out; }
+.cn-camada.visivel { opacity: 1; }
+.cn-camada img, .cn-camada canvas, .cn-part { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cn-camada img { object-fit: cover; filter: blur(1.5px) saturate(1.08); transform: scale(1.06); animation: passeio 40s ease-in-out infinite alternate; }
+@keyframes passeio { from { transform: scale(1.06) translate(-1.2%, 0.6%); } to { transform: scale(1.17) translate(1.4%, -1%); } }
+.cn-veu { position: absolute; inset: 0; background: rgba(255, 255, 255, .2); transition: background 1.8s; }
+.cn-veu.escuro { background: rgba(8, 14, 40, .16); }
 
 /* ---------- lojinha ---------- */
 #loja { gap: 10px; padding-bottom: calc(40px + var(--sb)); }
@@ -123,7 +110,7 @@ body:has(#jogo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px);
 .item.nao { animation: nao .35s; }
 @keyframes nao { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 .amostra { width: 84px; height: 150px; }
-.amostra.cena { height: 84px; border-radius: 14px; border: 2px solid var(--tinta); }
+.amostra.cena { width: 100%; height: 84px; object-fit: cover; border-radius: 14px; border: 2px solid var(--tinta); }
 .item-nome { font-weight: 700; font-size: 1rem; }
 .item-estado { font-size: .9rem; font-weight: 500; color: var(--tinta2); }
 
@@ -167,6 +154,7 @@ body:has(#jogo.ativa) .tela-inteira-bt { top: calc(var(--nav-alto, 56px) + 4px);
   .aj { width: 54px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mascote, .aj.chama, .cartao, .fim-estrelas .acesa, .aviso, .item.nao { animation: none; }
+  .mascote, .aj.chama, .cartao, .fim-estrelas .acesa, .aviso, .item.nao, .cn-camada img { animation: none; }
+  .cn-camada, .cn-veu { transition: none; }
   .nivel, .aj { transition: none; }
 }

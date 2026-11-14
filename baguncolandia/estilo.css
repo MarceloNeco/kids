@@ -269,3 +269,15 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
   .bn-nav #inicio.ativa { padding-top: .8rem; }
   .bn-nav #inicio > .marca, .bn-nav #inicio > h1 { margin-left: max(0px, calc(var(--nav-largo) - max(0px, (100vw - 54rem) / 2) - 2.4rem)); }
 }
+
+/* tela inicial em dois passos: só aparece o passo da vez (data-passo no #inicio) */
+#inicio .passo { display: none; }
+#inicio[data-passo="um"] .passo1, #inicio[data-passo="cel"] .passoCel, #inicio[data-passo="tv"] .passoTV { display: flex; }
+#inicio .passoTopo { display: flex; align-items: center; gap: .6rem; }
+#inicio .passoTopo h2 { margin: 0; flex: 1; }
+#inicio .voltaPasso { flex: 0 0 auto; padding: .45rem .8rem; font-size: .95rem; }
+@media (orientation: landscape) and (max-height: 500px) {   /* celular deitado: o passo da vez cabe sem rolar */
+  #inicio .sub { display: none; }
+  #inicio .caixa { gap: .45rem; }
+  #inicio .big { padding: .5rem .7rem; }
+}

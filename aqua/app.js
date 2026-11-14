@@ -5,9 +5,9 @@
    estrelas, as gotinhas e o que já foi trocado na lojinha. Sem dinheiro, sem anúncio, sem conta. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.0';
+  var APP_VERSION = '0.3.0';
   var APP_DATA = '14/Nov/2026';
-  var M = window.AquaMotor, D = window.AquaDesenho, Som = window.AquaSom;
+  var M = window.AquaMotor, D = window.AquaDesenho, Som = window.AquaSom, Fundo = window.AquaFundo;
   var $ = function (id) { return document.getElementById(id); };
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -33,7 +33,7 @@
   if (pref.tem.frascos.indexOf('tubinho') < 0) pref.tem.frascos.push('tubinho');
   if (pref.tem.cenarios.indexOf('chuva') < 0) pref.tem.cenarios.push('chuva');
   if (!D.FRASCOS[pref.frasco] || pref.tem.frascos.indexOf(pref.frasco) < 0) pref.frasco = 'tubinho';
-  if (!D.CENARIOS[pref.cenario] || pref.tem.cenarios.indexOf(pref.cenario) < 0) pref.cenario = 'chuva';
+  delete pref.cenario;   // até a 0.2.0 o cenário era um fundo parado escolhido na lojinha; desde a 0.3.0 os pacotes entram no carrossel
   function salvarPref() { gravar('aqua.pref', pref); }
   Som.ligar(pref.efeitos);
 
@@ -135,6 +135,10 @@
   var relogio = 0, ultimoTs = 0, quadroPedido = 0;
   var palco = $('palco'), ctx = palco.getContext('2d'), area = $('area'), caixa = $('frascos'), botoes = [];
   var rng = TESTE ? M.semente(7) : Math.random;
+  // o fundo em carrossel (fundo.js): troca de cena a cada frasco fechado
+  var cenas = [], cenaN = 0;
+  Fundo.iniciar($('cenario'), { calmo: CALMO, vel: VEL });
+  function proximaCena(suave) { cenaN++; Fundo.mostrar(cenas[cenaN % cenas.length], suave); }
 
   function novoVb() { return { sobe: 0, sobeAlvo: 0, ondaA: 0, ondaT: 0, rolha: 0, rolhaAlvo: 0, brilho: 0, treme: 0, revela: 0, nasce: 1, bolhas: [], pisca: Math.random() * 6 }; }
 
@@ -144,7 +148,10 @@
     est = M.novoEstado(gerada);
     hist = []; usos = { desfazer: 0, dica: 0, embaralhar: 0, extra: 0 }; sel = -1; fimDeFase = false; parado = 0;
     vb = est.frascos.map(novoVb);
-    $('jogo').className = 'tela' + (atual === 'jogo' ? ' ativa' : '') + ' cen-' + pref.cenario;
+    // cada fase começa numa cena diferente (a mesma fase começa sempre na mesma cena)
+    cenas = Fundo.lista(pref.tem.cenarios);
+    cenaN = (fase * 3 + { facil: 0, medio: 4, dificil: 7 }[nivel]) % cenas.length;
+    Fundo.mostrar(cenas[cenaN], atual === 'jogo');
     pintarBarra(); pintarAjudas(); montarBotoes(); ajustar(); pedirQuadro();
   }
   function pararTudo() { anims = []; faiscas = []; dicaPar = null; plano = null; sel = -1; Som.pararDespejo(); esconderAviso(); clearTimeout(esperaFim); }
@@ -203,6 +210,7 @@
     var W = ra.width, H = ra.height; if (W < 10 || H < 10) return;
     var dpr = Math.min(2, window.devicePixelRatio || 1);
     palco.width = Math.round(rj.width * dpr); palco.height = Math.round(rj.height * dpr);
+    Fundo.redimensionar();
     var md = D.medidas(pref.frasco, est.cap), n = est.frascos.length;
     var celW = md.largo + 14, celH = md.alto + LEVANTA + 26, melhor = null;
     for (var r = 1; r <= 4 && r <= n; r++) {
@@ -277,6 +285,7 @@
   function fechar(i) {
     var p = lay.casas[i], md = lay.md, s = lay.s, v = vb[i];
     v.rolhaAlvo = 1; v.brilho = 1;
+    proximaCena(true);
     Som.rolha(); setTimeout(function () { Som.brilho(); }, 160 / VEL);
     if (CALMO) return;
     for (var k = 0; k < 12; k++) {
@@ -417,7 +426,7 @@
     if (atual !== 'jogo' || !est || !lay) return;
     var dt = ultimoTs ? Math.min(0.05, (ts - ultimoTs) / 1000) : 0.016; ultimoTs = ts;
     dt *= VEL; relogio += dt;
-    atualizar(dt); desenhar();
+    atualizar(dt); Fundo.quadro(dt); desenhar();
     // sem "reduzir movimento" o líquido fica sempre vivo (ondinha e bolhas); com ele, só desenha enquanto algo muda
     if (!CALMO || mexendo()) pedirQuadro(); else ultimoTs = 0;
   }
@@ -479,7 +488,7 @@
     return u;
   }
   function desenhar() {
-    var s = lay.s, md = lay.md, dpr = lay.dpr, tema = D.CENARIOS[pref.cenario], i, a, p;
+    var s = lay.s, md = lay.md, dpr = lay.dpr, tema = D.CENARIOS[Fundo.tema()], i, a, p;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, lay.W, lay.H);
     lay.fileiras.forEach(function (f) { D.prateleira(ctx, f.x, f.y, f.w, f.h, tema); });
@@ -548,8 +557,32 @@
       D.frasco(c2, md, { unidades: [{ c: 6 }, { c: 2 }, { c: 0 }], t: 0, tema: D.CENARIOS.chuva, ang: 0 });
       return cv;
     });
-    montarVitrine($('lojaCenarios'), D.ORDEM_CENARIOS, D.CENARIOS, 'cenarios', 'cenario', function (id) {
-      var d = document.createElement('span'); d.className = 'amostra cena cen-' + id; d.setAttribute('aria-hidden', 'true'); return d;
+    montarPacotes();
+  }
+  // os pacotes de cenas (desde a 0.3.0): cada um põe uma foto e um desenho no carrossel do fundo
+  var PACOTES = ['mar', 'junina', 'espaco'];
+  function montarPacotes() {
+    var onde = $('lojaCenarios'); onde.innerHTML = '';
+    PACOTES.forEach(function (id) {
+      var it = D.CENARIOS[id], tem = pref.tem.cenarios.indexOf(id) >= 0, falta = it.preco - pref.gotas;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'item pacote' + (tem ? ' usando' : '') + (!tem && falta > 0 ? ' caro' : '');
+      b.id = 'item-' + id; b.setAttribute('aria-pressed', String(tem));
+      var foto = document.createElement('img'); foto.className = 'amostra cena'; foto.alt = ''; foto.src = Fundo.cena(Fundo.PACOTES[id][0]).img; b.appendChild(foto);
+      var n = document.createElement('span'); n.className = 'item-nome'; n.textContent = t(it.pt, it.en, it.es); b.appendChild(n);
+      var q = document.createElement('span'); q.className = 'item-estado';
+      q.textContent = Fundo.PACOTES[id].map(function (c) { var nn = Fundo.cena(c).nome; return t(nn[0], nn[1], nn[2]); }).join(' · ');
+      b.appendChild(q);
+      var e = document.createElement('span'); e.className = 'item-estado';
+      e.textContent = tem ? t('✔ no carrossel', '✔ in the carousel', '✔ en el carrusel') : falta > 0 ? '💧 ' + it.preco + t(' · faltam ', ' · need ', ' · faltan ') + falta : '💧 ' + it.preco + t(' · trocar', ' · get it', ' · cambiar');
+      b.appendChild(e);
+      b.addEventListener('click', function () {
+        Som.acordar();
+        if (tem) { Som.vidro(); return; }
+        if (pref.gotas < it.preco) { Som.erro(); b.classList.remove('nao'); void b.offsetWidth; b.classList.add('nao'); return; }
+        pref.gotas -= it.preco; pref.tem.cenarios.push(id); Som.brilho(); salvarPref(); montarLoja();
+        var novo = $('item-' + id); if (novo) novo.focus();
+      });
+      onde.appendChild(b);
     });
   }
   function montarVitrine(onde, ordem, itens, lista, emUso, amostra) {
@@ -606,7 +639,7 @@
   window.AquaApp = {
     estado: function () { return est; }, nivel: function () { return nivel; }, fase: function () { return fase; }, versao: APP_VERSION, MUSICAS: MUSICAS,
     pref: function () { return pref; }, usos: function () { return usos; }, tela: function () { return atual; }, lay: function () { return lay; },
-    animando: function () { return anims.length; }, dica: function () { return dicaPar; }, assentar: terminarAnims, fim: function () { return fimDeFase; }, LIMITES: LIMITES
+    animando: function () { return anims.length; }, cena: function () { return Fundo.atual(); }, cenas: function () { return cenas.slice(); }, dica: function () { return dicaPar; }, assentar: terminarAnims, fim: function () { return fimDeFase; }, LIMITES: LIMITES
   };
 })();
 

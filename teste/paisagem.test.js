@@ -27,9 +27,9 @@ const servidor = http.createServer((req, res) => {
 
 const TAMANHOS = [[915, 412], [844, 390]];
 const JOGOS = [
-  { id: 'baguncolandia', url: 'baguncolandia/?teste', capa: ['#btTV', '#btCel', '#btSolo', '#btToque'], alvo: '#tvCanvas', altura: 0.95,
+  { id: 'baguncolandia', url: 'baguncolandia/?teste', capa: ['#btPassoCel', '#btPassoTV'], alvo: '#tvCanvas', altura: 0.95,
     tamanhos: [[915, 412], [844, 390], [915, 356]],   // 915×356: o S24 com a barra do Chrome
-    jogar: async (pg) => { await pg.click('#btToque'); await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar');
+    jogar: async (pg) => { await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar');
       await pg.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 }); await pg.click('#localComecar');
       await pg.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'jogando' && document.getElementById('tv').classList.contains('casa'), null, { timeout: 20000 }); } },
   { id: 'peluqueria', url: 'peluqueria/', entrada: '#btEntrar', capa: ['#btJogar'], alvo: '#palco',

@@ -145,7 +145,7 @@ test('inglês: com EN escolhido na estante o jogo abre em inglês (sem botão de
   assert.equal(await pg.getAttribute('#menu .logo', 'aria-label'), 'My Little Big Chef');
   await pg.click('[data-rec="pizza"]');
   assert.match(await pg.textContent('#recIngredientes'), /cups of flour/);
-  assert.equal(await pg.evaluate(() => document.documentElement.lang), 'en');
+  assert.match(await pg.evaluate(() => document.documentElement.lang), /^en(-US)?$/);   // ../idioma.js marca en-US
   assert.deepEqual(erros, [], 'erros no console');
   await ctx.close();
 });
@@ -155,7 +155,7 @@ test('espanhol: com ES escolhido na estante tudo fica em espanhol (menu, ficha, 
   assert.equal(await pg.getAttribute('#entrada .logo', 'aria-label'), 'Manos a la Masa');
   assert.match(await pg.title(), /^Manos a la Masa/);
   await pg.click('#btEntrar');
-  assert.equal(await pg.evaluate(() => document.documentElement.lang), 'es');
+  assert.match(await pg.evaluate(() => document.documentElement.lang), /^es(-ES)?$/);   // ../idioma.js marca es-ES
   assert.match(await pg.textContent('#menu'), /Elige la receta/);
   assert.match(await pg.textContent('#niveis'), /Fácil.*Medio.*Difícil/);
   assert.match(await pg.textContent('#receitas'), /Tarta de zanahoria/);

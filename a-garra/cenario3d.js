@@ -1,5 +1,5 @@
-/* A-GARRA — as máquinas em 3D, fiéis às fotos de fliperama que o dono mandou (14/Nov/2026), mas com desenho próprio:
-   nenhuma marca, letreiro ou personagem das fotos (no lugar deles, "A-GARRA" e desenhos nossos).
+/* H-rraaa (pasta a-garra) — as máquinas em 3D, fiéis às fotos de fliperama que o dono mandou (14/Nov/2026), mas com desenho próprio:
+   nenhuma marca, letreiro ou personagem das fotos (no lugar deles, "H-rraaa", com o H colorido, e desenhos nossos).
      - telefone:   cabine de telefone vermelha, vidrinhos com grade vermelha nas laterais, placa branca "TELEFONE",
                    painel com bandeira, portinha "PRÊMIO" quadriculada;
      - neon:       gabinete preto com tubos de neon verde e amarelo, parede de tijolo, letreiro de LED que corre;
@@ -39,7 +39,22 @@ function brilho(g, cor, blur) { g.shadowColor = cor; g.shadowBlur = blur; }
 function texto(g, txt, x, y, fonte, cor, sombra, larg) { g.font = fonte; g.textAlign = 'center'; g.textBaseline = 'middle'; if (sombra) brilho(g, sombra, 18); g.fillStyle = cor; if (larg) g.fillText(txt, x, y, larg); else g.fillText(txt, x, y); g.shadowBlur = 0; }
 // letreiros no idioma escolhido na estante (../idioma.js); a máquina é montada de novo a cada partida
 const tx = (pt, en, es) => (window.BolinhoIdioma ? window.BolinhoIdioma.t(pt, en, es) : pt);
-const NOME = () => tx('A-GARRA', 'THE CLAW', 'LA GARRA');
+const NOME = () => 'H-rraaa';   // o nome do jogo (dono, 14/Nov/2026), igual nos três idiomas
+// o nome nos letreiros: o "H" com as cores do arco-íris e o resto na cor da máquina (mesmos argumentos do texto())
+function nomeColorido(g, x, y, fonte, cor, sombra, larg) {
+  const txt = NOME(), h = txt[0], resto = txt.slice(1), px = +(fonte.match(/(\d+)px/) || [0, 100])[1];
+  g.save(); g.font = fonte; g.textBaseline = 'middle'; g.textAlign = 'left';
+  const wh = g.measureText(h).width, wr = g.measureText(resto).width, tot = wh + wr, k = larg && tot > larg ? larg / tot : 1;
+  g.translate(x - tot * k / 2, y); g.scale(k, 1);
+  if (sombra) brilho(g, sombra, 18);
+  g.fillStyle = cor; g.fillText(resto, wh, 0);
+  const gr = g.createLinearGradient(0, -px * 0.4, wh, px * 0.4);
+  ARCO_IRIS.forEach((c, i) => gr.addColorStop(i / (ARCO_IRIS.length - 1), c));
+  brilho(g, '#ff4fd8', 14); g.fillStyle = gr; g.fillText(h, 0, 0);
+  g.shadowBlur = 0; g.lineWidth = Math.max(2, px * 0.025); g.strokeStyle = 'rgba(20,10,30,.55)'; g.strokeText(h, 0, 0);
+  g.restore();
+}
+const ARCO_IRIS = ['#ff3b3b', '#ff9f1c', '#ffe14d', '#39ff6a', '#3ec7ff', '#9b5cff', '#ff4fd8'];
 function estrela(g, x, y, r, ri, cor) { g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? ri : r; g[i ? 'lineTo' : 'moveTo'](x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.closePath(); g.fillStyle = cor; g.fill(); }
 function hexagono(g, x, y, r) { g.beginPath(); for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + i * Math.PI / 3; g[i ? 'lineTo' : 'moveTo'](x + Math.cos(a) * r, y + Math.sin(a) * r); } g.closePath(); }
 function bandeira(g, x, y, w, h) {   // bandeira do Reino Unido (símbolo nacional), simplificada
@@ -95,7 +110,7 @@ function fundoDe(tema) {
     } else if (tema === 'neon') {
       tijolos(g, w, h, '#232625', '#0f1110', '#3a3f3d');
       ursoNeon(g, w * 0.3, h * 0.36, 110, '#7ef9ff'); coracaoNeon(g, w * 0.74, h * 0.28, 70, '#ff4fd8');
-      texto(g, NOME(), w * 0.7, h * 0.52, '700 64px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a', 560);
+      nomeColorido(g, w * 0.7, h * 0.52, '700 64px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a', 560);
     } else if (tema === 'estrelas') {
       const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#24318f'); gr.addColorStop(1, '#141c5c'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
       for (let i = 0; i < 160; i++) { g.globalAlpha = 0.3 + (i % 5) * 0.14; estrela(g, (i * 97) % w, (i * 151) % h, 3 + (i % 3) * 2, 1.4, '#fff7c2'); }
@@ -103,7 +118,7 @@ function fundoDe(tema) {
       [[0.3, 0.22, 0], [0.5, 0.22, 1], [0.7, 0.22, 2], [0.4, 0.42, 1], [0.6, 0.42, 0]].forEach(([x, y, q]) => {
         hexagono(g, x * w, y * h, 95); g.fillStyle = '#3a2f8f'; g.fill(); g.lineWidth = 8; g.strokeStyle = '#7ef9ff'; g.stroke(); insetoIcone(g, x * w, y * h, 110, q);
       });
-      texto(g, tx('INSETOS OFICIAIS DA A-GARRA', 'OFFICIAL BUGS OF THE CLAW', 'INSECTOS OFICIALES DE LA GARRA'), w / 2, h * 0.6, '700 46px Fredoka, system-ui, sans-serif', 'rgba(255,255,255,.75)', null, w * 0.92);
+      texto(g, tx('INSETOS OFICIAIS DA H-rraaa', 'OFFICIAL H-rraaa BUGS', 'INSECTOS OFICIALES DE H-rraaa'), w / 2, h * 0.6, '700 46px Fredoka, system-ui, sans-serif', 'rgba(255,255,255,.75)', null, w * 0.92);
     } else if (tema === 'bichos') {   // parede clara de pet shop, com patinhas e uma janelinha de luzes do fliperama
       const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#f4efe6'); gr.addColorStop(1, '#ddd3c4'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
       for (let i = 0; i < 18; i++) patinha(g, 80 + (i * 173) % (w - 160), 90 + (i * 97) % (h * 0.55), 22 + (i % 3) * 6, 'rgba(160,130,100,.25)', i * 0.7);
@@ -122,11 +137,11 @@ function fundoDe(tema) {
 }
 function placaDe(tema) {
   return textura(1024, 256, (g, w, h) => {
-    if (tema === 'telefone') { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, w, h); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#111', null, w * 0.7); estrela(g, 90, h / 2, 50, 22, '#c8102e'); estrela(g, w - 90, h / 2, 50, 22, '#c8102e'); }
-    else if (tema === 'neon') { g.fillStyle = '#050505'; g.fillRect(0, 0, w, h); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#c6ffd4', '#39ff6a', w * 0.9); }
-    else if (tema === 'estrelas') { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2b3aa0'); gr.addColorStop(1, '#101a4d'); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 30; i++) estrela(g, (i * 137) % w, (i * 71) % h, 6, 2.5, 'rgba(255,240,180,.7)'); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', w * 0.9); }
-    else if (tema === 'bichos') { g.fillStyle = '#f4f6f8'; g.fillRect(0, 0, w, h); texto(g, NOME(), w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#4a3a2c', null, w * 0.66); patinha(g, 110, h / 2, 46, '#b5652e', -0.3); patinha(g, w - 110, h / 2, 46, '#1d1715', 0.3); }
-    else { g.fillStyle = '#d62839'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 64) { g.fillStyle = (x / 64) % 2 ? '#fff' : '#d62839'; g.fillRect(x, h - 40, 64, 40); } texto(g, NOME(), w / 2, h / 2 - 12, '800 140px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', w * 0.6); burguerIcone(g, 110, h / 2, 110); burguerIcone(g, w - 110, h / 2, 110); }
+    if (tema === 'telefone') { g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, w, h); nomeColorido(g, w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#111', null, w * 0.7); estrela(g, 90, h / 2, 50, 22, '#c8102e'); estrela(g, w - 90, h / 2, 50, 22, '#c8102e'); }
+    else if (tema === 'neon') { g.fillStyle = '#050505'; g.fillRect(0, 0, w, h); nomeColorido(g, w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#c6ffd4', '#39ff6a', w * 0.9); }
+    else if (tema === 'estrelas') { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2b3aa0'); gr.addColorStop(1, '#101a4d'); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 30; i++) estrela(g, (i * 137) % w, (i * 71) % h, 6, 2.5, 'rgba(255,240,180,.7)'); nomeColorido(g, w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', w * 0.9); }
+    else if (tema === 'bichos') { g.fillStyle = '#f4f6f8'; g.fillRect(0, 0, w, h); nomeColorido(g, w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#4a3a2c', null, w * 0.66); patinha(g, 110, h / 2, 46, '#b5652e', -0.3); patinha(g, w - 110, h / 2, 46, '#1d1715', 0.3); }
+    else { g.fillStyle = '#d62839'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 64) { g.fillStyle = (x / 64) % 2 ? '#fff' : '#d62839'; g.fillRect(x, h - 40, 64, 40); } nomeColorido(g, w / 2, h / 2 - 12, '800 140px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', w * 0.6); burguerIcone(g, 110, h / 2, 110); burguerIcone(g, w - 110, h / 2, 110); }
   });
 }
 function laterais(tema) {   // a placa "TELEFONE" das laterais da cabine
@@ -137,10 +152,10 @@ function frenteBase(tema) {
     const T = TEMAS[tema];
     g.fillStyle = T.corpo; g.fillRect(0, 0, w, h);
     if (tema === 'telefone') { bandeira(g, 40, 520, 230, 250); bandeira(g, w - 270, 520, 230, 250); }
-    if (tema === 'neon') { g.save(); brilho(g, '#39ff6a', 22); g.strokeStyle = '#39ff6a'; g.lineWidth = 12; g.strokeRect(40, 40, w - 80, h - 80); g.restore(); texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a', 500); }
-    if (tema === 'estrelas') { for (let i = 0; i < 80; i++) estrela(g, (i * 97) % w, (i * 151) % h, 6 + (i % 3) * 3, 2.6, 'rgba(255,240,180,.8)'); texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', 500); }
-    if (tema === 'bichos') { for (let i = 0; i < 10; i++) patinha(g, 480 + (i * 131) % 500, 520 + (i * 89) % 420, 26, 'rgba(120,100,80,.3)', i); texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#4a3a2c', null, 500); }
-    if (tema === 'lanchonete') { for (let y = 640; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff' : '#111'; g.fillRect(x, y, 64, 64); } texto(g, NOME(), w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', 500); }
+    if (tema === 'neon') { g.save(); brilho(g, '#39ff6a', 22); g.strokeStyle = '#39ff6a'; g.lineWidth = 12; g.strokeRect(40, 40, w - 80, h - 80); g.restore(); nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a', 500); }
+    if (tema === 'estrelas') { for (let i = 0; i < 80; i++) estrela(g, (i * 97) % w, (i * 151) % h, 6 + (i % 3) * 3, 2.6, 'rgba(255,240,180,.8)'); nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', 500); }
+    if (tema === 'bichos') { for (let i = 0; i < 10; i++) patinha(g, 480 + (i * 131) % 500, 520 + (i * 89) % 420, 26, 'rgba(120,100,80,.3)', i); nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#4a3a2c', null, 500); }
+    if (tema === 'lanchonete') { for (let y = 640; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff' : '#111'; g.fillRect(x, y, 64, 64); } nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', 500); }
     // portinha do prêmio (embaixo do buraco, à esquerda)
     const px = 50, py = 120, pw = 330, ph = 330;
     g.fillStyle = tema === 'lanchonete' || tema === 'bichos' ? '#fff3df' : tema === 'telefone' ? '#a00d24' : '#0b0b0b'; g.fillRect(px - 14, py - 14, pw + 28, ph + 28);
@@ -264,7 +279,7 @@ export function montarMaquina(cena, tema, M) {
   const ponte = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, L - 0.2, 12), matMetal); ponte.rotation.z = Math.PI / 2; raiz.add(ponte);
   const carrinho = new THREE.Group(); raiz.add(carrinho);
   const cx = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.4, 0.5), matBranco); cx.castShadow = true; carrinho.add(cx);
-  const adesivo = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.3), new THREE.MeshBasicMaterial({ map: textura(128, 128, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); texto(g, 'A', 64, 70, '800 96px Fredoka, system-ui, sans-serif', '#ff4f7b'); }) }));
+  const adesivo = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.3), new THREE.MeshBasicMaterial({ map: textura(128, 128, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 128); const gr = g.createLinearGradient(30, 20, 98, 110); ARCO_IRIS.forEach((c, i) => gr.addColorStop(i / (ARCO_IRIS.length - 1), c)); texto(g, 'H', 64, 70, '800 96px Fredoka, system-ui, sans-serif', gr); }) }));
   adesivo.position.set(0, 0, 0.255); carrinho.add(adesivo);
   // cabo prateado em "U" saindo do carrinho (como nas fotos)
   const u = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(-0.25, -0.1, 0), new THREE.Vector3(-0.45, -0.9, 0.05), new THREE.Vector3(-0.15, -1.15, 0.08), new THREE.Vector3(0.05, -0.6, 0.05), new THREE.Vector3(0.1, -0.15, 0)]), 30, 0.035, 8), matMetal);
@@ -299,7 +314,7 @@ export function montarMaquina(cena, tema, M) {
   function desenharLed(t) {
     const g = ledTex.userData.g, w = 1024, h = 128;
     g.fillStyle = '#020302'; g.fillRect(0, 0, w, h);
-    const msg = tx('  A-GARRA  ★  PEGUE O SEU BICHINHO  ★  ', '  THE CLAW  ★  GRAB YOUR CRITTER  ★  ', '  LA GARRA  ★  COGE TU PELUCHE  ★  '), larg = msg.length * 46, desl = (t * 140) % larg;
+    const msg = tx('  H-rraaa  ★  PEGUE O SEU BICHINHO  ★  ', '  H-rraaa  ★  GRAB YOUR CRITTER  ★  ', '  H-rraaa  ★  COGE TU PELUCHE  ★  '), larg = msg.length * 46, desl = (t * 140) % larg;
     g.font = '800 92px Fredoka, system-ui, sans-serif'; g.textBaseline = 'middle';
     for (let k = -1; k < 3; k++) { const cores = ['#39ff6a', '#ff4fd8', '#7ef9ff', '#ffd400']; g.fillStyle = cores[(k + 4) % 4]; g.fillText(msg, k * larg - desl, h / 2 + 4); }
     g.fillStyle = 'rgba(0,0,0,.55)'; for (let x = 0; x < w; x += 8) g.fillRect(x, 0, 3, h); for (let y = 0; y < h; y += 8) g.fillRect(0, y, w, 3);   // pontinhos de LED

@@ -10,7 +10,7 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
 (async()=>{ await new Promise(r=>server.listen(0,r)); const base='http://127.0.0.1:'+server.address().port+'/baguncolandia/'; const b=await chromium.launch({args:['--autoplay-policy=no-user-gesture-required']}); const ctx=await b.newContext({viewport:{width:412,height:860},locale:'pt-BR'}); const pg=await ctx.newPage(); const erros=[]; pg.on('pageerror',e=>erros.push(e.message));
  const pedidos=[]; pg.on('request',r=>{ if(/musicas\//.test(r.url())) pedidos.push(r.url().split('/').pop()); });
  await pg.goto(base+'?teste'); await pg.waitForTimeout(400);
- await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(2500);
+ await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(2500);
  let st=await pg.evaluate(()=>({arq:Som.tocandoArquivo(), tem:Som.tocando()}));
  conf(st.arq, 'tela "Quem vai jogar": toca a música de verdade ('+pedidos.join(',')+')');
  await pg.click('#localComecar'); await pg.waitForFunction(()=>window.BaguncaApp.TVApp.tv.fase==='jogando',null,{timeout:15000}); await pg.waitForTimeout(2000);

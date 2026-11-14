@@ -11,7 +11,7 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
  const pg=await b.newPage({viewport:{width:412,height:860},deviceScaleFactor:2,locale:'pt-BR'}); const erros=[]; pg.on('pageerror',e=>erros.push(e.message));
  await pg.goto(base+'?teste'); await pg.waitForTimeout(400);
  await pg.evaluate(()=>{ window.musicas=[]; const m=Som.musica; Som.musica=function(l,f){ window.musicas.push(l?f:'off'); return m.apply(this,arguments); }; });
- await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(1500);
+ await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.fill('#nome','Lara'); await pg.click('#btEntrar'); await pg.waitForTimeout(1500);
  const vis=id=>pg.evaluate(id=>{const e=document.getElementById(id); const r=e.getBoundingClientRect(); return r.width>0 && getComputedStyle(e).display!=='none';},id);
  conf(!(await vis('localPausa')), 'lobby: ⏸ escondido');
  conf(await vis('localMudo') && await vis('localMusica'), 'lobby: 🔊 e 🎵 à vista');
