@@ -2,6 +2,32 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.12.0",
+      "data": "14/Nov/2026",
+      "hora": "18:30:00",
+      "pt": [
+        "🏙️ Cidade em 3D de verdade: prédios com luz e sombra, carros andando pelas ruas, fumaça nas chaminés, cata-vento girando e a galinha passeando. Dá para girar a cidade com o dedo (ou ⟲ ⟳) e aproximar com dois dedos.",
+        "🚶 Toque num lugar e o cozinheirinho vai a pé pela rua até a porta antes de entrar.",
+        "🔎 Tocar num ingrediente (na cesta, na ficha ou no \"daqui ainda falta\") abre uma janela com a imagem grande, o nome, quanto falta, onde achar e de onde vem. Acabou aquele \"Toque para pesquisar\" do Google que aparecia.",
+        "🥚 Ícones novos em 3D, feitos no Higgsfield: ovo, queijo, leite, farinha, frutas, peixe e o liquidificador (os outros chegam na próxima versão).",
+        "🎬 Botão de animações no menu. Se o celular estiver com \"remover animações\", o jogo pergunta uma vez se quer ligar."
+      ],
+      "en": [
+        "🏙️ A real 3D town: buildings with light and shadow, cars driving down the streets, smoking chimneys, a spinning windmill and a wandering hen. Turn the town with your finger (or ⟲ ⟳) and zoom with two fingers.",
+        "🚶 Tap a place and the little chef walks down the street to the door before going in.",
+        "🔎 Tapping an ingredient (in the basket, on the recipe card or in \"still needed\") opens a window with a big picture, the name, how many are missing, where to find it and where it comes from. No more Google \"Tap to search\" popping up.",
+        "🥚 New 3D icons made with Higgsfield: egg, cheese, milk, flour, fruit, fish and the blender (the rest arrive in the next version).",
+        "🎬 Animations button in the menu. If the phone has \"remove animations\" on, the game asks once whether to turn them on."
+      ],
+      "es": [
+        "🏙️ Un pueblo en 3D de verdad: edificios con luz y sombra, coches por las calles, chimeneas con humo, un molino que gira y una gallina paseando. Gira el pueblo con el dedo (o ⟲ ⟳) y acerca con dos dedos.",
+        "🚶 Toca un lugar y el cocinerito va andando por la calle hasta la puerta antes de entrar.",
+        "🔎 Al tocar un ingrediente (en la cesta, en la ficha o en \"todavía falta\") se abre una ventana con la imagen grande, el nombre, cuánto falta, dónde encontrarlo y de dónde viene. Se acabó el \"Toca para buscar\" de Google.",
+        "🥚 Iconos nuevos en 3D hechos con Higgsfield: huevo, queso, leche, harina, frutas, pescado y la batidora (los demás llegan en la próxima versión).",
+        "🎬 Botón de animaciones en el menú. Si el móvil tiene \"quitar animaciones\", el juego pregunta una vez si quieres encenderlas."
+      ]
+    },
+    {
       "versao": "0.11.1",
       "data": "14/Nov/2026",
       "hora": "17:10:00",

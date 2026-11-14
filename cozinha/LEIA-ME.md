@@ -7,7 +7,13 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.11.1** (14/Nov/2026) — **três idiomas**: português, inglês (EUA) e espanhol (da Espanha), escolhidos só
+Versão atual: **0.12.0** (14/Nov/2026) — **cidade em 3D de verdade** (`cidade3d.js`, three.js em `libs/`, módulo ES): 10
+lugares montados em código com luz e sombra, ruas com carros, fumaça, cata-vento, galinhas; girar com o dedo ou ⟲ ⟳, zoom
+com dois dedos; o cozinheirinho anda pela rua até a porta (`Cidade3D.andar`); os nomes são os botões `data-lugar` postos em
+cima de cada prédio. Sem WebGL (ou com `?vila2d`, e nos testes sem `&vila3d`) fica a vila desenhada de antes. **Janela do
+ingrediente** (`mostrarIngrediente`, `#dialogo`) ao tocar na cesta, na ficha ou no "daqui ainda falta"; `user-select: none`
+(acabou o "Toque para pesquisar" do Google). **🎬** (`pref.movimento`, `html.parado`; pergunta uma vez se o aparelho pede
+menos movimento). **Ícones 3D** do Higgsfield (`render/*.webp`, `ART.render`). Antes — Versão atual: **0.11.1** (14/Nov/2026) — **três idiomas**: português, inglês (EUA) e espanhol (da Espanha), escolhidos só
 na estante (`../idioma.js`, `BolinhoIdioma.atual()`); o jogo não tem mais botão de idioma nem guarda o idioma nas
 preferências. Textos com `t(pt, en, es)`, `data-t="pt|en|es"`, `data-rotulo` (aria-label) e listas `[pt, en, es]` em
 `dados.js`; `logica.textoPasso(..., 'pt'|'en'|'es')`. Nome em espanhol: **Manos a la Masa**. A Dona Cida fala com a
@@ -158,6 +164,8 @@ Toda receita começa lavando as mãos e termina servindo.
 | `logica.js` | Regras sem tela: cesta, moedas e troco, favores, passos de cada nível e a ordem, imprevisto, estrelas, texto de cada passo em PT/EN. |
 | `cenas.js` | Cenas animadas em SVG/canvas, sem imagem: recipientes que enchem, a cena de despejar (inclina para o recipiente, jorro, nível), a pia com as mãos e a espuma, o menininho comendo (e a animação dele), a foto em PNG e as partículas (faíscas, terra, pó, pedacinhos). Não conhece as regras do jogo. |
 | `fotos/` | **Fotos de verdade** (v0.6.0): `fotos/<id>.jpg`, uma por receita e por ingrediente (320 × 320, JPG), da Wikimedia Commons com licença livre. `ART.icone(id)` mostra a foto do ingrediente num círculo; `ART.icone(id, true)` mostra o desenho/emoji (frutas no pé, legumes na terra). Foto nova = arquivo aqui + linha no `CREDITOS.md` + `sw.js` (o teste confere). |
+| `cidade3d.js`, `libs/` | A cidade em 3D (v0.12.0) com o three.js (MIT) guardado no jogo. `window.Cidade3D`: `montar`, `andar`, `porNaPorta`, `girar`, `pausar`, `estado`. |
+| `render/` | Ícones em 3D (Higgsfield + Qwen-Image, Apache 2.0), WebP 256 px com transparência; `ART.render(id)`. |
 | `vila.js` | A vila "3D" (v0.7.0): o bloquinho isométrico de cada lugar (`bloco(id)`), o cozinheirinho que anda (`boneco()`), o carrinho e a nuvem, tudo em SVG feito no código. Classes com `v-` para não confundir com as peças dos mini-jogos. |
 | `desenhos.js` | Desenhos em SVG feitos em código (utensílios, ingredientes sem emoji, faca sem ponta, ícone do app, as plantas do pomar e da horta e o lugar das frutas em cada planta). |
 | `app.js` | Telas, mini-jogos da vila, cozinha, receita pronta, progresso, voz, sons, música, service worker. `APP_VERSION`. |

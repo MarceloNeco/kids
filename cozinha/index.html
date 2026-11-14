@@ -34,6 +34,7 @@
 <section id="menu" class="tela" data-recurso="cozinha">
   <div class="faixa">
     <button id="btVoz" class="mini" type="button" aria-label="Ler em voz alta / Read aloud" data-rotulo="Ler em voz alta|Read aloud|Leer en voz alta">🗣️</button>
+    <button id="btMovimento" class="mini" type="button" aria-label="Animações / Animations" data-rotulo="Animações do jogo|Game animations|Animaciones del juego" aria-pressed="true">🎬</button>
     <button id="btEfeitos" class="mini" type="button" aria-label="Sons / Sounds" data-rotulo="Sons|Sounds|Sonidos">🔔</button>
     <button id="btVozVovo" class="mini" type="button" aria-label="Trocar a voz da vovó / Change grandma's voice" title="🔁 Trocar a voz da vovó / Change grandma's voice" data-rotulo="Trocar a voz da vovó|Change grandma's voice|Cambiar la voz de la abuelita">👵🔁</button>
     <button id="btAjuda" class="mini" type="button" aria-label="Como brincar / How to play" data-rotulo="Como brincar|How to play|Cómo jugar" aria-expanded="false">❓</button>
@@ -132,6 +133,7 @@
 </section>
 
 <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+<div id="dialogo" class="dialogo" hidden><div class="dialogo-caixa" role="dialog" aria-modal="true" aria-labelledby="dialogoTitulo"><div id="dialogoCorpo"></div></div></div>
 
 <script src="dados.js"></script>
 <script src="logica.js"></script>
@@ -146,5 +148,6 @@
 <script src="../versao.js" data-alvo="#entrada" data-fora-do-arquivo defer></script>
 <script src="../trilha.js" data-fora-do-arquivo></script>
 <script src="app.js"></script>
+<script type="module" src="cidade3d.js"></script>
 </body>
 </html>

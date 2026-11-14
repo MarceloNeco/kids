@@ -84,3 +84,13 @@ na tabela. A foto do *pacotinho de gelatina* é uma gelatina pronta (não havia 
 | `fotos/tomate.jpg` | [Tomato je.jpg](https://commons.wikimedia.org/wiki/File:Tomato_je.jpg) | Softeis | CC BY-SA 3.0 |
 | `fotos/uva.jpg` | [巨峰の房、窓辺.jpg](https://commons.wikimedia.org/wiki/File:%E5%B7%A8%E5%B3%B0%E3%81%AE%E6%88%BF%E3%80%81%E7%AA%93%E8%BE%BA.jpg) | Kanko* | CC BY 2.0 |
 | `fotos/vitamina.jpg` | [Mango Banana Smoothie.jpg](https://commons.wikimedia.org/wiki/File:Mango_Banana_Smoothie.jpg) | Irma Sakul | CC BY-SA 4.0 |
+
+## Cidade 3D e ícones 3D (v0.12.0)
+
+| O quê | De onde | Licença |
+|---|---|---|
+| **three.js** r170 (`libs/three.module.min.js`, cópia de `libs/three-LICENSE.txt`), a biblioteca que desenha a cidade em 3D (`cidade3d.js`) | https://threejs.org (pacote npm `three@0.170.0`) | **MIT** |
+| Ícones em 3D de ingredientes e utensílios (`render/*.webp`) | Gerados para este jogo no **Higgsfield** (GPU alugada pelo dono), com o modelo aberto **Qwen-Image** (Qwen/Qwen-Image), e o fundo tirado com o **rembg** (MIT, modelo isnet-general-use); 256 × 256, WebP com transparência | Qwen-Image: **Apache 2.0** (as imagens geradas são livres para uso pessoal e comercial) |
+
+Prédios, carros, árvores, a vaca, as galinhas e o cozinheirinho da cidade 3D: **originais, montados em código** (`cidade3d.js`).
+

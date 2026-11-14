@@ -437,7 +437,8 @@ a { color: #1d6fb8; }
 .balanca { animation: treme .4s; }
 .fruta.balanca { animation: balancaF .4s; }
 @keyframes balancaF { 0%, 100% { transform: translate(-50%, -50%) scale(.72) rotate(0); } 25% { transform: translate(-50%, -50%) scale(.72) rotate(-18deg); } 75% { transform: translate(-50%, -50%) scale(.72) rotate(18deg); } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+/* v0.11.2: quem decide é o botão 🎬 do jogo (app.aplicarMovimento põe html.parado; sem escolha, segue o aparelho) */
+html.parado *, html.parado *::before, html.parado *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 
 /* ---------- cenas animadas (v0.5.0) ---------- */
 /* partículas: faíscas, terra, pó, pedacinhos, gema, jorrinho (cenas.js, Web Animations) */
@@ -626,7 +627,7 @@ a { color: #1d6fb8; }
 .tela.ativa > :not(.cesta) { animation: telaEntra .38s cubic-bezier(.25, 1.3, .5, 1) both; }
 @keyframes telaEntra { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .tela.ativa .rec, .tela.ativa .lista-ing li, .tela.ativa .produto, .tela.ativa .pedido { animation: popEntra .45s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: calc(min(var(--i, 0), 10) * 45ms + .1s); }
-@media (prefers-reduced-motion: reduce) { .tela.ativa .rec, .tela.ativa .lista-ing li, .tela.ativa .produto, .tela.ativa .pedido { animation-delay: 0s !important; } }
+html.parado .tela.ativa .rec, html.parado .tela.ativa .lista-ing li, html.parado .tela.ativa .produto, html.parado .tela.ativa .pedido { animation-delay: 0s !important; }
 @keyframes popEntra { from { opacity: 0; transform: scale(.5) translateY(14px); } to { opacity: 1; transform: none; } }
 .rec .rec-foto { animation: respira 3.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -.4s); }
 @keyframes respira { 0%, 100% { transform: rotate(-3deg) scale(1); } 50% { transform: rotate(3deg) scale(1.05); } }
@@ -847,3 +848,57 @@ a { color: #1d6fb8; }
   .setor .produto .ic { font-size: 1.3rem; } .setor .produto .preco { font-size: .62rem; }
   .s-mercearia { background: #fff8ee; }
 }
+
+/* ---------- v0.11.2: nada de selecionar texto ao tocar (o "Toque para pesquisar" do Google aparecia na cesta);
+   janela bonita do ingrediente e da pergunta das animações ---------- */
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.cesta .item, .lista-ing li, .precisa .pq { cursor: pointer; }
+.cesta .item:active, .lista-ing li:active, .precisa .pq:active { transform: scale(.94); }
+.dialogo { position: fixed; inset: 0; z-index: 90; background: rgba(60, 30, 10, .45); display: grid; place-items: center; padding: 16px; }
+.dialogo-caixa { width: min(92vw, 24rem); max-height: 88dvh; overflow: auto; background: #fffaf2; border: 4px solid var(--ouro); border-radius: 28px; padding: 16px 18px 18px;
+  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 14px 40px rgba(60, 30, 10, .35); }
+.dialogo-caixa.entra { animation: dialogoEntra .35s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes dialogoEntra { from { transform: scale(.6) translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.dialogo-caixa h3 { font-size: 1.5rem; line-height: 1.15; }
+.ing-foto { width: 9.5rem; height: 9.5rem; border-radius: 50%; overflow: hidden; border: 5px solid #fff; box-shadow: 0 0 0 4px var(--ouro), 0 8px 18px rgba(0, 0, 0, .18); background: #fff; }
+.ing-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ing-foto.emoji { display: grid; place-items: center; font-size: 4.6rem; }
+.ing-conta { font-weight: 700; color: var(--tomate); font-size: 1.1rem; } .ing-conta.ok { color: var(--verde); }
+.ing-onde-t { font-weight: 700; margin-top: 2px; }
+.ing-onde { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.ing-onde li { background: #fff; border: 2px solid var(--borda); border-radius: 999px; padding: 3px 10px; font-weight: 600; }
+.ing-fato { background: #fff6d6; border: 2px dashed var(--ouro); border-radius: 14px; padding: 6px 10px; }
+@media (orientation: landscape) and (max-height: 32rem) {
+  .dialogo-caixa { width: min(92vw, 40rem); display: grid; grid-template-columns: auto 1fr; column-gap: 16px; text-align: left; align-items: center; }
+  .dialogo-caixa > .ing-foto { grid-row: 1 / span 6; width: 7.5rem; height: 7.5rem; }
+  .dialogo-caixa > * { grid-column: 2; } .ing-onde { justify-content: flex-start; }
+}
+
+/* ---------- v0.12.0: a cidade em 3D de verdade (cidade3d.js, three.js) ---------- */
+.vila.vila3d { display: block; position: relative; padding: 0; height: max(24rem, calc(100dvh - 15.5rem)); overflow: hidden; border-radius: 26px;
+  background: #bfe8ff; box-shadow: inset 0 0 0 4px #86cf5c, 0 6px 16px rgba(60, 100, 40, .18); touch-action: none; }
+.vila3d .cidade3d { position: absolute; inset: 0; }
+.vila3d .cidade3d canvas { width: 100% !important; height: 100% !important; display: block; }
+.vila3d .rotulos { position: absolute; inset: 0; pointer-events: none; }
+.vila3d .rotulos .lugar { position: absolute; left: 0; top: 0; pointer-events: auto; min-height: 0; width: auto; padding: 0; background: none; border: 0; box-shadow: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; will-change: transform; z-index: 1; }
+.vila3d .rotulos .lugar .nome { font-size: .8rem; line-height: 1.05; padding: 2px 8px; max-width: 8.5rem; white-space: normal; background: rgba(255, 255, 255, .92); border: 2px solid #fff;
+  border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, .18); }
+.vila3d .rotulos .lugar.proximo .nome { border-color: var(--verde); box-shadow: 0 0 0 3px #bdf2d4, 0 3px 6px rgba(0, 0, 0, .18); }
+.vila3d .rotulos .lugar .aqui { display: none; }   /* na cidade 3D: o que tem em cada lugar fica na faixa da missão e no ✨ */
+.vila3d .rotulos .lugar .brilho { position: absolute; right: -14px; top: -6px; font-size: 1rem; }
+.vila3d .rotulos .lugar .seta { position: absolute; left: 50%; top: auto; bottom: 100%; transform: translateX(-50%); }
+.vila3d .rotulos .lugar:active { transform: none; }
+.vila3d .girar { position: absolute; right: 8px; top: 8px; display: flex; gap: 6px; z-index: 2; }
+.vila3d .girar .mini { font-size: 1.4rem; background: rgba(255, 255, 255, .92); }
+@media (orientation: landscape) and (max-height: 32rem) {
+  .vila.vila3d { height: calc(100dvh - 8.2rem); min-height: 14rem; }
+  .vila3d .rotulos .lugar .nome { font-size: .7rem; max-width: 7rem; }
+}
+
+/* ícones em 3D (render/*.webp, v0.12.0): o objeto inteiro, sem círculo, com uma sombrinha embaixo */
+.ic-3d { width: 1.35em; height: 1.35em; vertical-align: middle; flex: none; position: relative; }
+.ic-3d img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; -webkit-user-drag: none; filter: drop-shadow(0 .06em .06em rgba(60, 30, 10, .3)); }
+.utensilio .ic-3d { font-size: 2.6rem; }
+.dialogo .ing-foto.render { border-radius: 24px; background: radial-gradient(circle at 50% 40%, #fff, #fff1d6); }
+.dialogo .ing-foto.render img { object-fit: contain; padding: 8px; }

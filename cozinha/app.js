@@ -5,14 +5,21 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.11.1';
+  var APP_VERSION = '0.12.0';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
   var V = RAPIDO ? 0.12 : 1;   // multiplica os tempos de espera
   var VA = RAPIDO && !/[?&]devagar\b/.test(location.search) ? 0.12 : 1;   // tempo das animações (?teste&devagar = de verdade)
   // "reduzir movimento" no aparelho: as cenas ficam paradas (sem voo, sem partícula, sem balanço)
-  function calmo() { return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  // movimento (v0.11.2): o botão 🎬 do jogo manda (pref.movimento); sem escolha, segue o aparelho ("remover animações")
+  function calmo() {
+    if (pref && pref.movimento === true) return false;
+    if (pref && pref.movimento === false) return true;
+    return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+  function aparelhoPedeCalma() { return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  function aplicarMovimento() { document.documentElement.classList.toggle('parado', calmo()); var b = document.getElementById('btMovimento'); if (b) b.setAttribute('aria-pressed', String(!calmo())); }
   function $(id) { return document.getElementById(id); }
   function qs(el, s) { return el.querySelector(s); }
   function qsa(el, s) { return Array.prototype.slice.call(el.querySelectorAll(s)); }
@@ -36,6 +43,7 @@
   pref.familia = ['eu'].concat(pref.familia.filter(function (x) { return x !== 'eu' && D.pessoa[x]; }));
   function familiaDoNivel(nivel) { var m = L.maxPessoas(nivel), l = pref.familia.slice(); while (l.length > m) l.splice(1, 1); return l; }
   function salvarPref() { gravar(CH_PREF, pref); }
+  aplicarMovimento();
   var prog = ler(CH_PROG, null);
   if (!prog || typeof prog !== 'object' || !prog.r) prog = { r: {} };
   function estrelasDe(rec, nivel) { return (prog.r[rec] && prog.r[rec][nivel]) || 0; }
@@ -199,6 +207,7 @@
     if (atual === 'lugar' && id !== 'lugar') limparLugar();
     if (atual === 'cozinha' && id !== 'cozinha') limparCozinha();
     if (atual === 'pronto' && id !== 'pronto') pararMenino();
+    if (atual === 'mapa' && id !== 'mapa' && window.Cidade3D) Cidade3D.pausar();
     qsa(document, '.tela').forEach(function (s) { s.classList.toggle('ativa', s.id === id); });
     atual = id; window.scrollTo(0, 0);
     if (id === 'mapa') {
@@ -245,10 +254,64 @@
     Som.acordar();
     try { if (window.matchMedia && matchMedia('(pointer: coarse)').matches && document.documentElement.requestFullscreen && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); } catch (e) { /* ok */ }
     mostrar('menu');   // a capa não fica no histórico: o Voltar do celular na escolha da receita sai do jogo
+    // o aparelho pede menos movimento e a família ainda não escolheu: pergunta uma vez (nos testes, não)
+    if (!RAPIDO && pref.movimento == null && aparelhoPedeCalma()) setTimeout(function () {
+      abrirDialogo('<div class="ing-foto emoji" aria-hidden="true">🎬</div><h3 id="dialogoTitulo">' + t('Ligar as animações do jogo?', 'Turn on the game animations?', '¿Encender las animaciones del juego?') + '</h3>' +
+        '<p>' + t('Este celular está pedindo menos movimento. No jogo, as animações ajudam a brincar: o cozinheirinho anda pela vila, os carros passam e a comida cai na tigela. Dá para mudar depois no botão 🎬.', 'This phone asks for less motion. In the game, animations help kids play: the little chef walks around the village, cars drive by and food drops into the bowl. You can change it later with the 🎬 button.', 'Este móvil pide menos movimiento. En el juego, las animaciones ayudan a jugar: el cocinerito camina por el pueblo, pasan los coches y la comida cae en el bol. Puedes cambiarlo luego con el botón 🎬.') + '</p>' +
+        '<div class="linha-botoes"><button type="button" class="grande verde" data-acao="ligar">' + t('🎬 Ligar as animações', '🎬 Turn them on', '🎬 Encenderlas') + '</button><button type="button" class="medio" data-acao="parado">' + t('Deixar parado', 'Keep it still', 'Dejarlo quieto') + '</button></div>',
+        function (a) { if (a === 'fora') return; pref.movimento = a === 'ligar'; salvarPref(); aplicarMovimento(); });
+    }, 400);
   });
   $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); traduzir(); aviso(pref.voz ? t('🗣️ Voz ligada', '🗣️ Voice on', '🗣️ Voz activada') : t('🗣️ Voz desligada', '🗣️ Voice off', '🗣️ Voz desactivada'), 1500, true); if (!pref.voz && window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) { /* ok */ } });
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); traduzir(); Som.toca('toque'); });
   $('btVozVovo').addEventListener('click', trocarVozVovo);
+  // 🎬 animações do jogo (v0.11.2): liga e desliga, e fica guardado
+  $('btMovimento').addEventListener('click', function () {
+    pref.movimento = calmo(); salvarPref(); aplicarMovimento(); Som.toca('toque');
+    aviso(calmo() ? t('🎬 Animações desligadas', '🎬 Animations off', '🎬 Animaciones apagadas') : t('🎬 Animações ligadas!', '🎬 Animations on!', '🎬 ¡Animaciones encendidas!'), 1600, true);
+  });
+
+  // ---------- janela (diálogo) bonita: ingrediente tocado, pergunta das animações ----------
+  var fecharDialogoCb = null;
+  function abrirDialogo(html, aoFechar) {
+    $('dialogoCorpo').innerHTML = html; $('dialogo').hidden = false; fecharDialogoCb = aoFechar || null;
+    var c = qs($('dialogo'), '.dialogo-caixa'); c.classList.remove('entra'); void c.offsetWidth; c.classList.add('entra');
+    var b = qs($('dialogo'), '[data-acao]'); if (b) b.focus();
+  }
+  function fecharDialogo(acao) {
+    if ($('dialogo').hidden) return;
+    $('dialogo').hidden = true; var cb = fecharDialogoCb; fecharDialogoCb = null; if (cb) cb(acao);
+  }
+  $('dialogo').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-acao]');
+    if (b) { Som.toca('toque'); fecharDialogo(b.getAttribute('data-acao')); }
+    else if (e.target === $('dialogo')) fecharDialogo('fora');
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('dialogo').hidden) { e.stopPropagation(); fecharDialogo('fora'); } }, true);
+  // o ingrediente tocado (cesta, ficha, "daqui ainda falta"): foto grande, nome, quanto já tem, onde achar e de onde vem
+  function mostrarIngrediente(id) {
+    var g = D.ingrediente[id]; if (!g) return;
+    var r = jogo ? L.resumo(jogo.precisa, jogo.cesta).filter(function (x) { return x.id === id; })[0] : null;
+    var onde = L.lugaresDe(id).map(function (l) { return '<li>' + D.lugar[l].e + ' ' + tx(D.lugar[l]) + '</li>'; }).join('');
+    var conta = r ? (r.falta ? t('Você tem ' + r.tem + ' de ' + r.precisa + '. Falta ' + r.falta + '.', 'You have ' + r.tem + ' of ' + r.precisa + '. ' + r.falta + ' to go.', 'Tienes ' + r.tem + ' de ' + r.precisa + '. Falta' + (r.falta > 1 ? 'n ' : ' ') + r.falta + '.')
+      : t('✅ Já tem tudo: ' + r.tem + ' de ' + r.precisa + '!', '✅ You have it all: ' + r.tem + ' of ' + r.precisa + '!', '✅ ¡Ya lo tienes todo: ' + r.tem + ' de ' + r.precisa + '!')) : '';
+    abrirDialogo('<div class="ing-foto' + (ART.render(id) ? ' render' : '') + '"><img src="' + (ART.render(id) || ART.foto(id)) + '" alt=""></div><h3 id="dialogoTitulo">' + L.nomeIng(id, lingua) + '</h3>' +
+      (conta ? '<p class="ing-conta' + (r && !r.falta ? ' ok' : '') + '">' + conta + '</p>' : '') +
+      '<p class="ing-onde-t">' + t('Onde achar:', 'Where to find it:', 'Dónde encontrarlo:') + '</p><ul class="ing-onde">' + onde + '</ul>' +
+      (g.fato ? '<p class="ing-fato">💡 ' + ix(g.fato) + '</p>' : '') +
+      '<button type="button" class="grande verde" data-acao="ok">' + t('👍 Entendi', '👍 Got it', '👍 Entendido') + '</button>');
+    falar(L.nomeIng(id, lingua));
+  }
+  ['cestaMapa', 'cestaLugar', 'recIngredientes', 'lugarPrecisa'].forEach(function (k) {
+    $(k).addEventListener('click', function (e) {
+      var el = e.target.closest('[data-ing]'); if (!el || !this.contains(el)) return;
+      Som.toca('toque'); mostrarIngrediente(el.getAttribute('data-ing'));
+    });
+    $(k).addEventListener('keydown', function (e) {
+      var el = e.target.closest('[data-ing]'); if (!el || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault(); mostrarIngrediente(el.getAttribute('data-ing'));
+    });
+  });
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
 
   function desenharMenu() {
@@ -289,7 +352,7 @@
       '🍽️ Para ' + n + (n > 1 ? ' personas' : ' persona') + (fator > 1 ? ' · receta x' + fator : '') + ' (hasta ' + max + ' en este nivel)');
     $('recIngredientes').innerHTML = L.ingredientesDoNivel(r, nv, fator).map(function (x, i) {
       var onde = L.lugaresDe(x.id).map(function (l) { return D.lugar[l].e; }).join(' ');
-      return '<li style="--i:' + i + '">' + icone(x.id) + '<span class="q">' + L.nomeQtd(x.id, x.q, lingua) + '</span><span class="onde" title="' + t('onde achar', 'where to find', 'dónde encontrarlo') + '">' + onde + '</span></li>';
+      return '<li style="--i:' + i + '" data-ing="' + x.id + '" role="button" tabindex="0">' + icone(x.id) + '<span class="q">' + L.nomeQtd(x.id, x.q, lingua) + '</span><span class="onde" title="' + t('onde achar', 'where to find', 'dónde encontrarlo') + '">' + onde + '</span></li>';
     }).join('');
     var m = L.moedasIniciais(r, nv, fator);
     var bolsa = nv.moedas ? t('Você tem 💰 ' + m + ' moedas', 'You have 💰 ' + m + ' coins', 'Tienes 💰 ' + m + ' monedas') : t('Hoje o mercadinho é de graça! 🎁', 'Today the shop is free! 🎁', '¡Hoy la tienda es gratis! 🎁');
@@ -339,7 +402,7 @@
   function desenharCesta() {
     if (!jogo) return;
     var h = '<span class="cesta-ic" aria-hidden="true">🧺</span>' + L.resumo(jogo.precisa, jogo.cesta).map(function (r) {
-      return '<span class="item' + (r.falta ? '' : ' ok') + '" data-ing="' + r.id + '" aria-label="' + L.nomeIng(r.id, lingua, 2) + ': ' + r.tem + t(' de ', ' of ', ' de ') + r.precisa + '">' + icone(r.id) + '<b>' + r.tem + '/' + r.precisa + '</b></span>';
+      return '<span class="item' + (r.falta ? '' : ' ok') + '" data-ing="' + r.id + '" role="button" tabindex="0" aria-label="' + L.nomeIng(r.id, lingua, 2) + ': ' + r.tem + t(' de ', ' of ', ' de ') + r.precisa + '">' + icone(r.id) + '<b>' + r.tem + '/' + r.precisa + '</b></span>';
     }).join('');
     $('cestaMapa').innerHTML = h; $('cestaLugar').innerHTML = h;
     var completa = L.completa(jogo.precisa, jogo.cesta);
@@ -432,10 +495,35 @@
     var l = D.lugar[prox];
     return t('👉 Agora: buscar ' + o + ' em ' + l.e + ' ' + l.pt, '👉 Now: get ' + o + ' at ' + l.e + ' ' + l.en, '👉 Ahora: busca ' + o + ' en ' + l.e + ' ' + l.es);
   }
+  // cidade 3D de verdade (cidade3d.js, v0.12.0) quando o aparelho tem 3D; senão (ou com ?vila2d) a vila desenhada de antes
+  // nos testes (?teste) fica a vila desenhada, para os testes antigos; ?teste&vila3d testa a cidade 3D
+  function usa3D() { return !!(window.Cidade3D && Cidade3D.suportado() && !/[?&]vila2d\b/.test(location.search) && (!RAPIDO || /[?&]vila3d\b/.test(location.search))); }
+  window.addEventListener('cidade3d-pronta', function () { if (atual === 'mapa' && jogo) desenharMapa(); });
   function desenharMapa() {
     if (!jogo) return;
     var uteis = L.lugaresUteis(jogo.precisa, jogo.cesta), completa = L.completa(jogo.precisa, jogo.cesta), prox = jogo.cfg.brilho ? proximoLugar() : null;
     $('missao').textContent = textoMissao();
+    var botoes = D.LUGARES.map(function (l) {
+      var aqui = jogo.cfg.brilho && uteis[l.id] ? uteis[l.id] : null;
+      var extra = '';
+      if (l.id === 'casa') extra = completa ? '<span class="brilho">✨</span>' : '';
+      else if (aqui) extra = '<span class="brilho">✨</span><span class="aqui">' + aqui.slice(0, 4).map(function (id) { return icone(id); }).join('') + '</span>';
+      if (prox === l.id) extra += '<span class="seta" aria-hidden="true">⬇️</span>';
+      return '<button type="button" class="lugar l-' + l.id + (l.id === 'casa' && completa ? ' pronta' : '') + (aqui ? ' util' : '') + (prox === l.id ? ' proximo' : '') + '" data-lugar="' + l.id + '">' +
+        '<span class="nome">' + tx(l) + '</span>' + extra + '</button>';
+    }).join('');
+    if (usa3D()) {
+      var vila = $('vila');
+      vila.classList.add('vila3d');
+      if (!qs(vila, '.cidade3d')) vila.innerHTML = '<div class="cidade3d" aria-hidden="true"></div><div class="rotulos"></div>' +
+        '<div class="girar"><button type="button" class="mini" data-girar="-1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟲</button><button type="button" class="mini" data-girar="1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟳</button></div>';
+      qs(vila, '.rotulos').innerHTML = botoes;
+      desenharCesta();
+      Cidade3D.montar(vila, { pos: jogo.pos || 'casa', aoTocar: function (id) { if (!jogo) return; Som.toca('toque'); irPara(id); }, instantaneo: calmo() || VA < 1,
+        placas: { mercado: t('MERCADO', 'MARKET', 'MERCADO'), padaria: t('PADARIA', 'BAKERY', 'PANADERÍA') } });
+      return;
+    }
+    $('vila').classList.remove('vila3d');
     $('vila').innerHTML = '<svg class="ruas" aria-hidden="true" focusable="false"></svg>' + D.LUGARES.map(function (l) {
       var aqui = jogo.cfg.brilho && uteis[l.id] ? uteis[l.id] : null;
       var extra = '';
@@ -474,13 +562,18 @@
       '<path d="' + d + '" stroke="#fff" stroke-width="1.6" stroke-dasharray="7 7" fill="none" opacity=".9"/>';
     var carro = qs(vila, '.carro'); if (carro) { carro.style.top = (y0 - 13) + 'px'; carro.style.setProperty('--larg', w + 'px'); }
   }
-  window.addEventListener('resize', function () { if (atual === 'mapa' && jogo && !andando) { desenharRuas(); porNaPorta(jogo.pos || 'casa'); } });
+  window.addEventListener('resize', function () { if (atual === 'mapa' && jogo && !andando && !$('vila').classList.contains('vila3d')) { desenharRuas(); porNaPorta(jogo.pos || 'casa'); } });
   function porNaPorta(id) {
     var bon = qs($('vila'), '.boneco'), p = geo().portas[id]; if (!bon || !p) return;
     bon.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px)'; bon.classList.remove('anda', 'entra');
   }
   // anda pelas ruas até a porta do lugar e chama aoChegar. Com "reduzir movimento" ou nos testes rápidos, chega na hora.
   function andarAte(id, aoChegar) {
+    if (usa3D() && qs($('vila'), '.cidade3d')) {
+      jogo.pos = id; andando = id;
+      Cidade3D.andar(id, function () { andando = null; if (atual === 'mapa') aoChegar(); });
+      return;
+    }
     var vila = $('vila'), bon = qs(vila, '.boneco'), g = geo(), de = g.portas[jogo.pos || 'casa'], ate = g.portas[id];
     jogo.pos = id;
     if (!bon || !de || !ate || calmo() || VA < 1 || !Element.prototype.animate) { aoChegar(); return; }
@@ -515,6 +608,7 @@
     andarAte(id, faz);
   }
   $('vila').addEventListener('click', function (e) {
+    var gi = e.target.closest('[data-girar]'); if (gi && window.Cidade3D) { Cidade3D.girar(+gi.getAttribute('data-girar')); Som.toca('toque'); return; }
     var b = e.target.closest('[data-lugar]'); if (!b || !jogo) return;
     Som.toca('toque');
     irPara(b.getAttribute('data-lugar'));
@@ -562,7 +656,7 @@
     var u = L.lugaresUteis(jogo.precisa, jogo.cesta)[lugarAtual] || [];
     var falt = L.faltando(jogo.precisa, jogo.cesta);
     $('lugarPrecisa').innerHTML = u.length ? t('Daqui ainda falta: ', 'Still needed from here: ', 'De aquí todavía falta: ') + u.map(function (id) {
-      var f = falt.filter(function (r) { return r.id === id; })[0]; return '<span class="pq">' + icone(id) + ' ' + f.falta + '</span>';
+      var f = falt.filter(function (r) { return r.id === id; })[0]; return '<span class="pq" data-ing="' + id + '" role="button" tabindex="0">' + icone(id) + ' ' + f.falta + '</span>';
     }).join(' ') : (falt.length ? t('Daqui não falta nada. Tente outro lugar! 🗺️', 'Nothing needed from here. Try another place! 🗺️', 'De aquí no falta nada. ¡Prueba en otro sitio! 🗺️') : t('🧺 Tudo na cesta! Vá para 🏠 Casa.', '🧺 Everything is in the basket! Head 🏠 Home.', '🧺 ¡Todo está en la cesta! Ve a 🏠 Casa.'));
   }
   function abrirLugar(id) {

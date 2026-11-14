@@ -214,14 +214,21 @@
   // icone(id) mostra a foto num círculo; icone(id, true) mostra o desenho/emoji (frutas no pé, legumes na terra).
   function foto(id) { return (D.ingrediente[id] || D.receita[id]) ? 'fotos/' + id + '.jpg' : ''; }
   function imgFoto(id, cls) { return '<span class="ic ic-foto' + (cls ? ' ' + cls : '') + '"><img src="' + foto(id) + '" alt="" draggable="false" decoding="async"></span>'; }
+  // v0.12.0: ícones em 3D (render/<id>.webp para ingredientes e render/u-<id>.webp para utensílios), feitos no Higgsfield
+  // (modelo Qwen-Image, licença Apache 2.0) com o fundo tirado; CREDITOS.md. RENDER lista os que já existem.
+  var RENDER = {};
+  ('banana cenoura farinha jabuticaba laranja leite limao maca morango ovo peixe queijo tomate u-liquidificador uva')
+    .split(' ').forEach(function (k) { RENDER[k] = true; });
+  function render(id) { var k = D.ingrediente[id] ? id : 'u-' + id; return RENDER[k] ? 'render/' + k + '.webp' : ''; }
   function icone(id, desenho) {
     var x = D.ingrediente[id] || D.utensilio[id];
     if (!x) return '';
+    if (!desenho && render(id)) return '<span class="ic ic-3d"><img src="' + render(id) + '" alt="" draggable="false" decoding="async"></span>';
     if (!desenho && D.ingrediente[id]) return imgFoto(id);
     if (x.s && S[x.s]) return '<span class="ic ic-svg">' + S[x.s] + '</span>';
     return '<span class="ic">' + x.e + '</span>';
   }
 
-  var API = { S: S, icone: icone, foto: foto, imgFoto: imgFoto, planta: planta, FRUTOS: FRUTOS, fruto: fruto, horta: horta };
+  var API = { S: S, icone: icone, render: render, RENDER: RENDER, foto: foto, imgFoto: imgFoto, planta: planta, FRUTOS: FRUTOS, fruto: fruto, horta: horta };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else raiz.CozinhaDesenhos = API;
 })(typeof self !== 'undefined' ? self : this);
