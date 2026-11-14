@@ -25,7 +25,7 @@ coroa, nariz de palhaço…), para jogar contra o computador, um contra o outro 
 | 🎭 **Duelo de Caras** | Tabuleiro de personagens **desenhados pelo jogo**; cada um escolhe um em segredo e pergunta características até descobrir o do outro. | **Fase 1 — esta especificação** |
 | 🔮 **A Meleca Adivinha** | A pessoa pensa em alguém (personagem, famoso, bicho, alguém da família) e a meleca adivinha com perguntas Sim / Não / Não sei / Provavelmente sim / Provavelmente não. Lista grande pronta + aprende quando erra + João Alves. | Fase 2 — resumida na seção 12; especificação própria antes de começar |
 
-Ordem escolhida pelo dono (14/Nov/2026): **Duelo primeiro**, porque reaproveita peças prontas (rede da Batalha Naval,
+Ordem escolhida pelo dono (14/Nov/2026): **Duelo primeiro e, em seguida, a Meleca Adivinha** ("já sequencia"), porque reaproveita peças prontas (rede da Batalha Naval,
 jeito de desenhar da Purpurina), funciona sem internet desde o começo e as meninas testam logo.
 
 ## 3. Metas, não-metas e anti-metas
@@ -36,13 +36,15 @@ jeito de desenhar da Purpurina), funciona sem internet desde o começo e as meni
   a Batalha Naval.
 - **Tabuleiro novo a cada partida**: personagens gerados pelo código, com combinações de características; nunca dois
   iguais no mesmo tabuleiro.
-- A **resposta sai sozinha** (o jogo sabe a verdade): ninguém responde errado e ninguém trapaceia.
+- **Quem responde Sim/Não é a pessoa**, e o jogo confere com a verdade: ninguém responde errado sem querer e ninguém trapaceia.
 - 3 níveis (Fácil, Médio, Difícil), 10+ músicas, 🏠 e 🚪, PT agora e EN escondido.
 - A meleca escolhida (Melekento Blue ou Pink Honey) é a anfitriã: aparece, reage, comemora e é a adversária no modo
   contra o computador.
 
 **Não-metas (fase 1)**
-- A Meleca Adivinha (fase 2).
+- Personagens de **corpo inteiro** (sapato, saia, short, calça): o dono quer como próxima versão do Duelo (v0.2),
+  com perguntas novas de roupa e sapato. O `caras.js` já nasce pensando nisso (mesmo personagem, desenho maior).
+- A Meleca Adivinha (fase 2, logo em seguida; seção 12).
 - Voz da ElevenLabs (fase 2; na fase 1 só a voz do aparelho, ligável, como na Cozinha e nos Enigmas).
 - Modo de TV próprio com o celular de controle (fase 3). Na fase 1, TV = espelhar a tela do celular/tablet.
 - Mais de 2 jogadores no Duelo (o formato clássico é 1 contra 1; rever depois de testar).
@@ -85,29 +87,36 @@ Na raiz: entrada em `catalogo.js`, interruptor `quem-e` em `recursos-do-app.json
    o modo: **🤖 Contra a meleca**, **📱 Cada um no seu celular**, **🔁 Passando o aparelho**. Depois o nível.
 2. **Escolher o segredo**: o tabuleiro aparece; cada jogador toca no personagem que será o seu segredo (ou 🎲 sorteia).
    No "passando o aparelho", cortina entre um e outro ("Passe para a outra pessoa sem olhar").
-**A vez (regra clássica; decisão do Claude, o dono pode mudar):** na sua vez você faz **uma coisa só**: **perguntar**
-ou **dar o palpite**.
+**A vez (pedido do dono, 14/Nov/2026):** na sua vez você faz **uma coisa só**: **perguntar** ou **dar o palpite**.
 
 3. **Perguntar**: escolher uma **pergunta** numa lista de botões grandes, agrupada, cada uma com **ícone + texto curto +
-   🔊** (seção 6), por exemplo "Usa óculos?", "Tem cabelo ruivo?", "Tem algo na cabeça?", "É criança?". O jogo
-   **responde sozinho** com a verdade do segredo do outro: **"Sim!"** ou **"Não!"** (a meleca fala/balança).
-4. **Virar as cartas**: as caras que não servem mais viram para baixo.
-   - Fácil: viram **sozinhas**, com animação.
-   - Médio e Difícil: o jogador **toca** para virar (a graça do jogo); o botão **"🪄 Virar as que não servem"** faz por
-     ele. Virar uma carta que ainda serve é permitido (é o jogo), e tocar de novo desvira.
-   - Depois, **"✅ Pronto, passar a vez"** encerra a vez (no Fácil aparece logo depois da virada automática). Contra a
-     meleca e em rede, a vez do outro só começa aí. Passando o aparelho, a **cortina** aparece a cada troca de vez.
-5. **Palpite** (no lugar da pergunta): **"É este!"** + tocar numa cara + confirmar. Acertou: vitória, confete, a meleca
+   🔊** (seção 6), por exemplo "Tem cabelo comprido?", "Usa óculos?", "Tem algo na cabeça?", "É criança?". Jogando
+   juntos na mesma sala, a pessoa também pode só falar a pergunta em voz alta; o botão serve para registrar e para o jogo
+   em rede.
+4. **Quem responde é a outra pessoa**: no aparelho dela aparece a pergunta e dois botões grandes **👍 Sim** e **👎 Não**.
+   O jogo **confere** com a verdade do segredo dela: resposta errada não passa, e aparece com carinho "Olha de novo: o
+   seu personagem tem cabelo comprido?" com a cara dela ampliada (criança não estraga a partida sem querer). Contra a
+   meleca, a meleca responde sozinha (sempre certo). Passando o aparelho: cortina "Passe para Fulano responder".
+5. **Descartar**: com a resposta na tela, aparece **um botão só, já pronto**: "🗑️ Descartar todos **de** cabelo
+   comprido" (resposta Não) ou "🗑️ Descartar todos **sem** cabelo comprido" (resposta Sim). Um toque e essas caras viram
+   para baixo de uma vez. Se nenhuma cara de pé seria descartada, o botão diz "Nenhuma para descartar". Também dá para
+   virar e desvirar **uma por uma** com o dedo (é o jogo).
+   - Depois, **"✅ Pronto, passar a vez"** encerra a vez. Contra a meleca e em rede, a vez do outro só começa aí.
+     Passando o aparelho, a **cortina** aparece a cada troca de vez.
+6. **Palpite** (no lugar da pergunta): **"É este!"** + tocar numa cara + confirmar. Acertou: vitória, confete, a meleca
    comemora, as duas caras secretas aparecem. Errou: a carta vira, a meleca faz cara de "ops" e a vez passa (nos três
    níveis, para criança não perder de uma vez).
-6. **Fim**: "Jogar de novo" (tabuleiro novo, mesmo modo) e 🏠.
+7. **Lupa**: tocar e segurar (ou o botão 🔍 da carta) abre a cara **grande**, com nome e todos os detalhes (brinco,
+   estampa e cor da roupa, óculos), para conferir antes de perguntar ou descartar. Fecha com ✕, toque fora, Esc ou
+   Voltar (`janela.js`).
+8. **Fim**: "Jogar de novo" (tabuleiro novo, mesmo modo) e 🏠.
 
 **Quem joga**: as filhas têm ~8 e ~10 anos e já leem (anotações da Rabiscolândia e da Purpurina). Mesmo assim, cada
 pergunta tem ícone e 🔊, e no Fácil a voz começa **ligada** (dá para desligar), para irmão menor ou amigo que ainda não
 lê conseguir brincar com ajuda.
 
 **Contra a meleca**: a meleca também tem um segredo e também pergunta, na vez dela, mostrando a pergunta em balão; a
-resposta sobre o segredo da criança sai sozinha. Esperteza por nível: Fácil = perguntas ao acaso entre as que ainda
+criança responde Sim/Não (conferido, como na seção 5). Esperteza por nível: Fácil = perguntas ao acaso entre as que ainda
 dividem o tabuleiro, às vezes chuta cedo; Médio = boa pergunta na maioria das vezes; Difícil = sempre a pergunta que
 divide o que sobrou mais perto da metade.
 
@@ -126,6 +135,11 @@ O tabuleiro deve caber sem rolar no celular em pé e deitado (do Fácil ao Difí
 celular de 360 px em pé, o construtor reduz para o maior número que caiba (mínimo 30) e anota.
 
 ## 6. Os personagens desenhados
+
+**Capricho (pedido do dono, 14/Nov/2026)**: o desenho é **bem detalhado e colorido**, nada simples estilo Atari: cabelo
+com mechas e brilho, sombras e luz no rosto, olhos com íris e brilho, roupa com gola, botões, costura e estampa
+(listras, bolinhas, xadrez, estrelas), acessórios com reflexo, fundo da carta com degradê. Não precisa ser realista, mas
+tem que ser bonito de olhar ampliado na lupa. Desenho em SVG feito no código.
 
 **Decisão do construtor-arquiteto (Claude), com motivo**: um desenhista novo e leve, `caras.js`, só de **busto** (cabeça,
 ombros, roupa), em vez de usar o `purpurina/boneca.js` diretamente. Motivo: o `boneca.js` desenha corpo inteiro de
@@ -152,6 +166,7 @@ diferentes **considerando só as características do nível**):
 | Joias | brinco | sim / não |
 | Joias | colar | sim / não |
 | Roupa | cor | vermelho, azul, verde, amarelo, roxo, laranja |
+| Roupa | estampa (só desenho, sem pergunta na v0.1) | lisa, listras, bolinhas, xadrez, estrelas |
 
 Regras do gerador (decisões do Claude, para o gerador nunca travar):
 - combinações sem sentido não saem (barba em criança, peruca em careca, cabelo branco só em vovô/vovó ou peruca);
@@ -162,8 +177,10 @@ Regras do gerador (decisões do Claude, para o gerador nunca travar):
   afrouxa o mínimo para 1 (nunca falha); o resultado depende só da semente (mesmo tabuleiro nos dois aparelhos);
 - todas as caras do tabuleiro diferem em pelo menos uma pergunta do nível (ninguém fica impossível de descobrir).
 
-**Nomes**: cada cara ganha um primeiro nome comum, combinando com o tipo (lista própria de ~80 nomes PT, sem sobrenome,
-sem nome de famoso). Serve para a criança dizer "é a Lia!".
+**Nomes** (pedido do dono): cada cara ganha um **primeiro nome sorteado**, combinando com o tipo, de uma lista própria
+bem sortida (pelo menos 80 de menino/homem e 80 de menina/mulher: comuns, antigos de vovô e vovó, modernos, curtos e
+longos; sem sobrenome; sem nome de famoso). Nunca dois nomes iguais no tabuleiro. **Equilíbrio**: metade das caras de
+menino/homem/vovô e metade de menina/mulher/vovó (diferença de no máximo 1). Serve para a criança dizer "é a Lia!".
 
 **Perguntas**: geradas das características do nível, com texto PT/EN e ícone, agrupadas: 👤 Quem é · 💇 Cabelo · 👀 Rosto
 · 🎩 Cabeça · 💎 Joias · 👕 Roupa. Exemplos: "É criança?", "É uma vovó?", "Tem cabelo ruivo?", "É careca?", "Usa óculos
@@ -178,8 +195,8 @@ Reaproveitar a rede da **Batalha Naval** (`batalha-naval/rede.js`, `pertinho.js`
   públicas por desenho; `supabase-js` de `../baguncolandia/libs/supabase.js`, carregado só ao jogar em rede);
   `?teste` = BroadcastChannel; **📶 Jogar pertinho** = canal direto (QR), sem internet.
 - Quem cria a partida escolhe o nível e manda a **semente** do tabuleiro; os dois montam o mesmo tabuleiro.
-- **O segredo fica só no aparelho do dono.** Quem pergunta manda só o id da pergunta; o aparelho do dono responde
-  sim/não (resposta automática). Palpite: manda o id da cara; o dono responde acertou/errou. No fim, cada um mostra o seu.
+- **O segredo fica só no aparelho do dono.** Quem pergunta manda só o id da pergunta; no aparelho do dono a pessoa toca
+  Sim/Não (conferido pelo jogo, seção 5) e o aparelho manda a resposta. Palpite: manda o id da cara; o dono responde acertou/errou. No fim, cada um mostra o seu.
 - Toda mensagem passa por validação; tela só com `textContent` do que vem de fora; recarregar a página volta para a
   partida (como na Batalha Naval); o outro sumiu → aviso e "Esperar" / "Sair".
 - 2 jogadores por sala (3º aparelho recebe "sala cheia").
@@ -227,21 +244,65 @@ Alvos de toque ≥ 44 px; contraste AA; em pé e deitado.
 - Publicar: PR + merge sem perguntar (autorizado no `CLAUDE.md`), zip `QUEM-E v0.1.0 <data> <hora>.zip`, e no resumo o
   que o RootifyONE precisa saber (interruptor novo `quem-e`).
 
-## 12. Fase 2 — A Meleca Adivinha (resumo do que já foi decidido)
+## 12. Fase 2 — A Meleca Adivinha (em seguida ao Duelo, pedido do dono)
 
-- Três níveis por público: 🧒 Infantil · 👨‍👩‍👧 Família · 🧑 Adulto (o dono pediu infantil e adulto; o Família no meio
-  atende à regra dos 3 níveis). Sem divisão Brasil × mundo.
-- Lista pronta grande, priorizando o que a família conhece: músicas infantis, Xuxa, Michael Jackson, Dua Lipa, Katy
-  Perry, Lady Gaga; Sing, Disney, Pixar, DreamWorks; De Volta para o Futuro, Uma Noite de Aventuras, Os Goonies, E.T.;
-  Forrest Gump, O Exterminador do Futuro, O Vingador do Futuro, Velocidade Máxima, Avenida Brasil, O Auto da
-  Compadecida, John Wick; depois famosos em geral, bichos e coisas.
-- **Só o nome** do personagem, com emoji ou desenho da meleca; nenhuma foto nem imagem de filme.
-- **Aprende quando erra** ("em quem você pensou?"), guardado só no aparelho; o que foi ensinado num nível aparece nele e
-  nos de cima.
-- **João Alves**, lenda da casa, nos três níveis, com festa especial e "qual João: João Wick Alves, João Grilo Alves,
-  João Connor Alves?". Antes de construir, o dono confere a lista de respostas dele.
-- Voz: a do aparelho como reserva; **ElevenLabs opcional** com a chave no cofre (`cofre.js`, `ia:elevenlabs`) e as falas
-  guardadas no aparelho para tocar sem internet.
+**Como se joga.** Na tela inicial do Quem é?, a segunda brincadeira: **🔮 A Meleca Adivinha**. Escolher o nível (🧒
+Infantil · 👨‍👩‍👧 Família · 🧑 Adulto; o dono pediu infantil e adulto, o Família no meio atende à regra dos 3 níveis).
+"Pense em alguém: de desenho, de filme, famoso, um bicho ou alguém da sua casa." A meleca escolhida pergunta uma coisa
+por vez; respostas em 5 botões grandes: **Sim · Provavelmente sim · Não sei · Provavelmente não · Não**, mais
+"↩️ Voltar uma pergunta". Quando tiver certeza, ela chuta: "Você pensou em… **Lady Gaga**?" (com emoji ou desenho da
+meleca fantasiada, **nunca foto**). Acertou: festa. Errou: ela continua perguntando; até 3 chutes (perto das perguntas
+20, 30 e 40). Se perder: "Você me venceu! Em quem você pensou?" (ver Aprender).
+
+**O motor (decisão do Claude).** Arquivo puro `adivinha.js`, testado no Node:
+- Cada personagem guarda a resposta "certa" de cada pergunta que se aplica (sim, provavelmente sim, não sei/depende,
+  provavelmente não, não); pergunta sem resposta guardada = "não sei".
+- A cada resposta, a chance de cada personagem é multiplicada por quanto a resposta combina com a dele, **sempre com
+  uma sobra** (resposta errada da criança derruba, mas não elimina), e normalizada.
+- A próxima pergunta é a que mais divide os candidatos mais prováveis (ganho de informação), entre as perguntas do
+  nível; nunca repete; evita perguntas muito parecidas seguidas.
+- Chuta quando o primeiro tem chance alta e bem à frente do segundo, ou ao chegar no limite de perguntas.
+- Funciona inteiro sem internet; rápido em celular simples (milhares de personagens × centenas de perguntas).
+
+**A lista pronta (`personagens/*.js`, por assunto).** Meta da v0.1: **pelo menos 600 personagens** com respostas
+conferidas, crescendo em versões seguintes. Prioridade do que a família conhece: músicas e cantores infantis, Xuxa,
+Michael Jackson, Dua Lipa, Katy Perry, Lady Gaga; Sing, Disney, Pixar, DreamWorks (principais e secundários famosos);
+De Volta para o Futuro, Uma Noite de Aventuras, Os Goonies, E.T.; Forrest Gump, O Exterminador do Futuro, O Vingador do
+Futuro, Velocidade Máxima, Avenida Brasil, O Auto da Compadecida, John Wick; depois famosos do Brasil e do mundo
+(atletas, apresentadores, youtubers, personagens de novela e de série), personagens históricos, super-heróis, bichos e
+algumas coisas. Sem divisão Brasil × mundo. Cada personagem diz em que níveis aparece (Infantil, Família, Adulto).
+Nenhum conteúdo impróprio na lista. **Perguntas**: de 150 a 250, cada uma com o nível mínimo (no Infantil só as
+concretas: "É um bicho?", "Ele canta?", "É azul?"; no Adulto também "Ganhou um Oscar?", "Já morreu?", "Ficou famoso
+antes do ano 2000?"). Testes conferem contradições (ex.: "é um bicho" e "é uma pessoa de verdade" juntos) e que todo
+personagem é alcançável (o motor acerta cada um respondendo as respostas dele).
+
+**João Alves, a lenda da casa.** Já vem na lista, nos três níveis, com as respostas tiradas do que o dono contou
+(taxista humilde, achou uma mala de dinheiro no carro, rodou o mundo numa missão, pai do Forrest Gump, inventado pelo
+pai, aparece em muitas histórias). Quando a meleca acerta, **festa especial** (diferente da normal) e a pergunta
+"Qual João foi hoje? João Wick Alves · João Grilo Alves · João Connor Alves · o Taxista". A lista de respostas dele vai
+num arquivo próprio (`joao-alves.js`) e **o dono confere** depois da entrega (pendência aberta).
+
+**Aprender (só no aparelho).** Quando perde, a meleca pergunta o nome; se já existe na lista, corrige as respostas
+daquele personagem **neste aparelho**; se não existe ("meu irmão"), cria um personagem novo com as respostas daquela
+partida e o emoji que a pessoa escolher. Fica no `localStorage` (`bolinho:quem-e:aprendidos`), no nível em que foi
+ensinado e nos de cima (ensinado no Infantil aparece em todos; no Adulto não aparece no Infantil). Mais:
+- **✏️ Ensinar alguém**: responder as perguntas de uma vez sobre uma pessoa (para o pai cadastrar a família);
+- **📤 Passar para outro celular**: gerar um arquivo (ou compartilhar) com o que a meleca aprendeu e **📥 receber** no
+  outro aparelho, juntando sem duplicar. Sem servidor (dividir automático entre aparelhos exige servidor: fica fora);
+- **🧹 Esquecer**: apagar um aprendido.
+Nome digitado é conteúdo da família: nunca sai do aparelho, nunca vai para IA.
+
+**Voz da meleca.**
+- **Voz do aparelho** sempre disponível (grátis, sem internet), mais animada: tom e velocidade ajustados por meleca
+  (Melekento Blue mais grave e "borbulhante", Pink Honey mais aguda), frases curtas e exclamativas.
+- **ElevenLabs opcional**: a pessoa cola a chave dela no **cofre** (`cofre.js`, nome `ia:elevenlabs`, nunca em texto
+  aberto) pelas ⚙ do jogo, com o passo a passo para leigo; escolhe a voz de cada meleca numa lista curta. Cada fala
+  gerada fica **guardada no aparelho** (Cache Storage, chave = texto + voz) e repete sem gastar cota e sem internet.
+  Sem chave, sem internet ou cota acabada → voz do aparelho, sem erro na tela. O texto que vai para a ElevenLabs são só
+  as falas da meleca (perguntas e frases do jogo) e o nome do personagem chutado da lista pronta, **nunca** nome
+  ensinado pela família (esse é falado pela voz do aparelho).
+
+**Fora da fase 2**: IA para adivinhar personagens fora da lista (com internet), placar entre aparelhos, TV própria.
 
 ## 13. O que fica para o construtor
 
