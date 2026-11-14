@@ -102,6 +102,7 @@
       return [Math.sin(p) * 0.55, Math.max(0, -Math.cos(p)) * 1.0 + 0.08];
     }
     var pernas = [perna(f + Math.PI), perna(f)];   // [de trás, da frente]
+    if (o.chute != null) { var ch = o.chute; pernas = [[-0.12 - ch * 0.15, 0.25], [-0.5 + ch * 1.7, 0.9 * (1 - ch) + 0.1]]; }   // chute: a perna da frente vai para trás e lança para a frente
     var alt = function (a) { return l1 * Math.cos(a[0]) + l2 * Math.cos(a[0] - a[1]); };
     var quadril = -(o.noAr ? pernaA * 0.95 : Math.max(alt(pernas[0]), alt(pernas[1])) + L * 0.6);
     if (o.andando && !o.noAr) quadril -= Math.abs(Math.sin(f)) * A * 0.012;   // sobe e desce no passo
@@ -121,7 +122,7 @@
       ctx.strokeStyle = tras ? tom(cfg.pele, 0.88) : cfg.pele; ctx.lineWidth = L; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(hx, hy); ctx.stroke();
       ctx.fillStyle = tras ? tom(cfg.pele, 0.88) : cfg.pele; ctx.beginPath(); ctx.arc(hx, hy, L * 0.95, 0, 6.2832); ctx.fill();
     }
-    var bal = o.andando && !o.noAr ? Math.sin(f) * 0.6 : 0, angTras = o.cima ? Math.PI * 0.92 : (o.noAr ? 2.2 : -bal + 0.1), angFrente = o.cima ? Math.PI * 0.82 : (o.noAr ? 2.5 : bal + 0.15);
+    var bal = o.chute != null ? -0.6 + o.chute * 1.2 : o.andando && !o.noAr ? Math.sin(f) * 0.6 : 0, angTras = o.cima ? Math.PI * 0.92 : (o.noAr ? 2.2 : -bal + 0.1), angFrente = o.cima ? Math.PI * 0.82 : (o.noAr ? 2.5 : bal + 0.15);
     if (cfg.acessorio === 'asas') asas(ctx, A, ombroY + th * 0.3, o.ts || 0);
     desenhaBraco(angTras, true);
     desenhaPerna(pernas[0], true);

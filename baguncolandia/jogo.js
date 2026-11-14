@@ -171,9 +171,34 @@
        cadeirinha que dobra. Acertou o alvo dele(a): a cadeira dobra, cai na piscina (bolinhas para todo lado), sobe pela
        escadinha e senta de novo. Chute para a esquerda vai no papai, para a direita na mamãe, reto no gol. */
     var tanques = (modoBase === 'chuta' || modoBase === 'mistura') ? [
-      { quem: 'pai', lado: -1, x: 205, alvo: { x: 395, y: 250, r: 48 }, fase: 'sentado', t: 0 },
+      { quem: 'vovo', lado: -1, x: 205, alvo: { x: 395, y: 250, r: 48 }, fase: 'sentado', t: 0 },
       { quem: 'mae', lado: 1, x: W - 205, alvo: { x: W - 395, y: 250, r: 48 }, fase: 'sentado', t: 0 }
     ] : null;
+    /* 👨 o papai joga junto (1 pessoa): corre de lado atrás da bola que está mais perto dele, pede a bola acenando
+       ("Toca pra mim!"), e quando ela chega no pé dele chuta: quase sempre devolve para a criança chutar, às vezes no gol. */
+    var papai = (modoBase === 'chuta' && nJog === 1) ? { x: W * 0.7, vx: 0, fase: 'anda', t: 0, chama: false, fala: null, falaAte: 0, proxFala: 1.5, dir: -1 } : null;
+    var FALAS_PAI = [['Toca pra mim!', 'Pass it to me!'], ['Aqui, aqui!', 'Over here!'], ['Chuta pro papai!', 'Kick it to Dad!'], ['Vai, campeã(o)!', 'Go, champ!']];
+    function falaPai(f, ms) { papai.fala = f; papai.falaAte = tempo + (ms || 1800); }
+    function passoPapai(dt) {
+      if (!papai) return;
+      var P = papai, crianca = raia(0).x + jogadores[0].corpo.x * raia(0).w, chaoBola = H - 60;
+      P.t += dt; if (P.fase === 'chuta' && P.t > 0.4) { P.fase = 'anda'; P.t = 0; } if (P.fase === 'festa' && P.t > 1.4) { P.fase = 'anda'; P.t = 0; }
+      var bola = null, dm = 1e9;
+      coisas.forEach(function (c) { if (c.morta || c.papel !== 'bola' || c.chutada || c.estilo !== 'rola' || (c.passe || 0) > tempo || c.y < chaoBola - 80) return; var d = Math.abs(c.x - P.x); if (d < Math.abs(c.x - crianca) && d < dm && c.x > 360 && c.x < 920) { dm = d; bola = c; } });
+      var lado = crianca < W / 2 ? 1 : -1, alvoX = bola ? bola.x - Math.sign(crianca - bola.x || 1) * 34 : clamp(crianca + lado * 360, 400, 880);   // fica do lado de lá da bola, para chutar em direção à criança
+      var vmax = W / 2.2, dx = alvoX - P.x;
+      if (P.fase !== 'chuta') { P.vx += clamp(clamp(dx * 5, -vmax, vmax) - P.vx, -4000 * dt, 4000 * dt); P.x = clamp(P.x + P.vx * dt, 400, 880); }
+      else P.vx *= 0.8;
+      if (Math.abs(P.vx) > 20) P.dir = P.vx > 0 ? 1 : -1;
+      if (bola && P.fase !== 'chuta' && Math.abs(bola.x - P.x) < 55) {   // a bola chegou no pé: chuta
+        P.fase = 'chuta'; P.t = 0; P.dir = crianca > P.x ? 1 : -1;
+        if (rnd() < 0.3) { chutar(bola, 0, false); bola.doPapai = true; falaPai(['Olha o chute do papai!', 'Watch Dad\'s kick!']); }
+        else { bola.vx = clamp((crianca - bola.x) / 1.1, -720, 720); bola.vy = -240; bola.passe = tempo + 1600; falaPai(['Toma! Agora chuta!', 'Here! Now kick it!']); }
+        emitir({ t: 'papai', acao: 'chute', x: P.x });
+      }
+      P.chama = !bola && P.fase === 'anda' && Math.abs(P.vx) < 40;
+      if (P.chama && tempo / 1000 > P.proxFala) { P.proxFala = tempo / 1000 + 5 + rnd() * 3; falaPai(FALAS_PAI[Math.floor(rnd() * FALAS_PAI.length)], 2000); }
+    }
     var TEMPO_TANQUE = { caindo: 0.55, piscina: 1.7, subindo: 1.9 };
     function passoTanques(dt) {
       if (!tanques) return;
@@ -182,7 +207,7 @@
     /* chute mirado: escolhe o alvo pela direção do chute; forte = bola mais rápida; 1 em 4 passa raspando (fácil, mas nem sempre) */
     function chutar(c, dirX, forte) {
       var alvoT, tipo;
-      if (tanques && dirX < -120) { alvoT = tanques[0].alvo; tipo = 'pai'; }
+      if (tanques && dirX < -120) { alvoT = tanques[0].alvo; tipo = 'vovo'; }
       else if (tanques && dirX > 120) { alvoT = tanques[1].alvo; tipo = 'mae'; }
       else { alvoT = { x: trave.x + trave.w / 2, y: trave.y + trave.h * 0.55 }; tipo = 'gol'; }
       var erro = rnd() < 0.25 ? (rnd() < 0.5 ? -1 : 1) * (tipo === 'gol' ? 150 : 95) : (rnd() - 0.5) * (tipo === 'gol' ? 80 : 30);
@@ -325,7 +350,8 @@
         else { c.vy += G * d; c.x += c.vx * d; c.y += c.vy * d; c.rot += c.vrot * d; }
         // gol
         if (c.papel === 'bola' && c.chutada && c.x > trave.x && c.x < trave.x + trave.w && c.y < trave.y + trave.h && c.y > trave.y - 20) {
-          c.morta = true; c.como = 'gol'; jogadores[c.j].pontos += mult(c.j, PONTOS.gol); emitir({ t: 'gol', id: c.id, j: c.j, x: c.x, y: c.y, pontos: PONTOS.gol });
+          c.morta = true; c.como = 'gol'; jogadores[c.j].pontos += mult(c.j, PONTOS.gol); emitir({ t: 'gol', id: c.id, j: c.j, x: c.x, y: c.y, pontos: PONTOS.gol, papai: !!c.doPapai });
+          if (papai) { papai.fase = 'festa'; papai.t = 0; falaPai(c.doPapai ? ['Gol do papai!', 'Dad scores!'] : ['Golaço! Toca aqui!', 'What a goal! High five!'], 2200); }
           trave.x = tanques ? W / 2 - trave.w / 2 + (rnd() - 0.5) * 120 : clamp(W / 2 - 120 + (rnd() - 0.5) * 700, 20, W - trave.w - 20); continue;
         }
         if (tanques && c.papel === 'bola' && c.chutada) { var tq = null; tanques.forEach(function (k) { if (k.fase === 'sentado' && Math.hypot(c.x - k.alvo.x, c.y - k.alvo.y) < k.alvo.r + c.raio * 0.6) tq = k; });
@@ -334,6 +360,7 @@
         if (fora) { if ((c.papel === 'fruta' || c.papel === 'doce') && c.estilo === 'arco') emitir({ t: 'perdeu', id: c.id, j: c.j, fig: c.fig }); coisas.splice(i, 1); }
       }
       passoTanques(dt);
+      passoPapai(dt);
       if (vai) passoVai(dt);
       else if (toque) passoDedo(dt);
       // poderes vencendo
@@ -564,7 +591,7 @@
       return {
         fase: fase, modo: modoAtual, modoBase: modoBase, tempo: tempo, restante: duracao ? Math.max(0, Math.ceil((duracao * 1000 - tempo) / 1000)) : null,
         jogadores: jogadores.map(function (jg, j) { var r = raia(j); return { pontos: Math.round(jg.pontos), vidas: jg.vidas, combo: jg.combo, poder: jg.poder, poderAte: jg.poderAte, lento: jg.lento > tempo, raia: r, zonaChute: jg.zonaChute, rastro: jg.rastro.slice(-8), corpo: jg.corpo, vai: jg.vai ? { x: jg.vai.x, y: jg.vai.y, vx: jg.vai.vx, A: VAI.A, cima: corpoVai(j).cima, alvo: jg.vai.alvo } : null, invencivel: jg.invencivelAte > tempo, esqueleto: jg.esq && tempo - 0 >= 0 ? jg.esq.k : null }; }),
-        coisas: coisas, trave: trave, bpm: bpm, tanques: tanques
+        coisas: coisas, trave: trave, bpm: bpm, tanques: tanques, papai: papai ? { x: papai.x, vx: papai.vx, fase: papai.fase, t: papai.t, chama: papai.chama, dir: papai.dir, fala: tempo < papai.falaAte ? papai.fala : null } : null
       };
     }
     function batida(novoBpm) { bpm = novoBpm ? clamp(novoBpm, 40, 220) : 0; ultimaBatida = tempo; }
