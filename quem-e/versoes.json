@@ -1,0 +1,26 @@
+{
+  "app": "quem-e",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "14/Nov/2026",
+      "hora": "02:43:57",
+      "pt": [
+        "🎭 Nasce o Quem é? com a primeira brincadeira, o Duelo de Caras: cada um escolhe uma cara em segredo e pergunta até descobrir a do outro",
+        "🫧 O Melekento Blue e a Pink Honey conversam, reagem e jogam contra você",
+        "🐣🐥🦉 Três níveis: 12, 24 e 36 caras desenhadas, um tabuleiro novo a cada partida",
+        "🔁 Passando o aparelho, com cortina para ninguém espiar",
+        "📱 Cada um no seu celular: um cria a partida e manda o código de 4 letras (precisa de internet)",
+        "🔍 Lupa para ver cada cara de perto"
+      ],
+      "en": [
+        "🎭 Who Is It? is born with its first game, Face Duel: each player secretly picks a face and asks questions to find the other one",
+        "🫧 Melekento Blue and Pink Honey chat, react and play against you",
+        "🐣🐥🦉 Three levels: 12, 24 and 36 drawn faces, a new board every game",
+        "🔁 Pass the device, with a curtain so nobody peeks",
+        "📱 Each on their own phone: one creates the game and sends the 4-letter code (needs internet)",
+        "🔍 Magnifier to see every face up close"
+      ]
+    }
+  ]
+}

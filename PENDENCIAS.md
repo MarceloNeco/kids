@@ -59,3 +59,11 @@ interruptor em `recursos-do-app.json`. Antes de começar cada um, fazer uma entr
 | 33 | Enigmatic: fotos mais realistas no lugar dos emojis (precisa de banco de fotos com licença livre; deixa o jogo mais pesado sem internet). | Dono, 06/Nov/2026 | 💡 ideia |
 | 34 | Mão na Massa: entrevistar a filha do dono para ajustar receitas, lugares e passos. | Dono | ⏸ aguardando o dono |
 | 35 | **A Garra** (jogo novo): máquina de pegar bichinho de pelúcia, inspirada nas fotos de fliperama do dono — 3 máquinas, 3 níveis, fichas, relógio, coleção com estrela dourada. Testar com as crianças; ideias das fotos (bichão gigante, caixinhas, prêmios pendurados) em `a-garra/PENDENCIAS.md`. | Dono, 14/Nov/2026 | ✅ v0.1.0 (14/Nov/2026); testar com as crianças ⏸ |
+
+## Quem é? (dono, 14/Nov/2026)
+
+| # | Descrição | Origem | Situação |
+|---|---|---|---|
+| 36 | **Quem é?**: jogo de adivinhar com o Melekento Blue e a Pink Honey (as massinhas das filhas), inspirado no formato "pense em alguém e eu descubro", com identidade própria. Primeira brincadeira: **Duelo de Caras** (cada um escolhe uma cara desenhada em segredo e pergunta até descobrir a do outro; contra a meleca, passando o aparelho ou cada um no seu celular). | Dono, 14/Nov/2026 | ✅ v0.1.0 (14/Nov/2026); pendências em `quem-e/PENDENCIAS.md` |
+| 37 | **Quem é? — A Meleca Adivinha**: a pessoa pensa em alguém e a meleca descobre (lista grande, aprende quando erra, João Alves, Infantil/Família/Adulto, voz ElevenLabs opcional). | Dono, 14/Nov/2026 | 🔵 em seguida |
+| 38 | Mandar a **foto das massinhas** (Melekento Blue e Pink Honey) para ajustar o desenho das melecas. | Dono, 14/Nov/2026 | ⏸ aguardando o dono |
