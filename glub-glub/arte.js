@@ -1056,7 +1056,11 @@
   /* =================================================================== linha, anzol, bolhas de poder */
   function linhaEAnzol(c, E, j, t) {
     var pt = R.ponta(E, j), a = E.j[j].anzol;
-    c.strokeStyle = 'rgba(255,255,255,0.85)'; c.lineWidth = 1.3;
+    var px1 = 1 / A.s;   // 1 px de tela, em unidades do mundo
+    c.lineCap = 'round';
+    c.strokeStyle = 'rgba(10,25,45,0.55)'; c.lineWidth = 4.5 * px1;   // contorno escuro: aparece no céu claro e na água
+    c.beginPath(); c.moveTo(pt.x, pt.y); c.lineTo(a.x, a.y); c.stroke();
+    c.strokeStyle = 'rgba(255,255,255,0.95)'; c.lineWidth = 2.2 * px1;
     c.beginPath(); c.moveTo(pt.x, pt.y); c.lineTo(a.x, a.y); c.stroke();
     var ang = a.fase === 'balanca' ? a.ang : a.dirAng;
     c.save(); c.translate(a.x, a.y); c.rotate(-ang);
