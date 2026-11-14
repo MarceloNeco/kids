@@ -207,8 +207,8 @@
   /* ---------- jogadores ---------- */
   function ponta(E, j) {
     var lado = E.j[j].lado === 'dir';
-    var m = E.W < H ? 0.3 : 0.21;   // celular em pé: as varas mais para o meio, para os personagens caberem
-    return { x: E.W * (lado ? 1 - m : m), y: E.sup - ACIMA };
+    var empe = E.W < H, m = empe ? 0.34 : 0.21;   // celular em pé: as varas mais baixas e mais para o meio, para os personagens caberem
+    return { x: E.W * (lado ? 1 - m : m), y: E.sup - (empe ? 110 : ACIMA) };
   }
   function repouso(E, j, ang) { var p = ponta(E, j); return { x: p.x + Math.sin(ang) * L_LINHA, y: p.y + Math.cos(ang) * L_LINHA }; }
   function novoPedido(E, j) {

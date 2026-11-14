@@ -866,7 +866,7 @@
   var IMG = {};
   function carregarImagens(base) {
     if (typeof Image === 'undefined') return;
-    R.BICHOS.map(function (b) { return b.id; }).concat(['juca', 'lili', 'mergulhador']).forEach(function (id) {
+    R.BICHOS.map(function (b) { return b.id; }).concat(['juca', 'lili', 'mergulhador']).filter(function (id) { return id !== 'sacola'; }).forEach(function (id) {   // a sacolinha continua desenhada no código
       var im = new Image(); im.onload = function () { IMG[id] = im; A.sprites = {}; }; im.src = base + id + '.webp';
     });
   }
@@ -993,10 +993,7 @@
     if (f > 1) { M.ini = -1; M.prox = t + 18 + Math.random() * 14; return; }
     var x = M.dir > 0 ? -150 + f * (W + 300) : W + 150 - f * (W + 300), y = M.y + Math.sin(t * 0.9) * 10, e = escala() * 0.9, k = t * 1.4;
     c.save(); c.translate(x, y); c.scale(M.dir * e, e);
-    if (IMG.mergulhador) {
-      c.globalCompositeOperation = 'lighter';
-      c.fillStyle = grad(c, 60, 0, 230, 0, [[0, 'rgba(255,250,200,0.35)'], [1, 'rgba(255,250,200,0)']]); c.beginPath(); c.moveTo(60, 0); c.lineTo(230, -55); c.lineTo(230, 60); c.closePath(); c.fill();
-      c.globalCompositeOperation = 'source-over';
+    if (IMG.mergulhador) {   // a imagem já vem com o facho da lanterna
       var im = IMG.mergulhador, lw = 150, lh = lw * im.naturalHeight / im.naturalWidth;
       c.rotate(Math.sin(t * 1.4) * 0.05); c.drawImage(im, -lw / 2, -lh / 2, lw, lh);
       c.restore();
