@@ -6,7 +6,7 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.4 de 07/Nov/2026', () => {
+test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.5 de 14/Nov/2026', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const j = JSON.parse(ler('versoes.json'));
@@ -17,7 +17,8 @@ test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.
   assert.match(v.data, /^\d{2}\/[A-Z][a-z]{2}\/\d{4}$/);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
   assert.equal(ler('app.js').match(/APP_DATA = '([^']+)'/)[1], v.data);
-  assert.equal(a, '0.2.4'); assert.equal(v.data, '07/Nov/2026');
+  assert.equal(a, '0.2.5'); assert.equal(v.data, '14/Nov/2026');
+  assert.ok(v.es && v.es.length === v.pt.length, 'versoes.json sem espanhol');
 });
 
 test('sw.js guarda todos os arquivos publicados (e os de fora, com ../)', () => {
@@ -46,7 +47,7 @@ test('manifest: instalável, escopo da pasta, ícones existem', () => {
   }
 });
 
-test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN', () => {
+test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES', () => {
   const html = ler('index.html');
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
@@ -55,7 +56,7 @@ test('index.html: CSP sem script inline, scripts existem, interruptor e textos P
   assert.match(html, /<script src="\.\.\/recursos\.js" data-app="kids"/);
   assert.match(html, /data-recurso="campo-minado"/);
   assert.match(html, /<link rel="manifest" href="manifest\.webmanifest">/);
-  for (const m of html.matchAll(/data-(?:t|rotulo)="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-(?:t|rotulo)="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'texto sem os três idiomas: ' + m[1]);
 });
 
 test('ids usados no app.js existem no index.html', () => {

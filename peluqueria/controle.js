@@ -36,7 +36,7 @@
   function receber(m) {
     if (m.t === 'tv') { join(); return; }
     if (m.t === 'pong' && m.to === ct.id) { pong(m); return; }
-    if (m.t === 'cheia' && m.to === ct.id) { ct.recusado = true; status(T('Esta TV já tem 2 jogadores.', 'This TV already has 2 players.')); return; }
+    if (m.t === 'cheia' && m.to === ct.id) { ct.recusado = true; status(T('Esta TV já tem 2 jogadores.', 'This TV already has 2 players.', 'Esta tele ya tiene 2 jugadores.')); return; }
     if (m.t === 'estado') { ct.ultimaTV = agora(); atualizar(m); }
   }
   function atualizar(m) {
@@ -50,14 +50,14 @@
     var jogando = m.fase === 'jogo' || m.fase === 'contagem';
     $('ctNiveis').hidden = jogando; $('ctComecar').hidden = jogando; $('ctParar').hidden = !jogando;
     document.querySelectorAll('[data-nivel-tv]').forEach(function (b) { b.classList.toggle('marcado', b.getAttribute('data-nivel-tv') === m.nivel); });
-    $('ctComecar').textContent = m.fase === 'fim' ? T('Jogar de novo', 'Play again') : T('Começar', 'Start');
+    $('ctComecar').textContent = m.fase === 'fim' ? T('Jogar de novo', 'Play again', 'Jugar otra vez') : T('Começar', 'Start', 'Empezar');
     var nomes = m.jogadores.map(function (j) { return j.nome; }).join(' · ');
-    if (!meus.length && m.fase !== 'lobby') { status(T('A TV está numa rodada. Espere acabar para entrar.', 'The TV is in a round. Wait for it to end to join.')); return; }
-    if (m.fase === 'lobby') status(T('Conectado! ', 'Connected! ') + nomes + T(' — escolha o nível e comece.', ' — pick the level and start.'));
-    else if (jogando) status(T('Valendo! ', 'Go! ') + meus.map(function (j) { return j.nome + ': ' + j.pontos; }).join(' · '));
+    if (!meus.length && m.fase !== 'lobby') { status(T('A TV está numa rodada. Espere acabar para entrar.', 'The TV is in the middle of a round. Wait for it to end to join.', 'La tele está en medio de una ronda. Espera a que termine para entrar.')); return; }
+    if (m.fase === 'lobby') status(T('Conectado! ', 'Connected! ', '¡Conectado! ') + nomes + T(' — escolha o nível e comece.', ' — pick the level and start.', ' — elige el nivel y empieza.'));
+    else if (jogando) status(T('Valendo! ', 'Go! ', '¡A jugar! ') + meus.map(function (j) { return j.nome + ': ' + j.pontos; }).join(' · '));
     else if (m.fase === 'fim') {
       var v = m.vencedor, placar = m.jogadores.map(function (j) { return j.nome + ' ' + j.pontos; }).join(' × ');
-      status((m.jogadores.length > 1 ? (v < 0 ? T('Empate! ', 'Tie! ') : T(m.jogadores[v].nome + ' venceu! ', m.jogadores[v].nome + ' wins! ')) : T('Fim! ', 'Done! ')) + placar);
+      status((m.jogadores.length > 1 ? (v < 0 ? T('Empate! ', 'Tie! ', '¡Empate! ') : T(m.jogadores[v].nome + ' venceu! ', m.jogadores[v].nome + ' wins! ', '¡' + m.jogadores[v].nome + ' gana! ')) : T('Fim! ', 'Done! ', '¡Fin! ')) + placar);
     }
   }
 
@@ -102,7 +102,7 @@
     if (ct.ligando) return;
     var vez = ct.ligando = Date.now();
     var valendo = function () { return ct.ligando === vez && ct.aberto; };
-    status(T('Ligando a câmera e a inteligência do corpo (na primeira vez baixa ~20 MB)…', 'Starting the camera and body AI (first time downloads ~20 MB)…'));
+    status(T('Ligando a câmera e a inteligência do corpo (na primeira vez baixa ~20 MB)…', 'Starting the camera and body AI (first time downloads ~20 MB)…', 'Encendiendo la cámara y la inteligencia del cuerpo (la primera vez descarga ~20 MB)…'));
     $('ctCamera').hidden = false; $('ctDicaCorpo').hidden = false; $('ctDois').hidden = false;
     return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false }).then(function (s) {
       if (!valendo()) { s.getTracks().forEach(function (t) { t.stop(); }); throw new Error('cancelado'); }
@@ -111,12 +111,12 @@
     }).then(function () {
       if (!valendo()) throw new Error('cancelado');
       ct.ligando = 0; ct.corpo = true; $('ctCorpo').setAttribute('aria-pressed', 'true'); manterAcesa();
-      status(T('Pronto! Levante um braço ou chute de repente para parar.', 'Ready! Raise an arm or kick suddenly to stop.'));
+      status(T('Pronto! Levante um braço ou chute de repente para parar.', 'Ready! Raise an arm or kick suddenly to stop.', '¡Listo! Levanta un brazo o da una patada de repente para detenerlo.'));
       laco();
     }).catch(function (e) {
       if (e && e.message === 'cancelado') return;
       desligarCorpo();
-      status(T('Não deu para ligar a câmera. Use o botão PARAR.', "Couldn't start the camera. Use the STOP button."));
+      status(T('Não deu para ligar a câmera. Use o botão PARAR.', "Couldn't start the camera. Use the STOP button.", 'No se pudo encender la cámara. Usa el botón ALTO.'));
     });
   }
   function desligarCorpo() {
@@ -133,17 +133,17 @@
     ct.codigo = codigo; ct.nome = nome; ct.id = idProprio(); ct.k = senha(); ct.recusado = false; ct.ultimaTV = agora();
     var pref = A.pref(); pref.nome = nome; A.gravarPref();
     $('ctEntrada').hidden = true; $('ctPainel').hidden = false; $('ctParar').hidden = true;
-    status(T('Procurando a TV…', 'Looking for the TV…'));
+    status(T('Procurando a TV…', 'Looking for the TV…', 'Buscando la tele…'));
     PeluqueriaSala.abrir(codigo, receber).then(function (c) {
       ct.canal = c; join();
       ct.timers.push(setInterval(function () { if (!ct.conectado) join(); }, 2000));
       ct.timers.push(setInterval(function () { mandar({ t: 'ping', id: ct.id, k: ct.k, a: agora() }); }, PING));
       ct.timers.push(setInterval(function () {
-        if (ct.conectado && agora() - ct.ultimaTV > SUMIU) { ct.conectado = false; status(T('TV não encontrada. Ela fechou ou mudou de código? Confira e entre de novo.', 'TV not found. Was it closed or did the code change? Check and join again.')); }
+        if (ct.conectado && agora() - ct.ultimaTV > SUMIU) { ct.conectado = false; status(T('TV não encontrada. Ela fechou ou mudou de código? Confira e entre de novo.', 'TV not found. Was it closed or did the code change? Check and join again.', 'No encontramos la tele. ¿Se cerró o cambió el código? Revisa y entra otra vez.')); }
       }, 1000));
       mandar({ t: 'ping', id: ct.id, k: ct.k, a: agora() });
-      setTimeout(function () { if (!ct.conectado) status(T('TV não encontrada. Confira o código e se a TV está na tela do código.', 'TV not found. Check the code and that the TV shows it.')); }, 8000);
-    }).catch(function () { status(T('Sem internet para falar com a TV.', 'No internet to reach the TV.')); });
+      setTimeout(function () { if (!ct.conectado) status(T('TV não encontrada. Confira o código e se a TV está na tela do código.', 'TV not found. Check the code and that the TV is showing it.', 'No encontramos la tele. Revisa el código y que la tele lo esté mostrando.')); }, 8000);
+    }).catch(function () { status(T('Sem internet para falar com a TV.', 'No internet to reach the TV.', 'No hay internet para hablar con la tele.')); });
     manterAcesa();
   }
   function sair() {

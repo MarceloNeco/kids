@@ -5,14 +5,13 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.Peluqueria;
-  var lingua = /^en/i.test(navigator.language || '') ? 'en' : 'pt';
-  function T(pt, en) { return lingua === 'en' ? en : pt; }
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';   // o idioma escolhido na estante (../idioma.js)
+  function T(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' ? (es != null ? es : pt) : pt; }
   function traduzir() {
-    document.documentElement.lang = lingua === 'en' ? 'en' : 'pt-BR';
-    document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = T(p[0], p[1] || p[0]); });
-    $('btLingua').textContent = lingua === 'en' ? 'PT' : 'EN';
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
+    document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = T(p[0], p[1] || p[0], p[2]); });
   }
-  $('btLingua').addEventListener('click', function () { lingua = lingua === 'en' ? 'pt' : 'en'; traduzir(); mostrar(); });
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); mostrar(); });
 
   var est = { modo: 'cenario', lugar: 'cabeca', nome: '', id: '', arquivo: '', lugares: {}, encaixe: null, url: '' };
   var r3 = function (v) { return Math.round(v * 1000) / 1000; };
@@ -30,7 +29,7 @@
     var s = simples(f.name);
     est.id = s.id; est.nome = s.nome; est.arquivo = s.id + '.' + (s.ext || 'png'); est.lugares = {}; est.encaixe = null;
     $('aviso').hidden = !!s.ext;
-    $('aviso').textContent = T('Use foto PNG, JPG, WEBP ou SVG.', 'Use a PNG, JPG, WEBP or SVG picture.');
+    $('aviso').textContent = T('Use foto PNG, JPG, WEBP ou SVG.', 'Use a PNG, JPG, WEBP or SVG picture.', 'Usa una foto PNG, JPG, WEBP o SVG.');
     if (est.url) URL.revokeObjectURL(est.url);
     est.url = URL.createObjectURL(f);
     $('imagem').src = est.url;
@@ -43,8 +42,8 @@
     $('modoCenario').classList.toggle('marcado', m === 'cenario'); $('modoCenario').setAttribute('aria-pressed', String(m === 'cenario'));
     $('modoItem').classList.toggle('marcado', m === 'item'); $('modoItem').setAttribute('aria-pressed', String(m === 'item'));
     $('dicaModo').setAttribute('data-t', m === 'cenario'
-      ? '2. Escolha o tipo de lugar e arraste um quadrado sobre a foto: o centro é onde o item para; a largura é o tamanho dele.|2. Pick the kind of spot and drag a box over the picture: the center is where the item stops; the width is its size.'
-      : '2. Escolha onde o item vai (cabeça, olhos, nariz, boca) e toque no ponto do desenho que deve cair no lugar (ex.: a base da coroa).|2. Pick where the item goes (head, eyes, nose, mouth) and tap the point of the drawing that must land on the spot (e.g. the base of the crown).');
+      ? '2. Escolha o tipo de lugar e arraste um quadrado sobre a foto: o centro é onde o item para; a largura é o tamanho dele.|2. Pick the kind of spot and drag a box over the picture: the center is where the item stops; the width is its size.|2. Elige el tipo de lugar y arrastra un cuadrado sobre la foto: el centro es donde se detiene el objeto; el ancho es su tamaño.'
+      : '2. Escolha onde o item vai (cabeça, olhos, nariz, boca) e toque no ponto do desenho que deve cair no lugar (ex.: a base da coroa).|2. Pick where the item goes (head, eyes, nose, mouth) and tap the point of the drawing that must land on the spot (e.g. the base of the crown).|2. Elige dónde va el objeto (cabeza, ojos, nariz, boca) y toca el punto del dibujo que debe caer en su lugar (por ejemplo, la base de la corona).');
     $('giro').parentNode.hidden = m === 'item';
     $('quadro').hidden = true; $('ponto').hidden = true;
     traduzir(); mostrar();
@@ -111,7 +110,7 @@
       $('ponto').style.left = (est.encaixe.x * im.clientWidth) + 'px'; $('ponto').style.top = (est.encaixe.y * im.clientHeight) + 'px';
     } else $('ponto').hidden = true;
     var e = entrada(), ok = e && (est.modo === 'item' ? P.validarItem(e) : P.validarCenario(e));
-    $('linha').textContent = e ? JSON.stringify(e) : T('(a linha aparece aqui)', '(the line shows up here)');
+    $('linha').textContent = e ? JSON.stringify(e) : T('(a linha aparece aqui)', '(the line shows up here)', '(la línea aparece aquí)');
     $('copiar').disabled = !ok;
   }
 

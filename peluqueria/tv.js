@@ -8,8 +8,8 @@
   var A = window.PeluqueriaApp, P = window.Peluqueria, $ = function (id) { return document.getElementById(id); };
   var T = A.T, TESTE = A.TESTE, CONTAGEM = 2.1;
   var SUMIU = TESTE ? 2000 : 10000, ESTADO = TESTE ? 800 : 3000;   // celular sem sinal há tanto tempo sai do lobby
-  var NIVEIS = ['crianca', 'normal', 'maluco'], NOME_NIVEL = { crianca: ['Criança', 'Kids'], normal: ['Normal', 'Normal'], maluco: ['Maluco', 'Crazy'] };
-  var ROTULO = { PERFEITO: ['PERFEITO!', 'PERFECT!'], BOM: ['BOM!', 'GOOD!'], QUASE: ['QUASE!', 'ALMOST!'], LONGE: ['LONGE!', 'MISS!'] };
+  var NIVEIS = ['crianca', 'normal', 'maluco'], NOME_NIVEL = { crianca: ['Criança', 'Kids', 'Niños'], normal: ['Normal', 'Normal', 'Normal'], maluco: ['Maluco', 'Crazy', 'Loco'] };
+  var ROTULO = { PERFEITO: ['PERFEITO!', 'PERFECT!', '¡PERFECTO!'], BOM: ['BOM!', 'GOOD!', '¡BIEN!'], QUASE: ['QUASE!', 'ALMOST!', '¡CASI!'], LONGE: ['LONGE!', 'MISS!', '¡LEJOS!'] };
   var tv = { aberta: false, codigo: '', canal: null, jogadores: [], nivel: 'normal', fase: 'lobby', partida: null, desenhos: [], resto: 0 };
   var som = window.PeluqueriaSom;
 
@@ -17,7 +17,7 @@
   function mandar(m) { if (tv.canal) tv.canal.mandar(m); }
   function nomeDe(j) {
     for (var k = 0; k < tv.jogadores.length; k++) if (tv.jogadores[k].js.indexOf(j) >= 0) return tv.jogadores[k].nome + (tv.jogadores[k].js.length > 1 ? ' ' + (j + 1) : '');
-    return T('Jogador', 'Player') + (j ? ' 2' : '');
+    return T('Jogador', 'Player', 'Jugador') + (j ? ' 2' : '');
   }
   function usados() { var u = []; tv.jogadores.forEach(function (x) { u = u.concat(x.js); }); return u; }
 
@@ -67,8 +67,8 @@
   function desenharLobby() {
     var box = $('tvJogadores'); box.textContent = '';
     tv.jogadores.forEach(function (x) { var s = document.createElement('span'); s.textContent = '📱 ' + x.nome + (x.js.length > 1 ? ' 👯' : ''); box.appendChild(s); });
-    if (!tv.jogadores.length) { var s = document.createElement('span'); s.textContent = T('Esperando os celulares… (ou aperte OK)', 'Waiting for phones… (or press OK)'); box.appendChild(s); }
-    $('tvNivel').textContent = T(NOME_NIVEL[tv.nivel][0], NOME_NIVEL[tv.nivel][1]);
+    if (!tv.jogadores.length) { var s = document.createElement('span'); s.textContent = T('Esperando os celulares… (ou aperte OK)', 'Waiting for phones… (or press OK)', 'Esperando los móviles… (o pulsa OK)'); box.appendChild(s); }
+    $('tvNivel').textContent = T(NOME_NIVEL[tv.nivel][0], NOME_NIVEL[tv.nivel][1], NOME_NIVEL[tv.nivel][2]);
   }
   function lobby() {
     tv.fase = 'lobby'; tv.partida = null;
@@ -90,7 +90,7 @@
     }
     tv.fase = 'contagem'; tv.resto = CONTAGEM; placar();
     if (som) { som.ligar(); som.rodada(tv.nivel); }
-    A.efeito('conta'); A.falar('Três, dois, um, já!', 'Three, two, one, go!');
+    A.efeito('conta'); A.falar('Três, dois, um, já!', 'Three, two, one, go!', '¡Tres, dos, uno, ya!');
     estado();
   }
   function placar() {
@@ -108,10 +108,10 @@
       var est = document.createElement('span'); var e = P.estrelas(r); est.textContent = '★★★'.slice(0, e) + '☆☆☆'.slice(0, 3 - e);
       d.appendChild(nome); d.appendChild(pts); d.appendChild(est); box.appendChild(d);
     });
-    if (p.rodadas.length > 1) { var f = document.createElement('p'); f.textContent = v < 0 ? T('Empate!', 'Tie!') : T(nomeDe(v) + ' venceu!', nomeDe(v) + ' wins!'); box.appendChild(f); }
+    if (p.rodadas.length > 1) { var f = document.createElement('p'); f.textContent = v < 0 ? T('Empate!', 'Tie!', '¡Empate!') : T(nomeDe(v) + ' venceu!', nomeDe(v) + ' wins!', '¡' + nomeDe(v) + ' gana!'); box.appendChild(f); }
     A.tela('tvFim');
     if (som) { som.musica('fim'); }
-    A.efeito('fim'); A.falar(p.rodadas.length > 1 && v >= 0 ? nomeDe(v) + ' venceu!' : 'Fim da rodada!', p.rodadas.length > 1 && v >= 0 ? nomeDe(v) + ' wins!' : 'Round over!');
+    A.efeito('fim'); A.falar(p.rodadas.length > 1 && v >= 0 ? nomeDe(v) + ' venceu!' : 'Fim da rodada!', p.rodadas.length > 1 && v >= 0 ? nomeDe(v) + ' wins!' : 'Round over!', p.rodadas.length > 1 && v >= 0 ? '¡' + nomeDe(v) + ' gana!' : '¡Fin de la ronda!');
     estado();
   }
 
@@ -126,7 +126,7 @@
     var p = tv.partida; if (!p) return;
     p.eventos().forEach(function (ev) {
       A.efeito(ev.res.categoria); if (ev.res.categoria === 'PERFEITO') A.efeito('uhul');
-      var r = ROTULO[ev.res.categoria]; $('aviso').textContent = nomeDe(ev.j) + ': ' + T(r[0], r[1]) + ' +' + ev.res.pontos;
+      var r = ROTULO[ev.res.categoria]; $('aviso').textContent = nomeDe(ev.j) + ': ' + T(r[0], r[1], r[2]) + ' +' + ev.res.pontos;
     });
     placar();
   }
@@ -143,7 +143,7 @@
     tv.partida.rodadas.forEach(function (r, j) {
       if (r.fase === 'fim') return;
       var q = r.quedas[r.i], res = r.fase === 'parado' ? r.resultados[r.resultados.length - 1] : null, rot = res ? ROTULO[res.categoria] : null;
-      tv.desenhos[j].pintar(r, { pos: P.posicao(q, r.nivel, r.i, r.t), resultado: res, rotulo: rot ? T(rot[0], rot[1]) : '', uhul: res && res.categoria === 'PERFEITO' ? T('UHUL!', 'WOOHOO!') : '', pausado: false, dt: dt });
+      tv.desenhos[j].pintar(r, { pos: P.posicao(q, r.nivel, r.i, r.t), resultado: res, rotulo: rot ? T(rot[0], rot[1], rot[2]) : '', uhul: res && res.categoria === 'PERFEITO' ? T('UHUL!', 'WOOHOO!', '¡YUJU!') : '', pausado: false, dt: dt });
     });
   }
   var ultimo = 0;
@@ -198,7 +198,7 @@
     tv.codigo = PeluqueriaSala.codigoNovo(); $('codigo').textContent = tv.codigo;
     lobby();
     PeluqueriaSala.abrir(tv.codigo, receber).then(function (c) { tv.canal = c; mandar({ t: 'tv' }); estado(); })
-      .catch(function () { $('tvAviso').textContent = T('Sem conexão com os celulares agora. Dá para jogar com o controle da TV (OK).', 'No connection to phones right now. You can play with the TV remote (OK).'); });
+      .catch(function () { $('tvAviso').textContent = T('Sem conexão com os celulares agora. Dá para jogar com o controle da TV (OK).', 'No connection to phones right now. You can play with the TV remote (OK).', 'Ahora no hay conexión con los móviles. Puedes jugar con el mando de la tele (OK).'); });
     tv.timers = [setInterval(estado, ESTADO), setInterval(limparSumidos, 1000)];
     if (!TESTE) requestAnimationFrame(quadro);
     if (TESTE) window.PeluqueriaTVDebug.pronto = true;

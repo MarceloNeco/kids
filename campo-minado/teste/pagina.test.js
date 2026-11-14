@@ -262,13 +262,14 @@ test('computador: botão direito marca, acorde e perder acordando o ouriço', as
   await pg.ctx.close();
 });
 
-test('inglês, ajuda e zoom', async () => {
+test('idioma da estante (inglês e espanhol), ajuda e zoom', async () => {
   const pg = await abrir(TELAS.celular);
   await pg.tap('#btAjuda');
   assert.equal(await pg.isVisible('#ajuda'), true);
   assert.match(await pg.textContent('#ajuda'), /primeiro toque nunca acorda um ouriço/);
   assert.match(await pg.textContent('#ajuda'), /No Fácil, se você ficar uns segundinhos pensando/);
-  await pg.tap('#btLingua');
+  assert.equal(await pg.evaluate(() => !document.getElementById('btLingua')), true, 'sem botão de idioma próprio');
+  await pg.evaluate(() => BolinhoIdioma.escolher('en'));   // a escolha é feita na estante (../idioma.js)
   assert.equal(await pg.getAttribute('html', 'lang'), 'en');
   assert.equal(await pg.textContent('h1'), 'Garden Sweeper');
   assert.match(await pg.textContent('#ajuda'), /first tap never wakes a hedgehog/);
@@ -286,9 +287,20 @@ test('inglês, ajuda e zoom', async () => {
   await pg.tap('#btZoom');
   assert.equal((await pg.locator('.casa').first().boundingBox()).width, antes, 'outro toque mostra o jardim todo de novo');
   assert.equal(await pg.getAttribute('#btZoom', 'aria-pressed'), 'false');
-  // a língua fica guardada
+  // a escolha da estante fica guardada; o jogo não guarda idioma próprio
   await pg.reload(); await pg.waitForFunction(() => window.CampoDebug);
   assert.equal(await pg.textContent('h1'), 'Garden Sweeper');
+  assert.doesNotMatch(await pg.evaluate(() => localStorage.getItem('campo-minado.pref') || ''), /lingua/);
+  // espanhol
+  await pg.evaluate(() => BolinhoIdioma.escolher('es'));
+  assert.equal(await pg.getAttribute('html', 'lang'), 'es');
+  assert.equal(await pg.textContent('h1'), 'Buscaminas del Jardín');
+  assert.match(await pg.textContent('#ajuda'), /El primer toque nunca despierta a un erizo/);
+  assert.match(await pg.textContent('#btFacil'), /Fácil/);
+  assert.match(await pg.textContent('#versao'), /Versión .* 14\/nov\/2026/);
+  await pg.tap('#btDificil');
+  assert.equal(await pg.getAttribute('#btModo', 'aria-label'), 'Modo banderita');
+  assert.match(await pg.locator('.casa').first().getAttribute('aria-label'), /^Fila 1, columna 1: césped$/);
   assert.deepEqual(pg.erros(), []);
   await pg.ctx.close();
 });
