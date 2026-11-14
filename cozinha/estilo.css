@@ -601,3 +601,38 @@ a { color: #1d6fb8; }
   .titulo-pronto { font-size: 1.4rem; } .estrelas { font-size: 1.8rem; }
   .cartao-receita { max-width: none; }
 }
+
+/* ---------- v0.6.0: fotos de verdade (fotos/<id>.jpg) e mais movimento ----------
+   Ingredientes e receitas aparecem com a foto num círculo (o tamanho segue o font-size, como os emojis).
+   Tudo o que se mexe aqui para com "reduzir movimento" (regra geral mais acima). */
+.ic-foto { width: 1.3em; height: 1.3em; border-radius: 50%; overflow: hidden; background: #fff; vertical-align: middle; flex: none;
+  box-shadow: 0 0 0 .08em #fff, 0 .06em .2em rgba(80, 40, 10, .28); }
+.ic-foto img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none; }
+.ic-titulo { font-size: 1.25em; margin-right: 2px; vertical-align: -.32em; }
+.rec-foto { width: 6.4rem; height: 6.4rem; border-radius: 50%; overflow: hidden; border: 4px solid #fff; box-shadow: 0 0 0 3px var(--c), 0 6px 12px rgba(0, 0, 0, .16); filter: none; }
+.rec-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.rec:hover .rec-foto img, .rec:focus-visible .rec-foto img { transform: scale(1.15) rotate(-4deg); }
+.prato-grande { overflow: hidden; background: #fff; }
+@media not all and (orientation: landscape) and (max-height: 32rem) { .prato-grande { width: 9rem; height: 9rem; border-width: 5px; } .lista-ing .ic-foto { font-size: 2rem; } }
+.prato-grande img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bt-servir .comida .ic-foto { font-size: 1.6em; }
+.dentro-gel .ic-foto { font-size: 1.3rem; }
+.festa .ic-foto { font-size: 2.2rem; }
+.enfeite { display: flex; justify-content: center; flex-wrap: nowrap; gap: 6px; letter-spacing: 0; animation: none; }
+.enfeite .onda { font-size: min(1.9rem, 8.4vw); animation: onda 2.2s ease-in-out infinite; animation-delay: calc(var(--i) * .14s); }
+@keyframes onda { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-12px) rotate(-8deg); } 50% { transform: translateY(0) rotate(0); } 75% { transform: translateY(3px) rotate(6deg); } }
+
+/* telas entram deslizando; cartões, ingredientes e produtos aparecem um depois do outro, com pulinho */
+.tela.ativa > :not(.cesta) { animation: telaEntra .38s cubic-bezier(.25, 1.3, .5, 1) both; }
+@keyframes telaEntra { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.tela.ativa .rec, .tela.ativa .lista-ing li, .tela.ativa .produto, .tela.ativa .pedido { animation: popEntra .45s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: calc(var(--i, 0) * 45ms + .1s); }
+@keyframes popEntra { from { opacity: 0; transform: scale(.5) translateY(14px); } to { opacity: 1; transform: none; } }
+.rec .rec-foto { animation: respira 3.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -.4s); }
+@keyframes respira { 0%, 100% { transform: rotate(-3deg) scale(1); } 50% { transform: rotate(3deg) scale(1.05); } }
+.tela.ativa .prato-grande { animation: pratoGira .8s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes pratoGira { from { transform: rotate(-200deg) scale(.3); opacity: 0; } to { transform: none; opacity: 1; } }
+/* botão que chama para ser tocado: um anel de luz pulsando em volta (sem mexer no tamanho do botão) */
+#btBuscar, .lugar.pronta, #btEntrar { animation: chamaToque 1.6s ease-out 1s infinite; }
+@keyframes chamaToque { 0% { box-shadow: 0 6px 0 #c9601d, 0 0 0 0 rgba(255, 138, 61, .55); } 100% { box-shadow: 0 6px 0 #c9601d, 0 0 0 18px rgba(255, 138, 61, 0); } }
+.vila .lugar .cena span { display: inline-block; animation: pula 2s ease-in-out infinite; }
+.vila .lugar .cena .c2 { animation-delay: -.7s; } .vila .lugar .cena .c3 { animation-delay: -1.3s; }

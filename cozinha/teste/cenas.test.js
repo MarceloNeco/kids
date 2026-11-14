@@ -18,6 +18,10 @@ test.after(fechar);
 async function abrirMov(viewport, extra, antes) {
   const r = await abrir(viewport, Object.assign({ reducedMotion: 'no-preference' }, extra || {}), antes);
   await r.pg.goto(r.pg.url() + '&devagar');
+  // a abinha "Tela inteira" (../telacheia.js, no meio da borda esquerda) aparece no teste porque o navegador do teste não
+  // entra em tela cheia; com os cartões de receita maiores (fotos, v0.6.0) ela fica em cima do primeiro cartão e o clique
+  // forçado (sem esperar) acertava nela. No celular de verdade ela some na tela cheia.
+  await r.pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
   const click0 = r.pg.click.bind(r.pg);
   r.pg.click = (s, o) => click0(s, Object.assign({ force: true }, o));
   return r;
