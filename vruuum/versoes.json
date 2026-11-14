@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.23.0",
+      "data": "14/Nov/2026",
+      "hora": "17:55:00",
+      "pt": [
+        "✈️ Os que voam mais caprichados: rastro branco nas pontas das asas, luzes vermelha e verde piscando, clarão no motor do jato, luz do helicóptero, purpurina mágica atrás do trenó com o nariz da rena brilhando, pintas da arara acendendo e olhos acesos do morcego."
+      ],
+      "en": [
+        "✈️ Fancier flyers: white trails from the wingtips, blinking red and green lights, a glow from the jet engine, the helicopter beacon, magic glitter behind the sleigh with the reindeer's glowing nose, the macaw's spots lighting up and the bat's glowing eyes."
+      ],
+      "es": [
+        "✈️ Los que vuelan, más cuidados: estela blanca en las puntas de las alas, luces roja y verde parpadeando, resplandor en el motor del jet, la luz del helicóptero, purpurina mágica detrás del trineo con la nariz del reno brillando, las manchas del guacamayo encendiéndose y los ojos brillantes del murciélago."
+      ]
+    },
+    {
       "versao": "1.22.0",
       "data": "14/Nov/2026",
       "hora": "17:40:00",
