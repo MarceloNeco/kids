@@ -31,8 +31,9 @@ const TAMANHOS = [[390, 844], [915, 412]];
 // confirmar: o jogo pergunta antes de largar a partida (🏠 e Voltar) e o teste responde que sim;
 // fundo: jogos de várias telas, onde o Voltar volta uma tela por vez (diretriz): o 🏠 é testado lá do fundo;
 // avisaAntesDeSair: na tela de começo o 1º Voltar avisa "toque de novo para sair" e só o 2º sai (diretriz)
+// voltasNoComeco: a tela de começo tem passos (o Voltar volta um passo antes de chegar ao primeiro)
 const JOGOS = [
-  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#btPassoCel', avisaAntesDeSair: true,
+  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#inicio.ativa', voltasNoComeco: 1, avisaAntesDeSair: true,
     entrar: async (pg) => { await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.waitForTimeout(300); },
     fundo: async (pg) => { await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar');
       await pg.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 }); await pg.click('#localComecar'); await pg.waitForTimeout(1500); } },
@@ -155,6 +156,7 @@ for (const j of JOGOS) {
         await esperarInicio(pg, j, onde + ' (Voltar)');
         assert.ok(pg.url().startsWith(base + j.url.split('?')[0]), onde + ': o Voltar saiu do jogo (' + pg.url() + ')');
         // Voltar na tela de começo: sai do jogo (para a estante, de onde veio)
+        for (let i = 0; i < (j.voltasNoComeco || 0); i++) { await pg.goBack().catch(() => {}); await pg.waitForTimeout(300); }   // começo em passos (Bagunçolândia: "como?" → "onde vamos jogar?")
         if (j.avisaAntesDeSair) { await pg.goBack().catch(() => {}); await pg.waitForTimeout(400); }
         await pg.goBack().catch(() => {});
         await pg.waitForURL(base, { timeout: 5000 }).catch(() => assert.fail(onde + ': o Voltar na tela de começo não saiu do jogo (' + pg.url() + ')'));
