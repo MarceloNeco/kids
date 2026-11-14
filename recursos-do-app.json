@@ -114,6 +114,14 @@
       "pagina": "cozinha/"
     },
     {
+      "id": "a-garra",
+      "nome": {
+        "pt": "A Garra",
+        "en": "The Claw Machine"
+      },
+      "pagina": "a-garra/"
+    },
+    {
       "id": "aqua",
       "nome": {
         "pt": "AQUA",

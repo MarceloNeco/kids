@@ -53,7 +53,7 @@
   function suave(a, b, p) { return a + (b - a) * ((-Math.cos(p * Math.PI) / 2) + 0.5); }
   function entra(a, b, p) { return a + (b - a) * Math.pow(p, 2); }
 
-  function montar(nivel, semente) {
+  function montar(nivel, semente, escolhidos) {
     var cfg = NIVEIS[nivel] || NIVEIS.normal;
     var r = sorteio(semente || 1);
     var segs = [];
@@ -99,6 +99,8 @@
     // mundos: 2 fantásticos e 2 dos outros, em ordem sorteada, cada um com 1/4 do caminho até a chegada
     function embaralhar(l) { for (var i = l.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), tmp = l[i]; l[i] = l[j]; l[j] = tmp; } return l; }
     var ordem = embaralhar(embaralhar(FANTASTICOS.slice()).slice(0, 2).concat(embaralhar(MUNDOS.filter(function (m) { return FANTASTICOS.indexOf(m) < 0; })).slice(0, 2)));
+    var esc = (escolhidos || []).filter(function (m, k, l) { return MUNDOS.indexOf(m) >= 0 && l.indexOf(m) === k; }).slice(0, 4);
+    if (esc.length) ordem = esc.concat(embaralhar(MUNDOS.filter(function (m) { return esc.indexOf(m) < 0; })).slice(0, 4 - esc.length));   // escolhidos na ordem do toque
     var quarto = chegada / 4, i;
     var perto = function (k, folga) { return loops.some(function (l) { return k > l.ini - folga && k < l.fim + folga; }); };
     var portas = [0, 1, 2, 3].map(function (q) { var k = Math.round(quarto * q); while (q && perto(k, 30)) k++; return k; });   // portal nunca no looping

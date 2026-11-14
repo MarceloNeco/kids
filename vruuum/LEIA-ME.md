@@ -53,7 +53,7 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 - O veículo escolhido fica **sempre à vista**: em pé, preso no topo da tela enquanto as opções rolam; deitado, de um
   lado, com as opções do outro. O botão 🏁 Correr fica preso embaixo. Com 2 jogadores, abas Jogador 1 e Jogador 2.
-- **23 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
+- **24 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
 
 | Grupo | Veículos |
 |---|---|
@@ -179,7 +179,8 @@ No arquivo baixado (📲 Guardar no celular) tocam só as feitas pelo jogo, para
 | `estilo.css` | visual, paleta Bolinho de Chuva, fonte Fredoka. |
 | `pista.js` | **puro**: monta a estrada com semente (retas, curvas, morros, mundos), espalha estrelas, cones, lama, turbos, rampas, enfeites e o trânsito. Níveis em `NIVEIS`. |
 | `motor.js` | **puro**: regras da corrida (volante, curva, acelerar, grama, coisas da pista, batidas, chegada) e lista de eventos para som e efeitos. |
-| `veiculos.js` | a garagem: os 23 veículos (desenho, nome, grupo, velocidade e curva), testada no Node. |
+| `veiculos.js` | a garagem: os 24 veículos
+| `modelos3d.js` | veículos em 3D de verdade (caixas, rodas cilíndricas, bolas, vidro transparente e desenhos nas faces): furgão, ônibus escolar, caminhão de pelúcias, pipoca, sorvete, hambúrguer, galinha e o Ovo Corredor; giram de lado na curva e inclinam no morro | (desenho, nome, grupo, velocidade e curva), testada no Node. |
 | `cavalo.js` | o cavalo galopando com quem monta, montado em 3D com peças simples (gira de lado nas curvas); galope testado no Node. |
 | `sprites.js` | todos os desenhos, feitos em código uma vez num canvas escondido. |
 | `desenho.js` | a estrada em 3D (pseudo-3D por pedaços), céu, fundo, enfeites, carros, efeitos, placar e tela dividida. |
@@ -227,3 +228,43 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - Mundos **Cidade do Lanche** (toalha xadrez, hambúrgueres gigantes, batata, milkshake) e **Mundo dos Blocos** (cubos; nada do Minecraft);
   chocolate, pudim e taça de sorvete também na Terra dos Doces; **balões de emoji** aparecem de vez em quando em todo mundo.
 
+## 1.13.0 — veículos em 3D, volta de 360°, cenários à escolha
+
+- **3D de verdade** (`modelos3d.js`): furgão de surfe, ônibus escolar, caminhão de pelúcias, carrinhos de pipoca e de sorvete,
+  carro-hambúrguer e galinha. Na curva aparece a lateral; no morro e no pulo o veículo inclina (descendo dá para ver o teto).
+  Janelas de vidro transparente: o piloto aparece lá dentro. Os quadros parados (rivais e garagem) saem do mesmo modelo.
+- **Ovo Corredor**: o Humpty Dumpty da cantiga inglesa (domínio público), correndo sem carro; ele mesmo é o piloto.
+- **Volta de 360°** (`vistaOrbita` em `desenho.js`): no 3-2-1 e logo depois da chegada a câmera gira em volta de quem joga
+  e termina na câmera do jogo. Quem é 3D gira de verdade; os outros dão uma meia-volta curta.
+- **Cenários à escolha** no menu (até 4, na ordem do toque; 🎲 Surpresa = sorteio). **Rivais sem repetição**: nenhum corre
+  com o mesmo veículo de quem joga, nem com o mesmo de outro rival.
+- Abertura mais clara e com turbo de vez em quando (linhas de velocidade).
+
+
+## 1.14.0 — menu com a corrida atrás e música à escolha
+
+- A corrida de demonstração da abertura (`#demo`, agora fixa no `<body>`) continua rodando atrás do menu, com um véu um
+  pouco mais escuro e os botões meio transparentes (`body.com-demo` / `body.demo-menu`, ligados em `tela()` no `app.js`).
+  Na corrida e no fim ela para.
+- Grupo 🎵 Música no menu: ⏮ e ⏭ trocam; tocar no nome abre a lista inteira (na ordem em que vai tocar). A escolhida
+  continua na corrida seguinte; sem escolha, cada corrida começa uma música nova, como antes. `som.js` ganhou
+  `listaMusicas()`, `escolherMusica(k)` e `musicaAtual()`. Sem internet a regra da música não muda: toca só a favorita
+  guardada, e o menu avisa.
+
+## 1.15.0 — carros antigos e trenó em 3D
+
+- Clássico, GT, Superesportivo, Kart, Monstrão, Moto, Conversível e Trenó saíram do desenho de costas e viraram modelos
+  em `modelos3d.js` (entram em `veiculos.js` por `em3d(...)`, como os da 1.13.0). Peça nova: `tronco()` — caixa com o
+  topo menor e empurrado, para cabines com vidro inclinado; a luz de cada face sai da inclinação de verdade.
+- Kart e moto continuam com capacete: em 3D a cabeça vem do modelo (`onde`) e o `cabeca.js` desenha o capacete nela.
+- `piloto(..., vies)`: em carro baixo (GT, Super) o piloto é pintado por último, para a tampa de trás não tapar.
+- Ainda de costas: avião, jato, helicóptero, arara e morcego (e skate, cavalo e dinossauro, que já giram do seu jeito).
+
+## 1.16.0 — conversível esportivo e os que voam em 3D
+
+- Peças novas no `modelos3d.js`: `casco()` (carroceria arredondada feita de fatias, com brilho de verniz), `chapa()`
+  (peça fina dos dois lados: asa, cauda, capa; `verso` = cor do outro lado) e `disco()` (hélice e rotor girando).
+- Conversível Rosa refeito com `casco()`: baixo, comprido e arredondado, sem marca.
+- Avião, jato, helicóptero, arara, morcego e Drácula em 3D. A hélice, o rotor e o fogo do jato agora são do modelo
+  (saíram `extrasAntes`/`extrasDepois` do `desenho.js`); `morcegoDracula()` troca os dois modelos 3D com a fumaça.
+- Ainda do jeito antigo: o skate (o skatista em quadros); cavalo e dinossauro já giram pelo `cavalo.js`.

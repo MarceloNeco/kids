@@ -18,6 +18,7 @@
 | Reconhecedor de mãos do volante no ar: `hand_landmarker.task` (MediaPipe Hand Landmarker, em `../baguncolandia/libs/mediapipe/`, trazido pela Rabiscolândia) | Google, MediaPipe | Apache 2.0 |
 | Motor de visão MediaPipe Tasks (reaproveitado de `../baguncolandia/libs/mediapipe/`) | Google, MediaPipe | Apache 2.0 (`LICENSE` naquela pasta) |
 | O som de reserva (só enquanto as gravações ainda não carregaram) | sintetizado no WebAudio pelo próprio jogo (`som.js`) | mesma licença do repositório |
+| 1.13.0: veículos em 3D (`modelos3d.js`) e o Ovo Corredor | desenhos próprios em código; o Ovo é o Humpty Dumpty da cantiga inglesa do século XVIII (domínio público), desenhado aqui sem copiar filme nenhum (o do Shrek é da DreamWorks) | mesma licença do repositório |
 | 1.12.0: desenhos novos (galinha, morcego, Conde Drácula, carrinhos de pipoca e de sorvete, carro-hambúrguer, comidas gigantes, mundo dos blocos) | desenhos próprios em código; o Conde Drácula é personagem de Bram Stoker (1897), domínio público, desenhado aqui sem copiar filme nenhum; o mundo dos blocos é um estilo de construir com cubos, sem nada do Minecraft (que é da Mojang/Microsoft) | mesma licença do repositório |
 
 ### Sons gravados (`sons/`, 1.12.0) — convertidos para MP3/WAV mono, alguns cortados

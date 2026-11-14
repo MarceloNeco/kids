@@ -66,6 +66,7 @@
     enigmas: 'baguncolandia/musicas/happy-whistling-ukulele.mp3',
     labirinto: 'peluqueria/musicas/beachfront-celebration.mp3',
     cozinha: 'rabiscolandia/musicas/mariachi-snooze.mp3',
+    'a-garra': 'baguncolandia/musicas/my-giant-bunny-friend.mp3',
     aqua: 'purpurina/musicas/c-funk.mp3'
   };
   O.FAVORITAS = {};

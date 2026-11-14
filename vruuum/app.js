@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.12.0';
+  var APP_VERSION = '1.16.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -29,6 +29,7 @@
   if (pref.controle !== 'maos') pref.controle = 'toque';
   if (pref.rivais !== 'sem') pref.rivais = 'com';
   var PE = window.VruuumPersonagens;
+  if (!Array.isArray(pref.mundos)) pref.mundos = [];   // cenários escolhidos (vazio = surpresa)
   if (['neon', 'colorido', 'misto'].indexOf(pref.visual) < 0 || !pref.visualV2) { pref.visual = 'misto'; pref.visualV2 = true; }   // misto: alterna dia e noite (padrão desde a 1.0)
   D.definirEstilo(pref.visual);
   if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
@@ -51,6 +52,10 @@
   function tela(id) {
     Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
     estadoTela = id;
+    // a corrida de demonstração fica atrás da apresentação e do menu (1.14.0); na corrida e no fim, some
+    var comDemo = id === 'entrada' || id === 'menu';
+    document.body.classList.toggle('com-demo', comDemo); document.body.classList.toggle('demo-menu', id === 'menu');
+    if (comDemo && !demo) try { iniciarDemo(); } catch (e) { demo = null; }
   }
   var estadoTela = 'entrada';
 
@@ -82,15 +87,17 @@
   }
   function passoDemo(agora) {
     if (!demo) return;
-    if (estadoTela !== 'entrada') { demo = null; return; }
+    if (estadoTela !== 'entrada' && estadoTela !== 'menu') { demo = null; return; }
     var cv = $('demo'), W2 = cv.clientWidth, H2 = cv.clientHeight, e = demo.e, dt = Math.min(0.05, Math.max(0, (agora - demo.ultimo) / 1000)); demo.ultimo = agora;
     if (cv.width !== W2 || cv.height !== H2) { cv.width = W2; cv.height = H2; }
     var ent = e.jogadores.map(function (j, k) { return pilotoDemo(e, j, k); });
     M.atualizar(e, ent, dt); e.eventos.forEach(function (ev) { D.evento(ev, e); }); D.passo(dt, e, ent);
     demo.tCena += dt;
+    e.jogadores.forEach(function (j) { if (e.fase === 'corrida' && j.turbo <= 0 && Math.random() < dt * 0.25) j.turbo = 2.5; });   // turbo de vez em quando: linhas de velocidade e fogo
     if (demo.tCena > 5 && e.fase === 'corrida') {   // corte de câmera
       demo.tCena = 0; demo.cena++;
       var l = e.pista.loops && e.pista.loops[demo.cena % e.pista.loops.length];
+      e.jogadores.forEach(function (j) { j.turbo = 2.5; });
       if (demo.cena % 3 === 2 && l) e.jogadores.forEach(function (j, k) { j.z = (l.ini - 45 - k * 6) * window.VruuumPista.SEG; j.vel = e.pista.cfg.velMax; j.x = k ? 0.3 : -0.3; });
       if (e.jogadores[0].z > e.pista.zChegada - 30000) { demo = null; iniciarDemo(); return; }
     }
@@ -103,7 +110,7 @@
     if (estadoTela !== 'entrada') return;
     Som.iniciar(); Som.tocar('whoosh'); Som.musica(true);
     $('entrada').classList.add('saindo');
-    setTimeout(function () { $('entrada').classList.remove('saindo'); demo = null; tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
+    setTimeout(function () { $('entrada').classList.remove('saindo'); tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
   }
   $('btEntrar').addEventListener('click', entrar);
 
@@ -147,6 +154,17 @@
         b.setAttribute('data-personagem', p.id); b.title = p.nome[0];
         var cv = document.createElement('canvas'); cv.width = cv.height = 80; p.frente(cv.getContext('2d'), 40, 46, 26); b.appendChild(cv);
         $('bichos').appendChild(b);
+      });
+      // cenários: toque para escolher (até 4, na ordem do toque); 🎲 Surpresa = o jogo sorteia
+      [''].concat(window.VruuumPista.MUNDOS).forEach(function (m) {
+        var tm = m && D.TEMAS[m], b = botao('opcao', m ? tm.nome[0] : 'Surpresa', function () {
+          if (!m) pref.mundos = [];
+          else if (pref.mundos.indexOf(m) >= 0) pref.mundos.splice(pref.mundos.indexOf(m), 1);
+          else { pref.mundos.push(m); if (pref.mundos.length > 4) pref.mundos.shift(); }
+          salvar(); Som.tocar('clique'); marcar();
+        });
+        b.setAttribute('data-mundo', m); b.setAttribute('data-t', m ? tm.emoji + ' ' + tm.nome[0] + '|' + tm.emoji + ' ' + tm.nome[1] : '🎲 Surpresa|🎲 Surprise');
+        $('mundosEsc').appendChild(b);
       });
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
         b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); });
@@ -252,6 +270,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-controle]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-controle') === pref.controle)); });
     $('dicaMaos').hidden = pref.controle !== 'maos';
     Array.prototype.forEach.call(document.querySelectorAll('[data-visual]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-visual') === pref.visual)); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-mundo]'), function (b) { var m = b.getAttribute('data-mundo'); b.setAttribute('aria-pressed', String(m === '' ? !pref.mundos.length : pref.mundos.indexOf(m) >= 0)); });
     if (editando >= pref.jogadores) editando = 0;
     var c = pref.carros[editando], v = VE.achar(c.veic);
     $('abas').hidden = pref.jogadores < 2;
@@ -328,19 +347,24 @@
     var configs = [];
     if (pref.rivais === 'com' && PE) {
       var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return VE.voa(v.id) === voa1; });
+      // 1.13.0: ninguém repetido — nem o personagem, nem o veículo de quem joga (escolheu a galinha, não corre contra galinha)
+      var livres = opcoes.filter(function (v) { return jogs.every(function (j) { return j.veic !== v.id; }); });
+      for (var q = livres.length - 1; q > 0; q--) { var w = Math.floor(Math.random() * (q + 1)), tq = livres[q]; livres[q] = livres[w]; livres[w] = tq; }
       PE.sortear(pref.jogadores === 1 ? 5 : 3, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {   // 1.11.0: mais rivais, disputa de perto
-        var v = opcoes[Math.floor(Math.random() * opcoes.length)];
+        var v = livres.length ? livres[k % livres.length] : opcoes[k % opcoes.length];
         configs.push({ id: p.id, veic: v.id, cor: p.cor || D.CORES[(k + 3) % D.CORES.length], mod: { vel: v.vel, curva: v.curva } });
       });
     }
-    estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs);
+    estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs, pref.mundos);
     estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id) }; });
     D.preparar(estado, jogs, pref.lingua, pref.visual);
     tela('jogo'); redimensionar();
     $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false];
     lerBordas(); telaCheia(true);
     ligarMaos();
-    Som.proxima(); Som.musica(true);
+    // a música escolhida no menu continua na corrida; sem escolha, cada corrida começa uma música nova
+    if (musicaEscolhida) musicaEscolhida = false; else Som.proxima();
+    Som.musica(true);
     if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (l) { trava = l; }).catch(function () { /* sem trava de tela: segue normal */ });
     if (!rodando) { rodando = true; ultimo = performance.now(); requestAnimationFrame(quadro); }
   }
@@ -700,10 +724,35 @@
     });
   });
 
+  // ---------- música no menu (1.14.0): ⏮ ⏭ e a lista para escolher; na corrida continua a que estiver tocando ----------
+  var musicaEscolhida = false;
+  function pintarMusica(i) {
+    $('musNome').textContent = '🎵 ' + (i ? i.nome : t('Toque para escolher', 'Tap to choose')) + ' ▾';
+    $('musOff').hidden = navigator.onLine !== false;
+    var at = Som.musicaAtual();
+    Array.prototype.forEach.call($('musLista').children, function (b, k) { b.setAttribute('aria-pressed', k === at ? 'true' : 'false'); });
+  }
+  function escolherMusica(k) { Som.iniciar(); Som.escolherMusica(k); musicaEscolhida = true; }
+  $('musAnt').addEventListener('click', function () { escolherMusica(Som.musicaAtual() - 1); });
+  $('musProx').addEventListener('click', function () { escolherMusica(Som.musicaAtual() + 1); });
+  $('musNome').addEventListener('click', function () {
+    var l = $('musLista'), abrir = l.hidden;
+    if (abrir && !l.children.length) Som.listaMusicas().forEach(function (m, k) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'mus-item';
+      b.textContent = m.nome + ' · ' + m.autor.replace(/ \(.*\)$/, '');
+      b.addEventListener('click', function () { escolherMusica(k); l.hidden = true; $('musNome').setAttribute('aria-expanded', 'false'); });
+      l.appendChild(b);
+    });
+    l.hidden = !abrir; $('musNome').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    pintarMusica(Som.listaMusicas()[Som.musicaAtual()]);
+  });
+  window.addEventListener('online', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+  window.addEventListener('offline', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+
   // ---------- começo ----------
   $('ver').textContent = 'v' + APP_VERSION;
   // nome da música tocando, com autor e licença (as gravadas são CC BY-SA: o crédito aparece aqui)
-  Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); });
+  Som.aoTrocarMusica(function (i) { $('tocando').textContent = '🎵 ' + i.nome + ' — ' + i.autor + (i.licenca ? ' (' + i.licenca + ')' : ''); pintarMusica(i); });
   // navegação padrão (../navegacao.js): 🏠 Início volta ao menu (da corrida e do fim); o Voltar do celular faz o mesmo
   // (a barra cuida do histórico: este jogo não mexia nele); 🚪 Saída sai do jogo, perguntando antes no meio da corrida
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'vruuum', cuidarDoVoltar: true,
@@ -712,6 +761,7 @@
   lerBordas();
   $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
   traduzir();
+  pintarMusica(Som.listaMusicas()[Som.musicaAtual()]);
   try { iniciarDemo(); } catch (e) { demo = null; }   // apresentação: se algo falhar, fica a tela de entrada parada
   if (TV) setTimeout(function () { try { $('btEntrar').focus(); } catch (e) { /* ok */ } }, 200);
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });

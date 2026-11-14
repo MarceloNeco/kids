@@ -14,7 +14,7 @@ const jogos = [...catalogo.matchAll(/\{ id: '([a-z0-9-]+)',[^]*?url: '([^']+)'/g
 const rec = JSON.parse(ler('recursos-do-app.json'));
 
 test('catálogo tem os jogos', () => {
-  assert.ok(jogos.length >= 12, 'jogos no catálogo: ' + jogos.map(j => j.id).join(', '));
+  assert.ok(jogos.length >= 13, 'jogos no catálogo: ' + jogos.map(j => j.id).join(', '));
 });
 
 test('recursos-do-app.json: app kids, "app" (manutenção) e um interruptor por jogo', () => {

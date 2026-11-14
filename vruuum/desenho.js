@@ -122,6 +122,13 @@
   // o piloto vivo: de costas, e de vez em quando vira, olha e sorri
   function pilotoVivo(c, vv, x0, y0, cw, ch, info, semente, periodo, onde) { if (Cab()) Cab().desenhar(c, vv, x0, y0, cw, ch, info, Date.now() / 1000, semente, periodo, onde); }
   var CAV = function () { return raiz.VruuumCavalo; };
+  var MOD = function () { return raiz.VruuumModelos; };
+  // veículo em 3D (modelos3d.js) ao vivo: gira de lado na curva, inclina no morro e no pulo; o piloto vai dentro, na ordem certa
+  function modeloVivo(c, vv, x0, y0, cw, ch, info, fase, lado, inclina, semente, periodo, voo, orbita) {
+    var tt = Date.now() / 1000, est = Cab() && Cab().estado ? Cab().estado(tt, semente, periodo) : { giro: 0 };
+    MOD().vivo(c, vv.modelo, x0, y0, cw, ch, info.cor, fase, lado, inclina, { t: tt, voo: voo, giroCabeca: est.giro, orbita: orbita || 0,
+      cabeca: vv.semPiloto ? null : function (c2, x, y, r) { if (Cab()) Cab().desenhar(c2, vv, x0, y0, cw, ch, info, tt, semente, periodo, { x: x, y: y, r: r }); } });
+  }
   // onde fica a cabeça de quem monta o cavalo (sobe e desce com o galope); nos outros veículos, a do desenho
   function ondeCabeca(vv, x0, y0, cw, ch, fase) { return vv && vv.cavalo && CAV() ? CAV().cabeca(x0, y0, cw, ch, fase, 0, vv.bicho) : null; }
   var V = function () { return raiz.VruuumVeiculos; };
@@ -282,8 +289,9 @@
     var jSeg = P.achar(pista, j.z), jPct = (j.z % SEG) / SEG;
     var jY = jSeg.p1.y + (jSeg.p2.y - jSeg.p1.y) * jPct;
     var voa = !!VOA[ji], camY = jY + ALTURA_CAM + (voa ? ALT_VOO : 0), camX = j.x * LARG;
-    var lpV = voa ? null : loopDaCamera(pista, j.z);
+    var lpV = voa ? null : loopDaCamera(pista, j.z), orb = voa || lpV ? null : orbitaAtiva(e, j, VEIC[ji]);
     if (lpV) vistaLoop(c, e, ji, lpV, g, w, h, vs);   // dentro do looping: a câmera gira junto (cena toda em 3D)
+    else if (orb) vistaOrbita(c, e, ji, g, w, h, vs, orb);   // volta de 360° na largada e na chegada
     else {
 
     // céu e fundo: misturam com o mundo anterior logo depois do portal
@@ -544,7 +552,7 @@
     }
 
     }
-    desenharCarro(c, j, vs, g, h, w, e);
+    if (!orb) desenharCarro(c, j, vs, g, h, w, e);
     linhasVelocidade(c, g, w, h, Math.min(1, j.turbo * 0.9) * (voa ? 0.6 : 1));
     desenharEfeitos(c, vs, g, w, h);
     if (!op.semPlacar) desenharPlacar(c, e, j, ji, w, h, K, op, v);
@@ -687,15 +695,14 @@
     c.restore();
   }
 
-  // morcego <-> Conde Drácula: troca aos poucos, com uma nuvem de fumaça no meio da transformação
-  var draculas = {};
-  function morcegoDracula(c, obj, virado, spr, fase, cw, ch, cor, tt) {
+  // morcego <-> Drácula (1.16.0: os dois em 3D): um some enquanto o outro aparece, com um puf de fumaça roxa.
+  // vivo3d(id) desenha o modelo 3D com esse nome no lugar do veículo
+  function morcegoDracula(c, obj, virado, cw, ch, tt, vivo3d) {
     var dt = obj.tMorf ? Math.min(0.1, tt - obj.tMorf) : 0; obj.tMorf = tt;
     obj.morf = (obj.morf || 0) + ((virado ? 1 : 0) - (obj.morf || 0)) * Math.min(1, dt * 7);
     var m = obj.morf;
-    if (!draculas[cor]) draculas[cor] = S.fazer(1300, 1000, function (c2, W2, H2) { V().dracula(c2, W2, H2, cor, null); }, 300);
-    if (m < 0.98) { c.globalAlpha = 1 - m; c.drawImage(S.quadro(spr, fase).img, -cw / 2, -ch, cw, ch); }
-    if (m > 0.02) { c.globalAlpha = m; c.drawImage(draculas[cor].img, -cw / 2, -ch, cw, ch); }
+    if (m < 0.98) { c.globalAlpha = 1 - m; vivo3d('morcego'); }
+    if (m > 0.02) { c.globalAlpha = m; vivo3d('dracula'); }
     c.globalAlpha = 1;
     if (m > 0.08 && m < 0.92) {   // puf! fumaça roxa
       var f = Math.sin(m * Math.PI);
@@ -806,6 +813,74 @@
     return null;
   }
   // a cena inteira de dentro do looping: céu e chão girando, estradas de antes e depois, a fita, os rivais e os enfeites
+  // ---------- volta de 360° pelo cenário (1.13.0): na largada (durante o 3-2-1) e na chegada ----------
+  /* A câmera sai de trás do veículo, dá uma volta inteira em volta dele (mostrando a pista, os enfeites e os rivais
+     de todos os lados) e termina exatamente na câmera do jogo. Quem é 3D (modelos3d.js, cavalo, dinossauro) gira de
+     verdade; os outros dão uma meia-volta curtinha (desenho de costas). */
+  function suaveO(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
+  function eh3d(vv) { return !!(vv && (vv.modelo || vv.cavalo)); }
+  function orbitaAtiva(e, j, vv) {
+    var M = raiz.VruuumMotor, p = -1, zoom = 0;
+    if (e.fase === 'contagem') { p = (1 - e.contagem / M.CONTAGEM) / 0.85; zoom = 1 - suaveO(p); }
+    else if (j.chegou && e.t - j.tempo < M.DEPOIS_DO_FIM) { p = (e.t - j.tempo) / M.DEPOIS_DO_FIM; zoom = Math.sin(Math.PI * Math.min(1, p)) * 0.9; }
+    if (p < 0 || p >= 1) return null;
+    var th = eh3d(vv) ? suaveO(p) * Math.PI * 2 : Math.sin(Math.PI * suaveO(p)) * 0.45;
+    return { th: th, zoom: zoom };
+  }
+  function norm3(v) { var l = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; }
+  function cruz(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+  // desenha quem corre num ponto da cena: 3D (gira com a câmera) ou o desenho de costas
+  function corredorNaCena(c, cam, g, p, vv, spr, info, fase, th, semente, voa) {
+    var q = noCam(cam, p); if (q[2] < PERTO * 4) return;
+    var b = naTela(q, g), esc = PROF / q[2] * g.K, W = spr.w * esc, H = spr.h * esc;
+    if (vv && vv.modelo && MOD()) modeloVivo(c, vv, b[0] - W / 2, b[1] - H * 0.93, W, H, info, fase, 0, 0, semente, 6, 0, th);
+    else if (vv && vv.cavalo && CAV()) { var on = CAV().vivo(c, b[0] - W / 2, b[1] - H * 0.93, W, H, info.cor, fase, { yaw: th }, info.corpo, Date.now() / 1000, vv.bicho); pilotoVivo(c, vv, b[0] - W / 2, b[1] - H, W, H, info, semente, 6, on); }
+    else { emPe(c, cam, g, p, [0, 1, 0], S.quadro(spr, fase), function (c2, x0, y0, dw, dh) { if (dw > 24) pilotoVivo(c2, vv, x0, y0, dw, dh, info, semente, 6, ondeCabeca(vv, x0, y0, dw, dh, fase)); }); }
+  }
+  function vistaOrbita(c, e, ji, g, w, h, vs, orb) {
+    var j = e.jogadores[ji], pista = e.pista, segs = pista.segs, i0 = Math.floor(j.z / SEG), dz0 = j.z - i0 * SEG;
+    var P = [j.x * LARG, 0, 0], Dc = JOG_Z * (1 + orb.zoom * 1.3), Hc = ALTURA_CAM * (1 + orb.zoom * 0.25), th = orb.th;
+    // a câmera olha na horizontal (como a do jogo), na direção de quem joga: o veículo fica embaixo, o céu e o cenário em cima
+    var pos = [P[0] + Math.sin(th) * Dc, Hc, -Math.cos(th) * Dc];
+    var f = norm3([-Math.sin(th), 0, Math.cos(th)]), r = norm3(cruz([0, 1, 0], f)), u = [0, 1, 0];
+    var cam = { p: pos, d: r, u: u, f: f };
+    var pc = corPedaco(pista, segs[i0]), m = segs[i0].mundo, nomeM = pista.mundos[m], nt = pc.noite;
+    // céu, montanhas (correm de lado conforme a câmera gira) e chão
+    var ceuA = mixRgb(hexRgb(TEMAS[nomeM].ceu[0]), hexRgb(NEON[nomeM].ceu[0]), nt), ceuB = mixRgb(hexRgb(TEMAS[nomeM].ceu[1]), hexRgb(NEON[nomeM].ceu[1]), nt);
+    var yh = g.cy + f[1] * PROF * g.KY / Math.max(0.2, u[1]), gr = c.createLinearGradient(0, yh, 0, yh - h);
+    gr.addColorStop(0, css(ceuB)); gr.addColorStop(1, css(ceuA)); c.fillStyle = gr; c.fillRect(0, 0, w, h);
+    if (nt > 0.3) camada(c, base.estrelasCeu, w, yh, yh, vs.nuvemX + th / (Math.PI * 2), nt);
+    camada(c, nt > 0.5 ? fundoNoite(nomeM) : base.fundos[nomeM], w, yh + 2, Math.min(g.K * 0.6, g.cy * 0.9), vs.fundoX + th / (Math.PI * 2) * 3, 1);
+    c.fillStyle = css(pc.num.grama[0]); c.fillRect(0, Math.max(0, yh), w, h);
+    var F = 1600;
+    for (var z = 40000; z > -24000; z -= F) poli3(c, cam, g, [[-50000, 0, z], [50000, 0, z], [50000, 0, z - F], [-50000, 0, z - F]], (Math.floor((z + i0 * SEG) / F) & 1) ? pc.grama[0] : pc.grama[1]);
+    var Ls = LARG, S2 = 800, zb = Math.floor(-20000 / S2) * S2 - dz0 % S2;
+    for (var zz = 40000; zz > -20000; zz -= S2) {
+      var par = (Math.floor((zz + j.z) / S2) & 1);
+      poli3(c, cam, g, [[-Ls * 1.13, 0, zz], [Ls * 1.13, 0, zz], [Ls * 1.13, 0, zz - S2], [-Ls * 1.13, 0, zz - S2]], pc.borda[par]);
+      poli3(c, cam, g, [[-Ls, 0, zz], [Ls, 0, zz], [Ls, 0, zz - S2], [-Ls, 0, zz - S2]], pc.pista[par]);
+      if (par) [-1 / 3, 1 / 3].forEach(function (fx) { poli3(c, cam, g, [[Ls * fx - Ls / 32, 0, zz], [Ls * fx + Ls / 32, 0, zz], [Ls * fx + Ls / 32, 0, zz - S2], [Ls * fx - Ls / 32, 0, zz - S2]], pc.faixa); });
+    }
+    // enfeites, rivais, o outro jogador e quem joga, do mais longe para o mais perto
+    var lista = [];
+    for (var i = Math.max(0, i0 - 80); i < Math.min(segs.length, i0 + 160); i++) segs[i].enfeites.forEach(function (en) {
+      if (en.tipo === 'portal' || en.tipo === 'chegada' || en.tipo === 'largada') return;
+      var sp = enfeiteSpr(en.tipo, nt >= 0.5); if (!sp) return;
+      var p = [en.x * LARG, 0, i * SEG - j.z];
+      lista.push({ d: noCam(cam, p)[2], f: function (c2) { emPe(c2, cam, g, p, [0, 1, 0], sp); } });
+    });
+    e.rivais.forEach(function (rv, k) {
+      var rd = RIV[k]; if (!rd || Math.abs(rv.z - j.z) > SEG * 120) return;
+      var p = [rv.x * LARG, 0, rv.z - j.z], fr = rd.spr.quadros ? (Date.now() / 1000 * 0.8) % 1 : 0;
+      lista.push({ d: noCam(cam, p)[2], f: function (c2) { corredorNaCena(c2, cam, g, p, rd.veic, rd.spr, rd.info, fr, th, 10 + k * 2.1); } });
+    });
+    e.jogadores.forEach(function (o) {
+      var p = [o.x * LARG, 0, o.z - j.z], fr = VS[o.n] && VS[o.n].fPe != null ? Math.max(0, VS[o.n].fPe) : (Date.now() / 1000 * 0.8) % 1;
+      lista.push({ d: noCam(cam, p)[2], f: function (c2) { corredorNaCena(c2, cam, g, p, VEIC[o.n], carrosJog[o.n], INFO[o.n], fr, th, o.n * 3.3); } });
+    });
+    pintarLista(c, lista);
+  }
+
   function vistaLoop(c, e, ji, l, g, w, h, vs) {
     var j = e.jogadores[ji], pista = e.pista, segs = pista.segs, o = noLooping(l, j.z, j.x);
     var fr = o.f == null ? [0, 0, 1] : loopFrente(o.f), up = o.up;
@@ -1043,16 +1118,18 @@
     if (derr && !(vv && vv.cavalo)) { c.restore(); marcasPneu(c, g, h, cw, j.ladoDerrapa, lift); c.save(); c.translate(g.cx, chao - lift); }
     c.rotate(vs.lado * inclina + (derr ? j.ladoDerrapa * 0.14 : 0) + (j.rodando > 0 ? Math.sin(j.rodando * 22) * 0.25 : 0));
     if (j.rodando > 0) c.scale(Math.max(0.25, Math.abs(Math.cos(j.rodando * 9))) * (Math.cos(j.rodando * 9) < 0 ? -1 : 1), 1);
-    extrasAntes(c, vv, cw, ch, tt);
     var faseQ = spr.quadros ? faseSkate(vs, j, e, vv) : 0, corJ = INFO[j.n] && INFO[j.n].cor, onde = null;
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'longe');
     if (vv && vv.cavalo && CAV()) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, INFO[j.n].corpo, tt, vv.bicho);   // ao vivo: de lado nas curvas
-    else if (vv && vv.dracula) morcegoDracula(c, vs, j.dracula, spr, faseQ, cw, ch, corJ, tt);
+    else if (vv && vv.dracula) morcegoDracula(c, vs, j.dracula, cw, ch, tt, function (id) { var v2 = Object.create(vv); v2.modelo = id; modeloVivo(c, v2, -cw / 2, -ch, cw, ch, INFO[j.n], faseQ, vs.lado, 0, j.n * 3.3, 7, 0); });
+    else if (vv && vv.modelo && MOD()) {   // 3D: no morro inclina (subindo mostra a traseira de baixo, descendo mostra o teto) e no pulo empina
+      var sg = P.achar(e.pista, j.z), alvoI = Math.atan((sg.p2.y - sg.p1.y) / SEG) * 1.4 + (j.pulo > 0 ? Math.sin(Math.PI * 2 * (1 - j.pulo / (j.puloMax || 1))) * 0.25 : 0);
+      vs.incl = (vs.incl || 0) + (alvoI - (vs.incl || 0)) * 0.15;
+      modeloVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], spr.quadros ? faseQ : tt * 0.5, vs.lado + (derr ? j.ladoDerrapa * 0.5 : 0), vs.incl, j.n * 3.3, 7, j.pulo > 0 ? 1 : 0);
+    }
     else c.drawImage((spr.quadros ? S.quadro(spr, faseQ) : spr).img, -cw / 2, -ch, cw, ch);
-    if (vv && vv.galinha && j.pulo > 0 && V()) V().asasGalinha(c, -cw / 2, -ch, cw, ch, tt);   // pulando, a galinha abre e bate as asas
     bracos(c, vv, -cw / 2, -ch, cw, ch, corJ, faseQ, vs.lado, 'perto');
-    pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], j.n * 3.3, 7, onde);
-    extrasDepois(c, vv, cw, ch, tt, j.turbo > 0);
+    if (!(vv && (vv.modelo || vv.semPiloto))) pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], j.n * 3.3, 7, onde);
     if (j.turbo > 0 && !voa && !(vv && (vv.cavalo || vv.bracos))) fogoEscape(c, cw, ch, Math.min(1, j.turbo), j.foguete > 0);
     if (derr) faiscasDerrapa(c, cw, ch, nivD, j.ladoDerrapa);
     if (j.escudo > 0) bolhaEscudo(c, cw, ch, j.escudo, tt);
@@ -1065,30 +1142,6 @@
   }
 
   // partes que se mexem, desenhadas por cima do veículo (origem: meio da base do desenho)
-  function extrasAntes(c, vv, cw, ch, tt) {
-    if (!vv || !vv.helice) return;   // hélice girando na frente do avião (aparece em volta do corpo)
-    var cy0 = -ch * 0.44, r = cw * 0.14;
-    c.globalAlpha = 0.28; c.fillStyle = '#e8e8f0'; c.beginPath(); c.arc(0, cy0, r, 0, Math.PI * 2); c.fill();
-    c.globalAlpha = 0.6; c.strokeStyle = '#555'; c.lineWidth = Math.max(1, cw * 0.012);
-    var a = tt * 40; c.beginPath(); c.moveTo(Math.cos(a) * r, cy0 + Math.sin(a) * r); c.lineTo(-Math.cos(a) * r, cy0 - Math.sin(a) * r); c.stroke();
-    c.globalAlpha = 1;
-  }
-  function extrasDepois(c, vv, cw, ch, tt, turbo) {
-    if (!vv) return;
-    if (vv.rotor) {   // pás do helicóptero
-      var ry = -ch * 0.88, rx = cw * 0.78, rr = ch * 0.07;
-      c.globalAlpha = 0.25; c.fillStyle = '#dcdce6'; c.beginPath(); c.ellipse ? c.ellipse(0, ry, rx, rr, 0, 0, Math.PI * 2) : c.arc(0, ry, rx, 0, Math.PI * 2); c.fill();
-      c.globalAlpha = 0.8; c.strokeStyle = '#2a2a30'; c.lineWidth = Math.max(1.5, ch * 0.025);
-      for (var k = 0; k < 2; k++) { var a = tt * 18 + k * Math.PI / 2; c.beginPath(); c.moveTo(Math.cos(a) * rx, ry + Math.sin(a) * rr); c.lineTo(-Math.cos(a) * rx, ry - Math.sin(a) * rr); c.stroke(); }
-      c.globalAlpha = 1;
-    }
-    if (vv.fogo) {   // fogo do jato (azul e maior no turbo)
-      var fy = -ch * 0.38, fr = cw * (turbo ? 0.09 : 0.055) * (0.85 + Math.random() * 0.3);
-      var gr = c.createRadialGradient(0, fy, 0, 0, fy + fr * 0.6, fr * 1.8);
-      gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.3, turbo ? '#7fd3ff' : '#ffd166'); gr.addColorStop(0.7, turbo ? 'rgba(58,134,255,.6)' : 'rgba(255,123,0,.6)'); gr.addColorStop(1, 'rgba(255,80,0,0)');
-      c.fillStyle = gr; c.beginPath(); c.arc(0, fy + fr * 0.6, fr * 1.8, 0, Math.PI * 2); c.fill();
-    }
-  }
 
   function desenharEfeitos(c, vs, g, w, h) {
     var K = g.K, ox = g.cx, oy = g.cy + g.KY * 0.72;
@@ -1413,17 +1466,16 @@
     var esc = Math.min(W * 0.78 / spr.w, H * 0.8 / spr.h), cw = spr.w * esc, ch = spr.h * esc;
     c.save(); c.translate(W / 2, H * 0.94 + (voa ? Math.sin(tt * 2.2) * H * 0.02 - H * 0.06 : Math.sin(tt * 9) * 1.2));
     if (voa) c.rotate(Math.sin(tt * 0.9) * 0.08);
-    var cav = vv && vv.cavalo && CAV(), faseP = tt * (cav ? 1.7 : 0.8), ladoP = vv && (vv.bracos || vv.cavalo) ? Math.sin(tt * 0.9) * 0.9 : 0, onde = null;   // na garagem o skatista e o cavalo fazem curvas para os dois lados
+    var cav = vv && vv.cavalo && CAV(), faseP = tt * (cav ? 1.7 : 0.8), ladoP = vv && (vv.bracos || vv.cavalo) ? Math.sin(tt * 0.9) * 0.9 : 0, onde = null;
+    if (vv && vv.modelo) ladoP = 0;   // o 3D gira sozinho (o canvas não inclina)   // na garagem o skatista e o cavalo fazem curvas para os dois lados
     if (ladoP) c.rotate(ladoP * (cav ? 0.04 : 0.12));
-    extrasAntes(c, vv, cw, ch, tt);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'longe');
     if (cav) onde = CAV().vivo(c, -cw / 2, -ch, cw, ch, cor, faseP % 1, ladoP, corpo, tt, vv.bicho);
-    else if (vv && vv.dracula) morcegoDracula(c, cachePrevia, Math.sin(tt * 1.6) > 0.3, spr, faseP, cw, ch, cor, tt);   // na garagem ele vira e desvira
+    else if (vv && vv.dracula) morcegoDracula(c, cachePrevia, Math.sin(tt * 1.6) > 0.3, cw, ch, tt, function (id) { var v2 = Object.create(vv); v2.modelo = id; modeloVivo(c, v2, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), faseP % 1, Math.sin(tt * 0.7) * 1.4, Math.sin(tt * 0.5) * 0.25, 1.2, 4.5, 0); });   // na garagem ele vira e desvira
+    else if (vv && vv.modelo && MOD()) modeloVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), faseP % 1, Math.sin(tt * 0.7) * 1.4, Math.sin(tt * 0.5) * 0.25, 1.2, 4.5, vv.galinha && Math.sin(tt * 1.3) > 0.7 ? 1 : 0);   // na garagem gira bem para mostrar os lados e o teto
     else c.drawImage(S.quadro(spr, faseP).img, -cw / 2, -ch, cw, ch);
-    if (vv && vv.galinha && Math.sin(tt * 1.3) > 0.7 && V()) V().asasGalinha(c, -cw / 2, -ch, cw, ch, tt);
     bracos(c, vv, -cw / 2, -ch, cw, ch, cor, faseP, ladoP, 'perto');
-    pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), 1.2, 4.5, onde);   // na garagem vira mais vezes
-    extrasDepois(c, vv, cw, ch, tt, false);
+    if (!(vv && (vv.modelo || vv.semPiloto))) pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, infoPiloto(cor, piloto, foto, pers), 1.2, 4.5, onde);   // na garagem vira mais vezes
     c.restore();
   }
   // miniatura parada (cartões da garagem)
