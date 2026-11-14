@@ -32,8 +32,10 @@ test.before(async () => {
 });
 test.after(async () => { if (browser) await browser.close(); server.close(); });
 
-async function abrir(ctxOp, busca) {
+async function abrir(ctxOp, busca, idioma) {
   const ctx = await browser.newContext(Object.assign({ locale: 'pt-BR' }, ctxOp));
+  // o idioma escolhido na estante (../idioma.js guarda em localStorage "bolinho:idioma")
+  if (idioma) await ctx.addInitScript((c) => { try { localStorage.setItem('bolinho:idioma', c); } catch (e) {} }, idioma);
   const pg = await ctx.newPage(), erros = [];
   pg.on('console', m => { if (m.type() === 'error') { const u = (m.location() && m.location().url) || ''; if (!IGNORAR.test(u + m.text())) erros.push(m.text() + ' @' + u); } });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
@@ -103,15 +105,32 @@ async function desenharCaminho(pg, de, para) {
 test('celular: menu abre sem erro, textos em português, trilha de música e versão', async () => {
   const pg = await abrir(FONE);
   assert.match(await pg.textContent('#btJogar'), /Jogar/);
-  assert.match(await pg.textContent('#versao'), /0\.2\.4/);
+  assert.match(await pg.textContent('#versao'), /0\.3\.0 · 14\/Nov\/2026/);
   assert.ok(await pg.isVisible('.trilha'), 'tocador da trilha');
   assert.equal(await pg.evaluate(() => document.querySelectorAll('[data-recurso="labirinto"]').length), 2);
-  await pg.click('#btLingua');
+  assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma no jogo: o idioma vem da estante');
+  // trocaram o idioma na estante (outra aba): o jogo troca na hora
+  await pg.evaluate(() => BolinhoIdioma.escolher('en'));
   assert.match(await pg.textContent('#btJogar'), /Play/);
   const semRolagem = await pg.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   assert.ok(semRolagem, 'menu sem rolagem para o lado a 390 px');
   assert.deepEqual(pg.erros, []);
   await pg.ctx.close();
+});
+
+test('celular: abre no idioma da estante (inglês e espanhol), com o nome do jogo e a data em cada idioma', async () => {
+  for (const [cod, jogar, nome, lang, data] of [['en', /^▶ Play!$/, 'Maze', 'en', /Version 0\.3\.0 · Nov\/14\/2026/], ['es', /^▶ ¡Jugar!$/, 'Laberinto', 'es', /Versión 0\.3\.0 · 14\/nov\/2026/]]) {
+    const pg = await abrir(FONE, '', cod);
+    assert.match(await pg.textContent('#btJogar'), jogar);
+    assert.equal(await pg.evaluate(() => document.documentElement.lang), lang);
+    assert.equal(await pg.textContent('#menu .logo'), nome);
+    assert.equal(await pg.getAttribute('#menu .logo', 'aria-label'), nome);
+    assert.match(await pg.textContent('#versao'), data);
+    assert.equal(await pg.getAttribute('#btNovo', 'aria-label'), cod === 'en' ? 'Another maze' : 'Otro laberinto');
+    assert.ok(await pg.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), cod + ': menu sem rolagem para o lado');
+    assert.deepEqual(pg.erros, []);
+    await pg.ctx.close();
+  }
 });
 
 test('celular, cachorrinho no quadrado: tocar na saída de longe não leva; só toques em linha reta; trancada, item, vitória e recorde', async () => {
