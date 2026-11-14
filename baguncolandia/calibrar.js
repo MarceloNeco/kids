@@ -11,16 +11,16 @@
   var PASSOS = ['fundo', 'parado', 'bracoDir', 'bracoEsq', 'chute', 'pulo'];
   var TEMPO_PASSO = 7000, CICLO = 100;
   var TEXTOS = {
-    fundo: { pt: 'Saia da frente da câmera por um instante', en: 'Step out of the camera view for a moment' },
-    parado: { pt: 'Agora entre e fique parado, de braços abertos', en: 'Now step in and stand still with your arms open' },
-    bracoDir: { pt: 'Levante o braço direito!', en: 'Raise your right arm!' },
-    bracoEsq: { pt: 'Agora o braço esquerdo!', en: 'Now the left arm!' },
-    chute: { pt: 'Chuta com um pé!', en: 'Kick with one foot!' },
-    pulo: { pt: 'Pula!', en: 'Jump!' },
-    ok: { pt: 'Isso!', en: 'Yes!' },
-    vi: { pt: 'Te vi! Agora os movimentos.', en: 'I see you! Now the moves.' },
-    pulado: { pt: 'Tudo bem, vamos assim mesmo', en: 'All right, let’s go anyway' },
-    fim: { pt: 'Pronto! Vamos jogar?', en: 'Ready! Let’s play?' }
+    fundo: { pt: 'Saia da frente da câmera por um instante', en: 'Step out of the camera view for a moment', es: 'Apártate de la cámara un momento' },
+    parado: { pt: 'Agora entre e fique parado, de braços abertos', en: 'Now step in and stand still with your arms open', es: 'Ahora entra y quédate quieto, con los brazos abiertos' },
+    bracoDir: { pt: 'Levante o braço direito!', en: 'Raise your right arm!', es: '¡Levanta el brazo derecho!' },
+    bracoEsq: { pt: 'Agora o braço esquerdo!', en: 'Now the left arm!', es: '¡Ahora el brazo izquierdo!' },
+    chute: { pt: 'Chuta com um pé!', en: 'Kick with one foot!', es: '¡Chuta con un pie!' },
+    pulo: { pt: 'Pula!', en: 'Jump!', es: '¡Salta!' },
+    ok: { pt: 'Isso!', en: 'Yes!', es: '¡Eso es!' },
+    vi: { pt: 'Te vi! Agora os movimentos.', en: 'I see you! Now the moves.', es: '¡Te veo! Ahora los movimientos.' },
+    pulado: { pt: 'Tudo bem, vamos assim mesmo', en: 'All right, let’s go anyway', es: 'Vale, seguimos así' },
+    fim: { pt: 'Pronto! Vamos jogar?', en: 'Ready! Let’s play!', es: '¡Listo! ¿Jugamos?' }
   };
 
   function iniciar(opts) {

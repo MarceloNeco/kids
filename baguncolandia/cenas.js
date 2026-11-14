@@ -1,5 +1,5 @@
 /* Bagunçolândia — cenários desenhados (SVG vetorial, leve) para o ambiente "Paisagem + boneco".
-   Cada cena: id, nome PT/EN, chão (y do chão em 0..1 do palco), céu (cor para o fundo do canvas) e o svg
+   Cada cena: id, nome PT/EN/ES, chão (y do chão em 0..1 do palco), céu (cor para o fundo do canvas) e o svg
    (viewBox 0 0 1280 720), rasterizado uma vez pelo desenho.js. Sem imagens de fora. */
 (function (root, fabrica) {
   if (typeof module !== 'undefined' && module.exports) module.exports = fabrica();
@@ -13,7 +13,7 @@
   function flor(x, y, cor) { return '<g transform="translate(' + x + ' ' + y + ')"><rect x="-2" y="0" width="4" height="26" fill="#4caf50"/><circle cx="0" cy="-6" r="7" fill="' + cor + '"/><circle cx="-8" cy="0" r="7" fill="' + cor + '"/><circle cx="8" cy="0" r="7" fill="' + cor + '"/><circle cx="-5" cy="8" r="7" fill="' + cor + '"/><circle cx="5" cy="8" r="7" fill="' + cor + '"/><circle cx="0" cy="2" r="5" fill="#ffd166"/></g>'; }
 
   var C = [];
-  C.push({ id: 'praia', bichos: true, buraco: false, nome: { pt: 'Praia', en: 'Beach' }, chao: CHAO, ceu: '#8fd7ff',
+  C.push({ id: 'praia', bichos: true, buraco: false, nome: { pt: 'Praia', en: 'Beach', es: 'Playa' }, chao: CHAO, ceu: '#8fd7ff',
     svg: svg('<linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fb3ff"/><stop offset="1" stop-color="#bdeaff"/></linearGradient><linearGradient id="mar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1fa2d6"/><stop offset="1" stop-color="#0d6fa8"/></linearGradient><linearGradient id="areia" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe8a8"/><stop offset="1" stop-color="#f0c674"/></linearGradient>',
       '<rect width="1280" height="720" fill="url(#ceu)"/><circle cx="1080" cy="120" r="70" fill="#fff176"/><circle cx="1080" cy="120" r="95" fill="#fff176" opacity=".25"/>' + nuvem(220, 110, 1.2) + nuvem(620, 70, 0.8) + nuvem(900, 170, 1) +
       '<rect y="420" width="1280" height="220" fill="url(#mar)"/><g fill="#fff" opacity=".5"><path d="M0 450 q40 -12 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 v6 h-1280z"/><path d="M0 520 q50 -14 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 v5 h-1280z" opacity=".6"/></g>' +
@@ -25,7 +25,7 @@
       '<g transform="translate(980 640)"><rect x="-50" y="-30" width="100" height="40" fill="#f5c76b"/><rect x="-40" y="-60" width="30" height="30" fill="#f5c76b"/><rect x="10" y="-60" width="30" height="30" fill="#f5c76b"/><path d="M-40 -60 h6 v-6 h6 v6 h6 v-6 h6 v6 h6 M10 -60 h6 v-6 h6 v6 h6 v-6 h6 v6 h6" stroke="#e0b050" stroke-width="3" fill="none"/><rect x="-10" y="-14" width="20" height="24" rx="10" fill="#d9a441"/><path d="M25 -60 v-24 l14 6 l-14 6" stroke="#5d4037" stroke-width="2" fill="#ff4fa3"/></g>' +
       passaroCeu(420, 230, 1.2) + passaroCeu(470, 210, 0.9) + pedra(80, 640, 0.6, '#a1887f') + pedra(1240, 650, 0.5, '#8d6e63')) });
 
-  C.push({ id: 'floresta', bichos: true, buraco: true, nome: { pt: 'Floresta', en: 'Forest' }, chao: CHAO, ceu: '#bfe9ff',
+  C.push({ id: 'floresta', bichos: true, buraco: true, nome: { pt: 'Floresta', en: 'Forest', es: 'Bosque' }, chao: CHAO, ceu: '#bfe9ff',
     svg: svg('<linearGradient id="ceu2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ccfff"/><stop offset="1" stop-color="#d6f3ff"/></linearGradient><linearGradient id="grama" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8bd450"/><stop offset="1" stop-color="#4f9d2f"/></linearGradient>',
       '<rect width="1280" height="720" fill="url(#ceu2)"/><circle cx="200" cy="130" r="60" fill="#fff59d"/>' + nuvem(500, 120, 1) + nuvem(1000, 90, 1.3) +
       '<ellipse cx="300" cy="600" rx="500" ry="180" fill="#7bc67a"/><ellipse cx="1000" cy="620" rx="520" ry="200" fill="#6ab868"/>' +
@@ -37,7 +37,7 @@
       '<g transform="translate(560 630)"><rect x="-90" y="-26" width="180" height="40" rx="20" fill="#8d6e63"/><ellipse cx="90" cy="-6" rx="14" ry="20" fill="#d7a77a"/><ellipse cx="90" cy="-6" rx="7" ry="11" fill="#a1805a"/><path d="M-60 -26 q10 -18 22 0" fill="#7cb342"/></g>' +
       terra(300, 668, 100) + terra(1000, 672, 80) + pedra(140, 655, 0.6) + pedra(1230, 648, 0.5, '#bdbdbd') + tufos(605, 715, 55, '#5aa832', 13) + arbusto(700, 610, 0.6, '#388e3c') + arbusto(1080, 612, 0.5, '#2e7d32')) });
 
-  C.push({ id: 'espaco', bichos: false, buraco: false, nome: { pt: 'Espaço', en: 'Space' }, chao: CHAO, ceu: '#0b0a1f',
+  C.push({ id: 'espaco', bichos: false, buraco: false, nome: { pt: 'Espaço', en: 'Space', es: 'Espacio' }, chao: CHAO, ceu: '#0b0a1f',
     svg: svg('<radialGradient id="lua" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#e0e0e0"/><stop offset="1" stop-color="#8d8d9a"/></radialGradient><radialGradient id="pl" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffb74d"/><stop offset="1" stop-color="#c2410c"/></radialGradient>',
       '<rect width="1280" height="720" fill="#0b0a1f"/><g fill="#fff">' + [[60, 80, 2], [200, 200, 1.5], [330, 60, 2.5], [480, 160, 1.5], [700, 40, 2], [820, 220, 1.5], [980, 90, 2.5], [1150, 180, 1.5], [1240, 40, 2], [560, 300, 1.2], [1050, 320, 1.6], [150, 340, 1.4], [900, 380, 1.3]].map(function (s) { return '<circle cx="' + s[0] + '" cy="' + s[1] + '" r="' + s[2] + '"/>'; }).join('') + '</g>' +
       '<circle cx="1040" cy="150" r="80" fill="url(#pl)"/><ellipse cx="1040" cy="150" rx="130" ry="26" fill="none" stroke="#ffd166" stroke-width="10" opacity=".8" transform="rotate(-18 1040 150)"/>' +
@@ -45,7 +45,7 @@
       '<g transform="translate(600 150) rotate(30)"><path d="M0 -60 q30 0 30 60 v40 h-60 v-40 q0 -60 30 -60z" fill="#eceff1"/><circle cx="0" cy="-10" r="12" fill="#3ee8ff"/><path d="M-30 20 l-20 30 h20z M30 20 l20 30 h-20z" fill="#ff4fa3"/><path d="M-12 40 h24 l-12 40z" fill="#ff7a00"/><path d="M-6 40 h12 l-6 24z" fill="#fff176"/></g>' +
       '<ellipse cx="640" cy="760" rx="900" ry="180" fill="url(#lua)"/><g fill="#6f6f80" opacity=".8"><ellipse cx="300" cy="650" rx="50" ry="18"/><ellipse cx="900" cy="670" rx="70" ry="22"/><ellipse cx="620" cy="690" rx="40" ry="14"/></g><g fill="#fff" opacity=".2"><ellipse cx="290" cy="645" rx="30" ry="9"/><ellipse cx="885" cy="663" rx="40" ry="11"/></g>') });
 
-  C.push({ id: 'cidade', bichos: true, buraco: false, nome: { pt: 'Cidade', en: 'City' }, chao: CHAO, ceu: '#ffb37a',
+  C.push({ id: 'cidade', bichos: true, buraco: false, nome: { pt: 'Cidade', en: 'City', es: 'Ciudad' }, chao: CHAO, ceu: '#ffb37a',
     svg: svg('<linearGradient id="ceu4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b3fa0"/><stop offset=".55" stop-color="#ff7eb3"/><stop offset="1" stop-color="#ffcf7a"/></linearGradient><linearGradient id="rua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4a5e"/><stop offset="1" stop-color="#2b2b3a"/></linearGradient>',
       '<rect width="1280" height="720" fill="url(#ceu4)"/><circle cx="640" cy="440" r="110" fill="#ffd166" opacity=".9"/>' + nuvem(260, 150, 1, '#ffd6ea') + nuvem(1000, 110, 1.2, '#ffe3f0') +
       '<g fill="#3b2a6e">' + [[0, 300, 120], [130, 220, 100], [240, 340, 80], [330, 180, 140], [480, 280, 110], [600, 360, 90], [700, 240, 120], [830, 320, 100], [940, 160, 150], [1100, 300, 90], [1200, 230, 80]].map(function (b) { return '<rect x="' + b[0] + '" y="' + b[1] + '" width="' + b[2] + '" height="' + (620 - b[1]) + '"/>'; }).join('') + '</g>' +
@@ -63,7 +63,7 @@
   function sol(x, y, r) { var raios = ''; for (var i = 0; i < 12; i++) { var a = i * Math.PI / 6; raios += '<path d="M' + (x + Math.cos(a) * r * 1.25).toFixed(0) + ' ' + (y + Math.sin(a) * r * 1.25).toFixed(0) + ' L' + (x + Math.cos(a) * r * 1.6).toFixed(0) + ' ' + (y + Math.sin(a) * r * 1.6).toFixed(0) + '" stroke="#fff176" stroke-width="6" stroke-linecap="round" opacity=".7"/>'; } return raios + '<circle cx="' + x + '" cy="' + y + '" r="' + (r * 1.15) + '" fill="#fff59d" opacity=".4"/><circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#ffeb3b"/>'; }
   function passaroCeu(x, y, s) { return '<path transform="translate(' + x + ' ' + y + ') scale(' + s + ')" d="M-14 0 q7 -8 14 0 q7 -8 14 0" stroke="#37474f" stroke-width="3" fill="none" stroke-linecap="round"/>'; }
 
-  C.push({ id: 'fazenda', bichos: true, buraco: true, nome: { pt: 'Fazenda', en: 'Farm' }, chao: CHAO, ceu: '#9fdcff',
+  C.push({ id: 'fazenda', bichos: true, buraco: true, nome: { pt: 'Fazenda', en: 'Farm', es: 'Granja' }, chao: CHAO, ceu: '#9fdcff',
     svg: svg('<linearGradient id="fzC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ec2ff"/><stop offset="1" stop-color="#d9f4ff"/></linearGradient><linearGradient id="fzG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ccc65"/><stop offset="1" stop-color="#558b2f"/></linearGradient>',
       '<rect width="1280" height="720" fill="url(#fzC)"/>' + sol(1110, 110, 52) + nuvem(260, 100, 1.1) + nuvem(640, 70, 0.8) + passaroCeu(470, 150, 1) + passaroCeu(510, 135, 0.8) +
       '<path d="M0 470 Q200 380 430 450 T880 430 T1280 460 V720 H0z" fill="#aed581"/><path d="M0 500 Q300 440 640 500 T1280 490 V720 H0z" fill="#8bc34a"/>' +
@@ -80,7 +80,7 @@
       terra(420, 650, 120) + terra(1080, 668, 90) + tufos(600, 715, 60, '#689f38', 3) + tufos(590, 710, 30, '#7cb342', 11) +
       flor(70, 650, '#ff4fa3') + flor(600, 690, '#ffd166') + flor(980, 660, '#fff') + flor(1220, 690, '#b388ff') + pedra(1200, 640, 0.6) + pedra(560, 662, 0.4, '#bdbdbd')) });
 
-  C.push({ id: 'jardim', bichos: true, buraco: true, nome: { pt: 'Jardim florido', en: 'Flower garden' }, chao: CHAO, ceu: '#bfe9ff',
+  C.push({ id: 'jardim', bichos: true, buraco: true, nome: { pt: 'Jardim florido', en: 'Flower garden', es: 'Jardín de flores' }, chao: CHAO, ceu: '#bfe9ff',
     svg: svg('<linearGradient id="jdC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd8ff"/><stop offset="1" stop-color="#f1fbff"/></linearGradient><linearGradient id="jdG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8bd450"/><stop offset="1" stop-color="#4c9a2a"/></linearGradient><radialGradient id="jdL" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#81d4fa"/><stop offset="1" stop-color="#29b6f6"/></radialGradient>',
       '<rect width="1280" height="720" fill="url(#jdC)"/>' + sol(160, 110, 46) + nuvem(520, 90, 1) + nuvem(980, 130, 1.2) +
       // casa ao fundo e cerca-viva
@@ -97,7 +97,7 @@
       '<g transform="translate(240 650)"><rect x="-120" y="-20" width="240" height="44" rx="8" fill="#8d6e63"/><rect x="-112" y="-14" width="224" height="20" rx="6" fill="#6d4c41"/>' + flor(-80, -40, '#ff4fa3') + flor(-30, -44, '#ffd166') + flor(20, -40, '#e040fb') + flor(70, -44, '#ff7043') + '</g>' +
       terra(700, 676, 90) + tufos(590, 715, 50, '#558b2f', 5) + flor(80, 690, '#fff') + flor(1200, 700, '#ff4fa3') + flor(1150, 600, '#ffd166') + pedra(1240, 640, 0.5)) });
 
-  C.push({ id: 'lago', bichos: true, buraco: true, nome: { pt: 'Lago na montanha', en: 'Mountain lake' }, chao: CHAO, ceu: '#c5e8ff',
+  C.push({ id: 'lago', bichos: true, buraco: true, nome: { pt: 'Lago na montanha', en: 'Mountain lake', es: 'Lago en la montaña' }, chao: CHAO, ceu: '#c5e8ff',
     svg: svg('<linearGradient id="lgC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#64b5f6"/><stop offset="1" stop-color="#e3f2fd"/></linearGradient><linearGradient id="lgA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fc3f7"/><stop offset="1" stop-color="#0277bd"/></linearGradient><linearGradient id="lgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ccc65"/><stop offset="1" stop-color="#33691e"/></linearGradient>',
       '<rect width="1280" height="720" fill="url(#lgC)"/>' + nuvem(300, 90, 1.2) + nuvem(900, 60, 0.9) + passaroCeu(700, 120, 1.1) +
       '<path d="M-40 470 L220 170 L360 330 L520 120 L720 380 L880 200 L1080 400 L1200 260 L1320 470z" fill="#78909c"/><path d="M220 170 L180 216 L210 210 L240 230 L262 220z M520 120 L470 178 L505 170 L540 190 L570 176z M880 200 L846 240 L876 236 L906 252 L924 244z" fill="#fff"/>' +
