@@ -40,6 +40,7 @@ test.after(async () => { if (browser) await browser.close(); if (srv) srv.close(
 
 async function contexto(locale) {
   const ctx = await browser.newContext({ locale: locale || 'pt-BR', viewport: { width: 1000, height: 900 }, serviceWorkers: 'block' });
+  await ctx.addInitScript(() => localStorage.setItem('bolinho:novidades-vistas', '["*"]'));   // sem a janela de novidades por cima
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());   // nada de internet de verdade (YouTube, CDN)
   return ctx;
 }
@@ -100,6 +101,7 @@ test('estante: a caixinha dos idiomas abre inteira dentro da tela (botão à dir
       const ctx = await contexto('pt-BR');
       await ctx.close();
       const c2 = await browser.newContext({ locale: 'pt-BR', viewport: { width: w, height: h }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
+      await c2.addInitScript(() => localStorage.setItem('bolinho:novidades-vistas', '["*"]'));
       await c2.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
       const pg = await c2.newPage();
       try {
