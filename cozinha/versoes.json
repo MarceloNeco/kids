@@ -2,6 +2,21 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.8.0",
+      "data": "14/Nov/2026",
+      "hora": "12:40:00",
+      "pt": [
+        "👨‍👩‍👧 Quem vai comer? Na ficha da receita, toque na mamãe, no papai, na vovó, no vovô, no irmão, na irmã ou no bebê para chamar para a mesa.",
+        "🍽️ A receita serve 2 pessoas: com mais gente as quantidades crescem (receita x2, x3) e as moedas também. No Fácil cabem 2, no Médio 4 e no Difícil 6.",
+        "😋 No final, cada pessoa da família aparece à mesa com o seu prato de verdade, comendo junto com o menininho."
+      ],
+      "en": [
+        "👨‍👩‍👧 Who is eating? On the recipe card, tap Mom, Dad, Grandma, Grandpa, Brother, Sister or Baby to invite them to the table.",
+        "🍽️ A recipe serves 2: with more people the amounts grow (recipe x2, x3) and so do the coins. Easy fits 2, Medium 4 and Hard 6.",
+        "😋 At the end, everyone in the family sits at the table with their own real dish, eating with the little boy."
+      ]
+    },
+    {
       "versao": "0.7.0",
       "data": "14/Nov/2026",
       "hora": "11:30:00",

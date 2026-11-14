@@ -139,12 +139,25 @@
   // zonaPeixe: metade da largura do círculo do anzol (fração do rio) — o peixe só é fisgado com o centro dentro dele;
   // velPeixe: velocidade média dos peixes (rio por segundo; cada peixe varia e muda de velocidade de vez em quando).
   var NIVEIS = [
-    { id: 'facil', n: 1, e: '🌱', pt: 'Fácil', en: 'Easy', moedas: null, margem: 0, favores: 5, dica: 'sempre', fichas: false, distratores: 0, evento: false, tempo: 0, brilho: true, madura: 0.75, zonaPeixe: 0.14, velPeixe: 0.1,
+    { id: 'facil', n: 1, e: '🌱', pt: 'Fácil', en: 'Easy', pessoas: 2, moedas: null, margem: 0, favores: 5, dica: 'sempre', fichas: false, distratores: 0, evento: false, tempo: 0, brilho: true, madura: 0.75, zonaPeixe: 0.14, velPeixe: 0.1,
       txt: ['Poucos ingredientes, tudo de graça e o passo certo brilhando.', 'Few ingredients, everything free and the right step glowing.'] },
-    { id: 'medio', n: 2, e: '🌻', pt: 'Médio', en: 'Medium', moedas: true, margem: 4, favores: 3, dica: 'metade', fichas: false, distratores: 2, evento: false, tempo: 0, brilho: true, madura: 0.5, zonaPeixe: 0.08, velPeixe: 0.16,
+    { id: 'medio', n: 2, e: '🌻', pt: 'Médio', en: 'Medium', pessoas: 4, moedas: true, margem: 4, favores: 3, dica: 'metade', fichas: false, distratores: 2, evento: false, tempo: 0, brilho: true, madura: 0.5, zonaPeixe: 0.08, velPeixe: 0.16,
       txt: ['Mais ingredientes, moedas para o mercado e menos ajuda.', 'More ingredients, coins for the shop and less help.'] },
-    { id: 'dificil', n: 3, e: '🌳', pt: 'Difícil', en: 'Hard', moedas: true, margem: 1, favores: 2, dica: 'erros', fichas: true, distratores: 4, evento: true, tempo: 420, brilho: false, madura: 0.35, zonaPeixe: 0.05, velPeixe: 0.22,
+    { id: 'dificil', n: 3, e: '🌳', pt: 'Difícil', en: 'Hard', pessoas: 6, moedas: true, margem: 1, favores: 2, dica: 'erros', fichas: true, distratores: 4, evento: true, tempo: 420, brilho: false, madura: 0.35, zonaPeixe: 0.05, velPeixe: 0.22,
       txt: ['Você escolhe a ordem dos passos, as moedas são contadas e o sol anda no céu.', 'You choose the order of the steps, coins are counted and the sun moves across the sky.'] }
+  ];
+
+  // Família à mesa (v0.8.0): quem pode comer a receita. "eu" (a criança) sempre come. A receita serve 2 pessoas; para
+  // mais gente as quantidades crescem (logica.fatorDe). cor = roupa; cabelo = jeito do desenho (cenas.familia).
+  var FAMILIA = [
+    { id: 'eu', pt: 'Eu', en: 'Me', cor: '#ff8a3d', cabelo: 'chef' },
+    { id: 'mamae', pt: 'Mamãe', en: 'Mom', cor: '#ff5e9c', cabelo: 'longo' },
+    { id: 'papai', pt: 'Papai', en: 'Dad', cor: '#3aa0e8', cabelo: 'curto' },
+    { id: 'vovo-a', pt: 'Vovó', en: 'Grandma', cor: '#8e6bff', cabelo: 'coque' },
+    { id: 'vovo-o', pt: 'Vovô', en: 'Grandpa', cor: '#2bb673', cabelo: 'careca' },
+    { id: 'irmao', pt: 'Irmão', en: 'Brother', cor: '#e84a3c', cabelo: 'bone' },
+    { id: 'irma', pt: 'Irmã', en: 'Sister', cor: '#ffc93c', cabelo: 'chiquinhas' },
+    { id: 'bebe', pt: 'Bebê', en: 'Baby', cor: '#7fd3ff', cabelo: 'bebe' }
   ];
 
   function P(id, a, u, o) { var p = { id: id, a: a, u: u }; if (o) for (var k in o) p[k] = o[k]; return p; }
@@ -354,8 +367,8 @@
         P('servir', 'servir', 'prato')] }
   ];
 
-  var D = { LUGARES: LUGARES, PLANTAS: PLANTAS, INGREDIENTES: INGREDIENTES, UTENSILIOS: UTENSILIOS, ACOES: ACOES, NIVEIS: NIVEIS, RECEITAS: RECEITAS };
+  var D = { FAMILIA: FAMILIA, LUGARES: LUGARES, PLANTAS: PLANTAS, INGREDIENTES: INGREDIENTES, UTENSILIOS: UTENSILIOS, ACOES: ACOES, NIVEIS: NIVEIS, RECEITAS: RECEITAS };
   function porId(lista) { var m = {}; lista.forEach(function (x) { m[x.id] = x; }); return m; }
-  D.lugar = porId(LUGARES); D.planta = porId(PLANTAS); D.ingrediente = porId(INGREDIENTES); D.utensilio = porId(UTENSILIOS); D.nivel = porId(NIVEIS); D.receita = porId(RECEITAS);
+  D.pessoa = porId(FAMILIA); D.lugar = porId(LUGARES); D.planta = porId(PLANTAS); D.ingrediente = porId(INGREDIENTES); D.utensilio = porId(UTENSILIOS); D.nivel = porId(NIVEIS); D.receita = porId(RECEITAS);
   if (typeof module !== 'undefined' && module.exports) module.exports = D; else raiz.CozinhaDados = D;
 })(typeof self !== 'undefined' ? self : this);
