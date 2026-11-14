@@ -188,6 +188,21 @@
     rios.sort(function (a, b) { return a[0] - b[0]; });
     rios.forEach(function (t, k) { for (var i3 = t[0]; i3 < t[1]; i3++) segs[i3].agua = k + 1; });
 
+    // paredões (1.19.0, dono: "montanhas dos lados, um negócio 3D bem arrojado"): nos rios e em trechos dos mundos de
+    // pedra (cânion, templo, lava, neve) a estrada passa entre dois paredões de rocha. Nunca no túnel nem no looping.
+    var PEDRA = ['canion', 'templo', 'lava', 'neve'], i4;
+    for (i4 = 200; i4 < chegada + 20; ) {
+      var lenP = inteiro(90, 170);
+      if (PEDRA.indexOf(ordem[segs[i4].mundo]) >= 0) { for (var q4 = i4; q4 < Math.min(segs.length, i4 + lenP); q4++) segs[q4].parede = true; }
+      i4 += lenP + inteiro(50, 110);
+    }
+    segs.forEach(function (sg) { if (sg.agua) sg.parede = true; if (sg.tunel || perto(sg.i, 20)) sg.parede = false; });
+    // setas nas curvas (como as placas de pista de corrida): do lado de fora da curva, apontando para onde ela vai
+    for (i4 = 140; i4 < chegada - 10; i4 += 6) {
+      var sc = segs[i4];
+      if (Math.abs(sc.curva) >= 2.2 && !sc.tunel && !sc.loop && !perto(i4, 15)) sc.enfeites.push({ tipo: sc.curva > 0 ? 'setaD' : 'setaE', x: (sc.curva > 0 ? -1 : 1) * 1.32 });
+    }
+
     return { segs: segs, chegada: chegada, tuneis: tuneis, rios: rios, loops: loops, zChegada: chegada * SEG, comprimento: segs.length * SEG, nivel: NIVEIS[nivel] ? nivel : 'normal', cfg: cfg, mundos: ordem, carros: carros, semente: semente };
   }
 
