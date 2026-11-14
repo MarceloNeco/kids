@@ -75,4 +75,8 @@ interruptor em `recursos-do-app.json`. Antes de começar cada um, fazer uma entr
 | 39 | **GLUB GLUB**, jogo novo de pescaria (Juca e Lili, anzol em pêndulo, 28 bichos e prêmios em 3D, 3 níveis por jogador, sozinho ou em dois no mesmo aparelho, balde, bolhas de poder, “Limpa o Rio!”, álbum, 3 lugares × 3 horas do dia). Detalhe em `glub-glub/PENDENCIAS.md`. | Dono, 13/Nov/2026 | ✅ v0.1.0 (14/Nov/2026); ⏸ testar com as filhas |
 | 40 | GLUB GLUB na **TV** com celulares de controle (Entrega 2) e como **aplicativo na TV LG pelo free-my-tv**, com o celular de controle todo desenhado. | Dono, 14/Nov/2026 | 🟡 fase 2 |
 | 41 | GLUB GLUB **cada um no seu celular**, com código (Entrega 3). | Dono, 14/Nov/2026 | 🟡 |
+| 42 | **Três idiomas (PT · EN · ES)** em toda a estante e em todos os jogos, escolhidos só na estante com bandeira + sigla (pasta `bandeiras/`); espanhol da Espanha; vozes no idioma escolhido. | Dono, 14/Nov/2026 | ✅ feita (14/Nov/2026, estante 23) |
+| 43 | Ouvir os jogos em inglês e espanhol num aparelho de verdade (vozes da Dona Cida, da Peluqueria, do Quem é?, da Rabiscolândia e do Enigmatic) e contar o que soou estranho. As falas gravadas da Dona Cida (`cozinha/voz/`) existem só em português: em EN/ES ela usa a voz do aparelho. | Três idiomas, 14/Nov/2026 | ⏸ com o dono |
+| 44 | Palavras pintadas nos carrinhos do Vruuum! (PIPOCA, SORVETE, ESCOLAR, PARE…) continuam em português nos três idiomas. | Três idiomas, 14/Nov/2026 | 🟡 |
+| 45 | O vigia `teste/navegacao.test.js` falha no A-GARRA (o 🏠 não aparece a tempo depois de começar) — já falhava no `main` antes dos três idiomas; para a conversa do A-GARRA. | Três idiomas, 14/Nov/2026 | 🟡 |
 
