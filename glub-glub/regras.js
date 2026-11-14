@@ -75,7 +75,7 @@
     b('agua-viva-gigante', 'Água-viva gigante', 'Giant jellyfish', 'Medusa gigante', 5, 65, 0.2, 4, 'bicho', 1.0, true),
     b('peixe-dragao', 'Peixe-dragão', 'Dragonfish', 'Pez dragón', 5, 75, 0.2, 4, 'bicho', 0.35, true),
     // das rodadas especiais e as piranhas (não entram no cardume)
-    b('gigante', 'Dragão-do-mar', 'Sea dragon', 'Dragón marino', 0, 100, 0.34, 5, 'chefe', 0.45),
+    b('gigante', 'Dragão-do-mar', 'Sea dragon', 'Dragón marino', 0, 100, 0.3, 5, 'chefe', 0.9),
     b('menino', 'Menino', 'Boy', 'Niño', 0, 10, 0.085, 1, 'banhista', 1.0),
     b('menina', 'Menina', 'Girl', 'Niña', 0, 10, 0.085, 1, 'banhista', 1.0),
     b('filhote', 'Filhote de tartaruga', 'Baby turtle', 'Tortuguita', 0, 15, 0.05, 1, 'filhote', 0.7),
@@ -392,7 +392,10 @@
     a.presos.forEach(function (o) {
       var k = E.bichos.indexOf(o); if (k >= 0) E.bichos.splice(k, 1);
       if (!valeu) return;
-      if (o.tipo === 'filhote') { a.levando = 'filhote'; ev.push({ tipo: 'filhote', j: j }); return; }
+      if (o.tipo === 'filhote') {   // só vale dentro da rodada dos filhotes (acabou com ele na linha: volta para a água)
+        if (E.bonus && E.bonus.tipo === 'filhotes') { a.levando = 'filhote'; ev.push({ tipo: 'filhote', j: j }); }
+        return;
+      }
       J.pontos += o.pontos;
       ev.push({ tipo: 'pegou', j: j, bicho: { id: o.id, tipo: o.tipo, faixa: o.faixa, raro: o.raro }, pontos: o.pontos });
       if (o.tipo === 'bicho' || o.tipo === 'premio') repor(E, o.faixa);
@@ -444,7 +447,7 @@
       if (alvo) {
         var pegos = [alvo], limpa = E.bonus && E.bonus.tipo === 'limpa';
         if (limpa || (J.poder && J.poder.id === 'rede')) {   // a rede pega até 3 de uma vez (no "Limpa o Rio!", só lixo)
-          E.bichos.filter(function (o) { return o !== alvo && pegavel(E, J, o) && (!limpa || o.tipo === 'lixo') && Math.hypot(o.x - a.x, o.y - a.y) <= (limpa ? 110 : 70) * E.esc; })
+          if (alvo.tipo !== 'filhote') E.bichos.filter(function (o) { return o !== alvo && pegavel(E, J, o) && o.tipo !== 'filhote' && (!limpa || o.tipo === 'lixo') && Math.hypot(o.x - a.x, o.y - a.y) <= (limpa ? 110 : 70) * E.esc; })
             .sort(function (p, q) { return Math.hypot(p.x - a.x, p.y - a.y) - Math.hypot(q.x - a.x, q.y - a.y); })
             .slice(0, 2).forEach(function (o) { pegos.push(o); });
           if (!limpa) J.poder = null;
@@ -568,6 +571,7 @@
     E.bichos.forEach(function (o) { o.x *= f; });
     E.bolhas.forEach(function (o) { o.x *= f; });
     E.W = W; E.sup = supDe(aspecto); E.esc = escDe(aspecto);
+    E.j.forEach(function (J) { var a = J.anzol; if (a.de) { a.de.x *= f; a.para.x *= f; a.para.y = E.sup + 6; } });
     E.bichos.forEach(function (o) { o.y = fundoY(E, o.fy); });
     E.bolhas.forEach(function (o) { o.y = fundoY(E, o.fy); });
   }

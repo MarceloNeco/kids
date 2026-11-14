@@ -421,3 +421,33 @@ test('gigantes que brilham passam de vez em quando bem no fundo e valem muito', 
   }
   assert.ok(R.GIGANTES.every(id => vistos.has(id)), 'vistos: ' + [...vistos]);
 });
+
+test('filhote ainda subindo quando a rodada acaba: o anzol não fica preso, volta a pescar', () => {
+  const E = naRodada('filhotes'), ang = 0.1, p = noCaminho(E, 0, ang, 400);
+  R.colocar(E, 'filhote', p.x, p.y, { vel: 0 });
+  R.pescar(E, 0, ang);
+  assert.ok(ateEvento(E, 'fisgou', 4));
+  E.bonus.fim = E.t;   // a rodada acaba com o filhote na linha
+  rodar(E, 5);
+  assert.equal(E.j[0].anzol.levando, null);
+  const q = noCaminho(E, 0, ang, 300);
+  E.bichos = []; R.colocar(E, 'lambari', q.x, q.y, { vel: 0 });
+  R.pescar(E, 0, ang);
+  assert.ok(ateEvento(E, 'fisgou', 4), 'pesca de novo');
+});
+
+test('rede da vovó na rodada dos filhotes: pega um filhote só', () => {
+  const E = naRodada('filhotes'), ang = 0.1, p = noCaminho(E, 0, ang, 300);
+  E.j[0].poder = { id: 'rede', ate: Infinity };
+  [-30, 0, 30].forEach(dx => R.colocar(E, 'filhote', p.x + dx, p.y, { vel: 0 }));
+  R.pescar(E, 0, ang);
+  assert.equal(rodar(E, 1.5).filter(e => e.tipo === 'fisgou').length, 1);
+});
+
+test('girar a tela com a boia no ar: ela cai dentro da tela, na água', () => {
+  const E = naRodada('socorro');
+  R.pescar(E, 0, 0.6); rodar(E, 0.3);
+  R.redimensionar(E, 9 / 16);
+  const a = E.j[0].anzol;
+  assert.ok(a.para.x <= E.W && a.para.y === E.sup + 6, JSON.stringify(a.para));
+});

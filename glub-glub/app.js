@@ -134,7 +134,7 @@
     if (VITRINE) vitrine(enfeite);
   }
   function vitrine(L) {   // ?vitrine: todos os bichos parados no lago, para os prints
-    L.bichos = []; L.repor = false; L.proxBolha = Infinity; L.proxRaro = Infinity; L.j.forEach(function (J) { J.robo = false; });
+    L.bichos = []; L.repor = false; L.proxBolha = Infinity; L.proxRaro = Infinity; L.proxPiranha = Infinity; L.j.forEach(function (J) { J.robo = false; });
     var porFaixa = {};
     R.BICHOS.forEach(function (b) { if (b.tipo === 'bicho' || b.tipo === 'premio') (porFaixa[b.faixa] = porFaixa[b.faixa] || []).push(b.id); });
     Object.keys(porFaixa).forEach(function (f) {

@@ -868,7 +868,7 @@
   };
   // quanto o corpo ondula ao nadar (fração do comprimento) e o brilho em volta dos bichos do fundo
   var ONDA = { tartaruga: 0, polvo: 0, 'agua-viva': 0, 'cavalo-marinho': 0, lagosta: 0.01, caranguejo: 0, morsa: 0.02, baleia: 0.025, orca: 0.04, bota: 0, garrafa: 0, bau: 0, pet: 0, lata: 0, sacola: 0, chinelo: 0, pneu: 0,
-    menino: 0, menina: 0, filhote: 0, estrela: 0, 'agua-viva-gigante': 0, 'lula-gigante': 0.03, gigante: 0.05, 'peixe-dragao': 0.05 };
+    menino: 0, menina: 0, filhote: 0, estrela: 0, 'agua-viva-gigante': 0, 'lula-gigante': 0.03, gigante: 0.02, 'peixe-dragao': 0.05 };
   var BRILHO = { abissal: '#ff4a3a', orca: '#9fd0ff', tubarao: '#9a6bff', martelo: '#3fe0ff', 'tubarao-baleia': '#5ad1ff', lanterna: '#3fffd0', baleia: '#6aa8ff', sereia: '#7effe0', pirarucu: '#ffd84a',
     polvo: '#ff5fa2', lagosta: '#ff8a3a', caranguejo: '#ff6a3a', morsa: '#9fd0ff', bau: '#ffcc33', garrafa: '#9ff7ff', 'agua-viva': '#ff9ff0',
     'lula-gigante': '#4aa8ff', 'agua-viva-gigante': '#c08bff', 'peixe-dragao': '#3fffe0', gigante: '#5ad1ff', estrela: '#ffd84a' };
