@@ -18,8 +18,10 @@
     { id: 'horta', e: '🌱', pt: 'Horta', en: 'Vegetable garden', faz: ['Puxar legumes', 'Pull veggies'] },
     { id: 'galinheiro', e: '🐔', pt: 'Galinheiro', en: 'Hen house', faz: ['Pegar ovos', 'Collect eggs'] },
     { id: 'vaca', e: '🐄', pt: 'Fazendinha da Mimosa', en: "Mimosa's little farm", faz: ['Tirar leite', 'Get milk'] },
-    { id: 'mercado', e: '🏪', pt: 'Mercadinho do Seu Zé', en: "Mr. Zé's shop", faz: ['Comprar', 'Buy'] },
+    { id: 'mercado', e: '🏪', pt: 'Mercadinho do Seu Zé', en: "Mr. Zé's shop", faz: ['Comprar', 'Buy'], dono: ['Seu Zé', 'Mr. Zé'] },
     { id: 'vizinha', e: '👵', pt: 'Dona Cida, a vizinha', en: 'Mrs. Cida next door', faz: ['Pedir emprestado', 'Borrow'] },
+    { id: 'padaria', e: '🥖', pt: 'Padaria do Seu Joaquim', en: "Mr. Joaquim's bakery", faz: ['Comprar pão', 'Buy bread'], dono: ['Seu Joaquim', 'Mr. Joaquim'] },
+    { id: 'feira', e: '🍉', pt: 'Feira da Dona Rosa', en: "Mrs. Rosa's street market", faz: ['Frutas e legumes', 'Fruit and veg'], dono: ['Dona Rosa', 'Mrs. Rosa'] },
     { id: 'casa', e: '🏠', pt: 'Casa', en: 'Home', faz: ['Cozinhar', 'Cook'] }
   ];
 
@@ -41,6 +43,8 @@
       fato: ['A uva nasce em cachos na parreira, uma planta que sobe e se enrola! 🍇', 'Grapes grow in bunches on a grapevine, a plant that climbs and curls! 🍇'] },
     { id: 'limao', e: '🍋', pt: ['limão', 'limões'], en: ['lemon', 'lemons'], de: 'pomar', preco: 1, planta: 'limoeiro',
       fato: ['O limão nasce no limoeiro, uma árvore com espinhos! 🍋', 'Lemons grow on the lemon tree, which has thorns! 🍋'] },
+    { id: 'jabuticaba', s: 'jabuticaba', pt: ['jabuticaba', 'jabuticabas'], en: ['jabuticaba', 'jabuticabas'], de: 'pomar', preco: 1, planta: 'jaboticabeira',
+      fato: ['A jabuticaba nasce grudadinha no tronco da jaboticabeira!', 'Jabuticabas grow stuck right on the trunk of the tree!'] },
     { id: 'cenoura', e: '🥕', pt: ['cenoura', 'cenouras'], en: ['carrot', 'carrots'], de: 'horta', preco: 1, planta: 'pe-cenoura',
       fato: ['A cenoura cresce embaixo da terra; em cima só aparecem as folhas! 🥕', 'Carrots grow under the ground; only the leaves show on top! 🥕'] },
     { id: 'tomate', e: '🍅', pt: ['tomate', 'tomates'], en: ['tomato', 'tomatoes'], de: 'horta', preco: 1, planta: 'tomateiro',
@@ -53,7 +57,7 @@
       fato: ['Cheiro-verde é salsinha com cebolinha, folhas cheirosas da horta! 🌿', 'Cheiro-verde is parsley and chives, tasty leaves from the garden! 🌿'] },
     { id: 'ovo', e: '🥚', pt: ['ovo', 'ovos'], en: ['egg', 'eggs'], de: 'galinheiro', preco: 1, vizinha: true,
       fato: ['A galinha bota o ovo no ninho de palha! 🥚', 'The hen lays her egg in a straw nest! 🥚'] },
-    { id: 'leite', e: '🥛', pt: ['xícara de leite', 'xícaras de leite'], en: ['cup of milk', 'cups of milk'], de: 'vaca', preco: 2, vizinha: true,
+    { id: 'leite', e: '🥛', padaria: true, pt: ['xícara de leite', 'xícaras de leite'], en: ['cup of milk', 'cups of milk'], de: 'vaca', preco: 2, vizinha: true,
       fato: ['O leite vem da vaca! 🐄', 'Milk comes from the cow! 🐄'] },
     { id: 'farinha', e: '🌾', pt: ['xícara de farinha', 'xícaras de farinha'], en: ['cup of flour', 'cups of flour'], preco: 1, vizinha: true,
       fato: ['A farinha é feita de trigo moído no moinho! 🌾', 'Flour is made from wheat ground at the mill! 🌾'] },
@@ -65,7 +69,7 @@
       fato: ['O óleo de cozinha é espremido de grãos, como a soja!', 'Cooking oil is pressed from seeds, like soybeans!'] },
     { id: 'fermento', s: 'fermento', pt: ['colher de fermento', 'colheres de fermento'], en: ['spoon of baking powder', 'spoons of baking powder'], preco: 1,
       fato: ['O fermento faz a massa crescer e ficar fofinha!', 'Baking powder makes the dough rise and get fluffy!'] },
-    { id: 'manteiga', s: 'manteiga', pt: ['colher de manteiga', 'colheres de manteiga'], en: ['spoon of butter', 'spoons of butter'], preco: 1, vizinha: true,
+    { id: 'manteiga', s: 'manteiga', padaria: true, pt: ['colher de manteiga', 'colheres de manteiga'], en: ['spoon of butter', 'spoons of butter'], preco: 1, vizinha: true,
       fato: ['A manteiga é feita da nata do leite, bem batida!', 'Butter is made by churning the cream from milk!'] },
     { id: 'chocolate', e: '🍫', pt: ['colher de chocolate', 'colheres de chocolate'], en: ['spoon of chocolate', 'spoons of chocolate'], preco: 2,
       fato: ['O chocolate é feito das sementes do cacau, que nasce no cacaueiro! 🍫', 'Chocolate is made from the seeds of the cacao tree! 🍫'] },
@@ -73,10 +77,10 @@
       fato: ['O leite condensado é leite cozido com açúcar até engrossar!', 'Condensed milk is milk cooked with sugar until it gets thick!'] },
     { id: 'granulado', s: 'granulado', pt: ['colher de granulado', 'colheres de granulado'], en: ['spoon of sprinkles', 'spoons of sprinkles'], preco: 1,
       fato: ['O granulado é feito de chocolate e açúcar!', 'Sprinkles are made of chocolate and sugar!'] },
-    { id: 'queijo', e: '🧀', pt: ['pedaço de queijo', 'pedaços de queijo'], en: ['piece of cheese', 'pieces of cheese'], preco: 2,
+    { id: 'queijo', e: '🧀', padaria: true, pt: ['pedaço de queijo', 'pedaços de queijo'], en: ['piece of cheese', 'pieces of cheese'], preco: 2,
       fato: ['O queijo é feito de leite! 🧀', 'Cheese is made from milk! 🧀'] },
-    { id: 'pao', e: '🍞', pt: ['fatia de pão', 'fatias de pão'], en: ['slice of bread', 'slices of bread'], preco: 1,
-      fato: ['O pão é feito de farinha, água e fermento, assado no forno! 🍞', 'Bread is made of flour, water and yeast, baked in the oven! 🍞'] },
+    { id: 'pao', e: '🍞', padaria: true, pt: ['fatia de pão', 'fatias de pão'], en: ['slice of bread', 'slices of bread'], preco: 1,
+      fato: ['O padeiro assa o pão no forno da padaria, com farinha, água e fermento! 🍞', 'The baker bakes bread in the bakery oven, with flour, water and yeast! 🍞'] },
     { id: 'gelatina-po', s: 'gelatina', pt: ['pacotinho de gelatina', 'pacotinhos de gelatina'], en: ['packet of jelly', 'packets of jelly'], preco: 2,
       fato: ['O pó some na água quente e, na geladeira, vira gelatina balançante!', 'The powder melts in hot water and turns wobbly in the fridge!'] },
     { id: 'carne', e: '🥩', pt: ['pedaço de carne', 'pedaços de carne'], en: ['piece of meat', 'pieces of meat'], preco: 3,
@@ -89,7 +93,7 @@
 
   // Plantas: onde cada fruta e cada legume nasce DE VERDADE (o jogo também ensina). Cada fruta só aparece na sua planta.
   // forma = como é desenhada (desenhos.js): arvore, bananeira (folhas compridas e cacho com o "coração" roxo),
-  // rasteira (baixinha, no chão), parreira (trepadeira numa armação de madeira), raiz (o legume fica EMBAIXO da terra
+  // rasteira (baixinha, no chão), parreira (trepadeira numa armação de madeira), tronco (a fruta nasce grudada no tronco: jaboticabeira), raiz (o legume fica EMBAIXO da terra
   // e se arranca puxando), estaca (planta amarrada numa estaca), cabeca (bola de folhas em cima da terra), touceira (maço de folhas).
   var PLANTAS = [
     { id: 'macieira', lugar: 'pomar', forma: 'arvore', pt: 'macieira', en: 'apple tree' },
@@ -98,6 +102,7 @@
     { id: 'bananeira', lugar: 'pomar', forma: 'bananeira', pt: 'bananeira', en: 'banana plant' },
     { id: 'morangueiro', lugar: 'pomar', forma: 'rasteira', pt: 'pé de morango', en: 'strawberry plant' },
     { id: 'parreira', lugar: 'pomar', forma: 'parreira', pt: 'parreira', en: 'grapevine' },
+    { id: 'jaboticabeira', lugar: 'pomar', forma: 'tronco', pt: 'jaboticabeira', en: 'jabuticaba tree' },
     { id: 'pe-cenoura', lugar: 'horta', forma: 'raiz', pt: 'pé de cenoura', en: 'carrot plant' },
     { id: 'pe-batata', lugar: 'horta', forma: 'raiz', pt: 'pé de batata', en: 'potato plant' },
     { id: 'tomateiro', lugar: 'horta', forma: 'estaca', pt: 'tomateiro', en: 'tomato plant' },
@@ -349,6 +354,17 @@
         P('tacas', 'despejar', 'copo', { de: 'tigela', dep: ['mexer'], pt: 'Despeje a gelatina nas tacinhas', en: 'Pour the jelly into the little cups' }),
         P('frutas', 'por', 'copo', { ing: ['morango', 'uva'], dep: ['tacas', 'cortar'], pt: 'Coloque as frutinhas na gelatina', en: 'Put the fruit into the jelly' }),
         P('gelar', 'gelar', 'geladeira', { pt: 'Leve à geladeira até ficar firme e balançante', en: 'Put it in the fridge until it is firm and wobbly' }),
+        P('servir', 'servir', 'copo')] },
+
+    { id: 'suco-jabuticaba', e: '🍇', cor: '#5b2160', pt: 'Suco de jabuticaba', en: 'Jabuticaba juice',
+      ing: [{ id: 'jabuticaba', q: 6 }, { id: 'acucar', q: 1 }],
+      facil: { jabuticaba: 4 },
+      passos: [LAVAR(),
+        P('lavarJ', 'lavar', 'pia', { ing: ['jabuticaba'] }),
+        P('liq', 'por', 'liquidificador', { ing: ['jabuticaba', 'acucar'], pt: 'Coloque as jabuticabas e um copo de água no liquidificador', en: 'Put the jabuticabas and a glass of water in the blender' }),
+        P('bater', 'bater', 'liquidificador'),
+        P('coar', 'despejar', 'copo', { de: 'liquidificador', pt: 'Coe o suco e despeje no copo', en: 'Strain the juice and pour it into the glass' }),
+        P('gelar', 'gelar', 'geladeira', { min: 3, pt: 'Deixe o suco gelar um pouquinho', en: 'Let the juice chill for a little while' }),
         P('servir', 'servir', 'copo')] },
 
     { id: 'churrasco', e: '🍢', cor: '#c0392b', pt: 'Churrasquinho no espeto', en: 'BBQ skewers',

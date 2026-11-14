@@ -37,7 +37,12 @@
     brinco: [false, true],
     colar: [false, true],
     roupaCor: ['vermelho', 'azul', 'verde', 'amarelo', 'roxo', 'laranja'],
-    estampa: ['lisa', 'listras', 'bolinhas', 'xadrez', 'estrelas']
+    estampa: ['lisa', 'listras', 'bolinhas', 'xadrez', 'estrelas'],
+    // só no corpo inteiro (dono, 14/Nov/2026)
+    baixo: ['calca', 'short', 'saia', 'vestido'],
+    calcado: ['tenis', 'bota', 'sapato', 'descalco'],
+    mochila: [false, true],
+    segura: [null, 'balao', 'bola', 'sorvete', 'livro', 'flor']
   };
 
   function ehMasc(c) { return c.tipo === 'menino' || c.tipo === 'homem' || c.tipo === 'vovo'; }
@@ -92,11 +97,29 @@
     PERGUNTAS.push(P('olhos-' + k, 'dificil', 'rosto', t[2], 'Tem olhos ' + t[0] + '?', 'Does it have ' + t[1] + ' eyes?', function (c) { return c.olhos === k; }));
   });
   PERGUNTAS.push(P('sardas', 'dificil', 'rosto', '🟠', 'Tem sardas?', 'Does it have freckles?', function (c) { return !!c.sardas; }));
+  // corpo inteiro: só entram quando o tabuleiro é de corpo inteiro (perguntasDoNivel(nivel, true))
+  function PC(id, nivel, ico, pt, en, teste) { var p = P(id, nivel, 'corpo', ico, pt, en, teste); p.corpo = true; return p; }
+  PERGUNTAS.push(
+    PC('calca', 'facil', '👖', 'Está de calça?', 'Wearing trousers?', function (c) { return c.baixo === 'calca'; }),
+    PC('short', 'facil', '🩳', 'Está de short?', 'Wearing shorts?', function (c) { return c.baixo === 'short'; }),
+    PC('saia', 'facil', '👗', 'Está de saia?', 'Wearing a skirt?', function (c) { return c.baixo === 'saia'; }),
+    PC('vestido', 'facil', '👗', 'Está de vestido?', 'Wearing a dress?', function (c) { return c.baixo === 'vestido'; }),
+    PC('descalco', 'facil', '🦶', 'Está descalço?', 'Is it barefoot?', function (c) { return c.calcado === 'descalco'; }),
+    PC('tenis', 'medio', '👟', 'Está de tênis?', 'Wearing sneakers?', function (c) { return c.calcado === 'tenis'; }),
+    PC('bota', 'medio', '👢', 'Está de bota?', 'Wearing boots?', function (c) { return c.calcado === 'bota'; }),
+    PC('mochila', 'medio', '🎒', 'Está de mochila?', 'Wearing a backpack?', function (c) { return !!c.mochila; }),
+    PC('segura', 'medio', '✋', 'Está segurando alguma coisa?', 'Holding something?', function (c) { return !!c.segura; }),
+    PC('segura-balao', 'dificil', '🎈', 'Está segurando um balão?', 'Holding a balloon?', function (c) { return c.segura === 'balao'; }),
+    PC('segura-bola', 'dificil', '⚽', 'Está segurando uma bola?', 'Holding a ball?', function (c) { return c.segura === 'bola'; }),
+    PC('segura-sorvete', 'dificil', '🍦', 'Está segurando um sorvete?', 'Holding an ice cream?', function (c) { return c.segura === 'sorvete'; }),
+    PC('segura-livro', 'dificil', '📕', 'Está segurando um livro?', 'Holding a book?', function (c) { return c.segura === 'livro'; }),
+    PC('segura-flor', 'dificil', '🌷', 'Está segurando uma flor?', 'Holding a flower?', function (c) { return c.segura === 'flor'; })
+  );
 
   var POR_ID = {};
   PERGUNTAS.forEach(function (p) { POR_ID[p.id] = p; });
 
-  function perguntasDoNivel(nivel) { return PERGUNTAS.filter(function (p) { return ORDEM[p.nivel] <= ORDEM[nivel]; }); }
+  function perguntasDoNivel(nivel, corpo) { return PERGUNTAS.filter(function (p) { return ORDEM[p.nivel] <= ORDEM[nivel] && (!p.corpo || !!corpo); }); }
   function pergunta(id) { var p = POR_ID[id]; if (!p) throw new Error('pergunta desconhecida: ' + id); return p; }
   function responder(cara, id) { return !!pergunta(id).teste(cara); }
   function conferir(cara, id, resposta) { return responder(cara, id) === !!resposta; }
@@ -140,9 +163,19 @@
     c.estampa = um(r, CARACTERISTICAS.estampa);
     return c;
   }
+  // corpo inteiro: o que vai da cintura para baixo e nas mãos (sorteado DEPOIS, para o rosto continuar igual ao do busto)
+  function sortearCorpo(r, c, nivel) {
+    var med = ORDEM[nivel] >= 1, dif = ORDEM[nivel] >= 2, masc = c.tipo === 'menino' || c.tipo === 'homem' || c.tipo === 'vovo';
+    c.baixo = um(r, masc ? ['calca', 'calca', 'short', 'short', 'saia'] : ['calca', 'short', 'saia', 'saia', 'vestido', 'vestido']);
+    if (masc && c.baixo === 'saia' && r() < 0.7) c.baixo = 'short';
+    c.calcado = r() < 0.15 ? 'descalco' : med ? um(r, ['tenis', 'bota', 'sapato']) : 'tenis';
+    c.mochila = med && r() < 0.3;
+    c.segura = med && r() < 0.5 ? (dif ? um(r, ['balao', 'bola', 'sorvete', 'livro', 'flor']) : 'balao') : null;
+    return c;
+  }
 
-  function avaliar(caras, nivel) {
-    var n = caras.length, max = Math.ceil(2 * n / 3), ps = perguntasDoNivel(nivel), presentes = [], ruins = 0, iguais = false;
+  function avaliar(caras, nivel, corpo) {
+    var n = caras.length, max = Math.ceil(2 * n / 3), ps = perguntasDoNivel(nivel, corpo), presentes = [], ruins = 0, iguais = false;
     ps.forEach(function (p) {
       var sim = 0; caras.forEach(function (c) { if (p.teste(c)) sim++; });
       if (sim > 0 && sim < n) { presentes.push(p.id); if (sim < 2 || sim > max) ruins++; }
@@ -152,13 +185,14 @@
     return { presentes: presentes, ruins: ruins, iguais: iguais };
   }
 
-  function gerarTabuleiro(semente, nivel) {
+  function gerarTabuleiro(semente, nivel, op) {
     if (!NIVEIS[nivel]) throw new Error('nível desconhecido: ' + nivel);
-    var n = NIVEIS[nivel].caras, melhor = null;
+    var corpo = !!(op && op.corpo), n = NIVEIS[nivel].caras, melhor = null;
     for (var k = 0; k < 200; k++) {
       var r = sorteio((semente >>> 0) * 1000 + k + 1);
       var caras = tipos(r, n).map(function (t) { return sortearCara(r, t, nivel); });
-      var a = avaliar(caras, nivel);
+      if (corpo) caras.forEach(function (c) { sortearCorpo(r, c, nivel); });
+      var a = avaliar(caras, nivel, corpo);
       if (a.iguais) continue;
       if (!melhor || a.ruins < melhor.a.ruins) melhor = { caras: caras, a: a, r: r };
       if (a.ruins === 0) break;
@@ -167,8 +201,11 @@
     var r2 = melhor.r, masc = embaralhar(r2, Nomes.MASCULINOS.slice()), fem = embaralhar(r2, Nomes.FEMININOS.slice());
     melhor.caras.forEach(function (c, i) { c.id = i; c.nome = ehMasc(c) ? masc.pop() : fem.pop(); });
     var ordem = ['id', 'nome', 'tipo', 'pele', 'cabeloCor', 'cabeloComp', 'peruca', 'olhos', 'oculos', 'pelos', 'sardas', 'nariz', 'cabeca', 'brinco', 'colar', 'roupaCor', 'estampa'];
+    if (corpo) ordem = ordem.concat(['baixo', 'calcado', 'mochila', 'segura']);
     var caras2 = melhor.caras.map(function (c) { var o = {}; ordem.forEach(function (k) { o[k] = c[k]; }); return o; });
-    return { semente: semente, nivel: nivel, caras: caras2, perguntas: melhor.a.presentes };
+    var t = { semente: semente, nivel: nivel, caras: caras2, perguntas: melhor.a.presentes };
+    if (corpo) t.corpo = true;
+    return t;
   }
 
   // ---------- durante a partida ----------

@@ -131,3 +131,10 @@ test('em rede: segredo do outro desconhecido, resposta e veredito vêm de fora',
   assert.strictEqual(p.estado.vez, 1);
   assert.strictEqual(p.estado.dePe[0][5], false);
 });
+
+test('corpo inteiro: a partida guarda e volta com o corpo', () => {
+  const p = QP.criar({ modo: 'passar', nivel: 'medio', semente: 3, corpo: true });
+  assert.equal(p.tabuleiro.corpo, true);
+  const q = QP.voltar(JSON.parse(JSON.stringify(p.salvar())));
+  assert.deepEqual(q.tabuleiro, p.tabuleiro);
+});

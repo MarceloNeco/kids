@@ -136,6 +136,14 @@
         "en": "Who Is It? (Face Duel)"
       },
       "pagina": "quem-e/"
+    },
+    {
+      "id": "glub-glub",
+      "nome": {
+        "pt": "GLUB GLUB",
+        "en": "GLUB GLUB"
+      },
+      "pagina": "glub-glub/"
     }
   ]
 }

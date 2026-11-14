@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.36', APP_UPDATED = '14/11/2026';
+  var APP_VERSION = '0.8.38', APP_UPDATED = '14/11/2026';
   // o idioma vem da estante (../idioma.js): pt, en ou es; o jogo não tem botão de idioma próprio
   function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
   function T(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }
@@ -204,7 +204,7 @@
       var dd = duracaoDe(c), d = dd ? (dd >= 120 ? '2 min' : dd + ' s') : T('🎵 a música inteira', '🎵 the whole song', '🎵 toda la canción');
       var n = { crianca: T('Criança', 'Kids', 'Niños'), normal: 'Normal', maluco: T('Maluco', 'Crazy', 'Loco') }[c.dificuldade];
       var amb = c.ambiente === 'paisagem' ? T('🏞️ paisagem', '🏞️ landscape', '🏞️ paisaje') : T('📷 câmera', '📷 camera', '📷 cámara');
-      var pc = tv.toque && window.matchMedia && matchMedia('(pointer: fine)').matches, teclado = (c.modo === 'bagunca' || vaiLigado()) ? T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump (or use the mouse). Enter pauses.', '⌨️ En el ordenador: ← → caminan, ↑ o Espacio saltan (o usa el ratón). Enter pausa.') : T('🖱️ No computador, o mouse é o dedo: clique e arraste. Para jogar com as setas, escolha 💪 Difícil.', '🖱️ On a computer the mouse is your finger: click and drag. To play with the arrow keys, choose 💪 Hard.', '🖱️ En el ordenador, el ratón es tu dedo: haz clic y arrastra. Para jugar con las flechas, elige 💪 Difícil.');
+      var pc = tv.toque && window.matchMedia && matchMedia('(pointer: fine)').matches, teclado = (c.modo === 'bagunca' || vaiLigado()) ? (c.modo === 'bagunca' ? T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump (or use the mouse). Enter pauses.', '⌨️ En el ordenador: ← → caminan, ↑ o Espacio saltan (o usa el ratón). Enter pausa.') : T('⌨️ No computador: ← → andam, ↑ ou Espaço pulam, ↓ abaixa (ou use o mouse). Enter pausa.', '⌨️ On a computer: ← → walk, ↑ or Space jump, ↓ ducks (or use the mouse). Enter pauses.', '⌨️ En el ordenador: ← → caminan, ↑ o Espacio saltan, ↓ se agacha (o usa el ratón). Enter pausa.')) : T('🖱️ No computador, o mouse é o dedo: clique e arraste. Para jogar com as setas, escolha 💪 Difícil.', '🖱️ On a computer the mouse is your finger: click and drag. To play with the arrow keys, choose 💪 Hard.', '🖱️ En el ordenador, el ratón es tu dedo: haz clic y arrastra. Para jugar con las flechas, elige 💪 Difícil.');
       $('lobbyDica').textContent = c.jogadores !== 2 ? (pc && c.modo !== 'arrumar' && c.modo !== 'pula' ? teclado : '') : tv.toque ? T('👥 Duas pessoas: cada uma joga numa metade da tela, uma na esquerda e outra na direita.', '👥 Two people: each plays on one half of the screen, one left and one right.', '👥 Dos personas: cada una juega en una mitad de la pantalla, una a la izquierda y otra a la derecha.') : (tv.local || c.celulares === 1) ? T('👥 Duas pessoas: fiquem lado a lado na frente da câmera, uma na esquerda e outra na direita.', '👥 Two people: stand side by side in front of the camera, one left and one right.', '👥 Dos personas: pónganse lado a lado frente a la cámara, una a la izquierda y otra a la derecha.') : T('👥 Duas pessoas: cada uma com o seu celular filmando.', '👥 Two people: each with their own phone filming.', '👥 Dos personas: cada una con su móvil grabando.');
       $('lobbyResumo').textContent = m + ' · ' + amb + ' · ' + c.jogadores + (c.jogadores > 1 ? T(' pessoas', ' people', ' personas') : T(' pessoa', ' person', ' persona')) + (tv.local ? '' : ' · ' + c.celulares + (c.celulares > 1 ? T(' celulares', ' phones', ' móviles') : T(' celular', ' phone', ' móvil'))) + ' · ' + d + ' · ' + n + (vaiLigado() ? T(' · 💪 difícil: o boneco vai até lá', ' · 💪 hard: the avatar goes there', ' · 💪 difícil: el muñeco va hasta allí') : tv.toque && JEITO_MODOS.indexOf(c.modo) >= 0 ? T(' · 😊 fácil: o dedo pega na hora', ' · 😊 easy: your finger catches right away', ' · 😊 fácil: tu dedo coge al instante') : '');
       if (tv.toque) botaoJeito();
@@ -461,9 +461,9 @@
         if (e.key === 'Enter' || e.key === ' ') { if (tv.fase === 'lobby' || tv.fase === 'fim') comecar(); else if (tv.fase === 'jogando' || tv.fase === 'pausa') comando({ acao: 'pausar' }); else if (tv.fase === 'calibrando' && tv.calib) tv.calib.pular(); }
       });
     }
-    /* ⌨️ no computador, sem TV: ← → andam e ↑ ou Espaço pulam (2ª pessoa: A D W). Vale na 🧸 Bagunça e no 💪 Difícil;
+    /* ⌨️ no computador, sem TV: ← → andam, ↑ ou Espaço pulam e ↓ abaixa (2ª pessoa: A D W S). Vale na 🧸 Bagunça e no 💪 Difícil;
        no 😊 Fácil quem joga é o mouse. Enter continua pausando. */
-    var TECLAS = { ArrowLeft: [0, 'esq'], ArrowRight: [0, 'dir'], ArrowUp: [0, 'pulo'], ' ': [0, 'pulo'], a: [1, 'esq'], d: [1, 'dir'], w: [1, 'pulo'] };
+    var TECLAS = { ArrowLeft: [0, 'esq'], ArrowRight: [0, 'dir'], ArrowUp: [0, 'pulo'], ' ': [0, 'pulo'], ArrowDown: [0, 'baixo'], a: [1, 'esq'], d: [1, 'dir'], w: [1, 'pulo'], s: [1, 'baixo'] };   // ↓ / S: abaixa enquanto segura
     function teclaBoneco(e, desce) {
       var t = TECLAS[e.key.length === 1 ? e.key.toLowerCase() : e.key];
       if (!t || !tv.local || tv.fase !== 'jogando' || !tv.partida || !tv.partida.teclas || tv.arrumando) return false;

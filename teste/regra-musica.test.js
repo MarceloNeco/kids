@@ -86,7 +86,8 @@ const LISTAS = {
   'quem-e': () => [...ler('quem-e/app.js').matchAll(/a: '\.\.\/([^']+\.mp3)'/g)].map(m => m[1]),
   cozinha: () => [...ler('cozinha/app.js').matchAll(/a: ([MB]) \+ '([a-z0-9-]+\.mp3)'/g)].map(m => (m[1] === 'M' ? 'rabiscolandia' : 'baguncolandia') + '/musicas/' + m[2]),
   aqua: () => [...ler('aqua/app.js').matchAll(/a: M_ \+ '([a-z0-9-]+\.mp3)'/g)].map(m => 'purpurina/musicas/' + m[1]),
-  enigmas: () => [...ler('enigmas/app.js').matchAll(/a: M \+ '([a-z0-9-]+\.mp3)'/g)].map(m => 'baguncolandia/musicas/' + m[1])
+  enigmas: () => [...ler('enigmas/app.js').matchAll(/a: M \+ '([a-z0-9-]+\.mp3)'/g)].map(m => 'baguncolandia/musicas/' + m[1]),
+  'glub-glub': () => [...ler('glub-glub/app.js').matchAll(/a: (?:(B|RB) \+ )?'([^']+\.mp3)'/g)].map(m => (m[1] === 'B' ? 'baguncolandia/musicas/' : m[1] === 'RB' ? 'rabiscolandia/musicas/' : '') + m[2].replace(/^\.\.\//, ''))
 };
 
 test('playlists: pelo menos 10 arquivos que existem, sem repetir, nenhum mudo ou com som de videogame; favorita entre elas e até 2,5 MB', () => {
