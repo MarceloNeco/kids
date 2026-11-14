@@ -288,12 +288,7 @@
     var bob = Math.sin(t * 1.6) * 2.5, rot = Math.sin(t * 1.3) * 0.025;
     c.save(); c.rotate(rot); c.translate(0, bob);
     c.fillStyle = 'rgba(0,40,80,0.25)'; elipse(c, 0, 10, 105, 9); c.fill();
-    if (IMG.juca) {
-      var mj = personagemImg(c, 'juca', t, false);
-      barco(c);
-      c.restore();
-      return { x: mj.x, y: mj.y + bob };
-    }
+    if (IMG.juca) { barco(c); c.restore(); return null; }   // com a imagem 3D, aqui só o barquinho
     var pele = '#e0a87a';
     // pernas da jardineira dobradas, pés descalços
     c.fillStyle = '#3d6fb0'; c.beginPath(); c.moveTo(-34, -32); c.quadraticCurveTo(-2, -60, 18, -42); c.lineTo(22, -28); c.quadraticCurveTo(-6, -42, -30, -18); c.closePath(); c.fill();
@@ -350,12 +345,7 @@
     c.fillStyle = '#4aa84a'; [[60, -40], [90, -30], [-40, -32]].forEach(function (p) { for (var i = -2; i <= 2; i++) { c.beginPath(); c.moveTo(p[0] + i * 3, p[1]); c.lineTo(p[0] + i * 5, p[1] - 12 + Math.abs(i) * 2); c.lineTo(p[0] + i * 3 + 2, p[1]); c.fill(); } });
     c.fillStyle = '#ffd1dc'; elipse(c, 108, -8, 4, 3); c.fill(); c.fillStyle = '#fff3c4'; elipse(c, -58, -6, 3.5, 2.5); c.fill();
     coqueiro(c, 92, -36, 140, -0.2, false);
-    if (IMG.lili) {
-      var ml = personagemImg(c, 'lili', t, true);
-      c.fillStyle = '#8a5a20'; c.font = 'bold 13px sans-serif'; c.textAlign = 'center'; c.fillText('LILI', 30, -6);
-      c.restore();
-      return ml;
-    }
+    if (IMG.lili) { c.fillStyle = '#8a5a20'; c.font = 'bold 13px sans-serif'; c.textAlign = 'center'; c.fillText('LILI', 30, -6); c.restore(); return null; }   // com a imagem 3D, aqui só a ilhota
     c.translate(0, bob);
     var pele = '#9a5b34', bal = Math.sin(t * 2.2) * 0.25;
     [[-46, 0], [-34, 1]].forEach(function (p, i) { c.save(); c.translate(p[0], -34); c.rotate(0.35 + (i ? -bal : bal)); c.fillStyle = pele; c.fillRect(-4, 0, 9, 30); c.fillStyle = '#c0392b'; elipse(c, -3, 31, 8, 5); c.fill(); c.restore(); });   // sapatilhas vermelhas
@@ -395,16 +385,18 @@
     var pt = R.ponta(E, j), e = escala(), dir = E.j[j].lado === 'dir';
     return { x: pt.x + (dir ? 150 : -122) * e * (A.W >= H ? 1 : 0.85), y: E.sup, e: e, dir: dir };
   }
-  // onde ficam as mãos em cada imagem (fração da largura e da altura), para a vara sair delas
-  var MAOS = { juca: [0.74, 0.5], lili: [0.24, 0.52] };
-  function personagemImg(c, id, t, dir) {
-    var im = IMG[id], alt = 175, larg = alt * im.naturalWidth / im.naturalHeight, bob = dir ? Math.sin(t * 1.1) * 1.2 : 0;   // o Juca já balança com o barco
-    var x0 = dir ? -62 - larg / 2 : -22 - larg / 2, y0 = -alt + (dir ? -30 : 4) + bob;
-    c.drawImage(im, x0, y0, larg, alt);
-    return { x: x0 + MAOS[id][0] * larg, y: y0 + MAOS[id][1] * alt };
-  }
+  // onde fica a ponta da vara em cada imagem 3D (fração da largura e da altura): a imagem é posta de modo que essa ponta
+  // caia exatamente na ponta das regras, de onde o anzol balança
+  var PONTAS = { juca: [0.985, 0.15], lili: [0.012, 0.12] };
   function personagem(c, E, j, t) {
-    var L = lugar(E, j), pt = R.ponta(E, j);
+    var L = lugar(E, j), pt = R.ponta(E, j), id = L.dir ? 'lili' : 'juca', im = IMG[id];
+    if (im) {
+      var P = PONTAS[id], base = L.dir ? E.sup - 22 : E.sup + 14, alt = (base - pt.y) / (1 - P[1]), larg = alt * im.naturalWidth / im.naturalHeight;
+      var x0 = pt.x - P[0] * larg, y0 = pt.y - P[1] * alt, e = alt / 175;
+      if (L.dir) { c.save(); c.translate(x0 + larg * 0.62, E.sup); c.scale(e, e); lili(c, t); c.restore(); c.drawImage(im, x0, y0, larg, alt); }
+      else { c.drawImage(im, x0, y0, larg, alt); c.save(); c.translate(x0 + larg * 0.42, E.sup); c.scale(e * 1.1, e); juca(c, t); c.restore(); }
+      return;
+    }
     c.save(); c.translate(L.x, L.y); c.scale(L.e, L.e);
     var mao = L.dir ? lili(c, t) : juca(c, t);
     c.restore();
@@ -883,7 +875,7 @@
   function sprite(id, comp) {
     var chave = id + ':' + Math.round(comp), sp = A.sprites[chave];
     if (sp) return sp;
-    var d = R.POR_ID[id] || { alt: 0.5 }, im = IMG[id], iw = comp * 1.08, ih = im ? iw * im.naturalHeight / im.naturalWidth : 0;
+    var d = R.POR_ID[id] || { alt: 0.5 }, im = IMG[id], prop = im ? im.naturalHeight / im.naturalWidth : 1, iw = comp * 1.08 / Math.max(1, prop), ih = iw * prop;   // em pé (cavalo-marinho, água-viva): a altura é que vale o comprimento
     var w = Math.ceil(comp * 1.6), h = Math.ceil(im ? Math.max(ih * 1.3, comp * 0.5) : comp * (ALTURA[id] || Math.max(0.95, d.alt * 1.9)));
     var cv = tela(w * QUADROS, h), c = cv.getContext('2d'), b1 = tela(w, h), c1 = b1.getContext('2d'), b2 = tela(w, h), c2 = b2.getContext('2d');
     var onda = (ONDA[id] != null ? ONDA[id] : 0.045) * (im ? 1.25 : 1), brilho = BRILHO[id], cabeca = w / 2 + comp * 0.5;
