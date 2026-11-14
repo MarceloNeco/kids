@@ -344,7 +344,7 @@ function pintarColecao() {
 /* ---------- a cada quadro ---------- */
 function quadro(agora) {
   requestAnimationFrame(quadro);
-  const dt = Math.min(0.25, ultimoQuadro ? (agora - ultimoQuadro) / 1000 : 0.016); ultimoQuadro = agora;
+  const dt = Math.min(1, ultimoQuadro ? (agora - ultimoQuadro) / 1000 : 0.016); ultimoQuadro = agora;   // até 1 s: aparelho lento não vira câmera lenta
   if (telaAtual !== 'jogo' || !m || !cena) return;
   const seg = agora / 1000;
   // aparelho lento (poucos quadros por segundo): o jogo anda em passinhos, no tempo certo, sem câmera lenta
