@@ -106,7 +106,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   novo = uma entrada lá), `jogos.js`, `kids.js` (controle da TV), `instalar.js`, `radio.js`, `tela-cheia.js`,
   `estante.css`, `sw.js`, `manifest.webmanifest`, `musicas/`, `CREDITOS.md`.
 - Uma pasta por jogo: `baguncolandia/`, `peluqueria/`, `vruuum/`, `purpurina/`, `rabiscolandia/`, `campo-minado/`,
-  `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, `aqua/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
+  `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, `aqua/`, `glub-glub/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
   (só português por enquanto; o inglês com o interruptor `ingles`),
   `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
