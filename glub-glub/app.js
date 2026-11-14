@@ -4,10 +4,10 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.2', APP_DATA = '14/Nov/2026';
+  var APP_VERSION = '0.1.3', APP_DATA = '14/Nov/2026';
   var R = window.GlubRegras, A = window.GlubArte, Som = window.GlubSom;
   var $ = function (id) { return document.getElementById(id); };
-  var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA), VITRINE = /[?&]vitrine\b/.test(BUSCA);
+  var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA), VITRINE = /[?&]vitrine\b/.test(BUSCA), RODADA_PEDIDA = (BUSCA.match(/[?&]rodada=(\w+)/) || [])[1];
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   // trilha: músicas alegres de sol e água, que já moram na Bagunçolândia, na Rabiscolândia e na Purpurina (créditos em CREDITOS.md)
   var KM = 'Kevin MacLeod', CC = 'CC BY 4.0', CC0 = 'CC0 1.0 (FreePD)', B = '../baguncolandia/musicas/', RB = '../rabiscolandia/musicas/';
@@ -136,7 +136,7 @@
   function vitrine(L) {   // ?vitrine: todos os bichos parados no lago, para os prints
     L.bichos = []; L.repor = false; L.proxBolha = Infinity; L.proxRaro = Infinity; L.j.forEach(function (J) { J.robo = false; });
     var porFaixa = {};
-    R.BICHOS.forEach(function (b) { if (b.tipo !== 'lixo') (porFaixa[b.faixa] = porFaixa[b.faixa] || []).push(b.id); });
+    R.BICHOS.forEach(function (b) { if (b.tipo === 'bicho' || b.tipo === 'premio') (porFaixa[b.faixa] = porFaixa[b.faixa] || []).push(b.id); });
     Object.keys(porFaixa).forEach(function (f) {
       var ids = porFaixa[f], linhas = R.LINHAS[f];
       ids.forEach(function (id, i) { var o = R.colocar(L, id, (i + 0.5) / ids.length * L.W, L.sup + (R.H - L.sup) * linhas[i % linhas.length], { vel: 0 }); o.fy0 = o.fy; o.dir = i % 2 ? -1 : 1; });
@@ -154,7 +154,7 @@
     }
     humano = jogadores.map(function (j, i) { return j.robo ? -1 : i; }).filter(function (i) { return i >= 0; });
     cenario = ['roca', 'mar', 'serra'][Math.floor(Math.random() * 3)];
-    E = R.criar({ semente: Math.floor(Math.random() * 1e9), aspecto: aspecto(), jogadores: jogadores });
+    E = R.criar({ semente: Math.floor(Math.random() * 1e9), aspecto: aspecto(), jogadores: jogadores, rodada: RODADA_PEDIDA });
     E.modoDois = dois;
     novasDaPartida = [];
     efeitos = []; ultimoT = 0; pausado = false;
@@ -169,7 +169,7 @@
     faixa(t('Pesque! 🎣', "Let's fish! 🎣", '¡A pescar! 🎣'), 1200);
   }
   function jogadorDoBotao(n) { return E && E.modoDois ? n : humano[0]; }
-  function pescar(n) { if (!E || tela !== 'jogo' || pausado) return; var j = jogadorDoBotao(n); if (j == null) return; if (R.pescar(E, j)) Som.mergulho(); }
+  function pescar(n) { if (!E || tela !== 'jogo' || pausado) return; var j = jogadorDoBotao(n); if (j == null) return; if (R.pescar(E, j)) { if (E.j[j].anzol.fase === 'joga') Som.boia(); else Som.mergulho(); } }
   function subir(n, s) { if (!E || tela !== 'jogo') return; var j = jogadorDoBotao(n); if (j == null) return; R.subir(E, j, s); }
   ['0', '1'].forEach(function (n) {
     var bp = $('pescar' + n), bs = $('subir' + n);
@@ -249,6 +249,19 @@
 
   /* ---------- eventos das regras ---------- */
   var novasDaPartida = [];
+  // as rodadas especiais: o aviso do começo e o do fim
+  var RODADA = {
+    limpa: [function () { return t('♻️ Limpa o Rio! Pegue o lixo com a rede!', '♻️ Clean the River! Scoop the trash with the net!', '♻️ ¡Limpia el río! ¡Recoge la basura con la red!'); }, function () { return t('Rio limpo! 🌿', 'The river is clean! 🌿', '¡Río limpio! 🌿'); }],
+    socorro: [function () { return t('🛟 Socorro na Água! Jogue as boias!', '🛟 Rescue time! Throw the life rings!', '🛟 ¡Socorro en el agua! ¡Lanza los flotadores!'); }, function () { return t('Todo mundo salvo! 🏖️', 'Everyone is safe! 🏖️', '¡Todos a salvo! 🏖️'); }],
+    filhotes: [function () { return t('🐢 Leva os Filhotes! Pesque um e leve até a mamãe!', '🐢 Baby turtles! Catch one and take it to mom!', '🐢 ¡Las tortuguitas! ¡Pesca una y llévala con su mamá!'); }, function () { return t('A família de tartarugas agradece! 💚', 'The turtle family says thanks! 💚', '¡La familia tortuga te da las gracias! 💚'); }],
+    estrelas: [function () { return t('⭐ Chuva de Estrelas! Pegue as douradas!', '⭐ Star shower! Catch the golden ones!', '⭐ ¡Lluvia de estrellas! ¡Coge las doradas!'); }, function () { return t('Que céu brilhante! ✨', 'What a sparkly sky! ✨', '¡Qué cielo tan brillante! ✨'); }],
+    gigante: [function () { return t('🐉 O Gigante! Acerte o anzol 3 vezes!', '🐉 The Giant! Hit it with the hook 3 times!', '🐉 ¡El Gigante! ¡Dale con el anzuelo 3 veces!'); }, function () { return t('O gigante foi embora nadando! 🌊', 'The giant swam away! 🌊', '¡El gigante se fue nadando! 🌊'); }]
+  };
+  function figurinha(b) { return !!b && (b.tipo === 'bicho' || b.tipo === 'premio' || b.tipo === 'chefe'); }
+  function colar(id) {
+    if (!album[id]) novasDaPartida.push(id);
+    album[id] = (album[id] || 0) + 1; gravarJSON(CH_ALBUM, album);
+  }
   function tratar(ev) {
     ev.forEach(function (e) {
       if (e.tipo === 'fisgou') { if (!e.n) Som.fisgou(); if (e.bicho.faixa === 6) Som.raro(); }
@@ -257,17 +270,26 @@
         efeito('respingo', J.anzol.x, E.sup);
         efeito('pontos', pt.x, E.sup - 40, '+' + e.pontos, e.j ? '#7ff0ff' : '#ffd23f');
         Som.ponto(e.pontos);
-        if (e.bicho.tipo !== 'lixo') {
-          if (!album[e.bicho.id]) novasDaPartida.push(e.bicho.id);
-          album[e.bicho.id] = (album[e.bicho.id] || 0) + 1; gravarJSON(CH_ALBUM, album);
-        }
+        if (figurinha(R.POR_ID[e.bicho.id])) colar(e.bicho.id);
         if (e.bicho.faixa === 6) faixa(t('🌟 Pirarucu Dourado! +500', '🌟 Golden Arapaima! +500', '🌟 ¡Arapaima Dorado! +500'), 2200);
+        else if (e.bicho.raro) faixa('✨ ' + nomeBicho(e.bicho.id) + '! +' + e.pontos, 2200);
       }
+      else if (e.tipo === 'salvou' || e.tipo === 'entregou' || e.tipo === 'acertou' || e.tipo === 'chefe') {
+        efeito('pontos', e.x, e.y - 30, '+' + e.pontos, e.j ? '#7ff0ff' : '#ffd23f');
+        if (e.tipo === 'salvou') { Som.salvou(); efeito('respingo', e.x, E.sup); faixa(t('🛟 Salvou! Que alegria!', '🛟 Saved! Hooray!', '🛟 ¡Salvado! ¡Qué alegría!'), 1300); }
+        else if (e.tipo === 'entregou') { Som.balde(); faixa(t('🐢 O filhote voltou para a mamãe!', '🐢 The baby is back with mom!', '🐢 ¡La tortuguita volvió con su mamá!'), 1500); }
+        else if (e.tipo === 'acertou') { Som.acerto(); faixa(t('🎯 Acertou! Faltam ', '🎯 Hit! ', '🎯 ¡Tocado! Faltan ') + (3 - e.acertos) + t('', ' to go', ''), 1200); }
+        else { Som.gigante(); colar('gigante'); faixa(t('🐉 Você pescou o Dragão-do-mar! +', '🐉 You caught the Sea Dragon! +', '🐉 ¡Has pescado el Dragón marino! +') + e.pontos, 2400); }
+      }
+      else if (e.tipo === 'filhote') { Som.poder(); faixa(t('🐢 Agora leve o filhote até a mamãe, lá no fundo!', '🐢 Now take the baby down to its mom!', '🐢 ¡Ahora lleva la tortuguita hasta su mamá, al fondo!'), 1800); }
+      else if (e.tipo === 'cortou') { Som.corte(); efeito('pontos', e.x, e.y, '✂️', '#ff8a80'); faixa(t('✂️ As piranhas cortaram a linha!', '✂️ The piranhas cut the line!', '✂️ ¡Las pirañas cortaron el sedal!'), 1600, true); }
+      else if (e.tipo === 'piranhas') { Som.piranhas(); faixa(t('🐟 Cuidado: piranhas!', '🐟 Watch out: piranhas!', '🐟 ¡Cuidado: pirañas!'), 1500, true); }
+      else if (e.tipo === 'raro' && e.id !== 'pirarucu') { Som.raro(); faixa(t('✨ Um gigante que brilha passou lá no fundo!', '✨ A glowing giant is down deep!', '✨ ¡Un gigante que brilla pasa por el fondo!'), 1800); }
       else if (e.tipo === 'vazio') Som.glub();
       else if (e.tipo === 'balde') { Som.balde(); faixa(t('🪣 Balde cheio! +10 segundos', '🪣 Bucket full! +10 seconds', '🪣 ¡Cubo lleno! +10 segundos'), 1800); }
       else if (e.tipo === 'poder') { Som.poder(); faixa({ rede: t('🕸️ Rede da vovó!', "🕸️ Grandma's net!", '🕸️ ¡La red de la abuela!'), ligeiro: t('⚡ Anzol ligeiro!', '⚡ Quick hook!', '⚡ ¡Anzuelo veloz!'), minhoca: t('🪱 Minhoca dourada!', '🪱 Golden worm!', '🪱 ¡Lombriz dorada!') }[e.poder], 1500); }
-      else if (e.tipo === 'bonus') { Som.bonus(); faixa(t('♻️ Limpa o Rio! Pesque o lixo!', '♻️ Clean the River! Fish out the trash!', '♻️ ¡Limpia el río! ¡Pesca la basura!'), 2400, true); }
-      else if (e.tipo === 'bonusFim') { Som.rioLimpo(); faixa(t('Rio limpo! 🌿', 'The river is clean! 🌿', '¡Río limpio! 🌿'), 2000); }
+      else if (e.tipo === 'bonus') { Som.bonus(); faixa(RODADA[e.rodada][0](), 2600, true); }
+      else if (e.tipo === 'bonusFim') { Som.rioLimpo(); faixa(RODADA[e.rodada][1](), 2000); }
       else if (e.tipo === 'fim') { faixa(t('⏱ Acabou o tempo!', "⏱ Time's up!", '⏱ ¡Se acabó el tiempo!'), 1500); }
     });
   }
@@ -296,7 +318,7 @@
   /* ---------- álbum ---------- */
   function abrirAlbum() {
     var g = $('grade'); g.textContent = '';
-    var ids = R.BICHOS.filter(function (b) { return b.tipo !== 'lixo'; }).sort(function (p, q) { return p.faixa - q.faixa || p.pontos - q.pontos; });
+    var ids = R.BICHOS.filter(figurinha).sort(function (p, q) { return p.faixa - q.faixa || p.pontos - q.pontos; });
     var tem = 0;
     ids.forEach(function (b) {
       var n = album[b.id] || 0; if (n) tem++;
@@ -351,9 +373,29 @@
     estado: function () {
       return { tela: tela, aspecto: aspecto(), album: album, fim: !$('fim').hidden,
         fases: E ? E.j.map(function (J) { return J.anzol.fase; }) : [], niveis: E ? E.j.map(function (J) { return J.nivel; }) : [],
-        tempo: E ? E.tempo : null, pontos: E ? E.j.map(function (J) { return J.pontos; }) : [], bichos: E ? E.bichos.length : 0, bonus: E ? !!E.bonus : false };
+        tempo: E ? E.tempo : null, pontos: E ? E.j.map(function (J) { return J.pontos; }) : [], bichos: E ? E.bichos.length : 0, bonus: E ? !!E.bonus : false,
+        rodada: E ? E.rodada : null, tipos: E ? E.bichos.map(function (o) { return o.tipo; }) : [] };
     },
     pescar: function (j) { pescar(j); }, subir: function (j, s) { subir(j, s); }, irMenu: function () { irMenu(); },
+    // uma piranha bem no caminho do anzol de j: o anzol desce, encosta e a linha é cortada
+    cortar: function (j) {
+      var a = E.j[j].anzol, p = R.repouso(E, j, 0);
+      E.bichos = []; a.ang = 0; R.pescar(E, j, 0);
+      R.colocar(E, 'piranha', p.x, p.y + 120, { vel: 0 });
+      for (var s = 0; s < 2 && E.j[j].anzol.fase !== 'cortada'; s += 0.05) tratar(R.passo(E, 0.05));
+      return E.j[j].anzol.fase;
+    },
+    // para as fotos: cardume de piranhas no meio e dois gigantes que brilham no fundo
+    cena: function () {
+      E.bichos = E.bichos.filter(function (o) { return o.faixa <= 2 && o.tipo === 'bicho'; }); E.proxPiranha = E.proxRaro = Infinity;
+      var y = function (fy) { return E.sup + (R.H - E.sup) * fy; };
+      for (var i = 0; i < 6; i++) R.colocar(E, 'piranha', E.W * (0.42 + i * 0.05), y(0.42 + (i % 3 - 1) * 0.04), { vel: 0 });
+      R.colocar(E, 'lula-gigante', E.W * 0.25, y(0.76), { vel: 0 }); R.colocar(E, 'peixe-dragao', E.W * 0.72, y(0.76), { vel: 0 });
+      R.colocar(E, 'agua-viva-gigante', E.W * 0.5, y(0.74), { vel: 0 });
+      E.j[0].anzol.fase = 'cortada'; E.j[0].anzol.ate = Infinity;
+    },
+    // pula para a rodada especial (faltando 32 s)
+    irRodada: function () { E.tempo = 32.05; tratar(R.passo(E, 0.1)); pintarHud(true); },
     avancar: function (seg) { for (var s = 0; s < seg; s += 0.05) tratar(R.passo(E, 0.05)); pintarHud(true); },
     // põe um bicho bem embaixo do anzol de quem joga e pesca (para testar o álbum)
     pescarUm: function (id) {

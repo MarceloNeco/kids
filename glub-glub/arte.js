@@ -849,6 +849,17 @@
       c.save(); c.rotate(-0.2); c.fillStyle = '#1e88e5'; c.beginPath(); c.moveTo(-36, 0); c.bezierCurveTo(-36, -14, 0, -16, 10, -10); c.bezierCurveTo(26, -14, 38, -8, 38, 0); c.bezierCurveTo(38, 10, 20, 14, 10, 10); c.bezierCurveTo(0, 16, -36, 14, -36, 0); c.fill();
       c.fillStyle = '#ffd23f'; c.beginPath(); c.moveTo(-34, 0); c.bezierCurveTo(-34, -10, 0, -12, 10, -7); c.bezierCurveTo(24, -10, 35, -6, 35, 0); c.bezierCurveTo(35, 7, 20, 10, 10, 7); c.bezierCurveTo(0, 12, -34, 10, -34, 0); c.fill();
       c.strokeStyle = '#2f9e57'; c.lineWidth = 4; c.lineCap = 'round'; c.beginPath(); c.moveTo(18, 0); c.lineTo(4, -8); c.moveTo(18, 0); c.lineTo(4, 8); c.stroke(); c.restore(); },
+    // estrela-do-mar dourada da "Chuva de Estrelas" (desenhada no código)
+    estrela: function (c, k) {
+      var pulso = 1 + 0.04 * Math.sin(k * TAU);
+      c.save(); c.scale(pulso, pulso); c.rotate(Math.sin(k * TAU) * 0.08);
+      function forma(R, r) { c.beginPath(); for (var i = 0; i < 10; i++) { var an = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r : R; c[i ? 'lineTo' : 'moveTo'](Math.cos(an) * rr, Math.sin(an) * rr); } c.closePath(); }
+      c.lineJoin = 'round'; c.lineWidth = 9; c.strokeStyle = '#e09a10'; forma(46, 21); c.stroke();
+      c.fillStyle = radial(c, -8, -10, 2, 50, [[0, '#fff6b0'], [0.45, '#ffd23f'], [1, '#f0a010']]); c.fill();
+      c.fillStyle = 'rgba(255,255,255,0.75)'; [[0, -26], [22, -8], [14, 20], [-14, 20], [-22, -8]].forEach(function (q) { elipse(c, q[0] * 0.8, q[1] * 0.8, 2.4, 2.4); c.fill(); });
+      olhoFofo(c, -8, -2, 6); olhoFofo(c, 8, -2, 6); bochecha(c, -14, 7, 4); bochecha(c, 14, 7, 4); sorriso(c, 0, 6, 5);
+      c.restore();
+    },
     pneu: function (c) {
       c.fillStyle = '#1b1d22'; elipse(c, 0, 0, 34, 34); c.fill(); c.fillStyle = '#2f3540'; elipse(c, 0, 0, 30, 30); c.fill();
       c.strokeStyle = '#0c0d10'; c.lineWidth = 3; for (var i = 0; i < 20; i++) { var an = i / 20 * TAU; c.beginPath(); c.moveTo(Math.cos(an) * 28, Math.sin(an) * 28); c.lineTo(Math.cos(an + 0.1) * 34, Math.sin(an + 0.1) * 34); c.stroke(); }
@@ -856,18 +867,22 @@
       c.fillStyle = 'rgba(255,255,255,0.15)'; elipse(c, -12, -16, 10, 4, -0.5); c.fill(); c.strokeStyle = '#2f9e57'; c.lineWidth = 2; c.beginPath(); c.moveTo(10, -26); c.quadraticCurveTo(18, -40, 8, -46); c.stroke(); }
   };
   // quanto o corpo ondula ao nadar (fração do comprimento) e o brilho em volta dos bichos do fundo
-  var ONDA = { tartaruga: 0, polvo: 0, 'agua-viva': 0, 'cavalo-marinho': 0, lagosta: 0.01, caranguejo: 0, morsa: 0.02, baleia: 0.025, orca: 0.04, bota: 0, garrafa: 0, bau: 0, pet: 0, lata: 0, sacola: 0, chinelo: 0, pneu: 0 };
+  var ONDA = { tartaruga: 0, polvo: 0, 'agua-viva': 0, 'cavalo-marinho': 0, lagosta: 0.01, caranguejo: 0, morsa: 0.02, baleia: 0.025, orca: 0.04, bota: 0, garrafa: 0, bau: 0, pet: 0, lata: 0, sacola: 0, chinelo: 0, pneu: 0,
+    menino: 0, menina: 0, filhote: 0, estrela: 0, 'agua-viva-gigante': 0, 'lula-gigante': 0.03, gigante: 0.05, 'peixe-dragao': 0.05 };
   var BRILHO = { abissal: '#ff4a3a', orca: '#9fd0ff', tubarao: '#9a6bff', martelo: '#3fe0ff', 'tubarao-baleia': '#5ad1ff', lanterna: '#3fffd0', baleia: '#6aa8ff', sereia: '#7effe0', pirarucu: '#ffd84a',
-    polvo: '#ff5fa2', lagosta: '#ff8a3a', caranguejo: '#ff6a3a', morsa: '#9fd0ff', bau: '#ffcc33', garrafa: '#9ff7ff', 'agua-viva': '#ff9ff0' };
+    polvo: '#ff5fa2', lagosta: '#ff8a3a', caranguejo: '#ff6a3a', morsa: '#9fd0ff', bau: '#ffcc33', garrafa: '#9ff7ff', 'agua-viva': '#ff9ff0',
+    'lula-gigante': '#4aa8ff', 'agua-viva-gigante': '#c08bff', 'peixe-dragao': '#3fffe0', gigante: '#5ad1ff', estrela: '#ffd84a' };
   var ALTURA = { orca: 0.95, 'cavalo-marinho': 1.05, 'agua-viva': 1.1, polvo: 1.0, caranguejo: 1.0, lagosta: 0.9, tartaruga: 0.9, morsa: 1.0, baleia: 0.9, lanterna: 1.25, sereia: 0.8, baleia: 1.0, bota: 1.0, bau: 0.9, pneu: 0.9, sacola: 0.9 };
+  PINTA.filhote = PINTA.tartaruga;
+  var IMG_DE = { filhote: 'tartaruga' };   // o filhote é a tartaruga pequenininha
   function pintarBicho(c, id, k) { (PINTA[id] || PINTA.lambari)(c, k); }
   // imagens 3D geradas com IA (img/<id>.webp, ver CREDITOS.md): quando carregam, tomam o lugar do desenho feito no código;
   // sem elas (arquivo que não abriu), o jogo continua com o desenho do código
   var IMG = {};
   function carregarImagens(base) {
     if (typeof Image === 'undefined') return;
-    R.BICHOS.map(function (b) { return b.id; }).concat(['juca', 'lili', 'mergulhador']).filter(function (id) { return id !== 'sacola'; }).forEach(function (id) {   // a sacolinha continua desenhada no código
-      var im = new Image(); im.onload = function () { IMG[id] = im; esquecer(id + ':'); }; im.src = base + id + '.webp';
+    R.BICHOS.map(function (b) { return b.id; }).concat(['juca', 'lili', 'mergulhador']).filter(function (id) { return ['sacola', 'estrela', 'filhote'].indexOf(id) < 0; }).forEach(function (id) {   // a sacolinha continua desenhada no código
+      var im = new Image(); im.onload = function () { IMG[id] = im; esquecer(id + ':'); if (id === 'tartaruga') esquecer('filhote:'); }; im.src = base + id + '.webp';
     });
   }
   // a tira de quadros de um bicho num tamanho (px de comprimento): cada quadro com as nadadeiras numa fase, o corpo
@@ -888,7 +903,7 @@
     var chave = id + ':' + Math.round(comp), sp = A.sprites[chave];
     if (sp) return sp;
     feitas++;
-    var d = R.POR_ID[id] || { alt: 0.5 }, im = IMG[id], prop = im ? im.naturalHeight / im.naturalWidth : 1, iw = comp * 1.08 / Math.max(1, prop), ih = iw * prop;   // em pé (cavalo-marinho, água-viva): a altura é que vale o comprimento
+    var d = R.POR_ID[id] || { alt: 0.5 }, im = IMG[IMG_DE[id] || id], prop = im ? im.naturalHeight / im.naturalWidth : 1, iw = comp * 1.08 / Math.max(1, prop), ih = iw * prop;   // em pé (cavalo-marinho, água-viva): a altura é que vale o comprimento
     var w = Math.ceil(comp * 1.6), h = Math.ceil(im ? Math.max(ih * 1.3, comp * 0.5) : comp * (ALTURA[id] || Math.max(0.95, d.alt * 1.9)));
     var cv = tela(w * QUADROS, h), c = cv.getContext('2d'), b1 = rascunhoDe(0, w, h), c1 = b1.getContext('2d'), b2 = rascunhoDe(1, w, h), c2 = b2.getContext('2d');
     var onda = (ONDA[id] != null ? ONDA[id] : 0.045) * (im ? 1.25 : 1), brilho = BRILHO[id], cabeca = w / 2 + comp * 0.5;
@@ -1058,14 +1073,24 @@
     var pt = R.ponta(E, j), a = E.j[j].anzol;
     var px1 = 1 / A.s;   // 1 px de tela, em unidades do mundo
     c.lineCap = 'round';
+    if (a.fase === 'cortada') {   // as piranhas cortaram: só um toco de linha, enquanto amarra outro anzol
+      c.strokeStyle = 'rgba(255,255,255,0.95)'; c.lineWidth = 2.2 * px1;
+      c.beginPath(); c.moveTo(pt.x, pt.y); c.lineTo(pt.x + Math.sin(t * 3) * 4, pt.y + 26); c.stroke();
+      c.font = (26 / A.s).toFixed(1) + 'px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText('✂️', pt.x + 18, pt.y + 40 + Math.sin(t * 5) * 4);
+      return;
+    }
     c.strokeStyle = 'rgba(10,25,45,0.55)'; c.lineWidth = 4.5 * px1;   // contorno escuro: aparece no céu claro e na água
     c.beginPath(); c.moveTo(pt.x, pt.y); c.lineTo(a.x, a.y); c.stroke();
     c.strokeStyle = 'rgba(255,255,255,0.95)'; c.lineWidth = 2.2 * px1;
     c.beginPath(); c.moveTo(pt.x, pt.y); c.lineTo(a.x, a.y); c.stroke();
-    var ang = a.fase === 'balanca' ? a.ang : a.dirAng;
+    var ang = a.fase === 'balanca' ? a.ang : a.dirAng, rod = E.bonus && E.bonus.tipo;
+    if (rod === 'socorro' || a.fase === 'joga' || a.fase === 'puxa') { desenharImagem(c, 'boia', a.x, a.y + 14, 58, Math.sin(t * 4) * 0.2); return; }
+    if (rod === 'limpa') { desenharImagem(c, 'rede', a.x, a.y + 4, 96 * E.esc, -ang * 0.5); return; }
+    if (a.levando) desenharBicho(c, 'filhote', a.x, a.y + 26, R.POR_ID.filhote.tam * H * E.esc, 1, t * 4, -Math.PI / 2 + Math.sin(t * 9) * 0.3);
     c.save(); c.translate(a.x, a.y); c.rotate(-ang);
     // minhoca
-    if (!a.presos.length) { c.strokeStyle = '#ff7d9c'; c.lineWidth = 3.4; c.lineCap = 'round'; c.beginPath(); c.moveTo(-5, 10); c.bezierCurveTo(-11, 14 + Math.sin(t * 6) * 3, -4, 20, -8, 24 + Math.sin(t * 5) * 2); c.stroke(); }
+    if (!a.presos.length && !a.levando) { c.strokeStyle = '#ff7d9c'; c.lineWidth = 3.4; c.lineCap = 'round'; c.beginPath(); c.moveTo(-5, 10); c.bezierCurveTo(-11, 14 + Math.sin(t * 6) * 3, -4, 20, -8, 24 + Math.sin(t * 5) * 2); c.stroke(); }
     c.strokeStyle = '#dfe6ec'; c.lineWidth = 2.2; c.lineCap = 'round';
     c.beginPath(); c.moveTo(0, 0); c.lineTo(0, 16); c.arc(-5, 16, 5, 0, Math.PI, false); c.lineTo(-10, 12); c.stroke();
     c.strokeStyle = '#7b8a96'; c.lineWidth = 0.8; c.beginPath(); c.moveTo(1, 2); c.lineTo(1, 15); c.stroke();
@@ -1099,15 +1124,20 @@
     var lista = E.bichos.slice().sort(function (p, q) { return (q.faixa - p.faixa) || (p.n - q.n); });
     lista.forEach(function (o) {
       if (o.preso != null) return;
-      desenharBicho(c, o.id, o.x, o.y, o.tam * H * E.esc, o.dir, t * (o.v ? 1.1 : 0.5) + o.fase, 0);
+      var comp = o.tam * H * E.esc;
+      if (o.tipo === 'banhista') { banhista(c, E, o, comp, t); return; }
+      if (o.tipo === 'chefe' && o.piscou && t >= 0 && E.t - o.piscou < 0.5) c.globalAlpha = 0.45 + 0.55 * Math.abs(Math.sin((E.t - o.piscou) * 25));   // levou um acerto: pisca
+      desenharBicho(c, o.id, o.x, o.y, comp, o.dir, t * (o.v ? 1.1 : 0.5) + o.fase, 0);
+      c.globalAlpha = 1;
     });
     // os pontos de cada bicho, em cima dele (para quem já lê; o tamanho e o brilho contam para quem ainda não lê)
     var fs = 15 / A.s; c.font = '700 ' + fs.toFixed(1) + 'px Fredoka, system-ui, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.lineJoin = 'round';
     lista.forEach(function (o) {
-      if (o.preso != null) return;
-      var y = o.y - o.tam * H * E.esc * Math.max(0.3, o.alt * 0.55) - 2;
-      c.lineWidth = fs * 0.28; c.strokeStyle = 'rgba(40,15,0,0.85)'; c.strokeText(String(o.pontos), o.x, y);
-      c.fillStyle = o.pontos >= 100 ? '#7ff0ff' : '#ffd23f'; c.fillText(String(o.pontos), o.x, y);
+      if (o.preso != null || !o.pontos || o.entregue || o.salvo != null || o.vencido) return;
+      var y = o.y - o.tam * H * E.esc * Math.max(0.3, o.alt * 0.55) - 2, txt = String(o.pontos);
+      if (o.tipo === 'chefe') txt = '🎯 ' + (o.acertos || 0) + '/3 · ' + o.pontos;   // o dragão precisa de 3 acertos
+      c.lineWidth = fs * 0.28; c.strokeStyle = 'rgba(40,15,0,0.85)'; c.strokeText(txt, o.x, y);
+      c.fillStyle = o.pontos >= 100 ? '#7ff0ff' : '#ffd23f'; c.fillText(txt, o.x, y);
     });
     E.bolhas.forEach(function (b) { bolhaPoder(c, b, t); });
     desenharVivosFrente(c, t);
@@ -1116,6 +1146,38 @@
       personagem(c, E, j, t);
       linhaEAnzol(c, E, j, t);
     }
+  }
+  // banhista: só a parte de cima fica fora da água; salvo, ganha a boia e vai sorrindo para a margem
+  function banhista(c, E, o, comp, t) {
+    var salvo = o.salvo != null;
+    c.save();
+    c.beginPath(); c.rect(o.x - comp * 2, 0, comp * 4, E.sup + comp * (salvo ? 0.28 : 0.12)); c.clip();
+    desenharBicho(c, o.id, o.x, o.y - comp * 0.18, comp, salvo ? o.dir : 1, 0, salvo ? Math.sin(t * 2 + o.fase) * 0.08 : Math.sin(t * 5 + o.fase) * 0.12);
+    c.restore();
+    c.strokeStyle = 'rgba(230,250,255,0.75)'; c.lineWidth = 2;   // a água mexendo em volta
+    var k = (t * 0.8 + o.fase) % 1;
+    elipse(c, o.x, E.sup + 4, comp * (0.4 + k * 0.5), comp * (0.07 + k * 0.06)); c.globalAlpha = 1 - k; c.stroke(); c.globalAlpha = 1;
+    if (salvo) desenharImagem(c, 'boia', o.x, E.sup + comp * 0.06, comp * 0.95);
+  }
+  function desenharImagem(c, id, x, y, larg, giro) {
+    var im = IMG[id];
+    c.save(); c.translate(x, y); if (giro) c.rotate(giro);
+    if (im) { var a = larg * im.naturalHeight / im.naturalWidth; c.drawImage(im, -larg / 2, -a / 2, larg, a); }
+    else if (id === 'boia') {   // boia salva-vidas: anel vermelho com quatro faixas brancas e a corda
+      var R0 = larg * 0.36, esp = larg * 0.2;
+      c.lineWidth = esp + 3; c.strokeStyle = 'rgba(80,10,10,0.55)'; elipse(c, 0, 0, R0, R0 * 0.62); c.stroke();
+      for (var q = 0; q < 8; q++) { c.strokeStyle = q % 2 ? '#ffffff' : '#e53935'; c.lineWidth = esp; c.beginPath(); c.ellipse(0, 0, R0, R0 * 0.62, 0, q * Math.PI / 4, (q + 1) * Math.PI / 4); c.stroke(); }
+      c.strokeStyle = 'rgba(255,255,255,0.55)'; c.lineWidth = esp * 0.25; c.beginPath(); c.ellipse(0, -esp * 0.15, R0, R0 * 0.62, 0, Math.PI * 1.1, Math.PI * 1.6); c.stroke();
+      c.strokeStyle = '#f3e3b0'; c.lineWidth = 1.6; c.setLineDash([5, 4]); elipse(c, 0, 0, R0 + esp * 0.55, (R0 + esp * 0.55) * 0.62); c.stroke(); c.setLineDash([]);
+    } else if (id === 'rede') {   // rede: aro de madeira e o saco de malha pendurado
+      var rx = larg / 2, ry = larg * 0.13, fundo = larg * 0.75;
+      c.strokeStyle = 'rgba(255,255,255,0.85)'; c.lineWidth = 1.4;
+      for (var m = -4; m <= 4; m++) { c.beginPath(); c.moveTo(m / 4 * rx, ry * Math.sqrt(1 - m * m / 16)); c.quadraticCurveTo(m / 4 * rx * 0.7, fundo * 0.6, m / 4 * rx * 0.25, fundo); c.stroke(); }
+      for (var n = 1; n <= 4; n++) { var f = n / 5, yy = ry + (fundo - ry) * f, ww = rx * (1 - f * 0.72); c.beginPath(); c.ellipse(0, yy, ww, ry * (1 - f * 0.6), 0, 0, Math.PI); c.stroke(); }
+      c.strokeStyle = '#8a5a2b'; c.lineWidth = 6; elipse(c, 0, 0, rx, ry); c.stroke();
+      c.strokeStyle = '#c08a50'; c.lineWidth = 2; elipse(c, 0, -1.5, rx, ry); c.stroke();
+    }
+    c.restore();
   }
   function bicho(c, id, x, y, comp, dir, k) {
     c.save(); c.translate(x, y); if (dir < 0) c.scale(-1, 1); c.scale(comp / 100, comp / 100); pintarBicho(c, id, k || 0); c.restore();
