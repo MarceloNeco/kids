@@ -35,7 +35,7 @@
 <section id="menu" class="tela" data-recurso="purpurina">
   <div class="faixa">
     <button id="btSom" class="mini" type="button" aria-label="Som" data-rotulo="Som|Sound|Sonido">🔊</button>
-    <button id="btSemMusicaMenu" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🔕</button>
+    <button id="btSemMusicaMenu" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🎶</button>
     <button id="btProxMusicaMenu" class="mini" type="button" aria-label="Próxima música" data-rotulo="Próxima música|Next song|Siguiente canción">⏭</button>
     <button id="btAjuda" class="mini" type="button" aria-label="Como brincar" data-rotulo="Como brincar|How to play|Cómo jugar" aria-expanded="false">❓</button>
   </div>
@@ -59,8 +59,6 @@
   </div>
   <div id="guardar" class="guardar">
     <button id="btInstalar" class="medio forte" type="button" data-t="📲 Instalar no celular (com ícone)|📲 Install on the phone (with icon)|📲 Instalar en el móvil (con icono)"></button>
-    <button id="btBaixar" class="medio leve" type="button" data-t="📄 Só um arquivo, sem ícone|📄 Just a file, no icon|📄 Solo un archivo, sin icono"></button>
-    <p id="baixarAviso" class="dica" aria-live="polite" data-t="Recomendado: 📲 Instalar. Fica um ícone no celular e funciona sem internet. O arquivo vai para os Downloads e não cria ícone.|Recommended: 📲 Install. You get an icon on the phone and it works offline. The file goes to Downloads and doesn't create an icon.|Recomendado: 📲 Instalar. Queda un icono en el móvil y funciona sin internet. El archivo va a Descargas y no crea icono."></p>
   </div>
   <p class="rodape"><span id="ver"></span> · SolverONE · <a href="https://solverone.com.br/kids/" data-t="🍩 Mais brincadeiras|🍩 More games|🍩 Más juegos"></a></p>
 </section>
@@ -149,20 +147,24 @@
 
 <section id="estudio" class="tela" data-recurso="purpurina">
   <div class="topo">
-    <p id="titulo" class="titulo"></p>
-    <button id="btZoom" class="mini" type="button" aria-pressed="false" aria-label="Zoom">🔍</button>
-    <button id="btDesfazer" class="mini" type="button" aria-label="Desfazer" data-rotulo="Desfazer|Undo|Deshacer">↩</button>
-    <button id="btSurpresa" class="mini" type="button" aria-label="Surpresa" data-rotulo="Surpresa|Surprise|Sorpresa">🎲</button>
-    <button id="btRecomecar" class="mini" type="button" aria-label="Começar de novo" data-rotulo="Começar de novo|Start over|Empezar de nuevo">🔄</button>
+    <div class="linha-titulo">
+      <p id="titulo" class="titulo"></p>
+      <div class="palco-esq">
+        <button id="btMusicaPalco" class="mini" type="button" aria-label="Música" data-rotulo="Música|Music|Música">🎵</button>
+        <button id="btSemMusica" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🎶</button>
+        <button id="btProxMusica" class="mini" type="button" aria-label="Próxima música" data-rotulo="Próxima música|Next song|Siguiente canción">⏭</button>
+        <button id="seloTV" class="mini selo-tv" type="button" hidden aria-label="TV"></button>
+      </div>
+    </div>
+    <div class="botoes-topo">
+      <button id="btZoom" class="mini" type="button" aria-pressed="false" aria-label="Zoom">🔍</button>
+      <button id="btDesfazer" class="mini" type="button" aria-label="Desfazer" data-rotulo="Desfazer|Undo|Deshacer">↩</button>
+      <button id="btSurpresa" class="mini" type="button" aria-label="Surpresa" data-rotulo="Surpresa|Surprise|Sorpresa">🎲</button>
+      <button id="btRecomecar" class="mini" type="button" aria-label="Começar de novo" data-rotulo="Começar de novo|Start over|Empezar de nuevo">🔄</button>
+    </div>
   </div>
   <div id="palco" class="palco">
     <div id="rastro" class="rastro" aria-hidden="true"></div>
-    <div class="palco-esq">
-      <button id="btMusicaPalco" class="mini" type="button" aria-label="Música" data-rotulo="Música|Music|Música">🎵</button>
-      <button id="btSemMusica" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🔕</button>
-      <button id="btProxMusica" class="mini" type="button" aria-label="Próxima música" data-rotulo="Próxima música|Next song|Siguiente canción">⏭</button>
-      <button id="seloTV" class="mini selo-tv" type="button" hidden aria-label="TV"></button>
-    </div>
     <div id="boneca" class="boneca" role="img"></div>
     <div class="giro">
       <button id="btFrente" class="mini" type="button" hidden aria-label="Virar de frente" data-rotulo="Virar de frente|Face front|Poner de frente">🙂</button>
@@ -249,7 +251,6 @@
 <script src="visual.js"></script>
 <script src="boneca.js"></script>
 <script src="som.js"></script>
-<script src="baixar.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>
 <script src="../navegacao.js" data-fora-do-arquivo></script>

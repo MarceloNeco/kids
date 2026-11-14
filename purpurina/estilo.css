@@ -56,8 +56,7 @@ ul { list-style: none; }
    espaço ao lado; deitado, os botões de música do palco descem */
 .bn-nav #desafios, .bn-nav #looks, .bn-nav #conectar, .bn-nav #musica { padding-top: var(--nav-alto); }
 @media (orientation: portrait) { .bn-nav .topo { padding-left: calc(var(--nav-largo) - 6px - var(--sl)); min-height: calc(var(--nav-alto) - 10px - var(--st)); flex-wrap: wrap; justify-content: flex-end; }
-  .bn-nav .topo .titulo { order: 9; flex-basis: 100%; margin-left: calc(6px + var(--sl) - var(--nav-largo)); } }
-@media (orientation: landscape) { .bn-nav .palco-esq { top: calc(var(--nav-alto) - 4px - var(--st)); } }
+  .bn-nav .topo .linha-titulo { order: 9; flex-basis: 100%; margin-left: calc(6px + var(--sl) - var(--nav-largo)); } }
 .topo-simples { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 900px; }
 .topo-simples h2 { font-size: 1.8rem; }
 
@@ -246,11 +245,17 @@ ul { list-style: none; }
 .opcao-fonte { background: var(--card); border: 3px solid transparent; border-radius: 16px; padding: 0 16px; font-size: 1.1rem; font-weight: 600; }
 .opcao-fonte[aria-pressed="true"] { border-color: var(--rosa); background: var(--card2); }
 .link-musica { display: grid; gap: 8px; width: min(100%, 520px); }
-.musica-agora { font-size: 1.15rem; font-weight: 600; min-height: 1.4em; }
+.musica-agora { font-size: 1.15rem; font-weight: 600; min-height: 1.4em; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .controles-musica { display: flex; gap: 10px; }
 .grande-mini { font-size: 1.6rem; min-width: 64px; }
-.palco-esq { position: absolute; top: 6px; left: 6px; display: flex; gap: 6px; z-index: 2; }
-.palco-esq .mini { background: rgba(42, 17, 70, .78); font-size: 1.2rem; }
+/* título + botões de música numa linha só, fora do palco (dono, 14/Nov/2026: os botões tampavam a cabeça da boneca) */
+.linha-titulo { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 6px; }
+.palco-esq { display: flex; gap: 6px; flex: none; }
+.palco-esq .mini { font-size: 1.2rem; }
+/* os 4 botões de cima encolhem um pouco em vez de pular de linha (celular estreito ou letra grande) */
+.botoes-topo { display: flex; gap: 6px; flex: 0 1 auto; min-width: 0; }
+.botoes-topo .mini { flex: 0 1 44px; min-width: 34px; padding: 0; }
+@media (max-width: 360px) { .botoes-topo { gap: 4px; } }
 .selo-tv { font-size: .95rem !important; color: var(--menta); }
 .mini-tocador { position: fixed; right: calc(8px + var(--sr)); bottom: calc(8px + var(--sb)); width: 220px; z-index: 45; background: #000; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.5); }
 .mini-tocador .yt { width: 220px; height: 220px; } .mini-tocador .sp { width: 300px; } .mini-tocador[data-fonte="spotify"] { width: 300px; }
