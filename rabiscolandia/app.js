@@ -4,7 +4,7 @@
    (banco "rabiscolandia"). Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.15';
+  var APP_VERSION = '0.1.16';
   var $ = function (id) { return document.getElementById(id); };
   var F = window.DesenhoFolha, P = window.DesenhoPaginas || { LISTA: [], CATEGORIAS: [] }, Pt = window.DesenhoPintura;
   var Som = window.DesenhoSom || { iniciar: function () {}, musica: function () {}, musicaLigada: function () { return false; }, efeito: function () {}, efeitos: function () {}, efeitosLigados: function () { return false; }, proxima: function () {}, nomeAtual: function () { return ''; } };
@@ -24,8 +24,9 @@
   function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   var pref = ler('rabiscolandia.pref', null) || {};
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  // idioma: o escolhido na estante (../idioma.js: português, inglês ou espanhol); o jogo não guarda mais o seu
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';
+  delete pref.lingua;
   if (typeof pref.musica !== 'boolean') pref.musica = true;
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   pref.feitas = pref.feitas || {};
@@ -34,13 +35,14 @@
   function salvarPref() { gravar('rabiscolandia.pref', pref); }
 
   // ---------- idioma ----------
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
-  function N(x) { return x ? (pref.lingua === 'en' ? x.en : x.pt) : ''; }
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' && es != null ? es : pt; }
+  function N(x) { return x ? t(x.pt, x.en, x.es) : ''; }
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + t(' · Músicas gravadas: Kevin MacLeod (incompetech.com), CC BY', ' · Recorded music: Kevin MacLeod (incompetech.com), CC BY');
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = t(p[0], p[1], p[2]); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', t(p[0], p[1], p[2])); });
+    $('ctrlNome').placeholder = t('Ex.: Ana', 'e.g. Ana', 'Ej.: Ana');
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + t(' · Músicas gravadas: Kevin MacLeod (incompetech.com), CC BY', ' · Recorded music: Kevin MacLeod (incompetech.com), CC BY', ' · Música grabada: Kevin MacLeod (incompetech.com), CC BY');
   }
 
   // ---------- telas e o botão Voltar do celular ----------
@@ -97,12 +99,12 @@
     $('btMusica2').textContent = pref.musica ? '🎵' : '🔇'; $('btMusica2').setAttribute('aria-pressed', pref.musica ? 'true' : 'false');
     $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔈';
   }
-  function trocarMusica() { pref.musica = !pref.musica; salvarPref(); aplicarSom(); aviso(pref.musica ? t('🎵 Música ligada', '🎵 Music on') + (Som.nomeAtual() ? ': ' + Som.nomeAtual() : '') : t('🔇 Música desligada', '🔇 Music off')); }
+  function trocarMusica() { pref.musica = !pref.musica; salvarPref(); aplicarSom(); aviso(pref.musica ? t('🎵 Música ligada', '🎵 Music on', '🎵 Música encendida') + (Som.nomeAtual() ? ': ' + Som.nomeAtual() : '') : t('🔇 Música desligada', '🔇 Music off', '🔇 Música apagada')); }
   $('btMusica').addEventListener('click', trocarMusica);
   $('btMusica2').addEventListener('click', function () { abrirPainel('musica'); });
   if (Som.aoAvisar) Som.aoAvisar(function (o) {
-    if (o.tipo === 'toque') aviso(t('Toque na tela para a música começar 🎵', 'Tap the screen to start the music 🎵'), 3000);
-    if (o.tipo === 'soApp') aviso(t('As músicas gravadas não estão abrindo (internet?). Tocando as do app 🎵', 'Recorded songs are not loading (internet?). Playing the app songs 🎵'), 3500);
+    if (o.tipo === 'toque') aviso(t('Toque na tela para a música começar 🎵', 'Tap the screen to start the music 🎵', 'Toca la pantalla para que empiece la música 🎵'), 3000);
+    if (o.tipo === 'soApp') aviso(t('As músicas gravadas não estão abrindo (internet?). Tocando as do app 🎵', 'Recorded songs are not loading (internet?). Playing the app songs 🎵', 'Las canciones grabadas no cargan (¿internet?). Sonando las del juego 🎵'), 3500);
     if (painelAberto === 'musica') renderPainel('musica');
   });
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); aplicarSom(); Som.efeito('toque'); });
@@ -119,7 +121,8 @@
     var d = document, el = d.documentElement;
     try { if (!(d.fullscreenElement || d.webkitFullscreenElement)) { var p = el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' }) : (el.webkitRequestFullscreen && el.webkitRequestFullscreen()); if (p && p.catch) p.catch(function () {}); } } catch (e) { /* sem tela cheia */ }
   }
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); if (atual === 'livro') listaLivro(); if (atual === 'pintar') montarBarra(); });
+  // trocaram o idioma na estante (noutra aba): traduz o que está à vista
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); if (atual === 'livro') listaLivro(); if (atual === 'pintar' && motor) { montarBarra(); var pg = motor.pagina(); $('tituloPintar').textContent = pg ? N(pg) : t('Desenho livre', 'Free drawing', 'Dibujo libre'); } });
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; this.setAttribute('aria-expanded', a.hidden ? 'false' : 'true'); });
   $('btLivre').addEventListener('click', function () { abrirLivre(); });
   $('btLivro').addEventListener('click', function () { livroModo = 'colorir'; ir('livro'); listaLivro(); });
@@ -132,9 +135,9 @@
   // ---------- livro de colorir / pintar por números ----------
   var livroModo = 'colorir', livroCat = 'todas';
   function listaLivro() {
-    $('livroTitulo').textContent = livroModo === 'numeros' ? t('🔢 Pintar por números', '🔢 Paint by numbers') : t('📚 Livro de colorir', '📚 Coloring book');
+    $('livroTitulo').textContent = livroModo === 'numeros' ? t('🔢 Pintar por números', '🔢 Paint by numbers', '🔢 Pintar por números') : t('📚 Livro de colorir', '📚 Coloring book', '📚 Libro para colorear');
     var cats = $('livroCats'); cats.innerHTML = '';
-    [{ id: 'todas', ico: '🌟', pt: 'Todos', en: 'All' }].concat(P.CATEGORIAS || []).forEach(function (c) {
+    [{ id: 'todas', ico: '🌟', pt: 'Todos', en: 'All', es: 'Todos' }].concat(P.CATEGORIAS || []).forEach(function (c) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', c.id === livroCat ? 'true' : 'false');
       b.textContent = (c.ico ? c.ico + ' ' : '') + N(c);
       b.addEventListener('click', function () { livroCat = c.id; listaLivro(); });
@@ -178,11 +181,11 @@
         var img = document.createElement('img'); img.src = d.mini || ''; img.alt = d.titulo || ''; abrir.appendChild(img);
         var nm = document.createElement('span'); nm.className = 'nome'; nm.textContent = d.titulo || ''; abrir.appendChild(nm);
         abrir.addEventListener('click', function () { abrirGuardado(d); });
-        var x = document.createElement('button'); x.type = 'button'; x.className = 'apagar'; x.textContent = '🗑️'; x.setAttribute('aria-label', t('Apagar', 'Delete'));
+        var x = document.createElement('button'); x.type = 'button'; x.className = 'apagar'; x.textContent = '🗑️'; x.setAttribute('aria-label', t('Apagar', 'Delete', 'Borrar'));
         x.addEventListener('click', function () {
-          abrirJanela({ titulo: t('Apagar este desenho?', 'Delete this drawing?'), img: d.mini, botoes: [
-            { t: t('🗑️ Apagar', '🗑️ Delete'), fn: function () { loja('readwrite', function (st) { return st.delete(d.id); }).then(listaMeus); } },
-            { t: t('Não', 'No') }] });
+          abrirJanela({ titulo: t('Apagar este desenho?', 'Delete this drawing?', '¿Borrar este dibujo?'), img: d.mini, botoes: [
+            { t: t('🗑️ Apagar', '🗑️ Delete', '🗑️ Borrar'), fn: function () { loja('readwrite', function (st) { return st.delete(d.id); }).then(listaMeus); } },
+            { t: t('Não', 'No', 'No') }] });
         });
         b.appendChild(abrir); b.appendChild(x); g.appendChild(b);
       });
@@ -196,7 +199,7 @@
     if (!motor || salvando || motor.vazio()) return Promise.resolve();
     salvando = true;
     var e = motor.estado(), pag = motor.pagina(), id = atualId || (atualId = idNovo());
-    var titulo = pag ? N(pag) : t('Desenho livre', 'Free drawing');
+    var titulo = pag ? N(pag) : t('Desenho livre', 'Free drawing', 'Dibujo libre');
     var mini; try { mini = motor.miniatura(300); } catch (x) { mini = ''; }
     return motor.pinturaBlob().then(function (blob) {
       return loja('readwrite', function (st) { return st.put({ id: id, quando: Date.now(), titulo: titulo, mini: mini, estado: e, pintura: blob }); });
@@ -224,13 +227,13 @@
       calmo: CALMO,
       aoMudar: function () { $('btDesfazer').disabled = !motor.podeDesfazer(); if (motor.modo() === 'numeros') atualizarPaleta(); agendarSalvar(); },
       aoNumero: function (ok, n, terminouCor) {
-        if (!ok) { Som.efeito('erro'); var b = document.querySelector('.num[data-n="' + n + '"]'); if (b && !CALMO && b.animate) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }], 400); aviso(t('Essa área é a cor ', 'That area is color ') + n + ' 🎨', 1400); return; }
+        if (!ok) { Som.efeito('erro'); var b = document.querySelector('.num[data-n="' + n + '"]'); if (b && !CALMO && b.animate) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }], 400); aviso(t('Essa área é a cor ', 'That area is color ', 'Esa parte es del color ') + n + ' 🎨', 1400); return; }
         Som.efeito('acerto');
         if (terminouCor) { var prox = proximaCorQueFalta(); if (prox) { motor.numero(prox); atualizarPaleta(); } }
       },
       aoTerminar: function () {
         Som.efeito('festa'); var p = motor.pagina(); if (p) { pref.feitas[p.id + ':numeros'] = 1; salvarPref(); }
-        setTimeout(function () { abrirJanela({ titulo: t('🎉 Ficou lindo!', '🎉 It looks beautiful!'), img: motor.miniatura(600), botoes: [{ t: t('📸 Salvar foto', '📸 Save photo'), fn: tirarFoto }, { t: t('Continuar', 'Continue') }] }); }, 2200);
+        setTimeout(function () { abrirJanela({ titulo: t('🎉 Ficou lindo!', '🎉 It looks great!', '🎉 ¡Te ha quedado precioso!'), img: motor.miniatura(600), botoes: [{ t: t('📸 Salvar foto', '📸 Save photo', '📸 Guardar foto'), fn: tirarFoto }, { t: t('Continuar', 'Continue', 'Seguir') }] }); }, 2200);
       },
       aoBalde: function () { Som.efeito('balde'); }, aoAdesivo: function () { Som.efeito('adesivo'); },
       aoApagarObjeto: function () { Som.efeito('apagar'); },
@@ -250,7 +253,7 @@
   }
   function depoisDeAbrir() {
     var pag = motor.pagina(), m = motor.modo();
-    $('tituloPintar').textContent = pag ? N(pag) : t('Desenho livre', 'Free drawing');
+    $('tituloPintar').textContent = pag ? N(pag) : t('Desenho livre', 'Free drawing', 'Dibujo libre');
     $('btColinha').hidden = !pag; $('btVariacao').hidden = !pag; $('btDica').hidden = m !== 'numeros';
     colinha(false); montarBarra(); $('btDesfazer').disabled = !motor.podeDesfazer();
     // primeira vez neste jeito de brincar: o Rabisquinho aparece sozinho e ensina (na TV, só pelo ❓)
@@ -264,7 +267,7 @@
     fecharPainel(true);
     pref.tour[qual] = 1; salvarPref();   // já viu (mesmo que saia no meio): não abre sozinho de novo
     if (!tourNoHistorico) { tourNoHistorico = true; try { history.pushState({ tour: 1 }, ''); } catch (e) { /* ok */ } }
-    DesenhoTour.comecar(qual, { t: t, lingua: pref.lingua, voz: pref.voz, aoMudarVoz: function (v) { pref.voz = v; salvarPref(); },
+    DesenhoTour.comecar(qual, { t: t, lingua: lingua, voz: pref.voz, aoMudarVoz: function (v) { pref.voz = v; salvarPref(); },
       aoTerminar: function () { if (tourNoHistorico) { tourNoHistorico = false; ignorar++; history.back(); } } });
   }
   var tourNoHistorico = false;
@@ -293,12 +296,12 @@
   $('btZoomMais').addEventListener('click', function () { motor.zoom(1.4); });
   $('btZoomMenos').addEventListener('click', function () { motor.zoom(1 / 1.4); });
   $('btAjustar').addEventListener('click', function () { motor.ajustar(); });
-  $('btDica').addEventListener('click', function () { if (!motor.dica()) aviso(t('Essa cor já está pronta! Escolha outra 🎨', 'This color is done! Pick another 🎨')); });
+  $('btDica').addEventListener('click', function () { if (!motor.dica()) aviso(t('Essa cor já está pronta! Escolha outra 🎨', 'This color is done! Pick another 🎨', '¡Ese color ya está listo! Elige otro 🎨')); });
   $('btLimpar').addEventListener('click', function () {
-    abrirJanela({ titulo: t('Começar de novo?', 'Start over?'), texto: t('Tudo some, mas dá para desfazer com ↩.', 'Everything goes away, but ↩ brings it back.'), botoes: [
-      { t: t('🗑️ Limpar a folha', '🗑️ Clear the page'), fn: function () { motor.limpar(); Som.efeito('apagar'); } },
-      { t: t('📄 Desenho novo', '📄 New drawing'), fn: function () { salvarAgora(); var p = motor.pagina(); if (p) abrirPagina(p, motor.modo(), motor.varIdx()); else abrirLivre(); } },
-      { t: t('Não', 'No') }] });
+    abrirJanela({ titulo: t('Começar de novo?', 'Start over?', '¿Empezar de nuevo?'), texto: t('Tudo some, mas dá para desfazer com ↩.', 'Everything goes away, but ↩ brings it back.', 'Todo desaparece, pero ↩ lo trae de vuelta.'), botoes: [
+      { t: t('🗑️ Limpar a folha', '🗑️ Clear the page', '🗑️ Limpiar la hoja'), fn: function () { motor.limpar(); Som.efeito('apagar'); } },
+      { t: t('📄 Desenho novo', '📄 New drawing', '📄 Dibujo nuevo'), fn: function () { salvarAgora(); var p = motor.pagina(); if (p) abrirPagina(p, motor.modo(), motor.varIdx()); else abrirLivre(); } },
+      { t: t('Não', 'No', 'No') }] });
   });
   $('btFoto').addEventListener('click', tirarFoto);
   function tirarFoto() {
@@ -306,11 +309,11 @@
     motor.foto(2048).then(function (blob) {
       if (!blob) return;
       var url = URL.createObjectURL(blob), nome = 'rabiscolandia-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.png';
-      var botoes = [{ t: t('💾 Salvar no aparelho', '💾 Save to device'), ficar: true, fn: function () { var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); aviso(t('Salvo! Veja em Downloads.', 'Saved! Check Downloads.')); } }];
+      var botoes = [{ t: t('💾 Salvar no aparelho', '💾 Save to device', '💾 Guardar en el dispositivo'), ficar: true, fn: function () { var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); aviso(t('Salvo! Veja em Downloads.', 'Saved! Check Downloads.', '¡Guardado! Míralo en Descargas.')); } }];
       var arq = null; try { arq = new File([blob], nome, { type: 'image/png' }); } catch (e) { /* navegador velho */ }
-      if (arq && navigator.canShare && navigator.canShare({ files: [arq] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share'), ficar: true, fn: function () { navigator.share({ files: [arq], title: 'Rabiscolândia' }).catch(function () {}); } });
-      botoes.push({ t: t('Fechar', 'Close') });
-      abrirJanela({ titulo: t('📸 Seu desenho', '📸 Your drawing'), img: url, alt: t('Seu desenho', 'Your drawing'), botoes: botoes });
+      if (arq && navigator.canShare && navigator.canShare({ files: [arq] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), ficar: true, fn: function () { navigator.share({ files: [arq], title: 'Rabiscolândia' }).catch(function () {}); } });
+      botoes.push({ t: t('Fechar', 'Close', 'Cerrar') });
+      abrirJanela({ titulo: t('📸 Seu desenho', '📸 Your drawing', '📸 Tu dibujo'), img: url, alt: t('Seu desenho', 'Your drawing', 'Tu dibujo'), botoes: botoes });
     });
   }
 
@@ -355,14 +358,14 @@
     if (m === 'numeros') { montarPaleta(); return; }
     caixa.innerHTML = '';
     var pinc = PINCEIS_LIVRES.indexOf(f.pincel) >= 0 ? f.pincel : ultimoPincel, ip = infoPincel(pinc);
-    caixa.appendChild(botaoFerr('pinceis', ip.ico, t('Pincéis', 'Brushes') + ': ' + N(ip), function () { if (motor.ferramenta().pincel !== pinc) { motor.ferramenta({ pincel: pinc }); montarBarra(); } else abrirPainel('pinceis'); }, f.pincel === pinc));
+    caixa.appendChild(botaoFerr('pinceis', ip.ico, t('Pincéis', 'Brushes', 'Pinceles') + ': ' + N(ip), function () { if (motor.ferramenta().pincel !== pinc) { motor.ferramenta({ pincel: pinc }); montarBarra(); } else abrirPainel('pinceis'); }, f.pincel === pinc));
     var bol = document.createElement('span'); bol.className = 'bolinha'; bol.style.background = f.cor;
-    caixa.appendChild(botaoFerr('cores', bol, t('Mais cores', 'More colors'), function () { abrirPainel('cores'); }, false));
-    caixa.appendChild(botaoFerr('balde', '🪣', t('Balde de tinta', 'Paint bucket'), function () { escolherPincel('balde'); }, f.pincel === 'balde'));
-    caixa.appendChild(botaoFerr('borracha', iconeBorracha(), t('Borracha', 'Eraser'), function () { escolherPincel('borracha'); aviso(t('Borracha: apaga traços, adesivos e animados — é só passar por cima', 'Eraser: erases strokes, stickers and animations — just rub over them'), 2600); }, f.pincel === 'borracha'));
-    caixa.appendChild(botaoFerr('adesivo', f.pincel === 'adesivo' && f.adesivo.tipo === 'emoji' ? f.adesivo.v : '⭐', t('Adesivos', 'Stickers'), function () { abrirPainel('adesivos'); }, f.pincel === 'adesivo'));
-    caixa.appendChild(botaoFerr('mover', '✋', t('Mover adesivo', 'Move sticker'), function () { escolherPincel('mover'); aviso(t('Arraste um adesivo para mudar de lugar ✋', 'Drag a sticker to move it ✋')); }, f.pincel === 'mover'));
-    caixa.appendChild(botaoFerr('fundo', '🏞️', t('Fundo', 'Background'), function () { abrirPainel('fundos'); }, false));
+    caixa.appendChild(botaoFerr('cores', bol, t('Mais cores', 'More colors', 'Más colores'), function () { abrirPainel('cores'); }, false));
+    caixa.appendChild(botaoFerr('balde', '🪣', t('Balde de tinta', 'Paint bucket', 'Cubo de pintura'), function () { escolherPincel('balde'); }, f.pincel === 'balde'));
+    caixa.appendChild(botaoFerr('borracha', iconeBorracha(), t('Borracha', 'Eraser', 'Goma de borrar'), function () { escolherPincel('borracha'); aviso(t('Borracha: apaga traços, adesivos e animados — é só passar por cima', 'Eraser: erases strokes, stickers and animations — just rub over them', 'Goma: borra trazos, pegatinas y animaciones — solo pásala por encima'), 2600); }, f.pincel === 'borracha'));
+    caixa.appendChild(botaoFerr('adesivo', f.pincel === 'adesivo' && f.adesivo.tipo === 'emoji' ? f.adesivo.v : '⭐', t('Adesivos', 'Stickers', 'Pegatinas'), function () { abrirPainel('adesivos'); }, f.pincel === 'adesivo'));
+    caixa.appendChild(botaoFerr('mover', '✋', t('Mover adesivo', 'Move sticker', 'Mover pegatina'), function () { escolherPincel('mover'); aviso(t('Arraste um adesivo para mudar de lugar ✋', 'Drag a sticker to move it ✋', 'Arrastra una pegatina para cambiarla de lugar ✋')); }, f.pincel === 'mover'));
+    caixa.appendChild(botaoFerr('fundo', '🏞️', t('Fundo', 'Background', 'Fondo'), function () { abrirPainel('fundos'); }, false));
     montarCores(cores);
   }
   /* borracha de escola desenhada (rosa e azul): o 🧽 parecia um amendoim para a criança */
@@ -381,12 +384,12 @@
   /* Grossura do traço: cinco traços de verdade, do fininho ao bem grosso, na cor escolhida, sempre à vista no começo
      da faixa de cores (a filha do dono não achava o botão da bolinha). Tocar num traço = desenhar daquela grossura.
      Também muda o tamanho do adesivo. Usado aqui e no celular de controle da TV (tv.js). */
-  var NOMES_GROSSURA = [['Traço fininho', 'Very thin line'], ['Traço fino', 'Thin line'], ['Traço médio', 'Medium line'], ['Traço grosso', 'Thick line'], ['Traço bem grosso', 'Very thick line']];
+  var NOMES_GROSSURA = [['Traço fininho', 'Very thin line', 'Trazo finito'], ['Traço fino', 'Thin line', 'Trazo fino'], ['Traço médio', 'Medium line', 'Trazo mediano'], ['Traço grosso', 'Thick line', 'Trazo grueso'], ['Traço bem grosso', 'Very thick line', 'Trazo muy grueso']];
   function grossuras(tamAtual, cor, aoEscolher) {
     var frag = document.createDocumentFragment(), LARG = [2.5, 5, 8, 12, 17];
     TAMANHOS.forEach(function (tm, i) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'grossura';
-      var nome = t(NOMES_GROSSURA[i][0], NOMES_GROSSURA[i][1]); b.setAttribute('aria-label', nome); b.title = nome;
+      var nome = t(NOMES_GROSSURA[i][0], NOMES_GROSSURA[i][1], NOMES_GROSSURA[i][2]); b.setAttribute('aria-label', nome); b.title = nome;
       b.setAttribute('aria-pressed', tamAtual === tm ? 'true' : 'false');
       var cl = /^#f{6}$/i.test(cor || '') ? '#ffffff' : (cor || '#ffffff');
       b.innerHTML = '<svg viewBox="0 0 56 40" width="48" height="34" aria-hidden="true"><path d="M8 24 C16 8, 24 34, 32 20 S 44 10, 48 18" fill="none" stroke="' + cl + '" stroke-width="' + LARG[i] + '" stroke-linecap="round"/></svg>';
@@ -403,11 +406,11 @@
       motor.ferramenta({ tam: tm, tamAdesivo: 60 + tm * 3.2 }); Som.efeito('pincel'); montarBarra(); aviso('✏️ ' + nome, 1100);
     }));
     coresDaVez().forEach(function (c) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'cor'; b.style.background = c; b.setAttribute('aria-label', t('Cor ', 'Color ') + c); b.setAttribute('aria-pressed', f.cor === c ? 'true' : 'false');
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'cor'; b.style.background = c; b.setAttribute('aria-label', t('Cor ', 'Color ', 'Color ') + c); b.setAttribute('aria-pressed', f.cor === c ? 'true' : 'false');
       b.addEventListener('click', function () { escolherCor(c); });
       caixa.appendChild(b);
     });
-    var arco = document.createElement('button'); arco.type = 'button'; arco.className = 'cor arco'; arco.setAttribute('aria-label', t('Qualquer cor', 'Any color'));
+    var arco = document.createElement('button'); arco.type = 'button'; arco.className = 'cor arco'; arco.setAttribute('aria-label', t('Qualquer cor', 'Any color', 'Cualquier color'));
     arco.addEventListener('click', function () { abrirPainel('cores'); });
     caixa.appendChild(arco);
   }
@@ -424,7 +427,7 @@
     var caixa = $('paleta'); caixa.innerHTML = '';
     (motor.cores() || []).forEach(function (c, i) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'num'; b.dataset.n = i + 1;
-      b.style.setProperty('--c', c); b.style.setProperty('--tc', corTexto(c)); b.setAttribute('aria-label', t('Cor número ', 'Color number ') + (i + 1));
+      b.style.setProperty('--c', c); b.style.setProperty('--tc', corTexto(c)); b.setAttribute('aria-label', t('Cor número ', 'Color number ', 'Color número ') + (i + 1));
       var s = document.createElement('span'), it = document.createElement('i'); it.textContent = i + 1; s.appendChild(it); b.appendChild(s);
       b.addEventListener('click', function () { motor.numero(i + 1); Som.efeito('cor'); atualizarPaleta(); });
       caixa.appendChild(b);
@@ -454,7 +457,7 @@
   function renderPainel(qual) {
     painelAberto = qual;
     var corpo = $('painelCorpo'); corpo.innerHTML = '';
-    var titulos = { pinceis: t('🖌️ Pincéis', '🖌️ Brushes'), cores: t('🎨 Cores', '🎨 Colors'), adesivos: t('⭐ Adesivos', '⭐ Stickers'), fundos: t('🏞️ Fundo', '🏞️ Background'), variacoes: t('🎨 Outras cores do desenho', '🎨 Other color sets'), musica: t('🎵 Músicas', '🎵 Music') };
+    var titulos = { pinceis: t('🖌️ Pincéis', '🖌️ Brushes', '🖌️ Pinceles'), cores: t('🎨 Cores', '🎨 Colors', '🎨 Colores'), adesivos: t('⭐ Adesivos', '⭐ Stickers', '⭐ Pegatinas'), fundos: t('🏞️ Fundo', '🏞️ Background', '🏞️ Fondo'), variacoes: t('🎨 Outras cores do desenho', '🎨 Other color sets', '🎨 Otros colores del dibujo'), musica: t('🎵 Músicas', '🎵 Music', '🎵 Canciones') };
     $('painelTitulo').textContent = titulos[qual] || '';
     ({ pinceis: painelPinceis, cores: painelCores, adesivos: painelAdesivos, fundos: painelFundos, variacoes: painelVariacoes, musica: painelMusica })[qual](corpo);
   }
@@ -486,17 +489,17 @@
       var p = infoPincel(id);
       (p.vivo ? b : a).appendChild(opcao(p.ico, N(p), f.pincel === id, function () { escolherPincel(id); fecharPainel(); }));
     });
-    corpo.appendChild(titulo4(t('Pincéis', 'Brushes'))); corpo.appendChild(a);
-    corpo.appendChild(titulo4(t('✨ Pincéis vivos (mexem sozinhos!)', '✨ Live brushes (they move!)'))); corpo.appendChild(b);
+    corpo.appendChild(titulo4(t('Pincéis', 'Brushes', 'Pinceles'))); corpo.appendChild(a);
+    corpo.appendChild(titulo4(t('✨ Pincéis vivos (mexem sozinhos!)', '✨ Live brushes (they move!)', '✨ Pinceles vivos (¡se mueven solos!)'))); corpo.appendChild(b);
   }
   function painelCores(corpo) {
     var f = motor.ferramenta(), p = motor.pagina();
     function faixa(lista) { var d = caixaOpcoes(); lista.forEach(function (c) { var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'cor'; bt.style.background = c; bt.setAttribute('aria-label', c); bt.setAttribute('aria-pressed', f.cor === c ? 'true' : 'false'); bt.addEventListener('click', function () { escolherCor(c); fecharPainel(); }); d.appendChild(bt); }); return d; }
-    if (p) { corpo.appendChild(titulo4(t('Cores deste desenho', 'Colors of this picture'))); corpo.appendChild(faixa(motor.cores() || p.cores)); }
-    corpo.appendChild(titulo4(t('Cores alegres', 'Happy colors'))); corpo.appendChild(faixa(CORES));
-    corpo.appendChild(titulo4(t('Tons pastel', 'Pastel tones'))); corpo.appendChild(faixa(['#ffd6e0', '#ffe5b4', '#fff9c4', '#d8f3dc', '#c7f9ff', '#d0e1ff', '#e4d7ff', '#f8d7ff', '#e6ccb2', '#ddd5d0']));
+    if (p) { corpo.appendChild(titulo4(t('Cores deste desenho', 'Colors of this picture', 'Colores de este dibujo'))); corpo.appendChild(faixa(motor.cores() || p.cores)); }
+    corpo.appendChild(titulo4(t('Cores alegres', 'Happy colors', 'Colores alegres'))); corpo.appendChild(faixa(CORES));
+    corpo.appendChild(titulo4(t('Tons pastel', 'Pastel tones', 'Tonos pastel'))); corpo.appendChild(faixa(['#ffd6e0', '#ffe5b4', '#fff9c4', '#d8f3dc', '#c7f9ff', '#d0e1ff', '#e4d7ff', '#f8d7ff', '#e6ccb2', '#ddd5d0']));
     var outra = document.createElement('label'); outra.className = 'medio'; outra.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 14px;justify-self:start';
-    outra.textContent = t('🌈 Qualquer cor: ', '🌈 Any color: ');
+    outra.textContent = t('🌈 Qualquer cor: ', '🌈 Any color: ', '🌈 Cualquier color: ');
     var inp = document.createElement('input'); inp.type = 'color'; inp.value = f.cor; inp.style.cssText = 'width:56px;height:40px;border:0;background:none';
     inp.addEventListener('input', function () { motor.ferramenta({ cor: inp.value }); montarBarra(); });
     outra.appendChild(inp); corpo.appendChild(outra);
@@ -504,27 +507,27 @@
   /* 🎵 Músicas: liga/desliga, anterior/próxima e a lista de todas (tocar uma = toque da pessoa, o navegador sempre deixa) */
   function painelMusica(corpo) {
     var ctl = document.createElement('div'); ctl.className = 'opcoes';
-    var lig = document.createElement('button'); lig.type = 'button'; lig.className = 'medio'; lig.textContent = pref.musica ? t('🔇 Desligar a música', '🔇 Music off') : t('🎵 Ligar a música', '🎵 Music on');
+    var lig = document.createElement('button'); lig.type = 'button'; lig.className = 'medio'; lig.textContent = pref.musica ? t('🔇 Desligar a música', '🔇 Music off', '🔇 Apagar la música') : t('🎵 Ligar a música', '🎵 Music on', '🎵 Encender la música');
     lig.addEventListener('click', function () { trocarMusica(); renderPainel('musica'); });
-    var ant = document.createElement('button'); ant.type = 'button'; ant.className = 'mini'; ant.textContent = '⏮'; ant.setAttribute('aria-label', t('Música anterior', 'Previous song'));
+    var ant = document.createElement('button'); ant.type = 'button'; ant.className = 'mini'; ant.textContent = '⏮'; ant.setAttribute('aria-label', t('Música anterior', 'Previous song', 'Canción anterior'));
     ant.addEventListener('click', function () { garantirMusica(); Som.anterior(); setTimeout(function () { renderPainel('musica'); }, 50); });
-    var prx = document.createElement('button'); prx.type = 'button'; prx.className = 'mini'; prx.textContent = '⏭'; prx.setAttribute('aria-label', t('Próxima música', 'Next song'));
+    var prx = document.createElement('button'); prx.type = 'button'; prx.className = 'mini'; prx.textContent = '⏭'; prx.setAttribute('aria-label', t('Próxima música', 'Next song', 'Siguiente canción'));
     prx.addEventListener('click', function () { garantirMusica(); Som.proxima(); setTimeout(function () { renderPainel('musica'); }, 50); });
     ctl.appendChild(lig); ctl.appendChild(ant); ctl.appendChild(prx); corpo.appendChild(ctl);
     // diagnóstico em linguagem de gente: as músicas gravadas (instrumentos de verdade) estão tocando neste aparelho?
     var es = Som.estado ? Som.estado() : null, diag = document.createElement('p'); diag.className = 'dica';
-    if (es && es.gravadasOk > 0) diag.textContent = t('✅ As músicas gravadas (🎻 instrumentos de verdade) estão tocando neste aparelho.', '✅ Recorded songs (🎻 real instruments) are playing on this device.');
-    else if (es && es.esperandoToque) diag.textContent = t('👆 Toque em qualquer lugar da tela para a música começar.', '👆 Tap anywhere on the screen to start the music.');
-    else if (es && (es.soApp || es.ultimoErro)) diag.textContent = t('⚠️ As músicas gravadas não abriram aqui (', '⚠️ Recorded songs did not open here (') + es.ultimoErro + t('). Tocando as do app. Toque numa 🎻 para tentar de novo.', '). Playing the app songs. Tap a 🎻 to try again.');
+    if (es && es.gravadasOk > 0) diag.textContent = t('✅ As músicas gravadas (🎻 instrumentos de verdade) estão tocando neste aparelho.', '✅ Recorded songs (🎻 real instruments) are playing on this device.', '✅ Las canciones grabadas (🎻 instrumentos de verdad) están sonando en este dispositivo.');
+    else if (es && es.esperandoToque) diag.textContent = t('👆 Toque em qualquer lugar da tela para a música começar.', '👆 Tap anywhere on the screen to start the music.', '👆 Toca en cualquier parte de la pantalla para que empiece la música.');
+    else if (es && (es.soApp || es.ultimoErro)) diag.textContent = t('⚠️ As músicas gravadas não abriram aqui (', '⚠️ Recorded songs did not open here (', '⚠️ Las canciones grabadas no se han abierto aquí (') + es.ultimoErro + t('). Tocando as do app. Toque numa 🎻 para tentar de novo.', '). Playing the app songs. Tap a 🎻 to try again.', '). Sonando las del juego. Toca una 🎻 para intentarlo otra vez.');
     if (diag.textContent) corpo.appendChild(diag);
-    var agora = document.createElement('p'); agora.className = 'dica'; agora.textContent = pref.musica && Som.nomeAtual() ? t('Tocando agora: ', 'Now playing: ') + Som.nomeAtual() : t('Toque numa música para ouvir.', 'Tap a song to listen.'); corpo.appendChild(agora);
+    var agora = document.createElement('p'); agora.className = 'dica'; agora.textContent = pref.musica && Som.nomeAtual() ? t('Tocando agora: ', 'Now playing: ', 'Sonando ahora: ') + Som.nomeAtual() : t('Toque numa música para ouvir.', 'Tap a song to listen.', 'Toca una canción para escucharla.'); corpo.appendChild(agora);
     var l = document.createElement('div'); l.className = 'lista-musicas';
     (Som.listar ? Som.listar() : []).forEach(function (m) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'musica-item'; b.setAttribute('aria-pressed', m.atual ? 'true' : 'false');
       var ic = document.createElement('span'); ic.className = 'ico'; ic.textContent = m.atual ? '🔊' : (m.gravada ? '🎻' : '🎹'); b.appendChild(ic);
       var tx = document.createElement('span'); tx.className = 'txt';
       var nm = document.createElement('b'); nm.textContent = m.nome; tx.appendChild(nm);
-      var au = document.createElement('small'); au.textContent = m.gravada ? m.autor + ' · CC BY' : t('feita pela Rabiscolândia', 'made by Rabiscolândia'); tx.appendChild(au);
+      var au = document.createElement('small'); au.textContent = m.gravada ? m.autor + ' · CC BY' : t('feita pela Rabiscolândia', 'made by Rabiscolândia', 'hecha por Rabiscolândia'); tx.appendChild(au);
       b.appendChild(tx);
       b.addEventListener('click', function () { pref.musica = true; salvarPref(); Som.iniciar(); Som.tocar(m.i); aplicarSom(); setTimeout(function () { renderPainel('musica'); }, 50); });
       l.appendChild(b);
@@ -540,7 +543,7 @@
   var abaAdesivo = 'vivos', animaPainel = 0;
   function painelAdesivos(corpo) {
     var A = window.DesenhoAdesivos; if (!A) return;
-    var f = motor.ferramenta(), grupos = [{ id: 'vivos', ico: '✨', pt: 'Animados', en: 'Animated' }].concat(A.GRUPOS);
+    var f = motor.ferramenta(), grupos = [{ id: 'vivos', ico: '✨', pt: 'Animados', en: 'Animated', es: 'Animadas' }].concat(A.GRUPOS);
     var topo = document.createElement('div'); topo.className = 'topo-adesivos';
     var abas = document.createElement('div'); abas.className = 'abas-ad'; abas.setAttribute('role', 'tablist');
     var secoes = {}, botoesAba = {}, pulando = 0;
@@ -553,7 +556,7 @@
     });
     topo.appendChild(abas);
     var mv = document.createElement('div'); mv.className = 'mov-ad';
-    var rot = document.createElement('span'); rot.textContent = t('Como mexe:', 'Moves:'); mv.appendChild(rot);
+    var rot = document.createElement('span'); rot.textContent = t('Como mexe:', 'How it moves:', 'Cómo se mueve:'); mv.appendChild(rot);
     A.MOVIMENTOS.forEach(function (m) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'mov'; b.textContent = m.ico; b.title = N(m); b.setAttribute('aria-label', N(m)); b.setAttribute('aria-pressed', f.adesivo.mov === m.id ? 'true' : 'false');
       b.addEventListener('click', function () { var ad = motor.ferramenta().adesivo; motor.ferramenta({ adesivo: { tipo: ad.tipo, v: ad.v, mov: m.id } }); Array.prototype.forEach.call(mv.querySelectorAll('.mov'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); aviso(m.ico + ' ' + N(m), 1200); });
@@ -561,7 +564,7 @@
     });
     topo.appendChild(mv);
     corpo.appendChild(topo);
-    function escolher(tipo, v) { motor.ferramenta({ pincel: 'adesivo', adesivo: { tipo: tipo, v: v, mov: motor.ferramenta().adesivo.mov } }); montarBarra(); fecharPainel(); aviso(t('Toque na folha para colar ⭐', 'Tap the page to stick it ⭐')); }
+    function escolher(tipo, v) { motor.ferramenta({ pincel: 'adesivo', adesivo: { tipo: tipo, v: v, mov: motor.ferramenta().adesivo.mov } }); montarBarra(); fecharPainel(); aviso(t('Toque na folha para colar ⭐', 'Tap the page to stick it ⭐', 'Toca la hoja para pegarla ⭐')); }
     var vivos = [];
     grupos.forEach(function (g) {
       var sec = document.createElement('section'); sec.className = 'sec-ad';
@@ -603,7 +606,7 @@
   }
   function painelFundos(corpo) {
     var fu = motor.fundo();
-    corpo.appendChild(titulo4(t('Paisagens', 'Landscapes')));
+    corpo.appendChild(titulo4(t('Paisagens', 'Landscapes', 'Paisajes')));
     var d = caixaOpcoes();
     (window.DesenhoFundos ? DesenhoFundos.LISTA : []).forEach(function (f) {
       var c = document.createElement('canvas'); c.width = c.height = 92;
@@ -611,13 +614,13 @@
       d.appendChild(opcao(c, (f.vivo ? '✨ ' : '') + N(f), fu.tipo === 'paisagem' && fu.v === f.id, function () { motor.fundo({ tipo: 'paisagem', v: f.id }); fecharPainel(); }));
     });
     corpo.appendChild(d);
-    corpo.appendChild(titulo4(t('Papel e cores', 'Paper and colors')));
+    corpo.appendChild(titulo4(t('Papel e cores', 'Paper and colors', 'Papel y colores')));
     var c2 = caixaOpcoes();
-    c2.appendChild(opcao('📄', t('Papel', 'Paper'), fu.tipo === 'papel', function () { motor.fundo({ tipo: 'papel', v: '#ffffff' }); fecharPainel(); }));
+    c2.appendChild(opcao('📄', t('Papel', 'Paper', 'Papel'), fu.tipo === 'papel', function () { motor.fundo({ tipo: 'papel', v: '#ffffff' }); fecharPainel(); }));
     ['#fff4d6', '#ffe0ec', '#dff6ff', '#e6ffe0', '#efe6ff', '#1b1446', '#000000'].forEach(function (c) { var s = document.createElement('span'); s.style.cssText = 'display:block;width:40px;height:40px;border-radius:50%;border:2px solid #fff;background:' + c; c2.appendChild(opcao(s, '', fu.tipo === 'cor' && fu.v === c, function () { motor.fundo({ tipo: 'cor', v: c }); fecharPainel(); })); });
     corpo.appendChild(c2);
-    corpo.appendChild(titulo4(t('Sua foto (fica só neste aparelho)', 'Your photo (stays on this device)')));
-    var c3 = caixaOpcoes(); c3.appendChild(opcao('📷', t('Escolher foto', 'Pick a photo'), fu.tipo === 'foto', function () { $('arquivoFoto').click(); }));
+    corpo.appendChild(titulo4(t('Sua foto (fica só neste aparelho)', 'Your photo (stays on this device)', 'Tu foto (se queda solo en este dispositivo)')));
+    var c3 = caixaOpcoes(); c3.appendChild(opcao('📷', t('Escolher foto', 'Pick a photo', 'Elegir foto'), fu.tipo === 'foto', function () { $('arquivoFoto').click(); }));
     corpo.appendChild(c3);
   }
   $('arquivoFoto').addEventListener('change', function () {
@@ -630,17 +633,17 @@
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
       motor.fundo({ tipo: 'foto', v: c.toDataURL('image/jpeg', 0.85) }); fecharPainel();
     };
-    img.onerror = function () { URL.revokeObjectURL(url); aviso(t('Não consegui abrir essa foto.', 'Could not open that photo.')); };
+    img.onerror = function () { URL.revokeObjectURL(url); aviso(t('Não consegui abrir essa foto.', 'Could not open that photo.', 'No he podido abrir esa foto.')); };
     img.src = url;
   });
   function painelVariacoes(corpo) {
     var p = motor.pagina(); if (!p) return;
     var d = caixaOpcoes();
-    [{ pt: 'Original', en: 'Original', cores: p.cores, i: -1 }].concat((p.variacoes || []).map(function (v, i) { return { pt: v.pt, en: v.en, cores: v.cores, i: i }; })).forEach(function (v) {
+    [{ pt: 'Original', en: 'Original', es: 'Original', cores: p.cores, i: -1 }].concat((p.variacoes || []).map(function (v, i) { return { pt: v.pt, en: v.en, es: v.es, cores: v.cores, i: i }; })).forEach(function (v) {
       var c = Pt.miniaturaPagina(p, 92, v.cores);
       d.appendChild(opcao(c, N(v), motor.varIdx() === v.i, function () { motor.variacao(v.i); fecharPainel(); montarBarra(); colinha(true); }));
     });
-    corpo.appendChild(titulo4(t('A colinha 👀 e as cores mudam juntas', 'The cheat sheet 👀 and colors change together'))); corpo.appendChild(d);
+    corpo.appendChild(titulo4(t('A colinha 👀 e as cores mudam juntas', 'The cheat sheet 👀 and colors change together', 'El modelo 👀 y los colores cambian juntos'))); corpo.appendChild(d);
   }
 
   // ---------- desenhar com a MÃO na câmera ----------
@@ -650,14 +653,14 @@
     if (maoLigada) return;
     if (!window.DesenhoMao) return;
     maoLigada = true; $('btMao').setAttribute('aria-pressed', 'true'); $('camBox').hidden = false;
-    $('camStatus').textContent = t('Ligando a câmera… (a 1ª vez baixa uns 8 MB)', 'Starting the camera… (first time downloads about 8 MB)');
-    DesenhoMao.ligar($('camVideo'), aoMao, function (p) { $('camStatus').textContent = t('Preparando a mão… ', 'Getting the hand ready… ') + Math.round(p * 100) + '%'; }).then(function () {
-      $('camStatus').textContent = t('✋ Mão aberta mira · ✊ fechada desenha', '✋ Open hand aims · ✊ closed hand draws');
-      aviso(t('Levante a mão aberta ✋ na frente da câmera', 'Raise your open hand ✋ in front of the camera'), 3500);
+    $('camStatus').textContent = t('Ligando a câmera… (a 1ª vez baixa uns 8 MB)', 'Starting the camera… (first time downloads about 8 MB)', 'Encendiendo la cámara… (la 1.ª vez descarga unos 8 MB)');
+    DesenhoMao.ligar($('camVideo'), aoMao, function (p) { $('camStatus').textContent = t('Preparando a mão… ', 'Getting the hand ready… ', 'Preparando la mano… ') + Math.round(p * 100) + '%'; }).then(function () {
+      $('camStatus').textContent = t('✋ Mão aberta mira · ✊ fechada desenha', '✋ Open hand aims · ✊ closed hand draws', '✋ Mano abierta apunta · ✊ cerrada dibuja');
+      aviso(t('Levante a mão aberta ✋ na frente da câmera', 'Raise your open hand ✋ in front of the camera', 'Levanta la mano abierta ✋ delante de la cámara'), 3500);
     }).catch(function (e) {
       desligarMao();
-      var msg = e && (e.name === 'NotAllowedError' || e.message === 'sem-camera') ? t('Preciso da câmera: toque no cadeado 🔒 do navegador → Câmera → Permitir.', 'I need the camera: tap the lock 🔒 in the browser → Camera → Allow.') : t('Não consegui ligar a mão neste aparelho. Tente no Chrome.', 'Could not start hand mode on this device. Try Chrome.');
-      abrirJanela({ titulo: t('🖐 A mão não ligou', '🖐 Hand mode did not start'), texto: msg, botoes: [{ t: 'OK' }] });
+      var msg = e && (e.name === 'NotAllowedError' || e.message === 'sem-camera') ? t('Preciso da câmera: toque no cadeado 🔒 do navegador → Câmera → Permitir.', 'I need the camera: tap the lock 🔒 in the browser → Camera → Allow.', 'Necesito la cámara: toca el candado 🔒 del navegador → Cámara → Permitir.') : t('Não consegui ligar a mão neste aparelho. Tente no Chrome.', 'Could not start hand mode on this device. Try Chrome.', 'No he podido activar la mano en este dispositivo. Prueba en Chrome.');
+      abrirJanela({ titulo: t('🖐 A mão não ligou', '🖐 Hand mode did not start', '🖐 La mano no se ha activado'), texto: msg, botoes: [{ t: 'OK' }] });
     });
   }
   function desligarMao() {

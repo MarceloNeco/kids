@@ -30,17 +30,21 @@ Endereço: https://solverone.com.br/kids/enigmas/
   (ajuda quem ainda não lê; a música abaixa enquanto a voz fala). **🔤** esconde as palavras e deixa só os desenhos:
   tocar (ou segurar, ou escolher) um desenho mostra a palavra num balão por 2 segundos e a 🗣️ lê; adivinha (carta só
   de texto) mostra sempre o texto. Começa com as palavras à vista e o jogo lembra a escolha. **🔔** liga/desliga os
-  sons. **EN/PT** troca a língua.
+  sons. O idioma (português, inglês ou espanhol da Espanha) é escolhido na estante do Bolinho de Chuva (`../idioma.js`);
+  o jogo não tem botão de idioma próprio, e a voz lê no idioma escolhido.
 - Ligou tudo: festa com estrelas e o **Próximo enigma**. Esc, o Voltar do celular ou tocar fora da janela também
   levam ao próximo; **🏠 Níveis** volta ao começo.
 
 ## Quantos enigmas
 
-| Nível | Rodadas (PT) | Rodadas (EN) | Pares |
-|---|---|---|---|
-| Fácil | 36 | 36 | 19 com 3, 17 com 4 |
-| Médio | 66 | 66 | 33 com 5, 17 com 6, 16 com 7 (as de 6 e 7 eram do Difícil até a v0.2.0; 4 de rimas próprias de cada língua) |
-| Difícil | 54 | 54 | 4 em todas (desde a v0.3.0) |
+| Nível | Rodadas (PT) | Rodadas (EN) | Rodadas (ES) | Pares |
+|---|---|---|---|---|
+| Fácil | 36 | 36 | 36 | 19 com 3, 17 com 4 |
+| Médio | 66 | 66 | 66 | 33 com 5, 17 com 6, 16 com 7 (as de 6 e 7 eram do Difícil até a v0.2.0; 4 de rimas próprias de cada língua — as do espanhol, da v0.3.4, foram escritas para rimar em espanhol) |
+| Difícil | 54 | 54 | 54 | 4 em todas (desde a v0.3.0) |
+
+Cada item tem as três línguas: `'emoji palavra|word|palabra'`. O código de cada rodada (o progresso guardado) sai só
+do português e do inglês, então colocar ou mudar o espanhol não apaga o progresso de ninguém.
 
 Na v0.3.0 o dono achou o Difícil fácil demais: as rodadas dele foram para o Médio (com o mesmo código, então quem já
 tinha feito algumas não perde nada: o `J.migrar` do `jogo.js` leva as feitas e as estrelas do Difícil antigo para o

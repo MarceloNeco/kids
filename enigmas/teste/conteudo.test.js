@@ -6,7 +6,7 @@ const J = require('../jogo.js');
 
 const PARES = { facil: [3, 4], medio: [5, 7], dificil: [4, 4] };
 const MINIMO = { facil: 30, medio: 30, dificil: 40 };
-const LINGUAS = ['pt', 'en'];
+const LINGUAS = ['pt', 'en', 'es'];
 const todas = n => R[n].map(c => J.rodada(c, n));
 const nomeR = r => r.nivel + ' "' + r.dica.pt + '" (' + r.pares.map(p => p[0].pt).join(', ') + ')';
 
@@ -32,33 +32,33 @@ test('dentro de cada nível a dificuldade só sobe (menos pares primeiro)', () =
   }
 });
 
-test('cada par escrito certo: "item = item", com uma língua de cada lado da barra', () => {
+test('cada par escrito certo: "item = item", com as três línguas separadas pela barra (PT|EN|ES)', () => {
   for (const n of R.NIVEIS) for (const c of R[n]) {
     assert.equal(typeof c[0], 'string');
-    assert.equal(c[0].replace(/^(pt|en):/, '').split('|').length, 2, 'pista sem as duas línguas: ' + c[0]);
+    assert.equal(c[0].replace(/^(pt|en|es):/, '').split('|').length, 3, 'pista sem as três línguas: ' + c[0]);
     for (const p of c.slice(1)) {
       assert.equal(p.split(' = ').length, 2, 'par mal escrito: ' + p);
       for (const lado of p.split(' = ')) {
-        assert.ok(/^\S+ [^|]+\|[^|]+$/.test(lado.trim()), 'item mal escrito: "' + lado + '"');
+        assert.ok(/^\S+ [^|]+\|[^|]+\|[^|]+$/.test(lado.trim()), 'item mal escrito: "' + lado + '"');
       }
     }
   }
 });
 
-test('PT e EN presentes em toda pista e todo item', () => {
+test('PT, EN e ES presentes em toda pista e todo item', () => {
   for (const n of R.NIVEIS) for (const r of todas(n)) {
-    assert.ok(r.dica.pt && r.dica.en, 'pista sem tradução: ' + nomeR(r));
+    assert.ok(r.dica.pt && r.dica.en && r.dica.es, 'pista sem tradução: ' + nomeR(r));
     for (const p of r.pares) for (const it of p) {
-      assert.ok(it.pt.length > 0 && it.en.length > 0, 'item sem as duas línguas em ' + nomeR(r) + ': ' + JSON.stringify(it));
+      assert.ok(it.pt.length > 0 && it.en.length > 0 && it.es.length > 0, 'item sem as três línguas em ' + nomeR(r) + ': ' + JSON.stringify(it));
       assert.ok(it.e || it.pt, 'item vazio');
     }
   }
 });
 
-test('nenhum item repetido numa rodada (desenho, palavra em PT ou em EN), então só existe um jeito de ligar', () => {
+test('nenhum item repetido numa rodada (desenho, palavra em PT, EN ou ES), então só existe um jeito de ligar', () => {
   for (const n of R.NIVEIS) for (const r of todas(n)) {
     const itens = r.pares.flat();
-    for (const campo of ['e', 'pt', 'en']) {
+    for (const campo of ['e', 'pt', 'en', 'es']) {
       const vals = itens.map(it => it[campo].toLowerCase()).filter(Boolean);
       const rep = vals.filter((v, i) => vals.indexOf(v) !== i);
       assert.deepEqual(rep, [], nomeR(r) + ': repetido (' + campo + ')');
@@ -80,10 +80,11 @@ test('nenhuma rodada repetida dentro do nível (nem com os pares em outra ordem)
   }
 });
 
-test('rimas: as rodadas só de uma língua existem nas duas (troca uma pela outra)', () => {
+test('rimas: as rodadas só de uma língua existem nas três (troca uma pela outra)', () => {
   for (const n of R.NIVEIS) {
     const rs = todas(n);
     assert.equal(rs.filter(r => r.so === 'pt').length, rs.filter(r => r.so === 'en').length, n + ': rimas em PT e EN não batem');
+    assert.equal(rs.filter(r => r.so === 'pt').length, rs.filter(r => r.so === 'es').length, n + ': rimas em PT e ES não batem');
   }
   assert.ok(todas('medio').some(r => r.so === 'pt'), 'Médio deve ter rimas em português (vieram do Difícil antigo)');
 });
@@ -110,7 +111,7 @@ const DIFICIL_ANTIGO = ['n2ejoc', '1cxtgc2', 'dzzxvz', '1gt23s9', '1koempy', '11
   '1wq0u0z', '1c7y4io', '1nbxttk', '1d9p7ec', '1ytt8p7', 'esf3nh', 'axmfe7', 'y9e89o', '1qdqjfa', '47d68q', 'iow3sc', 'dsd9mu', 'i6fjta',
   '1ijdld', '1sis6na', '1lp6t3', 'gzgn7e', 'tisvla', '17efc00', 'xounw3', '10s9iox', 'dxbqhe', '1wiwucf', 'uqojva', 'upjg2l', '14icjo1'];
 test('Médio tem as rodadas que já eram dele e todas as do Difícil antigo, com o mesmo código', () => {
-  const medio = todas('medio').map(r => r.id), dificil = todas('dificil').map(r => r.id);
+  const medio = todas('medio').filter(r => r.so !== 'es').map(r => r.id), dificil = todas('dificil').map(r => r.id);   // as rimas em espanhol são novas (v0.3.4)
   for (const h of MEDIO_ANTIGO.concat(DIFICIL_ANTIGO)) assert.ok(medio.includes('medio-' + h), 'falta no Médio: ' + h);
   assert.equal(medio.length, MEDIO_ANTIGO.length + DIFICIL_ANTIGO.length);
   for (const h of DIFICIL_ANTIGO) assert.ok(!dificil.includes('dificil-' + h), 'rodada antiga ainda no Difícil: ' + h);
@@ -122,7 +123,7 @@ const numeros = s => (s.match(/\d+(?:[.,]\d+)?/g) || []).map(x => +x.replace(','
 const fazer = expr => Function('"use strict"; return (' + expr + ');')();
 const ROMANOS = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
 const romano = s => [...s].reduce((t, c, i, a) => t + (ROMANOS[c] < (ROMANOS[a[i + 1]] || 0) ? -ROMANOS[c] : ROMANOS[c]), 0);
-test('matemática do Difícil: toda conta confere (refeita aqui), em PT e EN', () => {
+test('matemática do Difícil: toda conta confere (refeita aqui), em PT, EN e ES', () => {
   let contas = 0; const usadas = new Set();
   for (const r of todas('dificil')) {
     const comConta = r.pares.filter(p => R.CONTAS[p[0].pt] !== undefined);
@@ -135,7 +136,9 @@ test('matemática do Difícil: toda conta confere (refeita aqui), em PT e EN', (
       const certo = v => Math.abs(v - valor) < 1e-9;
       assert.ok(certo(numeros(dir.pt)[0]), esq.pt + ' dá ' + valor + ', não ' + dir.pt);
       assert.ok(certo(numeros(dir.en)[0]), esq.en + ' dá ' + valor + ', não ' + dir.en);
+      assert.ok(certo(numeros(dir.es)[0]), esq.es + ' dá ' + valor + ', não ' + dir.es);
       assert.deepEqual(numeros(esq.pt), numeros(esq.en), 'números diferentes em PT e EN: ' + esq.pt + ' / ' + esq.en);
+      assert.deepEqual(numeros(esq.pt), numeros(esq.es), 'números diferentes em PT e ES: ' + esq.pt + ' / ' + esq.es);
       // quando a própria carta é uma conta (7 × 8, 6², 1000 − 1) ou número romano, faz a conta direto do texto também
       const t = esq.pt.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/(\d+)²/g, '($1*$1)');
       if (/^[\d\s+\-*/().]+$/.test(t)) assert.ok(certo(fazer(t)), 'o texto "' + esq.pt + '" não dá ' + valor);

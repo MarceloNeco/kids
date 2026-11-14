@@ -2,6 +2,23 @@
   "app": "enigmas",
   "versoes": [
     {
+      "versao": "0.3.4",
+      "data": "14/Nov/2026",
+      "hora": "15:40:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante (a voz lê no idioma escolhido)",
+        "🎵 Rimas novas em espanhol, feitas para rimar em espanhol"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf (the voice reads in the chosen language)",
+        "🎵 New rhymes in Spanish, written to rhyme in Spanish"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería (la voz lee en el idioma elegido)",
+        "🎵 Rimas nuevas en español, hechas para rimar en español"
+      ]
+    },
+    {
       "versao": "0.3.3",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

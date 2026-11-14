@@ -22,13 +22,13 @@
     var codigo = S.codigoNovo();
     tv = { codigo: codigo, sala: null, jogadores: {} };
     A.abrirLivre();
-    mostrarChip(t('Conectando…', 'Connecting…'));
+    mostrarChip(t('Conectando…', 'Connecting…', 'Conectando…'));
     S.abrir(codigo, aoReceberTV).then(function (sala) {
       tv.sala = sala; mostrarChip();
       sala.mandar({ t: 'tv', id: 'tv' });
     }).catch(function () {
       tv = null; mostrarChip(null);
-      A.abrirJanela({ titulo: t('📺 Sem conexão', '📺 No connection'), texto: t('A TV precisa de internet para o celular controlar. Dá para desenhar aqui mesmo com o controle (o ponteiro) ou espelhar o celular.', 'The TV needs internet for the phone to control it. You can still draw here with the remote pointer, or mirror the phone.'), botoes: [{ t: 'OK' }] });
+      A.abrirJanela({ titulo: t('📺 Sem conexão', '📺 No connection', '📺 Sin conexión'), texto: t('A TV precisa de internet para o celular controlar. Dá para desenhar aqui mesmo com o controle (o ponteiro) ou espelhar o celular.', 'The TV needs internet for the phone to control it. You can still draw here with the remote pointer, or mirror the phone.', 'La tele necesita internet para que el móvil la controle. Puedes dibujar aquí mismo con el mando a distancia (el puntero) o duplicar la pantalla del móvil.'), botoes: [{ t: 'OK' }] });
     });
     requestAnimationFrame(passoTV);
   }
@@ -38,7 +38,7 @@
     c.hidden = false; c.innerHTML = '';
     if (txt) { c.textContent = txt; return; }
     var n = Object.keys(tv.jogadores).length;
-    c.appendChild(document.createTextNode(t('📱 No celular: Rabiscolândia → 📺 Na TV → 🎮 Controlar · código ', '📱 On the phone: Rabiscolândia → 📺 On the TV → 🎮 Control · code ')));
+    c.appendChild(document.createTextNode(t('📱 No celular: Rabiscolândia → 📺 Na TV → 🎮 Controlar · código ', '📱 On the phone: Rabiscolândia → 📺 On the TV → 🎮 Control · code ', '📱 En el móvil: Rabiscolândia → 📺 En la tele → 🎮 Controlar · código ')));
     var b = document.createElement('b'); b.textContent = tv.codigo; c.appendChild(b);
     if (n) c.appendChild(document.createTextNode(' · ' + Object.keys(tv.jogadores).map(function (k) { return tv.jogadores[k].nome || '🙂'; }).join(', ')));
   }
@@ -59,7 +59,7 @@
     var motor = A.motor(), fonte = 'tv' + m.id;
     if (m.t === 'tchau') { sairJogador(m.id); return; }
     var j = jogador(m); if (!j) return;
-    if (m.t === 'oi') { tv.sala.mandar({ t: 'tv', id: 'tv', cor: j.cor }); mostrarChip(); A.aviso('📱 ' + (j.nome || t('Celular', 'Phone')) + t(' entrou!', ' joined!')); return; }
+    if (m.t === 'oi') { tv.sala.mandar({ t: 'tv', id: 'tv', cor: j.cor }); mostrarChip(); A.aviso('📱 ' + (j.nome || t('Celular', 'Phone', 'Móvil')) + t(' entrou!', ' joined!', ' ¡ha entrado!')); return; }
     if (m.t === 'mira') { j.x = m.x; j.y = m.y; j.d = m.d; return; }
     if (m.t === 'ferramenta') { var f = {}; if (m.pincel && A.PINCEIS_LIVRES.concat(['balde', 'borracha']).indexOf(m.pincel) >= 0) f.pincel = m.pincel; if (m.cor) f.cor = m.cor; if (m.tam) f.tam = m.tam; motor.ferramentaDe(fonte, f); return; }
     if (m.t === 'cmd') {
@@ -111,16 +111,16 @@
   $('ctrlEntrar').addEventListener('submit', function (e) {
     e.preventDefault();
     var codigo = $('ctrlCodigo').value.trim(), nome = $('ctrlNome').value.trim().slice(0, 16);
-    if (codigo.length !== 4) { $('ctrlMsg').textContent = t('O código tem 4 letras (está na TV).', 'The code has 4 letters (it is on the TV).'); return; }
+    if (codigo.length !== 4) { $('ctrlMsg').textContent = t('O código tem 4 letras (está na TV).', 'The code has 4 letters (it\'s on the TV).', 'El código tiene 4 letras (está en la tele).'); return; }
     A.pref.nome = nome; A.salvarPref();
-    $('ctrlMsg').textContent = t('Conectando…', 'Connecting…');
+    $('ctrlMsg').textContent = t('Conectando…', 'Connecting…', 'Conectando…');
     var id = S.idNovo();
     S.abrir(codigo, aoReceberCtrl).then(function (sala) {
       ctrl = { sala: sala, id: id, nome: nome, modo: 'toque', ultimoEnvio: 0, x: 0.5, y: 0.5, d: 0, oi: null, ok: false };
       sala.mandar({ t: 'oi', id: id, nome: nome });
       ctrl.oi = setInterval(function () { if (ctrl) ctrl.sala.mandar({ t: 'oi', id: ctrl.id, nome: ctrl.nome }); }, 5000);
-      setTimeout(function () { if (ctrl && !ctrl.ok) $('ctrlMsg').textContent = t('Não achei a TV com esse código. Confira as letras na TV.', 'Could not find the TV with that code. Check the letters on the TV.'); }, 4000);
-    }).catch(function () { $('ctrlMsg').textContent = t('Sem internet: o celular precisa de internet para controlar a TV.', 'No internet: the phone needs internet to control the TV.'); });
+      setTimeout(function () { if (ctrl && !ctrl.ok) $('ctrlMsg').textContent = t('Não achei a TV com esse código. Confira as letras na TV.', 'Could not find the TV with that code. Check the letters on the TV.', 'No he encontrado la tele con ese código. Revisa las letras en la tele.'); }, 4000);
+    }).catch(function () { $('ctrlMsg').textContent = t('Sem internet: o celular precisa de internet para controlar a TV.', 'No internet: the phone needs internet to control the TV.', 'Sin internet: el móvil necesita internet para controlar la tele.'); });
   });
   function aoReceberCtrl(m) {
     if (!ctrl || m.t !== 'tv') return;
@@ -175,9 +175,9 @@
     Array.prototype.forEach.call(document.querySelectorAll('.ctrl-modo'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-modo') === modo ? 'true' : 'false'); });
     $('ctrlSegurar').hidden = modo !== 'giro'; $('ctrlCentro').hidden = modo !== 'giro';
     $('ctrlVideo').hidden = modo !== 'mao'; $('ctrlPontos').hidden = modo !== 'mao';
-    var dica = { toque: t('Deslize o dedo aqui: é a TV em miniatura. Encostou, desenhou! ✏️', 'Slide your finger here: it is a mini TV. Touch to draw! ✏️'),
-      giro: t('Aponte o celular para a TV e mexa devagar. Segure ✏️ para desenhar. 🎯 Centraliza a mira.', 'Point the phone at the TV and move it gently. Hold ✏️ to draw. 🎯 centers the pointer.'),
-      mao: t('Deixe o celular parado perto da TV, com a câmera da frente para você. ✋ aberta mira, ✊ fechada desenha.', 'Leave the phone still near the TV, front camera facing you. ✋ open aims, ✊ closed draws.') }[modo];
+    var dica = { toque: t('Deslize o dedo aqui: é a TV em miniatura. Encostou, desenhou! ✏️', 'Slide your finger here: it\'s a mini TV. Touch to draw! ✏️', 'Desliza el dedo aquí: es la tele en miniatura. ¡Tocas y dibujas! ✏️'),
+      giro: t('Aponte o celular para a TV e mexa devagar. Segure ✏️ para desenhar. 🎯 Centraliza a mira.', 'Point the phone at the TV and move it gently. Hold ✏️ to draw. 🎯 centers the pointer.', 'Apunta el móvil a la tele y muévelo despacio. Mantén ✏️ para dibujar. 🎯 centra la mira.'),
+      mao: t('Deixe o celular parado perto da TV, com a câmera da frente para você. ✋ aberta mira, ✊ fechada desenha.', 'Leave the phone still near the TV, front camera facing you. ✋ open aims, ✊ closed draws.', 'Deja el móvil quieto cerca de la tele, con la cámara frontal mirándote. ✋ abierta apunta, ✊ cerrada dibuja.') }[modo];
     $('ctrlDica').textContent = dica;
     if (modo === 'giro') ligarGiro();
     if (modo === 'mao') ligarMaoCtrl();
@@ -210,9 +210,9 @@
     var DO = window.DeviceOrientationEvent;
     if (DO && typeof DO.requestPermission === 'function') {
       // iPhone/iPad: precisa pedir com um toque — este é o toque no botão "📱 Mexer o celular"
-      DO.requestPermission().then(function (r) { if (r === 'granted') ouvir(); else $('ctrlDica').textContent = t('Sem permissão do movimento. No iPhone: Ajustes → Safari → Movimento e Orientação.', 'Motion permission denied. On iPhone: Settings → Safari → Motion & Orientation.'); }).catch(function () { ouvir(); });
+      DO.requestPermission().then(function (r) { if (r === 'granted') ouvir(); else $('ctrlDica').textContent = t('Sem permissão do movimento. No iPhone: Ajustes → Safari → Movimento e Orientação.', 'Motion permission denied. On iPhone: Settings → Safari → Motion & Orientation.', 'Sin permiso de movimiento. En el iPhone: Ajustes → Safari → Movimiento y orientación.'); }).catch(function () { ouvir(); });
     } else if (DO) ouvir();
-    else $('ctrlDica').textContent = t('Este celular não informa o movimento. Use 👆 Dedo.', 'This phone does not report motion. Use 👆 Finger.');
+    else $('ctrlDica').textContent = t('Este celular não informa o movimento. Use 👆 Dedo.', 'This phone does not report motion. Use 👆 Finger.', 'Este móvil no informa el movimiento. Usa 👆 Dedo.');
   }
   function pararGiro() { if (giro.ligado) { window.removeEventListener('deviceorientation', aoGirar); giro.ligado = false; } }
   $('ctrlCentro').addEventListener('click', function () { giro.ref = null; if (ctrl) { ctrl.x = 0.5; ctrl.y = 0.5; mandarMira(true); } });
@@ -234,9 +234,9 @@
       var d = m.estado === 'fechada' ? 1 : 0, mudou = d !== ctrl.d; ctrl.d = d;
       if (mudou) A.som.efeito(d ? 'pegar' : 'soltar');
       mandarMira(mudou);
-    }, function (p) { $('ctrlDica').textContent = t('Preparando a mão… ', 'Getting the hand ready… ') + Math.round(p * 100) + '%'; }).then(function () {
+    }, function (p) { $('ctrlDica').textContent = t('Preparando a mão… ', 'Getting the hand ready… ', 'Preparando la mano… ') + Math.round(p * 100) + '%'; }).then(function () {
       $('ctrlDica').textContent = '';
-    }).catch(function () { $('ctrlDica').textContent = t('Não consegui ligar a câmera. Permita a câmera no cadeado 🔒 ou use 👆 Dedo.', 'Could not start the camera. Allow the camera in the lock 🔒 or use 👆 Finger.'); });
+    }).catch(function () { $('ctrlDica').textContent = t('Não consegui ligar a câmera. Permita a câmera no cadeado 🔒 ou use 👆 Dedo.', 'Could not start the camera. Allow the camera in the lock 🔒 or use 👆 Finger.', 'No he podido encender la cámara. Permite la cámara en el candado 🔒 o usa 👆 Dedo.'); });
   }
 
   // sair da tela do controle desliga tudo e avisa a TV

@@ -4,7 +4,7 @@
    progresso de cada nível em "bolinho:enigmas:progresso". Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.3';
+  var APP_VERSION = '0.3.4';
   var $ = function (id) { return document.getElementById(id); };
   var J = window.Enigmas, R = window.EnigmasRodadas;
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -15,8 +15,9 @@
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem espaço ou modo privado: segue sem lembrar */ } }
   var CH_PREF = 'bolinho:enigmas:pref', CH_PROG = 'bolinho:enigmas:progresso';
   var pref = ler(CH_PREF, null) || {};
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = /^en/i.test(navigator.language || '') ? 'en' : 'pt';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  // idioma: o escolhido na estante (../idioma.js: português, inglês ou espanhol); o jogo não guarda mais o seu
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';
+  delete pref.lingua;
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (typeof pref.voz !== 'boolean') pref.voz = true;
   if (typeof pref.palavras !== 'boolean') pref.palavras = true;   // 🔤 desligado = só os desenhos
@@ -32,15 +33,17 @@
   if (J.migrar(prog, R)) salvarProg();   // v0.3.0: o Difícil antigo foi para o Médio (as estrelas vão junto)
 
   // ---------- idioma ----------
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
-  function w(it) { return pref.lingua === 'en' ? it.en : it.pt; }
-  var NOME_NIVEL = { facil: ['Fácil', 'Easy'], medio: ['Médio', 'Medium'], dificil: ['Difícil', 'Hard'] };
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' && es != null ? es : pt; }
+  function w(it) { return t(it.pt, it.en, it.es); }
+  var NOME_NIVEL = { facil: ['Fácil', 'Easy', 'Fácil'], medio: ['Médio', 'Medium', 'Medio'], dificil: ['Difícil', 'Hard', 'Difícil'] };
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
     Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) {
-      var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0];
+      var p = el.getAttribute('data-t').split('|'); el.textContent = t(p[0], p[1], p[2]);
     });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) {
+      var p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', t(p[0], p[1], p[2]));
+    });
     pintarPrefs(); pintarProgresso();
     if (partida) { montarCartas(); pintarTopo(); }
   }
@@ -48,25 +51,26 @@
   function pintarPrefs() {
     $('btEfeitos').textContent = pref.efeitos ? '🔔' : '🔕';
     $('btEfeitos').setAttribute('aria-pressed', String(pref.efeitos));
-    $('btEfeitos').setAttribute('aria-label', pref.efeitos ? t('Sons ligados', 'Sounds on') : t('Sons desligados', 'Sounds off'));
+    $('btEfeitos').setAttribute('aria-label', pref.efeitos ? t('Sons ligados', 'Sounds on', 'Sonidos activados') : t('Sons desligados', 'Sounds off', 'Sonidos desactivados'));
     $('btVoz').setAttribute('aria-pressed', String(pref.voz));
     $('btVoz').classList.toggle('desligado', !pref.voz);
-    $('btVoz').setAttribute('aria-label', pref.voz ? t('Voz ligada: lê as palavras', 'Voice on: reads the words') : t('Voz desligada', 'Voice off'));
+    $('btVoz').setAttribute('aria-label', pref.voz ? t('Voz ligada: lê as palavras', 'Voice on: reads the words', 'Voz activada: lee las palabras') : t('Voz desligada', 'Voice off', 'Voz desactivada'));
     $('btPalavras').setAttribute('aria-pressed', String(pref.palavras));
     $('btPalavras').classList.toggle('desligado', !pref.palavras);
-    $('btPalavras').setAttribute('aria-label', t('Mostrar palavras', 'Show words'));
-    $('btPalavras').title = t('Mostrar palavras', 'Show words');
+    $('btPalavras').setAttribute('aria-label', t('Mostrar palavras', 'Show words', 'Mostrar palabras'));
+    $('btPalavras').title = t('Mostrar palavras', 'Show words', 'Mostrar palabras');
     $('lousa').classList.toggle('so-desenhos', !pref.palavras);
   }
 
-  function listaNivel(n) { return J.lista(R, n, pref.lingua); }
+  function listaNivel(n) { return J.lista(R, n, lingua); }
   function feitasNoCiclo(n) { var ids = listaNivel(n).map(function (r) { return r.id; }); return prog[n].feitas.filter(function (id) { return ids.indexOf(id) >= 0; }).length; }
   function pintarProgresso() {
     R.NIVEIS.forEach(function (n) {
       var el = $('prog' + n.charAt(0).toUpperCase() + n.slice(1));
       el.textContent = '⭐ ' + prog[n].estrelas + ' · ' + feitasNoCiclo(n) + '/' + listaNivel(n).length;
       el.setAttribute('aria-label', t(prog[n].estrelas + ' estrelas, ' + feitasNoCiclo(n) + ' de ' + listaNivel(n).length + ' enigmas',
-        prog[n].estrelas + ' stars, ' + feitasNoCiclo(n) + ' of ' + listaNivel(n).length + ' puzzles'));
+        prog[n].estrelas + ' stars, ' + feitasNoCiclo(n) + ' of ' + listaNivel(n).length + ' puzzles',
+        prog[n].estrelas + ' estrellas, ' + feitasNoCiclo(n) + ' de ' + listaNivel(n).length + ' enigmas'));
     });
   }
 
@@ -95,13 +99,21 @@
     vitoria: function () { [523, 659, 784, 1047, 784, 1047].forEach(function (f, i) { nota(f, i * 0.11, 0.25, 'triangle', 0.16); }); }
   };
 
-  // ---------- voz: lê a palavra tocada (ajuda quem ainda não lê) ----------
+  // ---------- voz: lê a palavra tocada (ajuda quem ainda não lê), no idioma escolhido na estante ----------
+  function vozDoIdioma(lang) {
+    var vs = []; try { vs = speechSynthesis.getVoices() || []; } catch (e) { /* sem lista de vozes */ }
+    var norm = function (l) { return String(l || '').replace('_', '-').toLowerCase(); }, quer = norm(lang), base = quer.slice(0, 2);
+    var lista = vs.filter(function (v) { return norm(v.lang).indexOf(base) === 0; });
+    lista.sort(function (a, b) { return (norm(b.lang) === quer) - (norm(a.lang) === quer); });
+    return lista[0] || null;
+  }
   function falar(txt) {
     if (!pref.voz || !txt || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
     try {
       speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(txt);
-      u.lang = pref.lingua === 'en' ? 'en-US' : 'pt-BR'; u.rate = 0.95;
+      u.lang = window.BolinhoIdioma ? BolinhoIdioma.voz() : 'pt-BR'; u.rate = 0.95;
+      var v = vozDoIdioma(u.lang); if (v) u.voice = v;   // nunca uma voz de outro idioma lendo a palavra
       u.onstart = function () { if (window.Trilha) Trilha.volume(0.35); };
       u.onend = u.onerror = function () { if (window.Trilha) Trilha.volume(null); };
       speechSynthesis.speak(u);
@@ -151,16 +163,16 @@
     rodada = r.rodada; partida = J.Partida(rodada);
     montarCartas(); pintarTopo();
     $('status').textContent = '';
-    falar(t(rodada.dica.pt, rodada.dica.en));
+    falar(t(rodada.dica.pt, rodada.dica.en, rodada.dica.es));
     var primeira = $('colEsq').querySelector('.carta'); if (primeira && !('ontouchstart' in window)) primeira.focus({ preventScroll: true });
   }
 
   function pintarTopo() {
-    $('nomeNivel').textContent = t(NOME_NIVEL[nivel][0], NOME_NIVEL[nivel][1]);
+    $('nomeNivel').textContent = t(NOME_NIVEL[nivel][0], NOME_NIVEL[nivel][1], NOME_NIVEL[nivel][2]);
     var total = listaNivel(nivel).length;
-    $('contador').textContent = t('Enigma ', 'Puzzle ') + Math.min(feitasNoCiclo(nivel) + 1, total) + t(' de ', ' of ') + total;
+    $('contador').textContent = t('Enigma ', 'Puzzle ', 'Enigma ') + Math.min(feitasNoCiclo(nivel) + 1, total) + t(' de ', ' of ', ' de ') + total;
     $('estrelasTopo').textContent = '⭐ ' + prog[nivel].estrelas;
-    $('pista').textContent = t(rodada.dica.pt, rodada.dica.en);
+    $('pista').textContent = t(rodada.dica.pt, rodada.dica.en, rodada.dica.es);
   }
 
   function carta(lado, i) {
@@ -323,7 +335,7 @@
     if (b) {
       b.classList.add('escolhida'); b.setAttribute('aria-pressed', 'true'); Som.escolher();
       falar(b.getAttribute('aria-label')); mostrarBalao(b);
-      $('status').textContent = t(b.getAttribute('aria-label') + ' escolhido. Agora toque no outro lado.', b.getAttribute('aria-label') + ' picked. Now tap the other side.');
+      $('status').textContent = t(b.getAttribute('aria-label') + ' escolhido. Agora toque no outro lado.', b.getAttribute('aria-label') + ' picked. Now tap the other side.', b.getAttribute('aria-label') + ' elegido. Ahora toca el otro lado.');
     }
   }
   function tentar(a, b, gTemp) {
@@ -340,7 +352,7 @@
       ligarBalanco();
       [esq, dir].forEach(function (c) { c.classList.add('ligada', 'pulo'); c.disabled = true; });
       Som.certo();
-      $('status').textContent = t('Isso! ' + w(rodada.pares[ie][0]) + ' com ' + w(rodada.pares[ie][1]) + '.', 'Yes! ' + w(rodada.pares[ie][0]) + ' with ' + w(rodada.pares[ie][1]) + '.');
+      $('status').textContent = t('Isso! ' + w(rodada.pares[ie][0]) + ' com ' + w(rodada.pares[ie][1]) + '.', 'Yes! ' + w(rodada.pares[ie][0]) + ' with ' + w(rodada.pares[ie][1]) + '.', '¡Eso es! ' + w(rodada.pares[ie][0]) + ' con ' + w(rodada.pares[ie][1]) + '.');
       if (res === 'fim') setTimeout(terminar, CALMO ? 300 : 900);
       else { var prox = document.querySelector('.carta:not(:disabled)'); if (prox && document.activeElement && document.activeElement.disabled) prox.focus({ preventScroll: true }); }
     } else if (res === 'errado') {
@@ -349,7 +361,7 @@
       Som.errado();
       setTimeout(function () { g.classList.add('apagando'); }, 350);
       setTimeout(function () { g.remove(); }, CALMO ? 400 : 1000);
-      $('status').textContent = t('Ainda não. Tente outro!', 'Not yet. Try another one!');
+      $('status').textContent = t('Ainda não. Tente outro!', 'Not yet. Try another one!', 'Todavía no. ¡Prueba con otro!');
     } else g.remove();
   }
 
@@ -440,7 +452,7 @@
   });
 
   // ---------- fim da rodada: janela de festa (SolverJanela: Esc, Voltar e tocar fora = próximo enigma) ----------
-  var TITULOS = [['Muito bem!', 'Well done!'], ['Que esperto!', 'So clever!'], ['Mandou bem!', 'Great job!'], ['Isso aí!', 'You did it!'], ['Uau, acertou tudo!', 'Wow, all done!']];
+  var TITULOS = [['Muito bem!', 'Well done!', '¡Muy bien!'], ['Que esperto!', 'So clever!', '¡Qué ingenio!'], ['Mandou bem!', 'Great job!', '¡Genial!'], ['Isso aí!', 'You did it!', '¡Lo has conseguido!'], ['Uau, acertou tudo!', 'Wow, all done!', '¡Hala, lo has acertado todo!']];
   var festa = null;
   function el(tag, classe, texto) { var n = document.createElement(tag); if (classe) n.className = classe; if (texto != null) n.textContent = texto; return n; }
   function terminar() {
@@ -451,18 +463,18 @@
     salvarProg(); pintarTopo();
     var tt = TITULOS[Math.floor(Math.random() * TITULOS.length)];
     var total = listaNivel(nivel).length, feitas = feitasNoCiclo(nivel);
-    var txt = t('Você ganhou ' + est + (est > 1 ? ' estrelas!' : ' estrela!'), 'You earned ' + est + (est > 1 ? ' stars!' : ' star!'));
-    if (feitas >= total) txt += ' ' + t('Você fez todos os ' + total + ' enigmas deste nível! Agora eles voltam misturados.', 'You solved all ' + total + ' puzzles on this level! Now they come back mixed up.');
-    else txt += ' ' + t('Faltam ' + (total - feitas) + ' enigmas neste nível.', (total - feitas) + ' puzzles left on this level.');
-    var caixa = el('div', 'festa-caixa'), h = el('h2', null, t(tt[0], tt[1]));
-    var ee = el('p', 'festa-estrelas', '⭐'.repeat(est) + '☆'.repeat(3 - est)); ee.setAttribute('aria-label', t(est + ' estrelas', est + ' stars'));
-    var bP = el('button', 'grande', t('Próximo enigma ▶', 'Next puzzle ▶')), bN = el('button', 'mini largo', t('🏠 Níveis', '🏠 Levels'));
+    var txt = t('Você ganhou ' + est + (est > 1 ? ' estrelas!' : ' estrela!'), 'You earned ' + est + (est > 1 ? ' stars!' : ' star!'), '¡Has ganado ' + est + (est > 1 ? ' estrellas!' : ' estrella!'));
+    if (feitas >= total) txt += ' ' + t('Você fez todos os ' + total + ' enigmas deste nível! Agora eles voltam misturados.', 'You solved all ' + total + ' puzzles on this level! Now they come back mixed up.', '¡Has resuelto los ' + total + ' enigmas de este nivel! Ahora vuelven mezclados.');
+    else txt += ' ' + t('Faltam ' + (total - feitas) + ' enigmas neste nível.', (total - feitas) + ' puzzles left on this level.', (total - feitas === 1 ? 'Queda 1 enigma' : 'Quedan ' + (total - feitas) + ' enigmas') + ' en este nivel.');
+    var caixa = el('div', 'festa-caixa'), h = el('h2', null, t(tt[0], tt[1], tt[2]));
+    var ee = el('p', 'festa-estrelas', '⭐'.repeat(est) + '☆'.repeat(3 - est)); ee.setAttribute('aria-label', t(est + ' estrelas', est + ' stars', est + ' estrellas'));
+    var bP = el('button', 'grande', t('Próximo enigma ▶', 'Next puzzle ▶', 'Siguiente enigma ▶')), bN = el('button', 'mini largo', t('🏠 Níveis', '🏠 Levels', '🏠 Niveles'));
     bP.type = bN.type = 'button'; bP.id = 'btProxima'; bN.id = 'btNiveis';
     var bts = el('div', 'festa-bts'); bts.appendChild(bP); bts.appendChild(bN);
     [h, ee, el('p', 'festa-texto', txt), bts].forEach(function (n) { caixa.appendChild(n); });
     var conf = el('div', 'confete'); conf.setAttribute('aria-hidden', 'true'); confete(conf);
     var tudo = el('div', 'festa-dentro'); tudo.appendChild(conf); tudo.appendChild(caixa);
-    Som.vitoria(); falar(t(tt[0], tt[1]));
+    Som.vitoria(); falar(t(tt[0], tt[1], tt[2]));
     var abrir = window.SolverJanela ? SolverJanela.abrir : null;
     if (!abrir) { novaRodada(); return; }
     festa = abrir({ conteudo: tudo, classe: 'festa', focar: bP, aoFechar: function (motivo) {
@@ -490,16 +502,17 @@
 
   // ---------- início ----------
   R.NIVEIS.forEach(function (n) { $('bt' + n.charAt(0).toUpperCase() + n.slice(1)).addEventListener('click', function () { comecar(n); }); });
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
+  // trocaram o idioma na estante (noutra aba): traduz a tela (e, no jogo, as cartas)
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); });
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarPrefs(); if (pref.efeitos) Som.escolher(); });
   $('btPalavras').addEventListener('click', function () { pref.palavras = !pref.palavras; salvarPref(); pintarPrefs(); esconderBalao(); ajustarTudo(); redesenhar(); });
-  $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarPrefs(); if (pref.voz) falar(t('Voz ligada', 'Voice on')); else { try { speechSynthesis.cancel(); } catch (e) { /* ok */ } } });
+  $('btVoz').addEventListener('click', function () { pref.voz = !pref.voz; salvarPref(); pintarPrefs(); if (pref.voz) falar(t('Voz ligada', 'Voice on', 'Voz activada')); else { try { speechSynthesis.cancel(); } catch (e) { /* ok */ } } });
   $('btZerar').addEventListener('click', function () {
     if (!window.SolverJanela) return;
-    var caixa = el('div', 'festa-caixa pergunta'), bS = el('button', 'grande perigo', t('Apagar', 'Erase')), bC = el('button', 'mini largo', t('Cancelar', 'Cancel'));
+    var caixa = el('div', 'festa-caixa pergunta'), bS = el('button', 'grande perigo', t('Apagar', 'Erase', 'Borrar')), bC = el('button', 'mini largo', t('Cancelar', 'Cancel', 'Cancelar'));
     bS.type = bC.type = 'button';
-    caixa.appendChild(el('h2', null, t('Começar do zero?', 'Start over?')));
-    caixa.appendChild(el('p', 'festa-texto', t('Apaga as estrelas e o progresso dos três níveis neste aparelho.', 'Erases the stars and progress of all three levels on this device.')));
+    caixa.appendChild(el('h2', null, t('Começar do zero?', 'Start over?', '¿Empezar de cero?')));
+    caixa.appendChild(el('p', 'festa-texto', t('Apaga as estrelas e o progresso dos três níveis neste aparelho.', 'Erases the stars and progress of all three levels on this device.', 'Borra las estrellas y el progreso de los tres niveles en este dispositivo.')));
     var bts = el('div', 'festa-bts'); bts.appendChild(bS); bts.appendChild(bC); caixa.appendChild(bts);
     var j = SolverJanela.abrir({ conteudo: caixa, classe: 'festa', papel: 'alertdialog', focar: bC, aoFechar: function (motivo) {
       if (motivo !== 'apagar') return;
