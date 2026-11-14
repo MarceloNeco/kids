@@ -2,6 +2,23 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.8.1",
+      "data": "14/Nov/2026",
+      "hora": "16:30:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante. Textos, receitas e falas mudam juntos.",
+        "👵 A Dona Cida fala com voz de mulher no idioma escolhido, e o 👵🔁 troca só entre as vozes desse idioma."
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf. Texts, recipes and voices all switch together.",
+        "👵 Mrs. Cida speaks with a woman's voice in the chosen language, and 👵🔁 only switches between voices of that language."
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería. Los textos, las recetas y las voces cambian juntos.",
+        "👵 Doña Cida habla con voz de mujer en el idioma elegido, y el 👵🔁 solo cambia entre las voces de ese idioma."
+      ]
+    },
+    {
       "versao": "0.8.0",
       "data": "14/Nov/2026",
       "hora": "12:40:00",

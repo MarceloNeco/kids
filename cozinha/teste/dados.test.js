@@ -11,7 +11,7 @@ test('pelo menos 10 receitas, cada uma com nome PT/EN, emoji, cor e ingredientes
   const ids = new Set();
   for (const r of D.RECEITAS) {
     assert.ok(!ids.has(r.id), 'receita repetida ' + r.id); ids.add(r.id);
-    assert.ok(r.pt && r.en && r.pt !== '' && r.en !== '', r.id + ' sem nome PT/EN');
+    assert.ok(r.pt && r.en && r.es && r.pt !== '' && r.en !== '', r.id + ' sem nome PT/EN/ES');
     assert.ok(r.e && /^#[0-9a-f]{6}$/i.test(r.cor), r.id + ' sem emoji ou cor');
     assert.ok(r.ing.length >= 2, r.id + ': poucos ingredientes');
     for (const x of r.ing) { assert.ok(D.ingrediente[x.id], r.id + ': ingrediente desconhecido ' + x.id); assert.ok(Number.isInteger(x.q) && x.q >= 1, r.id + ': quantidade ruim de ' + x.id); }
@@ -25,17 +25,18 @@ test('pelo menos 10 receitas, cada uma com nome PT/EN, emoji, cor e ingredientes
   }
 });
 
-test('ingredientes, lugares e utensílios com textos PT e EN e desenho', () => {
+test('ingredientes, lugares e utensílios com textos PT, EN e ES e desenho', () => {
   for (const g of D.INGREDIENTES) {
-    assert.ok(g.pt.length === 2 && g.en.length === 2 && g.pt.every(Boolean) && g.en.every(Boolean), g.id + ': nome no singular e plural, PT e EN');
+    assert.ok(g.pt.length === 2 && g.en.length === 2 && g.es.length === 2 && g.pt.every(Boolean) && g.en.every(Boolean) && g.es.every(Boolean), g.id + ': nome no singular e plural, PT, EN e ES');
     assert.ok(g.e || g.s, g.id + ' sem desenho');
     assert.ok(ART.icone(g.id).length > 10, g.id + ' sem ícone');
     if (g.de) assert.ok(D.lugar[g.de], g.id + ': lugar desconhecido ' + g.de);
     assert.ok(L.lugaresDe(g.id).length >= 1, g.id + ' não se consegue em lugar nenhum');
   }
-  for (const l of D.LUGARES) assert.ok(l.pt && l.en && l.faz[0] && l.faz[1] && l.e, l.id);
-  for (const u of D.UTENSILIOS) { assert.ok(u.pt && u.en && u.na[0] && u.na[1], u.id); assert.ok(ART.icone(u.id).length > 10, u.id + ' sem ícone'); }
-  for (const n of D.NIVEIS) assert.ok(n.pt && n.en && n.txt[0] && n.txt[1], n.id);
+  for (const l of D.LUGARES) assert.ok(l.pt && l.en && l.es && l.faz[0] && l.faz[1] && l.faz[2] && l.e, l.id);
+  for (const u of D.UTENSILIOS) { assert.ok(u.pt && u.en && u.es && u.na[0] && u.na[1] && /^(en|con) (el|la|las) /.test(u.na[2]), u.id); assert.ok(ART.icone(u.id).length > 10, u.id + ' sem ícone'); }
+  for (const n of D.NIVEIS) assert.ok(n.pt && n.en && n.es && n.txt[0] && n.txt[1] && n.txt[2], n.id);
+  for (const f of D.FAMILIA) assert.ok(f.es, f.id + ' sem nome ES');
   // os lugares pedidos: rio, pomar, horta, galinheiro, vaca, mercado e vizinha
   for (const id of ['rio', 'pomar', 'horta', 'galinheiro', 'vaca', 'mercado', 'vizinha', 'casa']) assert.ok(D.lugar[id], 'falta o lugar ' + id);
 });
@@ -84,9 +85,11 @@ test('passos de cada nível: começam lavando as mãos, terminam servindo, ordem
         if (p.a === 'por') assert.ok(p.ing.length >= 1, r.id + '/' + n + ': passo de pôr sem ingrediente ' + p.id);
         for (const d of p.dep) assert.ok(ids.has(d), r.id + '/' + n + ': ' + p.id + ' depende de um passo que vem depois ou não existe: ' + d);
         for (const i of p.ing) { assert.ok(tem.has(i), r.id + '/' + n + ': ' + p.id + ' usa ' + i + ' que não está no nível'); usados.add(i); }
-        const pt = L.textoPasso(p, r, n, false), en = L.textoPasso(p, r, n, true);
+        const pt = L.textoPasso(p, r, n, false), en = L.textoPasso(p, r, n, true), es = L.textoPasso(p, r, n, 'es');
         assert.ok(pt && en && pt !== en, r.id + '/' + n + ': texto PT/EN do passo ' + p.id);
-        assert.ok(!/undefined|NaN/.test(pt + en), r.id + ': texto quebrado ' + pt + ' / ' + en);
+        assert.ok(es && es !== pt && es !== en, r.id + '/' + n + ': texto ES do passo ' + p.id + ': ' + es);
+        assert.equal(L.textoPasso(p, r, n, 'pt'), pt); assert.equal(L.textoPasso(p, r, n, 'en'), en);
+        assert.ok(!/undefined|NaN/.test(pt + en + es), r.id + ': texto quebrado ' + pt + ' / ' + en + ' / ' + es);
       }
       for (const i of tem) assert.ok(usados.has(i), r.id + '/' + n + ': o ingrediente ' + i + ' é buscado mas não é usado em nenhum passo');
     }
@@ -133,7 +136,7 @@ test('cada fruta e cada legume nasce na planta certa, e cada coisa vem do lugar 
       assert.ok(D.planta[planta], 'planta desconhecida ' + planta);
       assert.equal(D.planta[planta].lugar, lugar, planta + ' fica em ' + lugar);
       assert.equal(D.planta[planta].forma, forma, planta + ' é desenhada como ' + forma);
-      assert.ok(D.planta[planta].pt && D.planta[planta].en, planta + ' sem nome PT/EN');
+      assert.ok(D.planta[planta].pt && D.planta[planta].en && D.planta[planta].es, planta + ' sem nome PT/EN/ES');
     } else assert.ok(!g.planta, id + ' não nasce em planta');
   }
   for (const id of FEITO_PELAS_PESSOAS) {
@@ -153,8 +156,8 @@ test('cada fruta e cada legume nasce na planta certa, e cada coisa vem do lugar 
 
 test('cada ingrediente tem uma frase curta que ensina de onde vem (PT e EN), e a da banana fala da bananeira', () => {
   for (const g of D.INGREDIENTES) {
-    assert.ok(Array.isArray(g.fato) && g.fato[0] && g.fato[1] && g.fato[0] !== g.fato[1], g.id + ' sem frase PT/EN');
-    assert.ok(g.fato[0].length <= 90 && g.fato[1].length <= 90, g.id + ': frase comprida demais para criança');
+    assert.ok(Array.isArray(g.fato) && g.fato[0] && g.fato[1] && g.fato[2] && g.fato[0] !== g.fato[1] && g.fato[2] !== g.fato[0], g.id + ' sem frase PT/EN/ES');
+    assert.ok(g.fato.every(f => f.length <= 90), g.id + ': frase comprida demais para criança');
   }
   assert.match(D.ingrediente.banana.fato[0], /cachos na bananeira/); assert.match(D.ingrediente.banana.fato[1], /banana plant/);
   assert.match(D.ingrediente.cenoura.fato[0], /embaixo da terra/);
