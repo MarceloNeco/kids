@@ -7,7 +7,11 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.8.0** (14/Nov/2026) — **família à mesa**: na ficha, "Quem vai comer?" com 8 pessoas (`dados.FAMILIA`:
+Versão atual: **0.9.0** (14/Nov/2026) — **lugares por dentro**: fazendinha com a Mimosa desenhada (`vila.vacaGrande`) e a
+criança no banquinho tirando leite no balde (`vila.ordenha`; `.jarra.balde`, as mãos mexem com `.ordenhando`); frutas "de
+massinha" no pomar (`desenhos.fruto`); o **ajudante** (o cozinheirinho) entra na horta, no pomar e no galinheiro e anda até
+onde a criança toca (`app.ajudante`, só enfeite, não atrasa a brincadeira); horta com cerquinha e galinheiro com telhado e
+janelinha. Na 0.8.0 — **família à mesa**: na ficha, "Quem vai comer?" com 8 pessoas (`dados.FAMILIA`:
 eu, mamãe, papai, vovó, vovô, irmão, irmã, bebê; "eu" sempre); a receita serve 2 e cada 2 pessoas a mais multiplicam as
 quantidades e as moedas (`logica.fatorDe`, `ingredientesDoNivel(rec, nível, fator)`); o nível limita (Fácil 2, Médio 4,
 Difícil 6; a pessoa nova entra no lugar da mais antiga); a escolha fica guardada (`pref.familia`); no fim cada pessoa
