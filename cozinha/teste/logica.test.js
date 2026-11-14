@@ -27,6 +27,7 @@ test('quantidades por nível: Fácil usa as do Fácil, Médio e Difícil as comp
   assert.equal(L.quantidade(r, 'facil', 'fermento'), 0);
   assert.equal(L.nomeQtd('ovo', 1, false), '1 ovo'); assert.equal(L.nomeQtd('ovo', 3, false), '3 ovos');
   assert.equal(L.nomeQtd('farinha', 2, true), '2 cups of flour');
+  assert.equal(L.nomeQtd('farinha', 2, 'es'), '2 tazas de harina'); assert.equal(L.nomeQtd('ovo', 1, 'es'), '1 huevo'); assert.equal(L.nomeQtd('ovo', 3, 'pt'), '3 ovos');
 });
 
 test('lugares: onde achar cada coisa e os lugares que ainda ajudam', () => {

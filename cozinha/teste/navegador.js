@@ -27,8 +27,10 @@ async function iniciar() {
 async function fechar() { if (browser) await browser.close(); if (server) server.close(); }
 
 // antes (opcional): função que roda na página antes do jogo (ex.: trocar a voz do navegador por uma de mentira)
-async function abrir(viewport, extra, antes) {
+// idioma (opcional): 'pt', 'en' ou 'es', como se a estante tivesse escolhido (localStorage "bolinho:idioma", ../idioma.js)
+async function abrir(viewport, extra, antes, idioma) {
   const ctx = await browser.newContext(Object.assign({ viewport, locale: 'pt-BR', reducedMotion: 'reduce' }, extra || {}));   // sem animação sem fim: o Playwright clica sem esperar parar
+  if (idioma) await ctx.addInitScript(c => { try { localStorage.setItem('bolinho:idioma', c); } catch (e) { /* ok */ } }, idioma);
   if (antes) await ctx.addInitScript(antes);
   const pg = await ctx.newPage(), erros = [];
   pg.on('console', m => { if (m.type() === 'error') erros.push(m.text() + ' @' + (m.location() && m.location().url)); });

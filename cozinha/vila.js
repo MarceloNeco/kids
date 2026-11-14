@@ -159,9 +159,9 @@
     h += naE(0.7, 0.36, 0.56, 0, 22, '#6cc3e8', ' stroke="#fff" stroke-width="2"') + janelaE(0.7, 0.22, 0.32, 8, 22) + janelaE(0.7, 0.6, 0.76, 8, 22) + janelaD(0.82, 0.3, 0.6, 8, 24);
     // toldo listrado (verde-água e branco) na frente
     for (var i = 0; i < 8; i++) { var a = 0.18 + i * 0.08, b = a + 0.08; h += poli([P(a, 0.7, 30), P(b, 0.7, 30), P(b, 0.8, 22), P(a, 0.8, 22)], i % 2 ? '#fff' : '#2bb6a8', CONT); }
-    // placa "MERCADO" no alto da frente e a cesta gigante no telhado
+    // placa "MERCADO" (em inglês, "MARKET") no alto da frente e a cesta gigante no telhado
     var pl = P(0.2, 0.7, 38);
-    h += '<text x="0" y="0" transform="matrix(.894 .447 0 1 ' + pl[0] + ' ' + pl[1] + ')" font-family="Fredoka, system-ui, sans-serif" font-weight="700" font-size="9.5" fill="#b8541c">MERCADO</text>';
+    h += '<text x="0" y="0" transform="matrix(.894 .447 0 1 ' + pl[0] + ' ' + pl[1] + ')" font-family="Fredoka, system-ui, sans-serif" font-weight="700" font-size="9.5" fill="#b8541c">' + (raiz.BolinhoIdioma && raiz.BolinhoIdioma.atual() === 'en' ? 'MARKET' : 'MERCADO') + '</text>';
     var pc = P(0.5, 0.44, 40);
     h += '<path d="M' + (pc[0] - 18) + ' ' + (pc[1] - 16) + ' h36 l-5 18 h-26z" fill="#ffc93c" stroke="#d99a1a" stroke-width="1.5"/><path d="M' + (pc[0] - 12) + ' ' + (pc[1] - 13) + ' v12 M' + (pc[0] - 4) + ' ' + (pc[1] - 13) + ' v12 M' + (pc[0] + 4) + ' ' + (pc[1] - 13) + ' v12 M' + (pc[0] + 12) + ' ' + (pc[1] - 13) + ' v12" stroke="#d99a1a" stroke-width="1.5"/>' +
       '<path d="M' + (pc[0] - 13) + ' ' + (pc[1] - 16) + ' q13 -20 26 0" fill="none" stroke="#fff6e0" stroke-width="3.4" stroke-linecap="round"/>' + bola(pc[0] - 7, pc[1] - 18, 4, '#e8432f') + bola(pc[0] + 2, pc[1] - 19, 4, '#7bc950');

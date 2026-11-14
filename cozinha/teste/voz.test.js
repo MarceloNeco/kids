@@ -113,3 +113,72 @@ test('🔁 Trocar a voz da vovó: da gravada para cada voz do aparelho e de volt
   assert.deepEqual(erros, [], 'erros no console');
   await ctx.close();
 });
+
+// ---------- três idiomas (14/Nov/2026): em inglês e em espanhol a vovó fala com a voz de MULHER do aparelho naquela
+// língua (as gravações são em português e não tocam), e o 👵🔁 gira só entre as vozes daquela língua ----------
+const ESPANHOL = [
+  { name: 'Jorge', lang: 'es-ES' },                 // masculina, Espanha
+  { name: 'Paulina', lang: 'es-MX' },               // feminina, México
+  { name: 'Monica', lang: 'es-ES' },                // feminina, Espanha
+  { name: 'pt-br-x-afs-network', lang: 'pt-BR' },   // feminina, mas de outra língua
+  { name: 'Samantha', lang: 'en-US' }
+];
+async function naVizinhaEm(idioma, lista) {
+  const r = await abrir({ width: 412, height: 915 }, { isMobile: true, hasTouch: true }, vozes(lista), idioma);
+  await comecar(r.pg, 'medio', 'brigadeiro');
+  await noLugar(r.pg, 'vizinha');
+  return r;
+}
+
+test('espanhol: a vovó fala em espanhol com a voz de mulher da Espanha (Monica), sem a gravação em português', { timeout: 30000 }, async () => {
+  const { ctx, pg, erros } = await naVizinhaEm('es', ESPANHOL);
+  let f = await falas(pg);
+  assert.equal(f.length, 1); assert.match(f[0].text, /qué alegría verte/);
+  assert.equal(f[0].voz, 'Monica', 'voz feminina da Espanha, nunca a masculina nem a de outra língua');
+  assert.equal(f[0].lang, 'es-ES'); assert.equal(f[0].pitch, 1.2);
+  assert.match(await pg.textContent('#btObrigado'), /Gracias, doña Cida/);
+  await pg.click('.pedido[data-ing="ovo"]'); await pg.waitForTimeout(80);
+  f = await falas(pg);
+  assert.match(f[f.length - 1].text, /Aquí tienes 1 huevo/); assert.equal(f[f.length - 1].voz, 'Monica');
+  assert.deepEqual(await audios(pg), [], 'a gravação em português não toca em espanhol');
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('espanhol: o 👵🔁 gira só entre as vozes em espanhol (Monica, Jorge, Paulina) e guarda a escolha do espanhol', { timeout: 30000 }, async () => {
+  const { ctx, pg, erros } = await naVizinhaEm('es', ESPANHOL);
+  const nomes = [];
+  for (let i = 0; i < 3; i++) {
+    await pg.click('.bt-voz-vovo');
+    const f = await falas(pg), ult = f[f.length - 1];
+    assert.match(ult.text, /mi voz de abuelita/); assert.equal(ult.lang, 'es-ES');
+    nomes.push(ult.voz);
+    assert.match(await pg.textContent('#aviso'), new RegExp('Voz de la abuelita: ' + ult.voz + ' \\(' + ((i + 1) % 3 + 1) + '/3\\)'));
+  }
+  assert.deepEqual(nomes, ['Jorge', 'Paulina', 'Monica']);
+  assert.deepEqual(await pg.evaluate(() => JSON.parse(localStorage.getItem('bolinho:cozinha:voz-vovo'))), { es: 'Monica' });
+  assert.deepEqual(await audios(pg), []);
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('inglês: a vovó fala com a voz de mulher em inglês e o 👵🔁 não mostra vozes de outra língua', { timeout: 30000 }, async () => {
+  const { ctx, pg, erros } = await naVizinhaEm('en', ANDROID.concat([{ name: 'Fred', lang: 'en-US' }]));
+  const f = await falas(pg);
+  assert.equal(f[0].voz, 'Samantha'); assert.equal(f[0].lang, 'en-US');
+  await pg.click('.bt-voz-vovo');
+  assert.match(await pg.textContent('#aviso'), /Grandma's voice: Fred \(2\/2\)/);
+  assert.deepEqual(await audios(pg), []);
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});
+
+test('espanhol num aparelho sem voz em espanhol: fala só com lang es-ES, nunca com uma voz em português', { timeout: 30000 }, async () => {
+  const { ctx, pg, erros } = await naVizinhaEm('es', [{ name: 'pt-br-x-afs-network', lang: 'pt-BR' }, { name: 'Samantha', lang: 'en-US' }]);
+  const f = await falas(pg);
+  assert.equal(f.length, 1); assert.equal(f[0].voz, null); assert.equal(f[0].lang, 'es-ES');
+  await pg.click('.bt-voz-vovo');
+  assert.match(await pg.textContent('#aviso'), /no tiene otra voz en este idioma/);
+  assert.deepEqual(erros, [], 'erros no console');
+  await ctx.close();
+});

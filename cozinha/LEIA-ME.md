@@ -1,4 +1,4 @@
-# Mão na Massa (My Little Big Chef) — juntar os ingredientes e cozinhar uma receita
+# Mão na Massa (My Little Big Chef · Manos a la Masa) — juntar os ingredientes e cozinhar uma receita
 
 Brincadeira da família **Bolinho de Chuva** (SolverONE). **Ideia da filha do dono.** A criança escolhe uma receita,
 sai pela vila para juntar os ingredientes (pescando, colhendo, puxando da horta, pegando ovos, tirando leite, comprando
@@ -7,7 +7,12 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.8.0** (14/Nov/2026) — **família à mesa**: na ficha, "Quem vai comer?" com 8 pessoas (`dados.FAMILIA`:
+Versão atual: **0.8.1** (14/Nov/2026) — **três idiomas**: português, inglês (EUA) e espanhol (da Espanha), escolhidos só
+na estante (`../idioma.js`, `BolinhoIdioma.atual()`); o jogo não tem mais botão de idioma nem guarda o idioma nas
+preferências. Textos com `t(pt, en, es)`, `data-t="pt|en|es"`, `data-rotulo` (aria-label) e listas `[pt, en, es]` em
+`dados.js`; `logica.textoPasso(..., 'pt'|'en'|'es')`. Nome em espanhol: **Manos a la Masa**. A Dona Cida fala com a
+voz gravada só em português; em inglês e espanhol usa a voz de mulher do aparelho daquela língua (en-US, es-ES
+primeiro) e o 👵🔁 gira só entre as vozes dessa língua (sem voz da língua, só `u.lang`). Na 0.8.0 — **família à mesa**: na ficha, "Quem vai comer?" com 8 pessoas (`dados.FAMILIA`:
 eu, mamãe, papai, vovó, vovô, irmão, irmã, bebê; "eu" sempre); a receita serve 2 e cada 2 pessoas a mais multiplicam as
 quantidades e as moedas (`logica.fatorDe`, `ingredientesDoNivel(rec, nível, fator)`); o nível limita (Fácil 2, Médio 4,
 Difícil 6; a pessoa nova entra no lugar da mais antiga); a escolha fica guardada (`pref.familia`); no fim cada pessoa
