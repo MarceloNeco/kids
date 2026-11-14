@@ -138,6 +138,14 @@ TV, dois celulares, loja de iscas, moedas, anúncios, login, banco, missão de m
 - RootifyONE: interruptor novo `glub-glub` (avisar no resumo). ArchONE: jogo novo no mapa. EaglePlanONE: entregas 2 e 3 no roadmap.
 - AssistONE, termos, comunicações e e-mails: não aplicável hoje (o Bolinho não tem AssistONE, conta, termos nem e-mail).
 
+## Dois jogadores: disputa e time ao mesmo tempo (dono aprovou, 14/Nov)
+
+- **Cada jogador escolhe o próprio nível** (a pequena no fácil, a grande no difícil). O nível de cada um vale para o balanço
+  e a velocidade do anzol dele e para o pedido do balde dele. Os peixes do lago são os mesmos para os dois e seguem o
+  nível **mais fácil** dos dois.
+- **Cada um tem o seu balde**; o tempo extra do balde cheio vale para a partida (o relógio é um só).
+- No fim: os pontos de cada um, festa para quem ganhou e o **total do time** ("Juntas vocês pescaram 340!" / "Juntos…").
+
 ## Decisões minhas (o dono pode mudar)
 
 - O lago inteiro cabe numa tela só, sem rolar: a criança vê o caminho todo até o fundo.
