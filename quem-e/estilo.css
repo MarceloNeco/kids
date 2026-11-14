@@ -69,8 +69,8 @@ button:disabled { cursor: default; opacity: .5; }
 .ajuda { max-width: 34rem; background: var(--branco); border: 3px solid var(--tinta); border-radius: 20px; padding: 14px 16px; text-align: left; display: grid; gap: 8px; font-size: 1.05rem; }
 .versao { font-size: .85rem; color: var(--tinta2); }
 
-/* ---------- modos e níveis ---------- */
-#modos, #niveis { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+/* ---------- modos, níveis e rede ---------- */
+#modos, #niveis, #rede { min-height: 100vh; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
   padding: calc(70px + var(--st)) calc(16px + var(--sr)) calc(90px + var(--sb)) calc(16px + var(--sl)); }
 .conversa { display: flex; align-items: center; gap: 8px; }
 .meleca-mini { width: 76px; height: 76px; flex: 0 0 auto; display: block; }
@@ -79,6 +79,12 @@ button:disabled { cursor: default; opacity: .5; }
 .opcoes { display: grid; gap: 14px; width: min(100%, 26rem); }
 .opcao { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--branco); color: var(--tinta); font-size: 1.25rem; }
 .op-ico { font-size: 2rem; }
+.entrar { display: grid; gap: 8px; text-align: center; font-weight: 600; }
+.codigo { width: 7.5ch; min-height: 54px; font: 700 1.8rem var(--fonte); letter-spacing: .15em; text-align: center; text-transform: uppercase; color: var(--tinta);
+  border: 3px solid var(--tinta); border-radius: 16px; background: var(--branco); }
+.codigo:focus-visible { outline: 3px solid var(--mel); outline-offset: 2px; }
+.codigo-grande { font-size: 3.4rem; font-weight: 700; letter-spacing: .2em; text-align: center; color: var(--cor); -webkit-text-stroke: 2px var(--tinta); paint-order: stroke fill; }
+.status { font-weight: 600; text-align: center; min-height: 1.5em; }
 .nivel { display: grid; text-align: left; background: var(--branco); color: var(--tinta); }
 .n-nome { font-size: 1.35rem; } .n-info { font-size: .95rem; font-weight: 400; color: var(--tinta2); }
 .nivel.facil { box-shadow: 0 5px 0 var(--verde); border-color: var(--verde); }

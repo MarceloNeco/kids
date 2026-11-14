@@ -52,7 +52,29 @@
   <div class="opcoes">
     <button id="btMeleca" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🤖</span><span id="txtMeleca"></span></button>
     <button id="btPassar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🔁</span><span data-t="Passando o aparelho|Pass the device"></span></button>
+    <button id="btRede" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📱</span><span data-t="Cada um no seu celular|Each on their own phone"></span></button>
   </div>
+</section>
+
+<section id="rede" class="tela" data-recurso="quem-e">
+  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Cada um no seu celular! Um cria a partida e manda o código para o outro.|Each on their own phone! One creates the game and sends the code to the other."></p></div>
+  <div id="redeInicio" class="opcoes">
+    <button id="btCriarSala" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">➕</span><span data-t="Criar uma partida|Create a game"></span></button>
+    <div class="entrar">
+      <label for="codigo" data-t="Recebeu um código? Digite aqui:|Got a code? Type it here:"></label>
+      <div class="linha">
+        <input id="codigo" class="codigo" type="text" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD">
+        <button id="btEntrarSala" class="grande" type="button" data-t="🔑 Entrar|🔑 Join"></button>
+      </div>
+    </div>
+    <p class="dica" data-t="📡 Os dois celulares precisam de internet (Wi-Fi ou dados).|📡 Both phones need internet (Wi-Fi or data)."></p>
+  </div>
+  <div id="redeSala" class="opcoes" hidden>
+    <p class="dica" data-t="Código da partida|Game code"></p>
+    <p id="codigoSala" class="codigo-grande"></p>
+    <button id="btConvidar" class="grande" type="button" data-t="📤 Mandar convite|📤 Send invite"></button>
+  </div>
+  <p id="redeStatus" class="status" aria-live="polite"></p>
 </section>
 
 <section id="niveis" class="tela" data-recurso="quem-e">
@@ -145,6 +167,7 @@
 <script src="partida.js"></script>
 <script src="caras.js"></script>
 <script src="melecas.js"></script>
+<script src="rede.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>
 <script src="../navegacao.js" data-fora-do-arquivo></script>

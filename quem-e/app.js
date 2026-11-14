@@ -6,7 +6,7 @@
   'use strict';
   var APP_VERSION = '0.1.0';
   var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026';
-  var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas;
+  var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -112,7 +112,7 @@
   }
   function voltarInicio() { if (dentro) { try { history.back(); } catch (e) { aoVoltar(); } } else aoVoltar(); }
   function aoVoltar() {
-    dentro = false; clearTimeout(timerMeleca); calar(); partida = null; fecharSobreposicoes(); mostrar('inicio');
+    dentro = false; clearTimeout(timerMeleca); calar(); sairDaSala(); partida = null; fecharSobreposicoes(); mostrar('inicio');
     setTimeout(function () { $(pref.meleca === 'blue' ? 'btBlue' : 'btPink').focus(); }, 30);
   }
   window.addEventListener('popstate', function () { if (dentro) aoVoltar(); });
@@ -131,8 +131,9 @@
   });
   $('btMeleca').addEventListener('click', function () { modo = 'meleca'; mostrar('niveis'); });
   $('btPassar').addEventListener('click', function () { modo = 'passar'; mostrar('niveis'); });
+  $('btRede').addEventListener('click', function () { modo = 'rede'; telaRede(); });
   Array.prototype.forEach.call(document.querySelectorAll('.nivel'), function (b) {
-    b.addEventListener('click', function () { nivel = b.getAttribute('data-nivel'); novaPartida(); telaCheia(); });
+    b.addEventListener('click', function () { nivel = b.getAttribute('data-nivel'); if (modo === 'rede') criarSala(); else novaPartida(); telaCheia(); });
   });
 
   function telaCheia() {
@@ -218,12 +219,13 @@
     irParaSegredo(0);
   }
   function nomeJogador(j) {
+    if (modo === 'rede') return j === sala.eu ? t('Você', 'You') : t('A outra pessoa', 'The other player');
     if (modo === 'meleca') return j === 0 ? t('Você', 'You') : nomeMeleca();
     return t('Jogador ', 'Player ') + (j + 1);
   }
 
   function irParaSegredo(j) {
-    escolhido = null; quemSegura = j;
+    escolhido = null; quemSegura = j; $('btSortear').disabled = false;
     $('tituloSegredo').textContent = modo === 'passar' ? nomeJogador(j) + t(': escolha o seu personagem secreto 🤫', ': pick your secret character 🤫') : t('Escolha o seu personagem secreto 🤫', 'Pick your secret character 🤫');
     pintarSegredo(); mostrar('segredo');
     if (modo === 'meleca') falar(t('Escolha o seu personagem secreto. Eu não vou olhar!', "Pick your secret character. I won't peek!"));
@@ -237,7 +239,13 @@
   $('btSortear').addEventListener('click', function () { escolhido = Math.floor(Math.random() * partida.tabuleiro.caras.length); Som.virar(); pintarSegredo(); });
   $('btConfirmarSegredo').addEventListener('click', function () {
     if (escolhido === null) return;
-    partida.escolherSegredo(quemSegura, escolhido); Som.gosma();
+    Som.gosma();
+    if (modo === 'rede') {
+      sala.agir('segredo', { c: escolhido });
+      if (partida.estado.fase === 'segredo') { esperarOutroSegredo(); return; }
+      comecarJogo(); return;
+    }
+    partida.escolherSegredo(quemSegura, escolhido);
     if (partida.estado.fase === 'segredo') { cortina(1, function () { irParaSegredo(1); }); return; }
     comecarJogo();
   });
@@ -261,8 +269,8 @@
   }
 
   // quem está olhando a tela agora: contra a meleca é sempre o jogador 0; passando o aparelho, quem segura
-  function quemVe() { return modo === 'meleca' ? 0 : quemSegura; }
-  function humano(a) { return !!a && (modo !== 'meleca' || a.jogador === 0); }
+  function quemVe() { return modo === 'meleca' ? 0 : modo === 'rede' ? sala.eu : quemSegura; }
+  function humano(a) { return !!a && (modo === 'meleca' ? a.jogador === 0 : modo === 'rede' ? a.jogador === sala.eu : true); }
   function palpitando() { return !$('palpitando').hidden; }
 
   function textoPergunta(id) { var p = L.pergunta(id); return t(p.pt, p.en); }
@@ -303,6 +311,13 @@
   function pintarBalao(a) {
     if (!a) return;
     var b = $('balao');
+    if (modo === 'rede') {
+      if (!sala.outroAqui()) { b.textContent = t('📶 Esperando a outra pessoa voltar…', '📶 Waiting for the other player to come back…'); return; }
+      if (a.jogador !== sala.eu) {
+        b.textContent = a.acao === 'responder' ? t('Esperando a resposta…', 'Waiting for the answer…') : a.acao === 'veredito' ? b.textContent : t('Vez da outra pessoa. Espere um pouquinho…', "The other player's turn. Hang on…");
+        humor('pensando'); return;
+      }
+    }
     if (modo === 'meleca' && a.jogador === 1) {
       if (a.acao === 'perguntar') { b.textContent = t('Hmm… deixa eu pensar 🤔', 'Hmm… let me think 🤔'); humor('pensando'); }
       return;
@@ -377,7 +392,8 @@
   }
   function perguntar(id) {
     var eu = quemVe();
-    partida.perguntar(eu, id); autoDescartou = false; fecharPainelPerguntas(); Som.gosma();
+    if (modo === 'rede') sala.agir('pergunta', { p: id }); else partida.perguntar(eu, id);
+    autoDescartou = false; fecharPainelPerguntas(); Som.gosma();
     falar(textoPergunta(id));
     $('balao').textContent = textoPergunta(id);
     pintar(); agendarMeleca();
@@ -386,7 +402,7 @@
   // ---------- responder ----------
   function responder(r) {
     var a = partida.aguardando(); if (!humano(a) || a.acao !== 'responder') return;
-    var res = partida.responder(a.jogador, r);
+    var res = modo === 'rede' ? sala.agir('resposta', { r: r }) : partida.responder(a.jogador, r);
     if (!res.ok) {
       var o = $('olhaDeNovo'); o.hidden = false;
       o.innerHTML = '';
@@ -409,7 +425,8 @@
   $('btDescartar').addEventListener('click', function () { var ids = partida.descartarTodos(quemVe()); if (ids.length) Som.virar(); pintar(); });
   $('btPronto').addEventListener('click', function () {
     var a = partida.aguardando(); if (!humano(a) || a.acao !== 'descartar') return;
-    partida.pronto(a.jogador); pintar(); agendarMeleca();
+    if (modo === 'rede') sala.agir('fimvez'); else partida.pronto(a.jogador);
+    pintar(); agendarMeleca();
   });
 
   // ---------- palpite ----------
@@ -419,8 +436,9 @@
     if (palpiteSel === null) return;
     var eu = quemVe(), id = palpiteSel, nome = partida.tabuleiro.caras[id].nome;
     palpiteSel = null; $('palpitando').hidden = true;
-    var r = partida.palpite(eu, id);
-    if (!r.acertou) {
+    var r = modo === 'rede' ? (sala.agir('palpite', { c: id }), { pendente: true }) : partida.palpite(eu, id);
+    if (r.pendente) { $('balao').textContent = t('Será que é ', 'Could it be ') + nome + t('? Esperando a resposta…', '? Waiting for the answer…'); falar(t('Será que é ', 'Could it be ') + nome + '?'); }
+    else if (!r.acertou) {
       Som.erro(); humor(modo === 'meleca' ? 'feliz' : 'ops');
       $('balao').textContent = t('Não é ', "It's not ") + nome + '! 😅';
       falar(t('Não é ', "It's not ") + nome + '!');
@@ -469,27 +487,35 @@
   $('btCortina').addEventListener('click', function () { $('cortina').hidden = true; var f = depoisCortina; depoisCortina = null; if (f) f(); });
 
   // ---------- fim ----------
+  var fimMostrado = false;
   function mostrarFim() {
-    if (!$('fim').hidden) return;
+    if (!$('fim').hidden && !(modo === 'rede' && sala && sala.revelado() !== null && $('fimCaras').querySelector('.oculta'))) return;
+    var jaAberto = !$('fim').hidden;
     clearTimeout(timerMeleca);
-    var e = partida.estado, v = e.vencedor, ganhouHumano = modo !== 'meleca' || v === 0;
-    var alvo = partida.tabuleiro.caras[e.segredos[1 - v]].nome;
-    $('fimTitulo').textContent = modo === 'meleca'
+    var e = partida.estado, v = e.vencedor, ganhouHumano = modo === 'meleca' ? v === 0 : modo === 'rede' ? v === sala.eu : true;
+    var alvo = partida.tabuleiro.caras[e.ultima.palpite].nome;   // quem ganhou acertou o palpite: era o segredo do outro
+    $('fimTitulo').textContent = modo === 'rede'
+      ? (v === sala.eu ? t('Você acertou! 🎉 Era ', 'You got it! 🎉 It was ') + alvo + '!' : t('A outra pessoa acertou! Era ', 'The other player got it! It was ') + alvo + '.')
+      : modo === 'meleca'
       ? (v === 0 ? t('Você acertou! 🎉 Era ', 'You got it! 🎉 It was ') + alvo + '!' : t('Eu acertei! Era ', 'I got it! It was ') + alvo + t('! Quer a revanche?', '! Want a rematch?'))
       : nomeJogador(v) + t(' ganhou! 🎉 Era ', ' wins! 🎉 It was ') + alvo + '!';
     $('fimMeleca').innerHTML = melecaSvg(pref.meleca, modo === 'meleca' && v === 0 ? 'triste' : 'feliz');
     var caras = $('fimCaras'); caras.innerHTML = '';
     [0, 1].forEach(function (j) {
       var d = document.createElement('div'); d.className = 'fim-cara';
-      d.innerHTML = caraMini(e.segredos[j]) + '<span class="dono"></span>';
+      var seg = e.segredos[j];
+      if (seg === null && modo === 'rede') seg = j === v ? null : e.ultima.palpite;   // o do perdedor é o palpite certo
+      if (seg === null && modo === 'rede') seg = sala.revelado();
+      d.innerHTML = (seg === null ? '<span class="mini-cara oculta">?</span>' : caraMini(seg)) + '<span class="dono"></span>';
       d.querySelector('.dono').textContent = nomeJogador(j);
       caras.appendChild(d);
     });
-    $('fim').hidden = false; $('btDeNovo').focus();
+    $('fim').hidden = false; $('btDeNovo').focus(); fimMostrado = true;
+    if (jaAberto) return;
     if (ganhouHumano) { Som.ganhou(); festa(); } else Som.perdeu();
     falar($('fimTitulo').textContent);
   }
-  $('btDeNovo').addEventListener('click', function () { novaPartida(); });
+  $('btDeNovo').addEventListener('click', function () { if (modo === 'rede') { $('fim').hidden = true; limparFesta(); sairDaSala(); telaRede(); return; } novaPartida(); });
   $('btOutroNivel').addEventListener('click', function () { $('fim').hidden = true; limparFesta(); partida = null; mostrar('niveis'); });
 
   function festa() {
@@ -504,6 +530,100 @@
     setTimeout(limparFesta, 3800);
   }
   function limparFesta() { $('festa').innerHTML = ''; }
+
+  // ---------- cada um no seu celular (rede.js) ----------
+  // a partida em rede fica guardada na ABA (sessionStorage): recarregar volta para ela; duas abas no mesmo aparelho
+  // não se confundem. O endereço ganha ?sala=ABCD para recarregar voltar à mesma sala.
+  var sala = null, canal = null, relogio = null, CH_REDE = 'bolinho:quem-e:rede';
+  function lerSessao() { try { var v = sessionStorage.getItem(CH_REDE); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function gravarSessao(v) { try { if (v) sessionStorage.setItem(CH_REDE, JSON.stringify(v)); else sessionStorage.removeItem(CH_REDE); } catch (e) { /* sem espaço */ } }
+  function enderecoSala(cod) {
+    try { var u = new URL(location.href); if (cod) u.searchParams.set('sala', cod); else u.searchParams.delete('sala'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) { /* ok */ }
+  }
+  function telaRede() {
+    sairDaSala();
+    $('redeInicio').hidden = false; $('redeSala').hidden = true; $('codigo').value = '';
+    $('redeStatus').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Sem internet, jogue "Passando o aparelho" ou contra a meleca.', '📡 No internet right now. Offline, play "Pass the device" or against the slime.') : '';
+    mostrar('rede');
+  }
+  $('btCriarSala').addEventListener('click', function () { mostrar('niveis'); });
+  $('btEntrarSala').addEventListener('click', function () { entrarSala($('codigo').value); });
+  $('codigo').addEventListener('keydown', function (e) { if (e.key === 'Enter') entrarSala(this.value); });
+  $('codigo').addEventListener('input', function () { this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); });
+  $('btConvidar').addEventListener('click', function () {
+    var link = location.origin + location.pathname + '?sala=' + sala.codigo;
+    var txt = t('Vamos jogar Quem é? Entre na partida ', "Let's play Who Is It? Join game ") + sala.codigo + ': ' + link;
+    if (navigator.share) navigator.share({ title: 'Quem é?', text: txt }).catch(function () {});
+    else window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+  });
+
+  function criarSala() {
+    var codigo = REDE.codigoNovo(), semente = Math.floor(Math.random() * 4e9);
+    conectar(codigo, { id: REDE.idNovo(), codigo: codigo, host: true, nivel: nivel, semente: semente });
+    $('redeInicio').hidden = true; $('redeSala').hidden = false; $('codigoSala').textContent = codigo;
+    $('redeStatus').textContent = t('Esperando alguém entrar com o código…', 'Waiting for someone to join with the code…');
+    mostrar('rede');
+  }
+  function entrarSala(cod) {
+    cod = String(cod || '').toUpperCase().replace(/[^A-Z]/g, '');
+    if (cod.length !== 4) { $('redeStatus').textContent = t('O código tem 4 letras. Confira e tente de novo.', 'The code has 4 letters. Check it and try again.'); return; }
+    modo = 'rede';
+    var guardado = lerSessao();
+    conectar(cod, guardado && guardado.codigo === cod ? { dados: guardado.dados } : { id: REDE.idNovo(), codigo: cod, host: false });
+    $('redeStatus').textContent = t('Procurando a partida ', 'Looking for game ') + cod + '…';
+    if (atual !== 'rede') mostrar('rede');
+  }
+  function conectar(codigo, op) {
+    sala = REDE.criar({
+      id: op.id, codigo: codigo, host: op.host, nivel: op.nivel, semente: op.semente, dados: op.dados,
+      mandar: function (m) { if (canal) canal.mandar(m); },
+      salvar: function (d) { gravarSessao({ codigo: codigo, dados: d }); },
+      aoMudar: redeMudou
+    });
+    enderecoSala(codigo);
+    abrirCanal(codigo);
+    clearInterval(relogio); relogio = setInterval(function () { if (sala) sala.tique(); }, 500);
+    if (sala.partida) redeMudou();
+  }
+  function abrirCanal(codigo) {
+    var minha = sala;
+    REDE.abrir(codigo, function (m) { if (sala === minha) minha.receber(m); }, function () { if (sala === minha) setTimeout(function () { if (sala === minha) abrirCanal(codigo); }, 2000); })
+      .then(function (c) { if (sala !== minha) { c.fechar(); return; } canal = c; minha.tique(); })
+      .catch(function () {
+        if (sala !== minha) return;
+        $('redeStatus').textContent = t('📡 Não deu para conectar. Confira a internet: vou tentar de novo.', "📡 Couldn't connect. Check the internet: trying again.");
+        setTimeout(function () { if (sala === minha) abrirCanal(codigo); }, 4000);
+      });
+  }
+  function sairDaSala() {
+    if (!sala) return;
+    try { sala.sair(); } catch (e) { /* ok */ }
+    clearInterval(relogio); relogio = null;
+    if (canal) { var c = canal; setTimeout(function () { c.fechar(); }, 300); }
+    canal = null; sala = null;
+    gravarSessao(null); enderecoSala(null);
+  }
+  function redeMudou() {
+    if (!sala) return;
+    if (sala.cheia()) { $('redeStatus').textContent = t('Essa partida já tem dois jogadores. Peça um código novo.', 'That game already has two players. Ask for a new code.'); return; }
+    if (sala.partida && partida !== sala.partida && sala.temOutro()) {
+      partida = sala.partida; nivel = partida.nivel;
+      montarGrade($('gradeSegredo')); montarGrade($('tabuleiro'));
+      humorAtual = ''; humor('parada'); $('meuSegredo').removeAttribute('data-chave'); fimMostrado = false;
+      var e = partida.estado;
+      if (e.segredos[sala.eu] === null) { irParaSegredo(sala.eu); return; }
+      if (e.fase === 'segredo') { irParaSegredo(sala.eu); esperarOutroSegredo(); return; }
+      comecarJogo(); return;
+    }
+    if (!partida) return;
+    if (atual === 'segredo' && partida.estado.fase !== 'segredo') { comecarJogo(); return; }
+    if (atual === 'jogo') pintar();
+    if (partida.estado.fase === 'fim') mostrarFim();
+  }
+  function esperarOutroSegredo() {
+    $('tituloSegredo').textContent = t('Pronto! Esperando a outra pessoa escolher… 🤫', 'Done! Waiting for the other player to pick… 🤫');
+    $('btConfirmarSegredo').disabled = true; $('btSortear').disabled = true;
+  }
 
   // ---------- música (trilha comum dos jogos): instrumentos de verdade, nada de videogame ----------
   var MUSICAS = [
@@ -529,6 +649,8 @@
   if ('serviceWorker' in navigator && location.protocol !== 'file:' && !TESTE) navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
 
   pintarMelecas(); pintarBotoes(); traduzir();
+  // convite: ?sala=ABCD entra direto na partida
+  (function () { var m = /[?&]sala=([A-Za-z]{4})\b/.exec(location.search); if (m) entrarSala(m[1]); })();
 
   // usado pelos testes
   window.QEDebug = {

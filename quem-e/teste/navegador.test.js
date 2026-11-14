@@ -140,3 +140,37 @@ test('lupa abre a cara grande e fecha com Esc; 🏠 volta ao começo', async () 
   assert.deepEqual(pg.erros(), []);
   await pg.ctx.close();
 });
+
+test('cada um no seu celular: duas abas jogam pelo código', async () => {
+  const a = await abrir();
+  await a.click('#btBlue'); await a.click('#btRede'); await a.waitForSelector('#rede.ativa');
+  await a.click('#btCriarSala'); await a.click('#btFacil');
+  await a.waitForSelector('#redeSala:not([hidden])');
+  const codigo = (await a.textContent('#codigoSala')).trim();
+  assert.match(codigo, /^[A-Z]{4}$/);
+  const b = await a.ctx.newPage(); const errosB = [];
+  b.on('pageerror', e => errosB.push(e.message));
+  await b.goto(base + '?teste&sala=' + codigo);
+  await b.waitForSelector('#segredo.ativa', { timeout: 10000 });
+  await a.waitForSelector('#segredo.ativa', { timeout: 10000 });
+  await a.click('#segredo .carta[data-id="2"]'); await a.click('#btConfirmarSegredo');
+  await b.click('#segredo .carta[data-id="5"]'); await b.click('#btConfirmarSegredo');
+  await a.waitForSelector('#jogo.ativa'); await b.waitForSelector('#jogo.ativa');
+  // A pergunta, B responde (a errada é recusada), A passa a vez
+  await a.click('#btPerguntar'); await a.click('#perguntas button[data-p]:not(.inutil)');
+  await b.waitForSelector('#responder:not([hidden])', { timeout: 10000 });
+  const certa = await b.evaluate(() => QEDebug.respostaCerta());
+  await b.click(certa ? '#btNao' : '#btSim');
+  await b.waitForSelector('#olhaDeNovo:not([hidden])');
+  await b.click(certa ? '#btSim' : '#btNao');
+  await a.waitForSelector('#descartar:not([hidden])', { timeout: 10000 });
+  await a.click('#btPronto');
+  await b.waitForSelector('#acoes:not([hidden])', { timeout: 10000 });
+  // B chuta certo (o segredo de A é a carta 2)
+  await b.click('#btPalpite'); await b.click('#tabuleiro .carta[data-id="2"]'); await b.click('#btConfirmarPalpite');
+  await b.waitForSelector('#fim:not([hidden])', { timeout: 10000 });
+  await a.waitForSelector('#fim:not([hidden])', { timeout: 10000 });
+  await b.waitForFunction(() => !document.querySelector('#fimCaras .oculta'), null, { timeout: 10000 });
+  assert.deepEqual(a.erros(), []); assert.deepEqual(errosB, []);
+  await a.ctx.close();
+});
