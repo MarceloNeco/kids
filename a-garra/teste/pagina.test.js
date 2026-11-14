@@ -193,3 +193,32 @@ test('três idiomas, escolhidos na estante: nome, botões e prêmios no idioma c
     } finally { await ctx.close(); }
   }
 });
+
+test('tela estreita (320 px, celular com zoom de tela): PEGAR, setas e câmera inteiros; tocador aberto longe do 🏠; 🔊 cala a música; botão de tela cheia', async () => {
+  const pg = await abrir({ viewport: { width: 320, height: 700 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 }, '&semente=3');
+  try {
+    // 🔊 no menu: desliga efeitos E música; de novo, liga tudo
+    assert.equal(await pg.isVisible('.bt-tela'), true, 'botão de tela cheia no menu');
+    await pg.click('#btEfeitos');
+    await pg.waitForTimeout(400);
+    assert.equal(await pg.textContent('#btEfeitos'), '🔇');
+    assert.equal(await pg.evaluate(() => localStorage.getItem('bolinho:a-garra:trilha-mudo')), '1', 'a música fica desligada');
+    assert.equal(await pg.evaluate(() => Trilha.tocando()), false);
+    await pg.click('#btEfeitos');
+    await pg.waitForTimeout(400);
+    assert.equal(await pg.textContent('#btEfeitos'), '🔊');
+    assert.equal(await pg.evaluate(() => localStorage.getItem('bolinho:a-garra:trilha-mudo')), null, 'a música volta');
+    // no jogo, nada sai da tela
+    await jogar(pg, 'estrelas', 'medio');
+    const caixas = await pg.evaluate(() => ['#btPegar', '#btEsq', '#btDir', '#btCima', '#btBaixo', '#btCamera', '#btMais', '#btMenos', '#jogo .bt-tela'].map((s) => { const r = document.querySelector(s).getBoundingClientRect(); return [s, r.left, r.right, r.top, r.bottom]; }));
+    for (const [s, l, r, t, b] of caixas) assert.ok(l >= 0 && r <= 320.5 && t >= 0 && b <= 700.5, s + ' fora da tela: ' + [l, r, t, b].map(Math.round));
+    assert.ok(await pg.evaluate(() => document.documentElement.scrollWidth <= 320), 'a página não fica mais larga que a tela');
+    // o tocador aberto não fica embaixo do 🏠 Saída
+    await pg.evaluate(() => { const b = document.querySelector('.trilha'); b.hidden = false; b.classList.remove('mini'); });
+    await pg.waitForTimeout(200);
+    const [som, nav] = await pg.evaluate(() => [document.querySelector('.trilha .tr-som'), document.querySelector('.bolinho-nav')].map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.right, r.top, r.bottom]; }));
+    const cruza = som[0] < nav[1] && som[1] > nav[0] && som[2] < nav[3] && som[3] > nav[2];
+    assert.ok(!cruza, 'o botão de parar a música não pode ficar embaixo do 🏠 Saída: ' + JSON.stringify({ som, nav }));
+    assert.deepEqual(pg.erros, []);
+  } finally { await pg.ctx.close(); }
+});

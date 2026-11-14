@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.4.2', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
+const APP_VERSION = '0.4.3', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -83,8 +83,33 @@ function pintarMenu() {
 document.querySelectorAll('#maquinas [data-maquina]').forEach((b) => b.addEventListener('click', () => { pref.maquina = b.getAttribute('data-maquina'); salvarPref(); pintarMenu(); Som.toque(); }));
 document.querySelectorAll('#niveis [data-nivel]').forEach((b) => b.addEventListener('click', () => { pref.nivel = b.getAttribute('data-nivel'); salvarPref(); pintarMenu(); Som.toque(); }));
 if (window.BolinhoIdioma) window.BolinhoIdioma.aoMudar(() => traduzir());   // trocaram o idioma na estante (outra aba)
-function pintarEfeitos() { $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔈'; $('btEfeitos').setAttribute('aria-pressed', String(!!pref.efeitos)); Som.ligar(pref.efeitos); }
-$('btEfeitos').addEventListener('click', () => { pref.efeitos = !pref.efeitos; salvarPref(); pintarEfeitos(); Som.toque(); });
+// 🔊 liga e desliga TUDO: os efeitos e a música (dono, 14/Nov/2026: antes só os efeitos, e a música continuava).
+// A música usa o próprio botão do tocador comum (../trilha.js), que guarda a escolha no aparelho.
+const musicaTocando = () => !!(window.Trilha && window.Trilha.tocando());
+function pintarEfeitos() { $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔇'; $('btEfeitos').setAttribute('aria-pressed', String(!!pref.efeitos)); Som.ligar(pref.efeitos); }
+$('btEfeitos').addEventListener('click', () => {
+  pref.efeitos = !pref.efeitos; salvarPref(); pintarEfeitos(); Som.toque();
+  const bt = document.querySelector('.trilha .tr-som');
+  if (bt && musicaTocando() !== pref.efeitos) bt.click();
+});
+// tela cheia num botão de verdade (no menu e ao lado da câmera): a abinha da borda não respondia no celular do dono
+const temTelaCheia = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+const cheia = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function pintarTela() {
+  document.querySelectorAll('.bt-tela').forEach((b) => {
+    b.hidden = !temTelaCheia;
+    b.setAttribute('aria-pressed', String(cheia()));
+    b.querySelector('path').setAttribute('d', cheia() ? 'M9 3v6H3M15 3v6h6M21 15h-6v6M3 15h6v6' : 'M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6');
+  });
+}
+document.querySelectorAll('.bt-tela').forEach((b) => b.addEventListener('click', () => {
+  Som.toque();
+  try {
+    if (cheia()) { const s = document.exitFullscreen || document.webkitExitFullscreen; const p = s && s.call(document); if (p && p.catch) p.catch(() => {}); }
+    else { const el = document.documentElement, pedir = el.requestFullscreen || el.webkitRequestFullscreen; const p = pedir.call(el); if (p && p.catch) p.catch(() => {}); }
+  } catch (e) { /* o navegador recusou */ }
+}));
+['fullscreenchange', 'webkitfullscreenchange'].forEach((ev) => document.addEventListener(ev, pintarTela));
 $('btAjuda').addEventListener('click', () => { const a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
 function telaCheia() {   // tela cheia no celular e no tablet (no botão de começar, como os outros jogos)
   try {
@@ -402,8 +427,11 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) parar
 
 function comecar() {
   if (window.SolverRecursos && !window.SolverRecursos.ligado('a-garra', true)) { mostrar('desligado'); $('desligado').hidden = false; traduzir(); return; }
-  pintarEfeitos(); traduzir();
+  pintarEfeitos(); pintarTela(); traduzir();
+  if (!pref.efeitos) { try { localStorage.setItem('bolinho:a-garra:trilha-mudo', '1'); } catch (e) { /* sem espaço */ } }   // som desligado: a música também
   if (window.Trilha) window.Trilha.iniciar({ jogo: 'a-garra', creditos: 'CREDITOS.md', volume: 0.45, musicas: MUSICAS });
+  // ligaram a música pelo tocador com o 🔇 marcado: o 🔊 volta a ficar ligado
+  if (window.Trilha && window.Trilha._audio) window.Trilha._audio.addEventListener('play', () => { if (!pref.efeitos && musicaTocando()) { pref.efeitos = true; salvarPref(); pintarEfeitos(); } });
   requestAnimationFrame(quadro);
 }
 comecar();

@@ -29,6 +29,9 @@ o botão PEGAR vira GRAB · COGER.
   prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
 - **Sortido**: cada partida tem outra mistura (cada tipo pelo menos uma vez, o resto sorteado), outro total, outro formato de
   monte (um "pico" sorteado) e prêmios caídos de jeitos variados (de costas, de lado, de cabeça para baixo).
+- **Som e tela** (0.4.3): o 🔊 do menu desliga tudo, música e efeitos (usa o botão do tocador comum, que guarda a
+  escolha). Botão de tela cheia no menu e ao lado da câmera (a abinha da borda, peça comum, não respondia no celular do
+  dono). Setas e PEGAR encolhem em tela estreita (até ~320 px); no jogo, o tocador aberto fica à direita do 🏠 Saída.
 - **Câmera**: 🎥 troca entre de frente, de cima e bem de lado (as laterais são de vidro, para ver a profundidade da garra); 🔍 aproxima (perto, a câmera acompanha a garra); arrastar o dedo
   na máquina gira; dois dedos aproximam.
 - **Regra da garra** (igual às máquinas de verdade): quase sempre ela fecha **fraca** e solta — logo ao subir, no tranco lá
