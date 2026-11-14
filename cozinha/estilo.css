@@ -612,13 +612,14 @@ a { color: #1d6fb8; }
 .rec-foto { width: 6.4rem; height: 6.4rem; border-radius: 50%; overflow: hidden; border: 4px solid #fff; box-shadow: 0 0 0 3px var(--c), 0 6px 12px rgba(0, 0, 0, .16); filter: none; }
 .rec-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
 .rec:hover .rec-foto img, .rec:focus-visible .rec-foto img { transform: scale(1.15) rotate(-4deg); }
-.prato-grande { overflow: hidden; width: 9rem; height: 9rem; border-width: 5px; background: #fff; }
+.prato-grande { overflow: hidden; background: #fff; }
+@media not all and (orientation: landscape) and (max-height: 32rem) { .prato-grande { width: 9rem; height: 9rem; border-width: 5px; } .lista-ing .ic-foto { font-size: 2rem; } }
 .prato-grande img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .bt-servir .comida .ic-foto { font-size: 1.6em; }
 .dentro-gel .ic-foto { font-size: 1.3rem; }
 .festa .ic-foto { font-size: 2.2rem; }
-.enfeite { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; letter-spacing: 0; animation: none; }
-.enfeite .onda { font-size: 2.2rem; animation: onda 2.2s ease-in-out infinite; animation-delay: calc(var(--i) * .14s); }
+.enfeite { display: flex; justify-content: center; flex-wrap: nowrap; gap: 6px; letter-spacing: 0; animation: none; }
+.enfeite .onda { font-size: min(1.9rem, 8.4vw); animation: onda 2.2s ease-in-out infinite; animation-delay: calc(var(--i) * .14s); }
 @keyframes onda { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-12px) rotate(-8deg); } 50% { transform: translateY(0) rotate(0); } 75% { transform: translateY(3px) rotate(6deg); } }
 
 /* telas entram deslizando; cartões, ingredientes e produtos aparecem um depois do outro, com pulinho */
@@ -630,8 +631,8 @@ a { color: #1d6fb8; }
 @keyframes respira { 0%, 100% { transform: rotate(-3deg) scale(1); } 50% { transform: rotate(3deg) scale(1.05); } }
 .tela.ativa .prato-grande { animation: pratoGira .8s cubic-bezier(.3, 1.4, .5, 1) both; }
 @keyframes pratoGira { from { transform: rotate(-200deg) scale(.3); opacity: 0; } to { transform: none; opacity: 1; } }
-#btBuscar, .lugar.pronta, #btEntrar { animation: chamaToque 1.6s ease-in-out 1s infinite; }
-@keyframes chamaToque { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-.lista-ing .ic-foto { font-size: 2rem; }
+/* botão que chama para ser tocado: um anel de luz pulsando em volta (sem mexer no tamanho do botão) */
+#btBuscar, .lugar.pronta, #btEntrar { animation: chamaToque 1.6s ease-out 1s infinite; }
+@keyframes chamaToque { 0% { box-shadow: 0 6px 0 #c9601d, 0 0 0 0 rgba(255, 138, 61, .55); } 100% { box-shadow: 0 6px 0 #c9601d, 0 0 0 18px rgba(255, 138, 61, 0); } }
 .vila .lugar .cena span { display: inline-block; animation: pula 2s ease-in-out infinite; }
 .vila .lugar .cena .c2 { animation-delay: -.7s; } .vila .lugar .cena .c3 { animation-delay: -1.3s; }

@@ -100,6 +100,7 @@ test('fotos de verdade (v0.6.0): toda receita e todo ingrediente tem a sua foto 
   const sw = ler('sw.js'), cred = ler('CREDITOS.md');
   const lista = JSON.parse(sw.match(/var ARQUIVOS = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
   const ids = D.RECEITAS.map(r => r.id).concat(D.INGREDIENTES.map(i => i.id));
+  assert.equal(new Set(ids).size, ids.length, 'receita e ingrediente com o mesmo id dividiriam a mesma foto');
   for (const id of ids) {
     const f = 'fotos/' + id + '.jpg', b = fs.readFileSync(path.join(pasta, f));
     assert.equal(b[0] === 0xff && b[1] === 0xd8, true, f + ' não é JPG');
