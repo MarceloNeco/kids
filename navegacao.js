@@ -7,7 +7,8 @@
       estante do Bolinho de Chuva (/kids/).
     - Voltar do celular: numa tela de dentro faz o mesmo que o 🏠; na tela de começo NÃO sai direto (diretriz): avisa
       "Toque em Voltar de novo para sair" e só o segundo Voltar sai (volta para a página de antes, normalmente a estante;
-      no app instalado, fecha). A maioria dos jogos já cuida do Voltar (pushState/popstate); quem não cuida passa
+      no app instalado, fecha). Se o jogo NÃO foi aberto pela estante (link de fora, hub de projetos, ícone do jogo), o
+      Voltar na tela de começo leva para a estante do Bolinho (a estante marca a aba em sessionStorage "bolinho:estante"). A maioria dos jogos já cuida do Voltar (pushState/popstate); quem não cuida passa
       cuidarDoVoltar: true e este arquivo põe uma entrada no histórico ao sair da tela de começo.
     - Guarda (dono, 14/Nov/2026: "o Voltar às vezes acaba com o progresso e cai na home do celular"): no primeiro toque
       na tela de começo, este arquivo põe uma entrada de guarda no histórico (com toque, porque o Chrome do celular pula
@@ -45,6 +46,12 @@
   var empurrado = false, ignorar = 0, ultimoInicio = null;
   var guarda = false, naGuarda = false, avisoVoltar = null, avisoTimer = 0;
   var hPush = history.pushState, hReplace = history.replaceState;
+  // aberto pela estante nesta aba? (a estante marca a aba; dono, 14/Nov/2026: aberto direto de outro lugar — o hub de
+  // projetos, um link —, o Voltar na tela de começo saía para lá em vez de voltar para o Bolinho de Chuva)
+  var veioDaEstante = (function () {
+    try { if (sessionStorage.getItem('bolinho:estante') === '1') return true; } catch (e) { return true; }
+    return !!(d.referrer && d.referrer.indexOf(ESTANTE) === 0);
+  })();
 
   function chamar(fn, padrao) { try { return typeof fn === 'function' ? fn() : padrao; } catch (e) { return padrao; } }
   function noInicio() { return !!chamar(cfg.noInicio, true); }
@@ -195,7 +202,10 @@
         setTimeout(function () { if (naGuarda && !noInicio()) { chamar(cfg.irParaInicio); atualizar(); } }, 0);
       } else if (naGuarda) {
         naGuarda = false; guarda = false;
-        if (!ignorar && noInicio()) avisarVoltar();   // saiu da guarda na tela de começo: o próximo Voltar sai
+        if (!ignorar && noInicio()) {   // saiu da guarda na tela de começo
+          if (veioDaEstante || instalado()) avisarVoltar();   // o próximo Voltar sai (para a estante, a página de antes; no app instalado, fecha)
+          else location.replace(ESTANTE);   // aba sem a estante antes: vai para ela (e o Voltar de lá sai do Bolinho)
+        }
       }
     }
     if (aviso && !aviso.hidden) fecharAviso();

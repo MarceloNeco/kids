@@ -131,7 +131,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   vai para a estante `/kids/`). O Voltar do celular numa tela de dentro volta (o jogo que não cuida do histórico passa
   `cuidarDoVoltar: true`); na tela de começo o 1º Voltar avisa "toque de novo para sair" e só o 2º sai, e a guarda do
   histórico (posta no primeiro toque) faz o jogo voltar ao começo em vez de fechar quando o Chrome pula uma entrada (dono,
-  14/Nov/2026). Jogo com aviso próprio passa `guarda: false`. Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
+  14/Nov/2026). Aberto sem a estante antes na aba (link de fora, hub de projetos; a estante marca a aba em `sessionStorage` "bolinho:estante", no `jogos.js`), o Voltar na tela de começo leva para a estante em vez de sair (dono, 14/Nov/2026). Jogo com aviso próprio passa `guarda: false`. Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
   `bn-nav`/`bn-dentro` e as medidas `--nav-alto`/`--nav-largo` no `<html>`. Na TV (`?tv=`) a barra some. Vigia:
   `teste/navegacao.test.js`.
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
