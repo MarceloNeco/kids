@@ -13,6 +13,8 @@
     texto    descrição em português   en    em inglês   es    em espanhol
     tag      texto do botão do cartão, "PT / EN / ES" (ex.: '▶ Brincar / Play / Jugar')
              Só aparece o idioma escolhido na estante (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES, idioma.js).
+    novo     data em que o jogo entrou na estante ('AAAA-MM-DD'). Por 7 dias o cartão ganha o selo "✨ Novo" e o jogo
+             aparece na janela "✨ Novidades da semana" (novidades.js). Jogo novo = pôr a data do dia.
     instalar true = pode ser instalado e funciona sem internet (o service worker fica em url + 'sw.js')
     soOnline true = precisa de internet (ex.: YouTube e TV); o cartão mostra "🌐 Só com internet"
     tv       { texto, tag, param } = abre na TV com este parâmetro; param vai no fim do endereço
@@ -58,47 +60,47 @@
       es: "Dibujar, un libro para colorear y pintar por números, con pinceles que se mueven, pegatinas animadas, paisajes y música. Dibuja con la mano frente a la cámara o en la tele con el móvil como mando.",
       tag: '▶ Desenhar / Draw / Dibujar', instalar: true,
       tv: { texto: 'Desenhar e colorir na TV. A TV mostra um código: no celular, toque em 📺 Na TV → 🎮 Controlar e desenhe com o dedo, mexendo o celular ou com a mão na câmera.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'campo-minado', nomes: { en: "Garden Sweeper", es: "Buscaminas del Jardín" }, nome: 'Campo Minado', ico: '🦔', img: '/kids/campo-minado/icone.svg', cor: '#7ee081', url: '/kids/campo-minado/',
+    { id: 'campo-minado', novo: '2026-11-06', nomes: { en: "Garden Sweeper", es: "Buscaminas del Jardín" }, nome: 'Campo Minado', ico: '🦔', img: '/kids/campo-minado/icone.svg', cor: '#7ee081', url: '/kids/campo-minado/',
       texto: 'Abra o jardim inteiro sem acordar os ouriços que dormem embaixo da grama. Os números contam quantos estão em volta; marque com 🚩. Fácil, médio e difícil.',
       en: "Open up the whole garden without waking the hedgehogs sleeping under the grass. The numbers tell you how many are nearby; mark them with 🚩. Easy, medium and hard.",
       es: "Abre todo el jardín sin despertar a los erizos que duermen bajo el césped. Los números te dicen cuántos hay alrededor; márcalos con 🚩. Fácil, medio y difícil.",
       tag: '▶ Jogar / Play / Jugar', instalar: true },
-    { id: 'enigmas', nome: 'Enigmatic', ico: '🧩', img: '/kids/enigmas/icone.svg', cor: '#9ee37d', url: '/kids/enigmas/',
+    { id: 'enigmas', novo: '2026-11-06', nome: 'Enigmatic', ico: '🧩', img: '/kids/enigmas/icone.svg', cor: '#9ee37d', url: '/kids/enigmas/',
       texto: 'Enigmas na lousa: ligue com giz o que combina, o cachorro com o osso, a bola com o gol. Do fácil (3 anos) ao difícil, com charadas, sequências e rimas.',
       en: "Riddles on the chalkboard: draw a chalk line between the things that go together, the dog and the bone, the ball and the goal. From easy (age 3) to really tricky, with riddles, patterns and rhymes.",
       es: "Acertijos en la pizarra: une con tiza lo que va junto, el perro con el hueso, la pelota con la portería. De fácil (3 años) a difícil, con adivinanzas, secuencias y rimas.",
       tag: '▶ Ligar / Match / Unir', instalar: true },
-    { id: 'labirinto', nomes: { en: "Maze", es: "Laberinto" }, nome: 'Labirinto', ico: '🐶', img: '/kids/labirinto/icone.svg', cor: '#ffd166', url: '/kids/labirinto/',
+    { id: 'labirinto', novo: '2026-11-06', nomes: { en: "Maze", es: "Laberinto" }, nome: 'Labirinto', ico: '🐶', img: '/kids/labirinto/icone.svg', cor: '#ffd166', url: '/kids/labirinto/',
       texto: 'Um labirinto novo a cada vez, quadrado, redondo ou de colmeia, que nasce em 3D. Leve o cachorrinho ou risque o caminho com o dedo, pegue o osso do meio e ache a saída.',
       en: "A brand-new maze every time, square, round or honeycomb-shaped, that pops up in 3D. Walk the puppy or draw the path with your finger, grab the bone in the middle and find the way out.",
       es: "Un laberinto nuevo cada vez, cuadrado, redondo o de panal, que aparece en 3D. Lleva al perrito o traza el camino con el dedo, coge el hueso del centro y encuentra la salida.",
       tag: '▶ Explorar / Explore / Explorar', instalar: true },
-    { id: 'cozinha', nomes: { en: "My Little Big Chef", es: "Manos a la Masa" }, nome: 'Mão na Massa', ico: '🍳', img: '/kids/cozinha/icone.svg', cor: '#ff9f6e', url: '/kids/cozinha/',
+    { id: 'cozinha', novo: '2026-11-06', nomes: { en: "My Little Big Chef", es: "Manos a la Masa" }, nome: 'Mão na Massa', ico: '🍳', img: '/kids/cozinha/icone.svg', cor: '#ff9f6e', url: '/kids/cozinha/',
       texto: 'Escolha uma receita, saia pela vila para pescar, colher, comprar no mercado ou pedir emprestado à vizinha, e volte para cozinhar: misturar, bater, ligar o fogão e servir. 12 receitas.',
       en: "Pick a recipe, head out around the village to fish, pick fruit, shop at the market or borrow from the neighbour, then come back to cook: mix, whisk, turn on the stove and serve. 12 recipes.",
       es: "Elige una receta, sal por el pueblo a pescar, cosechar, comprar en el mercado o pedirle algo prestado a la vecina, y vuelve a cocinar: mezclar, batir, encender el fuego y servir. 12 recetas.",
       tag: '▶ Cozinhar / Cook / Cocinar', instalar: true },
-    { id: 'aqua', nome: 'AQUA', ico: '💧', img: '/kids/aqua/icone.svg', cor: '#17c3c9', url: '/kids/aqua/',
+    { id: 'aqua', novo: '2026-11-14', nome: 'AQUA', ico: '💧', img: '/kids/aqua/icone.svg', cor: '#17c3c9', url: '/kids/aqua/',
       texto: 'Despeje os líquidos coloridos de um frasco no outro até cada frasco ficar de uma cor só. Fases sem fim, sempre com solução, frascos embaçados e uma lojinha de brincadeira. Fácil, médio e difícil.',
       en: "Pour the colourful liquids from one bottle into another until each bottle holds just one colour. Endless levels that can always be solved, foggy bottles and a pretend little shop. Easy, medium and hard.",
       es: "Vierte los líquidos de colores de un frasco a otro hasta que cada frasco tenga un solo color. Niveles sin fin, siempre con solución, frascos empañados y una tiendecita de juguete. Fácil, medio y difícil.",
       tag: '▶ Despejar / Pour / Verter', instalar: true },
-    { id: 'glub-glub', nome: 'GLUB GLUB', ico: '🎣', img: '/kids/glub-glub/icone-192.png', cor: '#4fc3f7', url: '/kids/glub-glub/',
+    { id: 'glub-glub', novo: '2026-11-14', nome: 'GLUB GLUB', ico: '🎣', img: '/kids/glub-glub/icone-192.png', cor: '#4fc3f7', url: '/kids/glub-glub/',
       texto: 'Pescaria com o Juca e a Lili no lago encantado: o anzol balança, você solta na hora certa e pesca peixes, tartaruga, polvo, tubarões, baleia e a sereia. Quanto mais fundo, mais pontos! Sozinho ou em dois.',
       en: "Go fishing with Juca and Lili in the enchanted lake: the hook swings, you drop it at just the right moment and catch fish, a turtle, an octopus, sharks, a whale and the mermaid. The deeper you go, the more points! Play alone or with a friend.",
       es: "Ve de pesca con Juca y Lili al lago encantado: el anzuelo se balancea, lo sueltas justo a tiempo y pescas peces, una tortuga, un pulpo, tiburones, una ballena y la sirena. ¡Cuanto más hondo, más puntos! Solo o con otra persona.",
       tag: '▶ Pescar / Fish / Pescar', instalar: true },
-    { id: 'batalha-naval', nomes: { en: "Sea Battle", es: "Batalla Naval" }, nome: 'Batalha Naval', ico: '⚓', img: '/kids/batalha-naval/icone.svg', cor: '#4fc3ff', url: '/kids/batalha-naval/',
+    { id: 'batalha-naval', novo: '2026-11-06', nomes: { en: "Sea Battle", es: "Batalla Naval" }, nome: 'Batalha Naval', ico: '⚓', img: '/kids/batalha-naval/icone.svg', cor: '#4fc3ff', url: '/kids/batalha-naval/',
       texto: 'Esconda seus navios e afunde os dos outros: E4, F2... Jogue em família, de 2 a 4 pessoas, cada uma no seu celular, com um código de 4 letras. Também contra o computador ou passando o aparelho.',
       en: "Hide your ships and sink everyone else's: E4, F2... Play as a family, 2 to 4 players, each on their own phone, with a 4-letter code. You can also play against the computer or pass the phone around.",
       es: "Esconde tus barcos y hunde los de los demás: E4, F2... Juega en familia, de 2 a 4 personas, cada una en su móvil, con un código de 4 letras. También contra el ordenador o pasando el móvil.",
       tag: '▶ Navegar / Sail / Navegar', instalar: true },
-    { id: 'a-garra', nomes: { en: "THE CLAW", es: "LA GARRA" }, nome: 'A-GARRA', ico: '🧸', img: '/kids/a-garra/icone.svg', cor: '#39ff6a', url: '/kids/a-garra/',
+    { id: 'a-garra', novo: '2026-11-14', nomes: { en: "THE CLAW", es: "LA GARRA" }, nome: 'A-GARRA', ico: '🧸', img: '/kids/a-garra/icone.svg', cor: '#39ff6a', url: '/kids/a-garra/',
       texto: 'A máquina de pegar bichinho em 3D, igual à do fliperama: leve a garra com as setas, aperte PEGAR e torça para ela não soltar! Pelúcias, bichinhos que mexem, insetos, hambúrgueres e filhotes de verdade que andam.',
       en: "The 3D claw machine, just like at the arcade: move the claw with the arrows, press GRAB and hope it doesn't let go! Plushies, wiggly critters, bugs, burgers and real-looking puppies that walk around.",
       es: "La máquina de garra en 3D, igual que la de la feria: mueve la garra con las flechas, pulsa COGER ¡y cruza los dedos para que no lo suelte! Peluches, bichitos que se mueven, insectos, hamburguesas y cachorritos que caminan.",
       tag: '▶ Pegar / Grab / Coger', instalar: true },
-    { id: 'quem-e', nomes: { en: "Who Is It?", es: "¿Quién es?" }, nome: 'Quem é?', ico: '🫧', img: '/kids/quem-e/icone.svg', cor: '#ff5fa8', url: '/kids/quem-e/',
+    { id: 'quem-e', novo: '2026-11-14', nomes: { en: "Who Is It?", es: "¿Quién es?" }, nome: 'Quem é?', ico: '🫧', img: '/kids/quem-e/icone.svg', cor: '#ff5fa8', url: '/kids/quem-e/',
       texto: 'Pense em alguém e a meleca adivinha! Mais de 790 personagens, e ela aprende quem não conhece. E o Duelo de Caras: cada um escolhe uma cara em segredo e pergunta "usa óculos?", "tem coroa?" até descobrir a do outro. Com o Melekento Blue e a Pink Honey.',
       en: "Think of someone and the slime guesses who it is! More than 790 characters, and it learns the ones it doesn't know. Plus Face Duel: each player picks a secret face and asks \"glasses?\", \"a crown?\" until they find the other one's. With Melekento Blue and Pink Honey.",
       es: "¡Piensa en alguien y el slime adivina quién es! Más de 790 personajes, y aprende los que no conoce. Y el Duelo de Caras: cada uno elige una cara en secreto y pregunta \"¿lleva gafas?\", \"¿tiene corona?\" hasta descubrir la del otro. Con Melekento Blue y Pink Honey.",
@@ -116,7 +118,14 @@
   window.BolinhoCatalogo = {
     jogos: JOGOS,
     instalaveis: function () { return JOGOS.filter(function (j) { return j.instalar; }); },
-    sw: function (j) { return j.url.replace(/[^\/]*$/, '') + 'sw.js'; }
+    sw: function (j) { return j.url.replace(/[^\/]*$/, '') + 'sw.js'; },
+    // entrou na estante há 7 dias ou menos (campo "novo")
+    ehNovo: function (j, hoje) {
+      if (!j.novo) return false;
+      var dias = ((hoje || Date.now()) - Date.parse(j.novo + 'T00:00:00')) / 864e5;
+      return dias >= 0 && dias < 7;
+    },
+    novos: function (hoje) { return JOGOS.filter(function (j) { return window.BolinhoCatalogo.ehNovo(j, hoje); }); }
   };
 
   function el(tag, classe, texto) {
@@ -149,6 +158,10 @@
     h2.appendChild(el('span', 'pt', j.nome));
     h2.appendChild(el('span', 'en', nomes.en || j.nome));
     h2.appendChild(el('span', 'es', nomes.es || j.nome));
+    if (j.novo && window.BolinhoCatalogo.ehNovo(j)) {
+      var selo = h2.appendChild(el('span', 'novo-selo'));
+      selo.appendChild(el('span', 'pt', '✨ Novo')); selo.appendChild(el('span', 'en', '✨ New')); selo.appendChild(el('span', 'es', '✨ Nuevo'));
+    }
     a.appendChild(el('p', 'pt', j.texto));
     a.appendChild(el('p', 'en', j.en || j.texto));
     a.appendChild(el('p', 'es', j.es || j.texto));
