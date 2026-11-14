@@ -22,6 +22,9 @@
     return el;
   }
   function T(pt, en, es) { return window.BolinhoIdioma ? BolinhoIdioma.t(pt, en, es) : pt; }
+  // título da aba com o nome da marca no idioma escolhido
+  function titulo() { if (window.BolinhoIdioma) document.title = BolinhoIdioma.marca() + T(' — brincadeiras para a família · SolverONE', ' — games for the whole family · SolverONE', ' — juegos para toda la familia · SolverONE'); }
+  titulo(); if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(titulo);
   var cards = Array.prototype.slice.call(document.querySelectorAll('a.card[data-instalar], a.card[data-so-online]'));
   if (!cards.length) return;
   var instalaveis = cards.filter(function (c) { return c.hasAttribute('data-instalar'); });
