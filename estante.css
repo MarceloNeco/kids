@@ -29,13 +29,13 @@ footer b{color:var(--ouro)}
 /* Idioma da estante e de todos os jogos: 🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES (idioma.js monta os botões) */
 .wrap>.barra-topo{display:flex;justify-content:flex-start;align-items:center;gap:.5rem;flex-wrap:nowrap;padding-top:.6rem}
 .barra-topo>.idiomas-topo{display:flex;gap:.4rem;flex-wrap:wrap;margin-left:auto}
-.bt-biblioteca,.bt-instalar{min-height:44px;padding:.35rem .9rem;border-radius:999px;border:1px solid #3a2f73;background:rgba(34,27,77,.8);color:#f3f0ff;font:inherit;font-weight:800;font-size:.95rem;cursor:pointer}
-.bt-biblioteca:focus-visible,.bt-instalar:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
+.bt-biblioteca{min-height:44px;padding:.35rem .9rem;border-radius:999px;border:1px solid #3a2f73;background:rgba(34,27,77,.8);color:#f3f0ff;font:inherit;font-weight:800;font-size:.95rem;cursor:pointer}
+.bt-biblioteca:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 .marca .pt,.marca .en,.marca .es{font-size:inherit;filter:none}
-/* os três (🎵 Músicas, 📲 Instalar, idioma) sempre numa linha só (dono, 14/Nov/2026), até com a letra grande do celular:
+/* 🎵 Músicas e o idioma sempre numa linha só (dono, 14/Nov/2026), até com a letra grande do celular:
    no celular a letra acompanha a largura da tela (vw não cresce com o "tamanho da fonte" do Android) */
-.barra-topo .bt-biblioteca,.barra-topo .bt-instalar,.barra-topo .bi-atual{white-space:nowrap;flex:0 1 auto;min-width:0}
-@media (max-width:440px){.barra-topo{gap:.3rem}.barra-topo .bt-biblioteca,.barra-topo .bt-instalar,.barra-topo .bolinho-idiomas .bi-atual{padding:.3rem .55rem;gap:.25rem;font-size:min(.95rem,3.6vw)}.barra-topo .bolinho-idiomas .bi-atual .bd img{width:22px;height:17px}}
+.barra-topo .bt-biblioteca,.barra-topo .bi-atual{white-space:nowrap;flex:0 1 auto;min-width:0}
+@media (max-width:440px){.barra-topo{gap:.3rem}.barra-topo .bt-biblioteca,.barra-topo .bolinho-idiomas .bi-atual{padding:.3rem .55rem;gap:.25rem;font-size:min(.95rem,3.6vw)}.barra-topo .bolinho-idiomas .bi-atual .bd img{width:22px;height:17px}}
 .wrap>.idiomas-topo{display:flex;justify-content:flex-end;padding-top:.6rem}
 
 /* ✨ Novo: jogo que entrou na estante nos últimos 7 dias (catalogo.js, campo novo) */
