@@ -32,6 +32,15 @@ async function abrirAdivinha(viewport) {
   return { ctx, pg };
 }
 // responde como o personagem até a meleca chutar; devolve o personagem chutado
+// ⚙️ área de adulto: segurar o botão (no ?teste, 0,3 s) e acertar a conta (no ?teste, doze vezes sete)
+async function entrarAdulto(pg) {
+  await pg.waitForSelector('#nivelAdivinha.ativa');
+  await pg.hover('#btAreaAdulto'); await pg.mouse.down(); await pg.waitForTimeout(450); await pg.mouse.up();
+  await pg.waitForSelector('#contaAdulto');
+  assert.match(await pg.textContent('dialog.sj[open] .qe-aviso p'), /doze vezes sete/);
+  await pg.fill('#contaAdulto', '84'); await pg.keyboard.press('Enter');
+  await pg.waitForSelector('#adulto.ativa');
+}
 async function responderComo(pg, id, max = 60) {
   for (let i = 0; i < max; i++) {
     if (await pg.locator('#advChute:not([hidden])').count()) return pg.evaluate(() => QEDebugAdv.chute().id);
@@ -91,31 +100,87 @@ test('quando perde, aprende alguém novo e guarda só no aparelho', async () => 
   await pg.waitForSelector('#advFim:not([hidden])');
   const l = await pg.evaluate(() => QEDebugAdv.aprender.lista());
   assert.equal(l.length, 1); assert.equal(l[0].nome, 'Meu irmão Theo'); assert.equal(l[0].niveis, 'FA');
-  await pg.click('#btAdvNivel'); await pg.click('#btAprendidos');
+  assert.equal(l[0].todos, false, 'aprendido depois de perder é da família');
+  await pg.click('#btAdvNivel'); await entrarAdulto(pg); await pg.click('#btAprendidos');
   await pg.waitForSelector('#aprendidos.ativa');
   assert.match(await pg.textContent('#listaAprendidos'), /Meu irmão Theo/);
-  await pg.click('#listaAprendidos button'); await pg.click('#listaAprendidos button');
+  await pg.click('#listaAprendidos li button >> nth=1'); await pg.click('#listaAprendidos li button >> nth=1');
   assert.equal((await pg.evaluate(() => QEDebugAdv.aprender.lista())).length, 0);
   assert.deepEqual(pg.errosPg, []);
   await ctx.close();
 });
 
-test('ensinar alguém do zero e ver o "Já chega"', async () => {
+test('área de adulto: criança não vê os botões; toque curto explica; conta errada não entra', async () => {
   const { ctx, pg } = await abrirAdivinha();
-  await pg.click('#btEnsinar');
+  for (const id of ['#btEnsinar', '#btAprendidos', '#btVozAnimada', '#btParaTodos']) assert.equal(await pg.isVisible(id), false, id + ' à vista');
+  await pg.click('#btAreaAdulto');
+  assert.ok(await pg.isVisible('#adultoDica'), 'toque curto: explica que é para segurar');
+  assert.equal(await pg.locator('dialog.sj[open]').count(), 0);
+  await pg.hover('#btAreaAdulto'); await pg.mouse.down(); await pg.waitForTimeout(450); await pg.mouse.up();
+  await pg.fill('#contaAdulto', '83'); await pg.keyboard.press('Enter');
+  assert.match(await pg.textContent('dialog.sj[open] .status'), /adultos/);
+  assert.equal(await pg.isVisible('#adulto.ativa'), false);
+  await pg.fill('#contaAdulto', '84'); await pg.keyboard.press('Enter');
+  await pg.waitForSelector('#adulto.ativa');
+  assert.deepEqual(pg.errosPg, []);
+  await ctx.close();
+});
+
+test('criar alguém da família e ver o "Já chega" depois das perguntas do núcleo', async () => {
+  const { ctx, pg } = await abrirAdivinha();
+  await entrarAdulto(pg); await pg.click('#btEnsinar');
+  assert.equal(await pg.getAttribute('[data-familia="1"]', 'aria-checked'), 'true', 'começa como família');
   await pg.fill('#advNome', 'Vovó Cida'); await pg.click('#btEnsinarSalvar');
-  for (let i = 0; i < 7; i++) await pg.click('#advRespostas .resp[data-r="' + (i % 2 ? 'n' : 's') + '"]');
+  // um bicho de verdade, o resto "não sei": depois do núcleo ainda sobram muitos parecidos, e aí aparece o "Já chega"
+  const verdade = { bicho: 's', pessoa: 'n', coisa: 'n', real: 's' };
+  let n = 0;
+  while (!(await pg.isVisible('#btJaChega')) && !(await pg.isVisible('#advFim')) && n < 60) {
+    const e = await pg.evaluate(() => QEDebugAdv.ensino());
+    await pg.click('#advRespostas .resp[data-r="' + (verdade[e.atual] || '?') + '"]'); n++;
+  }
+  assert.ok(await pg.isVisible('#btJaChega'), 'sem "Já chega" depois do núcleo (' + n + ' perguntas)');
+  assert.ok(n >= 10 && n < 60, 'perguntas do núcleo: ' + n);
   await pg.click('#btJaChega');
   await pg.waitForSelector('#advFim:not([hidden])');
   const l = await pg.evaluate(() => QEDebugAdv.aprender.lista());
-  assert.equal(l[0].nome, 'Vovó Cida'); assert.equal(l[0].niveis, 'IFA');
-  assert.equal(Object.keys(l[0].r).length, 8, 'as 7 respostas e o "é da casa"');
+  assert.equal(l[0].nome, 'Vovó Cida'); assert.equal(l[0].niveis, 'IFA'); assert.equal(l[0].todos, false); assert.equal(l[0].r.casa, 's');
+  assert.deepEqual(l[0].r, { bicho: 's', pessoa: 'n', coisa: 'n', real: 's', casa: 's' }, 'só as respostas certas (sem os "não sei") e o "é da casa"');
+  await ctx.close();
+});
+
+test('criar alguém que não é da família: a meleca pergunta até não sobrar parecido, e vai no arquivo para todo mundo', async () => {
+  const { ctx, pg } = await abrirAdivinha();
+  await entrarAdulto(pg); await pg.click('#btEnsinar');
+  await pg.click('[data-familia="0"]'); await pg.click('[data-criar-nivel="F"]');
+  await pg.fill('#advNome', 'Capitão Bigode'); await pg.click('#btEnsinarSalvar');
+  // um pirata de desenho, homem, de barba, que é vilão; o resto "não"
+  const verdade = { pessoa: 's', desenho: 's', masculino: 's', barba: 's', vilao: 's', engracado: 's', real: 'n' };
+  let n = 0, parecidos = [];
+  for (; n < 140; n++) {
+    if (await pg.isVisible('#advFim')) break;
+    const e = await pg.evaluate(() => QEDebugAdv.ensino());
+    if (e.parecidos !== undefined) parecidos.push(e.parecidos);
+    await pg.click('#advRespostas .resp[data-r="' + (verdade[e.atual] || 'n') + '"]');
+  }
+  await pg.waitForSelector('#advFim:not([hidden])');
+  assert.ok(parecidos[0] > parecidos[parecidos.length - 1], 'os parecidos não diminuíram: ' + parecidos.slice(0, 3) + '…' + parecidos.slice(-3));
+  const p = (await pg.evaluate(() => QEDebugAdv.aprender.lista()))[0];
+  assert.equal(p.todos, true); assert.equal(p.r.casa, 'n'); assert.equal(p.niveis, 'FA');
+  // na lista aparece 🌎; o arquivo para todos leva ele
+  await pg.click('#btAdvNivel'); await entrarAdulto(pg);
+  await pg.click('#btParaTodos');
+  await pg.waitForFunction(() => /Arquivo pronto/.test(document.getElementById('adultoStatus').textContent));
+  const arq = JSON.parse(await pg.evaluate(() => QEDebugAdv.aprender.exportarParaTodos()));
+  assert.deepEqual(arq.aprendidos.map(x => x.nome), ['Capitão Bigode']);
+  await pg.click('#btAprendidos'); await pg.waitForSelector('#aprendidos.ativa');
+  assert.equal((await pg.textContent('#listaAprendidos .apr-quem')).trim(), '🌎');
+  assert.deepEqual(pg.errosPg, []);
   await ctx.close();
 });
 
 test('voz animada: a janela abre e fecha; sem chave nada vai para a internet', async () => {
   const { ctx, pg } = await abrirAdivinha();
-  await pg.click('#btVozAnimada');
+  await entrarAdulto(pg); await pg.click('#btVozAnimada');
   await pg.waitForSelector('dialog.sj[open] .voz-caixa');
   await pg.keyboard.press('Escape');
   await pg.waitForFunction(() => !document.querySelector('dialog.sj[open]'));
