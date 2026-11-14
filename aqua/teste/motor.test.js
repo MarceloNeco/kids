@@ -187,6 +187,24 @@ test('➕ frasco extra e 🔀 embaralhar: a fase continua com solução; frascos
   }
 });
 
+test('temSaida: diz se a arrumação ainda tem saída (fase nova sempre tem; jogando ao acaso, às vezes deixa de ter)', () => {
+  assert.equal(M.temSaida([[0, 1], [1, 0]], 2), false);
+  assert.equal(M.temSaida([[0, 1, 0], [1, 0, 1], [], []], 3), true);
+  const r = M.semente(11); let semSaida = 0;
+  for (const nivel of M.NIVEIS) for (let f = 1; f <= 30; f++) {
+    const e = M.novoEstado(M.gerar(nivel, f));
+    assert.ok(M.temSaida(e.frascos, e.cap), nivel + ' ' + f + ': fase nova sem saída');
+    for (let k = 0; k < 20; k++) {
+      const pode = [];
+      for (let i = 0; i < e.frascos.length; i++) for (let j = 0; j < e.frascos.length; j++) if (M.quantoDespeja(e, i, j)) pode.push([i, j]);
+      if (!pode.length) break;
+      const p = pode[Math.floor(r() * pode.length)]; M.despejar(e, p[0], p[1]);
+      if (!M.temSaida(e.frascos, e.cap)) semSaida++;
+    }
+  }
+  assert.ok(semSaida > 20, 'jogando ao acaso, a fase fica sem saída às vezes (' + semSaida + ')');
+});
+
 test('copiar: a cópia não mexe no original (é o que o ↩️ desfazer guarda)', () => {
   const est = M.novoEstado(M.gerar('medio', 20)), c = M.copiar(est), p = M.plano(est)[0];
   M.despejar(est, p[0], p[1]);
