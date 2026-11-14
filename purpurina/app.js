@@ -373,7 +373,7 @@
         b.addEventListener('click', function () {
           var sem0 = semNada(cat), tirar = !!sem0 && op.id !== sem0 && estado[cat.id] === op.id && V.visivel(estado, cat.id);
           mudar(V.aplicar(estado, cat.id, tirar ? sem0 : op.id), cat.id);
-          if (tirar) recado(t('Tirou: ', 'Removed: ', 'Quitaste: ') + N(op));
+          if (tirar) recado(t('Tirou: ', 'Removed: ', 'Has quitado: ') + N(op));
         });
         estilos.appendChild(b);
       });
@@ -519,7 +519,7 @@
       else ['personagem', 'pele', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'cabelo', 'cabeloCor', 'mechas', 'mechasCor', 'olhos'].forEach(function (k) { e[k] = P.PADRAO[k]; });
       e.cenario = d ? d.cenario : (tudo ? P.PADRAO.cenario : estado.cenario);
       mudar(e, null); Som.tocar('desfazer');
-      recado(t('Pronto, começou de novo! ↩ desfaz.', 'Done, starting over! ↩ undoes.', '¡Listo, empezaste de nuevo! ↩ deshace.'));
+      recado(t('Pronto, começou de novo! ↩ desfaz.', 'Done, starting over! ↩ undoes.', '¡Listo, empiezas de nuevo! ↩ deshace.'));
     }
     abrirJanela({ titulo: t('🔄 Reiniciar', '🔄 Start over', '🔄 Reiniciar'), texto: t('O que você quer tirar?', 'What do you want to reset?', '¿Qué quieres quitar?'), botoes: [
       { t: t('🧼 Maquiagem, roupas e acessórios', '🧼 Makeup, clothes and accessories', '🧼 Maquillaje, ropa y accesorios'), classe: 'grande', fn: function () { limpo(false); } },
@@ -539,7 +539,7 @@
     if (looks.some(function (l) { return V.iguais(V.limpar(l.e), estado); })) { recado(t('Esse look já está guardado 💖', 'This look is already saved 💖', 'Este look ya está guardado 💖')); return; }
     if (looks.length >= MAX_LOOKS) { recado(t('Já tem ' + MAX_LOOKS + ' looks guardados. Apague um em 💖 Meus looks.', 'You already have ' + MAX_LOOKS + ' looks. Delete one in 💖 My looks.', 'Ya tienes ' + MAX_LOOKS + ' looks guardados. Borra uno en 💖 Mis looks.')); return; }
     looks.unshift({ id: Date.now(), quando: new Date().toISOString(), e: V.copiar(estado) });
-    if (!gravar('purpurina.looks', looks)) { recado(t('Não deu para guardar: o aparelho está sem espaço.', "Couldn't save: the device is out of space.", "No se pudo guardar: el aparato no tiene espacio.")); return; }
+    if (!gravar('purpurina.looks', looks)) { recado(t('Não deu para guardar: o aparelho está sem espaço.', "Couldn't save: the device is out of space.", "No se ha podido guardar: el dispositivo no tiene espacio.")); return; }
     Som.tocar('coracao'); recado(t('Guardado em 💖 Meus looks!', 'Saved to 💖 My looks!', '¡Guardado en 💖 Mis looks!'));
     if (atual === 'estudio') { var q = naTela(200, 360); faiscas(q[0], q[1], 10, ['💖', '💕', '💗']); }
   }
@@ -626,16 +626,16 @@
       var url = URL.createObjectURL(blob), nome = 'purpurina-' + carimbo() + '.png';
       var arquivo = null; try { arquivo = new File([blob], nome, { type: 'image/png' }); } catch (e) { /* navegador antigo */ }
       var podeCompartilhar = !!(arquivo && navigator.canShare && navigator.canShare({ files: [arquivo] }));
-      var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device', '💾 Guardar en el celular'), classe: 'grande', ficar: true, fn: function () {
+      var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device', '💾 Guardar en el móvil'), classe: 'grande', ficar: true, fn: function () {
         var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
-        recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).', 'La foto se guardó en la carpeta Descargas (o Archivos).'));
+        recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).', 'La foto se ha guardado en la carpeta Descargas (o Archivos).'));
       } }];
       if (podeCompartilhar) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), ficar: true, fn: function () { navigator.share({ files: [arquivo], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
-      if (VIDEO_OK) botoes.push({ t: t('🎬 Vídeo girando', '🎬 Spinning video', '🎬 Video girando'), ficar: true, fn: video });
+      if (VIDEO_OK) botoes.push({ t: t('🎬 Vídeo girando', '🎬 Spinning video', '🎬 Vídeo girando'), ficar: true, fn: video });
       if (iaLigada()) botoes.push({ t: t('✨ Foto de cinema (IA)', '✨ Movie-style photo (AI)', '✨ Foto de cine (IA)'), fn: fotoIA });
       botoes.push({ t: t('Fechar', 'Close', 'Cerrar') });
-      abrirJanela({ titulo: t('📸 Que foto linda!', '📸 What a lovely photo!', '📸 ¡Qué foto tan linda!'), img: url, alt: V.resumo(estado, lingua), botoes: botoes }, true);
-    }).catch(function () { abrirJanela({ titulo: t('📸 Foto', '📸 Photo', '📸 Foto'), texto: t('Não deu para tirar a foto agora. Tente de novo.', "Couldn't take the photo now. Try again.", "No se pudo tomar la foto ahora. Inténtalo otra vez."), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true); });
+      abrirJanela({ titulo: t('📸 Que foto linda!', '📸 What a lovely photo!', '📸 ¡Qué foto tan bonita!'), img: url, alt: V.resumo(estado, lingua), botoes: botoes }, true);
+    }).catch(function () { abrirJanela({ titulo: t('📸 Foto', '📸 Photo', '📸 Foto'), texto: t('Não deu para tirar a foto agora. Tente de novo.', "Couldn't take the photo now. Try again.", "No se ha podido hacer la foto ahora. Inténtalo otra vez."), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true); });
   }
 
   /* ---------- ✨ foto de cinema com IA (escondida: ver ia-foto.js) ----------
@@ -655,9 +655,9 @@
   function mostrarFotoIA(blob) {
     var url = URL.createObjectURL(blob), nome = 'purpurina-cinema-' + carimbo() + '.png';
     var arquivo = null; try { arquivo = new File([blob], nome, { type: blob.type || 'image/png' }); } catch (e) { /* navegador antigo */ }
-    var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device', '💾 Guardar en el celular'), classe: 'grande', ficar: true, fn: function () {
+    var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device', '💾 Guardar en el móvil'), classe: 'grande', ficar: true, fn: function () {
       var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
-      recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).', 'La foto se guardó en la carpeta Descargas (o Archivos).'));
+      recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).', 'La foto se ha guardado en la carpeta Descargas (o Archivos).'));
     } }];
     if (arquivo && navigator.canShare && navigator.canShare({ files: [arquivo] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), ficar: true, fn: function () { navigator.share({ files: [arquivo], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
     botoes.push({ t: t('✨ Fazer outra', '✨ Make another', '✨ Hacer otra'), fn: fotoIA }, { t: t('Fechar', 'Close', 'Cerrar') });
@@ -708,29 +708,29 @@
     });
   }
   function video() {
-    abrirJanela({ titulo: t('🎬 Preparando o vídeo…', '🎬 Making the video…', '🎬 Preparando el video…'), texto: '0%', botoes: [] }, true);
+    abrirJanela({ titulo: t('🎬 Preparando o vídeo…', '🎬 Making the video…', '🎬 Preparando el vídeo…'), texto: '0%', botoes: [] }, true);
     fazerVideo(function (pct) { $('janelaTexto').textContent = pct + '%'; }).then(function (r) {
       var url = URL.createObjectURL(r.blob), nome = 'purpurina-giro-' + carimbo() + '.' + r.ext, arq = null;
       try { arq = new File([r.blob], nome, { type: r.tipo }); } catch (x) { /* navegador antigo */ }
-      var botoes = [{ t: t('💾 Salvar o vídeo', '💾 Save the video', '💾 Guardar el video'), classe: 'grande', ficar: true, fn: function () {
+      var botoes = [{ t: t('💾 Salvar o vídeo', '💾 Save the video', '💾 Guardar el vídeo'), classe: 'grande', ficar: true, fn: function () {
         var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
-        recado(t('O vídeo foi para a pasta Downloads (ou Arquivos).', 'The video went to your Downloads (or Files).', 'El video se guardó en la carpeta Descargas (o Archivos).'));
+        recado(t('O vídeo foi para a pasta Downloads (ou Arquivos).', 'The video went to your Downloads (or Files).', 'El vídeo se ha guardado en la carpeta Descargas (o Archivos).'));
       } }];
       if (arq && navigator.canShare && navigator.canShare({ files: [arq] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), ficar: true, fn: function () { navigator.share({ files: [arq], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
       botoes.push({ t: t('Fechar', 'Close', 'Cerrar') });
-      abrirJanela({ titulo: t('🎬 Seu vídeo girando!', '🎬 Your spinning video!', '🎬 ¡Tu video girando!'), video: url, botoes: botoes }, true);
+      abrirJanela({ titulo: t('🎬 Seu vídeo girando!', '🎬 Your spinning video!', '🎬 ¡Tu vídeo girando!'), video: url, botoes: botoes }, true);
       Som.tocar('tada');
     }).catch(function () {
-      abrirJanela({ titulo: t('🎬 Vídeo', '🎬 Video', '🎬 Video'), texto: t('Este navegador não conseguiu gravar o vídeo. A foto continua funcionando.', "This browser couldn't record the video. Photos still work.", "Este navegador no pudo grabar el video. La foto sigue funcionando."), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true);
+      abrirJanela({ titulo: t('🎬 Vídeo', '🎬 Video', '🎬 Vídeo'), texto: t('Este navegador não conseguiu gravar o vídeo. A foto continua funcionando.', "This browser couldn't record the video. Photos still work.", "Este navegador no ha podido grabar el vídeo. La foto sigue funcionando."), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true);
     });
   }
 
   // ---------- desfile ----------
   var FRASES = {
-    3: [['Arrasou!', 'Amazing!', '¡Lo bordaste!'], ['Perfeito!', 'Perfect!', '¡Perfecto!'], ['Uau, que brilho!', 'Wow, so sparkly!', '¡Guau, cuánto brillo!']],
-    2: [['Que lindo!', 'So pretty!', '¡Qué lindo!'], ['Muito estilo!', 'Great style!', '¡Mucho estilo!'], ['Quase 3!', 'Almost 3!', '¡Casi 3!']],
-    1: [['Que fofo!', 'So cute!', '¡Qué tierno!'], ['Gostei!', 'I like it!', '¡Me gusta!'], ['Veja as dicas!', 'Check the tips!', '¡Mira las pistas!']],
-    0: [['Lindo!', 'Gorgeous!', '¡Precioso!'], ['Que estilo!', 'What style!', '¡Qué estilo!'], ['Brilhou!', 'You shine!', '¡Brillaste!']]
+    3: [['Arrasou!', 'Amazing!', '¡Lo has bordado!'], ['Perfeito!', 'Perfect!', '¡Perfecto!'], ['Uau, que brilho!', 'Wow, so sparkly!', '¡Hala, cuánto brillo!']],
+    2: [['Que lindo!', 'So pretty!', '¡Qué bonito!'], ['Muito estilo!', 'Great style!', '¡Mucho estilo!'], ['Quase 3!', 'Almost 3!', '¡Casi 3!']],
+    1: [['Que fofo!', 'So cute!', '¡Qué mono!'], ['Gostei!', 'I like it!', '¡Me gusta!'], ['Veja as dicas!', 'Check the tips!', '¡Mira las pistas!']],
+    0: [['Lindo!', 'Gorgeous!', '¡Precioso!'], ['Que estilo!', 'What style!', '¡Qué estilo!'], ['Brilhou!', 'You shine!', '¡Has brillado!']]
   };
   var JURADOS = ['🐱', '🦄', '🐰'];
   /* ---------- o desfile ----------
@@ -939,9 +939,9 @@
     var aviso = $('baixarAviso');
     aviso.textContent = t('Preparando o arquivo…', 'Preparing the file…', 'Preparando el archivo…');
     BaixarJogo.baixar('purpurina.html').then(function () {
-      aviso.textContent = t('Pronto! O arquivo purpurina.html foi para os Downloads. Toque nele para brincar, mesmo sem internet. (Os looks guardados ficam separados dos do site.)', 'Done! purpurina.html went to Downloads. Tap it to play, even offline. (Saved looks stay separate from the website ones.)', '¡Listo! El archivo purpurina.html se guardó en Descargas. Tócalo para jugar, incluso sin internet. (Los looks guardados quedan separados de los del sitio).');
+      aviso.textContent = t('Pronto! O arquivo purpurina.html foi para os Downloads. Toque nele para brincar, mesmo sem internet. (Os looks guardados ficam separados dos do site.)', 'Done! purpurina.html went to Downloads. Tap it to play, even offline. (Saved looks stay separate from the website ones.)', '¡Listo! El archivo purpurina.html se ha guardado en Descargas. Tócalo para jugar, incluso sin internet. (Los looks guardados van aparte de los de la web).');
     }).catch(function () {
-      aviso.textContent = t('Não deu para baixar agora. Abra o jogo com internet e tente de novo.', "Couldn't download now. Open the game online and try again.", "No se pudo descargar ahora. Abre el juego con internet e inténtalo otra vez.");
+      aviso.textContent = t('Não deu para baixar agora. Abra o jogo com internet e tente de novo.', "Couldn't download now. Open the game online and try again.", "No se ha podido descargar ahora. Abre el juego con internet e inténtalo otra vez.");
     });
   });
 

@@ -23,7 +23,7 @@
       preco: { pt: 'A geração de imagens do Gemini pode cobrar por imagem; confira a cota na sua conta.', en: 'Gemini image generation may charge per image; check the quota in your account.', es: 'La generación de imágenes de Gemini puede cobrar por imagen; revisa la cuota en tu cuenta.' } },
     openai: { nome: 'OpenAI', modelo: 'gpt-image-1', segredo: 'ia:openai', prefixo: ['sk-'],
       site: 'https://platform.openai.com/api-keys',
-      guia: { pt: 'Na OpenAI, entre, compre crédito (mínimo US$ 5) em Billing, toque em “Create new secret key” e copie.', en: 'At OpenAI, sign in, buy credit (US$ 5 minimum) in Billing, tap “Create new secret key” and copy it.', es: 'En OpenAI, inicia sesión, compra crédito (mínimo US$ 5) en Billing, toca “Create new secret key” y cópiala.' },
+      guia: { pt: 'Na OpenAI, entre, compre crédito (mínimo US$ 5) em Billing, toque em “Create new secret key” e copie.', en: 'At OpenAI, sign in, buy credit (US$ 5 minimum) in Billing, tap “Create new secret key” and copy it.', es: 'En OpenAI, inicia sesión, compra crédito (mínimo 5 US$) en Billing, toca “Create new secret key” y cópiala.' },
       preco: { pt: 'Pago por uso: cada foto custa alguns centavos de dólar.', en: 'Pay per use: each photo costs a few cents.', es: 'Pago por uso: cada foto cuesta unos centavos de dólar.' } }
   };
 
@@ -92,8 +92,8 @@
     var msg = j && j.error && (j.error.message || j.error.status) || '';
     if (st === 400 && /key|API key/i.test(msg)) return t('A chave não foi aceita. Confira se copiou inteira.', 'The key was not accepted. Check that you copied all of it.', 'La clave no fue aceptada. Revisa que la copiaste completa.');
     if (st === 401 || st === 403) return t('A chave não foi aceita (ou não tem permissão para imagens). Confira a chave ou crie outra.', 'The key was not accepted (or has no image permission). Check it or create another one.', 'La clave no fue aceptada (o no tiene permiso para imágenes). Revisa la clave o crea otra.');
-    if (st === 429) return t('A cota da sua conta acabou por agora (ou precisa de crédito para imagens). Tente mais tarde.', 'Your account quota ran out for now (or image generation needs credit). Try later.', 'Se acabó la cuota de tu cuenta por ahora (o se necesita crédito para imágenes). Inténtalo más tarde.');
-    if (st >= 500) return t('O serviço de IA está fora do ar agora. Tente de novo daqui a pouco.', 'The AI service is down right now. Try again in a bit.', 'El servicio de IA no está funcionando ahora. Inténtalo de nuevo en un ratito.');
+    if (st === 429) return t('A cota da sua conta acabou por agora (ou precisa de crédito para imagens). Tente mais tarde.', 'Your account quota ran out for now (or image generation needs credit). Try later.', 'Se ha acabado la cuota de tu cuenta por ahora (o hace falta crédito para imágenes). Inténtalo más tarde.');
+    if (st >= 500) return t('O serviço de IA está fora do ar agora. Tente de novo daqui a pouco.', 'The AI service is down right now. Try again in a bit.', 'El servicio de IA no funciona ahora mismo. Inténtalo de nuevo dentro de un rato.');
     return t('A IA não conseguiu fazer a foto agora.', 'The AI could not make the photo right now.', 'La IA no pudo hacer la foto ahora.') + (msg ? ' (' + String(msg).slice(0, 140) + ')' : '');
   }
 
@@ -107,7 +107,7 @@
           if (!r.ok) throw new Error(explicar(r.status, j, t));
           var res;
           try { res = prov === 'openai' ? lerOpenAI(j) : lerGemini(j); }
-          catch (e) { throw new Error(e.motivo && /SAFETY|PROHIBITED|moderation/i.test(e.motivo) ? t('A IA preferiu não fazer esta foto. Mude alguma coisa no visual e tente de novo.', 'The AI chose not to make this photo. Change something in the look and try again.', 'La IA prefirió no hacer esta foto. Cambia algo del look e inténtalo otra vez.') : t('A IA respondeu sem foto. Tente de novo.', 'The AI answered without a photo. Try again.', 'La IA respondió sin foto. Inténtalo otra vez.')); }
+          catch (e) { throw new Error(e.motivo && /SAFETY|PROHIBITED|moderation/i.test(e.motivo) ? t('A IA preferiu não fazer esta foto. Mude alguma coisa no visual e tente de novo.', 'The AI chose not to make this photo. Change something in the look and try again.', 'La IA ha preferido no hacer esta foto. Cambia algo del look e inténtalo otra vez.') : t('A IA respondeu sem foto. Tente de novo.', 'The AI answered without a photo. Try again.', 'La IA ha respondido sin foto. Inténtalo otra vez.')); }
           return deBase64(res.base64, res.tipo);
         });
       });
@@ -144,7 +144,7 @@
   /* app = { t, imagem() → Promise<Blob> (o desenho), descricao() → texto, mostrarFoto(blob), recado(msg) } */
   function abrir(app) {
     var t = app.t, C = raiz.SolverCofre;
-    if (!raiz.SolverJanela || !C) { app.recado(t('A foto com IA precisa do site com internet (não funciona no arquivo baixado).', 'The AI photo needs the website online (not the downloaded file).', 'La foto con IA necesita el sitio con internet (no funciona en el archivo descargado).')); return; }
+    if (!raiz.SolverJanela || !C) { app.recado(t('A foto com IA precisa do site com internet (não funciona no arquivo baixado).', 'The AI photo needs the website online (not the downloaded file).', 'La foto con IA necesita la web con internet (no funciona en el archivo descargado).')); return; }
     var prov = provedorEscolhido();
     if (C.tem(PROVEDORES[prov].segredo)) { produzir(app, prov); return; }
     configurar(app, prov);
@@ -155,7 +155,7 @@
     var t = app.t, C = raiz.SolverCofre, j = null;
     var ttl = el('h2', { texto: t('✨ Foto de cinema com IA', '✨ Movie-style photo with AI', '✨ Foto de cine con IA') });
     var txt = el('p', { texto: t('Uma IA redesenha a sua personagem com luz e sombra de filme de animação. Para a IA vai só o desenho (nenhuma foto de pessoa). Precisa de um adulto: a chave de IA fica guardada no cofre do aparelho, protegida pelo PIN dele.',
-      'An AI redraws your character with animated-movie light and shadow. Only the drawing goes to the AI (never a photo of a person). An adult is needed: the AI key is kept in the device vault, protected by their PIN.', 'Una IA vuelve a dibujar a tu personaje con luces y sombras de película animada. A la IA solo va el dibujo (nunca una foto de una persona). Se necesita un adulto: la clave de IA se guarda en la caja fuerte del aparato, protegida por su PIN.') });
+      'An AI redraws your character with animated-movie light and shadow. Only the drawing goes to the AI (never a photo of a person). An adult is needed: the AI key is kept in the device vault, protected by their PIN.', 'Una IA vuelve a dibujar a tu personaje con luces y sombras de película de animación. A la IA solo va el dibujo (nunca una foto de una persona). Hace falta un adulto: la clave de IA se guarda en la caja fuerte del dispositivo, protegida por su PIN.') });
     var escolha = el('div', { class: 'pp-ia-provs', role: 'group' });
     var guia = el('p', { class: 'pp-ia-guia' }), preco = el('p', { class: 'pp-ia-preco' }), site = el('a', { class: 'pp-ia-site', target: '_blank', rel: 'noopener' });
     var campo = el('input', { type: 'password', autocomplete: 'off', spellcheck: 'false', 'data-sj-texto': '1', placeholder: t('Cole a chave aqui', 'Paste the key here', 'Pega la clave aquí'), 'aria-label': t('Chave de IA', 'AI key', 'Clave de IA') });
@@ -164,7 +164,7 @@
       prov = p;
       Array.prototype.forEach.call(escolha.children, function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-p') === p)); });
       var P = PROVEDORES[p], L = t('pt', 'en', 'es');
-      guia.textContent = P.guia[L]; preco.textContent = P.preco[L]; site.href = P.site; site.textContent = t('Abrir o site da chave ↗', 'Open the key site ↗', 'Abrir el sitio de la clave ↗');
+      guia.textContent = P.guia[L]; preco.textContent = P.preco[L]; site.href = P.site; site.textContent = t('Abrir o site da chave ↗', 'Open the key site ↗', 'Abrir la web de la clave ↗');
       aviso.textContent = C.tem(P.segredo) ? t('✓ Já existe uma chave guardada para ' + P.nome + '.', '✓ A key is already saved for ' + P.nome + '.', '✓ Ya hay una clave guardada para ' + P.nome + '.') : '';
     }
     Object.keys(PROVEDORES).forEach(function (p) {
@@ -180,7 +180,7 @@
       C.gravar(PROVEDORES[prov].segredo, k, { motivo: { pt: 'Para guardar a chave de IA da Purpurina com proteção.', en: 'To keep the Purpurina AI key protected.', es: 'Para guardar con protección la clave de IA de Purpurina.' } }).then(function () {
         try { raiz.localStorage.setItem('purpurina.ia.provedor', prov); } catch (e) { /* ok */ }
         campo.value = ''; j.fechar('salvo'); raiz.SolverJanela.quandoQuieto(function () { produzir(app, prov); });
-      }).catch(function () { aviso.textContent = t('Não foi guardada (o cofre ficou trancado). Tente de novo.', 'It was not saved (the vault stayed locked). Try again.', 'No se guardó (la caja fuerte quedó cerrada). Inténtalo otra vez.'); });
+      }).catch(function () { aviso.textContent = t('Não foi guardada (o cofre ficou trancado). Tente de novo.', 'It was not saved (the vault stayed locked). Try again.', 'No se ha guardado (la caja fuerte se ha quedado cerrada). Inténtalo otra vez.'); });
     });
     usar.addEventListener('click', function () {
       if (!C.tem(PROVEDORES[prov].segredo)) { aviso.textContent = t('Ainda não há chave guardada para ' + PROVEDORES[prov].nome + '.', 'There is no saved key for ' + PROVEDORES[prov].nome + ' yet.', 'Todavía no hay una clave guardada para ' + PROVEDORES[prov].nome + '.'); return; }
@@ -208,13 +208,13 @@
     function soltar() { try { if (trava) trava.release(); } catch (e) { /* ok */ } trava = null; }
     Promise.all([C.ler(P.segredo, { motivo: { pt: 'Para a Purpurina usar a chave de IA (' + P.nome + ').', en: 'For Purpurina to use the AI key (' + P.nome + ').', es: 'Para que Purpurina use la clave de IA (' + P.nome + ').' } }), app.imagem()])
       .then(function (r) {
-        if (!r[0]) throw new Error(t('Não achei a chave de IA no cofre.', 'I could not find the AI key in the vault.', 'No encontré la clave de IA en la caja fuerte.'));
+        if (!r[0]) throw new Error(t('Não achei a chave de IA no cofre.', 'I could not find the AI key in the vault.', 'No he encontrado la clave de IA en la caja fuerte.'));
         return gerar(prov, r[0], r[1], app.descricao(), t);
       })
       .then(function (foto) { soltar(); if (cancelado) return; j.fechar('pronto'); raiz.SolverJanela.quandoQuieto(function () { app.mostrarFoto(foto); }); })
       .catch(function (e) {
         soltar(); if (cancelado) return;
-        var msg = e && e.message === 'cofre-trancado' ? t('O cofre ficou trancado: sem o PIN do adulto não dá para usar a chave.', 'The vault stayed locked: without the adult PIN the key cannot be used.', 'La caja fuerte quedó cerrada: sin el PIN del adulto no se puede usar la clave.') : (e && e.message) || t('Não deu certo.', 'It did not work.', 'No funcionó.');
+        var msg = e && e.message === 'cofre-trancado' ? t('O cofre ficou trancado: sem o PIN do adulto não dá para usar a chave.', 'The vault stayed locked: without the adult PIN the key cannot be used.', 'La caja fuerte quedó cerrada: sin el PIN del adulto no se puede usar la clave.') : (e && e.message) || t('Não deu certo.', 'It did not work.', 'No ha funcionado.');
         var trocar = el('button', { type: 'button', class: 'medio', texto: t('🔑 Trocar a chave ou a IA', '🔑 Change the key or the AI', '🔑 Cambiar la clave o la IA') });
         var ok = el('button', { type: 'button', class: 'medio', texto: t('Fechar', 'Close', 'Cerrar') });
         trocar.addEventListener('click', function () { j.fechar('trocar'); raiz.SolverJanela.quandoQuieto(function () { configurar(app, prov); }); });

@@ -31,7 +31,7 @@
   }
   function conectar(codigo, nome) {
     codigo = String(codigo || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); nome = String(nome || '').trim().slice(0, 16) || t('Jogadora', 'Player', 'Jugadora');
-    if (codigo.length !== 4) { $('conectarAviso').textContent = t('O código tem 4 letras. Ele aparece na TV.', 'The code has 4 letters. It shows on the TV.', 'El código tiene 4 letras. Aparece en la TV.'); return; }
+    if (codigo.length !== 4) { $('conectarAviso').textContent = t('O código tem 4 letras. Ele aparece na TV.', 'The code has 4 letters. It shows on the TV.', 'El código tiene 4 letras. Aparece en la tele.'); return; }
     $('conectarAviso').textContent = t('Conectando…', 'Connecting…', 'Conectando…');
     desconectar(true);
     S.abrir(codigo, receberNoCelular).then(function (sala) {
@@ -41,18 +41,18 @@
       mandar('oi');
       clearInterval(cel.vivo); cel.vivo = setInterval(function () { mandar('oi'); }, 12000);
       atualizarSelos();
-      $('conectarAviso').textContent = t('Conectado! Olhe a TV: sua personagem está lá. ✨', 'Connected! Look at the TV: your character is there. ✨', '¡Conectado! Mira la TV: tu personaje está allí. ✨');
-      A.recado(t('📺 Conectado na TV!', '📺 Connected to the TV!', '📺 ¡Conectado a la TV!')); Som.tocar('tada');
+      $('conectarAviso').textContent = t('Conectado! Olhe a TV: sua personagem está lá. ✨', 'Connected! Look at the TV: your character is there. ✨', '¡Conectado! Mira la tele: tu personaje está allí. ✨');
+      A.recado(t('📺 Conectado na TV!', '📺 Connected to the TV!', '📺 ¡Conectado a la tele!')); Som.tocar('tada');
       setTimeout(function () { A.irEstudio(); }, 900);
     }).catch(function () {
-      $('conectarAviso').textContent = t('Não deu para conectar. Confira a internet e o código e tente de novo.', "Couldn't connect. Check the internet and the code and try again.", "No se pudo conectar. Revisa el internet y el código e inténtalo otra vez.");
+      $('conectarAviso').textContent = t('Não deu para conectar. Confira a internet e o código e tente de novo.', "Couldn't connect. Check the internet and the code and try again.", "No se ha podido conectar. Revisa internet y el código e inténtalo otra vez.");
     });
   }
   function desconectar(silencioso) {
     if (!cel.sala) return;
     mandar('tchau'); try { cel.sala.fechar(); } catch (e) { /* ok */ }
     cel.sala = null; clearInterval(cel.vivo); cel.tvMusica = null; atualizarSelos();
-    if (!silencioso) { A.recado(t('Desconectado da TV.', 'Disconnected from the TV.', 'Desconectado de la TV.')); if (Som) Som.musica(true); }
+    if (!silencioso) { A.recado(t('Desconectado da TV.', 'Disconnected from the TV.', 'Desconectado de la tele.')); if (Som) Som.musica(true); }
   }
   function receberNoCelular(m) {
     if (m.t === 'tv') { cel.tvMusica = { fonte: m.fonte, titulo: m.titulo, tocando: m.tocando }; mostrarMusica(cel.tvMusica, true); }
@@ -61,7 +61,7 @@
     var c = conectado();
     $('seloTV').hidden = !c; if (c) $('seloTV').textContent = '📺 ' + cel.codigo;
     $('btDesconectar').hidden = !c; $('formConectar').hidden = c;
-    $('ondeToca').textContent = c ? t('📺 A música toca na TV.', '📺 Music plays on the TV.', '📺 La música suena en la TV.') : t('📱 A música toca neste celular.', '📱 Music plays on this phone.', '📱 La música suena en este celular.');
+    $('ondeToca').textContent = c ? t('📺 A música toca na TV.', '📺 Music plays on the TV.', '📺 La música suena en la tele.') : t('📱 A música toca neste celular.', '📱 Music plays on this phone.', '📱 La música suena en este móvil.');
   }
   $('btConectar').addEventListener('click', function () { Som.tocar('clique'); conectar($('codigoTV').value, $('nomeTV').value); });
   $('codigoTV').addEventListener('input', function () { this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); });
@@ -76,19 +76,19 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-fonte-bt]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-fonte-bt') === f)); });
     $('linkMusica').hidden = f === 'purpurina';
     $('ajudaYT').hidden = f !== 'youtube'; $('ajudaSP').hidden = f !== 'spotify';
-    $('linkMusicaCampo').placeholder = f === 'youtube' ? t('Cole aqui o link do YouTube (vídeo ou playlist)', 'Paste the YouTube link here (video or playlist)', 'Pega aquí el enlace de YouTube (video o lista)') : t('Cole aqui o link do Spotify (música, álbum ou playlist)', 'Paste the Spotify link here (song, album or playlist)', 'Pega aquí el enlace de Spotify (canción, álbum o lista)');
+    $('linkMusicaCampo').placeholder = f === 'youtube' ? t('Cole aqui o link do YouTube (vídeo ou playlist)', 'Paste the YouTube link here (video or playlist)', 'Pega aquí el enlace de YouTube (vídeo o lista)') : t('Cole aqui o link do Spotify (música, álbum ou playlist)', 'Paste the Spotify link here (song, album or playlist)', 'Pega aquí el enlace de Spotify (canción, álbum o lista)');
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-fonte-bt]'), function (b) {
     b.addEventListener('click', function () { Som.tocar('clique'); escolherFonte(b.getAttribute('data-fonte-bt')); if (b.getAttribute('data-fonte-bt') === 'purpurina') tocar('purpurina', ''); });
   });
   function tocar(fonte, ref) {
-    if (conectado()) { mandar('musica', { fonte: fonte, ref: ref }); A.recado(t('🎵 Mandei para a TV!', '🎵 Sent to the TV!', '🎵 ¡Lo mandé a la TV!')); return; }
-    local.tocar(fonte, ref).then(function (ok) { if (!ok) A.recado(t('Não deu para tocar. Confira o link e a internet.', "Couldn't play. Check the link and the internet.", "No se pudo reproducir. Revisa el enlace y el internet.")); });
+    if (conectado()) { mandar('musica', { fonte: fonte, ref: ref }); A.recado(t('🎵 Mandei para a TV!', '🎵 Sent to the TV!', '🎵 ¡Enviado a la tele!')); return; }
+    local.tocar(fonte, ref).then(function (ok) { if (!ok) A.recado(t('Não deu para tocar. Confira o link e a internet.', "Couldn't play. Check the link and the internet.", "No se ha podido reproducir. Revisa el enlace e internet.")); });
   }
   $('btTocarLink').addEventListener('click', function () {
     // aceita link do YouTube ou do Spotify, não importa qual botão estava escolhido
     var r = M.ler($('linkMusicaCampo').value);
-    if (!r) { $('musicaAviso').textContent = t('Não entendi esse link. No app do YouTube ou do Spotify, toque em Compartilhar → Copiar link e cole aqui.', "I didn't understand this link. In the YouTube or Spotify app, tap Share → Copy link and paste it here.", "No entendí ese enlace. En la app de YouTube o de Spotify, toca Compartir → Copiar enlace y pégalo aquí."); return; }
+    if (!r) { $('musicaAviso').textContent = t('Não entendi esse link. No app do YouTube ou do Spotify, toque em Compartilhar → Copiar link e cole aqui.', "I didn't understand this link. In the YouTube or Spotify app, tap Share → Copy link and paste it here.", "No he entendido ese enlace. En la app de YouTube o de Spotify, toca Compartir → Copiar enlace y pégalo aquí."); return; }
     escolherFonte(r.fonte); $('musicaAviso').textContent = ''; Som.tocar('clique'); tocar(r.fonte, r.ref);
   });
   function comando(acao) {
@@ -135,8 +135,8 @@
     $('musicaAgora').textContent = (e.tocando ? '🎶 ' : '⏸ ') + nome + (e.titulo && e.titulo !== 'YouTube' && e.titulo !== 'Spotify' ? ' · ' + e.titulo : '');
     $('btMusTocar').textContent = e.tocando ? '⏸' : '▶';
     $('btMusTocar').setAttribute('aria-label', e.tocando ? t('Pausar', 'Pause', 'Pausar') : t('Tocar', 'Play', 'Reproducir'));
-    if (e.erro === 'bloqueado') $('musicaAviso').textContent = t('O dono desse vídeo não deixa tocar fora do YouTube. Escolha outro.', "This video's owner doesn't allow playing outside YouTube. Pick another one.", "El dueño de este video no deja reproducirlo fuera de YouTube. Elige otro.");
-    else if (e.erro === 'invalido') $('musicaAviso').textContent = t('Esse vídeo não abriu (privado ou apagado). Escolha outro.', "This video didn't open (private or deleted). Pick another one.", "Este video no se abrió (es privado o fue borrado). Elige otro.");
+    if (e.erro === 'bloqueado') $('musicaAviso').textContent = t('O dono desse vídeo não deixa tocar fora do YouTube. Escolha outro.', "This video's owner doesn't allow playing outside YouTube. Pick another one.", "El dueño de este vídeo no deja reproducirlo fuera de YouTube. Elige otro.");
+    else if (e.erro === 'invalido') $('musicaAviso').textContent = t('Esse vídeo não abriu (privado ou apagado). Escolha outro.', "This video didn't open (private or deleted). Pick another one.", "Este vídeo no se ha abierto (es privado o se ha borrado). Elige otro.");
     else if (e.erro === 'sem-internet') $('musicaAviso').textContent = t('Precisa de internet para o YouTube e o Spotify.', 'YouTube and Spotify need internet.', 'YouTube y Spotify necesitan internet.');
   }
   escolherFonte('purpurina'); atualizarSelos(); atualizarSemMusica();
@@ -151,7 +151,7 @@
     $('tvEndereco').textContent = /solverone\.com\.br$/.test(location.host) ? 'solverone.com.br/kids' : location.host + location.pathname.replace(/index\.html$/, '');
     tv.tocador = M.tocador($('tvMusica'), function (e) { mandarTV(e); mostrarTituloTV(e); });
     S.abrir(tv.codigo, receberNaTV).then(function (sala) { tv.sala = sala; setInterval(function () { mandarTV(tv.tocador.estado()); limparSumidos(); }, 3000); })
-      .catch(function () { $('tvEspera').querySelector('.tv-passos').textContent = t('Sem conexão com a internet. Confira o Wi-Fi da TV e recarregue a página.', 'No internet connection. Check the TV Wi-Fi and reload the page.', 'Sin conexión a internet. Revisa el wifi de la TV y recarga la página.'); });
+      .catch(function () { $('tvEspera').querySelector('.tv-passos').textContent = t('Sem conexão com a internet. Confira o Wi-Fi da TV e recarregue a página.', 'No internet connection. Check the TV Wi-Fi and reload the page.', 'Sin conexión a internet. Revisa el wifi de la tele y recarga la página.'); });
     setTimeout(function () { try { $('btLigarSom').focus(); } catch (e) { /* ok */ } }, 200);
     desenharTV();
   }
