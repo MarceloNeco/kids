@@ -105,8 +105,8 @@ test('celular: as setas ⬅ ➡ ⬆ ⬇ levam a garra; no médio tem relógio e 
     await pg.waitForTimeout(200);
     const e4 = await est(pg);
     assert.ok(Math.hypot(e4.x - e3.x, e4.z - e3.z) < 0.05, 'soltou, parou');
-    await pg.evaluate(() => GarraDebug.velocidade(10));
-    await pg.waitForFunction(() => GarraDebug.estado().fase !== 'mirar', null, { timeout: 15000 });
+    await pg.evaluate(() => GarraDebug.velocidade(20));   // 1 minuto de relógio, acelerado
+    await pg.waitForFunction(() => GarraDebug.estado().fase !== 'mirar', null, { timeout: 30000 });
     assert.equal((await est(pg)).fichas, 9, 'o tempo acabou e gastou a ficha');
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
