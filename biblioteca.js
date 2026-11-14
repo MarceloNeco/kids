@@ -113,17 +113,22 @@
   ['play', 'pause', 'ended'].forEach(function (ev) { audio.addEventListener(ev, function () { marcar(); }); });
   audio.addEventListener('error', function () { marcar(true); });
 
+  // trava a página de trás enquanto a janela está aberta (dono, 14/Nov/2026: rolar até o fim da janela não pode mexer o fundo)
+  function travarFundo(sim) {
+    var h = document.documentElement, n = Math.max(0, (+h.getAttribute('data-travas') || 0) + (sim ? 1 : -1));
+    h.setAttribute('data-travas', n); h.classList.toggle('trava-fundo', n > 0);
+  }
   function abrir() {
     montar();
     painel.hidden = false;
-    d.body.classList.add('bib-aberta');
+    d.body.classList.add('bib-aberta'); travarFundo(true);
     painel.querySelector('.bib-x').focus();
     try { history.pushState({ bolinhoBiblioteca: 1 }, ''); naHistoria = true; } catch (e) { naHistoria = false; }
   }
   function fechar(pelaHistoria) {
     if (painel.hidden) return;
     painel.hidden = true;
-    d.body.classList.remove('bib-aberta');
+    d.body.classList.remove('bib-aberta'); travarFundo(false);
     audio.pause();
     if (naHistoria && !pelaHistoria) { naHistoria = false; history.back(); }
     naHistoria = false;

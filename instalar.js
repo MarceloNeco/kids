@@ -289,15 +289,15 @@
     if (android) return T('<ol><li>Se em cima da página aparece um <b>✕</b> (você abriu por um link de outro app), toque em <b>Abrir no Chrome</b> (botão abaixo) e faça os passos lá.</li>' +
       '<li>No Chrome, toque nos <b>três pontinhos ⋮</b> (no canto de cima) e em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
       '<li>Confirme em <b>Instalar</b>.</li></ol>' +
-      '<p class="aviso">Não achou o ícone? Arraste a tela inicial para cima para abrir a <b>lista de apps</b> e procure <b>' + N + '</b>. Segure o dedo em cima dele e arraste para a tela inicial.</p>',
+      '<p class="aviso">Apagar o ícone da tela inicial não desinstala: o ' + N + ' continua instalado na lista de apps (por isso o Chrome não oferece instalar de novo). Não achou o ícone? Arraste a tela inicial para cima para abrir a <b>lista de apps</b> e procure <b>' + N + '</b>. Segure o dedo em cima dele e arraste para a tela inicial.</p>',
       '<ol><li>If you see an <b>✕</b> at the top of the page (you opened it from a link in another app), tap <b>Open in Chrome</b> (button below) and do the steps there.</li>' +
       '<li>In Chrome, tap the <b>three dots ⋮</b> (top corner) and <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
       '<li>Confirm with <b>Install</b>.</li></ol>' +
-      '<p class="aviso">Can\'t find the icon? Swipe up on the home screen to open the <b>app list</b> and look for <b>' + N + '</b>. Hold your finger on it and drag it to the home screen.</p>',
+      '<p class="aviso">Removing the icon from the home screen doesn\'t uninstall it: ' + N + ' is still installed in the app list (that\'s why Chrome won\'t offer to install it again). Can\'t find the icon? Swipe up on the home screen to open the <b>app list</b> and look for <b>' + N + '</b>. Hold your finger on it and drag it to the home screen.</p>',
       '<ol><li>Si arriba de la página aparece una <b>✕</b> (lo abriste desde un enlace de otra app), toca <b>Abrir en Chrome</b> (botón de abajo) y haz los pasos allí.</li>' +
       '<li>En Chrome, toca los <b>tres puntitos ⋮</b> (arriba) y <b>Instalar aplicación</b> o <b>Añadir a la pantalla de inicio</b>.</li>' +
       '<li>Confirma con <b>Instalar</b>.</li></ol>' +
-      '<p class="aviso">¿No encuentras el icono? Desliza hacia arriba en la pantalla de inicio para abrir la <b>lista de apps</b> y busca <b>' + N + '</b>. Mantén el dedo encima y arrástralo a la pantalla de inicio.</p>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
+      '<p class="aviso">Quitar el icono de la pantalla de inicio no lo desinstala: ' + N + ' sigue instalado en la lista de apps (por eso Chrome no ofrece instalarlo otra vez). ¿No encuentras el icono? Desliza hacia arriba en la pantalla de inicio para abrir la <b>lista de apps</b> y busca <b>' + N + '</b>. Mantén el dedo encima y arrástralo a la pantalla de inicio.</p>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
     if (macSafari) return T('<ol><li>No menu do topo da tela, clique em <b>Arquivo</b>.</li>' +
       '<li>Clique em <b>Adicionar ao Dock</b> e em <b>Adicionar</b>.</li></ol>',
       '<ol><li>In the menu at the top of the screen, click <b>File</b>.</li>' +
@@ -338,10 +338,15 @@
 
   // Janela de passos: abre com movimento curto, fecha no ✕, no Esc, tocando fora e no Voltar do celular.
   var naHistoria = false;
+  // trava a página de trás enquanto a janela está aberta (dono, 14/Nov/2026: rolar até o fim da janela não pode mexer o fundo)
+  function travarFundo(sim) {
+    var h = document.documentElement, n = Math.max(0, (+h.getAttribute('data-travas') || 0) + (sim ? 1 : -1));
+    h.setAttribute('data-travas', n); h.classList.toggle('trava-fundo', n > 0);
+  }
   function abrir() {
     corpo.innerHTML = passos();
     fundo.hidden = false;
-    document.body.classList.add('bc-modal');
+    document.body.classList.add('bc-modal'); travarFundo(true);
     requestAnimationFrame(function () { fundo.classList.add('aberto'); });
     fundo.querySelector('.bc-fechar').focus();
     try { history.pushState({ bcPassos: 1 }, ''); naHistoria = true; } catch (e) {}
@@ -350,7 +355,7 @@
     if (fundo.hidden) return;
     fundo.classList.remove('aberto');
     fundo.hidden = true;
-    document.body.classList.remove('bc-modal');
+    document.body.classList.remove('bc-modal'); travarFundo(false);
     if (!barra.hidden) botao.focus();
     if (naHistoria && !pelaHistoria) { naHistoria = false; history.back(); }
     naHistoria = false;
