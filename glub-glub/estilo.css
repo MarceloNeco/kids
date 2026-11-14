@@ -1,0 +1,6 @@
+/* GLUB GLUB — visual das telas (o lago é desenhado em canvas pelo arte.js) */
+html, body { margin: 0; height: 100%; background: #0b3f82; overflow: hidden; overscroll-behavior: none; }
+body { font-family: 'Fredoka', system-ui, sans-serif; color: #fff; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+.tela { display: none; position: fixed; inset: 0; }
+.tela.ativa { display: block; }
+#lago { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }

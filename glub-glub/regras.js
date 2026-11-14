@@ -37,31 +37,31 @@
     return o;
   }
   var BICHOS = [
-    b('lambari', 'Lambari', 'Lambari', 1, 1, 0.034, 1, 'bicho', 0.42),
-    b('piaba', 'Piaba', 'Piaba', 1, 1, 0.03, 1, 'bicho', 0.42),
-    b('tilapia', 'Tilápia', 'Tilapia', 1, 2, 0.046, 1, 'bicho', 0.55),
-    b('baiacu', 'Baiacu', 'Pufferfish', 1, 3, 0.044, 1, 'bicho', 0.8),
-    b('traira', 'Traíra', 'Wolf fish', 2, 5, 0.058, 2, 'bicho', 0.4),
-    b('pacu', 'Pacu', 'Pacu', 2, 5, 0.056, 2, 'bicho', 0.7),
-    b('bagre', 'Bagre', 'Catfish', 2, 6, 0.062, 2, 'bicho', 0.4),
-    b('tartaruga', 'Tartaruga', 'Turtle', 2, 8, 0.066, 3, 'bicho', 0.6),
-    b('bota', 'Bota velha', 'Old boot', 3, 1, 0.046, 1, 'premio', 0.85),
-    b('garrafa', 'Garrafa com bilhete', 'Message in a bottle', 3, 10, 0.046, 1, 'premio', 0.5),
-    b('bau', 'Baú', 'Treasure chest', 3, 15, 0.06, 2, 'premio', 0.75),
-    b('polvo', 'Polvo', 'Octopus', 4, 12, 0.07, 3, 'bicho', 0.85),
-    b('lagosta', 'Lagosta', 'Lobster', 4, 15, 0.072, 3, 'bicho', 0.5),
-    b('caranguejo', 'Caranguejo gigante', 'Giant crab', 4, 20, 0.08, 3, 'bicho', 0.6),
-    b('tubarao', 'Tubarão', 'Shark', 4, 25, 0.1, 4, 'bicho', 0.4),
-    b('martelo', 'Tubarão-martelo', 'Hammerhead shark', 4, 30, 0.1, 4, 'bicho', 0.45),
-    b('tubarao-baleia', 'Tubarão-baleia', 'Whale shark', 5, 40, 0.14, 5, 'bicho', 0.4),
-    b('baleia', 'Baleia', 'Whale', 5, 60, 0.17, 5, 'bicho', 0.45),
-    b('sereia', 'Sereia Iara', 'Iara the mermaid', 5, 80, 0.1, 4, 'bicho', 0.55),
-    b('pirarucu', 'Pirarucu Dourado', 'Golden Arapaima', 6, 500, 0.13, 5, 'bicho', 0.35, true),
-    b('pet', 'Garrafa PET', 'Plastic bottle', 0, 3, 0.04, 1, 'lixo', 0.45),
-    b('lata', 'Lata', 'Can', 0, 3, 0.03, 1, 'lixo', 0.75),
-    b('sacola', 'Sacolinha', 'Plastic bag', 0, 4, 0.045, 1, 'lixo', 0.8),
-    b('chinelo', 'Chinelo', 'Flip-flop', 0, 5, 0.045, 1, 'lixo', 0.5),
-    b('pneu', 'Pneu velho', 'Old tire', 0, 8, 0.06, 2, 'lixo', 0.9)
+    b('lambari', 'Lambari', 'Lambari', 1, 1, 0.048, 1, 'bicho', 0.42),
+    b('piaba', 'Piaba', 'Piaba', 1, 1, 0.044, 1, 'bicho', 0.42),
+    b('tilapia', 'Tilápia', 'Tilapia', 1, 2, 0.062, 1, 'bicho', 0.55),
+    b('baiacu', 'Baiacu', 'Pufferfish', 1, 3, 0.06, 1, 'bicho', 0.8),
+    b('traira', 'Traíra', 'Wolf fish', 2, 5, 0.078, 2, 'bicho', 0.4),
+    b('pacu', 'Pacu', 'Pacu', 2, 5, 0.074, 2, 'bicho', 0.7),
+    b('bagre', 'Bagre', 'Catfish', 2, 6, 0.082, 2, 'bicho', 0.4),
+    b('tartaruga', 'Tartaruga', 'Turtle', 2, 8, 0.085, 3, 'bicho', 0.6),
+    b('bota', 'Bota velha', 'Old boot', 3, 1, 0.06, 1, 'premio', 0.85),
+    b('garrafa', 'Garrafa com bilhete', 'Message in a bottle', 3, 10, 0.06, 1, 'premio', 0.5),
+    b('bau', 'Baú', 'Treasure chest', 3, 15, 0.08, 2, 'premio', 0.75),
+    b('polvo', 'Polvo', 'Octopus', 4, 12, 0.09, 3, 'bicho', 0.85),
+    b('lagosta', 'Lagosta', 'Lobster', 4, 15, 0.095, 3, 'bicho', 0.5),
+    b('caranguejo', 'Caranguejo gigante', 'Giant crab', 4, 20, 0.1, 3, 'bicho', 0.6),
+    b('tubarao', 'Tubarão', 'Shark', 4, 25, 0.14, 4, 'bicho', 0.4),
+    b('martelo', 'Tubarão-martelo', 'Hammerhead shark', 4, 30, 0.14, 4, 'bicho', 0.45),
+    b('tubarao-baleia', 'Tubarão-baleia', 'Whale shark', 5, 40, 0.19, 5, 'bicho', 0.4),
+    b('baleia', 'Baleia', 'Whale', 5, 60, 0.22, 5, 'bicho', 0.45),
+    b('sereia', 'Sereia Iara', 'Iara the mermaid', 5, 80, 0.14, 4, 'bicho', 0.55),
+    b('pirarucu', 'Pirarucu Dourado', 'Golden Arapaima', 6, 500, 0.17, 5, 'bicho', 0.35, true),
+    b('pet', 'Garrafa PET', 'Plastic bottle', 0, 3, 0.055, 1, 'lixo', 0.45),
+    b('lata', 'Lata', 'Can', 0, 3, 0.045, 1, 'lixo', 0.75),
+    b('sacola', 'Sacolinha', 'Plastic bag', 0, 4, 0.06, 1, 'lixo', 0.8),
+    b('chinelo', 'Chinelo', 'Flip-flop', 0, 5, 0.06, 1, 'lixo', 0.5),
+    b('pneu', 'Pneu velho', 'Old tire', 0, 8, 0.08, 2, 'lixo', 0.9)
   ];
   var POR_ID = {};
   BICHOS.forEach(function (x) { POR_ID[x.id] = x; });
@@ -114,7 +114,7 @@
     if (pedidos.length && E.rnd() < 0.5) d = POR_ID[sortear(E, pedidos)];
     var linhas = LINHAS[faixa], linha = linhas[Math.floor(E.rnd() * linhas.length)];
     if (faixa === 3) { novoBicho(E, d.id, (0.1 + E.rnd() * 0.8) * E.W, linha, 1, 0); return; }
-    var dir = E.rnd() < 0.5 ? 1 : -1, r = d.tam * H / 2;
+    var dir = E.rnd() < 0.5 ? 1 : -1, r = d.tam * H * E.esc / 2;
     novoBicho(E, d.id, dir > 0 ? -r : E.W + r, linha, dir, velDe(E, faixa));
   }
   function moverBichos(E, h) {
@@ -122,7 +122,7 @@
     for (var i = E.bichos.length - 1; i >= 0; i--) {
       var o = E.bichos[i];
       if (o.preso != null) continue;
-      var r = o.tam * H / 2;
+      var r = o.tam * H * E.esc / 2;
       if (o.tipo === 'lixo') {   // afunda devagar e fica no fundo
         if (o.fy < 0.95) { o.fy += 0.05 * h; o.x += o.v * E.W * h; }
         o.y = fundoY(E, o.fy) + Math.sin(E.t * 1.5 + o.fase) * 3;
@@ -143,8 +143,10 @@
       o.y = fundoY(E, o.fy) + (z ? Math.sin(E.t * o.wf * 1.7 + o.fase) * z * 12 : 0) + (o.faixa === 3 ? Math.sin(E.t + o.fase) * 3 : 0);
     }
   }
-  function encosta(o, x, y) {
-    var rx = o.tam * H / 2 + 6, ry = o.tam * H / 2 * o.alt + 6, dx = (x - o.x) / rx, dy = (y - o.y) / ry;
+  // deitado, a tela é baixinha: os bichos ficam maiores (E.esc) para dar para ver os detalhes; o toque e o desenho usam o mesmo tamanho
+  function escDe(aspecto) { return aspecto >= 1 ? 1.45 : 1; }
+  function encosta(E, o, x, y) {
+    var rx = o.tam * H * E.esc / 2 + 6, ry = o.tam * H * E.esc / 2 * o.alt + 6, dx = (x - o.x) / rx, dy = (y - o.y) / ry;
     return dx * dx + dy * dy <= 1;
   }
 
@@ -165,7 +167,7 @@
     if (E.t < E.proxRaro) return;
     E.proxRaro = E.t + RARO_CADA;
     if (E.bonus || E.acabou || E.bichos.some(function (o) { return o.raro; }) || E.rnd() > 0.35) return;
-    var dir = E.rnd() < 0.5 ? 1 : -1, r = POR_ID.pirarucu.tam * H;
+    var dir = E.rnd() < 0.5 ? 1 : -1, r = POR_ID.pirarucu.tam * H * E.esc;
     novoBicho(E, 'pirarucu', dir > 0 ? -r : E.W + r, LINHAS[6][0], dir, E.nv.vel * VEL_FAIXA[6]);
   }
   function bonus(E, ev) {
@@ -194,7 +196,8 @@
   /* ---------- jogadores ---------- */
   function ponta(E, j) {
     var lado = E.j[j].lado === 'dir';
-    return { x: E.W * (lado ? 0.79 : 0.21), y: E.sup - ACIMA };
+    var m = E.W < H ? 0.3 : 0.21;   // celular em pé: as varas mais para o meio, para os personagens caberem
+    return { x: E.W * (lado ? 1 - m : m), y: E.sup - ACIMA };
   }
   function repouso(E, j, ang) { var p = ponta(E, j); return { x: p.x + Math.sin(ang) * L_LINHA, y: p.y + Math.cos(ang) * L_LINHA }; }
   function novoPedido(E, j) {
@@ -215,7 +218,7 @@
 
   function criar(op) {
     var aspecto = op.aspecto || 16 / 9, E = {
-      W: H * aspecto, sup: supDe(aspecto), t: 0, tempo: DURACAO, rnd: mulberry32(op.semente || 1), seq: 0,
+      W: H * aspecto, sup: supDe(aspecto), esc: escDe(aspecto), t: 0, tempo: DURACAO, rnd: mulberry32(op.semente || 1), seq: 0,
       bichos: [], bolhas: [], fila: [], pend: [], repor: true, proxBolha: 8, proxRaro: RARO_CADA,
       bonus: null, bonusFeito: false, acabou: false, fimT: 0, encerrado: false
     };
@@ -289,11 +292,11 @@
         }
       }
       var alvo = null;
-      for (var i = 0; i < E.bichos.length; i++) { var o = E.bichos[i]; if (o.preso == null && encosta(o, a.x, a.y)) { alvo = o; break; } }
+      for (var i = 0; i < E.bichos.length; i++) { var o = E.bichos[i]; if (o.preso == null && encosta(E, o, a.x, a.y)) { alvo = o; break; } }
       if (alvo) {
         var pegos = [alvo];
         if (J.poder && J.poder.id === 'rede') {
-          E.bichos.filter(function (o) { return o !== alvo && o.preso == null && Math.hypot(o.x - a.x, o.y - a.y) <= 70; })
+          E.bichos.filter(function (o) { return o !== alvo && o.preso == null && Math.hypot(o.x - a.x, o.y - a.y) <= 70 * E.esc; })
             .sort(function (p, q) { return Math.hypot(p.x - a.x, p.y - a.y) - Math.hypot(q.x - a.x, q.y - a.y); })
             .slice(0, 2).forEach(function (o) { pegos.push(o); });
           J.poder = null;
@@ -311,7 +314,7 @@
     a.dist -= v * h;
     if (a.dist <= 0) { a.dist = 0; a.x = pt.x + sx * L_LINHA; a.y = pt.y + sy * L_LINHA; chegou(E, j, ev); a.tb = Math.asin(Math.max(-1, Math.min(1, a.ang / nv.angMax))) / (2 * Math.PI * nv.balanco); return; }
     a.x = pt.x + sx * (L_LINHA + a.dist); a.y = pt.y + sy * (L_LINHA + a.dist);
-    a.presos.forEach(function (o) { o.x = a.x; o.y = a.y + o.tam * H * o.alt * 0.4; o.fy = (o.y - E.sup) / (H - E.sup); });
+    a.presos.forEach(function (o) { o.x = a.x; o.y = a.y + o.tam * H * E.esc * 0.42; o.fy = (o.y - E.sup) / (H - E.sup); });
   }
 
   /* ---------- robô (o outro personagem no modo sozinho) ---------- */
@@ -320,7 +323,7 @@
     for (var d = L_LINHA; d < 1400; d += 14) {
       var x = pt.x + sx * d, y = pt.y + sy * d;
       if (y >= H - 15 || x <= 0 || x >= E.W) return null;
-      for (var i = 0; i < E.bichos.length; i++) if (E.bichos[i].preso == null && encosta(E.bichos[i], x, y)) return E.bichos[i];
+      for (var i = 0; i < E.bichos.length; i++) if (E.bichos[i].preso == null && encosta(E, E.bichos[i], x, y)) return E.bichos[i];
     }
     return null;
   }
@@ -362,7 +365,7 @@
     var W = H * aspecto, f = W / E.W;
     E.bichos.forEach(function (o) { o.x *= f; });
     E.bolhas.forEach(function (o) { o.x *= f; });
-    E.W = W; E.sup = supDe(aspecto);
+    E.W = W; E.sup = supDe(aspecto); E.esc = escDe(aspecto);
     E.bichos.forEach(function (o) { o.y = fundoY(E, o.fy); });
     E.bolhas.forEach(function (o) { o.y = fundoY(E, o.fy); });
   }
