@@ -104,12 +104,12 @@ música** (fica guardado no aparelho: ao abrir de novo, continua sem; os efeitos
   primeira vez que toca (cache `purpurina-musicas-v1`, que não baixa de novo a cada versão); se uma não estiver guardada, pula para a próxima. No arquivo baixado tocam
   só as feitas pelo jogo, para o arquivo continuar pequeno.
 
-## Instalar, baixar e brincar sem internet
+## Instalar e brincar sem internet
 
 - Depois da primeira abertura com internet, o jogo funciona **sem internet** no mesmo endereço (`sw.js`).
-- **📲 Instalar no celular** (no menu, quando o navegador oferece) ou, no Chrome, ⋮ → **Adicionar à tela inicial**.
-- **📥 Baixar o jogo (arquivo)**: baixa o `purpurina.html` com tudo dentro (uns 250 KB), que abre direto do celular,
-  sem internet e sem login. Os looks guardados no arquivo ficam separados dos do site.
+- **📲 Instalar no celular (com ícone)**, no menu, sempre à vista no navegador: com a janela do Chrome instala na hora; sem
+  ela (ou já instalado), abre o passo a passo comum (`../instalar.js`), que ensina a achar o ícone na lista de apps.
+- O botão de baixar um arquivo `purpurina.html` saiu na 0.21.0 (dono, 14/Nov/2026: confundia com instalar e não criava ícone).
 
 ## O que fica guardado (só neste aparelho)
 
@@ -133,8 +133,7 @@ no código, `t(pt, en, es)`; peças e desafios com `pt`, `en` e `es` no `pecas.j
 | `sala.js` | canal TV ↔ celular (Supabase Realtime; `BroadcastChannel` com `?teste`); confere toda mensagem que chega. |
 | `musica.js` | links do YouTube/Spotify e o tocador (Purpurina, YouTube IFrame API, Spotify iFrame API). |
 | `tv.js` | modo TV (código, até 4 personagens, desfile, música), celular-controle (📺 Conectar) e a tela 🎵 Música. |
-| `app.js` | telas, Voltar do celular, estúdio, zoom do palco, pincel e faíscas, foto, looks, desfile, confete, teclado/TV, instalar e baixar. `APP_VERSION` aqui. |
-| `baixar.js` | **cópia idêntica** do `vruuum/baixar.js` (o teste confere): monta o `.html` de arquivo único. |
+| `app.js` | telas, Voltar do celular, estúdio, zoom do palco, pincel e faíscas, foto, looks, desfile, confete, teclado/TV e instalar. `APP_VERSION` aqui. |
 | `ia-foto.js` | ✨ foto de cinema com IA (escondida: ?ia=1 ou interruptor `purpurina-ia`): manda só o desenho para o Gemini ou a OpenAI; chave no cofre comum (`../cofre.js` + `../janela.js`, cópias dos masters do rootify-one), com o PIN do adulto. Partes sem tela testadas em `teste/ia.test.js`. |
 | `sw.js` | cache `purpurina-v…` para funcionar sem internet e `purpurina-musicas-v1` para as músicas. `VERSAO` aqui. |
 | `versoes.json` | novidades de cada versão (PT e EN). |

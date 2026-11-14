@@ -289,7 +289,7 @@ function montar(el, op) {
   const carros = [{ m: carro('#e84a3c'), rota: voltaFora, t: 0, vel: 5.5 }, { m: carro('#3aa0e8'), rota: voltaFora, t: 0.5, vel: 5.5 }, { m: carro('#ffc93c'), rota: voltaMeio, t: 0.25, vel: 4.5 }];
   carros.forEach(c => { c.len = rotaLen(c.rota); cena.add(c.m); });
   const chef = cozinheiro(); cena.add(chef);
-  R = { host, el, retrato, renderer, cena, cam, sol, lotes, xs, zs, W, D, carros, chef, fumacas, op, az: retrato ? 0.18 : 0.14, azAlvo: null, zoom: 1, rodando: false, anda: null, t0: performance.now(), rotulos: {} };
+  R = { host, el, retrato, renderer, cena, cam, sol, lotes, xs, zs, W, D, carros, chef, fumacas, op, az: retrato ? 0.18 : 0.14, azAlvo: null, zoom: 1, rodando: false, anda: null, t0: performance.now(), rotulos: {}, pan: { x: 0, y: 0 }, vista: { hw: 10, hh: 10 } };
   ajustarTamanho(); acharRotulos(el); porNaPorta(op.pos || 'casa'); interacao(); continuar();
 }
 function rotaLen(r) { let s = 0; for (let i = 0; i < r.length; i++) { const a = r[i], b = r[(i + 1) % r.length]; s += Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]); } return s; }
@@ -325,29 +325,53 @@ function posicionarCamera() {
   const cw = x1 - x0, ch = y1 - y0, asp = R.w / R.h;
   let hw = cw / 2, hh = ch / 2;
   if (hw / hh > asp) hh = hw / asp; else hw = hh * asp;
-  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-  c.left = cx - hw; c.right = cx + hw; c.top = cy + hh; c.bottom = cy - hh; c.zoom = R.zoom; c.updateProjectionMatrix();
+  // v0.12.1: a câmera anda até o centro da cidade (assim o zoom aproxima do meio, sem a cidade fugir para o canto) e,
+  // aproximada, a criança arrasta a cidade (R.pan, em unidades da vista, preso para não sair da cidade)
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, z = R.zoom;
+  const mx = Math.max(0, hw * (1 - 1 / z)), my = Math.max(0, hh * (1 - 1 / z));
+  R.pan.x = Math.max(-mx, Math.min(mx, R.pan.x)); R.pan.y = Math.max(-my, Math.min(my, R.pan.y));
+  const dir = new THREE.Vector3(1, 0, 0).applyQuaternion(c.quaternion), cima = new THREE.Vector3(0, 1, 0).applyQuaternion(c.quaternion);
+  c.position.addScaledVector(dir, cx + R.pan.x).addScaledVector(cima, cy + R.pan.y); c.updateMatrixWorld();
+  c.left = -hw; c.right = hw; c.top = hh; c.bottom = -hh; c.zoom = z; c.updateProjectionMatrix();
+  R.vista = { hw, hh };
 }
 function interacao() {
-  const cv = R.renderer.domElement; let ini = null, toques = {}, dist0 = 0, zoom0 = 1;
+  // um dedo: arrasta a cidade (aproximada) ou gira (inteira); dois dedos: aproxima/afasta e arrasta; ⟲ ⟳ giram
+  const cv = R.renderer.domElement; let ini = null; const toques = {}; let dist0 = 0, zoom0 = 1, meio0 = null;
   cv.style.touchAction = 'none';
-  cv.addEventListener('pointerdown', e => { toques[e.pointerId] = [e.clientX, e.clientY]; ini = { x: e.clientX, y: e.clientY, az: R.az, mexeu: false }; const k = Object.values(toques); if (k.length === 2) { dist0 = Math.hypot(k[0][0] - k[1][0], k[0][1] - k[1][1]); zoom0 = R.zoom; } try { cv.setPointerCapture(e.pointerId); } catch (x) { /* ok */ } });
+  const meio = () => { const k = Object.values(toques); return [(k[0][0] + k[1][0]) / 2, (k[0][1] + k[1][1]) / 2]; };
+  cv.addEventListener('pointerdown', e => {
+    toques[e.pointerId] = [e.clientX, e.clientY];
+    ini = { x: e.clientX, y: e.clientY, az: R.az, px: R.pan.x, py: R.pan.y, mexeu: false, ultimo: [e.clientX, e.clientY] };
+    const k = Object.values(toques); if (k.length === 2) { dist0 = Math.hypot(k[0][0] - k[1][0], k[0][1] - k[1][1]); zoom0 = R.zoom; meio0 = meio(); ini.mexeu = true; }
+    try { cv.setPointerCapture(e.pointerId); } catch (x) { /* ok */ }
+  });
+  const arrastar = (dx, dy) => { const u = (2 * R.vista.hw / R.zoom) / R.w; R.pan.x -= dx * u; R.pan.y += dy * u; };
   cv.addEventListener('pointermove', e => {
     if (!toques[e.pointerId]) return; toques[e.pointerId] = [e.clientX, e.clientY];
     const k = Object.values(toques);
-    if (k.length === 2 && dist0) { R.zoom = Math.max(0.8, Math.min(2.6, zoom0 * Math.hypot(k[0][0] - k[1][0], k[0][1] - k[1][1]) / dist0)); ini && (ini.mexeu = true); continuar(); return; }
-    if (!ini) return; const dx = e.clientX - ini.x;
-    if (Math.abs(dx) > 8) ini.mexeu = true;
-    if (ini.mexeu) { R.az = ini.az - dx / R.w * Math.PI; R.azAlvo = null; continuar(); }
+    if (k.length === 2 && dist0) {
+      R.zoom = Math.max(1, Math.min(3, zoom0 * Math.hypot(k[0][0] - k[1][0], k[0][1] - k[1][1]) / dist0));
+      const m = meio(); arrastar(m[0] - meio0[0], m[1] - meio0[1]); meio0 = m; continuar(); return;
+    }
+    if (!ini) return;
+    const dx = e.clientX - ini.x, dy = e.clientY - ini.y;
+    if (Math.hypot(dx, dy) > 8) ini.mexeu = true;
+    if (!ini.mexeu) return;
+    if (R.zoom > 1.05) { arrastar(e.clientX - ini.ultimo[0], e.clientY - ini.ultimo[1]); ini.ultimo = [e.clientX, e.clientY]; }
+    else { R.az = ini.az - dx / R.w * Math.PI; R.azAlvo = null; }
+    continuar();
   });
   const fim = e => {
     delete toques[e.pointerId];
     if (ini && !ini.mexeu && Object.keys(toques).length === 0) tocar(e);
+    if (Object.keys(toques).length < 2) dist0 = 0;
     if (!Object.keys(toques).length) ini = null;
   };
-  cv.addEventListener('pointerup', fim); cv.addEventListener('pointercancel', e => { delete toques[e.pointerId]; ini = null; });
-  cv.addEventListener('wheel', e => { e.preventDefault(); R.zoom = Math.max(0.8, Math.min(2.6, R.zoom * (e.deltaY < 0 ? 1.1 : 0.9))); continuar(); }, { passive: false });
+  cv.addEventListener('pointerup', fim); cv.addEventListener('pointercancel', e => { delete toques[e.pointerId]; ini = null; dist0 = 0; });
+  cv.addEventListener('wheel', e => { e.preventDefault(); R.zoom = Math.max(1, Math.min(3, R.zoom * (e.deltaY < 0 ? 1.1 : 0.9))); continuar(); }, { passive: false });
 }
+function zoom(f) { R.zoom = Math.max(1, Math.min(3, R.zoom * f)); continuar(); }
 function tocar(e) {
   const r = R.renderer.domElement.getBoundingClientRect(), v = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   const rc = new THREE.Raycaster(); rc.setFromCamera(v, R.cam);
@@ -412,15 +436,25 @@ function quadro(agora) {
   R.fumacas.forEach(b => { const f = (b.userData.f + t * 0.25) % 1; b.position.set(b.userData.o[0] + f * 0.8, b.userData.o[1] + f * 2.4, b.userData.o[2]); b.scale.setScalar(0.6 + f * 1.4); b.material.opacity = 0.8 * (1 - f); });
   R.renderer.render(R.cena, R.cam);
   // os nomes (botões do app) em cima de cada prédio
-  const v = new THREE.Vector3();
+  // v0.12.1: quando dois nomes batem, fica só o mais importante (o próximo da missão, depois o que tem coisa da lista)
+  const v = new THREE.Vector3(), caixas = [];
   Object.keys(R.rotulos).forEach(id => {
     const L = R.lotes[id], b = R.rotulos[id]; if (!L || !b) return;
-    v.set(L.x, 0.4, L.z + LOTE / 2 - 0.4).project(R.cam);
-    const x = (v.x + 1) / 2 * R.w, y = (1 - v.y) / 2 * R.h;
+    v.set(L.x, 0.4, L.z + LOTE / 2 - 0.6).project(R.cam);
+    const x = (v.x + 1) / 2 * R.w, y = (1 - v.y) / 2 * R.h, w = b.offsetWidth || 60, h = b.offsetHeight || 20;
     b.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px) translate(-50%, -100%)';
+    const pri = b.classList.contains('proximo') ? 3 : b.classList.contains('pronta') ? 2.5 : b.classList.contains('util') ? 2 : 1;
+    const fora = x < 0 || x > R.w || y < 10 || y > R.h + 4;
+    caixas.push({ b, pri: pri - (fora ? 10 : 0), r: [x - w / 2, y - h, x + w / 2, y], fora });
+  });
+  caixas.sort((a, c) => c.pri - a.pri);
+  const postas = [];
+  caixas.forEach(k => {
+    const bate = k.fora || postas.some(p => k.r[0] < p[2] - 2 && k.r[2] > p[0] + 2 && k.r[1] < p[3] - 2 && k.r[3] > p[1] + 2);
+    k.b.classList.toggle('escondido', bate); if (!bate) postas.push(k.r);
   });
   raf = requestAnimationFrame(quadro);
 }
 
-window.Cidade3D = { suportado, montar, andar, porNaPorta, pausar, continuar, girar, estado: () => R && { pos: R.pos, andando: !!R.anda, az: R.az } };
+window.Cidade3D = { suportado, montar, andar, porNaPorta, pausar, continuar, girar, zoom, estado: () => R && { pos: R.pos, andando: !!R.anda, az: R.az, zoom: R.zoom, pan: Object.assign({}, R.pan) } };
 window.dispatchEvent(new Event('cidade3d-pronta'));

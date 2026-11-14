@@ -929,3 +929,29 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .palco .diorama.d3 { width: 100%; max-width: 30rem; aspect-ratio: 1.35; border-radius: 18px; overflow: hidden; background: linear-gradient(180deg, #fff8ee, #f3dcc0); }
 .palco .diorama.d3 canvas { width: 100% !important; height: 100% !important; display: block; }
 @media (orientation: landscape) and (max-height: 32rem) { .palco .diorama.d3 { max-width: 20rem; } }
+
+/* ---------- v0.12.1: cesta numa fileira só (com o nome curtinho embaixo de cada ingrediente), arrastando para o lado se
+   não couber; a cidade ganha o espaço. A cesta para antes da bolinha 🎵 (right), sem ficar embaixo dela. ---------- */
+.cesta { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; overflow-y: hidden; right: calc(88px + var(--sr)); padding: 6px 8px calc(6px + var(--sb)) calc(8px + var(--sl));
+  gap: 6px; scrollbar-width: none; border-top-right-radius: 18px; }
+.cesta::-webkit-scrollbar { display: none; }
+.cesta .item { flex: none; flex-direction: column; gap: 0; border-radius: 16px; padding: 3px 6px 2px; font-size: 1.5rem; min-width: 3.6rem; line-height: 1; }
+.cesta .item b { font-size: .82rem; margin-top: 1px; }
+.cesta .item .ces-n { font-style: normal; font-size: .6rem; color: var(--muted); font-weight: 600; max-width: 4.6rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: capitalize; }
+.cesta .item.ok::after { position: absolute; margin: -2px 0 0 2.2rem; font-size: .8rem; }
+.cesta .item { position: relative; }
+.cesta-ic { flex: none; font-size: 1.6rem; }
+#mapa, #lugar { padding-bottom: calc(84px + var(--sb)); }
+.vila.vila3d { height: max(24rem, calc(100dvh - 12.6rem)); }
+.vila3d .rotulos .lugar .nome { font-size: .74rem; padding: 2px 7px; max-width: none; white-space: nowrap; }
+.vila3d .rotulos .lugar.escondido { opacity: 0; pointer-events: none; }
+.vila3d .rotulos .lugar { transition: opacity .2s; }
+.vila3d .zoom-bt { position: absolute; right: 8px; top: 62px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.vila3d .zoom-bt .mini { font-size: 1.2rem; background: rgba(255, 255, 255, .92); }
+@media (orientation: landscape) and (max-height: 32rem) {
+  .cesta .item { font-size: 1.15rem; min-width: 0; flex-direction: row; gap: 3px; padding: 1px 6px 1px 4px; border-radius: 999px; } .cesta .item .ces-n { display: none; } .cesta .item b { margin: 0; }
+  .cesta { padding-top: 3px; padding-bottom: calc(3px + var(--sb)); }
+  #mapa, #lugar { padding-bottom: calc(52px + var(--sb)); }
+  .vila.vila3d { height: calc(100dvh - 9.4rem); min-height: 12rem; }
+  .vila3d .zoom-bt { top: 8px; right: 112px; flex-direction: row; }
+}

@@ -96,7 +96,8 @@
   function sintParar() { if (timer) { clearInterval(timer); timer = null; } }
 
   // ---------- a rádio: gravadas (pop, dance e R&B, licença livre) e as feitas pelo jogo ----------
-  // só músicas animadas de dança e pop (sem voz), todas CC BY 4.0; a primeira é a de abertura
+  // só músicas animadas de dança e pop (sem voz), todas CC BY 4.0; a primeira é a de abertura. As com desfile: true
+  // (passarela chique ou emocionante, mais sóbrias) tocam no desfile (desfile())
   var GRAVADAS = [
     { url: 'musicas/disco-medusae.mp3', nome: 'Disco Medusae', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/glitter-blast.mp3', nome: 'Glitter Blast', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
@@ -107,17 +108,35 @@
     { url: 'musicas/airport-lounge.mp3', nome: 'Airport Lounge', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/cloud-dancer.mp3', nome: 'Cloud Dancer', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/got-funk.mp3', nome: 'Got Funk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/newer-wave.mp3', nome: 'Newer Wave', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/newer-wave.mp3', desfile: true, nome: 'Newer Wave', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/moonlight-beach.mp3', nome: 'Moonlight Beach', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/your-call.mp3', nome: 'Your Call', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/club-seamus.mp3', nome: 'Club Seamus', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/club-seamus.mp3', desfile: true, nome: 'Club Seamus', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/celebration.mp3', nome: 'Celebration', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/funky-one.mp3', nome: 'Funky One', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/neon-laser-horizon.mp3', nome: 'Neon Laser Horizon', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/neon-laser-horizon.mp3', desfile: true, nome: 'Neon Laser Horizon', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/beauty-flow.mp3', nome: 'Beauty Flow', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/voxel-revolution.mp3', nome: 'Voxel Revolution', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
     { url: 'musicas/c-funk.mp3', nome: 'C-Funk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
-    { url: 'musicas/shiny-tech.mp3', nome: 'Shiny Tech', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' }
+    { url: 'musicas/shiny-tech.mp3', nome: 'Shiny Tech', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    // 14/Nov/2026 (0.21.0): +17 (9 novas e 8 dos outros jogos do Bolinho, sem baixar de novo); desfile: true = passarela
+    { url: 'musicas/island-meet-and-greet.mp3', nome: 'Island Meet and Greet', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/paradise-found.mp3', nome: 'Paradise Found', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/late-night-radio.mp3', nome: 'Late Night Radio', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/vibing-over-venus.mp3', nome: 'Vibing Over Venus', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: 'musicas/chill-wave.mp3', nome: 'Chill Wave', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0', desfile: true },
+    { url: 'musicas/ethernight-club.mp3', nome: 'Ethernight Club', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0', desfile: true },
+    { url: 'musicas/dream-catcher.mp3', nome: 'Dream Catcher', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0', desfile: true },
+    { url: 'musicas/miami-nights.mp3', nome: 'Miami Nights', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0', desfile: true },
+    { url: 'musicas/twisting.mp3', nome: 'Twisting', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0', desfile: true },
+    { url: '../peluqueria/musicas/digital-lemonade.mp3', nome: 'Digital Lemonade', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: '../peluqueria/musicas/enter-the-party.mp3', nome: 'Enter the Party', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: '../peluqueria/musicas/disco-con-tutti.mp3', nome: 'Disco con Tutti', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: '../peluqueria/musicas/funky-chunk.mp3', nome: 'Funky Chunk', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: '../peluqueria/musicas/stringed-disco.mp3', nome: 'Stringed Disco', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: '../peluqueria/musicas/abertura-show-your-moves.mp3', nome: 'Show Your Moves', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: '../rabiscolandia/musicas/street-party.mp3', nome: 'Street Party', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0' },
+    { url: '../peluqueria/musicas/electro-cabello.mp3', nome: 'Electro Cabello', autor: 'Kevin MacLeod (incompetech.com)', licenca: 'CC BY 4.0', desfile: true }
   ];
   var lista = [], atual = -1, audio = null, aoTrocar = null, falhas = 0, guardouFavorita = false, sintN = 0;
   // só as gravadas, em ordem sorteada com a favorita por último; no arquivo baixado ou sem <audio> (não dá para tocar
@@ -194,6 +213,8 @@
   function faixaAtual() { if (!lista.length) montarLista(); return nomeDe(lista[Math.max(0, atual)]); }
   function anterior() { tocarItem(atual - 1); }
   function proxima() { tocarItem(atual + 1); }
+  // desfile: uma das músicas de passarela, sorteada (sem repetir a que está tocando)
+  function desfile() { if (!lista.length) montarLista(); var ks = []; lista.forEach(function (it, k) { if (it.g && it.g.desfile && k !== atual) ks.push(k); }); tocarItem(ks.length ? ks[Math.floor(Math.random() * ks.length)] : atual + 1); }
   // app escondido (outra aba, tela apagada): silencia; ao voltar, continua
   function dormir(sim) {
     if (!ac) return;
@@ -221,5 +242,5 @@
   function tocar(nome) { if (!ac || !ligado || !efeitos[nome]) return; efeitos[nome](ac.currentTime + 0.005); }
   function alternar() { ligado = !ligado; if (mestre) mestre.gain.setTargetAtTime(ligado ? 0.8 : 0, ac.currentTime, 0.05); if (audio) audio.muted = !ligado; return ligado; }
 
-  raiz.PurpurinaSom = { iniciar: iniciar, tocar: tocar, musica: musica, proxima: proxima, anterior: anterior, faixaAtual: faixaAtual, tocandoMusica: function () { return musicaLigada; }, aoTrocarMusica: function (fn) { aoTrocar = fn; }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, ligado: function () { return ligado; }, MUSICAS: MUSICAS };
+  raiz.PurpurinaSom = { iniciar: iniciar, tocar: tocar, musica: musica, proxima: proxima, desfile: desfile, anterior: anterior, faixaAtual: faixaAtual, tocandoMusica: function () { return musicaLigada; }, aoTrocarMusica: function (fn) { aoTrocar = fn; }, GRAVADAS: GRAVADAS, dormir: dormir, alternar: alternar, ligado: function () { return ligado; }, MUSICAS: MUSICAS };
 })(this);

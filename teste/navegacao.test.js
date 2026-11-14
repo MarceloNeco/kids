@@ -198,6 +198,20 @@ test('navegação padrão: Voltar que pula entradas do jogo (Chrome) cai na guar
   }
 });
 
+test('navegação padrão: aberto direto (sem a estante antes na aba), o Voltar na tela de começo leva para a estante', async () => {
+  // dono, 14/Nov/2026: aberto do hub de projetos, o Voltar saía para o hub em vez de voltar para o Bolinho de Chuva
+  for (const j of JOGOS.filter((x) => ['vruuum', 'campo-minado'].includes(x.id))) {
+    const onde = j.id + ' (sem estante)';
+    const { ctx, pg } = await abrir(390, 844);
+    try {
+      await irAoInicio(pg, j);
+      await pg.keyboard.press('Shift');   // o primeiro toque arma a guarda
+      await pg.goBack().catch(() => {});
+      await pg.waitForURL(base, { timeout: 5000 }).catch(() => assert.fail(onde + ': o Voltar não levou para a estante (' + pg.url() + ')'));
+    } finally { await ctx.close(); }
+  }
+});
+
 test('navegação padrão: 🚪 com a partida rolando pergunta antes de sair (Campo Minado)', async () => {
   const j = JOGOS.find((x) => x.id === 'campo-minado');
   const { ctx, pg, erros } = await abrir(390, 844);

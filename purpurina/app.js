@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.20.0';
+  var APP_VERSION = '0.21.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -834,7 +834,7 @@
     $('desfileRecorde').hidden = !recorde;
     $('btProximo').textContent = d ? t('▶ Próximo desafio', '▶ Next challenge', '▶ Siguiente desafío') : t('🎨 Continuar brincando', '🎨 Keep playing', '🎨 Seguir jugando');
     $('btMaisUm').hidden = !d;
-    Som.proxima();
+    Som.desfile();
     if (CALMO) { Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 500); }
     ponte('desfile', { d: modo || '', est: r ? r.estrelas : 0 });
   }
@@ -939,7 +939,8 @@
   // a música toca o tempo todo; só silencia quando o app fica escondido (outra aba, tela apagada)
   document.addEventListener('visibilitychange', function () { Som.dormir(document.hidden); });
 
-  // ---------- guardar no celular: instalar (atalho) ou baixar o arquivo do jogo ----------
+  // ---------- guardar no celular: instalar (com ícone) ----------
+  // (o botão de baixar um arquivo .html saiu na 0.21.0, dono, 14/Nov/2026: confundia com instalar e não criava ícone)
   /* 📲 Instalar (dono, 14/Nov/2026: "não instalou um ícone no celular e agora eu não acho ele"): o botão fica sempre à vista
      no navegador. Com a janela de instalar do Chrome, o toque instala na hora; sem ela (já instalado, iPhone, Samsung,
      link de outro app), abre o passo a passo comum do Bolinho (../instalar.js), que ensina a achar o ícone na lista de apps.
@@ -974,18 +975,9 @@
     p.userChoice.then(function (r) { if (r && r.outcome === 'accepted') rotuloInstalar(true); }).catch(function () {});
   });
   var EM_ARQUIVO = !!window.JOGO_EM_ARQUIVO || location.protocol === 'file:' || location.protocol === 'content:';
-  if (EM_ARQUIVO || !window.BaixarJogo) $('guardar').hidden = true;
+  if (EM_ARQUIVO) $('guardar').hidden = true;   // arquivo baixado nas versões antigas: sem instalar
   // no arquivo baixado não há TV nem YouTube/Spotify (precisam do site e da internet)
   if (EM_ARQUIVO) Array.prototype.forEach.call(document.querySelectorAll('[data-so-site]'), function (el) { el.hidden = true; });
-  $('btBaixar').addEventListener('click', function () {
-    var aviso = $('baixarAviso');
-    aviso.textContent = t('Preparando o arquivo…', 'Preparing the file…', 'Preparando el archivo…');
-    BaixarJogo.baixar('purpurina.html').then(function () {
-      aviso.textContent = t('Pronto! O arquivo purpurina.html foi para os Downloads (é só um arquivo, não cria ícone; cada toque faz mais uma cópia). Toque nele para brincar, mesmo sem internet. (Os looks guardados ficam separados dos do site.)', 'Done! purpurina.html went to Downloads (it is just a file, no icon; each tap makes another copy). Tap it to play, even offline. (Saved looks stay separate from the website ones.)', '¡Listo! El archivo purpurina.html se ha guardado en Descargas (es solo un archivo, sin icono; cada toque hace otra copia). Tócalo para jugar, incluso sin internet. (Los looks guardados van aparte de los de la web).');
-    }).catch(function () {
-      aviso.textContent = t('Não deu para baixar agora. Abra o jogo com internet e tente de novo.', "Couldn't download now. Open the game online and try again.", "No se ha podido descargar ahora. Abre el juego con internet e inténtalo otra vez.");
-    });
-  });
 
   /* ---------- versão nova ----------
      Uma aba que ficou aberta continua com a versão antiga na memória. Ao abrir e ao voltar para o jogo (no máximo a cada

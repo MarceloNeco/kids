@@ -46,11 +46,10 @@ test('interruptor purpurina no recursos-do-app.json do Feature Tester', () => {
   assert.ok(r.recursos.some(x => x.id === 'purpurina' && x.pagina === 'purpurina/'));
 });
 
-test('baixar: baixar.js na página e interruptores fora do arquivo', () => {
+test('sem o botão de baixar arquivo (dono, 14/Nov/2026: só confundia; instalar é o caminho)', () => {
   const html = ler('index.html');
-  assert.match(html, /<script src="baixar.js"><\/script>/);
+  assert.doesNotMatch(html, /btBaixar|baixar\.js/);
   assert.match(html, /recursos\.js"[^>]*data-fora-do-arquivo/);
-  assert.match(html, /id="btBaixar"/);
 });
 
 test('instalar: botão sempre à vista, passo a passo comum offline e "já instalado" (dono, 14/Nov/2026: "não acho o ícone")', () => {
@@ -66,17 +65,22 @@ test('instalar: botão sempre à vista, passo a passo comum offline e "já insta
   assert.match(fs.readFileSync(path.join(pasta, '..', 'instalar.js'), 'utf8'), /fullscreen\)'\)\.matches && !document\.fullscreenElement/);
 });
 
-test('baixar.js igual ao do Vruuum! (um só jeito de montar o arquivo)', () => {
-  assert.equal(ler('baixar.js'), fs.readFileSync(path.join(pasta, '..', 'vruuum', 'baixar.js'), 'utf8'));
-});
-
 test('músicas: toda música da rádio existe, está no sw.js e tem crédito em musicas/LICENCAS.md', () => {
   const urls = require('../som.js').PurpurinaSom.GRAVADAS.map(g => g.url), lic = ler('musicas/LICENCAS.md');
   const doSw = JSON.parse(ler('sw.js').match(/var MUSICAS = (\[[^\]]*\]);/)[1].replace(/'/g, '"'));
   assert.ok(urls.length >= 20, 'pelo menos 20 músicas');
   assert.equal(urls[0], 'musicas/disco-medusae.mp3', 'a de abertura continua sendo a primeira');
   assert.deepEqual(doSw, urls, 'a mesma lista no sw.js');
-  urls.forEach(u => { assert.ok(fs.existsSync(path.join(pasta, u)), u + ' existe'); assert.ok(lic.includes('`' + u.split('/')[1] + '`'), u + ' tem crédito'); });
+  urls.forEach(u => {
+    assert.ok(fs.existsSync(path.join(pasta, u)), u + ' existe');
+    // as da pasta da Purpurina têm crédito aqui; as tocadas da pasta de outro jogo, no CREDITOS.md de lá
+    const outro = (f) => { const a = path.join(pasta, u.split('/musicas/')[0], f); return fs.existsSync(a) ? fs.readFileSync(a, 'utf8') : ''; };
+    const cred = u.startsWith('../') ? outro('CREDITOS.md') + outro('musicas/LICENCAS.md') : lic;
+    assert.ok(cred.includes(u.split('/').pop()), u + ' tem crédito');
+  });
+  const desfile = require('../som.js').PurpurinaSom.GRAVADAS.filter(g => g.desfile);
+  assert.ok(desfile.length >= 6, 'pelo menos 6 de passarela (desfile)');
+  assert.match(ler('app.js'), /Som\.desfile\(\)/, 'o desfile sorteia uma de passarela');
   const sobrando = fs.readdirSync(path.join(pasta, 'musicas')).filter(f => f.endsWith('.mp3') && !urls.includes('musicas/' + f));
   assert.deepEqual(sobrando, ['laserpack.mp3'], 'nenhum MP3 fora da rádio (só a Laserpack, que saiu na 0.17.3: som de videogame)');
 });

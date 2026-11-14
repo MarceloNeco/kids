@@ -46,3 +46,34 @@ for (const vp of [{ width: 390, height: 844 }, { width: 915, height: 412 }]) {
     await ctx.close();
   });
 }
+
+test('v0.12.1: ➕ aproxima sem a cidade fugir para o canto, o dedo arrasta a cidade aproximada, os nomes não se encavalam e a cesta fica numa fileira', { timeout: 60000 }, async () => {
+  const { ctx, pg, erros } = await abrir({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+  await pg.goto(pg.url() + '&vila3d');
+  await pg.addStyleTag({ content: '.tela-inteira-bt{display:none!important}' });
+  await comecar(pg, 'medio', 'panqueca');
+  await pg.waitForFunction(() => window.Cidade3D && document.querySelector('#vila.vila3d canvas'), null, { timeout: 15000 });
+  await pg.waitForTimeout(500);
+  // nomes curtos e nenhum par de nomes à vista um em cima do outro
+  assert.match(await pg.textContent('#vila .rotulos [data-lugar="mercado"] .nome'), /^Mercado$/);
+  const bate = await pg.evaluate(() => { const r = [...document.querySelectorAll('#vila .rotulos .lugar:not(.escondido)')].map(b => b.getBoundingClientRect());
+    return r.some((a, i) => r.some((c, j) => j > i && a.left < c.right - 2 && a.right > c.left + 2 && a.top < c.bottom - 2 && a.bottom > c.top + 2)); });
+  assert.equal(bate, false, 'nomes encavalados');
+  assert.ok(await pg.locator('#vila .rotulos .lugar:not(.escondido)').count() >= 8, 'quase todos os nomes à vista');
+  // aproximar: o centro da cidade continua no meio
+  await pg.click('[data-zoom="1.3"]', { force: true }); await pg.click('[data-zoom="1.3"]', { force: true });
+  const e1 = await pg.evaluate(() => Cidade3D.estado());
+  assert.ok(e1.zoom > 1.6); assert.deepEqual(e1.pan, { x: 0, y: 0 }, 'aproxima do meio');
+  // arrastar com um dedo move a cidade (sem girar)
+  const c = await pg.locator('#vila canvas').boundingBox();
+  await pg.mouse.move(c.x + c.width / 2, c.y + c.height / 2); await pg.mouse.down();
+  await pg.mouse.move(c.x + c.width / 2 + 100, c.y + c.height / 2 + 60, { steps: 6 }); await pg.mouse.up();
+  const e2 = await pg.evaluate(() => Cidade3D.estado());
+  assert.ok(Math.abs(e2.pan.x) > 0.5 || Math.abs(e2.pan.y) > 0.5, 'arrastou'); assert.equal(e2.az, e1.az, 'não girou');
+  // a cesta numa fileira só, com o nome embaixo
+  const linhas = await pg.evaluate(() => new Set([...document.querySelectorAll('#cestaMapa .item')].map(i => Math.round(i.getBoundingClientRect().top))).size);
+  assert.equal(linhas, 1, 'cesta numa fileira');
+  assert.match(await pg.textContent('#cestaMapa .item[data-ing="ovo"] .ces-n'), /ovo/i);
+  assert.deepEqual(erros.filter(e => !/GL Driver|GPU stall|WebGL/.test(e)), [], 'erros no console');
+  await ctx.close();
+});
