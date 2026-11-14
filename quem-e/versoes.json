@@ -2,6 +2,23 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.6.1",
+      "data": "14/Nov/2026",
+      "hora": "18:30:35",
+      "pt": [
+        "💃 O Melekento Blue e a Pink Honey não ficam mais parados: balançam, respiram, pulam e chacoalham o tempo todo",
+        "🔇 Saiu o botão de som lá de cima, que não fazia diferença; a música continua no 🎵 de baixo"
+      ],
+      "en": [
+        "💃 Melekento Blue and Pink Honey never stand still now: they sway, breathe, bounce and wiggle all the time",
+        "🔇 The sound button at the top is gone, it made no difference; music is still on the 🎵 at the bottom"
+      ],
+      "es": [
+        "💃 Melekento Blue y Pink Honey ya no se quedan quietos: se balancean, respiran, saltan y se sacuden todo el rato",
+        "🔇 Se ha quitado el botón de sonido de arriba, que no cambiaba nada; la música sigue en el 🎵 de abajo"
+      ]
+    },
+    {
       "versao": "0.6.0",
       "data": "14/Nov/2026",
       "hora": "20:13:42",
