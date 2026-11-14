@@ -2,6 +2,21 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "14/Nov/2026",
+      "hora": "14:30:18",
+      "pt": [
+        "📶 Duelo de Caras pertinho, sem internet: um celular liga o Roteador Wi-Fi, o outro conecta, e um lê o código QR do outro com a câmera",
+        "🔁 Se a ligação cair, dá para ligar de novo e continuar de onde parou",
+        "🧍 Em dois celulares, o corpo inteiro escolhido por quem cria a partida vale para os dois"
+      ],
+      "en": [
+        "📶 Face Duel nearby, no internet: one phone turns on its Wi-Fi hotspot, the other joins, and each scans the other's QR code with the camera",
+        "🔁 If the link drops, link again and go on where you stopped",
+        "🧍 On two phones, the whole body chosen by the game creator applies to both"
+      ]
+    },
+    {
       "versao": "0.3.0",
       "data": "14/Nov/2026",
       "hora": "14:09:20",
