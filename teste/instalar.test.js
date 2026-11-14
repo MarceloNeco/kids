@@ -109,6 +109,18 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
       await ctx.close();
       assert.match(fs.readFileSync(path.join(raiz, 'manifest.webmanifest'), 'utf8'), /"start_url": "\.\/\?app=1"/, 'o ícone abre com ?app=1');
     }
+    // 🎵 Músicas, 📲 Instalar e o idioma numa linha só, até em celular estreito e com a letra grande do Android
+    for (const [w, letra] of [[390, 16], [360, 21], [320, 21]]) {
+      const ctx = await b.newContext({ viewport: { width: w, height: 700 }, userAgent: UA.celular, locale: 'pt-BR', serviceWorkers: 'block' });
+      await ctx.addInitScript((f) => { localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); document.addEventListener('DOMContentLoaded', () => { document.documentElement.style.fontSize = f + 'px'; }); }, letra);
+      await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+      const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(400);
+      const r = await pg.$$eval('.barra-topo .bt-biblioteca, .barra-topo .bt-instalar, .barra-topo .bi-atual', (bs) => bs.map((x) => { const c = x.getBoundingClientRect(); return { t: Math.round(c.top), r: c.right, cortado: x.scrollWidth > x.clientWidth + 1 }; }));
+      assert.strictEqual(r.length, 3, w + ': os três botões');
+      assert.ok(r.every((x) => x.t === r[0].t), w + ' px, letra ' + letra + ': os três na mesma linha ' + JSON.stringify(r));
+      assert.ok(r.every((x) => !x.cortado && x.r <= w), w + ' px: nenhum cortado nem para fora da tela');
+      await ctx.close();
+    }
     // marca de "Já instalei" de hoje: escondido; antiga ("1", de antes) ou de 31 dias: o botão volta
     for (const [marca, escondido] of [[String(Date.now()), true], ['1', false], [String(Date.now() - 31 * 864e5), false]]) {
       const { ctx, pg } = await abrir(UA.celular, 'pt', marca);
