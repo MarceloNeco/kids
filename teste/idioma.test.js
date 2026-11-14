@@ -51,20 +51,32 @@ const fora = (pg, i) => pg.evaluate((i) => Array.prototype.filter.call(document.
 }).map(el => el.getAttribute('data-t')), i);
 const botao = (pg) => pg.evaluate(() => { const b = document.getElementById('btLingua'); return b ? getComputedStyle(b).display : null; });
 
-test('estante: três botões com bandeira, a escolha muda os textos e fica guardada', async () => {
+test('estante: um botão com o idioma atual; tocando, continua ou troca; a escolha muda os textos e fica guardada', async () => {
   const ctx = await contexto('pt-BR');
   const pg = await ctx.newPage();
   try {
     await pg.goto(base, { waitUntil: 'load' }); await assentar(pg);
-    const bts = await pg.$$eval('[data-idiomas] button', bs => bs.map(b => b.textContent.trim()));
-    assert.deepEqual(bts, ['PT', 'EN', 'ES']);
-    const imgs = await pg.$$eval('[data-idiomas] button img', is => is.map(i => ({ src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0 })));
-    assert.deepEqual(imgs.map(i => i.src.replace(/^.*\/kids\//, '')), ['bandeiras/br.svg', 'bandeiras/us.svg', 'bandeiras/es.svg'], 'bandeiras em arquivo SVG');
-    assert.ok(imgs.every(i => i.ok), 'bandeiras carregadas');
+    // UM botão com o idioma atual; tocando, pergunta: continuar nele ou trocar (as três opções com bandeira)
+    assert.strictEqual(await pg.$$eval('[data-idiomas] .bi-atual', (b) => b.length), 1, 'um botão só');
+    assert.match(await pg.textContent('[data-idiomas] .bi-atual'), /PT/);
+    assert.ok(await pg.$eval('[data-idiomas] .bi-menu', (m) => m.hidden), 'as opções começam fechadas');
+    await pg.click('[data-idiomas] .bi-atual');
+    assert.ok(!(await pg.$eval('[data-idiomas] .bi-menu', (m) => m.hidden)), 'tocar abre as opções');
+    assert.match(await pg.textContent('[data-idiomas] .bi-menu p'), /continuar em português ou trocar/);
+    assert.deepStrictEqual(await pg.$$eval('[data-idiomas] .bi-op', (b) => b.map((x) => x.getAttribute('data-idioma'))), ['pt', 'en', 'es']);
+    assert.match(await pg.textContent('[data-idiomas] .bi-op[aria-checked="true"]'), /continuar/, 'o atual aparece como "continuar"');
+    const imgs = await pg.$$eval('[data-idiomas] .bi-op img', (is) => is.map((i) => ({ src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0 })));
+    assert.deepStrictEqual(imgs.map((i) => i.src.replace(/^.*\/kids\//, '')), ['bandeiras/br.svg', 'bandeiras/us.svg', 'bandeiras/es.svg'], 'bandeiras em arquivo SVG');
+    assert.ok(imgs.every((i) => i.ok), 'bandeiras carregadas');
+    await pg.click('[data-idiomas] .bi-op[data-idioma="pt"]');   // continuar: fecha e não muda nada
+    assert.ok(await pg.$eval('[data-idiomas] .bi-menu', (m) => m.hidden), 'continuar fecha as opções');
+    assert.strictEqual(await pg.evaluate(() => BolinhoIdioma.atual()), 'pt');
     assert.match(await pg.evaluate(() => document.body.innerText), /Brincar/);
     for (const [cod, re] of [['en', /\bPlay\b/], ['es', /Jugar/], ['pt', /Brincar/]]) {
-      await pg.click('[data-idiomas] button[data-idioma="' + cod + '"]');
+      await pg.click('[data-idiomas] .bi-atual');
+      await pg.click('[data-idiomas] .bi-op[data-idioma="' + cod + '"]');
       await pg.waitForTimeout(200);
+      assert.match(await pg.textContent('[data-idiomas] .bi-atual'), new RegExp(cod.toUpperCase()), 'o botão mostra o idioma escolhido');
       assert.equal(await pg.evaluate(() => BolinhoIdioma.atual()), cod);
       assert.match(await pg.evaluate(() => document.body.innerText), re, 'estante em ' + cod);
       const r = await pg.evaluate(() => ({ texto: document.body.innerText, j: BolinhoCatalogo.jogos.map(j => ({ pt: j.texto, en: j.en, es: j.es })) }));
@@ -76,10 +88,35 @@ test('estante: três botões com bandeira, a escolha muda os textos e fica guard
         }
       }
     }
-    await pg.click('[data-idiomas] button[data-idioma="es"]');
+    await pg.click('[data-idiomas] .bi-atual'); await pg.click('[data-idiomas] .bi-op[data-idioma="es"]');
     await pg.reload({ waitUntil: 'load' }); await assentar(pg);
     assert.equal(await pg.evaluate(() => BolinhoIdioma.atual()), 'es', 'escolha guardada');
   } finally { await ctx.close(); }
+});
+
+test('estante: a caixinha dos idiomas abre inteira dentro da tela (botão à direita ou à esquerda, celular estreito)', async () => {
+  for (const [w, h] of [[390, 844], [320, 640], [844, 390]]) {
+    for (const lado of ['direita', 'esquerda']) {
+      const ctx = await contexto('pt-BR');
+      await ctx.close();
+      const c2 = await browser.newContext({ locale: 'pt-BR', viewport: { width: w, height: h }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
+      await c2.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+      const pg = await c2.newPage();
+      try {
+        await pg.goto(base, { waitUntil: 'load' }); await assentar(pg);
+        // como no celular do dono (página antiga guardada): o botão no canto esquerdo
+        if (lado === 'esquerda') await pg.evaluate(() => { const g = document.querySelector('[data-idiomas]'); g.style.cssText = 'position:fixed;left:8px;top:96px;margin:0;z-index:20'; });
+        await pg.tap('[data-idiomas] .bi-atual');
+        const r = await pg.$eval('[data-idiomas] .bi-menu', (m) => { const b = m.getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom }; });
+        const onde = w + '×' + h + ' botão à ' + lado + ' ' + JSON.stringify(r);
+        assert.ok(r.l >= 0 && r.t >= 0 && r.r <= w && r.b <= h, 'a caixinha sai da tela: ' + onde);
+        const ops = await pg.$$eval('[data-idiomas] .bi-op', (os) => os.map((o) => { const b = o.getBoundingClientRect(); return b.left >= 0 && b.right <= innerWidth && o.textContent.trim().length > 0; }));
+        assert.deepStrictEqual(ops, [true, true, true], 'opções inteiras à vista: ' + onde);
+        await pg.tap('[data-idiomas] .bi-op[data-idioma="en"]');
+        assert.strictEqual(await pg.evaluate(() => BolinhoIdioma.atual()), 'en', 'trocar funciona: ' + onde);
+      } finally { await c2.close(); }
+    }
+  }
 });
 
 for (const jogo of JOGOS) {

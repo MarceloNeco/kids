@@ -4,13 +4,14 @@
     <script src="/kids/instalar.js" data-nome="Bolinho de Chuva" data-icone="icone-192.png"></script>
   e tem na própria pasta um manifest.webmanifest (com <link rel="manifest">) e um sw.js.
 
-  Um botão só, para qualquer aparelho:
+  Um botão só, para qualquer aparelho, com a frase do aparelho: "Instalar o Bolinho de Chuva no celular" (no tablet,
+  no computador; na TV, "Deixar o Bolinho de Chuva na TV"):
   - Chrome, Edge e Samsung no Android e Chrome/Edge no computador entregam a janela de instalar
     (beforeinstallprompt): o toque instala na hora.
   - Onde o navegador não tem essa janela (iPhone, Mac, Firefox, tablet Fire da Amazon, TV, navegador
     dentro de outro app), o toque abre o passo a passo daquele aparelho, detectado sem perguntar.
-  - Já aberto como aplicativo, o botão some. "Já instalei" também esconde (se o navegador voltar a
-    oferecer a instalação, é porque não está instalado, e o botão volta).
+  - Já aberto como aplicativo, o botão some. "Já instalei" esconde por 30 dias (se o navegador voltar a
+    oferecer a instalação, é porque não está instalado, e o botão volta na hora).
   Enquanto a janela de passos está aberta, <body> ganha a classe "bc-modal" (o kids.js deixa as
   setas e o OK do controle para ela).
 
@@ -123,7 +124,9 @@
   document.body.insertBefore(barra, document.body.firstChild);
   var botao = barra.querySelector('button');
   var texto = barra.querySelector('span');
-  if (ler() && !FILA) barra.hidden = true;
+  // "Já instalei" esconde por 30 dias (antes era para sempre, e quem tocou sem querer nunca mais achava o botão)
+  function escondidoPorEscolha() { var v = Number(ler()); return v > 1 && Date.now() - v < 30 * 864e5; }
+  if (escondidoPorEscolha() && !FILA) barra.hidden = true;
 
   var fundo = document.createElement('div');
   fundo.className = 'bc-fundo';
@@ -162,6 +165,19 @@
   var edge = /Edg\//.test(ua);
   var macSafari = /Macintosh/.test(ua) && /Safari/.test(ua) && !/Chrome|Chromium|Edg|Firefox/.test(ua) && !ios;
   var endereco = location.href.split('#')[0];
+  var tablet = fire || /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) || (android && !/Mobile/.test(ua));
+  var computador = !tv && !ios && !android && !fire;
+  // Uma frase curta, do jeito de cada aparelho (dono, 14/Nov/2026: simples, fácil e para qualquer aparelho)
+  var CURTO = NOME.replace(/ de Chuva$/, '');   // na frase do botão, curto para caber numa linha do celular
+  function rotulo() {
+    if (tv) return T('Deixar o ' + CURTO + ' na TV', 'Keep ' + CURTO + ' on the TV', 'Dejar ' + CURTO + ' en la tele');
+    if (tablet) return T('Instalar o ' + CURTO + ' no tablet', 'Install ' + CURTO + ' on your tablet', 'Instalar ' + CURTO + ' en la tablet');
+    if (computador) return T('Instalar o ' + CURTO + ' no computador', 'Install ' + CURTO + ' on your computer', 'Instalar ' + CURTO + ' en el ordenador');
+    return T('Instalar o ' + CURTO + ' no celular', 'Install ' + CURTO + ' on your phone', 'Instalar ' + CURTO + ' en el móvil');
+  }
+  function pintarRotulo() { if (!botao.classList.contains('ok')) texto.textContent = rotulo(); }
+  pintarRotulo();
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(pintarRotulo);
 
   function linkChrome() {
     return 'intent://' + location.host + location.pathname + location.search + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(endereco) + ';end';
@@ -316,7 +332,7 @@
   fundo.addEventListener('click', function (e) { if (e.target === fundo) fechar(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.keyCode === 27) fechar(); });
   fundo.querySelector('.bc-ja').addEventListener('click', function () {
-    gravar('1'); fechar();
+    gravar(String(Date.now())); fechar();
     if (FILA) return pronto();
     barra.hidden = true;
   });

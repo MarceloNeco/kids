@@ -116,8 +116,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 ## Regras de cada jogo
 
 - **Idioma (dono, 14/Nov/2026; diretriz "três idiomas"): português (Brasil), inglês (EUA) e espanhol (Espanha), em tudo,
-  com tradução humanizada.** A escolha é feita **só na estante**, com bandeira desenhada (SVG) + sigla (🇧🇷 PT · 🇺🇸 EN ·
-  🇪🇸 ES), e vale para todos os jogos — **nenhum jogo tem botão de idioma próprio**. Peça comum: `idioma.js` (logo depois do
+  com tradução humanizada.** A escolha é feita **só na estante**, num **botão só** com o idioma atual (bandeira SVG + sigla);
+  tocando, ele pergunta se continua nesse idioma ou troca (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES) (dono, 14/Nov/2026), e vale para todos os jogos — **nenhum jogo tem botão de idioma próprio**. Peça comum: `idioma.js` (logo depois do
   `recursos.js`, na estante e em todo jogo): guarda a escolha em `localStorage` "bolinho:idioma"; o jogo lê
   `BolinhoIdioma.atual()` ('pt' | 'en' | 'es'), usa `BolinhoIdioma.t(pt, en, es)` e, na fala, `BolinhoIdioma.voz()`
   (pt-BR / en-US / es-ES), sempre com uma voz do mesmo idioma. Todo texto novo nasce nos três (`data-t="pt|en|es"`,
