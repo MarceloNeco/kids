@@ -2,6 +2,32 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.25.0",
+      "data": "14/Nov/2026",
+      "hora": "18:07:00",
+      "pt": [
+        "📱 Menu no celular: todos os grupos numa linha só (jogadores, nível, visual, rivais e como dirigir); a música com ⏮ e ⏭ cabendo na tela (o nome comprido é cortado); cenários com setas ◀ ▶ e o próximo cartão aparecendo pela metade, para mostrar que tem mais.",
+        "🚌 Ônibus escolar com o rosto das crianças sem ficar espremido; letreiros das laterais sem esticar.",
+        "🔷 Todos os veículos com as quinas arredondadas.",
+        "🥚 O Ovo corre com as pernas girando super rápido e, no pulo, faz a pose de pulo; a galinha também corre mais rápido.",
+        "➡️ Setas de luz maiores flutuando nas curvas, acendendo uma depois da outra (como no vídeo)."
+      ],
+      "en": [
+        "📱 Phone menu: every group on a single row (players, level, look, rivals and how to steer); music with ⏮ and ⏭ fitting on screen (long names are cut); worlds with ◀ ▶ arrows and the next card half showing, so you know there are more.",
+        "🚌 School bus with the kids' faces no longer squished; side lettering no longer stretched.",
+        "🔷 Every ride with rounded edges.",
+        "🥚 The Egg runs with its legs spinning super fast and strikes a jump pose when it jumps; the hen runs faster too.",
+        "➡️ Bigger light arrows floating on the curves, lighting up one after another (like in the video)."
+      ],
+      "es": [
+        "📱 Menú en el móvil: todos los grupos en una sola fila (jugadores, nivel, estilo, rivales y cómo conducir); la música con ⏮ y ⏭ cabiendo en la pantalla (el nombre largo se corta); escenarios con flechas ◀ ▶ y la siguiente tarjeta asomando por la mitad, para que se vea que hay más.",
+        "🚌 Autobús escolar con las caras de los niños sin aplastar; letreros de los lados sin estirar.",
+        "🔷 Todos los vehículos con las esquinas redondeadas.",
+        "🥚 El Huevo corre con las piernas girando superrápido y, al saltar, hace la pose de salto; la gallina también corre más rápido.",
+        "➡️ Flechas de luz más grandes flotando en las curvas, encendiéndose una tras otra (como en el vídeo)."
+      ]
+    },
+    {
       "versao": "1.24.0",
       "data": "14/Nov/2026",
       "hora": "17:14:00",
