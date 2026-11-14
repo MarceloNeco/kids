@@ -2,44 +2,44 @@
    próprio (nenhum personagem de marca). Cada tipo vira UMA geometria com as cores nos vértices (rápido no celular) e,
    por cima, os olhos (piscam) e as asas (batem) como pecinhas separadas.
      MAQUINAS             as máquinas (cada uma é um jogo): nome, prêmios, o raro e se os bichinhos são vivos
-     NOMES[tipo]          [pt, en]
+     NOMES[tipo]          [pt, en, es]
      criarPremio(tipo)    THREE.Group de raio ~1 (o app escala pelo raio da física)
      animar(obj, t, vivo) olhos piscando, asas batendo, bichinho vivo se mexendo */
 import * as THREE from './libs/three.module.js';
 
 export const MAQUINAS = {
-  telefone: { nome: ['Cabine de Telefone', 'Phone Booth'], prem: ['Pelúcias', 'Plushies'],
+  telefone: { nome: ['Cabine de Telefone', 'Phone Booth', 'Cabina de Teléfono'], prem: ['Pelúcias', 'Plushies', 'Peluches'],
     tipos: ['urso', 'coelho', 'gato', 'cachorro', 'ovelha', 'pinguim', 'unicornio', 'sapo', 'porquinho', 'panda', 'pato', 'girafa'], raro: 'urso-dourado' },
-  neon: { nome: ['Neon', 'Neon'], prem: ['Bichinhos que mexem', 'Wiggly critters'], vivos: true,
+  neon: { nome: ['Neon', 'Neon', 'Neón'], prem: ['Bichinhos que mexem', 'Wiggly critters', 'Bichitos que se mueven'], vivos: true,
     tipos: ['dino', 'polvo', 'pintinho', 'macaco', 'raposa', 'hamster', 'coruja', 'tartaruga'], raro: 'dino-dourado' },
-  estrelas: { nome: ['Estrelas', 'Stars'], prem: ['Insetos', 'Bugs'],
+  estrelas: { nome: ['Estrelas', 'Stars', 'Estrellas'], prem: ['Insetos', 'Bugs', 'Insectos'],
     tipos: ['joaninha', 'abelha', 'borboleta', 'besouro', 'lagarta', 'libelula', 'formiga', 'vagalume'], raro: 'joaninha-dourada' },
-  lanchonete: { nome: ['Lanchonete', 'Burger Bar'], prem: ['Hambúrgueres e lanches', 'Burgers and snacks'],
+  lanchonete: { nome: ['Lanchonete', 'Burger Bar', 'Hamburguesería'], prem: ['Hambúrgueres e lanches', 'Burgers and snacks', 'Hamburguesas y más'],
     tipos: ['x-burguer', 'x-salada', 'x-bacon', 'duplo', 'x-frango', 'vegano', 'x-tudo', 'cachorro-quente', 'batata', 'milk-shake'], raro: 'burguer-dourado' },
-  bichos: { nome: ['Bichos de Verdade', 'Real Animals'], prem: ['Filhotes que andam', 'Puppies that walk'], andam: true,
+  bichos: { nome: ['Bichos de Verdade', 'Real Animals', 'Animales de Verdad'], prem: ['Filhotes que andam', 'Puppies that walk', 'Cachorros que caminan'], andam: true,
     tipos: ['salsicha', 'salsicha-caramelo', 'salsicha-malhado', 'labrador', 'gato-rajado', 'coelho-marrom', 'porquinho-da-india', 'pinguim-imperador', 'pato-real', 'jabuti', 'leaozinho'], raro: 'salsicha-dourado' }
 };
 
 export const NOMES = {
-  urso: ['Ursinho', 'Teddy'], coelho: ['Coelhinha', 'Bunny'], gato: ['Gatinho', 'Kitty'], cachorro: ['Cachorrinho', 'Puppy'],
-  ovelha: ['Ovelhinha', 'Lamb'], pinguim: ['Pinguim', 'Penguin'], unicornio: ['Unicórnio', 'Unicorn'], sapo: ['Sapinho', 'Froggy'],
-  porquinho: ['Porquinha', 'Piggy'], panda: ['Panda', 'Panda'], pato: ['Patinho', 'Duckling'], girafa: ['Girafinha', 'Giraffe'],
-  'urso-dourado': ['Ursinho dourado', 'Golden teddy'],
-  dino: ['Dino', 'Dino'], polvo: ['Polvinho', 'Octopus'], pintinho: ['Pintinho', 'Chick'], macaco: ['Macaquinho', 'Monkey'],
-  raposa: ['Raposinha', 'Fox'], hamster: ['Hamster', 'Hamster'], coruja: ['Corujinha', 'Owl'], tartaruga: ['Tartaruga', 'Turtle'],
-  'dino-dourado': ['Dino dourado', 'Golden dino'],
-  joaninha: ['Joaninha', 'Ladybug'], abelha: ['Abelhinha', 'Bee'], borboleta: ['Borboleta', 'Butterfly'], besouro: ['Besouro', 'Beetle'],
-  lagarta: ['Lagarta', 'Caterpillar'], libelula: ['Libélula', 'Dragonfly'], formiga: ['Formiguinha', 'Ant'], vagalume: ['Vaga-lume', 'Firefly'],
-  'joaninha-dourada': ['Joaninha dourada', 'Golden ladybug'],
-  'x-burguer': ['X-Burguer', 'Cheeseburger'], 'x-salada': ['X-Salada', 'Salad burger'], 'x-bacon': ['X-Bacon', 'Bacon burger'],
-  duplo: ['Burguer duplo', 'Double burger'], 'x-frango': ['X-Frango', 'Chicken burger'], vegano: ['Burguer verde', 'Veggie burger'],
-  'x-tudo': ['X-Tudo', 'Everything burger'], 'cachorro-quente': ['Cachorro-quente', 'Hot dog'], batata: ['Batata frita', 'Fries'],
-  'milk-shake': ['Milk-shake', 'Milkshake'], 'burguer-dourado': ['Burguer dourado', 'Golden burger'],
-  labrador: ['Cachorro labrador', 'Labrador'], 'gato-rajado': ['Gato rajado', 'Tabby cat'], 'coelho-marrom': ['Coelho', 'Rabbit'],
-  'porquinho-da-india': ['Porquinho-da-índia', 'Guinea pig'], 'pinguim-imperador': ['Pinguim-imperador', 'Emperor penguin'],
-  'pato-real': ['Pato', 'Mallard duck'], jabuti: ['Jabuti', 'Tortoise'], leaozinho: ['Leãozinho', 'Lion cub'],
-  salsicha: ['Salsicha preto e caramelo', 'Black and tan dachshund'], 'salsicha-caramelo': ['Salsicha caramelo', 'Red dachshund'],
-  'salsicha-malhado': ['Salsicha malhado', 'Dapple dachshund'], 'salsicha-dourado': ['Salsicha dourado', 'Golden dachshund']
+  urso: ['Ursinho', 'Teddy', 'Osito'], coelho: ['Coelhinha', 'Bunny', 'Conejita'], gato: ['Gatinho', 'Kitty', 'Gatito'], cachorro: ['Cachorrinho', 'Puppy', 'Perrito'],
+  ovelha: ['Ovelhinha', 'Lamb', 'Ovejita'], pinguim: ['Pinguim', 'Penguin', 'Pingüino'], unicornio: ['Unicórnio', 'Unicorn', 'Unicornio'], sapo: ['Sapinho', 'Froggy', 'Ranita'],
+  porquinho: ['Porquinha', 'Piggy', 'Cerdita'], panda: ['Panda', 'Panda', 'Panda'], pato: ['Patinho', 'Duckling', 'Patito'], girafa: ['Girafinha', 'Giraffe', 'Jirafita'],
+  'urso-dourado': ['Ursinho dourado', 'Golden teddy', 'Osito dorado'],
+  dino: ['Dino', 'Dino', 'Dino'], polvo: ['Polvinho', 'Octopus', 'Pulpito'], pintinho: ['Pintinho', 'Chick', 'Pollito'], macaco: ['Macaquinho', 'Monkey', 'Monito'],
+  raposa: ['Raposinha', 'Fox', 'Zorrita'], hamster: ['Hamster', 'Hamster', 'Hámster'], coruja: ['Corujinha', 'Owl', 'Buhito'], tartaruga: ['Tartaruga', 'Turtle', 'Tortuga'],
+  'dino-dourado': ['Dino dourado', 'Golden dino', 'Dino dorado'],
+  joaninha: ['Joaninha', 'Ladybug', 'Mariquita'], abelha: ['Abelhinha', 'Bee', 'Abejita'], borboleta: ['Borboleta', 'Butterfly', 'Mariposa'], besouro: ['Besouro', 'Beetle', 'Escarabajo'],
+  lagarta: ['Lagarta', 'Caterpillar', 'Oruga'], libelula: ['Libélula', 'Dragonfly', 'Libélula'], formiga: ['Formiguinha', 'Ant', 'Hormiguita'], vagalume: ['Vaga-lume', 'Firefly', 'Luciérnaga'],
+  'joaninha-dourada': ['Joaninha dourada', 'Golden ladybug', 'Mariquita dorada'],
+  'x-burguer': ['X-Burguer', 'Cheeseburger', 'Hamburguesa con queso'], 'x-salada': ['X-Salada', 'Salad burger', 'Hamburguesa con ensalada'], 'x-bacon': ['X-Bacon', 'Bacon burger', 'Hamburguesa con beicon'],
+  duplo: ['Burguer duplo', 'Double burger', 'Hamburguesa doble'], 'x-frango': ['X-Frango', 'Chicken burger', 'Hamburguesa de pollo'], vegano: ['Burguer verde', 'Veggie burger', 'Hamburguesa vegetal'],
+  'x-tudo': ['X-Tudo', 'Everything burger', 'Hamburguesa completa'], 'cachorro-quente': ['Cachorro-quente', 'Hot dog', 'Perrito caliente'], batata: ['Batata frita', 'Fries', 'Patatas fritas'],
+  'milk-shake': ['Milk-shake', 'Milkshake', 'Batido'], 'burguer-dourado': ['Burguer dourado', 'Golden burger', 'Hamburguesa dorada'],
+  labrador: ['Cachorro labrador', 'Labrador', 'Perro labrador'], 'gato-rajado': ['Gato rajado', 'Tabby cat', 'Gato atigrado'], 'coelho-marrom': ['Coelho', 'Rabbit', 'Conejo'],
+  'porquinho-da-india': ['Porquinho-da-índia', 'Guinea pig', 'Cobaya'], 'pinguim-imperador': ['Pinguim-imperador', 'Emperor penguin', 'Pingüino emperador'],
+  'pato-real': ['Pato', 'Mallard duck', 'Pato'], jabuti: ['Jabuti', 'Tortoise', 'Tortuga de tierra'], leaozinho: ['Leãozinho', 'Lion cub', 'Leoncito'],
+  salsicha: ['Salsicha preto e caramelo', 'Black and tan dachshund', 'Salchicha negro y canela'], 'salsicha-caramelo': ['Salsicha caramelo', 'Red dachshund', 'Salchicha canela'],
+  'salsicha-malhado': ['Salsicha malhado', 'Dapple dachshund', 'Salchicha moteado'], 'salsicha-dourado': ['Salsicha dourado', 'Golden dachshund', 'Salchicha dorado']
 };
 
 /* ---------- peças básicas ---------- */

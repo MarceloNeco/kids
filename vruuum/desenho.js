@@ -11,18 +11,18 @@
   var EMOJI = S.EMOJI, FONTE = S.FONTE;
 
   var TEMAS = {
-    praia: { ceu: ['#38b6ff', '#c9f0ff'], grama: ['#f3d27a', '#ebc868'], borda: ['#ff4d6d', '#ffffff'], pista: ['#8d929c', '#868b95'], faixa: '#ffffff', sol: '#fff1a6', nome: ['Praia', 'Beach'], emoji: '🏖️', cor: '#1fa3e0' },
-    floresta: { ceu: ['#5cc8ff', '#dcf7ff'], grama: ['#4cc35a', '#44b552'], borda: ['#ffffff', '#ff9f1c'], pista: ['#6e737b', '#686d75'], faixa: '#ffffff', sol: '#fff1a6', nome: ['Floresta', 'Forest'], emoji: '🌲', cor: '#1e9a4e' },
-    doces: { ceu: ['#ff9ad5', '#ffe3f3'], grama: ['#ffb6e1', '#ffa8da'], borda: ['#ffffff', '#ff3d8b'], pista: ['#7a4a33', '#734530'], faixa: '#fff7c2', sol: '#fff7c2', nome: ['Terra dos Doces', 'Candy Land'], emoji: '🍭', cor: '#ff4fa3' },
-    neve: { ceu: ['#8fb8ff', '#eef4ff'], grama: ['#f4f8ff', '#e4ecfb'], borda: ['#3a86ff', '#ffffff'], pista: ['#7d8590', '#77808a'], faixa: '#ffd166', sol: '#ffffff', nome: ['Montanha de Neve', 'Snow Mountain'], emoji: '❄️', cor: '#3a86ff' },
-    neon: { ceu: ['#0d0630', '#4b1a7a'], grama: ['#1b1250', '#160f45'], borda: ['#ff2bd6', '#2bf4ff'], pista: ['#2a2550', '#25204a'], faixa: '#2bf4ff', sol: null, nome: ['Cidade Neon', 'Neon City'], emoji: '🌃', cor: '#9b5de5', noite: true },
+    praia: { ceu: ['#38b6ff', '#c9f0ff'], grama: ['#f3d27a', '#ebc868'], borda: ['#ff4d6d', '#ffffff'], pista: ['#8d929c', '#868b95'], faixa: '#ffffff', sol: '#fff1a6', nome: ['Praia', 'Beach', 'Playa'], emoji: '🏖️', cor: '#1fa3e0' },
+    floresta: { ceu: ['#5cc8ff', '#dcf7ff'], grama: ['#4cc35a', '#44b552'], borda: ['#ffffff', '#ff9f1c'], pista: ['#6e737b', '#686d75'], faixa: '#ffffff', sol: '#fff1a6', nome: ['Floresta', 'Forest', 'Bosque'], emoji: '🌲', cor: '#1e9a4e' },
+    doces: { ceu: ['#ff9ad5', '#ffe3f3'], grama: ['#ffb6e1', '#ffa8da'], borda: ['#ffffff', '#ff3d8b'], pista: ['#7a4a33', '#734530'], faixa: '#fff7c2', sol: '#fff7c2', nome: ['Terra dos Doces', 'Candy Land', 'Tierra de las Chuches'], emoji: '🍭', cor: '#ff4fa3' },
+    neve: { ceu: ['#8fb8ff', '#eef4ff'], grama: ['#f4f8ff', '#e4ecfb'], borda: ['#3a86ff', '#ffffff'], pista: ['#7d8590', '#77808a'], faixa: '#ffd166', sol: '#ffffff', nome: ['Montanha de Neve', 'Snow Mountain', 'Montaña Nevada'], emoji: '❄️', cor: '#3a86ff' },
+    neon: { ceu: ['#0d0630', '#4b1a7a'], grama: ['#1b1250', '#160f45'], borda: ['#ff2bd6', '#2bf4ff'], pista: ['#2a2550', '#25204a'], faixa: '#2bf4ff', sol: null, nome: ['Cidade Neon', 'Neon City', 'Ciudad Neón'], emoji: '🌃', cor: '#9b5de5', noite: true },
     // 1.11.0: mundos fantásticos
-    canion: { ceu: ['#4aa8ff', '#ffe0a8'], grama: ['#e8b36a', '#dfa75c'], borda: ['#ff6b35', '#ffffff'], pista: ['#7a7f87', '#737880'], faixa: '#ffd166', sol: '#fff1a6', nome: ['Cânion do Deserto', 'Desert Canyon'], emoji: '🏜️', cor: '#e07a2f' },
-    templo: { ceu: ['#3fa7b5', '#bfeee0'], grama: ['#2f8a5a', '#2a7d51'], borda: ['#e9c46a', '#2a9d8f'], pista: ['#8fa3a0', '#879b98'], faixa: '#e9f5db', sol: '#fff1a6', nome: ['Templo na Selva', 'Jungle Temple'], emoji: '🗿', cor: '#2a9d8f' },
-    lava: { ceu: ['#ff7b54', '#ffd3a5'], grama: ['#4a1d14', '#3f1811'], borda: ['#ff6a00', '#ffd166'], pista: ['#4a3b3f', '#443539'], faixa: '#ffb703', sol: '#ffe0a0', nome: ['Vulcão de Lava', 'Lava Volcano'], emoji: '🌋', cor: '#e85d04' },
-    lanche: { ceu: ['#ffb36b', '#ffe9c2'], grama: ['#e63946', '#ffffff'], borda: ['#ffd23f', '#e63946'], pista: ['#5a5a66', '#53535e'], faixa: '#ffd23f', sol: '#fff1a6', nome: ['Cidade do Lanche', 'Burger Town'], emoji: '🍔', cor: '#e63946' },
-    blocos: { ceu: ['#5aa9ff', '#cfe8ff'], grama: ['#5fd068', '#4caf50'], borda: ['#8a5a36', '#c9ced6'], pista: ['#8d8d8d', '#858585'], faixa: '#ffffff', sol: '#fff7c2', nome: ['Mundo dos Blocos', 'Block World'], emoji: '🧱', cor: '#4caf50' },
-    flutuante: { ceu: ['#6a7bff', '#c8b6ff'], grama: ['#1d8a7a', '#18806f'], borda: ['#ff4fd8', '#7cf9ff'], pista: ['#6b5b95', '#64558c'], faixa: '#c6ff3d', sol: '#fff7c2', nome: ['Ilhas Flutuantes', 'Floating Islands'], emoji: '✨', cor: '#7b2cbf' }
+    canion: { ceu: ['#4aa8ff', '#ffe0a8'], grama: ['#e8b36a', '#dfa75c'], borda: ['#ff6b35', '#ffffff'], pista: ['#7a7f87', '#737880'], faixa: '#ffd166', sol: '#fff1a6', nome: ['Cânion do Deserto', 'Desert Canyon', 'Cañón del Desierto'], emoji: '🏜️', cor: '#e07a2f' },
+    templo: { ceu: ['#3fa7b5', '#bfeee0'], grama: ['#2f8a5a', '#2a7d51'], borda: ['#e9c46a', '#2a9d8f'], pista: ['#8fa3a0', '#879b98'], faixa: '#e9f5db', sol: '#fff1a6', nome: ['Templo na Selva', 'Jungle Temple', 'Templo en la Selva'], emoji: '🗿', cor: '#2a9d8f' },
+    lava: { ceu: ['#ff7b54', '#ffd3a5'], grama: ['#4a1d14', '#3f1811'], borda: ['#ff6a00', '#ffd166'], pista: ['#4a3b3f', '#443539'], faixa: '#ffb703', sol: '#ffe0a0', nome: ['Vulcão de Lava', 'Lava Volcano', 'Volcán de Lava'], emoji: '🌋', cor: '#e85d04' },
+    lanche: { ceu: ['#ffb36b', '#ffe9c2'], grama: ['#e63946', '#ffffff'], borda: ['#ffd23f', '#e63946'], pista: ['#5a5a66', '#53535e'], faixa: '#ffd23f', sol: '#fff1a6', nome: ['Cidade do Lanche', 'Burger Town', 'Ciudad Hamburguesa'], emoji: '🍔', cor: '#e63946' },
+    blocos: { ceu: ['#5aa9ff', '#cfe8ff'], grama: ['#5fd068', '#4caf50'], borda: ['#8a5a36', '#c9ced6'], pista: ['#8d8d8d', '#858585'], faixa: '#ffffff', sol: '#fff7c2', nome: ['Mundo dos Blocos', 'Block World', 'Mundo de Bloques'], emoji: '🧱', cor: '#4caf50' },
+    flutuante: { ceu: ['#6a7bff', '#c8b6ff'], grama: ['#1d8a7a', '#18806f'], borda: ['#ff4fd8', '#7cf9ff'], pista: ['#6b5b95', '#64558c'], faixa: '#c6ff3d', sol: '#fff7c2', nome: ['Ilhas Flutuantes', 'Floating Islands', 'Islas Flotantes'], emoji: '✨', cor: '#7b2cbf' }
   };
   // visual NEON (padrão): os mesmos mundos à noite, estrada escura com bordas de neon
   var NEON = {
@@ -141,7 +141,7 @@
 
   function ordinalEn(n) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'; }
   function milhar(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, lingua === 'en' ? ',' : '.'); }
-  function t(pt, en) { return lingua === 'en' ? en : pt; }
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' && es != null ? es : pt; }   // pt, en, es (o idioma vem da estante)
   function misturar(a, b, f) {
     var x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
     var r = Math.round(((x >> 16) & 255) * (1 - f) + ((y >> 16) & 255) * f), g = Math.round(((x >> 8) & 255) * (1 - f) + ((y >> 8) & 255) * f), bl = Math.round((x & 255) * (1 - f) + (y & 255) * f);
@@ -158,9 +158,9 @@
     VOA = jogadores.map(function (j) { return !!(V() && V().voa(j.veic)); });
     RIV = (estado.rivais || []).map(function (r) { var P3 = raiz.VruuumPersonagens; return { spr: S.carroJogador(r.cor, null, r.veic, undefined, (P3 && P3.corpoDe(r.id)) || (r.r % 2 ? 'menino' : 'menina')), veic: V() ? V().achar(r.veic) : null, voa: !!(V() && V().voa(r.veic)), info: infoPiloto(r.cor, '', null, r.id) }; });
     prepararPaletas(estado.pista);
-    portais = estado.pista.mundos.map(function (m) { var tm = TEMAS[m]; return S.arco(tm.emoji + ' ' + t(tm.nome[0], tm.nome[1]), tm.cor, '#ffffff', false); });
-    largada = S.arco(t('🚦 VAI! 🚦', '🚦 GO! 🚦'), '#ff4fa3', '#ffffff', false);
-    chegada = S.arco(t('🏁 CHEGADA 🏁', '🏁 FINISH 🏁'), '#1a1446', '#ffffff', true);
+    portais = estado.pista.mundos.map(function (m) { var tm = TEMAS[m]; return S.arco(tm.emoji + ' ' + t(tm.nome[0], tm.nome[1], tm.nome[2]), tm.cor, '#ffffff', false); });
+    largada = S.arco(t('🚦 VAI! 🚦', '🚦 GO! 🚦', '🚦 ¡YA! 🚦'), '#ff4fa3', '#ffffff', false);
+    chegada = S.arco(t('🏁 CHEGADA 🏁', '🏁 FINISH 🏁', '🏁 META 🏁'), '#1a1446', '#ffffff', true);
     VS = jogadores.map(function () { return { fundoX: 0, nuvemX: 0, lado: 0, parts: [], faixa: null, chegouT: -1 }; });
   }
 
@@ -198,33 +198,33 @@
   }
   function evento(ev, estado) {
     var vs = VS[ev.j];
-    if (ev.tipo === 'vai') { var tm0 = TEMAS[estado.pista.mundos[0]]; VS.forEach(function (v) { v.faixa = { txt: tm0.emoji + ' ' + t(tm0.nome[0], tm0.nome[1]), ate: 2.6, cor: tm0.cor }; }); return; }
-    if (ev.tipo === 'mundo') { VS.forEach(function (v, k) { if (k === ev.j && !(v.faixa && v.faixaCheck > 0)) { var tm = TEMAS[ev.nome]; v.faixa = { txt: tm.emoji + ' ' + t(tm.nome[0], tm.nome[1]) + '!', ate: 2.6, cor: tm.cor }; } }); return; }
+    if (ev.tipo === 'vai') { var tm0 = TEMAS[estado.pista.mundos[0]]; VS.forEach(function (v) { v.faixa = { txt: tm0.emoji + ' ' + t(tm0.nome[0], tm0.nome[1], tm0.nome[2]), ate: 2.6, cor: tm0.cor }; }); return; }
+    if (ev.tipo === 'mundo') { VS.forEach(function (v, k) { if (k === ev.j && !(v.faixa && v.faixaCheck > 0)) { var tm = TEMAS[ev.nome]; v.faixa = { txt: tm.emoji + ' ' + t(tm.nome[0], tm.nome[1], tm.nome[2]) + '!', ate: 2.6, cor: tm.cor }; } }); return; }
     if (!vs) return;
     if (ev.tipo === 'lugar') { texto(vs, (ev.subiu ? '⬆ ' : '⬇ ') + ev.lugar + (lingua === 'en' ? ordinalEn(ev.lugar) : 'º'), ev.subiu ? '#c6ff3d' : '#ff9f1c', 1.2); return; }
     if (ev.tipo === 'pontos') { if (ev.motivo !== 'checkpoint' && ev.motivo !== 'chegada') texto(vs, (ev.p > 0 ? '+' : '') + ev.p, ev.p > 0 ? '#ffd93d' : '#ff6b6b', ev.p >= 200 ? 1.3 : 1); return; }
-    if (ev.tipo === 'checkpoint') { var tmC = TEMAS[estado.pista.mundos[ev.numero]]; vs.faixa = { txt: 'CHECKPOINT +' + milhar(500 + ev.bonus) + ' · ' + tmC.emoji + ' ' + t(tmC.nome[0], tmC.nome[1]), ate: 2.8, cor: '#c6ff3d' }; confete(vs, 30, 'cima'); fogos(vs, 3); vs.faixaCheck = 2.6; return; }
+    if (ev.tipo === 'checkpoint') { var tmC = TEMAS[estado.pista.mundos[ev.numero]]; vs.faixa = { txt: 'CHECKPOINT +' + milhar(500 + ev.bonus) + ' · ' + tmC.emoji + ' ' + t(tmC.nome[0], tmC.nome[1], tmC.nome[2]), ate: 2.8, cor: '#c6ff3d' }; confete(vs, 30, 'cima'); fogos(vs, 3); vs.faixaCheck = 2.6; return; }
     if (ev.tipo === 'estrela') { brilhinhos(vs, 6); if (ev.ar) confete(vs, 8); }
-    else if (ev.tipo === 'faisca') texto(vs, ['', t('Derrapando!', 'Drifting!'), t('Derrapagem!!', 'Super drift!!'), t('DERRAPAGEM MÁXIMA!', 'MAX DRIFT!')][ev.nivel], COR_FAISCA[ev.nivel], 1 + ev.nivel * 0.15);
+    else if (ev.tipo === 'faisca') texto(vs, ['', t('Derrapando!', 'Drifting!', '¡Derrapando!'), t('Derrapagem!!', 'Super drift!!', '¡Súper derrape!!'), t('DERRAPAGEM MÁXIMA!', 'MAX DRIFT!', '¡DERRAPE MÁXIMO!')][ev.nivel], COR_FAISCA[ev.nivel], 1 + ev.nivel * 0.15);
     else if (ev.tipo === 'miniturbo') { texto(vs, ev.nivel === 3 ? 'ULTRA TURBO!' : 'MINI TURBO!', COR_FAISCA[ev.nivel], 1.3 + ev.nivel * 0.15); brilhinhos(vs, 8 * ev.nivel, COR_FAISCA[ev.nivel]); if (ev.nivel === 3) fogos(vs, 1); }
     else if (ev.tipo === 'caixa') { if (ev.nova) texto(vs, '❓', '#ffffff', 1.4); brilhinhos(vs, 10, '#7cf9ff'); }
-    else if (ev.tipo === 'poder') texto(vs, ev.poder === 'escudo' ? t('🛡️ Bolha!', '🛡️ Bubble!') : ev.poder === 'foguete' ? t('🚀 Foguete!', '🚀 Rocket!') : t('🟢 Gosma!', '🟢 Goo!'), ev.poder === 'escudo' ? '#c6ff3d' : ev.poder === 'foguete' ? '#ff9f1c' : '#7ae03d', 1.5);
-    else if (ev.tipo === 'escudoBate') texto(vs, t('Bóing!', 'Boing!'), '#c6ff3d', 1.3);
-    else if (ev.tipo === 'splat') { texto(vs, ev.abobora ? t('🎃 Abóbora!', '🎃 Pumpkin!') : 'SPLAT!', ev.abobora ? '#ff8c1a' : '#7ae03d', 1.6); }
-    else if (ev.tipo === 'vira' && ev.dracula) texto(vs, t('🧛 Conde Drácula!', '🧛 Count Dracula!'), '#ff4d6d', 1.3);
-    else if (ev.tipo === 'pulo' && VEIC[ev.j] && VEIC[ev.j].galinha) texto(vs, t('Cocoricóóó!', 'Cock-a-doodle-doo!'), '#ffffff', 1.4);
+    else if (ev.tipo === 'poder') texto(vs, ev.poder === 'escudo' ? t('🛡️ Bolha!', '🛡️ Bubble!', '🛡️ ¡Burbuja!') : ev.poder === 'foguete' ? t('🚀 Foguete!', '🚀 Rocket!', '🚀 ¡Cohete!') : t('🟢 Gosma!', '🟢 Goo!', '🟢 ¡Baba!'), ev.poder === 'escudo' ? '#c6ff3d' : ev.poder === 'foguete' ? '#ff9f1c' : '#7ae03d', 1.5);
+    else if (ev.tipo === 'escudoBate') texto(vs, t('Bóing!', 'Boing!', '¡Boing!'), '#c6ff3d', 1.3);
+    else if (ev.tipo === 'splat') { texto(vs, ev.abobora ? t('🎃 Abóbora!', '🎃 Pumpkin!', '🎃 ¡Calabaza!') : 'SPLAT!', ev.abobora ? '#ff8c1a' : '#7ae03d', 1.6); }
+    else if (ev.tipo === 'vira' && ev.dracula) texto(vs, t('🧛 Conde Drácula!', '🧛 Count Dracula!', '🧛 ¡Conde Drácula!'), '#ff4d6d', 1.3);
+    else if (ev.tipo === 'pulo' && VEIC[ev.j] && VEIC[ev.j].galinha) texto(vs, t('Cocoricóóó!', 'Cock-a-doodle-doo!', '¡Quiquiriquííí!'), '#ffffff', 1.4);
     else if (ev.tipo === 'looping') texto(vs, 'LOOPING!', '#ff4fd8', 1.8);
-    else if (ev.tipo === 'loopFeito') { texto(vs, t('Que looping!', 'What a loop!'), '#c6ff3d', 1.5); fogos(vs, 2); confete(vs, 25, 'cima'); }
+    else if (ev.tipo === 'loopFeito') { texto(vs, t('Que looping!', 'What a loop!', '¡Menudo looping!'), '#c6ff3d', 1.5); fogos(vs, 2); confete(vs, 25, 'cima'); }
     else if (ev.tipo === 'perdeu') { for (var k = 0; k < Math.min(ev.q, 6); k++) vs.parts.push({ tipo: 'est', x: 0, y: -0.2, vx: (Math.random() - 0.5) * 2.4, vy: -1.8 - Math.random(), vida: 1.2, max: 1.2 }); }
-    else if (ev.tipo === 'batida') texto(vs, t('Opa!', 'Oops!'), '#ffffff', 1.4);
-    else if (ev.tipo === 'cone' && VOA[ev.j]) texto(vs, t('Piu piu!', 'Tweet!'), '#ff9f1c', 1.2);
-    else if (ev.tipo === 'lama' && VOA[ev.j]) texto(vs, t('Turbulência!', 'Turbulence!'), '#dfe6ff', 1.2);
-    else if (ev.tipo === 'pulo' && VOA[ev.j]) texto(vs, ev.manual ? t('Subindo!', 'Climb!') : t('Corrente de ar!', 'Updraft!'), '#c6ff3d', 1.3);
-    else if (ev.tipo === 'cone') texto(vs, t('Ops!', 'Oops!'), '#ff9f1c', 1.2);
-    else if (ev.tipo === 'lama') { texto(vs, t('Splash!', 'Splash!'), '#c98a4b', 1.2); for (k = 0; k < 10; k++) vs.parts.push({ tipo: 'gota', cor: '#6b3e1f', x: (Math.random() - 0.5) * 0.4, y: -0.1, vx: (Math.random() - 0.5) * 2, vy: -1.5 - Math.random(), vida: 0.8, max: 0.8 }); }
+    else if (ev.tipo === 'batida') texto(vs, t('Opa!', 'Oops!', '¡Uy!'), '#ffffff', 1.4);
+    else if (ev.tipo === 'cone' && VOA[ev.j]) texto(vs, t('Piu piu!', 'Tweet!', '¡Pío pío!'), '#ff9f1c', 1.2);
+    else if (ev.tipo === 'lama' && VOA[ev.j]) texto(vs, t('Turbulência!', 'Turbulence!', '¡Turbulencia!'), '#dfe6ff', 1.2);
+    else if (ev.tipo === 'pulo' && VOA[ev.j]) texto(vs, ev.manual ? t('Subindo!', 'Climb!', '¡Subiendo!') : t('Corrente de ar!', 'Updraft!', '¡Corriente de aire!'), '#c6ff3d', 1.3);
+    else if (ev.tipo === 'cone') texto(vs, t('Ops!', 'Oops!', '¡Ups!'), '#ff9f1c', 1.2);
+    else if (ev.tipo === 'lama') { texto(vs, t('Splash!', 'Splash!', '¡Splash!'), '#c98a4b', 1.2); for (k = 0; k < 10; k++) vs.parts.push({ tipo: 'gota', cor: '#6b3e1f', x: (Math.random() - 0.5) * 0.4, y: -0.1, vx: (Math.random() - 0.5) * 2, vy: -1.5 - Math.random(), vida: 0.8, max: 0.8 }); }
     else if (ev.tipo === 'turbo') texto(vs, 'TURBO!', '#3ee8ff', 1.6);
-    else if (ev.tipo === 'pulo') texto(vs, ev.manual ? t('Hop!', 'Hop!') : t('Uhuuu!', 'Wheee!'), '#c6ff3d', ev.manual ? 1.1 : 1.5);
-    else if (ev.tipo === 'buzina') { var vz = VEIC[ev.j] && VEIC[ev.j].voz, BZ = { galo: t('Cocoricó!', 'Cock-a-doodle-doo!'), cavalo: t('Iiirrrí!', 'Neigh!'), dino: t('ROOOAR!', 'ROOOAR!'), arara: t('Cráá!', 'Squawk!'), morcego: t('Iiiik!', 'Eeek!') }; texto(vs, BZ[vz] || t('Bi-bi!', 'Beep-beep!'), '#ff7ac6', 1.1); }
+    else if (ev.tipo === 'pulo') texto(vs, ev.manual ? t('Hop!', 'Hop!', '¡Hop!') : t('Uhuuu!', 'Wheee!', '¡Yujuuu!'), '#c6ff3d', ev.manual ? 1.1 : 1.5);
+    else if (ev.tipo === 'buzina') { var vz = VEIC[ev.j] && VEIC[ev.j].voz, BZ = { galo: t('Cocoricó!', 'Cock-a-doodle-doo!', '¡Quiquiriquí!'), cavalo: t('Iiirrrí!', 'Neigh!', '¡Hiiiii!'), dino: t('ROOOAR!', 'ROOOAR!', '¡ROOOAR!'), arara: t('Cráá!', 'Squawk!', '¡Craaa!'), morcego: t('Iiiik!', 'Eeek!', '¡Iiiik!') }; texto(vs, BZ[vz] || t('Bi-bi!', 'Beep-beep!', '¡Bip-bip!'), '#ff7ac6', 1.1); }
     else if (ev.tipo === 'chegou') { vs.chegouT = 0; vs.lugar = ev.lugar; confete(vs, 70, 'cima'); fogos(vs, 8); }
   }
   function passo(dt, estado, entradas) {
@@ -1252,8 +1252,8 @@
       if (ligada) { c.globalCompositeOperation = 'lighter'; luz(c, x, y, L * 1.1, vai ? '#3dff6e' : cor, 0.7); c.globalCompositeOperation = 'source-over'; }
     });
     // a frase: chega uma parte a cada segundo, crescendo; no VAI! some e entra o VAI! enorme
-    var partes = [t('PRONTO', 'READY'), t('PRA SENTIR', 'TO FEEL'), t('A VELOCIDADE?', 'THE SPEED?')], qtas = contando ? 4 - n : 3;
-    var txt = vai ? t('VAI!', 'GO!') : partes.slice(0, qtas).join(' '), fr = contando ? 1 - (e.contagem % 1 || 1) : e.t / 1.1;
+    var partes = [t('PRONTO', 'READY', '¿LISTOS'), t('PRA SENTIR', 'TO FEEL', 'PARA SENTIR'), t('A VELOCIDADE?', 'THE SPEED?', 'LA VELOCIDAD?')], qtas = contando ? 4 - n : 3;
+    var txt = vai ? t('VAI!', 'GO!', '¡YA!') : partes.slice(0, qtas).join(' '), fr = contando ? 1 - (e.contagem % 1 || 1) : e.t / 1.1;
     var tam = vai ? K * (0.42 + 0.25 * (1 - fr)) : Math.min(K * 0.2, w * 0.95 / Math.max(6, txt.length * 0.62));
     if (!vai && fr < 0.2) tam *= 1 + (0.2 - fr) * 2;
     c.font = 'italic 700 ' + Math.round(tam) + 'px ' + FONTE; c.textAlign = 'center'; c.textBaseline = 'middle';
@@ -1297,7 +1297,7 @@
     if (vs.chegouT >= 0) {
       var tc = K * 0.2 * Math.min(1, vs.chegouT * 3);
       c.font = '700 ' + Math.round(tc) + 'px ' + FONTE + ',' + EMOJI; c.textAlign = 'center'; c.textBaseline = 'middle';
-      var tx = (e.total || 1) < 2 ? t('🏁 Chegou!', '🏁 Finished!') : vs.lugar === 1 ? t('🥇 1º lugar!', '🥇 1st place!') : vs.lugar === 2 ? t('🥈 2º lugar!', '🥈 2nd place!') : vs.lugar === 3 ? t('🥉 3º lugar!', '🥉 3rd place!') : t('🏁 Chegou em ', '🏁 Finished ') + vs.lugar + (lingua === 'en' ? ordinalEn(vs.lugar) : 'º') + '!';
+      var tx = (e.total || 1) < 2 ? t('🏁 Chegou!', '🏁 Finished!', '🏁 ¡Has llegado!') : vs.lugar === 1 ? t('🥇 1º lugar!', '🥇 1st place!', '🥇 ¡Primer puesto!') : vs.lugar === 2 ? t('🥈 2º lugar!', '🥈 2nd place!', '🥈 ¡Segundo puesto!') : vs.lugar === 3 ? t('🥉 3º lugar!', '🥉 3rd place!', '🥉 ¡Tercer puesto!') : t('🏁 Chegou em ', '🏁 Finished ', '🏁 ¡Has llegado ') + vs.lugar + (lingua === 'en' ? ordinalEn(vs.lugar) : 'º') + '!';
       c.lineWidth = tc * 0.1; c.strokeStyle = '#1a1446'; c.strokeText(tx, w / 2, h * 0.32); c.fillStyle = '#ffd166'; c.fillText(tx, w / 2, h * 0.32);
     }
     // setas de toque
@@ -1312,14 +1312,14 @@
       if (guia) {
         var fs = Math.round(u * 0.62), bpg = botaoPulo(v, ml);
         c.font = '700 ' + fs + 'px ' + FONTE + ',' + EMOJI; c.textBaseline = 'middle'; c.lineWidth = fs * 0.22; c.strokeStyle = '#1a1446'; c.fillStyle = '#ffffff';
-        c.textAlign = 'left'; c.strokeText(t('segure: virar', 'hold: steer'), xl, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer'), xl, ay - as - fs * 0.7);
-        c.textAlign = 'right'; c.strokeText(t('segure: virar', 'hold: steer'), xr, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer'), xr, ay - as - fs * 0.7);
-        c.textAlign = 'center'; c.strokeText(t('toque: pular', 'tap: jump'), bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8); c.fillText(t('toque: pular', 'tap: jump'), bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8);
+        c.textAlign = 'left'; c.strokeText(t('segure: virar', 'hold: steer', 'mantén: girar'), xl, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer', 'mantén: girar'), xl, ay - as - fs * 0.7);
+        c.textAlign = 'right'; c.strokeText(t('segure: virar', 'hold: steer', 'mantén: girar'), xr, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer', 'mantén: girar'), xr, ay - as - fs * 0.7);
+        c.textAlign = 'center'; c.strokeText(t('toque: pular', 'tap: jump', 'toca: saltar'), bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8); c.fillText(t('toque: pular', 'tap: jump', 'toca: saltar'), bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8);
         if (dois) {   // de quem é cada metade da tela
-          var tj = (op.jogadores && op.jogadores[ji] ? (op.jogadores[ji].piloto || '') + ' ' : '') + t('Jogador ', 'Player ') + (ji + 1), fj = Math.round(Math.min(u * 0.95, w / 11));
+          var tj = (op.jogadores && op.jogadores[ji] ? (op.jogadores[ji].piloto || '') + ' ' : '') + t('Jogador ', 'Player ', 'Jugador ') + (ji + 1), fj = Math.round(Math.min(u * 0.95, w / 11));
           c.font = '700 ' + fj + 'px ' + FONTE + ',' + EMOJI; c.lineWidth = fj * 0.22;
           c.strokeText(tj, w / 2, h * 0.6); c.fillStyle = ji ? '#7cf9ff' : '#ffd166'; c.fillText(tj, w / 2, h * 0.6);
-          var t2 = t('esta metade da tela é sua', 'this half of the screen is yours'), f2 = Math.round(fj * 0.6);
+          var t2 = t('esta metade da tela é sua', 'this half of the screen is yours', 'esta mitad de la pantalla es tuya'), f2 = Math.round(fj * 0.6);
           c.font = '700 ' + f2 + 'px ' + FONTE; c.lineWidth = f2 * 0.22; c.fillStyle = '#ffffff';
           c.strokeText(t2, w / 2, h * 0.6 + fj * 0.95); c.fillText(t2, w / 2, h * 0.6 + fj * 0.95);
         }
@@ -1332,7 +1332,7 @@
       else { c.strokeStyle = '#c6ff3d'; c.stroke(); }
       c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle';
       c.font = '700 ' + Math.round(u * 1.3) + 'px ' + FONTE; c.fillText('⬆', bx2, by2 - u * 0.25);
-      c.font = '700 ' + Math.round(u * 0.55) + 'px ' + FONTE; c.fillText(t('PULAR', 'JUMP'), bx2, by2 + u * 0.8);
+      c.font = '700 ' + Math.round(u * 0.55) + 'px ' + FONTE; c.fillText(t('PULAR', 'JUMP', 'SALTAR'), bx2, by2 + u * 0.8);
       c.globalAlpha = 1;
     }
   }
@@ -1394,20 +1394,20 @@
       if (o.vv && o.vv.cavalo && CAV()) onde = CAV().vivo(c, x1, y1, cw, ch, o.info.cor, fr, Math.sin(tt * 0.8) * 0.6, o.info.corpo, tt, o.vv.bicho);
       else c.drawImage(S.quadro(o.spr, fr).img, x1, y1, cw, ch);
       pilotoVivo(c, o.vv, x1, y1, cw, ch, o.info, o.sem, 2.5, onde || ondeCabeca(o.vv, x1, y1, cw, ch, fr));
-      if (o.eu) { c.font = '700 ' + Math.round(H * 0.05) + 'px ' + FONTE + ',' + EMOJI; c.fillStyle = '#ffd166'; c.fillText(t('VOCÊ', 'YOU'), W * d[0], y1 - H * 0.03); }
+      if (o.eu) { c.font = '700 ' + Math.round(H * 0.05) + 'px ' + FONTE + ',' + EMOJI; c.fillStyle = '#ffd166'; c.fillText(t('VOCÊ', 'YOU', 'TÚ'), W * d[0], y1 - H * 0.03); }
     });
     // quem joga e não ficou entre os 3: aparece embaixo, com o lugar
     todos.forEach(function (o, k) { if (!o.eu || k < 3) return; c.drawImage(retrato(o.info), W * 0.04, H * 0.8, H * 0.16, H * 0.16); c.font = '700 ' + Math.round(H * 0.06) + 'px ' + FONTE; c.fillStyle = '#ffffff'; c.textAlign = 'left'; c.fillText((k + 1) + (lingua === 'en' ? ordinalEn(k + 1) : 'º'), W * 0.04 + H * 0.18, H * 0.88); });
     // título com louros e os pontos subindo
     var eu = todos.findIndex ? todos.findIndex(function (o) { return o.eu; }) : 0, lugar = eu + 1;
-    var titulo = todos.length < 2 ? t('🏁 CHEGOU!', '🏁 FINISHED!') : lugar === 1 ? t('🏆 CAMPEÃO!', '🏆 CHAMPION!') : lugar === 2 ? t('🥈 VICE-CAMPEÃO!', '🥈 RUNNER-UP!') : lugar === 3 ? t('🥉 3º LUGAR!', '🥉 3RD PLACE!') : t('👏 MUITO BEM!', '👏 WELL DONE!');
+    var titulo = todos.length < 2 ? t('🏁 CHEGOU!', '🏁 FINISHED!', '🏁 ¡HAS LLEGADO!') : lugar === 1 ? t('🏆 CAMPEÃO!', '🏆 CHAMPION!', '🏆 ¡CAMPEÓN!') : lugar === 2 ? t('🥈 VICE-CAMPEÃO!', '🥈 RUNNER-UP!', '🥈 ¡SUBCAMPEÓN!') : lugar === 3 ? t('🥉 3º LUGAR!', '🥉 3RD PLACE!', '🥉 ¡TERCER PUESTO!') : t('👏 MUITO BEM!', '👏 WELL DONE!', '👏 ¡MUY BIEN!');
     var ts = H * 0.09 * (1 + Math.max(0, 0.3 - tA) * 2);
     c.font = 'italic 700 ' + Math.round(ts) + 'px ' + FONTE + ',' + EMOJI; c.textAlign = 'center'; c.textBaseline = 'middle';
     c.lineJoin = 'round'; c.lineWidth = ts * 0.2; c.strokeStyle = '#7b2cbf'; c.strokeText(titulo, W / 2, H * 0.07); c.lineWidth = ts * 0.08; c.strokeStyle = '#2bf4ff'; c.strokeText(titulo, W / 2, H * 0.07);
     c.fillStyle = '#d8ff3d'; c.fillText(titulo, W / 2, H * 0.07);
     var j0 = e.jogadores[0], conta = Math.min(1, tA / 2.2), pts = Math.round((j0.pontos || 0) * conta), est = Math.round(j0.estrelas * conta);
     c.font = '700 ' + Math.round(H * 0.06) + 'px ' + FONTE + ',' + EMOJI; c.fillStyle = 'rgba(26,20,70,.75)';
-    var txt = '⭐ ' + est + '   ' + milhar(pts) + ' ' + t('pontos', 'points') + (j0.loopings ? '   🌀 ' + j0.loopings : '');
+    var txt = '⭐ ' + est + '   ' + milhar(pts) + ' ' + t('pontos', 'points', 'puntos') + (j0.loopings ? '   🌀 ' + j0.loopings : '');
     var tw = c.measureText(txt).width + H * 0.08; c.fillRect(W * 0.98 - tw, H * 0.86, tw, H * 0.1);
     c.fillStyle = '#ffd166'; c.textAlign = 'right'; c.fillText(txt, W * 0.98 - H * 0.04, H * 0.91);
     // confete caindo e fogos estourando

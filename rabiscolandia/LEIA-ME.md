@@ -78,7 +78,7 @@ o mesmo canal das irmãs): só a posição da mira (de 0 a 1), "apertado" e coma
 
 ## O que fica guardado (só neste aparelho)
 
-`rabiscolandia.pref` (idioma, música, efeitos, desenhos terminados, nome no controle) e o banco IndexedDB
+`rabiscolandia.pref` (música, efeitos, desenhos terminados, nome no controle) e o banco IndexedDB
 `rabiscolandia` (Meus desenhos: miniatura, estado e a pintura em quadradinhos PNG; a foto de fundo, se houver, vai
 diminuída junto). Nada vai para a internet; não há login, cookie nem coleta.
 

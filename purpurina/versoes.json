@@ -2,6 +2,20 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.18.0",
+      "data": "14/Nov/2026",
+      "hora": "14:30:00",
+      "pt": [
+        "🌎 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante"
+      ],
+      "en": [
+        "🌎 Now in three languages: Portuguese, English and Spanish, chosen on the shelf"
+      ],
+      "es": [
+        "🌎 Ahora en tres idiomas: portugués, inglés y español, elegidos en la estantería"
+      ]
+    },
+    {
       "versao": "0.17.5",
       "data": "07/Nov/2026",
       "hora": "12:00:00",

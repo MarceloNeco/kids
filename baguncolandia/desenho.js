@@ -31,8 +31,8 @@
     }
   }
   function ehTV() { var ua = (root.navigator && navigator.userAgent) || ''; return /Web0S|webOS|SMART-TV|SmartTV|Tizen|BRAVIA|VIDAA|NetCast|HbbTV|AppleTV|CrKey|AFT[A-Z]/i.test(ua); }
-  var EN = /^en/i.test((root.navigator && root.navigator.language) || '') && !(root.BolinhoIdioma && !root.BolinhoIdioma.ingles());   // ../idioma.js
-  function T(pt, en) { return EN ? en : pt; }
+  // o idioma da estante (../idioma.js), lido a cada quadro: pt, en ou es
+  function T(pt, en, es) { var l = root.BolinhoIdioma ? root.BolinhoIdioma.atual() : 'pt'; return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }
 
   function iniciar(canvas, opts) {
     D.canvas = canvas; canvas.width = W; canvas.height = H; D.ctx = canvas.getContext('2d');
@@ -145,21 +145,21 @@
       texto('+' + ev.pontos, ev.x, ev.y - raio, cor, 34);
       pop(ev.j);
     } else if (ev.t === 'pegou') { estrelas(ev.x, ev.y, ev.mascote ? CORES.ouro : cor, ev.mascote ? 30 : 14); texto((ev.mascote ? '★ ' : '') + '+' + ev.pontos, ev.x, ev.y - 50, ev.mascote ? CORES.ouro : cor, ev.mascote ? 44 : 34); pop(ev.j); }
-    else if (ev.t === 'chutou') { estrelas(ev.x, ev.y, '#fff', 10); texto(T('Chutou! +', 'Kick! +') + ev.pontos, ev.x, ev.y - 60, cor, 32); pop(ev.j); }
-    else if (ev.t === 'tanque') { for (var bi = 0; bi < 34; bi++) D.parts.push({ x: ev.px + (Math.random() - 0.5) * 200, y: 548, vx: (Math.random() - 0.5) * 760, vy: -280 - Math.random() * 560, g: 1300, r: 7 + Math.random() * 5, cor: CORES_BOLINHAS[bi % CORES_BOLINHAS.length], vida: 1400 }); texto(T('TCHIBUM! +', 'SPLASH! +') + ev.pontos, ev.px, 420, CORES.ouro, 46); pop(ev.j); }   // 🎉 caiu na piscina: bolinhas para todo lado
-    else if (ev.t === 'gol') { D.flash = 0.6; estrelas(ev.x, ev.y, CORES.ouro, 40); texto(T('GOOOL! +', 'GOAL! +') + ev.pontos, W / 2, 300, CORES.ouro, 72); pop(ev.j); }
-    else if (ev.t === 'vilao') { fumaca(ev.x, ev.y); texto(ev.vida ? T('Ai! −1 vida', 'Ouch! −1 life') : (ev.pontos + ''), ev.x, ev.y - 50, '#ff5252', 36); if (ev.fig === 'chuvisco') D.chuva = 2500; if (ev.vida) D.flash = 0.35; }
-    else if (ev.t === 'combo') { texto((EN ? 'COMBO ×' : 'COMBO ×') + ev.n + '  +' + ev.pontos, ev.x || W / 2, (ev.y || 300) - 110, CORES.ouro, 48, true); }
-    else if (ev.t === 'poder') { if (ev.poder) texto({ x2: '✖2!', lento: T('🐌 Lento!', '🐌 Slow!'), chuva: T('🌧 Chuva de frutas!', '🌧 Fruit rain!') }[ev.poder] || '', ev.x || W / 2, (ev.y || 200) - 60, CORES.ciano, 44, true); estrelas(ev.x || W / 2, ev.y || 200, CORES.ciano, 24); }
+    else if (ev.t === 'chutou') { estrelas(ev.x, ev.y, '#fff', 10); texto(T('Chutou! +', 'Kick! +', '¡Chutazo! +') + ev.pontos, ev.x, ev.y - 60, cor, 32); pop(ev.j); }
+    else if (ev.t === 'tanque') { for (var bi = 0; bi < 34; bi++) D.parts.push({ x: ev.px + (Math.random() - 0.5) * 200, y: 548, vx: (Math.random() - 0.5) * 760, vy: -280 - Math.random() * 560, g: 1300, r: 7 + Math.random() * 5, cor: CORES_BOLINHAS[bi % CORES_BOLINHAS.length], vida: 1400 }); texto(T('TCHIBUM! +', 'SPLASH! +', '¡CHAPUZÓN! +') + ev.pontos, ev.px, 420, CORES.ouro, 46); pop(ev.j); }   // 🎉 caiu na piscina: bolinhas para todo lado
+    else if (ev.t === 'gol') { D.flash = 0.6; estrelas(ev.x, ev.y, CORES.ouro, 40); texto(T('GOOOL! +', 'GOAL! +', '¡GOOOL! +') + ev.pontos, W / 2, 300, CORES.ouro, 72); pop(ev.j); }
+    else if (ev.t === 'vilao') { fumaca(ev.x, ev.y); texto(ev.vida ? T('Ai! −1 vida', 'Ouch! −1 life', '¡Ay! −1 vida') : (ev.pontos + ''), ev.x, ev.y - 50, '#ff5252', 36); if (ev.fig === 'chuvisco') D.chuva = 2500; if (ev.vida) D.flash = 0.35; }
+    else if (ev.t === 'combo') { texto('COMBO ×' + ev.n + '  +' + ev.pontos, ev.x || W / 2, (ev.y || 300) - 110, CORES.ouro, 48, true); }
+    else if (ev.t === 'poder') { if (ev.poder) texto({ x2: '✖2!', lento: T('🐌 Lento!', '🐌 Slow!', '🐌 ¡Lento!'), chuva: T('🌧 Chuva de frutas!', '🌧 Fruit rain!', '🌧 ¡Lluvia de frutas!') }[ev.poder] || '', ev.x || W / 2, (ev.y || 200) - 60, CORES.ciano, 44, true); estrelas(ev.x || W / 2, ev.y || 200, CORES.ciano, 24); }
     else if (ev.t === 'troca') { D.modoAviso = { modo: ev.modo, ate: D.ultimo + 2200 }; }
     else if (ev.t === 'tocou') { estrelas(ev.x, ev.y, cor, 8); texto('+' + ev.pontos, ev.x, ev.y - 40, cor, 28); pop(ev.j); }
     else if (ev.t === 'desviou') { texto('+' + ev.pontos + (ev.tipo === 'baixo' ? ' 🦘' : ' 🙇'), ev.x, ev.y - 60, cor, 34); estrelas(ev.x, ev.y, cor, 10); pop(ev.j); }
-    else if (ev.t === 'bateu') { fumaca(ev.x, ev.y); D.flash = 0.3; texto(T('Ai! −1 vida', 'Ouch! −1 life'), ev.x, ev.y - 60, '#ff5252', 36); }
+    else if (ev.t === 'bateu') { fumaca(ev.x, ev.y); D.flash = 0.3; texto(T('Ai! −1 vida', 'Ouch! −1 life', '¡Ay! −1 vida'), ev.x, ev.y - 60, '#ff5252', 36); }
     else if (ev.t === 'aviso') { D.aviso = { tipo: ev.tipo, j: ev.j, ate: D.ultimo + 1000 }; }
     else if (ev.t === 'fim') { confete(); }
-    else if (ev.t === 'casa') { if (ev.texto) texto(T(ev.texto, ev.textoEn || ev.texto), ev.x, ev.y - 40, ev.texto === '+10' ? CORES.ouro : cor, ev.texto === '+10' ? 30 : 36); if (ev.festa) estrelas(ev.x, ev.y, cor, 6); if (ev.pontos > 0) pop(ev.j || 0); }
-    else if (ev.t === 'arrumado') { confete(); D.flash = 0.4; texto(T('TUDO ARRUMADO! 🌟 Que capricho!', 'ALL TIDY! 🌟 Great job!'), W / 2, 320, CORES.ouro, 60, true); }
-    else if (ev.t === 'bagunca100') { confete(); D.flash = 0.5; texto(T('BAGUNÇA TOTAL! 🎉 +100', 'TOTAL MAYHEM! 🎉 +100'), W / 2, 320, CORES.ouro, 66, true); }
+    else if (ev.t === 'casa') { if (ev.texto) texto(T(ev.texto, ev.textoEn || ev.texto, ev.textoEs || ev.texto), ev.x, ev.y - 40, ev.texto === '+10' ? CORES.ouro : cor, ev.texto === '+10' ? 30 : 36); if (ev.festa) estrelas(ev.x, ev.y, cor, 6); if (ev.pontos > 0) pop(ev.j || 0); }
+    else if (ev.t === 'arrumado') { confete(); D.flash = 0.4; texto(T('TUDO ARRUMADO! 🌟 Que capricho!', 'ALL TIDY! 🌟 Great job!', '¡TODO ORDENADO! 🌟 ¡Qué bien te ha quedado!'), W / 2, 320, CORES.ouro, 60, true); }
+    else if (ev.t === 'bagunca100') { confete(); D.flash = 0.5; texto(T('BAGUNÇA TOTAL! 🎉 +100', 'TOTAL MAYHEM! 🎉 +100', '¡ALBOROTO TOTAL! 🎉 +100'), W / 2, 320, CORES.ouro, 66, true); }
   }
   function pop(j) { D.pops[j] = D.ultimo; }
   function texto(t, x, y, cor, tam, grande) { D.textos.push({ t: t, x: x, y: y, cor: cor, tam: tam, vida: grande ? 1600 : 1000, grande: grande }); }
@@ -408,7 +408,7 @@
       ctx.fillStyle = 'rgba(41,182,246,.92)'; arred(ctx, cx - 135, topoP + 8, 270, fundoP - topoP - 8, 18); ctx.fill();
       ctx.strokeStyle = '#0288d1'; ctx.lineWidth = 5; ctx.stroke();
       for (var f = 0; f < 18; f++) { ctx.fillStyle = CORES_BOLINHAS[(f + 3) % CORES_BOLINHAS.length]; ctx.beginPath(); ctx.arc(cx - 115 + (f * 29) % 230, topoP + 6 + (f % 2) * 6, 12, Math.PI, 0); ctx.fill(); }
-      ctx.fillStyle = '#fff'; ctx.font = '700 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.fillText(k.quem === 'pai' ? T('Papai', 'Dad') : T('Mamãe', 'Mom'), cx, fundoP - 22);
+      ctx.fillStyle = '#fff'; ctx.font = '700 22px ' + D.fonte; ctx.textAlign = 'center'; ctx.fillText(k.quem === 'pai' ? T('Papai', 'Dad', 'Papá') : T('Mamãe', 'Mom', 'Mamá'), cx, fundoP - 22);
       ctx.restore();
     });
   }
@@ -434,7 +434,7 @@
     else B.corpoEmPe(ctx, cfg, A, { bE: 0.12, bD: P.chama ? 0.6 + 0.4 * Math.sin(ts / 120) : 0.2, balanco: 0, ts: ts });   // parado: acena chamando
     ctx.restore();
     if (P.fala) {   // balão de fala em cima da cabeça
-      var txt = T(P.fala[0], P.fala[1]); ctx.save(); ctx.font = '700 26px ' + D.fonte; var tw = ctx.measureText(txt).width + 32, bx = Math.max(10, Math.min(W - tw - 10, P.x - tw / 2)), by = Math.max(6, chao + y - A * (1 - 0.35 * ab) - 70);   // o balão acompanha o pulo e o abaixar
+      var txt = T(P.fala[0], P.fala[1], P.fala[2]); ctx.save(); ctx.font = '700 26px ' + D.fonte; var tw = ctx.measureText(txt).width + 32, bx = Math.max(10, Math.min(W - tw - 10, P.x - tw / 2)), by = Math.max(6, chao + y - A * (1 - 0.35 * ab) - 70);   // o balão acompanha o pulo e o abaixar
       ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.beginPath(); ctx.moveTo(bx + 20, by); ctx.arcTo(bx + tw, by, bx + tw, by + 48, 22); ctx.arcTo(bx + tw, by + 48, bx, by + 48, 22); ctx.arcTo(bx, by + 48, bx, by, 22); ctx.arcTo(bx, by, bx + tw, by, 22); ctx.fill();
       ctx.beginPath(); ctx.moveTo(P.x - 10, by + 46); ctx.lineTo(P.x, by + 66); ctx.lineTo(P.x + 12, by + 46); ctx.fill();
       ctx.fillStyle = '#0d47a1'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, bx + tw / 2, by + 25); ctx.restore();
@@ -465,7 +465,7 @@
       ctx.textAlign = dir ? 'right' : 'left';
       // nome
       ctx.font = '600 26px ' + D.fonte; ctx.fillStyle = cor; sombra(ctx, 'rgba(0,0,0,.8)', 8);
-      ctx.fillText(D.nomes[j] || (T('Jogador ', 'Player ') + (j + 1)), x, y);
+      ctx.fillText(D.nomes[j] || (T('Jogador ', 'Player ', 'Jugador ') + (j + 1)), x, y);
       // pontos
       ctx.save(); ctx.translate(x, y + 30); ctx.scale(esc, esc); ctx.font = '700 64px ' + D.fonte; ctx.fillStyle = CORES.ouro; ctx.fillText(String(jg.pontos), 0, 0); ctx.restore();
       // vidas
@@ -482,12 +482,12 @@
       var s = estado.restante, mm = Math.floor(s / 60), ss = s % 60; ctx.fillText(mm + ':' + (ss < 10 ? '0' : '') + ss, W / 2, 16);
     }
     // modo atual (pequeno)
-    var nomeModo = { corta: T('🍉 Corta-corta', '🍉 Slice'), pega: T('🎈 Pega-pega', '🎈 Catch'), chuta: T('⚽ Chuta-chuta', '⚽ Kick'), pula: T('🪵 Pula e abaixa', '🪵 Jump and duck'), bolas: T('🎳 Bagunça de bolas', '🎳 Ball mayhem'), bagunca: estado.casa ? { sala: T('🧸 Bagunça na sala', '🧸 Living-room mayhem'), quarto: T('🧸 Bagunça no quarto', '🧸 Bedroom mayhem'), jardim: T('🧸 Bagunça no jardim', '🧸 Garden mayhem'), cozinha: T('🧸 Bagunça na cozinha', '🧸 Kitchen mayhem'), banheiro: T('🧸 Bagunça no banheiro', '🧸 Bathroom mayhem'), parquinho: T('🧸 Bagunça no parquinho', '🧸 Playground mayhem') }[estado.casa.cena] : '' }[estado.modo] || '';
-    if (estado.arrumando && estado.casa) nomeModo = { sala: T('🧹 Arrumando a sala', '🧹 Tidying the living room'), quarto: T('🧹 Arrumando o quarto', '🧹 Tidying the bedroom'), jardim: T('🧹 Arrumando o jardim', '🧹 Tidying the garden'), cozinha: T('🧹 Arrumando a cozinha', '🧹 Tidying the kitchen'), banheiro: T('🧹 Arrumando o banheiro', '🧹 Tidying the bathroom'), parquinho: T('🧹 Arrumando o parquinho', '🧹 Tidying the playground') }[estado.casa.cena] || nomeModo;
+    var nomeModo = { corta: T('🍉 Corta-corta', '🍉 Slice', '🍉 Corta-corta'), pega: T('🎈 Pega-pega', '🎈 Catch', '🎈 Pilla-pilla'), chuta: T('⚽ Chuta-chuta', '⚽ Kick', '⚽ Chuta-chuta'), pula: T('🪵 Pula e abaixa', '🪵 Jump and duck', '🪵 Salta y agáchate'), bolas: T('🎳 Bagunça de bolas', '🎳 Ball mayhem', '🎳 Alboroto de pelotas'), bagunca: estado.casa ? { sala: T('🧸 Bagunça na sala', '🧸 Living-room mayhem', '🧸 Alboroto en el salón'), quarto: T('🧸 Bagunça no quarto', '🧸 Bedroom mayhem', '🧸 Alboroto en el dormitorio'), jardim: T('🧸 Bagunça no jardim', '🧸 Garden mayhem', '🧸 Alboroto en el jardín'), cozinha: T('🧸 Bagunça na cozinha', '🧸 Kitchen mayhem', '🧸 Alboroto en la cocina'), banheiro: T('🧸 Bagunça no banheiro', '🧸 Bathroom mayhem', '🧸 Alboroto en el baño'), parquinho: T('🧸 Bagunça no parquinho', '🧸 Playground mayhem', '🧸 Alboroto en el parque') }[estado.casa.cena] : '' }[estado.modo] || '';
+    if (estado.arrumando && estado.casa) nomeModo = { sala: T('🧹 Arrumando a sala', '🧹 Tidying the living room', '🧹 Ordenando el salón'), quarto: T('🧹 Arrumando o quarto', '🧹 Tidying the bedroom', '🧹 Ordenando el dormitorio'), jardim: T('🧹 Arrumando o jardim', '🧹 Tidying the garden', '🧹 Ordenando el jardín'), cozinha: T('🧹 Arrumando a cozinha', '🧹 Tidying the kitchen', '🧹 Ordenando la cocina'), banheiro: T('🧹 Arrumando o banheiro', '🧹 Tidying the bathroom', '🧹 Ordenando el baño'), parquinho: T('🧹 Arrumando o parquinho', '🧹 Tidying the playground', '🧹 Ordenando el parque') }[estado.casa.cena] || nomeModo;
     ctx.textAlign = 'center'; ctx.font = '600 24px ' + D.fonte; ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillText(nomeModo, W / 2, 76);
-    if (D.modoAviso && ts < D.modoAviso.ate) { var a = Math.min(1, (D.modoAviso.ate - ts) / 500); ctx.globalAlpha = a; ctx.font = '700 80px ' + D.fonte; ctx.fillStyle = CORES.ciano; sombra(ctx, CORES.ciano, 30); ctx.fillText({ corta: T('🍉 Corta!', '🍉 Slice!'), pega: T('🎈 Pega!', '🎈 Catch!'), chuta: T('⚽ Chuta!', '⚽ Kick!'), pula: T('🪵 Pula e abaixa!', '🪵 Jump and duck!'), bolas: T('🎳 Bagunça de bolas!', '🎳 Ball mayhem!') }[D.modoAviso.modo], W / 2, 280); ctx.globalAlpha = 1; }
-    if (D.aviso && ts < D.aviso.ate) { var rj = jogs[D.aviso.j] ? jogs[D.aviso.j].raia : jogs[0].raia, pisc = Math.floor(ts / 120) % 2 === 0 || D.menos; ctx.textAlign = 'center'; ctx.font = '700 96px ' + D.fonte; ctx.fillStyle = pisc ? (D.aviso.tipo === 'baixo' ? CORES.ouro : CORES.ciano) : '#fff'; sombra(ctx, ctx.fillStyle, 30); ctx.fillText(D.aviso.tipo === 'baixo' ? T('⬆ PULA!', '⬆ JUMP!') : T('⬇ ABAIXA!', '⬇ DUCK!'), rj.x + rj.w / 2, 230); ctx.shadowBlur = 0; }
-    if (estado.fase === 'pausa') { ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0, 0, W, H); ctx.font = '700 90px ' + D.fonte; ctx.fillStyle = '#fff'; ctx.fillText(T('⏸ Pausa', '⏸ Paused'), W / 2, 300); }
+    if (D.modoAviso && ts < D.modoAviso.ate) { var a = Math.min(1, (D.modoAviso.ate - ts) / 500); ctx.globalAlpha = a; ctx.font = '700 80px ' + D.fonte; ctx.fillStyle = CORES.ciano; sombra(ctx, CORES.ciano, 30); ctx.fillText({ corta: T('🍉 Corta!', '🍉 Slice!', '🍉 ¡Corta!'), pega: T('🎈 Pega!', '🎈 Catch!', '🎈 ¡Coge!'), chuta: T('⚽ Chuta!', '⚽ Kick!', '⚽ ¡Chuta!'), pula: T('🪵 Pula e abaixa!', '🪵 Jump and duck!', '🪵 ¡Salta y agáchate!'), bolas: T('🎳 Bagunça de bolas!', '🎳 Ball mayhem!', '🎳 ¡Alboroto de pelotas!') }[D.modoAviso.modo], W / 2, 280); ctx.globalAlpha = 1; }
+    if (D.aviso && ts < D.aviso.ate) { var rj = jogs[D.aviso.j] ? jogs[D.aviso.j].raia : jogs[0].raia, pisc = Math.floor(ts / 120) % 2 === 0 || D.menos; ctx.textAlign = 'center'; ctx.font = '700 96px ' + D.fonte; ctx.fillStyle = pisc ? (D.aviso.tipo === 'baixo' ? CORES.ouro : CORES.ciano) : '#fff'; sombra(ctx, ctx.fillStyle, 30); ctx.fillText(D.aviso.tipo === 'baixo' ? T('⬆ PULA!', '⬆ JUMP!', '⬆ ¡SALTA!') : T('⬇ ABAIXA!', '⬇ DUCK!', '⬇ ¡AGÁCHATE!'), rj.x + rj.w / 2, 230); ctx.shadowBlur = 0; }
+    if (estado.fase === 'pausa') { ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0, 0, W, H); ctx.font = '700 90px ' + D.fonte; ctx.fillStyle = '#fff'; ctx.fillText(T('⏸ Pausa', '⏸ Paused', '⏸ Pausa'), W / 2, 300); }
     ctx.restore();
   }
 
@@ -517,8 +517,8 @@
     ctx = ctx || D.ctx; ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(0, 0, W, H);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '700 96px ' + D.fonte; ctx.fillStyle = CORES.ouro; sombra(ctx, CORES.ouro, 40); ctx.fillText('🏆', W / 2, 150);
     ctx.shadowBlur = 0; var med = ['🥇', '🥈'];
-    ordem.forEach(function (o, i) { ctx.font = '700 ' + (i ? 48 : 64) + 'px ' + D.fonte; ctx.fillStyle = i ? '#fff' : CORES.ouro; ctx.fillText((ordem.length > 1 ? med[i] + ' ' : '') + (nomesJ[o.j] || (T('Jogador ', 'Player ') + (o.j + 1))) + '  ' + o.pontos, W / 2, 290 + i * 90); });
-    ctx.font = '600 32px ' + D.fonte; ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText(T('Jogar de novo: toque em ▶ no celular (ou OK no controle)', 'Play again: tap ▶ on the phone (or OK on the remote)'), W / 2, 560, W - 80);
+    ordem.forEach(function (o, i) { ctx.font = '700 ' + (i ? 48 : 64) + 'px ' + D.fonte; ctx.fillStyle = i ? '#fff' : CORES.ouro; ctx.fillText((ordem.length > 1 ? med[i] + ' ' : '') + (nomesJ[o.j] || (T('Jogador ', 'Player ', 'Jugador ') + (o.j + 1))) + '  ' + o.pontos, W / 2, 290 + i * 90); });
+    ctx.font = '600 32px ' + D.fonte; ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText(T('Jogar de novo: toque em ▶ no celular (ou OK no controle)', 'Play again: tap ▶ on the phone (or OK on the remote)', 'Jugar otra vez: toca ▶ en el móvil (u OK en el mando)'), W / 2, 560, W - 80);
     ctx.restore();
   }
 

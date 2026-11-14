@@ -1,10 +1,11 @@
 /* Campo Minado — a tela: níveis, tabuleiro, toques (abrir, bandeirinha, acorde), zoom, cronômetro, recordes,
    dica do Fácil (gramas seguras piscam depois de uns segundos parado), sons, fim de jogo e instalar. O jogo em si (minas, números, enchente, vitória) é do motor campo.js.
-   Guarda só neste aparelho (localStorage "campo-minado.pref"): idioma, sons e o melhor tempo de cada nível. */
+   Guarda só neste aparelho (localStorage "campo-minado.pref"): sons e o melhor tempo de cada nível. O idioma é o escolhido
+   na estante (../idioma.js: português, inglês ou espanhol). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.4';
-  var APP_DATA = '07/Nov/2026';
+  var APP_VERSION = '0.2.5';
+  var APP_DATA = '14/Nov/2026';
   var CM = window.CampoMinado;
   var $ = function (id) { return document.getElementById(id); };
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -14,26 +15,27 @@
   function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   var pref = ler('campo-minado.pref', null) || {};
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  delete pref.lingua;   // o idioma não fica mais aqui: é o escolhido na estante (../idioma.js, 14/Nov/2026)
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (!pref.recordes || typeof pref.recordes !== 'object') pref.recordes = {};
   function salvarPref() { gravar('campo-minado.pref', pref); }
 
   // ---------- idioma ----------
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' ? (es != null ? es : pt) : pt; }
+  function parte(v) { var p = v.split('|'); return t(p[0], p[1] != null ? p[1] : p[0], p[2]); }
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var p = el.getAttribute('data-rotulo').split('|'); var r = pref.lingua === 'en' ? p[1] : p[0]; el.setAttribute('aria-label', r); el.title = r; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + (pref.lingua === 'en' ? 'Nov/06/2026' : APP_DATA) +
-      t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY', ' · Music: Kevin MacLeod (incompetech.com), CC BY');
-    $('tabuleiro').setAttribute('aria-label', t('Jardim', 'Garden'));
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { el.textContent = parte(el.getAttribute('data-t')); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var r = parte(el.getAttribute('data-rotulo')); el.setAttribute('aria-label', r); el.title = r; });
+    pintarEfeitos();
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, 'Nov/14/2026', '14/nov/2026') +
+      t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY', ' · Music: Kevin MacLeod (incompetech.com), CC BY', ' · Música: Kevin MacLeod (incompetech.com), CC BY');
+    $('tabuleiro').setAttribute('aria-label', t('Jardim', 'Garden', 'Jardín'));
     mostrarRecordes(); pintarModo();
     if (est) desenharTudo();
   }
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); });
   $('btAjuda').addEventListener('click', function () {
     var aj = $('ajuda'); aj.hidden = !aj.hidden; this.setAttribute('aria-expanded', String(!aj.hidden));
     if (!aj.hidden) aj.scrollIntoView({ block: 'nearest', behavior: CALMO ? 'auto' : 'smooth' });
@@ -58,14 +60,14 @@
     perdeu: function () { [392, 330, 262, 196].forEach(function (f, k) { bip(f, 0.2, 'sawtooth', k * 0.14, 0.08); }); },
     ganhou: function () { [523, 659, 784, 1047, 784, 1047].forEach(function (f, k) { bip(f, 0.18, 'triangle', k * 0.12, 0.16); }); }
   };
-  function pintarEfeitos() { var b = $('btEfeitos'); b.textContent = pref.efeitos ? '🔊' : '🔈'; b.setAttribute('aria-pressed', String(pref.efeitos)); b.title = pref.efeitos ? t('Sons ligados', 'Sounds on') : t('Sons desligados', 'Sounds off'); }
+  function pintarEfeitos() { var b = $('btEfeitos'); b.textContent = pref.efeitos ? '🔊' : '🔈'; b.setAttribute('aria-pressed', String(pref.efeitos)); b.title = pref.efeitos ? t('Sons ligados', 'Sounds on', 'Sonidos activados') : t('Sons desligados', 'Sounds off', 'Sonidos desactivados'); }
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarEfeitos(); Som.bandeira(true); });
 
   // ---------- recordes ----------
   var REC_ID = { facil: 'recFacil', medio: 'recMedio', dificil: 'recDificil' };
   function relogio(s) { var m = Math.floor(s / 60), r = s % 60; return m ? m + ':' + (r < 10 ? '0' : '') + r : r + 's'; }
   function mostrarRecordes() {
-    CM.ORDEM.forEach(function (n) { var r = pref.recordes[n]; $(REC_ID[n]).textContent = r ? t('🏆 Melhor tempo: ', '🏆 Best time: ') + relogio(r) : t('Ainda sem recorde', 'No best time yet'); });
+    CM.ORDEM.forEach(function (n) { var r = pref.recordes[n]; $(REC_ID[n]).textContent = r ? t('🏆 Melhor tempo: ', '🏆 Best time: ', '🏆 Mejor tiempo: ') + relogio(r) : t('Ainda sem recorde', 'No best time yet', 'Todavía sin récord'); });
   }
 
   // ---------- telas e o botão Voltar do celular ----------
@@ -127,13 +129,13 @@
 
   function rotulo(i) {
     var c = est.cel[i], l = Math.floor(i / est.colunas) + 1, co = i % est.colunas + 1, s;
-    if (c.aberta && c.mina) s = t('ouriço acordado', 'awake hedgehog');
-    else if (c.errada) s = t('bandeirinha errada', 'wrong flag');
-    else if (c.bandeira) s = t('bandeirinha', 'flag');
-    else if (est.fim === 'perdeu' && c.mina) s = t('ouriço dormindo', 'sleeping hedgehog');
-    else if (c.aberta) s = c.n ? String(c.n) : t('vazia', 'empty');
-    else s = t('grama', 'grass');
-    return t('Linha ', 'Row ') + l + t(', coluna ', ', column ') + co + ': ' + s;
+    if (c.aberta && c.mina) s = t('ouriço acordado', 'awake hedgehog', 'erizo despierto');
+    else if (c.errada) s = t('bandeirinha errada', 'wrong flag', 'banderita equivocada');
+    else if (c.bandeira) s = t('bandeirinha', 'flag', 'banderita');
+    else if (est.fim === 'perdeu' && c.mina) s = t('ouriço dormindo', 'sleeping hedgehog', 'erizo dormido');
+    else if (c.aberta) s = c.n ? String(c.n) : t('vazia', 'empty', 'vacía');
+    else s = t('grama', 'grass', 'césped');
+    return t('Linha ', 'Row ', 'Fila ') + l + t(', coluna ', ', column ', ', columna ') + co + ': ' + s;
   }
   function desenhar(i) {
     var c = est.cel[i], b = casas[i];
@@ -146,7 +148,7 @@
     if (c.aberta && !c.mina && c.n) b.setAttribute('data-n', c.n); else b.removeAttribute('data-n');
     b.setAttribute('aria-label', rotulo(i));
   }
-  function desenharTudo() { for (var i = 0; i < casas.length; i++) desenhar(i); $('restam').textContent = String(CM.restantes(est)); $('placaRestam').setAttribute('aria-label', t('Ouriços que faltam marcar: ', 'Hedgehogs left to flag: ') + CM.restantes(est)); }
+  function desenharTudo() { for (var i = 0; i < casas.length; i++) desenhar(i); $('restam').textContent = String(CM.restantes(est)); $('placaRestam').setAttribute('aria-label', t('Ouriços que faltam marcar: ', 'Hedgehogs left to flag: ', 'Erizos que faltan por marcar: ') + CM.restantes(est)); }
 
   function iniciarRelogio() {
     if (cronometro) return;
@@ -185,9 +187,9 @@
     var b = $('btModo'); b.setAttribute('aria-pressed', String(modoBandeira));
     document.documentElement.classList.toggle('modo-bandeira', modoBandeira);
     // texto inteiro e texto curto (celular estreito): o CSS mostra um dos dois, sempre numa linha só
-    var txt = modoBandeira ? [t('🚩 Modo bandeirinha: cada toque põe ou tira uma bandeirinha.', '🚩 Flag mode: each tap puts or removes a flag.'), t('🚩 Cada toque põe ou tira 🚩', '🚩 Each tap adds or removes 🚩')]
-      : TOQUE ? [t('👆 Toque para abrir · segure o dedo para pôr 🚩', '👆 Tap to open · hold your finger to place a 🚩'), t('👆 Toque abre · segure põe 🚩', '👆 Tap opens · hold for 🚩')]
-        : [t('🖱 Clique para abrir · botão direito põe 🚩', '🖱 Click to open · right-click places a 🚩'), t('🖱 Clique abre · botão direito põe 🚩', '🖱 Click opens · right-click for 🚩')];
+    var txt = modoBandeira ? [t('🚩 Modo bandeirinha: cada toque põe ou tira uma bandeirinha.', '🚩 Flag mode: each tap adds or removes a flag.', '🚩 Modo banderita: cada toque pone o quita una banderita.'), t('🚩 Cada toque põe ou tira 🚩', '🚩 Each tap adds or removes 🚩', '🚩 Cada toque pone o quita 🚩')]
+      : TOQUE ? [t('👆 Toque para abrir · segure o dedo para pôr 🚩', '👆 Tap to open · hold your finger to place a 🚩', '👆 Toca para abrir · mantén el dedo para poner 🚩'), t('👆 Toque abre · segure põe 🚩', '👆 Tap opens · hold for 🚩', '👆 Tocar abre · mantener pone 🚩')]
+        : [t('🖱 Clique para abrir · botão direito põe 🚩', '🖱 Click to open · right-click places a 🚩', '🖱 Haz clic para abrir · el botón derecho pone 🚩'), t('🖱 Clique abre · botão direito põe 🚩', '🖱 Click opens · right-click for 🚩', '🖱 Clic abre · botón derecho pone 🚩')];
     var d = $('dicaModo'); d.textContent = '';
     ['dica-longa', 'dica-curta'].forEach(function (cl, k) { var s = document.createElement('span'); s.className = cl; s.textContent = txt[k]; d.appendChild(s); });
   }
@@ -340,12 +342,12 @@
   function abrirFim(ganhou, novoRec) {
     $('fimDesenho').src = ganhou ? 'flor.svg' : 'ourico.svg';
     $('fimDesenho').className = 'fim-desenho ' + (ganhou ? 'feliz' : 'acordado');
-    $('fimTitulo').textContent = ganhou ? t('Uhuu! Jardim todo aberto! 🌼', 'Hooray! The whole garden is open! 🌼') : t('Ops! Um ouriço acordou! 🦔', 'Oops! A hedgehog woke up! 🦔');
-    $('fimTexto').textContent = ganhou ? t('Você achou todos os ' + est.minas + ' ouriços em ' + relogio(seg) + ' e eles continuam dormindo. 💤', 'You found all ' + est.minas + ' hedgehogs in ' + relogio(seg) + ' and they are still asleep. 💤')
-      : t('Ele só queria dormir mais um pouquinho. Vamos tentar de novo?', 'It just wanted to sleep a little longer. Shall we try again?');
+    $('fimTitulo').textContent = ganhou ? t('Uhuu! Jardim todo aberto! 🌼', 'Hooray! The whole garden is open! 🌼', '¡Yupi! ¡Todo el jardín abierto! 🌼') : t('Ops! Um ouriço acordou! 🦔', 'Oops! A hedgehog woke up! 🦔', '¡Uy! ¡Se ha despertado un erizo! 🦔');
+    $('fimTexto').textContent = ganhou ? t('Você achou todos os ' + est.minas + ' ouriços em ' + relogio(seg) + ' e eles continuam dormindo. 💤', 'You found all ' + est.minas + ' hedgehogs in ' + relogio(seg) + ' and they are still asleep. 💤', 'Has encontrado los ' + est.minas + ' erizos en ' + relogio(seg) + ' y siguen durmiendo. 💤')
+      : t('Ele só queria dormir mais um pouquinho. Vamos tentar de novo?', 'It just wanted to sleep a little longer. Shall we try again?', 'Solo quería dormir un poquito más. ¿Lo intentamos otra vez?');
     var rec = $('fimRecorde'); rec.hidden = !(ganhou && novoRec);
-    rec.textContent = t('🏆 Novo recorde neste nível!', '🏆 New best time for this level!');
-    $('btDeNovo').textContent = ganhou ? t('🔄 Jogar de novo', '🔄 Play again') : t('🔄 Tentar de novo', '🔄 Try again');
+    rec.textContent = t('🏆 Novo recorde neste nível!', '🏆 New best time for this level!', '🏆 ¡Nuevo récord en este nivel!');
+    $('btDeNovo').textContent = ganhou ? t('🔄 Jogar de novo', '🔄 Play again', '🔄 Jugar otra vez') : t('🔄 Tentar de novo', '🔄 Try again', '🔄 Intentarlo otra vez');
     focoAntes = document.activeElement;
     $('fim').hidden = false; $('btDeNovo').focus();
   }

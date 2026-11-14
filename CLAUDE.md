@@ -108,17 +108,21 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - Uma pasta por jogo: `baguncolandia/`, `peluqueria/`, `vruuum/`, `purpurina/`, `rabiscolandia/`, `campo-minado/`,
   `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, `aqua/`, `glub-glub/`, e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
-  (só português por enquanto; o inglês com o interruptor `ingles`),
+  (PT/EN/ES escolhido na estante),
   `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
   bibliotecas em `baguncolandia/libs/`. Fundo dos cartões: `cartoes-fundos.css` (tirar a linha do `index.html` = visual antigo).
 - Interruptores: todos os jogos obedecem o app **`kids`** ("Bolinho de Chuva") do RootifyONE, um interruptor por jogo.
 
 ## Regras de cada jogo
 
-- **Idioma: por enquanto só português; o inglês fica escondido, ligado pelo interruptor `ingles` do RootifyONE; todo texto
-  novo continua com a versão em inglês, só escondida.** Peça comum: `idioma.js` (logo depois do `recursos.js`, na estante
-  e em todo jogo): sem o interruptor, `<html class="sem-ingles">` esconde o que tem `class="en"` e o botão `#btLingua`; o
-  jogo pergunta `BolinhoIdioma.ingles()` antes de escolher o inglês.
+- **Idioma (dono, 14/Nov/2026; diretriz "três idiomas"): português (Brasil), inglês (EUA) e espanhol (Espanha), em tudo,
+  com tradução humanizada.** A escolha é feita **só na estante**, com bandeira desenhada (SVG) + sigla (🇧🇷 PT · 🇺🇸 EN ·
+  🇪🇸 ES), e vale para todos os jogos — **nenhum jogo tem botão de idioma próprio**. Peça comum: `idioma.js` (logo depois do
+  `recursos.js`, na estante e em todo jogo): guarda a escolha em `localStorage` "bolinho:idioma"; o jogo lê
+  `BolinhoIdioma.atual()` ('pt' | 'en' | 'es'), usa `BolinhoIdioma.t(pt, en, es)` e, na fala, `BolinhoIdioma.voz()`
+  (pt-BR / en-US / es-ES), sempre com uma voz do mesmo idioma. Todo texto novo nasce nos três (`data-t="pt|en|es"`,
+  `t(pt, en, es)`). Espanhol da Espanha: móvil, ordenador, coger, gafas, zumo; datas `14/nov/2026`. Vigia:
+  `teste/idioma.test.js`. Não existe mais o interruptor `ingles` do RootifyONE.
 - **Navegação padrão (dono, 07/Nov/2026): todo jogo tem 🏠 Início e 🚪 Saída no canto de cima, pela peça comum
   `navegacao.js`.** `<script src="../navegacao.js" data-fora-do-arquivo>` logo depois do `../idioma.js`, `'../navegacao.js'`
   no `ARQUIVOS` do `sw.js` e `BolinhoNav.iniciar({ jogo, noInicio, irParaInicio, emAndamento })` no `app.js` (detalhe no

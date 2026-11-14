@@ -2,14 +2,34 @@
   "app": "baguncolandia",
   "versoes": [
     {
-      "versao": "0.8.39",
+      "versao": "0.8.40",
       "data": "14/Nov/2026",
-      "hora": "15:00:00",
+      "hora": "17:00:00",
       "pt": [
         "🏠 Tela inicial mais simples, em dois passos e cabendo no celular sem rolar: primeiro \"Onde vamos jogar?\" (📱 Só no celular, o mais comum, ou 📺 Com a TV); depois \"como?\": no celular, 👆 Com o dedo ou 🤸 Com o corpo (câmera); com a TV, 📺 Esta é a TV ou 📱 Este é o celular. O ← Voltar (e o Voltar do celular) volta ao primeiro passo."
       ],
       "en": [
         "🏠 Simpler start screen, in two steps and fitting on the phone without scrolling: first \"Where are we playing?\" (📱 Just on the phone, the most common, or 📺 With the TV); then \"how?\": on the phone, 👆 With your finger or 🤸 With your body (camera); with the TV, 📺 This is the TV or 📱 This is the phone. ← Back (and the phone's Back) returns to the first step."
+      ],
+      "es": [
+        "🏠 Pantalla de inicio más sencilla, en dos pasos y sin tener que bajar en el móvil: primero \"¿Dónde jugamos?\" (📱 Solo en el móvil, lo más habitual, o 📺 Con la TV); luego \"¿cómo?\": en el móvil, 👆 Con el dedo o 🤸 Con el cuerpo (cámara); con la TV, 📺 Esta es la TV o 📱 Este es el móvil. ← Atrás (y el botón Atrás del móvil) vuelve al primer paso."
+      ]
+    },
+    {
+      "versao": "0.8.39",
+      "data": "14/Nov/2026",
+      "hora": "16:00:00",
+      "pt": [
+        "🌍 Agora em três idiomas: português, inglês e espanhol, escolhidos na estante. Textos, vozes, falas da mamãe, do papai e do papagaio, tudo no idioma escolhido.",
+        "🔤 A Bagunçolândia se chama Mayhemland em inglês e Alborotolandia em espanhol."
+      ],
+      "en": [
+        "🌍 Now in three languages: Portuguese, English and Spanish, chosen on the shelf. Texts, voices, and what Mom, Dad and the parrot say all follow your choice.",
+        "🔤 Bagunçolândia is called Mayhemland in English and Alborotolandia in Spanish."
+      ],
+      "es": [
+        "🌍 Ahora en tres idiomas: portugués, inglés y español, que se eligen en la estantería. Los textos, las voces y lo que dicen mamá, papá y el loro, todo en el idioma elegido.",
+        "🔤 Bagunçolândia se llama Mayhemland en inglés y Alborotolandia en español."
       ]
     },
     {

@@ -53,8 +53,7 @@
 
   // ---------- 1. o botãozinho ----------
   var bt = null, encolher = 0, jaMostrou = false;
-  function ingles() { return /^en/i.test(el.lang || ''); }
-  function texto() { return ingles() ? 'Full screen' : 'Tela inteira'; }
+  function texto() { var l = el.lang || ''; return /^en/i.test(l) ? 'Full screen' : /^es/i.test(l) ? 'Pantalla completa' : 'Tela inteira'; }
   function criar() {
     if (bt || !d.body) return;
     var st = d.createElement('style');

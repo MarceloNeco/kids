@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0', APP_DATA = '14/Nov/2026';
+  var APP_VERSION = '0.1.1', APP_DATA = '14/Nov/2026';
   var R = window.GlubRegras, A = window.GlubArte, Som = window.GlubSom;
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA), VITRINE = /[?&]vitrine\b/.test(BUSCA);
@@ -30,22 +30,32 @@
   var CH_PREF = 'bolinho:glub-glub:pref', CH_ALBUM = 'bolinho:glub-glub:album';
   function lerJSON(k, pad) { try { var v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : pad; } catch (e) { return pad; } }
   function gravarJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  var pref = Object.assign({ modo: 'sozinho', quem: 'juca', niveis: ['facil', 'facil'], hora: 'auto', efeitos: true,
-    lingua: /^en/i.test(navigator.language || '') ? 'en' : 'pt' }, lerJSON(CH_PREF, {}));
+  var pref = Object.assign({ modo: 'sozinho', quem: 'juca', niveis: ['facil', 'facil'], hora: 'auto', efeitos: true }, lerJSON(CH_PREF, {}));
   if (!Array.isArray(pref.niveis) || pref.niveis.length !== 2) pref.niveis = ['facil', 'facil'];
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
+  delete pref.lingua;   // o idioma não fica mais nas preferências do jogo: vem da estante (../idioma.js)
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';   // 'pt' | 'en' | 'es', escolhido na estante
   function salvarPref() { gravarJSON(CH_PREF, pref); }
   var album = lerJSON(CH_ALBUM, {});
 
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
-  function nomeBicho(id) { var d = R.POR_ID[id]; return d ? (pref.lingua === 'en' ? d.nome.en : d.nome.pt) : id; }
+  var IDX = { pt: 0, en: 1, es: 2 };
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' ? es : pt; }
+  function nomeBicho(id) { var d = R.POR_ID[id]; return d ? d.nome[lingua] || d.nome.pt : id; }
+  function dataVersao() {   // PT 14/Nov/2026 · EN Nov/14/2026 · ES 14/nov/2026
+    var p = APP_DATA.split('/');
+    return t(APP_DATA, p[1] + '/' + p[0] + '/' + p[2], p[0] + '/' + p[1].toLowerCase() + '/' + p[2]);
+  }
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    document.querySelectorAll('[data-t]').forEach(function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
-    $('versao').textContent = t('Versão ', 'Version ') + APP_VERSION + ' · ' + APP_DATA;
+    document.documentElement.lang = t('pt-BR', 'en-US', 'es-ES');   // os mesmos do ../idioma.js
+    function parte(el, at) { var p = el.getAttribute(at).split('|'); return p[IDX[lingua]] != null ? p[IDX[lingua]] : p[0]; }
+    document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = parte(el, 'data-t'); });
+    document.querySelectorAll('[data-rotulo]').forEach(function (el) { el.setAttribute('aria-label', parte(el, 'data-rotulo')); });
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + dataVersao();
     pintarMenu();
   }
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) {   // trocaram o idioma na estante, noutra aba
+    lingua = c; traduzir(); pintarHud(true);
+    if (tela === 'album') abrirAlbum();
+  });
 
   /* ---------- telas ---------- */
   var tela = 'menu', empurrado = false;
@@ -77,12 +87,12 @@
     var dois = pref.modo === 'dois';
     $('linhaSozinho').hidden = dois;
     $('linhaNivel1').hidden = !dois;
-    $('rotuloNivel0').textContent = dois ? t('Nível do Juca', "Juca's level") : t('Nível', 'Level');
+    $('rotuloNivel0').textContent = dois ? t('Nível do Juca', "Juca's level", 'Nivel de Juca') : t('Nível', 'Level', 'Nivel');
     var bloqueia = dois && !cabemDois();
     $('avisoDeitar').hidden = !bloqueia;
     $('btJogar').disabled = bloqueia;
     $('btHora').textContent = { auto: '🕒', dia: '☀️', tarde: '🌅', noite: '🌙' }[pref.hora] || '🕒';
-    $('btHora').setAttribute('aria-label', t('Hora do dia: ', 'Time of day: ') + ({ auto: t('a do relógio', 'the clock'), dia: t('dia', 'day'), tarde: t('entardecer', 'sunset'), noite: t('noite', 'night') }[pref.hora]));
+    $('btHora').setAttribute('aria-label', t('Hora do dia: ', 'Time of day: ', 'Momento del día: ') + ({ auto: t('a do relógio', 'the clock', 'la del reloj'), dia: t('dia', 'day', 'día'), tarde: t('entardecer', 'sunset', 'atardecer'), noite: t('noite', 'night', 'noche') }[pref.hora]));
   }
   document.querySelectorAll('[data-modo]').forEach(function (b) { b.addEventListener('click', function () { pref.modo = b.getAttribute('data-modo'); salvarPref(); pintarMenu(); Som.toque(); }); });
   document.querySelectorAll('[data-quem]').forEach(function (b) { b.addEventListener('click', function () { pref.quem = b.getAttribute('data-quem'); salvarPref(); pintarMenu(); Som.toque(); }); });
@@ -91,7 +101,6 @@
   });
   $('btHora').addEventListener('click', function () { var o = ['auto', 'dia', 'tarde', 'noite']; pref.hora = o[(o.indexOf(pref.hora) + 1) % o.length]; salvarPref(); pintarMenu(); Som.toque(); montarTela(true); });
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; this.setAttribute('aria-expanded', String(!a.hidden)); });
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); });
   function pintarEfeitos() { $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔈'; $('btEfeitos').setAttribute('aria-pressed', String(!!pref.efeitos)); Som.ligar(pref.efeitos); }
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; salvarPref(); pintarEfeitos(); Som.toque(); });
   $('btJogar').addEventListener('click', function () { Som.acordar(); novaPartida(); });
@@ -157,7 +166,7 @@
     pintarHud(true);
     entrar('jogo');
     if (window.Trilha) Trilha.volume(0.55);
-    faixa(t('Pesque! 🎣', 'Fish! 🎣'), 1200);
+    faixa(t('Pesque! 🎣', "Let's fish! 🎣", '¡A pescar! 🎣'), 1200);
   }
   function jogadorDoBotao(n) { return E && E.modoDois ? n : humano[0]; }
   function pescar(n) { if (!E || tela !== 'jogo' || pausado) return; var j = jogadorDoBotao(n); if (j == null) return; if (R.pescar(E, j)) Som.mergulho(); }
@@ -252,20 +261,20 @@
           if (!album[e.bicho.id]) novasDaPartida.push(e.bicho.id);
           album[e.bicho.id] = (album[e.bicho.id] || 0) + 1; gravarJSON(CH_ALBUM, album);
         }
-        if (e.bicho.faixa === 6) faixa(t('🌟 Pirarucu Dourado! +500', '🌟 Golden Arapaima! +500'), 2200);
+        if (e.bicho.faixa === 6) faixa(t('🌟 Pirarucu Dourado! +500', '🌟 Golden Arapaima! +500', '🌟 ¡Arapaima Dorado! +500'), 2200);
       }
       else if (e.tipo === 'vazio') Som.glub();
-      else if (e.tipo === 'balde') { Som.balde(); faixa(t('🪣 Balde cheio! +10 segundos', '🪣 Bucket full! +10 seconds'), 1800); }
-      else if (e.tipo === 'poder') { Som.poder(); faixa({ rede: t('🕸️ Rede da vovó!', "🕸️ Grandma's net!"), ligeiro: t('⚡ Anzol ligeiro!', '⚡ Quick hook!'), minhoca: t('🪱 Minhoca dourada!', '🪱 Golden worm!') }[e.poder], 1500); }
-      else if (e.tipo === 'bonus') { Som.bonus(); faixa(t('♻️ Limpa o Rio! Pesque o lixo!', '♻️ Clean the River! Fish out the trash!'), 2400, true); }
-      else if (e.tipo === 'bonusFim') { Som.rioLimpo(); faixa(t('Rio limpo! 🌿', 'Clean river! 🌿'), 2000); }
-      else if (e.tipo === 'fim') { faixa(t('⏱ Acabou o tempo!', "⏱ Time's up!"), 1500); }
+      else if (e.tipo === 'balde') { Som.balde(); faixa(t('🪣 Balde cheio! +10 segundos', '🪣 Bucket full! +10 seconds', '🪣 ¡Cubo lleno! +10 segundos'), 1800); }
+      else if (e.tipo === 'poder') { Som.poder(); faixa({ rede: t('🕸️ Rede da vovó!', "🕸️ Grandma's net!", '🕸️ ¡La red de la abuela!'), ligeiro: t('⚡ Anzol ligeiro!', '⚡ Quick hook!', '⚡ ¡Anzuelo veloz!'), minhoca: t('🪱 Minhoca dourada!', '🪱 Golden worm!', '🪱 ¡Lombriz dorada!') }[e.poder], 1500); }
+      else if (e.tipo === 'bonus') { Som.bonus(); faixa(t('♻️ Limpa o Rio! Pesque o lixo!', '♻️ Clean the River! Fish out the trash!', '♻️ ¡Limpia el río! ¡Pesca la basura!'), 2400, true); }
+      else if (e.tipo === 'bonusFim') { Som.rioLimpo(); faixa(t('Rio limpo! 🌿', 'The river is clean! 🌿', '¡Río limpio! 🌿'), 2000); }
+      else if (e.tipo === 'fim') { faixa(t('⏱ Acabou o tempo!', "⏱ Time's up!", '⏱ ¡Se acabó el tiempo!'), 1500); }
     });
   }
   function mostrarFim() {
     var P = R.placar(E), nomes = ['Juca', 'Lili'];
-    $('fimTitulo').textContent = P.vencedor < 0 ? t('Empate! 🤝', "It's a tie! 🤝") : E.modoDois ? t(nomes[P.vencedor] + ' venceu! 🏆', nomes[P.vencedor] + ' wins! 🏆')
-      : (humano[0] === P.vencedor ? t('Você venceu! 🏆', 'You win! 🏆') : t('Quase! 🎣', 'So close! 🎣'));
+    $('fimTitulo').textContent = P.vencedor < 0 ? t('Empate! 🤝', "It's a tie! 🤝", '¡Empate! 🤝') : E.modoDois ? t(nomes[P.vencedor] + ' venceu! 🏆', nomes[P.vencedor] + ' wins! 🏆', '¡' + nomes[P.vencedor] + ' gana! 🏆')
+      : (humano[0] === P.vencedor ? t('Você venceu! 🏆', 'You win! 🏆', '¡Has ganado! 🏆') : t('Quase! 🎣', 'So close! 🎣', '¡Casi! 🎣'));
     var fp = $('fimPlacar'); fp.textContent = '';
     E.j.forEach(function (J, j) {
       var d = document.createElement('div'); d.className = 'lado' + (P.vencedor === j ? ' venceu' : '');
@@ -273,10 +282,10 @@
       var b = document.createElement('b'); b.textContent = String(J.pontos); d.appendChild(b);
       fp.appendChild(d);
     });
-    $('fimTime').textContent = t('Juntos vocês pescaram ', 'Together you caught ') + P.time + t(' pontos!', ' points!');
+    $('fimTime').textContent = t('Juntos vocês pescaram ', 'Together you scored ', '¡Juntos habéis pescado ') + P.time + t(' pontos!', ' points!', ' puntos!');
     var nv = $('fimNovas'); nv.textContent = '';
     if (novasDaPartida.length) {
-      var p = document.createElement('p'); p.textContent = t('Figurinhas novas no álbum:', 'New stickers in the album:'); p.style.margin = '4px 0'; p.style.width = '100%'; nv.appendChild(p);
+      var p = document.createElement('p'); p.textContent = t('Figurinhas novas no álbum:', 'New stickers in your album:', 'Cromos nuevos en el álbum:'); p.style.margin = '4px 0'; p.style.width = '100%'; nv.appendChild(p);
       novasDaPartida.forEach(function (id) { var im = document.createElement('img'); im.src = 'img/' + id + '.webp'; im.alt = nomeBicho(id); im.title = nomeBicho(id); nv.appendChild(im); });
     }
     $('fim').hidden = false; document.body.classList.remove('jogando');   // a música volta para o canto, longe do título
@@ -294,11 +303,11 @@
       var d = document.createElement('div'); d.className = 'figurinha' + (n ? ' tem' : ''); d.setAttribute('data-figurinha', b.id);
       var im = document.createElement('img'); im.src = 'img/' + b.id + '.webp'; im.alt = n ? nomeBicho(b.id) : '?'; d.appendChild(im);
       var nome = document.createElement('span'); nome.textContent = n ? nomeBicho(b.id) : '?'; d.appendChild(nome);
-      var pts = document.createElement('b'); pts.textContent = b.pontos + (b.pontos === 1 ? t(' ponto', ' point') : t(' pontos', ' points')); d.appendChild(pts);
+      var pts = document.createElement('b'); pts.textContent = b.pontos + (b.pontos === 1 ? t(' ponto', ' point', ' punto') : t(' pontos', ' points', ' puntos')); d.appendChild(pts);
       if (n) { var q = document.createElement('small'); q.textContent = '×' + n; d.appendChild(q); }
       g.appendChild(d);
     });
-    $('albumConta').textContent = tem + t(' de ', ' of ') + ids.length + t(' figurinhas', ' stickers');
+    $('albumConta').textContent = tem + t(' de ', ' of ', ' de ') + ids.length + t(' figurinhas', ' stickers', ' cromos');
     entrar('album');
   }
 

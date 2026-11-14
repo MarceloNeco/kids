@@ -12,13 +12,13 @@ for (const f of arquivos) for (const e of require(path.join(pasta, f))) lista.pu
 const nucleo = Q.PERGUNTAS.filter(p => p.nucleo).map(p => p.id);
 function respostas(txt) { const r = {}; for (const par of txt.trim().split(/\s+/)) { const [k, v] = par.split(':'); r[k] = v; } return r; }
 
-test('perguntas: ids únicos, nível, grupo, textos PT/EN com interrogação, padrão válido', () => {
+test('perguntas: ids únicos, nível, grupo, textos PT/EN/ES com interrogação, padrão válido', () => {
   const ids = new Set();
   for (const p of Q.PERGUNTAS) {
     assert.ok(/^[a-z0-9-]+$/.test(p.id) && !ids.has(p.id), p.id); ids.add(p.id);
     assert.ok(['I', 'F', 'A'].includes(p.n), p.id);
     assert.ok(Q.GRUPOS[p.g], p.id);
-    assert.ok(/\?$/.test(p.pt) && /\?$/.test(p.en), p.id);
+    assert.ok(/\?$/.test(p.pt) && /\?$/.test(p.en) && /^¿.*\?$/.test(p.es), p.id);
     assert.ok(['?', 'n'].includes(p.padrao), p.id);
   }
   assert.ok(Q.PERGUNTAS.length >= 120, 'perguntas: ' + Q.PERGUNTAS.length);

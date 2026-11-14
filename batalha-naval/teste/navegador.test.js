@@ -42,15 +42,19 @@ async function novaAba(ctx, url = base + '?teste') {
 }
 const visivel = (pg, sel) => pg.$eval(sel, el => !el.hidden && el.getClientRects().length > 0).catch(() => false);
 
-test('abre sem erro no celular em pé e no computador, nas duas línguas, sem rolar para o lado', async () => {
+test('abre sem erro no celular em pé e no computador, nos três idiomas da estante, sem rolar para o lado', async () => {
   for (const [vp, toque] of [[{ width: 360, height: 740 }, true], [{ width: 1280, height: 800 }, false], [{ width: 800, height: 1280 }, true]]) {
     const ctx = await browser.newContext({ viewport: vp, hasTouch: toque, locale: 'pt-BR' });
     const { pg, erros } = await novaAba(ctx);
-    assert.match(await pg.textContent('#versao'), /0\.3\.3/);
+    assert.match(await pg.textContent('#versao'), /0\.4\.0/);
     assert.equal(await pg.textContent('#btPC'), '🤖 Contra o computador');
-    await pg.click('#btLingua');
-    assert.equal(await pg.textContent('#btPC'), '🤖 Against the computer');
-    await pg.click('#btLingua');
+    assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma no jogo');
+    // a escolha é feita na estante (../idioma.js); trocar lá (outra aba) troca aqui na hora
+    for (const [cod, txt, lang] of [['en', '🤖 Against the computer', 'en'], ['es', '🤖 Contra el ordenador', 'es'], ['pt', '🤖 Contra o computador', 'pt-BR']]) {
+      await pg.evaluate(c => BolinhoIdioma.escolher(c), cod);
+      assert.equal(await pg.textContent('#btPC'), txt);
+      assert.equal(await pg.evaluate(() => document.documentElement.lang), lang);
+    }
     for (const tela of ['inicio']) assert.ok(await visivel(pg, '#' + tela));
     // uma partida contra o computador aberta, para medir as telas de jogo
     await pg.click('#btPC'); await pg.click('[data-nivel="dificil"]');
@@ -263,6 +267,45 @@ test('com amigos em 2 aparelhos (abas): código, frota, vez, recarregar no meio 
   assert.ok(await visivel(a.pg, '#btDeNovo')); assert.ok(!(await visivel(b.pg, '#btDeNovo')));
   await a.pg.click('#btDeNovo');
   await a.pg.waitForSelector('#sala.ativa'); await b.pg.waitForSelector('#sala.ativa');
+  assert.deepEqual(a.erros, []); assert.deepEqual(b.erros, []);
+  await ctx.close();
+});
+
+// cada aparelho no seu idioma: o idioma.js de verdade sincroniza as abas do mesmo navegador (a estante é uma só),
+// então aqui cada aba ganha um idioma fixo antes de tudo — como dois celulares diferentes
+const IDIOMA_FIXO = (c) => { window.BolinhoIdioma = { atual: () => c, t: (pt, en, es) => (c === 'en' ? en : c === 'es' && es != null ? es : pt), voz: () => c, aoMudar() {}, ingles: () => c === 'en', escolher() {} };
+  window.__enviadas = []; const pm = BroadcastChannel.prototype.postMessage;
+  BroadcastChannel.prototype.postMessage = function (m) { window.__enviadas.push(JSON.stringify(m)); return pm.call(this, m); }; };
+test('com amigos, cada aparelho no seu idioma: as mensagens só levam códigos, e cada tela traduz para o seu', async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 820 }, hasTouch: true, locale: 'pt-BR' });
+  const abrirEm = async (c) => { const pg = await ctx.newPage(); await pg.addInitScript(IDIOMA_FIXO, c); const erros = vigiar(pg); await pg.goto(base + '?teste'); await pg.waitForSelector('#inicio.ativa'); return { pg, erros }; };
+  const a = await abrirEm('en'), b = await abrirEm('es');
+  assert.equal(await a.pg.textContent('#btPC'), '🤖 Against the computer'); assert.equal(await b.pg.textContent('#btPC'), '🤖 Contra el ordenador');
+  const codigo = await criarSala(a, 'Ana', 'facil');
+  await entrarSala(b, '', codigo);            // sem nome: cada tela mostra "Player 2" / "Jugador 2" no seu idioma
+  await a.pg.waitForFunction(() => document.querySelectorAll('#salaLista li').length === 2);
+  await b.pg.waitForFunction(() => document.querySelectorAll('#salaLista li').length === 2);
+  assert.match(await a.pg.textContent('#salaLista'), /Player 2/); assert.match(await b.pg.textContent('#salaLista'), /Jugador 2 \(tú\)/);
+  await arrumarEPronto(a); await arrumarEPronto(b);
+  await a.pg.waitForFunction(() => !document.getElementById('btComecar').disabled);
+  assert.match(await a.pg.textContent('#salaStatus'), /Everyone is ready/);
+  await a.pg.click('#btComecar');
+  await a.pg.waitForSelector('#jogo.ativa'); await b.pg.waitForSelector('#jogo.ativa');
+  await a.pg.waitForTimeout(300);
+  const ban = [await a.pg.textContent('#banner'), await b.pg.textContent('#banner')];
+  assert.match(ban[0], /Your turn|Turn: /); assert.match(ban[1], /Tu turno|Turno de /);
+  await jogarAteFim([a, b]);
+  assert.match(await a.pg.textContent('#fimTexto'), /This game took \d+ shots/); assert.match(await b.pg.textContent('#fimTexto'), /La partida ha tenido \d+ disparos/);
+  // tudo o que um aparelho mandou para o outro: só ids, códigos, números e o nome digitado — nenhum texto traduzido
+  const CODIGOS = new Set(['oi', 'pulso', 'tchau', 'pronto', 'nao', 'tiro', 'resp', 'frota', 'estado', 'sala', 'jogo', 'fim', 'facil', 'medio', 'dificil', 'cheia', 'comecou', 'Ana', '', codigo]);
+  for (const x of [a, b]) {
+    const msgs = await x.pg.evaluate(() => window.__enviadas);
+    assert.ok(msgs.length > 10, 'quase nenhuma mensagem: ' + msgs.length);
+    const textos = new Set();
+    const juntar = (v) => { if (typeof v === 'string') textos.add(v); else if (v && typeof v === 'object') Object.values(v).forEach(juntar); };
+    msgs.forEach(m => juntar(JSON.parse(m)));
+    for (const v of textos) assert.ok(CODIGOS.has(v) || /^[a-z0-9]{8}$/.test(v), 'texto na mensagem entre aparelhos: ' + JSON.stringify(v));
+  }
   assert.deepEqual(a.erros, []); assert.deepEqual(b.erros, []);
   await ctx.close();
 });

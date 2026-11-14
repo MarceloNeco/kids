@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.17.5';
+  var APP_VERSION = '0.18.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -33,18 +33,15 @@
 
   function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; /* aparelho sem espaço ou modo privado: segue sem gravar */ } }
-  var pref = ler('purpurina.pref', null) || {};
-  if (pref.lingua !== 'en' && pref.lingua !== 'pt') pref.lingua = (navigator.language || 'pt').slice(0, 2) === 'pt' ? 'pt' : 'en';
-  if (window.BolinhoIdioma && !BolinhoIdioma.ingles()) pref.lingua = 'pt';   // só português sem o interruptor "ingles" (../idioma.js)
-  function salvarPref() { gravar('purpurina.pref', pref); }
-
   // ---------- idioma ----------
-  function t(pt, en) { return pref.lingua === 'en' ? en : pt; }
-  function N(x) { return pref.lingua === 'en' ? x.en : x.pt; }
+  // português, inglês ou espanhol: escolhido só na estante (../idioma.js); o jogo não tem botão de idioma próprio
+  var lingua = window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt';
+  function t(pt, en, es) { return lingua === 'en' ? en : lingua === 'es' ? (es != null ? es : pt) : pt; }
+  function N(x) { return lingua === 'en' ? x.en : lingua === 'es' ? (x.es != null ? x.es : x.pt) : x.pt; }
   function traduzir() {
-    document.documentElement.lang = pref.lingua === 'en' ? 'en' : 'pt-BR';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = pref.lingua === 'en' ? p[1] : p[0]; });
-    $('btLingua').textContent = pref.lingua === 'en' ? 'PT' : 'EN';
+    document.documentElement.lang = lingua === 'en' ? 'en' : lingua === 'es' ? 'es' : 'pt-BR';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = t(p[0], p[1], p[2]); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', t(p[0], p[1], p[2])); });
   }
 
   // ---------- telas e o botão Voltar do celular ----------
@@ -130,15 +127,14 @@
     $('menuBoneca').innerHTML = B.svg(livre, { id: 'menu', fundo: false, area: [40, 40, 320, 640] });
     $('qtdLooks').textContent = ler('purpurina.looks', []).length;
   }
-  $('btLingua').addEventListener('click', function () { pref.lingua = pref.lingua === 'en' ? 'pt' : 'en'; salvarPref(); traduzir(); Som.tocar('clique'); });
   $('btSom').addEventListener('click', function () { Som.iniciar(); var lig = Som.alternar(); $('btSom').textContent = lig ? '🔊' : '🔇'; });
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
   $('btLivre').addEventListener('click', function () {
     Som.tocar('aba');
     if (V.iguais(livre, V.novo())) { comecar(null); return; }
-    abrirJanela({ titulo: t('🎨 Brincar livre', '🎨 Free play'), texto: t('Quer continuar o visual de antes ou começar tudo do zero?', 'Do you want to keep your last look or start from scratch?'), botoes: [
-      { t: t('✨ Começar do zero', '✨ Start from scratch'), classe: 'grande', fn: function () { hist.limpar(); livre = V.novo(); gravar('purpurina.atual', livre); comecar(null); } },
-      { t: t('👗 Continuar o visual', '👗 Keep my look'), fn: function () { comecar(null); } }
+    abrirJanela({ titulo: t('🎨 Brincar livre', '🎨 Free play', '🎨 Juego libre'), texto: t('Quer continuar o visual de antes ou começar tudo do zero?', 'Do you want to keep your last look or start from scratch?', '¿Quieres seguir con el look de antes o empezar desde cero?'), botoes: [
+      { t: t('✨ Começar do zero', '✨ Start from scratch', '✨ Empezar desde cero'), classe: 'grande', fn: function () { hist.limpar(); livre = V.novo(); gravar('purpurina.atual', livre); comecar(null); } },
+      { t: t('👗 Continuar o visual', '👗 Keep my look', '👗 Seguir con mi look'), fn: function () { comecar(null); } }
     ] });
   });
   $('btDesafios').addEventListener('click', function () { Som.tocar('aba'); ir('desafios'); });
@@ -168,7 +164,7 @@
       var ico = document.createElement('span'); ico.className = 'ico'; ico.textContent = d.ico;
       var txt = document.createElement('span'), nome = document.createElement('span'), e = document.createElement('span');
       nome.className = 'nome'; nome.textContent = N(d); e.className = 'est'; e.textContent = estrelasTxt(est);
-      e.setAttribute('aria-label', est + ' ' + t('de 3 estrelas', 'of 3 stars'));
+      e.setAttribute('aria-label', est + ' ' + t('de 3 estrelas', 'of 3 stars', 'de 3 estrellas'));
       txt.appendChild(nome); txt.appendChild(e); b.appendChild(ico); b.appendChild(txt);
       b.addEventListener('click', function () { Som.tocar('aba'); comecar(d.id); });
       caixa.appendChild(b);
@@ -207,7 +203,7 @@
   }
   function desenharTudo() {
     var d = desafioAtual();
-    $('titulo').textContent = d ? d.ico + ' ' + N(d) : t('🎨 Brincar livre', '🎨 Free play');
+    $('titulo').textContent = d ? d.ico + ' ' + N(d) : t('🎨 Brincar livre', '🎨 Free play', '🎨 Juego libre');
     desenharGrupos(); desenharBoneca(); desenharOpcoes(); desenharDicas(false); zoom(zoomLigado, false);
     $('btDesfazer').disabled = !hist.tem();
   }
@@ -218,14 +214,14 @@
     el.innerHTML = B.svg(estado, { id: 'palco', anim: !CALMO && !angulo, area: vista, angulo: angulo, realce: !mexendo });
     $('btFrente').hidden = !angulo;
     if (angulo !== angMandado && !emVolta) { angMandado = angulo; ponte('giro'); }
-    el.setAttribute('aria-label', V.resumo(estado, pref.lingua));
+    el.setAttribute('aria-label', V.resumo(estado, lingua));
   }
   function desenharDicas(comSom) {
     var d = desafioAtual(), ul = $('dicas');
     $('dicasCaixa').hidden = !d; if (!d) return;
     var r = V.avaliar(estado, d); ul.innerHTML = '';
     $('dicasTitulo').textContent = '💡 ' + r.cumpridas + '/3';
-    $('dicasCaixa').setAttribute('aria-label', t('Dicas do desafio', 'Challenge tips') + ': ' + r.cumpridas + '/3');
+    $('dicasCaixa').setAttribute('aria-label', t('Dicas do desafio', 'Challenge tips', 'Pistas del desafío') + ': ' + r.cumpridas + '/3');
     d.dicas.forEach(function (x, i) {
       var li = document.createElement('li'), m = document.createElement('span'), s = document.createElement('span');
       li.className = r.dicas[i] ? 'ok' : ''; m.className = 'marca'; m.textContent = r.dicas[i] ? '✅' : '⚪'; s.textContent = N(x);
@@ -246,7 +242,7 @@
   function zoom(liga, animar) {
     zoomLigado = !!liga;
     var b = $('btZoom'); b.setAttribute('aria-pressed', String(zoomLigado)); b.textContent = zoomLigado ? '👗' : '🔍';   // 👗 (e não 🧍, que o Fire antigo mostra como um quadrado vazio)
-    b.setAttribute('aria-label', zoomLigado ? t('Ver a personagem inteira', 'See the whole character') : t('Chegar perto (zoom)', 'Zoom in'));
+    b.setAttribute('aria-label', zoomLigado ? t('Ver a personagem inteira', 'See the whole character', 'Ver al personaje entero') : t('Chegar perto (zoom)', 'Zoom in', 'Acercar (zoom)'));
     var de = vista.slice(), para = zoomLigado ? alvoZoom().slice() : INTEIRA.slice(), id = ++animZoom;
     if (de.join() === para.join()) return;
     var svg = $('boneca').querySelector('svg');
@@ -279,7 +275,7 @@
 
   // qual opção é "sem nada" (a bolinha com a diagonal) em cada parte; null = não dá para ficar sem (ex.: pele)
   function semNada(cat) { if (!cat.opcoes) return null; if (cat.opcoes[0].id === 'nenhum') return 'nenhum'; if (cat.id === 'estampa') return 'liso'; return null; }
-  var TIRAR_TUDO = { make: { pt: 'Tirar toda a maquiagem', en: 'Remove all makeup' }, joias: { pt: 'Tirar todas as joias', en: 'Remove all jewelry' }, acess: { pt: 'Tirar todos os acessórios', en: 'Remove all accessories' } };
+  var TIRAR_TUDO = { make: { pt: 'Tirar toda a maquiagem', en: 'Remove all makeup', es: 'Quitar todo el maquillaje' }, joias: { pt: 'Tirar todas as joias', en: 'Remove all jewelry', es: 'Quitar todas las joyas' }, acess: { pt: 'Tirar todos os acessórios', en: 'Remove all accessories', es: 'Quitar todos los accesorios' } };
 
   // abas (grupos), partes (categorias) e opções
   function catsDoGrupo(g) { return P.CATEGORIAS.filter(function (c) { return c.grupo === g; }); }
@@ -340,12 +336,12 @@
     // ✕ Tirar: aparece sempre que a peça está colocada e dá para ficar sem ela
     var sem = semNada(cat), podeTirar = !!(sem && estado[cat.id] !== sem), tb = $('btTirar');
     tb.hidden = !podeTirar;
-    if (podeTirar) { var opAtual = P.opcao(cat.id, estado[cat.id]); tb.textContent = '🚫 ' + t('Tirar: ', 'Remove: ') + N(opAtual); tb.onclick = function () { mudar(V.aplicar(estado, cat.id, sem), cat.id); Som.tocar('desfazer'); }; }
+    if (podeTirar) { var opAtual = P.opcao(cat.id, estado[cat.id]); tb.textContent = '🚫 ' + t('Tirar: ', 'Remove: ', 'Quitar: ') + N(opAtual); tb.onclick = function () { mudar(V.aplicar(estado, cat.id, sem), cat.id); Som.tocar('desfazer'); }; }
     // 🚫 Tirar todos (maquiagem, joias ou acessórios inteiros de uma vez)
     var tt = $('btTirarTudo'), daAba = TIRAR_TUDO[grupoAtual], postas = daAba ? catsDoGrupo(grupoAtual).filter(function (c) { var s0 = semNada(c); return s0 && estado[c.id] !== s0; }) : [];
     tt.hidden = postas.length < 2;
     if (!tt.hidden) { tt.textContent = '🚫 ' + N(daAba); tt.onclick = function () { var e = estado; postas.forEach(function (c) { e = V.aplicar(e, c.id, semNada(c)); }); mudar(e, null); Som.tocar('desfazer'); recado(N(daAba) + ' ✓'); }; }
-    cores.setAttribute('aria-label', t('Cores', 'Colors') + ' — ' + N(cat));
+    cores.setAttribute('aria-label', t('Cores', 'Colors', 'Colores') + ' — ' + N(cat));
     estilos.setAttribute('aria-label', N(cat));
     if (cat.cores) {
       var chave = cat.opcoes ? cat.id + 'Cor' : cat.id;
@@ -377,7 +373,7 @@
         b.addEventListener('click', function () {
           var sem0 = semNada(cat), tirar = !!sem0 && op.id !== sem0 && estado[cat.id] === op.id && V.visivel(estado, cat.id);
           mudar(V.aplicar(estado, cat.id, tirar ? sem0 : op.id), cat.id);
-          if (tirar) recado(t('Tirou: ', 'Removed: ') + N(op));
+          if (tirar) recado(t('Tirou: ', 'Removed: ', 'Has quitado: ') + N(op));
         });
         estilos.appendChild(b);
       });
@@ -523,12 +519,12 @@
       else ['personagem', 'pele', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'cabelo', 'cabeloCor', 'mechas', 'mechasCor', 'olhos'].forEach(function (k) { e[k] = P.PADRAO[k]; });
       e.cenario = d ? d.cenario : (tudo ? P.PADRAO.cenario : estado.cenario);
       mudar(e, null); Som.tocar('desfazer');
-      recado(t('Pronto, começou de novo! ↩ desfaz.', 'Done, starting over! ↩ undoes.'));
+      recado(t('Pronto, começou de novo! ↩ desfaz.', 'Done, starting over! ↩ undoes.', '¡Listo, empiezas de nuevo! ↩ deshace.'));
     }
-    abrirJanela({ titulo: t('🔄 Reiniciar', '🔄 Start over'), texto: t('O que você quer tirar?', 'What do you want to reset?'), botoes: [
-      { t: t('🧼 Maquiagem, roupas e acessórios', '🧼 Makeup, clothes and accessories'), classe: 'grande', fn: function () { limpo(false); } },
-      { t: t('✨ Tudo do zero (personagem também)', '✨ Everything (character too)'), fn: function () { limpo(true); } },
-      { t: t('Cancelar', 'Cancel') }
+    abrirJanela({ titulo: t('🔄 Reiniciar', '🔄 Start over', '🔄 Reiniciar'), texto: t('O que você quer tirar?', 'What do you want to reset?', '¿Qué quieres quitar?'), botoes: [
+      { t: t('🧼 Maquiagem, roupas e acessórios', '🧼 Makeup, clothes and accessories', '🧼 Maquillaje, ropa y accesorios'), classe: 'grande', fn: function () { limpo(false); } },
+      { t: t('✨ Tudo do zero (personagem também)', '✨ Everything (character too)', '✨ Todo desde cero (el personaje también)'), fn: function () { limpo(true); } },
+      { t: t('Cancelar', 'Cancel', 'Cancelar') }
     ] });
   });
   $('btGuardar').addEventListener('click', guardarLook);
@@ -540,11 +536,11 @@
   // ---------- looks favoritos ----------
   function guardarLook() {
     var looks = ler('purpurina.looks', []);
-    if (looks.some(function (l) { return V.iguais(V.limpar(l.e), estado); })) { recado(t('Esse look já está guardado 💖', 'This look is already saved 💖')); return; }
-    if (looks.length >= MAX_LOOKS) { recado(t('Já tem ' + MAX_LOOKS + ' looks guardados. Apague um em 💖 Meus looks.', 'You already have ' + MAX_LOOKS + ' looks. Delete one in 💖 My looks.')); return; }
+    if (looks.some(function (l) { return V.iguais(V.limpar(l.e), estado); })) { recado(t('Esse look já está guardado 💖', 'This look is already saved 💖', 'Este look ya está guardado 💖')); return; }
+    if (looks.length >= MAX_LOOKS) { recado(t('Já tem ' + MAX_LOOKS + ' looks guardados. Apague um em 💖 Meus looks.', 'You already have ' + MAX_LOOKS + ' looks. Delete one in 💖 My looks.', 'Ya tienes ' + MAX_LOOKS + ' looks guardados. Borra uno en 💖 Mis looks.')); return; }
     looks.unshift({ id: Date.now(), quando: new Date().toISOString(), e: V.copiar(estado) });
-    if (!gravar('purpurina.looks', looks)) { recado(t('Não deu para guardar: o aparelho está sem espaço.', "Couldn't save: the device is out of space.")); return; }
-    Som.tocar('coracao'); recado(t('Guardado em 💖 Meus looks!', 'Saved to 💖 My looks!'));
+    if (!gravar('purpurina.looks', looks)) { recado(t('Não deu para guardar: o aparelho está sem espaço.', "Couldn't save: the device is out of space.", "No se ha podido guardar: el dispositivo no tiene espacio.")); return; }
+    Som.tocar('coracao'); recado(t('Guardado em 💖 Meus looks!', 'Saved to 💖 My looks!', '¡Guardado en 💖 Mis looks!'));
     if (atual === 'estudio') { var q = naTela(200, 360); faiscas(q[0], q[1], 10, ['💖', '💕', '💗']); }
   }
   function listaLooks() {
@@ -555,13 +551,13 @@
       var mini = document.createElement('div'); mini.className = 'mini-boneca';
       mini.innerHTML = B.svg(V.limpar(l.e), { id: 'look' + k, area: [0, 60, 400, 600], cortar: true });
       var linha = document.createElement('div'); linha.className = 'linha';
-      var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('👗 Vestir', '👗 Wear');
+      var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('👗 Vestir', '👗 Wear', '👗 Ponérmelo');
       vestir.addEventListener('click', function () { livre = V.limpar(l.e); gravar('purpurina.atual', livre); Som.tocar('brilho'); comecar(null); });
-      var apagar = document.createElement('button'); apagar.type = 'button'; apagar.textContent = '🗑'; apagar.setAttribute('aria-label', t('Apagar este look', 'Delete this look'));
+      var apagar = document.createElement('button'); apagar.type = 'button'; apagar.textContent = '🗑'; apagar.setAttribute('aria-label', t('Apagar este look', 'Delete this look', 'Borrar este look'));
       apagar.addEventListener('click', function () {
-        abrirJanela({ titulo: t('Apagar este look?', 'Delete this look?'), texto: t('Ele sai dos seus looks guardados.', 'It will be removed from your saved looks.'), botoes: [
-          { t: t('🗑 Apagar', '🗑 Delete'), classe: 'grande', fn: function () { var ls = ler('purpurina.looks', []).filter(function (x) { return x.id !== l.id; }); gravar('purpurina.looks', ls); listaLooks(); } },
-          { t: t('Não, deixa', 'No, keep it') }
+        abrirJanela({ titulo: t('Apagar este look?', 'Delete this look?', '¿Borrar este look?'), texto: t('Ele sai dos seus looks guardados.', 'It will be removed from your saved looks.', 'Va a salir de tus looks guardados.'), botoes: [
+          { t: t('🗑 Apagar', '🗑 Delete', '🗑 Borrar'), classe: 'grande', fn: function () { var ls = ler('purpurina.looks', []).filter(function (x) { return x.id !== l.id; }); gravar('purpurina.looks', ls); listaLooks(); } },
+          { t: t('Não, deixa', 'No, keep it', 'No, déjalo') }
         ] });
       });
       linha.appendChild(vestir); linha.appendChild(apagar); card.appendChild(mini); card.appendChild(linha); caixa.appendChild(card);
@@ -616,30 +612,30 @@
         var d = desafioAtual();
         c.fillText('✨ Purpurina ✨', Wf / 2, Hf + 58);
         c.font = '500 38px Fredoka, sans-serif';
-        c.fillText(d ? N(d) : t('Meu visual', 'My look'), Wf / 2, Hf + 118);
+        c.fillText(d ? N(d) : t('Meu visual', 'My look', 'Mi look'), Wf / 2, Hf + 118);
         cv.toBlob(function (b) { if (b) ok(b); else erro(new Error('sem imagem')); }, 'image/png');
       });
     });
   }
   function foto() {
     Som.tocar('foto');
-    abrirJanela({ titulo: t('📸 Preparando a foto…', '📸 Getting the photo ready…'), botoes: [] });
+    abrirJanela({ titulo: t('📸 Preparando a foto…', '📸 Getting the photo ready…', '📸 Preparando la foto…'), botoes: [] });
     var flash = document.createElement('div'); flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:70;opacity:.9;transition:opacity .4s;pointer-events:none';
     document.body.appendChild(flash); setTimeout(function () { flash.style.opacity = '0'; setTimeout(function () { flash.remove(); }, 450); }, 60);
     fazerFoto().then(function (blob) {
       var url = URL.createObjectURL(blob), nome = 'purpurina-' + carimbo() + '.png';
       var arquivo = null; try { arquivo = new File([blob], nome, { type: 'image/png' }); } catch (e) { /* navegador antigo */ }
       var podeCompartilhar = !!(arquivo && navigator.canShare && navigator.canShare({ files: [arquivo] }));
-      var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device'), classe: 'grande', ficar: true, fn: function () {
+      var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device', '💾 Guardar en el móvil'), classe: 'grande', ficar: true, fn: function () {
         var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
-        recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).'));
+        recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).', 'La foto se ha guardado en la carpeta Descargas (o Archivos).'));
       } }];
-      if (podeCompartilhar) botoes.push({ t: t('📤 Compartilhar', '📤 Share'), ficar: true, fn: function () { navigator.share({ files: [arquivo], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
-      if (VIDEO_OK) botoes.push({ t: t('🎬 Vídeo girando', '🎬 Spinning video'), ficar: true, fn: video });
-      if (iaLigada()) botoes.push({ t: t('✨ Foto de cinema (IA)', '✨ Movie-style photo (AI)'), fn: fotoIA });
-      botoes.push({ t: t('Fechar', 'Close') });
-      abrirJanela({ titulo: t('📸 Que foto linda!', '📸 What a lovely photo!'), img: url, alt: V.resumo(estado, pref.lingua), botoes: botoes }, true);
-    }).catch(function () { abrirJanela({ titulo: t('📸 Foto', '📸 Photo'), texto: t('Não deu para tirar a foto agora. Tente de novo.', "Couldn't take the photo now. Try again."), botoes: [{ t: t('Fechar', 'Close') }] }, true); });
+      if (podeCompartilhar) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), ficar: true, fn: function () { navigator.share({ files: [arquivo], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
+      if (VIDEO_OK) botoes.push({ t: t('🎬 Vídeo girando', '🎬 Spinning video', '🎬 Vídeo girando'), ficar: true, fn: video });
+      if (iaLigada()) botoes.push({ t: t('✨ Foto de cinema (IA)', '✨ Movie-style photo (AI)', '✨ Foto de cine (IA)'), fn: fotoIA });
+      botoes.push({ t: t('Fechar', 'Close', 'Cerrar') });
+      abrirJanela({ titulo: t('📸 Que foto linda!', '📸 What a lovely photo!', '📸 ¡Qué foto tan bonita!'), img: url, alt: V.resumo(estado, lingua), botoes: botoes }, true);
+    }).catch(function () { abrirJanela({ titulo: t('📸 Foto', '📸 Photo', '📸 Foto'), texto: t('Não deu para tirar a foto agora. Tente de novo.', "Couldn't take the photo now. Try again.", "No se ha podido hacer la foto ahora. Inténtalo otra vez."), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true); });
   }
 
   /* ---------- ✨ foto de cinema com IA (escondida: ver ia-foto.js) ----------
@@ -659,14 +655,14 @@
   function mostrarFotoIA(blob) {
     var url = URL.createObjectURL(blob), nome = 'purpurina-cinema-' + carimbo() + '.png';
     var arquivo = null; try { arquivo = new File([blob], nome, { type: blob.type || 'image/png' }); } catch (e) { /* navegador antigo */ }
-    var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device'), classe: 'grande', ficar: true, fn: function () {
+    var botoes = [{ t: t('💾 Salvar no celular', '💾 Save to device', '💾 Guardar en el móvil'), classe: 'grande', ficar: true, fn: function () {
       var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
-      recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).'));
+      recado(t('A foto foi para a pasta Downloads (ou Arquivos).', 'The photo went to your Downloads (or Files).', 'La foto se ha guardado en la carpeta Descargas (o Archivos).'));
     } }];
-    if (arquivo && navigator.canShare && navigator.canShare({ files: [arquivo] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share'), ficar: true, fn: function () { navigator.share({ files: [arquivo], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
-    botoes.push({ t: t('✨ Fazer outra', '✨ Make another'), fn: fotoIA }, { t: t('Fechar', 'Close') });
+    if (arquivo && navigator.canShare && navigator.canShare({ files: [arquivo] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), ficar: true, fn: function () { navigator.share({ files: [arquivo], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
+    botoes.push({ t: t('✨ Fazer outra', '✨ Make another', '✨ Hacer otra'), fn: fotoIA }, { t: t('Fechar', 'Close', 'Cerrar') });
     Som.tocar('tada');
-    abrirJanela({ titulo: t('✨ Foto de cinema!', '✨ Movie-style photo!'), texto: t('Feita por IA a partir do seu desenho.', 'Made by AI from your drawing.'), img: url, alt: V.resumo(estado, pref.lingua), botoes: botoes });
+    abrirJanela({ titulo: t('✨ Foto de cinema!', '✨ Movie-style photo!', '✨ ¡Foto de cine!'), texto: t('Feita por IA a partir do seu desenho.', 'Made by AI from your drawing.', 'Hecha por IA a partir de tu dibujo.'), img: url, alt: V.resumo(estado, lingua), botoes: botoes });
   }
   function fotoIA() {
     PurpurinaIA.abrir({ t: t, imagem: imagemParaIA, descricao: function () { return V.resumo(estado, 'en'); }, mostrarFoto: mostrarFotoIA, recado: recado });
@@ -712,29 +708,29 @@
     });
   }
   function video() {
-    abrirJanela({ titulo: t('🎬 Preparando o vídeo…', '🎬 Making the video…'), texto: '0%', botoes: [] }, true);
+    abrirJanela({ titulo: t('🎬 Preparando o vídeo…', '🎬 Making the video…', '🎬 Preparando el vídeo…'), texto: '0%', botoes: [] }, true);
     fazerVideo(function (pct) { $('janelaTexto').textContent = pct + '%'; }).then(function (r) {
       var url = URL.createObjectURL(r.blob), nome = 'purpurina-giro-' + carimbo() + '.' + r.ext, arq = null;
       try { arq = new File([r.blob], nome, { type: r.tipo }); } catch (x) { /* navegador antigo */ }
-      var botoes = [{ t: t('💾 Salvar o vídeo', '💾 Save the video'), classe: 'grande', ficar: true, fn: function () {
+      var botoes = [{ t: t('💾 Salvar o vídeo', '💾 Save the video', '💾 Guardar el vídeo'), classe: 'grande', ficar: true, fn: function () {
         var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
-        recado(t('O vídeo foi para a pasta Downloads (ou Arquivos).', 'The video went to your Downloads (or Files).'));
+        recado(t('O vídeo foi para a pasta Downloads (ou Arquivos).', 'The video went to your Downloads (or Files).', 'El vídeo se ha guardado en la carpeta Descargas (o Archivos).'));
       } }];
-      if (arq && navigator.canShare && navigator.canShare({ files: [arq] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share'), ficar: true, fn: function () { navigator.share({ files: [arq], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
-      botoes.push({ t: t('Fechar', 'Close') });
-      abrirJanela({ titulo: t('🎬 Seu vídeo girando!', '🎬 Your spinning video!'), video: url, botoes: botoes }, true);
+      if (arq && navigator.canShare && navigator.canShare({ files: [arq] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), ficar: true, fn: function () { navigator.share({ files: [arq], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
+      botoes.push({ t: t('Fechar', 'Close', 'Cerrar') });
+      abrirJanela({ titulo: t('🎬 Seu vídeo girando!', '🎬 Your spinning video!', '🎬 ¡Tu vídeo girando!'), video: url, botoes: botoes }, true);
       Som.tocar('tada');
     }).catch(function () {
-      abrirJanela({ titulo: t('🎬 Vídeo', '🎬 Video'), texto: t('Este navegador não conseguiu gravar o vídeo. A foto continua funcionando.', "This browser couldn't record the video. Photos still work."), botoes: [{ t: t('Fechar', 'Close') }] }, true);
+      abrirJanela({ titulo: t('🎬 Vídeo', '🎬 Video', '🎬 Vídeo'), texto: t('Este navegador não conseguiu gravar o vídeo. A foto continua funcionando.', "This browser couldn't record the video. Photos still work.", "Este navegador no ha podido grabar el vídeo. La foto sigue funcionando."), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true);
     });
   }
 
   // ---------- desfile ----------
   var FRASES = {
-    3: [['Arrasou!', 'Amazing!'], ['Perfeito!', 'Perfect!'], ['Uau, que brilho!', 'Wow, so sparkly!']],
-    2: [['Que lindo!', 'So pretty!'], ['Muito estilo!', 'Great style!'], ['Quase 3!', 'Almost 3!']],
-    1: [['Que fofo!', 'So cute!'], ['Gostei!', 'I like it!'], ['Veja as dicas!', 'Check the tips!']],
-    0: [['Lindo!', 'Gorgeous!'], ['Que estilo!', 'What style!'], ['Brilhou!', 'You shine!']]
+    3: [['Arrasou!', 'Amazing!', '¡Lo has bordado!'], ['Perfeito!', 'Perfect!', '¡Perfecto!'], ['Uau, que brilho!', 'Wow, so sparkly!', '¡Hala, cuánto brillo!']],
+    2: [['Que lindo!', 'So pretty!', '¡Qué bonito!'], ['Muito estilo!', 'Great style!', '¡Mucho estilo!'], ['Quase 3!', 'Almost 3!', '¡Casi 3!']],
+    1: [['Que fofo!', 'So cute!', '¡Qué mono!'], ['Gostei!', 'I like it!', '¡Me gusta!'], ['Veja as dicas!', 'Check the tips!', '¡Mira las pistas!']],
+    0: [['Lindo!', 'Gorgeous!', '¡Precioso!'], ['Que estilo!', 'What style!', '¡Qué estilo!'], ['Brilhou!', 'You shine!', '¡Has brillado!']]
   };
   var JURADOS = ['🐱', '🦄', '🐰'];
   /* ---------- o desfile ----------
@@ -799,10 +795,10 @@
         }
       })(ini);
     }
-    $('desfileTitulo').textContent = d ? d.ico + ' ' + N(d) : t('💖 Que visual incrível!', '💖 What an amazing look!');
+    $('desfileTitulo').textContent = d ? d.ico + ' ' + N(d) : t('💖 Que visual incrível!', '💖 What an amazing look!', '💖 ¡Qué look tan increíble!');
     var est = $('desfileEstrelas'); est.innerHTML = '';
     var n = r ? r.estrelas : 0;
-    est.setAttribute('aria-label', r ? n + ' ' + t('de 3 estrelas', 'of 3 stars') : '');
+    est.setAttribute('aria-label', r ? n + ' ' + t('de 3 estrelas', 'of 3 stars', 'de 3 estrellas') : '');
     for (var i = 0; i < 3; i++) {
       var s = document.createElement('span'); s.className = 'e' + (r && i >= n ? ' apagada' : ''); s.textContent = r ? '⭐' : '💖';
       var atraso = (CALMO ? 0.9 : 4.1) + i * 0.35;
@@ -813,14 +809,14 @@
     JURADOS.forEach(function (bicho, k) {
       var f = FRASES[r ? n : 0][k], j = document.createElement('div'); j.className = 'jurado';
       var b = document.createElement('span'); b.className = 'b'; b.textContent = bicho;
-      j.appendChild(b); j.appendChild(document.createTextNode(t(f[0], f[1]))); jur.appendChild(j);
+      j.appendChild(b); j.appendChild(document.createTextNode(t(f[0], f[1], f[2]))); jur.appendChild(j);
     });
     var ul = $('desfileDicas'); ul.innerHTML = ''; ul.hidden = !d;
     if (d) d.dicas.forEach(function (x, i) { var li = document.createElement('li'); li.className = r.dicas[i] ? 'ok' : 'nao'; li.textContent = (r.dicas[i] ? '✅ ' : '💡 ') + N(x); ul.appendChild(li); });
     var recorde = false;
     if (d) { var antes = ler('purpurina.estrelas.' + d.id, 0); if (n > antes) { gravar('purpurina.estrelas.' + d.id, n); recorde = antes > 0; } }
     $('desfileRecorde').hidden = !recorde;
-    $('btProximo').textContent = d ? t('▶ Próximo desafio', '▶ Next challenge') : t('🎨 Continuar brincando', '🎨 Keep playing');
+    $('btProximo').textContent = d ? t('▶ Próximo desafio', '▶ Next challenge', '▶ Siguiente desafío') : t('🎨 Continuar brincando', '🎨 Keep playing', '🎨 Seguir jugando');
     $('btMaisUm').hidden = !d;
     Som.proxima();
     if (CALMO) { Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 500); }
@@ -941,11 +937,11 @@
   if (EM_ARQUIVO) Array.prototype.forEach.call(document.querySelectorAll('[data-so-site]'), function (el) { el.hidden = true; });
   $('btBaixar').addEventListener('click', function () {
     var aviso = $('baixarAviso');
-    aviso.textContent = t('Preparando o arquivo…', 'Preparing the file…');
+    aviso.textContent = t('Preparando o arquivo…', 'Preparing the file…', 'Preparando el archivo…');
     BaixarJogo.baixar('purpurina.html').then(function () {
-      aviso.textContent = t('Pronto! O arquivo purpurina.html foi para os Downloads. Toque nele para brincar, mesmo sem internet. (Os looks guardados ficam separados dos do site.)', 'Done! purpurina.html went to Downloads. Tap it to play, even offline. (Saved looks stay separate from the website ones.)');
+      aviso.textContent = t('Pronto! O arquivo purpurina.html foi para os Downloads. Toque nele para brincar, mesmo sem internet. (Os looks guardados ficam separados dos do site.)', 'Done! purpurina.html went to Downloads. Tap it to play, even offline. (Saved looks stay separate from the website ones.)', '¡Listo! El archivo purpurina.html se ha guardado en Descargas. Tócalo para jugar, incluso sin internet. (Los looks guardados van aparte de los de la web).');
     }).catch(function () {
-      aviso.textContent = t('Não deu para baixar agora. Abra o jogo com internet e tente de novo.', "Couldn't download now. Open the game online and try again.");
+      aviso.textContent = t('Não deu para baixar agora. Abra o jogo com internet e tente de novo.', "Couldn't download now. Open the game online and try again.", "No se ha podido descargar ahora. Abre el juego con internet e inténtalo otra vez.");
     });
   });
 
@@ -961,11 +957,11 @@
     fetch('versoes.json?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
       var nova = j && j.versoes && j.versoes[0] && j.versoes[0].versao;
       if (!nova || !maisNova(nova, APP_VERSION)) return;
-      var b = $('btNovaVersao'); b.textContent = t('✨ Versão nova (v', '✨ New version (v') + nova + t(')! Toque para atualizar', ')! Tap to update'); b.hidden = false;
+      var b = $('btNovaVersao'); b.textContent = t('✨ Versão nova (v', '✨ New version (v', '✨ ¡Versión nueva (v') + nova + t(')! Toque para atualizar', ')! Tap to update', ')! Toca para actualizar'); b.hidden = false;
     }).catch(function () { /* sem internet: tenta da próxima vez */ });
   }
   $('btNovaVersao').addEventListener('click', function () {
-    var b = $('btNovaVersao'); b.textContent = t('Atualizando…', 'Updating…');
+    var b = $('btNovaVersao'); b.textContent = t('Atualizando…', 'Updating…', 'Actualizando…');
     // pede ao navegador para conferir os arquivos novos, mas recarrega de qualquer jeito em no máximo 1,5 s
     var feito = false, rec = function () { if (feito) return; feito = true; location.reload(); };
     setTimeout(rec, 1500);
@@ -980,6 +976,11 @@
   $('btSom').textContent = Som.ligado() ? '🔊' : '🔇';
   $('entradaBoneca').innerHTML = B.svg(livre, { id: 'entrada', fundo: false, area: [40, 40, 320, 640] });
   traduzir();
+  // trocaram o idioma na estante aberta noutra aba: os textos da tela trocam na hora
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) {
+    lingua = c; traduzir();
+    if (atual === 'menu') desenharMenu(); else if (atual === 'desafios') listaDesafios(); else if (atual === 'looks') listaLooks(); else if (atual === 'estudio') desenharTudo();
+  });
   if (TV) setTimeout(focarPrimeiro, 200);
   // o que o tv.js (TV, celular-controle e 🎵 Música) usa do app
   window.PurpurinaApp = {

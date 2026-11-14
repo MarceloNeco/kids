@@ -31,7 +31,7 @@ const ID = /^[a-z0-9-]+$/;
 const TEMPOS = [0, 0.016, 0.5, 1.5, 3.2, 7.1, 9.6, 61.3, 1000.25];
 
 function textos(item) {
-  for (const k of ['pt', 'en', 'ico']) assert.ok(typeof item[k] === 'string' && item[k].trim(), item.id + ' sem ' + k);
+  for (const k of ['pt', 'en', 'es', 'ico']) assert.ok(typeof item[k] === 'string' && item[k].trim(), item.id + ' sem ' + k);
 }
 function unicos(lista, nome) {
   const ids = lista.map(i => i.id);

@@ -192,13 +192,15 @@
   }
 
   var CASA = ['sala', 'quarto', 'banheiro', 'cozinha', 'jardim', 'parquinho'];   // a ordem das setinhas
-  var NOMES = { sala: ['🛋️ Sala', '🛋️ Living room'], quarto: ['🛏️ Quarto', '🛏️ Bedroom'], banheiro: ['🛁 Banheiro', '🛁 Bathroom'], cozinha: ['🍳 Cozinha', '🍳 Kitchen'], jardim: ['🌳 Jardim', '🌳 Garden'], parquinho: ['🛝 Parquinho', '🛝 Playground'] };
+  var NOMES = { sala: ['🛋️ Sala', '🛋️ Living room', '🛋️ Salón'], quarto: ['🛏️ Quarto', '🛏️ Bedroom', '🛏️ Dormitorio'], banheiro: ['🛁 Banheiro', '🛁 Bathroom', '🛁 Baño'], cozinha: ['🍳 Cozinha', '🍳 Kitchen', '🍳 Cocina'], jardim: ['🌳 Jardim', '🌳 Garden', '🌳 Jardín'], parquinho: ['🛝 Parquinho', '🛝 Playground', '🛝 Parque'] };
+  // o idioma da estante (../idioma.js) para o que é desenhado aqui: [pt, en, es]
+  function L3(f) { var l = typeof BolinhoIdioma !== 'undefined' ? BolinhoIdioma.atual() : 'pt'; return l === 'en' ? f[1] : l === 'es' ? (f[2] || f[0]) : f[0]; }
   function rect(a, b, pad) { return dentro(b, a, pad || 0); }
   function perto(x, y, r) { return function (a, b) { return Math.hypot(b.x - x(a), b.y - y(a)) < r; }; }
   /* cada aparelho: acerta (onde o toque pega), toque (o que acontece), passo (anima), desenho */
   var APAR = {
     tv: { acerta: function (a, b) { return rect(a, b, 6); },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 600; a.on = !a.on; A.ponto(j, 4, 'tv', a.x + a.w / 2, a.y + 10, { texto: a.on ? '📺 Ligou!' : '📺 Desligou', textoEn: a.on ? '📺 On!' : '📺 Off', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 600; a.on = !a.on; A.ponto(j, 4, 'tv', a.x + a.w / 2, a.y + 10, { texto: a.on ? '📺 Ligou!' : '📺 Desligou', textoEn: a.on ? '📺 On!' : '📺 Off', textoEs: a.on ? '📺 ¡Encendida!' : '📺 Apagada', festa: true }); },
       desenho: function (ctx, a, ts) {
         ctx.fillStyle = '#212121'; arred(ctx, a.x - 6, a.y - 6, a.w + 12, a.h + 12, 8); ctx.fill();
         if (!a.on) { ctx.fillStyle = '#37474f'; ctx.fillRect(a.x, a.y, a.w, a.h); ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.beginPath(); ctx.moveTo(a.x + 10, a.y + a.h); ctx.lineTo(a.x + 60, a.y); ctx.lineTo(a.x + 90, a.y); ctx.lineTo(a.x + 40, a.y + a.h); ctx.fill(); return; }
@@ -239,7 +241,7 @@
         pecas.forEach(function (pc, i) { var an = a.ang + i * Math.PI / 2, dx = Math.cos(an) * 70, prof = Math.sin(an); ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x + dx, 70); ctx.lineTo(a.x + dx, 112 + i * 6); ctx.stroke(); ctx.font = (24 + prof * 6) + 'px system-ui'; ctx.textAlign = 'center'; ctx.fillText(pc[0], a.x + dx, 132 + i * 6); });
       } },
     surpresa: { acerta: function (a, b) { return rect(a, b, 14); },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 2200; a.mola = 2; A.ponto(j, 5, 'boing', a.x + a.w / 2, a.y - 60, { texto: '🤡 BUU!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 2200; a.mola = 2; A.ponto(j, 5, 'boing', a.x + a.w / 2, a.y - 60, { texto: '🤡 BUU!', textoEn: '🤡 BOO!', textoEs: '🤡 ¡BUU!', festa: true }); },
       passo: function (a, dt) { a.mola = Math.max(0, (a.mola || 0) - dt); },
       desenho: function (ctx, a, ts) {
         var m = a.mola || 0;
@@ -254,7 +256,7 @@
       passo: function (a, dt) { a.bate = Math.max(0, (a.bate || 0) - dt); },
       desenho: function (ctx, a) { var b2 = a.bate || 0; ctx.fillStyle = '#e53935'; ctx.fillRect(a.x, a.y + 8, a.w, a.h - 8); ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 3; for (var i = 0; i < 4; i++) { ctx.beginPath(); ctx.moveTo(a.x + i * a.w / 4, a.y + 10); ctx.lineTo(a.x + (i + 1) * a.w / 4, a.y + a.h); ctx.stroke(); } ctx.fillStyle = b2 > 0 ? '#fffde7' : '#f5f5f5'; ctx.beginPath(); ctx.ellipse(a.x + a.w / 2, a.y + 8, a.w / 2, 9 - b2 * 12, 0, 0, PI2); ctx.fill(); ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(a.x + a.w + 6, a.y - 30 + b2 * 60); ctx.lineTo(a.x + a.w / 2 + 10, a.y + 2); ctx.stroke(); } },
     cuco: { acerta: function (a, b) { return rect(a, b, 10); },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 1500; a.sai = 1.4; A.ponto(j, 4, 'cuco', a.x + a.w / 2, a.y - 10, { texto: '🐦 CUCO! CUCO!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 1500; a.sai = 1.4; A.ponto(j, 4, 'cuco', a.x + a.w / 2, a.y - 10, { texto: '🐦 CUCO! CUCO!', textoEn: '🐦 CUCKOO! CUCKOO!', textoEs: '🐦 ¡CUCÚ! ¡CUCÚ!', festa: true }); },
       passo: function (a, dt, A) { a.sai = Math.max(0, (a.sai || 0) - dt); a.t += dt; if (a.t > 22) { a.t = 0; a.sai = 1.4; A.emitir({ t: 'casa', j: 0, som: 'cuco', x: a.x + a.w / 2, y: a.y - 10, pontos: 0 }); } },
       desenho: function (ctx, a, ts) {
         var cx = a.x + a.w / 2; ctx.fillStyle = '#8d5634'; ctx.fillRect(a.x, a.y + 16, a.w, a.h - 30); ctx.fillStyle = '#5d3a1f'; ctx.beginPath(); ctx.moveTo(a.x - 8, a.y + 20); ctx.lineTo(cx, a.y - 6); ctx.lineTo(a.x + a.w + 8, a.y + 20); ctx.fill();
@@ -264,25 +266,25 @@
         if (a.sai > 0) { var o = Math.min(1, (1.4 - a.sai) * 5) * Math.min(1, a.sai * 5); ctx.fillStyle = '#ffee58'; ctx.beginPath(); ctx.arc(cx, a.y + 22 - o * 16, 9, 0, PI2); ctx.fill(); ctx.fillStyle = '#ff7043'; ctx.beginPath(); ctx.moveTo(cx + 7, a.y + 20 - o * 16); ctx.lineTo(cx + 16, a.y + 24 - o * 16); ctx.lineTo(cx + 7, a.y + 26 - o * 16); ctx.fill(); }
       } },
     torradeira: { acerta: function (a, b) { return rect(a, b, 12); },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 900; a.pula = 0.3; [-14, 14].forEach(function (d) { A.soltar('torrada', a.x + a.w / 2 + d, a.y - 20, d * 8 + (A.rnd() - 0.5) * 200, -900 - A.rnd() * 300, { w: 40, h: 40, quica: 0.3 }); }); A.ponto(j, 6, 'torradeira', a.x + a.w / 2, a.y - 40, { texto: '🍞 Torrada voando!', textoEn: '🍞 Flying toast!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 900; a.pula = 0.3; [-14, 14].forEach(function (d) { A.soltar('torrada', a.x + a.w / 2 + d, a.y - 20, d * 8 + (A.rnd() - 0.5) * 200, -900 - A.rnd() * 300, { w: 40, h: 40, quica: 0.3 }); }); A.ponto(j, 6, 'torradeira', a.x + a.w / 2, a.y - 40, { texto: '🍞 Torrada voando!', textoEn: '🍞 Flying toast!', textoEs: '🍞 ¡Tostadas volando!', festa: true }); },
       passo: function (a, dt) { a.pula = Math.max(0, (a.pula || 0) - dt); },
       desenho: function (ctx, a) { ctx.fillStyle = '#cfd8dc'; arred(ctx, a.x, a.y, a.w, a.h, 12); ctx.fill(); ctx.fillStyle = '#90a4ae'; ctx.fillRect(a.x + 12, a.y + 4, a.w - 24, 5); ctx.fillRect(a.x + 12, a.y + 12, a.w - 24, 5); ctx.fillStyle = '#37474f'; ctx.fillRect(a.x + a.w - 4, a.y + ((a.pula || 0) > 0 ? 10 : 24), 8, 8); ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fillRect(a.x + 6, a.y + 22, 6, a.h - 28); } },
     liquidificador: { acerta: function (a, b) { return rect(a, b, 12); },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 2600; a.liga = 2.5; A.ponto(j, 5, 'liquidificador', a.x + a.w / 2, a.y - 20, { texto: '🌀 Vrrrrr!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 2600; a.liga = 2.5; A.ponto(j, 5, 'liquidificador', a.x + a.w / 2, a.y - 20, { texto: '🌀 Vrrrrr!', textoEn: '🌀 Whirrrr!', textoEs: '🌀 ¡Brrrrr!', festa: true }); },
       passo: function (a, dt) { a.liga = Math.max(0, (a.liga || 0) - dt); },
       desenho: function (ctx, a, ts) { var l = a.liga || 0, tr = l > 0 ? Math.sin(ts / 25) * 2 : 0; ctx.save(); ctx.translate(tr, 0); ctx.fillStyle = '#e53935'; arred(ctx, a.x - 4, a.y + a.h - 26, a.w + 8, 26, 6); ctx.fill(); ctx.fillStyle = 'rgba(200,235,255,.6)'; ctx.beginPath(); ctx.moveTo(a.x, a.y + 10); ctx.lineTo(a.x + a.w, a.y + 10); ctx.lineTo(a.x + a.w - 6, a.y + a.h - 26); ctx.lineTo(a.x + 6, a.y + a.h - 26); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ff7043'; var nivel = l > 0 ? 20 + Math.sin(ts / 40) * 4 : 30; ctx.fillRect(a.x + 6, a.y + a.h - 26 - nivel, a.w - 12, nivel); if (l > 0) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(a.x + a.w / 2, a.y + a.h - 40, 8, ts / 40, ts / 40 + 4); ctx.stroke(); } ctx.fillStyle = '#424242'; ctx.fillRect(a.x - 2, a.y + 4, a.w + 4, 8); ctx.restore(); } },
     microondas: { nasce: function (a) { a.abre = 0; a.alvo = 0; },
       acerta: function (a, b) { return rect(a, b, 6); },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 700; a.alvo = a.alvo > 0.5 ? 0 : 1; A.ponto(j, 4, 'microondas', a.x + a.w / 2, a.y - 10, { texto: a.alvo ? '🔆 Abriu!' : '🔔 PIM!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 700; a.alvo = a.alvo > 0.5 ? 0 : 1; A.ponto(j, 4, 'microondas', a.x + a.w / 2, a.y - 10, { texto: a.alvo ? '🔆 Abriu!' : '🔔 PIM!', textoEn: a.alvo ? '🔆 Open!' : '🔔 DING!', textoEs: a.alvo ? '🔆 ¡Abierto!' : '🔔 ¡PIN!', festa: true }); },
       passo: function (a, dt) { a.abre += (a.alvo - a.abre) * Math.min(1, dt * 4); },
       desenho: function (ctx, a, ts) { ctx.fillStyle = '#eceff1'; arred(ctx, a.x, a.y, a.w, a.h, 8); ctx.fill(); ctx.fillStyle = a.abre > 0.1 ? '#fff8e1' : '#263238'; ctx.fillRect(a.x + 8, a.y + 8, a.w - 40, a.h - 16); if (a.abre > 0.1) { ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(a.x + 8 + (a.w - 40) / 2, a.y + a.h - 18, 22, 6, 0, 0, PI2); ctx.fill(); ctx.fillStyle = '#ff7043'; ctx.beginPath(); ctx.arc(a.x + 8 + (a.w - 40) / 2 + Math.cos(ts / 300) * 6, a.y + a.h - 24, 7, 0, PI2); ctx.fill(); }
         var lw = (a.w - 40) * Math.max(0.1, Math.cos(a.abre * 1.3)); ctx.fillStyle = 'rgba(30,40,50,.75)'; ctx.fillRect(a.x + 8, a.y + 8, lw, a.h - 16); ctx.fillStyle = '#90a4ae'; ctx.fillRect(a.x + a.w - 28, a.y + 12, 18, 10); ctx.fillStyle = '#4caf50'; ctx.font = '700 10px monospace'; ctx.fillText('12:00', a.x + a.w - 30, a.y + 36); [0, 1, 2].forEach(function (i) { ctx.fillStyle = '#b0bec5'; ctx.fillRect(a.x + a.w - 28, a.y + 44 + i * 9, 18, 6); }); } },
     chuveiro: { acerta: function (a, b) { return Math.hypot(b.x - a.x, b.y - a.y) < 55; },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 700; a.on = !a.on; A.ponto(j, 4, 'agua', a.x, a.y - 20, { texto: a.on ? '🚿 Chuveiro!' : '🚿 Fechou!', textoEn: a.on ? '🚿 Shower!' : '🚿 Off!' }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 700; a.on = !a.on; A.ponto(j, 4, 'agua', a.x, a.y - 20, { texto: a.on ? '🚿 Chuveiro!' : '🚿 Fechou!', textoEn: a.on ? '🚿 Shower!' : '🚿 Off!', textoEs: a.on ? '🚿 ¡Ducha!' : '🚿 ¡Cerrada!' }); },
       passo: function (a, dt, A) { if (!a.on || !A.M.banheira) return; a.t += dt; if (a.t > 0.35) { a.t = 0; var Bn = A.M.banheira; Bn.bolhas.push({ x: a.x + (A.rnd() - 0.5) * 60, y: Bn.topo, r: 8 + A.rnd() * 12, vy: 40 + A.rnd() * 50, t: 0, vida: 3, f: A.rnd() * 6 }); } },
       desenho: function (ctx, a, ts) { if (!a.on) return; ctx.strokeStyle = 'rgba(120,200,255,.7)'; ctx.lineWidth = 3; for (var i = -3; i <= 3; i++) { var x = a.x + i * 6; ctx.beginPath(); ctx.moveTo(x, a.y + 4); ctx.lineTo(x + i * 6, 470); ctx.stroke(); } ctx.fillStyle = 'rgba(255,255,255,.85)'; for (var k = 0; k < 10; k++) { var yy = a.y + 10 + ((ts / 4 + k * 37) % 110); ctx.fillRect(a.x - 20 + (k * 13) % 40, yy, 2, 7); } } },
     vaso: { acerta: function (a, b) { return rect(a, b, 6) && b.y > a.y + 30; },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 1800; a.gira = 1.6; A.ponto(j, 5, 'descarga', a.x + a.w / 2, a.y + 20, { texto: '🚽 Descarga!', textoEn: '🚽 Flush!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 1800; a.gira = 1.6; A.ponto(j, 5, 'descarga', a.x + a.w / 2, a.y + 20, { texto: '🚽 Descarga!', textoEn: '🚽 Flush!', textoEs: '🚽 ¡Cisterna!', festa: true }); },
       passo: function (a, dt) { a.gira = Math.max(0, (a.gira || 0) - dt); },
       desenho: function (ctx, a, ts) { var cx = a.x + a.w / 2; ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cfd8dc'; ctx.lineWidth = 2; arred(ctx, a.x + 22, a.y - 60, a.w - 36, 64, 8); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#b0bec5'; ctx.fillRect(a.x + 30, a.y - 44, 18, 6);
         ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.moveTo(a.x, a.y + 40); ctx.lineTo(a.x + a.w, a.y + 40); ctx.quadraticCurveTo(a.x + a.w - 10, a.y + 100, cx + 18, a.y + 110); ctx.lineTo(cx + 22, a.y + a.h); ctx.lineTo(cx - 22, a.y + a.h); ctx.lineTo(cx - 18, a.y + 110); ctx.quadraticCurveTo(a.x + 10, a.y + 100, a.x, a.y + 40); ctx.fill(); ctx.stroke();
@@ -294,26 +296,26 @@
       desenho: function (ctx, a) { var e = Math.min(1, (a.emb || 0) / 1.5); if (e <= 0) return; ctx.save(); ctx.globalAlpha = e; ctx.fillStyle = 'rgba(255,255,255,.65)'; arred(ctx, a.x, a.y, a.w, a.h, 12); ctx.fill(); ctx.strokeStyle = 'rgba(80,120,160,.8)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; var cx = a.x + a.w / 2, cy = a.y + a.h / 2; ctx.beginPath(); ctx.arc(cx, cy, 50, 0, PI2); ctx.stroke(); ctx.beginPath(); ctx.arc(cx - 18, cy - 12, 4, 0, PI2); ctx.arc(cx + 18, cy - 12, 4, 0, PI2); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy + 4, 26, 0.3, 2.8); ctx.stroke(); ctx.restore(); } },
     sapo: { frente: true, nasce: function (a) { a.x0 = a.x; a.dir = 1; a.pulo = null; a.t = 2; a.croac = 0; },
       acerta: function (a, b, A) { return Math.hypot(b.x - a.x, b.y - (a.y - 20)) < 55; },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 900; a.croac = 1; a.dir = b.x < a.x ? 1 : -1; a.pulo = { t: 0, dur: 0.6, x0: a.x, x1: clamp(a.x + a.dir * 220, 60, W - 60), alt: 180 }; A.ponto(j, 4, 'sapo', a.x, a.y - 70, { texto: '🐸 CROAC!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 900; a.croac = 1; a.dir = b.x < a.x ? 1 : -1; a.pulo = { t: 0, dur: 0.6, x0: a.x, x1: clamp(a.x + a.dir * 220, 60, W - 60), alt: 180 }; A.ponto(j, 4, 'sapo', a.x, a.y - 70, { texto: '🐸 CROAC!', textoEn: '🐸 RIBBIT!', textoEs: '🐸 ¡CROAC!', festa: true }); },
       passo: function (a, dt, A) { a.croac = Math.max(0, a.croac - dt); if (a.pulo) { var P = a.pulo; P.t += dt; var k = Math.min(1, P.t / P.dur); a.x = P.x0 + (P.x1 - P.x0) * k; a.h2 = P.alt * 4 * k * (1 - k); if (k >= 1) { a.pulo = null; a.h2 = 0; a.t = 2 + A.rnd() * 3; } return; } a.t -= dt; if (a.t < 0) { if (a.x < 120) a.dir = 1; else if (a.x > W - 120) a.dir = -1; else if (A.rnd() < 0.3) a.dir = -a.dir; a.pulo = { t: 0, dur: 0.45, x0: a.x, x1: clamp(a.x + a.dir * 90, 60, W - 60), alt: 60 }; } },
       desenho: function (ctx, a) { var y = a.y - (a.h2 || 0); ctx.save(); ctx.translate(a.x, y); ctx.scale(a.dir, 1); ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.beginPath(); ctx.ellipse(0, (a.h2 || 0), 26, 5, 0, 0, PI2); ctx.fill(); ctx.fillStyle = '#66bb6a'; ctx.beginPath(); ctx.ellipse(0, -16, 26, 17, 0, 0, PI2); ctx.fill(); ctx.fillStyle = '#43a047'; ctx.beginPath(); ctx.ellipse(-16, -4, 14, 7, 0, 0, PI2); ctx.fill(); ctx.fillStyle = '#a5d6a7'; ctx.beginPath(); ctx.ellipse(6, -8, 14, 8, 0, 0, PI2); ctx.fill(); [-2, 14].forEach(function (x) { ctx.fillStyle = '#66bb6a'; ctx.beginPath(); ctx.arc(x, -32, 9, 0, PI2); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, -33, 6, 0, PI2); ctx.fill(); ctx.fillStyle = '#212121'; ctx.beginPath(); ctx.arc(x + 1.5, -33, 3, 0, PI2); ctx.fill(); }); ctx.strokeStyle = '#2e7d32'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(10, -16, 10, 0.2, 2.6); ctx.stroke(); if (a.croac > 0) { ctx.fillStyle = '#c8e6c9'; ctx.beginPath(); ctx.arc(14, -8, 8 + Math.sin(a.croac * 30) * 3, 0, PI2); ctx.fill(); } ctx.restore(); } },
     irrigador: { nasce: function (a) { a.gotas = []; a.ang = 0; },
       acerta: function (a, b) { return Math.hypot(b.x - a.x, b.y - (a.y - 20)) < 50; },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 700; a.on = !a.on; A.ponto(j, 4, 'agua', a.x, a.y - 60, { texto: a.on ? '💦 Água!' : '💦 Parou!', textoEn: a.on ? '💦 Water!' : '💦 Stopped!' }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 700; a.on = !a.on; A.ponto(j, 4, 'agua', a.x, a.y - 60, { texto: a.on ? '💦 Água!' : '💦 Parou!', textoEn: a.on ? '💦 Water!' : '💦 Stopped!', textoEs: a.on ? '💦 ¡Agua!' : '💦 ¡Se paró!' }); },
       passo: function (a, dt, A) { if (a.on) { a.ang += dt * 3; for (var i = 0; i < 3; i++) a.gotas.push({ x: a.x, y: a.y - 34, vx: Math.cos(a.ang + i * 2.1) * 260, vy: -320 - A.rnd() * 80, t: 0 }); } a.gotas.forEach(function (g) { g.t += dt; g.vy += 900 * dt; g.x += g.vx * dt; g.y += g.vy * dt; }); a.gotas = a.gotas.filter(function (g) { return g.y < a.y + 4 && g.t < 2; }).slice(-160); },
       desenho: function (ctx, a) { ctx.fillStyle = '#1e88e5'; arred(ctx, a.x - 18, a.y - 14, 36, 14, 6); ctx.fill(); ctx.fillRect(a.x - 3, a.y - 34, 6, 22); ctx.save(); ctx.translate(a.x, a.y - 36); ctx.rotate(a.ang); ctx.fillStyle = '#ffd166'; ctx.fillRect(-16, -3, 32, 6); ctx.restore(); ctx.fillStyle = 'rgba(100,190,255,.8)'; a.gotas.forEach(function (g) { ctx.beginPath(); ctx.arc(g.x, g.y, 3, 0, PI2); ctx.fill(); }); } },
     varal: { nasce: function (a) { a.roupas = [0, 1, 2, 3].map(function (i) { return { k: 0.15 + i * 0.23, cor: ['#ff4fa3', '#3ee8ff', '#ffd166', '#c6ff3d'][i], tipo: i % 2 ? 'meia' : 'roupa', presa: true }; }); },
       acerta: function (a, b) { return b.x > a.x1 && b.x < a.x2 && b.y > a.y1 - 20 && b.y < a.y2 + 90; },
-      toque: function (a, j, b, A) { var melhor = null, dm = 70; a.roupas.forEach(function (r) { if (!r.presa) return; var rx = a.x1 + (a.x2 - a.x1) * r.k, d = Math.abs(rx - b.x); if (d < dm) { dm = d; melhor = r; } }); if (!melhor) return; melhor.presa = false; var rx = a.x1 + (a.x2 - a.x1) * melhor.k, ry = a.y1 + (a.y2 - a.y1) * melhor.k + 40; A.soltar(melhor.tipo, rx, ry, (A.rnd() - 0.5) * 500, -300, { w: melhor.tipo === 'meia' ? 40 : 56, h: melhor.tipo === 'meia' ? 22 : 54, cor: melhor.cor, quica: 0.15 }); A.ponto(j, 5, 'janela', rx, ry - 30, { texto: '👕 Voou!', textoEn: '👕 Flew off!', festa: true }); },
+      toque: function (a, j, b, A) { var melhor = null, dm = 70; a.roupas.forEach(function (r) { if (!r.presa) return; var rx = a.x1 + (a.x2 - a.x1) * r.k, d = Math.abs(rx - b.x); if (d < dm) { dm = d; melhor = r; } }); if (!melhor) return; melhor.presa = false; var rx = a.x1 + (a.x2 - a.x1) * melhor.k, ry = a.y1 + (a.y2 - a.y1) * melhor.k + 40; A.soltar(melhor.tipo, rx, ry, (A.rnd() - 0.5) * 500, -300, { w: melhor.tipo === 'meia' ? 40 : 56, h: melhor.tipo === 'meia' ? 22 : 54, cor: melhor.cor, quica: 0.15 }); A.ponto(j, 5, 'janela', rx, ry - 30, { texto: '👕 Voou!', textoEn: '👕 Flew off!', textoEs: '👕 ¡Salió volando!', festa: true }); },
       desenho: function (ctx, a) { ctx.strokeStyle = '#6d4c41'; ctx.lineWidth = 6; [a.x1, a.x2].forEach(function (x, i) { ctx.beginPath(); ctx.moveTo(x, i ? a.y2 : a.y1); ctx.lineTo(x, 650); ctx.stroke(); }); ctx.strokeStyle = '#eceff1'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a.x1, a.y1); ctx.quadraticCurveTo((a.x1 + a.x2) / 2, (a.y1 + a.y2) / 2 + 22, a.x2, a.y2); ctx.stroke();
         a.roupas.forEach(function (r) { if (!r.presa) return; var x = a.x1 + (a.x2 - a.x1) * r.k, y = a.y1 + (a.y2 - a.y1) * r.k + 22 * 4 * r.k * (1 - r.k); ctx.fillStyle = r.cor; if (r.tipo === 'meia') { ctx.fillRect(x - 8, y, 16, 34); ctx.fillRect(x - 8, y + 26, 26, 12); } else { ctx.beginPath(); ctx.moveTo(x - 26, y + 4); ctx.lineTo(x + 26, y + 4); ctx.lineTo(x + 20, y + 22); ctx.lineTo(x + 14, y + 18); ctx.lineTo(x + 14, y + 54); ctx.lineTo(x - 14, y + 54); ctx.lineTo(x - 14, y + 18); ctx.lineTo(x - 20, y + 22); ctx.closePath(); ctx.fill(); } ctx.fillStyle = '#8d6e63'; ctx.fillRect(x - 3, y - 4, 6, 10); }); } },
     correio: { acerta: function (a, b) { return rect(a, b, 18); },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 1500; a.bandeira = 1; for (var i = 0; i < 3; i++) A.soltar('carta', a.x + a.w / 2, a.y + 10, (A.rnd() - 0.3) * 400, -500 - A.rnd() * 200, { w: 40, h: 26, quica: 0.1 }); A.ponto(j, 5, 'correio', a.x + a.w / 2, a.y - 20, { texto: '✉️ Cartas!', textoEn: '✉️ Letters!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 1500; a.bandeira = 1; for (var i = 0; i < 3; i++) A.soltar('carta', a.x + a.w / 2, a.y + 10, (A.rnd() - 0.3) * 400, -500 - A.rnd() * 200, { w: 40, h: 26, quica: 0.1 }); A.ponto(j, 5, 'correio', a.x + a.w / 2, a.y - 20, { texto: '✉️ Cartas!', textoEn: '✉️ Letters!', textoEs: '✉️ ¡Cartas!', festa: true }); },
       passo: function (a, dt) { a.bandeira = Math.max(0, (a.bandeira || 0) - dt * 0.2); },
       desenho: function (ctx, a) { ctx.fillStyle = '#6d4c41'; ctx.fillRect(a.x + a.w / 2 - 4, a.y + a.h, 8, 650 - a.y - a.h); ctx.fillStyle = '#1e88e5'; arred(ctx, a.x, a.y, a.w, a.h, 14); ctx.fill(); ctx.fillStyle = '#0d47a1'; ctx.fillRect(a.x + 6, a.y + a.h / 2 - 3, a.w - 12, 6); ctx.save(); ctx.translate(a.x + a.w + 2, a.y + a.h / 2); ctx.rotate((a.bandeira > 0 ? -1.5 : 0)); ctx.fillStyle = '#e53935'; ctx.fillRect(0, -2, 6, 26); ctx.fillRect(0, 18, 18, 10); ctx.restore(); } },
     pipa: { nasce: function (a) { a.x0 = a.x; a.y0 = a.y; a.loop = 0; a.fase = 0; },
       acerta: function (a, b) { return Math.hypot(b.x - a.x, b.y - a.y) < 70; },
-      toque: function (a, j, b, A) { a.ate = A.tempo + 1600; a.loop = 1.5; A.ponto(j, 5, 'tchau', a.x, a.y + 40, { texto: '🪁 Uhuuu!', festa: true }); },
+      toque: function (a, j, b, A) { a.ate = A.tempo + 1600; a.loop = 1.5; A.ponto(j, 5, 'tchau', a.x, a.y + 40, { texto: '🪁 Uhuuu!', textoEn: '🪁 Wheee!', textoEs: '🪁 ¡Yujuuu!', festa: true }); },
       passo: function (a, dt) { a.fase += dt; if (a.loop > 0) { a.loop = Math.max(0, a.loop - dt); var an = (1.5 - a.loop) / 1.5 * PI2; a.x = a.x0 + Math.sin(an) * 90; a.y = a.y0 + 90 - Math.cos(an) * 90; } else { a.x = a.x0 + Math.sin(a.fase * 0.8) * 50; a.y = a.y0 + Math.sin(a.fase * 1.3) * 18; } },
       desenho: function (ctx, a, ts) { ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(a.ax, a.ay); ctx.quadraticCurveTo((a.ax + a.x) / 2 + 40, (a.ay + a.y) / 2 + 60, a.x, a.y + 30); ctx.stroke(); ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(Math.sin(ts / 400) * 0.15 + (a.loop > 0 ? (1.5 - a.loop) / 1.5 * PI2 : 0)); ctx.fillStyle = '#ff4fa3'; ctx.beginPath(); ctx.moveTo(0, -36); ctx.lineTo(26, 0); ctx.lineTo(0, 34); ctx.lineTo(-26, 0); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.moveTo(0, -36); ctx.lineTo(26, 0); ctx.lineTo(0, 0); ctx.fill(); ctx.beginPath(); ctx.moveTo(0, 34); ctx.lineTo(-26, 0); ctx.lineTo(0, 0); ctx.fill(); ctx.strokeStyle = '#8e5bff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 34); for (var i = 1; i < 6; i++) ctx.lineTo(Math.sin(ts / 200 + i) * 8, 34 + i * 14); ctx.stroke(); ctx.restore(); } }
   };
@@ -337,7 +339,7 @@
       if (novo && cfg.modo === 'arrumar') { M.baguncou = true; baguncarSozinho(); }   // 🧹 direto: cada cômodo novo já chega bagunçado
       if (mae) M.mae = mae;
       M.trocou = dir < 0 ? -1 : 1; if (M.cachorro) { M.cachorro.x = dir < 0 ? W - 140 : 140; M.cachorro.dir = dir < 0 ? -1 : 1; }
-      var n = NOMES[nova]; emitir({ t: 'casa', j: 0, som: 'porta', x: W / 2, y: 320, pontos: 0, texto: n[0], textoEn: n[1], troca: nova });
+      var n = NOMES[nova]; emitir({ t: 'casa', j: 0, som: 'porta', x: W / 2, y: 320, pontos: 0, texto: n[0], textoEn: n[1], textoEs: n[2], troca: nova });
     }
     var jogadores = [];
     for (var j = 0; j < nJog; j++) jogadores.push({ pontos: 0, vidas: 3, combo: 0, rastro: [], corpo: { x: 0.5, topo: 0.1, altura: 0.8, pulando: false, abaixado: false, ts: 0 }, ref: null, esqAnt: null });
@@ -378,14 +380,14 @@
         var mh = meiaAltura(o), mw = meiaLargura(o), baixo = o.y + mh, pousou = false;
         // saída pela janela aberta (sala/quarto) ou por cima da cerca (jardim)
         var jan = M.janela, spd = Math.hypot(o.vx, o.vy);
-        if (jan && jan.abre > 0.55 && ['bola', 'pato', 'maca', 'laranja', 'tampa'].indexOf(o.tipo) >= 0 && spd > 350 && dentro(o, { x: jan.x + 20, y: jan.y + 20, w: jan.w - 40, h: jan.h - 40 })) { o.fora = 0.001; o.saida = { x: jan.x + jan.w / 2, y: jan.y + jan.h / 2 }; ponto(o.ult || 0, 20, 'tchau', o.x, o.y, { texto: '👋 Tchau, ' + nome(o) + '! +20', festa: true }); return; }
-        if (M.jardim && (o.x < -o.r || o.x > W + o.r) && o.y < 420) { o.fora = 0.001; o.saida = { x: o.x < 0 ? -200 : W + 200, y: o.y - 80 }; ponto(o.ult || 0, 20, 'tchau', clamp(o.x, 80, W - 80), o.y, { texto: '🚀 Lá se foi! +20', festa: true }); return; }
+        if (jan && jan.abre > 0.55 && ['bola', 'pato', 'maca', 'laranja', 'tampa'].indexOf(o.tipo) >= 0 && spd > 350 && dentro(o, { x: jan.x + 20, y: jan.y + 20, w: jan.w - 40, h: jan.h - 40 })) { o.fora = 0.001; o.saida = { x: jan.x + jan.w / 2, y: jan.y + jan.h / 2 }; ponto(o.ult || 0, 20, 'tchau', o.x, o.y, { texto: '👋 Tchau, ' + nome(o) + '! +20', textoEn: '👋 Bye, ' + nome(o, 1) + '! +20', textoEs: '👋 ¡Adiós, ' + nome(o, 2) + '! +20', festa: true }); return; }
+        if (M.jardim && (o.x < -o.r || o.x > W + o.r) && o.y < 420) { o.fora = 0.001; o.saida = { x: o.x < 0 ? -200 : W + 200, y: o.y - 80 }; ponto(o.ult || 0, 20, 'tchau', clamp(o.x, 80, W - 80), o.y, { texto: '🚀 Lá se foi! +20', textoEn: '🚀 Off it goes! +20', textoEs: '🚀 ¡Allá va! +20', festa: true }); return; }
         // escorregador: quem cai na rampa desce escorregando
         var naRampa = false;
         if (M.rampas) M.rampas.forEach(function (R) { if (o.x < R.x1 || o.x > R.x2) return; var sy = R.y1 + (o.x - R.x1) * (R.y2 - R.y1) / (R.x2 - R.x1); if (o.y + o.r > sy && o.y - o.r < sy + 40) { o.y = sy - o.r; var an = Math.atan2(R.y2 - R.y1, R.x2 - R.x1), ca = Math.cos(an), sa = Math.sin(an), v = Math.max(0, o.vx * ca + o.vy * sa) + G * sa * dt; o.vx = v * ca; o.vy = v * sa; o.va = v / Math.max(10, o.r); o.parado = 0; naRampa = true; } });
         if (naRampa) return;
         // rolo de papel: desenrola uma fita pelo caminho
-        if (o.tipo === 'rolo' && M.papel) { var P = M.papel, ul = P.pts[P.pts.length - 1] || { x: P.x, y: P.y }; if (Math.hypot(o.x - ul.x, o.y - ul.y) > 14 && P.pts.length < 220) { if (!P.pts.length) ponto(o.ult || 0, 10, 'papel', o.x, o.y, { texto: '🧻 Desenrolou! +10', textoEn: '🧻 Unrolled! +10', festa: true }); P.pts.push({ x: o.x, y: o.y + o.r * 0.7 }); } }
+        if (o.tipo === 'rolo' && M.papel) { var P = M.papel, ul = P.pts[P.pts.length - 1] || { x: P.x, y: P.y }; if (Math.hypot(o.x - ul.x, o.y - ul.y) > 14 && P.pts.length < 220) { if (!P.pts.length) ponto(o.ult || 0, 10, 'papel', o.x, o.y, { texto: '🧻 Desenrolou! +10', textoEn: '🧻 Unrolled! +10', textoEs: '🧻 ¡Desenrollado! +10', festa: true }); P.pts.push({ x: o.x, y: o.y + o.r * 0.7 }); } }
         // prateleiras, sofá, cama, baú (só pousa quem vem de cima)
         for (var i = 0; i < M.plats.length && !pousou; i++) {
           var p = M.plats[i];
@@ -466,8 +468,8 @@
       var Bn = M.banheira; if (Bn) { Bn.bolhas.forEach(function (b) { b.t += dt; b.y -= b.vy * dt; b.x += Math.sin(b.t * 3 + b.f) * 20 * dt; }); Bn.bolhas = Bn.bolhas.filter(function (b) { return b.t < b.vida && b.y > 60; }); }
       var Gg = M.gangorra; if (Gg) { Gg.va += ((Gg.ang >= 0 ? 2.2 : -2.2) - 1.4 * Gg.va) * dt; Gg.ang += Gg.va * dt; if (Gg.ang > 0.26) { Gg.ang = 0.26; Gg.va = -Math.abs(Gg.va) * 0.35; } if (Gg.ang < -0.26) { Gg.ang = -0.26; Gg.va = Math.abs(Gg.va) * 0.35; } }
     }
-    var FRASES = [['Currupaco!', 'Squawk!'], ['Que bagunça!', 'What a mess!'], ['Oi, Picolé!', 'Hi, Picolé!'], ['Arruma isso!', 'Clean this up!'], ['Bagunça! Bagunça!', 'Mess! Mess!'], ['Cadê o biscoito?', 'Where is my cookie?'], ['A mamãe vem aí!', 'Mom is coming!'], ['Olá, olá!', 'Hello, hello!'], ['Mais! Mais!', 'More! More!']];
-    function falar(j, x, y) { var P = M.papagaio, f = FRASES[Math.floor(rnd() * FRASES.length) % FRASES.length]; P.fala = 2.2; P.txt = f[0]; P.txtEn = f[1]; emitir({ t: 'casa', j: j, som: 'papagaio', x: x, y: y, pontos: 0, fala: f }); }
+    var FRASES = [['Currupaco!', 'Squawk!', '¡Cruac, cruac!'], ['Que bagunça!', 'What a mess!', '¡Qué desastre!'], ['Oi, Picolé!', 'Hi, Picolé!', '¡Hola, Picolé!'], ['Arruma isso!', 'Clean this up!', '¡Ordena esto!'], ['Bagunça! Bagunça!', 'Mess! Mess!', '¡Desastre! ¡Desastre!'], ['Cadê o biscoito?', 'Where’s my cookie?', '¿Dónde está mi galleta?'], ['A mamãe vem aí!', 'Mom is coming!', '¡Que viene mamá!'], ['Olá, olá!', 'Hello, hello!', '¡Hola, hola!'], ['Mais! Mais!', 'More! More!', '¡Más! ¡Más!']];
+    function falar(j, x, y) { var P = M.papagaio, f = FRASES[Math.floor(rnd() * FRASES.length) % FRASES.length]; P.fala = 2.2; P.txt = f[0]; P.txtEn = f[1]; P.txtEs = f[2]; emitir({ t: 'casa', j: j, som: 'papagaio', x: x, y: y, pontos: 0, fala: f }); }
     function papagaio(dt) {
       var P = M.papagaio; if (!P) return;
       P.fala = Math.max(0, P.fala - dt); P.fase += dt; P.prox -= dt;
@@ -496,9 +498,9 @@
       g.x += g.dir * 55 * dt; g.passo += dt * 9;
       if (g.x < p.x1 + 20) { g.x = p.x1 + 20; g.dir = 1; } if (g.x > p.x2 - 20) { g.x = p.x2 - 20; g.dir = -1; }
       // derruba o que estiver no caminho
-      if (g.ops <= 0 && !arrumando) M.obs.forEach(function (o) { if (g.ops > 0 || !o.dorme || o.fora) return; var mesma = g.plat >= 0 ? (o.apoio && o.apoio.p === g.plat) : (Math.abs(o.y + meiaAltura(o) - M.chao) < 4); if (!mesma || Math.abs(o.x - g.x) > o.w / 2 + 16 || (o.x - g.x) * g.dir < 0) return; acordar(o); o.vx = g.dir * (240 + rnd() * 120); o.vy = -160; o.va = g.dir * 4; o.ult = 0; g.ops = 4; emitir({ t: 'casa', j: 0, som: 'miau', x: g.x, y: g.y - 70, pontos: 0, texto: '😼 Ops!', textoEn: '😼 Oops!' }); });   // um empurrão de cada vez: a bagunça maior é da criança
+      if (g.ops <= 0 && !arrumando) M.obs.forEach(function (o) { if (g.ops > 0 || !o.dorme || o.fora) return; var mesma = g.plat >= 0 ? (o.apoio && o.apoio.p === g.plat) : (Math.abs(o.y + meiaAltura(o) - M.chao) < 4); if (!mesma || Math.abs(o.x - g.x) > o.w / 2 + 16 || (o.x - g.x) * g.dir < 0) return; acordar(o); o.vx = g.dir * (240 + rnd() * 120); o.vy = -160; o.va = g.dir * 4; o.ult = 0; g.ops = 4; emitir({ t: 'casa', j: 0, som: 'miau', x: g.x, y: g.y - 70, pontos: 0, texto: '😼 Ops!', textoEn: '😼 Oops!', textoEs: '😼 ¡Uy!' }); });   // um empurrão de cada vez: a bagunça maior é da criança
       // fugindo do Picolé
-      var c = M.cachorro; if (c && g.plat === -1 && Math.abs(c.x - g.x) < 120) { g.miau = 0.9; emitir({ t: 'casa', j: 0, som: 'miau', x: g.x, y: g.y - 80, pontos: 0, texto: '🙀 FFFF!', textoEn: '🙀 HISS!' }); pularGato(true); return; }
+      var c = M.cachorro; if (c && g.plat === -1 && Math.abs(c.x - g.x) < 120) { g.miau = 0.9; emitir({ t: 'casa', j: 0, som: 'miau', x: g.x, y: g.y - 80, pontos: 0, texto: '🙀 FFFF!', textoEn: '🙀 HISS!', textoEs: '🙀 ¡FFFF!' }); pularGato(true); return; }
       if (g.t < 0) { if (rnd() < 0.35) { g.dorme = true; g.t = 5 + rnd() * 4; } else pularGato(false); }
     }
     function tartaruga(dt) {
@@ -511,7 +513,7 @@
     // o que os aparelhos podem fazer no mundo
     function soltar(tipo, x, y, vx, vy, o) { o = o || {}; var w = o.w || 40, h = o.h || 40; var c = { id: ++M.seq, tipo: tipo, x: x, y: y, w: w, h: h, r: o.r || Math.min(w, h) / 2, vx: vx, vy: vy, ang: 0, va: (rnd() - 0.5) * 8, dorme: false, apoio: null, quica: o.quica != null ? o.quica : 0.3, cor: o.cor, toque: {}, parado: 0, fora: 0, aberto: false, gira: 0, extra: true }; c.x0 = x; c.y0 = y; c.ang0 = 0; M.obs.push(c); return c; }
     var api = { ponto: function () { ponto.apply(null, arguments); }, emitir: emitir, soltar: soltar, rnd: rnd, get M() { return M; }, get tempo() { return tempo; } };
-    function nome(o) { return { bola: 'bola', pato: 'patinho', maca: 'maçã', laranja: 'laranja', tampa: 'tampa', bambole: 'bambolê' }[o.tipo] || 'brinquedo'; }
+    function nome(o, i) { var n = { bola: ['bola', 'ball', 'pelota'], pato: ['patinho', 'duckie', 'patito'], maca: ['maçã', 'apple', 'manzana'], laranja: ['laranja', 'orange', 'naranja'], tampa: ['tampa', 'lid', 'tapa'], bambole: ['bambolê', 'hula hoop', 'aro'] }[o.tipo] || ['brinquedo', 'toy', 'juguete']; return n[i || 0]; }
 
     /* ---- o cachorrinho anda, late e corre atrás da bola ---- */
     function cachorro(dt) {
@@ -608,27 +610,27 @@
       var S = segurando[k]; delete segurando[k]; if (!S || !S.o) return;
       var o = S.o; o.segurado = 0;
       if (o.extra) {
-        if (dentro(o, CESTO, 30)) { o.fora = 1; M.obs.splice(M.obs.indexOf(o), 1); acertou(S.j, 5, 'guardou', CESTO.x + CESTO.w / 2, CESTO.y, '🧺 Guardou! +5', '🧺 Put away! +5'); return; }
+        if (dentro(o, CESTO, 30)) { o.fora = 1; M.obs.splice(M.obs.indexOf(o), 1); acertou(S.j, 5, 'guardou', CESTO.x + CESTO.w / 2, CESTO.y, '🧺 Guardou! +5', '🧺 Put away! +5', '🧺 ¡Guardado! +5'); return; }
       } else if (Math.hypot(o.x - o.x0, o.y - o.y0) < Math.max(48, o.r * 1.5)) {   // perto do lugar dele: encaixa
         o.x = o.x0; o.y = o.y0; o.ang = o.ang0; o.vx = o.vy = o.va = 0; o.dorme = true; o.parado = 0; o.apoio = o.apoio0 ? { p: o.apoio0.p, o: o.apoio0.o } : { p: -1 }; o.guardado = !!o.caixa;
         if (o.aberto) { o.aberto = false; o.w = o.w0; o.h = o.h0; o.r = o.r0; }
         if (o.tipo === 'rolo' && M.papel) M.papel.pts = [];   // o rolo voltou para o suporte: o papel enrola de novo
         var em = o.apoio0 && o.apoio0.o != null ? porId(o.apoio0.o) : null;
-        if (em && !noLugar(em)) emitir({ t: 'casa', j: S.j, som: 'tum', x: o.x, y: o.y - 50, pontos: 0, texto: '⬇️ Comece pelo de baixo!', textoEn: '⬇️ Start from the bottom!' });
-        if (o.caixa) acertou(S.j, 10, 'guardou', o.x, o.y - 40, '📦 Guardou! +10', '📦 Put away! +10'); else acertou(S.j, 10, 'arrumou', o.x, o.y, '✓ +10', '✓ +10');
+        if (em && !noLugar(em)) emitir({ t: 'casa', j: S.j, som: 'tum', x: o.x, y: o.y - 50, pontos: 0, texto: '⬇️ Comece pelo de baixo!', textoEn: '⬇️ Start from the bottom!', textoEs: '⬇️ ¡Empieza por el de abajo!' });
+        if (o.caixa) acertou(S.j, 10, 'guardou', o.x, o.y - 40, '📦 Guardou! +10', '📦 Put away! +10', '📦 ¡Guardado! +10'); else acertou(S.j, 10, 'arrumou', o.x, o.y, '✓ +10', '✓ +10', '✓ +10');
         if (M.dica && M.dica.id === o.id) M.dica = null; return;
       }
       o.vx = clamp(S.vx * 0.3, -600, 600); o.vy = clamp(S.vy * 0.3, -600, 600); o.va = 0;   // longe do lugar: cai onde soltou
     }
-    function acertou(j, n, som, x, y, txt, txtEn) { semArrumar = 0; ponto(j, n, som, x, y, { texto: txt, textoEn: txtEn, festa: true }); }
+    function acertou(j, n, som, x, y, txt, txtEn, txtEs) { semArrumar = 0; ponto(j, n, som, x, y, { texto: txt, textoEn: txtEn, textoEs: txtEs, festa: true }); }
     function varrer(j, x, y) { var antes = M.folhasChao.length; M.folhasChao = M.folhasChao.filter(function (f) { return Math.hypot(f.x - x, f.y - y) > 70; }); var n = antes - M.folhasChao.length; if (n) { semArrumar = 0; ponto(j, n, 'folhas', x, y - 30, n > 2 ? { texto: '🍃 +' + n } : {}); } }
     function arrumarAoTocar(j, x, y) {
       var b = { x: x, y: y };
-      var Q = M.quadro; if (Q && Math.abs(Q.repouso) > 0.12 && dentro(b, Q, 20)) { Q.repouso = 0; Q.va = 2; acertou(j, 5, 'quadro', Q.x + Q.w / 2, Q.y + 40, '🖼️ Endireitou! +5', '🖼️ Straight! +5'); return; }
-      var Gd = M.geladeira; if (Gd && Gd.alvo > 0.5 && dentro(b, Gd, 0)) { Gd.alvo = 0; acertou(j, 5, 'geladeira', Gd.x + Gd.w / 2, Gd.y + 120, '🧊 Fechou! +5', '🧊 Closed! +5'); return; }
-      var To = M.torneira; if (To && To.ligada && Math.hypot(x - To.x, y - To.y) < 55) { To.ligada = false; acertou(j, 5, 'agua', To.x, To.y - 20, '🚰 Fechou! +5', '🚰 Off! +5'); return; }
-      var I = M.interruptor; if (I && !M.luz && dentro(b, I, 22)) { M.luz = true; acertou(j, 5, 'interruptor', I.x, I.y, '💡 Acendeu! +5', '💡 Lights on! +5'); return; }
-      var Ca = M.castelo; if (Ca && !Ca.inteiro && Math.hypot(x - Ca.x, y - (Ca.y - 50)) < 90) { Ca.inteiro = true; acertou(j, 10, 'areia', Ca.x, Ca.y - 90, '🏰 Reconstruiu! +10', '🏰 Rebuilt! +10'); return; }
+      var Q = M.quadro; if (Q && Math.abs(Q.repouso) > 0.12 && dentro(b, Q, 20)) { Q.repouso = 0; Q.va = 2; acertou(j, 5, 'quadro', Q.x + Q.w / 2, Q.y + 40, '🖼️ Endireitou! +5', '🖼️ Straight again! +5', '🖼️ ¡Enderezado! +5'); return; }
+      var Gd = M.geladeira; if (Gd && Gd.alvo > 0.5 && dentro(b, Gd, 0)) { Gd.alvo = 0; acertou(j, 5, 'geladeira', Gd.x + Gd.w / 2, Gd.y + 120, '🧊 Fechou! +5', '🧊 Closed! +5', '🧊 ¡Cerrada! +5'); return; }
+      var To = M.torneira; if (To && To.ligada && Math.hypot(x - To.x, y - To.y) < 55) { To.ligada = false; acertou(j, 5, 'agua', To.x, To.y - 20, '🚰 Fechou! +5', '🚰 Off! +5', '🚰 ¡Cerrado! +5'); return; }
+      var I = M.interruptor; if (I && !M.luz && dentro(b, I, 22)) { M.luz = true; acertou(j, 5, 'interruptor', I.x, I.y, '💡 Acendeu! +5', '💡 Lights on! +5', '💡 ¡Luz encendida! +5'); return; }
+      var Ca = M.castelo; if (Ca && !Ca.inteiro && Math.hypot(x - Ca.x, y - (Ca.y - 50)) < 90) { Ca.inteiro = true; acertou(j, 10, 'areia', Ca.x, Ca.y - 90, '🏰 Reconstruiu! +10', '🏰 Rebuilt! +10', '🏰 ¡Reconstruido! +10'); return; }
       varrer(j, x, y);
     }
     function dica() {
@@ -642,7 +644,7 @@
     function arrumar() {   // depois do 🧸 Bagunça: a mesma bagunça vira arrumação (em todos os cômodos visitados)
       arrumando = true; duracao = 0; fase = 'jogando'; semArrumar = 0; M.tudoArrumado = false; M.fimEm = 0; M.chegou100 = true;
       Object.keys(visitados).forEach(function (k) { visitados[k].tudoArrumado = false; });
-      emitir({ t: 'casa', j: 0, som: 'passos', x: W / 2, y: 300, pontos: 0, texto: '🧹 Hora de arrumar!', textoEn: '🧹 Tidy-up time!', fala: ['Hora de arrumar! Arraste cada coisa para o lugar dela.', 'Tidy-up time! Drag each thing back to its place.'] });
+      emitir({ t: 'casa', j: 0, som: 'passos', x: W / 2, y: 300, pontos: 0, texto: '🧹 Hora de arrumar!', textoEn: '🧹 Tidy-up time!', textoEs: '🧹 ¡Hora de ordenar!', fala: ['Hora de arrumar! Arraste cada coisa para o lugar dela.', 'Tidy-up time! Drag each thing back to its place.', '¡Hora de ordenar! Arrastra cada cosa a su sitio.'] });
     }
     function baguncarSozinho() {   // modo 🧹 direto: a casa já começa bagunçada (sorteio)
       var ev0 = eventos.slice(), pts0 = jogadores.map(function (jg) { return jg.pontos; });
@@ -723,15 +725,15 @@
       var kk = chave == null ? j : chave;
       var vel = Math.hypot(vx, vy), forte = vel > 250, pad = 16, seg = function (o, extra) { return distSeg(a, b, o) <= extra; };
       // interruptor: acende e apaga
-      var I = M.interruptor; if (I && tempo >= I.ate && (dentro(b, I, 22) || dentro(a, I, 22))) { I.ate = tempo + 600; M.luz = !M.luz; ponto(j, 5, 'interruptor', I.x + I.w / 2, I.y, { texto: M.luz ? '💡 Acendeu!' : '🌙 Apagou!' }); }
+      var I = M.interruptor; if (I && tempo >= I.ate && (dentro(b, I, 22) || dentro(a, I, 22))) { I.ate = tempo + 600; M.luz = !M.luz; ponto(j, 5, 'interruptor', I.x + I.w / 2, I.y, { texto: M.luz ? '💡 Acendeu!' : '🌙 Apagou!', textoEn: M.luz ? '💡 Lights on!' : '🌙 Lights off!', textoEs: M.luz ? '💡 ¡Luz encendida!' : '🌙 ¡Luz apagada!' }); }
       // janela: abre e fecha devagar
-      var J = M.janela; if (J && tempo >= J.ate && (dentro(b, J, 0) && (!forte || dentro(a, J, 0)))) { J.ate = tempo + 900; J.alvo = J.alvo > 0.5 ? 0 : 1; ponto(j, 5, 'janela', J.x + J.w / 2, J.y + 20, { texto: J.alvo ? '🪟 Abriu!' : '🪟 Fechou!' }); }
+      var J = M.janela; if (J && tempo >= J.ate && (dentro(b, J, 0) && (!forte || dentro(a, J, 0)))) { J.ate = tempo + 900; J.alvo = J.alvo > 0.5 ? 0 : 1; ponto(j, 5, 'janela', J.x + J.w / 2, J.y + 20, { texto: J.alvo ? '🪟 Abriu!' : '🪟 Fechou!', textoEn: J.alvo ? '🪟 Open!' : '🪟 Closed!', textoEs: J.alvo ? '🪟 ¡Abierta!' : '🪟 ¡Cerrada!' }); }
       // lustre
       var L = M.lustre; if (L) { var lx = L.x + Math.sin(L.ang) * L.L, ly = Math.cos(L.ang) * L.L + 10; if (seg({ x: lx, y: ly }, 60) && tempo >= L.ate) { L.ate = tempo + 350; L.va += clamp((vx || (b.x < lx ? 400 : -400)) * 0.0035, -3, 3); M.corLuz = (M.corLuz + 1) % CORES_LUZ.length; ponto(j, 6, 'lustre', lx, ly, { texto: '💡 +6', festa: true }); } }
       // quadro torto
-      var Q = M.quadro; if (Q && tempo >= (Q.ate || 0) && dentro(b, Q, 10)) { Q.ate = tempo + 500; Q.va += (vx >= 0 ? 1 : -1) * (3 + Math.min(4, vel / 400)); Q.repouso = clamp(Q.repouso + (vx >= 0 ? 1 : -1) * (0.15 + rnd() * 0.2), -0.6, 0.6); ponto(j, 5, 'quadro', Q.x + Q.w / 2, Q.y + Q.h / 2, { texto: '🖼️ Ficou torto! +5', festa: true }); }
+      var Q = M.quadro; if (Q && tempo >= (Q.ate || 0) && dentro(b, Q, 10)) { Q.ate = tempo + 500; Q.va += (vx >= 0 ? 1 : -1) * (3 + Math.min(4, vel / 400)); Q.repouso = clamp(Q.repouso + (vx >= 0 ? 1 : -1) * (0.15 + rnd() * 0.2), -0.6, 0.6); ponto(j, 5, 'quadro', Q.x + Q.w / 2, Q.y + Q.h / 2, { texto: '🖼️ Ficou torto! +5', textoEn: '🖼️ All crooked! +5', textoEs: '🖼️ ¡Se ha torcido! +5', festa: true }); }
       // cachorro: late e pula
-      var C = M.cachorro; if (C && C.late <= 0 && Math.abs(b.x - C.x) < 75 && b.y > M.chao - 130 + C.y) { C.late = 0.8; C.vy = -520; C.y = -1; C.dir = b.x < C.x ? 1 : -1; ponto(j, 3, 'latido', C.x, M.chao - 110, { texto: '🐶 Picolé: AU AU!', textoEn: '🐶 Picolé: WOOF!', festa: true }); }
+      var C = M.cachorro; if (C && C.late <= 0 && Math.abs(b.x - C.x) < 75 && b.y > M.chao - 130 + C.y) { C.late = 0.8; C.vy = -520; C.y = -1; C.dir = b.x < C.x ? 1 : -1; ponto(j, 3, 'latido', C.x, M.chao - 110, { texto: '🐶 Picolé: AU AU!', textoEn: '🐶 Picolé: WOOF!', textoEs: '🐶 Picolé: ¡GUAU GUAU!', festa: true }); }
       // jardim
       if (M.arvore && Math.hypot(b.x - M.arvore.copa.x, b.y - M.arvore.copa.y) < M.arvore.copa.r) sacudirArvore(j, b.x, b.y, true);
       var Bl = M.balanco; if (Bl) { var sx = Bl.x + Math.sin(Bl.ang) * Bl.L, sy = Bl.topo + Math.cos(Bl.ang) * Bl.L; if (seg({ x: sx, y: sy }, 55) && tempo >= (Bl.ate || 0)) { Bl.ate = tempo + 300; Bl.va += clamp((vx || (b.x < sx ? 300 : -300)) * 0.003, -2.4, 2.4); ponto(j, 4, 'balanco', sx, sy, { texto: '🎠 +4' }); } }
@@ -741,18 +743,18 @@
       // aparelhos (TV, piano, torradeira, sapo…)
       M.aparelhos.forEach(function (ap) { var T2 = APAR[ap.tipo]; if (T2.toque && tempo >= ap.ate && T2.acerta(ap, b, a)) T2.toque(ap, j, b, api); });
       // geladeira, torneira, bolhas, gangorra, castelo de areia
-      var Gd = M.geladeira; if (Gd && tempo >= Gd.ate && dentro(b, Gd, 0)) { Gd.ate = tempo + 800; Gd.alvo = Gd.alvo > 0.5 ? 0 : 1; ponto(j, 5, 'geladeira', Gd.x + Gd.w / 2, Gd.y + 120, { texto: Gd.alvo ? '🧊 Abriu a geladeira!' : '🧊 Fechou!', textoEn: Gd.alvo ? '🧊 Fridge open!' : '🧊 Closed!', festa: true }); }
-      var To = M.torneira; if (To && tempo >= To.ate && Math.hypot(b.x - To.x, b.y - To.y) < 50) { To.ate = tempo + 700; To.ligada = !To.ligada; ponto(j, 5, 'agua', To.x, To.y - 20, { texto: To.ligada ? '🚰 Água!' : '🚰 Fechou!', textoEn: To.ligada ? '🚰 Water!' : '🚰 Off!' }); }
+      var Gd = M.geladeira; if (Gd && tempo >= Gd.ate && dentro(b, Gd, 0)) { Gd.ate = tempo + 800; Gd.alvo = Gd.alvo > 0.5 ? 0 : 1; ponto(j, 5, 'geladeira', Gd.x + Gd.w / 2, Gd.y + 120, { texto: Gd.alvo ? '🧊 Abriu a geladeira!' : '🧊 Fechou!', textoEn: Gd.alvo ? '🧊 Fridge open!' : '🧊 Closed!', textoEs: Gd.alvo ? '🧊 ¡Nevera abierta!' : '🧊 ¡Cerrada!', festa: true }); }
+      var To = M.torneira; if (To && tempo >= To.ate && Math.hypot(b.x - To.x, b.y - To.y) < 50) { To.ate = tempo + 700; To.ligada = !To.ligada; ponto(j, 5, 'agua', To.x, To.y - 20, { texto: To.ligada ? '🚰 Água!' : '🚰 Fechou!', textoEn: To.ligada ? '🚰 Water!' : '🚰 Off!', textoEs: To.ligada ? '🚰 ¡Agua!' : '🚰 ¡Cerrado!' }); }
       var Bn = M.banheira; if (Bn) {
         Bn.bolhas.forEach(function (bo) { if (!bo.estourou && Math.hypot(bo.x - b.x, bo.y - b.y) < bo.r + 14) { bo.estourou = true; bo.vida = 0; ponto(j, 1, 'pop', bo.x, bo.y, {}); } });
         if (tempo >= Bn.ate && b.x > Bn.x1 && b.x < Bn.x2 && b.y > Bn.topo - 40 && b.y < Bn.topo + 120) { Bn.ate = tempo + 300; for (var nb = 0; nb < 6; nb++) Bn.bolhas.push({ x: clamp(b.x + (rnd() - 0.5) * 120, Bn.x1 + 30, Bn.x2 - 30), y: Bn.topo, r: 12 + rnd() * 18, vy: 50 + rnd() * 70, t: 0, vida: 4 + rnd() * 3, f: rnd() * 6 }); ponto(j, 3, 'bolhas', b.x, Bn.topo - 30, { texto: '🫧 +3' }); }
       }
       var Gg = M.gangorra; if (Gg && tempo >= Gg.ate) { var ex = Math.cos(Gg.ang) * Gg.L; if (Math.abs(b.y - (Gg.y - 30)) < 90 && Math.abs(b.x - Gg.x) < Gg.L + 30 && Math.abs(b.x - Gg.x) > 40) { Gg.ate = tempo + 350; Gg.va += b.x > Gg.x ? 4 : -4; ponto(j, 4, 'gangorra', b.x, Gg.y - 60, { texto: '⚖️ +4' }); } void ex; }
-      var Ca = M.castelo; if (Ca && Ca.inteiro && Math.hypot(b.x - Ca.x, b.y - (Ca.y - 50)) < 80) { Ca.inteiro = false; for (var na = 0; na < 16; na++) M.petalas.push({ x: Ca.x + (rnd() - 0.5) * 90, y: Ca.y - 40 - rnd() * 50, vx: (rnd() - 0.5) * 300, vy: -100 - rnd() * 250, t: 0, cor: rnd() < 0.5 ? '#e6c27a' : '#d4a85a' }); ponto(j, 10, 'areia', Ca.x, Ca.y - 90, { texto: '🏰 Desmoronou! +10', textoEn: '🏰 Crumbled! +10', festa: true }); }
+      var Ca = M.castelo; if (Ca && Ca.inteiro && Math.hypot(b.x - Ca.x, b.y - (Ca.y - 50)) < 80) { Ca.inteiro = false; for (var na = 0; na < 16; na++) M.petalas.push({ x: Ca.x + (rnd() - 0.5) * 90, y: Ca.y - 40 - rnd() * 50, vx: (rnd() - 0.5) * 300, vy: -100 - rnd() * 250, t: 0, cor: rnd() < 0.5 ? '#e6c27a' : '#d4a85a' }); ponto(j, 10, 'areia', Ca.x, Ca.y - 90, { texto: '🏰 Desmoronou! +10', textoEn: '🏰 Crumbled! +10', textoEs: '🏰 ¡Se derrumbó! +10', festa: true }); }
       // gato, papagaio e tartaruga
-      var Gt = M.gato; if (Gt && Gt.miau <= 0 && !Gt.salto && Math.hypot(b.x - Gt.x, b.y - (Gt.y - 25)) < 60) { Gt.miau = 0.9; ponto(j, 4, 'miau', Gt.x, Gt.y - 70, { texto: '🐱 MIAU!', textoEn: '🐱 MEOW!', festa: true }); pularGato(false); }
+      var Gt = M.gato; if (Gt && Gt.miau <= 0 && !Gt.salto && Math.hypot(b.x - Gt.x, b.y - (Gt.y - 25)) < 60) { Gt.miau = 0.9; ponto(j, 4, 'miau', Gt.x, Gt.y - 70, { texto: '🐱 MIAU!', textoEn: '🐱 MEOW!', textoEs: '🐱 ¡MIAU!', festa: true }); pularGato(false); }
       var Pa = M.papagaio; if (Pa && Pa.voa === 0 && Math.hypot(b.x - Pa.x, b.y - Pa.y) < 60) { Pa.voa = 0.001; ponto(j, 4, 'papagaio', Pa.x, Pa.y - 50, { festa: true }); falar(j, Pa.x, Pa.y - 50); }
-      var Tt = M.tartaruga; if (Tt && Tt.esconde <= 0 && tempo >= Tt.ate && Math.abs(b.x - Tt.x) < 55 && b.y > M.chao - 70) { Tt.esconde = 3; Tt.ate = tempo + 3500; ponto(j, 3, 'casco', Tt.x, M.chao - 60, { texto: '🐢 Escondeu!', textoEn: '🐢 Hid!', festa: true }); }
+      var Tt = M.tartaruga; if (Tt && Tt.esconde <= 0 && tempo >= Tt.ate && Math.abs(b.x - Tt.x) < 55 && b.y > M.chao - 70) { Tt.esconde = 3; Tt.ate = tempo + 3500; ponto(j, 3, 'casco', Tt.x, M.chao - 60, { texto: '🐢 Escondeu!', textoEn: '🐢 Hid!', textoEs: '🐢 ¡Se escondió!', festa: true }); }
       // as coisas
       M.obs.forEach(function (o) {
         if (o.fora) return;
@@ -784,14 +786,14 @@
         if (pct <= 0 && !M.tudoArrumado) {
           M.tudoArrumado = true; jogadores.forEach(function (jg) { jg.pontos += 50; });
           var falta = Object.keys(visitados).filter(function (k) { return visitados[k] !== M && bagunca(visitados[k]) > 0; });
-          if (falta.length) { var n = NOMES[falta[0]]; emitir({ t: 'casa', j: 0, som: 'fim', x: W / 2, y: 300, pontos: 50, texto: '✨ Cômodo arrumado! Agora: ' + n[0], textoEn: '✨ Room done! Next: ' + n[1], festa: true, fala: ['Muito bem! Agora falta ' + n[0].replace(/^\S+ /, ''), 'Well done! Now the ' + n[1].replace(/^\S+ /, '')] }); }
+          if (falta.length) { var n = NOMES[falta[0]]; emitir({ t: 'casa', j: 0, som: 'fim', x: W / 2, y: 300, pontos: 50, texto: '✨ Cômodo arrumado! Agora: ' + n[0], textoEn: '✨ Room done! Next: ' + n[1], textoEs: '✨ ¡Habitación ordenada! Ahora: ' + n[2], festa: true, fala: ['Muito bem! Agora falta ' + n[0].replace(/^\S+ /, ''), 'Well done! Now the ' + n[1].replace(/^\S+ /, ''), '¡Muy bien! Siguiente: ' + n[2].replace(/^\S+ /, '')] }); }
           else { emitir({ t: 'arrumado' }); M.fimEm = tempo + 3500; }
         }
         if (M.fimEm && tempo >= M.fimEm) terminar();
       }
       if (!arrumando && pct >= 1 && !M.chegou100) { M.chegou100 = true; jogadores.forEach(function (jg) { jg.pontos += 100; }); emitir({ t: 'bagunca100' }); }
       ultimaPct = pct;
-      if (duracao && !arrumando && !M.mae && duracao * 1000 - tempo <= 6000) { M.mae = { desde: tempo }; emitir({ t: 'casa', j: 0, som: 'passos', x: W - 260, y: 260, pontos: 0, texto: '🚶‍♀️ A mamãe está chegando! Rápido!', textoEn: '🚶‍♀️ Mom is coming! Hurry!', fala: ['A mamãe está chegando! Rápido!', 'Mom is coming! Hurry!'] }); }
+      if (duracao && !arrumando && !M.mae && duracao * 1000 - tempo <= 6000) { M.mae = { desde: tempo }; emitir({ t: 'casa', j: 0, som: 'passos', x: W - 260, y: 260, pontos: 0, texto: '🚶‍♀️ A mamãe está chegando! Rápido!', textoEn: '🚶‍♀️ Mom is coming! Hurry!', textoEs: '🚶‍♀️ ¡Que viene mamá! ¡Rápido!', fala: ['A mamãe está chegando! Rápido!', 'Mom is coming! Hurry!', '¡Que viene mamá! ¡Rápido!'] }); }
       if (M.mae) M.mae.k = Math.min(1, (tempo - M.mae.desde) / 5000);
       if (duracao && tempo >= duracao * 1000) terminar();
     }
@@ -801,7 +803,7 @@
     function terminar() {
       if (fase === 'fim') return; fase = 'fim';
       var ordem = jogadores.map(function (jg, i) { return { j: i, pontos: Math.round(jg.pontos) }; }).sort(function (a, b) { return b.pontos - a.pontos; });
-      if (M.mae) { M.mae.k = 1; M.mae.viu = true; emitir({ t: 'casa', j: 0, som: 'mamae', x: W - 260, y: 240, pontos: 0, texto: '😱 Que bagunça é essa?!', textoEn: '😱 What is this mess?!', fala: ['Que bagunça é essa?!', 'What is this mess?!'] }); }
+      if (M.mae) { M.mae.k = 1; M.mae.viu = true; emitir({ t: 'casa', j: 0, som: 'mamae', x: W - 260, y: 240, pontos: 0, texto: '😱 Que bagunça é essa?!', textoEn: '😱 What is this mess?!', textoEs: '😱 ¡¿Pero qué desastre es este?!', fala: ['Que bagunça é essa?!', 'What is this mess?!', '¡¿Pero qué desastre es este?!'] }); }
       emitir({ t: 'fim', ordem: ordem });
     }
     /* corpo (câmera) e dedo: só para o boneco andar; esqueleto: pulsos e tornozelos viram toques */
@@ -1097,7 +1099,7 @@
     ctx.fillStyle = '#e53935'; arred(ctx, 24, -78, 12, 22, 4); ctx.fill(); ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.arc(32, -54, 6, 0, PI2); ctx.fill();
     ctx.restore();
     ctx.save(); ctx.font = '700 16px system-ui'; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = 3; ctx.strokeText('Picolé', c.x, y - 132 + c.y * 0); ctx.fillText('Picolé', c.x, y - 132); ctx.restore();
-    if (c.late > 0) balao(ctx, c.x + c.dir * 70, y - 168 + Math.sin(ts / 40) * 3, 'AU AU!');
+    if (c.late > 0) balao(ctx, c.x + c.dir * 70, y - 168 + Math.sin(ts / 40) * 3, L3(['AU AU!', 'WOOF!', '¡GUAU!']));
   }
   function balao(ctx, x, y, txt) {
     ctx.save(); ctx.font = '700 26px system-ui'; var w = ctx.measureText(txt).width + 28; x = clamp(x, w / 2 + 6, W - w / 2 - 6);
@@ -1128,7 +1130,7 @@
     ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 1.5; [-3, 0, 3].forEach(function (d) { ctx.beginPath(); ctx.moveTo(42, -47 + d); ctx.lineTo(56, -49 + d * 2); ctx.stroke(); });
     if (g.miau > 0) { ctx.fillStyle = '#7a1f2e'; ctx.beginPath(); ctx.ellipse(38, -42, 4, 4, 0, 0, PI2); ctx.fill(); }
     ctx.restore();
-    if (g.miau > 0) balao(ctx, g.x + g.dir * 40, g.y - 110, 'MIAU!');
+    if (g.miau > 0) balao(ctx, g.x + g.dir * 40, g.y - 110, L3(['MIAU!', 'MEOW!', '¡MIAU!']));
   }
   function papagaio(ctx, P, ts, fora) {
     // poleiro pendurado no teto (ou num poste, lá fora)
@@ -1147,7 +1149,7 @@
     ctx.fillStyle = '#424242'; ctx.beginPath(); ctx.moveTo(18, -26); ctx.quadraticCurveTo(30, -26, 24, -14); ctx.lineTo(18, -18); ctx.closePath(); ctx.fill();   // bico curvo
     if (!voando) { ctx.strokeStyle = '#757575'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-4, 24); ctx.lineTo(-4, 30); ctx.moveTo(6, 24); ctx.lineTo(6, 30); ctx.stroke(); }
     ctx.restore();
-    if (P.fala > 0) balao(ctx, P.x + 20, P.y - 70, '🦜 ' + P.txt);
+    if (P.fala > 0) balao(ctx, P.x + 20, P.y - 70, '🦜 ' + L3([P.txt, P.txtEn, P.txtEs]));
   }
   function tartaruga(ctx, t, chao, ts) {
     var esc = t.esconde > 0, ps = esc ? 0 : Math.sin(t.passo) * 3;
@@ -1161,8 +1163,8 @@
     ctx.restore();
   }
   /* a mamãe: adulta (maior que a criança), vem andando e falando; no fim balança a cabeça e sacode o dedo */
-  var FALAS_MAE = [['Crianças?', 'Kids?'], ['Que barulho é esse?', 'What is that noise?'], ['Já vou aí!', 'Coming!'], ['O que está acontecendo?', 'What is going on?']];
-  var FALAS_BRAVA = [['Que bagunça é essa?!', 'What is this mess?!'], ['Vamos arrumar!', 'Let\'s tidy up!']];
+  var FALAS_MAE = [['Crianças?', 'Kids?', '¿Niños?'], ['Que barulho é esse?', 'What’s that noise?', '¿Qué es ese ruido?'], ['Já vou aí!', 'Coming!', '¡Ya voy!'], ['O que está acontecendo?', 'What’s going on?', '¿Qué está pasando?']];
+  var FALAS_BRAVA = [['Que bagunça é essa?!', 'What is this mess?!', '¡¿Pero qué desastre es este?!'], ['Vamos arrumar!', 'Let\'s tidy up!', '¡A ordenar!']];
   var MAE_CFG = { cabeca: 'menina', cabelo: 'coque', corCabelo: '#5d4037', cor: '#5e35b1', roupa: 'vestido', acessorio: 'nenhum', sapato: '#37474f', pele: '#ffd9b3' };
   function mae(ctx, M, ts) {
     var m = M.mae, k = m.k || 0, x = W + 120 - k * 320, y = M.chao + 4, viu = !!m.viu, B = typeof self !== 'undefined' && self.Boneco, A = 300;   // adulta: bem maior que a criança (175)
@@ -1176,7 +1178,7 @@
       ctx.save(); ctx.translate(x, y); ctx.fillStyle = '#5e35b1'; ctx.beginPath(); ctx.moveTo(-26, -170); ctx.lineTo(26, -170); ctx.lineTo(48, -64); ctx.lineTo(-48, -64); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ffd9b3'; ctx.beginPath(); ctx.arc(0, -198, 28, 0, PI2); ctx.fill(); ctx.restore();
     }
     // balão de fala
-    var lista = viu ? FALAS_BRAVA : FALAS_MAE, f = lista[Math.floor(ts / 1800) % lista.length], txt = /^en/i.test((typeof navigator !== 'undefined' && navigator.language) || '') && !(typeof BolinhoIdioma !== 'undefined' && !BolinhoIdioma.ingles()) ? f[1] : f[0];
+    var lista = viu ? FALAS_BRAVA : FALAS_MAE, f = lista[Math.floor(ts / 1800) % lista.length], txt = L3(f);
     ctx.save(); ctx.font = '700 24px system-ui'; var tw = ctx.measureText(txt).width + 30, bx = Math.min(W - tw - 10, x - tw + 30), by = y - 375;   // acima da cabeça dela
     ctx.fillStyle = 'rgba(255,255,255,.96)'; arred(ctx, bx, by, tw, 46, 20); ctx.fill(); ctx.beginPath(); ctx.moveTo(x - 30, by + 44); ctx.lineTo(x - 6, by + 70); ctx.lineTo(x - 2, by + 44); ctx.fill();
     ctx.fillStyle = viu ? '#c62828' : '#311b92'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(txt, bx + 15, by + 24); ctx.restore();

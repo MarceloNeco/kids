@@ -117,13 +117,13 @@
       try { dc = pc.createDataChannel('jogo', { ordered: false, maxRetransmits: 0 }); dc.onmessage = function (x) { var d; try { d = JSON.parse(x.data); } catch (e) { return; } d = V(d); if (d) opts.aoTV && opts.aoTV(d); }; } catch (e) { dc = null; }
       pc.onicecandidate = function (ev) { if (ev.candidate) mandar(canal, { t: 'ice', id: id, to: 'tv', c: ev.candidate.toJSON() }); };
       pc.onconnectionstatechange = function () {
-        if (pc.connectionState === 'connected') { status(opts.T('Ao vivo na TV ✅', 'Live on the TV ✅'), 'ok'); opts.aoConectado && opts.aoConectado(); }
-        else if (pc.connectionState === 'failed') { status(opts.T('Caiu. Tentando de novo…', 'Dropped. Retrying…'), 'erro'); setTimeout(function () { if (!fechado) mandar(canal, { t: 'join', id: id, nome: nome }); }, 2000); }
-        else if (pc.connectionState === 'disconnected') status(opts.T('Reconectando…', 'Reconnecting…'));
+        if (pc.connectionState === 'connected') { status(opts.T('Ao vivo na TV ✅', 'Live on the TV ✅', 'En directo en la TV ✅'), 'ok'); opts.aoConectado && opts.aoConectado(); }
+        else if (pc.connectionState === 'failed') { status(opts.T('Caiu. Tentando de novo…', 'Dropped. Retrying…', 'Se ha cortado. Probando otra vez…'), 'erro'); setTimeout(function () { if (!fechado) mandar(canal, { t: 'join', id: id, nome: nome }); }, 2000); }
+        else if (pc.connectionState === 'disconnected') status(opts.T('Reconectando…', 'Reconnecting…', 'Reconectando…'));
       };
       pc.createOffer().then(function (o) { return pc.setLocalDescription(o); })
-        .then(function () { mandar(canal, { t: 'offer', id: id, nome: nome, sdp: pc.localDescription.toJSON() }); status(opts.T('Conectando à TV…', 'Connecting to the TV…')); })
-        .catch(function (e) { status(opts.T('Erro ao conectar: ', 'Connect error: ') + e.message, 'erro'); });
+        .then(function () { mandar(canal, { t: 'offer', id: id, nome: nome, sdp: pc.localDescription.toJSON() }); status(opts.T('Conectando à TV…', 'Connecting to the TV…', 'Conectando con la TV…')); })
+        .catch(function (e) { status(opts.T('Erro ao conectar: ', 'Connect error: ', 'Error al conectar: ') + e.message, 'erro'); });
     }
     /* câmera: primeiro a traseira; o botão 🔄 passa por todas (grande-angular aparece como câmera própria) */
     function ligarCamera(deviceId, lado) {
@@ -156,7 +156,7 @@
     document.addEventListener('visibilitychange', aoVoltar);
     var pronto = ligarCamera().then(function () { return abrirCanal(codigo, receber); }).then(function (c) {
       canal = c; mandar(canal, { t: 'join', id: id, nome: nome }); pedirWakeLock();
-      setTimeout(function () { if (!tvViu && !fechado) status(opts.T('TV não encontrada. Confira o código e se a TV está nesta página.', 'TV not found. Check the code and that the TV is on this page.'), 'erro'); }, 7000);
+      setTimeout(function () { if (!tvViu && !fechado) status(opts.T('TV não encontrada. Confira o código e se a TV está nesta página.', 'TV not found. Check the code and that the TV is on this page.', 'No encuentro la TV. Comprueba el código y que la TV esté en esta página.'), 'erro'); }, 7000);
     });
     function enviarDados(obj) {
       if (dc && dc.readyState === 'open') { try { dc.send(JSON.stringify(obj)); return true; } catch (e) {} }

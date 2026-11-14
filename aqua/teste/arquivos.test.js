@@ -6,18 +6,19 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.1.0 de 14/Nov/2026', () => {
+test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.2.0 de 14/Nov/2026', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const j = JSON.parse(ler('versoes.json'));
   const v = j.versoes[0];
   assert.equal(j.app, 'aqua');
   assert.equal(a, s); assert.equal(v.versao, a);
-  for (const k of ['data', 'hora', 'pt', 'en']) assert.ok(v[k], 'versoes.json sem ' + k);
+  for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.match(v.data, /^\d{2}\/[A-Z][a-z]{2}\/\d{4}$/);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
+  assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
   assert.equal(ler('app.js').match(/APP_DATA = '([^']+)'/)[1], v.data);
-  assert.equal(a, '0.1.0'); assert.equal(v.data, '14/Nov/2026');
+  assert.equal(a, '0.2.0'); assert.equal(v.data, '14/Nov/2026');
 });
 
 test('sw.js guarda todos os arquivos publicados (e os de fora, com ../)', () => {
@@ -47,7 +48,7 @@ test('manifest: instalável, escopo da pasta, ícones existem', () => {
   }
 });
 
-test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN', () => {
+test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES, sem botão de idioma próprio', () => {
   const html = ler('index.html');
   assert.match(html, /Content-Security-Policy/);
   assert.ok(!/<script(?![^>]*src)[^>]*>/.test(html), 'script inline');
@@ -56,7 +57,8 @@ test('index.html: CSP sem script inline, scripts existem, interruptor e textos P
   assert.match(html, /<script src="\.\.\/recursos\.js" data-app="kids"/);
   assert.match(html, /data-recurso="aqua"/);
   assert.match(html, /<link rel="manifest" href="manifest\.webmanifest">/);
-  for (const m of html.matchAll(/data-(?:t|rotulo)="([^"]*)"/g)) assert.equal(m[1].split('|').length, 2, 'texto sem as duas línguas: ' + m[1]);
+  for (const m of html.matchAll(/data-(?:t|rotulo)="([^"]*)"/g)) assert.equal(m[1].split('|').length, 3, 'texto sem as três línguas: ' + m[1]);
+  assert.ok(!html.includes('btLingua'), 'o idioma é escolhido só na estante');
 });
 
 test('ids usados no app.js existem no index.html', () => {
@@ -64,9 +66,12 @@ test('ids usados no app.js existem no index.html', () => {
   for (const m of ler('app.js').matchAll(/\$\('([A-Za-z0-9]+)'\)/g)) assert.ok(html.includes('id="' + m[1] + '"'), 'falta id ' + m[1]);
 });
 
-test('textos t(pt, en) do app sempre nas duas línguas', () => {
+test('textos t(pt, en, es) do app sempre nas três línguas', () => {
   const js = ler('app.js');
   for (const m of js.matchAll(/\bt\('((?:[^'\\]|\\.)*)'\s*\)/g)) assert.fail('t() só com uma língua: ' + m[1]);
+  for (const m of js.matchAll(/\bt\('((?:[^'\\]|\\.)*)',\s*'((?:[^'\\]|\\.)*)'\s*\)/g)) assert.fail('t() sem o espanhol: ' + m[1]);
+  const D = ler('desenho.js');
+  for (const m of D.matchAll(/en: '[^']*'(, es: '[^']*')?/g)) assert.ok(m[1], 'desenho.js sem o espanhol: ' + m[0]);
 });
 
 test('carrega o instalar.js comum só com ?instalar', () => {
