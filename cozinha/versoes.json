@@ -2,6 +2,21 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.11.0",
+      "data": "14/Nov/2026",
+      "hora": "16:20:00",
+      "pt": [
+        "🛒 O mercadinho por dentro tem setores, como um mercado de verdade: hortifrúti nos caixotes, geladeira, açougue, padaria e as prateleiras da mercearia. O setor que tem o que falta brilha com uma seta.",
+        "🏠 Cozinha em 3D: enquanto você escolhe o utensílio, aparece a cozinha inteira (pia, fogão com forno, geladeira, ilha e mesinha, com piso xadrez), e o cozinheirinho anda até o lugar certo antes de cada passo.",
+        "🥄 Os utensílios ficam pendurados numa barra de madeira, como na cozinha da vovó."
+      ],
+      "en": [
+        "🛒 The shop inside has sections, like a real supermarket: fruit and veg in crates, fridge, butcher, bakery and the pantry shelves. The section with what you still need glows with an arrow.",
+        "🏠 3D kitchen: while you pick the tool, the whole kitchen shows up (sink, stove with oven, fridge, island and a little table, with a checkered floor), and the little chef walks to the right spot before each step.",
+        "🥄 The kitchen tools hang from a wooden bar, like in grandma's kitchen."
+      ]
+    },
+    {
       "versao": "0.10.0",
       "data": "14/Nov/2026",
       "hora": "15:30:00",

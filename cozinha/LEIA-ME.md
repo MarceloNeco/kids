@@ -7,7 +7,11 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.10.0** (14/Nov/2026) — **padaria, feira e jaboticabeira**: a vila tem 10 lugares (5 colunas deitado e
+Versão atual: **0.11.0** (14/Nov/2026) — **parte 3**: o **mercadinho por dentro** com setores (`SETORES`: hortifrúti,
+geladeira, açougue, padaria, mercearia; o que tem algo da lista brilha; deitado, cada produto só com foto e preço); a
+**cozinha "casinha cortada"** (`vila.cozinhaDiorama`) aparece no palco enquanto a criança escolhe o utensílio, e ao
+acertar o cozinheirinho anda até a estação (`estacaoDe`: pia, fogão, geladeira, bancada, mesa; `chefAte`); utensílios
+pendurados numa barra. Na 0.10.0 — **padaria, feira e jaboticabeira**: a vila tem 10 lugares (5 colunas deitado e
 no tablet); **Padaria do Seu Joaquim** (pão, leite, queijo, manteiga: `padaria: true` no ingrediente) e **Feira da Dona
 Rosa** (frutas e legumes) funcionam como o mercadinho (`MINI.mercado(area, loja)`, `logica.vende`, `LOJAS`); as moedas
 contam o que só se compra (`soCompra`); **jaboticabeira** no pomar (forma `tronco`, a fruta grudada no tronco) e a

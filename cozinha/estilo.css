@@ -625,7 +625,8 @@ a { color: #1d6fb8; }
 /* telas entram deslizando; cartões, ingredientes e produtos aparecem um depois do outro, com pulinho */
 .tela.ativa > :not(.cesta) { animation: telaEntra .38s cubic-bezier(.25, 1.3, .5, 1) both; }
 @keyframes telaEntra { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-.tela.ativa .rec, .tela.ativa .lista-ing li, .tela.ativa .produto, .tela.ativa .pedido { animation: popEntra .45s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: calc(var(--i, 0) * 45ms + .1s); }
+.tela.ativa .rec, .tela.ativa .lista-ing li, .tela.ativa .produto, .tela.ativa .pedido { animation: popEntra .45s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: calc(min(var(--i, 0), 10) * 45ms + .1s); }
+@media (prefers-reduced-motion: reduce) { .tela.ativa .rec, .tela.ativa .lista-ing li, .tela.ativa .produto, .tela.ativa .pedido { animation-delay: 0s !important; } }
 @keyframes popEntra { from { opacity: 0; transform: scale(.5) translateY(14px); } to { opacity: 1; transform: none; } }
 .rec .rec-foto { animation: respira 3.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -.4s); }
 @keyframes respira { 0%, 100% { transform: rotate(-3deg) scale(1); } 50% { transform: rotate(3deg) scale(1.05); } }
@@ -795,3 +796,54 @@ a { color: #1d6fb8; }
 .bloco .v-bandeira { transform-box: fill-box; transform-origin: 50% 0; animation: bandeira 1.4s ease-in-out infinite alternate; }
 .bloco .v-bandeira:nth-child(2n) { animation-delay: -.7s; }
 @keyframes bandeira { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+
+/* ---------- v0.11.0: cozinha "casinha cortada" (vila.cozinhaDiorama) com o cozinheirinho indo até a estação ---------- */
+.palco .diorama { position: relative; width: min(100%, 26rem); margin: 0 auto; }
+.palco .diorama .diorama-svg { width: 100%; height: auto; display: block; }
+.palco .diorama + .pergunta { margin-top: -6px; }
+.chef-cz { position: absolute; width: 11%; aspect-ratio: 40 / 56; transform: translate(-50%, -96%); z-index: 2; pointer-events: none;
+  transition: left var(--dur, .6s) ease-in-out, top var(--dur, .6s) ease-in-out; }
+.chef-cz .boneco-svg { width: 100%; height: 100%; display: block; overflow: visible; transform-origin: 50% 100%; }
+.chef-cz.esq .boneco-svg { transform: scaleX(-1); }
+.chef-cz .v-perna { transform-box: fill-box; transform-origin: 50% 0; }
+.chef-cz.anda .v-pe1 { animation: passo .28s ease-in-out infinite alternate; } .chef-cz.anda .v-pe2 { animation: passo .28s ease-in-out infinite alternate-reverse; }
+.diorama .est { transition: filter .3s; }
+.diorama.em-pia .est-pia, .diorama.em-fogao .est-fogao, .diorama.em-geladeira .est-geladeira, .diorama.em-bancada .est-bancada, .diorama.em-mesa .est-mesa { filter: drop-shadow(0 0 6px #fff36b) drop-shadow(0 0 3px #ffd23f); }
+.diorama .vidro-forno { animation: brasa 1.4s ease-in-out infinite alternate; }
+.diorama .agua-pia { stroke-dasharray: 3 3; animation: aguaCorre .5s linear infinite; }
+@media (orientation: landscape) and (max-height: 32rem) { .palco .diorama { width: min(100%, 15rem); } }
+/* mercadinho por dentro (v0.11.0): setores com cara de mercado de verdade, piso xadrez e placas penduradas */
+.prateleira.mercado-setores { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 12px; border-radius: 22px;
+  background: repeating-conic-gradient(#f4f1ea 0 25%, #e3ddd0 0 50%) 0 0 / 36px 36px; box-shadow: inset 0 0 0 4px #d9cdb8; align-items: start; }
+.setor { position: relative; border-radius: 16px; padding: 22px 6px 8px; box-shadow: 0 5px 0 rgba(0, 0, 0, .14); }
+.setor .placa { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 2px solid var(--borda); border-radius: 999px;
+  padding: 1px 10px; font-size: .86rem; box-shadow: 0 2px 0 var(--borda); }
+.setor .itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.8rem, 1fr)); gap: 6px; }
+.setor .produto { font-size: .78rem; border-width: 2px; padding: 4px 2px; }
+.setor .produto .ic { font-size: 1.9rem; }
+.s-hortifruti { background: repeating-linear-gradient(0deg, #c98a4b 0 6px, #b5763a 6px 8px, #d99a5b 8px 30px); }   /* caixotes de madeira */
+.s-geladeira { background: linear-gradient(135deg, #e8f7ff, #bfe6ff 60%, #a6d8f5); border: 3px solid #9aa5b4; }
+.s-geladeira::after { content: ''; position: absolute; left: 8%; top: 18%; width: 20%; height: 60%; background: linear-gradient(90deg, rgba(255, 255, 255, .7), transparent); border-radius: 8px; pointer-events: none; }
+.s-acougue { background: repeating-conic-gradient(#fff 0 25%, #ffd9d6 0 50%) 0 0 / 22px 22px; border: 3px solid #e84a3c; }
+.s-padaria { background: linear-gradient(180deg, #ffe0b3, #f6c27a); border: 3px solid #c98a4b; }
+.s-mercearia { background: repeating-linear-gradient(180deg, #fff8ee 0 74px, #b07a44 74px 80px); border: 3px solid #b07a44; }
+.setor.tem-falta { box-shadow: 0 0 0 4px #bdf2d4, 0 5px 0 var(--verde); }
+.setor.tem-falta .placa { border-color: var(--verde); }
+.seta-setor { display: inline-block; animation: setaPula .9s ease-in-out infinite; font-size: .8rem; }
+@media (orientation: landscape), (min-width: 46rem) { .prateleira.mercado-setores { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; padding: 14px 10px 10px; } .s-hortifruti, .s-mercearia { grid-column: 1 / -1; } }
+/* utensílios pendurados numa barra (v0.11.0, referência do dono): a bandeja vira uma barra de madeira com ganchos */
+.utensilios { background: linear-gradient(180deg, #b07a44 0 10px, transparent 10px), linear-gradient(180deg, #fff8ee, #f3dcc0); padding-top: 18px; }
+.utensilios .utensilio { position: relative; overflow: visible; }
+.utensilios .utensilio::before { content: ''; position: absolute; left: 50%; top: -12px; width: 2px; height: 12px; background: #8a5a2b; transform: translateX(-50%); }
+.utensilios .utensilio::after { content: ''; position: absolute; left: 50%; top: -15px; width: 8px; height: 8px; border: 2px solid #7d8a99; border-radius: 50%; transform: translateX(-50%); background: transparent; }
+@media (orientation: landscape) and (max-height: 32rem) {
+  /* deitado: o mercado inteiro na tela — setores lado a lado, cada produto só com a foto e o preço */
+  .prateleira.mercado-setores { display: flex; flex-wrap: wrap; gap: 12px 6px; padding: 12px 6px 6px; align-content: flex-start; }
+  .prateleira.mercado-setores .setor { flex: 1 1 auto; grid-column: auto; padding: 12px 4px 4px; border-width: 2px; }
+  .setor .placa { font-size: .66rem; top: -9px; padding: 0 6px; }
+  .setor .itens { display: flex; flex-wrap: nowrap; gap: 4px; justify-content: center; }
+  .setor .produto { width: 2.9rem; min-width: 0; min-height: 0; padding: 2px 1px 1px; border-radius: 10px; }
+  .setor .produto .pn { display: none; }
+  .setor .produto .ic { font-size: 1.3rem; } .setor .produto .preco { font-size: .62rem; }
+  .s-mercearia { background: #fff8ee; }
+}
