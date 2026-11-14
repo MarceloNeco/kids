@@ -497,3 +497,25 @@ test('👨👩 quem joga junto só aparece com 1 pessoa, na Bagunça de bolas e 
   assert.equal(partida({ modo: 'chuta' }).estado().parente, null);
   assert.equal(partida({ modo: 'corta' }).estado().parente, null);
 });
+
+/* ⬇️ abaixar também no 💪 Difícil (boneco vai até lá): ↓ no teclado ou o dedo parado embaixo dos pés */
+test('⬇️ Difícil: com ↓ o boneco abaixa e o galho passa por cima; soltando, levanta', () => {
+  const p = vaiPartida('pula'); limpar(p);
+  p.teclas(0, { baixo: true }); rodar(p, 100);
+  assert.equal(p.estado().jogadores[0].corpo.abaixado, true, 'abaixou');
+  const ev = []; p.obstaculo({ tipo: 'alto', x: 900, vx: -500 }, 0);
+  for (let t = 0; t < 2500; t += 16) { p.avancar(16); ev.push(...p.eventos()); }
+  assert.ok(ev.some(e => e.t === 'desviou' && e.tipo === 'alto'), 'desviou do galho');
+  assert.ok(!ev.some(e => e.t === 'bateu'), 'não bateu');
+  p.teclas(0, { baixo: false }); rodar(p, 100);
+  assert.equal(p.estado().jogadores[0].corpo.abaixado, false, 'levantou');
+});
+test('⬇️ Difícil: dedo parado embaixo dos pés abaixa; arrastando pelo chão, ele anda sem abaixar', () => {
+  const p = vaiPartida('corta'); limpar(p);
+  const ab = () => p.estado().jogadores[0].corpo.abaixado;
+  p.alvo(0, 0.9, 0.97); let abaixouAndando = false;   // dedo no chão, longe: ele vai andando
+  for (let t = 0; t < 400; t += 16) { p.avancar(16); limpar(p); abaixouAndando = abaixouAndando || ab(); }
+  assert.ok(!abaixouAndando, 'andando não abaixa');
+  rodar(p, 2500); assert.equal(ab(), true, 'chegou e o dedo ficou nos pés: abaixou');
+  p.alvo(0, null); rodar(p, 100); assert.equal(ab(), false, 'soltou o dedo: levanta');
+});
