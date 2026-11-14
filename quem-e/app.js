@@ -5,7 +5,7 @@
    voz e a meleca escolhida. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.1';
+  var APP_VERSION = '0.4.1';
   var APP_DATA = '14/Nov/2026', APP_DATA_EN = 'Nov/14/2026', APP_DATA_ES = '14/nov/2026';
   var L = window.QELogica, QP = window.QEPartida, CARAS = window.QECaras, MEL = window.QEMelecas, REDE = window.QERede;
   var $ = function (id) { return document.getElementById(id); };
@@ -119,7 +119,7 @@
   }
   function voltarInicio() { if (dentro) { try { history.back(); } catch (e) { aoVoltar(); } } else aoVoltar(); }
   function aoVoltar() {
-    dentro = false; clearTimeout(timerMeleca); calar(); sairDaSala(); partida = null; desligarLupa();
+    dentro = false; clearTimeout(timerMeleca); calar(); cancelarPertoQuieto(); sairDaSala(); partida = null; desligarLupa();
     if (window.QEAdivinhaTela) QEAdivinhaTela.parar(); fecharSobreposicoes(); mostrar('inicio');
     setTimeout(function () { $(pref.meleca === 'blue' ? 'btBlue' : 'btPink').focus(); }, 30);
   }
@@ -147,7 +147,7 @@
   Array.prototype.forEach.call(document.querySelectorAll('.nivel'), function (b) {
     b.addEventListener('click', function () {
       nivel = b.getAttribute('data-nivel');
-      if (modo === 'rede') criarSala();
+      if (modo === 'rede') { if (pertoNivel) pertoCriar(nivel, null); else criarSala(); }
       else if (modo === 'passar') pedirNomes();
       else novaPartida();
       telaCheia();
@@ -590,12 +590,12 @@
     try { var u = new URL(location.href); if (cod) u.searchParams.set('sala', cod); else u.searchParams.delete('sala'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) { /* ok */ }
   }
   function telaRede() {
-    sairDaSala();
+    sairDaSala(); pertoNivel = false;
     $('redeInicio').hidden = false; $('redeSala').hidden = true; $('codigo').value = '';
-    $('redeStatus').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Sem internet, jogue "Passando o aparelho" ou contra a meleca.', '📡 No internet right now. Offline, play "Pass the device" or against the slime.', '📡 Ahora no hay internet. Sin internet, juega a "Pasando el móvil" o contra el slime.') : '';
+    $('redeStatus').textContent = navigator.onLine === false ? t('📡 Sem internet agora. Sem internet, jogue 📶 pertinho, "Passando o aparelho" ou contra a meleca.', '📡 No internet right now. Offline, play 📶 nearby, "Pass the device" or against the slime.', '📡 Ahora no hay internet. Sin internet, juega 📶 de cerca, a "Pasando el móvil" o contra el slime.') : '';
     mostrar('rede');
   }
-  $('btCriarSala').addEventListener('click', function () { mostrar('niveis'); });
+  $('btCriarSala').addEventListener('click', function () { pertoNivel = false; mostrar('niveis'); });
   $('btEntrarSala').addEventListener('click', function () { entrarSala($('codigo').value); });
   $('codigo').addEventListener('keydown', function (e) { if (e.key === 'Enter') entrarSala(this.value); });
   $('codigo').addEventListener('input', function () { this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); });
@@ -626,21 +626,28 @@
     if (atual !== 'rede') mostrar('rede');
     conectar(cod, volta ? { dados: guardado.dados } : { id: REDE.idNovo(), codigo: cod, host: false });
   }
+  // op.conexao (📶 Jogar pertinho): canal direto já aberto com o outro aparelho; nada fica guardado para recarregar
   function conectar(codigo, op) {
+    var direto = op.conexao || null;
     sala = REDE.criar({
-      id: op.id, codigo: codigo, host: op.host, nivel: op.nivel, semente: op.semente, dados: op.dados,
+      id: op.id, codigo: codigo, host: op.host, nivel: op.nivel, semente: op.semente, corpo: op.corpo, dados: op.dados,
       mandar: function (m) { if (canal) canal.mandar(m); },
-      salvar: function (d) { gravarSessao({ codigo: codigo, dados: d }); },
+      salvar: function (d) { if (!direto) gravarSessao({ codigo: codigo, dados: d }); },
       aoMudar: redeMudou
     });
-    enderecoSala(codigo);
-    abrirCanal(codigo);
+    sala.perto = !!direto;
+    if (!direto) enderecoSala(codigo);
+    abrirCanal(codigo, direto);
     clearInterval(relogio); relogio = setInterval(function () { if (sala) sala.tique(); }, 500);
     if (sala.partida) redeMudou();
   }
-  function abrirCanal(codigo) {
+  function abrirCanal(codigo, direto) {
     var minha = sala;
-    REDE.abrir(codigo, function (m) { if (sala === minha) minha.receber(m); }, function () { if (sala === minha) setTimeout(function () { if (sala === minha) abrirCanal(codigo); }, 2000); })
+    REDE.abrir(codigo, function (m) { if (sala === minha) minha.receber(m); }, function () {
+      if (sala !== minha) return;
+      if (direto) { caiuPerto(minha); return; }
+      setTimeout(function () { if (sala === minha) abrirCanal(codigo); }, 2000);
+    }, direto)
       .then(function (c) { if (sala !== minha) { c.fechar(); return; } canal = c; minha.tique(); })
       .catch(function () {
         if (sala !== minha) return;
@@ -651,7 +658,7 @@
   function sairDaSala() {
     if (!sala) return;
     try { sala.sair(); } catch (e) { /* ok */ }
-    clearInterval(relogio); relogio = null;
+    clearInterval(relogio); relogio = null; manterTelaAcesa(false);
     if (canal) { var c = canal; setTimeout(function () { c.fechar(); }, 300); }
     canal = null; sala = null;
     gravarSessao(null); enderecoSala(null);
@@ -687,6 +694,221 @@
   function esperarOutroSegredo() {
     $('tituloSegredo').textContent = t('Pronto! Esperando a outra pessoa escolher… 🤫', 'Done! Waiting for the other player to pick… 🤫', '¡Listo! Esperando a que la otra persona elija… 🤫');
     $('btConfirmarSegredo').disabled = true; $('btSortear').disabled = true;
+  }
+
+  // ---------- 📶 Jogar pertinho (sem internet): dois celulares no mesmo Wi-Fi, ligados direto ----------
+  // Peças da Batalha Naval, usadas como estão: ../batalha-naval/pertinho.js (a ligação direta e o código curto) e
+  // ../batalha-naval/qr.js (desenhar e ler o QR, com as bibliotecas de ../batalha-naval/libs/). O código mostrado
+  // ganha "QE" na frente: assim um código da Batalha Naval aqui (ou o nosso lá) avisa em vez de ligar errado.
+  // Depois de ligados, a partida é a mesma do "cada um no seu celular" (rede.js com o canal direto).
+  var P = window.BNPertinho, Q = window.BNQR, PREFIXO = 'QE', LIBS = '../batalha-naval/libs/';
+  var perto = null, pertoNivel = false, trava = null;      // perto = { papel: 'criar' | 'entrar', nivel, religar, volta, ses, leitor, codigo, qr, etapa }
+  var ESPERA_ABRIR = TESTE ? 4000 : 20000, ESPERA_DICA = TESTE ? 4000 : 45000;
+  function libsQR() { return Promise.all([Q.carregar(LIBS + 'qrcode.js', 'qrcode'), Q.carregar(LIBS + 'jsQR.js', 'jsQR')]); }
+  function manterTelaAcesa(liga) {    // tela apagada derruba a ligação direta: enquanto joga pertinho, a tela fica acesa
+    if (!liga) { if (trava) { try { trava.release(); } catch (e) { /* ok */ } } trava = null; return; }
+    if (trava || document.hidden || !navigator.wakeLock) return;
+    navigator.wakeLock.request('screen').then(function (w) { trava = w; w.addEventListener('release', function () { if (trava === w) trava = null; }); }).catch(function () { /* sem trava */ });
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && sala && sala.perto) manterTelaAcesa(true); });
+  function janelaAviso(op) {          // { titulo, texto, botoes: [{ t, fn }] }
+    if (!window.SolverJanela) return;
+    var caixa = document.createElement('div'), h = document.createElement('h2'), p = document.createElement('p'), j = null;
+    caixa.className = 'qe-aviso'; h.textContent = op.titulo; p.textContent = op.texto; caixa.appendChild(h); caixa.appendChild(p);
+    op.botoes.forEach(function (b, i) {
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = i ? 'medio-bt' : 'grande'; bt.textContent = b.t;
+      bt.addEventListener('click', function () { if (j) j.fechar('ok'); SolverJanela.quandoQuieto(b.fn); });
+      caixa.appendChild(bt);
+    });
+    j = SolverJanela.abrir({ conteudo: caixa, classe: 'qe-janela' });
+  }
+  function semWebRTC() { return !P || !Q || !P.temWebRTC(); }
+  $('btPerto').addEventListener('click', function () {
+    modo = 'rede';
+    $('pertoMsg').textContent = semWebRTC() ? t('😕 Este navegador não consegue ligar dois aparelhos direto. Use o Chrome (Android) ou o Safari (iPhone) atualizados.', "😕 This browser can't link two devices directly. Use an up-to-date Chrome (Android) or Safari (iPhone).", '😕 Este navegador no puede conectar dos aparatos directamente. Usa Chrome (Android) o Safari (iPhone) actualizados.') : '';
+    mostrar('perto');
+  });
+  $('btPertoCriar').addEventListener('click', function () { if (semWebRTC()) return; modo = 'rede'; pertoNivel = true; mostrar('niveis'); });
+  $('btPertoEntrar').addEventListener('click', function () { if (semWebRTC()) return; modo = 'rede'; pertoEntrar(null); });
+
+  function limparPerto(s) {
+    if (!s) return;
+    clearTimeout(s.tempo); clearTimeout(s.dica);
+    if (s.leitor) { s.leitor.parar(); s.leitor = null; }
+    if (s.ses && !s.conectou) s.ses.fechar();
+  }
+  function cancelarPertoQuieto() { var s = perto; perto = null; limparPerto(s); }
+  // cancelar: volta para onde estava (no meio de uma partida que caiu: para ela, com o aviso de novo)
+  function cancelarPerto() {
+    var s = perto; perto = null; limparPerto(s);
+    if (s && s.religar && sala === s.religar) { mostrar(s.volta); if (s.volta === 'jogo') pintar(); caiuPerto(s.religar); return; }
+    mostrar('perto');
+  }
+  $('btPertoCancelar1').addEventListener('click', cancelarPerto);
+  $('btPertoCancelar2').addEventListener('click', cancelarPerto);
+  $('btPertoDeNovo').addEventListener('click', function () { var s = perto; if (!s) return; if (s.papel === 'criar') pertoCriar(s.nivel, s.religar); else pertoEntrar(s.religar); });
+
+  function telaCodigo(titulo, dica) {
+    $('pertoCodTitulo').textContent = titulo; $('pertoCodDica').textContent = dica;
+    $('pertoCodStatus').textContent = t('⏳ Preparando o código…', '⏳ Getting the code ready…', '⏳ Preparando el código…');
+    $('pertoCodTexto').textContent = ''; $('btPertoLerResposta').hidden = true; $('btPertoDeNovo').hidden = true;
+    var cv = $('pertoQR'); cv.width = cv.height = 1; cv.hidden = true;
+    mostrar('pertoCodigo');
+  }
+  function mostrarQR(s, codigo, status) {
+    s.codigo = PREFIXO + codigo; $('pertoCodTexto').textContent = s.codigo; $('pertoCodStatus').textContent = status;
+    return libsQR().then(function () { return Q.desenhar($('pertoQR'), s.codigo); }).then(function (info) { if (perto !== s) return; s.qr = info; $('pertoQR').hidden = false; },
+      function () { if (perto === s) $('pertoCodStatus').textContent = t('😕 Não consegui desenhar o QR. Use o código em texto aqui embaixo.', "😕 Couldn't draw the QR. Use the text code below.", '😕 No he podido dibujar el QR. Usa el código en texto de aquí abajo.'); });
+  }
+  $('btPertoCopiar').addEventListener('click', function () {
+    var txt = $('pertoCodTexto').textContent; if (!txt) return;
+    var marcar = function () { var sel = window.getSelection(), r = document.createRange(); r.selectNodeContents($('pertoCodTexto')); sel.removeAllRanges(); sel.addRange(r); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { $('pertoCodStatus').textContent = t('📋 Código copiado!', '📋 Code copied!', '📋 ¡Código copiado!'); }, marcar); else marcar();
+  });
+
+  // quem cria (religar = a sala que caiu: ligar de novo sem perder a partida)
+  function pertoCriar(nv, religar) {
+    limparPerto(perto);
+    var s = perto = { papel: 'criar', nivel: nv, religar: religar || null, volta: religar ? atual : null, etapa: 'oferta' };
+    telaCodigo(t('1️⃣ Mostre este código para o outro celular', '1️⃣ Show this code to the other phone', '1️⃣ Enseña este código al otro móvil'),
+      religar ? t('No outro celular: toque em 🔁 Ligar de novo e aponte a câmera para este quadrado.', 'On the other phone: tap 🔁 Link again and point the camera at this square.', 'En el otro móvil: toca 🔁 Volver a conectar y apunta la cámara a este cuadrado.')
+        : t('No outro celular: 📱 Cada um no seu celular → 📶 Jogar pertinho → 📷 Entrar pertinho, e aponte a câmera para este quadrado.', 'On the other phone: 📱 Each on their own phone → 📶 Play nearby → 📷 Join nearby, and point the camera at this square.', 'En el otro móvil: 📱 Cada uno con su móvil → 📶 Jugar de cerca → 📷 Entrar de cerca, y apunta la cámara a este cuadrado.'));
+    $('pertoCodStatus').textContent = t('⏳ Preparando o código… (se pedir a câmera, toque em Permitir)', '⏳ Getting the code ready… (if it asks for the camera, tap Allow)', '⏳ Preparando el código… (si pide la cámara, toca Permitir)');
+    P.criar({ camera: true }).then(function (ses) {
+      if (perto !== s) { ses.fechar(); return; }
+      s.ses = ses;
+      ses.aberta.then(function (cx) { conectou(s, cx); }, function () { falhouPerto(s); });
+      mostrarQR(s, ses.codigo, t('Quando o outro celular mostrar o código dele, toque no botão aqui embaixo.', 'When the other phone shows its code, tap the button below.', 'Cuando el otro móvil enseñe su código, toca el botón de aquí abajo.'));
+      $('btPertoLerResposta').hidden = false;
+    }, function (e) { erroPerto(s, e); });
+  }
+  $('btPertoLerResposta').addEventListener('click', function () {
+    var s = perto; if (!s || s.papel !== 'criar' || !s.ses) return;
+    s.etapa = 'lerResposta';
+    abrirLeitor(s, t('3️⃣ Leia o código do outro celular', "3️⃣ Scan the other phone's code", '3️⃣ Lee el código del otro móvil'), t('Aponte a câmera para o quadrado que apareceu no outro celular.', 'Point the camera at the square on the other phone.', 'Apunta la cámara al cuadrado que ha salido en el otro móvil.'));
+  });
+  // quem entra
+  function pertoEntrar(religar) {
+    limparPerto(perto);
+    var s = perto = { papel: 'entrar', religar: religar || null, volta: religar ? atual : null, etapa: 'lerOferta' };
+    abrirLeitor(s, t('2️⃣ Leia o código de quem criou', '2️⃣ Scan the creator’s code', '2️⃣ Lee el código de quien ha creado la partida'), t('Aponte a câmera para o quadrado preto e branco na tela do outro celular.', 'Point the camera at the black and white square on the other phone.', 'Apunta la cámara al cuadrado blanco y negro de la pantalla del otro móvil.'));
+  }
+  function abrirLeitor(s, titulo, dica) {
+    $('pertoLerTitulo').textContent = titulo; $('pertoLerDica').textContent = dica;
+    $('pertoLerStatus').textContent = t('📷 Abrindo a câmera…', '📷 Opening the camera…', '📷 Abriendo la cámara…');
+    $('pertoColar').value = ''; $('pertoVideo').hidden = false;
+    mostrar('pertoLer');
+    libsQR().then(function () { return Q.ler($('pertoVideo'), lerCodigo); }).then(function (leitor) {
+      if (perto !== s) { leitor.parar(); return; }
+      s.leitor = leitor; if (!s.avisou && (s.etapa === 'lerOferta' || s.etapa === 'lerResposta')) $('pertoLerStatus').textContent = t('🔎 Procurando o código…', '🔎 Looking for the code…', '🔎 Buscando el código…');
+    }, function (e) {
+      if (perto !== s) return;
+      $('pertoLerStatus').textContent = e && e.codigo === 'negado'
+        ? t('📷 A câmera não foi liberada. Libere a câmera para este site (no cadeado ao lado do endereço) ou cole o código em texto aqui embaixo.', '📷 The camera was not allowed. Allow the camera for this site (padlock next to the address) or paste the text code below.', '📷 No se ha permitido la cámara. Permite la cámara para esta web (en el candado junto a la dirección) o pega el código en texto aquí abajo.')
+        : t('📷 Não achei a câmera. Cole o código em texto aqui embaixo.', "📷 Couldn't find a camera. Paste the text code below.", '📷 No he encontrado la cámara. Pega el código en texto aquí abajo.');
+      $('pertoColarCaixa').open = true;
+    });
+  }
+  $('btPertoUsar').addEventListener('click', function () { lerCodigo($('pertoColar').value); });
+
+  // um código lido pela câmera (ou colado): o mesmo caminho para os dois
+  function lerCodigo(texto) {
+    var s = perto; if (!s || (s.etapa !== 'lerOferta' && s.etapa !== 'lerResposta')) return false;
+    var bruto = String(texto || '').replace(/\s+/g, '').toUpperCase(), r;
+    if (bruto.slice(0, PREFIXO.length) !== PREFIXO) { avisoCodigo(/^BN\d/.test(bruto) ? 'outro' : 'lixo'); return false; }
+    bruto = bruto.slice(PREFIXO.length);
+    try { r = P.deCodigo(bruto); } catch (e) { avisoCodigo(e.codigo); return false; }
+    var quero = s.etapa === 'lerOferta' ? 'offer' : 'answer';
+    if (r.type !== quero) { avisoCodigo(quero === 'offer' ? 'resposta' : 'oferta'); return false; }
+    Som.gosma(); if (navigator.vibrate) try { navigator.vibrate(40); } catch (e) { /* ok */ }
+    if (s.etapa === 'lerResposta') {
+      s.etapa = 'conectando';
+      if (s.leitor) { s.leitor.parar(); s.leitor = null; }
+      $('pertoVideo').hidden = true;
+      $('pertoLerStatus').textContent = t('🔗 Código lido! Ligando os dois celulares…', '🔗 Code scanned! Linking the two phones…', '🔗 ¡Código leído! Conectando los dos móviles…');
+      s.ses.aceitar(bruto).then(function () {
+        if (perto !== s) return;
+        s.tempo = setTimeout(function () { if (perto === s && !s.conectou) falhouPerto(s); }, ESPERA_ABRIR);
+      }, function () { if (perto === s) { s.etapa = 'lerResposta'; avisoCodigo('lixo'); } });
+      return true;
+    }
+    s.etapa = 'resposta';
+    $('pertoLerStatus').textContent = t('✅ Código lido! Preparando a resposta…', '✅ Code scanned! Getting the answer ready…', '✅ ¡Código leído! Preparando la respuesta…');
+    // a câmera continua ligada enquanto o aparelho junta os endereços (assim ele mostra o endereço de verdade na rede)
+    P.entrar(bruto, { camera: !s.leitor }).then(function (ses) {
+      if (s.leitor) { s.leitor.parar(); s.leitor = null; }
+      if (perto !== s) { ses.fechar(); return; }
+      s.ses = ses;
+      ses.aberta.then(function (cx) { conectou(s, cx); }, function () { falhouPerto(s); });
+      telaCodigo(t('4️⃣ Agora mostre este código para quem criou', '4️⃣ Now show this code to the creator', '4️⃣ Ahora enseña este código a quien ha creado la partida'),
+        t('Quem criou toca em "📷 Agora ler o código do outro celular" e aponta a câmera para cá.', 'The creator taps "📷 Now scan the other phone\'s code" and points the camera here.', 'Quien ha creado la partida toca "📷 Ahora leer el código del otro móvil" y apunta la cámara aquí.'));
+      mostrarQR(s, ses.codigo, t('⏳ Esperando o outro celular ler este código…', '⏳ Waiting for the other phone to scan this code…', '⏳ Esperando a que el otro móvil lea este código…'));
+      s.dica = setTimeout(function () {
+        if (perto !== s || s.conectou) return;
+        $('pertoCodStatus').textContent = t('🤔 Ainda não ligou. Os dois estão no MESMO Wi-Fi (o do celular-roteador)? Wi-Fi de avião, hotel ou loja costuma não deixar um aparelho ver o outro. Se quem criou já leu este código, toquem em Começar de novo nos dois.', "🤔 Not linked yet. Are both on the SAME Wi-Fi (the hotspot phone's)? Plane, hotel or shop Wi-Fi often doesn't let devices see each other. If the creator already scanned this code, tap Start over on both.", '🤔 Todavía no se han conectado. ¿Estáis los dos en la MISMA wifi (la del móvil que comparte conexión)? La wifi de un avión, un hotel o una tienda no suele dejar que un aparato vea al otro. Si quien ha creado la partida ya ha leído este código, tocad Empezar de nuevo en los dos.');
+        $('btPertoDeNovo').hidden = false;
+      }, ESPERA_DICA);
+    }, function (e) { if (s.leitor) { s.leitor.parar(); s.leitor = null; } erroPerto(s, e); });
+    return true;
+  }
+  function avisoCodigo(cod) {
+    if (perto) perto.avisou = true;          // a câmera terminando de abrir não apaga este aviso
+    $('pertoLerStatus').textContent = cod === 'versao' ? t('⚠️ Esse código é de outra versão do jogo. Abram o Quem é? com internet nos dois celulares para atualizar e tentem de novo.', '⚠️ That code is from another version of the game. Open Who Is It? with internet on both phones to update, then try again.', '⚠️ Ese código es de otra versión del juego. Abrid ¿Quién es? con internet en los dos móviles para actualizar y volved a intentarlo.')
+      : cod === 'resposta' ? t('⚠️ Esse é o código de resposta. Leia o código que aparece no celular de quem criou a partida.', "⚠️ That's an answer code. Scan the code on the phone of whoever created the game.", '⚠️ Ese es el código de respuesta. Lee el código que sale en el móvil de quien ha creado la partida.')
+      : cod === 'oferta' ? t('⚠️ Esse é o código de criar partida. Leia o código que o OUTRO celular mostra depois de ler o seu.', "⚠️ That's a create-game code. Scan the code the OTHER phone shows after scanning yours.", '⚠️ Ese es el código para crear la partida. Lee el código que enseña el OTRO móvil después de leer el tuyo.')
+      : cod === 'outro' ? t('⚠️ Esse código é da Batalha Naval. Para o Quem é?, os dois abrem o Quem é?.', '⚠️ That code is from Sea Battle. For Who Is It?, both open Who Is It?.', '⚠️ Ese código es de Batalla Naval. Para jugar a ¿Quién es?, abrid ¿Quién es? en los dos.')
+      : t('⚠️ Esse não é um código do Quem é?. Aponte para o quadrado preto e branco na tela do outro celular.', "⚠️ That's not a Who Is It? code. Point at the black and white square on the other phone.", '⚠️ Ese no es un código de ¿Quién es?. Apunta al cuadrado blanco y negro de la pantalla del otro móvil.');
+  }
+  function tentarDeNovo(s) { return function () { if (s.papel === 'criar') pertoCriar(s.nivel, s.religar); else pertoEntrar(s.religar); }; }
+  function voltarDoPerto(s) { return function () { perto = s; cancelarPerto(); }; }
+  function erroPerto(s, e) {
+    if (perto !== s) return;
+    perto = null; limparPerto(s);
+    var semRede = e && e.codigo === 'semrede';
+    janelaAviso({ titulo: semRede ? t('📶 Este celular não está em nenhum Wi-Fi', '📶 This phone is not on any Wi-Fi', '📶 Este móvil no está conectado a ninguna wifi') : t('😕 Não deu para preparar a ligação', "😕 Couldn't prepare the link", '😕 No se ha podido preparar la conexión'),
+      texto: semRede ? t('Ligue o Roteador Wi-Fi (Ponto de acesso) neste celular, ou conecte no Wi-Fi do outro, e tente de novo.', "Turn on this phone's Wi-Fi hotspot, or join the other one's Wi-Fi, and try again.", 'Activa el punto de acceso wifi (compartir conexión) en este móvil, o conéctate a la wifi del otro, y vuelve a intentarlo.')
+        : e && e.codigo === 'lixo' ? t('O código lido não funcionou. Tentem de novo do começo.', "The scanned code didn't work. Try again from the start.", 'El código leído no ha funcionado. Volved a intentarlo desde el principio.') : t('Tente de novo. Se continuar, feche e abra o jogo de novo.', 'Try again. If it keeps happening, close and reopen the game.', 'Vuelve a intentarlo. Si sigue pasando, cierra el juego y ábrelo otra vez.'),
+      botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again', '🔄 Volver a intentarlo'), fn: tentarDeNovo(s) }, { t: t('Voltar', 'Back', 'Volver'), fn: voltarDoPerto(s) }] });
+  }
+  // não abriu a tempo (ou falhou): dizer o que costuma ser e deixar tentar de novo
+  function falhouPerto(s) {
+    if (perto !== s || s.conectou) return;
+    perto = null; limparPerto(s);
+    janelaAviso({ titulo: t('📡 Os celulares não se acharam', "📡 The phones couldn't find each other", '📡 Los móviles no se han encontrado'),
+      texto: t('O que costuma ser: 1) os dois não estão no MESMO Wi-Fi: o outro precisa estar conectado no Roteador Wi-Fi deste celular (ou os dois no mesmo Wi-Fi); 2) Wi-Fi de avião, hotel, loja ou escola costuma não deixar um aparelho ver o outro: use o Roteador de um dos celulares; 3) o código lido era de uma tentativa anterior. Toquem em Tentar de novo nos dois.',
+        "Usually: 1) the two are not on the SAME Wi-Fi: the other one must be joined to this phone's hotspot (or both on the same Wi-Fi); 2) plane, hotel, shop or school Wi-Fi often stops devices from seeing each other: use one phone's hotspot; 3) the scanned code was from an earlier try. Tap Try again on both.", 'Lo normal es que: 1) los dos no estén en la MISMA wifi: el otro tiene que estar conectado al punto de acceso de este móvil (o los dos a la misma wifi); 2) la wifi de un avión, un hotel, una tienda o un colegio no suele dejar que un aparato vea al otro: usad el punto de acceso de uno de los móviles; 3) el código leído era de un intento anterior. Tocad Volver a intentarlo en los dos.'),
+      botoes: [{ t: t('🔄 Tentar de novo', '🔄 Try again', '🔄 Volver a intentarlo'), fn: tentarDeNovo(s) }, { t: t('Voltar', 'Back', 'Volver'), fn: voltarDoPerto(s) }] });
+  }
+  function conectou(s, cx) {
+    if (perto !== s) { cx.fechar(); return; }
+    s.conectou = true; perto = null; limparPerto(s);
+    Som.gosma(); if (navigator.vibrate) try { navigator.vibrate([40, 40, 40]); } catch (e) { /* ok */ }
+    manterTelaAcesa(true);
+    if (s.religar && sala === s.religar) {          // ligou de novo: a mesma partida continua de onde parou
+      abrirCanal('PERTO', cx);
+      mostrar(s.volta); if (s.volta === 'jogo') { pintar(); dizer(t('📶 Ligados de novo!', '📶 Linked again!', '📶 ¡Conectados otra vez!')); }
+      redeMudou();
+      return;
+    }
+    modo = 'rede';
+    conectar('PERTO', { id: REDE.idNovo(), codigo: 'PERTO', host: s.papel === 'criar', nivel: s.nivel, semente: Math.floor(Math.random() * 4e9), corpo: !!pref.corpo, conexao: cx });
+    $('redeInicio').hidden = true; $('redeSala').hidden = true;
+    $('redeStatus').textContent = t('🔗 Ligados! Começando…', '🔗 Linked! Starting…', '🔗 ¡Conectados! Empezando…');
+    if (atual !== 'rede' && !(sala && sala.partida && sala.temOutro())) mostrar('rede');
+  }
+  // a ligação direta caiu no meio: avisar e oferecer ligar de novo (precisa trocar os códigos de novo)
+  function caiuPerto(minha) {
+    if (sala !== minha) return;
+    var velho = canal; canal = null; if (velho) try { velho.fechar(); } catch (e) { /* ok */ }
+    manterTelaAcesa(false);
+    if ((partida && partida.estado.fase === 'fim') || perto) return;
+    var criei = minha.host();
+    janelaAviso({ titulo: t('📡 A ligação com o outro celular caiu', '📡 The link to the other phone dropped', '📡 Se ha cortado la conexión con el otro móvil'),
+      texto: (criei ? t('Para continuar de onde parou, toque em Ligar de novo e mostre o código novo; no outro celular, tocar em Ligar de novo e ler o código.', 'To go on where you stopped, tap Link again and show the new code; on the other phone, tap Link again and scan it.', 'Para seguir donde lo habíais dejado, toca Volver a conectar y enseña el código nuevo; en el otro móvil, tocad Volver a conectar y leed el código.')
+        : t('Para continuar de onde parou, toque em Ligar de novo e leia o código novo que vai aparecer no celular de quem criou a partida (lá também tocam em Ligar de novo).', "To go on where you stopped, tap Link again and scan the new code that will show on the creator's phone (they tap Link again too).", 'Para seguir donde lo habíais dejado, toca Volver a conectar y lee el código nuevo que saldrá en el móvil de quien ha creado la partida (allí también tocan Volver a conectar).'))
+        + ' ' + t('Os dois precisam continuar no mesmo Wi-Fi.', 'Both need to stay on the same Wi-Fi.', 'Los dos tenéis que seguir en la misma wifi.'),
+      botoes: [{ t: t('🔁 Ligar de novo', '🔁 Link again', '🔁 Volver a conectar'), fn: function () { if (sala !== minha) return; if (criei) pertoCriar(minha.nivel || nivel, minha); else pertoEntrar(minha); } },
+        { t: t('🚪 Sair da partida', '🚪 Leave game', '🚪 Salir de la partida'), fn: voltarInicio }] });
   }
 
   // ---------- música (trilha comum dos jogos): instrumentos de verdade, nada de videogame ----------
@@ -730,7 +952,11 @@
     estado: function () { return partida && partida.estado; },
     respostaCerta: function () { var a = partida.aguardando(); return L.responder(partida.tabuleiro.caras[partida.estado.segredos[a.jogador]], partida.estado.ultima.pergunta); },
     quantasDescartar: function () { return partida.quantasDescartar(quemVe()); },
-    temSala: function () { return !!sala; }
+    temSala: function () { return !!sala; },
+    // Jogar pertinho: o mesmo caminho da câmera quando ela lê um código; e o que está na tela agora
+    lerCodigo: function (txt) { return lerCodigo(txt); },
+    perto: function () { return perto ? { papel: perto.papel, codigo: perto.codigo || null, qr: perto.qr || null, etapa: perto.etapa } : null; },
+    sala: function () { return sala ? { perto: !!sala.perto, ligado: !!canal, host: sala.host(), eu: sala.eu } : null; }
   };
 })();
 

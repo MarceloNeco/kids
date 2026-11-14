@@ -474,7 +474,7 @@ test('🐰 sem terra (praia, cidade) não aparece toupeira nem minhoca', () => {
 test('👨 na Bagunça de bolas o papai pede a bola, corre até ela e bate de volta para a criança', () => {
   const p = partida({ modo: 'bolas' }); p.comecar(); limpar(p);
   p.corpo(0, { x: 0.05, y: 0.1, w: 0.2, h: 0.8 }, 1000);   // criança à esquerda
-  const P = () => p.estado().parente;
+  const P = () => p.estado().parentes[0];
   assert.ok(P() && P().quem === 'pai', 'o papai está em campo');
   let pediu = false; for (let t = 0; t < 3000; t += 16) { p.avancar(16); limpar(p); pediu = pediu || !!P().fala; }
   assert.ok(pediu, 'pediu a bola');
@@ -486,16 +486,18 @@ test('👨 na Bagunça de bolas o papai pede a bola, corre até ela e bate de vo
 test('👩 no Pega-pega a mamãe corre atrás dos bichos e pega um', () => {
   const p = pegaPega({ figuras: FIGS.concat([BICHOS[0]]) }); limpar(p);
   p.corpo(0, { x: 0.02, y: 0.1, w: 0.15, h: 0.8 }, 1000);   // criança longe, no canto esquerdo
-  assert.equal(p.estado().parente.quem, 'mae');
+  assert.equal(p.estado().parentes[0].quem, 'mae');
   let foiMae = false; const pegou = ate(p, () => { foiMae = foiMae || p.eventos().some(e => e.t === 'parente' && e.quem === 'mae'); return foiMae; }, 20000);
   assert.ok(pegou, 'a mamãe pegou um bicho');
   assert.ok(p.estado().coisas.some(c => c.estilo === 'bicho' && c.pego), 'o bicho foi para o cantinho');
 });
-test('👨👩 quem joga junto só aparece com 1 pessoa, na Bagunça de bolas e no Pega-pega', () => {
-  assert.equal(partida({ modo: 'bolas', jogadores: 2 }).estado().parente, null);
-  assert.equal(partida({ modo: 'pega', jogadores: 2 }).estado().parente, null);
-  assert.equal(partida({ modo: 'chuta' }).estado().parente, null);
-  assert.equal(partida({ modo: 'corta' }).estado().parente, null);
+test('👨👩 quem joga junto só aparece com 1 pessoa, na Bagunça de bolas, no Pega-pega e no Pula e abaixa', () => {
+  assert.deepEqual(partida({ modo: 'pula' }).estado().parentes.map(P => P.quem), ['pai', 'mae']);
+  assert.equal(partida({ modo: 'pula', jogadores: 2 }).estado().parentes.length, 0);
+  assert.equal(partida({ modo: 'bolas', jogadores: 2 }).estado().parentes.length, 0);
+  assert.equal(partida({ modo: 'pega', jogadores: 2 }).estado().parentes.length, 0);
+  assert.equal(partida({ modo: 'chuta' }).estado().parentes.length, 0);
+  assert.equal(partida({ modo: 'corta' }).estado().parentes.length, 0);
 });
 
 /* ⬇️ abaixar também no 💪 Difícil (boneco vai até lá): ↓ no teclado ou o dedo parado embaixo dos pés */
@@ -518,4 +520,42 @@ test('⬇️ Difícil: dedo parado embaixo dos pés abaixa; arrastando pelo chã
   assert.ok(!abaixouAndando, 'andando não abaixa');
   rodar(p, 2500); assert.equal(ab(), true, 'chegou e o dedo ficou nos pés: abaixou');
   p.alvo(0, null); rodar(p, 100); assert.equal(ab(), false, 'soltou o dedo: levanta');
+});
+
+/* 🪵 papai e mamãe no Pula e abaixa: pulam o tronco e abaixam do galho; reagem ao que acontece com a criança */
+function pulaComPais() { const p = partida({ modo: 'pula' }); p.comecar(); limpar(p); return p; }
+test('🪵 papai e mamãe pulam o tronco e abaixam do galho, cada um quando ele chega', () => {
+  const p = pulaComPais(); const PS = () => p.estado().parentes;
+  const tronco = p.obstaculo({ tipo: 'baixo', x: 1280 + 100, vx: -420 }, 0);
+  const pulou = { pai: false, mae: false };
+  for (let t = 0; t < 4000; t += 16) { p.avancar(16); const cs = p.estado().coisas; for (let i = cs.length - 1; i >= 0; i--) if (cs[i] !== tronco) cs.splice(i, 1);   // só o tronco do teste
+    PS().forEach(P => { if (P.y < -60) pulou[P.quem] = true; }); }
+  assert.deepEqual(pulou, { pai: true, mae: true }, 'os dois pularam o tronco');
+  for (let t = 0; t < 1500; t += 16) { limpar(p); p.avancar(16); }
+  const abaixou = { pai: false, mae: false }; let paiPrimeiro = null;
+  const galho = p.obstaculo({ tipo: 'alto', x: 1280 + 100, vx: -420 }, 0);
+  const levantou = { pai: false, mae: false };
+  for (let t = 0; t < 4000; t += 16) { p.avancar(16); const cs = p.estado().coisas; for (let i = cs.length - 1; i >= 0; i--) if (cs[i] !== galho) cs.splice(i, 1);   // só o galho do teste
+    PS().forEach(P => { if (P.abaixa) { abaixou[P.quem] = true; if (!paiPrimeiro) paiPrimeiro = P.quem; } else if (abaixou[P.quem]) levantou[P.quem] = true; }); }
+  assert.deepEqual(abaixou, { pai: true, mae: true }, 'os dois abaixaram do galho');
+  assert.equal(paiPrimeiro, 'pai', 'o papai (à direita) vê o galho primeiro');
+  assert.deepEqual(levantou, { pai: true, mae: true }, 'depois que passou, levantaram');
+});
+test('😢 a criança bateu no tronco: papai e mamãe ficam tristes; 🎉 desviou: comemoram', () => {
+  const p = pulaComPais(); rodar(p, 100); p.eventos();
+  p.obstaculo({ tipo: 'baixo', x: 900, vx: -500 }, 0);   // a criança está parada no chão: vai bater
+  let triste = false; for (let t = 0; t < 1500 && !triste; t += 16) { p.avancar(16); triste = p.estado().parentes.every(P => P.reacao === 'triste'); }
+  assert.ok(triste, 'mão na cabeça, carinha triste');
+  rodar(p, 2500); limpar(p);
+  p.calibrar(0, { x: 0.4, y: 0.1, w: 0.2, h: 0.8 }); p.corpo(0, { x: 0.4, y: -0.1, w: 0.2, h: 0.8 }, 5000);   // pulando
+  p.obstaculo({ tipo: 'baixo', x: 900, vx: -500 }, 0);
+  let festa = false; for (let t = 0; t < 1500 && !festa; t += 16) { p.avancar(16); p.corpo(0, { x: 0.4, y: -0.1, w: 0.2, h: 0.8 }, 5000 + t); festa = p.estado().parentes.every(P => P.reacao === 'festa'); }
+  assert.ok(festa, 'comemoraram');
+});
+test('⚽ gol: quem está sentado na cadeirinha comemora; quem caiu na piscina não', () => {
+  const p = chutaPartida(); const b = chuteEm(p, -1);   // derruba o papai
+  for (let t = 0; t < 1500; t += 16) p.avancar(16);
+  const [pai, mae] = p.estado().tanques;
+  assert.notEqual(pai.fase, 'sentado'); assert.equal(mae.reacao, 'festa', 'a mamãe comemora o papai caindo');
+  void b;
 });

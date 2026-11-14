@@ -8,7 +8,7 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 2 | Testar com as meninas no celular, no tablet e na TV (espelhando a tela): Fácil, Médio e Difícil, contra a meleca e passando o aparelho. | Entrega 0.1.0 | 🟡 |
 | 3 | Testar "cada um no seu celular" em dois celulares de verdade (internet de verdade). | Entrega 0.1.0 | 🟡 |
 | 4 | Duelo de Caras com **corpo inteiro**: sapato, saia, short, calça, com perguntas novas de roupa. | Dono, 14/Nov/2026 | ✅ 0.3.0: botão "🧍 Corpo inteiro" na escolha do nível (saia, short, calça, vestido, tênis, bota, sapato, descalço, mochila, segurando algo) |
-| 5 | **📶 Jogar pertinho**: dois celulares sem internet (QR, como na Batalha Naval). | Spec 0.1.0 | 🟡 ficou para a próxima versão |
+| 5 | **📶 Jogar pertinho**: dois celulares sem internet (QR, como na Batalha Naval). | Spec 0.1.0 | ✅ 0.4.0 (usa `../batalha-naval/pertinho.js`, `qr.js` e `libs/` como estão). Falta o dono testar em 2 celulares de verdade (Roteador Wi-Fi). |
 | 6 | **A Meleca Adivinha**: você pensa em alguém (desenho, filme, famoso, bicho, alguém da família) e a meleca descobre; lista pronta grande, aprende quando erra, João Alves, níveis Infantil/Família/Adulto, voz ElevenLabs opcional. | Dono, 14/Nov/2026 | ✅ v0.2.0 (667 personagens) |
 | 7 | Conferir as respostas do **João Alves** (lenda da casa): estão em `personagens/familia.js`, tiradas do que o dono contou. | Dono, 14/Nov/2026 | ✅ 0.2.1 (dono descreveu: atlético, forte, uns 45 anos, óculos escuros, sem barba, sem superpoder, inteligente, já foi à guerra, namorou mas não tem filhos, humilde) |
 | 8 | Modo de TV próprio com o celular de controle (hoje: espelhar a tela). | Spec 0.1.0 | 🟡 |

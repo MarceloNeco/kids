@@ -22,6 +22,12 @@ vira e a vez passa. Acertou, ganhou.
 - **🧍 Corpo inteiro** (0.3.0, botão na escolha do nível, fica guardado): as cartas mostram a pessoa toda, com perguntas
   novas (grupo "🧍 Corpo inteiro"): saia, short, calça, vestido, descalço (Fácil) · tênis, bota, mochila, segurando algo
   (Médio) · o que segura: balão, bola, sorvete, livro, flor (Difícil). Em 📱 rede, quem cria a sala decide.
+- **📶 Jogar pertinho** (0.4.0, dentro de 📱 Cada um no seu celular): dois celulares sem internet, no mesmo Wi-Fi (um
+  liga o Roteador Wi-Fi). Usa as peças da Batalha Naval **como estão**: `../batalha-naval/pertinho.js` (ligação direta
+  WebRTC e o código curto), `../batalha-naval/qr.js` e `../batalha-naval/libs/` (desenhar e ler o QR). O código ganha
+  `QE` na frente (um código da Batalha Naval aqui só avisa). Depois de ligados, é a mesma partida do `rede.js` pelo canal
+  direto; nada fica guardado para recarregar; a tela fica acesa (Wake Lock); caiu, "🔁 Ligar de novo" troca os códigos e
+  continua. Vigia: `teste/pertinho.test.js` (se a Batalha Naval mudar essas peças, ele quebra aqui).
 - **Tabuleiro novo a cada partida:** as caras são sorteadas e desenhadas pelo jogo (`caras.js`), com nomes sorteados
   (metade de menino, metade de menina). Ninguém real é desenhado.
 - **Lupa:** 🔍 e tocar numa cara, ou segurar o dedo nela.

@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.38', APP_UPDATED = '14/11/2026';
+  var APP_VERSION = '0.8.39', APP_UPDATED = '14/11/2026';
   // o idioma vem da estante (../idioma.js): pt, en ou es; o jogo não tem botão de idioma próprio
   function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
   function T(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }

@@ -218,7 +218,7 @@
       trave(ctx, estado.trave, ts);
     }
     if (estado.tanques) seguro('tanques', function () { tanques(ctx, estado.tanques, ts); });
-    if (estado.parente) seguro('parente', function () { parenteCampo(ctx, estado.parente, jogs, ts, dt); });
+    (estado.parentes || []).forEach(function (P) { seguro('parente', function () { parenteCampo(ctx, P, jogs, ts, dt); }); });
     // rastro de luz onde a pessoa se mexe
     jogs.forEach(function (jg, j) {
       var pts = jg.rastro; if (!pts || pts.length < 1) return;
@@ -398,7 +398,7 @@
       // quem está lá
       if (B) {
         var px, py, op = {}, sentX = (poste + escada) / 2 + L * 8;
-        if (k.fase === 'sentado') { px = sentX; py = assento + A * 0.22; op = { bE: 0.15, bD: 0.55 + 0.45 * Math.sin(ts / (k.quem === 'pai' ? 130 : 110)), balanco: 0 }; }   // sentado, dando tchauzinho
+        if (k.fase === 'sentado') { px = sentX; py = assento + A * 0.22; op = k.reacao === 'triste' ? { pose: 'triste', balanco: 0 } : k.reacao === 'festa' ? (k.quem === 'pai' ? { pose: 'festa', bE: 1, bD: 1, balanco: 0 } : { pose: 'festa', palmas: ts / 95, balanco: 0 }) : { bE: 0.15, bD: 0.55 + 0.45 * Math.sin(ts / (k.quem === 'pai' ? 130 : 110)), balanco: 0 }; }   // sentado, dando tchauzinho (ou comemorando / triste com a criança)
         else if (k.fase === 'caindo') { var q = Math.min(1, u / 0.55); px = sentX; py = assento + A * 0.22 + (topoP + A * 0.55 - assento - A * 0.22) * q * q; op = { pose: 'dor' }; }
         else if (k.fase === 'piscina') { px = sentX + Math.sin(u * 6) * 6; py = topoP + A * 0.55; op = { pose: 'festa', bE: 1, bD: 1 }; }   // rindo no meio das bolinhas
         else { var s2 = Math.min(1, u / 1.6), s3 = Math.max(0, (u - 1.6) / 0.3); px = escada + (sentX - escada) * s3; py = topoP + (assento + A * 0.22 - topoP) * s2; op = { costas: s3 < 0.5, bE: 0.5 + 0.5 * Math.sin(u * 9), bD: 0.5 - 0.5 * Math.sin(u * 9) }; }   // sobe a escadinha
@@ -418,17 +418,23 @@
   function parenteCampo(ctx, P, jogs, ts, dt) {
     var B = root.Boneco, jg = jogs[0]; if (!B || !jg) return;
     var r = jg.raia, Ac = jg.vai ? jg.vai.A : r.h * 0.42, A = Math.min(420, Ac * 1.3), chao = r.y + r.h * 0.86, anda = Math.abs(P.vx) > 40;
-    var cfg = P.quem === 'mae' ? MAE : PAI;
+    var cfg = P.quem === 'mae' ? MAE : PAI, y = P.y || 0, pai = P.quem === 'pai';
     D.parenteFase = (D.parenteFase || 0) + Math.abs(P.vx) / (A * 0.6) * 6.2832 * dt;
-    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(P.x, chao + 4, A * 0.2, A * 0.05, 0, 0, 6.2832); ctx.fill(); ctx.restore();
-    ctx.save(); ctx.translate(P.x, chao);
-    if (P.fase === 'bate' && !P.alto && P.quem === 'pai') { ctx.scale(P.dir, 1); B.corpoLado(ctx, cfg, A, { chute: Math.min(1, P.t / 0.18), ts: ts }); }   // bola baixa: devolve com o pé
+    D.parAb = D.parAb || {}; var ab = D.parAb[P.quem] = (D.parAb[P.quem] || 0) + ((P.abaixa ? 1 : 0) - (D.parAb[P.quem] || 0)) * Math.min(1, dt * 14);   // abaixa dobrando os joelhos, como o boneco
+    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(P.x, chao + 4, A * 0.2 * Math.max(0.4, 1 + y / A * 0.6), A * 0.05, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(P.x, chao + y);
+    if (ab > 0.02) { ctx.scale(P.dir, 1); B.corpoLado(ctx, cfg, A, { abaixa: ab, ts: ts }); }   // 🪵 abaixando do galho
+    else if (y < -5) { ctx.scale(P.dir, 1); B.corpoLado(ctx, cfg, A, { noAr: true, ts: ts }); }   // 🪵 pulando o tronco
+    else if (P.fase === 'bate' && !P.alto && P.quem === 'pai') { ctx.scale(P.dir, 1); B.corpoLado(ctx, cfg, A, { chute: Math.min(1, P.t / 0.18), ts: ts }); }   // bola baixa: devolve com o pé
     else if (P.fase === 'bate') B.corpoEmPe(ctx, cfg, A, { bE: 1, bD: 1, balanco: 0, ts: ts });   // bola alta / bicho: pega com as mãos para cima
-    else if (anda && P.fase !== 'festa') { ctx.scale(P.vx < 0 ? -1 : 1, 1); B.corpoLado(ctx, cfg, A, { fase: D.parenteFase, andando: true, ts: ts }); }
-    else B.corpoEmPe(ctx, cfg, A, { bE: P.fase === 'festa' ? 1 : 0.12, bD: P.fase === 'festa' ? 1 : P.chama ? 0.6 + 0.4 * Math.sin(ts / 120) : 0.2, pose: P.fase === 'festa' ? 'festa' : null, balanco: 0, ts: ts });   // parado: acena pedindo a bola
+    else if (P.reacao === 'festa' && pai) { var pu = -A * 0.08 * Math.abs(Math.sin(ts / 150)); ctx.translate(0, pu); B.corpoEmPe(ctx, cfg, A, { bE: 1, bD: 1, pose: 'festa', pulando: pu < -A * 0.03, balanco: 0, ts: ts }); }   // 👨 comemora pulando com os dois braços para cima
+    else if (P.reacao === 'festa') { ctx.translate(0, -A * 0.03 * Math.abs(Math.sin(ts / 190))); B.corpoEmPe(ctx, cfg, A, { palmas: ts / 95, pose: 'festa', balanco: 0, ts: ts }); }   // 👩 comemora batendo palmas, pulinhos
+    else if (P.reacao === 'triste') B.corpoEmPe(ctx, cfg, A, { pose: 'triste', balanco: 0, ts: ts });   // a criança se machucou: mãos na cabeça, carinha triste
+    else if (anda) { ctx.scale(P.vx < 0 ? -1 : 1, 1); B.corpoLado(ctx, cfg, A, { fase: D.parenteFase, andando: true, ts: ts }); }
+    else B.corpoEmPe(ctx, cfg, A, { bE: 0.12, bD: P.chama ? 0.6 + 0.4 * Math.sin(ts / 120) : 0.2, balanco: 0, ts: ts });   // parado: acena chamando
     ctx.restore();
     if (P.fala) {   // balão de fala em cima da cabeça
-      var txt = T(P.fala[0], P.fala[1], P.fala[2]); ctx.save(); ctx.font = '700 26px ' + D.fonte; var tw = ctx.measureText(txt).width + 32, bx = Math.max(10, Math.min(W - tw - 10, P.x - tw / 2)), by = chao - A - 70;
+      var txt = T(P.fala[0], P.fala[1], P.fala[2]); ctx.save(); ctx.font = '700 26px ' + D.fonte; var tw = ctx.measureText(txt).width + 32, bx = Math.max(10, Math.min(W - tw - 10, P.x - tw / 2)), by = Math.max(6, chao + y - A * (1 - 0.35 * ab) - 70);   // o balão acompanha o pulo e o abaixar
       ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.beginPath(); ctx.moveTo(bx + 20, by); ctx.arcTo(bx + tw, by, bx + tw, by + 48, 22); ctx.arcTo(bx + tw, by + 48, bx, by + 48, 22); ctx.arcTo(bx, by + 48, bx, by, 22); ctx.arcTo(bx, by, bx + tw, by, 22); ctx.fill();
       ctx.beginPath(); ctx.moveTo(P.x - 10, by + 46); ctx.lineTo(P.x, by + 66); ctx.lineTo(P.x + 12, by + 46); ctx.fill();
       ctx.fillStyle = '#0d47a1'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, bx + tw / 2, by + 25); ctx.restore();
