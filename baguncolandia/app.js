@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.38', APP_UPDATED = '14/11/2026';
+  var APP_VERSION = '0.8.39', APP_UPDATED = '14/11/2026';
   var EN = /^en/i.test(navigator.language || '') && !(window.BolinhoIdioma && !BolinhoIdioma.ingles());   // só português sem o interruptor "ingles" (../idioma.js)
   function T(pt, en) { return EN ? en : pt; }
   var $ = function (id) { return document.getElementById(id); };
@@ -809,6 +809,12 @@
   })();
 
   /* ---------- papel ---------- */
+  /* tela inicial em dois passos: 1) onde (só no celular / com a TV); 2) como. O Voltar (do celular ou o ← da caixa) volta ao 1 */
+  function passo(p) { $('inicio').setAttribute('data-passo', p); }
+  function abrirPasso(p, foco) { passo(p); Nav.abrir(function () { passo('um'); }); var b = $(foco); if (b) b.focus(); }
+  $('btPassoCel').onclick = function () { abrirPasso('cel', 'btToque'); };
+  $('btPassoTV').onclick = function () { abrirPasso('tv', 'btTV'); };
+  document.querySelectorAll('#inicio .voltaPasso').forEach(function (b) { b.onclick = function () { history.back(); }; });
   $('btTV').onclick = function () { TVApp.iniciar({ gesto: true }); };
   $('btCel').onclick = function () { CelApp.cel.local = false; CelApp.cel.toque = false; $('codigo').style.display = ''; $('lblCodigo').style.display = ''; $('btEntrar').textContent = T('Entrar e ligar a câmera', 'Join and start the camera'); tela('entrar'); Nav.abrir(function () { tela('inicio'); }); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; $('codigo').value = localStorage.getItem('bagunca:codigo') || ''; } catch (e) {} ($('nome').value ? $('codigo') : $('nome')).focus(); };
   $('btToque').onclick = function () { CelApp.cel.local = true; CelApp.cel.toque = true; tela('entrar'); Nav.abrir(function () { tela('inicio'); }); $('codigo').style.display = 'none'; $('lblCodigo').style.display = 'none'; $('btEntrar').textContent = T('Começar', 'Start'); try { $('nome').value = localStorage.getItem('bagunca:nome') || ''; } catch (e) {} $('nome').focus(); };
@@ -821,7 +827,7 @@
     emAndamento: function () { return (TVApp.tv.local && TVApp.tv.fase === 'jogando') || $('jogo').classList.contains('ativa'); },
     esconder: function () { return /[?&]tv=auto\b/.test(location.search) || ($('tv').classList.contains('ativa') && !TVApp.tv.local); } });
   if (/[?&]tv=auto\b/.test(location.search)) TVApp.iniciar({ gesto: false });   // casca da LG: já entra como TV
-  else if (/[?&]tv\b/.test(location.search)) $('btTV').focus();
+  else if (/[?&]tv\b/.test(location.search)) { passo('tv'); $('btTV').focus(); }   // aberta pela TV: já no passo da TV
   if (TESTE) { window.BaguncaApp = { TVApp: TVApp, CelApp: CelApp, Bagunca: Bagunca, Figuras: Figuras, Boneco: Boneco }; }
 })();
 

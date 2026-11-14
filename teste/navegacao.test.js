@@ -32,8 +32,8 @@ const TAMANHOS = [[390, 844], [915, 412]];
 // fundo: jogos de várias telas, onde o Voltar volta uma tela por vez (diretriz): o 🏠 é testado lá do fundo;
 // avisaAntesDeSair: na tela de começo o 1º Voltar avisa "toque de novo para sair" e só o 2º sai (diretriz)
 const JOGOS = [
-  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#btToque', avisaAntesDeSair: true,
-    entrar: async (pg) => { await pg.click('#btToque'); await pg.waitForTimeout(300); },
+  { id: 'baguncolandia', url: 'baguncolandia/?teste', inicio: '#btPassoCel', avisaAntesDeSair: true,
+    entrar: async (pg) => { await pg.click('#btPassoCel'); await pg.click('#btToque'); await pg.waitForTimeout(300); },
     fundo: async (pg) => { await pg.fill('#nome', 'Lara'); await pg.click('#btEntrar');
       await pg.waitForFunction(() => window.BaguncaApp.TVApp.tv.fase === 'lobby', null, { timeout: 20000 }); await pg.click('#localComecar'); await pg.waitForTimeout(1500); } },
   { id: 'peluqueria', url: 'peluqueria/', entrada: '#btEntrar', inicio: '#btJogar',

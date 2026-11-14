@@ -28,27 +28,33 @@
 <body>
 
 <!-- ===== Escolha do papel ===== -->
-<section id="inicio" class="tela ativa" data-recurso="baguncolandia">
+<section id="inicio" class="tela ativa" data-recurso="baguncolandia" data-passo="um">
   <div class="marca"><span class="bolinho">🍩</span><small data-t="Bolinho de Chuva apresenta|Rain Dumpling presents">Bolinho de Chuva apresenta</small></div>
   <h1><span class="titulo">Bagunçolândia</span></h1>
-  <p class="sub" data-t="Frutas, doces e personagens voando na TV. Você corta, pega e chuta com o corpo. Uma ou duas pessoas. Nada para instalar, nada para cadastrar.|Fruit, sweets and characters flying on the TV. You slice, catch and kick with your body. One or two people. Nothing to install, no sign-up.">Frutas, doces e personagens voando na TV. Você corta, pega e chuta com o corpo. Uma ou duas pessoas. Nada para instalar, nada para cadastrar.</p>
+  <p class="sub" data-t="Frutas, doces e bichos voando: você corta, pega e chuta. Uma ou duas pessoas, nada para instalar.|Fruit, sweets and critters flying: you slice, catch and kick. One or two people, nothing to install.">Frutas, doces e bichos voando: você corta, pega e chuta. Uma ou duas pessoas, nada para instalar.</p>
+  <!-- Dois passos (dono, 14/Nov/2026): 1) onde vai jogar (só no celular / com a TV); 2) como (dedo ou corpo / qual aparelho é este) -->
   <div class="col">
-    <div class="caixa">
-      <h2 data-t="Com a TV|With the TV">Com a TV</h2>
+    <div class="caixa passo passo1">
+      <h2 data-t="Onde vamos jogar?|Where are we playing?">Onde vamos jogar?</h2>
+      <button class="big" id="btPassoCel" type="button">📱 <span data-t="Só no celular|Just on the phone">Só no celular</span><small data-t="Ou no tablet. Com o dedo ou com a câmera|Or on a tablet. With your finger or the camera">Ou no tablet. Com o dedo ou com a câmera</small></button>
+      <button class="big sec" id="btPassoTV" type="button">📺 <span data-t="Com a TV|With the TV">Com a TV</span><small data-t="O jogo aparece na TV e o celular filma quem joga|The game shows on the TV and the phone films the players">O jogo aparece na TV e o celular filma quem joga</small></button>
+    </div>
+    <div class="caixa passo passoCel">
+      <div class="passoTopo"><button class="sec voltaPasso" type="button" data-t="← Voltar|← Back">← Voltar</button><h2 data-t="📱 No celular: como?|📱 On the phone: how?">📱 No celular: como?</h2></div>
+      <button class="big" id="btToque" type="button">👆 <span data-t="Com o dedo|With your finger">Com o dedo</span><small data-t="Toque e deslize na tela|Tap and swipe on the screen">Toque e deslize na tela</small></button>
+      <button class="big sec" id="btSolo" type="button">🤸 <span data-t="Com o corpo|With your body">Com o corpo</span><small data-t="A câmera filma você e o jogo aparece no celular|The camera films you and the game shows on the phone">A câmera filma você e o jogo aparece no celular</small></button>
+    </div>
+    <div class="caixa passo passoTV">
+      <div class="passoTopo"><button class="sec voltaPasso" type="button" data-t="← Voltar|← Back">← Voltar</button><h2 data-t="📺 Com a TV: que aparelho é este?|📺 With the TV: which device is this?">📺 Com a TV: que aparelho é este?</h2></div>
       <button class="big" id="btTV" type="button">📺 <span data-t="Esta é a TV|This is the TV">Esta é a TV</span><small data-t="Aperte aqui no navegador da TV|Press this in the TV browser">Aperte aqui no navegador da TV</small></button>
       <button class="big sec" id="btCel" type="button">📱 <span data-t="Este é o celular|This is the phone">Este é o celular</span><small data-t="Ele filma quem joga e manda para a TV|It films the players and sends it to the TV">Ele filma quem joga e manda para a TV</small></button>
-    </div>
-    <div class="caixa">
-      <h2 data-t="Sem a TV|Without the TV">Sem a TV</h2>
-      <button class="big sec" id="btSolo" type="button">🤸 <span data-t="Jogar com o corpo|Play with your body">Jogar com o corpo</span><small data-t="A câmera filma você e o jogo aparece no próprio celular|The camera films you and the game shows on the phone itself">A câmera filma você e o jogo aparece no próprio celular</small></button>
-      <button class="big sec" id="btToque" type="button">👆 <span data-t="Jogar com o dedo|Play with your finger">Jogar com o dedo</span><small data-t="Sem câmera: toque e deslize na tela. Bom para tablet|No camera: tap and swipe on the screen. Great on a tablet">Sem câmera: toque e deslize na tela. Bom para tablet</small></button>
     </div>
   </div>
   <details class="como">
     <summary data-t="❓ Como usar|❓ How to use">❓ Como usar</summary>
     <ol>
-      <li data-t="Na TV, abra esta página no navegador (ou digite solverone.com.br/tv/bagunca) e aperte “Esta é a TV”.|On the TV, open this page in its browser (or type solverone.com.br/tv/bagunca) and press “This is the TV”.">Na TV, abra esta página no navegador (ou digite solverone.com.br/tv/bagunca) e aperte “Esta é a TV”.</li>
-      <li data-t="No celular, abra a mesma página, aperte “Este é o celular”, digite o nome e o código que a TV mostra.|On the phone, open the same page, press “This is the phone”, type a name and the code the TV shows.">No celular, abra a mesma página, aperte “Este é o celular”, digite o nome e o código que a TV mostra.</li>
+      <li data-t="Com a TV: na TV, abra esta página no navegador (ou digite solverone.com.br/tv/bagunca), toque em “Com a TV” e depois em “Esta é a TV”.|With the TV: on the TV, open this page in its browser (or type solverone.com.br/tv/bagunca), press “With the TV” and then “This is the TV”.">Com a TV: na TV, abra esta página no navegador (ou digite solverone.com.br/tv/bagunca), toque em “Com a TV” e depois em “Esta é a TV”.</li>
+      <li data-t="No celular, abra a mesma página, toque em “Com a TV” e depois em “Este é o celular”, digite o nome e o código que a TV mostra.|On the phone, open the same page, press “With the TV” and then “This is the phone”, type a name and the code the TV shows.">No celular, abra a mesma página, toque em “Com a TV” e depois em “Este é o celular”, digite o nome e o código que a TV mostra.</li>
       <li data-t="Apoie o celular deitado, virado para quem vai jogar, a uns 2 metros. A tela precisa ficar ligada.|Prop the phone up in landscape, facing the players, about 2 metres away. The screen must stay on.">Apoie o celular deitado, virado para quem vai jogar, a uns 2 metros. A tela precisa ficar ligada.</li>
       <li data-t="Escolha o modo no celular e toque em ▶ Começar. Siga a voz: fique parado, levante o braço, chute, pule.|Pick the mode on the phone and tap ▶ Start. Follow the voice: stand still, raise your arm, kick, jump.">Escolha o modo no celular e toque em ▶ Começar. Siga a voz: fique parado, levante o braço, chute, pule.</li>
     </ol>
