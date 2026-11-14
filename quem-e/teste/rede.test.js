@@ -16,7 +16,7 @@ function Mundo(semente, perda = 0, repete = 0) {
   M.no = (op) => {
     const k = nos.length, no = { on: true, salvo: null };
     no.criar = dados => R.criar({
-      id: op.id, codigo: 'ABCD', host: !!op.host, nivel: op.nivel, semente: op.semente, dados, agora: M.agora,
+      id: op.id, codigo: 'ABCD', host: !!op.host, nivel: op.nivel, semente: op.semente, corpo: op.corpo, dados, agora: M.agora,
       mandar: m => { if (!no.on) return; const txt = JSON.stringify(m); M.msgs.push(txt); nos.forEach((o, j) => { if (j !== k && o.on && rnd() >= perda) { fila.push([j, txt]); if (rnd() < repete) fila.push([j, txt]); } }); },
       salvar: d => { no.salvo = d; }
     });
@@ -112,4 +112,12 @@ test('o outro sumiu: depois de 12 s sem notícia, avisa', () => {
   b.on = false;
   for (let i = 0; i < 30; i++) M.passo();
   assert.equal(a.s.outroAqui(), false);
+});
+
+test('corpo inteiro: quem entra recebe o mesmo tabuleiro de corpo inteiro', () => {
+  const M = Mundo(31);
+  const a = M.no({ id: idTeste(), host: true, nivel: 'facil', semente: 4, corpo: true }), b = M.no({ id: idTeste() });
+  for (let i = 0; i < 20 && !b.s.partida; i++) M.passo();
+  assert.equal(b.s.partida.tabuleiro.corpo, true);
+  assert.deepEqual(b.s.partida.tabuleiro, a.s.partida.tabuleiro);
 });
