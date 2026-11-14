@@ -115,3 +115,19 @@ test('revisão: texto privado pede voz que funciona sem internet', async () => {
   assert.equal(reg.faladas[0].jeito.soLocal, true);
   assert.ok(!reg.faladas[1].jeito.soLocal);
 });
+
+test('dublar: vozes prontas mudam o tom e a velocidade da voz do aparelho (e não usam a ElevenLabs)', async () => {
+  const { amb, reg } = ambiente({ chave: 'sk_teste' });
+  const v = V.criar(amb); v.usarEleven(true);
+  assert.equal(v.dublagem(), 'meleca');
+  v.dublar('esquilo');
+  await v.falar('Oi!', { meleca: 'blue' });
+  assert.equal(reg.fetches.length, 0, 'voz pronta é sempre a do aparelho');
+  assert.deepEqual({ pitch: reg.faladas[0].jeito.pitch, rate: reg.faladas[0].jeito.rate }, V.DUBLAGENS.esquilo);
+  v.dublar('gigante');
+  await v.falar('Oi!', { meleca: 'pink' });
+  assert.ok(reg.faladas[1].jeito.pitch < reg.faladas[0].jeito.pitch, 'gigante fala mais grosso que o esquilo');
+  v.dublar('inventada');
+  assert.equal(v.dublagem(), 'meleca', 'id desconhecido volta para o jeito da meleca');
+  for (const id of Object.keys(V.DUBLAGENS)) { const d = V.DUBLAGENS[id]; if (d) assert.ok(d.pitch >= 0 && d.pitch <= 2 && d.rate > 0, id); }
+});

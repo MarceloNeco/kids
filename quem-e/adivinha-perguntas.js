@@ -24,10 +24,12 @@
     P('pessoa', 'I', 'oque', 'É uma pessoa?', 'Is it a person?', '¿Es una persona?', N),
     P('bicho', 'I', 'oque', 'É um bicho?', 'Is it an animal?', '¿Es un animal?', N),
     P('coisa', 'I', 'oque', 'É uma coisa (um objeto, uma comida, um lugar)?', 'Is it a thing (an object, a food, a place)?', '¿Es una cosa (un objeto, una comida, un lugar)?', N),
-    P('masculino', 'I', 'oque', 'É menino ou homem?', 'Is it a boy or a man?', '¿Es un chico o un hombre?', N),
-    P('feminino', 'I', 'oque', 'É menina ou mulher?', 'Is it a girl or a woman?', '¿Es una chica o una mujer?', N),
-    P('crianca', 'I', 'oque', 'É criança (ou filhote)?', 'Is it a child (or a baby animal)?', '¿Es un niño o una niña (o una cría de animal)?', N),
-    P('idoso', 'I', 'oque', 'É velhinho ou velhinha?', 'Is it old?', '¿Es un abuelito o una abuelita?', N),
+    P('masculino', 'I', 'oque', 'É masculino (menino, homem ou velhinho)?', 'Is it male (a boy, a man or an old man)?', '¿Es masculino (un chico, un hombre o un abuelito)?', N),
+    P('feminino', 'I', 'oque', 'É feminino (menina, mulher ou velhinha)?', 'Is it female (a girl, a woman or an old woman)?', '¿Es femenino (una chica, una mujer o una abuelita)?', N),
+    P('crianca', 'I', 'oque', 'É criança (até uns 12 anos, ou filhote de bicho)?', 'Is it a child (up to about 12, or a baby animal)?', '¿Es un niño o una niña (hasta unos 12 años, o una cría de animal)?', N),
+    // adolescente (dono, 14/Nov/2026: a Merida de Valente não é criança nem adulta): sem resposta guardada = "não sei"
+    P('adolescente', 'I', 'oque', 'É adolescente (entre 13 e 19 anos)?', 'Is it a teenager (13 to 19 years old)?', '¿Es adolescente (entre 13 y 19 años)?'),
+    P('idoso', 'I', 'oque', 'É idoso (velhinho ou velhinha)?', 'Is it old (an old man or an old woman)?', '¿Es mayor (un abuelito o una abuelita)?', N),
     P('brasileiro', 'I', 'oque', 'É do Brasil?', 'Is it from Brazil?', '¿Es de Brasil?', N),
     P('fala', 'I', 'oque', 'Fala como gente?', 'Does it talk like people?', '¿Habla como las personas?', N),
     // ---------- de onde vem (núcleo) ----------
@@ -38,12 +40,14 @@
     P('videogame', 'I', 'onde', 'É de videogame?', 'Is it from a video game?', '¿Es de un videojuego?', N),
     P('internet', 'F', 'onde', 'Ficou famoso na internet (YouTube, TikTok…)?', 'Did it get famous on the internet (YouTube, TikTok…)?', '¿Se hizo famoso en internet (YouTube, TikTok…)?', N),
     P('tv', 'F', 'onde', 'Apresenta ou apresentou programa de TV?', 'Does it host (or did it host) a TV show?', '¿Presenta o ha presentado un programa de televisión?', N),
-    P('disney', 'I', 'onde', 'É da Disney ou da Pixar?', 'Is it from Disney or Pixar?', '¿Es de Disney o de Pixar?', N),
+    P('disney', 'I', 'onde', 'É da Disney/Pixar?', 'Is it from Disney/Pixar?', '¿Es de Disney/Pixar?', N),   // uma pergunta só: a Pixar é da Disney
+    P('dreamworks', 'I', 'onde', 'É da DreamWorks (Shrek, Kung Fu Panda, Madagascar…)?', 'Is it from DreamWorks (Shrek, Kung Fu Panda, Madagascar…)?', '¿Es de DreamWorks (Shrek, Kung Fu Panda, Madagascar…)?', T),
+    P('illumination', 'I', 'onde', 'É da Illumination (Minions, Sing, Pets…)?', 'Is it from Illumination (Minions, Sing, Pets…)?', '¿Es de Illumination (Minions, ¡Canta!, Mascotas…)?', T),
     // ---------- o que faz (núcleo) ----------
     P('canta', 'I', 'faz', 'Canta?', 'Does it sing?', '¿Canta?', N),
     P('musica', 'I', 'faz', 'É famoso por causa de música?', 'Is it famous for music?', '¿Es famoso por la música?', N),
     P('esporte', 'I', 'faz', 'É famoso por esporte?', 'Is it famous for sports?', '¿Es famoso por el deporte?', N),
-    P('heroi', 'I', 'faz', 'É super-herói ou herói da história?', 'Is it a superhero or the hero of the story?', '¿Es un superhéroe o el héroe de la historia?', N),
+    P('heroi', 'I', 'faz', 'É o herói ou o personagem principal da história?', 'Is it the hero or the main character of the story?', '¿Es el héroe o el protagonista de la historia?', N),
     P('vilao', 'I', 'faz', 'É vilão (malvado)?', 'Is it a villain (bad guy)?', '¿Es un villano (un malo)?', N),
     P('magia', 'I', 'faz', 'Tem poderes mágicos ou superpoderes?', 'Does it have magic or superpowers?', '¿Tiene poderes mágicos o superpoderes?', N),
     P('voa', 'I', 'faz', 'Voa?', 'Does it fly?', '¿Vuela?', N),

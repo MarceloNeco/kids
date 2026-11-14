@@ -9,7 +9,8 @@
       sem erro na tela.
    Texto "privado" (nome que a família ensinou) nunca vai para a internet: sempre a voz do aparelho.
 
-   QEVoz.criar(amb) → { falar(texto, { meleca, privado }), calar(), usarEleven(sim), vozes, definirVoz(meleca, id) }
+   QEVoz.criar(amb) → { falar(texto, { meleca, privado }), calar(), usarEleven(sim), vozes, definirVoz(meleca, id),
+     dublar(id), dublagem() }  (id de QEVoz.DUBLAGENS: 'meleca', 'esquilo', 'gigante', 'vovo', 'apressada', 'preguica')
      amb: { online, cofre, fetch, caches, tocarAudio(blob), falarAparelho(texto, jeito), pararTudo() }
      QEVoz.ambienteDoNavegador(lingua) monta o amb de verdade. */
 (function (raiz) {
@@ -21,14 +22,24 @@
   // vozes prontas da biblioteca da ElevenLabs (a pessoa pode trocar o id nas ⚙): Blue mais grave, Pink mais aguda
   var VOZES = { blue: 'TxGEqnHWrfWFTfGW9XTX', pink: 'AZnzlk1XvdvUeBnXmlld' };
   var JEITO = { blue: { pitch: 0.75, rate: 1.0 }, pink: { pitch: 1.5, rate: 1.08 } };
+  // vozes prontas para "dublar" a meleca (dono, 14/Nov/2026): só tom (pitch, 0 a 2) e velocidade (rate) da voz do aparelho;
+  // 'meleca' = o jeito de cada uma (JEITO) e, se ligada, a voz animada. As outras são sempre a voz do aparelho.
+  var DUBLAGENS = {
+    meleca: null,
+    esquilo: { pitch: 2, rate: 1.4 },
+    gigante: { pitch: 0.1, rate: 0.8 },
+    vovo: { pitch: 0.9, rate: 0.7 },
+    apressada: { pitch: 1.3, rate: 1.7 },
+    preguica: { pitch: 0.6, rate: 0.55 }
+  };
 
   function limpar(t) { return String(t || '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').replace(/\s+/g, ' ').trim(); }
   function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; return h.toString(36); }
 
   function criar(amb) {
-    var eleven = false, vozes = { blue: VOZES.blue, pink: VOZES.pink }, vez = 0;
+    var eleven = false, vozes = { blue: VOZES.blue, pink: VOZES.pink }, vez = 0, dub = 'meleca';
     // privado: só voz que funciona dentro do aparelho (a voz "Google" do Chrome manda o texto para a internet)
-    function aparelho(txt, meleca, privado) { var j = Object.assign({}, JEITO[meleca] || JEITO.pink); if (privado) j.soLocal = true; return Promise.resolve(amb.falarAparelho(txt, j)).catch(function () {}); }
+    function aparelho(txt, meleca, privado) { var j = Object.assign({}, DUBLAGENS[dub] || JEITO[meleca] || JEITO.pink); if (privado) j.soLocal = true; return Promise.resolve(amb.falarAparelho(txt, j)).catch(function () {}); }
     function chaveCache(txt, voz) { return 'https://quem-e.local/voz/' + voz + '/' + hash(txt) + '-' + txt.length; }
 
     function daInternet(txt, voz) {
@@ -50,13 +61,15 @@
     return {
       vozes: vozes,
       usarEleven: function (sim) { eleven = !!sim; },
+      dublar: function (id) { dub = Object.prototype.hasOwnProperty.call(DUBLAGENS, id) ? id : 'meleca'; },
+      dublagem: function () { return dub; },
       definirVoz: function (meleca, id) { if (/^[A-Za-z0-9]{8,40}$/.test(id || '')) vozes[meleca] = id; },
       calar: function () { vez++; try { amb.pararTudo(); } catch (e) { /* ok */ } },
       falar: function (texto, op) {
         op = op || {};
         var txt = limpar(texto), meleca = op.meleca === 'blue' ? 'blue' : 'pink', minha = ++vez;
         if (!txt) return Promise.resolve();
-        if (op.privado || !eleven || !amb.cofre || !amb.cofre.tem('ia:elevenlabs') || !amb.caches) return aparelho(txt, meleca, op.privado);
+        if (op.privado || !eleven || dub !== 'meleca' || !amb.cofre || !amb.cofre.tem('ia:elevenlabs') || !amb.caches) return aparelho(txt, meleca, op.privado);
         var voz = vozes[meleca], chave = chaveCache(txt, voz);
         function ainda() { return minha === vez; }   // veio outra fala depois (ou calar): esta não toca mais
         return amb.caches.open(CACHE).then(function (c) {
@@ -110,7 +123,7 @@
     };
   }
 
-  var API = { criar: criar, ambienteDoNavegador: ambienteDoNavegador, VOZES: VOZES, CACHE: CACHE };
+  var API = { criar: criar, ambienteDoNavegador: ambienteDoNavegador, VOZES: VOZES, CACHE: CACHE, DUBLAGENS: DUBLAGENS };
   raiz.QEVoz = API;
   if (typeof module === 'object' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -23,7 +23,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:s cor-branco:n cor-marrom:n grande:n pequeno:n cabelo-comprido:s ' +
       'arma:p forte:p monstro:p antigo:n recente:s estrangeiro-eua:s'],
     ['rei-gelado', 'Rei Gelado (Hora de Aventura)', '🥶', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:p magia:s voa:s engracado:s realeza:s cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n chapeu:s careca:n ' +
@@ -53,19 +53,19 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n robo:p antigo:n ' +
       'recente:s estrangeiro-eua:s professor:q'],
     ['pairulito', 'Pairulito (Apenas um Show)', '🍭', 'IFA',
-      'real:n pessoa:p bicho:n coisa:n masculino:s feminino:n crianca:n idoso:p brasileiro:n fala:s ' +
+      'real:n pessoa:p bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:p brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:s realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:p cor-branco:s cor-marrom:n grande:n pequeno:n chapeu:s careca:p ' +
       'rico:s comida:q antigo:n recente:s estrangeiro-eua:s'],
     ['gwen-tennyson', 'Gwen Tennyson (Ben 10)', '🔮', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n ruivo:s antigo:n ' +
       'recente:q estrangeiro-eua:s espaco:p veiculo:p familia-grande:p chapeu-magico:p'],
     ['vovo-max', 'Vovô Max (Ben 10)', '👴', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n careca:n forte:p ' +
@@ -95,31 +95,31 @@
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n pelo:s orelhas:p ' +
       'cachorro:s monstro:n fazenda:q estimacao:s antigo:s recente:n estrangeiro-eua:s'],
     ['muriel', 'Muriel (Coragem, o Cão Covarde)', '👵', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:q realeza:n cor-azul:? cor-vermelho:? cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n oculos:s vestido:s ' +
       'antigo:s recente:n estrangeiro-eua:q europa:p casado:s'],
     ['dexter', 'Dexter (O Laboratório de Dexter)', '🔬', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:p cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n oculos:s ruivo:s ' +
       'robo:q antigo:s recente:n cientista:s estrangeiro-eua:s escola:s'],
     ['dee-dee', 'Dee Dee (O Laboratório de Dexter)', '🩰', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:q magia:n voa:n engracado:s realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n loiro:s ' +
       'cabelo-comprido:p antigo:s recente:n dancar:p estrangeiro-eua:s escola:p'],
     ['billy', 'Billy (As Terríveis Aventuras de Billy e Mandy)', '🤪', 'FA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:s realeza:n cor-azul:? cor-vermelho:? cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n chapeu:s ruivo:p ' +
       'antigo:q recente:n estrangeiro-eua:s escola:s'],
     ['mandy', 'Mandy (Billy e Mandy)', '😠', 'FA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:p magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n loiro:s vestido:s ' +
@@ -131,13 +131,13 @@
       'cor-amarelo:n cor-rosa:n cor-preto:s cor-branco:s cor-marrom:n grande:n pequeno:n capa:s arma:s ' +
       'monstro:s antigo:q recente:n'],
     ['darwin-gumball', 'Darwin (O Incrível Mundo de Gumball)', '🐠', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:s realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n agua:s estimacao:p ' +
       'antigo:n recente:s estrangeiro-eua:s escola:s familia-grande:s'],
     ['anais', 'Anais (O Incrível Mundo de Gumball)', '🐰', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n orelhas:s antigo:n ' +
@@ -185,61 +185,61 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:? cor-marrom:n grande:n pequeno:n agua:s antigo:q ' +
       'recente:n professor:s veiculo:s escola:p t-bob:s'],
     ['perola-bob', 'Pérola (Bob Esponja)', '🐋', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:? cor-preto:n cor-branco:n cor-marrom:n grande:s pequeno:n rico:p agua:s ' +
       'antigo:q recente:n familia-grande:q t-bob:s'],
     ['tommy-pickles', 'Tommy Pickles (Rugrats)', '👶', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:p ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:p ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:n voa:n engracado:p realeza:n cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n careca:s antigo:s ' +
       'recente:n estrangeiro-eua:s familia-grande:p'],
     ['angelica-pickles', 'Angélica Pickles (Rugrats)', '🎀', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:p magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n loiro:s vestido:s ' +
       'rico:q antigo:s recente:n estrangeiro-eua:s'],
     ['chuckie', 'Chuckie (Rugrats)', '👓', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:p ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:p ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:p realeza:n cor-azul:? cor-vermelho:n cor-verde:? ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n oculos:s ruivo:s ' +
       'antigo:s recente:n estrangeiro-eua:s'],
     ['jimmy-neutron', 'Jimmy Nêutron', '🚀', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n robo:q antigo:q ' +
       'recente:n cientista:s estrangeiro-eua:s espaco:p veiculo:p escola:s'],
     ['aang', 'Aang (Avatar: A Lenda de Aang)', '🌀', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:p idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:p serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:p engracado:p realeza:n cor-azul:p cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:s cor-rosa:n cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n careca:s arma:p ' +
       'antigo:n recente:q'],
     ['katara', 'Katara (Avatar: A Lenda de Aang)', '💧', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:p serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n cabelo-comprido:s ' +
       'antigo:n recente:q familia-grande:p'],
     ['sokka', 'Sokka (Avatar: A Lenda de Aang)', '🪃', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:p serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:n voa:n engracado:s realeza:n cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n arma:s antigo:n ' +
       'recente:q'],
     ['zuko', 'Zuko (Avatar: A Lenda de Aang)', '🔥', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:p serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:p magia:s voa:n engracado:p realeza:s cor-azul:n cor-vermelho:s cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n arma:p antigo:n ' +
       'recente:q'],
     ['timmy-turner', 'Timmy Turner (Os Padrinhos Mágicos)', '🧢', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:q serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:p voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n chapeu:s antigo:n ' +
@@ -281,19 +281,19 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n rabo:q capa:s ' +
       'arma:s forte:s agua:q antigo:s recente:n estrangeiro-eua:s t-scooby:n'],
     ['splinter', 'Mestre Splinter (Tartarugas Ninja)', '🐀', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:s serie:p livro:s videogame:p internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n barba:s rabo:s ' +
       'arma:p rato:s antigo:s recente:n estrangeiro-eua:s professor:p'],
     ['arnold-hey', 'Arnold (Hey Arnold!)', '🏈', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:n voa:n engracado:p realeza:n cor-azul:p cor-vermelho:? cor-verde:p ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n chapeu:s loiro:s ' +
       'antigo:s recente:n estrangeiro-eua:s escola:s'],
     ['botas', 'Botas (Dora, a Aventureira)', '🐒', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:p serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:s realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:? cor-preto:n cor-branco:n cor-marrom:? grande:n pequeno:n rabo:s pelo:s ' +
@@ -305,7 +305,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n rabo:s pelo:s ' +
       'capa:s selvagem:s antigo:n recente:q estrangeiro-eua:s'],
     ['diego', 'Diego (Vai, Diego!)', '🐆', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:p serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:p grande:n pequeno:n selvagem:p ' +
@@ -431,7 +431,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n loiro:s antigo:s ' +
       'recente:n historia:p estrangeiro-eua:s veiculo:p casado:s'],
     ['pedrita', 'Pedrita (Os Flintstones)', '🍼', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:p serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n chapeu:p ruivo:s ' +
@@ -473,13 +473,13 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:s chapeu:s monstro:p ' +
       'antigo:s recente:n europa:s'],
     ['lucy-snoopy', 'Lucy (Turma do Snoopy)', '💙', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:n livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:q magia:n voa:n engracado:p realeza:n cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n vestido:s antigo:s ' +
       'recente:n estrangeiro-eua:s escola:p'],
     ['linus', 'Linus (Turma do Snoopy)', '🧸', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:n livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n antigo:s recente:n ' +
@@ -539,13 +539,13 @@
       'cor-amarelo:p cor-rosa:p cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n capa:s arma:s ' +
       'monstro:p antigo:s recente:n estrangeiro-eua:s'],
     ['mestre-dos-magos', 'Mestre dos Magos (Caverna do Dragão)', '🧙', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:s voa:n engracado:p realeza:n cor-azul:n cor-vermelho:s cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n careca:p barba:? ' +
       'arma:p antigo:s recente:n estrangeiro-eua:s chapeu-magico:s'],
     ['gasparzinho', 'Gasparzinho', '👻', 'IFA',
-      'real:n pessoa:q bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:q bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:s serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:s engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n monstro:p antigo:s ' +
@@ -557,13 +557,13 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:p grande:n pequeno:n chapeu:s robo:p ' +
       'antigo:s recente:n estrangeiro-eua:s professor:p detetive:s'],
     ['maggie', 'Maggie Simpson', '🍼', 'FA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:n ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:n ' +
       'desenho:s filme:n serie:s livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:s cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n antigo:s recente:n ' +
       'estrangeiro-eua:s familia-grande:p t-simpsons:s'],
     ['sr-burns', 'Sr. Burns (Os Simpsons)', '💰', 'FA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:n serie:s livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:s magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:? ' +
       'cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n careca:p rico:s ' +
@@ -575,7 +575,7 @@
       'cor-amarelo:p cor-rosa:p cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n oculos:s barba:s ' +
       'antigo:s recente:n estrangeiro-eua:s familia-grande:p t-simpsons:s'],
     ['milhouse', 'Milhouse (Os Simpsons)', '🤓', 'FA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:s livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:s cor-vermelho:? cor-verde:n ' +
       'cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n oculos:s antigo:s ' +
@@ -593,7 +593,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n oculos:s antigo:q ' +
       'recente:n estrangeiro-eua:s casado:s familia-grande:s'],
     ['stewie', 'Stewie Griffin (Uma Família da Pesada)', '🍼', 'A',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:s livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:p magia:n voa:n engracado:s realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n arma:p antigo:q ' +
@@ -611,19 +611,19 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n ruivo:s antigo:q ' +
       'recente:n estrangeiro-eua:s espaco:s veiculo:p'],
     ['cartman', 'Cartman (South Park)', '🧢', 'A',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:s livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:p magia:n voa:n engracado:s realeza:n cor-azul:p cor-vermelho:s cor-verde:n ' +
       'cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n chapeu:s antigo:s ' +
       'recente:n estrangeiro-eua:s escola:s'],
     ['rick-sanchez', 'Rick (Rick e Morty)', '🧪', 'A',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:n serie:s livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:s realeza:n cor-azul:p cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n arma:s antigo:n ' +
       'recente:s cientista:s estrangeiro-eua:s espaco:s veiculo:s'],
     ['morty', 'Morty (Rick e Morty)', '😰', 'A',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:s livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:p cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:s cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n antigo:n recente:s ' +
@@ -641,7 +641,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n forte:s antigo:s ' +
       'recente:n estrangeiro-eua:n europa:n espaco:s casado:s'],
     ['gohan', 'Gohan (Dragon Ball)', '📚', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p adolescente:p idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:p internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:s engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:p cor-preto:n cor-branco:n cor-marrom:p grande:n pequeno:n forte:s antigo:s ' +
@@ -665,7 +665,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n careca:s forte:p ' +
       'antigo:s recente:n estrangeiro-eua:n europa:n casado:s'],
     ['mestre-kame', 'Mestre Kame (Dragon Ball)', '🐢', 'FA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n idoso:s brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:n adolescente:n idoso:s brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:p voa:n engracado:s realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:p grande:n pequeno:n oculos:s careca:s ' +
@@ -683,19 +683,19 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:s pequeno:n dinossauro:s ' +
       'monstro:p antigo:s recente:n estrangeiro-eua:n europa:n'],
     ['naruto', 'Naruto', '🍥', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:s realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:s grande:n pequeno:n chapeu:p loiro:s ' +
       'rapido:p antigo:q recente:p estrangeiro-eua:n europa:n'],
     ['sasuke', 'Sasuke (Naruto)', '⚡', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:p magia:s voa:n engracado:p realeza:n cor-azul:p cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:p cor-branco:n cor-marrom:n grande:n pequeno:n arma:s antigo:q ' +
       'recente:p estrangeiro-eua:n europa:n'],
     ['sakura-naruto', 'Sakura (Naruto)', '🌸', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:s voa:n engracado:p realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n forte:s antigo:q ' +
@@ -719,61 +719,61 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n arma:s forte:s ' +
       'antigo:s recente:n estrangeiro-eua:n europa:n pirata:s'],
     ['seiya', 'Seiya de Pégaso (Cavaleiros do Zodíaco)', '🐴', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n arma:n forte:s ' +
       'antigo:s recente:n estrangeiro-eua:n europa:n'],
     ['shiryu', 'Shiryu de Dragão (Cavaleiros do Zodíaco)', '🐉', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:s ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n cabelo-comprido:s ' +
       'forte:s antigo:s recente:n estrangeiro-eua:n europa:n'],
     ['hyoga', 'Hyoga de Cisne (Cavaleiros do Zodíaco)', '🦢', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:p cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n loiro:s forte:s ' +
       'antigo:s recente:n estrangeiro-eua:n europa:?'],
     ['shun', 'Shun de Andrômeda (Cavaleiros do Zodíaco)', '⛓️', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n arma:s antigo:s ' +
       'recente:n estrangeiro-eua:n europa:n'],
     ['ikki', 'Ikki de Fênix (Cavaleiros do Zodíaco)', '🔥', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:p magia:s voa:p engracado:p realeza:n cor-azul:? cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:? cor-preto:n cor-branco:n cor-marrom:? grande:n pequeno:n forte:s antigo:s ' +
       'recente:n estrangeiro-eua:n europa:n'],
     ['saori-kido', 'Saori Kido (Atena)', '🏛️', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:s voa:n engracado:p realeza:p cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:p cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n cabelo-comprido:s ' +
       'vestido:s arma:p rico:s antigo:s recente:n estrangeiro-eua:n europa:n'],
     ['sailor-moon', 'Sailor Moon', '🌙', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:s cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n loiro:s ' +
       'cabelo-comprido:s arma:p antigo:s recente:n estrangeiro-eua:n europa:n escola:s'],
     ['sailor-mercurio', 'Sailor Mercúrio (Sailor Moon)', '💧', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:s voa:n engracado:p realeza:n cor-azul:s cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n loiro:n antigo:s ' +
       'recente:n cientista:p estrangeiro-eua:n europa:n escola:s'],
     ['misty', 'Misty (Pokémon)', '💧', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:p videogame:p internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:p realeza:n cor-azul:p cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:s cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n ruivo:s antigo:s ' +
       'recente:n estrangeiro-eua:n europa:n t-pokemon:p'],
     ['brock', 'Brock (Pokémon)', '🪨', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:p videogame:p internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:p ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:p grande:n pequeno:n antigo:s recente:n ' +
@@ -791,18 +791,18 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:s pequeno:n pelo:s orelhas:s ' +
       'monstro:s selvagem:s antigo:s recente:n'],
     ['chihiro', 'Chihiro (A Viagem de Chihiro)', '🛁', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:n livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:q voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:p cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n antigo:n recente:n'],
     ['kiki', 'Kiki (O Serviço de Entregas da Kiki)', '🧹', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:n livro:p videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:s voa:s engracado:p realeza:n cor-azul:n cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:s cor-branco:n cor-marrom:n grande:n pequeno:n chapeu:p vestido:s ' +
       'arma:p antigo:s recente:n chapeu-magico:s'],
     ['ponyo', 'Ponyo', '🐟', 'IFA',
-      'real:n pessoa:p bicho:p coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:p bicho:p coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:n livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:s voa:n engracado:p realeza:n cor-azul:n cor-vermelho:s cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n agua:s antigo:n ' +
@@ -814,25 +814,25 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n rabo:s gato:p ' +
       'robo:s antigo:s recente:n estrangeiro-eua:n europa:n espaco:q'],
     ['nobita', 'Nobita (Doraemon)', '👓', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n oculos:s antigo:s ' +
       'recente:n estrangeiro-eua:n europa:n escola:s'],
     ['hello-kitty', 'Hello Kitty', '🎀', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:p ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:p ' +
       'desenho:p filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:s cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n gato:s estimacao:p ' +
       'antigo:s recente:n'],
     ['my-melody', 'My Melody (Sanrio)', '🐰', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:p filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:s cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n chapeu:s orelhas:s ' +
       'antigo:p recente:n'],
     ['kuromi', 'Kuromi (Sanrio)', '😈', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:p filme:n serie:p livro:n videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:p magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:p cor-preto:s cor-branco:p cor-marrom:n grande:n pequeno:n chapeu:s antigo:n ' +
@@ -844,19 +844,19 @@
       'cor-amarelo:s cor-rosa:n cor-preto:n cor-branco:n cor-marrom:p grande:n pequeno:n dinossauro:p ' +
       'monstro:s antigo:s recente:n'],
     ['yugi', 'Yugi Muto (Yu-Gi-Oh!)', '🃏', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:p idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:q adolescente:s idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:p internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:s vilao:n magia:p voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:p cor-rosa:p cor-preto:p cor-branco:n cor-marrom:n grande:n pequeno:n antigo:s recente:n ' +
       'estrangeiro-eua:n europa:n escola:s'],
     ['tyson-beyblade', 'Tyson (Beyblade)', '🌀', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:n fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:n fala:s ' +
       'desenho:s filme:n serie:p livro:p videogame:n internet:n tv:n disney:n canta:q musica:n esporte:p ' +
       'heroi:s vilao:n magia:n voa:n engracado:p realeza:n cor-azul:p cor-vermelho:p cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n chapeu:s antigo:n ' +
       'recente:n'],
     ['franjinha', 'Franjinha', '🧪', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:s fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:s fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:? cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:? cor-marrom:n grande:n pequeno:n antigo:s recente:n ' +
@@ -874,7 +874,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n pelo:s cachorro:s ' +
       'estimacao:s antigo:s recente:n t-monica:s'],
     ['anjinho', 'Anjinho', '👼', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:s fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:s fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:p voa:s engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:p cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n chapeu:p loiro:s ' +
@@ -886,7 +886,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:s cor-marrom:n grande:n pequeno:n monstro:p antigo:s ' +
       'recente:n t-monica:s'],
     ['rosinha', 'Rosinha (Turma da Mônica)', '🌹', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s idoso:n brasileiro:s fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:n feminino:s crianca:s adolescente:n idoso:n brasileiro:s fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:? cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:n cabelo-comprido:? ' +
@@ -910,7 +910,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:p cor-marrom:n grande:n pequeno:n chapeu:s antigo:s ' +
       'recente:n espaco:s veiculo:s t-monica:s'],
     ['papa-capim', 'Papa-Capim', '🏹', 'IFA',
-      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:s fala:s ' +
+      'real:n pessoa:s bicho:n coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:s fala:s ' +
       'desenho:s filme:n serie:p livro:s videogame:n internet:n tv:n disney:n canta:q musica:n esporte:n ' +
       'heroi:p vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:n cor-rosa:n cor-preto:n cor-branco:n cor-marrom:? grande:n pequeno:n arma:p selvagem:s ' +
@@ -922,7 +922,7 @@
       'cor-amarelo:n cor-rosa:n cor-preto:? cor-branco:n cor-marrom:? grande:n pequeno:n antigo:s recente:n ' +
       't-monica:s'],
     ['pintinho-amarelinho', 'Pintinho Amarelinho (Galinha Pintadinha)', '🐥', 'IFA',
-      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s idoso:n brasileiro:s fala:s ' +
+      'real:n pessoa:n bicho:s coisa:n masculino:s feminino:n crianca:s adolescente:n idoso:n brasileiro:s fala:s ' +
       'desenho:s filme:n serie:p livro:n videogame:n internet:s tv:n disney:n canta:p musica:s esporte:n ' +
       'heroi:q vilao:n magia:n voa:n engracado:p realeza:n cor-azul:n cor-vermelho:n cor-verde:n ' +
       'cor-amarelo:s cor-rosa:n cor-preto:n cor-branco:n cor-marrom:n grande:n pequeno:s passaro:s ' +
