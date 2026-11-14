@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.20.0",
+      "data": "14/Nov/2026",
+      "hora": "16:40:00",
+      "pt": [
+        "🛼 Patins novo: uma pessoa de capacete patinando com patins de 4 rodinhas, com a passada de verdade (uma perna empurra para o lado enquanto a outra desliza, e os braços balançam), joelheiras e cotoveleiras.",
+        "🚛 Caminhão Guincho novo: cabine alta, braço amarelo do guincho com o gancho balançando, giroflex piscando no teto, chaminés cromadas e rodas grandes."
+      ],
+      "en": [
+        "🛼 New Roller Skates: a person in a helmet skating on 4-wheel roller skates, with a real stride (one leg pushes out while the other glides, arms swinging), knee and elbow pads.",
+        "🚛 New Tow Truck: tall cab, yellow tow boom with a swinging hook, flashing beacons on the roof, chrome stacks and big wheels."
+      ],
+      "es": [
+        "🛼 Patines nuevos: una persona con casco patinando con patines de 4 ruedas, con la zancada de verdad (una pierna empuja hacia el lado mientras la otra se desliza, y los brazos se balancean), rodilleras y coderas.",
+        "🚛 Camión Grúa nuevo: cabina alta, brazo amarillo de la grúa con el gancho balanceándose, rotativo parpadeando en el techo, chimeneas cromadas y ruedas grandes."
+      ]
+    },
+    {
       "versao": "1.19.0",
       "data": "14/Nov/2026",
       "hora": "16:10:00",
