@@ -156,7 +156,7 @@
 
   function pronto() {
     botao.className = 'bc-btn ok';
-    texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el icono ') + NOME;   // o ícone instalado se chama assim
+    texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el icono ') + NOME + (android ? T(' (ou na lista de apps)', ' (or in the app list)', ' (o en la lista de apps)') : '');   // o ícone instalado se chama assim
     if (FILA) { barra.hidden = false; rotuloProx(true); return; }   // na fila, a barra fica para seguir ao próximo
     setTimeout(function () { barra.hidden = true; }, 6000);
   }
@@ -286,18 +286,20 @@
       '<p>Has abierto esta página dentro de otra app (WhatsApp, Instagram…). Para instalarla, ábrela en Chrome:</p>' +
       '<ol><li>Toca <b>Abrir en Chrome</b> (botón de abajo) o los <b>tres puntitos ⋮</b> y <b>Abrir en el navegador</b>.</li>' +
       '<li>En Chrome, toca <b>Instalar la aplicación</b>, arriba de la página.</li></ol>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
-    if (android) return T('<ol><li>Toque nos <b>três pontinhos ⋮</b> do navegador (no canto de cima ou de baixo).</li>' +
-      '<li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
-      '<li>Confirme em <b>Instalar</b>. O ícone aparece junto dos seus apps.</li></ol>' +
-      '<p class="aviso">Se essa opção não aparecer, talvez já esteja instalado: procure o ícone <b>' + N + '</b> nos seus apps.</p>',
-      '<ol><li>Tap the browser\'s <b>three dots ⋮</b> (in the top or bottom corner).</li>' +
-      '<li>Tap <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
-      '<li>Confirm with <b>Install</b>. The icon shows up with your other apps.</li></ol>' +
-      '<p class="aviso">If you can\'t see that option, it may already be installed: look for the <b>' + N + '</b> icon in your apps.</p>',
-      '<ol><li>Toca los <b>tres puntitos ⋮</b> del navegador (arriba o abajo).</li>' +
-      '<li>Toca <b>Instalar app</b> o <b>Añadir a la pantalla de inicio</b>.</li>' +
-      '<li>Confirma con <b>Instalar</b>. El icono aparece junto a tus apps.</li></ol>' +
-      '<p class="aviso">Si no aparece esa opción, quizá ya esté instalada: busca el icono <b>' + N + '</b> en tus apps.</p>');
+    // Android sem a janela de instalar do Chrome: ou abriu por um link de outro app (janelinha com ✕ em cima, onde o
+    // Chrome não instala), ou já está instalado (no Samsung o ícone vai para a gaveta de apps, não para a tela inicial)
+    if (android) return T('<ol><li>Se em cima da página aparece um <b>✕</b> (você abriu por um link de outro app), toque em <b>Abrir no Chrome</b> (botão abaixo) e faça os passos lá.</li>' +
+      '<li>No Chrome, toque nos <b>três pontinhos ⋮</b> (no canto de cima) e em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>' +
+      '<li>Confirme em <b>Instalar</b>.</li></ol>' +
+      '<p class="aviso">Não achou o ícone? Arraste a tela inicial para cima para abrir a <b>lista de apps</b> e procure <b>' + N + '</b>. Segure o dedo em cima dele e arraste para a tela inicial.</p>',
+      '<ol><li>If you see an <b>✕</b> at the top of the page (you opened it from a link in another app), tap <b>Open in Chrome</b> (button below) and do the steps there.</li>' +
+      '<li>In Chrome, tap the <b>three dots ⋮</b> (top corner) and <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
+      '<li>Confirm with <b>Install</b>.</li></ol>' +
+      '<p class="aviso">Can\'t find the icon? Swipe up on the home screen to open the <b>app list</b> and look for <b>' + N + '</b>. Hold your finger on it and drag it to the home screen.</p>',
+      '<ol><li>Si arriba de la página aparece una <b>✕</b> (lo abriste desde un enlace de otra app), toca <b>Abrir en Chrome</b> (botón de abajo) y haz los pasos allí.</li>' +
+      '<li>En Chrome, toca los <b>tres puntitos ⋮</b> (arriba) y <b>Instalar aplicación</b> o <b>Añadir a la pantalla de inicio</b>.</li>' +
+      '<li>Confirma con <b>Instalar</b>.</li></ol>' +
+      '<p class="aviso">¿No encuentras el icono? Desliza hacia arriba en la pantalla de inicio para abrir la <b>lista de apps</b> y busca <b>' + N + '</b>. Mantén el dedo encima y arrástralo a la pantalla de inicio.</p>') + '<div class="bc-botoes"><a class="bc-forte" href="' + linkChrome() + '">' + T('Abrir no Chrome', 'Open in Chrome', 'Abrir en Chrome') + '</a></div>';
     if (macSafari) return T('<ol><li>No menu do topo da tela, clique em <b>Arquivo</b>.</li>' +
       '<li>Clique em <b>Adicionar ao Dock</b> e em <b>Adicionar</b>.</li></ol>',
       '<ol><li>In the menu at the top of the screen, click <b>File</b>.</li>' +
