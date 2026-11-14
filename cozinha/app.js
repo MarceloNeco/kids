@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.7.0';
+  var APP_VERSION = '0.8.0';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -30,6 +30,10 @@
   if (typeof pref.voz !== 'boolean') pref.voz = true;
   if (typeof pref.efeitos !== 'boolean') pref.efeitos = true;
   if (!D.nivel[pref.nivel]) pref.nivel = 'facil';
+  // família à mesa (v0.8.0): quem vai comer ("eu" sempre); fica guardado; o nível limita quantos (logica.maxPessoas)
+  if (!Array.isArray(pref.familia)) pref.familia = ['eu'];
+  pref.familia = ['eu'].concat(pref.familia.filter(function (x) { return x !== 'eu' && D.pessoa[x]; }));
+  function familiaDoNivel(nivel) { var m = L.maxPessoas(nivel), l = pref.familia.slice(); while (l.length > m) l.splice(1, 1); return l; }
   function salvarPref() { gravar(CH_PREF, pref); }
   var prog = ler(CH_PROG, null);
   if (!prog || typeof prog !== 'object' || !prog.r) prog = { r: {} };
@@ -263,25 +267,47 @@
     $('recTitulo').textContent = tx(r);
     $('recPrato').innerHTML = '<img src="' + ART.foto(r.id) + '" alt="" draggable="false">'; $('recPrato').style.setProperty('--c', r.cor);
     $('recNivel').textContent = nv.e + ' ' + t('Nível ', 'Level: ') + tx(nv);
-    $('recIngredientes').innerHTML = L.ingredientesDoNivel(r, nv).map(function (x, i) {
+    desenharFicha();
+    ir('receita');
+  }
+  // o que depende de quem vai comer: rostos da família, porção, ingredientes (quantidades) e moedas
+  function desenharFicha() {
+    var r = D.receita[recEscolhida], nv = D.nivel[pref.nivel], fam = familiaDoNivel(nv), fator = L.fatorDe(fam.length), max = L.maxPessoas(nv);
+    $('recFamilia').innerHTML = D.FAMILIA.map(function (f) {
+      var on = fam.indexOf(f.id) >= 0;
+      return '<button type="button" class="fam-bt' + (on ? ' on' : '') + '" data-pessoa="' + f.id + '" aria-pressed="' + on + '"' + (f.id === 'eu' ? ' disabled' : '') + '>' + C.pessoa(f, null, true) + '<span>' + tx(f) + '</span></button>';
+    }).join('');
+    var n = fam.length;
+    $('recPorcao').textContent = t('🍽️ Para ' + n + (n > 1 ? ' pessoas' : ' pessoa') + (fator > 1 ? ' · receita x' + fator : '') + ' (até ' + max + ' neste nível)',
+      '🍽️ For ' + n + (n > 1 ? ' people' : ' person') + (fator > 1 ? ' · recipe x' + fator : '') + ' (up to ' + max + ' on this level)');
+    $('recIngredientes').innerHTML = L.ingredientesDoNivel(r, nv, fator).map(function (x, i) {
       var onde = L.lugaresDe(x.id).map(function (l) { return D.lugar[l].e; }).join(' ');
       return '<li style="--i:' + i + '">' + icone(x.id) + '<span class="q">' + L.nomeQtd(x.id, x.q, en()) + '</span><span class="onde" title="' + t('onde achar', 'where to find') + '">' + onde + '</span></li>';
     }).join('');
-    var bolsa = nv.moedas ? t('Você tem 💰 ' + L.moedasIniciais(r, nv) + ' moedas', 'You have 💰 ' + L.moedasIniciais(r, nv) + ' coins') : t('Hoje o mercadinho é de graça! 🎁', 'Today the shop is free! 🎁');
+    var m = L.moedasIniciais(r, nv, fator);
+    var bolsa = nv.moedas ? t('Você tem 💰 ' + m + ' moedas', 'You have 💰 ' + m + ' coins') : t('Hoje o mercadinho é de graça! 🎁', 'Today the shop is free! 🎁');
     bolsa += t(' e 💛 ' + nv.favores + ' favores da vizinha.', ' and 💛 ' + nv.favores + ' favours from the neighbour.');
     if (nv.tempo) bolsa += t(' ☀️ Tente terminar antes do sol se pôr.', ' ☀️ Try to finish before sunset.');
     $('recBolsa').textContent = bolsa;
     $('recPassos').textContent = t('👩‍🍳 ' + L.passosDoNivel(r, nv).length + ' passos na cozinha.', '👩‍🍳 ' + L.passosDoNivel(r, nv).length + ' steps in the kitchen.');
-    ir('receita');
   }
+  $('recFamilia').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-pessoa]'); if (!b || b.disabled) return;
+    var antes = familiaDoNivel(pref.nivel).length;
+    pref.familia = L.alternarPessoa(familiaDoNivel(pref.nivel), b.getAttribute('data-pessoa'), pref.nivel); salvarPref();
+    Som.toca(familiaDoNivel(pref.nivel).length > antes ? 'pega' : 'toque');
+    desenharFicha();
+    var nb = qs($('recFamilia'), '[data-pessoa="' + b.getAttribute('data-pessoa') + '"]'); if (nb) { nb.classList.add('pulou'); nb.focus(); }
+  });
   $('btBuscar').addEventListener('click', function () { novoJogo(recEscolhida, pref.nivel); ir('mapa'); });
 
   // ---------- partida ----------
   var jogo = null, tSol = null;
   function novoJogo(recId, nivel) {
     var r = D.receita[recId], nv = D.nivel[nivel];
-    jogo = { rec: r, nivel: nivel, cfg: nv, precisa: L.ingredientesDoNivel(r, nv), passos: L.passosDoNivel(r, nv), cesta: {},
-      moedas: L.moedasIniciais(r, nv), favores: nv.favores, pendente: null, erros: 0, inicio: Date.now(), imprevistoFeito: false, cz: null, pos: 'casa' };
+    var fam = familiaDoNivel(nv), fator = L.fatorDe(fam.length);
+    jogo = { rec: r, nivel: nivel, cfg: nv, familia: fam, fator: fator, precisa: L.ingredientesDoNivel(r, nv, fator), passos: L.passosDoNivel(r, nv), cesta: {},
+      moedas: L.moedasIniciais(r, nv, fator), favores: nv.favores, pendente: null, erros: 0, inicio: Date.now(), imprevistoFeito: false, cz: null, pos: 'casa' };
     clearInterval(tSol);
     $('sol').hidden = !nv.tempo;
     if (nv.tempo) tSol = setInterval(desenharCarteira, 1000);
@@ -1010,7 +1036,7 @@
   function agendarCz(fn, ms) { var id = setTimeout(fn, ms); tCz.push(function () { clearTimeout(id); }); }
   function limparCozinha() { tCz.forEach(function (f) { f(); }); tCz = []; fimCz.forEach(function (f) { try { f(); } catch (e) { /* ok */ } }); fimCz = []; }
   function passoAtual() { return jogo.cz.atual ? jogo.passos.filter(function (p) { return p.id === jogo.cz.atual; })[0] : null; }
-  function texto(p) { return L.textoPasso(p, jogo.rec, jogo.nivel, en()); }
+  function texto(p) { return L.textoPasso(p, jogo.rec, jogo.nivel, en(), jogo.fator); }
   function iniciarCozinha() {
     $('czTitulo').innerHTML = ART.imgFoto(jogo.rec.id, 'ic-titulo') + ' ' + tx(jogo.rec);
     if (jogo.cz) { desenharCozinha(); return; }
@@ -1228,7 +1254,7 @@
       var temRp = C.temRecipiente(p.u), dentroP = dentroDe(p.u);
       palco.innerHTML = '<p class="instr">' + t('Toque em cada ingrediente para colocar ', 'Tap each ingredient to put it ') + D.utensilio[p.u].na[en() ? 1 : 0] + '</p>' +
         '<div class="grandao destino' + (temRp ? ' com-recip' : '') + '">' + (temRp ? C.recipiente(p.u) : icone(p.u)) + '</div>' +
-        '<div class="chips">' + chips.map(function (id) { return '<button type="button" class="chip-ing" data-ing="' + id + '">' + icone(id) + '<span>' + L.nomeQtd(id, L.quantidade(jogo.rec, jogo.nivel, id), en()) + '</span></button>'; }).join('') + '</div>';
+        '<div class="chips">' + chips.map(function (id) { return '<button type="button" class="chip-ing" data-ing="' + id + '">' + icone(id) + '<span>' + L.nomeQtd(id, L.quantidade(jogo.rec, jogo.nivel, id, jogo.fator), en()) + '</span></button>'; }).join('') + '</div>';
       var faltam = certos.length, dest = qs(palco, '.destino');
       if (temRp) C.encher(dest, nivelDe(dentroP), corDe(dentroP));
       qs(palco, '.chips').addEventListener('click', function (e) {
@@ -1356,14 +1382,21 @@
     pararMenino();
     $('prontoPrato').innerHTML = C.menino({ cor: jogo.rec.cor, prato: jogo.rec.e, foto: ART.foto(jogo.rec.id), hmm: t('Hmm!', 'Yum!') });
     if (!calmo()) pararMenino = C.animarMenino(qs($('prontoPrato'), 'svg'));
+    // a família à mesa: cada um com o seu prato (a foto de verdade), comendo junto com o menininho
+    var outros = jogo.familia.filter(function (x) { return x !== 'eu'; }).map(function (id) { return Object.assign({}, D.pessoa[id], { nome: tx(D.pessoa[id]) }); });
+    $('prontoFamilia').innerHTML = outros.length ? C.familia(outros, ART.foto(jogo.rec.id)) : ''; $('prontoFamilia').hidden = !outros.length;
     foto = { rec: jogo.rec, est: est, nivel: nv.e + ' ' + tx(nv) };
     $('prontoTitulo').textContent = t('🎉 Oba! Você fez: ', '🎉 Yay! You made: ') + tx(jogo.rec) + '!';
     $('prontoEstrelas').innerHTML = '<span aria-label="' + est + t(' estrelas', ' stars') + '">' + '⭐'.repeat(est) + '<span class="apagada">' + '☆'.repeat(3 - est) + '</span></span>';
     $('prontoNota').textContent = atrasou ? t('🌙 Ficou de noite, mas a comida ficou uma delícia!', '🌙 It got dark, but the food is delicious!')
       : jogo.erros ? t('Você acertou quase tudo! Errinhos: ' + jogo.erros, 'You got almost everything right! Little mistakes: ' + jogo.erros) : t('Perfeito, sem nenhum erro! 👏', 'Perfect, no mistakes at all! 👏');
+    if (outros.length) {
+      var nomes = outros.map(function (f) { return f.nome; }), lista = nomes.length > 1 ? nomes.slice(0, -1).join(', ') + t(' e ', ' and ') + nomes[nomes.length - 1] : nomes[0];
+      $('prontoNota').textContent += t(' 👨‍👩‍👧 ' + lista + (nomes.length > 1 ? ' comeram' : ' comeu') + ' junto com você!', ' 👨‍👩‍👧 ' + lista + ' ate with you!');
+    }
     var ordem = jogo.cz.feitos.map(function (id) { return jogo.passos.filter(function (p) { return p.id === id; })[0]; });
     $('cartao').innerHTML = '<h3>📜 ' + t('Receita da família', 'Family recipe') + '</h3><h4>' + ART.imgFoto(jogo.rec.id, 'ic-titulo') + ' ' + tx(jogo.rec) + '</h4>' +
-      '<p class="nivel-c">' + nv.e + ' ' + tx(nv) + ' · ' + hoje() + '</p><h5>' + t('Ingredientes', 'Ingredients') + '</h5><ul>' +
+      '<p class="nivel-c">' + nv.e + ' ' + tx(nv) + ' · ' + hoje() + ' · 🍽️ ' + jogo.familia.length + t(jogo.familia.length > 1 ? ' pessoas' : ' pessoa', jogo.familia.length > 1 ? ' people' : ' person') + '</p><h5>' + t('Ingredientes', 'Ingredients') + '</h5><ul>' +
       jogo.precisa.map(function (x) { return '<li>' + icone(x.id) + ' ' + L.nomeQtd(x.id, x.q, en()) + '</li>'; }).join('') + '</ul><h5>' + t('Modo de fazer', 'How to make it') + '</h5><ol>' +
       ordem.map(function (p) { return '<li>' + texto(p) + '</li>'; }).join('') + '</ol><p class="dica-adulto">' + t('🧑‍🍳 Para fazer de verdade: chame um adulto para o fogão, o forno, a faca e o liquidificador. Bom apetite!', '🧑‍🍳 To make it for real: ask a grown-up for the stove, oven, knife and blender. Enjoy your meal!') + '</p>';
     var festa = qs($('pronto'), '.festa'); festa.innerHTML = '';

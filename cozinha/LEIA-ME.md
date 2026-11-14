@@ -7,7 +7,11 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.7.0** (14/Nov/2026) — **vila 3D em que se anda** (`vila.js`): cada lugar é um bloquinho isométrico
+Versão atual: **0.8.0** (14/Nov/2026) — **família à mesa**: na ficha, "Quem vai comer?" com 8 pessoas (`dados.FAMILIA`:
+eu, mamãe, papai, vovó, vovô, irmão, irmã, bebê; "eu" sempre); a receita serve 2 e cada 2 pessoas a mais multiplicam as
+quantidades e as moedas (`logica.fatorDe`, `ingredientesDoNivel(rec, nível, fator)`); o nível limita (Fácil 2, Médio 4,
+Difícil 6; a pessoa nova entra no lugar da mais antiga); a escolha fica guardada (`pref.familia`); no fim cada pessoa
+aparece à mesa com o prato de verdade, mastigando e levando o garfo à boca (`cenas.familia`). Na 0.7.0 — **vila 3D em que se anda** (`vila.js`): cada lugar é um bloquinho isométrico
 com a sua construção e animações (cata-vento, peixe pulando, fumaça, galinha bicando, rabo da vaca), ruas entre os
 blocos com carrinho e nuvens; o **cozinheirinho** começa na porta de casa e anda pelas ruas até o lugar tocado (com
 movimento reduzido, entra direto). **Faixa da missão** (`#missao`) com o que buscar agora e onde, e uma seta em cima do
@@ -196,6 +200,7 @@ leva cerca de 4 minutos).
   ou utensílio inteiro na tela fica embaixo dela (na cozinha, em todas as posições da rolagem); **celular deitado**
   915 × 412 e 844 × 390: entrada, menu, ficha, vila, os 7 lugares, cozinha e pronto cabem, sem rolar para o lado, com
   os botões principais na tela (acima da cesta).
+- `familia.test.js` (v0.8.0) — no Médio, chamar 3 pessoas dobra as quantidades e as moedas, o 5º entra no lugar do 1º, a escolha fica guardada, o passo da cozinha fala as quantidades da família e no fim os 3 comem com a foto do prato; no Fácil cabem 2 e, sozinho, ninguém aparece à mesa.
 - `vila.test.js` (v0.7.0) — cada lugar com o seu bloquinho; ruas; o cozinheirinho começa na porta de casa; faixa da missão e seta (Médio), sem seta no Difícil; ele anda com movimento (sai do lugar, pernas mexendo, entra) e entra direto com movimento reduzido; missão fluida no Fácil (segue sozinho para o próximo lugar e para casa) e no Difícil só volta à vila.
 - `voz.test.js` (v0.5.0) — vozes de mentira como no Android: escolhe `pt-br-x-afs` (feminina) e nunca
   `pt-br-x-ptd`/Daniel; só voz de homem → tom 1,45 e 0,88; voz desconhecida antes da masculina; 👵🔁 troca, fala o
