@@ -113,6 +113,30 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
       assert.match(await pg.textContent('.bc-corpo'), /três pontinhos ⋮.*Abrir no Chrome/, 'ensina o ⋮ → Abrir no Chrome (o link intent só recarregava a página)');
       assert.strictEqual(await pg.$('.bc-corpo a.bc-forte'), null, 'sem o botão que só recarregava');
       await ctx.close();
+      // "⋮ → Abrir no Chrome" leva a MESMA página para uma aba do Chrome, sem recarregar (dono, 14/Nov/2026, print: o aviso
+      // "por dentro de outro app" ficou no Chrome de verdade). A página percebe que saiu da janela de app e recarrega.
+      {
+        const ctx2 = await b.newContext({ viewport: { width: 390, height: 844 }, userAgent: UA.celular, locale: 'pt-BR', serviceWorkers: 'block' });
+        await ctx2.addInitScript(() => {
+          localStorage.setItem('bolinho:novidades-ocultas', '["*"]');
+          if (!sessionStorage.getItem('teste:modo')) sessionStorage.setItem('teste:modo', 'app');
+          const mm = window.matchMedia.bind(window);
+          window.matchMedia = (q) => /display-mode:\s*standalone/.test(q)
+            ? { get matches() { return sessionStorage.getItem('teste:modo') === 'app'; }, media: q, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} } : mm(q);
+        });
+        await ctx2.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+        const p2 = await ctx2.newPage(); await p2.goto(base); await p2.waitForTimeout(400);
+        await p2.click('.bc-btn'); await p2.waitForSelector('.bc-fundo:not([hidden])');
+        assert.match(await p2.textContent('.bc-corpo'), /por dentro de outro app/);
+        await p2.evaluate(() => sessionStorage.setItem('teste:modo', 'browser'));   // virou aba do Chrome
+        await p2.waitForEvent('load', { timeout: 5000 });
+        await p2.waitForTimeout(400);
+        assert.ok(await p2.$eval('.bc-fundo', (e) => e.hidden), 'recarregou: o aviso de "outro app" sumiu');
+        await p2.click('.bc-btn'); await p2.waitForSelector('.bc-fundo:not([hidden])');
+        assert.doesNotMatch(await p2.textContent('.bc-corpo'), /por dentro de outro app/, 'no Chrome: passos normais de instalar');
+        assert.match(await p2.textContent('.bc-corpo'), /role a lista para baixo.*Instalar app/, 'diz onde fica o Instalar app no menu ⋮');
+        await ctx2.close();
+      }
       assert.match(fs.readFileSync(path.join(raiz, 'manifest.webmanifest'), 'utf8'), /"start_url": "\.\/\?app=1"/, 'o ícone abre com ?app=1');
     }
     // 🎵 Músicas e o idioma numa linha só, até em celular estreito e com a letra grande do Android
