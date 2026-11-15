@@ -161,22 +161,50 @@
     // ---------- pescoço, tronco e braços ----------
     if (!virada) out.push(ret(186, 270, 28, 80, { fill: pele, stroke: peleE, 'stroke-width': 2 }), ret(187, 300, 26, 18, { fill: esc(pele, 0.35), opacity: 0.15 }));
     out.push(p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: 'url(#' + I + 'lado)' }));
-    var bracos = tchau ? ['M150,354 Q126,420 118,498'] : ['M150,354 Q126,420 118,498', 'M250,354 Q274,420 282,498'];
+    /* pose do fim da passarela (opcoes.pose): 'cintura' = mão direita na cintura (menina); 'cruzados' = braços cruzados
+       (menino). Os braços da pose são desenhados no fim, por cima (bracosPose). */
+    var bracoPose = !angB && !tchau && POSES.indexOf(op.pose) >= 0 ? op.pose : '';
+    var semDireito = tchau || !!bracoPose, semEsquerdo = !!bracoPose && bracoPose !== 'cintura', semBracos = semDireito && semEsquerdo;
+    var iniBracos = out.length;
+    var bracos = (semEsquerdo ? [] : ['M150,354 Q126,420 118,498']).concat(semDireito ? [] : ['M250,354 Q274,420 282,498']);
     bracos.forEach(function (d) { out.push(membro(d, 23)); });
 
     // ---------- vestido ou blusa ----------
+    var iTop = out.length;
     if (vis('vestido')) out.push(barra(vestido(e.vestido, C('vestido'), peca, linha, pele, peleE)));
     else out.push(blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), peca, linha));
 
     // ---------- bolsa, mãos e joias do corpo ----------
-    if (vis('bolsa') && !tchau) out.push(bolsa(e.bolsa, C('bolsa'), peca, linha));
+    if (vis('bolsa') && !tchau && !bracoPose) out.push(bolsa(e.bolsa, C('bolsa'), peca, linha));
     var esmalte = { tipo: e.unhas, cor: C('unhas') };
-    out.push(mao(118, -1, pele, peleE, esmalte));
-    if (!tchau) out.push(mao(282, 1, pele, peleE, esmalte));
+    if (!semEsquerdo) out.push(mao(118, -1, pele, peleE, esmalte));
+    if (!semDireito) out.push(mao(282, 1, pele, peleE, esmalte));
     if (!corpoCostas && vis('colar')) out.push(colar(e.colar, C('colar'), I));
     if (!corpoCostas && vis('broche')) out.push(broche(e.broche, C('broche')));
-    if (vis('pulseira') && !tchau) out.push(pulseira(e.pulseira, C('pulseira')));
-    if (!corpoCostas && vis('anel') && !tchau) out.push(anel(e.anel, C('anel')));
+    if (vis('pulseira') && !tchau && !semEsquerdo) out.push(pulseira(e.pulseira, C('pulseira')));
+    if (!corpoCostas && vis('anel') && !tchau && !bracoPose) out.push(anel(e.anel, C('anel')));
+    // em pose, a manga pendurada (parada) some do lado do braço em pose: o braço da pose desenha a própria manga
+    if (bracoPose) {
+      var vestP = vis('vestido');
+      defs += '<clipPath id="' + I + 'semManga"><rect x="140" y="-200" width="120" height="1200"/>' + (semEsquerdo ? '' : '<rect x="-200" y="-200" width="350" height="1200"/>') +
+        (semDireito ? '' : '<rect x="250" y="-200" width="400" height="1200"/>') + (vestP ? '<rect x="-200" y="455" width="800" height="800"/>' : '') + '</clipPath>';
+      out[iTop] = '<g clip-path="url(#' + I + 'semManga)">' + out[iTop] + '</g>';
+    }
+    /* desfile andando: cada braço balança a partir do ombro (.pp-braco-e / -d, estilo.css), junto com a perna do outro
+       lado. Os braços, a roupa de cima (mangas), as mãos e as joias saem em três cópias recortadas: o meio do corpo
+       (x 140–260) parado e cada lado (x < 150 e x > 250) girando no ombro. No vestido, só da cintura para cima vai com o
+       braço (a saia fica no lugar). */
+    if (op.passos && !angB && !tchau && !bracoPose) {
+      var camada = out.splice(iniBracos), topo = camada[iTop - iniBracos], vest = vis('vestido');
+      var antesTop = camada.slice(0, iTop - iniBracos).join(''), depoisTop = camada.slice(iTop - iniBracos + 1).join('');
+      defs += '<clipPath id="' + I + 'brMeio"><rect x="140" y="-200" width="120" height="1200"/></clipPath>' +
+        '<clipPath id="' + I + 'brTopFixo"><rect x="140" y="-200" width="120" height="1200"/>' + (vest ? '<rect x="-200" y="455" width="800" height="800"/>' : '') + '</clipPath>' +
+        '<clipPath id="' + I + 'brE"><rect x="-200" y="-200" width="350" height="1200"/></clipPath><clipPath id="' + I + 'brD"><rect x="250" y="-200" width="400" height="1200"/></clipPath>' +
+        '<clipPath id="' + I + 'brEtop"><rect x="-200" y="-200" width="350" height="' + (vest ? 655 : 1200) + '"/></clipPath><clipPath id="' + I + 'brDtop"><rect x="250" y="-200" width="400" height="' + (vest ? 655 : 1200) + '"/></clipPath>';
+      function lado(cl, clTop) { return '<g clip-path="url(#' + I + cl + ')">' + antesTop + '</g><g clip-path="url(#' + I + clTop + ')">' + topo + '</g><g clip-path="url(#' + I + cl + ')">' + depoisTop + '</g>'; }
+      out.push('<g clip-path="url(#' + I + 'brTopFixo)">' + topo + '</g><g clip-path="url(#' + I + 'brMeio)">' + depoisTop + '</g>');
+      out.push('<g class="pp-braco-e">' + lado('brE', 'brEtop') + '</g>', '<g class="pp-braco-d">' + lado('brD', 'brDtop') + '</g>');
+    }
     if (corpoCostas) out.push(asasF);
 
     // ---------- cabeça (tudo aqui dentro vai para o grupo aumentado) ----------
@@ -231,9 +259,14 @@
       if (wL < 1) out.push('<g transform="translate(200 0) scale(' + n((corpoCostas ? -1 : 1) * escalaX * 100) / 100 + ' 1) translate(-200 0)"' + (wL > 0 ? ' opacity="' + n(1 - wL) + '"' : '') + '>' + boneca + '</g>');
       if (wL > 0) { var ladoB = Math.sin(angB * Math.PI / 180) >= 0 ? 1 : -1, cl = corpoLado(); out.push('<g' + (wL < 1 ? ' opacity="' + n(wL) + '"' : '') + (ladoB < 0 ? ' transform="translate(400 0) scale(-1 1)"' : '') + '>' + cl + '</g>'); }
       out.push(costas ? '<g transform="translate(400 0) scale(-1 1)">' + cabecaPronta + '</g>' : cabecaPronta);
-    } else out.push(cabecaPronta);
+    } else {
+      // mão no cabelo: o braço sobe e a mão fica atrás da cabeça (desenhado antes da cabeça)
+      if (bracoPose === 'maoCabelo') out.push(bracosPose('maoCabeloAtras', tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
+      out.push(cabecaPronta);
+    }
     // o braço do tchau vai por cima de tudo (fica na frente do cabelo, do lado do rosto)
     if (tchau) out.push(bracoTchau(pele, peleE, esmalte, membro, op.anim));
+    if (bracoPose) out.push(bracosPose(bracoPose, tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
     /* desfile (opcoes.passos): tudo menos as pernas e a sombra do chão vai para grupos .pp-corpo, que acompanham o
        quadril (o peso passa de um pé para o outro e o corpo sobe e desce um pouco) sem tombar de lado; as pernas
        (.pp-passo-e / -d) fazem o catwalk: um pé cruza e pousa na frente do outro, na linha do meio (estilo.css) */
@@ -252,14 +285,18 @@
        Desenho próprio de lado, com as cores e a estampa das peças escolhidas: braço e perna do lado de lá atrás
        (um pouco mais escuros), tronco de lado, saia, calça ou vestido de lado, braço do lado de cá na frente e
        sapatos de lado. */
+    function tipoManga() {
+      var temVest = vis('vestido');
+      return temVest ? (['casaco', 'macacao'].indexOf(e.vestido) >= 0 ? 'longa' : ['tomara', 'verao', 'jardineira'].indexOf(e.vestido) >= 0 ? 'nada' : 'curta') :
+        (['sueter', 'jaqueta', 'pijama', 'moletom', 'camisa'].indexOf(e.blusa) >= 0 ? 'longa' : ['regata', 'ombro', 'colete', 'nenhum'].indexOf(e.blusa) >= 0 ? 'nada' : 'curta');
+    }
     function corpoLado() {
       var s = '', sombra = function (d, larg) { return p(d, { stroke: '#2a0a3c', 'stroke-width': larg, 'stroke-linecap': 'round', fill: 'none', opacity: 0.16 }); };
       var temVest = vis('vestido'), corTop = temVest ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), catTop = temVest ? 'vestido' : 'blusa';
       var compVest = { princesa: 640, gala: 640, sereia: 640, camisola: 600, festa: 560, rodado: 560, verao: 540, fada: 540, tomara: 560, casaco: 540, jardineira: 530, macacao: 640 }[e.vestido] || 560;
       var compSaia = { curta: 510, tutu: 515, balone: 520, pregas: 540, jeans: 530, camadas: 560, longa: 630 }[e.saia] || 530;
       var compCalca = { shorts: 505, bermuda: 545 }[e.calca] || 636;
-      var manga = temVest ? (['casaco', 'macacao'].indexOf(e.vestido) >= 0 ? 'longa' : ['tomara', 'verao', 'jardineira'].indexOf(e.vestido) >= 0 ? 'nada' : 'curta') :
-        (['sueter', 'jaqueta', 'pijama', 'moletom', 'camisa'].indexOf(e.blusa) >= 0 ? 'longa' : ['regata', 'ombro', 'colete', 'nenhum'].indexOf(e.blusa) >= 0 ? 'nada' : 'curta');
+      var manga = tipoManga();
       // braço e perna de lá (atrás)
       var bracoLa = 'M197,356 Q186,424 182,492', pernaLa = 'M195,456 L190,640';
       s += membro(pernaLa, 27) + sombra(pernaLa, 27);
@@ -939,6 +976,56 @@
     var ante = membro('M300,330 Q312,300 320,270', 19) + dedosT + polegar + mao2 + elip(318, 246, 6, 4, { fill: '#fff', opacity: 0.18 }) + unhas(pontas, esmalte, pele);
     var mexe = anim ? '<animateTransform attributeName="transform" type="rotate" values="-12 300 330;14 300 330;-12 300 330" dur=".7s" repeatCount="indefinite"/>' : '';
     return s + '<g>' + ante + mexe + '</g>';
+  }
+
+  /* poses do fim da passarela (opcoes.pose), sorteadas no desfile (app.js):
+     'cintura'      mão direita (da imagem) na cintura, cotovelo para fora; a outra solta
+     'duasCintura'  as duas mãos na cintura
+     'maoCabelo'    mão direita no cabelo, do lado da cabeça; a esquerda na cintura
+     'cruzados'     braços cruzados na frente do peito (menino)
+     'bolsos'       mãos nos bolsos (menino): os braços descem para dentro e as mãos somem no bolso
+     'carinha'      as duas mãos no queixo, emoldurando o rosto (foto de desfile infantil do dono)
+     Manga curta cobre o começo do braço; manga longa, o braço todo. */
+  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha'];
+  function bracosPose(tipo, manga, corTop, pele, peleE, esmalte, membro) {
+    function vestir(d, larg, ate) {   // a manga por cima do braço (ate: 0..1 do traço, aproximado pelo pathLength)
+      if (!corTop || manga === 'nada') return '';
+      var fim = manga === 'longa' ? 1 : ate;
+      return p(d, { fill: 'none', stroke: esc(corTop.hex, 0.25), 'stroke-width': larg + 4, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' }) +
+        p(d, { fill: 'none', stroke: corTop.hex, 'stroke-width': larg + 2, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' });
+    }
+    function punho(x, y, giro) {   // mão fechada, vista de cima (só os nós dos dedos)
+      return '<g transform="rotate(' + giro + ' ' + x + ' ' + y + ')">' + elip(x, y, 12, 9.5, { fill: pele, stroke: peleE, 'stroke-width': 2 }) +
+        p('M' + (x - 7) + ',' + (y + 2) + ' L' + (x + 7) + ',' + (y + 2), { stroke: peleE, 'stroke-width': 1.2, opacity: 0.5 }) + elip(x - 3, y - 3, 4, 2.4, { fill: '#fff', opacity: 0.2 }) + '</g>';
+    }
+    function cintura(lado) {   // lado 1 = direita da imagem, -1 = esquerda (espelho em x = 200)
+      var x = function (v) { return lado > 0 ? v : 400 - v; };
+      var br = 'M' + x(250) + ',356 Q' + x(280) + ',372 ' + x(300) + ',412', an = 'M' + x(300) + ',412 Q' + x(290) + ',438 ' + x(262) + ',452';
+      return membro(br, 23) + vestir(br, 23, 0.5) + membro(an, 20) + vestir(an, 20, 0) + punho(x(258), 452, -30 * lado);
+    }
+    if (tipo === 'cintura') return cintura(1);
+    if (tipo === 'duasCintura') return cintura(1) + cintura(-1);
+    if (tipo === 'bolsos') {
+      var bE = 'M150,354 Q132,410 160,462', bD = 'M250,354 Q268,410 240,462';
+      function bolso(x) { return p('M' + (x - 13) + ',458 Q' + x + ',452 ' + (x + 13) + ',458', { fill: 'none', stroke: '#000', 'stroke-width': 2, opacity: 0.35, 'stroke-linecap': 'round' }); }
+      return membro(bE, 23) + vestir(bE, 23, 0.4) + bolso(160) + membro(bD, 23) + vestir(bD, 23, 0.4) + bolso(240);
+    }
+    if (tipo === 'carinha') {
+      var cE = 'M150,354 Q124,392 150,402', cD = 'M250,354 Q276,392 250,402', aE = 'M150,402 Q154,350 164,312', aD = 'M250,402 Q246,350 236,312';
+      return membro(cE, 23) + vestir(cE, 23, 0.5) + membro(cD, 23) + vestir(cD, 23, 0.5) + membro(aE, 19) + vestir(aE, 19, 0) + membro(aD, 19) + vestir(aD, 19, 0) +
+        punho(166, 304, -35) + punho(234, 304, 35);
+    }
+    if (tipo === 'maoCabelo') return cintura(-1);   // a outra mão na cintura; o braço erguido vem antes da cabeça
+    if (tipo === 'maoCabeloAtras') {
+      var brC = 'M250,356 Q314,332 336,266', anC = 'M336,266 Q322,214 270,200';
+      return membro(brC, 23) + vestir(brC, 23, 0.45) + membro(anC, 20) + vestir(anC, 20, 0) + punho(266, 200, 40);
+    }
+    // cruzados: braços de cima descem do ombro até o cotovelo; antebraços atravessam o peito, um sobre o outro
+    var e1 = 'M150,354 Q138,384 146,420', d1 = 'M250,354 Q262,384 254,420';
+    var anteE = 'M146,420 Q190,416 236,394', anteD = 'M254,420 Q210,410 166,394';
+    return membro(e1, 23) + vestir(e1, 23, 0.7) + membro(d1, 23) + vestir(d1, 23, 0.7) +
+      membro(anteD, 20) + vestir(anteD, 20, 0) + punho(166, 394, 20) +
+      membro(anteE, 20) + vestir(anteE, 20, 0) + punho(238, 393, -20);
   }
 
   // ---------- mãos: palma, 4 dedos e polegar (do lado de dentro, virado para o corpo) ----------
@@ -1843,6 +1930,7 @@
   }
 
   var API = { svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow };
+  API.POSES = POSES;
   raiz.PurpurinaBoneca = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : this);

@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.22.0';
+  var APP_VERSION = '0.23.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -361,6 +361,7 @@
         var b = document.createElement('button'); b.type = 'button'; b.className = 'op-bt' + (ehNada ? ' nenhum' : '') + (cat.id === 'cenario' ? ' fundo' : '');
         var vis = document.createElement('span'); vis.className = 'mini-svg';
         if (ehNada) vis.textContent = '🚫';
+        else if (op.emoji) { vis.textContent = op.emoji; vis.className += ' mini-emoji'; }   // idade: o desenho não muda, vai o emoji
         else {
           var e = V.aplicar(estado, cat.id, op.id);
           if (cat.id === 'sapatos' || cat.id === 'unhas') e = Object.assign({}, e, { vestido: 'nenhum', saia: 'nenhum', calca: 'shorts' });   // para o sapato aparecer inteiro
@@ -769,20 +770,63 @@
     function lugar(k) {
       desfileK = k; desfileLugar = lugar;
       var W = palco.clientWidth, H = palco.clientHeight, s = Math.max(W / 400, H / 720), h = mod.clientHeight;
-      var longe = Math.min(290 * s, H * 0.55), perto = 26 * s, escala = 0.24 + 0.76 * k, pe = longe + (perto - longe) * k;
+      var longe = Math.min(290 * s, H * 0.55), perto = 26 * s, escala = (0.24 + 0.76 * k) * ALTURA, pe = longe + (perto - longe) * k;
       mod.style.transform = 'translateX(-50%) translateY(' + Math.round(-(pe - 0.09 * h * escala)) + 'px) scale(' + escala.toFixed(3) + ')';
+    }
+    // poses do fim da passarela, sorteadas sem repetir a anterior (boneca.js, opcoes.pose); lado = para onde inclina
+    // e conforme a idade (dono, 14/Nov/2026): até 5 anos, poses de criancinha (tchau, mãos na cintura) sem inclinar; 6 a
+    // 10, de criança; 11 a 15 e 16+, de modelo (menina: mão na cintura, no cabelo; menino: braços cruzados, mãos no bolso)
+    var idade = estado.idade || 'adulta', menino = estado.personagem === 'menino';
+    var ALTURA = { pequena: 0.8, crianca: 0.9, adolescente: 0.96 }[idade] || 1;   // a pequenininha é mais baixa na passarela
+    $('modelo').className = 'modelo idade-' + idade;
+    var POSES_DESFILE = ({
+      pequena: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'carinha', lado: '' }],
+      crianca: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'bolsos', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'cintura', lado: '' }, { pose: 'carinha', lado: '' }],
+      adolescente: menino ? [{ pose: 'cruzados', lado: '' }, { pose: 'bolsos', lado: 'dir' }, { tchau: true, lado: '' }] : [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: '' }, { pose: 'maoCabelo', lado: '' }, { pose: 'carinha', lado: '' }, { tchau: true, lado: '' }]
+    })[idade] || (menino ? [{ pose: 'cruzados', lado: 'esq' }, { pose: 'bolsos', lado: 'dir' }, { pose: 'cruzados', lado: 'dir' }, { pose: 'bolsos', lado: '' }] :
+      [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: 'dir' }, { pose: 'maoCabelo', lado: 'esq' }, { tchau: true, lado: '' }]);
+    var poseAtual = POSES_DESFILE[0];
+    function sortear() { var l = POSES_DESFILE.filter(function (x) { return x !== poseAtual; }); return l[Math.floor(Math.random() * l.length)]; }
+    function opPose(x) { return x.tchau ? { tchau: true } : { pose: x.pose }; }
+    // pernas da paradinha (fotos de desfile infantil do dono): pé cruzado na frente, joelho dobrado ou pernas abertas
+    var PERNAS = idade === 'pequena' || menino ? ['', 'perna-aberta'] : ['', 'perna-cruzada', 'perna-dobrada', 'perna-aberta'];
+    function semPose() { mod.classList.remove('pose-esq', 'pose-dir', 'perna-cruzada', 'perna-dobrada', 'perna-aberta'); }
+    function posar(x) {
+      poseAtual = x; semPose(); if (x.lado && idade !== 'pequena') mod.classList.add('pose-' + x.lado);
+      var pe = PERNAS[Math.floor(Math.random() * PERNAS.length)]; if (pe) mod.classList.add(pe);
+      pose(Object.assign({ sorriso: true }, opPose(x)));
+    }
+    // girinho: vira de lado (ângulo) e volta, sem rastro
+    var camera = $('cameraDesfile'), corte = $('corteDesfile');
+    camera.classList.remove('take-perto');
+    function cortar(take) {
+      corte.classList.remove('flash'); void corte.offsetWidth; corte.classList.add('flash');
+      camera.classList.toggle('take-perto', take === 'perto');
+      if (take === 'ladoE' || take === 'ladoD') {
+        semPose();
+        pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO, angulo: take === 'ladoE' ? -32 : 32, realce: false, sorriso: true });
+      } else posar(sortear());
+    }
+    function girar(de, para, ms, fim) {
+      var ini = performance.now();
+      (function passo(agora) {
+        if (!vale()) return;
+        var k = Math.min(1, (agora - ini) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: false, angulo: de + (para - de) * e, realce: false, sorriso: true });
+        if (k < 1) requestAnimationFrame(passo); else if (fim) fim();
+      })(ini);
     }
     function olharPara(de, para, ms, fim) {
       var ini = performance.now();
       (function passo(agora) {
         if (!vale()) return;
         var k = Math.min(1, (agora - ini) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-        pose({ sorriso: true, olhar: de + (para - de) * e });
+        pose(Object.assign({ sorriso: true, olhar: de + (para - de) * e }, opPose(poseAtual)));
         if (k < 1) requestAnimationFrame(passo); else if (fim) fim();
       })(ini);
     }
     var titulo = $('desfileTitulo'), jur = $('jurados');
-    if (CALMO) { lugar(1); pose({ sorriso: true }); }
+    if (CALMO) { lugar(1); posar(POSES_DESFILE[0]); }
     else {
       titulo.classList.add('esperando'); jur.classList.add('esperando');
       lugar(0); pose({}); mod.classList.add('andando');
@@ -795,18 +839,29 @@
         lugar(e);
         if (k < 1) requestAnimationFrame(andar);
         else {
-          // chegou na frente: sorri, dá tchau, estrelas e jurados
-          mod.classList.remove('andando'); pose({ sorriso: true, tchau: true });
+          // chegou na frente (dono, 14/Nov/2026, com fotos de referência): para numa pose sorteada — menina: mão na
+          // cintura, as duas mãos na cintura, mão no cabelo ou tchauzinho; menino: braços cruzados ou mãos nos bolsos — com a
+          // "inclinadinha"; olha para um lado e para o outro; dá um girinho (vira de lado e volta), a voltinha
+          // inteira e fica trocando de pose, sorteada, de tempos em tempos
+          mod.classList.remove('andando'); posar(sortear());
           titulo.classList.remove('esperando'); jur.classList.remove('esperando');
           Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 400); confete();
-          depois(2200, function () { olharPara(0, -38, 450, function () { depois(700, function () { olharPara(-38, 38, 700, function () { depois(700, function () { olharPara(38, 0, 450, function () {
-            depois(300, function () {
-              volta(pas, $('rastroDesfile'), function (a) { pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO && !a, angulo: a, realce: false, sorriso: true }); }, function () {
-                if (!vale()) return;
-                pose({ sorriso: true });
-                // posando: um tchauzinho de vez em quando
-                (function acenar() { depois(3800, function () { pose({ sorriso: true, tchau: true }); depois(1800, function () { pose({ sorriso: true }); acenar(); }); }); })();
-              });
+          depois(1600, function () { olharPara(0, -38, 450, function () { depois(600, function () { olharPara(-38, 38, 700, function () { depois(600, function () { olharPara(38, 0, 450, function () {
+            depois(500, function () {
+              semPose();
+              girar(0, -115, 520, function () { depois(350, function () { girar(-115, 0, 520, function () { depois(250, function () {
+                volta(pas, $('rastroDesfile'), function (a) { pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO && !a, angulo: a, realce: false, sorriso: true }); }, function () {
+                  if (!vale()) return;
+                  posar(sortear());
+                  // takes: de 3 em 3 s um corte — corpo inteiro numa pose nova, de perto, ou de três-quartos para um
+                  // lado e para o outro (olhando para o lado), sem repetir o take de antes
+                  var takeAntes = 'inteira';
+                  (function trocar() { depois(3200, function () {
+                    var opcoes = ['inteira', 'perto', 'ladoE', 'ladoD'].filter(function (x) { return x !== takeAntes; });
+                    cortar(takeAntes = opcoes[Math.floor(Math.random() * opcoes.length)]); trocar();
+                  }); })();
+                });
+              }); }); }); });
             });
           }); }); }); }); }); });
         }

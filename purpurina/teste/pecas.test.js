@@ -110,9 +110,9 @@ test('grupos, nomes curtos e desafios (com as dicas) em PT, EN e ES', () => {
   for (const d of P.DESAFIOS) { assert.ok(d.pt && d.en && d.es, 'desafio ' + d.id); for (const x of d.dicas) assert.ok(x.pt && x.en && x.es, 'dica de ' + d.id); }
 });
 
-test('toda parte que dá para tirar tem a opção 🚫 (nenhum), menos as do corpo (pele, rosto, nariz, olhos, cabelo…) e cenário', () => {
+test('toda parte que dá para tirar tem a opção 🚫 (nenhum), menos as do corpo (idade, pele, rosto, nariz, olhos, cabelo…) e cenário', () => {
   for (const c of P.CATEGORIAS) {
-    if (['personagem', 'pele', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'olhos', 'cabelo', 'cenario'].includes(c.id)) continue;
+    if (['personagem', 'idade', 'pele', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'olhos', 'cabelo', 'cenario'].includes(c.id)) continue;
     const ids = c.opcoes.map(o => o.id);
     assert.ok(ids[0] === 'nenhum' || (c.id === 'estampa' && ids[0] === 'liso'), c.id + ' sem 🚫');
   }

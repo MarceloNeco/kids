@@ -100,6 +100,11 @@
     { id: 'personagem', grupo: 'eu', ico: '👧', pt: 'Menina ou menino', en: 'Girl or boy', es: 'Niña o niño', area: A.cabeca, zoom: 'cabeca', opcoes: [
       o('menina', 'Menina', 'Girl', 'Niña'), o('menino', 'Menino', 'Boy', 'Niño')
     ] },
+    // idade (dono, 14/Nov/2026): muda o jeito de andar e as poses do desfile (app.js e estilo.css); o desenho é o mesmo
+    { id: 'idade', grupo: 'eu', ico: '🎂', pt: 'Idade (no desfile)', en: 'Age (on the runway)', es: 'Edad (en el desfile)', area: null, opcoes: [
+      Object.assign(o('pequena', 'Até 5 anos', 'Up to 5', 'Hasta 5 años'), { emoji: '🧸' }), Object.assign(o('crianca', '6 a 10 anos', '6 to 10', 'De 6 a 10 años'), { emoji: '🎈' }),
+      Object.assign(o('adolescente', '11 a 15 anos', '11 to 15', 'De 11 a 15 años'), { emoji: '🎧' }), Object.assign(o('adulta', '16 anos ou mais', '16 or older', '16 años o más'), { emoji: '👠' })
+    ] },
     { id: 'rosto', grupo: 'eu', ico: '🙂', pt: 'Rosto', en: 'Face shape', es: 'Cara', area: A.rosto, zoom: 'rosto', opcoes: [
       o('oval', 'Oval', 'Oval', 'Ovalada'), o('redondo', 'Redondinho', 'Round', 'Redondita'), o('coracao', 'Coração', 'Heart', 'Corazón'), o('fininho', 'Fininho', 'Slim', 'Delgadita'),
       o('bochechudo', 'Bochechudo', 'Chubby cheeks', 'Mofletuda'), o('largo', 'Largo', 'Wide', 'Ancha'), o('quadradinho', 'Quadradinho', 'Square', 'Cuadradita'),
@@ -317,7 +322,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
 
   // como a personagem começa (e o que volta no "começar de novo")
   var PADRAO = {
-    pele: 'p3', personagem: 'menina', rosto: 'oval', nariz: 'botao', testa: 'normal', formaOlho: 'redondos', distOlhos: 'normal', formaBoca: 'coracao', cabelo: 'ondulado', cabeloCor: 'castanho', mechas: 'nenhum', mechasCor: 'rosa', olhos: 'castanho',
+    pele: 'p3', personagem: 'menina', idade: 'adulta', rosto: 'oval', nariz: 'botao', testa: 'normal', formaOlho: 'redondos', distOlhos: 'normal', formaBoca: 'coracao', cabelo: 'ondulado', cabeloCor: 'castanho', mechas: 'nenhum', mechasCor: 'rosa', olhos: 'castanho',
     base: 'nenhum', blush: 'nenhum', blushCor: 'rosa', sombra: 'nenhum', sombraCor: 'lilas', delineado: 'nenhum', delineadoCor: 'preto',
     cilios: 'curtos', ciliosCor: 'preto', unhas: 'nenhum', unhasCor: 'chiclete', batom: 'nenhum', batomCor: 'rosaclaro', glitter: 'nenhum', glitterCor: 'dourado', adesivo: 'nenhum',
     vestido: 'nenhum', vestidoCor: 'lilas', blusa: 'camiseta', blusaCor: 'rosaclaro', saia: 'nenhum', saiaCor: 'chiclete',
