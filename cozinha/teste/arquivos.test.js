@@ -134,6 +134,6 @@ test('voz gravada da Dona Cida (v0.6.1): cada frase que ela fala tem o seu mp3, 
     assert.ok(b.length > 4000 && b.length < 60 * 1024, f + ' com tamanho estranho');
     assert.ok(lista.includes(f), 'sw.js não guarda ' + f);
   }
-  assert.match(sw, /url\.pathname\.indexOf\('\/cozinha\/voz\/'\) < 0\) return;/, 'a voz não fica de fora do service worker como as músicas');
+  assert.match(sw, /url\.pathname\.indexOf\('\/cozinha\/voz\/'\) < 0; \}/, 'a voz não fica de fora do service worker como as músicas');
   assert.match(cred, /Kokoro/); assert.match(cred, /pf_dora/); assert.match(cred, /Apache/);
 });
