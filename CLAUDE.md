@@ -111,7 +111,10 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
   (PT/EN/ES escolhido na estante),
   `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
-  bibliotecas em `baguncolandia/libs/`. Fundo dos cartões: `cartoes-fundos.css` (tirar a linha do `index.html` = visual antigo).
+  bibliotecas em `baguncolandia/libs/`. Cartões da estante (dono, 15/Nov/2026): compactos, montados pelo `catalogo.js` — ícone,
+  nome inteiro, "? ⌄" que abre a explicação, ícones do campo `rec` (TV, corpo, inclinar, dois; sem internet/precisa de internet
+  vêm de `instalar`/`soOnline`; tocar explica), ⬇ Instalar e **Jogar sempre na ponta direita**. Vigia: `teste/estante-cartoes.test.js`.
+  Jogo novo: diga no `rec` o que ele usa. (`cartoes-fundos.css` não é mais usado pela estante.)
 - Interruptores: todos os jogos obedecem o app **`kids`** ("Bolinho de Chuva") do RootifyONE, um interruptor por jogo.
 
 ## Regras de cada jogo

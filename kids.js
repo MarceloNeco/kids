@@ -1,16 +1,16 @@
 /* Controle remoto da TV — estante do Bolinho de Chuva (solverone.com.br/kids).
-   Numa TV de verdade (sem toque, ou com nome de TV no navegador), as setas passam o foco entre os cartões,
-   OK (Enter) abre, e o jogo abre já no "papel de TV" (?tv=auto, que o cartão guarda em data-tv).
+   Numa TV de verdade (sem toque, ou com nome de TV no navegador), as setas passam o foco entre os botões "Jogar"
+   dos cartões, OK (Enter) abre, e o jogo abre já no "papel de TV" (?tv=auto, que o cartão guarda em data-tv).
    No celular e no tablet (ex.: Amazon Fire), nada disso atrapalha: abre no jeito normal, por toque.
    ?debug mostra na tela cada tecla recebida (para diagnosticar numa TV de verdade). */
 (function () {
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card .c-jogar'));
   if (!cards.length) return;
   var toque = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
   var tv = /AFT|SMART-?TV|SmartTV|Tizen|Web0S|webOS|NetCast|BRAVIA|Android TV|GoogleTV|CrKey|HbbTV|AppleTV|Roku|Viera|Philips|Hisense|VIDAA/i.test(navigator.userAgent || '');
   // TV de verdade = tem nome de TV no navegador, ou não tem toque. Aí os jogos abrem já como TV.
   if (tv || !toque) cards.forEach(function (c) {
-    var p = c.getAttribute('data-tv');
+    var p = c.closest('.card').getAttribute('data-tv');
     if (p && c.href) c.href = c.href + (c.href.indexOf('?') < 0 ? p : p.replace('?', '&'));
   });
 
@@ -18,7 +18,7 @@
   var debug = /[?&]debug\b/.test(location.search), painel = null;
   if (debug) { painel = document.createElement('pre'); painel.id = 'debug'; painel.textContent = 'DIAGNÓSTICO: aperte as setas e OK no controle…\n'; document.body.appendChild(painel); }
   function log(e) { if (!painel) return; var ae = document.activeElement; painel.textContent += e.type + '  key=' + JSON.stringify(e.key) + '  code=' + JSON.stringify(e.code) + '  keyCode=' + e.keyCode + '  foco=' + (ae && (ae.id || ae.tagName)) + '\n'; var linhas = painel.textContent.split('\n'); if (linhas.length > 10) painel.textContent = linhas.slice(-10).join('\n'); }
-  function foco(n, parado) { i = (n + cards.length) % cards.length; try { cards[i].focus({ preventScroll: !!parado }); } catch (e) { cards[i].focus(); } cards.forEach(function (c, k) { c.classList.toggle('sel', k === i); }); }
+  function foco(n, parado) { i = (n + cards.length) % cards.length; try { cards[i].focus({ preventScroll: !!parado }); } catch (e) { cards[i].focus(); } cards.forEach(function (c, k) { c.closest('.card').classList.toggle('sel', k === i); }); }
 
   // Só assume o controle (foco inicial, navegação por setas) numa TV de verdade. No celular/tablet,
   // deixa o toque normal — senão um cartão fica "sedado" com borda de foco sem ninguém ter mexido.

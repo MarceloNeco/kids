@@ -23,7 +23,7 @@
   function cheia() { return d.fullscreenElement || d.webkitFullscreenElement; }
   function parar() { eventos.forEach(function (t) { d.removeEventListener(t, primeiroToque, true); }); }
   function primeiroToque(e) {
-    if (e && e.target && e.target.closest && e.target.closest('.bc-inst, .bc-fundo, .cx-inst')) return;
+    if (e && e.target && e.target.closest && e.target.closest('.bc-inst, .bc-fundo, .c-inst')) return;
     if (cheia()) return parar();
     try {
       var p = el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' }) : el.webkitRequestFullscreen();

@@ -1,6 +1,6 @@
 /*
   Jogos no aparelho, sem internet (a lista vem de catalogo.js).
-  - Cada cartão com data-instalar ganha "📲 Instalar": abre o jogo com ?instalar=1 e o jogo mostra a barra
+  - O botão ⬇ de cada cartão (feito no catalogo.js) abre o jogo com ?instalar=1 e o jogo mostra a barra
     "Instalar o aplicativo" (instalar.js) para ganhar ícone próprio.
   - Painel "Todos os jogos" (#todos):
       ⬇ Guardar todos neste aparelho → registra o service worker de cada jogo, com andamento na tela; cada jogo
@@ -11,7 +11,8 @@
         própria página). Então abre o primeiro jogo com ?instalar=1&fila=1; depois de instalar (ou pular), a barra
         leva ao próximo; no fim, volta para cá (?fila=fim). A fila fica em localStorage "bolinho:fila".
   - Com o Bolinho instalado (aberto como aplicativo, ou logo depois de instalar), guarda todos sozinho.
-  - Cartão com data-so-online (ex.: Dança na Sala: YouTube e TV) ganha "🌐 Só com internet".
+  - Cartão com data-so-online (ex.: Dança na Sala: YouTube e TV) mostra o ícone "Precisa de internet" (catalogo.js).
+  - Jogo já guardado no aparelho ganha data-guardado no cartão: sem internet ele continua aceso (catalogo.js, rede()).
   Sem internet não existe TV: o pareamento celular ↔ TV precisa da internet.
 */
 // a estante marca a aba: os jogos abertos daqui sabem que o Voltar na tela de começo volta para cá (navegacao.js)
@@ -27,18 +28,12 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
   // título da aba com o nome da marca no idioma escolhido
   function titulo() { if (window.BolinhoIdioma) document.title = BolinhoIdioma.marca() + T(' — brincadeiras para a família · SolverONE', ' — games for the whole family · SolverONE', ' — juegos para toda la familia · SolverONE'); }
   titulo(); if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(titulo);
-  var cards = Array.prototype.slice.call(document.querySelectorAll('a.card[data-instalar], a.card[data-so-online]'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card[data-instalar], .card[data-so-online]'));
   if (!cards.length) return;
   var instalaveis = cards.filter(function (c) { return c.hasAttribute('data-instalar'); });
   var temSW = 'serviceWorker' in navigator;
 
   var css = '' +
-    '.cx{position:relative;display:flex}' +
-    '.cx>.card{flex:1}' +
-    '.cx-inst{position:absolute;top:.9rem;right:.9rem;z-index:2;display:inline-flex;align-items:center;gap:.35rem;min-height:40px;padding:.4rem .8rem;border-radius:999px;background:rgba(11,10,31,.75);border:1px solid var(--c,#c6ff3d);color:#f3f0ff;font-weight:700;font-size:.85rem;text-decoration:none}' +
-    '.cx-inst:hover,.cx-inst:focus-visible{background:var(--c,#c6ff3d);color:#1a1446;outline:3px solid #ffd166;outline-offset:2px}' +
-    '.cx-on{position:absolute;top:.9rem;right:.9rem;z-index:2;padding:.35rem .7rem;border-radius:999px;background:rgba(11,10,31,.75);border:1px solid #3a2f73;color:#b3acd6;font-size:.8rem}' +
-    '.cx-ok{position:absolute;right:.9rem;bottom:.9rem;z-index:2;font-size:.75rem;color:#c6ff3d}' +
     '.todos{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-top:1.4rem;padding:.9rem 1rem;border-radius:18px;background:rgba(34,27,77,.7);border:1px solid #3a2f73}' +
     '.todos[hidden]{display:none}' +
     '.todos b{flex-basis:100%;font-size:1rem}' +
@@ -51,30 +46,6 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
   var estilo = document.createElement('style');
   estilo.textContent = css;
   document.head.appendChild(estilo);
-
-  // ---------- botão de cada cartão ----------
-  cards.forEach(function (card) {
-    var caixa = document.createElement('div');
-    caixa.className = 'cx';
-    caixa.style.setProperty('--c', card.style.getPropertyValue('--c'));
-    card.parentNode.insertBefore(caixa, card);
-    caixa.appendChild(card);
-    var nome = nomeDe(card);
-    if (card.hasAttribute('data-so-online')) {
-      var aviso = document.createElement('span');
-      aviso.className = 'cx-on';
-      tri(aviso, '🌐 Só com internet', '🌐 Internet only', '🌐 Solo con internet');
-      aviso.title = T('Precisa de internet: YouTube e TV.', 'Needs the internet: YouTube and TV.', 'Necesita internet: YouTube y la tele.');
-      caixa.appendChild(aviso);
-      return;
-    }
-    var bot = document.createElement('a');
-    bot.className = 'cx-inst';
-    bot.href = card.getAttribute('data-instalar') + '?instalar=1';
-    tri(bot, '📲 Instalar', '📲 Install', '📲 Instalar');
-    bot.setAttribute('aria-label', T('Instalar ' + nome + ' no aparelho, para jogar sem internet', 'Install ' + nome + ' on this device, to play without the internet', 'Instalar ' + nome + ' en el dispositivo, para jugar sin internet'));
-    caixa.appendChild(bot);
-  });
 
   function nomeDe(card) { return ((card.querySelector('h2 .pt') || card.querySelector('h2') || {}).textContent || '').trim(); }
   function escopo(card) { return card.getAttribute('data-sw').replace(/[^\/]*$/, ''); }
@@ -111,12 +82,8 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
     return O.guardar(ids, aoAndar).then(function (n) { return { feitas: n, total: ids.length }; });
   }
   function marcar(card) {
-    var caixa = card.parentNode;
-    if (caixa.querySelector('.cx-ok')) return;
-    var m = document.createElement('span');
-    m.className = 'cx-ok';
-    tri(m, '✓ funciona sem internet', '✓ works offline', '✓ funciona sin internet');
-    caixa.appendChild(m);
+    card.setAttribute('data-guardado', '');
+    if (window.BolinhoCatalogo && BolinhoCatalogo.rede) BolinhoCatalogo.rede();
   }
 
   // ---------- painel "Todos os jogos" ----------
