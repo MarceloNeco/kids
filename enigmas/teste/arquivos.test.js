@@ -117,7 +117,7 @@ test('nome Enigmatic (igual em PT, EN e ES) na página, no manifesto, na barra d
   assert.match(m.name, /^Enigmatic — /); assert.equal(m.short_name, 'Enigmatic');
   assert.match(ler('app.js'), /setAttribute\('data-nome', 'Enigmatic'\)/);
   const cat = fs.readFileSync(path.join(pasta, '..', 'catalogo.js'), 'utf8');
-  assert.match(cat, /\{ id: 'enigmas', nome: 'Enigmatic', [^}]*url: '\/kids\/enigmas\/'/, 'cartão da estante (mesmo id e endereço)');
+  assert.match(cat, /\{ id: 'enigmas', (novo: '[^']*', )?nome: 'Enigmatic', [^}]*url: '\/kids\/enigmas\/'/, 'cartão da estante (mesmo id e endereço)');
   const rec = JSON.parse(fs.readFileSync(path.join(pasta, '..', 'recursos-do-app.json'), 'utf8')).recursos.find(r => r.id === 'enigmas');
   assert.equal(rec.nome.pt, 'Enigmatic'); assert.equal(rec.nome.en, 'Enigmatic');
   if (rec.nome.es) assert.equal(rec.nome.es, 'Enigmatic');   // o mesmo nome nas três línguas
