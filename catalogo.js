@@ -11,50 +11,53 @@
     url      endereço do jogo a partir da raiz do site (funciona em solverone.com.br e no endereço antigo)
     nomes    (opcional) { en, es }: o nome do jogo em inglês e em espanhol, quando muda (sem ele: o mesmo nome)
     texto    descrição em português   en    em inglês   es    em espanhol
-    tag      texto do botão do cartão, "PT / EN / ES" (ex.: '▶ Brincar / Play / Jugar')
-             Só aparece o idioma escolhido na estante (🇧🇷 PT · 🇺🇸 EN · 🇪🇸 ES, idioma.js).
+    tag      verbo do jogo, "PT / EN / ES" (ex.: '▶ Brincar / Play / Jugar'). Desde 15/Nov/2026 o botão do cartão é
+             sempre "Jogar / Play / Jugar" (igual em todos); este campo fica para quem quiser o verbo próprio.
     novo     data em que o jogo entrou na estante ('AAAA-MM-DD'). Por 7 dias o cartão ganha o selo "✨ Novo" e o jogo
              aparece na janela "✨ Novidades da semana" (novidades.js). Jogo novo = pôr a data do dia.
     instalar true = pode ser instalado e funciona sem internet (o service worker fica em url + 'sw.js')
     soOnline true = precisa de internet (ex.: YouTube e TV); o cartão mostra "🌐 Só com internet"
     tv       { texto, tag, param } = abre na TV com este parâmetro; param vai no fim do endereço
+    rec      (opcional) ícones do cartão (dono, 15/Nov/2026): 'tv' joga na TV · 'cam' joga com o corpo (câmera) ·
+             'incl' inclinar o celular · 'dois' dá para jogar em dois. "Funciona sem internet" vem de instalar e
+             "Precisa de internet" de soOnline. Tocar num ícone explica o que é.
 
   Como a página usa: <div class="grid" data-catalogo="estante"></div> (ou "tv") e, logo depois,
   <script src="catalogo.js"></script>. O script monta os cartões na hora (a página não pisca vazia).
 */
 (function () {
   var JOGOS = [
-    { id: 'baguncolandia', nomes: { en: "Mayhemland", es: "Alborotolandia" }, nome: 'Bagunçolândia', ico: '🐶', img: '/kids/baguncolandia/icone.svg', cor: '#c6ff3d', url: '/kids/baguncolandia/',
+    { id: 'baguncolandia', rec: ['tv', 'cam', 'dois'], nomes: { en: "Mayhemland", es: "Alborotolandia" }, nome: 'Bagunçolândia', ico: '🐶', img: '/kids/baguncolandia/icone.svg', cor: '#c6ff3d', url: '/kids/baguncolandia/',
       texto: 'Frutas, doces e personagens voam na TV e você corta, pega, chuta, pula e abaixa com o corpo. 1 ou 2 pessoas, boneco personalizável, ou no dedo no celular.',
       en: "Fruit, sweets and funny characters fly across the TV, and you slice, catch, kick, jump and duck with your whole body. 1 or 2 players, a character you can dress up, or play with your finger on the phone.",
       es: "Frutas, dulces y personajes vuelan por la tele, y tú los cortas, los atrapas, les das patadas, saltas y te agachas con todo el cuerpo. 1 o 2 jugadores, un muñeco a tu gusto, o con el dedo en el móvil.",
       tag: '▶ Brincar / Play / Jugar', instalar: true,
       tv: { texto: 'Corte, pegue, chute, pule e abaixe com o corpo. A TV mostra o código; o celular filma.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'peluqueria', nome: 'Peluqueria', ico: '💇', cor: '#ffd166', url: '/kids/peluqueria/',
+    { id: 'peluqueria', rec: ['tv', 'cam', 'dois'], nome: 'Peluqueria', ico: '💇', cor: '#ffd166', url: '/kids/peluqueria/',
       texto: 'O provador maluco da família: uma coroa, um bigode ou uma peruca desce sobre o bicho e você toca na hora certa. Quanto mais perto, mais pontos. UHUL!',
       en: "The family's silly dressing room: a crown, a moustache or a wig comes down onto the animal and you tap at just the right moment. The closer you get, the more points. WOOHOO!",
       es: "El probador loco de la familia: una corona, un bigote o una peluca baja sobre el animalito y tú tocas justo a tiempo. Cuanto más cerca, más puntos. ¡YUJU!",
       tag: '▶ Brincar / Play / Jugar', instalar: true,
       tv: { texto: 'Um chapéu, um bigode ou uma peruca desce sobre o bicho: aperte OK na hora certa.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'danca-na-sala', nomes: { en: "Living Room Dance", es: "Baile en la Sala" }, nome: 'Dança na Sala', ico: '💃', cor: '#ff4fa3', url: '/kids/danca-na-sala.html',
+    { id: 'danca-na-sala', rec: ['tv', 'cam', 'dois'], nomes: { en: "Living Room Dance", es: "Baile en la Sala" }, nome: 'Dança na Sala', ico: '💃', cor: '#ff4fa3', url: '/kids/danca-na-sala.html',
       texto: 'A TV toca a música do YouTube e mostra quem está dançando, com neon, fogos e placar de energia. O celular filma e comanda.',
       en: "The TV plays music from YouTube and shows everyone who's dancing, with neon lights, fireworks and an energy score. The phone films and runs the show.",
       es: "La tele pone música de YouTube y muestra a todos los que bailan, con luces de neón, fuegos artificiales y un marcador de energía. El móvil graba y lo controla todo.",
       tag: '▶ Dançar / Dance / Bailar', soOnline: true,
       tv: { texto: 'Música do YouTube na TV e as câmeras dos celulares ao vivo, com neon e placar de energia.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'vruuum', nome: 'Vruuum!', ico: '🏎️', cor: '#ff9f1c', url: '/kids/vruuum/',
+    { id: 'vruuum', rec: ['tv', 'cam', 'incl', 'dois'], nome: 'Vruuum!', ico: '🏎️', cor: '#ff9f1c', url: '/kids/vruuum/',
       texto: 'Corrida de carrinho: desvie dos cones e da lama, pegue estrelas, turbo de arco-íris e rampas, passando pela praia, floresta, doces, neve e cidade neon. 1 ou 2 jogadores na mesma tela.',
       en: "Go-kart racing: dodge the cones and the mud, grab stars, use the rainbow turbo and jump the ramps, racing through the beach, the forest, candy land, the snow and a neon city. 1 or 2 players on the same screen.",
       es: "Carreras de karts: esquiva los conos y el barro, atrapa estrellas, usa el turbo arcoíris y salta las rampas, pasando por la playa, el bosque, el mundo de dulces, la nieve y una ciudad de neón. 1 o 2 jugadores en la misma pantalla.",
       tag: '▶ Correr / Race / Correr', instalar: true,
       tv: { texto: 'Corrida de carrinho: setas do controle para virar, OK para buzinar. Pegue as estrelas!', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'purpurina', nome: 'Purpurina', ico: '💄', cor: '#cfa8ff', url: '/kids/purpurina/',
+    { id: 'purpurina', rec: ['tv'], nome: 'Purpurina', ico: '💄', cor: '#cfa8ff', url: '/kids/purpurina/',
       texto: 'Maquiagem, roupas, joias e muito brilho: monte a personagem, faça a maquiagem com o pincel, vista roupas e acessórios, cumpra desafios e desfile com confete. Brinque na TV com o celular de controle e música do YouTube ou do Spotify.',
       en: "Makeup, clothes, jewelry and lots of sparkle: create your character, do the makeup with a brush, try on clothes and accessories, take on challenges and walk the runway with confetti. Play on the TV using the phone as a remote, with music from YouTube or Spotify.",
       es: "Maquillaje, ropa, joyas y mucho brillo: crea tu personaje, maquíllalo con el pincel, ponle ropa y accesorios, cumple retos y desfila con confeti. Juega en la tele con el móvil como mando y música de YouTube o Spotify.",
       tag: '▶ Brilhar / Sparkle / Brillar', instalar: true,
       tv: { texto: 'Maquiagem, roupas e desfile. A TV mostra um código: no celular, toque em 📺 Conectar na TV e brinque com o celular de controle. Música do YouTube e do Spotify.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'rabiscolandia', nome: 'Rabiscolândia', ico: '🎨', cor: '#c6ff3d', url: '/kids/rabiscolandia/',
+    { id: 'rabiscolandia', rec: ['tv', 'cam'], nome: 'Rabiscolândia', ico: '🎨', cor: '#c6ff3d', url: '/kids/rabiscolandia/',
       texto: 'Desenhar, livro de colorir e pintar por números, com pincéis que mexem, adesivos animados, paisagens e música. Desenhe com a mão na frente da câmera ou na TV com o celular de controle.',
       en: "Drawing, a coloring book and paint by numbers, with brushes that move, animated stickers, landscapes and music. Draw with your hand in front of the camera, or on the TV using the phone as a remote.",
       es: "Dibujar, un libro para colorear y pintar por números, con pinceles que se mueven, pegatinas animadas, paisajes y música. Dibuja con la mano frente a la cámara o en la tele con el móvil como mando.",
@@ -90,7 +93,7 @@
       en: "Go fishing with Juca and Lili in the enchanted lake: the hook swings, you drop it at just the right moment and catch fish, a turtle, an octopus, sharks, a whale and the mermaid. The deeper you go, the more points! Play alone or with a friend.",
       es: "Ve de pesca con Juca y Lili al lago encantado: el anzuelo se balancea, lo sueltas justo a tiempo y pescas peces, una tortuga, un pulpo, tiburones, una ballena y la sirena. ¡Cuanto más hondo, más puntos! Solo o con otra persona.",
       tag: '▶ Pescar / Fish / Pescar', instalar: true },
-    { id: 'batalha-naval', novo: '2026-11-06', nomes: { en: "Sea Battle", es: "Batalla Naval" }, nome: 'Batalha Naval', ico: '⚓', img: '/kids/batalha-naval/icone.svg', cor: '#4fc3ff', url: '/kids/batalha-naval/',
+    { id: 'batalha-naval', rec: ['dois'], novo: '2026-11-06', nomes: { en: "Sea Battle", es: "Batalla Naval" }, nome: 'Batalha Naval', ico: '⚓', img: '/kids/batalha-naval/icone.svg', cor: '#4fc3ff', url: '/kids/batalha-naval/',
       texto: 'Esconda seus navios e afunde os dos outros: E4, F2... Jogue em família, de 2 a 4 pessoas, cada uma no seu celular, com um código de 4 letras. Também contra o computador ou passando o aparelho.',
       en: "Hide your ships and sink everyone else's: E4, F2... Play as a family, 2 to 4 players, each on their own phone, with a 4-letter code. You can also play against the computer or pass the phone around.",
       es: "Esconde tus barcos y hunde los de los demás: E4, F2... Juega en familia, de 2 a 4 personas, cada una en su móvil, con un código de 4 letras. También contra el ordenador o pasando el móvil.",
@@ -100,12 +103,12 @@
       en: "The 3D claw machine, just like at the arcade: move the claw with the arrows, press GRAB and hope it doesn't let go! Plushies, wiggly critters, bugs, burgers and real-looking puppies that walk around.",
       es: "La máquina de garra en 3D, igual que la de la feria: mueve la garra con las flechas, pulsa COGER ¡y cruza los dedos para que no lo suelte! Peluches, bichitos que se mueven, insectos, hamburguesas y cachorritos que caminan.",
       tag: '▶ Pegar / Grab / Coger', instalar: true },
-    { id: 'quem-e', novo: '2026-11-14', nomes: { en: "Who Is It?", es: "¿Quién es?" }, nome: 'Quem é?', ico: '🫧', img: '/kids/quem-e/icone.svg', cor: '#ff5fa8', url: '/kids/quem-e/',
+    { id: 'quem-e', rec: ['dois'], novo: '2026-11-14', nomes: { en: "Who Is It?", es: "¿Quién es?" }, nome: 'Quem é?', ico: '🫧', img: '/kids/quem-e/icone.svg', cor: '#ff5fa8', url: '/kids/quem-e/',
       texto: 'Pense em alguém e a meleca adivinha! Mais de 1.600 personagens, e ela aprende quem não conhece. E o Duelo de Caras: cada um escolhe uma cara em segredo e pergunta "usa óculos?", "tem coroa?" até descobrir a do outro. Com o Melekento Blue e a Pink Honey.',
       en: "Think of someone and the slime guesses who it is! More than 1,600 characters, and it learns the ones it doesn't know. Plus Face Duel: each player picks a secret face and asks \"glasses?\", \"a crown?\" until they find the other one's. With Melekento Blue and Pink Honey.",
       es: "¡Piensa en alguien y el slime adivina quién es! Más de 1600 personajes, y aprende los que no conoce. Y el Duelo de Caras: cada uno elige una cara en secreto y pregunta \"¿lleva gafas?\", \"¿tiene corona?\" hasta descubrir la del otro. Con Melekento Blue y Pink Honey.",
       tag: '▶ Adivinhar / Guess / Adivinar', instalar: true },
-    { id: 'contador-de-historias', nomes: { en: "Storyteller", es: "Cuentacuentos" }, nome: 'Contador de Histórias', ico: '📖', cor: '#3ee8ff', url: '/contador-de-historias/',
+    { id: 'contador-de-historias', rec: ['tv'], nomes: { en: "Storyteller", es: "Cuentacuentos" }, nome: 'Contador de Histórias', ico: '📖', cor: '#3ee8ff', url: '/contador-de-historias/',
       texto: 'Histórias para dormir: um acervo para ler e ouvir, e a criação de histórias novas com os nomes da sua família.',
       en: "Bedtime stories: a library to read and listen to, and brand-new stories made up with your family's names.",
       es: "Cuentos para dormir: una biblioteca para leer y escuchar, y cuentos nuevos inventados con los nombres de tu familia.",
@@ -113,7 +116,6 @@
       tv: { texto: 'Histórias para ler e ouvir na tela grande, antes de dormir.', tag: '▶ Abrir', param: '' } }
   ];
   // cartão final da estante (não é um jogo)
-  var EM_BREVE = { url: '#', ico: '➕', nome: 'Próxima brincadeira', cor: '#ffd166', texto: 'Mais jogos de movimento, música e imaginação estão a caminho.', en: 'More games full of movement, music and imagination are on the way.', es: 'Vienen más juegos de movimiento, música e imaginación.', nomes: { en: 'Next game', es: 'Próximo juego' }, tag: '🚧 Em breve / Coming soon / Muy pronto' };
 
   window.BolinhoCatalogo = {
     jogos: JOGOS,
@@ -134,43 +136,94 @@
     if (texto != null) e.textContent = texto;
     return e;
   }
-  // Um cartão por jogo. A kids.js, numa TV de verdade,
-  // adiciona ?tv=auto e cuida das setas do controle; no celular/tablet não muda nada.
+  // texto nos três idiomas: um pedaço de cada (class pt / en / es); o idioma.js mostra só o escolhido
+  function tri(e, pt, en, es) {
+    [['pt', pt], ['en', en || pt], ['es', es || pt]].forEach(function (p) { e.appendChild(el('span', p[0], p[1])); });
+    return e;
+  }
+  function T(pt, en, es) { return window.BolinhoIdioma ? BolinhoIdioma.t(pt, en, es) : pt; }
+  // rótulo para leitor de tela no idioma escolhido (troca junto com o idioma: data-rot="pt|en|es")
+  function rotulo(e, pt, en, es) { e.setAttribute('data-rot', pt + '|' + en + '|' + es); e.setAttribute('aria-label', T(pt, en, es)); return e; }
+
+  // ---------- ícones do cartão (dono, 15/Nov/2026) ----------
+  var SVG = {
+    off: '<path d="M2.5 9.5a14 14 0 0 1 19 0M5.5 12.8a9.5 9.5 0 0 1 13 0M8.6 16a5 5 0 0 1 6.8 0"/><circle cx="12" cy="19.3" r="1.2" fill="currentColor" stroke="none"/><path d="M3 3l18 18" stroke-width="2.4"/>',
+    net: '<path d="M2.5 9.5a14 14 0 0 1 19 0M5.5 12.8a9.5 9.5 0 0 1 13 0M8.6 16a5 5 0 0 1 6.8 0"/><circle cx="12" cy="19.3" r="1.2" fill="currentColor" stroke="none"/>',
+    tv: '<rect x="2.5" y="7" width="19" height="13" rx="2.5"/><path d="M8 2.5l4 4 4-4"/><path d="M9 23h6"/>',
+    cam: '<circle cx="13.5" cy="3.8" r="2.1" fill="currentColor" stroke="none"/><path d="M13 7.2l-1.6 6.3M12.6 8.6l4.6 1.6 1.8-3.6M12.6 8.6L8.2 7.4 5.6 9.6M11.4 13.5l3.9 3 1.2 4.6M11.4 13.5l-2.6 3.7-4.3.4"/><path d="M2.5 4.5h3.5M1.5 7.5h3" stroke-width="1.7"/>',
+    incl: '<rect x="8.6" y="5.6" width="6.8" height="12.8" rx="1.6" transform="rotate(25 12 12)"/><path d="M3.3 9.7A9 9 0 0 1 8.9 3.5M7.4 5.7l1.5-2.1-2.5-.7M20.7 14.3a9 9 0 0 1-5.6 6.2M16.6 18.3l-1.5 2.1 2.5.7" stroke-width="1.9"/>',
+    dois: '<circle cx="8" cy="7.5" r="3"/><circle cx="16.5" cy="7.5" r="3"/><path d="M2.5 20.5c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6"/><path d="M14.5 14.6c.6-.1 1.3-.1 2-.1 3 0 5.5 2.4 5.5 6"/>',
+    baixar: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+    seta: '<path d="M6 9l6 6 6-6"/>'
+  };
+  var INFO = {
+    off: [['Funciona sem internet', 'Works offline', 'Funciona sin internet'],
+      ['Depois de aberto uma vez com internet, o jogo fica guardado no aparelho e abre até no avião.', 'Once you open it with the internet, the game is saved on the device and works even on a plane.', 'Después de abrirlo una vez con internet, el juego se queda guardado y funciona hasta en el avión.']],
+    net: [['Precisa de internet', 'Needs the internet', 'Necesita internet'],
+      ['Este jogo usa a internet (vídeos e músicas do YouTube). Sem internet ele fica apagado.', 'This game uses the internet (YouTube videos and music). Without it, the game is greyed out.', 'Este juego usa internet (vídeos y música de YouTube). Sin internet, se queda apagado.']],
+    tv: [['Joga na TV', 'Plays on the TV', 'Se juega en la tele'],
+      ['Abre na televisão; o celular vira o controle.', 'Opens on the TV; the phone becomes the remote.', 'Se abre en la tele; el móvil hace de mando.']],
+    cam: [['Joga com o corpo', 'Play with your body', 'Se juega con el cuerpo'],
+      ['Usa a câmera: você mexe o corpo ou as mãos e o jogo acompanha. Nada é gravado.', 'Uses the camera: move your body or your hands and the game follows you. Nothing is recorded.', 'Usa la cámara: mueves el cuerpo o las manos y el juego te sigue. No se graba nada.']],
+    incl: [['Inclinar o celular', 'Tilt the phone', 'Inclinar el móvil'],
+      ['Vire o celular para os lados para controlar (usa o sensor de movimento).', 'Tilt the phone from side to side to steer (it uses the motion sensor).', 'Inclina el móvil hacia los lados para controlar (usa el sensor de movimiento).']],
+    dois: [['Dá para jogar em dois', 'Two can play', 'Para jugar entre dos'],
+      ['Duas pessoas juntas, na mesma tela ou cada uma no seu celular.', 'Two people together, on the same screen or each on their own phone.', 'Dos personas juntas, en la misma pantalla o cada una en su móvil.']]
+  };
+  function svg(k, classe) { return '<svg class="' + (classe || '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + SVG[k] + '</svg>'; }
+  function icone(k) {
+    var b = el('button', 'ic ic-' + k); b.type = 'button'; b.setAttribute('data-ic', k);
+    b.innerHTML = svg(k);
+    var n = INFO[k][0]; return rotulo(b, n[0], n[1], n[2]);
+  }
+  function recursos(j) { return [j.soOnline ? 'net' : 'off'].concat(j.rec || []); }
+
+  // Um cartão por jogo (dono, 15/Nov/2026): ícone, nome inteiro, "? ⌄" que abre a explicação, os ícones do que o
+  // jogo faz, ⬇ Instalar e ▶ Jogar sempre na ponta direita. A kids.js, numa TV de verdade, põe ?tv=auto no Jogar
+  // e anda pelos botões Jogar com as setas.
   function cartao(j) {
-    var a = el('a', 'card');
-    a.style.setProperty('--c', j.cor);
-    a.href = j.url;
-    a.setAttribute('data-jogo', j.id);
+    var c = el('div', 'card');
+    c.style.setProperty('--c', j.cor);
+    c.setAttribute('data-jogo', j.id);
     // interruptor do RootifyONE (Controle dos apps → Bolinho de Chuva): jogo desligado some da estante (recursos.js)
-    if (/^\/kids\//.test(j.url)) a.setAttribute('data-recurso', j.id);
-    if (j.tv) a.setAttribute('data-tv', j.tv.param || '?tv=auto');
-    if (j.instalar) { a.setAttribute('data-instalar', j.url); a.setAttribute('data-sw', window.BolinhoCatalogo.sw(j)); }
-    else if (j.soOnline) a.setAttribute('data-so-online', '');
-    var ico = a.appendChild(el('div', 'ico', j.img ? null : j.ico));
-    if (j.img) {
-      var im = document.createElement('img');
-      im.src = j.img; im.alt = ''; im.style.cssText = 'display:block;width:1em;height:1em;border-radius:.22em';
-      ico.appendChild(im);
+    if (/^\/kids\//.test(j.url)) c.setAttribute('data-recurso', j.id);
+    if (j.tv) c.setAttribute('data-tv', j.tv.param || '?tv=auto');
+    if (j.instalar) { c.setAttribute('data-instalar', j.url); c.setAttribute('data-sw', window.BolinhoCatalogo.sw(j)); }
+    else if (j.soOnline) c.setAttribute('data-so-online', '');
+    var nomes = j.nomes || {}, nm = [j.nome, nomes.en || j.nome, nomes.es || j.nome];
+
+    var linha = c.appendChild(el('div', 'c-l'));
+    var ico = linha.appendChild(el('span', 'c-ic', j.img ? null : j.ico));
+    if (j.img) { var im = document.createElement('img'); im.src = j.img; im.alt = ''; ico.appendChild(im); }
+    var meio = linha.appendChild(el('div', 'c-m'));
+    var topo = meio.appendChild(el('div', 'c-n'));
+    tri(topo.appendChild(el('h2')), nm[0], nm[1], nm[2]);
+    var q = topo.appendChild(el('button', 'c-q')); q.type = 'button'; q.setAttribute('aria-expanded', 'false');
+    q.innerHTML = '?' + svg('seta');
+    rotulo(q, 'Saiba mais sobre ' + nm[0], 'More about ' + nm[1], 'Más sobre ' + nm[2]);
+    if (j.novo && window.BolinhoCatalogo.ehNovo(j)) tri(topo.appendChild(el('span', 'novo-selo')), 'Novo', 'New', 'Nuevo');
+    var baixo = meio.appendChild(el('div', 'c-r'));
+    var ics = baixo.appendChild(el('div', 'c-ics'));
+    recursos(j).forEach(function (k) { ics.appendChild(icone(k)); });
+    var bts = baixo.appendChild(el('div', 'c-bts'));   // ⬇ e Jogar juntos, sempre na ponta direita
+    if (j.instalar) {
+      var inst = bts.appendChild(el('a', 'c-inst')); inst.href = j.url + '?instalar=1';
+      inst.innerHTML = svg('baixar');
+      rotulo(inst, 'Instalar ' + nm[0] + ' no aparelho', 'Install ' + nm[1] + ' on this device', 'Instalar ' + nm[2] + ' en el dispositivo');
     }
-    // os três idiomas ficam no cartão; o idioma.js mostra só o escolhido (class="pt" / "en" / "es")
-    var nomes = j.nomes || {};
-    var h2 = a.appendChild(el('h2'));
-    h2.appendChild(el('span', 'pt', j.nome));
-    h2.appendChild(el('span', 'en', nomes.en || j.nome));
-    h2.appendChild(el('span', 'es', nomes.es || j.nome));
-    if (j.novo && window.BolinhoCatalogo.ehNovo(j)) {
-      var selo = h2.appendChild(el('span', 'novo-selo'));
-      selo.appendChild(el('span', 'pt', '✨ Novo')); selo.appendChild(el('span', 'en', '✨ New')); selo.appendChild(el('span', 'es', '✨ Nuevo'));
+    var jogar = bts.appendChild(el('a', 'c-jogar')); jogar.href = j.url;
+    tri(jogar, 'Jogar', 'Play', 'Jugar');
+    tri(meio.appendChild(el('div', 'c-aviso')), 'Precisa de internet', 'Needs the internet', 'Necesita internet');
+
+    var det = c.appendChild(el('div', 'c-d'));
+    det.appendChild(el('p', 'pt', j.texto)); det.appendChild(el('p', 'en', j.en || j.texto)); det.appendChild(el('p', 'es', j.es || j.texto));
+    var ul = det.appendChild(el('ul'));
+    recursos(j).forEach(function (k) { var li = ul.appendChild(el('li')); li.appendChild(icone(k)); var n = INFO[k][0]; tri(li, n[0], n[1], n[2]); });
+    if (j.tv) {
+      var tv = det.appendChild(el('a', 'c-tv')); tv.href = j.url + (j.tv.param || '?tv=auto');
+      tri(tv, '📺 Abrir na TV', '📺 Open on the TV', '📺 Abrir en la tele');
     }
-    a.appendChild(el('p', 'pt', j.texto));
-    a.appendChild(el('p', 'en', j.en || j.texto));
-    a.appendChild(el('p', 'es', j.es || j.texto));
-    var tag = j.tag.split(' / ');
-    var sp = a.appendChild(el('span', 'tag'));
-    sp.appendChild(el('span', 'pt', tag[0]));
-    sp.appendChild(el('span', 'en', tag[1] ? '▶ ' + tag[1].replace(/^▶\s*/, '') : tag[0]));
-    sp.appendChild(el('span', 'es', tag[2] ? '▶ ' + tag[2].replace(/^▶\s*/, '') : tag[0]));
-    return a;
+    return c;
   }
 
   // monta cada grade marcada com data-catalogo (o script vem logo depois dela)
@@ -179,10 +232,46 @@
     var g = grades[i];
     if (g.getAttribute('data-montado')) continue;
     JOGOS.forEach(function (j) { g.appendChild(cartao(j)); });
-    var b = cartao(EM_BREVE);
-    b.className = 'card breve'; b.href = '#'; b.setAttribute('aria-disabled', 'true'); b.tabIndex = -1;
-    b.removeAttribute('data-jogo');
-    g.appendChild(b);
     g.setAttribute('data-montado', '1');
   }
+  if (!grades.length) return;
+
+  // ---------- abrir o cartão, explicar um ícone ----------
+  var bal = el('div', 'c-bal'); bal.hidden = true; bal.setAttribute('role', 'status'); document.body.appendChild(bal);
+  function explicar(k) {
+    var n = INFO[k][0], t = INFO[k][1];
+    bal.innerHTML = svg(k, 'c-bal-ic ic-' + k);
+    var tx = bal.appendChild(el('div'));
+    tx.appendChild(el('b', null, T(n[0], n[1], n[2])));
+    tx.appendChild(el('span', null, T(t[0], t[1], t[2])));
+    bal.hidden = false;
+  }
+  document.addEventListener('click', function (e) {
+    var ic = e.target.closest && e.target.closest('.card .ic');
+    if (ic) { e.preventDefault(); explicar(ic.getAttribute('data-ic')); return; }
+    bal.hidden = true;
+    if (!e.target.closest) return;
+    var c = e.target.closest('.card');
+    if (!c || e.target.closest('a, .c-d')) return;
+    var aberto = c.classList.toggle('aberto');
+    c.querySelector('.c-q').setAttribute('aria-expanded', String(aberto));
+  });
+  // sem internet: o jogo que precisa dela (e o que ainda não foi guardado no aparelho) fica apagado
+  function rede() {
+    var cs = document.querySelectorAll('.card[data-jogo]');
+    for (var k = 0; k < cs.length; k++) {
+      var c = cs[k], sem = navigator.onLine === false && (c.hasAttribute('data-so-online') || (c.hasAttribute('data-instalar') && !c.hasAttribute('data-guardado')));
+      c.classList.toggle('sem', sem);
+      var a = c.querySelector('.c-aviso .pt');
+      if (a && sem && !c.hasAttribute('data-so-online')) { a.textContent = 'Ainda não guardado neste aparelho'; a.nextSibling.textContent = 'Not saved on this device yet'; a.nextSibling.nextSibling.textContent = 'Aún no está guardado en este dispositivo'; }
+    }
+  }
+  window.BolinhoCatalogo.rede = rede;
+  rede(); window.addEventListener('online', rede); window.addEventListener('offline', rede);
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.card.sem a')) e.preventDefault(); }, true);
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function () {
+    var rs = document.querySelectorAll('[data-rot]');
+    for (var k = 0; k < rs.length; k++) { var p = rs[k].getAttribute('data-rot').split('|'); rs[k].setAttribute('aria-label', T(p[0], p[1], p[2])); }
+    bal.hidden = true;
+  });
 })();

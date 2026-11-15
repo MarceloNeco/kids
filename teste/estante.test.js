@@ -36,7 +36,7 @@ test('cada jogo obedece o app kids (data-app) e marca o próprio interruptor (da
     assert.ok(html.includes('data-recurso="' + j.id + '"'), 'data-recurso="' + j.id + '" em ' + arq);
   }
   assert.match(ler('index.html'), /<script src="\/kids\/recursos\.js" data-app="kids"><\/script>/, 'estante obedece os interruptores');
-  assert.ok(catalogo.includes("a.setAttribute('data-recurso', j.id)"), 'cartão marcado com data-recurso');
+  assert.ok(catalogo.includes("c.setAttribute('data-recurso', j.id)"), 'cartão marcado com data-recurso');
 });
 
 test('jogos com a trilha comum: pelo menos 10 músicas que existem', () => {

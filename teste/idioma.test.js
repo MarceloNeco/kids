@@ -72,8 +72,8 @@ test('estante: um botão com o idioma atual; tocando, continua ou troca; a escol
     await pg.click('[data-idiomas] .bi-op[data-idioma="pt"]');   // continuar: fecha e não muda nada
     assert.ok(await pg.$eval('[data-idiomas] .bi-menu', (m) => m.hidden), 'continuar fecha as opções');
     assert.strictEqual(await pg.evaluate(() => BolinhoIdioma.atual()), 'pt');
-    assert.match(await pg.evaluate(() => document.body.innerText), /Brincar/);
-    for (const [cod, re] of [['en', /\bPlay\b/], ['es', /Jugar/], ['pt', /Brincar/]]) {
+    assert.match(await pg.evaluate(() => document.body.innerText), /\bJogar\b/);
+    for (const [cod, re] of [['en', /\bPlay\b/], ['es', /Jugar/], ['pt', /\bJogar\b/]]) {
       await pg.click('[data-idiomas] .bi-atual');
       await pg.click('[data-idiomas] .bi-op[data-idioma="' + cod + '"]');
       await pg.waitForTimeout(200);
