@@ -278,9 +278,12 @@ test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/No
     assert.equal(bemFormado(s), '', pose);
     assert.ok(!s.includes('pp-braco-'), pose + ': em pose os braços não balançam');
   }
-  for (const pose of ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha']) assert.ok(B.POSES.includes(pose), pose);
+  for (const pose of ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha']) assert.ok(B.POSES.includes(pose), pose);
   // idade: as quatro opções, com o jeito de andar de cada uma, e as poses sorteadas no desfile
   assert.deepEqual(P.categoria('idade').opcoes.map(o => o.id), ['pequena', 'crianca', 'adolescente', 'adulta']);
   assert.match(css, /\.modelo\.idade-pequena\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-crianca\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-adolescente\.andando \.pp-passo-e/);
+  // paradinha nunca com as duas pernas retas
+  assert.doesNotMatch(app.match(/var PERNAS = [^\n]*/)[0], /''/);
+  for (const pe of ['perna-cruzada', 'perna-dobrada', 'perna-aberta', 'perna-relaxada']) assert.match(css, new RegExp('\\.modelo\\.' + pe + ' \\.pp-passo'));
   assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.match(app, /girar\(0, -115/);
 });

@@ -985,8 +985,9 @@
      'cruzados'     braços cruzados na frente do peito (menino)
      'bolsos'       mãos nos bolsos (menino): os braços descem para dentro e as mãos somem no bolso
      'carinha'      as duas mãos no queixo, emoldurando o rosto (foto de desfile infantil do dono)
+     'joinha'       os dois punhos na frente do peito com o polegar para cima (foto do menino no desfile)
      Manga curta cobre o começo do braço; manga longa, o braço todo. */
-  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha'];
+  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha'];
   function bracosPose(tipo, manga, corTop, pele, peleE, esmalte, membro) {
     function vestir(d, larg, ate) {   // a manga por cima do braço (ate: 0..1 do traço, aproximado pelo pathLength)
       if (!corTop || manga === 'nada') return '';
@@ -1009,6 +1010,12 @@
       var bE = 'M150,354 Q132,410 160,462', bD = 'M250,354 Q268,410 240,462';
       function bolso(x) { return p('M' + (x - 13) + ',458 Q' + x + ',452 ' + (x + 13) + ',458', { fill: 'none', stroke: '#000', 'stroke-width': 2, opacity: 0.35, 'stroke-linecap': 'round' }); }
       return membro(bE, 23) + vestir(bE, 23, 0.4) + bolso(160) + membro(bD, 23) + vestir(bD, 23, 0.4) + bolso(240);
+    }
+    if (tipo === 'joinha') {
+      var jE = 'M150,354 Q130,392 148,420', jD = 'M250,354 Q270,392 252,420', fE = 'M148,420 Q160,396 176,372', fD = 'M252,420 Q244,394 230,366';
+      function polegar(x, y) { return p('M' + x + ',' + (y - 4) + ' L' + x + ',' + (y - 17), { stroke: peleE, 'stroke-width': 9, 'stroke-linecap': 'round' }) + p('M' + x + ',' + (y - 4) + ' L' + x + ',' + (y - 17), { stroke: pele, 'stroke-width': 6.4, 'stroke-linecap': 'round' }); }
+      return membro(jE, 23) + vestir(jE, 23, 0.6) + membro(jD, 23) + vestir(jD, 23, 0.6) + membro(fE, 20) + vestir(fE, 20, 0) + membro(fD, 20) + vestir(fD, 20, 0) +
+        polegar(180, 364) + punho(178, 368, 0) + polegar(232, 358) + punho(230, 362, 0);
     }
     if (tipo === 'carinha') {
       var cE = 'M150,354 Q124,392 150,402', cD = 'M250,354 Q276,392 250,402', aE = 'M150,402 Q154,350 164,312', aD = 'M250,402 Q246,350 236,312';
