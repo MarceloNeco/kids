@@ -284,6 +284,9 @@ test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/No
   assert.match(css, /\.modelo\.idade-pequena\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-crianca\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-adolescente\.andando \.pp-passo-e/);
   // paradinha nunca com as duas pernas retas
   assert.doesNotMatch(app.match(/var PERNAS = [^\n]*/)[0], /''/);
-  for (const pe of ['perna-cruzada', 'perna-dobrada', 'perna-aberta', 'perna-relaxada']) assert.match(css, new RegExp('\\.modelo\\.' + pe + ' \\.pp-passo'));
+  for (const pe of ['perna-cruzada', 'perna-aberta', 'ginga-dir', 'ginga-esq']) assert.match(css, new RegExp('\\.modelo\\.' + pe + ' \\.pp-passo'));
+  // os dois pés no chão (dono, 15/Nov/2026: "parece que tem um pé flutuando"): nenhuma paradinha levanta o pé
+  assert.doesNotMatch(app, /perna-dobrada|perna-relaxada/);
+  for (const m of css.matchAll(/\.modelo\.(perna-[a-z]+|ginga-[a-z]+) \.pp-passo-[ed] \{ transform: ([^}]*)\}/g)) assert.doesNotMatch(m[2], /translateY\(-|scaleY\(0?\.\d/, m[1] + ' tira o pé do chão');
   assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.match(app, /girar\(0, -115/);
 });

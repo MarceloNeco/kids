@@ -216,13 +216,21 @@ ul { list-style: none; }
 .modelo .passarela-boneca { transition: transform .35s ease-out; transform-origin: 50% 92%; }
 .modelo.pose-esq .passarela-boneca { transform: rotate(-3.2deg); }
 .modelo.pose-dir .passarela-boneca { transform: rotate(3deg); }
-/* pernas da paradinha (sempre uma destas, nunca as duas retas): o pé direito cruza na frente do outro; o joelho
-   esquerdo dobra (pé na ponta); pernas abertas; peso numa perna só */
+/* pernas da paradinha (dono, 15/Nov/2026: os dois pés no chão, nunca um flutuando).
+   Gingada (contrapposto, a pose da mão na cintura): o quadril vai 16 para o lado da mão e inclina 4° — desce do lado
+   da perna esticada (a saia desce junto) — e o tronco compensa para o outro lado. Cada perna é refeita do quadril novo até
+   o pé NO CHÃO (y 640): a de apoio fica embaixo do quadril; a outra vai esticada para fora.
+     ginga-dir: quadril esquerdo (177,455) → (193,456.6), pé em (150,640); direito (223,455) → (239,453.4), pé em (236,640)
+     ginga-esq: o espelho */
+.pp-corpo { transform-origin: 200px 455px; }
+.modelo.ginga-dir .pp-corpo { transform: translate(16px, 0) rotate(-4deg); }
+.modelo.ginga-dir .pp-passo-e { transform: translate(16px, 1.6px) rotate(12deg) scaleY(1.018); } .modelo.ginga-dir .pp-passo-d { transform: translate(16px, -1.6px) rotate(2.2deg) scaleY(1.008); }
+.modelo.ginga-esq .pp-corpo { transform: translate(-16px, 0) rotate(4deg); }
+.modelo.ginga-esq .pp-passo-e { transform: translate(-16px, -1.6px) rotate(-2.2deg) scaleY(1.008); } .modelo.ginga-esq .pp-passo-d { transform: translate(-16px, 1.6px) rotate(-12deg) scaleY(1.018); }
+/* outras paradinhas, também com os dois pés no chão: pé direito cruzado na frente (pousa um pouco mais perto de quem
+   assiste) e pernas abertas */
 .modelo.perna-cruzada .pp-passo-d { transform: translateY(1.4%) rotate(12deg); } .modelo.perna-cruzada .pp-passo-e { transform: rotate(-3deg); }
-.modelo.perna-dobrada .pp-passo-e { transform: translateY(-2.6%) scaleY(.9) rotate(-7deg); } .modelo.perna-dobrada .pp-passo-d { transform: rotate(-4deg); }
 .modelo.perna-aberta .pp-passo-e { transform: rotate(7deg); } .modelo.perna-aberta .pp-passo-d { transform: rotate(-7deg); }
-/* peso numa perna só: a direita firme e um pouco para dentro, a esquerda solta para fora com o joelho mole */
-.modelo.perna-relaxada .pp-passo-e { transform: translateY(-1.4%) scaleY(.95) rotate(7deg); } .modelo.perna-relaxada .pp-passo-d { transform: rotate(-3deg); }
 /* o jeito de andar muda com a idade (Eu → Idade; dono, 14/Nov/2026). Sem classe de idade (ou 16+): o catwalk acima.
    Até 5 anos: passinhos curtos e saltitantes, pé reto (sem cruzar), braços bem soltos, sobe e desce mais.
    6 a 10: andar de criança, pé quase reto, pouco quadril. 11 a 15: catwalk leve (cruza menos, quadril menor). */

@@ -788,14 +788,19 @@
     var poseAtual = POSES_DESFILE[0];
     function sortear() { var l = POSES_DESFILE.filter(function (x) { return x !== poseAtual; }); return l[Math.floor(Math.random() * l.length)]; }
     function opPose(x) { return x.tchau ? { tchau: true } : { pose: x.pose }; }
-    // pernas da paradinha (fotos de desfile infantil do dono): nunca as duas retinhas — pé cruzado na frente, joelho
-    // dobrado, pernas abertas ou o peso numa perna só (a outra solta, joelho mole), para menina e para menino
-    var PERNAS = idade === 'pequena' || menino ? ['perna-aberta', 'perna-relaxada', 'perna-dobrada'] : ['perna-cruzada', 'perna-dobrada', 'perna-aberta', 'perna-relaxada'];
-    function semPose() { mod.classList.remove('pose-esq', 'pose-dir', 'perna-cruzada', 'perna-dobrada', 'perna-aberta', 'perna-relaxada'); }
+    // pernas da paradinha (fotos de desfile infantil do dono): sempre os dois pés no chão, nunca as duas pernas retinhas.
+    // Na maior parte das vezes a gingada (quadril para o lado da mão na cintura, a outra perna esticada para fora); às
+    // vezes o pé cruzado na frente ou as pernas abertas, com o corpo inclinado
+    var PERNAS = idade === 'pequena' || menino ? ['ginga', 'ginga', 'perna-aberta'] : ['ginga', 'ginga', 'perna-cruzada', 'perna-aberta'];
+    function semPose() { mod.classList.remove('pose-esq', 'pose-dir', 'ginga-esq', 'ginga-dir', 'perna-cruzada', 'perna-aberta'); }
     function posar(x) {
-      // o corpo sempre faz pose: inclina para um lado (sorteado quando a pose não diz qual), em toda idade
-      poseAtual = x; semPose(); mod.classList.add('pose-' + (x.lado || (Math.random() < 0.5 ? 'esq' : 'dir')));
-      mod.classList.add(PERNAS[Math.floor(Math.random() * PERNAS.length)]);
+      poseAtual = x; semPose();
+      var pe = PERNAS[Math.floor(Math.random() * PERNAS.length)];
+      if (pe === 'ginga') {
+        // o quadril vai para o lado da mão na cintura: 'cintura' = direita da imagem; 'maoCabelo' = a esquerda na cintura
+        var lado = x.pose === 'cintura' ? 'dir' : x.pose === 'maoCabelo' ? 'esq' : (Math.random() < 0.5 ? 'esq' : 'dir');
+        mod.classList.add('ginga-' + lado);
+      } else mod.classList.add(pe, 'pose-' + (x.lado || (Math.random() < 0.5 ? 'esq' : 'dir')));
       pose(Object.assign({ sorriso: true }, opPose(x)));
     }
     // girinho: vira de lado (ângulo) e volta, sem rastro
