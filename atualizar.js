@@ -4,8 +4,9 @@
       <script src="../atualizar.js" data-fora-do-arquivo></script>
   e põe '../atualizar.js' na lista ARQUIVOS do sw.js (para abrir sem internet).
 
-  Como os jogos se atualizam (o que já existia): o service worker de cada jogo busca primeiro a versão do site
-  e guarda a cópia no aparelho; sem internet, abre a cópia guardada. Abrir com internet = versão nova.
+  Como os jogos se atualizam (sw-comum.js, desde 15/Nov/2026): cada jogo abre da cópia inteira guardada no aparelho; a
+  cada abertura com internet o navegador confere se há versão nova e a baixa INTEIRA (senão descarta); a tela de
+  carregando (carregando.js) espera e já abre na nova.
 
   O que este arquivo acrescenta: o AVISO dentro do jogo. Ao abrir, ele anota a versão que está rodando
   (versoes.json do próprio jogo). Depois confere de novo no site: ao voltar para o jogo, quando a internet
@@ -87,8 +88,9 @@
           novo.addEventListener('statechange', function () { if (novo.state === 'installed' || novo.state === 'activated' || novo.state === 'redundant') ok(); });
         });
       });
-      // no máximo 15 s esperando a cópia nova: depois recarrega assim mesmo (o site já entrega a versão nova)
-      Promise.race([esperar, new Promise(function (ok) { setTimeout(ok, 15000); })]).then(recarregar, recarregar);
+      // no máximo 45 s esperando a cópia nova chegar INTEIRA (sw-comum.js); se demorar mais, recarrega na versão do aparelho
+      // e a tela de carregando (carregando.js) termina de esperar a nova
+      Promise.race([esperar, new Promise(function (ok) { setTimeout(ok, 45000); })]).then(recarregar, recarregar);
     }).catch(recarregar);
   }
 

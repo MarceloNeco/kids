@@ -5,8 +5,8 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.12.2';
-  var APP_UPDATED = '14/Nov/2026';
+  var APP_VERSION = '0.12.3';
+  var APP_UPDATED = '15/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
   var V = RAPIDO ? 0.12 : 1;   // multiplica os tempos de espera
@@ -75,7 +75,7 @@
       });
     });
     document.title = ix(qs(document, '.logo[data-logo]').getAttribute('data-logo').split('|')) + ' — Bolinho de Chuva · SolverONE';
-    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + (en() ? 'Nov/14/2026' : lingua === 'es' ? APP_UPDATED.toLowerCase() : APP_UPDATED) +
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + (en() ? 'Nov/15/2026' : lingua === 'es' ? APP_UPDATED.toLowerCase() : APP_UPDATED) +
       t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY · ', ' · Music: Kevin MacLeod (incompetech.com), CC BY · ', ' · Música: Kevin MacLeod (incompetech.com), CC BY · ');
     var a = document.createElement('a'); a.href = 'CREDITOS.md'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = t('créditos', 'credits', 'créditos'); $('versao').appendChild(a);
     $('btVoz').setAttribute('aria-pressed', String(pref.voz)); $('btEfeitos').setAttribute('aria-pressed', String(pref.efeitos));

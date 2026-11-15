@@ -1,11 +1,9 @@
-/* Vruuum! — service worker: guarda a pasta no aparelho para abrir sem internet.
-   Código (html, js, css, json): rede primeiro com 4 s de espera, senão a cópia; fonte e imagens:
-   cópia primeiro. Músicas gravadas (35 MP3, ~65 MB): baixadas em segundo plano, uma por vez, depois de instalar
+/* Vruuum! — service worker: guarda o jogo inteiro no aparelho, de forma segura, pela peça comum ../sw-comum.js: a versão nova só entra
+   quando chega INTEIRA (senão continua a anterior) e tudo abre da cópia do próprio jogo. Músicas gravadas (35 MP3, ~65 MB): baixadas em segundo plano, uma por vez, depois de instalar
    (no 4G ou com economia de dados, só 6) e na primeira vez que tocam; sempre servidas inteiras da cópia (o <audio> pede pedaços, o cache não). Cache com o nome do app: só apaga caches "vruuum-" (nunca os dos outros apps
    da mesma origem). Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '1.25.0';
-var CACHE = 'vruuum-v' + VERSAO;
-var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'pista.js', 'motor.js', 'sprites.js', 'modelos3d.js', 'cavalo.js', 'veiculos.js', 'personagens.js', 'cabeca.js', 'desenho.js', 'rock.js', 'som.js', 'movimento.js', 'maos.js', 'selfie.js', 'app.js', 'baixar.js', 'rosto.tflite', 'fontes/fredoka.woff2', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../versao.js', '../trilha.js'].concat(['sons/aparece.mp3', 'sons/aplausos.mp3', 'sons/arara.mp3', 'sons/asas.mp3', 'sons/batida.mp3', 'sons/bip.mp3', 'sons/boing.mp3', 'sons/buzina.mp3', 'sons/caixa.mp3', 'sons/cavalo.mp3', 'sons/chegou.mp3', 'sons/cone.mp3', 'sons/derrapa.wav', 'sons/dino.mp3', 'sons/dracula.mp3', 'sons/escudo.mp3', 'sons/estrela-ar.mp3', 'sons/estrela.mp3', 'sons/explosao.mp3', 'sons/fogos.mp3', 'sons/galinha1.mp3', 'sons/galinha2.mp3', 'sons/galo.mp3', 'sons/gosma.mp3', 'sons/lama.mp3', 'sons/morcego.mp3', 'sons/motor.wav', 'sons/pipoca.mp3', 'sons/plop.mp3', 'sons/pulo.mp3', 'sons/ronco.mp3', 'sons/splat.mp3', 'sons/tum.mp3', 'sons/turbo.mp3', 'sons/vai.mp3']);   // sons gravados (1.11.1)
+var VERSAO = '1.25.1';
+var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'pista.js', 'motor.js', 'sprites.js', 'modelos3d.js', 'cavalo.js', 'veiculos.js', 'personagens.js', 'cabeca.js', 'desenho.js', 'rock.js', 'som.js', 'movimento.js', 'maos.js', 'selfie.js', 'app.js', 'baixar.js', 'rosto.tflite', 'fontes/fredoka.woff2', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../recursos.js', '../carregando.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../versao.js', '../trilha.js'].concat(['sons/aparece.mp3', 'sons/aplausos.mp3', 'sons/arara.mp3', 'sons/asas.mp3', 'sons/batida.mp3', 'sons/bip.mp3', 'sons/boing.mp3', 'sons/buzina.mp3', 'sons/caixa.mp3', 'sons/cavalo.mp3', 'sons/chegou.mp3', 'sons/cone.mp3', 'sons/derrapa.wav', 'sons/dino.mp3', 'sons/dracula.mp3', 'sons/escudo.mp3', 'sons/estrela-ar.mp3', 'sons/estrela.mp3', 'sons/explosao.mp3', 'sons/fogos.mp3', 'sons/galinha1.mp3', 'sons/galinha2.mp3', 'sons/galo.mp3', 'sons/gosma.mp3', 'sons/lama.mp3', 'sons/morcego.mp3', 'sons/motor.wav', 'sons/pipoca.mp3', 'sons/plop.mp3', 'sons/pulo.mp3', 'sons/ronco.mp3', 'sons/splat.mp3', 'sons/tum.mp3', 'sons/turbo.mp3', 'sons/vai.mp3']);   // sons gravados (1.11.1)
 var CACHE_MUSICAS = 'vruuum-musicas-v1';   // não muda a cada versão: as músicas não baixam de novo
 var MUSICAS = ['musicas/volatile-reaction.mp3', 'musicas/kart-grand-prix.mp3', 'musicas/heroic-age.mp3', 'musicas/lava.mp3', 'musicas/unholy-knight.mp3', 'musicas/las-dunas-champions.mp3', 'musicas/metalmania.mp3', 'musicas/ready-aim-fire.mp3', 'musicas/summon-the-rawk.mp3', 'musicas/noise-attack.mp3', 'musicas/hotrock.mp3', 'musicas/neolith.mp3', 'musicas/iron-bacon.mp3', 'musicas/take-the-lead.mp3', 'musicas/exhilarate.mp3', 'musicas/cool-hard-facts.mp3', 'musicas/bet-you-can.mp3', 'musicas/pump.mp3', 'musicas/breakdown.mp3', 'musicas/what-you-want.mp3', 'musicas/holizna-jams.mp3', 'musicas/holizna-punk.mp3', 'musicas/holizna-americana.mp3', 'musicas/holizna-grunge.mp3', 'musicas/holizna-classic.mp3', 'musicas/anthem-rock-this-house.mp3', 'musicas/anthem-bad-nostalgia.mp3', 'musicas/anthem-so-my-love.mp3', 'musicas/anthem-leave-the-country.mp3', 'musicas/holizna-way-of-the-samurai.mp3', 'musicas/retrofuture-clean.mp3', 'musicas/zap-beat.mp3', 'musicas/el-magicia.mp3', 'musicas/gearhead.mp3', 'musicas/bet-you-can-2.mp3'];
 // guarda as músicas uma de cada vez, em segundo plano. Com "economia de dados" ligada ou no 4G, só as 6 primeiras;
@@ -22,36 +20,17 @@ function guardarMusicas() {
     }, Promise.resolve());
   });
 }
-self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
-});
-self.addEventListener('activate', function (e) {
-  e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k.indexOf('vruuum-') === 0 && k !== CACHE && k !== CACHE_MUSICAS; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); }).then(function () { guardarMusicas(); }));   // músicas sem segurar a ativação (o jogo já abre)
-});
-self.addEventListener('fetch', function (e) {
-  var req = e.request; if (req.method !== 'GET') return;
-  var url = new URL(req.url);
-  if (url.origin !== location.origin) return;
-  if (/\.mp3$/i.test(url.pathname)) {
-    e.respondWith(caches.match(url.href).then(function (r) {
-      return r || fetch(new Request(url.href)).then(function (resp) {
-        if (resp.status === 200) { var c2 = resp.clone(); caches.open(CACHE_MUSICAS).then(function (c) { return c.put(url.href, c2); }).catch(function () {}); }
-        return resp;
-      });
-    }));
-    return;
-  }
-  if (/\.(woff2|png|wav|wasm|tflite|task|mjs)$/i.test(url.pathname)) {   // fonte, imagens e o reconhecedor de rosto: cópia primeiro
-    e.respondWith(caches.match(req).then(function (r) { return r || fetch(req).then(function (resp) { if (resp.status === 200) { var c2 = resp.clone(); caches.open(CACHE).then(function (c) { return c.put(req, c2); }).catch(function () {}); } return resp; }); }));
-    return;
-  }
-  var nav = req.mode === 'navigate';
-  e.respondWith(new Promise(function (ok) {
-    var feito = false, pedido = fetch(req, { cache: 'no-cache' });
-    var t = setTimeout(function () { if (!feito) { feito = true; caches.match(req, { ignoreSearch: nav }).then(function (r) { ok(r || pedido); }); } }, 4000);
-    pedido.then(function (resp) {
-      if (resp.status === 200) { var c2 = resp.clone(); caches.open(CACHE).then(function (c) { return c.put(req, c2); }).catch(function () {}); }
-      if (!feito) { feito = true; clearTimeout(t); ok(resp); }
-    }).catch(function () { if (!feito) { feito = true; clearTimeout(t); caches.match(req, { ignoreSearch: nav }).then(function (r) { ok(r || Response.error()); }); } });
-  }));
-});
+importScripts('../sw-comum.js');
+// músicas: a cópia guardada (sons/ na gaveta da versão, musicas/ na gaveta das músicas); senão a internet, e fica guardada
+function musica(e, url) {
+  if (!/\.mp3$/i.test(url.pathname)) return null;
+  return caches.open(CACHE).then(function (c) { return c.match(url.href); }).then(function (r) {
+    return r || caches.open(CACHE_MUSICAS).then(function (c) { return c.match(url.href); });
+  }).then(function (r) {
+    return r || fetch(new Request(url.href)).then(function (resp) {
+      if (resp.status === 200) { var c2 = resp.clone(); caches.open(CACHE_MUSICAS).then(function (c) { return c.put(url.href, c2); }).catch(function () {}); }
+      return resp;
+    });
+  });
+}
+var CACHE = BolinhoSW({ prefixo: 'vruuum-', versao: VERSAO, arquivos: ARQUIVOS, manter: [CACHE_MUSICAS], depois: guardarMusicas, rota: musica });

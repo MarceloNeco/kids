@@ -29,8 +29,8 @@ test('sw.js guarda todos os arquivos publicados e as peças de fora', () => {
   const html = ler('index.html');
   for (const m of html.matchAll(/src="(\.\.\/[^"]+)"/g)) assert.ok(lista.includes(m[1]), 'sw.js não guarda: ' + m[1]);
   assert.ok(lista.includes('../rabiscolandia/fontes/fredoka.woff2'));
-  assert.match(sw, /CACHE = 'quem-e-v'/);
-  assert.match(sw, /indexOf\('quem-e-'\) === 0/, 'só apaga os caches do próprio jogo');
+  assert.match(sw, /BolinhoSW\(\{ prefixo: 'quem-e-'/);
+  assert.match(sw, /prefixo: 'quem-e-'/, 'só apaga os caches do próprio jogo');
   assert.match(sw, /\\\.mp3\$\/i\.test/, 'não mexe nas músicas');
 });
 

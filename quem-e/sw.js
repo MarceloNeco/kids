@@ -1,33 +1,8 @@
-/* Quem é? — service worker: guarda a pasta no aparelho para abrir sem internet.
-   Código (html, js, css, json, svg): rede primeiro com 4 s de espera, senão a cópia; fonte e imagens png: cópia primeiro.
-   Músicas gravadas (*.mp3, das pastas de outros jogos): o service worker não mexe (o navegador busca direto).
-   Cache com o nome do app: só apaga caches "quem-e-" (nunca os dos outros apps da mesma origem).
+/* Quem é? — service worker: guarda o jogo inteiro no aparelho, de forma segura, pela peça comum ../sw-comum.js: a versão
+   nova só entra quando chega INTEIRA (senão continua a anterior) e tudo abre da cópia do próprio jogo. Músicas
+   gravadas (*.mp3): o service worker não mexe (o navegador busca direto).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.6.2';
-var CACHE = 'quem-e-v' + VERSAO;
-var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'nomes.js', 'logica.js', 'partida.js', 'caras.js', 'melecas.js', 'melecas/blue-feliz.webp', 'melecas/blue-ops.webp', 'melecas/blue-pensando.webp', 'melecas/blue-triste.webp', 'melecas/pink-feliz.webp', 'melecas/pink-ops.webp', 'melecas/pink-pensando.webp', 'rede.js', '../batalha-naval/pertinho.js', '../batalha-naval/qr.js', '../batalha-naval/libs/qrcode.js', '../batalha-naval/libs/jsQR.js', 'adivinha-perguntas.js', 'adivinha.js', 'aprender.js', 'voz.js', 'personagens/familia.js', 'personagens/disney.js', 'personagens/desenhos.js', 'personagens/filmes.js', 'personagens/musica.js', 'personagens/famosos.js', 'personagens/mundo.js', 'personagens/jogos.js', 'personagens/novos.js', 'personagens/animacao.js', 'personagens/cinema.js', 'personagens/estrelas.js', 'personagens/historia.js', 'personagens/natureza.js', 'app.js', 'adivinha-tela.js', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../janela.js', '../cofre.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
-self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(ARQUIVOS.map(function (a) { return c.add(a).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));
-});
-self.addEventListener('activate', function (e) {
-  e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k.indexOf('quem-e-') === 0 && k !== CACHE; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); }));
-});
-self.addEventListener('fetch', function (e) {
-  var req = e.request; if (req.method !== 'GET') return;
-  var url = new URL(req.url);
-  if (url.origin !== location.origin) return;
-  if (/\.mp3$/i.test(url.pathname)) return;
-  if (/\.(woff2|png)$/i.test(url.pathname)) {
-    e.respondWith(caches.match(req).then(function (r) { return r || fetch(req).then(function (resp) { if (resp.status === 200) { var c2 = resp.clone(); caches.open(CACHE).then(function (c) { return c.put(req, c2); }).catch(function () {}); } return resp; }); }));
-    return;
-  }
-  var nav = req.mode === 'navigate';
-  e.respondWith(new Promise(function (ok) {
-    var feito = false, pedido = fetch(req, { cache: 'no-cache' });
-    var t = setTimeout(function () { if (!feito) { feito = true; caches.match(req, { ignoreSearch: nav }).then(function (r) { ok(r || pedido); }); } }, 4000);
-    pedido.then(function (resp) {
-      if (resp.status === 200) { var c2 = resp.clone(); caches.open(CACHE).then(function (c) { return c.put(req, c2); }).catch(function () {}); }
-      if (!feito) { feito = true; clearTimeout(t); ok(resp); }
-    }).catch(function () { if (!feito) { feito = true; clearTimeout(t); caches.match(req, { ignoreSearch: nav }).then(function (r) { ok(r || Response.error()); }); } });
-  }));
-});
+var VERSAO = '0.6.3';
+var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'nomes.js', 'logica.js', 'partida.js', 'caras.js', 'melecas.js', 'melecas/blue-feliz.webp', 'melecas/blue-ops.webp', 'melecas/blue-pensando.webp', 'melecas/blue-triste.webp', 'melecas/pink-feliz.webp', 'melecas/pink-ops.webp', 'melecas/pink-pensando.webp', 'rede.js', '../batalha-naval/pertinho.js', '../batalha-naval/qr.js', '../batalha-naval/libs/qrcode.js', '../batalha-naval/libs/jsQR.js', 'adivinha-perguntas.js', 'adivinha.js', 'aprender.js', 'voz.js', 'personagens/familia.js', 'personagens/disney.js', 'personagens/desenhos.js', 'personagens/filmes.js', 'personagens/musica.js', 'personagens/famosos.js', 'personagens/mundo.js', 'personagens/jogos.js', 'personagens/novos.js', 'personagens/animacao.js', 'personagens/cinema.js', 'personagens/estrelas.js', 'personagens/historia.js', 'personagens/natureza.js', 'app.js', 'adivinha-tela.js', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../carregando.js', '../idioma.js', '../navegacao.js', '../janela.js', '../cofre.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
+importScripts('../sw-comum.js');
+var CACHE = BolinhoSW({ prefixo: 'quem-e-', versao: VERSAO, arquivos: ARQUIVOS, pular: function (url) { return /\.mp3$/i.test(url.pathname); } });

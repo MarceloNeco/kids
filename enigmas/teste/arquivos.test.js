@@ -21,8 +21,8 @@ test('versão igual nos três lugares: app.js, sw.js e a primeira entrada de ver
 
 test('sw.js: cache com o nome do app e guarda todos os arquivos publicados', () => {
   const sw = ler('sw.js');
-  assert.match(sw, /var CACHE = 'enigmas-v' \+ VERSAO/);
-  assert.match(sw, /indexOf\('enigmas-'\) === 0/, 'só apaga os caches deste app');
+  assert.match(sw, /BolinhoSW\(\{ prefixo: 'enigmas-', versao: VERSAO/);
+  assert.match(sw, /prefixo: 'enigmas-'/, 'só apaga os caches deste app');
   const lista = JSON.parse(sw.match(/var ARQUIVOS = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
   for (const a of lista) if (a !== './') assert.ok(fs.existsSync(path.join(pasta, a)), 'falta no disco: ' + a);
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|webmanifest)$/.test(f) && f !== 'sw.js');

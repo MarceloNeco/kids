@@ -5,8 +5,8 @@
    estrelas, as gotinhas e o que já foi trocado na lojinha. Sem dinheiro, sem anúncio, sem conta. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.0';
-  var APP_DATA = '14/Nov/2026';
+  var APP_VERSION = '0.4.1';
+  var APP_DATA = '15/Nov/2026';
   var M = window.AquaMotor, D = window.AquaDesenho, Som = window.AquaSom, Fundo = window.AquaFundo;
   var $ = function (id) { return document.getElementById(id); };
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -52,7 +52,7 @@
     document.documentElement.lang = { pt: 'pt-BR', en: 'en', es: 'es' }[lingua];
     Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { el.textContent = parte(el.getAttribute('data-t')); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var r = parte(el.getAttribute('data-rotulo')); el.setAttribute('aria-label', r); el.title = r; });
-    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, 'Nov/14/2026', '14/nov/2026') +
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, 'Nov/15/2026', '15/nov/2026') +
       t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY · sem anúncios e sem compras', ' · Music: Kevin MacLeod (incompetech.com), CC BY · no ads, no purchases', ' · Música: Kevin MacLeod (incompetech.com), CC BY · sin anuncios y sin compras');
     pintarEfeitos(); pintarMenu();
     if (est) { pintarBarra(); pintarAjudas(); rotular(); }

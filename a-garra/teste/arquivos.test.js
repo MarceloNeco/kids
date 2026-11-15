@@ -6,13 +6,13 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.4.3 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.4.4 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.4.3'); assert.equal(a, s); assert.equal(v.versao, a);
-  assert.equal(v.data, '14/Nov/2026');
-  assert.match(ler('app.js'), /APP_DATA = \['14\/Nov\/2026', 'Nov\/14\/2026', '14\/nov\/2026'\]/);
+  assert.equal(a, '0.4.4'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(v.data, '15/Nov/2026');
+  assert.match(ler('app.js'), /APP_DATA = \['15\/Nov\/2026', 'Nov\/15\/2026', '15\/nov\/2026'\]/);
   for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
   assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
@@ -20,8 +20,8 @@ test('versão 0.4.3 igual nos três lugares (app.js, sw.js, versoes.json)', () =
 
 test('sw.js guarda todos os arquivos publicados, cache com o nome da pasta', () => {
   const sw = ler('sw.js');
-  assert.match(sw, /var CACHE = 'a-garra-v'/);
-  assert.match(sw, /indexOf\('a-garra-'\) === 0/);
+  assert.match(sw, /BolinhoSW\(\{ prefixo: 'a-garra-'/);
+  assert.match(sw, /prefixo: 'a-garra-'/);
   const lista = JSON.parse(sw.match(/var ARQUIVOS = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
   for (const a of lista) if (a !== './') assert.ok(fs.existsSync(path.join(pasta, a)), 'falta no disco: ' + a);
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|webmanifest)$/.test(f) && f !== 'sw.js');

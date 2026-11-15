@@ -6,7 +6,7 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.4.0 de 14/Nov/2026', () => {
+test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.4.1 de 15/Nov/2026', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const j = JSON.parse(ler('versoes.json'));
@@ -18,7 +18,7 @@ test('versão igual nos três lugares (app.js, sw.js e versoes.json) e é a 0.4.
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
   assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
   assert.equal(ler('app.js').match(/APP_DATA = '([^']+)'/)[1], v.data);
-  assert.equal(a, '0.4.0'); assert.equal(v.data, '14/Nov/2026');
+  assert.equal(a, '0.4.1'); assert.equal(v.data, '15/Nov/2026');
 });
 
 test('sw.js guarda todos os arquivos publicados (e os de fora, com ../)', () => {
@@ -28,9 +28,9 @@ test('sw.js guarda todos os arquivos publicados (e os de fora, com ../)', () => 
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|svg|webmanifest)$/.test(f) && f !== 'sw.js');
   for (const f of publicados) assert.ok(lista.includes(f), 'sw.js não guarda: ' + f);
   for (const f of ['../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../rabiscolandia/fontes/fredoka.woff2']) assert.ok(lista.includes(f), 'sw.js não guarda: ' + f);
-  assert.match(sw, /CACHE = 'aqua-v'/);
-  assert.match(sw, /indexOf\('aqua-'\) === 0/, 'só apaga os caches do próprio jogo');
-  assert.match(sw, /\\\.mp3\$\/i\.test\(url\.pathname\) && !efeito\) return;/, 'não mexe nas músicas (só guarda os efeitos da pasta sons/)');
+  assert.match(sw, /BolinhoSW\(\{ prefixo: 'aqua-'/);
+  assert.match(sw, /prefixo: 'aqua-'/, 'só apaga os caches do próprio jogo');
+  assert.match(sw, /\\\.mp3\$\/i\.test\(url\.pathname\) && !efeito;/, 'não mexe nas músicas (só guarda os efeitos da pasta sons/)');
   for (const f of fs.readdirSync(path.join(pasta, 'sons'))) assert.ok(lista.includes('sons/' + f), 'sw.js não guarda: sons/' + f);
   for (const f of fs.readdirSync(path.join(pasta, 'cenas'))) assert.ok(lista.includes('cenas/' + f), 'sw.js não guarda: cenas/' + f);
 });
