@@ -214,15 +214,15 @@ ul { list-style: none; }
 @keyframes bracoD { 0%, 100% { transform: rotate(6deg) scaleY(.98); } 50% { transform: rotate(-5deg); } }
 /* pose no fim da passarela: a "inclinadinha" — o peso numa perna e o corpo inclinado para o lado de lá */
 .modelo .passarela-boneca { transition: transform .35s ease-out; transform-origin: 50% 92%; }
-.modelo.pose-esq .passarela-boneca { transform: rotate(-2.6deg); }
-.modelo.pose-dir .passarela-boneca { transform: rotate(2.4deg); }
+.modelo.pose-esq .passarela-boneca { transform: rotate(-3.2deg); }
+.modelo.pose-dir .passarela-boneca { transform: rotate(3deg); }
 /* pernas da paradinha (sempre uma destas, nunca as duas retas): o pé direito cruza na frente do outro; o joelho
    esquerdo dobra (pé na ponta); pernas abertas; peso numa perna só */
-.modelo.perna-cruzada .pp-passo-d { transform: translateY(1.2%) rotate(9deg); }
-.modelo.perna-dobrada .pp-passo-e { transform: translateY(-2.2%) scaleY(.92) rotate(-4deg); }
-.modelo.perna-aberta .pp-passo-e { transform: rotate(3.5deg); } .modelo.perna-aberta .pp-passo-d { transform: rotate(-3.5deg); }
+.modelo.perna-cruzada .pp-passo-d { transform: translateY(1.4%) rotate(12deg); } .modelo.perna-cruzada .pp-passo-e { transform: rotate(-3deg); }
+.modelo.perna-dobrada .pp-passo-e { transform: translateY(-2.6%) scaleY(.9) rotate(-7deg); } .modelo.perna-dobrada .pp-passo-d { transform: rotate(-4deg); }
+.modelo.perna-aberta .pp-passo-e { transform: rotate(7deg); } .modelo.perna-aberta .pp-passo-d { transform: rotate(-7deg); }
 /* peso numa perna só: a direita firme e um pouco para dentro, a esquerda solta para fora com o joelho mole */
-.modelo.perna-relaxada .pp-passo-e { transform: translateY(-1%) scaleY(.96) rotate(3deg); } .modelo.perna-relaxada .pp-passo-d { transform: rotate(-2deg); }
+.modelo.perna-relaxada .pp-passo-e { transform: translateY(-1.4%) scaleY(.95) rotate(7deg); } .modelo.perna-relaxada .pp-passo-d { transform: rotate(-3deg); }
 /* o jeito de andar muda com a idade (Eu → Idade; dono, 14/Nov/2026). Sem classe de idade (ou 16+): o catwalk acima.
    Até 5 anos: passinhos curtos e saltitantes, pé reto (sem cruzar), braços bem soltos, sobe e desce mais.
    6 a 10: andar de criança, pé quase reto, pouco quadril. 11 a 15: catwalk leve (cruza menos, quadril menor). */

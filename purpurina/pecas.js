@@ -35,7 +35,11 @@
     pele: [
       c('p1', '#ffe5d6', 'Tom 1', 'Tone 1', 'Tono 1'), c('p2', '#fbd3b8', 'Tom 2', 'Tone 2', 'Tono 2'), c('p3', '#f1c19c', 'Tom 3', 'Tone 3', 'Tono 3'),
       c('p4', '#e0a87f', 'Tom 4', 'Tone 4', 'Tono 4'), c('p5', '#c98c63', 'Tom 5', 'Tone 5', 'Tono 5'), c('p6', '#a96e49', 'Tom 6', 'Tone 6', 'Tono 6'),
-      c('p7', '#8a5336', 'Tom 7', 'Tone 7', 'Tono 7'), c('p8', '#653b22', 'Tom 8', 'Tone 8', 'Tono 8')
+      c('p7', '#8a5336', 'Tom 7', 'Tone 7', 'Tono 7'), c('p8', '#653b22', 'Tom 8', 'Tone 8', 'Tono 8'),
+      // tons de fundo dourado e oliva (japonesa, chinesa, coreana, indígena, árabe, indiana…) e um bem escuro
+      // (dono, 15/Nov/2026: "não pode deixar de fora nenhuma etnia")
+      c('p9', '#f6dcb4', 'Tom 9', 'Tone 9', 'Tono 9'), c('p10', '#e2b98a', 'Tom 10', 'Tone 10', 'Tono 10'), c('p11', '#b8875a', 'Tom 11', 'Tone 11', 'Tono 11'),
+      c('p12', '#4a2a19', 'Tom 12', 'Tone 12', 'Tono 12')
     ],
     cabelo: [
       c('preto', '#2a1d1b', 'Preto', 'Black', 'Negro'), c('escuro', '#4a2c20', 'Castanho-escuro', 'Dark brown', 'Castaño oscuro'),
@@ -341,7 +345,21 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       blusaCor: 'lilas' } },
     { id: 'cachinhosDourados', ico: '🎀', pt: 'Cachinhos dourados', en: 'Golden curls', es: 'Rizos dorados', e: {
       pele: 'p1', rosto: 'bochechudo', nariz: 'botao', testa: 'alta', formaOlho: 'grandes', formaBoca: 'pequenininha',
-      cabelo: 'cachosSoltos', cabeloCor: 'loiroEscuro', olhos: 'cinza', brincos: 'bolinha', brincosCor: 'dourado', laco: 'alto', lacoCor: 'rosaclaro' } }
+      cabelo: 'cachosSoltos', cabeloCor: 'loiroEscuro', olhos: 'cinza', brincos: 'bolinha', brincosCor: 'dourado', laco: 'alto', lacoCor: 'rosaclaro' } },
+    // mais personagens prontas, de vários jeitos e origens (dono, 15/Nov/2026), com nomes neutros
+    { id: 'franjinhaReta', ico: '🎐', pt: 'Franjinha reta', en: 'Straight bangs', es: 'Flequillo recto', e: {
+      pele: 'p9', rosto: 'redondo', nariz: 'pequenino', formaOlho: 'fininhos', formaBoca: 'pequenininha', cabelo: 'franja', cabeloCor: 'preto', olhos: 'preto',
+      laco: 'alto', lacoCor: 'vermelho', blusaCor: 'branco' } },
+    { id: 'coquinhos', ico: '🍡', pt: 'Dois coquinhos', en: 'Two buns', es: 'Dos moñitos', e: {
+      pele: 'p10', rosto: 'bochechudo', nariz: 'botao', formaOlho: 'fininhosPuxados', formaBoca: 'sorrisinho', cabelo: 'coqueDuplo', cabeloCor: 'preto', olhos: 'castanho' } },
+    { id: 'blackPower', ico: '✨', pt: 'Black power', en: 'Afro', es: 'Afro', e: {
+      pele: 'p7', rosto: 'oval', nariz: 'largo', formaOlho: 'amendoados', formaBoca: 'cheinha', cabelo: 'afro', cabeloCor: 'preto', olhos: 'castanho',
+      brincos: 'argola', brincosCor: 'dourado' } },
+    { id: 'trancasBox', ico: '💫', pt: 'Tranças box', en: 'Box braids', es: 'Trenzas box', e: {
+      pele: 'p12', rosto: 'coracao', nariz: 'batatinha', formaOlho: 'grandes', formaBoca: 'cheinha', cabelo: 'box', cabeloCor: 'preto', olhos: 'preto' } },
+    { id: 'trancasLongas', ico: '🪶', pt: 'Duas tranças', en: 'Two braids', es: 'Dos trenzas', e: {
+      pele: 'p11', rosto: 'largo', nariz: 'reto', formaOlho: 'amendoados', formaBoca: 'sorrisinho', cabelo: 'trancas', cabeloCor: 'preto', olhos: 'preto',
+      cabeca: 'flores', cabecaCor: 'amarelo' } }
   ];
 
   /* Desafios: cada um tem 3 dicas. Estrelas = dicas cumpridas, mas sempre pelo menos 1 (ninguém perde).

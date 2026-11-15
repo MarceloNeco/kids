@@ -781,10 +781,10 @@
     $('modelo').className = 'modelo idade-' + idade;
     var POSES_DESFILE = ({
       pequena: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'joinha', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'carinha', lado: '' }],
-      crianca: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'bolsos', lado: '' }, { pose: 'joinha', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'cintura', lado: '' }, { pose: 'carinha', lado: '' }],
-      adolescente: menino ? [{ pose: 'cruzados', lado: '' }, { pose: 'bolsos', lado: 'dir' }, { pose: 'joinha', lado: '' }, { tchau: true, lado: '' }] : [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: '' }, { pose: 'maoCabelo', lado: '' }, { pose: 'carinha', lado: '' }, { tchau: true, lado: '' }]
+      crianca: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'bolsos', lado: '' }, { pose: 'joinha', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'cintura', lado: '' }, { pose: 'carinha', lado: '' }, { pose: 'maosCabeca', lado: '' }],
+      adolescente: menino ? [{ pose: 'cruzados', lado: '' }, { pose: 'bolsos', lado: 'dir' }, { pose: 'joinha', lado: '' }, { tchau: true, lado: '' }] : [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: '' }, { pose: 'maoCabelo', lado: '' }, { pose: 'carinha', lado: '' }, { pose: 'maosCabeca', lado: '' }, { tchau: true, lado: '' }]
     })[idade] || (menino ? [{ pose: 'cruzados', lado: 'esq' }, { pose: 'bolsos', lado: 'dir' }, { pose: 'cruzados', lado: 'dir' }, { pose: 'bolsos', lado: '' }] :
-      [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: 'dir' }, { pose: 'maoCabelo', lado: 'esq' }, { tchau: true, lado: '' }]);
+      [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: 'dir' }, { pose: 'maoCabelo', lado: 'esq' }, { pose: 'maosCabeca', lado: 'dir' }, { tchau: true, lado: '' }]);
     var poseAtual = POSES_DESFILE[0];
     function sortear() { var l = POSES_DESFILE.filter(function (x) { return x !== poseAtual; }); return l[Math.floor(Math.random() * l.length)]; }
     function opPose(x) { return x.tchau ? { tchau: true } : { pose: x.pose }; }
@@ -793,7 +793,8 @@
     var PERNAS = idade === 'pequena' || menino ? ['perna-aberta', 'perna-relaxada', 'perna-dobrada'] : ['perna-cruzada', 'perna-dobrada', 'perna-aberta', 'perna-relaxada'];
     function semPose() { mod.classList.remove('pose-esq', 'pose-dir', 'perna-cruzada', 'perna-dobrada', 'perna-aberta', 'perna-relaxada'); }
     function posar(x) {
-      poseAtual = x; semPose(); if (x.lado && idade !== 'pequena') mod.classList.add('pose-' + x.lado);
+      // o corpo sempre faz pose: inclina para um lado (sorteado quando a pose não diz qual), em toda idade
+      poseAtual = x; semPose(); mod.classList.add('pose-' + (x.lado || (Math.random() < 0.5 ? 'esq' : 'dir')));
       mod.classList.add(PERNAS[Math.floor(Math.random() * PERNAS.length)]);
       pose(Object.assign({ sorriso: true }, opPose(x)));
     }

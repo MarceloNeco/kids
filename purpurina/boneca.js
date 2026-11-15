@@ -985,9 +985,10 @@
      'cruzados'     braços cruzados na frente do peito (menino)
      'bolsos'       mãos nos bolsos (menino): os braços descem para dentro e as mãos somem no bolso
      'carinha'      as duas mãos no queixo, emoldurando o rosto (foto de desfile infantil do dono)
+     'maosCabeca'   as duas mãos em cima da cabeça, cotovelos para fora (foto de desfile infantil do dono)
      'joinha'       os dois punhos na frente do peito com o polegar para cima (foto do menino no desfile)
      Manga curta cobre o começo do braço; manga longa, o braço todo. */
-  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha'];
+  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha', 'maosCabeca'];
   function bracosPose(tipo, manga, corTop, pele, peleE, esmalte, membro) {
     function vestir(d, larg, ate) {   // a manga por cima do braço (ate: 0..1 do traço, aproximado pelo pathLength)
       if (!corTop || manga === 'nada') return '';
@@ -1010,6 +1011,11 @@
       var bE = 'M150,354 Q132,410 160,462', bD = 'M250,354 Q268,410 240,462';
       function bolso(x) { return p('M' + (x - 13) + ',458 Q' + x + ',452 ' + (x + 13) + ',458', { fill: 'none', stroke: '#000', 'stroke-width': 2, opacity: 0.35, 'stroke-linecap': 'round' }); }
       return membro(bE, 23) + vestir(bE, 23, 0.4) + bolso(160) + membro(bD, 23) + vestir(bD, 23, 0.4) + bolso(240);
+    }
+    if (tipo === 'maosCabeca') {
+      var hE = 'M150,354 Q102,330 98,262', hD = 'M250,354 Q298,330 302,262', gE = 'M98,262 Q104,196 150,150', gD = 'M302,262 Q296,196 250,150';
+      return membro(hE, 23) + vestir(hE, 23, 0.4) + membro(hD, 23) + vestir(hD, 23, 0.4) + membro(gE, 19) + vestir(gE, 19, 0) + membro(gD, 19) + vestir(gD, 19, 0) +
+        punho(154, 146, 50) + punho(246, 146, -50);
     }
     if (tipo === 'joinha') {
       var jE = 'M150,354 Q130,392 148,420', jD = 'M250,354 Q270,392 252,420', fE = 'M148,420 Q160,396 176,372', fD = 'M252,420 Q244,394 230,366';
