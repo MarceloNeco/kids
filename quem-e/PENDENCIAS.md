@@ -5,7 +5,7 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | # | Descrição | Origem | Situação |
 |---|---|---|---|
 | 1 | Ajustar o desenho do Melekento Blue e da Pink Honey pela foto das massinhas de verdade (cor, textura, formato). | Dono, 14/Nov/2026 | ✅ 0.2.2: Pink Honey pelas fotos e vídeo (rosa-choque fosco, deitada, aba atrás da cabeça, rabinho pontudo); Melekento Blue pela descrição (geleia azul mole, em pé, com pezinhos). Foto do Blue, se o dono quiser, ajusta mais |
-| 2 | Testar com as meninas no celular, no tablet e na TV (espelhando a tela): Fácil, Médio e Difícil, contra a meleca e passando o aparelho. | Entrega 0.1.0 | 🟡 |
+| 2 | Testar com as meninas no celular, no tablet e na TV (espelhando a tela): Fácil, Médio e Difícil, contra a meleca (com perguntas prontas e no jeito livre). | Entrega 0.1.0 | 🟡 |
 | 3 | Testar "cada um no seu celular" em dois celulares de verdade (internet de verdade). | Entrega 0.1.0 | 🟡 |
 | 4 | Duelo de Caras com **corpo inteiro**: sapato, saia, short, calça, com perguntas novas de roupa. | Dono, 14/Nov/2026 | ✅ 0.3.0: botão "🧍 Corpo inteiro" na escolha do nível (saia, short, calça, vestido, tênis, bota, sapato, descalço, mochila, segurando algo) |
 | 5 | **📶 Jogar pertinho**: dois celulares sem internet (QR, como na Batalha Naval). | Spec 0.1.0 | ✅ 0.4.0 (usa `../batalha-naval/pertinho.js`, `qr.js` e `libs/` como estão). Falta o dono testar em 2 celulares de verdade (Roteador Wi-Fi). |

@@ -205,39 +205,6 @@ test('sem internet depois da primeira visita: contra a meleca funciona e o celul
   await ctx.close();
 });
 
-test('passando o aparelho: nomes de quem joga, a meleca avisa a troca e lê a pergunta em voz alta', async () => {
-  const ctx = await browser.newContext({ locale: 'pt-BR', viewport: { width: 390, height: 844 }, hasTouch: true });
-  await ctx.addInitScript(() => {
-    window.__falas = [];
-    const S = function (t) { this.text = t; };
-    window.SpeechSynthesisUtterance = S;
-    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: u => { window.__falas.push(u.text); setTimeout(() => u.onend && u.onend(), 5); }, cancel: () => {}, getVoices: () => [{ name: 'Local', lang: 'pt-BR', localService: true }], speaking: false, addEventListener: () => {} } });
-  });
-  const pg = await ctx.newPage(); const erros = [];
-  pg.on('pageerror', e => erros.push(e.message));
-  await pg.goto(base + '?teste'); await pg.waitForFunction(() => window.QEDebug && window.QEDebug.pronto);
-  await pg.click('#btBlue'); await pg.click('#btPassar'); await pg.click('#btFacil');
-  await pg.waitForSelector('#nomes.ativa');
-  await pg.fill('#nome1', 'Ana'); await pg.fill('#nome2', 'Bia'); await pg.click('#btNomesOk');
-  await pg.waitForSelector('#segredo.ativa');
-  assert.match(await pg.textContent('#tituloSegredo'), /Ana/);
-  await pg.click('#segredo .carta[data-id="0"]'); await pg.click('#btConfirmarSegredo');
-  await pg.waitForSelector('#cortina:not([hidden])');
-  assert.match(await pg.textContent('#cortinaTitulo'), /Bia/);
-  await pg.waitForFunction(() => window.__falas.some(f => /Bia/.test(f)), null, { timeout: 3000 });
-  await pg.click('#btCortina');
-  await pg.click('#segredo .carta[data-id="1"]'); await pg.click('#btConfirmarSegredo');
-  await pg.click('#btCortina');
-  await pg.click('#btPerguntar'); await pg.click('#perguntas button[data-p]:not(.inutil)');
-  const pergunta = await pg.evaluate(() => { const id = QEDebug.estado().ultima.pergunta; return QELogica.pergunta(id).pt; });
-  await pg.click('#btCortina');
-  await pg.waitForSelector('#responder:not([hidden])');
-  await pg.waitForFunction(p => window.__falas.filter(f => f.includes(p.replace(/[\u{1F000}-\u{1FAFF}]/gu, '').trim())).length >= 2, pergunta, { timeout: 3000 });
-  assert.deepEqual(erros, []);
-  // os nomes ficam guardados só neste aparelho e voltam na próxima partida
-  assert.deepEqual(await pg.evaluate(() => JSON.parse(localStorage.getItem('bolinho:quem-e:pref')).nomes), ['Ana', 'Bia']);
-  await ctx.close();
-});
 
 for (const vp of [{ width: 360, height: 740 }, { width: 740, height: 360 }]) {
   test('corpo inteiro ligado: cartas altas, perguntas de roupa e tudo cabe em ' + vp.width + '×' + vp.height, async () => {
@@ -331,4 +298,26 @@ test('jeito livre, cada um no seu celular: sem vez, pergunta em voz alta, palpit
   await b.waitForFunction(() => !document.querySelector('#fimCaras .oculta'), null, { timeout: 10000 });
   assert.deepEqual(a.erros(), []); assert.deepEqual(errosB, []);
   await a.ctx.close();
+});
+
+test('💡 ideias de pergunta no jeito livre: tocar pergunta à meleca; virando todos os meninos, "masculino" some', async () => {
+  const pg = await abrir();
+  await pg.click('#btPink'); await pg.click('#btMeleca'); await pg.click('#btLivre'); await pg.click('#btFacil');
+  await pg.waitForSelector('#jogo.ativa');
+  await pg.waitForSelector('#ideias:not([hidden]) .ideia');
+  const n = await pg.locator('#ideias .ideia').count();
+  assert.ok(n >= 1 && n <= 3);
+  // virar com o dedo todos os meninos
+  await pg.evaluate(() => {
+    const caras = window.QEDebug.caras();
+    caras.forEach((c, i) => { if (window.QELogica.responder(c, 'masculino')) document.querySelector(`#tabuleiro .carta[data-id="${i}"]`).click(); });
+  });
+  const depois = await pg.$$eval('#ideias .ideia', bs => bs.map(b => b.getAttribute('data-p')));
+  assert.ok(depois.length >= 1);
+  assert.ok(!depois.includes('masculino') && !depois.includes('feminino'), depois.join(','));
+  // tocar uma ideia = perguntar à meleca
+  await pg.click('#ideias .ideia');
+  assert.equal(await pg.evaluate(() => QEDebug.estado().feitas[0].length), 1);
+  assert.deepEqual(pg.erros(), []);
+  await pg.ctx.close();
 });
