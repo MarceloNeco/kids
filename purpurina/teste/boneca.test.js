@@ -243,3 +243,21 @@ test('cabelo comprido: nenhum penteado desce até os pés e, girando, não fica 
   }
   for (const a of [20, 30, 45]) assert.ok(!/url\(#q-trasC\)"><g opacity=/.test(B.svg(Object.assign(V.novo(), { cabelo: 'sereia' }), { id: 'q', angulo: a })), a + '°: sem cabelo transparente');
 });
+
+test('desfile: catwalk sem tombar (dono, 14/Nov/2026: "um pezinho na frente do outro", "de vestido parece que tá sambando")', () => {
+  const fs = require('fs'), path = require('path');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
+  for (const ex of [{}, { vestido: 'gala', calca: 'nenhum' }, { saia: 'tutu', calca: 'nenhum' }]) {
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'd', fundo: false, passos: true });
+    assert.equal(bemFormado(s), '');
+    assert.ok(s.includes('class="pp-passo-e"') && s.includes('class="pp-passo-d"'), 'as duas pernas andam');
+    assert.ok(s.includes('class="pp-corpo"'), 'o corpo acompanha o quadril separado das pernas');
+    if (ex.vestido || ex.saia) assert.ok(s.includes('class="pp-barra"'), 'a barra acompanha o passo');
+  }
+  assert.doesNotMatch(css, /\.modelo\.andando \.passarela-boneca \{ animation/, 'a boneca inteira não gira mais de um lado para o outro');
+  assert.doesNotMatch(css.match(/@keyframes quadril[^\n]*/)[0], /rotate/, 'o quadril só desloca, não tomba');
+  // cada pé vai para a linha do meio e cruza: perna esquerda gira para dentro (graus negativos), a direita espelhada
+  const e = css.match(/@keyframes passoE[\s\S]*?\} \}/)[0], d = css.match(/@keyframes passoD[\s\S]*?\} \}/)[0];
+  assert.ok([...e.matchAll(/rotate\((-?[\d.]+)deg\)/g)].every(m => +m[1] < 0));
+  assert.ok([...d.matchAll(/rotate\((-?[\d.]+)deg\)/g)].every(m => +m[1] > 0));
+});
