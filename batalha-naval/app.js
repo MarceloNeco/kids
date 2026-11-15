@@ -5,7 +5,7 @@
    (para voltar se a página recarregar). Nada de dado pessoal: só o apelido que a pessoa digitar. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.0';
+  var APP_VERSION = '0.4.1';
   var L = window.BNLogica, R = window.BNRede;
   var Som = window.BNSom || { iniciar: function () {}, ligar: function () {}, efeito: function () {} };
   var Nav = window.BNNavios;
@@ -44,7 +44,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { var p = el.getAttribute('data-t').split('|'); el.textContent = p[IDX[l]] != null ? p[IDX[l]] : p[0]; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var p = el.getAttribute('data-rotulo').split('|'); el.setAttribute('aria-label', p[IDX[l]] != null ? p[IDX[l]] : p[0]); });
     document.title = t('Batalha Naval', 'Sea Battle', 'Batalla Naval') + ' — Bolinho de Chuva · SolverONE';
-    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t('14/Nov/2026', 'Nov/14/2026', '14/nov/2026');
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t('15/Nov/2026', 'Nov/15/2026', '15/nov/2026');
     if (jogo && (atual === 'jogo' || atual === 'sala')) desenhar();
     if (atual === 'arrumar' && arr) pintarArr();
     atualizarInicio();

@@ -66,7 +66,7 @@ test('menu: nome, três níveis, lojinha, versão, sem erro e sem pedido para fo
   assert.equal((await pg.textContent('h1')).trim(), 'AQUA');
   for (const id of ['#btFacil', '#btMedio', '#btDificil', '#btLoja']) assert.ok(await pg.isVisible(id), id);
   assert.match(await pg.textContent('#recFacil'), /Fase 1/);
-  assert.match(await pg.textContent('#versao'), /Versão 0\.4\.0 · 14\/Nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /Versão 0\.4\.1 · 15\/Nov\/2026/);
   assert.match(await pg.textContent('#versao'), /sem anúncios e sem compras/);
   assert.equal(await pg.$('#btLingua'), null, 'o idioma é escolhido só na estante');
   await pg.click('#btAjuda'); assert.ok(await pg.isVisible('#ajuda'));
@@ -693,7 +693,7 @@ test('inglês escolhido na estante: o jogo abre em inglês, sem botão de idioma
   assert.equal(await pg.$('#btLingua'), null);
   assert.match(await pg.textContent('.sub'), /Pour the colors/);
   assert.match(await pg.textContent('#recFacil'), /Stage 1/);
-  assert.match(await pg.textContent('#versao'), /Version 0\.4\.0 · Nov\/14\/2026/);
+  assert.match(await pg.textContent('#versao'), /Version 0\.4\.1 · Nov\/15\/2026/);
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());
   assert.equal(await pg.textContent('#placaFase'), 'Stage 1');
   assert.match(await pg.getAttribute('#frasco-0', 'aria-label'), /^Bottle 1: top to bottom: /);
@@ -708,7 +708,7 @@ test('espanhol escolhido na estante: menu, jogo, ajudas, fim de fase e lojinha e
   assert.equal(await pg.textContent('#btFacil .n-nome'), '🫧 Fácil');
   assert.equal(await pg.textContent('#btMedio .n-nome'), '🧪 Medio');
   assert.match(await pg.textContent('#recFacil'), /Fase 1/);
-  assert.match(await pg.textContent('#versao'), /Versión 0\.4\.0 · 14\/nov\/2026 · Música: .* sin anuncios y sin compras/);
+  assert.match(await pg.textContent('#versao'), /Versión 0\.4\.1 · 15\/nov\/2026 · Música: .* sin anuncios y sin compras/);
   assert.equal(await pg.getAttribute('#btAjuda', 'aria-label'), 'Cómo jugar');
   await pg.click('#btAjuda'); assert.match(await pg.textContent('#ajuda'), /Nunca cuestan nada/);
   await pg.click('#btFacil'); await pg.waitForFunction(() => AquaApp.lay());

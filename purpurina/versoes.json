@@ -24,7 +24,18 @@
         "✋ Al final de la pasarela hace poses al azar: mano en la cintura, las dos manos en la cintura, mano en el pelo, manos en la barbilla, un saludito; el niño se cruza de brazos o mete las manos en los bolsillos. Las piernas también cambian: un pie cruzado delante, la rodilla doblada o las piernas abiertas.",
         "🔄 Después de mirar a los lados, da un giro pequeño y luego una vuelta entera.",
         "🎬 Tomas: la cámara corta entre cuerpo entero, de cerca y de tres cuartos hacia un lado y hacia el otro.",
-        "🎂 Nueva opción en Yo: Edad (hasta 5, de 6 a 10, de 11 a 15, 16 o más). Cada edad camina y posa a su manera, y la más pequeña es más bajita."
+        "🎂 Nueva opción en Yo: Edad (hasta 5, de 6 a 10, de 11 a 15, 16 o más). Cada edad camina y posa a su manera, y la más pequeña es más bajita.",
+      "versao": "0.22.1",
+      "data": "15/Nov/2026",
+      "hora": "11:30:00",
+      "pt": [
+        "⚡ Abre com a tela \"Carregando…\" e só mostra o jogo pronto; a versão nova só entra no aparelho quando chega inteira (senão continua a anterior)"
+      ],
+      "en": [
+        "⚡ Opens with a \"Loading…\" screen and only shows the game when it's ready; a new version is only saved on the device once it has fully arrived (otherwise the previous one stays)"
+      ],
+      "es": [
+        "⚡ Se abre con la pantalla \"Cargando…\" y solo muestra el juego cuando está listo; la versión nueva solo entra en el dispositivo cuando llega entera (si no, sigue la anterior)"
       ]
     },
     {

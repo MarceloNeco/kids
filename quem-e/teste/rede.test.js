@@ -16,7 +16,7 @@ function Mundo(semente, perda = 0, repete = 0) {
   M.no = (op) => {
     const k = nos.length, no = { on: true, salvo: null };
     no.criar = dados => R.criar({
-      id: op.id, codigo: 'ABCD', host: !!op.host, nivel: op.nivel, semente: op.semente, corpo: op.corpo, dados, agora: M.agora,
+      id: op.id, codigo: 'ABCD', host: !!op.host, nivel: op.nivel, semente: op.semente, corpo: op.corpo, livre: op.livre, dados, agora: M.agora,
       mandar: m => { if (!no.on) return; const txt = JSON.stringify(m); M.msgs.push(txt); nos.forEach((o, j) => { if (j !== k && o.on && rnd() >= perda) { fila.push([j, txt]); if (rnd() < repete) fila.push([j, txt]); } }); },
       salvar: d => { no.salvo = d; }
     });
@@ -120,4 +120,35 @@ test('corpo inteiro: quem entra recebe o mesmo tabuleiro de corpo inteiro', () =
   for (let i = 0; i < 20 && !b.s.partida; i++) M.passo();
   assert.equal(b.s.partida.tabuleiro.corpo, true);
   assert.deepEqual(b.s.partida.tabuleiro, a.s.partida.tabuleiro);
+});
+
+test('jeito livre: sem vez; o palpite vai e a resposta volta, mesmo perdendo e repetindo mensagens', () => {
+  const M = Mundo(5, 0.3, 0.3);
+  const a = M.no({ id: idTeste(), host: true, nivel: 'medio', semente: 77, livre: true }), b = M.no({ id: idTeste() });
+  for (let i = 0; i < 60 && !b.s.partida; i++) M.passo();
+  assert.ok(b.s.partida && b.s.livre(), 'quem entra recebe o jeito livre');
+  a.s.agir('segredo', { c: 4 }); b.s.agir('segredo', { c: 11 });
+  for (let i = 0; i < 40 && (a.s.partida.estado.fase !== 'jogo' || b.s.partida.estado.fase !== 'jogo'); i++) M.passo();
+  assert.equal(a.s.partida.estado.fase, 'jogo'); assert.equal(b.s.partida.estado.fase, 'jogo');
+  // os dois podem agir ao mesmo tempo: não tem vez
+  assert.deepEqual(a.s.partida.aguardando(), { jogador: 0, acao: 'livre', pendente: false });
+  assert.deepEqual(b.s.partida.aguardando(), { jogador: 1, acao: 'livre', pendente: false });
+  assert.equal(b.s.agir('palpite', { c: 2 }).ok, true);   // b chuta errado
+  assert.equal(a.s.agir('palpite', { c: 6 }).ok, true);   // a também, na mesma hora
+  assert.equal(a.s.agir('palpite', { c: 7 }).ok, false, 'um palpite pendente por vez');
+  for (let i = 0; i < 80 && (a.s.partida.aguardando().pendente || b.s.partida.aguardando().pendente); i++) M.passo();
+  assert.equal(a.s.partida.estado.dePe[0][6], false, 'errou: a carta virou');
+  assert.equal(b.s.partida.estado.dePe[1][2], false);
+  assert.equal(a.s.chutesDeles(), 1); assert.equal(b.s.chutesDeles(), 1);
+  // recarregar no meio continua igual
+  M.recarregar(a);
+  assert.equal(a.s.partida.estado.dePe[0][6], false); assert.equal(a.s.chutesDeles(), 1);
+  // b acerta o segredo de a
+  assert.equal(b.s.agir('palpite', { c: 4 }).ok, true);
+  for (let i = 0; i < 80 && (a.s.partida.estado.fase !== 'fim' || b.s.partida.estado.fase !== 'fim' || a.s.revelado() === null || b.s.revelado() === null); i++) M.passo();
+  assert.equal(a.s.partida.estado.vencedor, 1); assert.equal(b.s.partida.estado.vencedor, 1);
+  assert.equal(a.s.revelado(), 11); assert.equal(b.s.revelado(), 4);
+  // o segredo de cada um não foi pela rede antes do fim (só a resposta Sim/Não do palpite)
+  const antesDoFim = M.msgs.filter(m => /"t":"(chute|vered|sala|pronto|pulso)"/.test(m));
+  assert.ok(antesDoFim.every(m => !/"segredo"/.test(m)));
 });

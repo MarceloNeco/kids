@@ -4,8 +4,8 @@
    na estante (../idioma.js: português, inglês ou espanhol). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.5';
-  var APP_DATA = '14/Nov/2026';
+  var APP_VERSION = '0.2.6';
+  var APP_DATA = '15/Nov/2026';
   var CM = window.CampoMinado;
   var $ = function (id) { return document.getElementById(id); };
   var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -29,7 +29,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { el.textContent = parte(el.getAttribute('data-t')); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-rotulo]'), function (el) { var r = parte(el.getAttribute('data-rotulo')); el.setAttribute('aria-label', r); el.title = r; });
     pintarEfeitos();
-    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, 'Nov/14/2026', '14/nov/2026') +
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, 'Nov/15/2026', '15/nov/2026') +
       t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY', ' · Music: Kevin MacLeod (incompetech.com), CC BY', ' · Música: Kevin MacLeod (incompetech.com), CC BY');
     $('tabuleiro').setAttribute('aria-label', t('Jardim', 'Garden', 'Jardín'));
     mostrarRecordes(); pintarModo();

@@ -32,6 +32,7 @@ async function abrir(browser, url, opcoes = {}) {
   await pg.goto(url);
   if (opcoes.semDebug) await pg.waitForFunction(() => !document.getElementById('btJogar').disabled, null, { timeout: 15000 });
   else await pg.waitForFunction(() => window.PeluqueriaDebug && window.PeluqueriaDebug.pronto, null, { timeout: 15000 });
+  await pg.waitForFunction(() => !document.documentElement.classList.contains('bc-carregando'), null, { timeout: 15000 });   // a tela "Carregando…" (../carregando.js) saiu
   if (!opcoes.semEntrar && await pg.isVisible('#btEntrar')) await pg.click('#btEntrar');   // tela de entrada (toque para começar)
   pg.erros = () => erros.filter(e => !IGNORAR.test(e));
   return pg;
@@ -323,7 +324,7 @@ async function comecar(pg, nivel) {
 
   const pdb = await abrir(browser, base + '?debug&teste');
   await passo(pdb, 500);
-  confere(/v0\.6\.14/.test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
+  confere(/v0\.6\.15/.test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
   confere(await D(pdb, () => PeluqueriaDebug.leve === false), 'celular: modo leve desligado');
 
   /* ---------- revisão final ---------- */

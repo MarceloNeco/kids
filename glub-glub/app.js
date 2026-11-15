@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.3', APP_DATA = '14/Nov/2026';
+  var APP_VERSION = '0.1.4', APP_DATA = '15/Nov/2026';
   var R = window.GlubRegras, A = window.GlubArte, Som = window.GlubSom;
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA), VITRINE = /[?&]vitrine\b/.test(BUSCA), RODADA_PEDIDA = (BUSCA.match(/[?&]rodada=(\w+)/) || [])[1];

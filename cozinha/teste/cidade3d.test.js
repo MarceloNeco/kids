@@ -102,3 +102,28 @@ test('v0.12.2: a cidade não fica branca — perguntar se tem 3D não abre tela 
   assert.deepEqual(erros.filter(e => !/GL Driver|GPU stall|WebGL|CONTEXT_LOST/i.test(e)), [], 'erros no console');
   await ctx.close();
 });
+
+// v0.12.3 (dono: "o espaço eram os ingredientes"): a cesta mostra todos os ingredientes de uma vez, sem arrastar, divide
+// a largura entre eles, não fica embaixo da bolinha 🎵 e, no tablet, os ingredientes ficam grandes e enchem a barra.
+for (const vp of [{ width: 360, height: 760 }, { width: 390, height: 844 }, { width: 915, height: 412 }, { width: 1280, height: 800 }]) {
+  test('v0.12.3: cesta ' + vp.width + '×' + vp.height + ' com os 7 ingredientes à vista, sem arrastar e sem bater na 🎵 nem na cidade', { timeout: 60000 }, async () => {
+    const { ctx, pg, erros } = await abrir(vp, { isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
+    await pg.goto(pg.url() + '&vila3d');
+    await comecar(pg, 'medio', 'pizza');
+    await pg.waitForFunction(() => document.querySelector('#vila.vila3d canvas'), null, { timeout: 15000 });
+    await pg.waitForTimeout(300);
+    const m = await pg.evaluate(() => {
+      const c = document.querySelector('#cestaMapa'), cr = c.getBoundingClientRect(), its = [...c.querySelectorAll('.item')].map(i => i.getBoundingClientRect());
+      const v = document.querySelector('#vila').getBoundingClientRect();
+      return { n: its.length, cabe: c.scrollWidth <= c.clientWidth + 1, dentro: its.every(r => r.left >= cr.left - 1 && r.right <= cr.right + 1), larg: Math.min(...its.map(r => r.width)), alto: Math.min(...its.map(r => r.height)),
+        ocupa: (Math.max(...its.map(r => r.right)) - Math.min(...its.map(r => r.left))) / cr.width, direita: cr.right, w: innerWidth, vilaFim: v.bottom, cestaTopo: cr.top };
+    });
+    assert.equal(m.n, 7, 'ingredientes na cesta: ' + m.n);
+    assert.ok(m.cabe && m.dentro, 'todos à vista, sem arrastar: ' + JSON.stringify(m));
+    assert.ok(m.direita <= m.w - 58, 'a cesta para antes da bolinha 🎵: ' + m.direita);
+    assert.ok(m.vilaFim <= m.cestaTopo + 1, 'a cesta não cobre a cidade: ' + JSON.stringify(m));
+    if (vp.width >= 1000) { assert.ok(m.larg >= 80 && m.alto >= 64, 'no tablet os ingredientes ficam grandes: ' + JSON.stringify(m)); assert.ok(m.ocupa >= 0.55, 'e enchem a barra: ' + m.ocupa); }
+    assert.deepEqual(erros.filter(e => !/GL Driver|GPU stall|WebGL/.test(e)), [], 'erros no console');
+    await ctx.close();
+  });
+}

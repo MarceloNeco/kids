@@ -21,8 +21,8 @@ test('versão igual nos três lugares: app.js, sw.js e a primeira entrada de ver
 
 test('sw.js: cache com o nome do app e guarda todos os arquivos publicados', () => {
   const sw = ler('sw.js');
-  assert.match(sw, /var CACHE = 'enigmas-v' \+ VERSAO/);
-  assert.match(sw, /indexOf\('enigmas-'\) === 0/, 'só apaga os caches deste app');
+  assert.match(sw, /BolinhoSW\(\{ prefixo: 'enigmas-', versao: VERSAO/);
+  assert.match(sw, /prefixo: 'enigmas-'/, 'só apaga os caches deste app');
   const lista = JSON.parse(sw.match(/var ARQUIVOS = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
   for (const a of lista) if (a !== './') assert.ok(fs.existsSync(path.join(pasta, a)), 'falta no disco: ' + a);
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|webmanifest)$/.test(f) && f !== 'sw.js');
@@ -117,7 +117,7 @@ test('nome Enigmatic (igual em PT, EN e ES) na página, no manifesto, na barra d
   assert.match(m.name, /^Enigmatic — /); assert.equal(m.short_name, 'Enigmatic');
   assert.match(ler('app.js'), /setAttribute\('data-nome', 'Enigmatic'\)/);
   const cat = fs.readFileSync(path.join(pasta, '..', 'catalogo.js'), 'utf8');
-  assert.match(cat, /\{ id: 'enigmas', nome: 'Enigmatic', [^}]*url: '\/kids\/enigmas\/'/, 'cartão da estante (mesmo id e endereço)');
+  assert.match(cat, /\{ id: 'enigmas', (novo: '[^']*', )?nome: 'Enigmatic', [^}]*url: '\/kids\/enigmas\/'/, 'cartão da estante (mesmo id e endereço)');
   const rec = JSON.parse(fs.readFileSync(path.join(pasta, '..', 'recursos-do-app.json'), 'utf8')).recursos.find(r => r.id === 'enigmas');
   assert.equal(rec.nome.pt, 'Enigmatic'); assert.equal(rec.nome.en, 'Enigmatic');
   if (rec.nome.es) assert.equal(rec.nome.es, 'Enigmatic');   // o mesmo nome nas três línguas
