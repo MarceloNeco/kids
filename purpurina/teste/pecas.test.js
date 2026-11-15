@@ -161,3 +161,20 @@ test('personagens prontas: só usam peças e cores que existem, e têm nome nos 
     }
   }
 });
+
+test('estilos prontos (K-pop, praia, gala, rock…): só peças, cores e cenários que existem, nomes em PT/EN/ES, sem mexer no corpo', () => {
+  assert.ok(P.ESTILOS.length >= 8);
+  const corpo = ['pele', 'personagem', 'idade', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'cabelo', 'cabeloCor', 'mechas', 'mechasCor', 'olhos'];
+  for (const st of P.ESTILOS) {
+    assert.ok(st.pt && st.en && st.es && st.ico, st.id + ' sem nome');
+    for (const [k, v] of Object.entries(st.e)) {
+      assert.ok(k in P.PADRAO, st.id + ': ' + k + ' não existe');
+      assert.ok(!corpo.includes(k), st.id + ': estilo não muda o corpo (' + k + ')');
+      const cat = P.CATEGORIAS.find(c => c.id === k), daCor = P.CATEGORIAS.find(c => c.id + 'Cor' === k);
+      if (cat && cat.opcoes) assert.ok(cat.opcoes.some(o => o.id === v), st.id + ': ' + k + '=' + v);
+      else if (cat && cat.cores) assert.ok(P.CORES[cat.cores].some(c => c.id === v), st.id + ': ' + k + '=' + v);
+      if (daCor) assert.ok(P.CORES[daCor.cores].some(c => c.id === v), st.id + ': ' + k + '=' + v);
+    }
+  }
+  for (const id of ['kpop', 'praia', 'gala', 'rock']) assert.ok(P.ESTILOS.some(s => s.id === id), id);
+});

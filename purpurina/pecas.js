@@ -362,6 +362,51 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       cabeca: 'flores', cabecaCor: 'amarelo' } }
   ];
 
+  /* Estilos prontos (dono, 15/Nov/2026: "uns estilos pré-prontos, pra servir de exemplo, pra já empiriquetar e poder
+     editar"): só a produção — roupa, maquiagem, acessórios, chapéu e cenário. Vestem a personagem que está no estúdio
+     (pele, rosto, olhos, cabelo e idade continuam dela; menino fica sem saia, vestido e maquiagem — app.js, vestirEstilo). */
+  var ESTILOS = [
+    { id: 'kpop', ico: '🎤', pt: 'K-pop', en: 'K-pop', es: 'K-pop', e: {
+      blusa: 'jaqueta', blusaCor: 'preto', saia: 'pregas', saiaCor: 'preto', calca: 'nenhum', sapatos: 'botaCano', sapatosCor: 'preto',
+      brincos: 'argola', brincosCor: 'prata', colar: 'gargantilha', colarCor: 'preto', laco: 'presilhas', lacoCor: 'rosaclaro', anel: 'dois', anelCor: 'prata',
+      base: 'iluminada', blush: 'redondo', blushCor: 'rosa', sombra: 'brilhante', sombraCor: 'rosa', delineado: 'gatinho', delineadoCor: 'preto',
+      cilios: 'longos', ciliosCor: 'preto', batom: 'degrade', batomCor: 'cereja', glitter: 'olhos', glitterCor: 'prata', unhas: 'glitter', unhasCor: 'rosaclaro', cenario: 'palco' } },
+    { id: 'praia', ico: '🏖️', pt: 'Praia', en: 'Beach', es: 'Playa', e: {
+      vestido: 'verao', vestidoCor: 'amarelo', estampa: 'flores', estampaCor: 'branco', sapatos: 'chineloFlor', sapatosCor: 'coral', cabeca: 'chapeu', cabecaCor: 'nude',
+      oculos: 'coracao', oculosCor: 'chiclete', bolsa: 'praia', bolsaCor: 'turquesa', colar: 'concha', colarCor: 'branco', brincos: 'flor', brincosCor: 'coral',
+      base: 'bronze', blush: 'diagonal', blushCor: 'coral', batom: 'gloss', batomCor: 'coral', adesivo: 'concha', unhas: 'liso', unhasCor: 'coral', cenario: 'praia' } },
+    { id: 'gala', ico: '👑', pt: 'Vestido de gala', en: 'Gala gown', es: 'Vestido de gala', e: {
+      vestido: 'gala', vestidoCor: 'vinho', sapatos: 'scarpin', sapatosCor: 'dourado', colar: 'diamantes', colarCor: 'prata', brincos: 'cascata', brincosCor: 'prata',
+      pulseira: 'perolas', pulseiraCor: 'branco', cabeca: 'diadema', cabecaCor: 'prata', bolsa: 'mao', bolsaCor: 'dourado',
+      base: 'iluminada', blush: 'diagonal', blushCor: 'pessego', sombra: 'esfumada', sombraCor: 'marrom', delineado: 'fino', delineadoCor: 'preto',
+      cilios: 'volume', ciliosCor: 'preto', batom: 'cremoso', batomCor: 'vermelho', unhas: 'francesinha', unhasCor: 'branco', cenario: 'castelo' } },
+    { id: 'rock', ico: '🎸', pt: 'Rock and roll', en: 'Rock and roll', es: 'Rock and roll', e: {
+      blusa: 'jaqueta', blusaCor: 'preto', calca: 'rasgada', calcaCor: 'preto', sapatos: 'bota', sapatosCor: 'preto', oculos: 'aviador', oculosCor: 'preto',
+      colar: 'gargantilha', colarCor: 'preto', brincos: 'argola', brincosCor: 'prata', pulseira: 'varias', pulseiraCor: 'preto', anel: 'estrela', anelCor: 'prata',
+      sombra: 'esfumada', sombraCor: 'roxo', delineado: 'grosso', delineadoCor: 'preto', cilios: 'dramaticos', ciliosCor: 'preto', batom: 'cremoso', batomCor: 'roxo',
+      unhas: 'liso', unhasCor: 'preto', adesivo: 'estrela', cenario: 'palco' } },
+    { id: 'princesa', ico: '🏰', pt: 'Princesa', en: 'Princess', es: 'Princesa', e: {
+      vestido: 'princesa', vestidoCor: 'rosaclaro', sapatos: 'princesa', sapatosCor: 'prata', cabeca: 'coroa', cabecaCor: 'dourado', colar: 'perolas', colarCor: 'branco',
+      brincos: 'perola', brincosCor: 'branco', blush: 'coracao', blushCor: 'rosa', batom: 'gloss', batomCor: 'rosaclaro', cilios: 'boneca', ciliosCor: 'preto',
+      glitter: 'tudo', glitterCor: 'dourado', unhas: 'glitter', unhasCor: 'rose', cenario: 'castelo' } },
+    { id: 'festa', ico: '🪩', pt: 'Festa', en: 'Party', es: 'Fiesta', e: {
+      vestido: 'festa', vestidoCor: 'prata', sapatos: 'plataforma', sapatosCor: 'chiclete', brincos: 'estrela', brincosCor: 'dourado', pulseira: 'micangas', pulseiraCor: 'chiclete',
+      laco: 'estrela', lacoCor: 'dourado', sombra: 'arco', sombraCor: 'lilas', delineado: 'gatinho', delineadoCor: 'roxo', cilios: 'strass', ciliosCor: 'preto',
+      batom: 'brilho', batomCor: 'chiclete', glitter: 'bochechas', glitterCor: 'arco', unhas: 'arco', unhasCor: 'chiclete', adesivo: 'coracao', cenario: 'festa' } },
+    { id: 'esporte', ico: '⚽', pt: 'Esportivo', en: 'Sporty', es: 'Deportivo', e: {
+      blusa: 'camiseta', blusaCor: 'branco', estampa: 'listras', estampaCor: 'azul', calca: 'jogger', calcaCor: 'azul', sapatos: 'tenisLuz', sapatosCor: 'branco',
+      cabeca: 'faixa', cabecaCor: 'azul', pulseira: 'relogio', pulseiraCor: 'preto', bolsa: 'ombro', bolsaCor: 'preto', base: 'natural', cenario: 'jardim' } },
+    { id: 'inverno', ico: '❄️', pt: 'Inverno', en: 'Winter', es: 'Invierno', e: {
+      blusa: 'sueter', blusaCor: 'vermelho', estampa: 'xadrez', estampaCor: 'branco', calca: 'legging', calcaCor: 'preto', sapatos: 'botaNeve', sapatosCor: 'marrom',
+      cabeca: 'gorro', cabecaCor: 'branco', brincos: 'perola', brincosCor: 'branco', blush: 'redondo', blushCor: 'vermelho', batom: 'cremoso', batomCor: 'cereja', cenario: 'neve' } },
+    { id: 'fada', ico: '🧚', pt: 'Fada', en: 'Fairy', es: 'Hada', e: {
+      vestido: 'fada', vestidoCor: 'lilas', sapatos: 'ponta', sapatosCor: 'lilas', cabeca: 'flores', cabecaCor: 'rose', brincos: 'borboleta', brincosCor: 'lilas',
+      sombra: 'brilhante', sombraCor: 'lilas', cilios: 'fadinha', ciliosCor: 'roxo', batom: 'gloss', batomCor: 'lilas', glitter: 'tudo', glitterCor: 'lilas', adesivo: 'borboleta', cenario: 'jardim' } },
+    { id: 'pijama', ico: '🌙', pt: 'Festa do pijama', en: 'Sleepover', es: 'Fiesta de pijamas', e: {
+      blusa: 'pijama', blusaCor: 'ceu', estampa: 'estrelas', estampaCor: 'branco', calca: 'pijama', calcaCor: 'ceu', sapatos: 'pantufa', sapatosCor: 'rosaclaro',
+      cabeca: 'orelhas', cabecaCor: 'rosaclaro', blush: 'redondo', blushCor: 'rosa', cenario: 'quarto' } }
+  ];
+
   /* Desafios: cada um tem 3 dicas. Estrelas = dicas cumpridas, mas sempre pelo menos 1 (ninguém perde).
      Forma das dicas (conferidas em visual.js):
        { c: 'sapatos', tag: 'praia' }        a peça visível da categoria tem essa tag
@@ -429,7 +474,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
   function opcao(catId, id) { var cat = porId[catId]; if (!cat || !cat.opcoes) return null; for (var i = 0; i < cat.opcoes.length; i++) if (cat.opcoes[i].id === id) return cat.opcoes[i]; return null; }
   function cor(paleta, id) { var l = CORES[paleta] || []; for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; return l[0] || null; }
 
-  var API = { ZOOM: ZOOM, CORES: CORES, GRUPOS: GRUPOS, CATEGORIAS: CATEGORIAS, PADRAO: PADRAO, PRONTAS: PRONTAS, DESAFIOS: DESAFIOS, categoria: categoria, opcao: opcao, cor: cor };
+  var API = { ZOOM: ZOOM, CORES: CORES, GRUPOS: GRUPOS, CATEGORIAS: CATEGORIAS, PADRAO: PADRAO, PRONTAS: PRONTAS, ESTILOS: ESTILOS, DESAFIOS: DESAFIOS, categoria: categoria, opcao: opcao, cor: cor };
   raiz.PurpurinaPecas = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : this);
