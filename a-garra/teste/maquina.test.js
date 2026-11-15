@@ -109,8 +109,8 @@ test('relógio: no médio, sem apertar, a garra desce sozinha quando o tempo aca
   assert.equal(m.tempo, 60, '1 minuto para mirar');
   for (let i = 0; i < 60 * 59; i++) m.passo(1 / 60);
   assert.equal(m.fase, 'mirar');
-  assert.ok(m.eventos.some(e => e.tipo === 'tique'), 'tique-taque nos últimos segundos');
   for (let i = 0; i < 60 * 1.2; i++) m.passo(1 / 60);
+  assert.deepEqual(m.eventos.filter(e => e.tipo === 'tique').map(e => e.s), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1], 'contagem dos 10 últimos segundos');
   assert.notEqual(m.fase, 'mirar');
   assert.equal(m.fichas, m.cfg.fichas - 1);
 });
@@ -165,5 +165,15 @@ test('todo prêmio cabe no buraco (senão nunca dá para ganhar), também os bic
   for (const nivel of ['facil', 'medio', 'dificil']) for (const op of [{}, { andam: true, qtdFator: 0.32, raioFator: 1.12 }]) for (let s = 1; s <= 15; s++) {
     const m = M.nova(Object.assign({ nivel, semente: s, tipos: TIPOS }, op));
     for (const p of m.premios) assert.ok(2 * p.r < Math.min(BX, BZ), nivel + ': prêmio de raio ' + p.r.toFixed(2) + ' não cabe no buraco');
+  }
+});
+
+test('1 minuto para mirar em todos os níveis; quando acaba, avisa (para o 0 aparecer) e a garra desce sozinha', () => {
+  for (const nivel of ['facil', 'medio', 'dificil']) {
+    const m = M.nova({ nivel, semente: 2, tipos: TIPOS });
+    assert.equal(m.cfg.tempo, 60, nivel);
+    for (let i = 0; i < 60 * 61; i++) m.passo(1 / 60);
+    assert.ok(m.eventos.some(e => e.tipo === 'tempoAcabou'), nivel + ': avisou que o tempo acabou');
+    assert.equal(m.fichas, m.cfg.fichas - 1, nivel + ': gastou a ficha');
   }
 });

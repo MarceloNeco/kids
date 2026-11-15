@@ -39,8 +39,11 @@ o botão PEGAR vira GRAB · COGER.
   tentativas** a garra vem **forte** de novo: fácil na 2ª ou 3ª, médio da 2ª à 4ª (mais ou menos 1 em 3), difícil da 3ª
   à 5ª; e ainda tem 15% de sorte em qualquer tentativa bem mirada. Mirar no meio continua importando. A contagem fica
   guardada no aparelho (`bolinho:a-garra:contador`). Antes da 0.4.4 era 1 em 4 / 7 / 10.
-- **Nível**: fácil (12 fichas, sem relógio, prêmios grandes, anel de mira), médio (10 fichas, 1 minuto para mirar
-  cada tentativa, anel de mira), difícil (10 fichas, 1 minuto, prêmios menores, sem anel). Antes da 0.4.2 eram 25 s e 15 s.
+- **Nível**: fácil (12 fichas, prêmios grandes, anel de mira), médio (10 fichas, anel de mira), difícil (10 fichas, prêmios
+  menores, sem anel). **1 minuto para mirar cada tentativa em todos os níveis** (0.4.6; antes da 0.4.2 eram 25 s e 15 s, e o
+  fácil não tinha relógio). Nos **10 últimos segundos**, um número gordinho aparece pulando no canto de cima à direita
+  (10, 9, 8… 0, vermelho do 3 para baixo, com tique-taque); acabou o tempo, a garra desce sozinha. Deitado, os botões da
+  câmera ficam embaixo, à direita, para a contagem não encostar neles.
 
 ## Arquivos
 
