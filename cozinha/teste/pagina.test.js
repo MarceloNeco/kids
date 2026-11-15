@@ -160,7 +160,7 @@ test('espanhol: com ES escolhido na estante tudo fica em espanhol (menu, ficha, 
   assert.match(await pg.textContent('#niveis'), /Fácil.*Medio.*Difícil/);
   assert.match(await pg.textContent('#receitas'), /Tarta de zanahoria/);
   assert.equal(await pg.getAttribute('#btVoz', 'aria-label'), 'Leer en voz alta');
-  assert.match(await pg.textContent('#versao'), /Versión .*14\/nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /Versión .*15\/nov\/2026/);
   await pg.click('[data-nivel="facil"]'); await pg.click('[data-rec="vitamina"]');
   assert.match(await pg.textContent('#recTitulo'), /Batido de plátano/);
   assert.match(await pg.textContent('#recIngredientes'), /1 plátano/);

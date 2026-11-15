@@ -5,15 +5,16 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const codigo = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+const comum = fs.readFileSync(path.join(__dirname, '..', '..', 'sw-comum.js'), 'utf8');   // a peça comum que o sw.js importa
 
 function montar(rede) {
   const guardado = new Map(), ouvintes = {};
-  const cache = { put: async (req, resp) => { if (resp.status === 206) throw new TypeError('Partial response'); guardado.set(typeof req === 'string' ? req : req.url, resp); }, add: async () => {} };
-  const self = { addEventListener: (t, f) => { ouvintes[t] = f; }, skipWaiting() {}, clients: { claim() {} }, location: { origin: 'https://x.test' } };
+  const cache = { match: async (req) => guardado.get(typeof req === 'string' ? req : req.url), put: async (req, resp) => { if (resp.status === 206) throw new TypeError('Partial response'); guardado.set(typeof req === 'string' ? req : req.url, resp); }, add: async () => {} };
+  const self = { addEventListener: (t, f) => { ouvintes[t] = f; }, skipWaiting() {}, clients: { claim() {} }, location: { origin: 'https://x.test' }, registration: { scope: 'https://x.test/peluqueria/' } };
   const ctx = {
     self, location: self.location, URL, Promise, setTimeout, clearTimeout, console,
     caches: { open: async () => cache, match: async (req) => guardado.get(typeof req === 'string' ? req : req.url), keys: async () => [], delete: async () => true },
-    fetch: rede, Response: { error: () => ({ status: 0 }) }, Request: function (u, o) { this.url = u; this.headers = new Map(); Object.assign(this, o || {}); }
+    importScripts: () => vm.runInContext(comum, ctx), fetch: rede, Response: { error: () => ({ status: 0 }) }, Request: function (u, o) { this.url = u; this.headers = new Map(); Object.assign(this, o || {}); }
   };
   vm.createContext(ctx); vm.runInContext(codigo, ctx);
   return { ouvintes, guardado };

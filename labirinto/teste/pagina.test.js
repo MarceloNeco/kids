@@ -105,7 +105,7 @@ async function desenharCaminho(pg, de, para) {
 test('celular: menu abre sem erro, textos em português, trilha de música e versão', async () => {
   const pg = await abrir(FONE);
   assert.match(await pg.textContent('#btJogar'), /Jogar/);
-  assert.match(await pg.textContent('#versao'), /0\.3\.0 · 14\/Nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /0\.3\.1 · 15\/Nov\/2026/);
   assert.ok(await pg.isVisible('.trilha'), 'tocador da trilha');
   assert.equal(await pg.evaluate(() => document.querySelectorAll('[data-recurso="labirinto"]').length), 2);
   assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma no jogo: o idioma vem da estante');
@@ -119,10 +119,10 @@ test('celular: menu abre sem erro, textos em português, trilha de música e ver
 });
 
 test('celular: abre no idioma da estante (inglês e espanhol), com o nome do jogo e a data em cada idioma', async () => {
-  for (const [cod, jogar, nome, lang, data] of [['en', /^▶ Play!$/, 'Maze', 'en', /Version 0\.3\.0 · Nov\/14\/2026/], ['es', /^▶ ¡Jugar!$/, 'Laberinto', 'es', /Versión 0\.3\.0 · 14\/nov\/2026/]]) {
+  for (const [cod, jogar, nome, lang, data] of [['en', /^▶ Play!$/, 'Maze', 'en', /Version 0\.3\.1 · Nov\/15\/2026/], ['es', /^▶ ¡Jugar!$/, 'Laberinto', 'es', /Versión 0\.3\.1 · 15\/nov\/2026/]]) {
     const pg = await abrir(FONE, '', cod);
     assert.match(await pg.textContent('#btJogar'), jogar);
-    assert.equal(await pg.evaluate(() => document.documentElement.lang), lang);
+    assert.match(await pg.evaluate(() => document.documentElement.lang), new RegExp('^' + lang));   // en ou en-US (o idioma.js usa en-US)
     assert.equal(await pg.textContent('#menu .logo'), nome);
     assert.equal(await pg.getAttribute('#menu .logo', 'aria-label'), nome);
     assert.match(await pg.textContent('#versao'), data);

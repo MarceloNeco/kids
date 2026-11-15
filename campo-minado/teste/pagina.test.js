@@ -297,7 +297,7 @@ test('idioma da estante (inglês e espanhol), ajuda e zoom', async () => {
   assert.equal(await pg.textContent('h1'), 'Buscaminas del Jardín');
   assert.match(await pg.textContent('#ajuda'), /El primer toque nunca despierta a un erizo/);
   assert.match(await pg.textContent('#btFacil'), /Fácil/);
-  assert.match(await pg.textContent('#versao'), /Versión .* 14\/nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /Versión .* 15\/nov\/2026/);
   await pg.tap('#btDificil');
   assert.equal(await pg.getAttribute('#btModo', 'aria-label'), 'Modo banderita');
   assert.match(await pg.locator('.casa').first().getAttribute('aria-label'), /^Fila 1, columna 1: césped$/);

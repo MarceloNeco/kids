@@ -46,7 +46,7 @@ test('abre sem erro no celular em pé e no computador, nos três idiomas da esta
   for (const [vp, toque] of [[{ width: 360, height: 740 }, true], [{ width: 1280, height: 800 }, false], [{ width: 800, height: 1280 }, true]]) {
     const ctx = await browser.newContext({ viewport: vp, hasTouch: toque, locale: 'pt-BR' });
     const { pg, erros } = await novaAba(ctx);
-    assert.match(await pg.textContent('#versao'), /0\.4\.0/);
+    assert.match(await pg.textContent('#versao'), /0\.4\.1/);
     assert.equal(await pg.textContent('#btPC'), '🤖 Contra o computador');
     assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma no jogo');
     // a escolha é feita na estante (../idioma.js); trocar lá (outra aba) troca aqui na hora

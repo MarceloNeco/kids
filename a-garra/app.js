@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.4.4', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
+const APP_VERSION = '0.4.5', APP_DATA = ['15/Nov/2026', 'Nov/15/2026', '15/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);

@@ -140,8 +140,14 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - Jogo novo: pasta própria + entrada em `catalogo.js` (com `novo: 'AAAA-MM-DD'`, a data do dia: por 7 dias o cartão
   ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" toda vez que a estante abre (não ao voltar de um jogo), até "Não mostrar mais esta
   mensagem", `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
-  no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
+  no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + `sw.js` pelo `../sw-comum.js` + `../carregando.js` + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
+- **Jogo íntegro no aparelho (dono, 15/Nov/2026):** o `sw.js` de todo jogo usa a peça comum `../sw-comum.js` (`importScripts` +
+  `BolinhoSW({ prefixo, versao: VERSAO, arquivos: ARQUIVOS })`): versão nova só entra quando chega inteira, senão fica a
+  anterior; tudo abre da gaveta do próprio jogo. Todo arquivo do `ARQUIVOS` tem que existir (senão a versão nova nunca
+  instala). E todo jogo tem `<script src="../carregando.js" data-fora-do-arquivo></script>` logo depois do manifest (tela
+  "Carregando…" até o jogo estar pronto). **Mudou uma peça comum da raiz** (`idioma.js`, `navegacao.js`, `trilha.js`…)?
+  Rode `node ferramentas/pecas-comuns.js`. Vigia: `teste/sw-jogos.test.js`.
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
   - **Com internet**: tocam **todas** as músicas gravadas do jogo (instrumentos de verdade), em **ordem sorteada**. A
     favorita do jogo (a música "simples" de sem internet) **nunca é a primeira**: vai para o **fim** da volta.

@@ -2,6 +2,20 @@
   "app": "quem-e",
   "versoes": [
     {
+      "versao": "0.6.4",
+      "data": "15/Nov/2026",
+      "hora": "11:30:00",
+      "pt": [
+        "⚡ Abre com a tela \"Carregando…\" e só mostra o jogo pronto; a versão nova só entra no aparelho quando chega inteira (senão continua a anterior)"
+      ],
+      "en": [
+        "⚡ Opens with a \"Loading…\" screen and only shows the game when it's ready; a new version is only saved on the device once it has fully arrived (otherwise the previous one stays)"
+      ],
+      "es": [
+        "⚡ Se abre con la pantalla \"Cargando…\" y solo muestra el juego cuando está listo; la versión nueva solo entra en el dispositivo cuando llega entera (si no, sigue la anterior)"
+      ]
+    },
+    {
       "versao": "0.6.3",
       "data": "14/Nov/2026",
       "hora": "20:58:08",
