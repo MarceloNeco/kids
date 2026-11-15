@@ -122,7 +122,7 @@ test('celular: abre no idioma da estante (inglês e espanhol), com o nome do jog
   for (const [cod, jogar, nome, lang, data] of [['en', /^▶ Play!$/, 'Maze', 'en', /Version 0\.3\.1 · Nov\/15\/2026/], ['es', /^▶ ¡Jugar!$/, 'Laberinto', 'es', /Versión 0\.3\.1 · 15\/nov\/2026/]]) {
     const pg = await abrir(FONE, '', cod);
     assert.match(await pg.textContent('#btJogar'), jogar);
-    assert.equal(await pg.evaluate(() => document.documentElement.lang), lang);
+    assert.match(await pg.evaluate(() => document.documentElement.lang), new RegExp('^' + lang));   // en ou en-US (o idioma.js usa en-US)
     assert.equal(await pg.textContent('#menu .logo'), nome);
     assert.equal(await pg.getAttribute('#menu .logo', 'aria-label'), nome);
     assert.match(await pg.textContent('#versao'), data);
