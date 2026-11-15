@@ -98,6 +98,32 @@ contorno, paleta, animação), sons, tempo de uma partida, anúncios. Depois pro
   caminho possível para mim: desenho vetorial em camadas (SVG), imagens geradas por IA num estilo único e consistente,
   ou 2D com "rig" (partes que se mexem). Diga prós e contras de cada um para HTML puro e tablet velho.
 
+## 4A. PRIORIDADE Nº 1: look and feel (o visual), mais do que a jogabilidade
+
+O que mais me incomoda é a **aparência**: quero que o Bolinho, e principalmente a Purpurina, fique **tão ou mais
+sofisticado** que estes do Poki (inspiração de estilo, não cópia). Abra e jogue estes três primeiro:
+
+- **Nails DIY: Manicure Master** — https://poki.com/br/g/nails-diy-manicure-master (minha print: `docs/anamnese-poki/inspiracao/poki-nails-diy-manicure-master.webp`)
+- **Fashion Legends** — https://poki.com/br/g/fashion-legends (print: `…/inspiracao/poki-fashion-legends.png`)
+- **Glam Girl: Dress Up and Makeover** — procure na busca do Poki (print: `…/inspiracao/poki-glam-girl-dress-up.webp`)
+
+Compare com as minhas telas (`docs/anamnese-poki/telas/purpurina-*.png`) e me explique, bem concreto:
+
+1. **Por que o deles parece profissional e o meu parece infantil**: proporções do corpo e do rosto, olhos, cabelo
+   (mechas, volume, brilho), pele (sombra suave, blush), roupas (dobras, tecido, transparência), contorno ou não, luz,
+   cenário (ilustração pintada com profundidade/desfoque, objetos do tema), paleta de cores, tipografia, botões e ícones
+   da interface, animações e microinterações (brilho, partículas, transições), sons.
+2. **Guia de estilo para a Purpurina 2.0** (um "style guide" de 1 página): paleta com códigos de cor, proporções da
+   personagem, como desenhar olhos/cabelo/roupa, como fazer o cenário, kit de interface (botões, abas, cartões, ícones),
+   animações. Tudo **original**, inspirado na qualidade, não nos personagens deles.
+3. **Como eu chego nisso sem ilustrador**, com o que tenho (HTML/JS puro, tablet velho, gero imagens com IA):
+   um passo a passo de produção — por exemplo, gerar com IA a personagem base e cada peça de roupa/cabelo em camadas
+   alinhadas no mesmo estilo e pose, cenários pintados separados, e o jogo só empilhar as camadas. Diga quais
+   ferramentas de IA de imagem servem, como manter o mesmo estilo em todas as peças (prompts-modelo, mesma pose, mesmo
+   fundo transparente, mesmo tamanho), o peso das imagens para o tablet velho (formato, tamanho) e os riscos.
+4. Me dê **3 prompts de imagem prontos** (personagem base, uma peça de roupa em camada, um cenário de salão) no estilo
+   proposto, para eu testar já.
+
 ## 5. Outros jogos e o site como um todo
 
 - **Mapeie o portfólio do Poki**: categorias, quantos jogos em cada uma, os mais populares/em destaque, e quais têm
@@ -121,7 +147,8 @@ Faça **um documento principal** (Artifact) em português, com:
    para criança, profundidade/diversão, progressão/recompensa, celular, TV, offline, multijogador, idiomas, segurança
    infantil, velocidade para abrir.
 3. **Mapa de gêneros** (tabela da seção 5) e **lista de jogos analisados** com link, gênero e 3 aprendizados de cada.
-4. **Purpurina 2.0**: o mapa das salas, as funções novas em ordem de prioridade e a direção de arte.
+4. **Purpurina 2.0**: o guia de estilo e o passo a passo de produção da arte (seção 4A) **em primeiro lugar**, depois o mapa
+   das salas e as funções novas em ordem de prioridade.
 5. **Backlog priorizado** para todo o Bolinho: item, por quê, impacto (alto/médio/baixo), esforço (P/M/G), jogo afetado.
 6. **Prompt final, pronto para eu colar no meu Claude Code** (que mexe no repositório `MarceloNeco/kids`), pedindo para
    implementar a primeira entrega da Purpurina 2.0 — curto, objetivo, com critérios de pronto e lembrando as regras:
