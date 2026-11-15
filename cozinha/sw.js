@@ -5,7 +5,7 @@
    Voz gravada da Dona Cida (voz/cida-*.mp3, v0.6.1): guardada na instalação e servida da cópia (funciona sem internet).
    Cache com o nome do app: só apaga caches "cozinha-" (nunca os dos outros apps da mesma origem).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e à primeira entrada de versoes.json). */
-var VERSAO = '0.12.2';
+var VERSAO = '0.12.3';
 var CACHE = 'cozinha-v' + VERSAO;
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'dados.js', 'logica.js', 'desenhos.js', 'cenas.js', 'vila.js', 'app.js', 'cidade3d.js', 'lavar3d.js', 'cozinha3d.js',
   'libs/three.module.min.js', 'libs/three-LICENSE.txt', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js',

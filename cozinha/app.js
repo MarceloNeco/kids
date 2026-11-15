@@ -5,7 +5,7 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.12.2';
+  var APP_VERSION = '0.12.3';
   var APP_UPDATED = '14/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
@@ -209,7 +209,7 @@
     if (atual === 'pronto' && id !== 'pronto') pararMenino();
     if (atual === 'mapa' && id !== 'mapa' && window.Cidade3D) Cidade3D.pausar();
     qsa(document, '.tela').forEach(function (s) { s.classList.toggle('ativa', s.id === id); });
-    atual = id; window.scrollTo(0, 0);
+    atual = id; window.scrollTo(0, 0); medirCesta();
     if (id === 'mapa') {
       desenharMapa();
       if (jogo && jogo.seguir) { var sg = jogo.seguir; jogo.seguir = null; setTimeout(function () { if (atual === 'mapa' && jogo) irPara(sg); }, 700); }
@@ -405,10 +405,17 @@
       return '<span class="item' + (r.falta ? '' : ' ok') + '" data-ing="' + r.id + '" role="button" tabindex="0" aria-label="' + L.nomeIng(r.id, lingua, 2) + ': ' + r.tem + t(' de ', ' of ', ' de ') + r.precisa + '">' + icone(r.id) + '<b>' + r.tem + '/' + r.precisa + '</b><i class="ces-n">' + L.nomeIng(r.id, lingua).split(' de ').pop().split(' of ').pop() + '</i></span>';
     }).join('');
     $('cestaMapa').innerHTML = h; $('cestaLugar').innerHTML = h;
+    medirCesta();
     var completa = L.completa(jogo.precisa, jogo.cesta);
     $('cestaMapa').classList.toggle('completa', completa); $('cestaLugar').classList.toggle('completa', completa);
     desenharCarteira();
   }
+  // v0.12.3: a altura da cesta vai para o CSS (--cesta-alto), e a cidade ocupa exatamente o espaço que sobra em cima dela
+  function medirCesta() {
+    var c = qs(document, '.tela.ativa .cesta'), h = c ? Math.ceil(c.getBoundingClientRect().height) : 0;
+    if (h) document.documentElement.style.setProperty('--cesta-alto', h + 'px');
+  }
+  window.addEventListener('resize', function () { requestAnimationFrame(medirCesta); });
   function textoFalta() {
     return L.faltando(jogo.precisa, jogo.cesta).map(function (r) { return emojiDe(r.id) + L.nomeQtd(r.id, r.falta, lingua); }).join(', ');
   }
@@ -523,7 +530,7 @@
     }).join('');
     if (usa3D()) {
       var vila = $('vila');
-      vila.classList.add('vila3d');
+      vila.classList.add('vila3d'); $('mapa').classList.add('m3d');
       if (!qs(vila, '.cidade3d')) vila.innerHTML = '<div class="cidade3d" aria-hidden="true"></div><div class="rotulos"></div>' +
         '<div class="girar"><button type="button" class="mini" data-girar="-1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟲</button><button type="button" class="mini" data-girar="1" aria-label="' + t('Girar a cidade', 'Turn the town', 'Girar el pueblo') + '">⟳</button></div>' +
         '<div class="zoom-bt"><button type="button" class="mini" data-zoom="1.3" aria-label="' + t('Aproximar', 'Zoom in', 'Acercar') + '">➕</button><button type="button" class="mini" data-zoom="0.77" aria-label="' + t('Afastar', 'Zoom out', 'Alejar') + '">➖</button></div>';
@@ -533,7 +540,7 @@
         placas: { mercado: t('MERCADO', 'MARKET', 'MERCADO'), padaria: t('PADARIA', 'BAKERY', 'PANADERÍA') } });
       return;
     }
-    $('vila').classList.remove('vila3d');
+    $('vila').classList.remove('vila3d'); $('mapa').classList.remove('m3d');
     $('vila').innerHTML = '<svg class="ruas" aria-hidden="true" focusable="false"></svg>' + D.LUGARES.map(function (l) {
       var aqui = jogo.cfg.brilho && uteis[l.id] ? uteis[l.id] : null;
       var extra = '';
