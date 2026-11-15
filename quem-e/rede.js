@@ -20,11 +20,17 @@
      tipos: pergunta { p } · resposta { r } · fimvez · palpite { c } ·
             veredito { ok }
    Mensagens: oi (quero entrar, repetido a cada 2 s até chegar a "sala") · sala { para, nivel, semente } (só quem criou)
-     · nao { para, motivo: 'cheia' } · pronto · ev { e } · pulso { n, p } · revelar { c } (só depois do fim) · tchau.
+     · nao { para, motivo: 'cheia' } · pronto · ev { e } · pulso { n, p } · revelar { c } (só depois do fim) · tchau
+     · chute { k, c } · vered { k, ok } (jeito livre).
+   JEITO LIVRE (sala { livre: true }, dono, 14/Nov/2026): sem vez, então nada de diário (os dois agiriam ao mesmo tempo).
+     As perguntas são em voz alta; as cartas viradas ficam só em cada aparelho. Só o palpite vai pela rede:
+     chute { k, c } (k = número do meu palpite, 0, 1, 2…; repetido no pulso até a resposta) → o aparelho do outro, que
+     tem o segredo, responde vered { k, ok } (e repete se o chute chegar de novo). s.chutes = os meus palpites
+     [{ c, ok }]; s.deles = os palpites do outro no meu segredo [{ c, ok }]. Recarregar refaz os dois na QEPartida.
    Recarregar a página: o aparelho guarda tudo (salvar) e volta pelo mesmo código, com o mesmo id; o diário é aplicado
    de novo do começo.
 
-   QERede.criar({ id, codigo, host, nivel, semente, mandar, salvar, aoMudar, agora, dados }) → sala
+   QERede.criar({ id, codigo, host, nivel, semente, livre, mandar, salvar, aoMudar, agora, dados }) → sala
    QERede.abrir(codigo, aoReceber, aoCair, conexao) → Promise<{ mandar, fechar }> */
 (function (raiz) {
   'use strict';
@@ -58,11 +64,13 @@
       case 'oi': case 'tchau': case 'pronto': return r;
       case 'pulso': r.n = int(m.n, 0, MAXN); r.p = m.p === true; return r.n === null ? null : r;
       case 'sala':
-        r.para = id8(m.para); r.nivel = Object.prototype.hasOwnProperty.call(L.NIVEIS, m.nivel) ? m.nivel : null; r.semente = int(m.semente, 0, 4294967295); r.corpo = m.corpo === true;
+        r.para = id8(m.para); r.nivel = Object.prototype.hasOwnProperty.call(L.NIVEIS, m.nivel) ? m.nivel : null; r.semente = int(m.semente, 0, 4294967295); r.corpo = m.corpo === true; r.livre = m.livre === true;
         return r.para && r.nivel && r.semente !== null ? r : null;
       case 'nao': r.para = id8(m.para); return r.para && m.motivo === 'cheia' ? (r.motivo = 'cheia', r) : null;
       case 'ev': r.e = evento(m.e); return r.e ? r : null;
       case 'revelar': r.c = int(m.c, 0, 63); return r.c === null ? null : r;
+      case 'chute': r.k = int(m.k, 0, MAXN); r.c = int(m.c, 0, 63); return r.k === null || r.c === null ? null : r;
+      case 'vered': r.k = int(m.k, 0, MAXN); if (r.k === null || typeof m.ok !== 'boolean') return null; r.ok = m.ok; return r;
       default: return null;
     }
   }
@@ -76,8 +84,10 @@
     var s = op.dados ? JSON.parse(JSON.stringify(op.dados)) : {
       codigo: op.codigo, id: op.id, host: !!op.host, eu: op.host ? 0 : 1, outro: null,
       nivel: op.host ? op.nivel : null, semente: op.host ? op.semente >>> 0 : null, corpo: op.host ? !!op.corpo : false,
+      livre: op.host ? !!op.livre : false, chutes: [], deles: [],
       segredo: null, outroPronto: false, log: [], dePe: null, revelado: null, cheia: false, saiu: false
     };
+    if (!s.chutes) s.chutes = []; if (!s.deles) s.deles = [];
     var partida = null, ultimo = agora(), ultPulso = 0, ultOi = 0, aplicando = false;
 
     function salvar() { try { if (op.salvar) op.salvar(JSON.parse(JSON.stringify(s))); } catch (e) { /* sem espaço */ } }
@@ -97,12 +107,16 @@
       } catch (err) { return false; }
     }
     function montar() {
-      partida = QP.criar({ modo: 'rede', nivel: s.nivel, semente: s.semente, eu: s.eu, corpo: !!s.corpo });
+      partida = QP.criar({ modo: 'rede', nivel: s.nivel, semente: s.semente, eu: s.eu, corpo: !!s.corpo, livre: !!s.livre });
       if (s.segredo !== null) partida.escolherSegredo(s.eu, s.segredo);
       if (s.outroPronto) partida.marcarPronto(1 - s.eu);
       aplicando = true;
       s.log.forEach(function (e) { aplicar(e); });
       aplicando = false;
+      if (s.livre && partida.estado.fase === 'jogo') {
+        s.chutes.forEach(function (x) { try { partida.palpite(s.eu, x.c); if (x.ok !== null) partida.vereditoLivre(s.eu, x.ok); } catch (e) { /* já acabou */ } });
+        s.deles.forEach(function (x) { try { partida.palpite(1 - s.eu, x.c); } catch (e) { /* já acabou */ } });
+      }
       // as cartas que a pessoa virou no próprio tabuleiro (não vão pela rede, só ficam guardadas aqui)
       if (s.dePe && s.dePe.length === partida.tabuleiro.caras.length) partida.estado.dePe[s.eu] = s.dePe.slice();
     }
@@ -128,8 +142,27 @@
       salvar(); avisar();
     }
 
+    // jeito livre: o outro chutou o MEU segredo (está aqui): respondo; chute repetido = repito a resposta
+    function receberChute(m) {
+      if (m.k < s.deles.length) { mandar({ t: 'vered', k: m.k, ok: s.deles[m.k].ok }); return; }
+      if (m.k !== s.deles.length || m.c >= partida.tabuleiro.caras.length || s.segredo === null) return;
+      var r; try { r = partida.palpite(1 - s.eu, m.c); } catch (e) { return; }   // a partida já acabou
+      s.deles.push({ c: m.c, ok: !!r.acertou });
+      mandar({ t: 'vered', k: m.k, ok: !!r.acertou }); salvar(); avisar();
+    }
+    // jeito livre: a resposta do meu palpite chegou
+    function receberVered(m) {
+      var x = s.chutes[m.k]; if (!x || x.ok !== null) return;
+      x.ok = m.ok;
+      try { partida.vereditoLivre(s.eu, m.ok); } catch (e) { /* já acabou */ }
+      salvar(); avisar();
+    }
+
     var sala = {
       get id() { return s.id; }, get eu() { return s.eu; }, get partida() { return partida; }, codigo: s.codigo,
+      livre: function () { return !!s.livre; },
+      chutesDeles: function () { return s.deles.length; },
+      ultimoDeles: function () { return s.deles.length ? s.deles[s.deles.length - 1] : null; },
       diario: function () { return s.log.map(function (e) { return JSON.stringify(e, Object.keys(e).sort()); }); },
       revelado: function () { return s.revelado; },
       cheia: function () { return s.cheia; },
@@ -155,6 +188,12 @@
         }
         if (k === 'pergunta') return { ok: registrar({ k: 'pergunta', p: d.p }) };
         if (k === 'fimvez') return { ok: registrar({ k: 'fimvez' }) };
+        if (k === 'palpite' && s.livre) {
+          if (partida.estado.fase !== 'jogo' || s.chutes.some(function (x) { return x.ok === null; })) return { ok: false };
+          try { partida.palpite(s.eu, d.c); } catch (e) { return { ok: false }; }
+          var kk = s.chutes.length; s.chutes.push({ c: d.c, ok: null });
+          mandar({ t: 'chute', k: kk, c: d.c }); salvar(); avisar(); return { ok: true };
+        }
         if (k === 'palpite') return { ok: registrar({ k: 'palpite', c: d.c }) };
         return { ok: false };
       },
@@ -163,14 +202,14 @@
         var m = validar(bruto); if (!m || m.de === s.id) return;
         if (m.t === 'oi') {
           if (!s.host) return;
-          if (!s.outro || s.outro === m.de) { s.outro = m.de; ultimo = agora(); mandar({ t: 'sala', para: m.de, nivel: s.nivel, semente: s.semente, corpo: !!s.corpo }); salvar(); avisar(); }
+          if (!s.outro || s.outro === m.de) { s.outro = m.de; ultimo = agora(); mandar({ t: 'sala', para: m.de, nivel: s.nivel, semente: s.semente, corpo: !!s.corpo, livre: !!s.livre }); salvar(); avisar(); }
           else mandar({ t: 'nao', para: m.de, motivo: 'cheia' });
           return;
         }
         if (m.t === 'sala') {
           if (s.host || m.para !== s.id || (s.outro && s.outro !== m.de)) return;
           var novo = !s.nivel;
-          s.outro = m.de; s.nivel = m.nivel; s.semente = m.semente; s.corpo = m.corpo; ultimo = agora();
+          s.outro = m.de; s.nivel = m.nivel; s.semente = m.semente; s.corpo = m.corpo; s.livre = m.livre; ultimo = agora();
           if (novo) { montar(); salvar(); avisar(); }
           return;
         }
@@ -181,7 +220,9 @@
         if ((m.t === 'pronto' || (m.t === 'pulso' && m.p)) && !s.outroPronto) {
           s.outroPronto = true; if (partida && partida.estado.fase === 'segredo') partida.marcarPronto(1 - s.eu); salvar(); avisar();
         }
-        if (m.t === 'ev' && partida) receberEvento(m.e);
+        if (m.t === 'chute' && partida && s.livre) receberChute(m);
+        else if (m.t === 'vered' && partida && s.livre) receberVered(m);
+        else if (m.t === 'ev' && partida) receberEvento(m.e);
         else if (m.t === 'pulso') { if (m.n < s.log.length) for (var i = m.n; i < s.log.length; i++) mandar({ t: 'ev', e: s.log[i] }); }
         else if (m.t === 'revelar') { if (partida && partida.estado.fase === 'fim' && s.revelado === null && m.c < partida.tabuleiro.caras.length) { s.revelado = m.c; salvar(); avisar(); } }
         else if (m.t === 'tchau') { ultimo = 0; avisar(); }
@@ -194,6 +235,7 @@
         if (!s.host && !s.nivel && !s.cheia && t - ultOi >= TEMPO.oi) { ultOi = t; mandar({ t: 'oi' }); }
         if (s.outro && t - ultPulso >= TEMPO.pulso) {
           ultPulso = t; mandar({ t: 'pulso', n: s.log.length, p: s.segredo !== null });
+          if (s.livre) s.chutes.forEach(function (x, k) { if (x.ok === null) mandar({ t: 'chute', k: k, c: x.c }); });
           if (partida && partida.estado.fase === 'fim' && s.segredo !== null) mandar({ t: 'revelar', c: s.segredo });
         }
         if (s.outro && t - ultimo >= TEMPO.ausente && t - ultimo < TEMPO.ausente + 600) avisar();

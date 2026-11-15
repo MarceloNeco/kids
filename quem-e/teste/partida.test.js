@@ -138,3 +138,49 @@ test('corpo inteiro: a partida guarda e volta com o corpo', () => {
   const q = QP.voltar(JSON.parse(JSON.stringify(p.salvar())));
   assert.deepEqual(q.tabuleiro, p.tabuleiro);
 });
+
+test('jeito livre contra a meleca: sem vez; pergunta quando quer, vira com o dedo, "Vou adivinhar!"', () => {
+  const p = QP.criar({ modo: 'meleca', nivel: 'facil', semente: 9, livre: true, rnd: sorteio(3) });
+  const t = p.tabuleiro, seg = p.estado.segredos[1];
+  assert.strictEqual(p.estado.fase, 'jogo', 'começa direto: você não precisa escolher segredo');
+  assert.deepStrictEqual(p.aguardando(), { jogador: 0, acao: 'livre', pendente: false });
+  assert.strictEqual(p.vezDaMeleca(), null, 'a meleca não joga a vez dela');
+  // pergunta duas seguidas, sem passar a vez; ela responde certo
+  const [q1, q2] = t.perguntas;
+  assert.strictEqual(p.perguntarLivre(0, q1), !!L.responder(t.caras[seg], q1));
+  assert.strictEqual(p.perguntarLivre(0, q2), !!L.responder(t.caras[seg], q2));
+  assert.strictEqual(codigo(() => p.perguntarLivre(0, q1)), 'pergunta', 'a mesma pergunta não repete');
+  assert.strictEqual(codigo(() => p.perguntar(0, t.perguntas[3])), 'fase', 'no livre não tem a pergunta com vez');
+  // nada vira sozinho: só com o dedo
+  assert.ok(p.estado.dePe[0].every(Boolean));
+  p.virar(0, 0); assert.strictEqual(p.estado.dePe[0][0], false); p.virar(0, 0);
+  // palpite errado: a carta vira e continua; certo: ganha
+  const errada = seg === 0 ? 1 : 0;
+  assert.deepStrictEqual(p.palpite(0, errada), { acertou: false });
+  assert.strictEqual(p.estado.dePe[0][errada], false);
+  assert.strictEqual(p.estado.fase, 'jogo');
+  assert.deepStrictEqual(p.palpite(0, seg), { acertou: true });
+  assert.strictEqual(p.estado.fase, 'fim'); assert.strictEqual(p.estado.vencedor, 0);
+  assert.strictEqual(p.aguardando(), null);
+});
+
+test('jeito livre em rede: palpite pendente até o veredito; um por vez; salvar e voltar', () => {
+  const p = QP.criar({ modo: 'rede', nivel: 'medio', semente: 4, eu: 1, livre: true });
+  p.escolherSegredo(1, 5); p.marcarPronto(0);
+  assert.deepStrictEqual(p.aguardando(), { jogador: 1, acao: 'livre', pendente: false });
+  // o outro (0) chuta o MEU: o meu segredo está aqui, então já sei
+  assert.deepStrictEqual(p.palpite(0, 3), { acertou: false });
+  assert.strictEqual(p.estado.fase, 'jogo');
+  // eu chuto o dele: fica pendente
+  assert.deepStrictEqual(p.palpite(1, 7), { pendente: true });
+  assert.deepStrictEqual(p.aguardando(), { jogador: 1, acao: 'livre', pendente: true });
+  assert.strictEqual(codigo(() => p.palpite(1, 8)), 'passo', 'um palpite pendente por vez');
+  const q = QP.voltar(JSON.parse(JSON.stringify(p.salvar())));
+  assert.strictEqual(q.livre, true);
+  assert.deepStrictEqual(q.vereditoLivre(1, false), { acertou: false });
+  assert.strictEqual(q.estado.dePe[1][7], false);
+  q.palpite(1, 9);
+  assert.deepStrictEqual(q.vereditoLivre(1, true), { acertou: true });
+  assert.strictEqual(q.estado.vencedor, 1);
+  assert.strictEqual(q.estado.ultima.palpite, 9);
+});
