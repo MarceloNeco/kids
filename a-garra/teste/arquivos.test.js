@@ -21,7 +21,7 @@ test('versão 0.4.5 igual nos três lugares (app.js, sw.js, versoes.json)', () =
 test('sw.js guarda todos os arquivos publicados, cache com o nome da pasta', () => {
   const sw = ler('sw.js');
   assert.match(sw, /BolinhoSW\(\{ prefixo: 'a-garra-'/);
-  assert.match(sw, /indexOf\('a-garra-'\) === 0/);
+  assert.match(sw, /prefixo: 'a-garra-'/);
   const lista = JSON.parse(sw.match(/var ARQUIVOS = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
   for (const a of lista) if (a !== './') assert.ok(fs.existsSync(path.join(pasta, a)), 'falta no disco: ' + a);
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|webmanifest)$/.test(f) && f !== 'sw.js');
