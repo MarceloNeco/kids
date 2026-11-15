@@ -12,6 +12,8 @@ pesado. Ordem sugerida: P1 primeiro.
     de desfile (adulto, infantil, masculino). ✅ no Drive.
   - `Purpurina - 3-fotos-pessoais-PRIVADO parte 1 de 2` e `parte 2 de 2 (ate 15-Nov-2026).zip`: 35 fotos da família,
     só referência de rosto, cabelo e traços. ✅ no Drive. **Nunca no repositório**: o repositório é público.
+  - `Purpurina - referencia Poki Diva Makeup Studio rosto natural (15-Nov-2026).jpg`: foto da tela do Poki (jogo "Diva
+    Makeup Studio"), a referência de rosto natural. ✅ no Drive.
 - Cada .zip tem um `INDICE.txt` com a data e a hora de cada mídia. As fotos de câmera e os prints foram reduzidos para 1280 px
   (as originais continuam no celular do dono).
 
@@ -29,6 +31,12 @@ pesado. Ordem sugerida: P1 primeiro.
 - Referência: as fotos da família (Drive, pasta 3): rosto oval e suave, queixo pequeno e arredondado, bochechas de
   criança, testa proporcional.
 - Pode continuar havendo vários formatos de rosto, mas o feminino não pode ser queixudo.
+- **Referência do dono (15/Nov, foto do Poki, "Diva Makeup Studio"): rosto muito mais natural.** Olhos amendoados com
+  cílios, nariz fino e delicado com luz, lábios cheios e suaves, maxilar fino, queixo pequeno, sombreado leve só nas
+  laterais (nada escuro embaixo), cabelo com volume e mechas.
+- **Ter esse rosto natural em 4 idades, ligado à escolha Eu → Idade:** 5 anos (bochechas cheias, rosto redondinho, olhos
+  maiores, nariz pequenino), 10 anos (menininha), 15 anos (adolescente, traços mais definidos) e adulto (como a
+  referência). Muda o rosto e a proporção, não só o jeito de andar.
 - **A parte de baixo do rosto está escurecida e parece barba ("ficou horrível").** Provável causa: o degradê de volume
   do rosto (`volRosto` no `boneca.js`), que escurece as bordas. Tirar o escuro do queixo e da mandíbula, como já foi
   feito antes (pendência #5).
