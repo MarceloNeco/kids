@@ -2,9 +2,9 @@
   "app": "cozinha",
   "versoes": [
     {
-      "versao": "0.12.3",
+      "versao": "0.12.4",
       "data": "15/Nov/2026",
-      "hora": "09:30:00",
+      "hora": "11:30:00",
       "pt": [
         "⚡ Abre com a tela \"Carregando…\" e só mostra o jogo pronto; a versão nova só entra no aparelho quando chega inteira (senão continua a anterior)"
       ],
@@ -13,6 +13,26 @@
       ],
       "es": [
         "⚡ Se abre con la pantalla \"Cargando…\" y solo muestra el juego cuando está listo; la versión nueva solo entra en el dispositivo cuando llega entera (si no, sigue la anterior)"
+      ]
+    },
+    {
+      "versao": "0.12.3",
+      "data": "14/Nov/2026",
+      "hora": "21:00:00",
+      "pt": [
+        "🧺 A cesta mostra todos os ingredientes de uma vez, sem precisar arrastar, e divide o espaço entre eles.",
+        "📱 No tablet os ingredientes ficam grandes; com o celular deitado aparece o nome ao lado de cada um.",
+        "🏙️ A cidade ocupa todo o espaço entre a missão e a cesta, sem a cesta cobrir o pé dela."
+      ],
+      "en": [
+        "🧺 The basket shows every ingredient at once, no dragging needed, sharing the space between them.",
+        "📱 On tablets the ingredients are big; with the phone sideways each one shows its name next to it.",
+        "🏙️ The town fills all the space between the mission and the basket, and the basket no longer covers its bottom."
+      ],
+      "es": [
+        "🧺 La cesta muestra todos los ingredientes a la vez, sin tener que arrastrar, y reparte el espacio entre ellos.",
+        "📱 En la tablet los ingredientes se ven grandes; con el móvil tumbado aparece el nombre al lado de cada uno.",
+        "🏙️ El pueblo ocupa todo el espacio entre la misión y la cesta, y la cesta ya no tapa su parte de abajo."
       ]
     },
     {

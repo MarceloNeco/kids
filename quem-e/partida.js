@@ -10,8 +10,13 @@
      'meleca'  o jogador 1 é a meleca: ela escolhe o segredo, responde sozinha e joga a vez dela (vezDaMeleca)
      'rede'    só o MEU segredo está aqui (eu = 0 ou 1). O segredo do outro fica null: a resposta dele chega pela rede
                já conferida no aparelho dele; o palpite meu fica "pendente" até o veredito dele chegar.
+   Jeito LIVRE (op.livre, dono, 14/Nov/2026), como o jogo de tabuleiro: não tem vez nem "Pronto". Cada um vira as cartas
+   do próprio tabuleiro quando quiser e, a qualquer hora, dá o palpite ("Vou adivinhar!"): acertou, ganha; errou, a carta
+   vira e o jogo continua. Contra a meleca: ela não escolhe o seu segredo nem joga; só responde (perguntarLivre) as
+   perguntas prontas que você quiser, na ordem que quiser. Em rede: as perguntas são em voz alta; o palpite fica pendente
+   até o veredito do outro aparelho (vereditoLivre). Um palpite pendente por jogador.
 
-   QEPartida.criar({ modo, nivel, semente, eu, rnd }) → partida   ·   QEPartida.voltar(salvo) → partida
+   QEPartida.criar({ modo, nivel, semente, eu, rnd, livre }) → partida   ·   QEPartida.voltar(salvo) → partida
    partida.estado = { fase, vez, segredos, prontos, dePe, feitas, ultima, passo, vencedor }
    partida.aguardando() → quem precisa agir e o quê (a tela e a rede se guiam por isso). Regra quebrada = erro com
    .codigo: 'fase' | 'fora-da-vez' | 'passo' | 'pergunta' | 'carta'. */
@@ -24,13 +29,14 @@
   function criar(op, salvo) {
     op = op || {};
     var modo = op.modo || 'passar', nivel = op.nivel || 'facil', semente = op.semente >>> 0, eu = op.eu || 0;
-    var rnd = op.rnd || Math.random;
+    var rnd = op.rnd || Math.random, livre = !!op.livre;
     var corpo = !!op.corpo, tab = L.gerarTabuleiro(semente, nivel, { corpo: corpo }), n = tab.caras.length;
     function cheio() { var a = []; for (var i = 0; i < n; i++) a.push(true); return a; }
     var e = salvo || {
       fase: 'segredo', vez: 0, segredos: [null, null], prontos: [false, false], dePe: [cheio(), cheio()], feitas: [[], []],
       ultima: null, passo: 'escolher', vencedor: null
     };
+    if (livre && !e.pendente) e.pendente = [null, null];
 
     function exigirFase(f) { if (e.fase !== f) throw erro('fase'); }
     function exigirVez(j) { if (e.vez !== j) throw erro('fora-da-vez'); }
@@ -40,11 +46,12 @@
     function passarVez() { e.vez = 1 - e.vez; e.passo = 'escolher'; }
 
     var p = {
-      modo: modo, nivel: nivel, semente: semente, eu: eu, tabuleiro: tab, estado: e,
+      modo: modo, nivel: nivel, semente: semente, eu: eu, livre: livre, tabuleiro: tab, estado: e,
 
       aguardando: function () {
         if (e.fase === 'segredo') { var f = []; if (!e.prontos[0]) f.push(0); if (!e.prontos[1]) f.push(1); return { acao: 'segredo', faltam: f }; }
         if (e.fase === 'fim') return null;
+        if (livre) { var j0 = modo === 'meleca' ? 0 : eu; return { jogador: j0, acao: 'livre', pendente: e.pendente[j0] !== null }; }
         if (e.passo === 'escolher') return { jogador: e.vez, acao: 'perguntar' };
         if (e.passo === 'responder') return { jogador: 1 - e.vez, acao: 'responder' };
         if (e.passo === 'veredito') return { jogador: 1 - e.vez, acao: 'veredito' };
@@ -59,6 +66,7 @@
       marcarPronto: function (j) { exigirFase('segredo'); e.prontos[j] = true; talvezComecar(); },
 
       perguntar: function (j, id) {
+        if (livre) throw erro('fase');
         exigirFase('jogo'); exigirVez(j); exigirPasso('escolher');
         if (tab.perguntas.indexOf(id) < 0 || e.feitas[j].indexOf(id) >= 0) throw erro('pergunta');
         e.feitas[j].push(id); e.ultima = { quem: j, pergunta: id, resposta: null }; e.passo = 'responder';
@@ -66,6 +74,7 @@
 
       // quem responde é o outro jogador; com o segredo dele aqui, o jogo confere (errada não passa, nada muda)
       responder: function (j, resposta) {
+        if (livre) throw erro('fase');
         exigirFase('jogo'); exigirPasso('responder'); if (j !== 1 - e.vez) throw erro('fora-da-vez');
         var seg = e.segredos[j];
         if (seg !== null && !L.conferir(tab.caras[seg], e.ultima.pergunta, resposta)) return { ok: false };
@@ -88,9 +97,29 @@
       // virar ou desvirar uma carta do próprio tabuleiro (pode a qualquer hora do jogo: é o tabuleiro dele)
       virar: function (j, id) { exigirFase('jogo'); exigirCarta(id); e.dePe[j][id] = !e.dePe[j][id]; return e.dePe[j][id]; },
 
-      pronto: function (j) { exigirFase('jogo'); exigirVez(j); exigirPasso('descartar'); passarVez(); },
+      pronto: function (j) { if (livre) throw erro('fase'); exigirFase('jogo'); exigirVez(j); exigirPasso('descartar'); passarVez(); },
+
+      // jeito livre contra a meleca: perguntar o que quiser, quando quiser; ela responde na hora (true = Sim)
+      perguntarLivre: function (j, id) {
+        if (!livre) throw erro('fase');
+        exigirFase('jogo');
+        var seg = e.segredos[1 - j];
+        if (seg === null || tab.perguntas.indexOf(id) < 0 || e.feitas[j].indexOf(id) >= 0) throw erro('pergunta');
+        var r = !!L.responder(tab.caras[seg], id);
+        e.feitas[j].push(id); e.ultima = { quem: j, pergunta: id, resposta: r };
+        return r;
+      },
 
       palpite: function (j, id) {
+        if (livre) {
+          exigirFase('jogo'); exigirCarta(id);
+          if (j !== 0 && j !== 1) throw erro('fora-da-vez');
+          if (e.pendente[j] !== null) throw erro('passo');
+          e.ultima = { quem: j, palpite: id };
+          var s2 = e.segredos[1 - j];
+          if (s2 === null) { e.pendente[j] = id; return { pendente: true }; }
+          return fecharLivre(j, id, id === s2);
+        }
         exigirFase('jogo'); exigirVez(j); exigirPasso('escolher'); exigirCarta(id);
         e.ultima = { quem: j, palpite: id };
         var seg = e.segredos[1 - j];
@@ -98,7 +127,15 @@
         return fecharPalpite(j, id === seg);
       },
       // em rede: o outro aparelho disse se o meu palpite acertou
-      veredito: function (ok) { exigirFase('jogo'); exigirPasso('veredito'); fecharPalpite(e.vez, !!ok); },
+      // jeito livre em rede: o outro aparelho disse se o palpite pendente do jogador j acertou
+      vereditoLivre: function (j, ok) {
+        if (!livre) throw erro('fase');
+        exigirFase('jogo');
+        if (e.pendente[j] === null) throw erro('passo');
+        var id = e.pendente[j]; e.pendente[j] = null; e.ultima = { quem: j, palpite: id };
+        return fecharLivre(j, id, !!ok);
+      },
+      veredito: function (ok) { if (livre) throw erro('fase'); exigirFase('jogo'); exigirPasso('veredito'); fecharPalpite(e.vez, !!ok); },
 
       // modo meleca: faz a próxima coisa que a meleca precisa fazer
       vezDaMeleca: function () {
@@ -115,9 +152,14 @@
         return null;
       },
 
-      salvar: function () { return { modo: modo, nivel: nivel, semente: semente, eu: eu, corpo: corpo, estado: JSON.parse(JSON.stringify(e)) }; }
+      salvar: function () { return { modo: modo, nivel: nivel, semente: semente, eu: eu, corpo: corpo, livre: livre, estado: JSON.parse(JSON.stringify(e)) }; }
     };
 
+    function fecharLivre(j, id, acertou) {
+      if (acertou) { e.fase = 'fim'; e.vencedor = j; return { acertou: true }; }
+      e.dePe[j][id] = false;
+      return { acertou: false };
+    }
     function fecharPalpite(j, acertou) {
       if (acertou) { e.fase = 'fim'; e.vencedor = j; e.passo = 'escolher'; return { acertou: true }; }
       e.dePe[j][e.ultima.palpite] = false; passarVez();
@@ -125,10 +167,12 @@
     }
 
     if (!salvo && modo === 'meleca') { e.segredos[1] = Math.floor(rnd() * n); e.prontos[1] = true; }
+    // livre contra a meleca: ela não vai adivinhar o seu, então você nem escolhe: o jogo começa direto
+    if (!salvo && modo === 'meleca' && livre) { e.prontos[0] = true; talvezComecar(); }
     return p;
   }
 
-  function voltar(s) { return criar({ modo: s.modo, nivel: s.nivel, semente: s.semente, eu: s.eu, corpo: !!s.corpo }, s.estado); }
+  function voltar(s) { return criar({ modo: s.modo, nivel: s.nivel, semente: s.semente, eu: s.eu, corpo: !!s.corpo, livre: !!s.livre }, s.estado); }
 
   var QP = { criar: function (op) { return criar(op, null); }, voltar: voltar };
   raiz.QEPartida = QP;

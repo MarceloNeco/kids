@@ -2,7 +2,7 @@
    nova só entra quando chega INTEIRA (senão continua a anterior) e tudo abre da cópia do próprio jogo. Músicas
    gravadas (*.mp3): o service worker não mexe (o navegador busca direto).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.6.3';
+var VERSAO = '0.6.4';
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'nomes.js', 'logica.js', 'partida.js', 'caras.js', 'melecas.js', 'melecas/blue-feliz.webp', 'melecas/blue-ops.webp', 'melecas/blue-pensando.webp', 'melecas/blue-triste.webp', 'melecas/pink-feliz.webp', 'melecas/pink-ops.webp', 'melecas/pink-pensando.webp', 'rede.js', '../batalha-naval/pertinho.js', '../batalha-naval/qr.js', '../batalha-naval/libs/qrcode.js', '../batalha-naval/libs/jsQR.js', 'adivinha-perguntas.js', 'adivinha.js', 'aprender.js', 'voz.js', 'personagens/familia.js', 'personagens/disney.js', 'personagens/desenhos.js', 'personagens/filmes.js', 'personagens/musica.js', 'personagens/famosos.js', 'personagens/mundo.js', 'personagens/jogos.js', 'personagens/novos.js', 'personagens/animacao.js', 'personagens/cinema.js', 'personagens/estrelas.js', 'personagens/historia.js', 'personagens/natureza.js', 'app.js', 'adivinha-tela.js', 'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../carregando.js', '../idioma.js', '../navegacao.js', '../janela.js', '../cofre.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
 importScripts('../sw-comum.js');
 var CACHE = BolinhoSW({ prefixo: 'quem-e-', versao: VERSAO, arquivos: ARQUIVOS, pular: function (url) { return /\.mp3$/i.test(url.pathname); } });

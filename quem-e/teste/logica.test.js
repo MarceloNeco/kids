@@ -192,3 +192,19 @@ test('corpo inteiro: tabuleiros válidos, únicos, perguntas úteis e mesma seme
   const t = L.gerarTabuleiro(5, 'medio');
   assert.ok(!t.corpo && !('baixo' in t.caras[0]));
 });
+
+test('💡 ideias de pergunta: só as que ainda separam as cartas de pé, sem repetir as feitas', () => {
+  const t = L.gerarTabuleiro(21, 'facil');
+  const dePe = t.caras.map(() => true);
+  // derruba todos os meninos: "É menino?" e "É menina?" não ajudam mais
+  t.caras.forEach((c, i) => { if (L.responder(c, 'masculino')) dePe[i] = false; });
+  const ids = L.ideias(t.caras, dePe, [], t.perguntas, 3);
+  assert.ok(ids.length > 0 && ids.length <= 3);
+  const vivas = dePe.filter(Boolean).length;
+  for (const id of ids) { const u = L.utilidade(t.caras, dePe, id); assert.ok(u > 0 && u < vivas, id + ' não separa nada'); }
+  assert.ok(!ids.includes('masculino') && !ids.includes('feminino'));
+  const feitas = [ids[0]];
+  assert.ok(!L.ideias(t.caras, dePe, feitas, t.perguntas, 3).includes(ids[0]), 'a feita não volta');
+  // uma carta só de pé: nenhuma ideia
+  assert.deepEqual(L.ideias(t.caras, t.caras.map((c, i) => i === 0), [], t.perguntas, 3), []);
+});

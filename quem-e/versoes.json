@@ -2,9 +2,9 @@
   "app": "quem-e",
   "versoes": [
     {
-      "versao": "0.6.3",
+      "versao": "0.6.4",
       "data": "15/Nov/2026",
-      "hora": "09:30:00",
+      "hora": "11:30:00",
       "pt": [
         "⚡ Abre com a tela \"Carregando…\" e só mostra o jogo pronto; a versão nova só entra no aparelho quando chega inteira (senão continua a anterior)"
       ],
@@ -13,6 +13,32 @@
       ],
       "es": [
         "⚡ Se abre con la pantalla \"Cargando…\" y solo muestra el juego cuando está listo; la versión nueva solo entra en el dispositivo cuando llega entera (si no, sigue la anterior)"
+      ]
+    },
+    {
+      "versao": "0.6.3",
+      "data": "14/Nov/2026",
+      "hora": "20:58:08",
+      "pt": [
+        "✋ Duelo de Caras com jeito livre, como o jogo de tabuleiro: sem vez, vire as carinhas com o dedo e toque em \"Vou adivinhar!\" quando quiser",
+        "🤖 Contra o computador: a meleca guarda uma carinha e responde na hora qualquer pergunta pronta, na ordem que você quiser",
+        "📱 Cada um no seu celular: perguntem em voz alta; o outro celular confere o palpite",
+        "💡 No jeito livre, ideias de pergunta: só aparecem as que ainda ajudam (se só sobrou menina, não sugere \"É menino?\")",
+        "🔁 Saiu o \"Passando o aparelho\": agora é contra a meleca ou cada um no seu celular"
+      ],
+      "en": [
+        "✋ Face Duel now has a free mode, like the board game: no turns, flip faces with your finger and tap \"I'll guess!\" whenever you want",
+        "🤖 Against the computer: the slime keeps a face secret and answers any ready-made question right away, in any order",
+        "📱 Each on their own phone: ask out loud; the other phone checks the guess",
+        "💡 In free mode, question ideas: only the ones that still help show up (if only girls are left, it won't suggest \"Is it a boy?\")",
+        "🔁 \"Pass the device\" is gone: now it's against the slime or each on their own phone"
+      ],
+      "es": [
+        "✋ Duelo de Caras con modo libre, como el juego de mesa: sin turnos, baja las caras con el dedo y toca «¡Voy a adivinar!» cuando quieras",
+        "🤖 Contra el ordenador: el slime guarda una cara en secreto y responde al momento cualquier pregunta preparada, en el orden que quieras",
+        "📱 Cada uno con su móvil: preguntad en voz alta; el otro móvil comprueba la respuesta",
+        "💡 En el modo libre, ideas de pregunta: solo salen las que todavía ayudan (si solo quedan chicas, no sugiere «¿Es un chico?»)",
+        "🔁 Se ha quitado «Pasando el móvil»: ahora es contra el slime o cada uno con su móvil"
       ]
     },
     {

@@ -218,6 +218,22 @@
     var sim = 0; caras.forEach(function (c, i) { if (dePe[i] && responder(c, id)) sim++; }); return sim;
   }
 
+  // 💡 ideias de pergunta (jeito livre, dono 14/Nov/2026): só as que ainda separam as cartas de pé (se só sobrou menina,
+  // "É menino?" não aparece), as mais divididas primeiro, uma de cada grupo; até n
+  function ideias(caras, dePe, feitas, perguntas, n) {
+    var vivas = dePe.filter(Boolean).length, lista = [];
+    perguntas.forEach(function (id) {
+      if (feitas.indexOf(id) >= 0) return;
+      var u = utilidade(caras, dePe, id); if (u === 0 || u === vivas) return;
+      lista.push({ id: id, grupo: (pergunta(id) || {}).grupo, folga: Math.abs(vivas - 2 * u) });
+    });
+    lista.sort(function (a, b) { return a.folga - b.folga || perguntas.indexOf(a.id) - perguntas.indexOf(b.id); });
+    var r = [], grupos = {};
+    lista.forEach(function (x) { if (r.length < n && !grupos[x.grupo]) { grupos[x.grupo] = true; r.push(x.id); } });
+    lista.forEach(function (x) { if (r.length < n && r.indexOf(x.id) < 0) r.push(x.id); });
+    return r;
+  }
+
   function escolherPerguntaMeleca(caras, candidatos, feitas, perguntas, nivel, rnd) {
     rnd = rnd || Math.random;
     var cand = [];
@@ -240,7 +256,7 @@
   var L = {
     NIVEIS: NIVEIS, CARACTERISTICAS: CARACTERISTICAS, PERGUNTAS: PERGUNTAS,
     perguntasDoNivel: perguntasDoNivel, pergunta: pergunta, gerarTabuleiro: gerarTabuleiro,
-    responder: responder, conferir: conferir, descartaveis: descartaveis, utilidade: utilidade,
+    responder: responder, conferir: conferir, descartaveis: descartaveis, utilidade: utilidade, ideias: ideias,
     escolherPerguntaMeleca: escolherPerguntaMeleca, sorteio: sorteio
   };
   raiz.QELogica = L;

@@ -2,9 +2,9 @@
   "app": "a-garra",
   "versoes": [
     {
-      "versao": "0.4.4",
+      "versao": "0.4.5",
       "data": "15/Nov/2026",
-      "hora": "09:30:00",
+      "hora": "11:30:00",
       "pt": [
         "⚡ Abre com a tela \"Carregando…\" e só mostra o jogo pronto; a versão nova só entra no aparelho quando chega inteira (senão continua a anterior)"
       ],
@@ -13,6 +13,20 @@
       ],
       "es": [
         "⚡ Se abre con la pantalla \"Cargando…\" y solo muestra el juego cuando está listo; la versión nueva solo entra en el dispositivo cuando llega entera (si no, sigue la anterior)"
+      ]
+    },
+    {
+      "versao": "0.4.4",
+      "data": "14/Nov/2026",
+      "hora": "20:44:57",
+      "pt": [
+        "🧸 A garra pega muito mais: vem forte mais ou menos a cada 3 tentativas, sorteado (às vezes na 2ª, às vezes só na 5ª); no fácil a cada 2 ou 3"
+      ],
+      "en": [
+        "🧸 The claw grabs a lot more: it comes strong about every 3 tries, at random (sometimes on the 2nd, sometimes only on the 5th); every 2 or 3 on easy"
+      ],
+      "es": [
+        "🧸 La garra coge mucho más: viene fuerte más o menos cada 3 intentos, al azar (a veces en el 2.º, a veces solo en el 5.º); en fácil cada 2 o 3"
       ]
     },
     {

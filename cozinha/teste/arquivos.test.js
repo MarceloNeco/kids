@@ -6,11 +6,11 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.12.3 igual nos três lugares (app.js, sw.js e versoes.json), de 15/Nov/2026', () => {
+test('versão 0.12.4 igual nos três lugares (app.js, sw.js e versoes.json), de 15/Nov/2026', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.12.3'); assert.equal(s, a); assert.equal(v.versao, a);
+  assert.equal(a, '0.12.4'); assert.equal(s, a); assert.equal(v.versao, a);
   assert.equal(v.data, '15/Nov/2026'); assert.match(ler('app.js'), /APP_UPDATED = '15\/Nov\/2026'/);
   for (const k of ['hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
@@ -21,7 +21,7 @@ test('versão 0.12.3 igual nos três lugares (app.js, sw.js e versoes.json), de 
 test('sw.js: cache com o nome da pasta e guarda todos os arquivos publicados', () => {
   const sw = ler('sw.js');
   assert.match(sw, /BolinhoSW\(\{ prefixo: 'cozinha-', versao: VERSAO/);
-  assert.match(sw, /prefixo: 'cozinha-'/);
+  assert.match(sw, /indexOf\('cozinha-'\) === 0/);
   const lista = JSON.parse(sw.match(/var ARQUIVOS = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
   for (const a of lista) if (a !== './') assert.ok(fs.existsSync(path.join(pasta, a)), 'falta no disco: ' + a);
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|webmanifest)$/.test(f) && f !== 'sw.js');
