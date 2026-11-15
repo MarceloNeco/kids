@@ -2,6 +2,23 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.4.6",
+      "data": "15/Nov/2026",
+      "hora": "08:47:51",
+      "pt": [
+        "⏱️ 1 minuto para mirar em todos os níveis, inclusive no fácil",
+        "🔟 Nos 10 últimos segundos, um número grande aparece pulando no canto de cima (10, 9, 8… 0)"
+      ],
+      "en": [
+        "⏱️ 1 minute to aim on every level, easy included",
+        "🔟 In the last 10 seconds, a big number pops up in the top corner (10, 9, 8… 0)"
+      ],
+      "es": [
+        "⏱️ 1 minuto para apuntar en todos los niveles, también en fácil",
+        "🔟 En los 10 últimos segundos, un número grande aparece saltando en la esquina de arriba (10, 9, 8… 0)"
+      ]
+    },
+    {
       "versao": "0.4.5",
       "data": "15/Nov/2026",
       "hora": "11:30:00",

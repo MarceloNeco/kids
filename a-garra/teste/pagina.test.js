@@ -58,7 +58,7 @@ test('celular: tocar no prêmio leva a garra; com a garra forte ele vem, vai par
     await jogar(pg, 'lanchonete', 'facil');
     let e = await est(pg);
     assert.equal(e.maquina, 'lanchonete'); assert.equal(e.fichas, 12);
-    assert.equal(await pg.$eval('#infoTempo', el => el.hidden), true, 'fácil sem relógio');
+    assert.equal(await pg.$eval('#infoTempo', el => el.hidden), false, 'fácil também com relógio de 1 minuto');
     await pg.evaluate(() => { GarraDebug.forte(true); GarraDebug.fichas(1); GarraDebug.velocidade(3); });
     const a = await pg.evaluate(() => GarraDebug.maisAlto());
     const pt = await pg.evaluate((a) => GarraDebug.tela(a.x, a.y + a.r, a.z), a);
@@ -221,4 +221,33 @@ test('tela estreita (320 px, celular com zoom de tela): PEGAR, setas e câmera i
     assert.ok(!cruza, 'o botão de parar a música não pode ficar embaixo do 🏠 Saída: ' + JSON.stringify({ som, nav }));
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
+});
+
+test('contagem dos 10 últimos segundos: número no canto de cima à direita, sem cobrir botão, até o 0 (em pé e deitado)', async () => {
+  for (const vp of [{ width: 390, height: 844 }, { width: 320, height: 690 }, { width: 915, height: 412 }]) {
+    const pg = await abrir({ viewport: vp, hasTouch: true, isMobile: true, deviceScaleFactor: 1 }, '&semente=5');
+    const onde = vp.width + '×' + vp.height;
+    try {
+      await jogar(pg, 'telefone', 'facil');
+      assert.equal(await pg.isVisible('#contagem'), false, onde + ': sem contagem no começo');
+      await pg.evaluate(() => GarraDebug.tempo(10.4));
+      await pg.waitForFunction(() => !document.getElementById('contagem').hidden, null, { timeout: 10000 });
+      const n = +(await pg.textContent('#contagemNum'));
+      assert.ok(n >= 1 && n <= 10, onde + ': número ' + n);
+      const r = await pg.evaluate(() => {
+        const caixa = (e) => { const b = e.getBoundingClientRect(); return [b.left, b.top, b.right, b.bottom]; };
+        const c = caixa(document.getElementById('contagem')), palco = caixa(document.getElementById('palco'));
+        const outros = ['.bolinho-nav', '.trilha', '#btCamera', '#btMais', '#btMenos', '#jogo .bt-tela', '.placar'].map((s) => [s, document.querySelector(s)]).filter(([, e]) => e && !e.hidden).map(([s, e]) => [s, caixa(e)]);
+        return { c, palco, outros, w: innerWidth };
+      });
+      const [l, t, rr, b] = r.c;
+      assert.ok(rr <= r.w + 0.5 && t >= 0 && l > r.w / 2 && t < r.palco[1] + (r.palco[3] - r.palco[1]) / 2, onde + ': no canto de cima, à direita ' + JSON.stringify(r.c));
+      for (const [s, o] of r.outros) assert.ok(!(l < o[2] && rr > o[0] && t < o[3] && b > o[1]), onde + ': a contagem cobre ' + s + ' ' + JSON.stringify({ c: r.c, o }));
+      // até o 0: quando o tempo acaba, aparece o 0 e a garra desce sozinha
+      await pg.evaluate(() => GarraDebug.velocidade(3));
+      await pg.waitForFunction(() => document.getElementById('contagemNum').textContent === '0' && !document.getElementById('contagem').hidden, null, { timeout: 20000 });
+      assert.notEqual((await est(pg)).fase, 'mirar', onde + ': a garra desceu sozinha');
+      assert.deepEqual(pg.erros, []);
+    } finally { await pg.ctx.close(); }
+  }
 });

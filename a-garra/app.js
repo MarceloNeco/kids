@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.4.5', APP_DATA = ['15/Nov/2026', 'Nov/15/2026', '15/nov/2026'];
+const APP_VERSION = '0.4.6', APP_DATA = ['15/Nov/2026', 'Nov/15/2026', '15/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -181,8 +181,25 @@ function pintarBarra() {
   if (!m) return;
   $('fichas').textContent = m.fichas; $('ganhos').textContent = m.ganhos.length;
   const s = Math.ceil(m.tempo); $('tempo').textContent = s;
-  $('infoTempo').classList.toggle('pouco', !!m.cfg.tempo && m.fase === 'mirar' && s <= 5);
+  $('infoTempo').classList.toggle('pouco', !!m.cfg.tempo && m.fase === 'mirar' && s <= 10);
+  pintarContagem(s);
   $('btPegar').disabled = m.fase !== 'mirar';
+}
+// contagem dos 10 últimos segundos (dono, 15/Nov/2026): um número gordinho no canto de cima, à direita, que aparece
+// pulando a cada segundo (10, 9, 8… 0). Some quando a pessoa aperta PEGAR; o 0 fica um instante quando o tempo acaba.
+let contagemVista = null, zeroAte = 0;
+function mostrarNumero(n) {
+  const c = $('contagem'), num = $('contagemNum');
+  if (contagemVista === n) return;
+  contagemVista = n; c.hidden = false; num.textContent = n;
+  $('aviso').classList.remove('ver'); avisoT = 0;   // a contagem é mais importante que um aviso no mesmo canto
+  c.classList.toggle('quente', n <= 3);
+  num.classList.remove('vai'); void num.offsetWidth; num.classList.add('vai');   // recomeça a animação a cada número
+}
+function pintarContagem(s) {
+  if (performance.now() < zeroAte) return;   // o 0 ainda está na tela
+  if (m.cfg.tempo && m.fase === 'mirar' && s <= 10 && m.tempo > 0) mostrarNumero(s);
+  else if (contagemVista !== null) { contagemVista = null; $('contagem').hidden = true; }
 }
 function aviso(txt, seg) { $('aviso').textContent = txt; $('aviso').classList.add('ver'); avisoT = seg || 1.6; }
 
@@ -278,6 +295,7 @@ function eventos() {
     const ev = m.eventos.shift();
     if (ev.tipo === 'ficha') { Som.ficha(); setTimeout(() => Som.descer(), 120); }
     else if (ev.tipo === 'tique') Som.tique();
+    else if (ev.tipo === 'tempoAcabou') { mostrarNumero(0); zeroAte = performance.now() + 1100; }
     else if (ev.tipo === 'pegou') { Som.fechar(); Som.pegou(); aviso(ev.premio === MAQUINAS[pref.maquina].raro ? t('⭐ Pegou o dourado!', '⭐ Got the golden one!', '⭐ ¡Has cogido el dorado!') : t('Pegou! Segura, garra!', 'Got it! Hold on, claw!', '¡Lo has cogido! ¡Aguanta, garra!'), 1.4); }
     else if (ev.tipo === 'raspou') { Som.fechar(); Som.errou(); aviso(t('Quase! Mire no meio.', 'So close! Aim at the middle.', '¡Casi! Apunta al centro.'), 1.8); }
     else if (ev.tipo === 'errou') { Som.fechar(); Som.errou(); aviso(t('Não pegou nada…', 'Nothing this time…', 'Esta vez no ha cogido nada…'), 1.6); }
@@ -448,6 +466,7 @@ if (TESTE) window.GarraDebug = {
   maisAlto() { const l = m.premios.filter((p) => !p.ganho && !(p.x < MED.BX && p.z > MED.P - MED.BZ)).sort((a, b) => (b.y + b.r) - (a.y + a.r)); return l[0] && { x: l[0].x, y: l[0].y, z: l[0].z, r: l[0].r, tipo: l[0].tipo }; },
   forte(v) { m.cfg.sempreForte = !!v; },
   fichas(n) { m.fichas = n; },
+  tempo(s) { m.tempo = s; },
   irPara(x, z) { m.irPara(x, z); },
   velocidade(v) { velocidade = v; },
   camera() { return Object.assign({}, cam); },
