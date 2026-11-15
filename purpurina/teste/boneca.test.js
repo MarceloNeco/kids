@@ -261,3 +261,32 @@ test('desfile: catwalk sem tombar (dono, 14/Nov/2026: "um pezinho na frente do o
   assert.ok([...e.matchAll(/rotate\((-?[\d.]+)deg\)/g)].every(m => +m[1] < 0));
   assert.ok([...d.matchAll(/rotate\((-?[\d.]+)deg\)/g)].every(m => +m[1] > 0));
 });
+
+test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/Nov/2026, com fotos de referência)', () => {
+  const fs = require('fs'), path = require('path');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8'), app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  // andando: os dois braços em grupos próprios que giram no ombro, também de manga comprida e de vestido
+  for (const ex of [{}, { blusa: 'sueter' }, { vestido: 'festa', calca: 'nenhum' }]) {
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'a', fundo: false, passos: true });
+    assert.equal(bemFormado(s), '');
+    assert.ok(s.includes('class="pp-braco-e"') && s.includes('class="pp-braco-d"'), 'os braços balançam');
+  }
+  assert.match(css, /@keyframes bracoE/); assert.match(css, /@keyframes bracoD/);
+  // cada pose desenha e tira o braço solto do lado dela (sem braço sobrando)
+  for (const pose of B.POSES) for (const ex of [{}, { blusa: 'sueter' }, { personagem: 'menino' }, { vestido: 'gala', calca: 'nenhum' }]) {
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'p', fundo: false, passos: true, pose });
+    assert.equal(bemFormado(s), '', pose);
+    assert.ok(!s.includes('pp-braco-'), pose + ': em pose os braços não balançam');
+  }
+  for (const pose of ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha']) assert.ok(B.POSES.includes(pose), pose);
+  // idade: as quatro opções, com o jeito de andar de cada uma, e as poses sorteadas no desfile
+  assert.deepEqual(P.categoria('idade').opcoes.map(o => o.id), ['pequena', 'crianca', 'adolescente', 'adulta']);
+  assert.match(css, /\.modelo\.idade-pequena\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-crianca\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-adolescente\.andando \.pp-passo-e/);
+  // paradinha nunca com as duas pernas retas
+  assert.doesNotMatch(app.match(/var PERNAS = [^\n]*/)[0], /''/);
+  for (const pe of ['perna-cruzada', 'perna-aberta', 'ginga-dir', 'ginga-esq']) assert.match(css, new RegExp('\\.modelo\\.' + pe + ' \\.pp-passo'));
+  // os dois pés no chão (dono, 15/Nov/2026: "parece que tem um pé flutuando"): nenhuma paradinha levanta o pé
+  assert.doesNotMatch(app, /perna-dobrada|perna-relaxada/);
+  for (const m of css.matchAll(/\.modelo\.(perna-[a-z]+|ginga-[a-z]+) \.pp-passo-[ed] \{ transform: ([^}]*)\}/g)) assert.doesNotMatch(m[2], /translateY\(-|scaleY\(0?\.\d/, m[1] + ' tira o pé do chão');
+  assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.match(app, /girar\(0, -115/);
+});

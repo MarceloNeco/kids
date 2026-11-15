@@ -145,7 +145,7 @@ ul { list-style: none; }
 .op-bt .mini-svg { width: 100%; height: 70px; display: block; }
 .op-bt .mini-svg svg { width: 100%; height: 100%; display: block; }
 .op-bt[aria-pressed="true"] { border-color: var(--rosa); box-shadow: 0 0 0 3px rgba(255, 95, 180, .45); background: #fff; }
-.op-bt.nenhum .mini-svg { display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+.op-bt.nenhum .mini-svg, .op-bt .mini-svg.mini-emoji { display: flex; align-items: center; justify-content: center; font-size: 2.4rem; }
 .op-bt.fundo .mini-svg { height: 84px; border-radius: 10px; overflow: hidden; }
 
 /* deitado e computador: personagem de um lado, painel do outro */
@@ -172,6 +172,13 @@ ul { list-style: none; }
 /* a passarela de show: cena em SVG (boneca.js), a modelo andando por cima e os fogos num canvas */
 .passarela { background: #12031f; }
 .cena-desfile { position: absolute; inset: 0; }
+/* takes (dono, 14/Nov/2026): a câmera não se mexe, ela corta — corpo inteiro, de perto (rosto e busto) ou de
+   três-quartos — com um flash rápido no corte */
+.camera-desfile { position: absolute; inset: 0; transform-origin: 50% 18%; }
+.camera-desfile.take-perto { transform: scale(1.8); }
+.corte-desfile { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 3; }
+.corte-desfile.flash { animation: corte .35s ease-out; }
+@keyframes corte { from { opacity: .8; } to { opacity: 0; } }
 .cena-desfile svg { width: 100%; height: 100%; display: block; }
 .cena-desfile svg.teto-show { position: absolute; top: 0; left: 0; height: 42%; pointer-events: none; }
 .modelo { position: absolute; left: 50%; bottom: 0; height: 90%; aspect-ratio: 400 / 720; transform-origin: 50% 100%; transform: translateX(-50%); will-change: transform; }
@@ -198,6 +205,66 @@ ul { list-style: none; }
   62% { transform: translateY(-3.2%) scaleY(.9) rotate(-1.5deg); } 82% { transform: translateY(-1.2%) scaleY(.95) rotate(-8.5deg); } }
 @keyframes passoD { 0%, 100% { transform: translateY(1%) rotate(5.5deg); } 46% { transform: translateY(-.8%) scaleY(.98) rotate(4.5deg); }
   62% { transform: translateY(-3.2%) scaleY(.9) rotate(1.5deg); } 82% { transform: translateY(-1.2%) scaleY(.95) rotate(8.5deg); } }
+/* braços soltos balançando (dono, 14/Nov/2026, "os braços precisam balançar"): cada um gira no ombro junto com a perna
+   do outro lado; para a frente o braço vem um pouco para dentro (para o meio do corpo), para trás vai um pouco para fora */
+.modelo.andando .pp-braco-e, .modelo.andando .pp-braco-d { animation: bracoE .9s ease-in-out infinite; transform-box: view-box; }
+.pp-braco-e { transform-origin: 150px 352px; } .pp-braco-d { transform-origin: 250px 352px; }
+.modelo.andando .pp-braco-d { animation-name: bracoD; }
+@keyframes bracoE { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(-6deg) scaleY(.98); } }
+@keyframes bracoD { 0%, 100% { transform: rotate(6deg) scaleY(.98); } 50% { transform: rotate(-5deg); } }
+/* pose no fim da passarela: a "inclinadinha" — o peso numa perna e o corpo inclinado para o lado de lá */
+.modelo .passarela-boneca { transition: transform .35s ease-out; transform-origin: 50% 92%; }
+.modelo.pose-esq .passarela-boneca { transform: rotate(-3.2deg); }
+.modelo.pose-dir .passarela-boneca { transform: rotate(3deg); }
+/* pernas da paradinha (dono, 15/Nov/2026: os dois pés no chão, nunca um flutuando).
+   Gingada (contrapposto, a pose da mão na cintura): o quadril vai 16 para o lado da mão e inclina 4° — desce do lado
+   da perna esticada (a saia desce junto) — e o tronco compensa para o outro lado. Cada perna é refeita do quadril novo até
+   o pé NO CHÃO (y 640): a de apoio fica embaixo do quadril; a outra vai esticada para fora.
+     ginga-dir: quadril esquerdo (177,455) → (193,456.6), pé em (150,640); direito (223,455) → (239,453.4), pé em (236,640)
+     ginga-esq: o espelho */
+.pp-corpo { transform-origin: 200px 455px; }
+.modelo.ginga-dir .pp-corpo { transform: translate(16px, 0) rotate(-4deg); }
+.modelo.ginga-dir .pp-passo-e { transform: translate(16px, 1.6px) rotate(12deg) scaleY(1.018); } .modelo.ginga-dir .pp-passo-d { transform: translate(16px, -1.6px) rotate(2.2deg) scaleY(1.008); }
+.modelo.ginga-esq .pp-corpo { transform: translate(-16px, 0) rotate(4deg); }
+.modelo.ginga-esq .pp-passo-e { transform: translate(-16px, -1.6px) rotate(-2.2deg) scaleY(1.008); } .modelo.ginga-esq .pp-passo-d { transform: translate(-16px, 1.6px) rotate(-12deg) scaleY(1.018); }
+/* outras paradinhas, também com os dois pés no chão: pé direito cruzado na frente (pousa um pouco mais perto de quem
+   assiste) e pernas abertas */
+.modelo.perna-cruzada .pp-passo-d { transform: translateY(1.4%) rotate(12deg); } .modelo.perna-cruzada .pp-passo-e { transform: rotate(-3deg); }
+.modelo.perna-aberta .pp-passo-e { transform: rotate(7deg); } .modelo.perna-aberta .pp-passo-d { transform: rotate(-7deg); }
+/* o jeito de andar muda com a idade (Eu → Idade; dono, 14/Nov/2026). Sem classe de idade (ou 16+): o catwalk acima.
+   Até 5 anos: passinhos curtos e saltitantes, pé reto (sem cruzar), braços bem soltos, sobe e desce mais.
+   6 a 10: andar de criança, pé quase reto, pouco quadril. 11 a 15: catwalk leve (cruza menos, quadril menor). */
+.modelo.idade-pequena.andando .pp-passo-e { animation: passoPE .56s ease-in-out infinite; }
+.modelo.idade-pequena.andando .pp-passo-d { animation: passoPD .56s ease-in-out infinite; animation-delay: -.28s; }
+.modelo.idade-pequena.andando .pp-corpo { animation: quadrilP .56s ease-in-out infinite; }
+.modelo.idade-pequena.andando .pp-braco-e { animation: bracoPE .56s ease-in-out infinite; }
+.modelo.idade-pequena.andando .pp-braco-d { animation: bracoPD .56s ease-in-out infinite; }
+.modelo.idade-pequena.andando .pp-barra { animation: barra .56s ease-in-out infinite; }
+@keyframes passoPE { 0%, 50%, 100% { transform: rotate(1deg); } 25% { transform: translateY(-4.2%) scaleY(.86) rotate(0deg); } }
+@keyframes passoPD { 0%, 50%, 100% { transform: rotate(-1deg); } 25% { transform: translateY(-4.2%) scaleY(.86) rotate(0deg); } }
+@keyframes quadrilP { 0%, 50%, 100% { transform: translate(0, .5%); } 25% { transform: translate(-.5%, -1.6%); } 75% { transform: translate(.5%, -1.6%); } }
+@keyframes bracoPE { 0%, 100% { transform: rotate(11deg); } 50% { transform: rotate(-13deg) scaleY(.97); } }
+@keyframes bracoPD { 0%, 100% { transform: rotate(13deg) scaleY(.97); } 50% { transform: rotate(-11deg); } }
+.modelo.idade-crianca.andando .pp-passo-e { animation: passoCE .78s linear infinite; }
+.modelo.idade-crianca.andando .pp-passo-d { animation: passoCD .78s linear infinite; animation-delay: -.39s; }
+.modelo.idade-crianca.andando .pp-corpo { animation: quadrilC .78s ease-in-out infinite; }
+.modelo.idade-crianca.andando .pp-braco-e { animation: bracoCE .78s ease-in-out infinite; }
+.modelo.idade-crianca.andando .pp-braco-d { animation: bracoCD .78s ease-in-out infinite; }
+.modelo.idade-crianca.andando .pp-barra { animation: barra .78s ease-in-out infinite; }
+@keyframes passoCE { 0%, 100% { transform: translateY(.7%) rotate(-1.5deg); } 46% { transform: translateY(-.6%) scaleY(.98) rotate(-1deg); }
+  64% { transform: translateY(-3.2%) scaleY(.9) rotate(0deg); } 84% { transform: translateY(-1%) scaleY(.96) rotate(-2.2deg); } }
+@keyframes passoCD { 0%, 100% { transform: translateY(.7%) rotate(1.5deg); } 46% { transform: translateY(-.6%) scaleY(.98) rotate(1deg); }
+  64% { transform: translateY(-3.2%) scaleY(.9) rotate(0deg); } 84% { transform: translateY(-1%) scaleY(.96) rotate(2.2deg); } }
+@keyframes quadrilC { 0%, 50%, 100% { transform: translate(0, .4%); } 25% { transform: translate(-.4%, -.8%); } 75% { transform: translate(.4%, -.8%); } }
+@keyframes bracoCE { 0%, 100% { transform: rotate(8deg); } 50% { transform: rotate(-9deg) scaleY(.98); } }
+@keyframes bracoCD { 0%, 100% { transform: rotate(9deg) scaleY(.98); } 50% { transform: rotate(-8deg); } }
+.modelo.idade-adolescente.andando .pp-passo-e { animation-name: passoAE; } .modelo.idade-adolescente.andando .pp-passo-d { animation-name: passoAD; }
+.modelo.idade-adolescente.andando .pp-corpo { animation-name: quadrilA; }
+@keyframes passoAE { 0%, 100% { transform: translateY(1%) rotate(-3.5deg); } 46% { transform: translateY(-.8%) scaleY(.98) rotate(-3deg); }
+  62% { transform: translateY(-3.2%) scaleY(.9) rotate(-1deg); } 82% { transform: translateY(-1.2%) scaleY(.95) rotate(-5.5deg); } }
+@keyframes passoAD { 0%, 100% { transform: translateY(1%) rotate(3.5deg); } 46% { transform: translateY(-.8%) scaleY(.98) rotate(3deg); }
+  62% { transform: translateY(-3.2%) scaleY(.9) rotate(1deg); } 82% { transform: translateY(-1.2%) scaleY(.95) rotate(5.5deg); } }
+@keyframes quadrilA { 0%, 50%, 100% { transform: translate(0, .4%); } 25% { transform: translate(-.6%, -.5%); } 75% { transform: translate(.6%, -.5%); } }
 /* a barra da saia e do vestido (da cintura para baixo) vai um pouquinho para o lado da perna que está passando na frente */
 .modelo.andando .pp-barra { animation: barra .9s ease-in-out infinite; transform-box: view-box; transform-origin: 200px 455px; }
 @keyframes barra { 0%, 50%, 100% { transform: none; } 25% { transform: skewX(-2.2deg); } 75% { transform: skewX(2.2deg); } }
@@ -295,7 +362,7 @@ ul { list-style: none; }
 .tv .op-bt { font-size: 1rem; } .tv .op-bt .mini-svg { height: 90px; } .tv .cat-bt, .tv .grupo-bt { font-size: 1.1rem; }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo, .brilhos, .entrada-boneca, .jurado, .passarela-boneca svg, .pincel, .faisca, .desfile-estrelas .e, .modelo .passarela-boneca, .pp-corpo, .pp-barra, .pp-passo-e, .pp-passo-d, [class^="pas-"], [class*=" pas-"] { animation: none !important; }
+  .logo, .brilhos, .entrada-boneca, .jurado, .passarela-boneca svg, .pincel, .faisca, .desfile-estrelas .e, .modelo .passarela-boneca, .pp-corpo, .pp-barra, .pp-braco-e, .pp-braco-d, .pp-passo-e, .pp-passo-d, [class^="pas-"], [class*=" pas-"] { animation: none !important; }
   .pas-flash { opacity: 0 !important; }
   .pincel, .faisca { display: none; }
 }
