@@ -13,7 +13,7 @@
      m.premios           [{ id, tipo, x, y, z, r, q: [x, y, z, w] (giro), yaw, passeio (> 0 = andando), dorme, preso, ganho }]
      m.ganhos [tipo, ...]   m.fichas   m.tempo   m.semGanhar (tentativas desde o último prêmio)
      m.eventos           fila que o app esvazia: { tipo: 'ficha' | 'pegou' | 'raspou' | 'errou' | 'escorregou' |
-                         'ganhou' | 'pulo' | 'tique' | 'fim', ... }
+                         'ganhou' | 'pulo' | 'tique' (10 últimos segundos) | 'tempoAcabou' | 'fim', ... }
    Medidas (unidades da máquina, ~10 cm): o vidro tem L (x, esquerda → direita) × P (z, fundo → frente) × A (y, chão →
    teto). O buraco do prêmio fica na frente, à esquerda (x < BX, z > P − BZ), cercado por duas paredes de acrílico de
    altura AB; ali não tem chão: quem cai lá dentro é prêmio. */
@@ -23,12 +23,12 @@
   var CASA = { x: BX / 2, z: P - BZ / 2 };
   var LIM = { x0: 0.45, x1: L - 0.45, z0: 0.45, z1: P - 0.45 };
 
-  // cada nível: fichas, segundos para mirar em cada tentativa (0 = sem relógio; 1 minuto no médio e no difícil, pedido do dono), quantos prêmios e de que tamanho, tol (quão perto do meio
+  // cada nível: fichas, segundos para mirar em cada tentativa (1 minuto em todos, pedido do dono; 0 = sem relógio), quantos prêmios e de que tamanho, tol (quão perto do meio
   // a garra precisa fechar: 1 = até a borda) e cada [mín, máx]: depois de cada prêmio a máquina sorteia em quantas
   // tentativas a garra vem forte de novo (ex.: no médio, na 2ª, 3ª ou 4ª: mais ou menos 1 em 3), e ainda tem 15% de
   // sorte em qualquer tentativa bem mirada (dono, 14/Nov/2026: "às vezes 1 em 3, 1 em 2, 1 em 5"; antes era 1 em 4 / 7 / 10)
   var NIVEIS = {
-    facil: { fichas: 12, tempo: 0, qtd: 42, raio: [0.5, 0.58], tol: 0.9, cada: [2, 3], vel: 1.5 },
+    facil: { fichas: 12, tempo: 60, qtd: 42, raio: [0.5, 0.58], tol: 0.9, cada: [2, 3], vel: 1.5 },
     medio: { fichas: 10, tempo: 60, qtd: 54, raio: [0.44, 0.52], tol: 0.75, cada: [2, 4], vel: 1.7 },
     dificil: { fichas: 10, tempo: 60, qtd: 70, raio: [0.38, 0.46], tol: 0.6, cada: [3, 5], vel: 1.9 }
   };
@@ -139,8 +139,8 @@
       if (cfg.tempo) {
         m.tempo = Math.max(0, m.tempo - dt);
         var s = Math.ceil(m.tempo);
-        if (s <= 5 && s !== m._tique && m.tempo > 0) { m._tique = s; m.eventos.push({ tipo: 'tique', s: s }); }
-        if (m.tempo <= 0) m.pegar();
+        if (s <= 10 && s !== m._tique && m.tempo > 0) { m._tique = s; m.eventos.push({ tipo: 'tique', s: s }); }   // contagem dos 10 últimos
+        if (m.tempo <= 0) { m.eventos.push({ tipo: 'tempoAcabou' }); m.pegar(); }
       }
     } else if (m.fase === 'descer') {
       g.y -= 1.7 * dt;

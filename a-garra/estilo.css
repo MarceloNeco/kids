@@ -173,3 +173,31 @@ body.jogando .trilha:not(.mini) { max-width: calc(100% - var(--nav-largo, 9rem) 
   .versao { position: absolute; left: 1rem; bottom: .4rem; margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .logo span, .ganhou { animation: none; } }
+
+/* contagem dos 10 últimos segundos: número gordinho no canto de cima, à direita (abaixo da bolinha da música e acima
+   dos botões da câmera), que aparece pulando a cada segundo */
+.contagem {
+  position: absolute; right: .55rem; top: calc(max(.4rem, env(safe-area-inset-top)) + 52px); z-index: 4; pointer-events: none;
+  width: 4.6rem; height: 4.6rem; display: flex; align-items: center; justify-content: center;
+}
+.contagem span {
+  display: block; font-size: 3.6rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #fff6a8 0%, #ffd166 45%, #ff9f1c 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 2px rgba(60, 20, 0, .55);
+  filter: drop-shadow(0 4px 0 rgba(0,0,0,.45)) drop-shadow(0 0 14px rgba(255,180,40,.75));
+}
+.contagem.quente span {
+  background-image: linear-gradient(180deg, #ffd0dc 0%, #ff4f6d 55%, #c2002f 100%);
+  filter: drop-shadow(0 4px 0 rgba(0,0,0,.45)) drop-shadow(0 0 16px rgba(255,60,90,.85));
+}
+.contagem span.vai { animation: numero .7s cubic-bezier(.2, 1.6, .4, 1) both; }
+@keyframes numero {
+  0% { transform: scale(2.4) rotate(-14deg); opacity: 0; }
+  35% { transform: scale(.82) rotate(5deg); opacity: 1; }
+  60% { transform: scale(1.12) rotate(-2deg); }
+  80% { transform: scale(.96) rotate(1deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+/* deitado: o tocador aberto ocupa o alto da direita; a contagem desce um pouco e os botões da câmera vão para baixo */
+@media (orientation: landscape) { .contagem { top: 3.5rem; } .camera { top: auto; bottom: .5rem; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .contagem span.vai { animation: none; } }
