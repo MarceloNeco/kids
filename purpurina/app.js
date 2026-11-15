@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.23.0';
+  var APP_VERSION = '0.24.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -134,7 +134,8 @@
     if (V.iguais(livre, V.novo())) { comecar(null); return; }
     abrirJanela({ titulo: t('🎨 Brincar livre', '🎨 Free play', '🎨 Juego libre'), texto: t('Quer continuar o visual de antes ou começar tudo do zero?', 'Do you want to keep your last look or start from scratch?', '¿Quieres seguir con el look de antes o empezar desde cero?'), botoes: [
       { t: t('✨ Começar do zero', '✨ Start from scratch', '✨ Empezar desde cero'), classe: 'grande', fn: function () { hist.limpar(); livre = V.novo(); gravar('purpurina.atual', livre); comecar(null); } },
-      { t: t('👗 Continuar o visual', '👗 Keep my look', '👗 Seguir con mi look'), fn: function () { comecar(null); } }
+      { t: t('👗 Continuar o visual', '👗 Keep my look', '👗 Seguir con mi look'), fn: function () { comecar(null); } },
+      { t: t('✨ Escolher um estilo pronto', '✨ Pick a ready-made style', '✨ Elegir un estilo listo'), fn: function () { ir('looks'); } }
     ] });
   });
   $('btDesafios').addEventListener('click', function () { Som.tocar('aba'); ir('desafios'); });
@@ -544,6 +545,41 @@
     Som.tocar('coracao'); recado(t('Guardado em 💖 Meus looks!', 'Saved to 💖 My looks!', '¡Guardado en 💖 Mis looks!'));
     if (atual === 'estudio') { var q = naTela(200, 360); faiscas(q[0], q[1], 10, ['💖', '💕', '💗']); }
   }
+  /* estilos prontos (pecas.js, ESTILOS): vestem a personagem do brincar livre com a produção inteira — roupa, maquiagem,
+     acessórios, chapéu e cenário — e ela continua editando no estúdio. O corpo (pele, rosto, olhos, cabelo, idade) é dela.
+     O que o estilo não diz fica sem nada (🚫); menino fica sem saia, vestido e maquiagem (o vestido vira camiseta). */
+  var CORPO = ['pele', 'personagem', 'idade', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'cabelo', 'cabeloCor', 'mechas', 'mechasCor', 'olhos'];
+  var MAKE = ['base', 'blush', 'sombra', 'delineado', 'cilios', 'batom', 'glitter', 'adesivo', 'unhas'];
+  function vestirEstilo(st, base) {
+    var e = {};
+    Object.keys(P.PADRAO).forEach(function (k) {
+      if (CORPO.indexOf(k) >= 0) { e[k] = base[k]; return; }
+      var cat = P.categoria(k);
+      e[k] = cat && cat.opcoes && cat.opcoes.some(function (o) { return o.id === 'nenhum'; }) ? 'nenhum' : P.PADRAO[k];
+    });
+    Object.assign(e, st.e);
+    if (e.personagem === 'menino') {
+      if (e.vestido !== 'nenhum') { e.blusa = 'camiseta'; e.blusaCor = e.vestidoCor; e.vestido = 'nenhum'; }
+      e.saia = 'nenhum'; if (e.calca === 'nenhum' || e.calca === 'legging') e.calca = st.id === 'praia' ? 'bermuda' : 'jeans';
+      MAKE.forEach(function (k) { if (k !== 'unhas' || e.unhas !== 'nenhum') e[k] = 'nenhum'; });
+      if (['scarpin', 'plataforma', 'princesa', 'ponta', 'salto'].indexOf(e.sapatos) >= 0) e.sapatos = 'social';
+    }
+    return V.limpar(e);
+  }
+  function listaEstilos() {
+    var caixa = $('listaEstilos'); caixa.innerHTML = '';
+    P.ESTILOS.forEach(function (st, k) {
+      var card = document.createElement('div'); card.className = 'look';
+      var mini = document.createElement('div'); mini.className = 'mini-boneca';
+      var e = vestirEstilo(st, livre);
+      mini.innerHTML = B.svg(e, { id: 'estilo' + k, area: [0, 60, 400, 600], cortar: true });
+      var nome = document.createElement('p'); nome.className = 'nome-pronta'; nome.textContent = st.ico + ' ' + N(st);
+      var linha = document.createElement('div'); linha.className = 'linha';
+      var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('✨ Vestir e editar', '✨ Wear and edit', '✨ Ponérmelo y editar');
+      vestir.addEventListener('click', function () { hist.limpar(); livre = vestirEstilo(st, livre); gravar('purpurina.atual', livre); Som.tocar('brilho'); comecar(null); });
+      linha.appendChild(vestir); card.appendChild(mini); card.appendChild(nome); card.appendChild(linha); caixa.appendChild(card);
+    });
+  }
   // personagens prontas (pecas.js, PRONTAS): só vestir, não dá para apagar
   function listaProntas() {
     var caixa = $('listaProntas'); caixa.innerHTML = '';
@@ -560,6 +596,7 @@
     });
   }
   function listaLooks() {
+    listaEstilos();
     listaProntas();
     var looks = ler('purpurina.looks', []), caixa = $('listaLooks'); caixa.innerHTML = '';
     $('semLooks').hidden = looks.length > 0;
@@ -767,12 +804,44 @@
     function depois(ms, fn) { setTimeout(function () { if (vale()) fn(); }, ms); }
     function pose(op) { pas.innerHTML = B.svg(estado, Object.assign({ id: 'desfile', fundo: false, anim: !CALMO, realce: false, passos: true }, op || {})); }   // passos: as pernas andam enquanto ela anda (estilo.css)
     // posição na passarela: k = 0 (lá no fundo) até 1 (na frente); a cena é cortada por baixo (slice), como no boneca.js
-    function lugar(k) {
-      desfileK = k; desfileLugar = lugar;
-      var W = palco.clientWidth, H = palco.clientHeight, s = Math.max(W / 400, H / 720), h = mod.clientHeight;
-      var longe = Math.min(290 * s, H * 0.55), perto = 26 * s, escala = (0.24 + 0.76 * k) * ALTURA, pe = longe + (perto - longe) * k;
-      mod.style.transform = 'translateX(-50%) translateY(' + Math.round(-(pe - 0.09 * h * escala)) + 'px) scale(' + escala.toFixed(3) + ')';
+    function lugar(k) { desfileK = k; desfileLugar = lugar; lugarDe(mod, k, 0, ALTURA); }
+    // k: 0 (lá no fundo) até 1 (na frente); lado: deslocamento para o lado, em fração da largura (a turma fica dos lados)
+    function lugarDe(el, k, lado, altura) {
+      var W = palco.clientWidth, H = palco.clientHeight, s = Math.max(W / 400, H / 720), h = el.clientHeight;
+      var longe = Math.min(290 * s, H * 0.55), perto = 26 * s, escala = (0.24 + 0.76 * k) * altura, pe = longe + (perto - longe) * k;
+      el.style.transform = 'translateX(calc(-50% + ' + Math.round(lado * W) + 'px)) translateY(' + Math.round(-(pe - 0.09 * h * escala)) + 'px) scale(' + escala.toFixed(3) + ')';
     }
+    /* desfile com a turma (dono, 15/Nov/2026: "pegar todos os que estão salvos na galeria e fazer um desfile mútuo com o
+       principal"): depois da voltinha, até 4 looks guardados entram lá do fundo, um depois do outro, andando, e ficam
+       posando dos lados, atrás da personagem principal, que continua na frente */
+    function limparTurma() { Array.prototype.forEach.call(document.querySelectorAll('#cameraDesfile .figurante'), function (x) { x.remove(); }); }
+    function entrarTurma() {
+      var LADOS = [-0.3, 0.3, -0.16, 0.16], ALT = { pequena: 0.8, crianca: 0.9, adolescente: 0.96 };
+      ler('purpurina.looks', []).map(function (l) { return V.limpar(l.e); }).filter(function (e) { return !V.iguais(e, estado); }).slice(0, 4).forEach(function (e, i) {
+        depois(i * 900, function () {
+          var f = document.createElement('div'), alt = ALT[e.idade] || 1, menino2 = e.personagem === 'menino';
+          f.className = 'modelo figurante idade-' + (e.idade || 'adulta') + (CALMO ? '' : ' andando');
+          f.innerHTML = '<div class="passarela-boneca">' + B.svg(e, { id: 'fig' + i, fundo: false, anim: false, realce: false, passos: true }) + '</div>';
+          $('cameraDesfile').insertBefore(f, mod);
+          var POSES_F = menino2 ? ['cruzados', 'bolsos', 'joinha'] : ['cintura', 'duasCintura', 'maoCabelo', 'carinha'];
+          function posarF() {
+            var pz = POSES_F[Math.floor(Math.random() * POSES_F.length)];
+            f.classList.remove('ginga-esq', 'ginga-dir'); f.classList.add(pz === 'cintura' ? 'ginga-dir' : pz === 'maoCabelo' ? 'ginga-esq' : (Math.random() < 0.5 ? 'ginga-esq' : 'ginga-dir'));
+            f.firstChild.innerHTML = B.svg(e, { id: 'fig' + i, fundo: false, anim: false, realce: false, passos: true, sorriso: true, pose: pz });
+          }
+          function trocarF() { depois(3400 + i * 500, function () { posarF(); trocarF(); }); }
+          if (CALMO) { lugarDe(f, 0.42, LADOS[i], alt); posarF(); return; }
+          var ini = performance.now(), dur = 2600;
+          (function andar(agora) {
+            if (!vale()) return;
+            var k = Math.min(1, (agora - ini) / dur), e2 = 1 - Math.pow(1 - k, 1.5);
+            lugarDe(f, 0.42 * e2, LADOS[i] * e2, alt);
+            if (k < 1) requestAnimationFrame(andar); else { f.classList.remove('andando'); posarF(); trocarF(); }
+          })(ini);
+        });
+      });
+    }
+    limparTurma();
     // poses do fim da passarela, sorteadas sem repetir a anterior (boneca.js, opcoes.pose); lado = para onde inclina
     // e conforme a idade (dono, 14/Nov/2026): até 5 anos, poses de criancinha (tchau, mãos na cintura) sem inclinar; 6 a
     // 10, de criança; 11 a 15 e 16+, de modelo (menina: mão na cintura, no cabelo; menino: braços cruzados, mãos no bolso)
@@ -833,7 +902,7 @@
       })(ini);
     }
     var titulo = $('desfileTitulo'), jur = $('jurados');
-    if (CALMO) { lugar(1); posar(POSES_DESFILE[0]); }
+    if (CALMO) { lugar(1); posar(POSES_DESFILE[0]); entrarTurma(); }
     else {
       titulo.classList.add('esperando'); jur.classList.add('esperando');
       lugar(0); pose({}); mod.classList.add('andando');
@@ -859,7 +928,7 @@
               girar(0, -115, 520, function () { depois(350, function () { girar(-115, 0, 520, function () { depois(250, function () {
                 volta(pas, $('rastroDesfile'), function (a) { pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO && !a, angulo: a, realce: false, sorriso: true }); }, function () {
                   if (!vale()) return;
-                  posar(sortear());
+                  posar(sortear()); entrarTurma();
                   // takes: de 3 em 3 s um corte — corpo inteiro numa pose nova, de perto, ou de três-quartos para um
                   // lado e para o outro (olhando para o lado), sem repetir o take de antes
                   var takeAntes = 'inteira';

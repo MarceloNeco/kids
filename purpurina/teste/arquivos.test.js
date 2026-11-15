@@ -84,3 +84,11 @@ test('músicas: toda música da rádio existe, está no sw.js e tem crédito em 
   const sobrando = fs.readdirSync(path.join(pasta, 'musicas')).filter(f => f.endsWith('.mp3') && !urls.includes('musicas/' + f));
   assert.deepEqual(sobrando, ['laserpack.mp3'], 'nenhum MP3 fora da rádio (só a Laserpack, que saiu na 0.17.3: som de videogame)');
 });
+
+test('estilos prontos na tela de looks e desfile com a turma (dono, 15/Nov/2026)', () => {
+  const html = ler('index.html'), js = ler('app.js');
+  assert.match(html, /id="listaEstilos"/);
+  assert.match(js, /function vestirEstilo\(/); assert.match(js, /P\.ESTILOS\.forEach/);
+  assert.match(js, /Escolher um estilo pronto/);
+  assert.match(js, /function entrarTurma\(/); assert.match(js, /purpurina\.looks/); assert.match(js, /limparTurma\(\)/);
+});

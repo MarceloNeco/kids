@@ -2,6 +2,23 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.24.0",
+      "data": "15/Nov/2026",
+      "hora": "08:58:02",
+      "pt": [
+        "👗 Estilos prontos em 💖 Meus looks (e em 🎨 Brincar livre): K-pop, Praia, Vestido de gala, Rock and roll, Princesa, Festa, Esportivo, Inverno, Fada e Festa do pijama. Vestem a sua personagem com roupa, maquiagem, acessórios, chapéu e cenário, e dá para editar tudo depois.",
+        "💃 Desfile com a turma: depois da voltinha, os looks guardados entram na passarela e ficam posando dos lados, com a sua personagem na frente."
+      ],
+      "en": [
+        "👗 Ready-made styles in 💖 My looks (and in 🎨 Free play): K-pop, Beach, Gala gown, Rock and roll, Princess, Party, Sporty, Winter, Fairy and Sleepover. They dress your character with outfit, makeup, accessories, hat and scene, and you can edit everything afterwards.",
+        "💃 Runway with the crew: after the spin, your saved looks walk onto the runway and pose on the sides, with your character in front."
+      ],
+      "es": [
+        "👗 Estilos listos en 💖 Mis looks (y en 🎨 Juego libre): K-pop, Playa, Vestido de gala, Rock and roll, Princesa, Fiesta, Deportivo, Invierno, Hada y Fiesta de pijamas. Visten a tu personaje con ropa, maquillaje, accesorios, sombrero y escenario, y luego puedes editarlo todo.",
+        "💃 Desfile con la pandilla: después de la vuelta, tus looks guardados salen a la pasarela y posan a los lados, con tu personaje delante."
+      ]
+    },
+    {
       "versao": "0.23.0",
       "data": "15/Nov/2026",
       "hora": "08:40:47",
