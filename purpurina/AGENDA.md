@@ -12,6 +12,8 @@ Claude, volta à conversa e segue esta lista sozinha.
 ## 2. Todo dia, até os créditos do Higgsfield voltarem (provável na virada do mês)
 
 - **Checagem diária às 19h23 (horário de Brasília)**, de 14/Nov até 03/Dez/2026 (tarefa programada "Purpurina: checar créditos do Higgsfield", na conversa da Purpurina).
+  **Pausada de 15/Nov a 20/Nov** (pedido do dono, para não gastar créditos); o lembrete "Purpurina: retomar o backlog" de
+  sexta, 20/Nov, 10h17, religa e retoma pelo `BACKLOG.md`.
 - Como checa: liga a caixa L40S do Higgsfield (71 créditos/h, preço aprovado pelo dono). Se o Higgsfield recusar por falta
   de crédito, não gasta nada e tenta no dia seguinte. Se ligar, segue para o passo 3 na mesma hora.
 - Se passar de 03/Dez sem créditos: a checagem para e o Claude avisa o dono na conversa.
