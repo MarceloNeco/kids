@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.4.3', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
+const APP_VERSION = '0.4.4', APP_DATA = ['14/Nov/2026', 'Nov/14/2026', '14/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -333,7 +333,7 @@ function abrirFim() {
   $('fimTexto').textContent = n
     ? t('Você pegou ' + n + (n === 1 ? ' prêmio' : ' prêmios') + ' com ' + usadas + (usadas === 1 ? ' ficha.' : ' fichas.'), 'You got ' + n + (n === 1 ? ' prize' : ' prizes') + ' with ' + usadas + (usadas === 1 ? ' token.' : ' tokens.'),
       'Has conseguido ' + n + (n === 1 ? ' premio' : ' premios') + ' con ' + usadas + (usadas === 1 ? ' ficha.' : ' fichas.'))
-    : t('Na máquina de verdade também é assim: a garra só vem forte de vez em quando. Tente de novo!', 'Real machines are like this too: the claw is only strong once in a while. Try again!', 'En las máquinas de verdad también pasa: la garra solo viene fuerte de vez en cuando. ¡Inténtalo otra vez!');
+    : t('Quase! Mire bem no meio do prêmio: a garra forte vem a cada poucas tentativas. Tente de novo!', 'So close! Aim right at the middle of the prize: the strong claw comes every few tries. Try again!', '¡Casi! Apunta bien al centro del premio: la garra fuerte llega cada pocos intentos. ¡Inténtalo otra vez!');
   $('fim').hidden = false;
   Som.fim(e);
   setTimeout(() => $('btDeNovo').focus(), 50);

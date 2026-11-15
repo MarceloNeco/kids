@@ -20,3 +20,4 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 14 | O tempo para mirar estava curto: 1 minuto em cada tentativa no médio e no difícil (antes 25 s e 15 s). | Dono, 14/Nov/2026 | ✅ 0.4.2 |
 | 15 | No celular do dono: o 🔊 não calava a música (só os efeitos); com o tocador aberto no jogo, o botão de parar a música ficava embaixo do 🏠 Saída; o PEGAR e os botões da câmera não cabiam (tela de ~320 px, zoom de tela). | Dono, 14/Nov/2026 | ✅ 0.4.3 |
 | 16 | A abinha de tela cheia da borda esquerda (peça comum `telacheia.js`) não responde ao toque no celular do dono, mas funciona nos testes; o jogo ganhou um botão de tela cheia próprio (menu e jogo). Investigar no aparelho dele se a abinha falha também nos outros jogos. | Dono, 14/Nov/2026 | ⏸ aguardando o dono |
+| 17 | A garra estava difícil demais (1 em 4 / 7 / 10): agora vem forte mais ou menos a cada 3 tentativas, sorteado (fácil 2–3, médio 2–4, difícil 3–5). | Dono, 14/Nov/2026 | ✅ 0.4.4 |

@@ -2,6 +2,23 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.22.0",
+      "data": "14/Nov/2026",
+      "hora": "20:47:10",
+      "pt": [
+        "💃 Desfile de verdade: um pé pousa na frente do outro, na linha do meio, como modelo na passarela.",
+        "👗 O corpo não balança mais de um lado para o outro (de vestido parecia que estava sambando): só o quadril acompanha o passo e a barra da saia ou do vestido mexe de leve."
+      ],
+      "en": [
+        "💃 A real catwalk: one foot lands in front of the other, on the center line, like a runway model.",
+        "👗 The body no longer sways side to side (in a dress it looked like dancing samba): only the hips follow the step and the hem of the skirt or dress moves gently."
+      ],
+      "es": [
+        "💃 Un desfile de verdad: un pie se apoya delante del otro, en la línea del centro, como una modelo en la pasarela.",
+        "👗 El cuerpo ya no se balancea de un lado a otro (con vestido parecía que bailaba samba): solo la cadera acompaña el paso y el bajo de la falda o del vestido se mueve un poco."
+      ]
+    },
+    {
       "versao": "0.21.0",
       "data": "14/Nov/2026",
       "hora": "17:56:48",

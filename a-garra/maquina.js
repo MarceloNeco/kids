@@ -24,12 +24,13 @@
   var LIM = { x0: 0.45, x1: L - 0.45, z0: 0.45, z1: P - 0.45 };
 
   // cada nível: fichas, segundos para mirar em cada tentativa (0 = sem relógio; 1 minuto no médio e no difícil, pedido do dono), quantos prêmios e de que tamanho, tol (quão perto do meio
-  // a garra precisa fechar: 1 = até a borda) e cada (a garra vem forte mais ou menos 1 vez a cada "cada" tentativas;
-  // depois de "cada − 1" tentativas sem prêmio, a próxima bem mirada vem forte com certeza)
+  // a garra precisa fechar: 1 = até a borda) e cada [mín, máx]: depois de cada prêmio a máquina sorteia em quantas
+  // tentativas a garra vem forte de novo (ex.: no médio, na 2ª, 3ª ou 4ª: mais ou menos 1 em 3), e ainda tem 15% de
+  // sorte em qualquer tentativa bem mirada (dono, 14/Nov/2026: "às vezes 1 em 3, 1 em 2, 1 em 5"; antes era 1 em 4 / 7 / 10)
   var NIVEIS = {
-    facil: { fichas: 12, tempo: 0, qtd: 42, raio: [0.5, 0.58], tol: 0.9, cada: 4, vel: 1.5 },
-    medio: { fichas: 10, tempo: 60, qtd: 54, raio: [0.44, 0.52], tol: 0.75, cada: 7, vel: 1.7 },
-    dificil: { fichas: 10, tempo: 60, qtd: 70, raio: [0.38, 0.46], tol: 0.6, cada: 10, vel: 1.9 }
+    facil: { fichas: 12, tempo: 0, qtd: 42, raio: [0.5, 0.58], tol: 0.9, cada: [2, 3], vel: 1.5 },
+    medio: { fichas: 10, tempo: 60, qtd: 54, raio: [0.44, 0.52], tol: 0.75, cada: [2, 4], vel: 1.7 },
+    dificil: { fichas: 10, tempo: 60, qtd: 70, raio: [0.38, 0.46], tol: 0.6, cada: [3, 5], vel: 1.9 }
   };
 
   function sorteador(semente) {   // mulberry32: a mesma semente faz a mesma máquina (testes e ?semente=)
@@ -57,6 +58,7 @@
       premios: [], ganhos: [], eventos: [], esvaziou: false, semGanhar: op.semGanhar || 0,
       _dx: 0, _dz: 0, _alvo: null, _fase: 0, _queda: null, _tique: -1, _rnd: rnd
     };
+    m._meta = sortearMeta(m);   // em quantas tentativas a garra vem forte
 
     /* ---------- os prêmios: sortidos (cada partida é diferente), jogados de cima, assentados e conferidos ---------- */
     // quantos: o total varia um pouco; cada tipo aparece pelo menos uma vez e o resto é sorteado com pesos sorteados
@@ -118,6 +120,7 @@
     p.vx = p.vy = p.vz = 0;
   }
   function noBuraco(p) { return p.x < BX && p.z > P - BZ; }
+  function sortearMeta(m) { var c = m.cfg.cada; return c[0] + Math.floor(m._rnd() * (c[1] - c[0] + 1)); }
 
   /* ---------- a garra ---------- */
   function passo(m, dt) {
@@ -243,7 +246,7 @@
     m.semGanhar++;
     if (melhor) {
       var q = 1 - melhor._d / (melhor.r * cfg.tol);
-      var forte = q >= 0.3 && (rnd() < 1 / (3 * cfg.cada) || m.semGanhar >= cfg.cada + 1);
+      var forte = q >= 0.2 && (rnd() < 0.15 || m.semGanhar >= m._meta);
       if (cfg.sempreForte) forte = true;
       if (cfg.nuncaForte) forte = false;
       melhor.preso = true; melhor.dorme = false; melhor.vx = melhor.vy = melhor.vz = 0; g.premio = melhor;
@@ -329,7 +332,7 @@
         for (var k = 0; k < 2; k++) bater(p, paredes[k]);
         if (modo === 'conferir' && p.y < -p.r * 2) { p.y = -p.r * 2; p.vx = p.vy = p.vz = 0; continue; }   // espera no fundo do buraco
         if (!modo && p.y < -p.r * 1.5 && !p.ganho) {   // caiu pelo buraco: é prêmio!
-          p.ganho = true; m.ganhos.push(p.tipo); m.semGanhar = 0;
+          p.ganho = true; m.ganhos.push(p.tipo); m.semGanhar = 0; m._meta = sortearMeta(m);
           m.eventos.push({ tipo: 'ganhou', premio: p.tipo, total: m.ganhos.length });
         }
       }
