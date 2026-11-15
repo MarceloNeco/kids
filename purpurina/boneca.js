@@ -103,7 +103,8 @@
 
     if (fundo || op.soFundo) out.push(cenario(e.cenario, I));
     if (op.soFundo) return fechar();
-    out.push(elip(200, 664, 96, 13, { fill: '#000', opacity: 0.16 }));
+    var sombraChao = elip(200, 664, 96, 13, { fill: '#000', opacity: 0.16 });
+    out.push(sombraChao);
 
     /* ---------- giro (opcoes.angulo, em graus, qualquer valor) ----------
        Contínuo, como um boneco 3D: a cabeça é tratada como uma esfera. Olhos, sobrancelhas, nariz e boca andam
@@ -151,7 +152,11 @@
       defs += '<clipPath id="' + I + 'pernaE"><rect x="-200" y="0" width="400" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="200" y="0" width="400" height="900"/></clipPath>';
       out.push('<g class="pp-passo-e"><g clip-path="url(#' + I + 'pernaE)">' + pernas + '</g></g>', '<g class="pp-passo-d"><g clip-path="url(#' + I + 'pernaD)">' + pernas + '</g></g>');
     }
-    if (vis('saia')) out.push(saia(e.saia, C('saia'), peca, linha));
+    // desfile: da cintura para baixo, a saia e a barra do vestido acompanham o passo (.pp-barra, estilo.css), sem tombar
+    var andaBarra = op.passos && !angB;
+    if (andaBarra) defs += '<clipPath id="' + I + 'acimaCint"><rect x="-200" y="-200" width="800" height="658"/></clipPath><clipPath id="' + I + 'abaixoCint"><rect x="-200" y="455" width="800" height="600"/></clipPath>';
+    function barra(x) { return andaBarra ? '<g clip-path="url(#' + I + 'acimaCint)">' + x + '</g><g class="pp-barra"><g clip-path="url(#' + I + 'abaixoCint)">' + x + '</g></g>' : x; }
+    if (vis('saia')) out.push(andaBarra ? '<g class="pp-barra">' + saia(e.saia, C('saia'), peca, linha) + '</g>' : saia(e.saia, C('saia'), peca, linha));
 
     // ---------- pescoço, tronco e braços ----------
     if (!virada) out.push(ret(186, 270, 28, 80, { fill: pele, stroke: peleE, 'stroke-width': 2 }), ret(187, 300, 26, 18, { fill: esc(pele, 0.35), opacity: 0.15 }));
@@ -160,7 +165,7 @@
     bracos.forEach(function (d) { out.push(membro(d, 23)); });
 
     // ---------- vestido ou blusa ----------
-    if (vis('vestido')) out.push(vestido(e.vestido, C('vestido'), peca, linha, pele, peleE));
+    if (vis('vestido')) out.push(barra(vestido(e.vestido, C('vestido'), peca, linha, pele, peleE)));
     else out.push(blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), peca, linha));
 
     // ---------- bolsa, mãos e joias do corpo ----------
@@ -229,6 +234,18 @@
     } else out.push(cabecaPronta);
     // o braço do tchau vai por cima de tudo (fica na frente do cabelo, do lado do rosto)
     if (tchau) out.push(bracoTchau(pele, peleE, esmalte, membro, op.anim));
+    /* desfile (opcoes.passos): tudo menos as pernas e a sombra do chão vai para grupos .pp-corpo, que acompanham o
+       quadril (o peso passa de um pé para o outro e o corpo sobe e desce um pouco) sem tombar de lado; as pernas
+       (.pp-passo-e / -d) fazem o catwalk: um pé cruza e pousa na frente do outro, na linha do meio (estilo.css) */
+    if (op.passos && !angB) {
+      var junto = [], soltos = [];
+      out.forEach(function (x) {
+        if (x === sombraChao || x.indexOf('<g class="pp-passo-') === 0) { if (soltos.length) junto.push('<g class="pp-corpo">' + soltos.join('') + '</g>'); soltos = []; junto.push(x); }
+        else soltos.push(x);
+      });
+      if (soltos.length) junto.push('<g class="pp-corpo">' + soltos.join('') + '</g>');
+      out = junto;
+    }
     return fechar();
 
     /* ---------- o corpo de perfil (virado para a direita; o espelho vira para a esquerda) ----------

@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.21.0';
+  var APP_VERSION = '0.22.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -790,7 +790,8 @@
       var ini = performance.now(), dur = 3600;
       (function andar(agora) {
         if (!vale()) return;
-        var k = Math.min(1, (agora - ini) / dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        // passo constante (os pés não escorregam), freando só no fim
+        var k = Math.min(1, (agora - ini) / dur), e = 1 - Math.pow(1 - k, 1.5);
         lugar(e);
         if (k < 1) requestAnimationFrame(andar);
         else {
