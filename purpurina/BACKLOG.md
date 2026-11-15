@@ -8,11 +8,12 @@ pesado. Ordem sugerida: P1 primeiro.
 
 - **Google Drive do dono, pasta "Purpurina - backlog e referencias"** (particular, só o dono vê):
   - `Purpurina - 2-capturas-do-app (ate 15-Nov-2026).zip`: 37 prints do jogo com o que estava errado. ✅ no Drive.
-  - `Purpurina - 1-referencias-desfile (ate 15-Nov-2026).zip`: 53 GIFs, vetores e fotos de desfile (adulto, infantil,
-    masculino). ⏳ falta subir (passa do limite de envio daqui; ver o fim deste arquivo).
-  - `Purpurina - 3-fotos-pessoais-PRIVADO (ate 15-Nov-2026).zip`: 35 fotos da família, só referência de rosto, cabelo
-    e traços. ⏳ falta subir. **Nunca no repositório**: o repositório é público.
-- Cada .zip tem um `INDICE.txt` com a data e a hora de cada mídia.
+  - `Purpurina - 1-referencias-desfile parte 1 de 2` e `parte 2 de 2 (ate 15-Nov-2026).zip`: 53 GIFs, vetores e fotos
+    de desfile (adulto, infantil, masculino). ✅ no Drive.
+  - `Purpurina - 3-fotos-pessoais-PRIVADO parte 1 de 2` e `parte 2 de 2 (ate 15-Nov-2026).zip`: 35 fotos da família,
+    só referência de rosto, cabelo e traços. ✅ no Drive. **Nunca no repositório**: o repositório é público.
+- Cada .zip tem um `INDICE.txt` com a data e a hora de cada mídia. As fotos de câmera e os prints foram reduzidos para 1280 px
+  (as originais continuam no celular do dono).
 
 ## P1 — giro 3D com defeito (prioridade do dono)
 
