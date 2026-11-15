@@ -34,10 +34,11 @@ o botão PEGAR vira GRAB · COGER.
   dono). Setas e PEGAR encolhem em tela estreita (até ~320 px); no jogo, o tocador aberto fica à direita do 🏠 Saída.
 - **Câmera**: 🎥 troca entre de frente, de cima e bem de lado (as laterais são de vidro, para ver a profundidade da garra); 🔍 aproxima (perto, a câmera acompanha a garra); arrastar o dedo
   na máquina gira; dois dedos aproximam.
-- **Regra da garra** (igual às máquinas de verdade): quase sempre ela fecha **fraca** e solta — logo ao subir, no tranco lá
-  em cima ou no caminho. Só de vez em quando vem **forte**: mirando bem, mais ou menos **1 a cada 4** tentativas no fácil,
-  **1 a cada 7** no médio e **1 a cada 10** no difícil. Depois de muitas tentativas sem prêmio, a próxima bem mirada vem
-  forte (garantia). A máquina lembra a contagem entre partidas (`bolinho:a-garra:contador`), como uma máquina de verdade.
+- **Regra da garra** (0.4.4, dono, 14/Nov/2026: "estava muito difícil, sem graça"): às vezes a garra fecha **fraca** e
+  solta (logo ao subir, no tranco lá em cima ou no caminho). Depois de cada prêmio a máquina **sorteia em quantas
+  tentativas** a garra vem **forte** de novo: fácil na 2ª ou 3ª, médio da 2ª à 4ª (mais ou menos 1 em 3), difícil da 3ª
+  à 5ª; e ainda tem 15% de sorte em qualquer tentativa bem mirada. Mirar no meio continua importando. A contagem fica
+  guardada no aparelho (`bolinho:a-garra:contador`). Antes da 0.4.4 era 1 em 4 / 7 / 10.
 - **Nível**: fácil (12 fichas, sem relógio, prêmios grandes, anel de mira), médio (10 fichas, 1 minuto para mirar
   cada tentativa, anel de mira), difícil (10 fichas, 1 minuto, prêmios menores, sem anel). Antes da 0.4.2 eram 25 s e 15 s.
 

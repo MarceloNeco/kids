@@ -68,13 +68,21 @@ test('garra fraca: pega, mas deixa cair no caminho', () => {
   assert.equal(escorregou, 5);
 });
 
-test('regra de pagamento: mirando bem, mais ou menos 1 a cada 4 (fácil), 1 a cada 7 (médio) e 1 a cada 10 (difícil)', () => {
+test('regra de pagamento (dono, 14/Nov/2026): mirando bem, mais ou menos 1 a cada 2 (fácil), 1 a cada 3 (médio) e 1 a cada 3 a 4 (difícil), sorteado', () => {
   const taxa = (nivel) => { let g = 0, f = 0; for (let s = 1; s <= 20; s++) { const m = jogarSozinho(M.nova({ nivel, semente: s, tipos: TIPOS }), 0.3, sorteador(s)); g += m.ganhos.length; f += m.cfg.fichas; } return f / g; };
   const fa = taxa('facil'), me = taxa('medio'), di = taxa('dificil');
-  assert.ok(fa >= 2.5 && fa <= 6, 'fácil: 1 a cada ' + fa.toFixed(1));
-  assert.ok(me >= 4.5 && me <= 10, 'médio: 1 a cada ' + me.toFixed(1));
-  assert.ok(di >= 7 && di <= 16, 'difícil: 1 a cada ' + di.toFixed(1));
-  assert.ok(fa < me && me < di, 'cada nível mais difícil');
+  assert.ok(fa >= 1.4 && fa <= 3.2, 'fácil: 1 a cada ' + fa.toFixed(1));
+  assert.ok(me >= 1.6 && me <= 4, 'médio: 1 a cada ' + me.toFixed(1));
+  assert.ok(di >= 2.2 && di <= 5.5, 'difícil: 1 a cada ' + di.toFixed(1));
+  assert.ok(fa < di && me < di, 'o difícil é o mais difícil');
+});
+
+test('a vez da garra forte é sorteada: às vezes na 2ª tentativa, às vezes na 3ª, 4ª ou 5ª', () => {
+  const metas = new Set();
+  for (let s = 1; s <= 40; s++) metas.add(M.nova({ nivel: 'medio', semente: s, tipos: TIPOS })._meta);
+  assert.deepEqual([...metas].sort(), [2, 3, 4]);
+  const dif = new Set(); for (let s = 1; s <= 40; s++) dif.add(M.nova({ nivel: 'dificil', semente: s, tipos: TIPOS })._meta);
+  assert.deepEqual([...dif].sort(), [3, 4, 5]);
 });
 
 test('garantia: depois de muitas tentativas sem prêmio, a próxima bem mirada vem forte', () => {
