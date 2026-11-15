@@ -116,6 +116,10 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   vêm de `instalar`/`soOnline`; tocar explica), ⬇ Instalar e **Jogar sempre na ponta direita**. Vigia: `teste/estante-cartoes.test.js`.
   Jogo novo: diga no `rec` o que ele usa. (`cartoes-fundos.css` não é mais usado pela estante.)
 - Interruptores: todos os jogos obedecem o app **`kids`** ("Bolinho de Chuva") do RootifyONE, um interruptor por jogo.
+- **Backlog do Bolinho** (o dono chama de "backlog do Bolinho", "do hub" ou "da estante"): `PENDENCIAS.md`, seção
+  "Backlog da estante e do acesso" (15/Nov/2026: cartões rodada 2, textos dos ícones, degustação/login/planos pelo RootifyONE,
+  licença que se renova ao ficar online) e as linhas ainda abertas acima dela. Referências visuais do dono em `docs/referencias/`.
+  Ideia nova do dono para a estante ou para o acesso: anote lá, com data, antes de responder.
 
 ## Regras de cada jogo
 
