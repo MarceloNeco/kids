@@ -52,19 +52,7 @@
     <button id="btAdivinha" class="grande opcao destaque" type="button"><span class="op-ico" aria-hidden="true">🔮</span><span><span class="op-titulo" data-t="A Meleca Adivinha|The Slime Guesses|El Slime Adivina"></span><span class="op-sub" data-t="Pense em alguém e eu descubro quem é!|Think of someone and I'll find out who!|¡Piensa en alguien y yo descubro quién es!"></span></span></button>
     <p class="op-grupo" data-t="🎭 Duelo de Caras|🎭 Face Duel|🎭 Duelo de Caras"></p>
     <button id="btMeleca" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🤖</span><span id="txtMeleca"></span></button>
-    <button id="btPassar" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">🔁</span><span data-t="Passando o aparelho|Pass the device|Pasando el móvil"></span></button>
     <button id="btRede" class="grande opcao" type="button"><span class="op-ico" aria-hidden="true">📱</span><span data-t="Cada um no seu celular|Each on their own phone|Cada uno con su móvil"></span></button>
-  </div>
-</section>
-
-<section id="nomes" class="tela" data-recurso="quem-e">
-  <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Quem vai brincar? Escreva o nome de cada um (fica guardado só neste aparelho).|Who's playing? Write each name (it stays only on this device).|¿Quién juega? Escribe el nombre de cada uno (se guarda solo en este aparato)."></p></div>
-  <div class="opcoes">
-    <label for="nome1" class="rotulo-campo" data-t="Quem joga primeiro|Who plays first|Quién juega primero"></label>
-    <input id="nome1" class="campo" type="text" maxlength="16" autocomplete="off" placeholder="Jogador 1" data-dica="Jogador 1|Player 1|Jugador 1">
-    <label for="nome2" class="rotulo-campo" data-t="Quem joga depois|Who plays next|Quién juega después"></label>
-    <input id="nome2" class="campo" type="text" maxlength="16" autocomplete="off" placeholder="Jogador 2" data-dica="Jogador 2|Player 2|Jugador 2">
-    <button id="btNomesOk" class="grande" type="button" data-t="▶ Começar|▶ Start|▶ Empezar"></button>
   </div>
 </section>
 
@@ -237,6 +225,11 @@
 <section id="niveis" class="tela" data-recurso="quem-e">
   <div class="conversa"><span class="meleca-mini" aria-hidden="true"></span><p class="balao" data-t="Quantas caras no tabuleiro?|How many faces on the board?|¿Cuántas caras en el tablero?"></p></div>
   <div class="opcoes">
+    <div id="jeito" class="jeito" role="group" aria-labelledby="jeitoTitulo">
+      <p id="jeitoTitulo" class="jeito-titulo" data-t="Como vocês querem jogar?|How do you want to play?|¿Cómo queréis jugar?"></p>
+      <button id="btProntas" class="medio-bt jeito-bt" type="button" aria-pressed="true"><span data-t="❓ Com perguntas prontas, um de cada vez|❓ With ready-made questions, taking turns|❓ Con preguntas preparadas, por turnos"></span></button>
+      <button id="btLivre" class="medio-bt jeito-bt" type="button" aria-pressed="false"><span data-t="✋ Livre: sem vez, vire as carinhas com o dedo e diga quando quer adivinhar|✋ Free: no turns, flip faces with your finger and say when you want to guess|✋ Libre: sin turnos, baja las caras con el dedo y di cuándo quieres adivinar"></span></button>
+    </div>
     <button id="btFacil" class="grande nivel facil" type="button" data-nivel="facil"><span class="n-nome" data-t="🐣 Fácil|🐣 Easy|🐣 Fácil"></span><span class="n-info" data-t="12 caras, perguntas fáceis de ver|12 faces, easy-to-spot questions|12 caras, preguntas fáciles de ver"></span></button>
     <button id="btMedio" class="grande nivel medio" type="button" data-nivel="medio"><span class="n-nome" data-t="🐥 Médio|🐥 Medium|🐥 Medio"></span><span class="n-info" data-t="24 caras, com barba, brinco, peruca e nariz de palhaço|24 faces with beards, earrings, wigs and clown noses|24 caras, con barba, pendientes, peluca y nariz de payaso"></span></button>
     <button id="btDificil" class="grande nivel dificil" type="button" data-nivel="dificil"><span class="n-nome" data-t="🦉 Difícil|🦉 Hard|🦉 Difícil"></span><span class="n-info" data-t="36 caras, até a cor dos olhos e as sardas contam|36 faces, even eye color and freckles count|36 caras: hasta el color de los ojos y las pecas cuentan"></span></button>
@@ -269,6 +262,10 @@
       <button id="btPerguntar" class="grande" type="button" data-t="❓ Perguntar|❓ Ask|❓ Preguntar"></button>
       <button id="btPalpite" class="grande rosa" type="button" data-t="🎯 É este!|🎯 This one!|🎯 ¡Es este!"></button>
     </div>
+    <div id="ideias" class="ideias" hidden>
+      <p class="ideias-titulo" id="ideiasTitulo"></p>
+      <div id="ideiasLista" class="ideias-lista"></div>
+    </div>
     <div id="perguntas" class="perguntas" hidden>
       <div class="perg-topo"><button id="btFecharPerguntas" class="mini" type="button" data-rotulo="Voltar|Back|Volver">←</button><p data-t="O que você quer perguntar?|What do you want to ask?|¿Qué quieres preguntar?"></p></div>
       <div id="listaPerguntas" class="lista-perguntas"></div>
@@ -297,15 +294,6 @@
     </div>
   </div>
 </section>
-
-<div id="cortina" class="cortina" hidden role="dialog" aria-modal="true" aria-labelledby="cortinaTitulo">
-  <div class="cartao">
-    <p class="cortina-ico" aria-hidden="true">🙈</p>
-    <h2 id="cortinaTitulo"></h2>
-    <p id="cortinaTexto"></p>
-    <button id="btCortina" class="grande" type="button" data-t="👀 Estou pronto|👀 I'm ready|👀 ¡Ya estoy!"></button>
-  </div>
-</div>
 
 <div id="fim" class="fim" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
   <div class="cartao">

@@ -15,8 +15,16 @@ com a verdade: resposta errada não passa ("Olha de novo…"). Depois da respost
 todas as caras que não servem (ou vire uma por uma com o dedo) e **"✅ Pronto, passar a vez"**. Palpite errado: a carta
 vira e a vez passa. Acertou, ganhou.
 
-- **Modos:** 🤖 contra a meleca (ela escolhe o segredo, responde e pergunta sozinha) · 🔁 passando o aparelho (com
-  cortina entre as vezes) · 📱 cada um no seu celular, com um código de 4 letras (precisa de internet nos dois).
+- **Modos:** 🤖 contra a meleca (ela escolhe o segredo, responde e pergunta sozinha) · 📱 cada um no seu celular, com
+  um código de 4 letras (precisa de internet nos dois) ou 📶 pertinho. O 🔁 "passando o aparelho" saiu em 0.6.3 (dono: difícil,
+  a criança tinha que decorar); o `partida.js` ainda sabe o modo 'passar' (os testes de regra usam), mas a tela não oferece.
+- **✋ Jeito livre** (0.6.3, dono, 14/Nov/2026; na escolha do nível, fica guardado; contra a meleca e cada um no seu
+  celular): sem vez e sem "Pronto", como o jogo de tabuleiro. Cada um vira as carinhas com o dedo e, quando quiser, toca
+  em 🎯 Vou adivinhar!: acertou, ganha; errou, a carta vira e continua. Contra a meleca você não escolhe personagem: só
+  descobre o dela, perguntando as prontas que quiser (ela responde na hora). Em dois celulares, as perguntas são em voz alta
+  e só o palpite vai pela rede (`chute`/`vered` no `rede.js`).
+  💡 Ideias de pergunta (até 3, `QELogica.ideias`): só as que ainda separam as cartas de pé, uma de cada grupo; contra a
+  meleca, tocar pergunta; em dois celulares, tocar lê em voz alta.
 - **Níveis:** 🐣 Fácil 12 caras (perguntas fáceis de ver; as cartas viram sozinhas) · 🐥 Médio 24 (barba, brinco, peruca,
   nariz de palhaço, cor da roupa) · 🦉 Difícil 36 (tipo de chapéu e de óculos, cor dos olhos, sardas).
 - **🧍 Corpo inteiro** (0.3.0, botão na escolha do nível, fica guardado): as cartas mostram a pessoa toda, com perguntas
