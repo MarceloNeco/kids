@@ -155,6 +155,14 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   instala). E todo jogo tem `<script src="../carregando.js" data-fora-do-arquivo></script>` logo depois do manifest (tela
   "Carregando…" até o jogo estar pronto). **Mudou uma peça comum da raiz** (`idioma.js`, `navegacao.js`, `trilha.js`…)?
   Rode `node ferramentas/pecas-comuns.js`. Vigia: `teste/sw-jogos.test.js`.
+- **Recursos compartilhados, uma cópia só no aparelho (dono, 16/Nov/2026; vale sempre, venha ou não nos pacotes de pesquisa):**
+  tudo o que mais de um jogo (ou app da SolverONE no mesmo endereço, como o RiseONE) usa para rodar — o **motor gráfico**,
+  bibliotecas (Three.js, PixiJS, Rive, MediaPipe), peças comuns, personagens do perfil local, cenários, sons e músicas
+  repetidos — é baixado **uma vez**, guardado numa **gaveta compartilhada** (Cache Storage com nome próprio, como a
+  `bolinho-musicas`) e usado por todos, **com e sem internet**. Nunca uma cópia por jogo (hoje o H-rraaa e o Mão na Massa
+  carregam cada um o seu Three.js: juntar quando o motor existir). A gaveta compartilhada segue a regra do jogo íntegro:
+  versão nova só entra inteira; o jogo diz o que precisa e só o que ele usa é baixado. Medir o peso antes e depois de
+  cada mudança e contar ao dono.
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
   - **Com internet**: tocam **todas** as músicas gravadas do jogo (instrumentos de verdade), em **ordem sorteada**. A
     favorita do jogo (a música "simples" de sem internet) **nunca é a primeira**: vai para o **fim** da volta.
