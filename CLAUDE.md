@@ -148,6 +148,10 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" toda vez que a estante abre (não ao voltar de um jogo), até "Não mostrar mais esta
   mensagem", `novidades.js`) + entrada em `recursos-do-app.json` (interruptor) + `data-app="kids"`
   no `../recursos.js` + `../idioma.js` logo depois + `../navegacao.js` (🏠 e 🚪) + `sw.js` pelo `../sw-comum.js` + `../carregando.js` + 3 níveis (fácil, médio, difícil) + pelo menos 10 músicas (`trilha.js`). Vigia: `node --test teste/*.test.js`.
+- **Versão nova grande de um jogo = jogo novo ao lado, o antigo continua (dono, 19/Nov/2026):** quando um jogo for refeito
+  (ex.: com o motor-pixel), a versão de hoje **não é apagada nem substituída**: a nova ganha pasta, nome e cartão próprios
+  e fica **logo ao lado** da antiga no `catalogo.js`. Combinado: **Vruuum!** (o de hoje) + **Vruuum! 2.0 / Pro** (com o
+  motor); **Purpurina** em duas, "Purpurina 80s" e "Purpurina New Age" (pendência 68).
 - A cada mudança na estante (raiz), subir a `VERSAO` do `sw.js` da raiz.
 - **Jogo íntegro no aparelho (dono, 15/Nov/2026):** o `sw.js` de todo jogo usa a peça comum `../sw-comum.js` (`importScripts` +
   `BolinhoSW({ prefixo, versao: VERSAO, arquivos: ARQUIVOS })`): versão nova só entra quando chega inteira, senão fica a
