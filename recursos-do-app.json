@@ -153,6 +153,14 @@
         "en": "Rotten Fruit (slingshot)"
       },
       "pagina": "fruta-podre/"
+    },
+    {
+      "id": "tijolaco",
+      "nome": {
+        "pt": "TIJOLAÇO (jogo da obra)",
+        "en": "BrickFreak (construction game)"
+      },
+      "pagina": "tijolaco/"
     }
   ]
 }
