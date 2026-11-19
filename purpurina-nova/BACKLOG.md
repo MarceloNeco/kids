@@ -1,7 +1,9 @@
 # Backlog da Purpurina Nova Era (veio do backlog da Purpurina, 15/Nov/2026)
 
 > Andamento: v0.1.0 (19/Nov) rosto natural pela idade e sem "barba" ✅ · v0.2.0 (19/Nov) combinações prontas no estúdio e
-> setinha de "tem mais para o lado" ✅ · a fazer: giro 3D quadro a quadro, corpo por idade, roupas e penteados, benchmark Poki.
+> setinha de "tem mais para o lado" ✅ · v0.3.0 (19/Nov) desenho de ilustração (olhos, sobrancelhas, nariz, lábios, fios no
+> cabelo) e, no lugar do giro de 360° (dono escolheu "Ilustração, sem giro 360°"), vistas de três-quartos e de lado ✅ ·
+> a fazer: corpo e roupas também em traço de ilustração, corpo por idade, roupas e penteados mais caprichados, benchmark Poki.
 
 Pedido do dono (15/Nov/2026): anotar tudo, com as mídias, num lugar fácil de achar (não perdido no histórico da
 conversa). **Retomar depois de quinta-feira (19/Nov), quando os créditos renovarem.** Antes disso, nada de trabalho

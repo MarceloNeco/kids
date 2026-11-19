@@ -10,6 +10,9 @@
 >   `purpurina-musicas-v1`;
 > - rosto natural que acompanha Eu → Idade (`IDADES` no `boneca.js`): cabeça, largura, olhos, maxilar, queixo e boca;
 >   volume do rosto só nas laterais (nada escuro embaixo).
+> - desenho de ilustração (0.3.0): olho amendoado (`geoOlho`/`olho`), sobrancelha cheia (`sobrancelha`), nariz e lábios
+>   desenhados, contorno fino e fios no cabelo (`fiosIlustra`, máscara do próprio penteado);
+> - **sem giro de 360°**: vistas fixas `VISTAS = [0, 28, 45, -28, -45]` no estúdio (toque ou 👀), no desfile, no vídeo e na TV.
 
 # Purpurina — maquiagem, roupas e muito brilho
 
