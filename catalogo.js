@@ -51,7 +51,7 @@
       es: "Carreras de karts: esquiva los conos y el barro, atrapa estrellas, usa el turbo arcoíris y salta las rampas, pasando por la playa, el bosque, el mundo de dulces, la nieve y una ciudad de neón. 1 o 2 jugadores en la misma pantalla.",
       tag: '▶ Correr / Race / Correr', instalar: true,
       tv: { texto: 'Corrida de carrinho: setas do controle para virar, OK para buzinar. Pegue as estrelas!', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'purpurina', rec: ['tv'], nome: 'Purpurina', ico: '💄', cor: '#cfa8ff', url: '/kids/purpurina/',
+    { id: 'purpurina', rec: ['tv'], nome: 'Purpurina 80s', ico: '💄', cor: '#cfa8ff', url: '/kids/purpurina/',
       texto: 'Maquiagem, roupas, joias e muito brilho: monte a personagem, faça a maquiagem com o pincel, vista roupas e acessórios, cumpra desafios e desfile com confete. Brinque na TV com o celular de controle e música do YouTube ou do Spotify.',
       en: "Makeup, clothes, jewelry and lots of sparkle: create your character, do the makeup with a brush, try on clothes and accessories, take on challenges and walk the runway with confetti. Play on the TV using the phone as a remote, with music from YouTube or Spotify.",
       es: "Maquillaje, ropa, joyas y mucho brillo: crea tu personaje, maquíllalo con el pincel, ponle ropa y accesorios, cumple retos y desfila con confeti. Juega en la tele con el móvil como mando y música de YouTube o Spotify.",
