@@ -288,7 +288,7 @@ test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/No
   // os dois pés no chão (dono, 15/Nov/2026: "parece que tem um pé flutuando"): nenhuma paradinha levanta o pé
   assert.doesNotMatch(app, /perna-dobrada|perna-relaxada/);
   for (const m of css.matchAll(/\.modelo\.(perna-[a-z]+|ginga-[a-z]+) \.pp-passo-[ed] \{ transform: ([^}]*)\}/g)) assert.doesNotMatch(m[2], /translateY\(-|scaleY\(0?\.\d/, m[1] + ' tira o pé do chão');
-  assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.match(app, /girar\(0, -115/);
+  assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.match(app, /girar\(0, -45/);
 });
 
 test('Nova Era: rosto natural que acompanha a idade, sem sombra escura embaixo (dono, 19/Nov/2026, referência do Poki)', () => {
@@ -302,4 +302,22 @@ test('Nova Era: rosto natural que acompanha a idade, sem sombra escura embaixo (
   // o volume do rosto é só nas laterais (degradê de lado a lado): nada escurece o queixo ("parecia barba")
   assert.match(svgDe('adulta'), /<linearGradient id="r-volRosto" x1="0" x2="1" y1="0" y2="0">/);
   assert.doesNotMatch(svgDe('adulta'), /<radialGradient id="r-volRosto"/);
+});
+
+test('Nova Era em ilustração (dono, 19/Nov/2026): olho amendoado com pálpebra, sobrancelha cheia, fios no cabelo e sem giro de 360°', () => {
+  const s = B.svg(Object.assign(V.novo(), { cabelo: 'longo' }), { id: 'i', fundo: false });
+  assert.equal(bemFormado(s), '');
+  // o olho é de curvas (C), não mais o arco redondo antigo
+  assert.match(s, /id="i-olhoE"><path d="M[\d.]+,[\d.]+C/);
+  // fios desenhados por cima do cabelo liso, só dentro dele (máscara); cacheado não ganha fios
+  assert.match(s, /<mask id="i-fiosF"/); assert.match(s, /<mask id="i-fiosT"/);
+  assert.doesNotMatch(B.svg(Object.assign(V.novo(), { cabelo: 'cacheado' }), { id: 'c', fundo: false }), /<mask id="c-fiosF"/);
+  // as vistas do estúdio, do desfile, do vídeo e da TV não passam de 45° (sem volta inteira, sem costas)
+  const fs = require('fs'), path = require('path');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), tv = fs.readFileSync(path.join(__dirname, '..', 'tv.js'), 'utf8');
+  assert.match(app, /var VISTAS = \[0, 28, 45, -28, -45\];/);
+  assert.doesNotMatch(app, /\* 360|e \* 360|-115|pointermove/); assert.doesNotMatch(tv, /e \* 360/);
+  for (const a of [28, 45, -28, -45]) for (const idade of ['pequena', 'crianca', 'adolescente', 'adulta']) {
+    const v = B.svg(Object.assign(V.novo(), { idade }), { id: 'v', angulo: a }); assert.equal(bemFormado(v), ''); assert.ok(!/NaN|undefined/.test(v), idade + a);
+  }
 });

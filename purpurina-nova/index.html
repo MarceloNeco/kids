@@ -45,7 +45,7 @@
     <p data-t="Monte o visual da sua personagem: escolha a pele, o cabelo, as mechas e os olhos, faça a maquiagem (base, blush, sombra, delineado, cílios, batom, glitter e adesivos), vista roupas e sapatos, coloque joias (brincos, colares, pulseiras, anéis e broches) e acessórios. Toque numa aba embaixo (👧 💄 👗 💎 👑 🏞️), depois numa parte e numa opção. As bolinhas coloridas trocam a cor.|Style your character: pick skin, hair, highlights and eyes, do the makeup (foundation, blush, eyeshadow, eyeliner, lashes, lipstick, glitter and stickers), choose clothes and shoes, add jewelry (earrings, necklaces, bracelets, rings and brooches) and accessories. Tap a tab at the bottom (👧 💄 👗 💎 👑 🏞️), then a part and an option. The colored dots change the color.|Crea el look de tu personaje: elige la piel, el pelo, los mechones y los ojos, maquíllalo (base, colorete, sombra, delineador, pestañas, pintalabios, purpurina y pegatinas), ponle ropa y zapatos, joyas (pendientes, collares, pulseras, anillos y broches) y accesorios. Toca una pestaña de abajo (👧 💄 👗 💎 👑 🏞️), luego una parte y una opción. Los circulitos de colores cambian el color."></p>
     <p data-t="🔍 Zoom: na maquiagem e nas joias a tela chega perto sozinha (rosto, colar ou mãos). O botão 🔍 lá em cima chega perto e o 👗 volta a mostrar a personagem inteira.|🔍 Zoom: for makeup and jewelry the screen zooms in by itself (face, necklace or hands). The 🔍 button at the top zooms in and 👗 shows the whole character again.|🔍 Zoom: en el maquillaje y en las joyas la pantalla se acerca sola (cara, collar o manos). El botón 🔍 de arriba acerca la imagen y el 👗 vuelve a mostrar al personaje entero."></p>
     <p data-t="↩ desfaz a última troca, 🎲 sorteia um visual surpresa e 🔄 começa de novo. 📸 tira uma foto para guardar no celular e 💖 guarda o look nos favoritos. Para tirar uma peça (uma tiara, um brinco…), toque em ✕ Tirar em cima das opções, ou toque de novo na peça escolhida.|↩ undoes the last change, 🎲 picks a surprise look and 🔄 starts over. 📸 takes a photo to save on the phone and 💖 saves the look to favorites. To take something off (a tiara, an earring…), tap ✕ Remove above the options, or tap the chosen piece again.|↩ deshace el último cambio, 🎲 elige un look sorpresa y 🔄 empieza de nuevo. 📸 hace una foto para guardarla en el móvil y 💖 guarda el look en tus favoritos. Para quitar algo (una tiara, un pendiente…), toca ✕ Quitar encima de las opciones, o vuelve a tocar la prenda elegida."></p>
-    <p data-t="🔄 Girar: arraste o dedo para os lados em cima da personagem para ver de frente, de lado e de costas. Um toque nela (ou no ↻) dá uma volta inteira com rastro de luz; o 🙂 volta para a frente.|🔄 Spin: drag sideways on the character to see her front, side and back. One tap on her (or on ↻) does a full turn with a light trail; 🙂 turns her to the front again.|🔄 Girar: desliza el dedo de lado a lado sobre el personaje para verlo de frente, de lado y de espaldas. Un toque (o el ↻) le da una vuelta entera con estela de luz; el 🙂 lo pone de frente otra vez."></p>
+    <p data-t="👀 Vistas: cada toque na personagem (ou no 👀) mostra ela de três-quartos e de lado, para um lado e para o outro; o 🙂 volta para a frente.|👀 Views: each tap on the character (or on 👀) shows her three-quarter and side views, one way and the other; 🙂 turns her to the front again.|👀 Vistas: cada toque en el personaje (o en el 👀) lo muestra de tres cuartos y de lado, hacia un lado y hacia el otro; el 🙂 lo pone de frente otra vez."></p>
     <p data-t="⭐ Desafios: monte o visual para o tema, siga as 3 dicas e toque em ✨ Desfilar! Ninguém perde: todo desfile ganha pelo menos 1 estrela.|⭐ Challenges: style a look for the theme, follow the 3 tips and tap ✨ Runway! Nobody loses: every show gets at least 1 star.|⭐ Desafíos: crea el look para el tema, sigue las 3 pistas y toca ✨ ¡Desfila! Nadie pierde: cada desfile gana por lo menos 1 estrella."></p>
   </div>
   <div id="menuBoneca" class="menu-boneca" aria-hidden="true"></div>
@@ -167,13 +167,12 @@
     </div>
   </div>
   <div id="palco" class="palco">
-    <div id="rastro" class="rastro" aria-hidden="true"></div>
     <div id="boneca" class="boneca" role="img"></div>
     <div class="giro">
       <button id="btFrente" class="mini" type="button" hidden aria-label="Virar de frente" data-rotulo="Virar de frente|Face front|Poner de frente">🙂</button>
-      <button id="btGirar" class="mini" type="button" aria-label="Girar a personagem" data-rotulo="Girar a personagem|Spin the character|Girar al personaje">↻</button>
+      <button id="btGirar" class="mini" type="button" aria-label="Ver de outro lado" data-rotulo="Ver de outro lado|See another side|Ver desde otro lado">👀</button>
     </div>
-    <p id="dicaGiro" class="dica-giro" hidden data-t="👆 Arraste para os lados para girar|👆 Drag sideways to spin|👆 Desliza de lado a lado para girar"></p>
+    <p id="dicaGiro" class="dica-giro" hidden data-t="👆 Toque nela para ver de três-quartos e de lado|👆 Tap her to see her from the side|👆 Tócala para verla de tres cuartos y de lado"></p>
     <div id="efeitos" class="efeitos" aria-hidden="true"></div>
   </div>
   <div id="dicasCaixa" class="dicas" hidden>
@@ -210,7 +209,6 @@
       <div id="cenaDesfile" class="cena-desfile"></div>
       <canvas id="fogos" class="fogos"></canvas>
       <div id="modelo" class="modelo">
-        <div id="rastroDesfile" class="rastro"></div>
         <div id="passarela" class="passarela-boneca"></div>
       </div>
     </div>

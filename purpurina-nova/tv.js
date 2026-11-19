@@ -215,12 +215,13 @@
     var a = ang != null ? ang : j.ang;
     el.innerHTML = B.svg(j.e, { id: 'tv' + j.id, angulo: a, anim: !a, realce: !girando });
   }
+  // Nova Era: sem volta inteira — vira de três-quartos para um lado e para o outro e volta de frente
   function volta(j) {
     var ini = performance.now(), dur = 1700;
     if (tv.som) Som.tocar('surpresa');
     (function passo(agora) {
-      var k = Math.min(1, (agora - ini) / dur), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-      desenharJogador(j, k >= 1 ? j.ang : e * 360, k < 1);
+      var k = Math.min(1, (agora - ini) / dur);
+      desenharJogador(j, k >= 1 ? j.ang : Math.round(40 * Math.sin(k * 2 * Math.PI)), k < 1);
       if (k < 1) requestAnimationFrame(passo);
     })(ini);
   }

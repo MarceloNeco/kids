@@ -2,6 +2,26 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "19/Nov/2026",
+      "hora": "19:17:25",
+      "pt": [
+        "🎨 A personagem ganhou desenho de ilustração, como nos jogos de maquiagem do Poki: olhos amendoados com pálpebra, dobrinha e cílios saindo do traço, sobrancelhas desenhadas, nariz delicado com as narinas marcadas de leve e lábios com o arco do cupido. Contornos mais finos.",
+        "💇 O cabelo ganhou fios desenhados e brilho em mechas finas (no lugar da faixa larga de brilho). A franja agora cai de lado e o cabelo preso tem risca no meio.",
+        "👀 Sem giro de 360°: um toque na personagem (ou no 👀) mostra ela de três-quartos e de lado, para um lado e para o outro. No desfile ela vira de três-quartos e de lado, e as câmeras mostram esses ângulos. A Purpurina 80's continua com o giro."
+      ],
+      "en": [
+        "🎨 The character now has an illustration-style drawing, like Poki's makeup games: almond eyes with eyelids, creases and lashes coming out of the line, drawn eyebrows, a delicate nose with softly marked nostrils and lips with a cupid's bow. Finer outlines.",
+        "💇 The hair has drawn strands and thin shiny streaks (instead of the wide shine band). The fringe now falls to the side and tied-up hair has a middle part.",
+        "👀 No more 360° spin: a tap on the character (or on 👀) shows her three-quarter and side views, one way and the other. On the runway she turns three-quarter and to the side, and the cameras show those angles. Purpurina 80's keeps the spin."
+      ],
+      "es": [
+        "🎨 El personaje tiene ahora un dibujo de ilustración, como en los juegos de maquillaje de Poki: ojos almendrados con párpado, pliegue y pestañas que salen del trazo, cejas dibujadas, una nariz delicada con las aletas marcadas suavemente y labios con arco de Cupido. Contornos más finos.",
+        "💇 El pelo tiene mechones dibujados y brillos finos (en lugar de la franja ancha de brillo). El flequillo ahora cae de lado y el pelo recogido lleva raya al medio.",
+        "👀 Sin giro de 360°: un toque en el personaje (o en el 👀) lo muestra de tres cuartos y de lado, hacia un lado y hacia el otro. En el desfile se gira de tres cuartos y de lado, y las cámaras enseñan esos ángulos. Purpurina 80's sigue con el giro."
+      ]
+    },
+    {
       "versao": "0.2.0",
       "data": "19/Nov/2026",
       "hora": "18:22:12",

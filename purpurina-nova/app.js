@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.0';
+  var APP_VERSION = '0.3.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -188,7 +188,7 @@
     if (d) { estado = baseDesafio(d); grupoAtual = 'roupa'; Som.proxima(); }
     else { estado = livre; grupoAtual = grupoAtual || 'eu'; }
     dicasAntes = d ? V.avaliar(estado, d).dicas : [];
-    vista = INTEIRA.slice(); zoomLigado = false; angulo = 0; animGiro++;
+    vista = INTEIRA.slice(); zoomLigado = false; angulo = 0; vistaN = 0; animGiro++;
     ir('estudio'); setTimeout(mostrarDicaGiro, 600); ponte('visual');
   }
   function mudar(novo, catId) {
@@ -210,11 +210,11 @@
   }
   function desenharBoneca() {
     var el = $('boneca');
-    // girando (arrastando, dando a volta ou voltando de frente): sem desfoque e sombra, para o giro ficar liso
-    var mexendo = !!(arraste && arraste.mexeu) || emVolta || girando;
+    // trocando de vista: sem desfoque e sombra, para ficar liso
+    var mexendo = girando;
     el.innerHTML = B.svg(estado, { id: 'palco', anim: !CALMO && !angulo, area: vista, angulo: angulo, realce: !mexendo });
     $('btFrente').hidden = !angulo;
-    if (angulo !== angMandado && !emVolta) { angMandado = angulo; ponte('giro'); }
+    if (angulo !== angMandado) { angMandado = angulo; ponte('giro'); }
     el.setAttribute('aria-label', V.resumo(estado, lingua));
   }
   function desenharDicas(comSom) {
@@ -450,78 +450,26 @@
     Som.tocar(cat.grupo === 'roupa' ? 'roupa' : cat.grupo === 'eu' ? 'clique' : 'brilho');
     faiscas(q[0], q[1], cat.grupo === 'fundo' ? 12 : 7);
   }
-  /* ---------- girar a personagem ----------
-     Arrastar o dedo para os lados gira (frente, lado, costas). Um toque (ou o ↻) dá uma volta inteira com
-     rastro de luz: a cada poucos quadros, uma cópia do desenho fica para trás e vai sumindo (efeito
-     estroboscópico, sem piscar a tela). Quem pediu menos movimento vê a volta em 4 paradas, sem rastro. */
-  var angulo = 0, animGiro = 0, arraste = null, pedidoQuadro = 0, angMandado = 0, emVolta = false, girando = false;
-  function redesenharGiro() { if (pedidoQuadro) return; pedidoQuadro = requestAnimationFrame(function () { pedidoQuadro = 0; desenharBoneca(); }); }
+  /* ---------- vistas da personagem (Nova Era, 19/Nov/2026: sem giro de 360°) ----------
+     O desenho agora é de ilustração, bonito de frente; ela não dá mais a volta inteira. Um toque nela (ou no 👀) mostra
+     a próxima vista: três-quartos e de lado, para um lado e para o outro, e volta de frente. O 🙂 volta de frente. */
+  var VISTAS = [0, 28, 45, -28, -45];
+  var angulo = 0, animGiro = 0, angMandado = 0, girando = false, vistaN = 0;
   function girarPara(alvo, dur) {
-    var id = ++animGiro, de = angulo, ini = performance.now();
-    var dif = ((alvo - de) % 360 + 540) % 360 - 180;   // pelo caminho mais curto
+    var id = ++animGiro, de = angulo > 180 ? angulo - 360 : angulo, ini = performance.now(), dif = alvo - de;
     girando = true;
     (function passo(agora) {
       if (id !== animGiro) { girando = false; return; }
       var k = Math.min(1, (agora - ini) / dur);
-      angulo = de + dif * (1 - Math.pow(1 - k, 3)); if (k >= 1) { angulo = ((alvo % 360) + 360) % 360; girando = false; }
+      angulo = de + dif * (1 - Math.pow(1 - k, 3)); if (k >= 1) { angulo = alvo; girando = false; }
+      if (!alvo && k >= 1) vistaN = 0;
       desenharBoneca(); if (k < 1) requestAnimationFrame(passo);
     })(ini);
   }
-  // volta inteira com rastro (vale para o palco e para a passarela do desfile)
-  function volta(alvoEl, rastroEl, desenhar, pronto) {
-    var id = ++animGiro, ini = performance.now(), dur = 1700, quadro = 0;
-    function limpar() { rastroEl.innerHTML = ''; }
-    if (CALMO) {
-      [90, 180, 270, 0].forEach(function (a, i) { setTimeout(function () { if (id === animGiro) desenhar(a); if (i === 3 && pronto) pronto(); }, (i + 1) * 450); });
-      return;
-    }
-    Som.tocar('surpresa'); limpar();
-    (function passo(agora) {
-      if (id !== animGiro) { limpar(); return; }
-      var k = Math.min(1, (agora - ini) / dur), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-      desenhar(k >= 1 ? 0 : e * 360);
-      if (++quadro % 3 === 0 && k < 1) {
-        var atualSvg = alvoEl.querySelector('svg');
-        if (atualSvg) {
-          // a cópia ganha nomes internos próprios (recortes, degradês): com os mesmos nomes, o navegador usava os
-          // recortes da cópia (de outro ângulo) no desenho de verdade e o cabelo e a orelha saíam no lugar errado
-          var pref = ((atualSvg.querySelector('[id]') || {}).id || '').split('-')[0], f = document.createElement('div'); f.className = 'fantasma';
-          f.innerHTML = pref ? atualSvg.outerHTML.replace(new RegExp('(id="|url\\(#)' + pref + '-', 'g'), '$1f' + quadro + pref + '-') : atualSvg.outerHTML;
-          rastroEl.appendChild(f);
-          while (rastroEl.children.length > 4) rastroEl.removeChild(rastroEl.firstChild);
-          Array.prototype.forEach.call(rastroEl.children, function (c, i, l) { c.style.opacity = String(0.08 + 0.12 * (i + 1) * (4 / l.length) / 2); });
-        }
-      }
-      if (k < 1) requestAnimationFrame(passo); else { setTimeout(limpar, 120); Som.tocar('brilho'); if (pronto) pronto(); }
-    })(ini);
-  }
-  function voltaNoPalco() {
-    ponte('volta'); emVolta = true;   // a TV faz a própria volta; durante a volta não manda cada quadro
-    volta($('boneca'), $('rastro'), function (a) { angulo = a; desenharBoneca(); }, function () { emVolta = false; angMandado = angulo; desenharBoneca(); var q = naTela(200, 360); faiscas(q[0], q[1], 10); });
-  }
+  function proximaVista() { Som.tocar('clique'); vistaN = (vistaN + 1) % VISTAS.length; girarPara(VISTAS[vistaN], 350); }
   var bonecaEl = $('boneca');
-  bonecaEl.addEventListener('pointerdown', function (ev) {
-    try { bonecaEl.setPointerCapture(ev.pointerId); } catch (x) { /* ok */ }
-    animGiro++; $('rastro').innerHTML = '';
-    arraste = { x: ev.clientX, a: angulo, mexeu: false };
-  });
-  bonecaEl.addEventListener('pointermove', function (ev) {
-    if (!arraste) return;
-    var dx = ev.clientX - arraste.x;
-    if (Math.abs(dx) > 6) arraste.mexeu = true;
-    if (!arraste.mexeu) return;
-    angulo = ((arraste.a + dx * 0.9) % 360 + 360) % 360; redesenharGiro();   // o rosto vai para o lado do dedo
-  });
-  function soltar() {
-    if (!arraste) return;
-    var foiToque = !arraste.mexeu; arraste = null;
-    if (foiToque) voltaNoPalco();
-    else if (angulo < 12 || angulo > 348) girarPara(0, 200);   // quase de frente: encaixa
-    else desenharBoneca();   // parou de arrastar: volta o desfoque e a sombra
-  }
-  bonecaEl.addEventListener('pointerup', soltar);
-  bonecaEl.addEventListener('pointercancel', function () { arraste = null; });
-  $('btGirar').addEventListener('click', voltaNoPalco);
+  bonecaEl.addEventListener('click', proximaVista);
+  $('btGirar').addEventListener('click', proximaVista);
   $('btFrente').addEventListener('click', function () { Som.tocar('clique'); girarPara(0, 350); });
   var dicaGiroMostrada = false;
   function mostrarDicaGiro() {
@@ -538,7 +486,6 @@
     var novo = V.surpresa(estado); var d = desafioAtual(); if (d) novo.cenario = d.cenario;
     mudar(novo, null); Som.tocar('surpresa');
     var q = naTela(200, 360); faiscas(q[0], q[1], 16, ['✨', '🎲', '💖', '⭐']);
-    voltaNoPalco();
   });
   // 🔄 Reiniciar: tirar maquiagem, roupa e acessórios (a personagem continua) ou tudo do zero. Dá para desfazer (↩).
   $('btRecomecar').addEventListener('click', function () {
@@ -750,8 +697,8 @@
     PurpurinaIA.abrir({ t: t, imagem: imagemParaIA, descricao: function () { return V.resumo(estado, 'en'); }, mostrarFoto: mostrarFotoIA, recado: recado });
   }
 
-  /* ---------- vídeo da personagem girando ----------
-     Desenha 48 quadros (uma volta) num canvas e grava com o MediaRecorder do próprio navegador: duas voltas e
+  /* ---------- vídeo da personagem ----------
+     Desenha 48 quadros (ela vira de três-quartos para um lado e para o outro, sem dar a volta) num canvas e grava com o MediaRecorder do próprio navegador: duas vezes e
      uma paradinha de frente, uns 4 segundos. Tudo no aparelho; nada vai para a internet. MP4 quando o navegador
      sabe gravar (melhor para o WhatsApp), senão WebM. */
   var VIDEO_OK = !!(window.MediaRecorder && window.HTMLCanvasElement && HTMLCanvasElement.prototype.captureStream);
@@ -762,7 +709,7 @@
   }
   function fazerVideo(andamento) {
     var Wv = 540, Hv = 972, faixa = 76, QUADROS = 48, e = V.copiar(estado), imgs = [], d = desafioAtual();
-    function carregar(i) { return imagemDe(B.svg(e, { id: 'v' + i, fundo: false, realce: false, largura: Wv, altura: Hv, angulo: i * 360 / QUADROS })); }
+    function carregar(i) { return imagemDe(B.svg(e, { id: 'v' + i, fundo: false, realce: false, largura: Wv, altura: Hv, angulo: Math.round(40 * Math.sin(i * 2 * Math.PI / QUADROS)) })); }
     var fundoImg = null, cadeia = imagemDe(B.svg(e, { id: 'vF', soFundo: true, largura: Wv, altura: Hv })).then(function (img) { fundoImg = img; });
     for (var i = 0; i < QUADROS; i++) (function (k) { cadeia = cadeia.then(function () { return carregar(k); }).then(function (img) { imgs[k] = img; andamento(Math.round((k + 1) / QUADROS * 70)); }); })(i);
     return cadeia.then(function () {
@@ -817,7 +764,7 @@
   var JURADOS = ['🐱', '🦄', '🐰'];
   /* ---------- o desfile ----------
      Passarela de show (boneca.js → passarela): a personagem entra lá do fundo e vem andando, rebolando, até a
-     frente; para, sorri e dá tchauzinho; olha para um lado e para o outro; dá uma volta com rastro de luz; e
+     frente; para, sorri e dá tchauzinho; olha para um lado e para o outro; vira de três-quartos para um lado e para o outro; e
      fica posando, sorrindo e acenando de vez em quando. Fogos de artifício e flashes da plateia o tempo todo.
      As estrelas e os jurados aparecem quando ela chega na frente. Quem pediu menos movimento vê ela parada,
      sorrindo, sem fogos. */
@@ -900,15 +847,15 @@
       } else mod.classList.add(pe, 'pose-' + (x.lado || (Math.random() < 0.5 ? 'esq' : 'dir')));
       pose(Object.assign({ sorriso: true }, opPose(x)));
     }
-    // girinho: vira de lado (ângulo) e volta, sem rastro
     var camera = $('cameraDesfile'), corte = $('corteDesfile');
     camera.classList.remove('take-perto');
     function cortar(take) {
       corte.classList.remove('flash'); void corte.offsetWidth; corte.classList.add('flash');
       camera.classList.toggle('take-perto', take === 'perto');
-      if (take === 'ladoE' || take === 'ladoD') {
+      var ANG_TAKE = { tresE: -28, tresD: 28, ladoE: -45, ladoD: 45 };
+      if (ANG_TAKE[take]) {
         semPose();
-        pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO, angulo: take === 'ladoE' ? -32 : 32, realce: false, sorriso: true });
+        pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO, angulo: ANG_TAKE[take], realce: false, sorriso: true });
       } else posar(sortear());
     }
     function girar(de, para, ms, fim) {
@@ -945,23 +892,22 @@
         else {
           // chegou na frente (dono, 14/Nov/2026, com fotos de referência): para numa pose sorteada — menina: mão na
           // cintura, as duas mãos na cintura, mão no cabelo ou tchauzinho; menino: braços cruzados ou mãos nos bolsos — com a
-          // "inclinadinha"; olha para um lado e para o outro; dá um girinho (vira de lado e volta), a voltinha
-          // inteira e fica trocando de pose, sorteada, de tempos em tempos
+          // "inclinadinha"; olha para um lado e para o outro; vira de três-quartos para um lado e para o outro
+          // (Nova Era: sem volta inteira) e fica trocando de pose, sorteada, de tempos em tempos
           mod.classList.remove('andando'); posar(sortear());
           titulo.classList.remove('esperando'); jur.classList.remove('esperando');
           Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 400); confete();
           depois(1600, function () { olharPara(0, -38, 450, function () { depois(600, function () { olharPara(-38, 38, 700, function () { depois(600, function () { olharPara(38, 0, 450, function () {
             depois(500, function () {
               semPose();
-              girar(0, -115, 520, function () { depois(350, function () { girar(-115, 0, 520, function () { depois(250, function () {
-                volta(pas, $('rastroDesfile'), function (a) { pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO && !a, angulo: a, realce: false, sorriso: true }); }, function () {
+              girar(0, -45, 520, function () { depois(600, function () { girar(-45, 45, 900, function () { depois(600, function () { girar(45, 0, 520, function () {
                   if (!vale()) return;
                   posar(sortear()); entrarTurma();
-                  // takes: de 3 em 3 s um corte — corpo inteiro numa pose nova, de perto, ou de três-quartos para um
-                  // lado e para o outro (olhando para o lado), sem repetir o take de antes
+                  // takes: de 3 em 3 s um corte — corpo inteiro numa pose nova, de perto, de três-quartos ou de lado,
+                  // para um lado e para o outro, sem repetir o take de antes
                   var takeAntes = 'inteira';
                   (function trocar() { depois(3200, function () {
-                    var opcoes = ['inteira', 'perto', 'ladoE', 'ladoD'].filter(function (x) { return x !== takeAntes; });
+                    var opcoes = ['inteira', 'perto', 'tresE', 'tresD', 'ladoE', 'ladoD'].filter(function (x) { return x !== takeAntes; });
                     cortar(takeAntes = opcoes[Math.floor(Math.random() * opcoes.length)]); trocar();
                   }); })();
                 });
