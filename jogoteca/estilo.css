@@ -108,3 +108,5 @@ body.jogando { touch-action: none; }
 @media (prefers-reduced-motion: reduce) { .fim-festa { animation: none } .capa { transition: none } }
 
 #desligado.ativa, #desligado:not([hidden]) { display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; }
+/* celular em pé: o nome do jogo tem prioridade na barra (o nível já foi escolhido na prévia) */
+@media (max-width: 430px) { .barra-nivel { display: none; } .barra-nome { margin-right: auto; } }
