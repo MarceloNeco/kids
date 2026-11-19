@@ -10,7 +10,7 @@
 <script src="../carregando.js" data-fora-do-arquivo></script>
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#0b0a1f">
-<meta name="versao" content="1.25.1">
+<meta name="versao" content="1.26.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Corrida de carrinho para a família: desvie, pegue estrelas, pule rampas e passe por 4 mundos. 1 ou 2 jogadores. / Family kart race: dodge, grab stars, jump ramps across 4 worlds.">
 <link rel="stylesheet" href="estilo.css">
@@ -68,6 +68,7 @@
 
   <div id="ajuda" class="ajuda" hidden>
     <p data-t="✈️ Avião, jato e helicóptero voam: a estrada fica lá embaixo e você segue o caminho de luzes no céu, desviando de pássaros, nuvens de tempestade e outros aviões. Os anéis dourados dão TURBO e as correntes de ar levam lá para cima, até as estrelas altas.|✈️ Plane, jet and helicopter fly: the road stays far below and you follow the path of lights in the sky, dodging birds, storm clouds and other planes. Golden rings give TURBO and updrafts lift you up to the high stars.|✈️ El avión, el jet y el helicóptero vuelan: la carretera queda allá abajo y tú sigues el camino de luces en el cielo, esquivando pájaros, nubes de tormenta y otros aviones. Los anillos dorados dan TURBO y las corrientes de aire te suben bien alto, hasta las estrellas más altas."></p>
+    <p data-t="🌐 Duelo: cada um no seu celular. Um toca em Criar duelo e recebe um código de 4 letras; o outro digita o código e toca em Entrar (ou abre o convite). Quem criou escolhe o nível, os cenários e se tem rivais, e toca em Correr. Na pista, o nome do outro aparece em vermelho em cima dele, e o mapinha mostra onde cada um está.|🌐 Duel: each on their own phone. One taps Create duel and gets a 4-letter code; the other types the code and taps Join (or opens the invite). Whoever created it picks the level, the worlds and whether there are rivals, and taps Race. On the track, the other player's name shows in red above them, and the little map shows where everyone is.|🌐 Duelo: cada uno en su móvil. Uno pulsa Crear duelo y recibe un código de 4 letras; el otro escribe el código y pulsa Entrar (o abre la invitación). Quien lo creó elige el nivel, los escenarios y si hay rivales, y pulsa A correr. En la pista, el nombre del otro sale en rojo encima de él, y el mapa redondo enseña dónde va cada uno."></p>
     <p data-t="🌊 No rio o veículo vira barco (os bichos nadam): desvie das boias e dos redemoinhos e passe pelas setas azuis para ganhar TURBO. O mapinha redondo, no canto de cima, mostra a pista inteira e onde está cada um.|🌊 On the river your ride turns into a boat (animals swim): dodge the buoys and whirlpools and go through the blue arrows for TURBO. The little round map up in the corner shows the whole track and where everyone is.|🌊 En el río tu vehículo se convierte en barco (los animales nadan): esquiva las boyas y los remolinos y pasa por las flechas azules para ganar TURBO. El mapa redondo de la esquina de arriba enseña toda la pista y dónde va cada uno."></p>
     <p data-t="🏆 Pontos: estrela 100, estrela no ar 200, turbo e rampa 50; cada portal de mundo é um CHECKPOINT (500 + bônus por rapidez). Bater tira pontos, mas ninguém perde.|🏆 Points: star 100, star in the air 200, turbo and ramp 50; every world gate is a CHECKPOINT (500 + speed bonus). Crashing takes points away, but nobody loses.|🏆 Puntos: estrella 100, estrella en el aire 200, turbo y rampa 50; cada portal de mundo es un CHECKPOINT (500 + premio por llegar rápido). Chocar quita puntos, pero nadie pierde."></p>
     <p data-t="O carro acelera sozinho. Você vira para a esquerda e para a direita e aperta ⬆ PULAR para passar por cima dos cones, da lama e dos carrinhos. Pegue as ⭐ estrelas, passe pelo 🌈 arco-íris para ganhar TURBO e suba na rampa para um pulão até as estrelas do ar. Ninguém perde: bater só deixa o carro mais lento e derruba umas estrelas.|The car speeds up by itself. Steer left and right and press ⬆ JUMP to hop over cones, mud and cars. Grab the ⭐ stars, drive through the 🌈 rainbow for TURBO and hit the ramp for a big jump to the stars in the air. Nobody loses: crashing only slows you down and drops a few stars.|El coche acelera solo. Tú giras a la izquierda y a la derecha y pulsas ⬆ SALTAR para pasar por encima de los conos, el barro y los cochecitos. Coge las ⭐ estrellas, pasa por el 🌈 arcoíris para ganar TURBO y sube a la rampa para dar un saltote hasta las estrellas del aire. Nadie pierde: chocar solo hace que el coche vaya más lento y suelte unas estrellas."></p>
@@ -81,6 +82,26 @@
     <div class="opcoes linha3" role="group">
       <button class="opcao" type="button" data-jogadores="1" data-t="👤 1 jogador|👤 1 player|👤 1 jugador"></button>
       <button class="opcao" type="button" data-jogadores="2" data-t="👥 2 jogadores (tela dividida)|👥 2 players (split screen)|👥 2 jugadores (pantalla dividida)"></button>
+    </div>
+  </div>
+
+  <!-- 1.26.0: duelo, cada um no seu celular (duelo.js) -->
+  <div class="grupo grupo-duelo">
+    <button id="btDuelo" class="opcao duelo-abrir" type="button" aria-expanded="false" aria-controls="duelo" data-t="🌐 Duelo: cada um no seu celular|🌐 Duel: each on their own phone|🌐 Duelo: cada uno en su móvil"></button>
+    <div id="duelo" class="duelo" hidden>
+      <label class="duelo-nome"><span data-t="Seu nome|Your name|Tu nombre"></span>
+        <input id="dueloNome" maxlength="14" autocomplete="off" spellcheck="false" aria-label="Seu nome" data-aria="Seu nome|Your name|Tu nombre"></label>
+      <div id="dueloComeco" class="duelo-linha">
+        <button id="btDueloCriar" class="opcao" type="button" data-t="🏁 Criar duelo|🏁 Create duel|🏁 Crear duelo"></button>
+        <input id="dueloCodigo" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD" aria-label="Código" data-aria="Código do duelo|Duel code|Código del duelo">
+        <button id="btDueloEntrar" class="opcao" type="button" data-t="🔑 Entrar|🔑 Join|🔑 Entrar"></button>
+      </div>
+      <div id="dueloSala" hidden>
+        <p class="duelo-cod" id="dueloCod" aria-live="polite"></p>
+        <button id="btDueloConvite" class="opcao" type="button" data-t="📤 Mandar convite|📤 Send invite|📤 Enviar invitación"></button>
+        <button id="btDueloSair" class="opcao" type="button" data-t="✕ Sair do duelo|✕ Leave the duel|✕ Salir del duelo"></button>
+      </div>
+      <p id="dueloStatus" class="dica" aria-live="polite"></p>
     </div>
   </div>
 
@@ -254,6 +275,7 @@
 <script src="maos.js"></script>
 <script src="selfie.js"></script>
 <script src="baixar.js"></script>
+<script src="duelo.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>
 <script src="../navegacao.js" data-fora-do-arquivo></script>

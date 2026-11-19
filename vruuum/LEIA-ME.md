@@ -335,3 +335,14 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - Ovo: pernas pelo relógio (bem rápidas) com o borrão da roda de pernas e pose de pulo com `op.voo`; galinha mais rápida.
 - Setas das curvas viraram holograma flutuante (4 quadros `setaD0..3`/`setaE0..3`, a seta acesa anda), a cada 7 pedaços
   nas curvas com |curva| ≥ 1,8.
+
+## 1.26.0 — duelo, cada um no seu celular (dono, 16/Nov/2026)
+
+- `duelo.js`: o canal (o mesmo da Batalha Naval: Supabase Realtime broadcast com a chave publishable da plataforma,
+  canal "vruuum-<código>"; com ?teste, BroadcastChannel) e o `validar()` de toda mensagem (oi, largar, pos, riv, tchau).
+- `app.js` (seção "duelo"): criar/entrar pelo código (ou ?duelo=ABCD do convite); quem criou manda a largada (semente,
+  nível, cenários e rivais) e cada aparelho corre a sua corrida, com o outro como mais um corredor `remoto` (o `motor.js`
+  não o move; a posição chega 10 vezes por segundo e é adiantada pelo tempo que passou). Os rivais do computador quem move
+  é quem criou e manda a posição deles.
+- `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
+- Testes: `teste/duelo.test.js`.
