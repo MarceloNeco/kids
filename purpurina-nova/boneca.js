@@ -23,27 +23,31 @@
     adulta: { cab: 1.02, largura: 0.86, olho: 0.92, maxilar: 0.85, queixoY: 7, queixoL: 0.76, boca: [1.12, 1.32] }
   };
   var IDADE = IDADES.crianca;
-  /* ---------- corpo de ilustração de moda (Nova Era, 19/Nov/2026) ----------
+  /* ---------- corpo com medidas reais (Nova Era, 19/Nov/2026) ----------
      O desenho do corpo continua o mesmo por baixo (roupas, sapatos, joias e poses servem em todas as idades), mas cada
-     ponto passa por uma "deformação" que muda a proporção: cabeça bem menor, pescoço, tronco mais comprido e pernas
-     longas, como nas ilustrações de moda. Medida em cabeças (alturas da cabeça): 4 na criancinha, 5 aos 10 anos, 6 na
-     adolescente e 6,8 na adulta. Os pés (de 615 para baixo) não esticam. A cabeça inteira vai junto, só reduzida. */
+     ponto passa por uma "deformação" que põe o corpo nas medidas de gente de verdade (dono, 19/Nov/2026: "tem que ser
+     medidas reais"), em cabeças (alturas da cabeça) a partir do alto da cabeça:
+       - altura total: 5 cabeças aos 5 anos, 6 aos 10, 7 aos 15 e 7,5 na adulta;
+       - ombro: a ~1,3 cabeça do alto; quadril (o cós da calça, logo acima do gancho): perto da metade da altura;
+       - pernas: do gancho ao chão, metade da altura (pés de 615 para baixo não esticam);
+       - larguras em cabeças (larg = quanto a largura do desenho de baixo vira no ombro, na cintura, no quadril e nas
+         pernas): adulta com ombros ~1,65, cintura ~1,05 e quadril ~1,45 cabeça; criança quase sem cintura; menino com
+         quadril mais estreito que os ombros. A cabeça inteira vai junto, só reduzida. */
   var PROPORCAO = {
-    // larg: quanto fica a largura no ombro, na cintura, no quadril e nas pernas (menino: sem cintura marcada)
-    pequena: { cabecas: 4, topo: 150, pescoco: 0.2, tronco: 1.0, quadril: 0.55, larg: [0.95, 0.95, 0.95, 0.9] },
-    crianca: { cabecas: 5, topo: 100, pescoco: 0.26, tronco: 1.15, quadril: 0.6, larg: [0.9, 0.84, 0.88, 0.8] },
-    adolescente: { cabecas: 6, topo: 76, pescoco: 0.3, tronco: 1.3, quadril: 0.65, larg: [0.86, 0.74, 0.85, 0.74] },
-    adulta: { cabecas: 6.8, topo: 64, pescoco: 0.33, tronco: 1.4, quadril: 0.7, larg: [0.84, 0.7, 0.85, 0.72] }
+    pequena: { cabecas: 5, topo: 150, ombro: 1.28, quadril: 2.3, larg: [0.88, 1.0, 1.08, 0.95] },
+    crianca: { cabecas: 6, topo: 100, ombro: 1.33, quadril: 2.8, larg: [0.83, 0.92, 1.03, 0.92] },
+    adolescente: { cabecas: 7, topo: 76, ombro: 1.38, quadril: 3.3, larg: [0.79, 0.81, 1.13, 0.95] },
+    adulta: { cabecas: 7.5, topo: 64, ombro: 1.4, quadril: 3.55, larg: [0.8, 0.78, 1.16, 0.95] }
   };
   var DF = null;
   function deformacao(idade, menino) {
     var q = PROPORCAO[idade] || PROPORCAO.adulta, cab = IDADE.cab, L = q.larg.slice();
-    if (menino) { L[1] = L[0] * 0.94; L[2] = Math.min(L[2], L[0] * 0.92); }
+    if (menino) { L[1] = L[0] * 0.98; L[2] = L[0] * 1.15; }
     var queixo = 311 + ((IDADE === IDADES.pequena ? 275 : IDADE === IDADES.crianca ? 278 : IDADE === IDADES.adolescente ? 282 : 285) - 297) * cab;
     var alto = queixo - (311 - 205 * cab), h = (664 - q.topo) / q.cabecas, s = h / alto;
-    var yC = q.topo + h, yS = yC + q.pescoco * h, yW = yS + q.tronco * h, yQ = yW + q.quadril * h;
+    var yC = q.topo + h, yS = q.topo + q.ombro * h, yW = q.topo + q.quadril * h;
     // pontos de apoio: [y original, y novo]; abaixo do último a escala é 1
-    var Y = [[queixo, yC], [340, yS], [455, yW], [530, yQ], [615, 615]];
+    var Y = [[queixo, yC], [340, yS], [455, yW], [615, 615]];
     function fy(y) {
       if (y <= Y[0][0]) return yC + (y - queixo) * s;
       for (var i = 1; i < Y.length; i++) if (y <= Y[i][0]) { var a = Y[i - 1], b = Y[i]; return a[1] + (y - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); }
@@ -56,13 +60,24 @@
       for (var i = 1; i < X.length; i++) if (y <= X[i][0]) { var a = X[i - 1], b = X[i]; return a[1] + (y - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); }
       return L[3];
     }
-    return { s: s, traco: L[3], queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
+    return { s: s, traco: 1, queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
       cabeca: 'translate(200 ' + n(yC) + ') scale(' + n(s * 1000) / 1000 + ') translate(-200 ' + n(-queixo) + ')' };
   }
   // aplica a deformação em tudo o que é desenho do corpo (caminhos, círculos, elipses, retângulos e centros de giro)
   function deformar(str) {
     if (!DF || !str) return str;
-    var D = DF;
+    var D = DF, rigidas = [];
+    // a mão (com o anel e a pulseira) não estica junto com a perna: só vai para o lugar novo, do tamanho certo
+    str = str.replace(/<g data-rigido="(-?[\d.]+),(-?[\d.]+)">([\s\S]*?)<\/g><!--\/rigido-->/g, function (m, x, y, c) {
+      var k = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8;
+      rigidas.push('<g transform="translate(' + n(D.fx(+x, +y)) + ' ' + n(D.fy(+y)) + ') scale(' + n(k * 1000) / 1000 + ') translate(' + (-x) + ' ' + (-y) + ')">' + c + '</g>');
+      return '\u0001' + (rigidas.length - 1) + '\u0001';
+    });
+    return voltarRigidas(deformarResto(str, D), rigidas);
+  }
+  function voltarRigidas(str, rigidas) { return rigidas.length ? str.replace(/\u0001(\d+)\u0001/g, function (m, i) { return rigidas[+i]; }) : str; }
+  function rigido(x, y, s) { return s ? '<g data-rigido="' + x + ',' + y + '">' + s + '</g><!--/rigido-->' : ''; }
+  function deformarResto(str, D) {
     function par(x, y) { return n(D.fx(+x, +y)) + ',' + n(D.fy(+y)); }
     // arco (A rx,ry giro grande lado x,y): os raios só encolhem como a peça naquele ponto; o ponto final vai para o lugar novo
     function arco(m2, rx, ry, g, f1, f2, x, y) {
@@ -225,8 +240,16 @@
       return p(d, { stroke: esc(pele, 0.35), 'stroke-width': larg + 2.4, 'stroke-linecap': 'round', fill: 'none' }) + p(d, { stroke: pele, 'stroke-width': larg, 'stroke-linecap': 'round', fill: 'none' }) +
         '<g transform="translate(' + n(larg * 0.3) + ' 0)">' + p(d, { stroke: '#7a5ba8', 'stroke-width': larg * 0.36, 'stroke-linecap': 'round', fill: 'none', opacity: 0.16 }) + '</g>';
     }
+    function perna(x0, x1) {
+      var M = [[455, 20], [500, 17.5], [548, 12.5], [586, 14], [626, 9.5], [642, 9]], esq = [], dir = [];
+      M.forEach(function (m) { var x = x0 + (x1 - x0) * (m[0] - 455) / 187; esq.push([x - m[1], m[0]]); dir.push([x + m[1], m[0]]); });
+      var d = 'M' + esq.map(function (q) { return n(q[0]) + ',' + q[1]; }).join(' L') + ' L' + dir.reverse().map(function (q) { return n(q[0]) + ',' + q[1]; }).join(' L') + 'Z';
+      return p(d, { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }) +
+        p('M' + n(x0 + 9) + ',470 Q' + n(x0 + 13) + ',520 ' + n((x0 + x1) / 2 + 6) + ',548', { fill: 'none', stroke: '#7a5ba8', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: 0.12 });
+    }
     var iniPernas = out.length;
-    ['M177,455 L173,640', 'M223,455 L227,640'].forEach(function (d) { out.push(membro(d, 29)); });
+    // pernas com forma de verdade: coxa larga em cima, joelho, panturrilha e tornozelo fino (cabem dentro das calças)
+    [[177, 173], [223, 227]].forEach(function (q) { out.push(perna(q[0], q[1])); });
     out.push(sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas));
 
     // ---------- parte de baixo ----------
@@ -264,11 +287,11 @@
     // ---------- bolsa, mãos e joias do corpo ----------
     if (vis('bolsa') && !tchau && !bracoPose) out.push(bolsa(e.bolsa, C('bolsa'), peca, linha));
     var esmalte = { tipo: e.unhas, cor: C('unhas') };
-    if (!semEsquerdo) out.push(mao(118, -1, pele, peleE, esmalte));
-    if (!semDireito) out.push(mao(282, 1, pele, peleE, esmalte));
+    if (!semEsquerdo) out.push(rigido(118, 496, mao(118, -1, pele, peleE, esmalte)));
+    if (!semDireito) out.push(rigido(282, 496, mao(282, 1, pele, peleE, esmalte)));
     if (!corpoCostas && vis('colar')) out.push(colar(e.colar, C('colar'), I));
     if (!corpoCostas && vis('broche')) out.push(broche(e.broche, C('broche')));
-    if (vis('pulseira') && !tchau && !semEsquerdo) out.push(pulseira(e.pulseira, C('pulseira')));
+    if (vis('pulseira') && !tchau && !semEsquerdo) out.push(rigido(118, 496, pulseira(e.pulseira, C('pulseira'))));
     if (!corpoCostas && vis('anel') && !tchau && !bracoPose) out.push(anel(e.anel, C('anel')));
     // em pose, a manga pendurada (parada) some do lado do braço em pose: o braço da pose desenha a própria manga
     if (bracoPose) {
@@ -1802,7 +1825,7 @@
       if (topo === 'coracao') t += p(coracao(x, y + 0.4, 3), { fill: '#e8384f', stroke: '#fff', 'stroke-width': 0.7 });
       if (topo === 'flor') t += flor(x, y + 0.6, 1.9, '#ff8fc8', '#ffd23f');
       if (topo === 'estrela') t += p(estrela5(x, y + 0.6, 4, 1.8), { fill: cor.hex, stroke: esc(cor.hex, 0.3), 'stroke-width': 0.7 });
-      return t;
+      return rigido(lado < 0 ? 118 : 282, 496, t);   // vai junto com a mão
     }
     if (tipo === 'dois') return um(-1, 'pedra') + um(1, 'coracao');
     return um(-1, tipo);
