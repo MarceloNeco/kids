@@ -403,3 +403,16 @@ dialog.pp-ia::backdrop { background: rgba(20, 6, 36, .72); }
 
 /* Purpurina Nova Era: o selo "Nova Era" ao lado do nome */
 .logo .nova-era { display: block; font-size: .42em; letter-spacing: .12em; text-transform: uppercase; color: #ffe08a; text-shadow: 0 0 10px rgba(255, 210, 120, .6); }
+
+/* combinações prontas (Nova Era): fileira que rola para o lado, em cima das partes da aba; a borda esmaece e a setinha ›
+   aparece quando tem mais para o lado */
+.combos { grid-column: 1 / -1; position: relative; margin: 0 0 4px; }
+.combos-tit { margin: 2px 4px 4px; font-size: .82rem; font-weight: 700; color: #ffe08a; text-align: left; }
+.combos-fila { display: flex; gap: 6px; overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; touch-action: pan-x; padding: 2px 2px 6px; scrollbar-width: none; }
+.combos-fila::-webkit-scrollbar { display: none; }
+.combos.tem-mais .combos-fila { -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent); mask-image: linear-gradient(90deg, #000 78%, transparent); }
+.combo-bt { flex: 0 0 auto; scroll-snap-align: start; display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 999px; background: linear-gradient(180deg, #ffd6ef, #ffb3e0); color: #4a1240; font-weight: 700; font-size: .88rem; border: 2px solid #ff8fd0; white-space: nowrap; }
+.combo-bt .i { font-size: 1.2rem; }
+.combos-seta { position: absolute; right: 0; top: 50%; transform: translateY(-20%); width: 36px; height: 36px; min-height: 36px; padding: 0; border-radius: 50%; background: #ff5fb4; color: #fff; font-size: 1.5rem; font-weight: 800; line-height: 1; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .35); animation: setaMais 1.2s ease-in-out infinite; }
+@keyframes setaMais { 0%, 100% { transform: translateY(-20%) translateX(0); } 50% { transform: translateY(-20%) translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .combos-seta { animation: none; } }

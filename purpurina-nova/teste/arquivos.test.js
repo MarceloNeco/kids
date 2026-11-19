@@ -92,3 +92,9 @@ test('estilos prontos na tela de looks e desfile com a turma (dono, 15/Nov/2026)
   assert.match(js, /Escolher um estilo pronto/);
   assert.match(js, /function entrarTurma\(/); assert.match(js, /purpurinaNova\.looks/); assert.match(js, /limparTurma\(\)/);
 });
+
+test('combinações prontas no estúdio com a setinha de "tem mais para o lado" (dono, 15/Nov/2026)', () => {
+  const js = ler('app.js'), css = ler('estilo.css');
+  assert.match(js, /function combinacoes\(cc\)/); assert.match(js, /P\.COMBOS\[grupoAtual\]/);
+  assert.match(css, /\.combos-fila \{[^}]*overflow-x: auto/); assert.match(css, /\.combos\.tem-mais \.combos-fila/); assert.match(css, /\.combos-seta/);
+});

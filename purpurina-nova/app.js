@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0';
+  var APP_VERSION = '0.2.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -320,6 +320,7 @@
     $('parteNome').textContent = atualC.ico + ' ' + N(atualC);
     $('estudio').classList.toggle('escolhendo', mostrandoOpcoes && !soUma);
     setTimeout(conferirMais, 30);
+    combinacoes(cc);
     cats.forEach(function (c) {
       // botão quadradinho (desenho em cima, nome embaixo): todas as partes ficam à vista, nada escondido para o lado
       var b = document.createElement('button'); b.type = 'button'; b.className = 'cat-bt';
@@ -329,6 +330,33 @@
       b.addEventListener('click', function () { catPorGrupo[grupoAtual] = c.id; Som.tocar('clique'); entrarNaParte(); desenharGrupos(); desenharOpcoes(); $('opcoes').scrollTop = 0; zoomDaParte(); chegar($('cores'), $('estilos')); });
       cc.appendChild(b);
     });
+  }
+  /* combinações prontas da aba (pecas.js, COMBOS): uma fileira que rola para o lado, em cima das partes. Mudam só as
+     partes desta aba (o resto do visual continua). Quando tem mais para o lado, a borda esmaece e aparece a setinha ›,
+     que também rola (celular primeiro: dá para ver que tem mais). */
+  function combinacoes(cc) {
+    var menino = estado.personagem === 'menino';
+    var lista = (P.COMBOS[grupoAtual] || []).filter(function (cb) { return menino ? !cb.menina : !cb.menino; });
+    if (!lista.length) return;
+    var caixa = document.createElement('div'); caixa.className = 'combos';
+    var tit = document.createElement('p'); tit.className = 'combos-tit'; tit.textContent = t('✨ Combinações prontas', '✨ Ready-made combos', '✨ Combinaciones listas');
+    var fila = document.createElement('div'); fila.className = 'combos-fila';
+    lista.forEach(function (cb) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'combo-bt';
+      b.innerHTML = '<span class="i"></span><span class="t"></span>'; b.firstChild.textContent = cb.ico; b.lastChild.textContent = N(cb);
+      b.addEventListener('click', function () {
+        var e = V.copiar(estado); Object.keys(cb.e).forEach(function (k) { e[k] = cb.e[k]; });
+        mudar(V.limpar(e), null); Som.tocar('brilho'); recado(cb.ico + ' ' + N(cb));
+      });
+      fila.appendChild(b);
+    });
+    var seta = document.createElement('button'); seta.type = 'button'; seta.className = 'combos-seta'; seta.textContent = '›';
+    seta.setAttribute('aria-label', t('Mais combinações', 'More combos', 'Más combinaciones'));
+    seta.addEventListener('click', function () { Som.tocar('clique'); try { fila.scrollBy({ left: fila.clientWidth * 0.7, behavior: 'smooth' }); } catch (e) { fila.scrollLeft += fila.clientWidth * 0.7; } });
+    function conferir() { var mais = fila.scrollWidth - fila.scrollLeft - fila.clientWidth > 8; caixa.classList.toggle('tem-mais', mais); seta.hidden = !mais; }
+    fila.addEventListener('scroll', conferir, { passive: true });
+    caixa.appendChild(tit); caixa.appendChild(fila); caixa.appendChild(seta); cc.appendChild(caixa);
+    setTimeout(conferir, 30);
   }
   function desenharOpcoes() {
     var cat = P.categoria(catPorGrupo[grupoAtual] || catsDoGrupo(grupoAtual)[0].id);
