@@ -347,6 +347,16 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.29.0 — ônibus de turismo de dois andares (dono, 19/Nov/2026)
+
+- `modelos3d.js`: `turismo` — casco arredondado embaixo (fatiado ao longo do ônibus para a ordem de pintura acertar),
+  janelas com passageiros desenhados redondos (sem esticar), andar de cima aberto de cantos redondos com corrimão,
+  bancos, 9 turistas (acenando, tirando foto com flash, de chapéu, de boné), cobertura de vidro só na frente; o piloto
+  no banco do fundo, lá em cima.
+- Peças novas: `painel()` (quadro plano com desenho, com lado de dentro opcional) e `painelEmPartes()` (o mesmo,
+  cortado em pedaços, cada um com o seu pedaço do desenho).
+- `veiculos.js`: 30 veículos.
+
 ## 1.28.0 — pula-pula, carrinho de bebê e carrinho de empurrar (dono, 19/Nov/2026, com fotos)
 
 - `modelos3d.js`: `pulapula` (armação octogonal com pernas em "U" e rodinhas, espuma vermelha, lona que afunda,
