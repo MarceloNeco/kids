@@ -205,6 +205,24 @@
       g.stroke();
     }, 0.12); } });
   }
+  /* painel (1.29.0): quadro plano com desenho (janelas, letreiro), cantos na ordem cima-esq, cima-dir, baixo-dir,
+     baixo-esq vistos de fora; de dentro só aparece se tiver op.verso (a cor do lado de dentro, sem desenho) */
+  function painel(cam, L, pts, cor, desenho, op) {
+    op = op || {};
+    var centro = mul(pts.reduce(function (a, b) { return add(a, b); }, [0, 0, 0]), 1 / pts.length), n = norm(cross(sub(pts[1], pts[0]), sub(pts[3], pts[0]))), fora = cam.ve(centro, n);
+    if (!fora && !op.verso) return;
+    var q = pts.map(cam.pt), dm = 0; q.forEach(function (p) { dm += p.d; }); dm /= q.length;
+    var dw = sub(pts[1], pts[0]), dh = sub(pts[3], pts[0]), asp = Math.sqrt(dot(dh, dh)) / (Math.sqrt(dot(dw, dw)) || 1);
+    var c3 = fora ? verniz(luzDe(cor, n), n, centro, cam) : luzDe(op.verso, mul(n, -1));
+    L.push({ d: dm + (op.vies || 0), f: function (c) { poligono(c, q, c3, fora ? desenho : null, op.alfa, asp); } });
+  }
+  // o mesmo painel, cortado em n pedaços ao longo do comprimento (a ordem de pintura acerta com o que está perto)
+  function painelEmPartes(cam, L, pts, n, cor, desenho, op) {
+    for (var j = 0; j < n; j++) {
+      var a = j / n, b = (j + 1) / n, lerp = function (p, q, t) { return add(p, mul(sub(q, p), t)); };
+      painel(cam, L, [lerp(pts[0], pts[1], a), lerp(pts[0], pts[1], b), lerp(pts[3], pts[2], b), lerp(pts[3], pts[2], a)], cor, desenho ? (function (j) { return function (c) { var asp = ASP; ASP = asp / n; c.scale(n, 1); c.translate(-j * 100 / n, 0); desenho(c); ASP = asp; }; })(j) : null, op);
+    }
+  }
   // disco girando (hélice, rotor): um borrão claro e transparente
   function disco(cam, L, centro, ex, ey, cor, alfa, vies) {
     var pts = []; for (var k = 0; k < 16; k++) { var a = k / 16 * PI * 2; pts.push(add(centro, add(mul(ex, Math.cos(a)), mul(ey, Math.sin(a))))); }
@@ -815,6 +833,104 @@
     } },
 
     // ---------- 1.28.0 (dono, 19/Nov/2026: "um desses pula-pula como transporte e carrinhos de passeio de neném") ----------
+    /* ônibus de turismo de 2 andares (dono, 19/Nov/2026: "aquele ônibus hop-on hop-off vermelho de 2 andares de
+       turismo, com qualidade, nada de muito quadradão"): carroceria de baixo arredondada (casco) com faixa amarela e
+       janelas com gente; andar de cima aberto, de cantos redondos, corrimão cromado, bancos azuis e turistas (um
+       acenando, uma tirando foto, de chapéu e de boné); cobertura de vidro só na frente. O piloto vai no último banco
+       lá em cima, de onde a câmera vê. */
+    turismo: { alt: 5.3, y: 1.75, z: -2.6, larg: 1.3, comp: 4.1, montar: function (cam, L, cor, f, op) {
+      var VERM = '#d71920', CROMO = '#d9dde3', AZ = '#1f5fbf', AM = '#ffd23f', CREME = '#f3ead8', VIDRO = '#9fd3f5', Y1 = 2.28, TOPO = 3.0, TETO = 3.56;
+      var PELE = ['#f2c9a0', '#8d5524', '#e0ac69', '#c68642', '#ffdbac', '#5c3a1e'], CAB = ['#2b1d14', '#e8c35a', '#7a3b12', '#1a1a1a', '#b9b9b9', '#d1542a'];
+      casco(cam, L, [
+        { z: -4.0, y: 1.32, w: 1.02, h: 0.84, n: 3 }, { z: -3.9, y: 1.32, w: 1.2, h: 0.93, n: 4 }, { z: -3.6, y: 1.32, w: 1.26, h: 0.96, n: 5 }]
+        .concat([1, 2, 3, 4, 5, 6].map(function (k) { return -3.6 + k * 6.5 / 6; }).map(function (z) { return { z: z, y: 1.32, w: 1.26, h: 0.96, n: 5 }; }), [
+        { z: 3.6, y: 1.32, w: 1.26, h: 0.96, n: 5 }, { z: 3.9, y: 1.32, w: 1.2, h: 0.93, n: 4 }, { z: 4.0, y: 1.32, w: 1.02, h: 0.84, n: 3 }
+      ]), VERM, { pinta: function (k) { return k === 14 || k === 9 ? AM : k >= 10 && k <= 13 ? '#2a2a30' : null; } });
+      // janelas de baixo, com os passageiros (cabeça e ombros redondos, sem esticar)
+      function janelas(semente) { return function (c) {
+        degrade(c, ['#4d6f91', '#1b2838']);
+        for (var k = 0; k < 9; k++) {
+          var x = 6 + k * 11.2, s = (k * 5 + semente) % 6;
+          if ((k + semente) % 3) { circulo(c, x, 112, 34, ['#e63946', '#2ec4b6', '#ffbe0b', '#8338ec', '#3a86ff', '#06d6a0'][s]); circulo(c, x, 52 + Math.sin(f * PI * 2 + k) * 3, 21, PELE[s]); circulo(c, x, 40 + Math.sin(f * PI * 2 + k) * 3, 17, CAB[s]); }
+          retangulo(c, x + 4.6, 0, 1.4, 100, '#14181f');
+        }
+        c.fillStyle = 'rgba(255,255,255,.18)'; c.beginPath(); c.moveTo(8, 0); c.lineTo(30, 0); c.lineTo(18, 100); c.lineTo(-4, 100); c.closePath(); c.fill();
+      }; }
+      painelEmPartes(cam, L, [[1.275, 1.98, -3.6], [1.275, 1.98, 2.9], [1.275, 1.4, 2.9], [1.275, 1.4, -3.6]], 6, '#2b3a4c', janelas(1), { vies: -0.03 });
+      painelEmPartes(cam, L, [[-1.275, 1.98, 2.9], [-1.275, 1.98, -3.6], [-1.275, 1.4, -3.6], [-1.275, 1.4, 2.9]], 6, '#2b3a4c', janelas(4), { vies: -0.03 });
+      [-1, 1].forEach(function (l) { painel(cam, L, l > 0 ? [[1.27, 1.98, 3.0], [1.27, 1.98, 3.5], [1.27, 0.6, 3.5], [1.27, 0.6, 3.0]] : [[-1.27, 1.98, 3.5], [-1.27, 1.98, 3.0], [-1.27, 0.6, 3.0], [-1.27, 0.6, 3.5]], '#2b3a4c', function (c) { degrade(c, ['#4d6f91', '#1b2838']); retangulo(c, 46, 0, 8, 100, '#14181f'); }, { vies: -0.03 }); });   // porta
+      // traseira de baixo: grade do motor, letreiro, lanternas e placa
+      painel(cam, L, [[-0.8, 1.95, -4.03], [0.8, 1.95, -4.03], [0.8, 0.72, -4.03], [-0.8, 0.72, -4.03]], VERM, function (c) {
+        texto(c, 'CITY TOUR', 50, 18, 20, '#ffffff', '#7a0a10'); texto(c, 'HOP ON · HOP OFF', 50, 38, 10, AM);
+        retangulo(c, 12, 50, 76, 34, '#2a2a30'); for (var y = 54; y < 82; y += 5) retangulo(c, 14, y, 72, 2.2, '#5a5f6a');
+        retangulo(c, 38, 88, 24, 10, '#ffffff'); texto(c, 'TOUR', 50, 93, 7, '#1a1446');
+      });
+      [[-0.98, 0.78], [-0.98, 1.05], [0.98, 0.78], [0.98, 1.05]].forEach(function (l, k) { bola(cam, L, [l[0], l[1], -3.97], 0.1, 0.1, 0.05, k % 2 ? ['#ffe0a0', '#ffb703', '#a06a00'] : ['#ffd0d0', '#ff2a2a', '#9a0010'], -0.02); if (!(k % 2)) luzinha(cam, L, [l[0], l[1], -4.02], 0.45, '#ff3030', 0.45); });
+      caixa(cam, L, [0, 0.42, -3.98], [2.3, 0.2, 0.16], '#2a2a30');   // para-choque
+      // frente: para-brisa grande, letreiro de destino, faróis e grade
+      painel(cam, L, [[1.0, 2.12, 4.03], [-1.0, 2.12, 4.03], [-1.0, 1.15, 4.03], [1.0, 1.15, 4.03]], '#2b3a4c', function (c) { degrade(c, ['#6d93b8', '#22344a']); retangulo(c, 0, 0, 100, 18, '#111'); texto(c, 'CITY TOUR', 50, 9, 13, '#ffb703'); retangulo(c, 49, 18, 2, 82, '#14181f'); });
+      [-0.82, 0.82].forEach(function (x) { bola(cam, L, [x, 0.78, 3.98], 0.14, 0.11, 0.06, ['#ffffff', '#fff7c2', '#c9b870'], -0.02); });
+      caixa(cam, L, [0, 0.42, 3.98], [2.3, 0.2, 0.16], '#2a2a30');
+      [-1, 1].forEach(function (l) { cano(cam, L, [l * 1.2, 2.0, 3.8], [l * 1.48, 2.05, 3.95], 0.025, 0.025, '#2a2a30'); bola(cam, L, [l * 1.5, 1.88, 3.95], 0.07, 0.17, 0.05, tres('#2a2a30')); });   // retrovisores
+      // o andar de cima: contorno de cantos redondos (vista de cima)
+      var A = 1.24, B = 3.98, RC = 0.6, borda = [];
+      [[1, 1, 0], [-1, 1, 1], [-1, -1, 2], [1, -1, 3]].forEach(function (cn) { for (var s = 0; s <= 4; s++) { var a = (cn[2] + s / 4) * PI / 2; borda.push([cn[0] * (A - RC) + Math.cos(a) * RC, cn[1] * (B - RC) + Math.sin(a) * RC]); } });
+      chapa(cam, L, borda.map(function (p) { return [p[0], Y1, p[1]]; }), '#4a5262');   // piso
+      var horizonte = function (c) {   // lateral de fora: prédios da cidade em amarelo e o letreiro
+        retangulo(c, 0, 0, 100, 100, VERM);
+        c.fillStyle = 'rgba(255,210,63,.55)'; [[2, 40], [7, 25], [11, 50], [16, 30], [21, 15], [24, 45], [30, 35], [70, 30], [74, 50], [79, 20], [84, 40], [89, 28], [94, 45]].forEach(function (b) { c.fillRect(b[0], b[1], 4.2, 100 - b[1]); });
+        texto(c, 'CITY TOUR', 50, 52, 52, '#ffffff', '#7a0a10');
+      };
+      for (var i = 0; i < borda.length; i++) {
+        var p = borda[i], q = borda[(i + 1) % borda.length], lg = Math.hypot(q[0] - p[0], q[1] - p[1]);
+        var pts = [[p[0], TOPO, p[1]], [q[0], TOPO, q[1]], [q[0], Y1 - 0.02, q[1]], [p[0], Y1 - 0.02, p[1]]];
+        var reto = lg > 1, traseira = reto && p[1] < -B + 0.01;
+        var des = reto ? (traseira ? function (c) { retangulo(c, 0, 0, 100, 100, VERM); texto(c, 'CITY TOUR', 50, 52, 28, '#ffffff', '#7a0a10'); } : Math.abs(p[0]) > A - 0.01 ? horizonte : null) : null;
+        painelEmPartes(cam, L, pts, lg > 3 ? 7 : 1, VERM, des, { verso: CREME });
+        cano(cam, L, [p[0], TOPO + 0.03, p[1]], [q[0], TOPO + 0.03, q[1]], 0.04, 0.04, CROMO, -0.01);   // corrimão
+      }
+      // cobertura de vidro na frente: colunas, vidros dos lados e da frente, teto vermelho por fora e branco por dentro
+      var ZC = 1.9, frente = borda.filter(function (p) { return p[1] > ZC; });
+      [[A, ZC], [-A, ZC]].concat(frente.filter(function (p, k) { return k % 2 === 0; })).forEach(function (p) { cano(cam, L, [p[0], TOPO, p[1]], [p[0], TETO, p[1]], 0.045, 0.045, '#2a2a30'); });
+      painel(cam, L, [[A + 0.005, TETO, ZC], [A + 0.005, TETO, B - RC], [A + 0.005, TOPO, B - RC], [A + 0.005, TOPO, ZC]], VIDRO, null, { alfa: 0.28, verso: VIDRO });
+      painel(cam, L, [[-A - 0.005, TETO, B - RC], [-A - 0.005, TETO, ZC], [-A - 0.005, TOPO, ZC], [-A - 0.005, TOPO, B - RC]], VIDRO, null, { alfa: 0.28, verso: VIDRO });
+      for (i = 0; i < frente.length - 1; i++) chapa(cam, L, [[frente[i][0], TETO, frente[i][1]], [frente[i + 1][0], TETO, frente[i + 1][1]], [frente[i + 1][0], TOPO, frente[i + 1][1]], [frente[i][0], TOPO, frente[i][1]]], VIDRO, { alfa: 0.3 });
+      var teto = [[A, TETO, ZC]].concat(frente.map(function (p) { return [p[0], TETO, p[1]]; }), [[-A, TETO, ZC]]);
+      chapa(cam, L, teto, VERM, { verso: '#f6f6f8' });
+      for (i = 0; i < teto.length - 1; i++) cano(cam, L, teto[i], teto[i + 1], 0.05, 0.05, tom(VERM, -0.2), -0.01);
+      cano(cam, L, teto[0], teto[teto.length - 1], 0.05, 0.05, tom(VERM, -0.2), -0.01);
+      // bancos azuis (dois de cada lado do corredor) e os turistas
+      var FILAS = [-2.45, -1.7, -0.95, -0.2, 0.55, 1.3, 2.05, 2.8];
+      FILAS.forEach(function (z) { [-0.64, 0.64].forEach(function (x) {
+        caixa(cam, L, [x, Y1 + 0.3, z], [0.92, 0.1, 0.42], AZ, null, { chanfro: 0 });
+        caixa(cam, L, [x, Y1 + 0.5, z - 0.2], [0.92, 0.42, 0.1], AZ, { tras: function (c) { retangulo(c, 0, 0, 100, 100, AZ); retangulo(c, 0, 0, 100, 18, '#ffffff'); } }, { chanfro: 0 });
+      }); });
+      caixa(cam, L, [0, Y1 + 0.42, -3.35], [2.1, 0.12, 0.5], AZ, null, { chanfro: 0 });   // banco do fundo, mais alto, inteiro
+      caixa(cam, L, [0, Y1 + 0.6, -3.62], [2.1, 0.42, 0.1], AZ, { tras: function (c) { retangulo(c, 0, 0, 100, 100, AZ); retangulo(c, 0, 0, 100, 18, '#ffffff'); } }, { chanfro: 0 });
+      [[-0.86, -1.7, '#2ec4b6', 0, 1, 'acena'], [0.42, -1.7, '#ff9f1c', 2, 0, 'chapeu'], [0.86, -0.95, '#e71d36', 1, 3, ''], [-0.42, -0.2, '#8338ec', 4, 4, 'foto'],
+        [0.42, 0.55, '#3a86ff', 3, 2, 'acena'], [-0.86, 0.55, '#ffbe0b', 5, 3, 'bone'], [0.86, 1.3, '#06d6a0', 0, 5, ''], [-0.42, -2.45, '#fb5607', 2, 1, 'chapeu'], [0.42, 2.8, '#ff5aa8', 4, 2, 'bone']].forEach(function (t, k) {
+        var x = t[0], z = t[1], y = Y1 + 0.62 + Math.sin(f * PI * 2 + k * 1.7) * 0.015, pele = PELE[t[3]];
+        bola(cam, L, [x, y, z], 0.2, 0.2, 0.15, tres(t[2]));   // ombros
+        bola(cam, L, [x, y + 0.32, z + 0.02], 0.15, 0.17, 0.15, tres(pele));   // cabeça
+        bola(cam, L, [x, y + 0.38, z - 0.02], 0.15, 0.13, 0.14, tres(CAB[t[4]]), -0.01);   // cabelo
+        if (t[5] === 'chapeu') { bola(cam, L, [x, y + 0.47, z], 0.3, 0.03, 0.3, tres('#f1d58a'), -0.02); bola(cam, L, [x, y + 0.53, z], 0.14, 0.08, 0.14, tres('#f1d58a'), -0.03); }
+        if (t[5] === 'bone') { bola(cam, L, [x, y + 0.47, z], 0.16, 0.08, 0.16, tres(t[2]), -0.02); caixa(cam, L, [x, y + 0.44, z + 0.18], [0.2, 0.025, 0.16], t[2], null, { chanfro: 0, vies: -0.02 }); }
+        if (t[5] === 'acena') {   // braço levantado, mão balançando
+          var om = [x + 0.17 * (x > 0 ? 1 : -1), y + 0.08, z], mao = [om[0] + (x > 0 ? 0.12 : -0.12) + Math.sin(f * PI * 4) * 0.1, y + 0.55, z + 0.05];
+          cano(cam, L, om, mao, 0.055, 0.045, t[2], -0.02); bola(cam, L, mao, 0.06, 0.07, 0.05, tres(pele), -0.03);
+        }
+        if (t[5] === 'foto') {   // as duas mãos para cima segurando a câmera na frente do rosto
+          [-1, 1].forEach(function (l) { cano(cam, L, [x + l * 0.16, y + 0.08, z], [x + l * 0.1, y + 0.36, z + 0.22], 0.05, 0.04, t[2]); });
+          caixa(cam, L, [x, y + 0.38, z + 0.24], [0.24, 0.15, 0.08], '#26262e', null, { chanfro: 0.02 }); bola(cam, L, [x, y + 0.38, z + 0.3], 0.05, 0.05, 0.03, tres('#6d93b8'), -0.01);
+          if (f % 0.5 < 0.06) luzinha(cam, L, [x + 0.08, y + 0.44, z + 0.3], 0.5, '#ffffff', 0.9);   // flash
+        }
+      });
+      // o piloto, no meio do banco do fundo
+      bola(cam, L, [0, Y1 + 0.78, -3.32], 0.28, 0.26, 0.18, tres(cor));
+      piloto(cam, L, [0, Y1 + 1.15, -3.3], 0.42, op);
+      fumaca(cam, L, [0.9, 0.4, -4.05]);
+      [[-1, -2.5], [1, -2.5], [-1, 2.65], [1, 2.65]].forEach(function (w) { roda(cam, L, [w[0] * 1.1, 0.52, w[1]], 0.52, 0.36, '#c9ced6'); });
+    } },
     /* pula-pula de rede: armação octogonal de aço com pernas em "U" (e rodinhas, para andar na pista), espuma vermelha
        cobrindo as molas, lona preta que afunda quando a criança cai, 8 postes com espuma vermelha e a rede em volta.
        fase: um ciclo = um pulo (sobe, no alto abre braços e pernas em estrela, desce e dobra os joelhos na lona) */
