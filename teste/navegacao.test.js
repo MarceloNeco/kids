@@ -66,6 +66,8 @@ const JOGOS = [
     entrar: async (pg) => { await pg.click('#btPink'); await pg.click('#btMeleca'); await pg.click('#btFacil'); await pg.click('#segredo .carta[data-id="0"]'); await pg.click('#btConfirmarSegredo'); await pg.waitForTimeout(500); } },
   { id: 'glub-glub', url: 'glub-glub/?teste', inicio: '#btSozinho',
     entrar: async (pg) => { await pg.click('#btSozinho'); await pg.click('#btJogar'); await pg.waitForTimeout(600); } },
+  { id: 'jogoteca', url: 'jogoteca/?teste', inicio: '#btJogar',
+    entrar: async (pg) => { await pg.click('#btJogar'); await pg.waitForTimeout(600); } },
   { id: 'danca-na-sala', url: 'danca-na-sala.html?teste', inicio: '#btSolo',
     entrar: async (pg) => { await pg.click('#btSolo'); await pg.fill('#nome', 'Lara').catch(() => {}); await pg.click('#btEntrar'); await pg.waitForSelector('#jogo.solo', { timeout: 15000 }); await pg.waitForTimeout(500); } },
 ];

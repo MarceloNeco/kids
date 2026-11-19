@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Jogoteca — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../carregando.js" data-fora-do-arquivo></script>
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#1b2a6b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Jogoteca: os jogos clássicos para jogar em família — paciência, sudoku, boliche e mais chegando. / Jogoteca: classic games for the whole family — solitaire, sudoku, bowling and more on the way. / Jogoteca: los juegos clásicos para jugar en familia — solitario, sudoku, bolos y más en camino.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Jogoteca — a biblioteca de jogos clássicos do Bolinho de Chuva (SolverONE · kids). Pendência 69.
+  Menu (app.js): fileira de capas (capas.js) e, ao lado, a prévia do jogo escolhido com o nível e o ▶ Jogar.
+  Cada jogo mora em jogos/<id>.js e se registra em window.JogotecaJogos (contrato no começo do app.js).
+  Música: a trilha comum (../trilha.js). Sem login, sem banco: tudo fica no aparelho.
+  Nada de script inline: a CSP acima não permite. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+
+<section id="menu" class="tela ativa" data-recurso="jogoteca">
+  <header class="topo">
+    <h1 class="logo"><span class="logo-j">Jogo</span><span class="logo-t">teca</span></h1>
+    <p class="sub" data-t="Os clássicos para jogar em família|Classic games for the whole family|Los clásicos para jugar en familia"></p>
+  </header>
+  <div class="vitrine">
+    <div id="capas" class="capas" role="listbox" aria-label="Jogos" data-rotulo="Jogos|Games|Juegos"></div>
+    <aside id="previa" class="previa" aria-live="polite">
+      <div class="previa-topo">
+        <div id="previaCapa" class="previa-capa" aria-hidden="true"></div>
+        <div class="previa-info">
+          <h2 id="previaNome"></h2>
+          <p id="previaTexto" class="previa-texto"></p>
+        </div>
+      </div>
+      <div id="linhaNivel" class="grupo" role="radiogroup" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
+        <button class="chip verde" type="button" role="radio" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+        <button class="chip amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+        <button class="chip vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      </div>
+      <p id="previaNivel" class="previa-nivel"></p>
+      <button id="btJogar" class="jogar" type="button" data-t="▶ Jogar|▶ Play|▶ Jugar"></button>
+      <p id="emBreve" class="em-breve" hidden data-t="🛠️ Em construção: chega numa próxima versão.|🛠️ Under construction: coming in a future version.|🛠️ En construcción: llega en una próxima versión."></p>
+    </aside>
+  </div>
+  <div class="rodape">
+    <button id="btEfeitos" class="mini" type="button" aria-pressed="true" data-rotulo="Sons|Sounds|Sonidos">🔊</button>
+    <p id="versao" class="versao"></p>
+  </div>
+</section>
+
+<section id="jogo" class="tela" data-recurso="jogoteca">
+  <div class="barra">
+    <span id="jogoNome" class="barra-nome"></span>
+    <span id="jogoNivel" class="barra-nivel"></span>
+    <button id="btAjuda" class="mini" type="button" aria-expanded="false" data-rotulo="Como jogar|How to play|Cómo se juega">❓</button>
+    <button id="btRecomecar" class="mini" type="button" data-rotulo="Recomeçar|Restart|Empezar de nuevo">🔄</button>
+  </div>
+  <div id="palco" class="palco"></div>
+  <div id="ajuda" class="ajuda" hidden>
+    <div class="ajuda-caixa">
+      <h2 data-t="Como jogar|How to play|Cómo se juega"></h2>
+      <div id="ajudaTexto"></div>
+      <button id="btAjudaOk" class="jogar pequeno" type="button" data-t="✓ Entendi|✓ Got it|✓ Entendido"></button>
+    </div>
+  </div>
+  <div id="fim" class="fim" hidden>
+    <div class="fim-caixa">
+      <div class="fim-festa" aria-hidden="true">🎉</div>
+      <h2 id="fimTitulo"></h2>
+      <p id="fimTexto"></p>
+      <button id="btDeNovo" class="jogar" type="button" data-t="🔄 Jogar de novo|🔄 Play again|🔄 Jugar otra vez"></button>
+      <button id="btOutro" class="mini largo" type="button" data-t="📚 Escolher outro jogo|📚 Pick another game|📚 Elegir otro juego"></button>
+    </div>
+  </div>
+</section>
+
+<section id="desligado" class="tela" hidden>
+  <h2 data-t="A Jogoteca está descansando agora.|Jogoteca is resting right now.|Jogoteca está descansando ahora."></h2>
+</section>
+
+<script src="capas.js"></script>
+<script src="jogos/paciencia.js"></script>
+<script src="jogos/sudoku.js"></script>
+<script src="jogos/boliche.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

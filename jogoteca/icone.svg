@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3d56c9"/><stop offset="1" stop-color="#3a1d7a"/></linearGradient>
+    <linearGradient id="o" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe07a"/><stop offset="1" stop-color="#ff9d2e"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#f)"/>
+  <g transform="translate(256 286)">
+    <g transform="rotate(-18) translate(-150 -10)"><rect x="-62" y="-86" width="124" height="172" rx="16" fill="#1c7a3f" stroke="#fff" stroke-width="8"/><text x="0" y="22" text-anchor="middle" font-size="84" fill="#fff">♠</text></g>
+    <g transform="rotate(18) translate(150 -10)"><rect x="-62" y="-86" width="124" height="172" rx="16" fill="#2bb3b1" stroke="#fff" stroke-width="8"/><circle cx="0" cy="18" r="34" fill="#2340b8"/><circle cx="-10" cy="8" r="7" fill="#fff" opacity=".4"/></g>
+    <g><rect x="-74" y="-118" width="148" height="206" rx="18" fill="#eef6ff" stroke="#fff" stroke-width="8"/>
+      <g stroke="#1b3d8f" stroke-width="5"><line x1="-50" y1="-42" x2="50" y2="-42"/><line x1="-50" y1="8" x2="50" y2="8"/><line x1="-16" y1="-92" x2="-16" y2="58"/><line x1="18" y1="-92" x2="18" y2="58"/></g>
+      <text x="-33" y="-55" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="700" fill="#13265f">7</text>
+      <text x="1" y="-6" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="700" fill="#2d7cf6">3</text>
+      <text x="35" y="45" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="700" fill="#13265f">9</text></g>
+  </g>
+  <path d="M256 40 l22 46 l50 6 l-37 34 l10 50 l-45 -25 l-45 25 l10 -50 l-37 -34 l50 -6z" fill="url(#o)" stroke="#b45d0c" stroke-width="6" transform="translate(0 -6) scale(1) "/>
+</svg>

@@ -10,7 +10,7 @@ const raiz = path.join(__dirname, '..');
 const ler = (f) => fs.readFileSync(path.join(raiz, f), 'utf8');
 const Trilha = require('../trilha.js');
 const FAV = Trilha.offline.FAVORITAS;
-const IDS = ['estante', 'baguncolandia', 'peluqueria', 'vruuum', 'purpurina', 'rabiscolandia', 'campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub'];
+const IDS = ['estante', 'baguncolandia', 'peluqueria', 'vruuum', 'purpurina', 'rabiscolandia', 'campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub', 'jogoteca'];
 const arquivo = (u) => u.replace(/^.*?\/kids\//, '');
 
 test('favoritas: uma por jogo e a da estante, arquivo que existe, até 4 MB', () => {
@@ -33,7 +33,7 @@ test('cada favorita é uma música que o próprio jogo já toca', () => {
   assert.ok(ler('peluqueria/musicas/musicas.json').includes('"' + nome('peluqueria') + '"'), 'peluqueria');
   for (const id of ['vruuum', 'purpurina']) assert.ok(ler(id + '/som.js').includes("'musicas/" + nome(id) + "'"), id);
   assert.ok(ler('rabiscolandia/som.js').includes("gr('" + nome('rabiscolandia').replace('.mp3', '') + "'"), 'rabiscolandia');
-  for (const id of ['campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub']) {
+  for (const id of ['campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub', 'jogoteca']) {
     assert.ok(ler(id + '/app.js').includes(nome(id).replace('.mp3', '')), id + ': ' + nome(id));
   }
 });

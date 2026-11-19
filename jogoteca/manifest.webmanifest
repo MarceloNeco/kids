@@ -1,0 +1,17 @@
+{
+  "name": "Jogoteca — Bolinho de Chuva",
+  "short_name": "Jogoteca",
+  "description": "Os jogos clássicos para jogar em família: paciência, sudoku, boliche e mais chegando. / Classic games for the whole family: solitaire, sudoku, bowling and more on the way.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1b2a6b",
+  "theme_color": "#1b2a6b",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
