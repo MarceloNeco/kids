@@ -2,6 +2,26 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.2.1",
+      "data": "19/Nov/2026",
+      "hora": "23:30:00",
+      "pt": [
+        "📺 Bolinhas da Angústia com cara de programa de TV: parede de acrílico na moldura de metal com parafusos e LEDs, pinos cromados, placas de valor de LED, piso brilhante, luzes de estúdio e plateia",
+        "🎥 Câmera de transmissão: desce junto com a bolinha, mostra as outras em quadrinhos e faz câmera lenta no último segundo, perto das canaletas",
+        "🐢 Em aparelho mais lento, o jogo liga sozinho um modo leve para continuar fluido"
+      ],
+      "en": [
+        "📺 Nail-Biter Drop now looks like a real TV show: acrylic wall in a metal frame with bolts and LEDs, chrome pegs, LED value boards, a glossy floor, studio lights and an audience",
+        "🎥 Broadcast camera: it follows the ball down, shows the others in small inset frames and goes slow motion in the last second, near the slots",
+        "🐢 On slower devices, the game switches to a light mode on its own to stay smooth"
+      ],
+      "es": [
+        "📺 Bolitas de la Angustia con aspecto de programa de tele: pared de metacrilato en un marco de metal con tornillos y LED, clavos cromados, placas de valor de LED, suelo brillante, luces de plató y público",
+        "🎥 Cámara de retransmisión: baja junto con la bolita, enseña las demás en recuadros pequeños y pasa a cámara lenta en el último segundo, cerca de las casillas",
+        "🐢 En aparatos más lentos, el juego activa solo un modo ligero para seguir fluido"
+      ]
+    },
+    {
       "versao": "0.2.0",
       "data": "19/Nov/2026",
       "hora": "21:30:00",

@@ -12,7 +12,7 @@ na vitrine com a fita "Em breve".
 | `jogos/paciencia.js` | Paciência (Klondike): fácil vira 1, médio vira 3, difícil vira 3 sem desfazer |
 | `jogos/sudoku.js` | Sudoku com gerador próprio de solução única; pistas por nível |
 | `jogos/boliche.js` | Boliche em canvas, 10 jogadas com placar de verdade; fácil com proteção nas canaletas |
-| `jogos/bolinhas.js` | Bolinhas da Angústia: game show na parede de pinos (física própria, leve), Solo + Parceiro virtual ou Dois na mesma tela, 3 fases e o Contrato; especificação do dono em `BOLINHAS-ESPECIFICACAO.md` |
+| `jogos/bolinhas.js` | Bolinhas da Angústia: game show na parede de pinos (física própria, leve), Solo + Parceiro virtual ou Dois na mesma tela, 3 fases e o Contrato; estúdio de TV em 2.5D com câmera de transmissão (segue a bolinha, quadrinhos, câmera lenta no fim) e modo leve automático; especificação do dono em `BOLINHAS-ESPECIFICACAO.md` |
 | `jogos/bolinhas-perguntas.js` | as 100 perguntas do Bolinhas (40 de 2 opções, 30 de 3, 30 de 4), dificuldade 1 a 3, em PT/EN/ES |
 | `estilo.css` | visual da casca (cada jogo traz o próprio estilo, prefixado) |
 | `sw.js`, `manifest.webmanifest`, `versoes.json` | instalar e jogar sem internet (peça comum `../sw-comum.js`), versão |

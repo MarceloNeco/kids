@@ -214,6 +214,34 @@ test.describe('no navegador', () => {
     });
   }
 
+  test('câmera de TV: desce junto com a bolinha (com zoom e câmera lenta no fim) e volta ao plano aberto', { timeout: 60000 }, async () => {
+    const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }, 'facil');
+    await pg.click('.jt-bol2-cena [data-comecar]');
+    await pg.evaluate(() => BolinhasDebug.pularCartao());
+    const c0 = await pg.evaluate(() => BolinhasDebug.camera());
+    assert.ok(Math.abs(c0.z - 1) < 0.01 && Math.abs(c0.x - c0.aberto.x) < 1 && Math.abs(c0.y - c0.aberto.y) < 1, 'começa no plano aberto');
+    await pg.evaluate(() => { BolinhasDebug.velocidade(1.5); BolinhasDebug.responderCerto(); });
+    const amostras = [];
+    for (let i = 0; i < 200; i++) {
+      const s = await pg.evaluate(() => ({ c: BolinhasDebug.camera(), e: BolinhasDebug.estado() }));
+      amostras.push(s);
+      if (s.e.rodada >= 1) break;
+      await pg.waitForTimeout(100);
+    }
+    const seguindo = amostras.filter(s => s.c.lider && (s.c.plano === 'segue' || s.c.plano === 'lenta' || s.c.plano === 'grupo'));
+    assert.ok(seguindo.length >= 5, 'a câmera seguiu a queda: ' + seguindo.length + ' amostras');
+    assert.ok(seguindo.some(s => s.c.z > 1.6), 'aproxima (zoom)');
+    const meio = seguindo.slice(Math.floor(seguindo.length / 3));
+    assert.ok(meio[meio.length - 1].c.y > meio[0].c.y + 120, 'o centro da câmera desce junto: ' + meio[0].c.y.toFixed(0) + ' → ' + meio[meio.length - 1].c.y.toFixed(0));
+    for (const s of meio) assert.ok(Math.abs(s.c.y - s.c.lider.y) < 360, 'a bolinha fica no quadro');
+    assert.ok(amostras.some(s => s.c.lenta), 'câmera lenta perto das canaletas');
+    // terminou a queda: volta ao plano aberto
+    await pg.waitForFunction(() => { const c = BolinhasDebug.camera(); return !c.lider && Math.abs(c.z - 1) < 0.03 && Math.abs(c.y - c.aberto.y) < 12 && Math.abs(c.x - c.aberto.x) < 12; }, null, { timeout: 15000 });
+    assert.equal((await pg.evaluate(() => BolinhasDebug.camera())).lenta, false);
+    assert.deepEqual(pg.erros, []);
+    await pg.ctx.close();
+  });
+
   test('390×844, Solo + Parceiro: a partida inteira até o Contrato e a revelação', { timeout: 150000 }, async () => {
     const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }, 'medio');
     await pg.click('.jt-bol2-cena [data-comecar]');
