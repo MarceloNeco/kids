@@ -3,9 +3,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const V = require('../veiculos.js');
 
-test('26 veículos, ids únicos, nome em PT, EN e ES, grupo que existe', () => {
-  assert.equal(V.LISTA.length, 26);
-  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 26);
+test('30 veículos, ids únicos, nome em PT, EN e ES, grupo que existe', () => {
+  assert.equal(V.LISTA.length, 30);
+  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 30);
   const grupos = V.GRUPOS.map(g => g.id);
   for (const g of V.GRUPOS) assert.equal(g.nome.length, 3, g.id);
   for (const v of V.LISTA) {
@@ -50,7 +50,7 @@ test('bichos e carrinhos sem motor de carro: cada um tem a sua voz gravada', () 
 
 test('veículos em 3D (modelos3d.js): giram de lado, e a cabeça do piloto fica dentro do quadro em qualquer giro', () => {
   const M3 = require('../modelos3d.js');
-  for (const id of ['furgao', 'escolar', 'pelucias', 'pipoca', 'sorvete', 'hamburguer', 'galinha']) {
+  for (const id of ['furgao', 'escolar', 'pelucias', 'pipoca', 'sorvete', 'hamburguer', 'galinha', 'pulapula', 'bebe', 'empurrar', 'turismo']) {
     const v = V.achar(id);
     assert.equal(v.modelo, id);
     for (const lado of [-1, 0, 1]) for (const incl of [-0.3, 0, 0.3]) {
@@ -61,4 +61,13 @@ test('veículos em 3D (modelos3d.js): giram de lado, e a cabeça do piloto fica 
     assert.ok(fC > 5 && fL > 5, id + ' faces ' + fC + ' ' + fL);
   }
   assert.ok(V.achar('ovo').semPiloto, 'o Ovo corre sozinho, sem carro e sem piloto');
+});
+
+test('1.28.0: pula-pula, carrinho de bebê e carrinho de empurrar, sem motor; a criança pula de verdade no pula-pula', () => {
+  const M3 = require('../modelos3d.js');
+  for (const id of ['pulapula', 'bebe', 'empurrar']) { const v = V.achar(id); assert.ok(v.semMotor, id); assert.ok(!V.voa(id), id); }
+  const v = V.achar('pulapula');
+  assert.ok(v.quadros >= 8, 'quadros do pulo');
+  const lona = M3.cabeca('pulapula', 0, 0, v.w, v.h, 0, 0, 0).y, alto = M3.cabeca('pulapula', 0, 0, v.w, v.h, 0.5, 0, 0).y;
+  assert.ok(lona - alto > v.h * 0.15, 'no alto do pulo a cabeça sobe bem: ' + lona + ' -> ' + alto);
 });

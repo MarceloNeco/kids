@@ -1,4 +1,4 @@
-/* Vruuum! — a garagem: 26 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
+/* Vruuum! — a garagem: 30 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
    na curva aparece a lateral, no morro o teto. Grupos: carros, "moto, skate e montarias" e os que voam (desenho.js troca
    a estrada por uma rota no ar e os obstáculos por pássaros, nuvens de tempestade, anéis e correntes de ar).
    Estilos inspirados em carros esportivos famosos, mas sem marca, logotipo ou nome de fabricante.
@@ -38,9 +38,13 @@
     em3d('hamburguer', { id: 'hamburguer', grupo: 'terra', nome: ['Carro-Hambúrguer', 'Burger Car', 'Coche Hamburguesa'], w: 900, h: 860, vel: 1.0, curva: 1.0 }),
     em3d('furgao', { id: 'furgao', grupo: 'terra', nome: ['Furgão de Surfe', 'Surf Van', 'Furgoneta de Surf'], w: 900, h: 1000, vel: 0.99, curva: 1.0 }),
     em3d('escolar', { id: 'escolar', quadros: 8, grupo: 'terra', nome: ['Ônibus Escolar', 'School Bus', 'Autobús Escolar'], w: 1000, h: 1100, vel: 0.95, curva: 0.96 }),
+    em3d('turismo', { id: 'turismo', quadros: 8, grupo: 'terra', nome: ['Ônibus de Turismo', 'Tour Bus', 'Autobús Turístico'], w: 1050, h: 1320, vel: 0.94, curva: 0.95 }),
     em3d('pelucias', { id: 'pelucias', quadros: 8, grupo: 'terra', nome: ['Caminhão de Pelúcias', 'Plush Claw Truck', 'Camión de Peluches'], w: 1000, h: 1060, vel: 0.96, curva: 0.98 }),
     em3d('patins', { id: 'patins', capacete: true, semMotor: true, quadros: 12, grupo: 'moto', nome: ['Patins', 'Roller Skates', 'Patines'], w: 700, h: 1170, vel: 0.95, curva: 1.15 }),
     em3d('guincho', { id: 'guincho', quadros: 8, grupo: 'terra', nome: ['Caminhão Guincho', 'Tow Truck', 'Camión Grúa'], w: 760, h: 1290, vel: 0.95, curva: 0.96 }),
+    em3d('pulapula', { id: 'pulapula', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Pula-Pula', 'Trampoline', 'Cama Elástica'], w: 740, h: 1150, vel: 0.93, curva: 1.1 }),
+    em3d('bebe', { id: 'bebe', semMotor: true, quadros: 6, grupo: 'terra', nome: ['Carrinho de Bebê', 'Baby Stroller', 'Carrito de Bebé'], w: 760, h: 1080, vel: 0.94, curva: 1.12 }),
+    em3d('empurrar', { id: 'empurrar', semMotor: true, grupo: 'terra', nome: ['Carrinho de Empurrar', 'Push Car', 'Correpasillos'], w: 720, h: 1040, vel: 0.95, curva: 1.1 }),
     em3d('ovo', { id: 'ovo', quadros: 8, semPiloto: true, semMotor: true, grupo: 'moto', nome: ['Ovo Corredor', 'Running Egg', 'Huevo Corredor'], w: 720, h: 1000, vel: 0.97, curva: 1.14 }),
     em3d('aviao', { id: 'aviao', grupo: 'ar', nome: ['Aviãozinho', 'Little Plane', 'Avioncito'], w: 1500, h: 760, vel: 1, curva: 1.05 }),
     em3d('jato', { id: 'jato', grupo: 'ar', nome: ['Jato', 'Jet', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92 }),
