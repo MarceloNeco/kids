@@ -14,6 +14,9 @@
      pos    { id, rid, z, x, v, tu, pu, c, tm, pt }   onde eu estou (10 por segundo durante a corrida)
      riv    { id, rid, r: [[z, x, tu, c, tm], ...] }  onde estão os rivais do computador (só quem criou manda)
      tchau  { id }                              saí do duelo
+   CELULAR COMO CONTROLE DA TV (canal "vruuum-tv-<código>"; a TV mostra o código, cada celular vira um controle):
+     ctl    { id, d, p, g }   do celular: direção (-1 a 1), quantos pulos já pediu, quantas vezes tocou em Começar
+     vaga   { id, alvo, j }   da TV: o celular "alvo" é o jogador j (0 ou 1; -1 = já tem dois controles)
    Cada aparelho corre a SUA corrida (mesma semente = mesma pista); o outro aparece como mais um corredor, movido pelo
    que chega do canal (com um pouquinho de atraso, que o dono aceitou). Os rivais do computador quem move é quem criou.
 
@@ -75,6 +78,8 @@
       return { t: 'riv', id: id, rid: rd, r: lista };
     }
     if (m.t === 'tchau') return { t: 'tchau', id: id };
+    if (m.t === 'ctl') { var cl = { t: 'ctl', id: id, d: num(m.d, -1, 1), p: num(m.p, 0, 1e6), g: num(m.g, 0, 1e6) }; return cl.d === null || cl.p === null || cl.g === null ? null : cl; }
+    if (m.t === 'vaga') { var al = id8(m.alvo), jv = [-1, 0, 1].indexOf(m.j) >= 0 ? m.j : null; return al && jv !== null ? { t: 'vaga', id: id, alvo: al, j: jv } : null; }
     return null;
   }
 
@@ -92,7 +97,7 @@
   }
   function entregar(aoReceber) { return function (dado) { var m = validar(dado); if (m) { try { aoReceber(m); } catch (e) { if (raiz.console) console.warn(e); } } }; }
   function abrirLocal(cod, aoReceber) {
-    var bc = new BroadcastChannel('vruuum-' + cod), r = entregar(aoReceber);
+    var bc = new BroadcastChannel('vruuum-' + cod), r = entregar(aoReceber);   // cod já vem com "tv-" na frente quando é controle
     bc.onmessage = function (ev) { r(ev.data); };
     return Promise.resolve({ mandar: function (m) { try { bc.postMessage(JSON.parse(JSON.stringify(m))); } catch (e) { /* fechado */ } }, fechar: function () { try { bc.close(); } catch (e) { /* ok */ } } });
   }
@@ -116,7 +121,7 @@
 
   var API = {
     validar: validar, codigoNovo: codigoNovo, idNovo: idNovo, codigo: codigo, nome: nome, LOCAL: LOCAL,
-    abrir: function (cod, aoReceber, aoCair) { return LOCAL ? abrirLocal(cod, aoReceber) : abrirSupabase(cod, aoReceber, aoCair); }
+    abrir: function (cod, aoReceber, aoCair, tv) { cod = (tv ? 'tv-' : '') + cod; return LOCAL ? abrirLocal(cod, aoReceber) : abrirSupabase(cod, aoReceber, aoCair); }
   };
   raiz.VruuumDuelo = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

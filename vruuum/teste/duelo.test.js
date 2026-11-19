@@ -39,3 +39,13 @@ test('o corredor que vem do outro celular (remoto) não é movido pelo computado
   assert.equal(outro.z, 3000, 'o remoto ficou onde o canal pôs');
   assert.ok(e.rivais[0].z > z0, 'o rival do computador andou');
 });
+
+test('celular como controle da TV: mensagens ctl e vaga', () => {
+  const id = 'abcd1234';
+  assert.deepEqual(DU.validar({ t: 'ctl', id, d: -1, p: 3, g: 1 }), { t: 'ctl', id, d: -1, p: 3, g: 1 });
+  assert.equal(DU.validar({ t: 'ctl', id, d: 2, p: 0, g: 0 }), null, 'direção fora de -1 a 1');
+  assert.equal(DU.validar({ t: 'ctl', id, d: 0, p: -1, g: 0 }), null);
+  assert.deepEqual(DU.validar({ t: 'vaga', id, alvo: 'zzzz1111', j: 1 }), { t: 'vaga', id, alvo: 'zzzz1111', j: 1 });
+  assert.equal(DU.validar({ t: 'vaga', id, alvo: 'zzzz1111', j: 2 }), null);
+  assert.equal(DU.validar({ t: 'vaga', id, alvo: 'X', j: 0 }), null);
+});

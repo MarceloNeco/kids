@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.27.0",
+      "data": "19/Nov/2026",
+      "hora": "15:24:00",
+      "pt": [
+        "📺 TV com os celulares como controle: na TV, toque em 📺 Celulares como controle e aparece um código; em cada celular, toque em 🎮 Ser controle da TV e digite o código. O primeiro é o Jogador 1, o segundo o Jogador 2: ◀ e ▶ viram, ⬆ pula e 🏁 começa a corrida na tela dividida."
+      ],
+      "en": [
+        "📺 TV with phones as controllers: on the TV, tap 📺 Phones as controllers and a code shows up; on each phone, tap 🎮 Be the TV controller and type the code. The first is Player 1, the second Player 2: ◀ and ▶ steer, ⬆ jumps and 🏁 starts the split-screen race."
+      ],
+      "es": [
+        "📺 La tele con los móviles como mando: en la tele, pulsa 📺 Móviles como mando y sale un código; en cada móvil, pulsa 🎮 Ser el mando de la tele y escribe el código. El primero es el Jugador 1 y el segundo, el Jugador 2: ◀ y ▶ giran, ⬆ salta y 🏁 empieza la carrera en pantalla dividida."
+      ]
+    },
+    {
       "versao": "1.26.0",
       "data": "19/Nov/2026",
       "hora": "15:12:00",
