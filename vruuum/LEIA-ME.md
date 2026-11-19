@@ -347,6 +347,15 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.28.0 — pula-pula, carrinho de bebê e carrinho de empurrar (dono, 19/Nov/2026, com fotos)
+
+- `modelos3d.js`: `pulapula` (armação octogonal com pernas em "U" e rodinhas, espuma vermelha, lona que afunda,
+  8 postes, `rede()` com malha em losangos; a criança pula: fase 0 = na lona, 0,5 = no alto em estrela), `bebe`
+  (3 rodas, capota em gomos aberta atrás, assento de tecido na cor, cestinha, mamadeira, chocalho) e `empurrar`
+  (carrinho de brinquedo branco com friso na cor, volante, buzina, cabo de empurrar e bandejinha).
+- `roda(..., dosDois)`: no carrinho de bebê e no pula-pula aparece também o lado de dentro da roda.
+- `veiculos.js`: 29 veículos; os três novos são `semMotor` (sem ronco nem fogo do turbo).
+
 ## 1.27.0 — TV com os celulares como controle (dono, 16/Nov/2026, parte 2)
 
 - Mesmo canal do duelo, com "tv-" na frente do código (`VruuumDuelo.abrir(cod, ..., true)`). Mensagens `ctl` (do
