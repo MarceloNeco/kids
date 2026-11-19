@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.25.1';
+  var APP_VERSION = '1.26.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -390,14 +390,20 @@
   }
   window.addEventListener('resize', function () { if (rodando) redimensionar(); });
 
-  function iniciarCorrida() {
+  function iniciarCorrida(dl) {   // dl: a largada que veio de quem criou o duelo (só para quem entrou)
+    if (duelo && !dl) {   // no duelo, só quem criou dá a largada
+      if (!duelo.host) { dueloAviso(t('Espere ', 'Wait for ', 'Espera a ') + (duelo.outro ? duelo.outro.nome : '') + t(' tocar em Correr.', ' to tap Race.', ' a que pulse A correr.')); return; }
+      if (!duelo.outro) { dueloAviso(t('Espere alguém entrar no duelo (código ', 'Wait for someone to join the duel (code ', 'Espera a que alguien entre en el duelo (código ') + duelo.cod + ').'); return; }
+    }
+    if (duelo) pref.jogadores = 1;   // no duelo cada um joga no seu aparelho
     Som.iniciar();
     if (TOQUE && pref.jogadores === 1 && pref.controle !== 'maos') ligarMovimento();   // com as mãos na câmera, o celular fica parado (sem inclinar)
     mov.zerar(); mov.calibrar();
     jogs = pref.carros.slice(0, pref.jogadores).map(function (c) { return { cor: D.CORES[c.cor], piloto: D.PILOTOS[c.piloto], veic: c.veic, foto: fotoDe(pref.carros.indexOf(c)), personagem: c.personagem || null, corpo: c.corpo || 'menina' }; });
     // rivais: personagens sorteados (fora os escolhidos), no chão ou no céu como o jogador 1
     var configs = [];
-    if (pref.rivais === 'com' && PE) {
+    if (dl) configs = dl.riv.map(function (r) { return { id: r.id, veic: r.veic, cor: r.cor, mod: { vel: r.vel, curva: r.curva } }; });   // os rivais de quem criou
+    else if (pref.rivais === 'com' && PE) {
       var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return VE.voa(v.id) === voa1; });
       // 1.13.0: ninguém repetido — nem o personagem, nem o veículo de quem joga (escolheu a galinha, não corre contra galinha)
       var livres = opcoes.filter(function (v) { return jogs.every(function (j) { return j.veic !== v.id; }); });
@@ -407,7 +413,22 @@
         configs.push({ id: p.id, veic: v.id, cor: p.cor || D.CORES[(k + 3) % D.CORES.length], mod: { vel: v.vel, curva: v.curva } });
       });
     }
-    estado = M.novaCorrida(pref.nivel, (Date.now() % 1000000007) | 0, pref.jogadores, configs, pref.mundos);
+    var semente = dl ? dl.sem : (Date.now() % 1000000007) | 0, nivel = dl ? dl.niv : pref.nivel, mundos = dl ? dl.mun : pref.mundos;
+    if (duelo && !dl) {   // quem criou: manda a largada (repetida, o canal pode perder uma)
+      duelo.rid = DU.idNovo();
+      var larg = { t: 'largar', id: duelo.meuId, rid: duelo.rid, sem: semente, niv: nivel, mun: mundos.slice(0, 4), riv: configs.map(function (c) { return { id: c.id, veic: c.veic, cor: c.cor, vel: c.mod.vel, curva: c.mod.curva }; }) };
+      [0, 400, 900, 1500, 2200].forEach(function (ms) { setTimeout(function () { if (duelo && duelo.rid === larg.rid) duelo.canal.mandar(larg); }, ms); });
+    }
+    if (duelo && duelo.outro) {   // o outro jogador entra como mais um corredor, movido pelo canal
+      var o = duelo.outro, vo = VE.achar(o.veic) || VE.LISTA[0];
+      configs.push({ id: o.pers && PE && PE.achar(o.pers) ? o.pers : (PE ? PE.LISTA[0].id : 'x'), veic: vo.id, cor: o.cor, mod: { vel: vo.vel, curva: vo.curva } });
+    }
+    estado = M.novaCorrida(nivel, semente, pref.jogadores, configs, mundos);
+    if (duelo && duelo.outro) {
+      estado.rivais.forEach(function (r) { if (!duelo.host) r.remoto = true; });   // quem entrou: os rivais do computador vêm de quem criou
+      var hum = estado.rivais[estado.rivais.length - 1]; hum.remoto = true; hum.nome = duelo.outro.nome || t('Amigo', 'Friend', 'Amigo');
+      duelo.alvo = null; duelo.rivAlvo = null; duelo.tPos = 0;
+    }
     estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id) }; });
     D.preparar(estado, jogs, lingua, pref.visual);
     tela('jogo'); redimensionar();
@@ -459,6 +480,7 @@
     var dt = Math.min(0.05, Math.max(0, (agora - ultimo) / 1000)); ultimo = agora;
     if (!pausado) {
       var ent = lerEntradas();
+      if (duelo && duelo.outro) dueloPasso(agora);
       M.atualizar(estado, ent, dt);
       for (var i = 0; i < estado.eventos.length; i++) tratar(estado.eventos[i]);
       D.passo(dt, estado, ent);
@@ -528,7 +550,7 @@
   $('btRecomecar').addEventListener('click', function () { rodando = false; iniciarCorrida(); });
   $('btSair').addEventListener('click', irMenu);
   $('btMenu').addEventListener('click', irMenu);
-  $('btDeNovo').addEventListener('click', function () { iniciarCorrida(); });
+  $('btDeNovo').addEventListener('click', function () { if (duelo && !duelo.host) { irMenu(); iniciarCorrida(); return; } iniciarCorrida(); });
   // a música toca o tempo todo; só silencia quando o app fica escondido (outra aba, tela apagada)
   document.addEventListener('visibilitychange', function () { if (document.hidden) pausar(); Som.dormir(document.hidden); });
 
@@ -589,7 +611,7 @@
     });
     if (estado.rivais.length) {   // classificação com os rivais
       var todos = js.map(function (j) { return { nome: (jogs[j.n].personagem && PE ? tn(PE.achar(jogs[j.n].personagem).nome) : jogs[j.n].piloto) + (js.length === 2 ? ' (' + t('Jogador ', 'Player ', 'Jugador ') + (j.n + 1) + ')' : ' (' + t('você', 'you', 'tú') + ')'), fim: j.chegou ? j.tempo : Infinity, z: j.z, eu: true }; })
-        .concat(estado.rivais.map(function (r) { var p = PE.achar(r.id); return { nome: tn(p.nome), fim: r.chegou ? r.tempo : Infinity, z: r.z, eu: false }; }));
+        .concat(estado.rivais.map(function (r) { var p = PE.achar(r.id); return { nome: r.nome ? '🌐 ' + r.nome : tn(p.nome), fim: r.chegou ? r.tempo : Infinity, z: r.z, eu: false }; }));
       todos.sort(function (a, b) { return a.fim !== b.fim ? a.fim - b.fim : b.z - a.z; });
       var ol = document.createElement('ol'); ol.className = 'classificacao';
       todos.forEach(function (o, k) { var li = document.createElement('li'); if (o.eu) li.className = 'eu'; li.textContent = ['🥇', '🥈', '🥉'][k] || ((k + 1) + 'º'); var sp = document.createElement('span'); sp.textContent = o.nome; li.appendChild(sp); ol.appendChild(li); });
@@ -800,6 +822,104 @@
   });
   window.addEventListener('online', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
   window.addEventListener('offline', function () { pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+
+  // ---------- duelo: cada um no seu celular (1.26.0; o canal é o duelo.js) ----------
+  var DU = window.VruuumDuelo, duelo = null;
+  var dueloId = (function () {   // quem eu sou no duelo (um por aba)
+    var id = null; try { id = sessionStorage.getItem('vruuum.dueloId'); } catch (e) { /* ok */ }
+    if (!id || !/^[a-z0-9]{8}$/.test(id)) { id = DU ? DU.idNovo() : 'aaaaaaaa'; try { sessionStorage.setItem('vruuum.dueloId', id); } catch (e) { /* ok */ } }
+    return id;
+  })();
+  function dueloAviso(txt) { $('dueloStatus').textContent = txt; }
+  function dueloTela() {
+    var em = !!duelo;
+    $('dueloComeco').hidden = em; $('dueloSala').hidden = !em;
+    if (em) $('dueloCod').textContent = (duelo.host ? t('Seu código: ', 'Your code: ', 'Tu código: ') : t('Duelo ', 'Duel ', 'Duelo ')) + duelo.cod;
+    if (!em) return;
+    var o = duelo.outro;
+    if (duelo.host) dueloAviso(o ? o.nome + t(' entrou! Escolha o nível, os cenários e os rivais e toque em Correr.', ' joined! Pick the level, the worlds and the rivals and tap Race.', ' ha entrado. Elige el nivel, los escenarios y los rivales y pulsa A correr.') : t('Esperando alguém entrar… Mande o código ou o convite.', 'Waiting for someone to join… Send the code or the invite.', 'Esperando a que alguien entre… Manda el código o la invitación.'));
+    else dueloAviso(o ? t('Você está no duelo de ', 'You are in ', 'Estás en el duelo de ') + o.nome + t('. Escolha seu carro e espere ', "'s duel. Pick your ride and wait for ", '. Elige tu vehículo y espera a que ') + o.nome + t(' tocar em Correr.', ' to tap Race.', ' pulse A correr.') : t('Procurando quem criou o duelo…', 'Looking for whoever created the duel…', 'Buscando a quien creó el duelo…'));
+  }
+  function dueloOi() {
+    if (!duelo || !duelo.canal) return;
+    var c = pref.carros[0];
+    duelo.canal.mandar({ t: 'oi', id: duelo.meuId, nome: DU.nome($('dueloNome').value) || t('Amigo', 'Friend', 'Amigo'), veic: c.veic, cor: D.CORES[c.cor], pers: c.personagem || undefined, h: duelo.host ? 1 : 0 });
+  }
+  function dueloReceber(m) {
+    if (!duelo || m.id === duelo.meuId) return;
+    if (m.t === 'oi') {
+      if (duelo.outro && duelo.outro.id !== m.id) return;   // duelo é de dois
+      var novo = !duelo.outro; duelo.outro = { id: m.id, nome: m.nome || t('Amigo', 'Friend', 'Amigo'), veic: m.veic, cor: m.cor, pers: m.pers };
+      if (novo) { Som.tocar('mundo'); dueloOi(); }
+      dueloTela(); return;
+    }
+    if (!duelo.outro || m.id !== duelo.outro.id) return;
+    if (m.t === 'largar' && !duelo.host && m.rid !== duelo.rid) { duelo.rid = m.rid; if (estadoTela !== 'menu') irMenu(); iniciarCorrida(m); }
+    else if (m.t === 'pos' && m.rid === duelo.rid) duelo.alvo = { m: m, em: performance.now() };
+    else if (m.t === 'riv' && m.rid === duelo.rid && !duelo.host) duelo.rivAlvo = { m: m, em: performance.now() };
+    else if (m.t === 'tchau') { dueloAviso(duelo.outro.nome + t(' saiu do duelo.', ' left the duel.', ' ha salido del duelo.')); duelo.outro = null; }
+  }
+  // a cada quadro: põe o outro (e os rivais de quem criou) onde o canal disse, adiantando pelo tempo que passou; manda a minha posição
+  function dueloPasso(agora) {
+    if (!estado || !duelo.rid) return;
+    var rv = estado.rivais, hum = rv[rv.length - 1], j = estado.jogadores[0];
+    function puxar(r, z, x, k) { if (Math.abs(z - r.z) > 6000) r.z = z; else r.z += (z - r.z) * k; r.x += (x - r.x) * k; }
+    if (duelo.alvo) {
+      var m = duelo.alvo.m, seg = Math.min(0.6, (agora - duelo.alvo.em) / 1000);
+      puxar(hum, m.z + (m.c ? 0 : m.v * seg), m.x, 0.3); hum.vel = m.v; hum.turbo = m.tu; hum.chegou = !!m.c; if (m.c) hum.tempo = m.tm;
+    }
+    if (duelo.rivAlvo) duelo.rivAlvo.m.r.forEach(function (a, k) {
+      var r = rv[k]; if (!r || r === hum) return;
+      var seg2 = Math.min(0.6, (agora - duelo.rivAlvo.em) / 1000);
+      puxar(r, a[0] + (a[3] ? 0 : (r.vel || 0) * seg2), a[1], 0.3); r.turbo = a[2]; r.chegou = !!a[3]; if (a[3]) r.tempo = a[4];
+      if (r.zAnt != null && duelo.rivAlvo.em !== r.emAnt) r.vel = Math.max(0, (a[0] - r.zAnt) / Math.max(0.05, (duelo.rivAlvo.em - r.emAnt) / 1000));
+      if (duelo.rivAlvo.em !== r.emAnt) { r.zAnt = a[0]; r.emAnt = duelo.rivAlvo.em; }
+    });
+    if (agora - duelo.tPos > 100) {   // 10 vezes por segundo
+      duelo.tPos = agora;
+      duelo.canal.mandar({ t: 'pos', id: duelo.meuId, rid: duelo.rid, z: j.z, x: j.x, v: j.vel, tu: Math.max(0, j.turbo), pu: Math.max(0, j.pulo), c: j.chegou ? 1 : 0, tm: j.tempo || 0, pt: j.pontos || 0 });
+      if (duelo.host) duelo.canal.mandar({ t: 'riv', id: duelo.meuId, rid: duelo.rid, r: rv.filter(function (r) { return r !== hum; }).map(function (r) { return [r.z, r.x, Math.max(0, r.turbo || 0), r.chegou ? 1 : 0, r.tempo || 0]; }) });
+    }
+  }
+  function dueloConectar(cod, host) {
+    if (!DU) return;
+    if (!DU.nome($('dueloNome').value)) { dueloAviso(t('Escreva seu nome primeiro (ele aparece em cima do seu carrinho no celular do outro).', 'Type your name first (it shows above your ride on the other phone).', 'Escribe tu nombre primero (sale encima de tu vehículo en el móvil del otro).')); $('dueloNome').focus(); return; }
+    pref.nomeDuelo = DU.nome($('dueloNome').value); pref.jogadores = 1; salvar(); marcar();
+    duelo = { cod: cod, host: host, meuId: dueloId, outro: null, canal: null, rid: null };
+    dueloTela(); dueloAviso(t('Conectando…', 'Connecting…', 'Conectando…'));
+    var este = duelo;
+    DU.abrir(cod, dueloReceber, function () { if (duelo === este) dueloAviso(t('A internet caiu. Toque em Sair do duelo e entre de novo com o mesmo código.', 'The internet dropped. Tap Leave the duel and join again with the same code.', 'Se ha caído internet. Pulsa Salir del duelo y entra otra vez con el mismo código.')); })
+      .then(function (canal) {
+        if (duelo !== este) { canal.fechar(); return; }
+        este.canal = canal; dueloTela(); dueloOi();
+        este.pulso = setInterval(function () { if (duelo === este && (!este.rid || estadoTela !== 'jogo')) dueloOi(); }, 2000);
+      }, function () { if (duelo === este) { duelo = null; dueloTela(); dueloAviso(t('Não deu para conectar. Veja se tem internet e tente de novo.', "Couldn't connect. Check the internet and try again.", 'No se ha podido conectar. Mira si hay internet y prueba otra vez.')); } });
+  }
+  function dueloSair() {
+    if (!duelo) return;
+    if (duelo.canal) { duelo.canal.mandar({ t: 'tchau', id: duelo.meuId }); var c = duelo.canal; setTimeout(function () { c.fechar(); }, 300); }
+    clearInterval(duelo.pulso); duelo = null; dueloTela(); dueloAviso('');
+  }
+  $('dueloNome').value = pref.nomeDuelo || '';
+  $('btDuelo').addEventListener('click', function () { var d = $('duelo'); d.hidden = !d.hidden; $('btDuelo').setAttribute('aria-expanded', String(!d.hidden)); Som.tocar('clique'); });
+  $('btDueloCriar').addEventListener('click', function () { Som.iniciar(); dueloConectar(DU.codigoNovo(), true); });
+  $('btDueloEntrar').addEventListener('click', function () {
+    var cod = DU.codigo($('dueloCodigo').value);
+    if (!cod) { dueloAviso(t('O código tem 4 letras (ex.: ABCD).', 'The code has 4 letters (e.g. ABCD).', 'El código tiene 4 letras (p. ej., ABCD).')); return; }
+    Som.iniciar(); dueloConectar(cod, false);
+  });
+  $('btDueloSair').addEventListener('click', dueloSair);
+  $('btDueloConvite').addEventListener('click', function () {
+    if (!duelo) return;
+    var url = location.origin + location.pathname + '?duelo=' + duelo.cod, txt = t('Vem correr comigo no Vruuum! Código ', 'Come race with me in Vruuum! Code ', '¡Ven a correr conmigo en Vruuum! Código ') + duelo.cod;
+    if (navigator.share) navigator.share({ title: 'Vruuum!', text: txt, url: url }).catch(function () { /* cancelou */ });
+    else if (navigator.clipboard) navigator.clipboard.writeText(txt + ' ' + url).then(function () { dueloAviso(t('Convite copiado! Cole na conversa.', 'Invite copied! Paste it in the chat.', '¡Invitación copiada! Pégala en la conversación.')); });
+  });
+  window.addEventListener('pagehide', function () { if (duelo && duelo.canal) duelo.canal.mandar({ t: 'tchau', id: duelo.meuId }); });
+  (function () {   // abriu pelo convite (?duelo=ABCD): já deixa o código pronto e o painel aberto
+    var m = /[?&]duelo=([A-Za-z]{4})\b/.exec(location.search); if (!m || !DU) return;
+    $('dueloCodigo').value = m[1].toUpperCase(); $('duelo').hidden = false; $('btDuelo').setAttribute('aria-expanded', 'true');
+  })();
 
   // ---------- começo ----------
   $('ver').textContent = 'v' + APP_VERSION;

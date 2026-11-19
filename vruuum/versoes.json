@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.26.0",
+      "data": "19/Nov/2026",
+      "hora": "15:12:00",
+      "pt": [
+        "🌐 Duelo, cada um no seu celular: um toca em Criar duelo e recebe um código de 4 letras; o outro digita o código (ou abre o convite) e entra. Quem criou escolhe nível, cenários e rivais e dá a largada.",
+        "📍 Na pista, o nome do outro aparece num pino vermelho em cima do carrinho dele; no mapinha, ele é a bolinha vermelha maior."
+      ],
+      "en": [
+        "🌐 Duel, each on their own phone: one taps Create duel and gets a 4-letter code; the other types the code (or opens the invite) and joins. Whoever created it picks the level, worlds and rivals and starts the race.",
+        "📍 On the track, the other player's name shows on a red pin above their ride; on the little map, they're the bigger red dot."
+      ],
+      "es": [
+        "🌐 Duelo, cada uno en su móvil: uno pulsa Crear duelo y recibe un código de 4 letras; el otro escribe el código (o abre la invitación) y entra. Quien lo creó elige el nivel, los escenarios y los rivales y da la salida.",
+        "📍 En la pista, el nombre del otro sale en un pin rojo encima de su vehículo; en el mapa redondo, es el puntito rojo más grande."
+      ]
+    },
+    {
       "versao": "1.25.1",
       "data": "15/Nov/2026",
       "hora": "09:30:00",

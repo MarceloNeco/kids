@@ -347,7 +347,7 @@
       }
     }
 
-    e.rivais.forEach(function (rv) { moverRival(e, rv, dt); });
+    e.rivais.forEach(function (rv) { if (!rv.remoto) moverRival(e, rv, dt); });   // remoto (duelo): quem move é o canal (duelo.js)
     posicoes(e);
 
     if (e.jogadores.every(function (j) { return j.chegou; })) {

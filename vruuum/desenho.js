@@ -601,6 +601,7 @@
         rd.lado = (rd.lado || 0) + (Math.max(-1, Math.min(1, (rv.faixa - rv.x) * 4)) - (rd.lado || 0)) * 0.15;   // vira para onde está indo
         if (!rd.voa && !voa && rY <= clip + 2) { if (s.agua) espuma(c, rX, rY, rW); else sombraChao(c, rX, rY, rW, corPedaco(pista, s).noite, rd.info.cor); }
         sprite(c, S.quadro(rd.spr, faseR), pr.esc, rX, rY, rd.voa || voa ? 0 : clip, w);
+        if (rv.nome && rW > 6) etiquetaNome(c, rX, rY - rH * 1.02, rv.nome, rW);   // duelo: o nome do outro em cima dele
         if (vivo) { pilotoVivo(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info, 10 + rs[k2] * 2.1, 6, ondeCabeca(rd.veic, rX - rW / 2, rY - rH, rW, rH, faseR)); }
         if (rv.turbo > 0 && !rd.voa && rW > 6) { c.save(); c.translate(rX, rY); fogoEscape(c, rW, rH, Math.min(1, rv.turbo), false); c.restore(); }
         if (rv.gosma > 0 && rW > 6) gosmaEm(c, rX - rW / 2, rY - rH, rW, rH, rv.gosma, rv.gosmaCor);
@@ -722,6 +723,17 @@
     for (var k = 0; k < 3; k++) { c.beginPath(); c.arc((Math.random() - 0.5) * cw * 0.9, -ch * 0.02 + Math.random() * ch * 0.06, cw * (0.05 + Math.random() * 0.06), 0, Math.PI * 2); c.fill(); }
   }
   // marcas de pneu: duas faixas escuras da roda até o pé da tela, entortadas para o lado da derrapagem
+  // duelo (1.26.0): o nome de quem joga no outro celular, num pino vermelho em cima do carrinho dele
+  function etiquetaNome(c, x, y, nome, larg) {
+    var fs = Math.max(11, Math.min(26, larg * 0.22)), pad = fs * 0.45;
+    c.save(); c.font = '700 ' + Math.round(fs) + 'px ' + FONTE; c.textAlign = 'center'; c.textBaseline = 'middle';
+    var tw = c.measureText(nome).width, wb = tw + pad * 2, hb = fs * 1.5, yb = y - hb - fs * 0.5;
+    c.fillStyle = '#e63946'; c.strokeStyle = '#ffffff'; c.lineWidth = Math.max(1.5, fs * 0.12);
+    c.beginPath(); if (c.roundRect) c.roundRect(x - wb / 2, yb, wb, hb, hb / 2); else c.rect(x - wb / 2, yb, wb, hb); c.fill(); c.stroke();
+    c.beginPath(); c.moveTo(x - fs * 0.4, yb + hb); c.lineTo(x + fs * 0.4, yb + hb); c.lineTo(x, yb + hb + fs * 0.5); c.closePath(); c.fillStyle = '#e63946'; c.fill();
+    c.fillStyle = '#ffffff'; c.fillText(nome, x, yb + hb / 2 + 1);
+    c.restore();
+  }
   // no rio: a esteira de espuma abrindo em V para trás (até a beira da tela) e os borrifos dos lados
   function esteira(c, x, y, cw, ch, h, tt, vel) {
     c.save(); c.globalAlpha = 0.35 + 0.35 * vel; c.fillStyle = '#ffffff';
@@ -1382,7 +1394,7 @@
     c.lineWidth = Math.max(2, u * 0.18); c.strokeStyle = '#4cc9f0';
     for (var k = 1; k < m.length; k++) if (m[k][2]) { c.beginPath(); c.moveTo(x + m[k - 1][0] * R, y + m[k - 1][1] * R); c.lineTo(x + m[k][0] * R, y + m[k][1] * R); c.stroke(); }
     var fim = m[m.length - 1]; c.font = Math.round(u * 0.7) + 'px ' + EMOJI; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🏁', x + fim[0] * R, y + fim[1] * R - u * 0.2);
-    (e.rivais || []).forEach(function (rv) { var p = pt(rv.z); c.beginPath(); c.arc(p[0], p[1], Math.max(2, u * 0.2), 0, Math.PI * 2); c.fillStyle = rv.cor || '#fff'; c.fill(); c.lineWidth = 1; c.strokeStyle = 'rgba(0,0,0,.6)'; c.stroke(); });
+    (e.rivais || []).forEach(function (rv) { var p = pt(rv.z); c.beginPath(); c.arc(p[0], p[1], Math.max(2, u * (rv.nome ? 0.34 : 0.2)), 0, Math.PI * 2); c.fillStyle = rv.nome ? '#e63946' : (rv.cor || '#fff'); c.fill(); c.lineWidth = rv.nome ? 2 : 1; c.strokeStyle = rv.nome ? '#fff' : 'rgba(0,0,0,.6)'; c.stroke(); });   // o do duelo: bolinha vermelha maior
     e.jogadores.forEach(function (o) { if (o.n === ji) return; var p = pt(o.z); c.beginPath(); c.arc(p[0], p[1], Math.max(3, u * 0.3), 0, Math.PI * 2); c.fillStyle = op.jogadores[o.n].cor; c.fill(); c.lineWidth = 2; c.strokeStyle = '#fff'; c.stroke(); });
     var eu = pt(e.jogadores[ji].z), pis = 1 + 0.15 * Math.sin(Date.now() / 150);
     c.beginPath(); c.arc(eu[0], eu[1], Math.max(4, u * 0.4) * pis, 0, Math.PI * 2); c.fillStyle = op.jogadores[ji].cor; c.fill(); c.lineWidth = Math.max(2, u * 0.12); c.strokeStyle = '#fff'; c.stroke();
