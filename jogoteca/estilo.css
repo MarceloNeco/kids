@@ -73,8 +73,9 @@ button { font-family: inherit; cursor: pointer; touch-action: manipulation; colo
 }
 /* celular deitado: a capa grande sai da prévia (a vitrine já mostra) para o ▶ Jogar caber sem rolar */
 @media (max-height: 500px) and (orientation: landscape) {
-  #menu.ativa { padding-top: calc(var(--nav-alto, 56px) - 44px); }
-  .topo { margin: 0 0 4px; } .logo { font-size: 30px; } .sub { display: none; }
+  #menu.ativa { padding-top: calc(var(--st) + 6px); }
+  .topo { display: flex; align-items: center; min-height: calc(var(--nav-alto, 56px) - var(--st) - 12px); margin: 0 0 4px; padding-left: var(--nav-largo, 160px); text-align: left; }
+  .logo { font-size: 30px; } .sub { display: none; }
   .previa { padding: 10px 12px; gap: 7px; }
   .previa-capa { display: none; }
   .previa-topo { text-align: left; align-items: flex-start; }

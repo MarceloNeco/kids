@@ -265,6 +265,9 @@
     'animation:jt-pac-chama 1.2s ease-in-out infinite alternate;}',
     '@keyframes jt-pac-chama{0%{box-shadow:0 4px 0 #b45d0c,0 10px 24px rgba(0,0,0,.45);}100%{box-shadow:0 4px 0 #b45d0c,0 10px 24px rgba(0,0,0,.45),0 0 26px 6px rgba(255,207,74,.75);}}',
     '.jt-pac-calmo .jt-pac-completar{animation:none;}',
+    '.jt-pac-grande .jt-pac-rot{font-size:15px;}.jt-pac-grande .jt-pac-val{font-size:32px;}.jt-pac-grande .jt-pac-chip{padding:8px 10px 9px;border-radius:18px;}',
+    '.jt-pac-grande .jt-pac-bt{min-height:62px;font-size:24px;border-radius:18px;}.jt-pac-grande .jt-pac-completar{min-height:68px;font-size:26px;padding:0 36px;}',
+    '.jt-pac-grande .jt-pac-hud-lados .jt-pac-chip{margin-bottom:10px;}',
     '@media (max-width:360px){.jt-pac-chip{min-width:64px;padding:3px 8px 4px;}.jt-pac-val{font-size:18px;}.jt-pac-bt{font-size:15px;padding:0 12px;}.jt-pac-hud>*{margin:3px 3px;}}'
   ].join('\n');
 
@@ -382,6 +385,7 @@
         L.completar = { x: W / 2, bottom: hudH + 8 };
       } else {
         var hudL = podeDesfazer ? 108 : 56, G = 3 * g;
+        if (H >= 700) hudL = podeDesfazer ? 150 : 80;   // placar maior (TV, computador)
         var chMax = Math.min((H - 2 * pad) / 2.7, (H - 2 * pad - g) / 2.5, (H - 2 * pad - 2 * g - hudL) / 2);
         cw = Math.floor(Math.min((W - 2 * pad - 7 * g - 2 * G) / 10, chMax / R, 175)); ch = Math.round(cw * R);
         var x1 = Math.round((W - (10 * cw + 7 * g + 2 * G)) / 2), xC = x1 + cw + G;
@@ -399,6 +403,7 @@
       lay = L;
       mesa.style.setProperty('--cw', cw + 'px'); mesa.style.setProperty('--ch', ch + 'px');
       mesa.classList.toggle('jt-pac-mini', cw < 64);
+      mesa.classList.toggle('jt-pac-grande', cw >= 130);
       function poe(el, x, y) { el.style.width = cw + 'px'; el.style.height = ch + 'px'; el.style.transform = 'translate(' + x + 'px,' + y + 'px)'; }
       poe(vagas.monte, L.monte.x, L.monte.y); poe(vagas.desc, L.desc.x, L.desc.y);
       for (k = 0; k < 4; k++) poe(vagas['fund' + k], L.fund[k].x, L.fund[k].y);
