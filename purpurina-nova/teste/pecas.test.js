@@ -178,3 +178,24 @@ test('estilos prontos (K-pop, praia, gala, rock…): só peças, cores e cenári
   }
   for (const id of ['kpop', 'praia', 'gala', 'rock']) assert.ok(P.ESTILOS.some(s => s.id === id), id);
 });
+
+test('combinações prontas do estúdio: cada aba só mexe nas partes dela, com peças e cores que existem (dono, 15/Nov/2026)', () => {
+  const CORPO_OK = ['cabelo'];   // na aba Eu, a combinação troca só o penteado (e o que combina: laço e brincos)
+  for (const [aba, lista] of Object.entries(P.COMBOS)) {
+    assert.ok(lista.length >= 4, aba + ': pelo menos 4 combinações');
+    const daAba = P.CATEGORIAS.filter(c => c.grupo === aba).map(c => c.id);
+    for (const cb of lista) {
+      assert.ok(cb.pt && cb.en && cb.es && cb.ico, aba + '/' + cb.id + ' sem nome');
+      for (const [k, v] of Object.entries(cb.e)) {
+        assert.ok(k in P.PADRAO, cb.id + ': ' + k);
+        const base = k.endsWith('Cor') ? k.slice(0, -3) : k;
+        if (aba !== 'eu') assert.ok(daAba.includes(base), aba + '/' + cb.id + ' mexe em ' + k + ', que é de outra aba');
+        else assert.ok(CORPO_OK.includes(base) || ['laco', 'brincos'].includes(base), 'eu/' + cb.id + ' só mexe no penteado, laço e brincos');
+        const cat = P.CATEGORIAS.find(c => c.id === k), daCor = P.CATEGORIAS.find(c => c.id + 'Cor' === k);
+        if (cat && cat.opcoes) assert.ok(cat.opcoes.some(o => o.id === v), cb.id + ': ' + k + '=' + v);
+        else if (cat && cat.cores) assert.ok(P.CORES[cat.cores].some(c => c.id === v), cb.id + ': ' + k + '=' + v);
+        if (daCor) assert.ok(P.CORES[daCor.cores].some(c => c.id === v), cb.id + ': ' + k + '=' + v);
+      }
+    }
+  }
+});

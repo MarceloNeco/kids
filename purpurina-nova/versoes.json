@@ -2,6 +2,26 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "19/Nov/2026",
+      "hora": "18:22:12",
+      "pt": [
+        "✨ Combinações prontas dentro do estúdio, em cada aba: penteado com brincos e laço, maquiagens (natural, festa, K-pop, rock, princesa, praia), roupas (casual, festa, verão, esporte, inverno, gala), conjuntos de joias e de acessórios. Mudam só aquela parte, sem desfazer o resto.",
+        "👉 Quando a fileira tem mais opções para o lado, a borda esmaece e aparece uma setinha › que rola.",
+        "🎂 Em Eu, a escolha agora se chama só Idade: ela muda o rosto e o jeito de desfilar."
+      ],
+      "en": [
+        "✨ Ready-made combos inside the studio, in each tab: hairstyle with earrings and bow, makeup looks (natural, party, K-pop, rock, princess, beach), outfits (casual, party, summer, sporty, winter, gala), jewelry and accessory sets. They only change that part, without undoing the rest.",
+        "👉 When a row has more options to the side, the edge fades and a little › arrow appears that scrolls it.",
+        "🎂 In Me, the choice is now just called Age: it changes the face and the runway walk."
+      ],
+      "es": [
+        "✨ Combinaciones listas dentro del estudio, en cada pestaña: peinado con pendientes y lazo, maquillajes (natural, fiesta, K-pop, rock, princesa, playa), ropa (casual, fiesta, verano, deporte, invierno, gala), conjuntos de joyas y de accesorios. Solo cambian esa parte, sin deshacer el resto.",
+        "👉 Cuando una fila tiene más opciones hacia el lado, el borde se difumina y aparece una flechita › que la desplaza.",
+        "🎂 En Yo, la opción ahora se llama solo Edad: cambia la cara y la forma de desfilar."
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "19/Nov/2026",
       "hora": "18:03:04",

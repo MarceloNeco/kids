@@ -104,8 +104,9 @@
     { id: 'personagem', grupo: 'eu', ico: '👧', pt: 'Menina ou menino', en: 'Girl or boy', es: 'Niña o niño', area: A.cabeca, zoom: 'cabeca', opcoes: [
       o('menina', 'Menina', 'Girl', 'Niña'), o('menino', 'Menino', 'Boy', 'Niño')
     ] },
-    // idade (dono, 14/Nov/2026): muda o jeito de andar e as poses do desfile (app.js e estilo.css); o desenho é o mesmo
-    { id: 'idade', grupo: 'eu', ico: '🎂', pt: 'Idade (no desfile)', en: 'Age (on the runway)', es: 'Edad (en el desfile)', area: null, opcoes: [
+    // idade (dono, 14/Nov/2026): muda o jeito de andar e as poses do desfile (app.js e estilo.css) e, na Nova Era, também o
+    // rosto e o tamanho da cabeça (boneca.js, IDADES)
+    { id: 'idade', grupo: 'eu', ico: '🎂', pt: 'Idade', en: 'Age', es: 'Edad', area: null, opcoes: [
       Object.assign(o('pequena', 'Até 5 anos', 'Up to 5', 'Hasta 5 años'), { emoji: '🧸' }), Object.assign(o('crianca', '6 a 10 anos', '6 to 10', 'De 6 a 10 años'), { emoji: '🎈' }),
       Object.assign(o('adolescente', '11 a 15 anos', '11 to 15', 'De 11 a 15 años'), { emoji: '🎧' }), Object.assign(o('adulta', '16 anos ou mais', '16 or older', '16 años o más'), { emoji: '👠' })
     ] },
@@ -407,6 +408,51 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       cabeca: 'orelhas', cabecaCor: 'rosaclaro', blush: 'redondo', blushCor: 'rosa', cenario: 'quarto' } }
   ];
 
+  /* Combinações prontas dentro do estúdio (dono, 15/Nov/2026: "na parte que você já está montando, ele já traz; não
+     para desfazer tudo"): cada aba tem as suas, e cada uma muda só as partes daquela aba. menina: true = só aparece para
+     menina (maquiagem, vestido, saia). */
+  var COMBOS = {
+    eu: [
+      { id: 'rabinhoArgola', ico: '💫', pt: 'Rabo alto + argolas', en: 'High ponytail + hoops', es: 'Coleta alta + aros', menina: true, e: { cabelo: 'rabinhoAlto', brincos: 'argola', brincosCor: 'dourado', laco: 'nenhum' } },
+      { id: 'coquePerolas', ico: '🤍', pt: 'Coque + pérolas', en: 'Bun + pearls', es: 'Moño + perlas', menina: true, e: { cabelo: 'coque', brincos: 'perola', brincosCor: 'branco', laco: 'perolas', lacoCor: 'branco' } },
+      { id: 'trancasFlores', ico: '🌸', pt: 'Tranças + flores', en: 'Braids + flowers', es: 'Trenzas + flores', menina: true, e: { cabelo: 'trancas', brincos: 'flor', brincosCor: 'rose', laco: 'florGrande', lacoCor: 'rose' } },
+      { id: 'chiquinhasLacos', ico: '🎀', pt: 'Chiquinhas + laços', en: 'Pigtails + bows', es: 'Coletas + lazos', menina: true, e: { cabelo: 'chiquinhas', laco: 'dois', lacoCor: 'chiclete', brincos: 'coracao', brincosCor: 'chiclete' } },
+      { id: 'ondasEstrelas', ico: '⭐', pt: 'Ondas + estrelas', en: 'Waves + stars', es: 'Ondas + estrellas', menina: true, e: { cabelo: 'ondasLongas', laco: 'estrela', lacoCor: 'dourado', brincos: 'estrela', brincosCor: 'dourado' } },
+      { id: 'coroaDiamante', ico: '💎', pt: 'Trança coroa + diamantes', en: 'Crown braid + diamonds', es: 'Trenza corona + diamantes', menina: true, e: { cabelo: 'coroaTranca', brincos: 'diamante', brincosCor: 'prata', laco: 'nenhum' } },
+      { id: 'topete', ico: '😎', pt: 'Topete', en: 'Quiff', es: 'Tupé', menino: true, e: { cabelo: 'topete' } },
+      { id: 'cachinhos', ico: '🌀', pt: 'Cachinhos', en: 'Little curls', es: 'Ricitos', menino: true, e: { cabelo: 'cachosCurtos' } }
+    ],
+    make: [
+      { id: 'natural', ico: '🌿', pt: 'Natural', en: 'Natural', es: 'Natural', menina: true, e: { base: 'natural', blush: 'redondo', blushCor: 'pessego', sombra: 'nenhum', delineado: 'nenhum', cilios: 'curtos', ciliosCor: 'marrom', batom: 'gloss', batomCor: 'nude', glitter: 'nenhum', adesivo: 'nenhum' } },
+      { id: 'festa', ico: '🪩', pt: 'Festa', en: 'Party', es: 'Fiesta', menina: true, e: { base: 'iluminada', blush: 'coracao', blushCor: 'rosa', sombra: 'brilhante', sombraCor: 'lilas', delineado: 'gatinho', delineadoCor: 'roxo', cilios: 'longos', ciliosCor: 'preto', batom: 'brilho', batomCor: 'chiclete', glitter: 'olhos', glitterCor: 'prata' } },
+      { id: 'kpop', ico: '🎤', pt: 'K-pop', en: 'K-pop', es: 'K-pop', menina: true, e: { base: 'iluminada', blush: 'redondo', blushCor: 'rosa', sombra: 'simples', sombraCor: 'rosa', delineado: 'fino', delineadoCor: 'marrom', cilios: 'longos', ciliosCor: 'preto', batom: 'degrade', batomCor: 'cereja', glitter: 'nenhum' } },
+      { id: 'rock', ico: '🎸', pt: 'Rock', en: 'Rock', es: 'Rock', menina: true, e: { base: 'natural', blush: 'nenhum', sombra: 'esfumada', sombraCor: 'roxo', delineado: 'grosso', delineadoCor: 'preto', cilios: 'dramaticos', ciliosCor: 'preto', batom: 'cremoso', batomCor: 'roxo', glitter: 'nenhum' } },
+      { id: 'princesa', ico: '👑', pt: 'Princesa', en: 'Princess', es: 'Princesa', menina: true, e: { base: 'iluminada', blush: 'coracao', blushCor: 'rosa', sombra: 'brilhante', sombraCor: 'rosa', delineado: 'nenhum', cilios: 'boneca', ciliosCor: 'preto', batom: 'gloss', batomCor: 'rosaclaro', glitter: 'bochechas', glitterCor: 'dourado' } },
+      { id: 'praia', ico: '🏖️', pt: 'Praia', en: 'Beach', es: 'Playa', menina: true, e: { base: 'bronze', blush: 'diagonal', blushCor: 'coral', sombra: 'simples', sombraCor: 'dourado', delineado: 'nenhum', cilios: 'curtos', ciliosCor: 'preto', batom: 'gloss', batomCor: 'coral', adesivo: 'concha' } }
+    ],
+    roupa: [
+      { id: 'casual', ico: '👕', pt: 'Casual', en: 'Casual', es: 'Casual', e: { vestido: 'nenhum', blusa: 'camiseta', blusaCor: 'branco', saia: 'nenhum', calca: 'jeans', calcaCor: 'azul', estampa: 'liso', sapatos: 'tenis', sapatosCor: 'branco' } },
+      { id: 'festa', ico: '🪩', pt: 'Festa', en: 'Party', es: 'Fiesta', menina: true, e: { vestido: 'festa', vestidoCor: 'prata', blusa: 'nenhum', saia: 'nenhum', calca: 'nenhum', estampa: 'liso', sapatos: 'plataforma', sapatosCor: 'chiclete' } },
+      { id: 'verao', ico: '🌻', pt: 'Verão', en: 'Summer', es: 'Verano', menina: true, e: { vestido: 'verao', vestidoCor: 'amarelo', blusa: 'nenhum', saia: 'nenhum', calca: 'nenhum', estampa: 'flores', estampaCor: 'branco', sapatos: 'rasteirinha', sapatosCor: 'nude' } },
+      { id: 'esporte', ico: '⚽', pt: 'Esporte', en: 'Sporty', es: 'Deporte', e: { vestido: 'nenhum', blusa: 'camiseta', blusaCor: 'azul', saia: 'nenhum', calca: 'jogger', calcaCor: 'preto', estampa: 'listras', estampaCor: 'branco', sapatos: 'tenisLuz', sapatosCor: 'branco' } },
+      { id: 'inverno', ico: '❄️', pt: 'Inverno', en: 'Winter', es: 'Invierno', e: { vestido: 'nenhum', blusa: 'sueter', blusaCor: 'vermelho', saia: 'nenhum', calca: 'legging', calcaCor: 'preto', estampa: 'xadrez', estampaCor: 'branco', sapatos: 'botaNeve', sapatosCor: 'marrom' } },
+      { id: 'gala', ico: '👗', pt: 'Gala', en: 'Gala', es: 'Gala', menina: true, e: { vestido: 'gala', vestidoCor: 'vinho', blusa: 'nenhum', saia: 'nenhum', calca: 'nenhum', estampa: 'liso', sapatos: 'scarpin', sapatosCor: 'dourado' } },
+      { id: 'social', ico: '🤵', pt: 'Social', en: 'Smart', es: 'Elegante', menino: true, e: { vestido: 'nenhum', blusa: 'camisa', blusaCor: 'branco', saia: 'nenhum', calca: 'pantalona', calcaCor: 'preto', estampa: 'liso', sapatos: 'social', sapatosCor: 'preto' } }
+    ],
+    joias: [
+      { id: 'perolas', ico: '🤍', pt: 'Pérolas', en: 'Pearls', es: 'Perlas', e: { brincos: 'perola', brincosCor: 'branco', colar: 'perolas', colarCor: 'branco', pulseira: 'perolas', pulseiraCor: 'branco', anel: 'nenhum', broche: 'nenhum' } },
+      { id: 'dourado', ico: '✨', pt: 'Dourado', en: 'Gold', es: 'Dorado', e: { brincos: 'argola', brincosCor: 'dourado', colar: 'medalhao', colarCor: 'dourado', pulseira: 'simples', pulseiraCor: 'dourado', anel: 'simples', anelCor: 'dourado', broche: 'nenhum' } },
+      { id: 'fofura', ico: '💖', pt: 'Fofura', en: 'Cute', es: 'Monada', e: { brincos: 'coracao', brincosCor: 'chiclete', colar: 'coracao', colarCor: 'chiclete', pulseira: 'micangas', pulseiraCor: 'chiclete', anel: 'coracao', anelCor: 'chiclete', broche: 'nenhum' } },
+      { id: 'brilhante', ico: '💎', pt: 'Brilhante', en: 'Sparkly', es: 'Brillante', e: { brincos: 'diamante', brincosCor: 'prata', colar: 'diamantes', colarCor: 'prata', pulseira: 'varias', pulseiraCor: 'prata', anel: 'pedra', anelCor: 'prata', broche: 'nenhum' } }
+    ],
+    acess: [
+      { id: 'praia', ico: '🏖️', pt: 'Praia', en: 'Beach', es: 'Playa', e: { cabeca: 'chapeu', cabecaCor: 'nude', oculos: 'coracao', oculosCor: 'chiclete', bolsa: 'praia', bolsaCor: 'turquesa', laco: 'nenhum' } },
+      { id: 'princesa', ico: '👑', pt: 'Princesa', en: 'Princess', es: 'Princesa', e: { cabeca: 'coroa', cabecaCor: 'dourado', oculos: 'nenhum', bolsa: 'mao', bolsaCor: 'prata', laco: 'nenhum' } },
+      { id: 'estrela', ico: '😎', pt: 'Estrela do rock', en: 'Rock star', es: 'Estrella del rock', e: { cabeca: 'nenhum', oculos: 'aviador', oculosCor: 'preto', bolsa: 'ombro', bolsaCor: 'preto', laco: 'nenhum' } },
+      { id: 'fadinha', ico: '🧚', pt: 'Fadinha', en: 'Little fairy', es: 'Hadita', e: { cabeca: 'estrelas', cabecaCor: 'lilas', oculos: 'nenhum', bolsa: 'coracao', bolsaCor: 'lilas', laco: 'nenhum' } }
+    ]
+  };
+
   /* Desafios: cada um tem 3 dicas. Estrelas = dicas cumpridas, mas sempre pelo menos 1 (ninguém perde).
      Forma das dicas (conferidas em visual.js):
        { c: 'sapatos', tag: 'praia' }        a peça visível da categoria tem essa tag
@@ -474,7 +520,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
   function opcao(catId, id) { var cat = porId[catId]; if (!cat || !cat.opcoes) return null; for (var i = 0; i < cat.opcoes.length; i++) if (cat.opcoes[i].id === id) return cat.opcoes[i]; return null; }
   function cor(paleta, id) { var l = CORES[paleta] || []; for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; return l[0] || null; }
 
-  var API = { ZOOM: ZOOM, CORES: CORES, GRUPOS: GRUPOS, CATEGORIAS: CATEGORIAS, PADRAO: PADRAO, PRONTAS: PRONTAS, ESTILOS: ESTILOS, DESAFIOS: DESAFIOS, categoria: categoria, opcao: opcao, cor: cor };
+  var API = { ZOOM: ZOOM, CORES: CORES, GRUPOS: GRUPOS, CATEGORIAS: CATEGORIAS, PADRAO: PADRAO, PRONTAS: PRONTAS, ESTILOS: ESTILOS, COMBOS: COMBOS, DESAFIOS: DESAFIOS, categoria: categoria, opcao: opcao, cor: cor };
   raiz.PurpurinaPecas = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : this);
