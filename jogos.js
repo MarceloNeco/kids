@@ -18,6 +18,7 @@
 // a estante marca a aba: os jogos abertos daqui sabem que o Voltar na tela de começo volta para cá (navegacao.js)
 try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessionStorage */ }
 (function () {
+  function janelaDeApp() { return !!((window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone === true); }
   // texto nos três idiomas: o elemento recebe um pedaço de cada (class pt / en / es) e o idioma.js mostra o escolhido
   function tri(el, pt, en, es) {
     el.textContent = '';
@@ -135,6 +136,15 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
     });
 
     bFila.addEventListener('click', function () {
+      // dentro do Bolinho instalado (janela de aplicativo) o Chrome não instala outro ícone: a barra do jogo aparece, mas
+      // o toque não instala (dono, 19/Nov/2026, Samsung). Explica o caminho em vez de abrir o primeiro jogo.
+      if (janelaDeApp()) {
+        st.className = 'st';
+        tri(st, '📲 Aqui dentro do aplicativo do Bolinho o celular não deixa instalar outros ícones. Abra o Chrome, digite solverone.com.br/kids e toque em "Instalar os ícones um por um" de lá.',
+          '📲 Inside the Rainy Day Donuts app, the phone won\'t install other icons. Open Chrome, type solverone.com.br/kids and tap "Install the icons one by one" there.',
+          '📲 Dentro de la app de Buñuelos de Lluvia, el móvil no deja instalar otros iconos. Abre Chrome, escribe solverone.com.br/kids y toca "Instalar los iconos uno por uno" desde allí.');
+        return;
+      }
       var fila = instalaveis.map(function (c) { return { nome: nomeDe(c), url: c.getAttribute('data-instalar') }; });
       try { localStorage.setItem('bolinho:fila', JSON.stringify(fila.slice(1))); } catch (e) {}
       location.href = fila[0].url + '?instalar=1&fila=1';

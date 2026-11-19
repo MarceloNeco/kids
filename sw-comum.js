@@ -30,7 +30,7 @@
   delas, rode  node ferramentas/pecas-comuns.js  (o vigia teste/sw-jogos.test.js avisa): todos os jogos baixam de novo.
   Escrito em JavaScript antigo (sem =>) de propósito: o tablet Fire mais velho também roda.
 */
-var PECAS = 'fc1d9d2e78';
+var PECAS = 'd8acf0253e';
 function BolinhoSW(op) {
   'use strict';
   var P = op.prefixo, CACHE = P + 'v' + op.versao + '-' + PECAS, MANTER = op.manter || [];

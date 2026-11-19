@@ -1,0 +1,22 @@
+{
+  "app": "jogoteca",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "19/Nov/2026",
+      "hora": "17:00:00",
+      "pt": [
+        "📚 Nasce a Jogoteca, a biblioteca dos jogos clássicos do Bolinho: Paciência, Sudoku e Boliche, cada um com três níveis",
+        "🛠️ Em construção, já na vitrine: Bolinha Premiada, Milionário José Pobre e Bilhar"
+      ],
+      "en": [
+        "📚 Jogoteca is born, Bolinho's library of classic games: Solitaire, Sudoku and Bowling, each with three levels",
+        "🛠️ Under construction, already on the shelf: Prize Drop, Millionaire Joe Broke and Pool"
+      ],
+      "es": [
+        "📚 Nace Jogoteca, la biblioteca de juegos clásicos de Bolinho: Solitario, Sudoku y Bolos, cada uno con tres niveles",
+        "🛠️ En construcción, ya en el escaparate: Bola Premiada, Millonario José Pobre y Billar"
+      ]
+    }
+  ]
+}

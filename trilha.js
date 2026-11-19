@@ -70,7 +70,8 @@
     'a-garra': 'baguncolandia/musicas/my-giant-bunny-friend.mp3',
     aqua: 'purpurina/musicas/c-funk.mp3',
     'quem-e': 'rabiscolandia/musicas/fluffing-a-duck.mp3',
-    'glub-glub': 'baguncolandia/musicas/spring-chicken.mp3'
+    'glub-glub': 'baguncolandia/musicas/spring-chicken.mp3',
+    jogoteca: 'purpurina/musicas/club-seamus.mp3'
   };
   O.FAVORITAS = {};
   Object.keys(FAV).forEach(function (k) { O.FAVORITAS[k] = completo(FAV[k]); });

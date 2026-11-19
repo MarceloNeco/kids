@@ -137,6 +137,14 @@
         "en": "GLUB GLUB"
       },
       "pagina": "glub-glub/"
+    },
+    {
+      "id": "jogoteca",
+      "nome": {
+        "pt": "Jogoteca (jogos clássicos)",
+        "en": "Jogoteca (classic games)"
+      },
+      "pagina": "jogoteca/"
     }
   ]
 }
