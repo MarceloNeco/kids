@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.4', APP_DATA = '15/Nov/2026';
+  var APP_VERSION = '0.1.5', APP_DATA = '19/Nov/2026';
   var R = window.GlubRegras, A = window.GlubArte, Som = window.GlubSom;
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA), VITRINE = /[?&]vitrine\b/.test(BUSCA), RODADA_PEDIDA = (BUSCA.match(/[?&]rodada=(\w+)/) || [])[1];
@@ -366,7 +366,13 @@
   traduzir(); pintarEfeitos();
   montarTela(); novoLagoDeEnfeite();
   if (window.Trilha) Trilha.iniciar({ jogo: 'glub-glub', creditos: 'CREDITOS.md', volume: 0.4, musicas: MUSICAS });
-  requestAnimationFrame(quadro);
+  // o lago só começa a se mexer quando a página terminou de abrir (dono, 19/Nov/2026: no tablet Fire velho, o lago
+  // animando desde o começo não deixava a página terminar de carregar e o jogo ficava preso no "Carregando…")
+  // e só depois que a tela "Carregando…" (../carregando.js) sai: enquanto ela está na frente o lago nem aparece
+  (function esperar(n) {
+    if (document.readyState === 'complete' && (!document.documentElement.classList.contains('bc-carregando') || n > 150)) { requestAnimationFrame(quadro); return; }
+    setTimeout(function () { esperar(n + 1); }, 100);
+  })(0);
 
   if (TESTE) window.GlubDebug = {
     pronto: true, versao: APP_VERSION,

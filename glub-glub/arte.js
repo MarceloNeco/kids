@@ -890,6 +890,11 @@
   // tiras guardadas: quando uma imagem chega, só as tiras daquele bicho são refeitas (antes, todas eram jogadas fora a
   // cada imagem, e o celular simples engasgava); as telas que saem são zeradas na hora (o iPhone demora a soltar a memória)
   var feitas = 0, rascunho = [null, null];
+  // orçamento por quadro (dono, 19/Nov/2026: no tablet Fire velho o jogo ficava preso no "Carregando…" por mais de um minuto):
+  // montar as tiras de todos os bichos de uma vez travava o aparelho. Agora cada quadro monta pelo menos uma tira e
+  // continua só enquanto sobra tempo (6 ms); o bicho sem tira aparece com a imagem parada até a tira dele ficar pronta.
+  var prazo = Infinity, montouNoQuadro = false;
+  function agora() { return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }
   function esquecer(prefixo) {
     Object.keys(A.sprites).forEach(function (k) { if (!prefixo || k.indexOf(prefixo) === 0) { A.sprites[k].cv.width = 0; delete A.sprites[k]; } });
   }
@@ -916,16 +921,24 @@
       if (brilho) { c2.clearRect(0, 0, b2.width, b2.height); c2.shadowColor = brilho; c2.shadowBlur = Math.max(4, comp * 0.07); c2.drawImage(b1, 0, 0, w, h, 0, 0, w, h); c2.shadowBlur = 0; fonte = b2; }
       if (!onda) { c.drawImage(fonte, 0, 0, w, h, w * q, 0, w, h); continue; }
       var fase = q / QUADROS * TAU;
-      for (var x = 0; x < w; x++) {
-        var tt = Math.max(0, Math.min(1.25, (cabeca - x) / comp));
-        c.drawImage(fonte, x, 0, 1, h, w * q + x, onda * comp * Math.pow(tt, 1.6) * Math.sin(fase - tt * 2.8), 1, h);
+      for (var x = 0; x < w; x += 2) {
+        var tt = Math.max(0, Math.min(1.25, (cabeca - x) / comp)), fx = Math.min(2, w - x);
+        c.drawImage(fonte, x, 0, fx, h, w * q + x, onda * comp * Math.pow(tt, 1.6) * Math.sin(fase - tt * 2.8), fx, h);
       }
     }
     sp = A.sprites[chave] = { cv: cv, w: w, h: h };
     return sp;
   }
   function desenharBicho(c, id, x, y, comp, dir, k, giro) {
-    var px = A.s * Math.min(A.dpr, 1.5), sp = sprite(id, comp * px), q = Math.floor(((k % 1) + 1) % 1 * QUADROS);
+    var px = A.s * Math.min(A.dpr, 1.5);
+    if (!A.sprites[id + ':' + Math.round(comp * px)] && montouNoQuadro && agora() > prazo) {
+      var im = IMG[IMG_DE[id] || id]; if (!im) return;
+      var prop = im.naturalHeight / im.naturalWidth, iw = comp * 1.08 / Math.max(1, prop), ih = iw * prop;
+      c.save(); c.translate(x, y); if (giro) c.rotate(giro); if (dir < 0) c.scale(-1, 1); c.drawImage(im, -iw / 2, -ih / 2, iw, ih); c.restore();
+      return;
+    }
+    if (!A.sprites[id + ':' + Math.round(comp * px)]) montouNoQuadro = true;
+    var sp = sprite(id, comp * px), q = Math.floor(((k % 1) + 1) % 1 * QUADROS);
     c.save(); c.translate(x, y); if (giro) c.rotate(giro); if (dir < 0) c.scale(-1, 1);
     c.drawImage(sp.cv, sp.w * q, 0, sp.w, sp.h, -sp.w / px / 2, -sp.h / px / 2, sp.w / px, sp.h / px);
     c.restore();
@@ -1116,6 +1129,10 @@
     return { s: A.s, W: A.W };
   }
   function quadro(c, E, t) {
+    prazo = agora() + 6; montouNoQuadro = false;
+    try { quadroDe(c, E, t); } finally { prazo = Infinity; montouNoQuadro = false; }
+  }
+  function quadroDe(c, E, t) {
     var px = A.s * A.dpr;
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.drawImage(A.fundo, 0, 0);
