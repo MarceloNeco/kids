@@ -15,7 +15,7 @@
     { id: 'telha', cor: '#f2a516' }, { id: 'madeira', cor: '#8a5a2e' }, { id: 'pedra', cor: '#9aa3ab' }
   ];
   var NIVEIS = {
-    facil: { cores: 4, vel: 0.72, meta: 0.8, mira: 9999, intervalo: 0.24 },
+    facil: { cores: 4, vel: 0.62, meta: 0.8, mira: 9999, intervalo: 0.24 },
     medio: { cores: 5, vel: 1, meta: 1, mira: 220, intervalo: 0.26 },
     dificil: { cores: 6, vel: 1.3, meta: 1.2, mira: 70, intervalo: 0.28 }
   };
@@ -336,7 +336,7 @@
     // 6) tijolos que acabaram de encaixar
     conferir.forEach(function (b) { var j = B.indexOf(b); if (j >= 0) estourar(E, T, j, 1, ev); });
     // 7) chegam tijolos novos pela boca da manilha
-    if (!E.obraPronta && !E.perdendo && v > 0) {
+    if (!E.obraPronta && !E.perdendo && !E.semNovos && v > 0) {
       var guarda = 0;
       while ((!B.length || B[B.length - 1].s >= 0) && guarda++ < 40) {
         if (!B.length && T.gerados > 0) T.rajada = T.gerados + 10;   // limpou a fila: vem uma rajada curta
@@ -469,7 +469,7 @@
   function estrelas(E) {
     if (E.fim !== 'vitoria') return 0;
     var m = E.meta;
-    return 1 + (E.pontos >= m * 22 ? 1 : 0) + (E.pontos >= m * 34 ? 1 : 0);
+    return 1 + (E.pontos >= m * 26 ? 1 : 0) + (E.pontos >= m * 40 ? 1 : 0);
   }
 
   var API = { R: R, D: D, CORES: CORES, NIVEIS: NIVEIS, PODERES: PODERES, tabela: tabela, ponto: ponto, visivel: visivel,

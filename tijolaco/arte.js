@@ -9,7 +9,7 @@
   'use strict';
   var RG = raiz.TijolacoRegras, R = RG.R, CORES = RG.CORES;
   var SOMBRA = { x: 0.82, y: 0.57 };   // direção da sombra (sol na esquerda, em cima)
-  var cache = { k: 0, tex: [], brilho: null, sombra: null, poder: {}, ouro: null, chao: null };
+  var cache = { k: 0, tex: [], giros: [], brilho: null, sombra: null, poder: {}, ouro: null, chao: null, cacamba: {} };
   var fundo = null, fundoChave = '', bocas = [], galhos = [], dpr = 1;
 
   function novoCanvas(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h)); return c; }
@@ -148,7 +148,7 @@
   function figurinhas(k) {
     if (cache.k === k) return;
     var r = R * k;
-    cache.k = k; cache.tex = CORES.map(function (c, i) { return texturaMaterial(i, r); });
+    cache.k = k; cache.tex = CORES.map(function (c, i) { return texturaMaterial(i, r); }); cache.giros = []; cache.cacamba = {};
     cache.brilho = brilho(r); cache.sombra = sombraTijolo(r); cache.ouro = ouroSprite(r);
     cache.poder = {}; RG.PODERES.forEach(function (p) { cache.poder[p] = iconePoder(p, r); });
   }
@@ -399,7 +399,7 @@
     }
     g.setLineDash([]);
     // objetos do canteiro nos espaços livres (dentro e fora do campo)
-    var postos = [], nomes = ['palete', 'areia', 'cones', 'cimento', 'carrinho', 'tabuas', 'poca', 'balde', 'vergalhoes', 'andaime', 'cones', 'palete', 'balde', 'areia'];
+    var postos = [], nomes = ['palete', 'areia', 'cones', 'cimento', 'andaime', 'tabuas', 'poca', 'carrinho', 'vergalhoes', 'balde', 'cones', 'palete', 'tabuas', 'areia', 'cimento', 'cones'];
     var fimDe = E.trilhos.map(function (T) { return { x: T.tab.x[T.tab.L], y: T.tab.y[T.tab.L], r: 60 }; });
     fimDe.forEach(function (p) { postos.push(p); });
     E.portoes.forEach(function (gp) { postos.push({ x: gp.botao[0], y: gp.botao[1], r: 36 }); });
@@ -446,7 +446,7 @@
       var x = tab.x[s], y = tab.y[s], perto = false;
       for (var m = 0; m < mans.length && !perto; m++) {
         var a = mans[m][0], b = mans[m][1], dx = b[0] - a[0], dy = b[1] - a[1], u = ((x - a[0]) * dx + (y - a[1]) * dy) / (dx * dx + dy * dy);
-        if (u > -0.05 && u < 1.05) { var px = a[0] + dx * u - x, py = a[1] + dy * u - y; if (px * px + py * py < (R + 16) * (R + 16)) perto = true; }
+        if (u > -0.05 && u < 1.05 && Math.abs(Math.cos(tab.a[s] - Math.atan2(dy, dx))) < 0.6) { var px = a[0] + dx * u - x, py = a[1] + dy * u - y; if (px * px + py * py < (R + 16) * (R + 16)) perto = true; }
       }
       if (!perto) continue;
       var e = s; while (e < tab.L && !tab.oculto[e + 1] && e - s < 140) e++;
@@ -490,16 +490,28 @@
   }
 
   /* ---------- coisas que mexem ---------- */
+  // cada material tem 24 quadros já girados, com o brilho do sol por cima: um tijolo = uma cópia reta, sem girar na hora
+  // (girar figurinha a cada quadro pesava no tablet velho)
+  var GIROS = 24;
+  function quadroGirado(c, f) {
+    var q = cache.giros[c] || (cache.giros[c] = []);
+    if (q[f]) return q[f];
+    var t = cache.tex[c], b = cache.brilho, S = Math.max(t.width, b.width), cv = novoCanvas(S, S), g = cv.getContext('2d');
+    g.translate(S / 2, S / 2); g.rotate(f / GIROS * Math.PI * 2); g.drawImage(t, -t.width / 2, -t.height / 2);
+    g.setTransform(1, 0, 0, 1, S / 2, S / 2); g.drawImage(b, -b.width / 2, -b.height / 2);
+    q[f] = cv;
+    return cv;
+  }
   function desenharTijolo(ctx, c, x, y, rot, esc, k, ox, oy) {
-    var t = cache.tex[c], ex = ox + x * k, ey = oy + y * k, cs = Math.cos(rot) * esc, sn = Math.sin(rot) * esc;
-    ctx.setTransform(cs, sn, -sn, cs, ex, ey);
-    ctx.drawImage(t, -t.width / 2, -t.height / 2);
+    var f = Math.round(rot / (Math.PI * 2) * GIROS) % GIROS; if (f < 0) f += GIROS;
+    var spr = quadroGirado(c, f), ex = ox + x * k, ey = oy + y * k;
+    if (esc === 1) { ctx.setTransform(1, 0, 0, 1, Math.round(ex), Math.round(ey)); ctx.drawImage(spr, -spr.width / 2, -spr.height / 2); return; }
     ctx.setTransform(esc, 0, 0, esc, ex, ey);
-    ctx.drawImage(cache.brilho, -cache.brilho.width / 2, -cache.brilho.height / 2);
+    ctx.drawImage(spr, -spr.width / 2, -spr.height / 2);
   }
   function sombraEm(ctx, x, y, k, ox, oy) {
     var s = cache.sombra;
-    ctx.setTransform(1, 0, 0, 1, ox + (x + SOMBRA.x * 6) * k, oy + (y + SOMBRA.y * 6) * k);
+    ctx.setTransform(1, 0, 0, 1, Math.round(ox + (x + SOMBRA.x * 6) * k), Math.round(oy + (y + SOMBRA.y * 6) * k));
     ctx.drawImage(s, -s.width / 2, -s.height / 2);
   }
 
@@ -553,27 +565,36 @@
   }
   var fundoOx = 0, fundoOy = 0;
 
-  function cacamba(g, T, tm) {
-    var tab = T.tab, x = tab.x[tab.L], y = tab.y[tab.L], a = tab.a[tab.L], p = T.perigo;
-    var cx = x + Math.cos(a) * 26, cy = y + Math.sin(a) * 26;
-    g.save(); g.translate(cx, cy);
-    var w = 84, h = 54;
+  var CW = 84, CH = 54;
+  function corpoCacamba(i, k) {   // a caixa com o entulho, pintada uma vez por trilho
+    var chave = i + ':' + k;
+    if (cache.cacamba[chave]) return cache.cacamba[chave];
+    var w = CW, h = CH, M = 70, cv = novoCanvas((w + M * 2) * k, (h + M * 2) * k), g = cv.getContext('2d');
+    g.setTransform(k, 0, 0, k, (w / 2 + M) * k, (h / 2 + M) * k);
     g.fillStyle = 'rgba(55,20,4,.35)'; g.beginPath(); g.moveTo(-w / 2, h / 2); g.lineTo(w / 2, h / 2); g.lineTo(w / 2 + 52, h / 2 + 36); g.lineTo(-w / 2 + 52, h / 2 + 36); g.closePath(); g.fill();
-    // corpo
     var gr = g.createLinearGradient(0, -h / 2, 0, h / 2 + 14);
     gr.addColorStop(0, '#ffbe2e'); gr.addColorStop(1, '#c97c00');
     g.fillStyle = gr; g.beginPath(); g.moveTo(-w / 2, -h / 2); g.lineTo(w / 2, -h / 2); g.lineTo(w / 2 - 8, h / 2 + 14); g.lineTo(-w / 2 + 8, h / 2 + 14); g.closePath(); g.fill();
     g.strokeStyle = 'rgba(120,60,0,.6)'; g.lineWidth = 2;
-    for (var i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(i * 15, -h / 2 + 4); g.lineTo(i * 13, h / 2 + 12); g.stroke(); }
-    // boca com entulho
+    for (var j = -2; j <= 2; j++) { g.beginPath(); g.moveTo(j * 15, -h / 2 + 4); g.lineTo(j * 13, h / 2 + 12); g.stroke(); }
     g.fillStyle = '#3b2c22'; rr(g, -w / 2 + 5, -h / 2 + 4, w - 10, h - 18, 5); g.fill();
-    var rnd = sorteio(T.i * 13 + 5);
-    for (i = 0; i < 12; i++) { g.fillStyle = ['#8d8378', '#a5432a', '#6b625a', '#c3b8a8'][i % 4]; g.fillRect(-w / 2 + 10 + rnd() * (w - 26), -h / 2 + 8 + rnd() * (h - 30), 6 + rnd() * 6, 4 + rnd() * 4); }
-    // tampa abrindo no perigo
-    var abre = Math.min(1, p * 1.6);
-    g.fillStyle = '#2f6f5b';
-    g.beginPath(); g.moveTo(-w / 2 - 2, -h / 2); g.lineTo(w / 2 + 2, -h / 2); g.lineTo(w / 2 + 2, -h / 2 + (h - 14) * (1 - abre)); g.lineTo(-w / 2 - 2, -h / 2 + (h - 14) * (1 - abre)); g.closePath(); g.fill();
-    if (abre > 0) { g.fillStyle = '#245848'; g.fillRect(-w / 2 - 2, -h / 2 - 12 * abre, w + 4, 12 * abre); }
+    var rnd = sorteio(i * 13 + 5);
+    for (j = 0; j < 12; j++) { g.fillStyle = ['#8d8378', '#a5432a', '#6b625a', '#c3b8a8'][j % 4]; g.fillRect(-w / 2 + 10 + rnd() * (w - 26), -h / 2 + 8 + rnd() * (h - 30), 6 + rnd() * 6, 4 + rnd() * 4); }
+    cv.meio = { x: (w / 2 + M) * k, y: (h / 2 + M) * k };
+    cache.cacamba[chave] = cv;
+    return cv;
+  }
+  function cacamba(g, T, tm) {
+    var tab = T.tab, x = tab.x[tab.L], y = tab.y[tab.L], a = tab.a[tab.L], p = T.perigo;
+    var cx = x + Math.cos(a) * 26, cy = y + Math.sin(a) * 26, k = cache.k, corpo = corpoCacamba(T.i, k), w = CW, h = CH;
+    g.setTransform(1, 0, 0, 1, Math.round(fundoOx + cx * k - corpo.meio.x), Math.round(fundoOy + cy * k - corpo.meio.y));
+    g.drawImage(corpo, 0, 0);
+    g.setTransform(k, 0, 0, k, fundoOx, fundoOy);
+    g.save(); g.translate(cx, cy);
+    // tampa: fechada cobre a metade de trás; no perigo ela levanta (e aparece em pé, atrás)
+    var abre = Math.min(1, p * 1.6), fundoT = (h - 14) * 0.55 * (1 - abre);
+    g.fillStyle = '#2f6f5b'; g.fillRect(-w / 2 - 2, -h / 2, w + 4, fundoT);
+    if (abre > 0) { g.fillStyle = '#245848'; g.fillRect(-w / 2 - 2, -h / 2 - 22 * abre, w + 4, 22 * abre); g.fillStyle = 'rgba(255,255,255,.15)'; g.fillRect(-w / 2 - 2, -h / 2 - 22 * abre, w + 4, 3); }
     g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(-w / 2 - 2, -h / 2, w + 4, 3);
     // giroflex amarelo
     var lx = w / 2 - 8, ly = -h / 2 - 6;

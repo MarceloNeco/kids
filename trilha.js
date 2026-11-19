@@ -72,7 +72,8 @@
     'quem-e': 'rabiscolandia/musicas/fluffing-a-duck.mp3',
     'glub-glub': 'baguncolandia/musicas/spring-chicken.mp3',
     jogoteca: 'purpurina/musicas/club-seamus.mp3',
-    'fruta-podre': 'rabiscolandia/musicas/sneaky-snitch.mp3'
+    'fruta-podre': 'rabiscolandia/musicas/sneaky-snitch.mp3',
+    tijolaco: 'vruuum/musicas/anthem-rock-this-house.mp3'
   };
   O.FAVORITAS = {};
   Object.keys(FAV).forEach(function (k) { O.FAVORITAS[k] = completo(FAV[k]); });
