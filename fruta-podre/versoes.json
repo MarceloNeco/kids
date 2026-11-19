@@ -1,0 +1,31 @@
+{
+  "app": "fruta-podre",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "19/Nov/2026",
+      "hora": "22:30:00",
+      "pt": [
+        "🍎 FRUTA PODRE chegou: a Duda e o Téo arremessam frutas passadas com um estilingue gigante nas pragas que roubaram os doces da turma",
+        "🏪 Mundo 1, A Quitanda do Seu Zé: 8 fases de madeira, vidro e pedra, com galões de vinagre que explodem em cadeia a partir da fase 5",
+        "🍇 5 frutas com poder (toque no ar): Maçã Podre, Trio Uva-Passa, Pimenta Malagueta, Melancia Passada e Abacaxi Azêdo",
+        "🪰 Pragas: Mosca Zumbidora, Barata Cascuda e Rato Ladrão de capacete de tampinha; ninguém se machuca, elas ficam tontas e somem num puf",
+        "⭐ Até 3 estrelas por fase, guardadas no aparelho; Fácil, Médio e Difícil; dá para jogar com o dedo, o mouse, o teclado ou o controle da TV"
+      ],
+      "en": [
+        "🍎 ROTTEN FRUIT is here: Duda and Téo fling overripe fruit with a giant slingshot at the pests who stole the gang's sweets",
+        "🏪 World 1, Mr. Zé's Fruit Stand: 8 levels of wood, glass and stone, with vinegar jugs that blow up in a chain from level 5",
+        "🍇 5 fruits with powers (tap in the air): Rotten Apple, Raisin Trio, Hot Chili Pepper, Mushy Watermelon and Sour Pineapple",
+        "🪰 Pests: Buzzy Fly, Crusty Roach and the Robber Rat in a bottle-cap helmet; nobody gets hurt, they just get dizzy and vanish in a poof",
+        "⭐ Up to 3 stars per level, saved on the device; Easy, Medium and Hard; play with your finger, a mouse, a keyboard or the TV remote"
+      ],
+      "es": [
+        "🍎 Llega FRUTA PODRIDA: Duda y Téo lanzan fruta pasada con un tirachinas gigante contra las plagas que robaron las chuches de la pandilla",
+        "🏪 Mundo 1, La frutería de don Zé: 8 fases de madera, cristal y piedra, con garrafas de vinagre que explotan en cadena desde la fase 5",
+        "🍇 5 frutas con poder (toca en el aire): Manzana Podrida, Trío Pasas, Guindilla Picante, Sandía Pasada y Piña Agria",
+        "🪰 Plagas: Mosca Zumbona, Cucaracha Acorazada y Ratón Ladrón con casco de chapa; nadie se hace daño, se marean y desaparecen con un puf",
+        "⭐ Hasta 3 estrellas por fase, guardadas en el dispositivo; Fácil, Medio y Difícil; se juega con el dedo, el ratón, el teclado o el mando de la tele"
+      ]
+    }
+  ]
+}

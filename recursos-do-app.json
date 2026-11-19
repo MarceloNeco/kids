@@ -161,6 +161,22 @@
         "en": "Jogoteca (classic games)"
       },
       "pagina": "jogoteca/"
+    },
+    {
+      "id": "fruta-podre",
+      "nome": {
+        "pt": "FRUTA PODRE (estilingue)",
+        "en": "Rotten Fruit (slingshot)"
+      },
+      "pagina": "fruta-podre/"
+    },
+    {
+      "id": "tijolaco",
+      "nome": {
+        "pt": "TIJOLAÇO (jogo da obra)",
+        "en": "BrickFreak (construction game)"
+      },
+      "pagina": "tijolaco/"
     }
   ]
 }

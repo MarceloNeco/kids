@@ -25,7 +25,7 @@ function servidor() {
 }
 
 const TODOS = ['baguncolandia/', 'peluqueria/', 'vruuum/', 'purpurina/', 'rabiscolandia/', 'campo-minado/', 'batalha-naval/',
-  'enigmas/', 'labirinto/', 'cozinha/', 'a-garra/', 'aqua/', 'quem-e/', 'glub-glub/', 'jogoteca/', 'danca-na-sala.html'];
+  'enigmas/', 'labirinto/', 'cozinha/', 'a-garra/', 'aqua/', 'quem-e/', 'glub-glub/', 'jogoteca/', 'fruta-podre/', 'tijolaco/', 'danca-na-sala.html'];
 const JOGOS = process.env.JOGO === '-' ? [] : process.env.JOGO ? [process.env.JOGO] : TODOS;
 const IDIOMAS = [['pt', /^pt/i, 0], ['en', /^en/i, 1], ['es', /^es/i, 2]];
 

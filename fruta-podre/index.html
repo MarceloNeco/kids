@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>FRUTA PODRE — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../carregando.js" data-fora-do-arquivo></script>
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#e8433a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="FRUTA PODRE: a turma do estilingue arremessa frutas passadas na fortaleza das pragas da Quitanda do Seu Zé. Física de verdade, 8 fases, 5 frutas com poder. / ROTTEN FRUIT: the slingshot gang flings overripe fruit at the pests' fort in Mr. Zé's Fruit Stand. Real physics, 8 levels, 5 fruits with powers. / FRUTA PODRIDA: la pandilla del tirachinas lanza fruta pasada contra el fuerte de las plagas en la frutería de don Zé. Física de verdad, 8 fases, 5 frutas con poderes.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  FRUTA PODRE — estilingue com física da família Bolinho de Chuva (SolverONE · kids).
+  Regras (regras.js), fases (fases.js), mundo com a física do Matter.js (mundo.js + libs/matter.min.js), desenho em canvas
+  (arte.js), sons (som.js), telas, câmera e controles (app.js). Música: a trilha comum (../trilha.js). Sem login, sem banco.
+  Nada de script inline: a CSP acima não permite. Mapa: LEIA-ME.md. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+<canvas id="cena" aria-label="Quitanda do Seu Zé" data-rotulo="Quitanda do Seu Zé: arraste a fruta para trás no estilingue e solte|Mr. Zé's Fruit Stand: drag the fruit back in the slingshot and let go|La frutería de don Zé: tira de la fruta hacia atrás en el tirachinas y suéltala"></canvas>
+
+<section id="menu" class="tela ativa" data-recurso="fruta-podre">
+  <div class="titulo">
+    <canvas class="fig fig-esq" width="128" height="128" data-retrato="maca_podre" aria-hidden="true"></canvas>
+    <h1 id="logo" class="logo" aria-label="FRUTA PODRE" data-rotulo="FRUTA PODRE|ROTTEN FRUIT|FRUTA PODRIDA"></h1>
+    <canvas class="fig fig-dir" width="128" height="128" data-retrato="abacaxi_azedo" aria-hidden="true"></canvas>
+  </div>
+  <div class="painel">
+    <div class="grupo" role="radiogroup" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
+      <span class="rotulo" data-t="Nível|Level|Nivel"></span>
+      <div class="seg">
+        <button class="chip verde" type="button" role="radio" data-nivel="facil" aria-checked="true" data-t="Fácil|Easy|Fácil"></button>
+        <button class="chip amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false" data-t="Médio|Medium|Medio"></button>
+        <button class="chip vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false" data-t="Difícil|Hard|Difícil"></button>
+      </div>
+    </div>
+    <p class="mundo" data-t="Mundo 1 · A Quitanda do Seu Zé|World 1 · Mr. Zé's Fruit Stand|Mundo 1 · La frutería de don Zé"></p>
+    <div id="mapa" class="mapa" role="group" aria-label="Fases" data-rotulo="Fases|Levels|Fases"></div>
+    <div class="acoes">
+      <button id="btAjuda" class="redondo" type="button" aria-label="Como jogar" data-rotulo="Como jogar|How to play|Cómo se juega">❓</button>
+      <button id="btJogar" class="jogar" type="button"></button>
+      <button id="btSom" class="redondo" type="button" aria-label="Sons" data-rotulo="Sons|Sounds|Sonidos">🔊</button>
+    </div>
+    <button id="btInstalar" class="mini" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
+    <p id="versao" class="versao"></p>
+  </div>
+</section>
+
+<section id="jogo" class="tela" data-recurso="fruta-podre">
+  <div class="hud">
+    <div class="placa fase"><span id="hudFase"></span></div>
+    <div class="placa pontos"><span class="rot" data-t="Pontos|Score|Puntos"></span><b id="hudPontos">0</b></div>
+    <button id="btRecomecar" class="redondo" type="button" aria-label="Recomeçar a fase" data-rotulo="Recomeçar a fase|Restart the level|Reiniciar la fase">🔄</button>
+    <button id="btSomJogo" class="redondo" type="button" aria-label="Sons" data-rotulo="Sons|Sounds|Sonidos">🔊</button>
+  </div>
+  <p id="faixa" class="faixa" role="status" aria-live="polite" hidden></p>
+  <div id="contagem" class="contagem" hidden aria-live="assertive"></div>
+  <p id="avisoDeitar" class="aviso" hidden data-t="📱↻ Deite o celular para ver a quitanda inteira|📱↻ Turn the phone sideways to see the whole stand|📱↻ Pon el móvil en horizontal para ver toda la frutería"></p>
+</section>
+
+<div id="ajuda" class="janela" hidden role="dialog" aria-modal="true" aria-labelledby="ajudaTitulo">
+  <div class="caixa">
+    <h2 id="ajudaTitulo" data-t="❓ Como jogar|❓ How to play|❓ Cómo se juega"></h2>
+    <p data-t="As pragas roubaram os doces da turma e se esconderam na Quitanda do Seu Zé. A Duda e o Téo têm um estilingue gigante e um monte de fruta passada!|The pests stole the gang's sweets and hid in Mr. Zé's Fruit Stand. Duda and Téo have a giant slingshot and loads of overripe fruit!|Las plagas robaron las chuches de la pandilla y se escondieron en la frutería de don Zé. ¡Duda y Téo tienen un tirachinas gigante y un montón de fruta pasada!"></p>
+    <p data-t="👆 Arraste a fruta para trás no estilingue, mire e solte. A linha pontilhada mostra o começo do caminho, e os pontinhos claros mostram o tiro anterior.|👆 Drag the fruit back in the slingshot, aim and let go. The dotted line shows the start of the path, and the faint dots show your last shot.|👆 Tira de la fruta hacia atrás en el tirachinas, apunta y suelta. La línea de puntos enseña el principio del camino y los puntitos claros, el tiro anterior."></p>
+    <p data-t="✨ Com a fruta no ar, toque na tela para usar o poder dela. Derrube todas as pragas para passar de fase: cada fruta que sobrar vale 10.000 pontos!|✨ While the fruit is flying, tap the screen to use its power. Knock out every pest to clear the level: each fruit left over is worth 10,000 points!|✨ Con la fruta en el aire, toca la pantalla para usar su poder. Derriba todas las plagas para pasar de fase: ¡cada fruta que sobre vale 10.000 puntos!"></p>
+    <p data-t="🎮 No teclado ou no controle da TV: ⬆⬇ mudam o ângulo, ⬅➡ a força, OK lança e OK no ar usa o poder. Antes de lançar, arraste a tela para ver a fortaleza.|🎮 With a keyboard or TV remote: ⬆⬇ change the angle, ⬅➡ the power, OK launches and OK in the air uses the power. Before launching, drag the screen to look at the fort.|🎮 Con teclado o mando de la tele: ⬆⬇ cambian el ángulo, ⬅➡ la fuerza, OK lanza y OK en el aire usa el poder. Antes de lanzar, arrastra la pantalla para ver el fuerte."></p>
+    <h3 data-t="As frutas|The fruits|Las frutas"></h3>
+    <ul id="listaFrutas" class="lista"></ul>
+    <h3 data-t="As pragas|The pests|Las plagas"></h3>
+    <ul id="listaPragas" class="lista"></ul>
+    <button id="btFecharAjuda" class="jogar" type="button" data-t="👍 Entendi!|👍 Got it!|👍 ¡Entendido!"></button>
+  </div>
+</div>
+
+<div id="fim" class="janela" hidden role="dialog" aria-modal="true" aria-labelledby="fimTitulo">
+  <div class="caixa fim">
+    <h2 id="fimTitulo"></h2>
+    <div id="fimEstrelas" class="estrelas"></div>
+    <p id="fimPontos" class="fim-pontos"></p>
+    <p id="fimBonus" class="fim-bonus"></p>
+    <p id="fimRecorde" class="fim-recorde" hidden data-t="🏆 Novo recorde!|🏆 New record!|🏆 ¡Nuevo récord!"></p>
+    <div class="fim-botoes">
+      <button id="btProxima" class="jogar" type="button" data-t="▶ Próxima fase|▶ Next level|▶ Siguiente fase"></button>
+      <button id="btDeNovo" class="mini" type="button"></button>
+      <button id="btFimMenu" class="mini" type="button" data-t="🗺 Fases|🗺 Levels|🗺 Fases"></button>
+    </div>
+  </div>
+</div>
+
+<section id="desligado" class="tela" hidden>
+  <h2 data-t="O FRUTA PODRE está descansando agora.|ROTTEN FRUIT is resting right now.|FRUTA PODRIDA está descansando ahora."></h2>
+</section>
+
+<script src="libs/matter.min.js"></script>
+<script src="regras.js"></script>
+<script src="fases.js"></script>
+<script src="mundo.js"></script>
+<script src="arte.js"></script>
+<script src="som.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

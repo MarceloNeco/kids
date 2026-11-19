@@ -116,7 +116,7 @@
   - Poderes que caem: **bola tripla** (multibola), **andaime largo**, **ímã** (a bola gruda e você mira), **bola de concreto** (atravessa tudo por alguns segundos), **rede de proteção** (salva uma vez lá embaixo), **câmera lenta**. Também uma **fusão** simples inspirada no sucesso recente do gênero: dois poderes juntos fazem um terceiro (bola tripla + concreto = três bolas que atravessam).
   - Cada fase **desenha algo** com os tijolos (uma casinha, um sol, um bicho).
   - **Fica de fora:** a nave "Vaus", a cápsula com letras, os inimigos e o visual espacial do Arkanoid. Nada de tiro em gente ou bicho.
-- **E6. TijoLinto** (fila de tijolos num labirinto, a ideia do dono)
+- **E6. TijoLinto** (fila de tijolos num labirinto, a ideia do dono). Referência de jogabilidade mandada pelo dono em 19/Nov, já com o tema de obra: `REFERENCIA-TIJOLINTO.md`.
   - Uma **fila de tijolos coloridos** é empurrada por um **rolo compressor de brinquedo** por um caminho que é um **labirinto** (curvas, **túneis** onde a fila some e reaparece, **cruzamentos**) até a **caçamba**. Se chegar lá, perde a fase.
   - O lançador é uma **betoneira/canhão de tijolos**. Opção A: fica no centro e gira. Opção B: anda num trilho, como no Luxor. Ele atira um tijolo para juntar **3 da mesma cor**; o próximo tijolo fica visível e dá para trocar com um toque.
   - **O toque próprio do TijoLinto:** **portões** no labirinto que você abre e fecha com um toque para **desviar a fila por um caminho mais longo** e ganhar tempo. Assim o labirinto vira estratégia, e não só cenário.

@@ -1,0 +1,17 @@
+{
+  "name": "TIJOLAÇO — Bolinho de Chuva",
+  "short_name": "TIJOLAÇO",
+  "description": "O jogo da obra: a betoneira-canhão atira tijolos na fila que rola pela canaleta; junte 3 da mesma cor antes que ela chegue à caçamba. / BrickFreak, the building-site game: match 3 bricks before the line reaches the dumpster. / Ladrillolío, el juego de la obra: junta 3 ladrillos antes de que la fila llegue al contenedor.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1c252d",
+  "theme_color": "#1c252d",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

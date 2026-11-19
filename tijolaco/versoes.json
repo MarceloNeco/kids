@@ -1,0 +1,28 @@
+{
+  "app": "tijolaco",
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "19/Nov/2026",
+      "hora": "20:00:00",
+      "pt": [
+        "🧱 TIJOLAÇO chegou: o jogo da obra, começando pelo modo TijoLinto (Obra, Demolição, Canteiro e Mutirão vêm depois)",
+        "🎯 A betoneira-canhão gira e atira tijolos de material (tijolo, azulejo, tinta, telha, madeira e pedra): junte 3 iguais antes que a fila chegue à caçamba",
+        "🧲 Ímã com combo em cadeia, portões que desviam a fila, manilhas, poderes (marreta, ré do rolo, sinal vermelho e fio de prumo) e capacete dourado",
+        "🏗️ 8 fases com estrelas, de espiral a duas frentes e lançador no andaime; fácil, médio e difícil; toque, teclado e controle da TV"
+      ],
+      "en": [
+        "🧱 BrickFreak is here: the building-site game, starting with Brickrinth mode (Build, Demolition, Brickyard and All Hands come later)",
+        "🎯 The mixer cannon turns and shoots material bricks (brick, tile, paint, roof tile, wood and stone): match 3 before the line reaches the dumpster",
+        "🧲 Chain combos with the magnet, gates that send the line the long way, pipes, powers (sledgehammer, reverse roller, red light and plumb line) and a golden hard hat",
+        "🏗️ 8 levels with stars, from a spiral to two fronts and a cannon on the scaffold; easy, medium and hard; touch, keyboard and TV remote"
+      ],
+      "es": [
+        "🧱 Llega Ladrillolío: el juego de la obra, empezando por el modo Ladrilaberinto (Obra, Demolición, Almacén y Todos a Una llegarán después)",
+        "🎯 La hormigonera-cañón gira y lanza ladrillos de material (ladrillo, azulejo, pintura, teja, madera y piedra): junta 3 iguales antes de que la fila llegue al contenedor",
+        "🧲 Imán con combos en cadena, puertas que desvían la fila, tuberías, poderes (mazo, marcha atrás, semáforo rojo y plomada) y casco dorado",
+        "🏗️ 8 fases con estrellas, desde una espiral hasta dos frentes y un cañón en el andamio; fácil, medio y difícil; táctil, teclado y mando de la tele"
+      ]
+    }
+  ]
+}

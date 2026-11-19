@@ -8,14 +8,15 @@
      });
 
    ctx = { nivel: 'facil'|'medio'|'dificil', lingua: 'pt'|'en'|'es', t(pt, en, es), calmo (reduzir movimento),
-           som(nome) ('toque' | 'carta' | 'certo' | 'erro' | 'pino' | 'vitoria'), ler(chave), gravar(chave, valor) (no aparelho),
+           som(nome) ('toque' | 'carta' | 'certo' | 'erro' | 'pino' | 'vitoria'), somLigado() (o 🔊 do menu, para o jogo com WebAudio próprio),
+           ler(chave), gravar(chave, valor) (no aparelho),
            venceu(textoPt, textoEn, textoEs) (abre a janela 🎉), teste (true com ?teste) }.
    O jogo desenha tudo dentro de "palco" (um div que ocupa a tela embaixo da barra) e, no parar(), solta o que prendeu
    (laços de animação, eventos na janela). Nomes, textos e capas ficam aqui e em capas.js (a vitrine é da casca).
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0', APP_DATA = '19/Nov/2026';
+  var APP_VERSION = '0.2.1', APP_DATA = '19/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA);
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -51,10 +52,10 @@
       texto: ['Arraste o dedo para lançar a bola e derrube os 10 pinos. Uma partida de 10 jogadas, com strike, spare e placar de verdade.',
         'Swipe to throw the ball and knock down all 10 pins. A 10-frame game with strikes, spares and a real scoreboard.',
         'Desliza el dedo para lanzar la bola y derriba los 10 bolos. Una partida de 10 tiradas, con pleno, semipleno y marcador de verdad.'] },
-    { id: 'bolinha-premiada', breve: true, nome: ['Bolinha Premiada', 'Prize Drop', 'Bola Premiada'],
-      texto: ['Jogo de auditório: a bolinha desce quicando entre os pinos até cair numa casa de prêmio. Responda certo para soltar mais bolinhas!',
-        'A game-show classic: the ball bounces down through the pegs into a prize slot. Answer right to drop more balls!',
-        'Juego de plató: la bola baja rebotando entre los clavos hasta caer en una casilla de premio. ¡Acierta para soltar más bolas!'] },
+    { id: 'bolinhas', nome: ['Bolinhas da Angústia', 'Nail-Biter Drop', 'Bolitas de la Angustia'],
+      texto: ['O game show da parede gigante: responda, escolha de onde a bolinha cai e torça enquanto ela quica entre os pinos até o último segundo. Com um parceiro virtual ou em dois, passando o aparelho.',
+        'The giant-wall game show: answer, pick where the ball drops and hold your breath as it bounces through the pegs until the very last second. With a virtual partner or as two, passing the device.',
+        'El concurso de la pared gigante: responde, elige desde dónde cae la bolita y cruza los dedos mientras rebota entre los clavos hasta el último segundo. Con un compañero virtual o entre dos, pasándoos el aparato.'] },
     { id: 'milionario', breve: true, nome: ['Milionário José Pobre', 'Millionaire Joe Broke', 'Millonario José Pobre'],
       texto: ['Perguntas de cultura geral com prêmio que sobe a cada acerto e ajudas para os apertos. Será que o José fica milionário?',
         'General-knowledge questions with a prize that grows with every right answer, and lifelines for tight spots. Will Joe get rich?',
@@ -73,7 +74,10 @@
       ['Poucas pistas: para quem já é bom.', 'Few clues: for the experts.', 'Pocas pistas: para los que ya son buenos.']],
     boliche: [['Pista com proteção nas canaletas: a bola nunca cai.', 'Bumpers on the gutters: the ball never falls in.', 'Barreras en los canales: la bola nunca cae.'],
       ['Pista normal, sem proteção.', 'Regular lane, no bumpers.', 'Pista normal, sin barreras.'],
-      ['A bola faz curva e os pinos são mais teimosos.', 'The ball curves and the pins are more stubborn.', 'La bola hace curva y los bolos son más tozudos.']]
+      ['A bola faz curva e os pinos são mais teimosos.', 'The ball curves and the pins are more stubborn.', 'La bola hace curva y los bolos son más tozudos.']],
+    bolinhas: [['Perguntas mais fáceis e parceiro virtual mais forte.', 'Easier questions and a stronger virtual partner.', 'Preguntas más fáciles y un compañero virtual más fuerte.'],
+      ['Perguntas variadas e parceiro equilibrado.', 'Mixed questions and a balanced partner.', 'Preguntas variadas y un compañero equilibrado.'],
+      ['Perguntas difíceis e parceiro virtual mais fraco.', 'Hard questions and a weaker virtual partner.', 'Preguntas difíciles y un compañero virtual más flojo.']]
   };
 
   /* ---------- preferências (no aparelho) ---------- */
@@ -136,7 +140,7 @@
     $('jogoNome').textContent = tri(j.nome); $('jogoNivel').textContent = nomeNivel(nivel);
     $('jogoNivel').className = 'barra-nivel ' + nivel;
     var ctx = {
-      nivel: nivel, lingua: lingua, t: t, calmo: calmo, som: som, teste: TESTE,
+      nivel: nivel, lingua: lingua, t: t, calmo: calmo, som: som, teste: TESTE, somLigado: function () { return !!pref.efeitos; },
       ler: function (k) { try { return JSON.parse(localStorage.getItem('bolinho:jogoteca:' + j.id + ':' + k)); } catch (e) { return null; } },
       gravar: function (k, v) { try { localStorage.setItem('bolinho:jogoteca:' + j.id + ':' + k, JSON.stringify(v)); } catch (e) {} },
       venceu: function (pt, en, es) { abrirFim(t(pt || '', en || pt || '', es || pt || '')); }

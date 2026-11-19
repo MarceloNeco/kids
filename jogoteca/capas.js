@@ -54,13 +54,35 @@
         '<circle cx="58" cy="118" r="2" fill="#0d1d5c"/><circle cx="65" cy="116" r="2" fill="#0d1d5c"/><circle cx="62" cy="123" r="2" fill="#0d1d5c"/>' +
         '<path d="M10 20 l10 4 l-10 4 M110 30 l-10 4 l10 4" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>');
     },
-    'bolinha-premiada': function () {
-      var g = id('palco'), pinos = '';
-      for (var r = 0; r < 6; r++) for (var c = 0; c < 6; c++) pinos += '<circle cx="' + (16 + c * 18 + (r % 2) * 9) + '" cy="' + (30 + r * 14) + '" r="2.2" fill="#fff"/>';
-      var casas = ['#ff4d6d', '#ffb703', '#2ec4b6', '#8338ec', '#3a86ff', '#ff4d6d'].map(function (cor, i) { return '<rect x="' + (6 + i * 18) + '" y="116" width="17" height="22" rx="3" fill="' + cor + '"/>'; }).join('');
-      return svg('<defs><radialGradient id="' + g + '" cx=".5" cy=".1" r="1"><stop offset="0" stop-color="#5a3fd6"/><stop offset="1" stop-color="#14093f"/></radialGradient></defs>' +
-        '<rect width="120" height="160" fill="url(#' + g + ')"/>' + reticula('#fff', .07) + pinos + casas +
-        '<circle cx="52" cy="58" r="6" fill="#ffd54a" stroke="#c67c00" stroke-width="1.5"/><path d="M52 30 Q44 40 50 50" stroke="#ffd54a" stroke-width="1.2" fill="none" stroke-dasharray="2 2"/>');
+    bolinhas: function () {
+      // parede neon azul/roxo: 7 zonas em cima, pinos intercalados, 15 canaletas embaixo e as bolinhas verde, vermelha e branca
+      var g = id('parede'), lz = id('luz'), bv = id('bv'), bm = id('bm'), bb = id('bb'), pinos = '', zonas = '', canaletas = '', r, c;
+      for (r = 0; r < 7; r++) for (c = 0; c < 8; c++) {
+        var x = 11 + c * 14 + (r % 2) * 7;
+        if (x > 112) continue;
+        pinos += '<circle cx="' + x + '" cy="' + (44 + r * 11) + '" r="1.5" fill="#cfe9ff"/>';
+      }
+      for (c = 0; c < 7; c++) zonas += '<rect x="' + (8.5 + c * 15) + '" y="14" width="13" height="15" rx="3" fill="#0a1040" stroke="' + (c === 3 ? '#bff3ff' : '#5fc9ff') + '" stroke-width="' + (c === 3 ? 1.6 : .9) + '"/>' +
+        '<rect x="' + (10.5 + c * 15) + '" y="25" width="9" height="1.6" fill="#7fa8e8"/>';
+      for (c = 0; c < 15; c++) {
+        var alto = c === 7 || c === 9 || c === 3, x0 = 4 + c * 7.47;
+        canaletas += '<rect x="' + (x0 + .6) + '" y="128" width="6.2" height="26" fill="' + (alto ? '#ffc23a' : c % 2 ? '#3fd0ff' : '#5a62a8') + '" opacity="' + (alto ? .5 : .25) + '"/>' +
+          '<rect x="' + (x0 + 1.2) + '" y="151.5" width="5" height="1.6" rx=".8" fill="' + (alto ? '#ffe08a' : '#7fe6ff') + '"/>';
+        if (c) canaletas += '<rect x="' + (x0 - .5) + '" y="126" width="1.1" height="30" rx=".55" fill="#dfe8ff"/>';
+      }
+      function bola(cx, cy, rr, grad, cor) {
+        return '<circle cx="' + cx + '" cy="' + cy + '" r="' + (rr * 2.4) + '" fill="' + cor + '" opacity=".22"/><circle cx="' + cx + '" cy="' + cy + '" r="' + rr + '" fill="url(#' + grad + ')"/>' +
+          '<circle cx="' + (cx - rr * .35) + '" cy="' + (cy - rr * .4) + '" r="' + (rr * .3) + '" fill="#fff" opacity=".85"/>';
+      }
+      function rg(i, a, b2, cc) { return '<radialGradient id="' + i + '" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="' + a + '"/><stop offset=".55" stop-color="' + b2 + '"/><stop offset="1" stop-color="' + cc + '"/></radialGradient>'; }
+      return svg('<defs><linearGradient id="' + g + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14309a"/><stop offset=".55" stop-color="#0b1052"/><stop offset="1" stop-color="#2a0c66"/></linearGradient>' +
+        '<linearGradient id="' + lz + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bff3ff" stop-opacity=".55"/><stop offset="1" stop-color="#bff3ff" stop-opacity="0"/></linearGradient>' +
+        rg(bv, '#eafff2', '#2dff88', '#07843f') + rg(bm, '#ffe9ee', '#ff3b5c', '#99102a') + rg(bb, '#ffffff', '#dbeaff', '#7f9fd8') + '</defs>' +
+        '<rect width="120" height="160" fill="#090b38"/><rect x="3" y="3" width="114" height="154" rx="8" fill="url(#' + g + ')"/>' +
+        '<rect x="54" y="29" width="12" height="100" fill="url(#' + lz + ')"/>' + zonas + pinos + canaletas +
+        '<path d="M57 40 Q48 58 60 70 T 66 98" stroke="#2dff88" stroke-width="1.2" fill="none" stroke-dasharray="2 2.5" opacity=".7"/>' +
+        bola(66, 100, 5.2, bv, '#2dff88') + bola(30, 78, 4.6, bm, '#ff3b5c') + bola(92, 58, 4.6, bb, '#bff3ff') +
+        '<rect x="3" y="3" width="114" height="154" rx="8" fill="none" stroke="#7fe6ff" stroke-width="1.6"/><rect x="1" y="1" width="118" height="158" rx="9" fill="none" stroke="#7b3cff" stroke-width="1.4" opacity=".7"/>');
     },
     milionario: function () {
       var g = id('luz');

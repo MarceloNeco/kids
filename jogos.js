@@ -18,6 +18,7 @@
 // a estante marca a aba: os jogos abertos daqui sabem que o Voltar na tela de começo volta para cá (navegacao.js)
 try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessionStorage */ }
 (function () {
+  var CH_SEMPRE = 'bolinho:guardar-todos';   // "Guardar todos" já usado neste aparelho: manter todos atualizados
   function janelaDeApp() { return !!((window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone === true); }
   // texto nos três idiomas: o elemento recebe um pedaço de cada (class pt / en / es) e o idioma.js mostra o escolhido
   function tri(el, pt, en, es) {
@@ -107,6 +108,7 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
     painel.appendChild(bGuardar); painel.appendChild(bFila); painel.appendChild(st);
 
     bGuardar.addEventListener('click', function () {
+      try { localStorage.setItem(CH_SEMPRE, '1'); } catch (e) {}   // a partir daqui, o Bolinho mantém todos atualizados
       bGuardar.disabled = true;
       st.className = 'st';
       guardarTodos(function (i, nome) {
@@ -156,6 +158,12 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
       var escopos = regs.map(function (r) { return new URL(r.scope).pathname; });
       var n = 0;
       instalaveis.forEach(function (c) { if (escopos.indexOf(escopo(c)) >= 0) { n++; marcar(c); } });
+      // aparelho que já tinha guardado (quase) todos antes desta versão: passa a manter todos atualizados também
+      var jaSempre = false; try { jaSempre = localStorage.getItem(CH_SEMPRE) === '1'; } catch (e) {}
+      if (!jaSempre && n >= instalaveis.length - 3 && n > 0) {
+        try { localStorage.setItem(CH_SEMPRE, '1'); } catch (e) {}
+        if (navigator.onLine !== false && !comoApp) setTimeout(function () { guardarTodos().then(function () { return guardarMusicas(); }); }, 1500);
+      }
       if (n === instalaveis.length) {
         tri(bGuardar, '✓ Todos guardados', '✓ All saved', '✓ Todos guardados');
         if (fimFila) return;   // a mensagem do fim do "Instalar um por um" fica
@@ -172,8 +180,13 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
     }
   }
 
-  // com o Bolinho instalado, guarda todos sozinho
+  // com o Bolinho instalado, guarda todos sozinho. E quem já usou "Guardar todos" (dono, 19/Nov/2026: "se tiver internet,
+  // o Bolinho já atualiza todos os jogos baixados"): toda vez que a estante abre com internet, cada jogo confere se há
+  // versão nova e baixa por trás (a versão nova só entra inteira, sw-comum.js); jogo novo na estante também é guardado.
   var comoApp = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone === true;
-  if (comoApp) window.addEventListener('load', function () { guardarTodos().then(function () { return guardarMusicas(); }); });
+  var sempre = false; try { sempre = localStorage.getItem(CH_SEMPRE) === '1'; } catch (e) {}
+  if ((comoApp || sempre) && navigator.onLine !== false) window.addEventListener('load', function () {
+    setTimeout(function () { guardarTodos().then(function () { return guardarMusicas(); }); }, 1500);   // depois de a estante aparecer
+  });
   window.addEventListener('appinstalled', function () { guardarTodos().then(function () { return guardarMusicas(); }); });
 })();
