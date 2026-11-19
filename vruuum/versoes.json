@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.28.0",
+      "data": "19/Nov/2026",
+      "hora": "18:45:00",
+      "pt": [
+        "🤸 Pula-Pula: uma cama elástica de rede vermelha, com postes de espuma e rodinhas, e a criança pulando de verdade lá dentro (abre braços e pernas em estrela no alto do pulo).",
+        "👶 Carrinho de Bebê: de 3 rodas, com capota, cestinha, mamadeira no porta-copo e chocalho; e 🚼 Carrinho de Empurrar: branquinho e redondo, com volante, buzina e o cabo de empurrar."
+      ],
+      "en": [
+        "🤸 Trampoline: a red-net trampoline with foam poles and little wheels, with the kid really bouncing inside (a star jump at the top).",
+        "👶 Baby Stroller: three wheels, canopy, basket, a bottle in the cup holder and a rattle; and 🚼 Push Car: small, white and round, with a steering wheel, horn and push handle."
+      ],
+      "es": [
+        "🤸 Cama Elástica: con red roja, postes de espuma y ruedecitas, y el niño saltando de verdad dentro (abre brazos y piernas en estrella en lo más alto).",
+        "👶 Carrito de Bebé: de tres ruedas, con capota, cesta, biberón en el portavasos y sonajero; y 🚼 Correpasillos: blanquito y redondo, con volante, bocina y barra para empujar."
+      ]
+    },
+    {
       "versao": "1.27.0",
       "data": "19/Nov/2026",
       "hora": "15:24:00",
