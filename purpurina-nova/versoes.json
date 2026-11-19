@@ -1,0 +1,62 @@
+{
+  "app": "purpurina-nova",
+  "versoes": [
+    {
+      "versao": "0.3.0",
+      "data": "19/Nov/2026",
+      "hora": "19:17:25",
+      "pt": [
+        "🎨 A personagem ganhou desenho de ilustração, como nos jogos de maquiagem do Poki: olhos amendoados com pálpebra, dobrinha e cílios saindo do traço, sobrancelhas desenhadas, nariz delicado com as narinas marcadas de leve e lábios com o arco do cupido. Contornos mais finos.",
+        "💇 O cabelo ganhou fios desenhados e brilho em mechas finas (no lugar da faixa larga de brilho). A franja agora cai de lado e o cabelo preso tem risca no meio.",
+        "👀 Sem giro de 360°: um toque na personagem (ou no 👀) mostra ela de três-quartos e de lado, para um lado e para o outro. No desfile ela vira de três-quartos e de lado, e as câmeras mostram esses ângulos. A Purpurina 80's continua com o giro."
+      ],
+      "en": [
+        "🎨 The character now has an illustration-style drawing, like Poki's makeup games: almond eyes with eyelids, creases and lashes coming out of the line, drawn eyebrows, a delicate nose with softly marked nostrils and lips with a cupid's bow. Finer outlines.",
+        "💇 The hair has drawn strands and thin shiny streaks (instead of the wide shine band). The fringe now falls to the side and tied-up hair has a middle part.",
+        "👀 No more 360° spin: a tap on the character (or on 👀) shows her three-quarter and side views, one way and the other. On the runway she turns three-quarter and to the side, and the cameras show those angles. Purpurina 80's keeps the spin."
+      ],
+      "es": [
+        "🎨 El personaje tiene ahora un dibujo de ilustración, como en los juegos de maquillaje de Poki: ojos almendrados con párpado, pliegue y pestañas que salen del trazo, cejas dibujadas, una nariz delicada con las aletas marcadas suavemente y labios con arco de Cupido. Contornos más finos.",
+        "💇 El pelo tiene mechones dibujados y brillos finos (en lugar de la franja ancha de brillo). El flequillo ahora cae de lado y el pelo recogido lleva raya al medio.",
+        "👀 Sin giro de 360°: un toque en el personaje (o en el 👀) lo muestra de tres cuartos y de lado, hacia un lado y hacia el otro. En el desfile se gira de tres cuartos y de lado, y las cámaras enseñan esos ángulos. Purpurina 80's sigue con el giro."
+      ]
+    },
+    {
+      "versao": "0.2.0",
+      "data": "19/Nov/2026",
+      "hora": "18:22:12",
+      "pt": [
+        "✨ Combinações prontas dentro do estúdio, em cada aba: penteado com brincos e laço, maquiagens (natural, festa, K-pop, rock, princesa, praia), roupas (casual, festa, verão, esporte, inverno, gala), conjuntos de joias e de acessórios. Mudam só aquela parte, sem desfazer o resto.",
+        "👉 Quando a fileira tem mais opções para o lado, a borda esmaece e aparece uma setinha › que rola.",
+        "🎂 Em Eu, a escolha agora se chama só Idade: ela muda o rosto e o jeito de desfilar."
+      ],
+      "en": [
+        "✨ Ready-made combos inside the studio, in each tab: hairstyle with earrings and bow, makeup looks (natural, party, K-pop, rock, princess, beach), outfits (casual, party, summer, sporty, winter, gala), jewelry and accessory sets. They only change that part, without undoing the rest.",
+        "👉 When a row has more options to the side, the edge fades and a little › arrow appears that scrolls it.",
+        "🎂 In Me, the choice is now just called Age: it changes the face and the runway walk."
+      ],
+      "es": [
+        "✨ Combinaciones listas dentro del estudio, en cada pestaña: peinado con pendientes y lazo, maquillajes (natural, fiesta, K-pop, rock, princesa, playa), ropa (casual, fiesta, verano, deporte, invierno, gala), conjuntos de joyas y de accesorios. Solo cambian esa parte, sin deshacer el resto.",
+        "👉 Cuando una fila tiene más opciones hacia el lado, el borde se difumina y aparece una flechita › que la desplaza.",
+        "🎂 En Yo, la opción ahora se llama solo Edad: cambia la cara y la forma de desfilar."
+      ]
+    },
+    {
+      "versao": "0.1.0",
+      "data": "19/Nov/2026",
+      "hora": "18:03:04",
+      "pt": [
+        "✨ Nasceu a Purpurina Nova Era: a nova versão do jogo de vestir e maquiar, que vai ganhando as novidades por etapas. A Purpurina de antes continua igual, logo acima na estante.",
+        "🙂 Rosto mais natural, que acompanha a idade escolhida em Eu → Idade: a criancinha tem cabeça e olhos maiores e bochechas cheias; com 11 a 15 anos e adulta o rosto fica oval, com queixo pequeno, nariz delicado com brilho e lábios mais cheios. A sombra escura embaixo do rosto (que parecia barba) saiu."
+      ],
+      "en": [
+        "✨ Purpurina New Age is here: the new version of the dress-up and makeup game, getting new features step by step. The original Purpurina stays the same, right above on the shelf.",
+        "🙂 A more natural face that follows the age picked in Me → Age: the little one has a bigger head, bigger eyes and chubby cheeks; at 11 to 15 and as an adult the face becomes oval, with a small chin, a delicate nose with a highlight and fuller lips. The dark shadow under the face (it looked like a beard) is gone."
+      ],
+      "es": [
+        "✨ Llega Purpurina Nueva Era: la nueva versión del juego de vestir y maquillar, que irá recibiendo novedades por etapas. La Purpurina de antes sigue igual, justo encima en la estantería.",
+        "🙂 Una cara más natural que acompaña la edad elegida en Yo → Edad: la peque tiene la cabeza y los ojos más grandes y mofletes llenos; de 11 a 15 años y de adulta la cara se vuelve ovalada, con barbilla pequeña, nariz delicada con brillo y labios más llenos. Ya no está la sombra oscura debajo de la cara (parecía barba)."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+// Testes do catálogo e das regras da Purpurina: node --test purpurina/teste/*.test.js
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const P = require('../pecas.js');
+const V = require('../visual.js');
+
+test('catálogo: nomes em PT, EN e ES, ids únicos, cores válidas', () => {
+  const ids = new Set();
+  for (const c of P.CATEGORIAS) {
+    assert.ok(!ids.has(c.id), 'categoria repetida ' + c.id); ids.add(c.id);
+    assert.ok(c.pt && c.en && c.es, 'categoria sem nome ' + c.id);
+    assert.ok(P.GRUPOS.some(g => g.id === c.grupo), 'grupo desconhecido ' + c.grupo);
+    assert.ok(c.opcoes || c.cores, 'categoria vazia ' + c.id);
+    if (c.cores) assert.ok(P.CORES[c.cores], 'paleta desconhecida ' + c.cores);
+    if (c.opcoes) {
+      const ops = new Set();
+      for (const o of c.opcoes) { assert.ok(o.pt && o.en && o.es, c.id + '/' + o.id + ' sem nome'); assert.ok(!ops.has(o.id), 'opção repetida ' + c.id + '/' + o.id); ops.add(o.id); }
+      if (ops.has('nenhum')) assert.equal(c.opcoes[0].id, 'nenhum', '"nenhum" vem primeiro em ' + c.id);
+    }
+  }
+  for (const k in P.CORES) for (const c of P.CORES[k]) { assert.match(c.hex, /^#[0-9a-f]{6}$/i, k + '/' + c.id); assert.ok(c.pt && c.en && c.es, k + '/' + c.id + ' sem nome'); }
+});
+
+test('padrão: toda categoria tem valor válido', () => {
+  for (const c of P.CATEGORIAS) {
+    if (c.opcoes) assert.ok(P.opcao(c.id, P.PADRAO[c.id]), 'padrão inválido ' + c.id);
+    const k = c.opcoes ? c.id + 'Cor' : c.id;
+    if (c.cores) assert.ok(P.CORES[c.cores].some(x => x.id === P.PADRAO[k]), 'cor padrão inválida ' + k);
+  }
+});
+
+function vestida(e) { return e.vestido !== 'nenhum' || (e.blusa && (e.saia !== 'nenhum' || e.calca !== 'nenhum')); }
+
+test('roupa sempre coerente: vestido esconde o resto, nunca sem roupa', () => {
+  let e = V.novo();
+  e = V.aplicar(e, 'vestido', 'princesa');
+  assert.equal(V.visivel(e, 'blusa'), false); assert.equal(V.visivel(e, 'calca'), false);
+  e = V.aplicar(e, 'saia', 'tutu');
+  assert.equal(e.vestido, 'nenhum', 'escolher saia tira o vestido'); assert.equal(e.calca, 'nenhum', 'saia tira a calça (que não é legging)');
+  e = V.aplicar(e, 'calca', 'legging'); assert.equal(e.saia, 'tutu', 'legging vai com saia');
+  e = V.aplicar(e, 'calca', 'jeans'); assert.equal(e.saia, 'nenhum', 'calça tira a saia');
+  e = V.aplicar(e, 'calca', 'nenhum'); assert.ok(vestida(e), 'tirar a calça sem saia põe uma saia');
+  e = V.aplicar(e, 'saia', 'nenhum'); assert.ok(vestida(e), 'tirar a saia sem calça põe shorts');
+});
+
+test('cor numa peça em "nenhum" já coloca a peça; valores errados são ignorados', () => {
+  let e = V.aplicar(V.novo(), 'batom', 'vermelho', true);
+  assert.equal(e.batom, 'cremoso'); assert.equal(e.batomCor, 'vermelho');
+  assert.deepEqual(V.aplicar(e, 'batom', 'nao-existe'), e);
+  assert.deepEqual(V.aplicar(e, 'batom', 'azul-marciano', true), e);
+});
+
+test('surpresa: 500 sorteios sempre válidos e vestidos', () => {
+  for (let i = 1; i <= 500; i++) {
+    const e = V.surpresa(V.novo(), V.semente(i));
+    assert.deepEqual(V.limpar(e), e, 'sorteio ' + i + ' com valor inválido');
+    assert.ok(vestida(e), 'sorteio ' + i + ' sem roupa');
+  }
+});
+
+test('limpar: look antigo ou mexido volta a ser válido', () => {
+  assert.deepEqual(V.limpar(null), V.novo());
+  const e = V.limpar({ batom: 'gloss', batomCor: 'xx', cabelo: 'moicano', vestido: 'nenhum', saia: 'nenhum', calca: 'nenhum' });
+  assert.equal(e.batom, 'gloss'); assert.equal(e.batomCor, P.PADRAO.batomCor); assert.equal(e.cabelo, P.PADRAO.cabelo); assert.ok(vestida(e));
+});
+
+test('desfazer volta exatamente', () => {
+  const h = new V.Historico(); let e = V.novo(); const antes = V.copiar(e);
+  h.guardar(e); e = V.aplicar(e, 'cabelo', 'coque');
+  assert.deepEqual(h.voltar(), antes); assert.equal(h.tem(), false);
+});
+
+test('desafios: 3 dicas, todas possíveis, e ninguém fica sem estrela', () => {
+  for (const d of P.DESAFIOS) {
+    assert.equal(d.dicas.length, 3, d.id);
+    assert.ok(P.opcao('cenario', d.cenario), 'cenário do desafio ' + d.id);
+    const base = V.novo();
+    assert.ok(V.avaliar(base, d).estrelas >= 1, 'pelo menos 1 estrela');
+    // procura, peça por peça, um visual que cumpre cada dica (prova que a dica é possível)
+    d.dicas.forEach((dica, i) => {
+      let achou = false;
+      for (const c of P.CATEGORIAS) for (const o of (c.opcoes || [])) {
+        if (achou) break;
+        let e = V.aplicar(base, c.id, o.id);
+        if (V.cumpre(e, dica.t)) achou = true;
+        else if (c.cores) for (const cor of P.CORES[c.cores]) if (V.cumpre(V.aplicar(e, c.id, cor.id, true), dica.t)) { achou = true; break; }
+      }
+      if (!achou && dica.t.todos) { let e = base; for (const x of dica.t.todos) e = V.aplicar(e, x.c, P.categoria(x.c).opcoes[1].id); achou = V.cumpre(e, dica.t); }
+      assert.ok(achou, d.id + ' dica ' + (i + 1) + ' impossível');
+    });
+  }
+});
+
+test('desafio praia completo dá 3 estrelas', () => {
+  let e = V.novo();
+  e = V.aplicar(e, 'vestido', 'verao'); e = V.aplicar(e, 'oculos', 'sol'); e = V.aplicar(e, 'sapatos', 'sandalia');
+  assert.equal(V.avaliar(e, 'praia').estrelas, 3);
+});
+
+test('resumo para leitor de tela em PT, EN e ES', () => {
+  const e = V.aplicar(V.novo(), 'batom', 'gloss');
+  assert.match(V.resumo(e, 'pt'), /^Seu visual: .*gloss/);
+  assert.match(V.resumo(e, 'en'), /^Your look: /);
+  assert.match(V.resumo(e, 'es'), /^Tu look: .*gloss.*\. Escenario: /);
+  assert.ok(!/undefined/.test(V.resumo(e, 'es')), 'resumo em espanhol sem nome faltando');
+});
+
+test('grupos, nomes curtos e desafios (com as dicas) em PT, EN e ES', () => {
+  for (const g of P.GRUPOS) { assert.ok(g.pt && g.en && g.es, 'aba ' + g.id); if (g.curto) assert.ok(g.curto.pt && g.curto.en && g.curto.es, 'aba curta ' + g.id); }
+  for (const d of P.DESAFIOS) { assert.ok(d.pt && d.en && d.es, 'desafio ' + d.id); for (const x of d.dicas) assert.ok(x.pt && x.en && x.es, 'dica de ' + d.id); }
+});
+
+test('toda parte que dá para tirar tem a opção 🚫 (nenhum), menos as do corpo (idade, pele, rosto, nariz, olhos, cabelo…) e cenário', () => {
+  for (const c of P.CATEGORIAS) {
+    if (['personagem', 'idade', 'pele', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'olhos', 'cabelo', 'cenario'].includes(c.id)) continue;
+    const ids = c.opcoes.map(o => o.id);
+    assert.ok(ids[0] === 'nenhum' || (c.id === 'estampa' && ids[0] === 'liso'), c.id + ' sem 🚫');
+  }
+});
+
+test('sem blusa e sem sapato continua válido e vestido', () => {
+  let e = V.aplicar(V.novo(), 'blusa', 'nenhum'); e = V.aplicar(e, 'sapatos', 'nenhum');
+  assert.deepEqual(V.limpar(e), e); assert.ok(vestida(e));
+});
+
+test('menina ou menino, rosto e nariz: escolhas novas da personagem', () => {
+  const e = V.novo();
+  assert.equal(e.personagem, 'menina'); assert.equal(e.rosto, 'oval'); assert.equal(e.nariz, 'botao');
+  const m = V.aplicar(Object.assign(V.novo(), { vestido: 'princesa', batom: 'gloss' }), 'personagem', 'menino');
+  assert.equal(m.cabelo, 'curtinho'); assert.equal(m.vestido, 'nenhum'); assert.equal(m.batom, 'nenhum'); assert.ok(m.calca !== 'nenhum', 'menino com calça');
+  assert.equal(V.aplicar(m, 'personagem', 'menina').cabelo, P.PADRAO.cabelo);
+  for (let i = 0; i < 20; i++) { const s = V.surpresa(m, Math.random); assert.equal(s.personagem, 'menino'); assert.equal(s.vestido, 'nenhum'); assert.equal(s.batom, 'nenhum'); }
+  assert.ok(P.categoria('cabelo').opcoes.length >= 39, 'muitos penteados');
+});
+
+test('traços para parecer com qualquer criança: olhos, boca, nariz, rosto, cabelo armado e armações', () => {
+  const e = V.novo();
+  assert.equal(e.formaOlho, 'redondos'); assert.equal(e.distOlhos, 'normal'); assert.equal(e.formaBoca, 'coracao');
+  assert.equal(P.categoria('testa').opcoes.length, 4); assert.equal(e.testa, 'normal');
+  for (const [c, n] of [['formaOlho', 9], ['distOlhos', 3], ['formaBoca', 6]]) assert.equal(P.categoria(c).opcoes.length, n, c);
+  for (const id of ['batatinha', 'largo', 'reto']) assert.ok(P.opcao('nariz', id), id);
+  for (const id of ['largo', 'quadradinho', 'comprido']) assert.ok(P.opcao('rosto', id), id);
+  for (const id of ['armado', 'armadoLongo']) assert.ok(P.opcao('cabelo', id), id);
+  for (const id of ['retangular', 'quadrado', 'gatinho', 'oval', 'redondoGrande', 'aviador', 'meioAro', 'fininho']) assert.ok(P.opcao('oculos', id), id);
+  // a surpresa não mexe no jeito da criança
+  const eu = Object.assign(V.novo(), { formaOlho: 'amendoados', distOlhos: 'afastados', formaBoca: 'sorrisinho', nariz: 'batatinha' });
+  const s = V.surpresa(eu, Math.random); for (const k of ['formaOlho', 'distOlhos', 'formaBoca', 'nariz']) assert.equal(s[k], eu[k], k);
+});
+
+test('personagens prontas: só usam peças e cores que existem, e têm nome nos três idiomas', () => {
+  const P = require('../pecas.js');
+  assert.ok(P.PRONTAS.length >= 2);
+  for (const pr of P.PRONTAS) {
+    assert.ok(pr.pt && pr.en && pr.es, pr.id + ' sem nome');
+    for (const [k, v] of Object.entries(pr.e)) {
+      assert.ok(k in P.PADRAO, pr.id + ': ' + k + ' não existe');
+      const cat = P.CATEGORIAS.find(c => c.id === k), daCor = P.CATEGORIAS.find(c => c.id + 'Cor' === k);
+      if (cat && cat.opcoes) assert.ok(cat.opcoes.some(o => o.id === v), pr.id + ': ' + k + '=' + v);
+      else if (cat && cat.cores) assert.ok(P.CORES[cat.cores].some(c => c.id === v), pr.id + ': ' + k + '=' + v);
+      if (daCor) assert.ok(P.CORES[daCor.cores].some(c => c.id === v), pr.id + ': ' + k + '=' + v);
+    }
+  }
+});
+
+test('estilos prontos (K-pop, praia, gala, rock…): só peças, cores e cenários que existem, nomes em PT/EN/ES, sem mexer no corpo', () => {
+  assert.ok(P.ESTILOS.length >= 8);
+  const corpo = ['pele', 'personagem', 'idade', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'cabelo', 'cabeloCor', 'mechas', 'mechasCor', 'olhos'];
+  for (const st of P.ESTILOS) {
+    assert.ok(st.pt && st.en && st.es && st.ico, st.id + ' sem nome');
+    for (const [k, v] of Object.entries(st.e)) {
+      assert.ok(k in P.PADRAO, st.id + ': ' + k + ' não existe');
+      assert.ok(!corpo.includes(k), st.id + ': estilo não muda o corpo (' + k + ')');
+      const cat = P.CATEGORIAS.find(c => c.id === k), daCor = P.CATEGORIAS.find(c => c.id + 'Cor' === k);
+      if (cat && cat.opcoes) assert.ok(cat.opcoes.some(o => o.id === v), st.id + ': ' + k + '=' + v);
+      else if (cat && cat.cores) assert.ok(P.CORES[cat.cores].some(c => c.id === v), st.id + ': ' + k + '=' + v);
+      if (daCor) assert.ok(P.CORES[daCor.cores].some(c => c.id === v), st.id + ': ' + k + '=' + v);
+    }
+  }
+  for (const id of ['kpop', 'praia', 'gala', 'rock']) assert.ok(P.ESTILOS.some(s => s.id === id), id);
+});
+
+test('combinações prontas do estúdio: cada aba só mexe nas partes dela, com peças e cores que existem (dono, 15/Nov/2026)', () => {
+  const CORPO_OK = ['cabelo'];   // na aba Eu, a combinação troca só o penteado (e o que combina: laço e brincos)
+  for (const [aba, lista] of Object.entries(P.COMBOS)) {
+    assert.ok(lista.length >= 4, aba + ': pelo menos 4 combinações');
+    const daAba = P.CATEGORIAS.filter(c => c.grupo === aba).map(c => c.id);
+    for (const cb of lista) {
+      assert.ok(cb.pt && cb.en && cb.es && cb.ico, aba + '/' + cb.id + ' sem nome');
+      for (const [k, v] of Object.entries(cb.e)) {
+        assert.ok(k in P.PADRAO, cb.id + ': ' + k);
+        const base = k.endsWith('Cor') ? k.slice(0, -3) : k;
+        if (aba !== 'eu') assert.ok(daAba.includes(base), aba + '/' + cb.id + ' mexe em ' + k + ', que é de outra aba');
+        else assert.ok(CORPO_OK.includes(base) || ['laco', 'brincos'].includes(base), 'eu/' + cb.id + ' só mexe no penteado, laço e brincos');
+        const cat = P.CATEGORIAS.find(c => c.id === k), daCor = P.CATEGORIAS.find(c => c.id + 'Cor' === k);
+        if (cat && cat.opcoes) assert.ok(cat.opcoes.some(o => o.id === v), cb.id + ': ' + k + '=' + v);
+        else if (cat && cat.cores) assert.ok(P.CORES[cat.cores].some(c => c.id === v), cb.id + ': ' + k + '=' + v);
+        if (daCor) assert.ok(P.CORES[daCor.cores].some(c => c.id === v), cb.id + ': ' + k + '=' + v);
+      }
+    }
+  }
+});

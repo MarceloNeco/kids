@@ -59,6 +59,22 @@
       "pagina": "purpurina/"
     },
     {
+      "id": "purpurina-nova",
+      "nome": {
+        "pt": "Purpurina Nova Era",
+        "en": "Purpurina New Age"
+      },
+      "pagina": "purpurina-nova/"
+    },
+    {
+      "id": "purpurina-nova-ia",
+      "nome": {
+        "pt": "Purpurina Nova Era: foto de cinema com IA (começa desligada)",
+        "en": "Purpurina New Age: AI movie-style photo (starts off)"
+      },
+      "pagina": "purpurina-nova/"
+    },
+    {
       "id": "rabiscolandia",
       "nome": {
         "pt": "Rabiscolândia",
