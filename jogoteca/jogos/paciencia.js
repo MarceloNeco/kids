@@ -178,6 +178,8 @@
       '<path d="M50 44c2 24 7 40 17 52H33c10-12 15-28 17-52z"/>'
   ];
   function naipeSVG(s) { return '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">' + NAIPE[s] + '</svg>'; }
+  var COROA = '<svg class="jt-pac-coroa" viewBox="0 0 100 60" aria-hidden="true" focusable="false"><path d="M8 50L4 14l24 18L50 4l22 28 24-18-4 36z"/>' +
+    '<rect x="8" y="50" width="84" height="8" rx="2"/><circle cx="4" cy="12" r="5"/><circle cx="50" cy="5" r="5"/><circle cx="96" cy="12" r="5"/></svg>';
   function rotulo(n) { return n === 1 ? 'A' : n === 11 ? 'J' : n === 12 ? 'Q' : n === 13 ? 'K' : String(n); }
 
   var CSS = [
@@ -207,11 +209,13 @@
     '.jt-pac-meio{position:absolute;left:50%;top:64%;width:calc(var(--cw) * .52);height:calc(var(--cw) * .52);margin:calc(var(--cw) * -.26) 0 0 calc(var(--cw) * -.26);',
     'filter:drop-shadow(0 1px 0 rgba(0,0,0,.12));}',
     '.jt-pac-as{width:calc(var(--cw) * .66);height:calc(var(--cw) * .66);margin:calc(var(--cw) * -.33) 0 0 calc(var(--cw) * -.33);}',
-    '.jt-pac-fig{position:absolute;left:14%;right:14%;top:31%;bottom:7%;border-radius:calc(var(--cw) * .06);',
+    '.jt-pac-fig{position:absolute;left:13%;right:13%;top:30%;bottom:6%;border-radius:calc(var(--cw) * .06);',
     'border:1.5px solid #c9a23a;box-shadow:inset 0 0 0 2px rgba(255,255,255,.7),inset 0 0 0 3px rgba(201,162,58,.55);',
     'display:flex;flex-direction:column;align-items:center;justify-content:center;}',
     '.jt-pac-fig b{font:700 calc(var(--cw) * .4)/1 Georgia,"Times New Roman",serif;}',
     '.jt-pac-fig svg{width:calc(var(--cw) * .24);height:calc(var(--cw) * .24);margin-top:calc(var(--cw) * .02);}',
+    '.jt-pac-fig .jt-pac-coroa{width:calc(var(--cw) * .3);height:calc(var(--cw) * .18);margin:0 0 calc(var(--cw) * .03);fill:#c9a23a;}',
+    '.jt-pac-mini .jt-pac-coroa{display:none;}',
     '.jt-pac-fig11{background:linear-gradient(180deg,#e9f1ff,#cbdcf7);}',
     '.jt-pac-fig12{background:linear-gradient(180deg,#ffeef2,#f7cfd9);}',
     '.jt-pac-fig13{background:linear-gradient(180deg,#fff6dc,#f3dd9c);}',
@@ -326,11 +330,10 @@
       todas.forEach(function (c) {
         var el = document.createElement('div'), r = rotulo(c.n), sv = naipeSVG(c.s);
         el.className = 'jt-pac-carta'; el.setAttribute('data-id', c.id);
-        var meio = c.n > 10 ? '<span class="jt-pac-fig jt-pac-fig' + c.n + '"><b>' + r + '</b>' + sv + '</span>'
-          : '<span class="jt-pac-meio' + (c.n === 1 ? ' jt-pac-as' : '') + '">' + sv + '</span>';
+        var meio = c.n > 10 ? '<span class="jt-pac-fig jt-pac-fig' + c.n + '">' + (c.n > 11 ? COROA : '') + '<b>' + r + '</b>' + sv + '</span>'
+          : '<span class="jt-pac-meio' + (c.n === 1 ? ' jt-pac-as' : '') + '">' + sv + '</span><span class="jt-pac-cf">' + r + sv + '</span>';
         el.innerHTML = '<div class="jt-pac-corpo"><div class="jt-pac-frente ' + (vermelha(c) ? 'jt-pac-v' : 'jt-pac-p') + '">' +
-          '<span class="jt-pac-ci">' + r + '</span><span class="jt-pac-cs">' + sv + '</span>' + meio +
-          '<span class="jt-pac-cf">' + r + sv + '</span></div><div class="jt-pac-verso"></div></div>';
+          '<span class="jt-pac-ci">' + r + '</span><span class="jt-pac-cs">' + sv + '</span>' + meio + '</div><div class="jt-pac-verso"></div></div>';
         mesa.appendChild(el); els[c.id] = el;
       });
     })();
