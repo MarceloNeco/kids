@@ -23,6 +23,79 @@
     adulta: { cab: 1.02, largura: 0.86, olho: 0.92, maxilar: 0.85, queixoY: 7, queixoL: 0.76, boca: [1.12, 1.32] }
   };
   var IDADE = IDADES.crianca;
+  /* ---------- corpo de ilustração de moda (Nova Era, 19/Nov/2026) ----------
+     O desenho do corpo continua o mesmo por baixo (roupas, sapatos, joias e poses servem em todas as idades), mas cada
+     ponto passa por uma "deformação" que muda a proporção: cabeça bem menor, pescoço, tronco mais comprido e pernas
+     longas, como nas ilustrações de moda. Medida em cabeças (alturas da cabeça): 4 na criancinha, 5 aos 10 anos, 6 na
+     adolescente e 6,8 na adulta. Os pés (de 615 para baixo) não esticam. A cabeça inteira vai junto, só reduzida. */
+  var PROPORCAO = {
+    // larg: quanto fica a largura no ombro, na cintura, no quadril e nas pernas (menino: sem cintura marcada)
+    pequena: { cabecas: 4, topo: 150, pescoco: 0.2, tronco: 1.0, quadril: 0.55, larg: [0.95, 0.95, 0.95, 0.9] },
+    crianca: { cabecas: 5, topo: 100, pescoco: 0.26, tronco: 1.15, quadril: 0.6, larg: [0.9, 0.84, 0.88, 0.8] },
+    adolescente: { cabecas: 6, topo: 76, pescoco: 0.3, tronco: 1.3, quadril: 0.65, larg: [0.86, 0.74, 0.85, 0.74] },
+    adulta: { cabecas: 6.8, topo: 64, pescoco: 0.33, tronco: 1.4, quadril: 0.7, larg: [0.84, 0.7, 0.85, 0.72] }
+  };
+  var DF = null;
+  function deformacao(idade, menino) {
+    var q = PROPORCAO[idade] || PROPORCAO.adulta, cab = IDADE.cab, L = q.larg.slice();
+    if (menino) { L[1] = L[0] * 0.94; L[2] = Math.min(L[2], L[0] * 0.92); }
+    var queixo = 311 + ((IDADE === IDADES.pequena ? 275 : IDADE === IDADES.crianca ? 278 : IDADE === IDADES.adolescente ? 282 : 285) - 297) * cab;
+    var alto = queixo - (311 - 205 * cab), h = (664 - q.topo) / q.cabecas, s = h / alto;
+    var yC = q.topo + h, yS = yC + q.pescoco * h, yW = yS + q.tronco * h, yQ = yW + q.quadril * h;
+    // pontos de apoio: [y original, y novo]; abaixo do último a escala é 1
+    var Y = [[queixo, yC], [340, yS], [455, yW], [530, yQ], [615, 615]];
+    function fy(y) {
+      if (y <= Y[0][0]) return yC + (y - queixo) * s;
+      for (var i = 1; i < Y.length; i++) if (y <= Y[i][0]) { var a = Y[i - 1], b = Y[i]; return a[1] + (y - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); }
+      return y;
+    }
+    // largura: a cabeça (e o que fica na altura dela, como a mão no cabelo) reduz junto; do ombro para baixo, normal
+    var X = [[queixo, s], [340, L[0]], [420, L[1]], [470, L[2]], [560, L[3]]];
+    function gx(y) {
+      if (y <= X[0][0]) return s;
+      for (var i = 1; i < X.length; i++) if (y <= X[i][0]) { var a = X[i - 1], b = X[i]; return a[1] + (y - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); }
+      return L[3];
+    }
+    return { s: s, traco: L[3], queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
+      cabeca: 'translate(200 ' + n(yC) + ') scale(' + n(s * 1000) / 1000 + ') translate(-200 ' + n(-queixo) + ')' };
+  }
+  // aplica a deformação em tudo o que é desenho do corpo (caminhos, círculos, elipses, retângulos e centros de giro)
+  function deformar(str) {
+    if (!DF || !str) return str;
+    var D = DF;
+    function par(x, y) { return n(D.fx(+x, +y)) + ',' + n(D.fy(+y)); }
+    // arco (A rx,ry giro grande lado x,y): os raios só encolhem como a peça naquele ponto; o ponto final vai para o lugar novo
+    function arco(m2, rx, ry, g, f1, f2, x, y) {
+      var kx = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8, ky = (D.fy(+y + 4) - D.fy(+y - 4)) / 8;
+      return 'A' + n(+rx * kx) + ',' + n(+ry * ky) + ' ' + g + ' ' + f1 + ' ' + f2 + ' ' + par(x, y);
+    }
+    return str.replace(/(\sd=")([^"]*)"/g, function (m, a, d) {
+      return a + d.replace(/A(-?\d*\.?\d+),(-?\d*\.?\d+) (-?\d*\.?\d+) ([01]) ?([01]) (-?\d*\.?\d+),(-?\d*\.?\d+)|(-?\d*\.?\d+),(-?\d*\.?\d+)/g, function (m2, rx, ry, g, f1, f2, x, y, px, py) {
+        return rx !== undefined ? arco(m2, rx, ry, g, f1, f2, x, y) : par(px, py);
+      }) + '"';
+    })
+      .replace(/<(circle|ellipse)\s([^>]*)>/g, function (m, tag, atr) {
+        var cx = +(atr.match(/cx="([^"]*)"/) || [])[1], cy = +(atr.match(/cy="([^"]*)"/) || [])[1];
+        if (isNaN(cx) || isNaN(cy)) return m;
+        var y0 = D.fy(cy), ky = Math.max(0.35, (D.fy(cy + 4) - D.fy(cy - 4)) / 8), kx = (D.fx(cx + 4, cy) - D.fx(cx - 4, cy)) / 8;
+        atr = atr.replace(/cx="[^"]*"/, 'cx="' + n(D.fx(cx, cy)) + '"').replace(/cy="[^"]*"/, 'cy="' + n(y0) + '"');
+        // círculos afinam como os traços (as juntas dos braços casam com eles)
+        if (tag === 'circle') atr = atr.replace(/(\s|^)r="([^"]*)"/, function (m3, e0, r) { return e0 + 'r="' + n(+r * Math.min(kx, D.traco)) + '"'; });
+        else atr = atr.replace(/rx="([^"]*)"/, function (m3, r) { return 'rx="' + n(+r * kx) + '"'; }).replace(/ry="([^"]*)"/, function (m3, r) { return 'ry="' + n(+r * ky) + '"'; });
+        return '<' + tag + ' ' + atr + '>';
+      })
+      .replace(/<rect\s([^>]*)>/g, function (m, atr) {
+        var g = function (k) { return +(atr.match(new RegExp('(?:^|\\s)' + k + '="([^"]*)"')) || [])[1]; };
+        var x = g('x'), y = g('y'), w = g('width'), h = g('height');
+        if ([x, y, w, h].some(isNaN)) return m;
+        var y1 = D.fy(y), y2 = D.fy(y + h), x1 = D.fx(x, y + h / 2), x2 = D.fx(x + w, y + h / 2);
+        return '<rect ' + atr.replace(/(^|\s)x="[^"]*"/, '$1x="' + n(x1) + '"').replace(/(^|\s)y="[^"]*"/, '$1y="' + n(y1) + '"').replace(/width="[^"]*"/, 'width="' + n(x2 - x1) + '"').replace(/height="[^"]*"/, 'height="' + n(y2 - y1) + '"') + '>';
+      })
+      .replace(/stroke-width="([\d.]+)"/g, function (m, w) { return 'stroke-width="' + n(+w * D.traco) + '"'; })
+      .replace(/rotate\((-?[\d.]+) (-?[\d.]+) (-?[\d.]+)\)/g, function (m, a, x, y) { return 'rotate(' + a + ' ' + par(x, y).replace(',', ' ') + ')'; });
+  }
+  // ponto do corpo depois da deformação (para os centros das animações do desfile)
+  function origem(x, y) { return DF ? 'transform-origin:' + n(DF.fx(x, y)) + 'px ' + n(DF.fy(y)) + 'px' : ''; }
   function grupo(s) { return s ? '<g transform="' + CABECA + '">' + s + '</g>' : ''; }
 
   // ---------- ajudantes ----------
@@ -92,6 +165,7 @@
     ANIM = !!op.anim;
     var e = V.limpar(e0), I = (op.id || 'b') + '-', fundo = op.fundo !== false, out = [];
     IDADE = IDADES[e.idade] || IDADES.adulta;
+    DF = deformacao(e.idade, e.personagem === 'menino');
     // a partir dos 11 anos o rosto fica oval: a cabeça estreita um pouco (largura) e alonga
     CABECA = 'translate(0 14) translate(200 297) scale(' + IDADE.cab * (IDADE.largura || 1) + ' ' + IDADE.cab + ') translate(-200 -297)';
     var C = function (cat) { var k = P.categoria(cat); return P.cor(k.cores, e[k.opcoes ? cat + 'Cor' : cat]); };
@@ -114,7 +188,8 @@
     }
     function linha(d, cor, larg, op2) { return p(d, { fill: 'none', stroke: cor, 'stroke-width': larg || 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: op2 }); }
 
-    if (fundo || op.soFundo) out.push(cenario(e.cenario, I));
+    var cenarioS = fundo || op.soFundo ? cenario(e.cenario, I) : null;
+    if (cenarioS) out.push(cenarioS);
     if (op.soFundo) return fechar();
     var sombraChao = elip(200, 664, 96, 13, { fill: '#000', opacity: 0.16 });
     out.push(sombraChao);
@@ -143,13 +218,12 @@
     // ---------- asas e cabelo de trás (de costas, vão por cima do corpo, lá embaixo) ----------
     var asasF = vis('vestido') && e.vestido === 'fada' ? asas(C('vestido')) : '';
     if (!corpoCostas) out.push(asasF);
-    if (!ang) { var trasF = afinarCabelo(cabeloTras(e, I, cab, cabE), cabE); out.push(grupo(trasF + volumeCabelo(trasF, I) + fiosIlustra(trasF, I, 'fiosT', e, cab, cabE))); }
+    if (!ang) { var trasF = afinarCabelo(cabeloTras(e, I, cab, cabE), cabE); out.push(grupo(trasF + fiosIlustra(trasF, I, 'fiosT', e, cab, cabE))); }
 
     // ---------- pernas, pés e sapatos ----------
-    var peleS = esc(pele, 0.12), peleL = cla(pele, 0.28);
     function membro(d, larg) {
-      return p(d, { stroke: peleE, 'stroke-width': larg + 2.6, 'stroke-linecap': 'round', fill: 'none', opacity: 0.85 }) + p(d, { stroke: peleS, 'stroke-width': larg, 'stroke-linecap': 'round', fill: 'none' }) +
-        p(d, { stroke: pele, 'stroke-width': larg * 0.72, 'stroke-linecap': 'round', fill: 'none' }) + '<g transform="translate(-2.5 0)">' + p(d, { stroke: peleL, 'stroke-width': larg * 0.26, 'stroke-linecap': 'round', fill: 'none', opacity: 0.55 }) + '</g>';
+      return p(d, { stroke: esc(pele, 0.35), 'stroke-width': larg + 2.4, 'stroke-linecap': 'round', fill: 'none' }) + p(d, { stroke: pele, 'stroke-width': larg, 'stroke-linecap': 'round', fill: 'none' }) +
+        '<g transform="translate(' + n(larg * 0.3) + ' 0)">' + p(d, { stroke: '#7a5ba8', 'stroke-width': larg * 0.36, 'stroke-linecap': 'round', fill: 'none', opacity: 0.16 }) + '</g>';
     }
     var iniPernas = out.length;
     ['M177,455 L173,640', 'M223,455 L227,640'].forEach(function (d) { out.push(membro(d, 29)); });
@@ -162,17 +236,17 @@
        A saia e o vestido vêm depois, por cima, e balançam com o corpo. De frente apenas. */
     if (op.passos && !angB) {
       var pernas = out.splice(iniPernas).join('');
-      defs += '<clipPath id="' + I + 'pernaE"><rect x="-200" y="0" width="400" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="200" y="0" width="400" height="900"/></clipPath>';
+      defs += deformar('<clipPath id="' + I + 'pernaE"><rect x="-200" y="0" width="400" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="200" y="0" width="400" height="900"/></clipPath>');
       out.push('<g class="pp-passo-e"><g clip-path="url(#' + I + 'pernaE)">' + pernas + '</g></g>', '<g class="pp-passo-d"><g clip-path="url(#' + I + 'pernaD)">' + pernas + '</g></g>');
     }
     // desfile: da cintura para baixo, a saia e a barra do vestido acompanham o passo (.pp-barra, estilo.css), sem tombar
     var andaBarra = op.passos && !angB;
-    if (andaBarra) defs += '<clipPath id="' + I + 'acimaCint"><rect x="-200" y="-200" width="800" height="658"/></clipPath><clipPath id="' + I + 'abaixoCint"><rect x="-200" y="455" width="800" height="600"/></clipPath>';
+    if (andaBarra) defs += deformar('<clipPath id="' + I + 'acimaCint"><rect x="-200" y="-200" width="800" height="658"/></clipPath><clipPath id="' + I + 'abaixoCint"><rect x="-200" y="455" width="800" height="600"/></clipPath>');
     function barra(x) { return andaBarra ? '<g clip-path="url(#' + I + 'acimaCint)">' + x + '</g><g class="pp-barra"><g clip-path="url(#' + I + 'abaixoCint)">' + x + '</g></g>' : x; }
     if (vis('saia')) out.push(andaBarra ? '<g class="pp-barra">' + saia(e.saia, C('saia'), peca, linha) + '</g>' : saia(e.saia, C('saia'), peca, linha));
 
     // ---------- pescoço, tronco e braços ----------
-    if (!virada) out.push(ret(186, 270, 28, 80, { fill: pele, stroke: peleE, 'stroke-width': 2 }), ret(187, 300, 26, 18, { fill: esc(pele, 0.35), opacity: 0.15 }));
+    out.push(ret(186, 270, 28, 80, { fill: pele, stroke: peleE, 'stroke-width': 2 }), ret(187, 300, 26, 18, { fill: esc(pele, 0.35), opacity: 0.15 }));
     out.push(p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: 'url(#' + I + 'lado)' }));
     /* pose do fim da passarela (opcoes.pose): 'cintura' = mão direita na cintura (menina); 'cruzados' = braços cruzados
        (menino). Os braços da pose são desenhados no fim, por cima (bracosPose). */
@@ -199,8 +273,8 @@
     // em pose, a manga pendurada (parada) some do lado do braço em pose: o braço da pose desenha a própria manga
     if (bracoPose) {
       var vestP = vis('vestido');
-      defs += '<clipPath id="' + I + 'semManga"><rect x="140" y="-200" width="120" height="1200"/>' + (semEsquerdo ? '' : '<rect x="-200" y="-200" width="350" height="1200"/>') +
-        (semDireito ? '' : '<rect x="250" y="-200" width="400" height="1200"/>') + (vestP ? '<rect x="-200" y="455" width="800" height="800"/>' : '') + '</clipPath>';
+      defs += deformar('<clipPath id="' + I + 'semManga"><rect x="140" y="-200" width="120" height="1200"/>' + (semEsquerdo ? '' : '<rect x="-200" y="-200" width="350" height="1200"/>') +
+        (semDireito ? '' : '<rect x="250" y="-200" width="400" height="1200"/>') + (vestP ? '<rect x="-200" y="455" width="800" height="800"/>' : '') + '</clipPath>');
       out[iTop] = '<g clip-path="url(#' + I + 'semManga)">' + out[iTop] + '</g>';
     }
     /* desfile andando: cada braço balança a partir do ombro (.pp-braco-e / -d, estilo.css), junto com a perna do outro
@@ -210,10 +284,10 @@
     if (op.passos && !angB && !tchau && !bracoPose) {
       var camada = out.splice(iniBracos), topo = camada[iTop - iniBracos], vest = vis('vestido');
       var antesTop = camada.slice(0, iTop - iniBracos).join(''), depoisTop = camada.slice(iTop - iniBracos + 1).join('');
-      defs += '<clipPath id="' + I + 'brMeio"><rect x="140" y="-200" width="120" height="1200"/></clipPath>' +
+      defs += deformar('<clipPath id="' + I + 'brMeio"><rect x="140" y="-200" width="120" height="1200"/></clipPath>' +
         '<clipPath id="' + I + 'brTopFixo"><rect x="140" y="-200" width="120" height="1200"/>' + (vest ? '<rect x="-200" y="455" width="800" height="800"/>' : '') + '</clipPath>' +
         '<clipPath id="' + I + 'brE"><rect x="-200" y="-200" width="350" height="1200"/></clipPath><clipPath id="' + I + 'brD"><rect x="250" y="-200" width="400" height="1200"/></clipPath>' +
-        '<clipPath id="' + I + 'brEtop"><rect x="-200" y="-200" width="350" height="' + (vest ? 655 : 1200) + '"/></clipPath><clipPath id="' + I + 'brDtop"><rect x="250" y="-200" width="400" height="' + (vest ? 655 : 1200) + '"/></clipPath>';
+        '<clipPath id="' + I + 'brEtop"><rect x="-200" y="-200" width="350" height="' + (vest ? 655 : 1200) + '"/></clipPath><clipPath id="' + I + 'brDtop"><rect x="250" y="-200" width="400" height="' + (vest ? 655 : 1200) + '"/></clipPath>');
       function lado(cl, clTop) { return '<g clip-path="url(#' + I + cl + ')">' + antesTop + '</g><g clip-path="url(#' + I + clTop + ')">' + topo + '</g><g clip-path="url(#' + I + cl + ')">' + depoisTop + '</g>'; }
       out.push('<g clip-path="url(#' + I + 'brTopFixo)">' + topo + '</g><g clip-path="url(#' + I + 'brMeio)">' + depoisTop + '</g>');
       out.push('<g class="pp-braco-e">' + lado('brE', 'brEtop') + '</g>', '<g class="pp-braco-d">' + lado('brD', 'brDtop') + '</g>');
@@ -237,7 +311,7 @@
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
     } else {
       out.push(elip(116, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }), elip(284, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }));
-      out.push(pintar(rosto, 'url(#' + I + 'pele)', esc(pele, 0.42), 1.1) + p(rosto, { fill: 'url(#' + I + 'volRosto)' }));
+      out.push(pintar(rosto, 'url(#' + I + 'pele)', esc(pele, 0.42), 1.1));
       out.push(luzLados(pele, menino), luzMeio(pele), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, 0, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, e, I, C, 0, op.anim))));
       out.push(deslocar(-dO, sobr(164, -1)), deslocar(dO, sobr(236, 1)));
       out.push(narizFrente(e.nariz, pele) + narizLuz(pele, menino));
@@ -246,7 +320,7 @@
       if (e.glitter === 'bochechas' || e.glitter === 'olhos') out.push(glitter(e, C('glitter')));
       // ---------- cabelo da frente e acessórios do rosto ----------
       var franjaF = afinarCabelo(subirTesta(cabeloFrente(e, I, cab, cabE), TESTA[e.testa] || 0), cabE);
-      out.push(franjaF + volumeCabelo(franjaF, I) + fiosIlustra(franjaF, I, 'fiosF', e, cab, cabE));
+      out.push(franjaF + fiosIlustra(franjaF, I, 'fiosF', e, cab, cabE));
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
       if (vis('oculos')) out.push(oculos(e.oculos, C('oculos'), dO));
     }
@@ -280,16 +354,26 @@
     // o braço do tchau vai por cima de tudo (fica na frente do cabelo, do lado do rosto)
     if (tchau) out.push(bracoTchau(pele, peleE, esmalte, membro, op.anim));
     if (bracoPose) out.push(bracosPose(bracoPose, tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
+    // corpo de ilustração de moda: o corpo passa pela deformação e a cabeça (já pronta) só é reduzida e posta no lugar
+    var cabecaGrupo = '<g transform="' + CABECA + '">';
+    out = out.map(function (x) {
+      if (x === cenarioS || x === sombraChao) return x;
+      if (x === cabecaPronta || x.indexOf(cabecaGrupo) === 0) return '<g transform="' + DF.cabeca + '">' + x + '</g>';
+      return deformar(x).replace(/<g class="pp-(passo-e|passo-d|braco-e|braco-d)">/g, function (m, k) {
+        var o = { 'passo-e': [177, 455], 'passo-d': [223, 455], 'braco-e': [150, 352], 'braco-d': [250, 352] }[k];
+        return '<g class="pp-' + k + '" style="' + origem(o[0], o[1]) + '">';
+      }).replace(/<g class="pp-barra">/g, '<g class="pp-barra" style="' + origem(200, 455) + '">');
+    });
     /* desfile (opcoes.passos): tudo menos as pernas e a sombra do chão vai para grupos .pp-corpo, que acompanham o
        quadril (o peso passa de um pé para o outro e o corpo sobe e desce um pouco) sem tombar de lado; as pernas
        (.pp-passo-e / -d) fazem o catwalk: um pé cruza e pousa na frente do outro, na linha do meio (estilo.css) */
     if (op.passos && !angB) {
       var junto = [], soltos = [];
       out.forEach(function (x) {
-        if (x === sombraChao || x.indexOf('<g class="pp-passo-') === 0) { if (soltos.length) junto.push('<g class="pp-corpo">' + soltos.join('') + '</g>'); soltos = []; junto.push(x); }
+        if (x === sombraChao || x.indexOf('<g class="pp-passo-') === 0) { if (soltos.length) junto.push('<g class="pp-corpo" style="' + origem(200, 455) + '">' + soltos.join('') + '</g>'); soltos = []; junto.push(x); }
         else soltos.push(x);
       });
-      if (soltos.length) junto.push('<g class="pp-corpo">' + soltos.join('') + '</g>');
+      if (soltos.length) junto.push('<g class="pp-corpo" style="' + origem(200, 455) + '">' + soltos.join('') + '</g>');
       out = junto;
     }
     return fechar();
@@ -415,8 +499,8 @@
       if (zE <= 0.3) s += orelha(xE, 12, false, sg);
       s += p(cont, { fill: 'none', stroke: cabE, 'stroke-width': 3.4, 'stroke-linejoin': 'round' }) + '<g clip-path="url(#' + I + 'peleR)">' + p(cont, { fill: 'none', stroke: peleE, 'stroke-width': 3.4, 'stroke-linejoin': 'round' }) + '</g>';
       // a cabeça toda é cabelo (com fios que giram junto) e a pele vai por cima
-      s += p(cont, { fill: 'url(#' + I + 'cab)' }) + p(cont, { fill: 'url(#' + I + 'volCab)' }) + '<g clip-path="url(#' + I + 'rostoV)">' + fiosCabeca() + p('M146,126 Q200,104 254,126', { fill: 'none', stroke: '#fff', 'stroke-width': 13, opacity: 0.13, 'stroke-linecap': 'round' }) + p('M156,123 Q200,106 244,123', { fill: 'none', stroke: '#fff', 'stroke-width': 4, opacity: 0.3, 'stroke-linecap': 'round' }) +
-        p(peleD, { fill: 'url(#' + I + 'pele)' }) + p(peleD, { fill: 'url(#' + I + 'volRosto)' }) + p(peleD, { fill: 'url(#' + I + 'sombCab)' }) +
+      s += p(cont, { fill: 'url(#' + I + 'cab)' }) + '<g clip-path="url(#' + I + 'rostoV)">' + fiosCabeca() + p('M146,126 Q200,104 254,126', { fill: 'none', stroke: '#fff', 'stroke-width': 13, opacity: 0.13, 'stroke-linecap': 'round' }) + p('M156,123 Q200,106 244,123', { fill: 'none', stroke: '#fff', 'stroke-width': 4, opacity: 0.3, 'stroke-linecap': 'round' }) +
+        p(peleD, { fill: 'url(#' + I + 'pele)' }) + p(peleD, { fill: 'url(#' + I + 'sombCab)' }) +
         p(peleD, { fill: 'none', stroke: cabE, 'stroke-width': 1.8, opacity: 0.5, 'stroke-linejoin': 'round' }) + '</g>';
       // maquiagem e feições: só onde é pele
       var fe = '';
@@ -445,7 +529,7 @@
       if (cos > -0.1) {
         var xT = xa(-sg * 56, 86), xP = xa(-sg * 34, 86) + sg * 6, xH = xa(-sg * 44, 86), mv = -sg * 300 * (1 - Math.min(1, as / 0.4)), xL = 200 + sg * 900;
         defs += '<clipPath id="' + I + 'cabY"><path d="M' + n(xL) + ',-200 L' + n(xP + sg * 64 + mv) + ',-200 L' + n(xP + mv) + ',116 Q' + n(xH + mv) + ',134 ' + n(xT + mv) + ',168 Q' + n(xT + sg * 4 + mv) + ',204 ' + n(xT + sg * 16 + mv) + ',240 L' + n(xT + sg * 30 + mv) + ',900 L' + n(xL) + ',900Z"/></clipPath>';
-        s += '<g clip-path="url(#' + I + 'cabF)"><g clip-path="url(#' + I + 'cabY)">' + hf.frente + volumeCabelo(hf.frente, I) + '</g></g>';
+        s += '<g clip-path="url(#' + I + 'cabF)"><g clip-path="url(#' + I + 'cabY)">' + hf.frente + '</g></g>';
       }
       s += hf.lado;
       // orelha do lado de cá (com o desenho de dentro), por cima do cabelo, como cabelo preso atrás da orelha
@@ -509,18 +593,16 @@
     }
     var iris = P.cor('olhos', e.olhos).hex;
     return padrao +
-      '<radialGradient id="' + I + 'pele" cx=".45" cy=".38" r=".7"><stop offset="0" stop-color="' + cla(pele, 0.16) + '"/><stop offset="1" stop-color="' + esc(pele, 0.05) + '"/></radialGradient>' +
-      '<linearGradient id="' + I + 'lado" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".2"/><stop offset=".22" stop-color="#000" stop-opacity="0"/><stop offset=".4" stop-color="#fff" stop-opacity=".1"/><stop offset=".62" stop-color="#fff" stop-opacity="0"/><stop offset=".85" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".24"/></linearGradient>' +
+      // Nova Era (ilustração 2D, sem volume 3D): pele de cor lisa
+      '<linearGradient id="' + I + 'pele"><stop offset="0" stop-color="' + pele + '"/><stop offset="1" stop-color="' + pele + '"/></linearGradient>' +
+      // luz de desenho: uma faixa de luz de corte reto do lado esquerdo (a luz vem de cima, à esquerda)
+      '<linearGradient id="' + I + 'lado" x1="0" y1="0" x2="1" y2="0"><stop offset=".1" stop-color="#fff" stop-opacity="0"/><stop offset=".1" stop-color="#fff" stop-opacity=".22"/><stop offset=".2" stop-color="#fff" stop-opacity=".22"/><stop offset=".2" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
       '<filter id="' + I + 'somb" x="-30%" y="-15%" width="160%" height="135%"><feDropShadow dx="5" dy="9" stdDeviation="8" flood-color="#2a0a3c" flood-opacity=".38"/></filter>' +
       '<filter id="' + I + 'desf" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.2"/></filter>' +
       '<radialGradient id="' + I + 'luzE" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff8e8" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#1a0630" stop-opacity=".28"/></radialGradient>' +
-      '<radialGradient id="' + I + 'vol" cx=".42" cy=".3" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></radialGradient>' +
+      // sombra de desenho: uma faixa lilás de corte reto do lado direito (18%, como na bíblia de estilo da pesquisa)
+      '<linearGradient id="' + I + 'vol" x1="0" y1="0" x2="1" y2="0"><stop offset=".74" stop-color="#7a5ba8" stop-opacity="0"/><stop offset=".74" stop-color="#7a5ba8" stop-opacity=".18"/></linearGradient>' +
       '<linearGradient id="' + I + 'shine" x1="0" y1="0" x2="1" y2="1"><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".6"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
-      // volume 3D do rosto: luz no centro, sombra suave e quente nas bordas (como luz de estúdio de animação)
-      // volume do rosto (Nova Era): luz no meio e sombra só nas laterais — nada escuro embaixo (parecia barba)
-      '<linearGradient id="' + I + 'volRosto" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="' + esc(pele, 0.32) + '" stop-opacity=".32"/><stop offset=".2" stop-color="' + esc(pele, 0.2) + '" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset=".8" stop-color="' + esc(pele, 0.2) + '" stop-opacity="0"/><stop offset="1" stop-color="' + esc(pele, 0.32) + '" stop-opacity=".32"/></linearGradient>' +
-      // volume do cabelo: luz no alto (de cima e da esquerda), sombra embaixo e nas laterais
-      '<radialGradient id="' + I + 'volCab" cx=".4" cy=".18" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></radialGradient>' +
       // sombra que o cabelo faz na testa, logo abaixo da linha do cabelo
       '<linearGradient id="' + I + 'sombCab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + esc(cab, 0.2) + '" stop-opacity=".32"/><stop offset=".16" stop-color="' + esc(cab, 0.2) + '" stop-opacity="0"/></linearGradient>' +
       // branco do olho com volume (mais escuro em cima, onde a pálpebra faz sombra)
@@ -533,15 +615,10 @@
   }
 
   // ---------- cabelo ----------
-  // cópia do cabelo só com a luz e a sombra (volCab) por cima, sem traço: dá volume sem redesenhar cada penteado
-  function volumeCabelo(s, I) {
-    if (!s) return '';
-    return s.replace(/fill="url\(#[^"]*-cab\)"/g, 'fill="url(#' + I + 'volCab)"').replace(/<(path|circle|ellipse)\s[^>]*fill="(?!url\(#[^"]*volCab)[^"]*"[^>]*\/>/g, '')
-      .replace(/stroke="[^"]*"/g, 'stroke="none"');
-  }
   // mechas: "pontas" e "arco" mudam o degradê do cabelo (vale para todos os cortes); "frente" desenha faixas
   function gradienteCabelo(e, I, cab) {
-    var m = P.cor('cabelo', e.mechasCor).hex, st = [[0, cla(cab, 0.12)], [0.1, cla(cab, 0.34)], [0.2, cla(cab, 0.06)], [0.55, cab], [0.85, esc(cab, 0.14)], [1, esc(cab, 0.22)]];
+    // Nova Era: cor lisa, só uma sombra na raiz (o brilho vem das mechas de luz desenhadas)
+    var m = P.cor('cabelo', e.mechasCor).hex, st = [[0, esc(cab, 0.14)], [0.14, cab], [1, cab]];
     if (e.mechas === 'pontas') st = [[0, cla(cab, 0.18)], [0.45, cab], [0.8, m], [1, cla(m, 0.2)]];
     if (e.mechas === 'arco') st = [[0, cla(cab, 0.18)], [0.4, cab], [0.55, '#ff7cc8'], [0.68, '#ffd76a'], [0.8, '#7ee8ff'], [0.92, '#b892ff'], [1, '#86ecc8']];
     return '<linearGradient id="' + I + 'cab" x1="0" y1="0" x2="0" y2="1">' + st.map(function (s) { return '<stop offset="' + s[0] + '" stop-color="' + s[1] + '"/>'; }).join('') + '</linearGradient>';
@@ -1038,6 +1115,7 @@
     function vestir(d, larg, ate) {   // a manga por cima do braço (ate: 0..1 do traço, aproximado pelo pathLength)
       if (!corTop || manga === 'nada') return '';
       var fim = manga === 'longa' ? 1 : ate;
+      if (fim <= 0) return '';   // sem manga nesse pedaço (antes ficava uma bolinha da cor da roupa no cotovelo)
       return p(d, { fill: 'none', stroke: esc(corTop.hex, 0.25), 'stroke-width': larg + 4, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' }) +
         p(d, { fill: 'none', stroke: corTop.hex, 'stroke-width': larg + 2, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' });
     }
@@ -2021,7 +2099,18 @@
     return s;
   }
 
-  var API = { svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow };
+  /* área de zoom (rosto, mãos, pés…) no corpo de ilustração: a mesma área de antes (pecas.js → ZOOM) levada para o lugar
+     novo da cabeça e do corpo, conforme a idade escolhida */
+  function areaZoom(a, e0) {
+    var e = V.limpar(e0);
+    IDADE = IDADES[e.idade] || IDADES.adulta; DF = deformacao(e.idade, e.personagem === 'menino');
+    var ym = a[1] + a[3] / 2, y1 = DF.fy(a[1]), y2 = DF.fy(a[1] + a[3]), x1 = DF.fx(a[0], ym), x2 = DF.fx(a[0] + a[2], ym);
+    if (a[1] + a[3] > 600) y1 = Math.max(y1, y2 - a[3]);   // pés: os pés não esticam, a área continua do mesmo tamanho
+    // não fica menor que um rosto de criancinha (detalhe demais some na tela)
+    var w = Math.max(x2 - x1, 90), h = Math.max(y2 - y1, 90), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+    return [n(cx - w / 2), n(cy - h / 2), n(w), n(h)];
+  }
+  var API = { svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
   API.POSES = POSES;
   raiz.PurpurinaBoneca = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

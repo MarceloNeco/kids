@@ -2,6 +2,29 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "19/Nov/2026",
+      "hora": "20:41:11",
+      "pt": [
+        "🎨 Sem cara de boneco 3D: a personagem agora é desenho 2D, de cor lisa, com uma sombra e uma luz de corte reto e contorno fino na cor de cada peça (nunca preto), como pede a pesquisa do Poki.",
+        "👗 Corpo de ilustração de moda: cabeça menor, pescoço, cintura e pernas longas. Muda com a idade: a criancinha tem 4 cabeças de altura e a adulta quase 7.",
+        "🌸 Telas novas, claras, de ateliê: creme, ameixa, rosa, lavanda, mel e menta, e o nome em letra de revista. Bem diferente da Purpurina 80's.",
+        "🔍 O zoom da maquiagem, das mãos e dos pés acompanha o corpo novo."
+      ],
+      "en": [
+        "🎨 No more 3D doll look: the character is now a 2D drawing with flat colors, one hard-edged shadow and one highlight, and a thin outline in each piece's own color (never black), as the Poki research recommends.",
+        "👗 Fashion-illustration body: smaller head, a neck, a waist and long legs. It changes with age: the little one is 4 heads tall and the adult almost 7.",
+        "🌸 New light atelier screens: cream, plum, pink, lavender, honey and mint, with the name in magazine lettering. Very different from Purpurina 80's.",
+        "🔍 Zooming in for makeup, hands and feet follows the new body."
+      ],
+      "es": [
+        "🎨 Adiós al aspecto de muñeca 3D: el personaje es ahora un dibujo 2D de colores planos, con una sombra y una luz de corte limpio y un contorno fino del color de cada prenda (nunca negro), como recomienda la investigación de Poki.",
+        "👗 Cuerpo de ilustración de moda: cabeza más pequeña, cuello, cintura y piernas largas. Cambia con la edad: la pequeña mide 4 cabezas y la adulta casi 7.",
+        "🌸 Pantallas nuevas y claras, de taller de moda: crema, ciruela, rosa, lavanda, miel y menta, y el nombre con letra de revista. Muy distinta de Purpurina 80's.",
+        "🔍 El zoom del maquillaje, las manos y los pies sigue al cuerpo nuevo."
+      ]
+    },
+    {
       "versao": "0.3.0",
       "data": "19/Nov/2026",
       "hora": "19:17:25",

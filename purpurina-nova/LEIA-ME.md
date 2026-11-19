@@ -13,6 +13,9 @@
 > - desenho de ilustração (0.3.0): olho amendoado (`geoOlho`/`olho`), sobrancelha cheia (`sobrancelha`), nariz e lábios
 >   desenhados, contorno fino e fios no cabelo (`fiosIlustra`, máscara do próprio penteado);
 > - **sem giro de 360°**: vistas fixas `VISTAS = [0, 28, 45, -28, -45]` no estúdio (toque ou 👀), no desfile, no vídeo e na TV.
+> - **sem 3D** (0.4.0): cor lisa, sombra e luz em faixas de corte reto (`vol`, `lado`), contorno fino da cor da peça;
+> - **corpo de moda** (0.4.0): `PROPORCAO` e `deformar()` no `boneca.js` mudam a proporção de todo o corpo pela idade (a
+>   cabeça só é reduzida); `areaZoom()` leva o zoom para o lugar novo; telas claras no fim do `estilo.css` (tema "ateliê").
 
 # Purpurina — maquiagem, roupas e muito brilho
 
