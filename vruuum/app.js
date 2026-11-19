@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.26.0';
+  var APP_VERSION = '1.27.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -760,6 +760,11 @@
       if (pausa && !botoesAntes[k].pausa) setTimeout(pausar, 0);
       botoesAntes[k] = { pul: pul, buz: buz, pausa: pausa };
     }
+    if (tvc) for (k = 0; k < n; k++) {   // 1.27.0: celular como controle (o jogador k é o k-ésimo celular que entrou)
+      var sc = tvc.ctl[k]; if (!sc || performance.now() - sc.visto > 1500) continue;
+      ent[k].dir += sc.d;
+      if (sc.p > sc.pAnt) { sc.pAnt = sc.p; pularPend[k] = true; }
+    }
     for (k = 0; k < n; k++) { ent[k].dir = Math.max(-1, Math.min(1, ent[k].dir)); ent[k].pular = pularPend[k]; pularPend[k] = false; }
     if (usaMov && mov.pulou()) ent[0].pular = true;
     if (maosLigadas && estado.fase === 'corrida') for (k = 0; k < n; k++) {
@@ -920,6 +925,88 @@
     var m = /[?&]duelo=([A-Za-z]{4})\b/.exec(location.search); if (!m || !DU) return;
     $('dueloCodigo').value = m[1].toUpperCase(); $('duelo').hidden = false; $('btDuelo').setAttribute('aria-expanded', 'true');
   })();
+
+  // ---------- TV com os celulares como controle (1.27.0; canal "tv-<código>" do duelo.js) ----------
+  var tvc = null, ctlc = null;
+  function tvStatus() {
+    if (!tvc) return;
+    var nomes = [0, 1].map(function (k) { return t('Jogador ', 'Player ', 'Jugador ') + (k + 1) + (tvc.ctl[k] ? ' ✓' : t(': esperando…', ': waiting…', ': esperando…')); });
+    $('tvStatus').textContent = (tvc.canal ? '' : t('Conectando… ', 'Connecting… ', 'Conectando… ')) + nomes.join(' · ');
+  }
+  function tvReceber(m) {
+    if (!tvc || m.t !== 'ctl') return;
+    var agora = performance.now(), k = tvc.ctl[0] && tvc.ctl[0].id === m.id ? 0 : tvc.ctl[1] && tvc.ctl[1].id === m.id ? 1 : -1;
+    if (k < 0) {   // celular novo: pega a primeira vaga livre
+      k = !tvc.ctl[0] ? 0 : !tvc.ctl[1] ? 1 : -1;
+      if (k < 0) { tvc.canal.mandar({ t: 'vaga', id: dueloId, alvo: m.id, j: -1 }); return; }
+      tvc.ctl[k] = { id: m.id, d: 0, p: m.p, pAnt: m.p, g: m.g, gAnt: m.g, visto: agora };
+      tvc.canal.mandar({ t: 'vaga', id: dueloId, alvo: m.id, j: k }); Som.tocar('mundo');
+      if (tvc.ctl[0] && tvc.ctl[1] && estadoTela === 'menu' && pref.jogadores !== 2) { pref.jogadores = 2; salvar(); marcar(); }
+      tvStatus();
+    }
+    var s = tvc.ctl[k]; s.d = m.d; s.p = m.p; s.g = m.g; s.visto = agora;
+    if (s.g > s.gAnt) {   // tocou em Começar no celular
+      s.gAnt = s.g;
+      if (estadoTela === 'menu' || estadoTela === 'fim') { pref.jogadores = tvc.ctl[0] && tvc.ctl[1] ? 2 : 1; salvar(); marcar(); iniciarCorrida(); }
+    }
+  }
+  function tvAbrir() {
+    if (tvc || !DU) return;
+    var cod = DU.codigoNovo(), este = tvc = { cod: cod, canal: null, ctl: [null, null] };
+    $('tvCod').textContent = t('Código da TV: ', 'TV code: ', 'Código de la tele: ') + cod; tvStatus();
+    DU.abrir(cod, tvReceber, function () { if (tvc === este) $('tvStatus').textContent = t('A internet caiu. Feche e abra de novo o 📺.', 'The internet dropped. Close and open 📺 again.', 'Se ha caído internet. Cierra y abre otra vez el 📺.'); }, true)
+      .then(function (canal) {
+        if (tvc !== este) { canal.fechar(); return; }
+        este.canal = canal; tvStatus();
+        este.pulso = setInterval(function () {   // a cada 2 s: lembra cada celular de quem ele é; quem sumiu libera a vaga
+          var agora = performance.now();
+          [0, 1].forEach(function (k) { var s = este.ctl[k]; if (!s) return; if (agora - s.visto > 6000) { este.ctl[k] = null; tvStatus(); } else canal.mandar({ t: 'vaga', id: dueloId, alvo: s.id, j: k }); });
+        }, 2000);
+      }, function () { if (tvc === este) { tvc = null; $('tvStatus').textContent = t('Não deu para conectar. Veja se tem internet e tente de novo.', "Couldn't connect. Check the internet and try again.", 'No se ha podido conectar. Mira si hay internet y prueba otra vez.'); } });
+  }
+  function tvFechar() { if (!tvc) return; clearInterval(tvc.pulso); if (tvc.canal) tvc.canal.fechar(); tvc = null; $('tvCod').textContent = ''; $('tvStatus').textContent = ''; }
+  $('btTvControles').addEventListener('click', function () {
+    var p = $('tvControles'), abrir = p.hidden; p.hidden = !abrir; $('btTvControles').setAttribute('aria-expanded', String(abrir)); Som.tocar('clique');
+    if (abrir) tvAbrir(); else tvFechar();
+  });
+  // ----- o celular que vira controle -----
+  function ctlEnviar() { if (ctlc && ctlc.canal) ctlc.canal.mandar({ t: 'ctl', id: dueloId, d: ctlc.d, p: ctlc.p, g: ctlc.g }); }
+  function ctlQuem(txt, cor) { $('ctlQuem').textContent = txt; $('ctlQuem').style.color = cor || ''; }
+  function ctlReceber(m) {
+    if (!ctlc || m.t !== 'vaga' || m.alvo !== dueloId) return;
+    if (m.j < 0) { ctlQuem(t('Esta TV já tem dois controles.', 'This TV already has two controllers.', 'Esta tele ya tiene dos mandos.')); return; }
+    if (ctlc.j !== m.j) { ctlc.j = m.j; tremer([60]); }
+    ctlQuem('🎮 ' + t('Jogador ', 'Player ', 'Jugador ') + (m.j + 1), m.j ? '#3ee8ff' : '#ffd166');
+  }
+  function ctlConectar() {
+    var cod = DU && DU.codigo($('controleCodigo').value);
+    if (!cod) { $('controleStatus').textContent = t('O código da TV tem 4 letras (ex.: ABCD).', 'The TV code has 4 letters (e.g. ABCD).', 'El código de la tele tiene 4 letras (p. ej., ABCD).'); return; }
+    var este = ctlc = { cod: cod, canal: null, j: null, d: 0, p: 0, g: 0 };
+    tela('controle'); ctlQuem(t('Conectando à TV…', 'Connecting to the TV…', 'Conectando a la tele…'));
+    if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (l) { este.trava = l; }).catch(function () { /* ok */ });
+    DU.abrir(cod, ctlReceber, function () { if (ctlc === este) ctlQuem(t('A internet caiu. Toque em Parar e conecte de novo.', 'The internet dropped. Tap Stop and connect again.', 'Se ha caído internet. Pulsa Dejar y conecta otra vez.')); }, true)
+      .then(function (canal) {
+        if (ctlc !== este) { canal.fechar(); return; }
+        este.canal = canal; ctlQuem(t('Esperando a TV…', 'Waiting for the TV…', 'Esperando a la tele…'));
+        este.pulso = setInterval(ctlEnviar, 100);
+      }, function () { if (ctlc === este) ctlQuem(t('Não deu para conectar. Veja se tem internet e o código.', "Couldn't connect. Check the internet and the code.", 'No se ha podido conectar. Mira si hay internet y el código.')); });
+  }
+  function ctlSair() {
+    if (!ctlc) return;
+    clearInterval(ctlc.pulso); if (ctlc.canal) ctlc.canal.fechar(); if (ctlc.trava) try { ctlc.trava.release(); } catch (e) { /* ok */ }
+    ctlc = null; tela('menu');
+  }
+  $('btSerControle').addEventListener('click', function () { var p = $('serControle'), abrir = p.hidden; p.hidden = !abrir; $('btSerControle').setAttribute('aria-expanded', String(abrir)); Som.tocar('clique'); });
+  $('btControleEntrar').addEventListener('click', ctlConectar);
+  $('ctlSair').addEventListener('click', ctlSair);
+  $('ctlComecar').addEventListener('click', function () { if (!ctlc) return; ctlc.g++; ctlEnviar(); tremer([40]); });
+  [['ctlEsq', -1], ['ctlDir', 1]].forEach(function (b) {   // segurar = virar; soltar = reto
+    var el = $(b[0]);
+    el.addEventListener('pointerdown', function (e) { e.preventDefault(); if (!ctlc) return; ctlc.d = b[1]; el.classList.add('apertado'); ctlEnviar(); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { el.addEventListener(ev, function () { if (ctlc && ctlc.d === b[1]) { ctlc.d = 0; ctlEnviar(); } el.classList.remove('apertado'); }); });
+  });
+  $('ctlPular').addEventListener('pointerdown', function (e) { e.preventDefault(); if (!ctlc) return; ctlc.p++; ctlEnviar(); tremer([20]); $('ctlPular').classList.add('apertado'); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { $('ctlPular').addEventListener(ev, function () { $('ctlPular').classList.remove('apertado'); }); });
 
   // ---------- começo ----------
   $('ver').textContent = 'v' + APP_VERSION;

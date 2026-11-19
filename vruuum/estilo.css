@@ -208,3 +208,21 @@ a { color: var(--ciano); }
 .classificacao { width: min(420px, 100%); background: var(--card); border-radius: 16px; padding: 10px 14px; text-align: left; display: grid; gap: 4px; }
 .classificacao li { list-style: none; display: flex; gap: 8px; align-items: center; }
 .classificacao li.eu { color: var(--ouro); font-weight: 700; }
+
+/* 1.26.0/1.27.0: duelo e celular como controle da TV */
+.grupo-duelo { width: min(560px, calc(100vw - 32px)); }
+.duelo-abrir { width: 100%; }
+.duelo { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding: 10px; border-radius: 16px; background: rgba(20,16,56,.9); }
+.duelo[hidden] { display: none; }
+.duelo-nome { display: flex; align-items: center; gap: 8px; justify-content: center; color: var(--muted); }
+.duelo input { min-height: 44px; border-radius: 12px; border: 2px solid var(--borda); background: #120e30; color: #fff; font: 600 1.05rem var(--fonte); padding: 0 10px; min-width: 0; }
+#dueloCodigo, #controleCodigo { width: 6.5em; text-transform: uppercase; letter-spacing: .15em; text-align: center; }
+.duelo-linha { display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.duelo-cod { font-size: 1.5rem; font-weight: 700; color: var(--ouro); letter-spacing: .08em; }
+#controle { position: relative; flex-direction: column; align-items: stretch; justify-content: space-between; gap: 12px; padding: calc(var(--nav-alto, 56px) + 6px) 12px calc(14px + env(safe-area-inset-bottom)); min-height: 100%; height: 100%; }
+.ctl-quem { text-align: center; font-size: 1.6rem; font-weight: 700; }
+.ctl-botoes { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; min-height: 180px; }
+.ctl-seta, .ctl-pular { border-radius: 24px; font-size: 3rem; font-weight: 700; background: var(--card); border: 3px solid var(--borda); touch-action: none; user-select: none; -webkit-user-select: none; }
+.ctl-pular { font-size: 1.4rem; background: rgba(198,255,61,.18); border-color: var(--lima); }
+.ctl-seta.apertado, .ctl-pular.apertado { background: rgba(255,209,102,.35); border-color: var(--ouro); }
+.ctl-baixo { display: flex; flex-direction: column; gap: 8px; align-items: center; }

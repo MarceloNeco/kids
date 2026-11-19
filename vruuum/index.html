@@ -10,7 +10,7 @@
 <script src="../carregando.js" data-fora-do-arquivo></script>
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#0b0a1f">
-<meta name="versao" content="1.26.0">
+<meta name="versao" content="1.27.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Corrida de carrinho para a família: desvie, pegue estrelas, pule rampas e passe por 4 mundos. 1 ou 2 jogadores. / Family kart race: dodge, grab stars, jump ramps across 4 worlds.">
 <link rel="stylesheet" href="estilo.css">
@@ -68,6 +68,7 @@
 
   <div id="ajuda" class="ajuda" hidden>
     <p data-t="✈️ Avião, jato e helicóptero voam: a estrada fica lá embaixo e você segue o caminho de luzes no céu, desviando de pássaros, nuvens de tempestade e outros aviões. Os anéis dourados dão TURBO e as correntes de ar levam lá para cima, até as estrelas altas.|✈️ Plane, jet and helicopter fly: the road stays far below and you follow the path of lights in the sky, dodging birds, storm clouds and other planes. Golden rings give TURBO and updrafts lift you up to the high stars.|✈️ El avión, el jet y el helicóptero vuelan: la carretera queda allá abajo y tú sigues el camino de luces en el cielo, esquivando pájaros, nubes de tormenta y otros aviones. Los anillos dorados dan TURBO y las corrientes de aire te suben bien alto, hasta las estrellas más altas."></p>
+    <p data-t="📺 Na TV, cada um com o seu celular de controle: na TV, toque em 📺 Celulares como controle e aparece um código; em cada celular, toque em 🎮 Ser controle da TV e digite o código. O celular vira controle: ◀ e ▶ viram, ⬆ pula, e 🏁 começa a corrida.|📺 On the TV, each with their own phone as the controller: on the TV, tap 📺 Phones as controllers and a code shows up; on each phone, tap 🎮 Be the TV controller and type the code. The phone becomes a controller: ◀ and ▶ steer, ⬆ jumps, and 🏁 starts the race.|📺 En la tele, cada uno con su móvil de mando: en la tele, pulsa 📺 Móviles como mando y sale un código; en cada móvil, pulsa 🎮 Ser el mando de la tele y escribe el código. El móvil se convierte en mando: ◀ y ▶ giran, ⬆ salta y 🏁 empieza la carrera."></p>
     <p data-t="🌐 Duelo: cada um no seu celular. Um toca em Criar duelo e recebe um código de 4 letras; o outro digita o código e toca em Entrar (ou abre o convite). Quem criou escolhe o nível, os cenários e se tem rivais, e toca em Correr. Na pista, o nome do outro aparece em vermelho em cima dele, e o mapinha mostra onde cada um está.|🌐 Duel: each on their own phone. One taps Create duel and gets a 4-letter code; the other types the code and taps Join (or opens the invite). Whoever created it picks the level, the worlds and whether there are rivals, and taps Race. On the track, the other player's name shows in red above them, and the little map shows where everyone is.|🌐 Duelo: cada uno en su móvil. Uno pulsa Crear duelo y recibe un código de 4 letras; el otro escribe el código y pulsa Entrar (o abre la invitación). Quien lo creó elige el nivel, los escenarios y si hay rivales, y pulsa A correr. En la pista, el nombre del otro sale en rojo encima de él, y el mapa redondo enseña dónde va cada uno."></p>
     <p data-t="🌊 No rio o veículo vira barco (os bichos nadam): desvie das boias e dos redemoinhos e passe pelas setas azuis para ganhar TURBO. O mapinha redondo, no canto de cima, mostra a pista inteira e onde está cada um.|🌊 On the river your ride turns into a boat (animals swim): dodge the buoys and whirlpools and go through the blue arrows for TURBO. The little round map up in the corner shows the whole track and where everyone is.|🌊 En el río tu vehículo se convierte en barco (los animales nadan): esquiva las boyas y los remolinos y pasa por las flechas azules para ganar TURBO. El mapa redondo de la esquina de arriba enseña toda la pista y dónde va cada uno."></p>
     <p data-t="🏆 Pontos: estrela 100, estrela no ar 200, turbo e rampa 50; cada portal de mundo é um CHECKPOINT (500 + bônus por rapidez). Bater tira pontos, mas ninguém perde.|🏆 Points: star 100, star in the air 200, turbo and ramp 50; every world gate is a CHECKPOINT (500 + speed bonus). Crashing takes points away, but nobody loses.|🏆 Puntos: estrella 100, estrella en el aire 200, turbo y rampa 50; cada portal de mundo es un CHECKPOINT (500 + premio por llegar rápido). Chocar quita puntos, pero nadie pierde."></p>
@@ -102,6 +103,26 @@
         <button id="btDueloSair" class="opcao" type="button" data-t="✕ Sair do duelo|✕ Leave the duel|✕ Salir del duelo"></button>
       </div>
       <p id="dueloStatus" class="dica" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <!-- 1.27.0: TV com os celulares como controle (duelo.js, canal "tv-") -->
+  <div class="grupo grupo-duelo">
+    <div class="opcoes linha3" role="group">
+      <button id="btTvControles" class="opcao" type="button" aria-expanded="false" aria-controls="tvControles" data-t="📺 Celulares como controle|📺 Phones as controllers|📺 Móviles como mando"></button>
+      <button id="btSerControle" class="opcao" type="button" aria-expanded="false" aria-controls="serControle" data-t="🎮 Ser controle da TV|🎮 Be the TV controller|🎮 Ser el mando de la tele"></button>
+    </div>
+    <div id="tvControles" class="duelo" hidden>
+      <p class="duelo-cod" id="tvCod" aria-live="polite"></p>
+      <p class="dica" data-t="No celular: abra o Vruuum!, toque em 🎮 Ser controle da TV e digite este código. O primeiro celular é o Jogador 1, o segundo, o Jogador 2.|On the phone: open Vruuum!, tap 🎮 Be the TV controller and type this code. The first phone is Player 1, the second is Player 2.|En el móvil: abre Vruuum!, pulsa 🎮 Ser el mando de la tele y escribe este código. El primer móvil es el Jugador 1 y el segundo, el Jugador 2."></p>
+      <p id="tvStatus" class="dica" aria-live="polite"></p>
+    </div>
+    <div id="serControle" class="duelo" hidden>
+      <div class="duelo-linha">
+        <input id="controleCodigo" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD" aria-label="Código da TV" data-aria="Código da TV|TV code|Código de la tele">
+        <button id="btControleEntrar" class="opcao" type="button" data-t="🎮 Conectar|🎮 Connect|🎮 Conectar"></button>
+      </div>
+      <p id="controleStatus" class="dica" aria-live="polite"></p>
     </div>
   </div>
 
@@ -198,6 +219,20 @@
   </div>
   <p id="tocando" class="rodape" aria-live="polite"></p>
   <p class="rodape"><span id="ver"></span> · SolverONE · <a href="https://solverone.com.br/kids/" data-t="🍩 Mais brincadeiras|🍩 More games|🍩 Más juegos"></a></p>
+</section>
+
+<!-- 1.27.0: o celular virou controle da TV -->
+<section id="controle" class="tela">
+  <p id="ctlQuem" class="ctl-quem" aria-live="polite"></p>
+  <div class="ctl-botoes">
+    <button id="ctlEsq" class="ctl-seta" type="button" aria-label="Esquerda" data-aria="Esquerda|Left|Izquierda">◀</button>
+    <button id="ctlPular" class="ctl-pular" type="button" data-t="⬆ PULAR|⬆ JUMP|⬆ SALTAR"></button>
+    <button id="ctlDir" class="ctl-seta" type="button" aria-label="Direita" data-aria="Direita|Right|Derecha">▶</button>
+  </div>
+  <div class="ctl-baixo">
+    <button id="ctlComecar" class="grande" type="button" data-t="🏁 Começar a corrida|🏁 Start the race|🏁 Empezar la carrera"></button>
+    <button id="ctlSair" class="medio" type="button" data-t="✕ Parar de ser controle|✕ Stop being the controller|✕ Dejar de ser el mando"></button>
+  </div>
 </section>
 
 <section id="jogo" class="tela">

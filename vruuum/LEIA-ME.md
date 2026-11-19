@@ -346,3 +346,11 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   é quem criou e manda a posição deles.
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
+
+## 1.27.0 — TV com os celulares como controle (dono, 16/Nov/2026, parte 2)
+
+- Mesmo canal do duelo, com "tv-" na frente do código (`VruuumDuelo.abrir(cod, ..., true)`). Mensagens `ctl` (do
+  celular: direção, contagem de pulos e de "Começar") e `vaga` (da TV: qual jogador aquele celular é).
+- TV (`tvc` no `app.js`): 📺 Celulares como controle mostra o código; o 1º celular é o Jogador 1, o 2º o Jogador 2 (com
+  dois, a tela dividida liga sozinha); celular sumido por 6 s libera a vaga. `lerEntradas()` soma a direção e o pulo.
+- Celular (`ctlc`, tela `#controle`): ◀ ▶ (segurar), ⬆ PULAR, 🏁 Começar a corrida, tela sempre acesa (Wake Lock).
