@@ -31,7 +31,7 @@ aparecem no tocador enquanto a música toca. A sugerida para tocar sem internet 
 | “Bet You Can” | `../vruuum/musicas/bet-you-can.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0 |
 | “Cool Hard Facts” | `../vruuum/musicas/cool-hard-facts.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0 |
 | “Exhilarate” | `../vruuum/musicas/exhilarate.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0 |
-| “What You Want” | `../vruuum/musicas/what-you-want.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0 |
+| “What You Want” (a favorita: toca sem internet) | `../vruuum/musicas/what-you-want.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0 |
 | “Gearhead” | `../vruuum/musicas/gearhead.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0 |
 | “Got Funk” | `../purpurina/musicas/got-funk.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0; origem em `../purpurina/musicas/LICENCAS.md` |
 | “Funky One” | `../purpurina/musicas/funky-one.mp3` | Kevin MacLeod (incompetech.com), CC BY 4.0 |
