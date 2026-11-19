@@ -10,13 +10,13 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background
 h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.05;margin:.4rem 0 .6rem;background:linear-gradient(90deg,var(--lima),var(--ciano) 40%,var(--rosa));-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:var(--muted);font-size:1.05rem;line-height:1.5;max-width:46rem}
 .grid{display:grid;grid-template-columns:1fr;gap:.6rem;margin-top:1.2rem}
-@media (min-width:46rem){.grid{grid-template-columns:1fr 1fr}}
+@media (min-width:50rem){.grid{grid-template-columns:1fr 1fr}}
 @media (min-width:72rem){.grid{grid-template-columns:1fr 1fr 1fr}}
 /* Cartão compacto (dono, 15/Nov/2026): ícone, nome inteiro, "? ⌄" abre a explicação, ícones do que o jogo faz,
    ⬇ Instalar e Jogar sempre na ponta direita (catalogo.js) */
-.card{align-self:start;background:rgba(34,27,77,.78);border:1.5px solid var(--border);border-color:color-mix(in srgb,var(--c) 55%,var(--border));border-radius:18px;overflow:hidden;cursor:pointer}
+.card{align-self:stretch;display:flex;flex-direction:column;background:rgba(34,27,77,.78);border:1.5px solid var(--border);border-color:color-mix(in srgb,var(--c) 55%,var(--border));border-radius:18px;overflow:hidden;cursor:pointer}
 .card.sel,.card:focus-within{box-shadow:0 0 0 2px var(--c),0 10px 26px rgba(0,0,0,.35)}
-.c-l{display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem .65rem .65rem}
+.c-l{flex:1 0 auto;display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem .65rem .65rem}
 .c-ic{flex:none;width:60px;height:60px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:2.1rem;line-height:1;background:rgba(0,0,0,.25);box-shadow:0 0 14px var(--c)}
 .c-ic img{width:60px;height:60px;border-radius:15px;display:block}
 .c-m{flex:1;min-width:0}
@@ -99,3 +99,5 @@ html:not(.idioma-pt):not(.idioma-en):not(.idioma-es) .en,html:not(.idioma-pt):no
    touchpad, mesmo quando a janela já chegou ao fim (dono, 14/Nov/2026; diretriz das janelas) */
 html.trava-fundo,html.trava-fundo body{overflow:hidden!important;overscroll-behavior:none}
 .bib,.nov,.nov-c,.bc-fundo,.bc-passos,.bc-corpo{overscroll-behavior:contain}
+/* várias colunas (tablet, computador, TV): ícones e botões um pouco menores para todo cartão caber numa altura só (dono, 19/Nov/2026: "cards de tamanhos diferentes") */
+@media (min-width:50rem){.c-r{gap:.3rem}.c-ics{gap:.15rem}.ic{width:25px;height:25px;border-radius:7px}.ic svg{width:17px;height:17px}.c-bts{gap:.3rem}.c-inst{width:42px;height:42px}.c-jogar{min-width:4.4rem;padding:0 .75rem}}

@@ -2,7 +2,7 @@
    nova só entra quando chega INTEIRA (senão continua a anterior) e tudo abre da cópia do próprio jogo. Músicas
    gravadas (*.mp3): o service worker não mexe (o navegador busca direto).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). */
-var VERSAO = '0.1.4';
+var VERSAO = '0.1.5';
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'regras.js', 'arte.js', 'som.js', 'app.js', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2', '../recursos.js', '../carregando.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js', '../instalar.js',
   'img/abissal.webp', 'img/agua-viva.webp', 'img/agua-viva-gigante.webp', 'img/gigante.webp', 'img/lula-gigante.webp', 'img/menina.webp', 'img/menino.webp', 'img/peixe-dragao.webp', 'img/piranha.webp',  'img/bagre.webp', 'img/baiacu.webp', 'img/baleia.webp', 'img/bau.webp', 'img/bota.webp', 'img/caranguejo.webp', 'img/cavalo-marinho.webp', 'img/chinelo.webp', 'img/cirurgiao.webp', 'img/garrafa.webp', 'img/juca.webp', 'img/lagosta.webp', 'img/lambari.webp', 'img/lanterna.webp', 'img/lata.webp', 'img/lili.webp', 'img/martelo.webp', 'img/mergulhador.webp', 'img/morsa.webp', 'img/orca.webp', 'img/pacu.webp', 'img/palhaco.webp', 'img/pet.webp', 'img/piaba.webp', 'img/pirarucu.webp', 'img/pneu.webp', 'img/polvo.webp', 'img/sereia.webp', 'img/tartaruga.webp', 'img/tilapia.webp', 'img/traira.webp', 'img/tubarao-baleia.webp', 'img/tubarao.webp'];
 importScripts('../sw-comum.js');

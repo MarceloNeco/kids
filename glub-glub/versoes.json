@@ -2,6 +2,20 @@
   "app": "glub-glub",
   "versoes": [
     {
+      "versao": "0.1.5",
+      "data": "19/Nov/2026",
+      "hora": "18:10:00",
+      "pt": [
+        "⚡ Abre bem mais rápido no tablet velho: o lago só começa a se mexer depois que o jogo aparece, e os bichos ficam prontos aos poucos (antes o jogo podia ficar preso no \"Carregando…\")"
+      ],
+      "en": [
+        "⚡ Opens much faster on older tablets: the lake only starts moving once the game is on screen, and the creatures get ready little by little (before, the game could get stuck on \"Loading…\")"
+      ],
+      "es": [
+        "⚡ Se abre mucho más rápido en las tabletas antiguas: el lago solo empieza a moverse cuando aparece el juego y los animales se preparan poco a poco (antes el juego podía quedarse atascado en \"Cargando…\")"
+      ]
+    },
+    {
       "versao": "0.1.4",
       "data": "15/Nov/2026",
       "hora": "09:30:00",
