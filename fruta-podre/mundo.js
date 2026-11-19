@@ -58,6 +58,7 @@
       S.galoes.push(registrar(corpo, { tipo: h.type, w: 44, h: 58, explodiu: false, pavio: -1 }, 'galao'));
     });
 
+    function carencia() { return S.passos < CARENCIA && !S.tiros; }   // só antes do primeiro tiro
     function vivas() { var n = 0; for (var i = 0; i < S.pragas.length; i++) if (!S.pragas[i].ko) n++; return n; }
     function eProjetil(o) { return o && o.kind === 'fruta'; }
     function pos(corpo) { return { x: corpo.position.x, y: corpo.position.y }; }
@@ -138,14 +139,14 @@
         // mosca: qualquer coisa andando (ou fruta) que encostar derruba
         if (a.isSensor || b.isSensor) {
           var mosca = a.isSensor ? oa : ob, outro = a.isSensor ? b : a, oo = porId[outro.id];
-          if (S.passos < CARENCIA || !mosca || outro.isStatic) continue;
+          if (carencia() || !mosca || outro.isStatic) continue;
           var vo = outro.plugin.v || outro.velocity;
           if (Math.abs(vo.x) + Math.abs(vo.y) > 1 || eProjetil(oo)) ferirPraga(mosca, 999);
           continue;
         }
         if (eProjetil(oa)) bateuFruta(oa, ob, vrel, px, py);
         if (eProjetil(ob)) bateuFruta(ob, oa, vrel, px, py);
-        if (S.passos < CARENCIA) continue;
+        if (carencia()) continue;
         ferir(oa, a, b, ob, vrel);
         ferir(ob, b, a, oa, vrel);
         if (vrel > 2.2) {
@@ -320,7 +321,7 @@
         acordarTudo();
       }
       // fim de fase
-      if (!S.resultado && S.vitoriaT == null && vivas() === 0) { S.vitoriaT = VITORIA; ev({ tipo: 'ultima' }); }
+      if (!S.resultado && S.vitoriaT == null && vivas() === 0) { S.vitoriaT = VITORIA; ev({ tipo: 'ultima' }); return; }
       if (S.vitoriaT != null && !S.resultado) {
         if (--S.vitoriaT <= 0) {
           var sobra = S.fila.length + (S.atual ? 1 : 0), bonus = R.bonusFrutas(sobra);
@@ -373,6 +374,7 @@
     // para os testes: nocauteia todas as pragas (a vitória chega 3 s depois, como no jogo)
     S.vencer = function () { S.pragas.forEach(function (p) { if (!p.ko) { if (!S.turno) novoTurno(); nocautear(p); } }); };
     S.semFrutas = function () { S.fila = []; };
+    S.ferir = ferirPraga;   // um golpe direto numa praga (testes)
     carregar();
     return S;
   }

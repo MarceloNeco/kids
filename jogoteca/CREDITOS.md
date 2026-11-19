@@ -8,8 +8,9 @@
 | Efeitos sonoros (toque, carta, acerto, erro, pino, vitória) | sintetizados no WebAudio pela própria Jogoteca (`app.js`) | mesma licença do repositório |
 
 Nada foi copiado dos jogos de referência que o dono fotografou no avião (`../docs/referencias/jogoteca/`): nem arte, nem
-nomes, nem personagens. Elas servem só de régua de qualidade. Os jogos de auditório que vêm por aí (Bolinha Premiada e
-Milionário José Pobre) usam só a mecânica dos programas de TV, com nome, visual, vinheta e música próprios.
+nomes, nem personagens. Elas servem só de régua de qualidade. Os jogos de auditório (Bolinhas da Angústia, já pronto,
+e Milionário José Pobre, que vem por aí) usam só a mecânica dos programas de TV, com nome, visual, vinheta e música próprios.
+O Bolinhas da Angústia tem parede, personagens, perguntas e sons próprios (sons sintetizados no WebAudio pelo próprio jogo).
 
 ## Músicas da trilha
 

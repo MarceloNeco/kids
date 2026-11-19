@@ -2,20 +2,43 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.2.0",
+      "data": "19/Nov/2026",
+      "hora": "21:30:00",
+      "pt": [
+        "🎰 Chega o Bolinhas da Angústia: o game show da parede gigante de pinos, com Queda Livre, A Separação, Tudo ou Nada e o Contrato (assinar ou rasgar?)",
+        "🤝 Jogue com um parceiro virtual (cada um com seus pontos fortes) ou em dois na mesma tela, passando o aparelho para a Sala de Isolamento",
+        "🧠 100 perguntas de cultura geral para a família, em português, inglês e espanhol; o nível escolhe as perguntas e a força do parceiro",
+        "◐ Modo de alto contraste com + e − dentro das bolinhas"
+      ],
+      "en": [
+        "🎰 Nail-Biter Drop is here: the game show on a giant wall of pegs, with Free Fall, The Split, All or Nothing and the Contract (sign it or tear it up?)",
+        "🤝 Play with a virtual partner (each one with their own strengths) or as two on one screen, passing the device to the Isolation Booth",
+        "🧠 100 general-knowledge questions for the whole family, in Portuguese, English and Spanish; the level picks the questions and the partner’s strength",
+        "◐ High-contrast mode with + and − inside the balls"
+      ],
+      "es": [
+        "🎰 Llega Bolitas de la Angustia: el concurso de la pared gigante de clavos, con Caída Libre, La Separación, Todo o Nada y el Contrato (¿firmar o romper?)",
+        "🤝 Juega con un compañero virtual (cada uno con sus puntos fuertes) o entre dos en la misma pantalla, pasando el aparato a la Cabina de Aislamiento",
+        "🧠 100 preguntas de cultura general para toda la familia, en portugués, inglés y español; el nivel elige las preguntas y la fuerza del compañero",
+        "◐ Modo de alto contraste con + y − dentro de las bolitas"
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "19/Nov/2026",
       "hora": "17:00:00",
       "pt": [
         "📚 Nasce a Jogoteca, a biblioteca dos jogos clássicos do Bolinho: Paciência, Sudoku e Boliche, cada um com três níveis",
-        "🛠️ Em construção, já na vitrine: Bolinha Premiada, Milionário José Pobre e Bilhar"
+        "🛠️ Em construção, já na vitrine: Bolinhas da Angústia, Milionário José Pobre e Bilhar"
       ],
       "en": [
         "📚 Jogoteca is born, Bolinho's library of classic games: Solitaire, Sudoku and Bowling, each with three levels",
-        "🛠️ Under construction, already on the shelf: Prize Drop, Millionaire Joe Broke and Pool"
+        "🛠️ Under construction, already on the shelf: Nail-Biter Drop, Millionaire Joe Broke and Pool"
       ],
       "es": [
         "📚 Nace Jogoteca, la biblioteca de juegos clásicos de Bolinho: Solitario, Sudoku y Bolos, cada uno con tres niveles",
-        "🛠️ En construcción, ya en el escaparate: Bola Premiada, Millonario José Pobre y Billar"
+        "🛠️ En construcción, ya en el escaparate: Bolitas de la Angustia, Millonario José Pobre y Billar"
       ]
     }
   ]

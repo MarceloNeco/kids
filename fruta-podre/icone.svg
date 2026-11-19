@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- FRUTA PODRE: a Maçã Podre com o vermezinho de capacete (desenho original deste jogo) -->
+  <defs>
+    <clipPath id="fundo"><rect width="512" height="512" rx="112"/></clipPath>
+    <clipPath id="maca"><path d="M256 179C331 128 421 182 409 297.5C400 404 325 443 256 428C187 443 112 404 103 297.5C91 182 181 128 256 179Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#fundo)">
+    <rect width="512" height="512" fill="#ffd23f"/>
+    <g fill="#ffbf1f">
+      <path d="M256 300L-60 40L40 -60Z"/><path d="M256 300L190 -80L330 -80Z"/><path d="M256 300L480 -60L580 40Z"/>
+      <path d="M256 300L600 260L600 400Z"/><path d="M256 300L560 600L440 640Z"/><path d="M256 300L190 640L60 620Z"/><path d="M256 300L-80 560L-90 420Z"/><path d="M256 300L-90 200L-90 320Z"/>
+    </g>
+    <path d="M0 0H512V58H0Z" fill="#e8433a"/>
+    <g fill="#fff4dc"><rect x="46" y="0" width="46" height="58"/><rect x="138" y="0" width="46" height="58"/><rect x="230" y="0" width="46" height="58"/><rect x="322" y="0" width="46" height="58"/><rect x="414" y="0" width="46" height="58"/></g>
+    <path d="M0 58 Q23 84 46 58 Q69 84 92 58 Q115 84 138 58 Q161 84 184 58 Q207 84 230 58 Q253 84 276 58 Q299 84 322 58 Q345 84 368 58 Q391 84 414 58 Q437 84 460 58 Q483 84 506 58 L512 58" fill="none" stroke="#2a160b" stroke-width="7"/>
+    <ellipse cx="256" cy="450" rx="150" ry="22" fill="#2a160b" opacity=".22"/>
+  </g>
+  <!-- cabinho e folha -->
+  <path d="M256 182Q262 126 290 100" fill="none" stroke="#2a160b" stroke-width="20" stroke-linecap="round"/>
+  <path d="M256 182Q262 126 290 100" fill="none" stroke="#6b4a1e" stroke-width="8" stroke-linecap="round"/>
+  <path d="M274 140Q338 88 386 132Q332 170 274 140Z" fill="#7cb342" stroke="#2a160b" stroke-width="10" stroke-linejoin="round"/>
+  <!-- maçã -->
+  <path d="M256 179C331 128 421 182 409 297.5C400 404 325 443 256 428C187 443 112 404 103 297.5C91 182 181 128 256 179Z" fill="#d8342c"/>
+  <g clip-path="url(#maca)">
+    <ellipse cx="323" cy="365" rx="157" ry="142" fill="#8f1d17" opacity=".55"/>
+    <ellipse cx="193" cy="223" rx="48" ry="30" transform="rotate(-34 193 223)" fill="#fff" opacity=".55"/>
+    <ellipse cx="331" cy="338" rx="51" ry="40" transform="rotate(23 331 338)" fill="#8b5a2b"/>
+    <ellipse cx="193" cy="383" rx="37" ry="25" transform="rotate(-17 193 383)" fill="#8b5a2b"/>
+    <circle cx="340" cy="335" r="12" fill="#5e3a18"/><circle cx="310" cy="350" r="7" fill="#5e3a18"/><circle cx="199" cy="380" r="9" fill="#5e3a18"/>
+    <circle cx="418" cy="245" r="63" fill="#f8e7b5" stroke="#2a160b" stroke-width="11"/>
+    <ellipse cx="373" cy="230" rx="7" ry="13" transform="rotate(17 373 230)" fill="#5e3a18"/><ellipse cx="376" cy="263" rx="7" ry="13" transform="rotate(-11 376 263)" fill="#5e3a18"/>
+  </g>
+  <path d="M256 179C331 128 421 182 409 297.5C400 404 325 443 256 428C187 443 112 404 103 297.5C91 182 181 128 256 179Z" fill="none" stroke="#2a160b" stroke-width="15" stroke-linejoin="round"/>
+  <!-- olhos bravos e sorriso de dentes -->
+  <ellipse cx="216" cy="276" rx="34" ry="41" fill="#fff" stroke="#2a160b" stroke-width="9"/>
+  <ellipse cx="300" cy="276" rx="34" ry="41" fill="#fff" stroke="#2a160b" stroke-width="9"/>
+  <circle cx="228" cy="283" r="18" fill="#1a0d05"/><circle cx="312" cy="283" r="18" fill="#1a0d05"/>
+  <circle cx="222" cy="276" r="6" fill="#fff"/><circle cx="306" cy="276" r="6" fill="#fff"/>
+  <path d="M180 224L246 240M336 224L270 240" stroke="#2a160b" stroke-width="13" stroke-linecap="round"/>
+  <rect x="220" y="343" width="78" height="30" rx="10" fill="#fff" stroke="#2a160b" stroke-width="8"/>
+  <path d="M220 358H298M246 343V373M272 343V373" stroke="#2a160b" stroke-width="5"/>
+  <!-- buraco e o vermezinho de capacete -->
+  <ellipse cx="146" cy="268" rx="34" ry="26" fill="#3b1d0c" stroke="#2a160b" stroke-width="8"/>
+  <g transform="translate(138 256) rotate(-28)">
+    <rect x="-22" y="-82" width="44" height="88" rx="22" fill="#ff9bb3" stroke="#2a160b" stroke-width="8"/>
+    <path d="M-20 -20H20M-21 -2H21" stroke="#c25a78" stroke-width="5"/>
+    <circle cx="-8" cy="-54" r="9" fill="#fff" stroke="#2a160b" stroke-width="3"/><circle cx="10" cy="-54" r="9" fill="#fff" stroke="#2a160b" stroke-width="3"/>
+    <circle cx="-6" cy="-53" r="4.5" fill="#111"/><circle cx="12" cy="-53" r="4.5" fill="#111"/>
+    <path d="M-8 -36Q2 -28 12 -38" fill="none" stroke="#2a160b" stroke-width="4" stroke-linecap="round"/>
+    <path d="M-30 -66A30 30 0 0 1 30 -66Z" fill="#ffcf2e" stroke="#2a160b" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M-38 -65H38" stroke="#2a160b" stroke-width="12" stroke-linecap="round"/><path d="M-37 -65H37" stroke="#ffcf2e" stroke-width="5" stroke-linecap="round"/>
+    <rect x="-5" y="-96" width="10" height="20" rx="4" fill="#ffcf2e" stroke="#2a160b" stroke-width="5"/>
+  </g>
+  <!-- moscas zonzas -->
+  <g stroke="#2a160b" stroke-width="3"><ellipse cx="400" cy="128" rx="11" ry="7" fill="#cdeeff"/><ellipse cx="418" cy="126" rx="11" ry="7" fill="#cdeeff"/><circle cx="409" cy="138" r="8" fill="#333"/>
+  <ellipse cx="110" cy="150" rx="10" ry="6" fill="#cdeeff"/><ellipse cx="126" cy="148" rx="10" ry="6" fill="#cdeeff"/><circle cx="118" cy="158" r="7" fill="#333"/></g>
+  <path d="M372 170Q392 150 384 136M136 192Q118 178 124 166" fill="none" stroke="#6e8c3c" stroke-width="5" stroke-dasharray="6 7" stroke-linecap="round"/>
+</svg>

@@ -504,21 +504,25 @@
   }
 
   /* ---------- estilingue (forquilha de árvore com câmara de pneu) ---------- */
+  // x, y = onde a bolsa descansa; as pontas ficam acima e bem abertas (a fruta cabe no meio do "V")
+  function braco2(c, x0, y0, x1, y1, cor) {
+    c.beginPath(); c.moveTo(x0 - 9, y0); c.quadraticCurveTo((x0 + x1) / 2 - 9, (y0 + y1) / 2 + 6, x1 - 7, y1); c.lineTo(x1 + 7, y1 + 2);
+    c.quadraticCurveTo((x0 + x1) / 2 + 9, (y0 + y1) / 2 + 10, x0 + 9, y0 + 4); c.closePath(); encher(c, cor, 4);
+  }
   function forquilha(c, x, y, lado) {
-    c.save(); c.translate(x, y);
+    var jy = y + 62;
     if (lado === 'tras') {
-      c.beginPath(); c.moveTo(-8, CHAO - y); c.lineTo(-7, 60); c.quadraticCurveTo(-10, 30, -22, -12); c.lineTo(-10, -16); c.quadraticCurveTo(-2, 20, 7, 52); c.lineTo(8, CHAO - y); c.closePath();
+      c.beginPath(); c.moveTo(x - 11, CHAO + 2); c.lineTo(x - 9, jy + 4); c.quadraticCurveTo(x, jy - 8, x + 9, jy + 4); c.lineTo(x + 12, CHAO + 2); c.closePath();
       encher(c, '#8a5a2e', 4);
-      c.beginPath(); c.moveTo(-3, CHAO - y - 10); c.lineTo(-2, 70); c.moveTo(3, CHAO - y - 30); c.lineTo(3, 90); linha(c, 2, '#5e3a18'); c.stroke();
-      // folhinha brotando
-      c.beginPath(); c.moveTo(-5, 70); c.quadraticCurveTo(-24, 60, -30, 70); c.quadraticCurveTo(-20, 78, -5, 70); encher(c, '#7cb342', 2.5);
-      rret(c, -26, -16, 18, 12, 4); encher(c, '#2b2b2b', 2.5);
+      c.beginPath(); c.moveTo(x - 3, CHAO - 8); c.lineTo(x - 2, jy + 30); c.moveTo(x + 4, CHAO - 30); c.lineTo(x + 4, jy + 50); linha(c, 2, '#5e3a18'); c.stroke();
+      c.beginPath(); c.moveTo(x - 8, jy + 40); c.quadraticCurveTo(x - 28, jy + 30, x - 36, jy + 40); c.quadraticCurveTo(x - 24, jy + 50, x - 8, jy + 40); encher(c, '#7cb342', 2.5);
+      braco2(c, x, jy, x + 38, y - 22, '#8a5a2e');
+      rret(c, x + 30, y - 30, 17, 13, 4); encher(c, '#2b2b2b', 2.5);
     } else {
-      c.beginPath(); c.moveTo(4, 54); c.quadraticCurveTo(12, 28, 24, -6); c.lineTo(34, -2); c.quadraticCurveTo(22, 30, 14, 62); c.closePath();
-      encher(c, '#9c6a38', 4);
-      rret(c, 21, -8, 16, 12, 4); encher(c, '#2b2b2b', 2.5);
+      braco2(c, x, jy, x - 38, y - 22, '#9c6a38');
+      c.beginPath(); c.moveTo(x - 30, y - 6); c.lineTo(x - 20, y + 18); linha(c, 2, '#6e4520'); c.stroke();
+      rret(c, x - 47, y - 30, 17, 13, 4); encher(c, '#2b2b2b', 2.5);
     }
-    c.restore();
   }
   function elastico(c, de, ate, tensao) {
     c.beginPath(); c.moveTo(de.x, de.y); c.lineTo(ate.x, ate.y);
@@ -527,18 +531,18 @@
   }
   function estilingueTras(c, x, y, bolsa, tensao) {
     forquilha(c, x, y, 'tras');
-    elastico(c, { x: x - 17, y: y - 10 }, bolsa, tensao);
+    elastico(c, { x: x + 38, y: y - 23 }, { x: bolsa.x + 6, y: bolsa.y }, tensao);
   }
   function estilingueFrente(c, x, y, bolsa, tensao) {
-    elastico(c, { x: x + 29, y: y - 4 }, bolsa, tensao);
-    oval(c, bolsa.x, bolsa.y, 10, 15, 0); encher(c, '#7a4a22', 3);
+    elastico(c, { x: x - 38, y: y - 23 }, { x: bolsa.x - 6, y: bolsa.y }, tensao);
+    oval(c, bolsa.x - 4, bolsa.y + 4, 9, 15, 0.2); encher(c, '#7a4a22', 3);
     forquilha(c, x, y, 'frente');
   }
 
   /* ---------- os garotos ---------- */
   var GAROTOS = {
-    duda: { pele: '#c68642', camisa: '#ffd23f', faixa: '#e8433a', calca: '#3b6fd8', tenis: '#ffffff', cabelo: '#3a2414' },
-    nina: { pele: '#8d5524', camisa: '#ff8fab', faixa: '#ffffff', calca: '#2fae7a', tenis: '#ffe14d', cabelo: '#1f130b' }
+    teo: { pele: '#c68642', camisa: '#ffd23f', faixa: '#e8433a', calca: '#3b6fd8', tenis: '#ffffff', cabelo: '#3a2414' },
+    duda: { pele: '#8d5524', camisa: '#ff8fab', faixa: '#ffffff', calca: '#2fae7a', tenis: '#ffe14d', cabelo: '#1f130b' }
   };
   function braco(c, de, ate, cor, pele) {
     var mx = (de.x + ate.x) / 2, my = (de.y + ate.y) / 2 + 8;
@@ -549,7 +553,7 @@
   }
   // pose: parado | puxa | torce | ops | triste ; alvo = onde as mãos seguram (puxa), em coordenadas do mundo
   function garoto(c, quem, x, y, pose, t, alvo) {
-    var k = GAROTOS[quem], f = quem === 'duda' ? 0 : 1.7;
+    var k = GAROTOS[quem], f = quem === 'teo' ? 0 : 1.7;
     var pulo = pose === 'torce' ? -Math.abs(Math.sin(t * 7 + f)) * 18 : 0;
     var inclina = pose === 'puxa' ? -0.24 : pose === 'triste' ? 0.12 : 0, bob = pose === 'parado' ? Math.sin(t * 2.2 + f) * 1.2 : 0;
     c.save(); c.translate(x, y + pulo);
@@ -564,7 +568,7 @@
     rret(c, -13, -4, 26, 14, 4); encher(c, k.calca, 2.5);
     rret(c, -14, -36, 28, 36, 9); encher(c, k.camisa, 3);
     c.fillStyle = k.faixa; c.fillRect(-12.5, -22, 25, 5);
-    if (quem === 'nina') { rret(c, -10, -18, 20, 18, 4); encher(c, k.calca, 2.5); c.fillStyle = '#ffe14d'; circ(c, -6, -14, 2); c.fill(); circ(c, 6, -14, 2); c.fill(); }
+    if (quem === 'duda') { rret(c, -10, -18, 20, 18, 4); encher(c, k.calca, 2.5); c.fillStyle = '#ffe14d'; circ(c, -6, -14, 2); c.fill(); circ(c, 6, -14, 2); c.fill(); }
     // braços
     var omb = [{ x: -10, y: -30 }, { x: 10, y: -30 }], maos;
     if (pose === 'torce') maos = [{ x: -26, y: -70 + Math.sin(t * 14) * 4 }, { x: 26, y: -70 - Math.sin(t * 14) * 4 }];
@@ -578,10 +582,10 @@
     // cabeça
     var cy = -54, inc = pose === 'triste' ? 0.25 : 0;
     c.save(); c.translate(0, cy); c.rotate(inc);
-    if (quem === 'nina') { circ(c, -17, -14, 11); encher(c, k.cabelo, 2.5); circ(c, 17, -14, 11); encher(c, k.cabelo, 2.5); }
+    if (quem === 'duda') { circ(c, -17, -14, 11); encher(c, k.cabelo, 2.5); circ(c, 17, -14, 11); encher(c, k.cabelo, 2.5); }
     circ(c, -19, 2, 5); encher(c, k.pele, 2.5);
     circ(c, 0, 0, 19); encher(c, k.pele, 3);
-    if (quem === 'duda') {
+    if (quem === 'teo') {
       c.beginPath(); c.arc(0, -3, 19, Math.PI * 1.05, Math.PI * 1.95); c.closePath(); encher(c, k.faixa, 3);   // boné virado para trás
       rret(c, -27, -10, 14, 6, 3); encher(c, k.faixa, 2.5);
       circ(c, 0, -21, 2.5); encher(c, '#fff', 1.5);
@@ -632,7 +636,7 @@
     var sx = w * 0.84, sy = Math.min(90, h * 0.14), sr = Math.min(48, h * 0.07);
     c.save(); c.translate(sx, sy); c.rotate(t * 0.05);
     c.beginPath(); for (var i = 0; i < 24; i++) { var a = i * TAU / 24, q = i % 2 ? sr * 1.25 : sr * 1.75; c.lineTo(Math.cos(a) * q, Math.sin(a) * q); } c.closePath();
-    c.fillStyle = 'rgba(255,214,64,.45)'; c.fill();
+    c.fillStyle = 'rgba(255,236,150,.6)'; c.fill();
     c.restore();
     circ(c, sx, sy, sr); c.fillStyle = '#ffd640'; c.fill(); linha(c, 3, '#e8a317'); c.stroke();
     var s = Math.max(0.55, Math.min(1, h / 700));
@@ -683,12 +687,12 @@
   function cenario(c, W) {
     var rn = aleat(42), x, i;
     var cores = ['#f4c27a', '#9ed4c8', '#f29e8e', '#c7b6e8', '#fbe08a', '#a8d5f2'];
-    for (x = -700, i = 0; x < W + 700; i++) { var l = 170 + Math.floor(rn() * 90), a = 230 + Math.floor(rn() * 110); casa(c, x, l, a, cores[i % cores.length], rn); x += l + 6; }
-    c.fillStyle = 'rgba(255,240,210,.32)'; c.fillRect(-700, 200, W + 1400, 400);   // névoa: o fundo fica mais clarinho que a fase
+    for (x = -700, i = 0; x < W + 700; i++) { var l = 160 + Math.floor(rn() * 80), a = 190 + Math.floor(rn() * 90); casa(c, x, l, a, cores[i % cores.length], rn); x += l + 6; }
+    // névoa azulada só por cima das casas: o fundo fica mais clarinho e a fortaleza se destaca
+    c.save(); c.globalCompositeOperation = 'source-atop'; c.fillStyle = 'rgba(222,240,252,.5)'; c.fillRect(-700, 160, W + 1400, 440); c.restore();
     for (x = -650; x < W + 600; x += 520) bandeirinhas(c, x, x + 520, 230 + rn() * 30, rn);
     // a barraca da Quitanda do Seu Zé, atrás da fortaleza
     var b0 = 780, b1 = Math.min(W - 60, 1700);
-    c.fillStyle = 'rgba(90,60,30,.18)'; c.fillRect(b0, 320, b1 - b0, 280);
     [b0, (b0 + b1) / 2, b1].forEach(function (px) { rret(c, px - 7, 300, 14, 300, 3); encher(c, '#8a5a2e', 3); });
     var listra = 46, n = Math.ceil((b1 - b0 + 60) / listra);
     for (var k = 0; k < n; k++) {
@@ -703,12 +707,14 @@
     rret(c, cx - 170, 196, 340, 58, 10); encher(c, '#fff4dc', 4);
     rret(c, cx - 162, 204, 324, 42, 7); linha(c, 2, '#e8433a'); c.stroke();
     c.fillStyle = '#c0392b'; c.font = '700 30px Fredoka, system-ui, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillText('QUITANDA DO SEU ZÉ', cx, 227);
+    var larg = c.measureText('QUITANDA DO SEU ZÉ').width;
+    c.save(); c.translate(cx, 227); if (larg > 270) c.scale(270 / larg, 1); c.fillText('QUITANDA DO SEU ZÉ', 0, 0); c.restore();
     c.fillStyle = '#2f9e6f'; circ(c, cx - 150, 225, 7); c.fill(); circ(c, cx + 150, 225, 7); c.fill();
     // prateleira de caixotes no fundo
     var fr = ['#ff9f1c', '#ffd23f', '#e8433a', '#7cb342', '#ff8fab'];
+    c.globalAlpha = 0.62;
     for (x = b0 + 30; x < b1 - 70; x += 96) { caixaDeFrutas(c, x, 440, fr[Math.floor(rn() * fr.length)], rn); if (rn() < 0.6) caixaDeFrutas(c, x + 12, 404, fr[Math.floor(rn() * fr.length)], rn); }
-    c.fillStyle = 'rgba(255,240,210,.28)'; c.fillRect(b0 - 30, 320, b1 - b0 + 60, 280);
+    c.globalAlpha = 1;
     // balança antiga em cima de um caixote, à esquerda da barraca
     var bx = b0 - 90;
     rret(c, bx - 34, 540, 68, 60, 3); encher(c, '#c98546', 3);
