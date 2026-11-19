@@ -152,3 +152,10 @@ button:focus-visible { outline: 4px solid #3b6fd8; outline-offset: 2px; }
 }
 
 #desligado.ativa, #desligado:not([hidden]) { display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; background: var(--creme); }
+
+/* tela grande (computador, TV): letreiro e painel maiores */
+@media (min-width: 1200px) and (min-height: 760px) {
+  .logo { font-size: clamp(74px, 9vh, 112px); }
+  .fig { width: 110px; height: 110px; }
+  .painel { zoom: 1.3; }
+}

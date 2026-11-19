@@ -158,7 +158,7 @@
   $('ajuda').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
 
   /* ---------- canvas e câmera ---------- */
-  var cv = $('cena'), ctx = cv.getContext('2d'), dpr = 1, cw = 1, ch = 1;
+  var cv = $('cena'), ctx = cv.getContext('2d'), dpr = 1, cw = 1, ch = 1, reduz = 0;   // reduz: 0, 1 (dpr 1) ou 2 (3/4 da resolução) em aparelho lento
   var cam = { x0: -160, z: 0.6, gy: 500, livre: false, intro: 0, foco: null, tremor: 0 };
   var M = { chao: 60, zMira: 0.6, zTudo: 0.4, xMira: -160 };
   var camada = null;
@@ -172,6 +172,8 @@
   }
   function tamanho() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (reduz >= 1) dpr = Math.min(dpr, 1);
+    if (reduz >= 2) dpr = 0.75;
     cw = Math.max(1, innerWidth); ch = Math.max(1, innerHeight);
     cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr);
     medidas();
@@ -485,7 +487,7 @@
     if (!camada) montarCamada(W);
     var tr = cam.tremor > 0 ? cam.tremor * 22 : 0, ox = tr ? (Math.random() - 0.5) * tr : 0, oy = tr ? (Math.random() - 0.5) * tr : 0;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    A.ceu(ctx, cw, ch, calmo ? 0 : tm, cam.x0 * cam.z);
+    A.ceu(ctx, cw, ch, calmo ? 0 : tm, cam.x0 * cam.z, dpr);
     var z = cam.z;
     ctx.setTransform(dpr * z, 0, 0, dpr * z, dpr * (-cam.x0 * z + ox), dpr * (cam.gy - CHAO * z + oy));
     var vx0 = cam.x0 - 80, vx1 = cam.x0 + cw / z + 80;
@@ -661,7 +663,7 @@
       var painel = document.querySelector('#menu .painel'), pr = painel ? painel.getBoundingClientRect() : null;
       if (retrato()) { cam.gy = pr ? pr.top + 6 : ch * 0.6; cam.z = Math.max(0.3, Math.min(1, cw / 760)); cam.x0 = -170; enfeiteX = (cw * 0.74) / cam.z + cam.x0; }
       else {
-        cam.gy = ch - Math.max(30, ch * 0.08); cam.z = Math.max(0.3, Math.min(1.1, (ch - 30) / 520, cw / 1300)); cam.x0 = -230;
+        cam.gy = ch - Math.max(30, ch * 0.08); cam.z = Math.max(0.3, Math.min(1.5, (ch - 30) / 520, cw / 1300)); cam.x0 = -230;
         var livre = pr ? pr.left : cw;   // a turma das pragas fica entre o estilingue e o painel, se couber
         enfeiteX = livre / cam.z + cam.x0 - 90;
         if (enfeiteX < 380) enfeiteX = null;
@@ -731,7 +733,13 @@
     for (var j = textos.length - 1; j >= 0; j--) { textos[j].vida -= dt; textos[j].y -= 40 * dt; if (textos[j].vida <= 0) textos.splice(j, 1); }
     camera(dt);
     desenharMundo(agoraS);
+    // aparelho lento (menos de ~24 quadros por segundo por 3 s): desenha com menos pixels
+    if (dt > 0) {
+      lentos = dt > 0.042 ? lentos + dt : Math.max(0, lentos - dt * 0.5);
+      if (lentos > 3 && reduz < 2) { reduz++; lentos = 0; tamanho(); camada = null; }
+    }
   }
+  var lentos = 0;
 
   /* ---------- começo ---------- */
   var pedidoInstalar = null;

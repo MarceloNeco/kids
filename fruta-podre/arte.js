@@ -620,25 +620,27 @@
   }
 
   /* ---------- céu e cenário da quitanda ---------- */
-  var gradCeu = null, gradH = 0;
   function nuvem(c, x, y, s) {
     c.beginPath();
     c.arc(x, y, 26 * s, Math.PI * 0.5, Math.PI * 1.5); c.arc(x + 30 * s, y - 22 * s, 30 * s, Math.PI, Math.PI * 1.85);
     c.arc(x + 70 * s, y - 14 * s, 26 * s, Math.PI * 1.2, Math.PI * 1.95); c.arc(x + 92 * s, y + 4 * s, 22 * s, Math.PI * 1.5, Math.PI * 0.5);
     c.closePath(); c.fillStyle = '#fff'; c.fill(); linha(c, 3 * s, 'rgba(70,120,160,.5)'); c.stroke();
   }
-  function ceu(c, w, h, t, camX) {
-    if (!gradCeu || gradH !== h) {
-      gradCeu = c.createLinearGradient(0, 0, 0, h); gradCeu.addColorStop(0, '#39b4ec'); gradCeu.addColorStop(0.55, '#9fe0fa'); gradCeu.addColorStop(1, '#ffeec2'); gradH = h;
+  var fundoCeu = null;   // degradê e sol pintados uma vez (no tablet velho, pintar o degradê a cada quadro pesa)
+  function ceu(c, w, h, t, camX, px) {
+    px = px || 1;
+    var W = Math.max(1, Math.round(w * px)), H = Math.max(1, Math.round(h * px));
+    if (!fundoCeu || fundoCeu.width !== W || fundoCeu.height !== H) {
+      fundoCeu = document.createElement('canvas'); fundoCeu.width = W; fundoCeu.height = H;
+      var g = fundoCeu.getContext('2d'); g.scale(px, px);
+      var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#39b4ec'); gr.addColorStop(0.55, '#9fe0fa'); gr.addColorStop(1, '#ffeec2');
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      var sx = w * 0.84, sy = Math.min(90, h * 0.14), sr = Math.min(48, h * 0.07);
+      g.beginPath(); for (var i = 0; i < 24; i++) { var a = i * TAU / 24, q = i % 2 ? sr * 1.25 : sr * 1.75; g.lineTo(sx + Math.cos(a) * q, sy + Math.sin(a) * q); } g.closePath();
+      g.fillStyle = 'rgba(255,236,150,.6)'; g.fill();
+      circ(g, sx, sy, sr); g.fillStyle = '#ffd640'; g.fill(); linha(g, 3, '#e8a317'); g.stroke();
     }
-    c.fillStyle = gradCeu; c.fillRect(0, 0, w, h);
-    // sol
-    var sx = w * 0.84, sy = Math.min(90, h * 0.14), sr = Math.min(48, h * 0.07);
-    c.save(); c.translate(sx, sy); c.rotate(t * 0.05);
-    c.beginPath(); for (var i = 0; i < 24; i++) { var a = i * TAU / 24, q = i % 2 ? sr * 1.25 : sr * 1.75; c.lineTo(Math.cos(a) * q, Math.sin(a) * q); } c.closePath();
-    c.fillStyle = 'rgba(255,236,150,.6)'; c.fill();
-    c.restore();
-    circ(c, sx, sy, sr); c.fillStyle = '#ffd640'; c.fill(); linha(c, 3, '#e8a317'); c.stroke();
+    c.drawImage(fundoCeu, 0, 0, w, h);
     var s = Math.max(0.55, Math.min(1, h / 700));
     for (var k = 0; k < 4; k++) {
       var nx = ((k * 420 + t * 8 - camX * 0.15) % (w + 400) + w + 400) % (w + 400) - 200;
