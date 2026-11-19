@@ -71,7 +71,7 @@ const VIGIA = () => {
 };
 const tocandoBlob = (pg) => pg.evaluate(() => window.__audios.filter(a => !a.paused && a.currentTime > 0 && !a.error).map(a => a.src.slice(0, 5)).join(','));
 
-test('Guardar todos guarda as 15 favoritas; sem internet a rádio, a Bagunçolândia, o Vruuum! e o Campo Minado tocam a favorita por blob:', { timeout: 420000 }, async () => {
+test('Guardar todos guarda as 16 favoritas; sem internet a rádio, a Bagunçolândia, o Vruuum! e o Campo Minado tocam a favorita por blob:', { timeout: 420000 }, async () => {
   const { chromium } = require('playwright');
   const srv = servidor(); await new Promise(r => srv.listen(0, r));
   const base = 'http://127.0.0.1:' + srv.address().port + '/kids/';
@@ -84,13 +84,13 @@ test('Guardar todos guarda as 15 favoritas; sem internet a rádio, a Bagunçolâ
     await pg.goto(base);
     await pg.evaluate(() => navigator.serviceWorker.ready);
 
-    // (1) ⬇ Guardar todos → as 15 favoritas no cache "bolinho-musicas"
+    // (1) ⬇ Guardar todos → as 16 favoritas no cache "bolinho-musicas"
     await pg.click('#todos button.forte');
     await pg.waitForFunction(() => /músicas favoritas guardadas/.test(document.querySelector('#todos .st').textContent), null, { timeout: 300000 });
     const guardadas = await pg.evaluate(() => caches.open('bolinho-musicas').then(c => c.keys()).then(k => k.map(r => r.url)));
     const esperadas = IDS.map(id => base + arquivo(FAV[id]));
     assert.deepStrictEqual(guardadas.slice().sort(), [...new Set(esperadas)].sort(), 'cache bolinho-musicas');
-    assert.match(await pg.textContent('#todos .st'), /15 de 15 músicas favoritas/);
+    assert.match(await pg.textContent('#todos .st'), /16 de 16 músicas favoritas/);
 
     // o Vruuum! guarda todas as músicas dele no próprio cache; tira esse cache para testar só a favorita
     await pg.waitForFunction(() => caches.open('vruuum-musicas-v1').then(c => c.keys()).then(k => k.length >= 36), null, { timeout: 120000 }).catch(() => {});

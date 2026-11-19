@@ -82,10 +82,12 @@ test('estante: janela de novidades com os jogos da semana sempre que a estante a
     await pg.goto(base + '?tv=auto'); await pg.waitForTimeout(1500);
     assert.strictEqual(await pg.$('.nov'), null, 'TV: sem janela');
     await ctx.close();
-    // 8 dias depois: nada
-    ctx = await contexto(Date.parse('2026-11-22T10:00:00')); pg = await ctx.newPage();
+    // 8 dias depois do jogo mais novo do catálogo: nada (a data acompanha os jogos que entram depois)
+    const w = {}; new Function('window', 'document', fs.readFileSync(path.join(raiz, 'catalogo.js'), 'utf8'))(w, { querySelectorAll: () => [] });
+    const maisNovo = Math.max(...w.BolinhoCatalogo.jogos.filter((j) => j.novo).map((j) => Date.parse(j.novo + 'T10:00:00')));
+    ctx = await contexto(maisNovo + 8 * 864e5); pg = await ctx.newPage();
     await pg.goto(base); await pg.waitForTimeout(1500);
-    assert.strictEqual(await pg.$('.nov'), null, 'sem novidades depois de 7 dias');
+    assert.strictEqual(!!(await pg.$('.nov')), false, 'sem novidades depois de 7 dias');
     assert.strictEqual(await pg.$$eval('.card .novo-selo', (s) => s.length), 0, 'sem selo depois de 7 dias');
     await ctx.close();
   } finally { await b.close(); srv.close(); }

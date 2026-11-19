@@ -400,9 +400,6 @@
   });
 
   botao.addEventListener('click', function () {
-    // dentro da janela de outro app (ex.: o Bolinho instalado) o Chrome não instala: no Android, o toque já leva esta
-    // página para o Chrome de verdade, onde a barra vira o Instalar de um toque (dono, 19/Nov/2026)
-    if (!pedido && dentroDeOutroApp && android && !tv) { location.href = linkChrome(); return; }
     if (!pedido) { abrir(); return; }
     var p = pedido;
     pedido = null; // a janela do navegador só pode ser usada uma vez
