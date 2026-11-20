@@ -347,6 +347,12 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.32.0 — Ursão mais disputado (dono, 20/Nov/2026)
+
+- `motor.js` `URSO`: velocidade ×1,10 (era ×1,25) e, na beirada, freia até 15% (`freioAte`; era 30%) com força 4
+  (`freio`; era 2,4). Simulação (12 pistas, 3 níveis): dirigindo no meio ele chega sempre em 1º; encostando na
+  beirada 1,5 s a cada 20 s, os rivais chegam perto e às vezes passam. Teste novo em `teste/urso.test.js`.
+
 ## 1.31.0 — Ursão de Pelúcia gigante (dono, 20/Nov/2026)
 
 - `modelos3d.js`: `urso` — ursinho de pelúcia em 3D (laço na cor escolhida, costura nas costas, rabinho, solas
