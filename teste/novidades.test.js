@@ -1,6 +1,7 @@
 // ✨ Novidades da semana (dono, 14/Nov/2026): jogo que entrou na estante há até 7 dias (campo "novo" do catalogo.js)
 // aparece numa janela bonita (ícone, nome, frase, ▶ Jogar) toda vez que a estante abre ou recarrega (não ao voltar de
-// um jogo), até "Não mostrar mais esta mensagem"; e o cartão dele ganha "✨ Novo".
+// um jogo), até "Não mostrar mais esta mensagem"; e o cartão dele ganha "✨ Novo". Jogo que já existia e ganhou novidade
+// (campo "atualizado", dono, 20/Nov/2026) vem embaixo, em "jogos que ganharam novidades", com a frase do que mudou.
 // Rodar da raiz do repositório: node --test teste/novidades.test.js
 const test = require('node:test');
 const assert = require('node:assert');
@@ -14,6 +15,12 @@ test('catálogo: datas "novo" válidas e de no máximo hoje', () => {
   for (const j of w.BolinhoCatalogo.jogos) if (j.novo) {
     assert.match(j.novo, /^\d{4}-\d{2}-\d{2}$/, j.id + ': novo no formato AAAA-MM-DD');
     assert.ok(Date.parse(j.novo) <= Date.now() + 864e5, j.id + ': data no futuro');
+  }
+  for (const j of w.BolinhoCatalogo.jogos) if (j.atualizado) {
+    const a = j.atualizado;
+    assert.match(a.data, /^\d{4}-\d{2}-\d{2}$/, j.id + ': atualizado.data no formato AAAA-MM-DD');
+    assert.ok(Date.parse(a.data) <= Date.now() + 864e5, j.id + ': atualizado no futuro');
+    for (const l of ['pt', 'en', 'es']) assert.ok(typeof a[l] === 'string' && a[l].length > 10 && a[l].length <= 180, j.id + ': frase da novidade em ' + l + ' (curta)');
   }
   const C = w.BolinhoCatalogo, dia = (s) => Date.parse(s + 'T12:00:00');
   assert.ok(C.ehNovo({ novo: '2026-11-14' }, dia('2026-11-14')) && C.ehNovo({ novo: '2026-11-14' }, dia('2026-11-20')));
@@ -46,8 +53,13 @@ test('estante: janela de novidades com os jogos da semana sempre que a estante a
     let ctx = await contexto(hoje), pg = await ctx.newPage();
     await pg.goto(base); await pg.waitForSelector('.nov:not([hidden])', { timeout: 3000 });
     assert.match(await pg.textContent('#novTitulo'), /Novidades da semana/);
-    const ids = await pg.$$eval('.nov li a', (as) => as.map((a) => a.getAttribute('data-jogo')));
+    const ids = await pg.$$eval('.nov .nov-novos li a', (as) => as.map((a) => a.getAttribute('data-jogo')));
     assert.deepStrictEqual(ids.sort(), ['a-garra', 'aqua', 'glub-glub', 'quem-e']);
+    // atualizados até 15/11 (Mão na Massa em 14/11, Purpurina em 15/11), com a frase do que mudou; o H-rraaa, novo, não repete
+    const atu = await pg.$$eval('.nov .nov-atu li a', (as) => as.map((a) => [a.getAttribute('data-jogo'), a.querySelector('.tx span').textContent]));
+    assert.deepStrictEqual(atu.map((a) => a[0]).sort(), ['cozinha', 'purpurina']);
+    assert.match(atu.find((a) => a[0] === 'cozinha')[1], /3D/);
+    assert.match(await pg.$$eval('.nov .sub', (s) => s.map((e) => e.textContent).join(' | ')), /2 jogos ganharam novidades/);
     assert.ok(await pg.$$eval('.nov li a .ic img', (is) => is.every((i) => i.complete && i.naturalWidth > 0)), 'ícones carregados');
     assert.ok(await pg.evaluate(() => document.querySelector('.nov-c').scrollWidth <= document.querySelector('.nov-c').clientWidth + 1), 'nada rola para o lado');
     assert.strictEqual(await pg.$$eval('.card .novo-selo', (s) => s.length), 4, 'selo ✨ Novo nos 4 cartões');
@@ -84,7 +96,8 @@ test('estante: janela de novidades com os jogos da semana sempre que a estante a
     await ctx.close();
     // 8 dias depois do jogo mais novo do catálogo: nada (a data acompanha os jogos que entram depois)
     const w = {}; new Function('window', 'document', fs.readFileSync(path.join(raiz, 'catalogo.js'), 'utf8'))(w, { querySelectorAll: () => [] });
-    const maisNovo = Math.max(...w.BolinhoCatalogo.jogos.filter((j) => j.novo).map((j) => Date.parse(j.novo + 'T10:00:00')));
+    const datas = w.BolinhoCatalogo.jogos.flatMap((j) => [j.novo, j.atualizado && j.atualizado.data]).filter(Boolean);
+    const maisNovo = Math.max(...datas.map((d) => Date.parse(d + 'T10:00:00')));
     ctx = await contexto(maisNovo + 8 * 864e5); pg = await ctx.newPage();
     await pg.goto(base); await pg.waitForTimeout(1500);
     assert.strictEqual(!!(await pg.$('.nov')), false, 'sem novidades depois de 7 dias');
