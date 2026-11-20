@@ -239,6 +239,66 @@ function frenteBase(tema) {
   });
 }
 
+/* ---------- a menininha das máquinas gigantes (dono, 20/Nov/2026: "pra você ver o tanto que é gigante") ----------
+   Uma criança de uns 1,15 m de pé ao lado da cabine, desenho próprio (vestido, rabo de cavalo, tênis). Na introdução ela
+   acena para a câmera, vira para a máquina e aponta lá para cima; depois fica olhando a máquina. Nunca na frente do vidro. */
+function criarMenina(altura) {
+  const g = new THREE.Group(), mt = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75 });
+  const PELE = mt('#f2c4a0'), CABELO = mt('#5a3420'), VESTIDO = mt('#ff6fae'), BRANCO = mt('#ffffff'), TENIS = mt('#3a7bd5'), ESCURO = mt('#1b1512'), ROSA = mt('#ff9fb8');
+  const peca = (pai, geo, mat, p, e, r) => { const m = new THREE.Mesh(geo, mat); m.position.set(...p); if (e) m.scale.set(...e); if (r) m.rotation.set(...r); m.castShadow = true; pai.add(m); return m; };
+  const bola = new THREE.SphereGeometry(1, 18, 14), caps = new THREE.CapsuleGeometry(1, 1, 6, 12), cil = new THREE.CylinderGeometry(1, 1, 1, 18);
+  for (const x of [-0.045, 0.045]) {
+    peca(g, caps, PELE, [x, 0.25, 0], [0.034, 0.15, 0.034]);
+    peca(g, cil, BRANCO, [x, 0.1, 0], [0.037, 0.1, 0.037]);
+    peca(g, new THREE.BoxGeometry(1, 1, 1), TENIS, [x, 0.03, 0.025], [0.07, 0.055, 0.13]);
+  }
+  peca(g, new THREE.CylinderGeometry(0.075, 0.2, 0.36, 22), VESTIDO, [0, 0.58, 0]);
+  peca(g, cil, VESTIDO, [0, 0.79, 0], [0.082, 0.15, 0.07]);
+  peca(g, new THREE.TorusGeometry(0.16, 0.012, 6, 24), BRANCO, [0, 0.41, 0], null, [Math.PI / 2, 0, 0]);   // barrado
+  peca(g, cil, PELE, [0, 0.88, 0], [0.028, 0.05, 0.028]);
+  const cabeca = new THREE.Group(); cabeca.position.set(0, 0.95, 0); g.add(cabeca);
+  peca(cabeca, bola, PELE, [0, 0, 0], [0.1, 0.1, 0.095]);
+  peca(cabeca, bola, CABELO, [0, 0.018, -0.014], [0.106, 0.104, 0.1]);
+  peca(cabeca, bola, CABELO, [0, 0.06, 0.05], [0.08, 0.035, 0.05], [0.4, 0, 0]);   // franja
+  peca(cabeca, bola, CABELO, [0, 0.03, -0.13], [0.05, 0.075, 0.05], [-0.5, 0, 0]);   // rabo de cavalo
+  peca(cabeca, bola, ROSA, [0, 0.075, -0.1], [0.04, 0.025, 0.025]);   // lacinho
+  for (const x of [-0.034, 0.034]) { peca(cabeca, bola, ESCURO, [x, 0.0, 0.088], [0.013, 0.017, 0.01]); peca(cabeca, bola, ROSA, [x * 1.6, -0.03, 0.078], [0.016, 0.01, 0.008]); }
+  peca(cabeca, new THREE.TorusGeometry(0.022, 0.006, 6, 12, Math.PI), ESCURO, [0, -0.035, 0.09], null, [0, 0, Math.PI]);
+  const bracos = [-1, 1].map((sx) => {
+    const piv = new THREE.Group(); piv.position.set(sx * 0.1, 0.84, 0); g.add(piv);
+    peca(piv, caps, PELE, [0, -0.14, 0], [0.026, 0.11, 0.026]);
+    peca(piv, bola, PELE, [0, -0.29, 0], [0.032, 0.032, 0.032]);
+    peca(piv, cil, VESTIDO, [0, -0.02, 0], [0.04, 0.06, 0.04]);   // mangas
+    piv.rotation.z = sx * 0.12; return piv;
+  });
+  g.scale.setScalar(altura);
+  // t: segundos desde o começo da introdução (null = depois dela); giroMaquina: para onde é a máquina
+  function atualizar(t, giroMaquina) {
+    const respira = Math.sin(performance.now() / 600) * 0.01;
+    if (t != null && t < 1.5) {   // acena para a câmera
+      g.rotation.y = 0.35; cabeca.rotation.set(0.05, 0, Math.sin(t * 4) * 0.08);
+      bracos[1].rotation.set(0, 0, 2.6 + Math.sin(t * 12) * 0.35); bracos[0].rotation.set(0, 0, -0.12);
+    } else if (t != null && t < 2.3) {   // vira para a máquina
+      const k = (t - 1.5) / 0.8; g.rotation.y = 0.35 + (giroMaquina - 0.35) * k;
+      bracos[1].rotation.set(0, 0, 2.6 * (1 - k) + 0.12 * k); cabeca.rotation.set(-0.45 * k, 0, 0);
+    } else if (t != null) {   // aponta lá para cima
+      g.rotation.y = giroMaquina; cabeca.rotation.set(-0.5, 0, 0);
+      bracos[0].rotation.set(-2.5 + Math.sin(t * 3) * 0.08, 0, -0.12); bracos[1].rotation.set(0, 0, 0.12);
+    } else {   // olhando a máquina
+      g.rotation.y = giroMaquina; cabeca.rotation.set(-0.4 + respira * 3, 0, 0);
+      bracos[0].rotation.set(0, 0, -0.12); bracos[1].rotation.set(0, 0, 0.12);
+    }
+    g.position.y = g.userData.y0 + respira * altura * 0.3;
+  }
+  return { g, atualizar };
+}
+// põe a menininha de pé no chão, ao lado da cabine, olhando para o meio dela
+function porMenina(raiz, altura, x, z, alvoX, alvoZ) {
+  const m = criarMenina(altura); m.g.position.set(x, -3.3, z); m.g.userData.y0 = -3.3; raiz.add(m.g);
+  const giro = Math.atan2(alvoX - x, alvoZ - z);
+  return { g: m.g, altura, atualizar: (t) => m.atualizar(t, giro) };
+}
+
 /* ---------- a máquina ---------- */
 export function montarMaquina(cena, tema, M, op) {
   if (tema === 'festas') festa = (op && TEMAS_FESTA[op.festa]) ? op.festa : 'natal';
@@ -261,7 +321,7 @@ export function montarMaquina(cena, tema, M, op) {
   const sala = textura(1024, 512, (g, w, h) => tijolos(g, w, h, '#1b1f1e', '#0a0c0b', '#2c3230'));
   sala.wrapS = sala.wrapT = THREE.RepeatWrapping; sala.repeat.set(4, 2);
   plano(new THREE.MeshStandardMaterial({ map: sala, roughness: 0.9 }), 60, 30, [L / 2, 4, -6]);
-  plano(new THREE.MeshStandardMaterial({ color: '#141414', roughness: 0.95 }), 60, 40, [L / 2, -4.2, 10], [-Math.PI / 2, 0, 0]);
+  plano(new THREE.MeshStandardMaterial({ color: '#141414', roughness: 0.95 }), 60, 40, [L / 2, -3.3, 10], [-Math.PI / 2, 0, 0]);
 
   /* por dentro: chão (sem o buraco), fundo, laterais, teto com LED */
   const chaoTex = textura(512, 512, (g, w, h) => {
@@ -374,6 +434,10 @@ export function montarMaquina(cena, tema, M, op) {
   const botao = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.1, 24), neon(tema === 'neon' ? '#7ef9ff' : tema === 'lanchonete' ? '#ffd166' : '#ff4f6d')); botao.position.set(1.3, 0.15, 0); painel.add(botao);
   const visorTex = textura(512, 128, () => {});
   const visor = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.32), new THREE.MeshBasicMaterial({ map: visorTex })); visor.position.set(0, 0.11, 0.05); visor.rotation.x = -Math.PI / 2 + 0.12; painel.add(visor);
+  // gigantes (cabine de ~3 m): o controle é pequenininho, do tamanho da mão de uma criança, no canto da frente à direita,
+  // e uma menininha fica de pé ao lado, para dar a escala (dono, 20/Nov/2026)
+  let menina = null;
+  if (tema === 'gigantes') { painel.scale.setScalar(0.4); painel.position.set(L - 1.7, -0.55, P + C + 0.2); menina = porMenina(raiz, 5.3, -1.6, P + 1.2, L / 2, P / 2); }
 
   /* garra: trilhos, ponte, carrinho, cabo enrolado, cubo e 3 dedos */
   const trilhoY = A - 0.25;
@@ -427,7 +491,7 @@ export function montarMaquina(cena, tema, M, op) {
   }
 
   return {
-    raiz, mira,
+    raiz, mira, menina,
     alvo: new THREE.Vector3(L / 2, 2.2, P / 2),
     visor(fichas, tempo, ganhos) {
       const g = visorTex.userData.g; g.fillStyle = '#0a1a3a'; g.fillRect(0, 0, 512, 128);
@@ -545,9 +609,10 @@ export function montarTesoura(cena) {
   const fl = new THREE.DirectionalLight('#ffffff', 0.8); fl.position.set(CX, 4, P + 8); raiz.add(fl);
 
   let boneco = null, bonecoDe = null;
+  const menina = porMenina(raiz, 5.4, -1.3, P + 0.9, CX, Z);   // a escala: uma criança ao lado da cabine (dono, 20/Nov/2026)
   function fio(m, x, y0, y1, grosso) { const l = Math.max(0.01, y0 - y1); m.position.set(x, (y0 + y1) / 2, Z); m.scale.set(grosso, l, grosso); m.visible = l > 0.02; }
   return {
-    raiz, alvo: new THREE.Vector3(CX, 3.4, Z),
+    raiz, menina, alvo: new THREE.Vector3(CX, 3.4, Z),
     visor(fichas, tempo, ganhos) {
       const g = visorTex.userData.g; g.fillStyle = '#0a1a3a'; g.fillRect(0, 0, 512, 128);
       g.font = '700 54px Fredoka, system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left';

@@ -2,6 +2,23 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.5.4",
+      "data": "20/Nov/2026",
+      "hora": "13:50:20",
+      "pt": [
+        "👧 Nas máquinas Gigantes e Boneco Gigante, uma introdução mostra uma menininha ao lado da cabine: ela acena, vira e aponta lá para cima, para ver o tamanho (quase 3 metros!). Um toque pula",
+        "🕹️ Na Gigantes, o controle ficou pequenininho, no canto da frente à direita, do tamanho da mão de uma criança"
+      ],
+      "en": [
+        "👧 On the Giants and Giant Doll machines, an intro shows a little girl next to the booth: she waves, turns and points way up, so you can see how big it is (almost 10 feet!). One tap skips it",
+        "🕹️ On Giants, the controls are now tiny, at the front right corner, the size of a child's hand"
+      ],
+      "es": [
+        "👧 En las máquinas Gigantes y Muñeco Gigante, una introducción muestra a una niña al lado de la cabina: saluda, se gira y señala hacia arriba, para ver lo grande que es (¡casi 3 metros!). Un toque la salta",
+        "🕹️ En Gigantes, los mandos ahora son pequeñitos, en la esquina delantera derecha, del tamaño de la mano de un niño"
+      ]
+    },
+    {
       "versao": "0.5.3",
       "data": "20/Nov/2026",
       "hora": "01:30:00",
