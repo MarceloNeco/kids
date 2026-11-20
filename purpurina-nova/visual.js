@@ -39,6 +39,9 @@
     } else {
       if (!temOpcao(cat, valor)) return e;
       e[cat.id] = valor;
+      // estilo que já vem com cor (capa de patinho é amarela, a transparente é rosa): troca junto; dá para mudar depois
+      var opc = cat.opcoes.filter(function (x) { return x.id === valor; })[0];
+      if (opc && opc.cor && e0[cat.id] !== valor) e[chaveCor(cat)] = opc.cor;
     }
     // menina ou menino: troca o jeito básico (cabelo, cílios e batom) para o personagem já aparecer certo
     if (catId === 'personagem' && !ehCor && e0.personagem !== valor) {
