@@ -498,3 +498,10 @@ test('contorno dos dois lados da roupa e queixo curto (dono, 20/Nov/2026)', () =
   const xs = (g.match(/<path d="([^"]+)"/) || [])[1].match(/-?[\d.]+(?=,)/g).map(Number);
   assert.ok(Math.abs((200 - Math.min(...xs)) - (Math.max(...xs) - 200)) < 2, 'blusa simétrica');
 });
+
+test('desfile sempre de frente, olhando para a plateia (dono, 20/Nov/2026: "nem no desfile")', () => {
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  const desfile = app.slice(app.indexOf('function desfilar()'), app.indexOf('// fogos de artifício'));
+  assert.ok(desfile.length > 1000);
+  assert.doesNotMatch(desfile, /olhaE|olhaD|angulo:/, 'no desfile ela não olha nem vira para os lados');
+});

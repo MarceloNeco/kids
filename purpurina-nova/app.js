@@ -969,7 +969,7 @@
           pose({ sorriso: true, rig: true }); if (animD) animD.modo(''); posar(sortear());
           titulo.classList.remove('esperando'); jur.classList.remove('esperando');
           Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 400); confete();
-          depois(1600, function () { if (animD) animD.trocar('olhaE'); depois(1400, function () { if (animD) animD.trocar('olhaD'); depois(1400, function () { posar(poseAtual); depois(900, function () {
+          depois(1600, function () { posar(sortear()); depois(1400, function () { posar(sortear()); depois(1400, function () { posar(poseAtual);   /* sempre olhando para a frente, para a plateia (dono, 20/Nov/2026: "nem no desfile") */ depois(900, function () {
             depois(500, function () {
               semPose();
               (function () {
