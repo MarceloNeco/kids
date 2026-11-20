@@ -283,8 +283,10 @@ test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/No
   // idade: as quatro opções, com o jeito de andar de cada uma, e as poses sorteadas no desfile
   assert.deepEqual(P.categoria('idade').opcoes.map(o => o.id), ['pequena', 'crianca', 'adolescente', 'adulta']);
   assert.match(css, /\.modelo\.idade-pequena\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-crianca\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-adolescente\.andando \.pp-passo-e/);
-  // paradinha nunca com as duas pernas retas
-  assert.doesNotMatch(app.match(/var PERNAS = [^\n]*/)[0], /''/);
+  // paradinha (Nova Era, 20/Nov/2026): as pernas vêm do animador.js — gingada, cruzada ou aberta nas poses do desfile
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  for (const b of ['gingaD', 'gingaE', 'cruzada', 'aberta']) assert.match(anim, new RegExp(b + ': \\{ c:'));
+  assert.match(app, /var NOME_RIG = /); assert.match(app, /PurpurinaAnim\.criar\(pas/);
   for (const pe of ['perna-cruzada', 'perna-aberta', 'ginga-dir', 'ginga-esq']) assert.match(css, new RegExp('\\.modelo\\.' + pe + ' \\.pp-passo'));
   // os dois pés no chão (dono, 15/Nov/2026: "parece que tem um pé flutuando"): nenhuma paradinha levanta o pé
   assert.doesNotMatch(app, /perna-dobrada|perna-relaxada/);
@@ -350,4 +352,29 @@ test('barras de ajuste (dono, 20/Nov/2026): tom claro/escuro em toda cor e inten
   assert.equal(guardado.peleTom, 0.5); assert.equal(guardado.blushForca, 0.4); assert.equal(guardado.lixoTom, undefined);
   assert.ok(!V.iguais(e, Object.assign({}, e, { peleTom: 0.5 })));
   const s = B.svg(Object.assign({}, e, { peleTom: 0.6, blushForca: 0.3 }), { id: 'aj', fundo: false }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+});
+
+test('esqueleto (dono, 20/Nov/2026: "poses com movimento, não trocar de foto") e tipo de corpo', () => {
+  const s = B.svg(Object.assign(V.novo(), { idade: 'adulta' }), { id: 'r', fundo: false, rig: true, passos: true, poseRig: { oD: 50, cD: 120 } });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const c of ['rig-ombro-e', 'rig-cotovelo-e', 'rig-ombro-d', 'rig-cotovelo-d', 'rig-cabeca', 'rig-iris', 'pp-corpo', 'pp-passo-e']) assert.match(s, new RegExp('class="' + c + '"'), c);
+  // o braço de cima "vindo para a frente" encolhe e o cotovelo desfaz (o antebraço não deforma)
+  assert.match(B.transformaOmbro(10, 0.5, [100, 200]), /scale\(1 0\.5\)/); assert.match(B.transformaCotovelo(10, 0.5, [100, 300]), /scale\(1 2\)/);
+  // tipos de corpo: o gordinho é mais largo na cintura que o magrinho
+  const largura = (corpo) => { const t = B.svg(Object.assign(V.novo(), { corpo, blusa: 'nenhum' }), { id: 'c', fundo: false }); return t.length; };
+  assert.notEqual(largura('magrinho'), largura('gordinho'));
+  const fs = require('fs'), path = require('path');
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'), /'animador\.js'/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'), /<script src="animador\.js"><\/script>/);
+});
+
+test('maquiando, zoom no olho e na boca (dono, 20/Nov/2026) com movimento sutil', () => {
+  const fs = require('fs'), path = require('path');
+  ['sombra', 'delineado', 'cilios', 'olhos'].forEach(id => assert.equal(P.categoria(id).zoom, 'olho', id));
+  assert.equal(P.categoria('batom').zoom, 'boca');
+  const e = { idade: 'adulta' }, rosto = B.areaZoom(P.ZOOM.rosto, e), olho = B.areaZoom(P.ZOOM.olho, e, 50), boca = B.areaZoom(P.ZOOM.boca, e, 50);
+  assert.ok(olho[2] < rosto[2] && boca[2] < rosto[2], 'olho e boca mais perto que o rosto');
+  assert.ok(boca[1] > olho[1], 'boca abaixo do olho');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(app, /movimentoDaVista/); assert.match(anim, /amplitude: function/);
 });

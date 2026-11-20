@@ -19,6 +19,9 @@
 >   que não esticam (`rigido()`); a cabeça só é reduzida; curvas (0.4.2): `larg` com ombro, busto, cintura, quadril,
 >   coxa, joelho, panturrilha e tornozelo (`MENINO` para o menino), caminhos viram muitos pontos (`curvar`) para a roupa
 >   ganhar cintura, e braços com forma presos ao "osso" (`data-osso`: só ombro e pulso mudam de lugar); `areaZoom()` leva o zoom para o lugar novo; telas claras no fim do `estilo.css` (tema "ateliê").
+> - **esqueleto e movimento** (0.5.0): `opcoes.rig` no `boneca.js` desenha os braços como ombro → cotovelo → mão
+>   (`.rig-ombro-*`, `.rig-cotovelo-*`), a cabeça (`.rig-cabeca`) e as íris (`.rig-iris`); o `animador.js` leva tudo de pose
+>   em pose (abertura, menu, estúdio e desfile) sem redesenhar; tipo de corpo em Eu → Corpo (`TIPOS`).
 
 # Purpurina — maquiagem, roupas e muito brilho
 
