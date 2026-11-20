@@ -2286,13 +2286,14 @@
 
   /* área de zoom (rosto, mãos, pés…) no corpo de ilustração: a mesma área de antes (pecas.js → ZOOM) levada para o lugar
      novo da cabeça e do corpo, conforme a idade escolhida */
-  function areaZoom(a, e0) {
+  function areaZoom(a, e0, minimo) {
     var e = V.limpar(e0);
     IDADE = IDADES[e.idade] || IDADES.adulta; DF = deformacao(e.idade, e.personagem === 'menino', e.corpo);
     var ym = a[1] + a[3] / 2, y1 = DF.fy(a[1]), y2 = DF.fy(a[1] + a[3]), x1 = DF.fx(a[0], ym), x2 = DF.fx(a[0] + a[2], ym);
     if (a[1] + a[3] > 600) y1 = Math.max(y1, y2 - a[3]);   // pés: os pés não esticam, a área continua do mesmo tamanho
     // não fica menor que um rosto de criancinha (detalhe demais some na tela)
-    var w = Math.max(x2 - x1, 90), h = Math.max(y2 - y1, 90), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+    // (no olho e na boca, maquiando, chega mais perto: minimo menor)
+    var m = minimo || 90, w = Math.max(x2 - x1, m), h = Math.max(y2 - y1, m), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
     return [n(cx - w / 2), n(cy - h / 2), n(w), n(h)];
   }
   var API = { transformaOmbro: transformaOmbro, transformaCotovelo: transformaCotovelo, corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };

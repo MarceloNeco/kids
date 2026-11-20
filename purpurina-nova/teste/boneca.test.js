@@ -367,3 +367,14 @@ test('esqueleto (dono, 20/Nov/2026: "poses com movimento, não trocar de foto") 
   assert.match(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'), /'animador\.js'/);
   assert.match(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'), /<script src="animador\.js"><\/script>/);
 });
+
+test('maquiando, zoom no olho e na boca (dono, 20/Nov/2026) com movimento sutil', () => {
+  const fs = require('fs'), path = require('path');
+  ['sombra', 'delineado', 'cilios', 'olhos'].forEach(id => assert.equal(P.categoria(id).zoom, 'olho', id));
+  assert.equal(P.categoria('batom').zoom, 'boca');
+  const e = { idade: 'adulta' }, rosto = B.areaZoom(P.ZOOM.rosto, e), olho = B.areaZoom(P.ZOOM.olho, e, 50), boca = B.areaZoom(P.ZOOM.boca, e, 50);
+  assert.ok(olho[2] < rosto[2] && boca[2] < rosto[2], 'olho e boca mais perto que o rosto');
+  assert.ok(boca[1] > olho[1], 'boca abaixo do olho');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(app, /movimentoDaVista/); assert.match(anim, /amplitude: function/);
+});

@@ -98,7 +98,8 @@
     corpo: [70, 300, 260, 300], cintura: [70, 400, 260, 260], pes: [110, 560, 180, 120], tudo: [0, 40, 400, 660], pescoco: [90, 220, 220, 180],
     mao: [80, 456, 84, 76], anel: [80, 470, 70, 62], peito: [140, 340, 120, 100], cabeloTodo: [20, 10, 360, 640] };
   /* zoom do palco por parte (ver app.js): rosto, busto, mãos ou cabeça */
-  var ZOOM = { pes: [96, 520, 208, 170], unhas: [76, 462, 92, 80], rosto: [72, 70, 256, 260], busto: [56, 120, 288, 300], maos: [56, 428, 150, 130], cabeca: [30, 20, 340, 430] };
+  var ZOOM = { pes: [96, 520, 208, 170], unhas: [76, 462, 92, 80], rosto: [72, 70, 256, 260], busto: [56, 120, 288, 300], maos: [56, 428, 150, 130], cabeca: [30, 20, 340, 430],
+    olho: [108, 150, 184, 92], boca: [138, 214, 124, 80] };   // maquiando: zoom no olho (sombra, delineado, rímel) e na boca (batom)
   var CATEGORIAS = [
     { id: 'pele', grupo: 'eu', ico: '🎨', pt: 'Pele', en: 'Skin', es: 'Piel', cores: 'pele', area: A.rosto, zoom: 'rosto' },
     { id: 'personagem', grupo: 'eu', ico: '👧', pt: 'Menina ou menino', en: 'Girl or boy', es: 'Niña o niño', area: A.cabeca, zoom: 'cabeca', opcoes: [
@@ -165,7 +166,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       NENHUM('Sem mechas', 'No highlights', 'Sin mechones'), o('pontas', 'Pontas coloridas', 'Colored tips', 'Puntas de colores', ['pop']), o('frente', 'Mechas na frente', 'Front streaks', 'Mechones al frente', ['pop']),
       o('arco', 'Arco-íris', 'Rainbow', 'Arcoíris', ['pop', 'festa'])
     ] },
-    { id: 'olhos', grupo: 'eu', ico: '👀', pt: 'Olhos', en: 'Eyes', es: 'Ojos', cores: 'olhos', area: A.olhos, zoom: 'rosto' },
+    { id: 'olhos', grupo: 'eu', ico: '👀', pt: 'Olhos', en: 'Eyes', es: 'Ojos', cores: 'olhos', area: A.olhos, zoom: 'olho' },
 
     { id: 'base', grupo: 'make', ico: '🧴', pt: 'Base', en: 'Foundation', es: 'Base', area: A.rosto, zoom: 'rosto', opcoes: [
       NENHUM('Sem base', 'No foundation', 'Sin base'), o('natural', 'Natural', 'Natural', 'Natural'), o('iluminada', 'Iluminada', 'Glowy', 'Iluminada', ['brilho', 'festa']),
@@ -175,14 +176,14 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       NENHUM('Sem blush', 'No blush', 'Sin colorete'), o('redondo', 'Bochecha redonda', 'Round cheeks', 'Mofletes redondos'), o('coracao', 'Coraçõezinhos', 'Little hearts', 'Corazoncitos', ['festa']),
       o('diagonal', 'Fininho', 'Swept', 'Delgadito')
     ] },
-    { id: 'sombra', grupo: 'make', ico: '🎨', pt: 'Sombra', en: 'Eyeshadow', es: 'Sombra', cores: 'sombra', area: A.olhos, zoom: 'rosto', opcoes: [
+    { id: 'sombra', grupo: 'make', ico: '🎨', pt: 'Sombra', en: 'Eyeshadow', es: 'Sombra', cores: 'sombra', area: A.olhos, zoom: 'olho', opcoes: [
       NENHUM('Sem sombra', 'No eyeshadow', 'Sin sombra'), o('simples', 'Simples', 'Simple', 'Sencilla'), o('esfumada', 'Esfumada', 'Smoky', 'Ahumada'),
       o('arco', 'Arco-íris', 'Rainbow', 'Arcoíris', ['pop', 'festa']), o('brilhante', 'Com brilho', 'Shimmer', 'Con brillo', ['brilho', 'festa', 'princesa'])
     ] },
-    { id: 'delineado', grupo: 'make', ico: '✏️', pt: 'Delineado', en: 'Eyeliner', es: 'Delineador', cores: 'delineado', area: A.olhos, zoom: 'rosto', opcoes: [
+    { id: 'delineado', grupo: 'make', ico: '✏️', pt: 'Delineado', en: 'Eyeliner', es: 'Delineador', cores: 'delineado', area: A.olhos, zoom: 'olho', opcoes: [
       NENHUM('Sem delineado', 'No eyeliner', 'Sin delineador'), o('fino', 'Fininho', 'Thin', 'Finito'), o('gatinho', 'Gatinho', 'Cat eye', 'Ojo de gato', ['pop']), o('grosso', 'Marcado', 'Bold', 'Marcado', ['pop'])
     ] },
-    { id: 'cilios', grupo: 'make', ico: '👁️', pt: 'Cílios', en: 'Lashes', es: 'Pestañas', cores: 'cilios', area: A.olhos, zoom: 'rosto', opcoes: [
+    { id: 'cilios', grupo: 'make', ico: '👁️', pt: 'Cílios', en: 'Lashes', es: 'Pestañas', cores: 'cilios', area: A.olhos, zoom: 'olho', opcoes: [
       NENHUM('Sem cílios postiços', 'No false lashes', 'Sin pestañas postizas'), o('curtos', 'Naturais', 'Natural', 'Naturales'), o('longos', 'Longos', 'Long', 'Largas', ['festa']), o('boneca', 'De boneca', 'Doll lashes', 'De muñeca', ['princesa', 'pop']),
       o('gatinho', 'Gatinho', 'Cat-eye lashes', 'De gatita', ['pop']), o('volume', 'Volume', 'Volume', 'Volumen', ['festa', 'pop']), o('baixo', 'Em cima e embaixo', 'Top and bottom', 'Arriba y abajo'),
       o('arco', 'Arco-íris', 'Rainbow lashes', 'Arcoíris', ['pop', 'festa']), o('strass', 'Com strass', 'With rhinestones', 'Con brillantes', ['brilho', 'festa', 'princesa']),
@@ -194,7 +195,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       o('glitter', 'Com glitter', 'Glitter', 'Con purpurina', ['brilho', 'festa']), o('bolinhas', 'Bolinhas', 'Polka dots', 'Lunares', ['pop']), o('arco', 'Arco-íris', 'Rainbow', 'Arcoíris', ['pop', 'festa']),
       o('degrade', 'Degradê', 'Ombré', 'Degradado'), o('coracao', 'Coraçãozinho', 'Little hearts', 'Corazoncitos', ['festa', 'aniversario'])
     ] },
-    { id: 'batom', grupo: 'make', ico: '💋', pt: 'Batom', en: 'Lipstick', es: 'Pintalabios', cores: 'batom', area: A.boca, zoom: 'rosto', opcoes: [
+    { id: 'batom', grupo: 'make', ico: '💋', pt: 'Batom', en: 'Lipstick', es: 'Pintalabios', cores: 'batom', area: A.boca, zoom: 'boca', opcoes: [
       NENHUM('Sem batom', 'No lipstick', 'Sin pintalabios'), o('cremoso', 'Cremoso', 'Creamy', 'Cremoso'), o('gloss', 'Gloss', 'Gloss', 'Gloss', ['festa']),
       o('brilho', 'Com glitter', 'Glitter', 'Con purpurina', ['brilho', 'pop']), o('degrade', 'Degradê', 'Ombré', 'Degradado')
     ] },

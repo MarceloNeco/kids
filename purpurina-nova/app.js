@@ -219,7 +219,7 @@
     // volta, põe a mão na cintura e dá tchauzinho, tudo aos poucos (sem redesenhar)
     var viva = !CALMO && !angulo;
     el.innerHTML = B.svg(estado, { id: 'palco', anim: viva, area: vista, angulo: angulo, realce: !mexendo, passos: viva, rig: viva, piscadinha: viva && Date.now() < piscaAte });
-    if (viva && !animEstudio) animEstudio = PurpurinaAnim.criar(el, { poses: ['relax', 'olhaE', 'relax', 'cintura', 'olhaD', 'relax', 'tchau'], segura: 3600 });
+    if (viva && !animEstudio) { animEstudio = PurpurinaAnim.criar(el, { poses: POSES_INTEIRA, segura: 3600 }); posesVista = POSES_INTEIRA; movimentoDaVista(); }
     if (!viva && animEstudio) { animEstudio.parar(); animEstudio = null; }
     $('btFrente').hidden = !angulo;
     if (angulo !== angMandado) { angMandado = angulo; ponte('giro'); }
@@ -282,12 +282,24 @@
   var INTEIRA = [40, 30, 320, 650], vista = INTEIRA.slice(), zoomLigado = false, animZoom = 0;
   function catAtual() { return P.categoria(catPorGrupo[grupoAtual] || catsDoGrupo(grupoAtual)[0].id); }
   // corpo de ilustração de moda: a área de zoom vai para o lugar novo do rosto, das mãos ou dos pés (muda com a idade)
-  function alvoZoom() { var c = catAtual(); return B.areaZoom(P.ZOOM[(c && c.zoom) || 'rosto'], estado); }
+  function alvoZoom() { var c = catAtual(), z = (c && c.zoom) || 'rosto'; return B.areaZoom(P.ZOOM[z], estado, z === 'olho' || z === 'boca' ? 50 : 90); }
+  /* movimento conforme a vista (dono, 20/Nov/2026: "durante a montagem… movimento bem sutil, olhando para os lados… de
+     roupa, para ver como fica com o movimento do corpo… maquiando, zoom no olho, na boca, com um leve movimento"):
+     de corpo inteiro ela troca de pose e dá tchau; perto do rosto só olha para os lados, inclina a cabeça e respira;
+     no olho e na boca, mais sutil ainda (o quadril quase para, senão o olho sai do quadro) */
+  var POSES_INTEIRA = ['relax', 'olhaE', 'relax', 'cintura', 'olhaD', 'relax', 'tchau'], POSES_PERTO = ['relax', 'olhaE', 'relax', 'olhaD'], posesVista = POSES_INTEIRA;
+  function movimentoDaVista(para) {
+    if (!animEstudio) return;
+    var w = (para || vista)[2], perto = w < 300, lista = perto ? POSES_PERTO : POSES_INTEIRA;
+    animEstudio.amplitude(w >= 300 ? 1 : w >= 170 ? 0.3 : 0.1);
+    if (lista !== posesVista) { posesVista = lista; animEstudio.lista(lista); }
+  }
   function zoom(liga, animar) {
     zoomLigado = !!liga;
     var b = $('btZoom'); b.setAttribute('aria-pressed', String(zoomLigado)); b.textContent = zoomLigado ? '👗' : '🔍';   // 👗 (e não 🧍, que o Fire antigo mostra como um quadrado vazio)
     b.setAttribute('aria-label', zoomLigado ? t('Ver a personagem inteira', 'See the whole character', 'Ver al personaje entero') : t('Chegar perto (zoom)', 'Zoom in', 'Acercar (zoom)'));
     var de = vista.slice(), para = zoomLigado ? alvoZoom().slice() : INTEIRA.slice(), id = ++animZoom;
+    movimentoDaVista(para);
     if (de.join() === para.join()) return;
     var svg = $('boneca').querySelector('svg');
     if (!animar || CALMO || !svg) { vista = para; if (svg) svg.setAttribute('viewBox', vista.join(' ')); return; }

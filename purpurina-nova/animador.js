@@ -42,6 +42,9 @@
     op = op || {};
     var atual = valores('relax'), de = atual, para = atual, ini = 0, dur = 900, vivo = true, quadro = 0, nomeAtual = 'relax';
     var lista = op.poses || ['relax'], i = 0, prox = performance.now() + (op.primeira || 1800);
+    // amplitude do balanço (dono, 20/Nov/2026: maquiando, "zoom no olho, na boca, com um leve movimento"): 1 de corpo
+    // inteiro; perto do rosto o quadril e as pernas quase param e sobra o sutil — cabeça, olhos, respiração
+    var amp = 1, ampAlvo = 1;
     function trocar(nome, ms) { nomeAtual = nome; de = atual; para = valores(nome); ini = performance.now(); dur = ms || 900; }
     function aplicar(v, t) {
       var svg = caixa.querySelector('svg'); if (!svg) return;
@@ -53,13 +56,13 @@
         co.setAttribute('transform', B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E));
       });
       var cab = svg.querySelector('.rig-cabeca');
-      if (cab) cab.setAttribute('transform', 'rotate(' + (v.cab + Math.sin(t / 1100) * 1.2).toFixed(2) + ' ' + cab.getAttribute('data-x') + ' ' + cab.getAttribute('data-y') + ')');
+      if (cab) cab.setAttribute('transform', 'rotate(' + (v.cab * (0.5 + amp / 2) + Math.sin(t / 1100) * 1.2).toFixed(2) + ' ' + cab.getAttribute('data-x') + ' ' + cab.getAttribute('data-y') + ')');
       Array.prototype.forEach.call(svg.querySelectorAll('.rig-iris'), function (g) { g.setAttribute('transform', 'translate(' + (v.olho * 5).toFixed(2) + ' 0)'); });
       function estilo(sel, x, y, rot, extra) { var g = svg.querySelector(sel); if (!g) return; g.style.transformBox = 'view-box'; g.style.transform = 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px) rotate(' + rot.toFixed(2) + 'deg)' + (extra || ''); }
       var resp = Math.sin(t / 650) * 1.1;
-      estilo('.pp-corpo', v.cx, v.cy - resp, v.cr);
-      estilo('.pp-passo-e', v.ex, v.ey, v.er); estilo('.pp-passo-d', v.dx, v.dy, v.dr);
-      Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + v.s.toFixed(2) + 'deg)'; });
+      estilo('.pp-corpo', v.cx * amp, v.cy * amp - resp, v.cr * amp);
+      estilo('.pp-passo-e', v.ex * amp, v.ey * amp, v.er * amp); estilo('.pp-passo-d', v.dx * amp, v.dy * amp, v.dr * amp);
+      Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
     }
     function passo(t) {
       if (!vivo) return;
@@ -68,6 +71,7 @@
       var k = Math.min(1, (t - ini) / dur), e = suave(k), v = {};
       for (var c in para) v[c] = de[c] + (para[c] - de[c]) * e;
       v.aceno = para.aceno;
+      amp += (ampAlvo - amp) * 0.06;   // muda de amplitude devagar, sem tranco
       atual = v; aplicar(v, t);
       quadro = requestAnimationFrame(passo);
     }
@@ -76,6 +80,7 @@
     return {
       trocar: trocar,
       pose: function () { return nomeAtual; },
+      amplitude: function (a) { ampAlvo = a; },
       parar: function () { vivo = false; cancelAnimationFrame(quadro); },
       lista: function (l) { lista = l; i = 0; prox = performance.now() + (op.segura || 3200); trocar(l[0]); }
     };
