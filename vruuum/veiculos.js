@@ -1,4 +1,4 @@
-/* Vruuum! — a garagem: 30 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
+/* Vruuum! — a garagem: 31 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
    na curva aparece a lateral, no morro o teto. Grupos: carros, "moto, skate e montarias" e os que voam (desenho.js troca
    a estrada por uma rota no ar e os obstáculos por pássaros, nuvens de tempestade, anéis e correntes de ar).
    Estilos inspirados em carros esportivos famosos, mas sem marca, logotipo ou nome de fabricante.
@@ -45,6 +45,7 @@
     em3d('pulapula', { id: 'pulapula', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Pula-Pula', 'Trampoline', 'Cama Elástica'], w: 740, h: 1150, vel: 0.93, curva: 1.1 }),
     em3d('bebe', { id: 'bebe', semMotor: true, quadros: 6, grupo: 'terra', nome: ['Carrinho de Bebê', 'Baby Stroller', 'Carrito de Bebé'], w: 760, h: 1080, vel: 0.94, curva: 1.12 }),
     em3d('empurrar', { id: 'empurrar', semMotor: true, grupo: 'terra', nome: ['Carrinho de Empurrar', 'Push Car', 'Correpasillos'], w: 720, h: 1040, vel: 0.95, curva: 1.1 }),
+    em3d('urso', { id: 'urso', urso: true, quadros: 8, semPiloto: true, semMotor: true, voz: 'risada', grupo: 'moto', nome: ['Ursão de Pelúcia', 'Giant Teddy Bear', 'Osito de Peluche Gigante'], w: 1650, h: 1750, vel: 1, curva: 1.05 }),
     em3d('ovo', { id: 'ovo', quadros: 8, semPiloto: true, semMotor: true, grupo: 'moto', nome: ['Ovo Corredor', 'Running Egg', 'Huevo Corredor'], w: 720, h: 1000, vel: 0.97, curva: 1.14 }),
     em3d('aviao', { id: 'aviao', grupo: 'ar', nome: ['Aviãozinho', 'Little Plane', 'Avioncito'], w: 1500, h: 760, vel: 1, curva: 1.05 }),
     em3d('jato', { id: 'jato', grupo: 'ar', nome: ['Jato', 'Jet', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92 }),

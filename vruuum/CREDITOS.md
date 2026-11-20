@@ -54,6 +54,7 @@
 | `dino.mp3` | Joel Azzopardi (JoelAudio, freesound 85568), pelo Stendhal (`roar-dragon-1`) | **CC0** |
 | `morcego.mp3` | polymorpheva (freesound 104205), pelo Stendhal (`bat-1`) | **CC0** |
 | `dracula.mp3` (risada) | Jordan Irwin (AntumDeluge, opengameart.org/node/81237), pelo Stendhal (`laugh-evil-01`) | **CC0** |
+| `risada.mp3` (o "ho ho ho" do Ursão) | canucklovingbrit (freesound 110641), pelo Stendhal (`ho-ho-ho-1`) | **CC0** |
 | `pipoca.mp3` | fryzu82 (freesound 142325), pelo Stendhal (`cork-pop-1`) | **CC0** |
 | Ícone do jogo | desenhado com o próprio `sprites.js` e exportado para PNG | mesma licença do repositório |
 
