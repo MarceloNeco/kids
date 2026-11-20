@@ -334,7 +334,7 @@
     /* pose do fim da passarela (opcoes.pose): 'cintura' = mão direita na cintura (menina); 'cruzados' = braços cruzados
        (menino). Os braços da pose são desenhados no fim, por cima (bracosPose). */
     var bracoPose = !angB && !tchau && POSES.indexOf(op.pose) >= 0 ? op.pose : '';
-    var semDireito = tchau || !!bracoPose, semEsquerdo = !!bracoPose && bracoPose !== 'cintura', semBracos = semDireito && semEsquerdo;
+    var semDireito = tchau || !!bracoPose, semEsquerdo = !!bracoPose && bracoPose !== 'cintura' && bracoPose !== 'beijo', semBracos = semDireito && semEsquerdo;
     var iniBracos = out.length;
     var bracos = (semEsquerdo ? [] : ['M150,354 Q126,420 118,498']).concat(semDireito ? [] : ['M250,354 Q274,420 282,498']);
     bracos.forEach(function (d) { out.push(membro(d, 23)); });
@@ -443,6 +443,8 @@
     // o braço do tchau vai por cima de tudo (fica na frente do cabelo, do lado do rosto)
     // o braço do tchau vai inteiro junto com o ombro (sem a mão encolher para cima do rosto na altura da cabeça)
     if (tchau) out.push(rigido(250, 356, bracoTchau(pele, peleE, esmalte, membro, op.anim)));
+    // beijinho: corações saindo da boca e subindo (na cabeça, para ficarem no lugar dela; .pp-beijo no estilo.css)
+    if (bracoPose === 'beijo') out.push(grupo('<g class="pp-beijo">' + p(coracao(236, 256, 9), { fill: '#ff4f8b', stroke: '#fff', 'stroke-width': 1.5 }) + '</g><g class="pp-beijo pp-beijo2">' + p(coracao(252, 236, 6), { fill: '#ff8fc8', stroke: '#fff', 'stroke-width': 1.2 }) + '</g>'));
     if (bracoPose) out.push(bracosPose(bracoPose, tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
     // corpo de ilustração de moda: o corpo passa pela deformação e a cabeça (já pronta) só é reduzida e posta no lugar
     var cabecaGrupo = '<g transform="' + CABECA + '">';
@@ -1200,7 +1202,7 @@
      'maosCabeca'   as duas mãos em cima da cabeça, cotovelos para fora (foto de desfile infantil do dono)
      'joinha'       os dois punhos na frente do peito com o polegar para cima (foto do menino no desfile)
      Manga curta cobre o começo do braço; manga longa, o braço todo. */
-  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha', 'maosCabeca'];
+  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha', 'maosCabeca', 'beijo'];
   function bracosPose(tipo, manga, corTop, pele, peleE, esmalte, membro) {
     function vestir(d, larg, ate) {   // a manga por cima do braço (ate: 0..1 do traço, aproximado pelo pathLength)
       if (!corTop || manga === 'nada') return '';
@@ -1243,6 +1245,10 @@
       var cE = 'M150,354 Q124,392 150,402', cD = 'M250,354 Q276,392 250,402', aE = 'M150,402 Q154,350 164,312', aD = 'M250,402 Q246,350 236,312';
       return membro(cE, 23) + vestir(cE, 23, 0.5) + membro(cD, 23) + vestir(cD, 23, 0.5) + membro(aE, 19) + vestir(aE, 19, 0) + membro(aD, 19) + vestir(aD, 19, 0) +
         punho(166, 304, -35) + punho(234, 304, 35);
+    }
+    if (tipo === 'beijo') {   // mandando beijinho: cotovelo para baixo e para fora, a mão na boca
+      var bB = 'M250,356 Q272,378 266,404', aB = 'M266,404 Q244,330 214,282';
+      return membro(bB, 23) + vestir(bB, 23, 0.5) + membro(aB, 20) + vestir(aB, 20, 0) + punho(212, 280, -30);
     }
     if (tipo === 'maoCabelo') return cintura(-1);   // a outra mão na cintura; o braço erguido vem antes da cabeça
     if (tipo === 'maoCabeloAtras') {

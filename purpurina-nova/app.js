@@ -124,7 +124,7 @@
   }
   $('btEntrar').addEventListener('click', entrar);
   function desenharMenu() {
-    $('menuBoneca').innerHTML = B.svg(livre, { id: 'menu', fundo: false, area: [40, 40, 320, 640] });
+    abertura($('menuBoneca'), 'menu');
     $('qtdLooks').textContent = ler('purpurinaNova.looks', []).length;
   }
   $('btSom').addEventListener('click', function () { Som.iniciar(); var lig = Som.alternar(); $('btSom').textContent = lig ? '🔊' : '🔇'; });
@@ -1126,7 +1126,28 @@
   // ---------- começo ----------
   $('ver').textContent = 'v' + APP_VERSION;
   $('btSom').textContent = Som.ligado() ? '🔊' : '🔇';
-  $('entradaBoneca').innerHTML = B.svg(livre, { id: 'entrada', fundo: false, area: [40, 40, 320, 640] });
+  /* abertura e menu (dono, 20/Nov/2026: "na própria abertura tem que ter movimento… poses de modelo, mandando beijinho"):
+     a personagem troca de pose a cada 2,8 s, com a troca suave (duas camadas que se cruzam), e entre uma e outra respira e
+     passa o peso de uma perna para a outra. Quem pediu menos movimento vê ela parada. */
+  var POSES_ABERTURA = ['maoCabelo', 'beijo', 'tchau', 'duasCintura', 'carinha', 'cintura'];
+  function abertura(el, nome) {
+    var menino = livre.personagem === 'menino', lista = menino ? ['cruzados', 'tchau', 'bolsos', 'joinha'] : POSES_ABERTURA;
+    function desenho(i, k) {
+      var pz = lista[i % lista.length];
+      return B.svg(livre, { id: nome + k, fundo: false, area: [40, 40, 320, 640], anim: !CALMO, passos: !CALMO, pose: pz === 'tchau' ? '' : pz, tchau: pz === 'tchau', sorriso: pz !== 'beijo' });
+    }
+    clearInterval(el._abertura);
+    if (CALMO) { el.innerHTML = B.svg(livre, { id: nome, fundo: false, area: [40, 40, 320, 640] }); return; }
+    el.classList.add('ab-viva');
+    el.innerHTML = '<div class="ab-camada ativa">' + desenho(0, 0) + '</div><div class="ab-camada"></div>';
+    var i = 0;
+    el._abertura = setInterval(function () {
+      if (document.hidden || !el.offsetParent) return;   // tela escondida: não gasta bateria
+      i++; var cs = el.children, nova = cs[i % 2], velha = cs[(i + 1) % 2];
+      nova.innerHTML = desenho(i, i % 2); nova.classList.add('ativa'); velha.classList.remove('ativa');
+    }, 2800);
+  }
+  abertura($('entradaBoneca'), 'entrada');
   traduzir();
   // trocaram o idioma na estante aberta noutra aba: os textos da tela trocam na hora
   if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) {
