@@ -1408,6 +1408,10 @@
     if (!tl.rodando) return;
     tl.raf = raiz.requestAnimationFrame(tlQuadro);
     if (tl.meia && agora - tl.ultimoDesenho < 31) return;   // 30 quadros por segundo
+    // rádio parada: os DJs ficam parados (dono, 20/Nov/2026: "aparece sempre, só mexe quando estiver tocando"): um quadro e chega
+    var parada = !!(tl.audio && tl.audio.paused);
+    if (parada && tl.parouDesenhado && tl.V && tl.caixa.clientWidth === tl.mw) return;
+    tl.parouDesenhado = parada;
     var t = agora / 1000, dt = tl.ultimoT ? Math.min(0.1, Math.max(0.001, t - tl.ultimoT)) : 0.016;
     tl.ultimoT = t; tl.ultimoDesenho = agora;
     var R = ritmoPasso(dt, t);

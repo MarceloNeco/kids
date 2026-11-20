@@ -7,8 +7,8 @@
     alguém tocar ▶ de novo. Com "economia de dados" ligada, não toca sozinha.
   - ⏯ pausa e continua; ⏮ ⏭ trocam; as bolinhas mostram as 10 músicas e escolhem uma.
   - 📺 Clipe (19/Nov/2026) abre o telão do clipe.js: bichinhos dançando a música que está tocando (parada, começa a tocar).
-  - Telinha dos DJs (dono, 20/Nov/2026): uma TV pequena (16:9) presa em cima do tocador, só enquanto a rádio toca
-    (some devagar quando pausa). Dois bichinhos DJ dançando a música (desenho do clipe.js, BolinhoClipe.telinha; vídeo de
+  - Telinha dos DJs (dono, 20/Nov/2026): uma TV pequena (16:9) presa em cima do tocador, sempre à vista (com a rádio
+    parada os DJs esperam com um ▶ e tocar na telinha liga a música). Dois bichinhos DJ dançando a música (desenho do clipe.js, BolinhoClipe.telinha; vídeo de
     IA no lugar do desenho: CLIPES_VIDEO.telinha, no clipe.js). Tocar nela abre o telão do Clipe. O ✕ esconde e o aparelho
     lembra (bolinho:radio:telinha); ela volta ao tocar no botão Clipe. Na TV (?tv= ou navegador de TV) não aparece.
   - Cada música baixa só quando vai tocar (preload="none").
@@ -88,6 +88,11 @@
     'background:rgba(14,10,40,.74);color:#f3f0ff;font-size:.6rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;line-height:1.3;pointer-events:none}' +
     '.rt-vivo i{width:7px;height:7px;border-radius:50%;background:#ff4fa3;box-shadow:0 0 6px #ff4fa3;animation:rt-pisca 1.2s ease-in-out infinite}' +
     '@keyframes rt-pisca{50%{opacity:.3}}' +
+    // parada: um ▶ grande no meio da telinha (tocar liga a rádio); o selo "Ao vivo" e o ampliar só com música
+    '.rt-tocar{position:absolute;left:50%;top:50%;z-index:1;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(14,10,40,.78);color:#c6ff3d;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #c6ff3d,0 4px 14px rgba(0,0,0,.5);pointer-events:none;transition:opacity .3s,transform .3s}' +
+    '.rt-tocar svg{width:24px;height:24px;margin-left:3px}' +
+    '.radio.tocando .rt-tocar{opacity:0;transform:scale(.6)}' +
+    '.radio:not(.tocando) .rt-vivo,.radio:not(.tocando) .rt-amplia{opacity:0}' +
     '.rt-amplia{position:absolute;right:6px;bottom:6px;z-index:1;width:24px;height:24px;border-radius:50%;background:rgba(14,10,40,.74);color:#c6ff3d;display:flex;align-items:center;justify-content:center;pointer-events:none}' +
     '.radio .rt-amplia svg,.radio .rt-x svg{width:14px;height:14px;fill:none}' +
     '.radio .rt-x{position:absolute;right:-8px;top:-8px;z-index:2;width:30px;height:30px;border:1.5px solid #8b80d0;background:#1a1446;box-shadow:0 2px 8px rgba(0,0,0,.4)}' +
@@ -136,6 +141,7 @@
     telinha.className = 'r-telinha';
     telinha.innerHTML = '<button type="button" class="rt-tela" aria-label="' + T('Telinha dos DJs: toque para ver o clipe grande', 'DJ screen: tap to see the big music video', 'Pantallita de los DJ: toca para ver el videoclip en grande') + '">' +
       '<span class="rt-vivo" aria-hidden="true"><i></i><span class="pt">Ao vivo</span><span class="en">Live</span><span class="es">En directo</span></span>' +
+      '<span class="rt-tocar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg></span>' +
       '<span class="rt-amplia" aria-hidden="true"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></span></button>' +
       '<button type="button" class="rt-x" aria-label="' + T('Esconder a telinha (volta pelo botão Clipe)', 'Hide the little screen (bring it back with the Music video button)', 'Ocultar la pantallita (vuelve con el botón Videoclip)') + '">' +
       '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
@@ -153,12 +159,12 @@
     document.body.classList.toggle('com-telinha', sim);
     if (tl) { if (sim) tl.ligar(); else tl.desligar(); }
   }
-  // aparece com a rádio tocando; some só se continuar parada um instante (na troca de música ela não pisca)
+  // sempre à vista em cima do tocador (dono, 20/Nov/2026: "não achei o DJ" — só aparecia com a música tocando): parada,
+  // os DJs esperam com um ▶ e tocar na telinha liga a rádio; tocando, eles dançam e tocar abre o telão. Some só pelo ✕.
   function telinhaAtualizar() {
     if (!telinha) return;
     clearTimeout(tlEspera);
-    if (!audio.paused && !telinhaOculta()) mostrarTelinha(true);
-    else tlEspera = setTimeout(function () { mostrarTelinha(false); }, telinhaOculta() ? 0 : 700);
+    mostrarTelinha(!telinhaOculta());
   }
 
   var bPlay = barra.querySelector('.r-play');
@@ -216,7 +222,7 @@
     telinhaAtualizar();
   });
   if (telinha) {
-    tela.addEventListener('click', function () { barra.querySelector('.r-clipe').click(); });
+    tela.addEventListener('click', function () { if (audio.paused) bPlay.click(); else barra.querySelector('.r-clipe').click(); });
     telinha.querySelector('.rt-x').addEventListener('click', function () {
       try { localStorage.setItem(CHAVE_TELINHA, 'oculta'); } catch (e) {}
       telinhaAtualizar();
@@ -236,6 +242,8 @@
   audio.addEventListener('pause', botaoPlay);
   audio.addEventListener('playing', telinhaAtualizar);
   audio.addEventListener('pause', telinhaAtualizar);
+  // a telinha aparece logo que a estante abre (o clipe.js carrega depois deste arquivo)
+  if (document.readyState === 'complete') setTimeout(telinhaAtualizar, 0); else addEventListener('load', telinhaAtualizar);
   audio.addEventListener('playing', function () {
     falhas = 0;
     if (OFF && !guardou && !naFavorita && navigator.onLine !== false) { guardou = true; OFF.guardar(['estante']); }   // guarda a favorita

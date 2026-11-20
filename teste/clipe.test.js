@@ -4,7 +4,7 @@
 // - no H-rraaa, o botão 📺 do menu abre o telão;
 // - as peças estão ligadas: clipe.js no sw.js da estante e no ARQUIVOS do H-rraaa;
 // - nenhum erro no console;
-// - telinha dos DJs (dono, 20/Nov/2026): a TV pequena em cima da rádio aparece ao tocar, some ao pausar, abre o telão
+// - telinha dos DJs (dono, 20/Nov/2026): a TV pequena em cima da rádio fica sempre à vista (parada, ▶ liga a rádio), abre o telão
 //   ao ser tocada, o ✕ esconde e o aparelho lembra (o botão Clipe traz de volta), não cobre o ▶ e não aparece na TV.
 // Rodar da raiz do repositório: node --test teste/clipe.test.js
 const test = require('node:test');
@@ -106,7 +106,7 @@ test('telão: abre pelo 📺 da rádio e do H-rraaa, anima, fecha pelo ✕ e pel
   } finally { await b.close(); srv.close(); }
 });
 
-test('telinha dos DJs: aparece com a rádio tocando, some ao pausar, abre o telão, ✕ esconde e lembra, fora da TV', async () => {
+test('telinha dos DJs: sempre à vista (parada, ▶ liga a rádio), tocando abre o telão, ✕ esconde e lembra, fora da TV', async () => {
   const { chromium } = require('playwright');
   const srv = http.createServer((q, r) => {
     let p = decodeURIComponent(q.url.split('?')[0]);
@@ -121,7 +121,7 @@ test('telinha dos DJs: aparece com a rádio tocando, some ao pausar, abre o tel�
   const b = await chromium.launch();
   try {
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-    // começa parada (quem pausou antes): a telinha só aparece depois do ▶
+    // começa parada (quem pausou antes): a telinha já aparece, com os DJs esperando e um ▶ (dono, 20/Nov/2026: "não achei o DJ")
     await ctx.addInitScript(() => { localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); localStorage.setItem('bolinho:idioma', 'pt');
       if (!sessionStorage.getItem('ja')) { sessionStorage.setItem('ja', '1'); localStorage.setItem('bolinho:radio:pausado', '1'); } });
     await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
@@ -137,13 +137,17 @@ test('telinha dos DJs: aparece com a rádio tocando, some ao pausar, abre o tel�
     await pg.goto(base);
     await pg.waitForTimeout(600);
     assert.strictEqual(await pg.locator('.r-telinha').count(), 1, 'a telinha existe');
-    assert.ok(!(await visivel()), 'com a rádio parada, a telinha fica escondida');
-
-    // ▶: aparece, encostada em cima do tocador, centralizada, sem cobrir o ▶, e o desenho dança
-    await pg.click('.radio .r-play');
     await pg.waitForSelector('.r-telinha.rt-vis', { timeout: 8000 });
+    assert.ok(await visivel(), 'com a rádio parada, a telinha já está à vista');
+    assert.ok(!(await tocando()), 'e a rádio continua parada');
+    assert.ok(await pg.locator('.rt-tocar').evaluate((e) => getComputedStyle(e).opacity === '1'), 'parada: o ▶ aparece no meio da telinha');
+
+    // tocar na telinha parada liga a rádio; aí ela fica encostada em cima do tocador, centralizada, sem cobrir o ▶, e dança
+    await pg.click('.r-telinha .rt-tela');
+    await pg.waitForFunction(() => document.querySelector('.radio').classList.contains('tocando'), null, { timeout: 8000 });
+    assert.ok(!(await pg.evaluate(() => BolinhoClipe.aberto())), 'com a rádio parada, o toque na telinha só liga a música (não abre o telão)');
     await pg.waitForTimeout(700);
-    assert.ok(await visivel(), 'a telinha apareceu');
+    assert.ok(await visivel(), 'a telinha continua à vista');
     const tel = await pg.locator('.r-telinha').boundingBox(), radio = await pg.locator('.radio').boundingBox(), play = await pg.locator('.radio .r-play').boundingBox();
     assert.ok(Math.abs(tel.y + tel.height - radio.y) < 6, 'encostada em cima do tocador: ' + (tel.y + tel.height) + ' x ' + radio.y);
     assert.ok(Math.abs((tel.x + tel.width / 2) - (radio.x + radio.width / 2)) < 2, 'centralizada no tocador');
@@ -157,17 +161,17 @@ test('telinha dos DJs: aparece com a rádio tocando, some ao pausar, abre o tel�
     const a1 = await quadro(); await pg.waitForTimeout(300); const a2 = await quadro();
     assert.notStrictEqual(a1, a2, 'os DJs dançam');
 
-    // ⏸: some devagar e o desenho para
+    // ⏸: a telinha fica, com o ▶ de novo
     await pg.click('.radio .r-play');
-    await pg.waitForFunction(() => !document.querySelector('.r-telinha').classList.contains('rt-vis'), null, { timeout: 3000 });
-    await pg.waitForTimeout(500);
-    assert.ok(!(await visivel()), 'pausou: a telinha sumiu');
-    const p1 = await quadro(); await pg.waitForTimeout(300); const p2 = await quadro();
-    assert.strictEqual(p1, p2, 'escondida, o desenho não roda');
+    await pg.waitForTimeout(700);
+    assert.ok(await visivel(), 'pausou: a telinha continua à vista');
+    assert.ok(await pg.locator('.rt-tocar').evaluate((e) => getComputedStyle(e).opacity === '1'), 'pausou: o ▶ volta');
+    const p1 = await quadro(); await pg.waitForTimeout(400); const p2 = await quadro();
+    assert.strictEqual(p1, p2, 'pausou: os DJs ficam parados (só mexem com música)');
 
-    // tocar na telinha abre o telão (e a telinha descansa enquanto ele está aberto)
+    // tocando, tocar na telinha abre o telão (e a telinha descansa enquanto ele está aberto)
     await pg.click('.radio .r-play');
-    await pg.waitForSelector('.r-telinha.rt-vis'); await pg.waitForTimeout(600);
+    await pg.waitForFunction(() => document.querySelector('.radio').classList.contains('tocando')); await pg.waitForTimeout(600);
     await pg.click('.r-telinha .rt-tela');
     await pg.waitForSelector('.clp.aberto canvas');
     assert.ok(await pg.evaluate(() => BolinhoClipe.aberto()), 'a telinha abriu o telão');
