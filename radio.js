@@ -67,9 +67,9 @@
     // 📺 Clipe (dono, 19/Nov/2026): abre o telão com os bichinhos dançando a música que está tocando (clipe.js)
     '.radio .r-clipe{width:auto;min-width:44px;height:44px;border-radius:999px;padding:0 .9rem 0 .75rem;gap:.35rem;font-weight:800;font-size:.92rem;' +
     'background:linear-gradient(135deg,rgba(62,232,255,.24),rgba(198,255,61,.14));border:1.5px solid #3ee8ff;box-shadow:0 0 12px rgba(62,232,255,.28);white-space:nowrap}' +
-    '.r-clipe .r-tv{font-size:1.15rem;line-height:1}' +
+    '.r-clipe .r-tv{width:22px;height:22px;flex:none}' +
     // até 48rem, o botão fica compacto (📺 em cima, o nome embaixo) para as bolinhas das músicas continuarem cabendo
-    '@media (max-width:47.99rem){.radio .r-clipe{flex-direction:column;gap:1px;padding:0 .25rem;min-width:54px;max-width:62px;font-size:.62rem;line-height:1.05;white-space:normal;text-align:center}.r-clipe .r-tv{font-size:1.05rem}}' +
+    '@media (max-width:47.99rem){.radio .r-clipe{flex-direction:column;gap:1px;padding:0 .25rem;min-width:54px;max-width:62px;font-size:.62rem;line-height:1.05;white-space:normal;text-align:center}.r-clipe .r-tv{width:20px;height:20px}}' +
     '@media (min-width:48rem){.radio{max-width:42rem}}' +
     '@media (prefers-reduced-motion:reduce){.radio.tocando .r-disco{animation:none}.r-titulo{transition:none}}';
   var estilo = document.createElement('style');
@@ -96,7 +96,7 @@
     '<div class="r-info"><div class="r-titulo" aria-live="polite"></div>' +
     '<div class="r-autor"></div><div class="r-bolinhas">' + bolinhas + '</div></div>' +
     '<button type="button" class="r-clipe" aria-label="' + T('Clipe: os bichinhos dançam a música', 'Music video: the critters dance to the song', 'Videoclip: los bichitos bailan la canción') + '">' +
-    '<span class="r-tv" aria-hidden="true">📺</span><span><span class="pt">Clipe</span><span class="en">Music video</span><span class="es">Videoclip</span></span></button>';
+    '<svg class="r-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="13" rx="2.5"/><path d="M10 8.3v5.4l4.6-2.7z" fill="currentColor"/><path d="M8 21h8"/></svg><span><span class="pt">Clipe</span><span class="en">Music video</span><span class="es">Videoclip</span></span></button>';
   document.body.appendChild(barra);
 
   var bPlay = barra.querySelector('.r-play');
