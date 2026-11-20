@@ -450,3 +450,19 @@ test('desfile de modelo e dança no ritmo (dono, 20/Nov/2026: "quero desfile rea
   assert.doesNotMatch(app, /mod\.classList\.add\('andando'\)/, 'sem o andar antigo de CSS na modelo');
   assert.match(bal, /modo: 'dancar'/); assert.doesNotMatch(bal, /bal-pula/, 'na Baladinha as pernas dançam, a boneca não pula inteira');
 });
+
+test('estilo masculino anos 70 (dono, 20/Nov/2026): camisa de gola, jaqueta, corrente, cinto, bigode e prontos', () => {
+  const fs = require('fs'), path = require('path');
+  ['disco', 'jaquetaGola'].forEach(id => assert.ok(P.categoria('blusa').opcoes.some(o => o.id === id), id));
+  assert.ok(P.categoria('colar').opcoes.some(o => o.id === 'corrente'));
+  assert.deepEqual(P.categoria('cinto').opcoes.map(o => o.id), ['nenhum', 'fivela', 'fino', 'corrente']);
+  const big = P.categoria('bigode'); assert.ok(big && big.menino, 'bigode só para menino');
+  assert.ok(P.ESTILOS.some(s => s.id === 'disco')); assert.ok(P.COMBOS.roupa.some(s => s.id === 'disco'));
+  const moco = P.PRONTAS.find(p => p.id === 'mocoDisco'); assert.equal(moco.e.personagem, 'menino');
+  const e = V.limpar(Object.assign({}, P.PADRAO, moco.e));
+  for (const op of [{ rig: true }, {}, { angulo: 60 }]) { const s = B.svg(e, Object.assign({ id: 'dd' }, op)); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s)); }
+  // menina não fica de bigode
+  assert.equal(V.aplicar(e, 'personagem', 'menina').bigode, 'nenhum');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /c\.menino && estado\.personagem !== 'menino'/); assert.match(app, /Brincar com ele/);
+});

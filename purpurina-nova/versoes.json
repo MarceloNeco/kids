@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.0",
+      "data": "20/Nov/2026",
+      "hora": "16:41:56",
+      "pt": [
+        "🕺 Estilo anos 70: camisa de gola grande aberta no peito, jaqueta com essa camisa por baixo, corrente grossa de ouro e cintos (fivela grande dourada, fino e de corrente). Para menino, bigode (bigodão, fino ou com cavanhaque), da cor do cabelo.",
+        "✨ Prontos: visual \"Disco anos 70\" (jaqueta roxa, calça preta justa, bota, corrente e cinto de fivela), nas combinações de Roupas, Joias e Acessórios, e o personagem \"Moço dos anos 70\" com cabelo comprido e bigodão."
+      ],
+      "en": [
+        "🕺 70s style: big-collar shirt open at the chest, a jacket with that shirt underneath, a chunky gold chain and belts (big gold buckle, thin and chain). For boys, a mustache (big, thin or with a goatee) in the hair color.",
+        "✨ Ready-made: a \"70s disco\" look (purple jacket, skinny black pants, boots, chain and buckle belt), in the Clothes, Jewelry and Accessories combos, and the \"70s guy\" character with long hair and a big mustache."
+      ],
+      "es": [
+        "🕺 Estilo años 70: camisa de cuello grande abierta en el pecho, chaqueta con esa camisa debajo, cadena gruesa de oro y cinturones (hebilla grande dorada, fino y de cadena). Para chico, bigote (bigotazo, fino o con perilla) del color del pelo.",
+        "✨ Listos: look \"Disco de los 70\" (chaqueta morada, pantalón negro ajustado, botas, cadena y cinturón de hebilla), en las combinaciones de Ropa, Joyas y Accesorios, y el personaje \"Chico de los 70\" con pelo largo y bigotazo."
+      ]
+    },
+    {
       "versao": "0.8.0",
       "data": "20/Nov/2026",
       "hora": "16:08:32",

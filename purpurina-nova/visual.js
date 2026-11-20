@@ -46,7 +46,7 @@
     // menina ou menino: troca o jeito básico (cabelo, cílios e batom) para o personagem já aparecer certo
     if (catId === 'personagem' && !ehCor && e0.personagem !== valor) {
       if (valor === 'menino') { e.cabelo = 'curtinho'; e.cilios = 'nenhum'; e.batom = 'nenhum'; e.blush = 'nenhum'; e.vestido = 'nenhum'; e.saia = 'nenhum'; if (e.calca === 'nenhum' || e.calca === 'legging') e.calca = 'jeans'; }
-      else { e.cabelo = P.PADRAO.cabelo; e.cilios = P.PADRAO.cilios; }
+      else { e.cabelo = P.PADRAO.cabelo; e.cilios = P.PADRAO.cilios; e.bigode = 'nenhum'; }
     }
     // mexer em blusa, saia ou calça tira o vestido; a estampa vai para a peça que está aparecendo
     if (catId === 'blusa' || catId === 'saia' || catId === 'calca') e.vestido = 'nenhum';
