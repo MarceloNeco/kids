@@ -476,3 +476,17 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 @media (orientation: portrait) {
   #estudio.ativa.escolhendo { grid-template: "topo" auto "palco" minmax(0, 1fr) "dicas" auto "acoes" auto "painel" fit-content(40%) / minmax(0, 1fr); }
 }
+/* revisão do estúdio no celular (dono, 20/Nov/2026: "olha o espaço que está ocupando a configuração… revisa o app todo"):
+   o painel nunca passa de 40% da tela (ocupa só o que precisa), as opções ficam numa fileira só que rola para o lado
+   (cartões de 84 px), e os botões do topo ficam menores — a personagem (ou o rosto) fica com o resto da tela. */
+@media (orientation: portrait) {
+  #estudio.ativa { grid-template: "topo" auto "palco" minmax(0, 1fr) "dicas" auto "acoes" auto "painel" fit-content(40%) / minmax(0, 1fr); }
+  .estilos { display: flex; gap: 6px; overflow-x: auto; overscroll-behavior: contain; scroll-snap-type: x proximity; padding-bottom: 4px; }
+  .estilos .op-bt { flex: 0 0 84px; scroll-snap-align: start; }
+  .op-bt .mini-svg { height: 58px; } .op-bt.fundo .mini-svg { height: 64px; }
+  .op-bt.nenhum .mini-svg, .op-bt .mini-svg.mini-emoji { font-size: 2rem; }
+  .cores { flex-wrap: nowrap; overflow-x: auto; padding: 2px 2px 6px; }
+  .cor-bt.grande-cor { flex: 0 0 auto; width: 42px; height: 42px; }
+  .botoes-topo .mini { min-height: 40px; height: 40px; font-size: 1.05rem; }
+  .acoes .medio, .acoes .grande { min-height: 44px; }
+}

@@ -251,7 +251,8 @@
      O palco mostra a personagem inteira ou chega perto (rosto, busto, mãos ou cabeça). Liga sozinho ao escolher
      uma parte que tem zoom (maquiagem, joias, olhos…) e desliga nas roupas e no cenário; o 🔍 liga e desliga na mão.
      A animação só muda o viewBox do SVG (barato, sem redesenhar). */
-  var INTEIRA = [0, 0, 400, 720], vista = INTEIRA.slice(), zoomLigado = false, animZoom = 0;
+  // corpo inteiro (dono, 20/Nov/2026: a personagem ocupa a altura toda do palco, sem sobra em cima e embaixo)
+  var INTEIRA = [40, 30, 320, 650], vista = INTEIRA.slice(), zoomLigado = false, animZoom = 0;
   function catAtual() { return P.categoria(catPorGrupo[grupoAtual] || catsDoGrupo(grupoAtual)[0].id); }
   // corpo de ilustração de moda: a área de zoom vai para o lugar novo do rosto, das mãos ou dos pés (muda com a idade)
   function alvoZoom() { var c = catAtual(); return B.areaZoom(P.ZOOM[(c && c.zoom) || 'rosto'], estado); }
@@ -409,7 +410,7 @@
         else {
           var e = V.aplicar(estado, cat.id, op.id);
           if (cat.id === 'sapatos' || cat.id === 'unhas') e = Object.assign({}, e, { vestido: 'nenhum', saia: 'nenhum', calca: 'shorts' });   // para o sapato aparecer inteiro
-          vis.innerHTML = cat.id === 'cenario' ? B.svg(e, { id: 'm' + k, soFundo: true, cortar: true }) : B.svg(e, { id: 'm' + k, fundo: false, area: cat.area });
+          vis.innerHTML = cat.id === 'cenario' ? B.svg(e, { id: 'm' + k, soFundo: true, cortar: true }) : B.svg(e, { id: 'm' + k, fundo: false, area: cat.area ? B.areaZoom(cat.area, e) : undefined });   // miniatura no lugar certo do corpo novo
         }
         var nome = document.createElement('span'); nome.textContent = N(op);
         b.appendChild(vis); b.appendChild(nome);
