@@ -2,6 +2,20 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.46",
+      "data": "20/Nov/2026",
+      "hora": "17:30:00",
+      "pt": [
+        "🎈 Abertura nova, inspirada na piscina de bolas gigantes: atrás do menu, um mar de bolas brilhantes (rosa, azul, roxo, vermelho, dourado, prateado e com espiral) com luz neon que muda de cor. De vez em quando o seu boneco mergulha e aparece no meio das bolas, de braços para cima. Toque na tela e as bolas pulam."
+      ],
+      "en": [
+        "🎈 New opening, inspired by a giant ball pit: behind the menu, a sea of shiny balls (pink, blue, purple, red, gold, silver and swirly) under color-changing neon lights. Every now and then your character dives in and pops up among the balls, arms in the air. Tap the screen and the balls bounce."
+      ],
+      "es": [
+        "🎈 Nueva entrada, inspirada en una piscina de bolas gigantes: detrás del menú, un mar de bolas brillantes (rosa, azul, morado, rojo, dorado, plateado y con espiral) con luces de neón que cambian de color. De vez en cuando tu muñeco se zambulle y asoma entre las bolas, con los brazos en alto. Toca la pantalla y las bolas saltan."
+      ]
+    },
+    {
       "versao": "0.8.45",
       "data": "20/Nov/2026",
       "hora": "11:06:14",
