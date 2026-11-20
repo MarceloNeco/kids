@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.29.1';
+  var APP_VERSION = '1.30.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -71,7 +71,7 @@
   var demo = null;
   function iniciarDemo() {
     var cv = $('demo'); if (!cv || demo || !PE || !M.novaCorrida) return;
-    var noChao = VE.LISTA.filter(function (v) { return !VE.voa(v.id); }).map(function (v) { return v.id; });
+    var noChao = VE.LISTA.filter(function (v) { return !VE.voa(v.id) && !v.urso; }).map(function (v) { return v.id; });
     function sorteia(l) { return l[Math.floor(Math.random() * l.length)]; }
     var ps = PE.sortear(7, []), configs = ps.slice(2).map(function (p) { var v = VE.achar(sorteia(noChao)); return { id: p.id, veic: v.id, cor: p.cor, mod: { vel: v.vel, curva: v.curva } }; });
     var jd = ps.slice(0, 2).map(function (p, k) { return { cor: p.cor || D.CORES[k], piloto: D.PILOTOS[k], veic: sorteia(noChao), foto: null, personagem: p.id, corpo: PE.corpoDe(p.id) || 'menino' }; });
@@ -405,7 +405,7 @@
     var configs = [];
     if (dl) configs = dl.riv.map(function (r) { return { id: r.id, veic: r.veic, cor: r.cor, mod: { vel: r.vel, curva: r.curva } }; });   // os rivais de quem criou
     else if (pref.rivais === 'com' && PE) {
-      var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return VE.voa(v.id) === voa1; });
+      var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return VE.voa(v.id) === voa1 && !v.urso; });   // o Ursão gigante não é rival (taparia a tela)
       // 1.13.0: ninguém repetido — nem o personagem, nem o veículo de quem joga (escolheu a galinha, não corre contra galinha)
       var livres = opcoes.filter(function (v) { return jogs.every(function (j) { return j.veic !== v.id; }); });
       for (var q = livres.length - 1; q > 0; q--) { var w = Math.floor(Math.random() * (q + 1)), tq = livres[q]; livres[q] = livres[w]; livres[w] = tq; }
@@ -430,7 +430,7 @@
       var hum = estado.rivais[estado.rivais.length - 1]; hum.remoto = true; hum.nome = duelo.outro.nome || t('Amigo', 'Friend', 'Amigo');
       duelo.alvo = null; duelo.rivAlvo = null; duelo.tPos = 0;
     }
-    estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id) }; });
+    estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id), urso: !!v.urso }; });
     D.preparar(estado, jogs, lingua, pref.visual);
     tela('jogo'); redimensionar();
     $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false];
@@ -498,9 +498,9 @@
     requestAnimationFrame(quadro);
   }
 
-  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1, agua: 1 };
+  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1, agua: 1, risada: 1, saltito: 1, ursoBate: 1, ursoEmpurra: 1 };
   // o aparelho treme junto (celular e tablet que deixam; iPhone não deixa): milissegundos de vibração e de pausa
-  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120], agua: [40, 30, 40] };
+  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120], agua: [40, 30, 40], ursoBate: [80, 40, 80], ursoEmpurra: [40] };
   function tremer(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) { /* sem vibrar */ } }
   function tratar(ev) {
     if (ev.tipo === 'vai') mov.fimCalibrar();   // no 3-2-1 só descobre o sinal do sensor; o meio é o reto de verdade

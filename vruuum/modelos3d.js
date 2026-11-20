@@ -833,6 +833,59 @@
     } },
 
     // ---------- 1.28.0 (dono, 19/Nov/2026: "um desses pula-pula como transporte e carrinhos de passeio de neném") ----------
+    /* Ursão de Pelúcia gigante (1.30.0, dono 20/Nov/2026): ursinho de pelúcia enorme, marrom, com laço no pescoço (na
+       cor escolhida), costura nas costas, rabinho redondo e solas das patas mais claras (aparecem quando o pé vai para
+       trás). Corre gingando de um lado para o outro, como pelúcia; no ar (saltitando) encolhe as pernas e abre os
+       braços; dando risada, joga a cabeça para trás, a barriga treme e as patas vão para a barriga. */
+    urso: { alt: 5.3, y: 2.0, larg: 1.25, comp: 0.9, semPiloto: true, montar: function (cam, L, cor, f, op) {
+      var PELO = '#a8703f', CLARO = '#ecc9a0', ESC = tom(PELO, -0.35), voo = op.voo || 0, ri = op.ri || 0;
+      var passo = Math.sin(relogio * 9 + f * PI * 2), ginga = voo ? 0 : passo * 0.12, Y = voo ? 0.2 : Math.abs(passo) * 0.1;
+      var treme = ri > 0 ? Math.sin(relogio * 32) * 0.05 : 0;
+      [-1, 1].forEach(function (l) {   // pernas gordinhas e patas, com a sola clara
+        var p = voo ? 0 : l * passo, quadril = [l * 0.55 + ginga, 1.2 + Y, 0];
+        var pe = voo ? [l * 0.8, 0.6 + Y, 0.2] : [l * 0.6 + ginga * 0.5, 0.34 + Math.max(0, -p) * 0.4, p * 0.55];
+        cano(cam, L, quadril, pe, 0.42, 0.36, PELO);
+        bola(cam, L, add(pe, [0, -0.02, 0.12]), 0.38, 0.3, 0.46, tres(PELO));
+        bola(cam, L, add(pe, [0, 0.02, -0.28]), 0.27, 0.23, 0.05, tres(CLARO), -0.03);
+      });
+      var corpo = [ginga, 2.05 + Y + treme, 0];
+      bola(cam, L, corpo, 1.08, 1.18, 0.92, tres(PELO));   // o corpo
+      bola(cam, L, add(corpo, [0, -0.15, 0.64]), 0.7, 0.78, 0.32, tres(CLARO), -0.05);   // barriga clara (na frente)
+      for (var k = 0; k < 9; k++) {   // costura nas costas, tracejada
+        var y0 = -0.75 + k * 0.19, y1 = y0 + 0.11, z0 = -0.93 * Math.sqrt(Math.max(0, 1 - Math.pow(y0 / 1.18, 2))) - 0.01, z1 = -0.93 * Math.sqrt(Math.max(0, 1 - Math.pow(y1 / 1.18, 2))) - 0.01;
+        cano(cam, L, add(corpo, [0, y0, z0]), add(corpo, [0, y1, z1]), 0.025, 0.025, ESC, -0.1);
+      }
+      bola(cam, L, [ginga, 1.3 + Y, -0.86], 0.24, 0.22, 0.2, tres(CLARO), -0.12);   // rabinho
+      [-1, 1].forEach(function (l) {   // braços: balançam correndo, abrem no pulo, vão para a barriga na risada
+        var omb = [l * 0.95 + ginga, 2.6 + Y + treme, 0.05];
+        var mao = ri > 0 ? [l * 0.55 + ginga, 1.95 + Y + treme, 0.82] : voo ? [l * 1.6, 3.1 + Y, 0.1] : [l * 1.25 + ginga, 1.75 + Y, -l * passo * 0.5];
+        cano(cam, L, omb, mao, 0.32, 0.27, PELO);
+        bola(cam, L, mao, 0.3, 0.3, 0.3, tres(PELO));
+      });
+      // laço no pescoço, na cor escolhida (a gola e o laço grande nas costas)
+      bola(cam, L, [ginga, 3.0 + Y + treme, 0], 0.78, 0.13, 0.66, tres(cor), -0.15);
+      [-1, 1].forEach(function (l) {
+        bola(cam, L, [ginga + l * 0.3, 3.02 + Y + treme, -0.66], 0.3, 0.2, 0.1, tres(cor), -0.4);
+        cano(cam, L, [ginga + l * 0.06, 2.95 + Y + treme, -0.68], [ginga + l * 0.22, 2.55 + Y + treme + Math.sin(relogio * 7 + l) * 0.04, -0.72], 0.07, 0.05, tom(cor, -0.15), -0.38);
+      });
+      bola(cam, L, [ginga, 3.0 + Y + treme, -0.7], 0.12, 0.12, 0.08, tres(tom(cor, -0.2)), -0.42);
+      // a cabeça (vai para trás rindo), orelhas, focinho, nariz, olhos de botão e a boca
+      var tras = ri > 0 ? 0.35 + Math.sin(relogio * 32) * 0.05 : 0, fd = [0, Math.sin(tras), Math.cos(tras)];
+      var cab = [ginga * 1.2, 3.62 + Y + treme * 1.5, 0.08 - tras * 0.2];
+      function rosto(dx, dy, a) { return add(add(cab, [dx, dy, 0]), mul(fd, a)); }
+      [-1, 1].forEach(function (l) {
+        bola(cam, L, add(cab, [l * 0.66, 0.62, -0.05]), 0.33, 0.31, 0.16, tres(PELO), -0.32);
+        bola(cam, L, add(cab, [l * 0.66, 0.6, 0.06]), 0.2, 0.19, 0.06, tres(CLARO), -0.34);
+      });
+      bola(cam, L, cab, 0.98, 0.86, 0.86, tres(PELO), -0.3);
+      bola(cam, L, rosto(0, -0.2, 0.72), 0.4, 0.31, 0.24, tres(CLARO), -0.36);   // focinho
+      bola(cam, L, rosto(0, -0.06, 0.98), 0.15, 0.11, 0.08, ['#6b4a3a', '#3a2418', '#1a0e08'], -0.4);   // nariz
+      [-1, 1].forEach(function (l) {
+        bola(cam, L, rosto(l * 0.33, 0.2, 0.74), 0.11, 0.11 * (ri > 0 ? 0.35 : 1), 0.05, ['#555', '#151515', '#000'], -0.38);   // olhos de botão (rindo, fechadinhos)
+      });
+      if (ri > 0) bola(cam, L, rosto(0, -0.38, 0.86), 0.17, 0.14, 0.05, ['#ff8fa3', '#c2304a', '#6a0f1e'], -0.42);   // boca aberta, gargalhando
+      else { cano(cam, L, rosto(-0.16, -0.3, 0.88), rosto(0, -0.38, 0.92), 0.025, 0.025, '#3a2418', -0.42); cano(cam, L, rosto(0, -0.38, 0.92), rosto(0.16, -0.3, 0.88), 0.025, 0.025, '#3a2418', -0.42); }   // sorrisinho
+    } },
     /* ônibus de turismo de 2 andares (dono, 19/Nov/2026: "aquele ônibus hop-on hop-off vermelho de 2 andares de
        turismo, com qualidade, nada de muito quadradão"): carroceria de baixo arredondada (casco) com faixa amarela e
        janelas com gente; andar de cima aberto, de cantos redondos, corrimão cromado, bancos azuis e turistas (um
@@ -1072,7 +1125,7 @@
     var m = MODELOS[id], L = [], giro = Math.max(-1.2, Math.min(1.2, lado || 0)) * 0.62 + (op.orbita || 0);
     var cam = camera(x0, y0, W, H, giro, 0.3 - (inclina || 0) * 0.6, m.alt, m.y, m.z);
     if (!m.semSombra) sombra(cam, L, m.larg, m.comp);
-    var o = { cabeca: op.cabeca, giro: op.giroCabeca, aqui: op.aqui, voo: op.voo, t: op.t, corpo: op.corpo };
+    var o = { cabeca: op.cabeca, giro: op.giroCabeca, aqui: op.aqui, voo: op.voo, t: op.t, corpo: op.corpo, ri: op.ri };
     relogio = op.t || 0;
     emBarco = !!op.barco && m.larg > 0;
     m.montar(cam, L, cor || '#ff4fa3', ((fase || 0) % 1 + 1) % 1, o);

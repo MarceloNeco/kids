@@ -347,6 +347,18 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.30.0 — Ursão de Pelúcia gigante (dono, 20/Nov/2026)
+
+- `modelos3d.js`: `urso` — ursinho de pelúcia em 3D (laço na cor escolhida, costura nas costas, rabinho, solas
+  claras); corre gingando, no pulinho abre os braços, rindo joga a cabeça para trás com as patas na barriga
+  (`op.ri`, que vem de `j.ri` pelo `modeloVivo`). Na garagem ele é gigante (w 1650, h 1750): quase a tela toda.
+- `motor.js` (`URSO`): com `j.mod.urso`, velocidade ×1,25; cone e lama não seguram; o trânsito é jogado para o
+  lado; o rival que encosta (largura 0,75) é jogado para longe e fica lento um pouco; virando (|dir| > 0,3) ele
+  saltita (pulinhos de 0,38 s); na beirada (|x| > 0,92) freia forte — é assim que os outros passam. Eventos
+  `risada` (no máximo uma a cada 2,6 s), `saltito`, `ursoEmpurra`, `ursoBate`.
+- `app.js`: o Ursão não é sorteado como rival nem na abertura (taparia a tela). Som `sons/risada.mp3` ("ho ho ho",
+  CC0). Testes em `teste/urso.test.js`.
+
 ## 1.29.0 — ônibus de turismo de dois andares (dono, 19/Nov/2026)
 
 - `modelos3d.js`: `turismo` — casco arredondado embaixo (fatiado ao longo do ônibus para a ordem de pintura acertar),
