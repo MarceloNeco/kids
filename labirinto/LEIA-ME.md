@@ -8,6 +8,12 @@ Endereço: https://solverone.com.br/kids/labirinto/
 
 ## Como brincar
 
+- **Menu em etapas** (dono, 20/Nov/2026: nada de rolar a tela para achar o Jogar): no celular, as escolhas vêm em duas
+  etapas curtas — **1 Formato** · **2 Nível e jeito de brincar** —, com ◀ Voltar, "1 de 2" e Próximo ▶; o Voltar do
+  celular (e o Esc ou o Voltar do controle) na etapa 2 volta para a 1. O **▶ Jogar** fica sempre embaixo, à vista, com a
+  escolha da última vez escrita logo acima (ex.: "Quadrado · Fácil · 🐶 Levar o cachorrinho"): dá para jogar sem passar
+  pelas etapas. No tablet e no computador, se couber, fica tudo junto numa tela (no tablet deitado, sem o cachorrinho
+  grande). A página do menu nunca rola; se a ajuda ❓ estiver aberta, só o meio rola. Quem decide é `arrumarMenu()` no `app.js`.
 - **Formato**: ⬛ quadrado (jardim), ⚪ redondo (anéis e fatias, no espaço), ⬢ colmeia (hexágonos, cor de mel) ou
   🎲 surpresa (um de cada vez, alternando).
 - **Nível**: fácil, médio ou difícil — o labirinto cresce (quadrado 6×8, 10×14 e 15×22; redondo com 4, 7 e 11 anéis;

@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.1', APP_DATA = '15/Nov/2026';
+  var APP_VERSION = '0.4.0', APP_DATA = '20/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search;
   var TESTE = /[?&]teste\b/.test(BUSCA);
@@ -54,7 +54,7 @@
     document.title = nome + ' — Bolinho de Chuva · SolverONE';
     var d = APP_DATA.split('/');   // 14/Nov/2026 · Nov/14/2026 · 14/nov/2026
     $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + t(APP_DATA, d[1] + '/' + d[0] + '/' + d[2], d[0] + '/' + d[1].toLowerCase() + '/' + d[2]);
-    pintarRecordes();
+    pintarRecordes(); pintarResumo(); arrumarMenu();
     if (jogo) atualizarMissao();
   }
 
@@ -75,7 +75,58 @@
       el.setAttribute('aria-label', melhor ? t(melhor + ' estrelas', melhor + ' stars', melhor + ' estrellas') : '');
     });
   }
-  function pintarMenu() { marcar('formas', 'data-forma', pref.forma); marcar('niveis', 'data-nivel', pref.nivel); marcar('modos', 'data-modo', pref.modo); pintarRecordes(); }
+  function pintarMenu() { marcar('formas', 'data-forma', pref.forma); marcar('niveis', 'data-nivel', pref.nivel); marcar('modos', 'data-modo', pref.modo); pintarRecordes(); pintarResumo(); }
+  // o que vai ser jogado, à vista no rodapé das etapas (ex.: "Quadrado · Fácil · 🐶 Levar o cachorrinho")
+  function pintarResumo() {
+    $('resumo').textContent = ['#formas [aria-checked="true"] [data-t]', '#niveis [aria-checked="true"] [data-t]', '#modos [aria-checked="true"]']
+      .map(function (q) { var el = document.querySelector(q); return el ? el.textContent : ''; }).join(' · ');
+  }
+
+  /* ---------- etapas do menu (dono, 20/Nov/2026: nada de rolar a tela para achar o Jogar) ----------
+     Se tudo cabe (tablet, computador; se precisar, sem o cachorrinho grande), fica tudo junto. Senão (celular), uma etapa por vez: 1 Formato · 2 Nível e jeito
+     de brincar, com Voltar/Próximo e "1 de 2"; o ▶ Jogar fica sempre embaixo, com a escolha da última vez. O Voltar do
+     celular na etapa 2 volta para a 1 (uma entrada { labirinto: 'etapa' } no histórico, como a do jogo). */
+  var ETAPAS = 2, etapa = 1;
+  function emEtapas() { return $('menu').classList.contains('etapas'); }
+  function arrumarMenu() {
+    var m = $('menu'), c = $('menuCorpo');
+    if (telaAtual !== 'menu') return;
+    var naoCabe = function () { return c.scrollHeight > c.clientHeight + 1 || m.scrollHeight > m.clientHeight + 1; };
+    m.classList.remove('etapas', 'compacto');
+    if (innerWidth >= 600 && naoCabe()) m.classList.add('compacto');   // tablet deitado: sem o cachorrinho grande, tudo junto
+    if (innerWidth < 600 || naoCabe()) { m.classList.remove('compacto'); m.classList.add('etapas'); }
+    pintarEtapa();
+  }
+  function pintarEtapa() {
+    document.querySelectorAll('#menu .etapa').forEach(function (e) { e.classList.toggle('atual', +e.getAttribute('data-etapa') === etapa); });
+    $('btVoltarEtapa').style.visibility = etapa > 1 ? '' : 'hidden';
+    $('btProximo').style.visibility = etapa < ETAPAS ? '' : 'hidden';
+    var pontos = '';
+    for (var i = 1; i <= ETAPAS; i++) pontos += '<i' + (i === etapa ? ' class="atual"' : '') + '></i>';
+    $('indEtapa').innerHTML = pontos + ' ' + t(etapa + ' de ' + ETAPAS, etapa + ' of ' + ETAPAS, etapa + ' de ' + ETAPAS);
+  }
+  function mostrarEtapa(n) {
+    var foco = document.activeElement, noMenu = foco && foco !== document.body && $('menu').contains(foco);
+    etapa = n; pintarEtapa();
+    // pelo teclado ou controle remoto: se o que tinha o foco sumiu (Próximo na última etapa, escolha da etapa de antes),
+    // o foco vai para a escolha marcada da etapa nova
+    if (noMenu && (foco.offsetParent === null || foco.style.visibility === 'hidden')) { var b = document.querySelector('#menu .etapa.atual [aria-checked="true"]'); if (b) b.focus(); }
+  }
+  var etapaEmpurrada = false;
+  function proximaEtapa() {
+    if (etapa >= ETAPAS) return;
+    Som.toque();
+    if (!etapaEmpurrada) { try { history.pushState({ labirinto: 'etapa' }, ''); etapaEmpurrada = true; } catch (e) {} }
+    mostrarEtapa(etapa + 1);
+  }
+  function etapaAnterior() {
+    if (etapa <= 1) return;
+    Som.toque();
+    if (etapaEmpurrada) history.back();   // o popstate volta a etapa (o mesmo do Voltar do celular)
+    else mostrarEtapa(etapa - 1);
+  }
+  $('btProximo').addEventListener('click', proximaEtapa);
+  $('btVoltarEtapa').addEventListener('click', etapaAnterior);
   document.querySelectorAll('#formas [data-forma]').forEach(function (b) { b.addEventListener('click', function () { pref.forma = b.getAttribute('data-forma'); salvarPref(); pintarMenu(); Som.toque(); }); });
   document.querySelectorAll('#niveis [data-nivel]').forEach(function (b) { b.addEventListener('click', function () { pref.nivel = b.getAttribute('data-nivel'); salvarPref(); pintarMenu(); Som.toque(); }); });
   document.querySelectorAll('#modos [data-modo]').forEach(function (b) { b.addEventListener('click', function () { pref.modo = b.getAttribute('data-modo'); salvarPref(); pintarMenu(); Som.toque(); }); });
@@ -105,9 +156,14 @@
   function irMenu() {
     fecharFim(); jogo = null; acao = null; dedos.clear(); pinca = null;
     if (window.Trilha) Trilha.volume(null);
-    mostrar('menu'); pintarMenu();
+    mostrar('menu'); pintarMenu(); arrumarMenu();
   }
-  window.addEventListener('popstate', function () { empurrado = false; if (telaAtual === 'jogo') irMenu(); });
+  window.addEventListener('popstate', function (ev) {
+    empurrado = false;
+    etapaEmpurrada = !!(ev.state && ev.state.labirinto === 'etapa');   // voltou para a entrada da etapa 2 (ex.: saindo do jogo)?
+    if (telaAtual === 'jogo') irMenu();
+    if (!etapaEmpurrada && etapa > 1) mostrarEtapa(1);
+  });
   function voltarMenu() { if (empurrado) history.back(); else irMenu(); }
   // navegação padrão (../navegacao.js): 🏠 Início = voltar ao menu (o mesmo do Voltar do celular), 🚪 Saída
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'labirinto', noInicio: function () { return telaAtual !== 'jogo'; }, irParaInicio: voltarMenu,
@@ -535,6 +591,7 @@
 
   document.addEventListener('keydown', function (e) {
     if (!$('fim').hidden && (e.key === 'Escape' || e.key === 'GoBack' || e.keyCode === 461)) { e.preventDefault(); voltarMenu(); return; }
+    if (telaAtual === 'menu' && emEtapas() && etapa > 1 && (e.key === 'Escape' || e.key === 'GoBack' || e.keyCode === 461)) { e.preventDefault(); etapaAnterior(); return; }
     if (telaAtual !== 'jogo' || !jogo) return;
     if (e.key === 'Escape' || e.key === 'GoBack' || e.keyCode === 461) { e.preventDefault(); voltarMenu(); return; }
     if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); desfazer(false); return; }
@@ -726,11 +783,12 @@
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedidoInstalar = e; $('btInstalar').hidden = false; });
   $('btInstalar').addEventListener('click', function () { if (!pedidoInstalar) return; pedidoInstalar.prompt(); pedidoInstalar.userChoice.then(function () { pedidoInstalar = null; $('btInstalar').hidden = true; }); });
   if ('serviceWorker' in navigator && location.protocol !== 'file:' && !TESTE) navigator.serviceWorker.register('sw.js').catch(function () { /* sem modo offline */ });
-  window.addEventListener('resize', function () { if (telaAtual === 'jogo') medir(); });
+  window.addEventListener('resize', function () { if (telaAtual === 'jogo') medir(); else arrumarMenu(); });
   if (window.ResizeObserver) new ResizeObserver(function () { if (telaAtual === 'jogo' && jogo) medir(); }).observe($('palco'));
 
   if (window.SolverRecursos && !SolverRecursos.ligado('labirinto', true)) { mostrar('desligado'); $('desligado').hidden = false; traduzir(); return; }
   pintarEfeitos(); pintarMenu(); traduzir();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(arrumarMenu);   // a letra do jogo muda o tamanho dos botões
   // trocaram o idioma na estante aberta noutra aba: os textos trocam na hora
   if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); if (!$('fim').hidden) traduzirFim(); });
   if (window.Trilha) Trilha.iniciar({ jogo: 'labirinto', creditos: 'CREDITOS.md', volume: 0.45, musicas: MUSICAS });
@@ -739,8 +797,8 @@
   if (TESTE) window.LabirintoDebug = {
     pronto: true, versao: APP_VERSION,
     estado: function () {
-      if (!jogo) return { tela: telaAtual };
-      return { tela: telaAtual, forma: jogo.L.forma, nivel: jogo.L.nivel, modo: jogo.modo, item: jogo.L.item, inicio: jogo.L.inicio, saida: jogo.L.saida,
+      if (!jogo) return { tela: telaAtual, etapa: etapa, etapas: emEtapas() };
+      return { tela: telaAtual, etapa: etapa, etapas: emEtapas(), forma: jogo.L.forma, nivel: jogo.L.nivel, modo: jogo.modo, item: jogo.L.item, inicio: jogo.L.inicio, saida: jogo.L.saida,
         pegouItem: jogo.P.pegouItem, venceu: jogo.venceu, risco: jogo.risco.length, ponta: ponta(), bloqueado: jogo.bloqueado, casaCao: jogo.cao.de,
         casaPonta: Regras.celulaEm(jogo.L, ponta()[0], ponta()[1]), andando: jogo.cao.para >= 0, fila: jogo.cao.fila.length, hmm: agora() - jogo.cao.hmmT < 1000,
         brilhando: jogo.visao ? jogo.visao.casas.length : 0, dir: jogo.cao.dir, intro: !!jogo.intro, glide: !!jogo.glide, fim: !$('fim').hidden, z: jogo.cam.z, zFit: jogo.zFit, portaAberta: jogo.portaT != null };

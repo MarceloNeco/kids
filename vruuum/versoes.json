@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.30.0",
+      "data": "20/Nov/2026",
+      "hora": "13:45:34",
+      "pt": [
+        "🏁 Menu em 5 etapas curtas, cada uma cabendo na tela do celular em pé, sem rolar: 1 Quem corre (jogadores, nível, rivais, duelo e TV) · 2 Cenários · 3 Veículo · 4 Piloto · 5 Música e mais. As bolinhas no alto levam direto a qualquer etapa, e o Voltar do celular volta uma etapa",
+        "O botão Correr fica sempre embaixo, em todas as etapas: dá para correr já na primeira, com as escolhas de sempre (as da última vez)"
+      ],
+      "en": [
+        "🏁 The menu now comes in 5 short steps, each one fitting an upright phone screen with no scrolling: 1 Who's racing (players, level, rivals, duel and TV) · 2 Worlds · 3 Ride · 4 Driver · 5 Music & more. The dots at the top jump straight to any step, and the phone's Back button goes back one step",
+        "The Race button is always at the bottom, on every step: you can race right from the first one, with your usual picks (the ones from last time)"
+      ],
+      "es": [
+        "🏁 El menú ahora va en 5 pasos cortos, y cada uno cabe en la pantalla del móvil en vertical, sin desplazarse: 1 Quién corre (jugadores, nivel, rivales, duelo y tele) · 2 Escenarios · 3 Vehículo · 4 Piloto · 5 Música y más. Los puntos de arriba llevan directamente a cualquier paso, y el botón Atrás del móvil vuelve un paso",
+        "El botón A correr está siempre abajo, en todos los pasos: puedes correr desde el primero, con lo que eliges siempre (lo de la última vez)"
+      ]
+    },
+    {
       "versao": "1.29.1",
       "data": "20/Nov/2026",
       "hora": "11:06:14",
