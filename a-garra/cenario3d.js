@@ -456,3 +456,123 @@ export function montarMaquina(cena, tema, M, op) {
     }
   };
 }
+
+/* ---------- a máquina da Tesoura (tesoura.js): cabine alta e escura, janela com neon verde de cantos redondos, um boneco
+   grande pendurado por um fio, a tesoura num trilho, alçapão que abre embaixo e um botão redondo grande (como na foto do
+   dono, 19/Nov/2026, com desenho próprio: parede de azulejo com corações e o nosso letreiro) ----------
+   As medidas (MEDIDAS_TESOURA) servem para a câmera do app; o meio da cabine é x = L/2 e o fio fica em z = P/2. */
+export const MEDIDAS_TESOURA = { L: 4.4, P: 3, A: 7.4, BX: 4.4, BZ: 3 };
+export function montarTesoura(cena) {
+  const { L, P, A } = MEDIDAS_TESOURA, CX = L / 2, Z = P / 2, PISO = 1.75, YS = 6.0;
+  const raiz = new THREE.Group(); cena.add(raiz);
+  const preto = new THREE.MeshStandardMaterial({ color: '#0d0d10', roughness: 0.5, metalness: 0.2 });
+  const metal = new THREE.MeshStandardMaterial({ color: '#d9dde4', roughness: 0.22, metalness: 0.9 });
+  const verde = new THREE.MeshStandardMaterial({ color: '#39ff6a', emissive: '#39ff6a', emissiveIntensity: 2.2, roughness: 0.3 });
+  const vidro = new THREE.MeshStandardMaterial({ color: '#cfe8ff', transparent: true, opacity: 0.1, roughness: 0.05, depthWrite: false, side: THREE.DoubleSide });
+  const caixa = (mat, x0, y0, z0, x1, y1, z1) => { const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); raiz.add(m); return m; };
+  // sala atrás
+  const sala = textura(1024, 512, (g, w, h) => tijolos(g, w, h, '#1b1f1e', '#0a0c0b', '#2c3230')); sala.wrapS = sala.wrapT = THREE.RepeatWrapping; sala.repeat.set(4, 2);
+  const fundoSala = new THREE.Mesh(new THREE.PlaneGeometry(60, 30), new THREE.MeshStandardMaterial({ map: sala, roughness: 0.9 })); fundoSala.position.set(CX, 4, -6); raiz.add(fundoSala);
+  const chaoSala = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshStandardMaterial({ color: '#141414', roughness: 0.95 })); chaoSala.rotation.x = -Math.PI / 2; chaoSala.position.set(CX, -3.3, 10); raiz.add(chaoSala);
+  // parede do fundo: azulejo branco com corações, arabesco e o nome
+  const azulejo = textura(512, 1024, (g, w, h) => {
+    g.fillStyle = '#f7f7fb'; g.fillRect(0, 0, w, h); g.strokeStyle = '#8a8496'; g.lineWidth = 2;
+    for (let x = 0; x <= w; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+    for (let y = 0; y <= h; y += 32) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    [[0.15, 0.12, 30], [0.8, 0.1, 26], [0.88, 0.2, 18], [0.1, 0.26, 18]].forEach(([x, y, s]) => coracaoNeon(g, w * x, h * y, s, '#a89ccf'));
+    g.strokeStyle = '#6b6080'; g.lineWidth = 5; g.beginPath(); g.arc(w / 2, h * 0.62, w * 0.42, Math.PI * 1.1, Math.PI * 1.9); g.stroke();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(w / 2, h * 0.5, w * 0.33, 0, 7); g.fill(); g.strokeStyle = '#3aa0ff'; g.lineWidth = 10; g.stroke();
+    nomeColorido(g, w / 2, h * 0.5, '800 96px Fredoka, system-ui, sans-serif', '#5b3fa8', null, w * 0.6);
+  });
+  const parede = new THREE.Mesh(new THREE.PlaneGeometry(L, A - PISO), new THREE.MeshStandardMaterial({ map: azulejo, roughness: 0.6 })); parede.position.set(CX, (A + PISO) / 2, 0); raiz.add(parede);
+  // corpo: laterais, teto, base, piso (alçapão em duas tampas que abrem para baixo)
+  caixa(preto, -0.4, -3.3, -0.3, 0, A + 1.6, P + 0.3); caixa(preto, L, -3.3, -0.3, L + 0.4, A + 1.6, P + 0.3);
+  caixa(preto, -0.4, A, -0.3, L + 0.4, A + 1.6, P + 0.3); caixa(preto, -0.4, -3.3, -0.3, L + 0.4, PISO - 0.2, P + 0.3);
+  const matPiso = new THREE.MeshStandardMaterial({ color: '#2a2a33', roughness: 0.7 });
+  const tampas = [-1, 1].map((s) => {
+    const piv = new THREE.Group(); piv.position.set(s < 0 ? 0 : L, PISO, Z); raiz.add(piv);
+    const tp = new THREE.Mesh(new THREE.BoxGeometry(L / 2, 0.08, P), matPiso); tp.position.set(-s * L / 4, 0, 0); tp.receiveShadow = true; piv.add(tp);
+    return { piv, s };
+  });
+  // vidro da frente e a janela com neon verde de cantos redondos
+  const vid = new THREE.Mesh(new THREE.PlaneGeometry(L, A - PISO), vidro); vid.position.set(CX, (A + PISO) / 2, P + 0.31); raiz.add(vid);
+  const forma = new THREE.Shape(), rx = L / 2 - 0.15, ry = (A - PISO) / 2 - 0.1, cy = (A + PISO) / 2, rr = 1.2;
+  forma.moveTo(-rx + rr, -ry); forma.lineTo(rx - rr, -ry); forma.quadraticCurveTo(rx, -ry, rx, -ry + rr); forma.lineTo(rx, ry - rr); forma.quadraticCurveTo(rx, ry, rx - rr, ry);
+  forma.lineTo(-rx + rr, ry); forma.quadraticCurveTo(-rx, ry, -rx, ry - rr); forma.lineTo(-rx, -ry + rr); forma.quadraticCurveTo(-rx, -ry, -rx + rr, -ry);
+  const pts = forma.getSpacedPoints(160).map((p) => new THREE.Vector3(p.x, p.y, 0));
+  const tubo = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 200, 0.07, 8, true), verde); tubo.position.set(CX, cy, P + 0.34); raiz.add(tubo);
+  const moldura = textura(512, 1024, (g, w, h) => {   // frente preta com cantoneiras de neon verde
+    g.fillStyle = '#0d0d10'; g.fillRect(0, 0, w, h); g.save(); brilho(g, '#39ff6a', 18); g.strokeStyle = '#39ff6a'; g.lineWidth = 10;
+    for (const [x, y, sx, sy] of [[30, 30, 1, 1], [w - 30, 30, -1, 1], [30, h - 30, 1, -1], [w - 30, h - 30, -1, -1]]) { g.beginPath(); g.moveTo(x, y + sy * 110); g.lineTo(x, y); g.lineTo(x + sx * 110, y); g.moveTo(x + sx * 30, y + sy * 60); g.lineTo(x + sx * 60, y + sy * 30); g.stroke(); }
+    g.restore();
+  });
+  const frente = new THREE.Mesh(new THREE.PlaneGeometry(L + 0.8, PISO - 0.2 + 3.3), new THREE.MeshStandardMaterial({ map: moldura, roughness: 0.5 })); frente.position.set(CX, (PISO - 0.2 - 3.3) / 2, P + 0.31); raiz.add(frente);
+  const placa = new THREE.Mesh(new THREE.PlaneGeometry(L + 0.8, 1.5), new THREE.MeshStandardMaterial({ map: textura(1024, 340, (g, w, h) => { g.fillStyle = '#0d0d10'; g.fillRect(0, 0, w, h); nomeColorido(g, w / 2, h / 2, '800 150px Fredoka, system-ui, sans-serif', '#c6ffd4', '#39ff6a', w * 0.8); }), emissive: '#ffffff', emissiveIntensity: 0.15 }));
+  placa.position.set(CX, A + 0.8, P + 0.31); raiz.add(placa);
+  // botão redondo grande (aceso), entrada de ficha e visor, na frente de baixo
+  const botao = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.42, 0.18, 32), new THREE.MeshStandardMaterial({ color: '#ff3b5c', emissive: '#ff3b5c', emissiveIntensity: 1.6, roughness: 0.25 }));
+  botao.rotation.x = Math.PI / 2; botao.position.set(L - 0.9, 0.55, P + 0.4); raiz.add(botao);
+  const aroB = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.06, 10, 32), new THREE.MeshStandardMaterial({ color: '#3a7bd5', emissive: '#3a7bd5', emissiveIntensity: 1.5 })); aroB.position.set(L - 0.9, 0.55, P + 0.36); raiz.add(aroB);
+  caixa(new THREE.MeshStandardMaterial({ color: '#f0a020', roughness: 0.4, metalness: 0.5 }), L - 1.15, -0.6, P + 0.3, L - 0.65, -0.05, P + 0.36);
+  const visorTex = textura(512, 128, () => {});
+  const visor = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.38), new THREE.MeshBasicMaterial({ map: visorTex })); visor.position.set(0.95, 0.55, P + 0.33); raiz.add(visor);
+  // portinha do prêmio, embaixo
+  const porta = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.2), new THREE.MeshStandardMaterial({ map: textura(512, 280, (g, w, h) => { g.fillStyle = '#050505'; g.fillRect(0, 0, w, h); g.strokeStyle = '#39ff6a'; g.lineWidth = 8; g.strokeRect(6, 6, w - 12, h - 12); texto(g, tx('PRÊMIO', 'PRIZE', 'PREMIO'), w / 2, h / 2, '800 80px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a'); }), roughness: 0.5 }));
+  porta.position.set(CX, -1.9, P + 0.32); raiz.add(porta);
+  // gancho no teto e o fio (o pedaço de cima fica; o de baixo vai com o boneco)
+  caixa(metal, CX - 0.6, A - 0.12, Z - 0.06, CX + 0.6, A - 0.04, Z + 0.06);
+  const matFio = new THREE.MeshStandardMaterial({ color: '#f4efe6', roughness: 0.8 });
+  const fioCima = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 8), matFio), fioBaixo = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 8), matFio);
+  raiz.add(fioCima); raiz.add(fioBaixo);
+  // trilho e tesoura: duas lâminas que se cruzam no pino, cabos coloridos à esquerda; a origem é o ponto de corte
+  caixa(metal, 0.15, YS + 0.78, Z - 0.65, L - 0.15, YS + 0.9, Z - 0.5);
+  const tesoura = new THREE.Group(); tesoura.scale.setScalar(1.6); raiz.add(tesoura);
+  const carro = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.3, 0.2), new THREE.MeshStandardMaterial({ color: '#3a3f4a', roughness: 0.5, metalness: 0.6 })); carro.position.set(-0.45, 0.42, -0.37); tesoura.add(carro);
+  const haste = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.42, 0.05), metal); haste.position.set(-0.45, 0.2, -0.2); tesoura.add(haste);
+  const laminas = [1, -1].map((s) => {
+    const piv = new THREE.Group(); piv.position.set(-0.3, 0, 0.03 * s); tesoura.add(piv);
+    const lam = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.07, 0.025), metal); lam.position.set(0.36, 0, 0); lam.castShadow = true; piv.add(lam);
+    const ponta = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.14, 8), metal); ponta.rotation.z = -Math.PI / 2; ponta.position.set(0.8, 0, 0); piv.add(ponta);
+    const cabo = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.03, 8, 18), new THREE.MeshStandardMaterial({ color: s > 0 ? '#e63946' : '#3a7bd5', roughness: 0.4 })); cabo.position.set(-0.22, 0.04 * s, 0); piv.add(cabo);
+    return { piv, s };
+  });
+  const pino = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.1, 10), metal); pino.rotation.x = Math.PI / 2; pino.position.set(-0.3, 0, 0); tesoura.add(pino);
+  // luzes
+  raiz.add(new THREE.HemisphereLight('#ffffff', '#3a3344', 1.15));
+  const sol = new THREE.DirectionalLight('#ffffff', 2.2); sol.position.set(CX + 0.5, A + 5, Z + 3); sol.target.position.set(CX, 2, Z); sol.castShadow = true; sol.shadow.mapSize.set(1024, 1024);
+  sol.shadow.camera.left = -4; sol.shadow.camera.right = 4; sol.shadow.camera.top = 6; sol.shadow.camera.bottom = -4; raiz.add(sol); raiz.add(sol.target);
+  const luzVerde = new THREE.PointLight('#39ff6a', 4, 8, 1.6); luzVerde.position.set(CX, cy, P + 1.5); raiz.add(luzVerde);
+  const fl = new THREE.DirectionalLight('#ffffff', 0.8); fl.position.set(CX, 4, P + 8); raiz.add(fl);
+
+  let boneco = null, bonecoDe = null;
+  function fio(m, x, y0, y1, grosso) { const l = Math.max(0.01, y0 - y1); m.position.set(x, (y0 + y1) / 2, Z); m.scale.set(grosso, l, grosso); m.visible = l > 0.02; }
+  return {
+    raiz, alvo: new THREE.Vector3(CX, 3.4, Z),
+    visor(fichas, tempo, ganhos) {
+      const g = visorTex.userData.g; g.fillStyle = '#0a1a3a'; g.fillRect(0, 0, 512, 128);
+      g.font = '700 54px Fredoka, system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left';
+      g.fillStyle = '#7ef9ff'; g.fillText('🪙' + fichas, 20, 66); g.fillStyle = '#ffd166'; g.fillText('🧸' + ganhos, 190, 66);
+      if (tempo != null) { g.fillStyle = tempo <= 5 ? '#ff4f6d' : '#39ff6a'; g.fillText('⏱️' + tempo, 350, 66); }
+      visorTex.needsUpdate = true;
+    },
+    atualizar(seg, t, extra) {
+      const p = t.premio, fx = CX + t.fioX();
+      // o boneco da vez (um novo aparece pendurado quando o anterior cai)
+      if (bonecoDe !== p) { if (boneco) raiz.remove(boneco); boneco = criarPremio(p.tipo); boneco.scale.setScalar(1.35); raiz.add(boneco); bonecoDe = p; }
+      const solto = p.fiapos === 0, topo = p.y + 1.3;
+      boneco.position.set(fx, p.y, Z); boneco.rotation.z = solto ? boneco.rotation.z : (t.fioX() - p.base) * -0.8;
+      boneco.visible = p.y > -2.4 && !p.ganho;
+      const grosso = 0.016 + 0.01 * Math.max(1, p.fiapos);   // o fio afina a cada "quase"
+      if (solto) { fio(fioCima, fx, A - 0.1, YS, grosso); fio(fioBaixo, fx, YS - 0.05 - (p.ganho ? 99 : (t.alto - p.y)), topo, grosso); }
+      else { fio(fioCima, fx, A - 0.1, YS + 0.02, grosso); fio(fioBaixo, fx, YS + 0.02, topo, grosso); }
+      // tesoura: anda pelo trilho; aberta, e fecha no corte
+      tesoura.position.set(CX + t.x, YS, Z + 0.06);
+      const ang = t.fase === 'cortar' ? 0.38 * Math.max(0, 1 - t._f / 0.18) : t.fase === 'andar' ? 0.3 + Math.sin(seg * 14) * 0.08 : 0.38;
+      laminas.forEach((l) => { l.piv.rotation.z = l.s * ang; });
+      // alçapão
+      tampas.forEach((tp) => { tp.piv.rotation.z = tp.s * t.porta * 1.4; });
+      botao.position.z = P + (extra.apertado ? 0.34 : 0.4);
+      botao.material.emissiveIntensity = t.fase === 'mirar' ? 1.6 + Math.sin(seg * 6) * 0.8 : extra.apertado ? 2.6 : 0.5;
+    }
+  };
+}

@@ -78,7 +78,7 @@ test('celular: tocar no prêmio leva a garra; com a garra forte ele vem, vai par
     // coleção: uma aba por máquina, a da lanchonete mostra o que veio; continua lá depois de recarregar
     await pg.click('#btFimColecao');
     assert.equal(await pg.isVisible('#colecao'), true);
-    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 7);
+    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 8);
     assert.equal(await pg.$$eval('#prateleira .item', l => l.length), 11);
     assert.ok(await pg.$$eval('#prateleira .item:not(.falta)', l => l.length) >= 1);
     await pg.reload(); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
@@ -149,7 +149,7 @@ test('computador: setas e espaço jogam; 🎥 troca a câmera, 🔍 aproxima e a
 test('as máquinas abrem sem erro, cada uma com os seus prêmios (os bichos de verdade são menos, soltos no cobertor)', async () => {
   const pg = await abrir(FONE, '&semente=2');
   try {
-    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17], ['festas', 36, 48], ['gigantes', 8, 14]]) {
+    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17], ['festas', 36, 48], ['gigantes', 8, 14], ['tesoura', 1, 1]]) {
       await pg.goto(base + '?teste&semente=2'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
       await jogar(pg, mq, 'facil');
       const e = await est(pg);
@@ -168,6 +168,26 @@ test('máquina de Festas: o cartão mostra a festa e a máquina só tem os prêm
     assert.ok(tipos.length >= 6, 'todos os tipos: ' + tipos);
     for (const t of tipos) assert.ok(lista.tipos.includes(t) || t === lista.raro, 'prêmio de outra festa: ' + t);
     assert.match(await pg.textContent('#aviso'), /Feliz Páscoa/);
+    assert.deepEqual(pg.erros, []);
+  } finally { await pg.ctx.close(); }
+});
+
+test('Boneco Gigante: sem setas; segurar o botão anda a tesoura, soltar em cima do fio corta e o boneco vem', async () => {
+  const pg = await abrir(FONE, '&semente=3');
+  try {
+    await jogar(pg, 'tesoura', 'facil');
+    assert.equal(await pg.$eval('#cruz', el => getComputedStyle(el).visibility), 'hidden');
+    assert.match(await pg.textContent('#btPegar .so-tesoura'), /SEGURE/);
+    await pg.evaluate(() => GarraDebug.forte(true));
+    const x0 = (await est(pg)).x, b = await pg.locator('#btPegar').boundingBox();
+    await pg.mouse.move(b.x + b.width / 2, b.y + b.height / 2); await pg.mouse.down();
+    await pg.waitForFunction(() => { const e = GarraDebug.estado(); return e.fase === 'andar' && e.x >= e.fio - 0.03; }, null, { timeout: 30000, polling: 16 });
+    await pg.mouse.up();
+    assert.ok((await est(pg)).x > x0 + 0.3, 'a tesoura andou');
+    await pg.waitForFunction(() => GarraDebug.estado().ganhos.length === 1, null, { timeout: 30000 });
+    assert.equal((await est(pg)).fichas, 9);
+    const col = await pg.evaluate(() => GarraDebug.colecao());
+    assert.equal(Object.values(col).reduce((s, n) => s + n, 0), 1);
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
 });
@@ -200,7 +220,7 @@ test('três idiomas, escolhidos na estante: nome, botões e prêmios no idioma c
       assert.equal((await pg.textContent('#logo')).replace(/ /g, ' '), logo);
       assert.equal(await pg.$eval('#logo span:first-child', (el) => el.className + ':' + el.textContent), 'h:H', 'o H é o colorido');
       assert.equal(await pg.title(), 'H-rraaa — Bolinho de Chuva · SolverONE');
-      assert.equal(await pg.textContent('#btPegar'), pegar);
+      assert.equal(await pg.textContent('#btPegar .so-garra'), pegar);
       await pg.click('#btColecao');
       assert.ok((await pg.textContent('#prateleira')).includes(premio), cod + ': prêmio com o nome no idioma');
     } finally { await ctx.close(); }
