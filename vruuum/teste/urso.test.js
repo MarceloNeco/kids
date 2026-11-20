@@ -54,10 +54,10 @@ test('o Ursão empurra o rival para o lado (e o rival fica mais lento)', () => {
 });
 
 test('encostando na beirada o Ursão freia bastante (é assim que os outros passam)', () => {
-  const e = corrida('normal', 5, true), j = e.jogadores[0], max = e.pista.cfg.velMax * 1.25;
+  const e = corrida('normal', 5, true), j = e.jogadores[0], max = e.pista.cfg.velMax * M.URSO.vel;
   j.z = 30 * P.SEG; j.vel = max; j.x = 1.0;
   const ev = passo(e, 1, 30);
-  assert.ok(j.vel < max * 0.6, 'freou: ' + j.vel / max);
+  assert.ok(j.vel < max * 0.4, 'freou: ' + j.vel / max);
   assert.ok(ev.some(x => x.tipo === 'ursoBate'));
 });
 
@@ -75,4 +75,12 @@ test('quem não é o Ursão continua igual (cone segura)', () => {
   e.pista.segs[44].coisas.push({ tipo: 'cone', x: 0, pego: {} });
   const ev = passo(e, 0, 40);
   assert.ok(ev.some(x => x.tipo === 'cone'));
+});
+
+test('1.32.0: um pouco mais rápido que os rivais (não um foguete) e a beirada freia até 15%', () => {
+  assert.ok(M.URSO.vel > 1.05 && M.URSO.vel <= 1.12, 'vel ' + M.URSO.vel);
+  const e = corrida('normal', 5, true), j = e.jogadores[0], max = e.pista.cfg.velMax * M.URSO.vel;
+  j.z = 30 * P.SEG; j.vel = max; j.x = 1.0;
+  passo(e, 1, 90);
+  assert.ok(j.vel < max * 0.2, 'freou bem: ' + (j.vel / max).toFixed(2));
 });
