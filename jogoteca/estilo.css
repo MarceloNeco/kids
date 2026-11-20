@@ -124,3 +124,5 @@ body.jogando { touch-action: none; }
   .capas.roda-3d { height: 330px; } .capas.roda-3d .capa { width: 210px; }
 }
 .jogar:disabled { filter: grayscale(.7) brightness(.8); cursor: default; }
+/* celular em pé: a capa grande da prévia sai (a roda já mostra a capa) para o ▶ Jogar caber sem rolar */
+@media (orientation: portrait) and (max-width: 599px) { .previa-capa { display: none; } .previa-topo { gap: 0; } }
