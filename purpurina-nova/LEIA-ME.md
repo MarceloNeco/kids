@@ -16,7 +16,9 @@
 > - **sem 3D** (0.4.0): cor lisa, sombra e luz em faixas de corte reto (`vol`, `lado`), contorno fino da cor da peça;
 > - **corpo com medidas reais** (0.4.1; dono: "tem que ser medidas reais"): `PROPORCAO` e `deformar()` no `boneca.js` põem
 >   o corpo em 5/6/7/7,5 cabeças (5 anos/10/15/adulta), pernas com metade da altura, pernas em forma (`perna()`) e mãos
->   que não esticam (`rigido()`); a cabeça só é reduzida; `areaZoom()` leva o zoom para o lugar novo; telas claras no fim do `estilo.css` (tema "ateliê").
+>   que não esticam (`rigido()`); a cabeça só é reduzida; curvas (0.4.2): `larg` com ombro, busto, cintura, quadril,
+>   coxa, joelho, panturrilha e tornozelo (`MENINO` para o menino), caminhos viram muitos pontos (`curvar`) para a roupa
+>   ganhar cintura, e braços com forma presos ao "osso" (`data-osso`: só ombro e pulso mudam de lugar); `areaZoom()` leva o zoom para o lugar novo; telas claras no fim do `estilo.css` (tema "ateliê").
 
 # Purpurina — maquiagem, roupas e muito brilho
 

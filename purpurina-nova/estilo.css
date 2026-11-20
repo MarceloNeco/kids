@@ -437,3 +437,37 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .pp-ia-caixa { color: var(--text); }
 .pp-ia-caixa input { border-color: var(--borda); background: #fff; color: var(--text); }
 .dica-giro { background: rgba(255, 255, 255, .92); color: var(--text); box-shadow: 0 2px 8px rgba(61, 35, 82, .12); }
+/* ---------- viva no estúdio (dono, 20/Nov/2026: "não precisa ficar parado... se movimentando, dando um tchauzinho") ----------
+   De frente, ela respira e passa o peso de uma perna para a outra, devagar (6 s); a perna do lado do peso fica esticada e a
+   outra relaxa o joelho; os braços balançam de leve; a saia acompanha o quadril. Os centros vêm do boneca.js (corpo novo). */
+.boneca.parada .pp-corpo { animation: vivaCorpo 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-passo-e { animation: vivaPernaE 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-passo-d { animation: vivaPernaD 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-braco-e { animation: vivaBracoE 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-braco-d { animation: vivaBracoD 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-barra { animation: vivaBarra 6s ease-in-out infinite; transform-box: view-box; }
+@keyframes vivaCorpo { 0%, 100% { transform: translate(-1.2%, 0) rotate(.8deg); } 25% { transform: translate(0, -.4%); } 50% { transform: translate(1.2%, 0) rotate(-.8deg); } 75% { transform: translate(0, -.4%); } }
+@keyframes vivaPernaE { 0%, 100% { transform: translate(-1.2%, 0) rotate(2.2deg); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, .4%) rotate(1deg) scaleY(.985); } }
+@keyframes vivaPernaD { 0%, 100% { transform: translate(-1.2%, .4%) rotate(-1deg) scaleY(.985); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, 0) rotate(-2.2deg); } }
+@keyframes vivaBracoE { 0%, 100% { transform: rotate(2.5deg); } 50% { transform: rotate(-1.5deg); } }
+@keyframes vivaBracoD { 0%, 100% { transform: rotate(1.5deg); } 50% { transform: rotate(-2.5deg); } }
+@keyframes vivaBarra { 0%, 100% { transform: skewX(1.2deg); } 50% { transform: skewX(-1.2deg); } }
+/* abertura e menu com poses de modelo (troca suave entre duas camadas) e a mesma respiração do estúdio */
+.ab-camada { position: absolute; inset: 0; opacity: 0; transition: opacity .8s ease-in-out; }
+.ab-camada.ativa { opacity: 1; }
+.ab-camada svg { width: 100%; height: 100%; }
+.menu-boneca.ab-viva { position: relative; }
+.ab-viva .pp-corpo { animation: vivaCorpo 6s ease-in-out infinite; transform-box: view-box; }
+.ab-viva .pp-passo-e { animation: vivaPernaE 6s ease-in-out infinite; transform-box: view-box; }
+.ab-viva .pp-passo-d { animation: vivaPernaD 6s ease-in-out infinite; transform-box: view-box; }
+.ab-viva .pp-barra { animation: vivaBarra 6s ease-in-out infinite; transform-box: view-box; }
+/* beijinho: os corações saem da boca, sobem para o lado e somem */
+.pp-beijo { transform-box: fill-box; transform-origin: center; animation: beijo 1.6s ease-out infinite; }
+.pp-beijo2 { animation-delay: .5s; }
+@keyframes beijo { 0% { transform: translate(0, 0) scale(.4); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(28px, -40px) scale(1.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pp-beijo { animation: none; } }
+/* na abertura ela fica de pé no chão (sem flutuar) e maior, do tamanho natural na tela */
+.entrada-boneca { animation: none; width: min(280px, 62vw); height: min(440px, 48vh); }
+/* zoom no rosto da abertura: a câmera chega devagar e volta */
+.ab-camada { transition: opacity .8s ease-in-out, transform 1.1s ease-in-out; }
+.ab-viva { overflow: hidden; }
