@@ -525,3 +525,37 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
   #menu .rodape { font-size: .72rem; }
 }
 .ab-rig { position: relative; overflow: hidden; }
+
+/* ---------- Baladinha (dono, 20/Nov/2026): sala de luzes, a personagem e as amigas dançando, com sombras coloridas ---------- */
+#balada.ativa { display: grid; position: relative; height: 100vh; height: 100dvh; overflow: hidden; background: #0c0b1d;
+  grid-template: "palco" minmax(0, 1fr) "botoes" auto / minmax(0, 1fr); }
+.balada-palco { grid-area: palco; position: relative; overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.balada-palco:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+.bal-camada { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.bal-lavar, .bal-flor, .bal-caixa { will-change: transform; }
+.bal-lavar, .bal-flor { overflow: visible; }   /* a luz que desliza não mostra a borda da camada */
+.bal-sombras, .bal-gente { position: absolute; inset: 0; pointer-events: none; }
+.bal-caixa { position: absolute; }
+.bal-caixa svg { width: 100%; height: 100%; display: block; overflow: visible; }
+/* sombra colorida: o mesmo desenho, todo de uma cor só (a do refletor) */
+.bal-sombra { opacity: .72; }
+.bal-sombra svg * { fill: currentColor !important; stroke: currentColor !important; }
+.bal-sombra svg [fill="none"] { fill: none !important; }
+.bal-sombra svg * { clip-path: none !important; mask: none !important; }   /* sombra não precisa de recorte: mais leve */
+.bal-pula { animation: balPula .5s ease-in-out infinite alternate; }
+@keyframes balPula { from { transform: translateY(0); } to { transform: translateY(-1.8%); } }
+.bal-parede, .bal-lavar ellipse { transition: fill 1.2s ease; }
+.bal-luz-0 .bal-parede { fill: #b4b2ff; } .bal-luz-0 .bal-l1 { fill: #ff3bd0; } .bal-luz-0 .bal-l2 { fill: #3442e8; } .bal-luz-0 .bal-l3 { fill: #2f5bff; }
+.bal-luz-1 .bal-parede { fill: #ffb3ee; } .bal-luz-1 .bal-l1 { fill: #ffd84d; } .bal-luz-1 .bal-l2 { fill: #ff4f9a; } .bal-luz-1 .bal-l3 { fill: #3b6bff; }
+.bal-luz-2 .bal-parede { fill: #c3b0ff; } .bal-luz-2 .bal-l1 { fill: #3bff9a; } .bal-luz-2 .bal-l2 { fill: #2fc4ff; } .bal-luz-2 .bal-l3 { fill: #ff3bd0; }
+.bal-luz-3 .bal-parede { fill: #ffc2c9; } .bal-luz-3 .bal-l1 { fill: #ffb03b; } .bal-luz-3 .bal-l2 { fill: #ff3bd0; } .bal-luz-3 .bal-l3 { fill: #8a4dff; }
+.bal-lavar { animation: balLavar 7s ease-in-out infinite alternate; }
+@keyframes balLavar { from { transform: translateX(-40px); } to { transform: translateX(40px); } }
+.bal-flor { animation: balFlor 18s linear infinite; }
+@keyframes balFlor { to { transform: rotate(360deg); } }
+.bal-brilho { transform-box: fill-box; transform-origin: center; animation: balBrilho 1.6s ease-in-out infinite; }
+@keyframes balBrilho { 0%, 100% { opacity: .2; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.2); } }
+.balada-dica { position: absolute; left: 50%; top: calc(var(--nav-alto, 52px) + 6px); transform: translateX(-50%); margin: 0; padding: 4px 12px;
+  border-radius: 999px; background: rgba(0, 0, 0, .4); color: #fff; font-size: .85rem; white-space: nowrap; pointer-events: none; }
+.balada-botoes { grid-area: botoes; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: #0c0b1d; }
+@media (prefers-reduced-motion: reduce) { .bal-pula, .bal-lavar, .bal-flor, .bal-brilho { animation: none; } }

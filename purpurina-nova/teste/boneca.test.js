@@ -378,3 +378,17 @@ test('maquiando, zoom no olho e na boca (dono, 20/Nov/2026) com movimento sutil'
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
   assert.match(app, /movimentoDaVista/); assert.match(anim, /amplitude: function/);
 });
+
+test('baladinha (dono, 20/Nov/2026): sala de luzes, amigas dançando e sombras coloridas', () => {
+  const fs = require('fs'), path = require('path'), raiz = path.join(__dirname, '..');
+  global.window = global.window || global;
+  global.PurpurinaBoneca = B; require('../animador.js'); require('../balada.js');
+  const BL = global.PurpurinaBalada;
+  const sala = BL.sala(); assert.equal(bemFormado(sala), ''); assert.match(sala, /bal-parede/); assert.match(sala, /bal-flor/);
+  BL.PASSOS.forEach(p => assert.ok(global.PurpurinaAnim.POSES[p], 'passo ' + p + ' existe no animador'));
+  const html = fs.readFileSync(path.join(raiz, 'index.html'), 'utf8'), app = fs.readFileSync(path.join(raiz, 'app.js'), 'utf8');
+  assert.match(html, /id="btBalada"/); assert.match(html, /<section id="balada"/); assert.match(html, /<script src="balada\.js"><\/script>/);
+  assert.match(fs.readFileSync(path.join(raiz, 'sw.js'), 'utf8'), /'balada\.js'/);
+  assert.match(app, /PurpurinaBalada\.iniciar/); assert.match(app, /purpurinaNova\.looks/);
+  assert.match(fs.readFileSync(path.join(raiz, 'estilo.css'), 'utf8'), /\.bal-sombra svg \* \{ fill: currentColor !important/);
+});
