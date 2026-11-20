@@ -2,6 +2,29 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.5.0",
+      "data": "20/Nov/2026",
+      "hora": "13:24:43",
+      "pt": [
+        "🤸 Poses com movimento de verdade: braços com ombro, cotovelo e mão, cabeça e olhos se mexem aos poucos de uma pose para a outra (sem trocar de desenho): mão na cintura com o quadril para o lado, mão na cabeça, beijinho, mão no queixo, apontando, mãos no bolso, braços cruzados, tchauzinho e pernas cruzadas. Na abertura, no menu, no estúdio e no desfile.",
+        "🧍 Tipo de corpo em Eu → Corpo: magrinho, médio, cheinho, gordinho, curvilíneo e atlético.",
+        "📏 Proporções mais naturais: 4,8 / 5,8 / 6,5 / 7 cabeças de altura (antes a adulta ficava esticada), com braços e pernas mais cheios.",
+        "📱 Menu: os botões ocupam menos de um quarto da tela e a personagem fica grande."
+      ],
+      "en": [
+        "🤸 Poses with real movement: arms with shoulder, elbow and hand, head and eyes move gradually from one pose to the next (no more swapping drawings): hand on hip with the hip out, hand on head, blowing a kiss, hand on chin, pointing, hands in pockets, arms crossed, waving and crossed legs. On the opening screen, menu, studio and runway.",
+        "🧍 Body type in Me → Body: slim, medium, fuller, plus size, curvy and athletic.",
+        "📏 More natural proportions: 4.8 / 5.8 / 6.5 / 7 heads tall (the adult used to look stretched), with fuller arms and legs.",
+        "📱 Menu: the buttons take less than a quarter of the screen and the character is big."
+      ],
+      "es": [
+        "🤸 Poses con movimiento de verdad: brazos con hombro, codo y mano, cabeza y ojos que se mueven poco a poco de una pose a otra (sin cambiar de dibujo): mano en la cintura con la cadera de lado, mano en la cabeza, lanzando un beso, mano en la barbilla, señalando, manos en los bolsillos, brazos cruzados, saludando y piernas cruzadas. En la portada, el menú, el estudio y el desfile.",
+        "🧍 Tipo de cuerpo en Yo → Cuerpo: delgado, medio, rellenito, gordito, curvilíneo y atlético.",
+        "📏 Proporciones más naturales: 4,8 / 5,8 / 6,5 / 7 cabezas de alto (antes la adulta se veía estirada), con brazos y piernas más llenos.",
+        "📱 Menú: los botones ocupan menos de una cuarta parte de la pantalla y el personaje se ve grande."
+      ]
+    },
+    {
       "versao": "0.4.5",
       "data": "20/Nov/2026",
       "hora": "11:06:14",
