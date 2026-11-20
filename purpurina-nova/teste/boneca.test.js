@@ -128,7 +128,8 @@ test('desfile: passarela de show, sorriso, tchau e olhar para os lados', () => {
   }
   assert.match(B.svg(e, { id: 'd', tchau: true, anim: true }), /animateTransform/, 'a mão do tchau balança');
   const olhando = B.svg(e, { id: 'd', fundo: false, olhar: 38 });
-  assert.match(olhando, /d-rostoV/, 'olhar vira a cabeça');
+  // Nova Era (dono, 20/Nov/2026): olhar inclina a cabeça e mexe os olhos (desenho de frente), sem girar a cabeça em 3D
+  assert.doesNotMatch(olhando, /d-rostoV/); assert.match(olhando, /rotate\(6\.1 200 300\)/, 'olhar inclina a cabeça');
   assert.ok(!/translate\(200 0\) scale\(/.test(olhando), 'o corpo continua de frente');
 });
 

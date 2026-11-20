@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, FESTA, criarPremio, animar } from './premios3d.js';
 import { montarMaquina, montarTesoura, MEDIDAS_TESOURA } from './cenario3d.js';
 
-const APP_VERSION = '0.5.3', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
+const APP_VERSION = '0.5.4', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -158,6 +158,7 @@ const GIRO = 1.65;   // até onde a câmera gira para cada lado (um pouco mais q
 let cam = { yaw: 0, pitch: 0.42, zoom: 1, vista: 0 }, camAlvo = new THREE.Vector3(MED.L / 2, 2.2, MED.P / 2);
 let cena = null, maq = null, objetos = [], m = null, raycaster = new THREE.Raycaster();
 let proximoDesenho = 0, desenhouAntes = false;   // aparelho lento: espera antes de desenhar de novo (ver no fim de quadro())
+let intro = null;   // { t } enquanto a câmera mostra a menininha ao lado da máquina gigante
 let tesoura = false, porta = null, avisoT = 0, ultimoQuadro = 0, fichasIni = 0, fimT = null, velocidade = 1, apertando = { dx: 0, dz: 0 }, botaoApertado = 0;
 const chaveConta = () => pref.maquina + '-' + pref.nivel;
 
@@ -194,11 +195,23 @@ function novaPartida() {
   fichasIni = m.fichas; porta = null; fimT = null;
   $('infoTempo').hidden = !m.cfg.tempo;
   medir(); cam = Object.assign({}, VISTAS[0], { zoom: camera.aspect > 1.2 ? 0.8 : 1, vista: 0 });   // deitado: um pouco mais perto
+  // máquinas gigantes: uma introdução mostra a menininha ao lado da cabine, para ver o tamanho (dono, 20/Nov/2026)
+  intro = maq.menina && (!TESTE || /[?&]intro\b/.test(BUSCA)) ? { t: 0 } : null;
+  if (intro) { cena.fog.near = 120; cena.fog.far = 240; }
   pintarBarra();
   const ola = festaInfo().ola;
-  if (tesoura) aviso(t('Segure ✂️: a tesoura anda. Solte em cima do fio!', 'Hold ✂️: the scissors move. Let go right on the string!', 'Mantén ✂️: las tijeras avanzan. ¡Suelta justo encima del hilo!'), 3);
+  if (intro) aviso(tesoura ? t('🧸 Olha o tamanho desse boneco!', '🧸 Look how big this doll is!', '🧸 ¡Mira qué grande es este muñeco!')
+    : t('🧸 Olha o tamanho: quase 3 metros de altura!', '🧸 Look how big: almost 10 feet tall!', '🧸 Mira qué tamaño: ¡casi 3 metros de alto!'), 3.6);
+  else if (tesoura) aviso(t('Segure ✂️: a tesoura anda. Solte em cima do fio!', 'Hold ✂️: the scissors move. Let go right on the string!', 'Mantén ✂️: las tijeras avanzan. ¡Suelta justo encima del hilo!'), 3);
   else if (pref.maquina === 'festas') aviso(festaInfo().ico + ' ' + t(ola[0], ola[1], ola[2]), 2.4);
   else aviso(t('Leve a garra e aperte PEGAR!', 'Move the claw and press GRAB!', '¡Mueve la garra y pulsa COGER!'), 2.4);
+}
+// fim da introdução (acabou o tempo ou a pessoa tocou em algo): o jogo começa
+function pularIntro() {
+  if (!intro) return;
+  intro = null; if (cena && cena.fog) { cena.fog.near = 22; cena.fog.far = 45; }
+  aviso(tesoura ? t('Segure ✂️: a tesoura anda. Solte em cima do fio!', 'Hold ✂️: the scissors move. Let go right on the string!', 'Mantén ✂️: las tijeras avanzan. ¡Suelta justo encima del hilo!')
+    : t('Leve a garra e aperte PEGAR!', 'Move the claw and press GRAB!', '¡Mueve la garra y pulsa COGER!'), 2.4);
 }
 function parar() { Som.motor(false); if (m && m.mover) { m.mover(0, 0); m.irPara(null); } if (m && m.soltar) m.soltar(); apertando = { dx: 0, dz: 0 }; }
 function pintarBarra() {
@@ -239,10 +252,19 @@ function posicionarCamera() {
   const segue = m ? Math.max(0, Math.min(1, (1 - cam.zoom) / 0.5)) * 0.85 : 0;
   const alvo = new THREE.Vector3(MED.L / 2, 2.4 * MED.A / 7, MED.P / 2);
   if (m && m.garra && segue) alvo.lerp(new THREE.Vector3(m.garra.x, Math.max(1.2, m.garra.y - 1.5), m.garra.z), segue);
-  camAlvo.lerp(alvo, 0.12);
+  if (intro) camAlvo.copy(alvo); else camAlvo.lerp(alvo, 0.12);
   const cp = Math.cos(cam.pitch);
   camera.position.set(camAlvo.x + Math.sin(cam.yaw) * cp * dist, camAlvo.y + Math.sin(cam.pitch) * dist, camAlvo.z + Math.cos(cam.yaw) * cp * dist);
-  camera.lookAt(camAlvo);
+  if (intro) {
+    // começa de longe, na altura dos olhos da menininha, com ela e a cabine inteiras na tela; depois voa até a vista do jogo
+    const menina = maq.menina, topo = MED.A + 3, base = -3.3, larg = (MED.L - menina.g.position.x + 2.4) * 1.15;   // da menininha (mais uma folga) até a outra ponta da cabine
+    const d0 = Math.max(larg / 2 / meiaH, (topo - base) / 2 / meiaV) * 1.08;
+    const alvo0 = new THREE.Vector3((menina.g.position.x - 1.2 + MED.L) / 2, (topo + base) / 2, MED.P / 2);
+    const pos0 = new THREE.Vector3(alvo0.x, base + menina.altura * 0.85, alvo0.z + d0);
+    const k = intro.t < 1.8 ? 0 : Math.min(1, (intro.t - 1.8) / 2.2), e = k * k * (3 - 2 * k);
+    camera.position.lerpVectors(pos0, camera.position, e);
+    camera.lookAt(new THREE.Vector3().lerpVectors(alvo0, camAlvo, e));
+  } else camera.lookAt(camAlvo);
 }
 $('btCamera').addEventListener('click', () => { cam.vista = (cam.vista + 1) % VISTAS.length; Object.assign(cam, VISTAS[cam.vista]); Som.toque();
   aviso([t('🎥 De frente', '🎥 Front', '🎥 De frente'), t('🎥 De cima', '🎥 Top', '🎥 Desde arriba'), t('🎥 De lado: veja a profundidade da garra', '🎥 Side: check the claw depth', '🎥 De lado: mira la profundidad de la garra')][cam.vista], 1.6); });
@@ -311,6 +333,8 @@ function mirarNoToque(x, y) {
 }
 const teclas = {};
 const TECLAS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+// qualquer toque ou tecla na tela do jogo pula a introdução das máquinas gigantes
+['pointerdown', 'keydown'].forEach((ev) => document.addEventListener(ev, () => { if (telaAtual === 'jogo') pularIntro(); }, true));
 window.addEventListener('keydown', (e) => {
   if (telaAtual !== 'jogo' || !m || !$('fim').hidden) return;
   const k = TECLAS[e.key];
@@ -426,7 +450,9 @@ function quadro(agora) {
   if (telaAtual !== 'jogo' || !m || !cena) return;
   const seg = agora / 1000;
   // aparelho lento (poucos quadros por segundo): o jogo anda em passinhos, no tempo certo, sem câmera lenta
-  for (let resta = dt * (TESTE ? velocidade : 1); resta > 1e-4; resta -= 0.05) m.passo(Math.min(0.05, resta));
+  if (intro) { intro.t += dt; if (intro.t >= 4) pularIntro(); }
+  if (maq.menina) maq.menina.atualizar(intro ? intro.t : null);
+  if (!intro) for (let resta = dt * (TESTE ? velocidade : 1); resta > 1e-4; resta -= 0.05) m.passo(Math.min(0.05, resta));
   eventos();
   const anda = tesoura ? m.fase === 'andar' || m.fase === 'voltar' : (m.fase === 'mirar' && Math.hypot(m.garra.vx, m.garra.vz) > 0.05) || m.fase === 'levar';
   Som.motor(anda);
@@ -515,6 +541,7 @@ if (TESTE) window.GarraDebug = {
   velocidade(v) { velocidade = v; },
   camera() { return Object.assign({}, cam); },
   colecao() { return Object.assign({}, colecao); },
+  intro() { return intro ? intro.t : null; },
   tipos() { return m.premios ? [...new Set(m.premios.map((p) => p.tipo))] : [m.premio.tipo]; }
 };
 

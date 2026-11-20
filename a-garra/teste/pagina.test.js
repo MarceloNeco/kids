@@ -192,6 +192,30 @@ test('Boneco Gigante: sem setas; segurar o botão anda a tesoura, soltar em cima
   } finally { await pg.ctx.close(); }
 });
 
+test('máquinas gigantes: introdução com a menininha ao lado (o relógio espera); um toque pula e o jogo começa', async () => {
+  const pg = await abrir(FONE, '&semente=3&intro');
+  try {
+    for (const mq of ['gigantes', 'tesoura']) {
+      await pg.goto(base + '?teste&intro&semente=3'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
+      await jogar(pg, mq, 'facil');
+      assert.ok((await pg.evaluate(() => GarraDebug.intro())) !== null, mq + ': começa com a introdução');
+      assert.match(await pg.textContent('#aviso'), /Olha o tamanho/);
+      const t0 = (await est(pg)).tempo;
+      await pg.waitForTimeout(800);
+      assert.equal((await est(pg)).tempo, t0, mq + ': o relógio não corre na introdução');
+      const r = await pg.locator('#tela').boundingBox();
+      await pg.mouse.click(r.x + r.width / 2, r.y + r.height / 3);
+      assert.equal(await pg.evaluate(() => GarraDebug.intro()), null, mq + ': o toque pulou a introdução');
+      await pg.waitForFunction((t0) => GarraDebug.estado().tempo < t0, t0, { timeout: 15000 });
+    }
+    // as outras máquinas não têm introdução
+    await pg.goto(base + '?teste&intro&semente=3'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
+    await jogar(pg, 'telefone', 'facil');
+    assert.equal(await pg.evaluate(() => GarraDebug.intro()), null);
+    assert.deepEqual(pg.erros, []);
+  } finally { await pg.ctx.close(); }
+});
+
 test('Voltar do celular e 🏠 voltam ao menu', async () => {
   const pg = await abrir(FONE, '&semente=2');
   try {

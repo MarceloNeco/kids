@@ -34,15 +34,19 @@
          pernas): adulta com ombros ~1,65, cintura ~1,05 e quadril ~1,45 cabeça; criança quase sem cintura; menino com
          quadril mais estreito que os ombros. A cabeça inteira vai junto, só reduzida. */
   var PROPORCAO = {
-    pequena: { cabecas: 5, topo: 150, ombro: 1.28, quadril: 2.3, larg: [0.88, 1.0, 1.08, 0.95] },
-    crianca: { cabecas: 6, topo: 100, ombro: 1.33, quadril: 2.8, larg: [0.83, 0.92, 1.03, 0.92] },
-    adolescente: { cabecas: 7, topo: 76, ombro: 1.38, quadril: 3.3, larg: [0.79, 0.81, 1.13, 0.95] },
-    adulta: { cabecas: 7.5, topo: 64, ombro: 1.4, quadril: 3.55, larg: [0.8, 0.78, 1.16, 0.95] }
+    // larg: ombro, busto, cintura, quadril, coxa, joelho, panturrilha, tornozelo (curvas femininas; menino em MENINO)
+    pequena: { cabecas: 5, topo: 150, ombro: 1.28, quadril: 2.3, larg: [0.9, 0.92, 0.95, 1.02, 0.96, 0.88, 0.92, 0.84] },
+    crianca: { cabecas: 6, topo: 100, ombro: 1.33, quadril: 2.8, larg: [0.84, 0.85, 0.8, 1.0, 0.95, 0.84, 0.9, 0.8] },
+    adolescente: { cabecas: 7, topo: 76, ombro: 1.38, quadril: 3.3, larg: [0.84, 0.95, 0.66, 1.12, 1.0, 0.82, 0.92, 0.76] },
+    adulta: { cabecas: 7.5, topo: 64, ombro: 1.4, quadril: 3.55, larg: [0.86, 1.02, 0.64, 1.18, 1.04, 0.82, 0.93, 0.76] }
   };
+  // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
+  var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
+    adolescente: [0.9, 0.9, 0.8, 0.86, 0.9, 0.82, 0.88, 0.78], adulta: [0.94, 0.94, 0.82, 0.88, 0.92, 0.82, 0.9, 0.78] };
   var DF = null;
   function deformacao(idade, menino) {
     var q = PROPORCAO[idade] || PROPORCAO.adulta, cab = IDADE.cab, L = q.larg.slice();
-    if (menino) { L[1] = L[0] * 0.98; L[2] = L[0] * 1.15; }
+    if (menino) L = (MENINO[idade] || MENINO.adulta).slice();
     var queixo = 311 + ((IDADE === IDADES.pequena ? 275 : IDADE === IDADES.crianca ? 278 : IDADE === IDADES.adolescente ? 282 : 285) - 297) * cab;
     var alto = queixo - (311 - 205 * cab), h = (664 - q.topo) / q.cabecas, s = h / alto;
     var yC = q.topo + h, yS = q.topo + q.ombro * h, yW = q.topo + q.quadril * h;
@@ -54,11 +58,11 @@
       return y;
     }
     // largura: a cabeça (e o que fica na altura dela, como a mão no cabelo) reduz junto; do ombro para baixo, normal
-    var X = [[queixo, s], [340, L[0]], [420, L[1]], [470, L[2]], [560, L[3]]];
+    var X = [[queixo, s], [342, L[0]], [378, L[1]], [425, L[2]], [466, L[3]], [515, L[4]], [552, L[5]], [588, L[6]], [626, L[7]], [646, 0.95]];
     function gx(y) {
       if (y <= X[0][0]) return s;
       for (var i = 1; i < X.length; i++) if (y <= X[i][0]) { var a = X[i - 1], b = X[i]; return a[1] + (y - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); }
-      return L[3];
+      return 0.95;
     }
     return { s: s, traco: 1, queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
       cabeca: 'translate(200 ' + n(yC) + ') scale(' + n(s * 1000) / 1000 + ') translate(-200 ' + n(-queixo) + ')' };
@@ -68,15 +72,33 @@
     if (!DF || !str) return str;
     var D = DF, rigidas = [];
     // a mão (com o anel e a pulseira) não estica junto com a perna: só vai para o lugar novo, do tamanho certo
-    str = str.replace(/<g data-rigido="(-?[\d.]+),(-?[\d.]+)">([\s\S]*?)<\/g><!--\/rigido-->/g, function (m, x, y, c) {
-      var k = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8;
-      rigidas.push('<g transform="translate(' + n(D.fx(+x, +y)) + ' ' + n(D.fy(+y)) + ') scale(' + n(k * 1000) / 1000 + ') translate(' + (-x) + ' ' + (-y) + ')">' + c + '</g>');
+    str = str.replace(/<g data-rigido="(-?[\d.]+),(-?[\d.]+)(?:,(-?[\d.]+),(-?[\d.]+))?">([\s\S]*?)<\/g><!--\/rigido-->/g, function (m, x, y, sx, sy, c) {
+      var k = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8, X = D.fx(+x, +y), Y = D.fy(+y);
+      // mão: fica na ponta do braço encurtado (do ombro sx,sy até ela)
+      if (sx !== undefined) { var Sx = D.fx(+sx, +sy), Sy = D.fy(+sy); X = Sx + (X - Sx) * ENCURTA; Y = Sy + (Y - Sy) * ENCURTA; }
+      c = c.replace(/<g data-osso="[^"]*">/g, '<g>').replace(/<!--\/osso-->/g, '');   // dentro da peça rígida o braço vai junto, sem osso
+      rigidas.push('<g transform="translate(' + n(X) + ' ' + n(Y) + ') scale(' + n(k * 1000) / 1000 + ') translate(' + (-x) + ' ' + (-y) + ')">' + c + '</g>');
+      return '\u0001' + (rigidas.length - 1) + '\u0001';
+    });
+    // braço (osso): só os dois pontas (ombro e pulso) vão para o lugar novo; o desenho entre elas gira e estica junto,
+    // sem entortar com a curva da cintura
+    str = str.replace(/<g data-osso="(-?[\d.]+),(-?[\d.]+),(-?[\d.]+),(-?[\d.]+)">([\s\S]*?)<\/g><!--\/osso-->/g, function (m, x1, y1, x2, y2, c) {
+      var P = [+x1, +y1], Q = [+x2, +y2], P2 = [D.fx(P[0], P[1]), D.fy(P[1])], Q2 = [D.fx(Q[0], Q[1]), D.fy(Q[1])];
+      var v = [Q[0] - P[0], Q[1] - P[1]], w = [Q2[0] - P2[0], Q2[1] - P2[1]], lv = Math.sqrt(v[0] * v[0] + v[1] * v[1]) || 1, lw = Math.sqrt(w[0] * w[0] + w[1] * w[1]);
+      if (lv > 120) { w = [w[0] * ENCURTA, w[1] * ENCURTA]; lw *= ENCURTA; }   // braço inteiro: um pouco mais curto (dono, 20/Nov/2026)
+      var av = Math.atan2(v[1], v[0]), aw = Math.atan2(w[1], w[0]), k = lw / lv, kl = 0.95;
+      // matriz = gira para o eixo do osso, estica no comprimento (k) e mantém a grossura (kl), gira para a direção nova
+      var ca = Math.cos(aw), sa = Math.sin(aw), cb = Math.cos(-av), sb = Math.sin(-av);
+      var m11 = ca * k * cb - sa * kl * sb, m12 = ca * k * -sb - sa * kl * cb, m21 = sa * k * cb + ca * kl * sb, m22 = sa * k * -sb + ca * kl * cb;
+      var e = P2[0] - (m11 * P[0] + m12 * P[1]), f = P2[1] - (m21 * P[0] + m22 * P[1]);
+      rigidas.push('<g transform="matrix(' + [m11, m21, m12, m22, e, f].map(function (z) { return Math.round(z * 10000) / 10000; }).join(' ') + ')">' + c + '</g>');
       return '\u0001' + (rigidas.length - 1) + '\u0001';
     });
     return voltarRigidas(deformarResto(str, D), rigidas);
   }
   function voltarRigidas(str, rigidas) { return rigidas.length ? str.replace(/\u0001(\d+)\u0001/g, function (m, i) { return rigidas[+i]; }) : str; }
-  function rigido(x, y, s) { return s ? '<g data-rigido="' + x + ',' + y + '">' + s + '</g><!--/rigido-->' : ''; }
+  var ENCURTA = 0.9;   // quanto o braço inteiro encolhe depois de ir para o corpo novo
+  function rigido(x, y, s, ombro) { return s ? '<g data-rigido="' + x + ',' + y + (ombro ? ',' + ombro[0] + ',' + ombro[1] : '') + '">' + s + '</g><!--/rigido-->' : ''; }
   function deformarResto(str, D) {
     function par(x, y) { return n(D.fx(+x, +y)) + ',' + n(D.fy(+y)); }
     // arco (A rx,ry giro grande lado x,y): os raios só encolhem como a peça naquele ponto; o ponto final vai para o lugar novo
@@ -84,7 +106,30 @@
       var kx = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8, ky = (D.fy(+y + 4) - D.fy(+y - 4)) / 8;
       return 'A' + n(+rx * kx) + ',' + n(+ry * ky) + ' ' + g + ' ' + f1 + ' ' + f2 + ' ' + par(x, y);
     }
+    // caminho só com retas e curvas (M L Q C Z): vira uma linha de muitos pontos, cada um no lugar novo — assim a blusa
+    // ganha cintura e quadril de verdade (antes só os cantos mudavam de lugar e o meio ficava reto)
+    function curvar(d) {
+      if (/[^MLQCZ\d\s.,\-eE]/.test(d)) return null;
+      var tk = d.match(/[MLQCZ]|-?\d*\.?\d+(?:e-?\d+)?/g), i = 0, cmd = '', cur = [0, 0], ini = [0, 0], out = [];
+      function num() { return +tk[i++]; }
+      function pt(q) { return [num(), num()]; }
+      function poe(x, y, novo) { out.push((novo ? 'M' : 'L') + par(x, y)); }
+      function amostra(f, comp) { var k = Math.max(2, Math.min(24, Math.round(comp / 7))); for (var j = 1; j <= k; j++) { var q = f(j / k); poe(q[0], q[1]); } }
+      function dist(a, b) { return Math.sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1])); }
+      while (i < tk.length) {
+        if (/[MLQCZ]/.test(tk[i])) cmd = tk[i++];
+        if (cmd === 'Z') { out.push('Z'); cur = ini; continue; }
+        if (cmd === 'M') { cur = ini = pt(); poe(cur[0], cur[1], true); cmd = 'L'; continue; }
+        var a = cur;
+        if (cmd === 'L') { var b = pt(); amostra(function (t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }, dist(a, b)); cur = b; }
+        else if (cmd === 'Q') { var c1 = pt(), e = pt(); amostra(function (t) { var u = 1 - t; return [u * u * a[0] + 2 * u * t * c1[0] + t * t * e[0], u * u * a[1] + 2 * u * t * c1[1] + t * t * e[1]]; }, dist(a, c1) + dist(c1, e)); cur = e; }
+        else if (cmd === 'C') { var p1 = pt(), p2 = pt(), e2 = pt(); amostra(function (t) { var u = 1 - t; return [u * u * u * a[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * e2[0], u * u * u * a[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * e2[1]]; }, dist(a, p1) + dist(p1, p2) + dist(p2, e2)); cur = e2; }
+        else return null;
+      }
+      return out.join(' ');
+    }
     return str.replace(/(\sd=")([^"]*)"/g, function (m, a, d) {
+      var c = curvar(d); if (c) return a + c + '"';
       return a + d.replace(/A(-?\d*\.?\d+),(-?\d*\.?\d+) (-?\d*\.?\d+) ([01]) ?([01]) (-?\d*\.?\d+),(-?\d*\.?\d+)|(-?\d*\.?\d+),(-?\d*\.?\d+)/g, function (m2, rx, ry, g, f1, f2, x, y, px, py) {
         return rx !== undefined ? arco(m2, rx, ry, g, f1, f2, x, y) : par(px, py);
       }) + '"';
@@ -184,7 +229,7 @@
     // a partir dos 11 anos o rosto fica oval: a cabeça estreita um pouco (largura) e alonga
     CABECA = 'translate(0 14) translate(200 297) scale(' + IDADE.cab * (IDADE.largura || 1) + ' ' + IDADE.cab + ') translate(-200 -297)';
     var C = function (cat) { var k = P.categoria(cat); return P.cor(k.cores, e[k.opcoes ? cat + 'Cor' : cat]); };
-    var pele = C('pele').hex, peleE = esc(pele, 0.24), cab = C('cabelo').hex, cabE = esc(cab, 0.3);
+    var pele = C('pele').hex, peleE = esc(pele, 0.24), cab = C('cabelo').hex, cabE = esc(cab, 0.3 + 0.3 * escuridao(pele));
     var vis = function (cat) { return V.visivel(e, cat); };
     var estNa = vis('vestido') ? 'vestido' : 'blusa', comEstampa = e.estampa !== 'liso';
     var area = op.soFundo ? [0, 0, W, H] : (op.area || [0, 0, W, H]);
@@ -218,7 +263,9 @@
        vai sumindo atrás dela, e de costas sobra só cabelo. */
     function normal(a) { a = (((a || 0) % 360) + 360) % 360; return a < 0.5 || a > 359.5 ? 0 : a; }
     // opcoes.olhar: só a cabeça vira (o corpo fica de frente) — no desfile ela olha para os lados
-    var angB = normal(op.angulo), ang = angB || normal(op.olhar);
+    // Nova Era: "olhar" não gira a cabeça em 3D (parecia troca de foto): a cabeça inclina de leve e os olhos vão para o
+    // lado, contínuo (dono, 20/Nov/2026: "por que não tem o movimento do rosto?")
+    var angB = normal(op.angulo), ang = angB, olharV = angB ? 0 : (function (a) { return a > 180 ? a - 360 : a; })(normal(op.olhar));
     var rad = ang * Math.PI / 180, radS = ang > 180 ? rad - 2 * Math.PI : rad, cos = ang ? Math.cos(rad) : 1, sen = ang ? Math.sin(rad) : 0, cosB = Math.cos(angB * Math.PI / 180);
     var corpoCostas = cosB < 0, costas = false, virada = !!ang, escalaX = 1 - 0.55 * Math.pow(Math.abs(Math.sin(angB * Math.PI / 180)), 1.5);
     // opcoes.sorriso: sorriso aberto; opcoes.tchau: braço levantado dando tchau (mexendo, com opcoes.anim)
@@ -237,8 +284,23 @@
 
     // ---------- pernas, pés e sapatos ----------
     function membro(d, larg) {
-      return p(d, { stroke: esc(pele, 0.35), 'stroke-width': larg + 2.4, 'stroke-linecap': 'round', fill: 'none' }) + p(d, { stroke: pele, 'stroke-width': larg, 'stroke-linecap': 'round', fill: 'none' }) +
-        '<g transform="translate(' + n(larg * 0.3) + ' 0)">' + p(d, { stroke: '#7a5ba8', 'stroke-width': larg * 0.36, 'stroke-linecap': 'round', fill: 'none', opacity: 0.16 }) + '</g>';
+      // braço com forma (não um tubo): do ombro (mais largo) até o pulso (fino), seguindo a curva do traço
+      var v = (d.match(/-?\d*\.?\d+/g) || []).map(Number), A = [v[0], v[1]], B = v.length >= 6 ? [v[2], v[3]] : null, Z = B ? [v[4], v[5]] : [v[2], v[3]];
+      if (!B) B = [(A[0] + Z[0]) / 2, (A[1] + Z[1]) / 2];
+      var inteiro = larg >= 22, esq = [], dir = [], N = 12;
+      function largura(t) {   // inteiro: ombro → cotovelo → pulso; pedaço (antebraço): cotovelo → pulso
+        return larg * 0.5 * (inteiro ? (t < 0.45 ? 1.12 - t * 0.55 : t < 0.58 ? 0.87 - (t - 0.45) * 0.6 : 0.8 + (t - 0.58) * 0.15 - Math.max(0, t - 0.8) * 1.2) : (0.92 - t * 0.3));
+      }
+      for (var i = 0; i <= N; i++) {
+        var t = i / N, u = 1 - t, x = u * u * A[0] + 2 * u * t * B[0] + t * t * Z[0], y = u * u * A[1] + 2 * u * t * B[1] + t * t * Z[1];
+        var dx = 2 * u * (B[0] - A[0]) + 2 * t * (Z[0] - B[0]), dy = 2 * u * (B[1] - A[1]) + 2 * t * (Z[1] - B[1]), l = Math.sqrt(dx * dx + dy * dy) || 1, w = largura(t);
+        esq.push(n(x - dy / l * w) + ',' + n(y + dx / l * w)); dir.push(n(x + dy / l * w) + ',' + n(y - dx / l * w));
+      }
+      var r0 = largura(0);
+      var forma = 'M' + esq.join(' L') + ' L' + dir.reverse().join(' L') + 'Z';
+      var desenho = circ(A[0], A[1], r0, { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4 }) + p(forma, { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }) +
+        circ(A[0], A[1], r0 - 0.8, { fill: pele });
+      return '<g data-osso="' + A[0] + ',' + A[1] + ',' + Z[0] + ',' + Z[1] + '">' + desenho + '</g><!--/osso-->';
     }
     function perna(x0, x1) {
       var M = [[455, 20], [500, 17.5], [548, 12.5], [586, 14], [626, 9.5], [642, 9]], esq = [], dir = [];
@@ -269,12 +331,12 @@
     if (vis('saia')) out.push(andaBarra ? '<g class="pp-barra">' + saia(e.saia, C('saia'), peca, linha) + '</g>' : saia(e.saia, C('saia'), peca, linha));
 
     // ---------- pescoço, tronco e braços ----------
-    out.push(ret(186, 270, 28, 80, { fill: pele, stroke: peleE, 'stroke-width': 2 }), ret(187, 300, 26, 18, { fill: esc(pele, 0.35), opacity: 0.15 }));
+    out.push(p('M187,270 L213,270 L214,318 Q218,336 248,342 L152,342 Q182,336 186,318Z', { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }), ret(187, 300, 26, 14, { fill: '#7a5ba8', opacity: 0.1 }));
     out.push(p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: 'url(#' + I + 'lado)' }));
     /* pose do fim da passarela (opcoes.pose): 'cintura' = mão direita na cintura (menina); 'cruzados' = braços cruzados
        (menino). Os braços da pose são desenhados no fim, por cima (bracosPose). */
     var bracoPose = !angB && !tchau && POSES.indexOf(op.pose) >= 0 ? op.pose : '';
-    var semDireito = tchau || !!bracoPose, semEsquerdo = !!bracoPose && bracoPose !== 'cintura', semBracos = semDireito && semEsquerdo;
+    var semDireito = tchau || !!bracoPose, semEsquerdo = !!bracoPose && bracoPose !== 'cintura' && bracoPose !== 'beijo', semBracos = semDireito && semEsquerdo;
     var iniBracos = out.length;
     var bracos = (semEsquerdo ? [] : ['M150,354 Q126,420 118,498']).concat(semDireito ? [] : ['M250,354 Q274,420 282,498']);
     bracos.forEach(function (d) { out.push(membro(d, 23)); });
@@ -284,14 +346,20 @@
     if (vis('vestido')) out.push(barra(vestido(e.vestido, C('vestido'), peca, linha, pele, peleE)));
     else out.push(blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), peca, linha));
 
+    // busto (adolescente e adulta): duas curvinhas da dobra da roupa embaixo do peito, da cor da peça mais escura
+    if (e.personagem !== 'menino' && (e.idade === 'adolescente' || e.idade === 'adulta')) {
+      var corB = vis('vestido') ? C('vestido').hex : e.blusa !== 'nenhum' ? C('blusa').hex : pele;
+      out.push(p('M172,393 Q182,399 192,394 M208,394 Q218,399 228,393', { fill: 'none', stroke: esc(corB, 0.3), 'stroke-width': 1.3, 'stroke-linecap': 'round', opacity: 0.4 }));
+    }
     // ---------- bolsa, mãos e joias do corpo ----------
-    if (vis('bolsa') && !tchau && !bracoPose) out.push(bolsa(e.bolsa, C('bolsa'), peca, linha));
+    // bolsa de mão vai junto com a mão direita (não estica); a de ombro segue o corpo
+    if (vis('bolsa') && !tchau && !bracoPose) out.push(e.bolsa === 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : rigido(282, 496, bolsa(e.bolsa, C('bolsa'), peca, linha), [250, 354]));
     var esmalte = { tipo: e.unhas, cor: C('unhas') };
-    if (!semEsquerdo) out.push(rigido(118, 496, mao(118, -1, pele, peleE, esmalte)));
-    if (!semDireito) out.push(rigido(282, 496, mao(282, 1, pele, peleE, esmalte)));
+    if (!semEsquerdo) out.push(rigido(118, 496, mao(118, -1, pele, peleE, esmalte), [150, 354]));
+    if (!semDireito) out.push(rigido(282, 496, mao(282, 1, pele, peleE, esmalte), [250, 354]));
     if (!corpoCostas && vis('colar')) out.push(colar(e.colar, C('colar'), I));
     if (!corpoCostas && vis('broche')) out.push(broche(e.broche, C('broche')));
-    if (vis('pulseira') && !tchau && !semEsquerdo) out.push(rigido(118, 496, pulseira(e.pulseira, C('pulseira'))));
+    if (vis('pulseira') && !tchau && !semEsquerdo) out.push(rigido(118, 496, pulseira(e.pulseira, C('pulseira')), [150, 354]));
     if (!corpoCostas && vis('anel') && !tchau && !bracoPose) out.push(anel(e.anel, C('anel')));
     // em pose, a manga pendurada (parada) some do lado do braço em pose: o braço da pose desenha a própria manga
     if (bracoPose) {
@@ -335,7 +403,7 @@
     } else {
       out.push(elip(116, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }), elip(284, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }));
       out.push(pintar(rosto, 'url(#' + I + 'pele)', esc(pele, 0.42), 1.1));
-      out.push(luzLados(pele, menino), luzMeio(pele), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, 0, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, e, I, C, 0, op.anim))));
+      out.push(luzLados(pele, menino), luzMeio(pele, I), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, olharV * 0.16, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, olharV * 0.16, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
       out.push(deslocar(-dO, sobr(164, -1)), deslocar(dO, sobr(236, 1)));
       out.push(narizFrente(e.nariz, pele) + narizLuz(pele, menino));
       out.push(bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))));
@@ -343,6 +411,10 @@
       if (e.glitter === 'bochechas' || e.glitter === 'olhos') out.push(glitter(e, C('glitter')));
       // ---------- cabelo da frente e acessórios do rosto ----------
       var franjaF = afinarCabelo(subirTesta(cabeloFrente(e, I, cab, cabE), TESTA[e.testa] || 0), cabE);
+      // sombra que a franja faz na testa (separa o cabelo do rosto; mais forte na pele escura)
+      defs += '<clipPath id="' + I + 'rostoF"><path d="' + rosto + '"/></clipPath>';
+      out.push('<g clip-path="url(#' + I + 'rostoF)"><g transform="translate(0 4)" opacity="' + n(0.2 + 0.25 * escuridao(pele)) + '">' +
+        franjaF.replace(/fill="(url\([^)]*\)|#[0-9a-fA-F]{3,6})"/g, 'fill="' + esc(pele, 0.55) + '"').replace(/stroke="#[0-9a-fA-F]{3,6}"/g, 'stroke="' + esc(pele, 0.55) + '"') + '</g></g>');
       out.push(franjaF + fiosIlustra(franjaF, I, 'fiosF', e, cab, cabE));
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
       if (vis('oculos')) out.push(oculos(e.oculos, C('oculos'), dO));
@@ -356,7 +428,7 @@
     out.push(virada && enfeites ? '<g transform="translate(' + n(200 + sen * 22) + ' 0) scale(' + n((cos >= 0 ? 1 : -1) * Math.max(0.68, Math.abs(cos)) * 1000) / 1000 + ' 1) translate(-200 0)">' + enfeites + '</g>' : enfeites);
     var animAntes = ANIM; ANIM = ANIM && (virada || !ang);
     if (e.glitter === 'cabelo') out.push(virada ? torcer(glitter(e, C('glitter')), false, radS, sen >= 0 ? 1 : -1).frente : glitter(e, C('glitter')));
-    var cabecaPronta = grupo(out.join(''));
+    var cabecaPronta = grupo(olharV ? '<g transform="rotate(' + n(olharV * 0.16) + ' 200 300) translate(' + n(olharV * 0.12) + ' 0)">' + out.join('') + '</g>' : out.join(''));
     out = corpo;
     ANIM = animAntes && !ang;
     if (e.glitter === 'tudo') out.push(glitter(e, C('glitter')));
@@ -375,7 +447,10 @@
       out.push(cabecaPronta);
     }
     // o braço do tchau vai por cima de tudo (fica na frente do cabelo, do lado do rosto)
-    if (tchau) out.push(bracoTchau(pele, peleE, esmalte, membro, op.anim));
+    // o braço do tchau vai inteiro junto com o ombro (sem a mão encolher para cima do rosto na altura da cabeça)
+    if (tchau) out.push(rigido(250, 356, bracoTchau(pele, peleE, esmalte, membro, op.anim)));
+    // beijinho: corações saindo da boca e subindo (na cabeça, para ficarem no lugar dela; .pp-beijo no estilo.css)
+    if (bracoPose === 'beijo') out.push(grupo('<g class="pp-beijo">' + p(coracao(236, 256, 9), { fill: '#ff4f8b', stroke: '#fff', 'stroke-width': 1.5 }) + '</g><g class="pp-beijo pp-beijo2">' + p(coracao(252, 236, 6), { fill: '#ff8fc8', stroke: '#fff', 'stroke-width': 1.2 }) + '</g>'));
     if (bracoPose) out.push(bracosPose(bracoPose, tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
     // corpo de ilustração de moda: o corpo passa pela deformação e a cabeça (já pronta) só é reduzida e posta no lugar
     var cabecaGrupo = '<g transform="' + CABECA + '">';
@@ -627,7 +702,9 @@
       '<linearGradient id="' + I + 'vol" x1="0" y1="0" x2="1" y2="0"><stop offset=".74" stop-color="#7a5ba8" stop-opacity="0"/><stop offset=".74" stop-color="#7a5ba8" stop-opacity=".18"/></linearGradient>' +
       '<linearGradient id="' + I + 'shine" x1="0" y1="0" x2="1" y2="1"><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".6"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
       // sombra que o cabelo faz na testa, logo abaixo da linha do cabelo
-      '<linearGradient id="' + I + 'sombCab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + esc(cab, 0.2) + '" stop-opacity=".32"/><stop offset=".16" stop-color="' + esc(cab, 0.2) + '" stop-opacity="0"/></linearGradient>' +
+      '<radialGradient id="' + I + 'luzPele"><stop offset="0" stop-color="#ffe6c4" stop-opacity=".55"/><stop offset="1" stop-color="#ffe6c4" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="' + I + 'calorPele"><stop offset="0" stop-color="#c8452c" stop-opacity=".35"/><stop offset="1" stop-color="#c8452c" stop-opacity="0"/></radialGradient>' +
+      '<linearGradient id="' + I + 'sombCab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + esc(cab, 0.45) + '" stop-opacity="' + n(0.32 + 0.3 * escuridao(pele)) + '"/><stop offset=".16" stop-color="' + esc(cab, 0.2) + '" stop-opacity="0"/></linearGradient>' +
       // branco do olho com volume (mais escuro em cima, onde a pálpebra faz sombra)
       '<linearGradient id="' + I + 'esclera" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cde6"/><stop offset=".42" stop-color="#fff"/><stop offset="1" stop-color="#f6f1fb"/></linearGradient>' +
       gradienteCabelo(e, I, cab) +
@@ -1023,7 +1100,7 @@
     var N = { arrebitado: [5, 243, 0.5], fininho: [4, 247, 1], redondinho: [7, 246, 0.6], pequenino: [4, 246, 0.3], batatinha: [9, 246, 0.6], largo: [10, 247, 0.6], reto: [5, 247, 1] }[tipo] || [5.5, 246, 0.6];
     var w = N[0], y = N[1], ponte = N[2], c = esc(pele, 0.34);
     var s = p('M204,' + n(y - 12 - ponte * 18) + ' Q' + n(206 + w * 0.2) + ',' + n(y - 10) + ' ' + n(203 + w * 0.4) + ',' + n(y - 2), { fill: 'none', stroke: c, 'stroke-width': 1.5, 'stroke-linecap': 'round', opacity: 0.45 });
-    s += elip(200, y - 3, w * 0.45, 2.4, { fill: '#fff', opacity: 0.4 });
+    s += elip(200, y - 3, w * 0.45, 2.4, { fill: '#fff', opacity: n(0.4 * (1 - 0.6 * escuridao(pele))) });
     s += p('M' + n(200 - w) + ',' + n(y - 1) + ' Q' + n(200 - w - 2) + ',' + n(y + 4) + ' ' + n(200 - w * 0.45) + ',' + n(y + 4.5) + ' Q200,' + n(y + 6.5) + ' ' + n(200 + w * 0.45) + ',' + n(y + 4.5) + ' Q' + n(200 + w + 2) + ',' + n(y + 4) + ' ' + n(200 + w) + ',' + n(y - 1), { fill: 'none', stroke: c, 'stroke-width': 1.4, 'stroke-linecap': 'round', opacity: 0.75 });
     s += elip(200 - w * 0.5, y + 3, 1.7, 1, { fill: c, opacity: 0.55 }) + elip(200 + w * 0.5, y + 3, 1.7, 1, { fill: c, opacity: 0.55 });
     return s;
@@ -1104,12 +1181,25 @@
   // semMonolid: olho fininho sem a dobrinha da pálpebra (a linha da dobra não aparece)
   // (a dobrinha da pálpebra agora é desenhada junto com o olho)
   function luzLados(pele, menino) {
-    var rosa = menino ? 0.03 : 0.08;
+    var rosa = (menino ? 0.03 : 0.08) * (1 - escuridao(pele));
     return elip(152, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa }) + elip(248, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa });
   }
-  function luzMeio(pele) {
-    return elip(200, 290, 10, 3.5, { fill: '#fff', opacity: 0.12 });
+  function luzMeio(pele, I) {
+    return elip(200, 290, 10, 3.5, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);
   }
+  // quão escura é a pele (0 = branca, 1 = bem escura)
+  function escuridao(h) { var c = rgb(h), l = (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; return Math.max(0, Math.min(1, (0.72 - l) / 0.45)); }
+  /* pele escura de verdade (dono, 20/Nov/2026: "tá com a mesma cor do cabelo, falso"): tem brilho — luz dourada na testa,
+     na ponte e na ponta do nariz, nas maçãs do rosto e no queixo, e as bochechas com um calor avermelhado. Quanto mais
+     escura a pele, mais forte o brilho; na pele clara quase não aparece. */
+  function brilhoPele(pele, I) {
+    var k = escuridao(pele); if (k < 0.15) return '';
+    var o = function (v) { return n(v * k * 100) / 100; }, L = { fill: 'url(#' + I + 'luzPele)' }, Q = { fill: 'url(#' + I + 'calorPele)' };
+    return '<g opacity="' + o(0.85) + '">' + elip(200, 152, 40, 18, L) + elip(200, 230, 4, 18, L) +
+      elip(150, 234, 20, 10, Object.assign({ transform: 'rotate(-18 150 234)' }, L)) + elip(250, 234, 20, 10, Object.assign({ transform: 'rotate(18 250 234)' }, L)) +
+      elip(200, 289, 7, 3.5, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
+  }
+
 
   // braço levantado dando tchau: ombro → cotovelo → mão aberta; o antebraço balança (opcoes.anim)
   function bracoTchau(pele, peleE, esmalte, membro, anim) {
@@ -1133,14 +1223,17 @@
      'maosCabeca'   as duas mãos em cima da cabeça, cotovelos para fora (foto de desfile infantil do dono)
      'joinha'       os dois punhos na frente do peito com o polegar para cima (foto do menino no desfile)
      Manga curta cobre o começo do braço; manga longa, o braço todo. */
-  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha', 'maosCabeca'];
+  var POSES = ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha', 'maosCabeca', 'beijo'];
   function bracosPose(tipo, manga, corTop, pele, peleE, esmalte, membro) {
     function vestir(d, larg, ate) {   // a manga por cima do braço (ate: 0..1 do traço, aproximado pelo pathLength)
       if (!corTop || manga === 'nada') return '';
       var fim = manga === 'longa' ? 1 : ate;
       if (fim <= 0) return '';   // sem manga nesse pedaço (antes ficava uma bolinha da cor da roupa no cotovelo)
-      return p(d, { fill: 'none', stroke: esc(corTop.hex, 0.25), 'stroke-width': larg + 4, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' }) +
-        p(d, { fill: 'none', stroke: corTop.hex, 'stroke-width': larg + 2, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' });
+      // a manga vai junto com o osso do braço (mesmas pontas), para não se soltar dele no corpo novo
+      var v = (d.match(/-?\d*\.?\d+/g) || []), Z = v.length >= 6 ? [v[4], v[5]] : [v[2], v[3]];
+      return '<g data-osso="' + v[0] + ',' + v[1] + ',' + Z[0] + ',' + Z[1] + '">' +
+        p(d, { fill: 'none', stroke: esc(corTop.hex, 0.25), 'stroke-width': larg + 4, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' }) +
+        p(d, { fill: 'none', stroke: corTop.hex, 'stroke-width': larg + 2, 'stroke-linecap': 'round', pathLength: 100, 'stroke-dasharray': n(fim * 100) + ' 200' }) + '</g><!--/osso-->';
     }
     function punho(x, y, giro) {   // mão fechada, vista de cima (só os nós dos dedos)
       return '<g transform="rotate(' + giro + ' ' + x + ' ' + y + ')">' + elip(x, y, 12, 9.5, { fill: pele, stroke: peleE, 'stroke-width': 2 }) +
@@ -1173,6 +1266,10 @@
       var cE = 'M150,354 Q124,392 150,402', cD = 'M250,354 Q276,392 250,402', aE = 'M150,402 Q154,350 164,312', aD = 'M250,402 Q246,350 236,312';
       return membro(cE, 23) + vestir(cE, 23, 0.5) + membro(cD, 23) + vestir(cD, 23, 0.5) + membro(aE, 19) + vestir(aE, 19, 0) + membro(aD, 19) + vestir(aD, 19, 0) +
         punho(166, 304, -35) + punho(234, 304, 35);
+    }
+    if (tipo === 'beijo') {   // mandando beijinho: cotovelo para baixo e para fora, a mão na boca
+      var bB = 'M250,356 Q272,378 266,404', aB = 'M266,404 Q244,330 214,282';
+      return membro(bB, 23) + vestir(bB, 23, 0.5) + membro(aB, 20) + vestir(aB, 20, 0) + punho(212, 280, -30);
     }
     if (tipo === 'maoCabelo') return cintura(-1);   // a outra mão na cintura; o braço erguido vem antes da cabeça
     if (tipo === 'maoCabeloAtras') {
@@ -1825,7 +1922,7 @@
       if (topo === 'coracao') t += p(coracao(x, y + 0.4, 3), { fill: '#e8384f', stroke: '#fff', 'stroke-width': 0.7 });
       if (topo === 'flor') t += flor(x, y + 0.6, 1.9, '#ff8fc8', '#ffd23f');
       if (topo === 'estrela') t += p(estrela5(x, y + 0.6, 4, 1.8), { fill: cor.hex, stroke: esc(cor.hex, 0.3), 'stroke-width': 0.7 });
-      return rigido(lado < 0 ? 118 : 282, 496, t);   // vai junto com a mão
+      return rigido(lado < 0 ? 118 : 282, 496, t, [lado < 0 ? 150 : 250, 354]);   // vai junto com a mão
     }
     if (tipo === 'dois') return um(-1, 'pedra') + um(1, 'coracao');
     return um(-1, tipo);

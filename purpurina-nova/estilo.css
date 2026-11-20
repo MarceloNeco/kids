@@ -172,7 +172,6 @@ ul { list-style: none; }
 /* takes (dono, 14/Nov/2026): a câmera não se mexe, ela corta — corpo inteiro, de perto (rosto e busto) ou de
    três-quartos — com um flash rápido no corte */
 .camera-desfile { position: absolute; inset: 0; transform-origin: 50% 18%; }
-.camera-desfile.take-perto { transform: scale(1.8); }
 .corte-desfile { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 3; }
 .corte-desfile.flash { animation: corte .35s ease-out; }
 @keyframes corte { from { opacity: .8; } to { opacity: 0; } }
@@ -437,3 +436,84 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .pp-ia-caixa { color: var(--text); }
 .pp-ia-caixa input { border-color: var(--borda); background: #fff; color: var(--text); }
 .dica-giro { background: rgba(255, 255, 255, .92); color: var(--text); box-shadow: 0 2px 8px rgba(61, 35, 82, .12); }
+/* ---------- viva no estúdio (dono, 20/Nov/2026: "não precisa ficar parado... se movimentando, dando um tchauzinho") ----------
+   De frente, ela respira e passa o peso de uma perna para a outra, devagar (6 s); a perna do lado do peso fica esticada e a
+   outra relaxa o joelho; os braços balançam de leve; a saia acompanha o quadril. Os centros vêm do boneca.js (corpo novo). */
+.boneca.parada .pp-corpo { animation: vivaCorpo 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-passo-e { animation: vivaPernaE 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-passo-d { animation: vivaPernaD 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-braco-e { animation: vivaBracoE 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-braco-d { animation: vivaBracoD 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-barra { animation: vivaBarra 6s ease-in-out infinite; transform-box: view-box; }
+@keyframes vivaCorpo { 0%, 100% { transform: translate(-1.2%, 0) rotate(.8deg); } 25% { transform: translate(0, -.4%); } 50% { transform: translate(1.2%, 0) rotate(-.8deg); } 75% { transform: translate(0, -.4%); } }
+@keyframes vivaPernaE { 0%, 100% { transform: translate(-1.2%, 0) rotate(2.2deg); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, .4%) rotate(1deg) scaleY(.985); } }
+@keyframes vivaPernaD { 0%, 100% { transform: translate(-1.2%, .4%) rotate(-1deg) scaleY(.985); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, 0) rotate(-2.2deg); } }
+@keyframes vivaBracoE { 0%, 100% { transform: rotate(2.5deg); } 50% { transform: rotate(-1.5deg); } }
+@keyframes vivaBracoD { 0%, 100% { transform: rotate(1.5deg); } 50% { transform: rotate(-2.5deg); } }
+@keyframes vivaBarra { 0%, 100% { transform: skewX(1.2deg); } 50% { transform: skewX(-1.2deg); } }
+/* abertura e menu com poses de modelo (troca suave entre duas camadas) e a mesma respiração do estúdio */
+.ab-camada { position: absolute; inset: 0; opacity: 0; transition: opacity .8s ease-in-out; }
+.ab-camada.ativa { opacity: 1; }
+.ab-camada svg { width: 100%; height: 100%; }
+.menu-boneca.ab-viva { position: relative; }
+.ab-viva .pp-corpo { animation: vivaCorpo 6s ease-in-out infinite; transform-box: view-box; }
+.ab-viva .pp-passo-e { animation: vivaPernaE 6s ease-in-out infinite; transform-box: view-box; }
+.ab-viva .pp-passo-d { animation: vivaPernaD 6s ease-in-out infinite; transform-box: view-box; }
+.ab-viva .pp-barra { animation: vivaBarra 6s ease-in-out infinite; transform-box: view-box; }
+/* beijinho: os corações saem da boca, sobem para o lado e somem */
+.pp-beijo { transform-box: fill-box; transform-origin: center; animation: beijo 1.6s ease-out infinite; }
+.pp-beijo2 { animation-delay: .5s; }
+@keyframes beijo { 0% { transform: translate(0, 0) scale(.4); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(28px, -40px) scale(1.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pp-beijo { animation: none; } }
+/* na abertura ela fica de pé no chão (sem flutuar) e maior, do tamanho natural na tela */
+.entrada-boneca { animation: none; width: min(280px, 62vw); height: min(440px, 48vh); }
+/* zoom no rosto da abertura: a câmera chega devagar e volta */
+.ab-camada { transition: opacity .8s ease-in-out, transform 1.1s ease-in-out; }
+.ab-viva { overflow: hidden; }
+/* escolhendo uma parte (dono, 20/Nov/2026: "olha o espaço que tá ocupando a paleta… o rosto tem que estar maior"): o painel
+   ocupa só o que precisa (no máximo 40% da tela) e a personagem fica com o resto */
+@media (orientation: portrait) {
+  #estudio.ativa.escolhendo { grid-template: "topo" auto "palco" minmax(0, 1fr) "dicas" auto "acoes" auto "painel" fit-content(40%) / minmax(0, 1fr); }
+}
+/* revisão do estúdio no celular (dono, 20/Nov/2026: "olha o espaço que está ocupando a configuração… revisa o app todo"):
+   o painel nunca passa de 40% da tela (ocupa só o que precisa), as opções ficam numa fileira só que rola para o lado
+   (cartões de 84 px), e os botões do topo ficam menores — a personagem (ou o rosto) fica com o resto da tela. */
+@media (orientation: portrait) {
+  #estudio.ativa { grid-template: "topo" auto "palco" minmax(0, 1fr) "dicas" auto "acoes" auto "painel" fit-content(40%) / minmax(0, 1fr); }
+  .estilos { display: flex; gap: 6px; overflow-x: auto; overscroll-behavior: contain; scroll-snap-type: x proximity; padding-bottom: 4px; }
+  .estilos .op-bt { flex: 0 0 84px; scroll-snap-align: start; }
+  .op-bt .mini-svg { height: 58px; } .op-bt.fundo .mini-svg { height: 64px; }
+  .op-bt.nenhum .mini-svg, .op-bt .mini-svg.mini-emoji { font-size: 2rem; }
+  .cores { flex-wrap: nowrap; overflow-x: auto; padding: 2px 2px 6px; }
+  .cor-bt.grande-cor { flex: 0 0 auto; width: 42px; height: 42px; }
+  .botoes-topo .mini { min-height: 40px; height: 40px; font-size: 1.05rem; }
+  .acoes .medio, .acoes .grande { min-height: 44px; }
+}
+/* catwalk de verdade na Nova Era (dono, 20/Nov/2026: "uma perninha na frente da outra e um reboladinho"): o quadril vai
+   bem para o lado do pé de apoio e inclina, a saia acompanha, e cada pé cruza para a linha do meio */
+#desfile .modelo.andando .pp-corpo { animation-name: reboladoN; }
+#desfile .modelo.andando .pp-barra { animation-name: barraN; }
+#desfile .modelo.andando .pp-passo-e { animation-name: passoNE; }
+#desfile .modelo.andando .pp-passo-d { animation-name: passoND; }
+@keyframes reboladoN { 0%, 50%, 100% { transform: translate(0, .45%); } 25% { transform: translate(-2.4%, -.5%) rotate(1.8deg); } 75% { transform: translate(2.4%, -.5%) rotate(-1.8deg); } }
+@keyframes barraN { 0%, 50%, 100% { transform: none; } 25% { transform: skewX(-4deg); } 75% { transform: skewX(4deg); } }
+@keyframes passoNE { 0%, 100% { transform: translate(-2%, 1%) rotate(-8deg); } 46% { transform: translate(-1%, -.8%) scaleY(.98) rotate(-6deg); }
+  62% { transform: translate(1%, -3.2%) scaleY(.9) rotate(-2deg); } 82% { transform: translate(2.4%, -1.2%) scaleY(.95) rotate(-11deg); } }
+@keyframes passoND { 0%, 100% { transform: translate(2%, 1%) rotate(8deg); } 46% { transform: translate(1%, -.8%) scaleY(.98) rotate(6deg); }
+  62% { transform: translate(-1%, -3.2%) scaleY(.9) rotate(2deg); } 82% { transform: translate(-2.4%, -1.2%) scaleY(.95) rotate(11deg); } }
+/* parte de baixo do desfile compacta (dono, 20/Nov/2026: "a parte de baixo usando ícones grandes"): a passarela fica com
+   a maior parte da tela */
+@media (orientation: portrait) {
+  #desfile.ativa { grid-template: "passarela" minmax(0, 1fr) "placar" auto / minmax(0, 1fr); }
+  .placar { gap: 4px; padding: 2px 6px 6px; }
+  .desfile-titulo { font-size: 1.1rem; }
+  .desfile-estrelas { font-size: 1.5rem; letter-spacing: 3px; }
+  .jurados { gap: 6px; } .jurado { font-size: .78rem; padding: 2px 8px; display: flex; align-items: center; gap: 4px; } .jurado .b { font-size: 1.1rem; display: inline; }
+  #desfile .grande { font-size: 1.15rem; padding: 6px 18px; min-height: 48px; }
+  #desfile .medio { min-height: 42px; font-size: .98rem; }
+}
+@media (orientation: portrait) {
+  .desfile-botoes { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .desfile-botoes .grande { flex: 1 1 100%; }
+  .desfile-botoes .medio { flex: 1 1 0; padding: 0 8px; }
+}
