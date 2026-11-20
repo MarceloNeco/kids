@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.32.0",
+      "data": "20/Nov/2026",
+      "hora": "19:40:51",
+      "pt": [
+        "🧸 Ursão de Pelúcia mais disputado: continua passando os rivais, mas um pouco mais devagar; e, encostando na beirada da pista, agora ele freia bem mais, dando tempo para os outros alcançarem (e até passarem)."
+      ],
+      "en": [
+        "🧸 A closer race with the Giant Teddy Bear: he still overtakes the rivals, but a bit slower; and when he bumps the edge of the road he now slows down a lot more, giving the others time to catch up (and even pass him)."
+      ],
+      "es": [
+        "🧸 Carreras más reñidas con el Osito de Peluche Gigante: sigue adelantando a los rivales, pero un poco más despacio; y, si toca el borde de la carretera, ahora frena mucho más y da tiempo a que los demás le alcancen (e incluso le adelanten)."
+      ]
+    },
+    {
       "versao": "1.31.0",
       "data": "20/Nov/2026",
       "hora": "17:55:15",

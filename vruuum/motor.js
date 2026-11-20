@@ -26,7 +26,7 @@
   /* Ursão de Pelúcia (1.30.0, dono 20/Nov/2026): gigante, mais rápido que todos, nada atrapalha (cone, lama e trânsito
      são jogados para o lado), empurra os rivais para longe dando risada e, virando, vai dando pulinhos. O único jeito
      de passarem por ele: quando ele encosta na beirada da pista, freia bastante. */
-  var URSO = { vel: 1.25, largura: 0.75, beirada: 0.92, saltito: 0.38, risada: 2.6 };
+  var URSO = { vel: 1.1, largura: 0.75, beirada: 0.92, freio: 4, freioAte: 0.15, saltito: 0.38, risada: 2.6 };   // 1.32.0 (dono): um pouco mais lento (era 1,25) e freando mais na beirada (era até 30%)
 
   // rivais (personagens): configs = [{ id, veic, mod: { vel, curva } }]
   function novaCorrida(nivel, semente, nJogadores, configs, mundos) {
@@ -126,7 +126,7 @@
     // o urso encostou na beirada da pista: freia bastante (é aí que os outros passam)
     if (mod.urso && !lp) {
       var naBeira = Math.abs(j.x) > URSO.beirada;
-      if (naBeira) { if (j.vel > max * 0.3) j.vel -= max * 2.4 * dt; j.tremor = 0.2; j.x -= (j.x > 0 ? 1 : -1) * dt * 0.25; if (!j.naBeira) e.eventos.push({ tipo: 'ursoBate', j: j.n }); }
+      if (naBeira) { if (j.vel > max * URSO.freioAte) j.vel -= max * URSO.freio * dt; j.tremor = 0.2; j.x -= (j.x > 0 ? 1 : -1) * dt * 0.25; if (!j.naBeira) e.eventos.push({ tipo: 'ursoBate', j: j.n }); }
       j.naBeira = naBeira;
     }
     // fora da estrada: grama, areia ou neve seguram o carro
