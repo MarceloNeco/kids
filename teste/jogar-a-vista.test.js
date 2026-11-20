@@ -28,7 +28,8 @@ const JOGOS = {
   'fruta-podre': [[], '#btJogar'],
   tijolaco: [[], '#btJogar'],
   'a-garra': [[], '#btJogar'],
-  labirinto: [[], '#btJogar']
+  labirinto: [[], '#btJogar'],
+  cozinha: [['#btEntrar'], '#btCozinhar']
 };
 
 function servidor() {
