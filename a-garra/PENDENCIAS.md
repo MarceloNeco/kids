@@ -6,7 +6,7 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 |---|---|---|---|
 | 1 | Jogo novo: máquina de pegar bichinho com 3 máquinas, 3 níveis, fichas, relógio, coleção e estrela dourada. | Dono, 14/Nov/2026 (fotos de um fliperama) | ✅ 0.1.0 (2D) |
 | 2 | Testar com as crianças no celular (em pé e deitado) e no tablet: a força da garra no médio e no difícil está boa? O fácil está fácil demais? | Entrega da 0.1.0 | ⏸ aguardando o dono (agora na 0.2.0) |
-| 3 | Máquina do **bichão gigante** (como a do ursão rosa das fotos): um bichinho enorme pendurado; segurar o botão e soltar na hora certa para as lâminas cortarem o barbante. | Fotos do dono, 14/Nov/2026 | 💡 ideia |
+| 3 | ✅ 0.5.2 (Boneco Gigante). Máquina do **bichão gigante** (como a do ursão rosa das fotos): um bichinho enorme pendurado; segurar o botão e soltar na hora certa para as lâminas cortarem o barbante. | Fotos do dono, 14/Nov/2026 | 💡 ideia |
 | 4 | Máquina de **caixinhas surpresa** (como a de caixas das fotos): prêmios quadrados que abrem com um brinquedo dentro. | Fotos do dono, 14/Nov/2026 | 💡 ideia |
 | 5 | Máquina de **prêmios pendurados** (como a de anel giratório das fotos): acertar a hora de parar para soltar o prêmio. | Fotos do dono, 14/Nov/2026 | 💡 ideia |
 | 6 | Na TV (controle remoto): abrir com `?tv=auto` pelo cartão de TV da estante. Hoje as setas e o OK já jogam, mas o jogo não tem cartão de TV. | Entrega da 0.1.0 | 💡 ideia |
@@ -22,4 +22,4 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 16 | A abinha de tela cheia da borda esquerda (peça comum `telacheia.js`) não responde ao toque no celular do dono, mas funciona nos testes; o jogo ganhou um botão de tela cheia próprio (menu e jogo). Investigar no aparelho dele se a abinha falha também nos outros jogos. | Dono, 14/Nov/2026 | ⏸ aguardando o dono |
 | 17 | A garra estava difícil demais (1 em 4 / 7 / 10): agora vem forte mais ou menos a cada 3 tentativas, sorteado (fácil 2–3, médio 2–4, difícil 3–5). | Dono, 14/Nov/2026 | ✅ 0.4.4 |
 | 18 | 1 minuto para mirar em todos os níveis (o fácil não tinha relógio) e contagem animada dos 10 últimos segundos no canto de cima, à direita. | Dono, 15/Nov/2026 | ✅ 0.4.6 |
-| 19 | Máquina que **muda com a época do ano** (Natal, Carnaval, Páscoa…), máquina de **bichos gigantes** e máquina de **um boneco grande só** (cortar o fio com a tesoura). | Dono, 19/Nov/2026 (fotos e vídeo do fliperama) | 🔵 Festas na 0.5.0; gigantes e tesoura em seguida |
+| 19 | Máquina que **muda com a época do ano** (Natal, Carnaval, Páscoa…), máquina de **bichos gigantes** e máquina de **um boneco grande só** (cortar o fio com a tesoura). | Dono, 19/Nov/2026 (fotos e vídeo do fliperama) | ✅ Festas 0.5.0 · Gigantes 0.5.1 · Boneco Gigante (tesoura) 0.5.2 |

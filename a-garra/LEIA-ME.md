@@ -31,6 +31,18 @@ o botão PEGAR vira GRAB · COGER.
     **Dia das Bruxas** (13–31/out). Cada festa tem cor, parede, letreiro e 6 prêmios de pelúcia + 1 dourado; colunas de
     lâmpadas que trocam de cor (como no vídeo do dono) e três prêmios sentados em cima do letreiro. A coleção mostra os 42
     prêmios do ano. `?festa=pascoa` (etc.) na barra de endereço força uma festa, para testar.
+  - **Gigantes** (0.5.1; dono, 19/Nov/2026, fotos da cabine de pelúcias gigantes): cabine maior (`Maquina.GIGANTE`: 8 × 6,5
+    × 9, buraco de 2,7), poucas pelúcias enormes (ursão do coração, coelhona orelhuda, dinossauro, axolote, baleia, gatão,
+    cachorrão; raro: ursão dourado), garra grande de **dois braços em arco**, céu com nuvens, letreiro de letras gordinhas
+    e pelúcias sentadas em cima da cabine. As medidas de cada máquina ficam em `m.med` (maquina.js).
+  - **Boneco Gigante** (0.5.2; dono, 19/Nov/2026, "aquele que só tem um boneco grande", foto da máquina da tesoura): cabine
+    alta e preta com janela de neon verde de cantos redondos, **um boneco grande pendurado por um fio** e uma **tesoura**
+    num trilho (`tesoura.js`, a regra; `montarTesoura` no cenario3d.js, o desenho). **Segurando** o botão (✂️ SEGURE,
+    espaço no computador) a tesoura anda; **soltando**, corta ali. Em cima do fio, corta de vez quando chega a vez (a mesma
+    regra da garra: fácil 2–3, médio 2–4, difícil 3–5, mais 15% de sorte); se não, corta só um fiapo e o fio afina. O fio
+    balança (mais no difícil) e a folga para acertar diminui. Cortou: o alçapão abre, o boneco cai e aparece na portinha;
+    vem outro boneco. Sem setas nessa máquina. Bonecos: ursa de vestido, coelha de macacão, leão jubudo, panda de gorro,
+    sapo rei; raro: ursa dourada.
 - **Controle**: ⬅ ➡ para os lados, ⬆ para o fundo, ⬇ para a frente (segurar), e **PEGAR**. Também dá para **tocar no
   prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
 - **Sortido**: cada partida tem outra mistura (cada tipo pelo menos uma vez, o resto sorteado), outro total, outro formato de

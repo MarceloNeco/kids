@@ -2,6 +2,49 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.5.2",
+      "data": "20/Nov/2026",
+      "hora": "00:34:34",
+      "pt": [
+        "✂️ Máquina nova: Boneco Gigante. Um boneco grande pendurado por um fio: segure o botão para a tesoura andar e solte bem em cima do fio",
+        "🎁 Cortou? O alçapão abre, o boneco cai e aparece na portinha. Às vezes a tesoura corta só um fiapo e o fio fica mais fino",
+        "🧸 Bonecos: ursa de vestido, coelha de macacão, leão jubudo, panda de gorro, sapo rei e a ursa dourada, rara",
+        "📱 Com 8 máquinas, o menu fica em 4 colunas no computador e no celular deitado"
+      ],
+      "en": [
+        "✂️ New machine: Giant Doll. A big doll hanging on a string: hold the button to move the scissors and let go right on the string",
+        "🎁 Cut it? The trapdoor opens, the doll drops and shows up at the little door. Sometimes the scissors only cut a thread and the string gets thinner",
+        "🧸 Dolls: bear in a dress, bunny in overalls, fluffy lion, panda in a beanie, frog king and the rare golden bear",
+        "📱 With 8 machines, the menu has 4 columns on computers and on phones held sideways"
+      ],
+      "es": [
+        "✂️ Máquina nueva: Muñeco Gigante. Un muñeco grande colgado de un hilo: mantén el botón para que avancen las tijeras y suelta justo encima del hilo",
+        "🎁 ¿Lo has cortado? La trampilla se abre, el muñeco cae y aparece en la puertecita. A veces las tijeras solo cortan una hebra y el hilo queda más fino",
+        "🧸 Muñecos: osa con vestido, coneja con peto, león melenudo, panda con gorro, rana reina y la osa dorada, rara",
+        "📱 Con 8 máquinas, el menú tiene 4 columnas en el ordenador y en el móvil en horizontal"
+      ]
+    },
+    {
+      "versao": "0.5.1",
+      "data": "20/Nov/2026",
+      "hora": "00:18:21",
+      "pt": [
+        "🧸 Máquina nova: Gigantes. Uma cabine maior, com poucas pelúcias enormes (ursão, coelhona, dinossauro, axolote, baleia, gatão e cachorrão) e um buraco grande",
+        "🦾 A garra dos Gigantes é grande, com dois braços em arco, como a das cabines de pelúcia gigante do fliperama",
+        "☁️ Céu com nuvens e estrelas, letreiro de letras coloridas e pelúcias sentadas em cima da cabine"
+      ],
+      "en": [
+        "🧸 New machine: Giants. A bigger booth with a few huge plushies (big bear, floppy bunny, dinosaur, axolotl, whale, big cat and big dog) and a big hole",
+        "🦾 The Giants claw is big, with two curved arms, like the giant plush booths at the arcade",
+        "☁️ Sky with clouds and stars, a colorful letter sign and plushies sitting on top of the booth"
+      ],
+      "es": [
+        "🧸 Máquina nueva: Gigantes. Una cabina más grande, con pocos peluches enormes (osote, conejota, dinosaurio, ajolote, ballena, gatote y perrazo) y un agujero grande",
+        "🦾 La garra de Gigantes es grande, con dos brazos en arco, como la de las cabinas de peluches gigantes de los recreativos",
+        "☁️ Cielo con nubes y estrellas, letrero de letras de colores y peluches sentados encima de la cabina"
+      ]
+    },
+    {
       "versao": "0.5.0",
       "data": "19/Nov/2026",
       "hora": "23:59:32",

@@ -4,15 +4,16 @@
    ?semente=N repete a mesma máquina. Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, FESTA, criarPremio, animar } from './premios3d.js';
-import { montarMaquina } from './cenario3d.js';
+import { montarMaquina, montarTesoura, MEDIDAS_TESOURA } from './cenario3d.js';
 
-const APP_VERSION = '0.5.0', APP_DATA = ['19/Nov/2026', 'Nov/19/2026', '19/nov/2026'];
+const APP_VERSION = '0.5.2', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
 const SEMENTE_URL = (BUSCA.match(/[?&]semente=(\d+)/) || [])[1];
 const calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-const Maquina = window.Maquina, Som = window.Som, MED = Maquina.medidas;
+const Maquina = window.Maquina, Som = window.Som;
+let MED = Maquina.medidas;   // as medidas da máquina da partida (a dos gigantes é maior)
 const IDS = Object.keys(MAQUINAS), NIVEIS = ['facil', 'medio', 'dificil'];
 // trilha: músicas alegres de instrumentos de verdade que já moram na Bagunçolândia e na Purpurina (créditos em CREDITOS.md)
 const KM = 'Kevin MacLeod', CC = 'CC BY 4.0', PD = 'domínio público (CC0)';
@@ -149,7 +150,7 @@ const GIRO = 1.65;   // até onde a câmera gira para cada lado (um pouco mais q
 let cam = { yaw: 0, pitch: 0.42, zoom: 1, vista: 0 }, camAlvo = new THREE.Vector3(MED.L / 2, 2.2, MED.P / 2);
 let cena = null, maq = null, objetos = [], m = null, raycaster = new THREE.Raycaster();
 let proximoDesenho = 0, desenhouAntes = false;   // aparelho lento: espera antes de desenhar de novo (ver no fim de quadro())
-let porta = null, avisoT = 0, ultimoQuadro = 0, fichasIni = 0, fimT = null, velocidade = 1, apertando = { dx: 0, dz: 0 }, botaoApertado = 0;
+let tesoura = false, porta = null, avisoT = 0, ultimoQuadro = 0, fichasIni = 0, fimT = null, velocidade = 1, apertando = { dx: 0, dz: 0 }, botaoApertado = 0;
 const chaveConta = () => pref.maquina + '-' + pref.nivel;
 
 function limparCena() {
@@ -168,27 +169,37 @@ function novaPartida() {
   if (!render) { mostrar('semTresD'); $('semTresD').hidden = false; return; }
   limparCena();
   const def = MAQUINAS[pref.maquina];
-  m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam, qtdFator: def.andam ? 0.32 : 1, raioFator: def.andam ? 1.12 : 1,
-    semente: SEMENTE_URL ? +SEMENTE_URL : undefined, semGanhar: contador[chaveConta()] || 0 });
+  const semente = SEMENTE_URL ? +SEMENTE_URL : undefined, semGanhar = contador[chaveConta()] || 0;
+  tesoura = !!def.tesoura;   // a do boneco grande: segurar o botão anda a tesoura, soltar corta (tesoura.js)
+  document.body.classList.toggle('modo-tesoura', tesoura);
   cena = new THREE.Scene(); cena.background = new THREE.Color('#0b0a14'); cena.fog = new THREE.Fog('#0b0a14', 22, 45);
-  maq = montarMaquina(cena, pref.maquina, MED, { festa: FESTA });
-  objetos = m.premios.map((p) => { const o = criarPremio(p.tipo); o.userData.id = p.id; cena.add(o); return o; });
+  if (tesoura) {
+    m = window.Tesoura.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, semente, semGanhar });
+    MED = MEDIDAS_TESOURA; maq = montarTesoura(cena); objetos = [];
+  } else {
+    m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam,
+      qtdFator: def.andam ? 0.32 : def.gigante ? 0.24 : 1, raioFator: def.andam ? 1.12 : def.gigante ? 1.95 : 1, medidas: def.gigante ? Maquina.GIGANTE : undefined, semente, semGanhar });
+    MED = m.med;
+    maq = montarMaquina(cena, pref.maquina, MED, { festa: FESTA });
+    objetos = m.premios.map((p) => { const o = criarPremio(p.tipo); o.userData.id = p.id; cena.add(o); return o; });
+  }
   fichasIni = m.fichas; porta = null; fimT = null;
   $('infoTempo').hidden = !m.cfg.tempo;
   medir(); cam = Object.assign({}, VISTAS[0], { zoom: camera.aspect > 1.2 ? 0.8 : 1, vista: 0 });   // deitado: um pouco mais perto
   pintarBarra();
   const ola = festaInfo().ola;
-  if (pref.maquina === 'festas') aviso(festaInfo().ico + ' ' + t(ola[0], ola[1], ola[2]), 2.4);
+  if (tesoura) aviso(t('Segure ✂️: a tesoura anda. Solte em cima do fio!', 'Hold ✂️: the scissors move. Let go right on the string!', 'Mantén ✂️: las tijeras avanzan. ¡Suelta justo encima del hilo!'), 3);
+  else if (pref.maquina === 'festas') aviso(festaInfo().ico + ' ' + t(ola[0], ola[1], ola[2]), 2.4);
   else aviso(t('Leve a garra e aperte PEGAR!', 'Move the claw and press GRAB!', '¡Mueve la garra y pulsa COGER!'), 2.4);
 }
-function parar() { Som.motor(false); if (m) { m.mover(0, 0); m.irPara(null); } apertando = { dx: 0, dz: 0 }; }
+function parar() { Som.motor(false); if (m && m.mover) { m.mover(0, 0); m.irPara(null); } if (m && m.soltar) m.soltar(); apertando = { dx: 0, dz: 0 }; }
 function pintarBarra() {
   if (!m) return;
   $('fichas').textContent = m.fichas; $('ganhos').textContent = m.ganhos.length;
   const s = Math.ceil(m.tempo); $('tempo').textContent = s;
   $('infoTempo').classList.toggle('pouco', !!m.cfg.tempo && m.fase === 'mirar' && s <= 10);
   pintarContagem(s);
-  $('btPegar').disabled = m.fase !== 'mirar';
+  $('btPegar').disabled = tesoura ? !(m.fase === 'mirar' || m.fase === 'andar') : m.fase !== 'mirar';
 }
 // contagem dos 10 últimos segundos (dono, 15/Nov/2026): um número gordinho no canto de cima, à direita, que aparece
 // pulando a cada segundo (10, 9, 8… 0). Some quando a pessoa aperta PEGAR; o 0 fica um instante quando o tempo acaba.
@@ -216,10 +227,10 @@ function medir() {
 function posicionarCamera() {
   // distância para a máquina inteira caber (largura ou altura), vezes o zoom; com zoom, a câmera chega perto da garra
   const meiaV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), meiaH = meiaV * camera.aspect;
-  const dist = Math.max(4.4 / meiaH, 5.6 / meiaV) * cam.zoom;
+  const dist = Math.max((MED.L / 2 + 1.4) / meiaH, 5.6 * (MED.A + 4.2) / 11.2 / meiaV) * cam.zoom;   // máquina maior, câmera mais longe
   const segue = m ? Math.max(0, Math.min(1, (1 - cam.zoom) / 0.5)) * 0.85 : 0;
-  const alvo = new THREE.Vector3(MED.L / 2, 2.4, MED.P / 2);
-  if (m && segue) alvo.lerp(new THREE.Vector3(m.garra.x, Math.max(1.2, m.garra.y - 1.5), m.garra.z), segue);
+  const alvo = new THREE.Vector3(MED.L / 2, 2.4 * MED.A / 7, MED.P / 2);
+  if (m && m.garra && segue) alvo.lerp(new THREE.Vector3(m.garra.x, Math.max(1.2, m.garra.y - 1.5), m.garra.z), segue);
   camAlvo.lerp(alvo, 0.12);
   const cp = Math.cos(cam.pitch);
   camera.position.set(camAlvo.x + Math.sin(cam.yaw) * cp * dist, camAlvo.y + Math.sin(cam.pitch) * dist, camAlvo.z + Math.cos(cam.yaw) * cp * dist);
@@ -232,7 +243,7 @@ $('btMais').addEventListener('click', () => zoomEm(1 / 1.25));
 $('btMenos').addEventListener('click', () => zoomEm(1.25));
 
 /* ---------- controles: setas (segurar), PEGAR, dedo na máquina (tocar = mirar, arrastar = girar, pinça = zoom), teclado ---------- */
-function moverPor() { if (m && m.fase === 'mirar') m.mover(apertando.dx, apertando.dz); }
+function moverPor() { if (m && m.mover && m.fase === 'mirar') m.mover(apertando.dx, apertando.dz); }
 document.querySelectorAll('.seta').forEach((bt) => {
   const dx = +bt.getAttribute('data-dx'), dz = +bt.getAttribute('data-dz');
   const solta = () => { if (!bt.classList.contains('apertado')) return; bt.classList.remove('apertado'); if (dx) apertando.dx = 0; if (dz) apertando.dz = 0; moverPor(); };
@@ -242,11 +253,17 @@ document.querySelectorAll('.seta').forEach((bt) => {
     bt.classList.add('apertado'); Som.acordar(); if (dx) apertando.dx = dx; if (dz) apertando.dz = dz; moverPor();
   });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => bt.addEventListener(ev, solta));
-  bt.addEventListener('click', (e) => { if (e.detail === 0 && m && m.fase === 'mirar') m.irPara(m.garra.x + dx * 0.4, m.garra.z + dz * 0.4); });   // teclado: um passinho
+  bt.addEventListener('click', (e) => { if (e.detail === 0 && m && m.irPara && m.fase === 'mirar') m.irPara(m.garra.x + dx * 0.4, m.garra.z + dz * 0.4); });   // teclado: um passinho
   bt.addEventListener('contextmenu', (e) => e.preventDefault());
 });
-function pegar() { if (m && m.pegar()) { Som.motor(false); apertando = { dx: 0, dz: 0 }; document.querySelectorAll('.seta.apertado').forEach((b) => b.classList.remove('apertado')); botaoApertado = 0.25; pintarBarra(); } }
+function pegar() { if (tesoura) return; if (m && m.pegar()) { Som.motor(false); apertando = { dx: 0, dz: 0 }; document.querySelectorAll('.seta.apertado').forEach((b) => b.classList.remove('apertado')); botaoApertado = 0.25; pintarBarra(); } }
 $('btPegar').addEventListener('click', () => { Som.acordar(); pegar(); });
+// tesoura: SEGURAR o botão (dedo, mouse ou espaço) anda a tesoura; SOLTAR corta
+function segurarTesoura() { if (tesoura && m && m.apertar()) { Som.acordar(); botaoApertado = 99; pintarBarra(); } }
+function soltarTesoura() { if (tesoura && m && m.fase === 'andar') { m.soltar(); botaoApertado = 0.2; } }
+$('btPegar').addEventListener('pointerdown', (e) => { if (!tesoura) return; e.preventDefault(); try { $('btPegar').setPointerCapture(e.pointerId); } catch (x) { /* sem captura */ } segurarTesoura(); });
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => $('btPegar').addEventListener(ev, soltarTesoura));
+$('btPegar').addEventListener('contextmenu', (e) => { if (tesoura) e.preventDefault(); });
 const dedos = new Map();
 let gesto = null;
 cv.addEventListener('pointerdown', (e) => {
@@ -274,7 +291,7 @@ cv.addEventListener('pointerup', soltarDedo); cv.addEventListener('pointercancel
 cv.addEventListener('wheel', (e) => { e.preventDefault(); zoomEm(e.deltaY > 0 ? 1.1 : 1 / 1.1); }, { passive: false });
 // tocar num prêmio (ou no chão) leva a garra até lá
 function mirarNoToque(x, y) {
-  if (!m || m.fase !== 'mirar') return;
+  if (!m || m.fase !== 'mirar' || tesoura) return;
   const r = cv.getBoundingClientRect();
   raycaster.setFromCamera(new THREE.Vector2(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1), camera);
   const vivos = objetos.filter((o) => o.visible);
@@ -282,7 +299,7 @@ function mirarNoToque(x, y) {
   let ponto = null;
   if (hit) { let o = hit.object; while (o && !o.userData.premio) o = o.parent; ponto = o ? o.position : hit.point; }
   else { const p = new THREE.Vector3(); if (raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -1), p)) ponto = p; }
-  if (ponto) { Som.acordar(); Som.toque(); m.irPara(ponto.x, ponto.z); }
+  if (ponto && m.irPara) { Som.acordar(); Som.toque(); m.irPara(ponto.x, ponto.z); }
 }
 const teclas = {};
 const TECLAS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
@@ -290,8 +307,9 @@ window.addEventListener('keydown', (e) => {
   if (telaAtual !== 'jogo' || !m || !$('fim').hidden) return;
   const k = TECLAS[e.key];
   if (k) { e.preventDefault(); if (!teclas[e.key]) { teclas[e.key] = true; if (k[0]) apertando.dx = k[0]; if (k[1]) apertando.dz = k[1]; moverPor(); } return; }
-  if (e.key === ' ' || (e.key === 'Enter' && document.activeElement === document.body)) { e.preventDefault(); pegar(); }
+  if (e.key === ' ' || (e.key === 'Enter' && document.activeElement === document.body)) { e.preventDefault(); if (tesoura) { if (!e.repeat) segurarTesoura(); } else pegar(); }
 });
+window.addEventListener('keyup', (e) => { if (tesoura && (e.key === ' ' || e.key === 'Enter')) soltarTesoura(); });
 window.addEventListener('keyup', (e) => { const k = TECLAS[e.key]; if (k && teclas[e.key]) { teclas[e.key] = false; if (k[0]) apertando.dx = 0; if (k[1]) apertando.dz = 0; moverPor(); } });
 
 /* ---------- o que a máquina contou ---------- */
@@ -301,6 +319,9 @@ function eventos() {
     if (ev.tipo === 'ficha') { Som.ficha(); setTimeout(() => Som.descer(), 120); }
     else if (ev.tipo === 'tique') Som.tique();
     else if (ev.tipo === 'tempoAcabou') { mostrarNumero(0); zeroAte = performance.now() + 1100; }
+    else if (ev.tipo === 'cortou') { Som.fechar(); Som.pegou(); aviso(t('✂️ Cortou o fio!', '✂️ You cut the string!', '✂️ ¡Has cortado el hilo!'), 1.6); }
+    else if (ev.tipo === 'quase') { Som.fechar(); Som.errou(); aviso(t('Quase! Cortou só um fiapo do fio.', 'So close! Only a thread was cut.', '¡Casi! Solo ha cortado una hebra.'), 1.8); }
+    else if (ev.tipo === 'errou' && tesoura) { Som.fechar(); Som.errou(); aviso(ev.perto ? t('Passou pertinho do fio!', 'Just missed the string!', '¡Ha pasado rozando el hilo!') : t('A tesoura não pegou o fio…', 'The scissors missed the string…', 'Las tijeras no han pillado el hilo…'), 1.8); }
     else if (ev.tipo === 'pegou') { Som.fechar(); Som.pegou(); aviso(ev.premio === MAQUINAS[pref.maquina].raro ? t('⭐ Pegou o dourado!', '⭐ Got the golden one!', '⭐ ¡Has cogido el dorado!') : t('Pegou! Segura, garra!', 'Got it! Hold on, claw!', '¡Lo has cogido! ¡Aguanta, garra!'), 1.4); }
     else if (ev.tipo === 'raspou') { Som.fechar(); Som.errou(); aviso(t('Quase! Mire no meio.', 'So close! Aim at the middle.', '¡Casi! Apunta al centro.'), 1.8); }
     else if (ev.tipo === 'errou') { Som.fechar(); Som.errou(); aviso(t('Não pegou nada…', 'Nothing this time…', 'Esta vez no ha cogido nada…'), 1.6); }
@@ -347,7 +368,7 @@ const estrelasDe = (n) => (n === 0 ? 0 : n >= 3 ? 3 : n);
 function abrirFim() {
   const n = m.ganhos.length, e = estrelasDe(n), chave = chaveConta();
   if (n > (recordes[chave] || 0)) { recordes[chave] = n; gravarJSON(CH_REC, recordes); }
-  $('fimTitulo').textContent = m.esvaziou ? t('Você esvaziou a máquina!', 'You emptied the machine!', '¡Has vaciado la máquina!') : n ? t('Acabaram as fichas!', 'Out of tokens!', '¡Se han acabado las fichas!') : t('Quase! A garra é difícil mesmo…', 'So close! The claw is tricky…', '¡Casi! Esta garra es muy difícil…');
+  $('fimTitulo').textContent = m.esvaziou ? t('Você esvaziou a máquina!', 'You emptied the machine!', '¡Has vaciado la máquina!') : n ? t('Acabaram as fichas!', 'Out of tokens!', '¡Se han acabado las fichas!') : tesoura ? t('Quase! O fio é difícil de cortar…', 'So close! The string is hard to cut…', '¡Casi! El hilo cuesta de cortar…') : t('Quase! A garra é difícil mesmo…', 'So close! The claw is tricky…', '¡Casi! Esta garra es muy difícil…');
   $('fimEstrelas').textContent = '★★★'.slice(0, e) + '☆☆☆'.slice(0, 3 - e);
   $('fimEstrelas').setAttribute('aria-label', t(e + ' estrelas', e + ' stars', e + ' estrellas'));
   const caixa = $('fimPremios'); caixa.textContent = '';
@@ -356,6 +377,7 @@ function abrirFim() {
   $('fimTexto').textContent = n
     ? t('Você pegou ' + n + (n === 1 ? ' prêmio' : ' prêmios') + ' com ' + usadas + (usadas === 1 ? ' ficha.' : ' fichas.'), 'You got ' + n + (n === 1 ? ' prize' : ' prizes') + ' with ' + usadas + (usadas === 1 ? ' token.' : ' tokens.'),
       'Has conseguido ' + n + (n === 1 ? ' premio' : ' premios') + ' con ' + usadas + (usadas === 1 ? ' ficha.' : ' fichas.'))
+    : tesoura ? t('Quase! Solte o botão com a tesoura bem em cima do fio: ele arrebenta a cada poucas tentativas. Tente de novo!', 'So close! Let go with the scissors right on the string: it snaps every few tries. Try again!', '¡Casi! Suelta el botón con las tijeras justo encima del hilo: se rompe cada pocos intentos. ¡Inténtalo otra vez!')
     : t('Quase! Mire bem no meio do prêmio: a garra forte vem a cada poucas tentativas. Tente de novo!', 'So close! Aim right at the middle of the prize: the strong claw comes every few tries. Try again!', '¡Casi! Apunta bien al centro del premio: la garra fuerte llega cada pocos intentos. ¡Inténtalo otra vez!');
   $('fim').hidden = false;
   Som.fim(e);
@@ -398,11 +420,37 @@ function quadro(agora) {
   // aparelho lento (poucos quadros por segundo): o jogo anda em passinhos, no tempo certo, sem câmera lenta
   for (let resta = dt * (TESTE ? velocidade : 1); resta > 1e-4; resta -= 0.05) m.passo(Math.min(0.05, resta));
   eventos();
-  const anda = (m.fase === 'mirar' && Math.hypot(m.garra.vx, m.garra.vz) > 0.05) || m.fase === 'levar';
+  const anda = tesoura ? m.fase === 'andar' || m.fase === 'voltar' : (m.fase === 'mirar' && Math.hypot(m.garra.vx, m.garra.vz) > 0.05) || m.fase === 'levar';
   Som.motor(anda);
   if (avisoT > 0) { avisoT -= dt; if (avisoT <= 0) $('aviso').classList.remove('ver'); }
   if (fimT != null) { fimT -= dt; if (fimT <= 0) { fimT = null; abrirFim(); } }
   botaoApertado = Math.max(0, botaoApertado - dt);
+  if (tesoura) maq.atualizar(seg, m, { apertado: botaoApertado > 0 });
+  else desenharGarra(seg, dt);
+  mostrarPorta(dt);
+  if (!quadro.visorT || seg - quadro.visorT > 0.25) { quadro.visorT = seg; maq.visor(m.fichas, m.cfg.tempo ? Math.ceil(m.tempo) : null, m.ganhos.length); }
+  pintarBarra();
+  posicionarCamera();
+  // mostrar o 3D é o mais pesado. Num aparelho lento (o quadro que desenhou levou mais de 80 ms até o próximo), espera
+  // o mesmo tanto antes de desenhar de novo: a física e os toques continuam no tempo certo e a página não trava (no
+  // celular comum, com placa de vídeo, nada muda)
+  if (desenhouAntes && dt > 0.08) proximoDesenho = agora + dt * 1000;
+  desenhouAntes = false;
+  if (agora >= proximoDesenho) { render.render(cena, camera); desenhouAntes = true; }
+}
+function mostrarPorta(dt) {
+  // o prêmio ganho aparece na portinha da frente
+  if (porta) {
+    porta.t += dt;
+    if (!porta.obj) { porta.obj = criarPremio(porta.tipo); cena.add(porta.obj); }
+    const k = Math.min(1, porta.t / 0.4), pulo = Math.abs(Math.sin(porta.t * 6)) * Math.max(0, 1 - porta.t / 2) * 0.3;
+    const tam = tesoura ? 0.5 : 0.35 * MED.BX / 1.5;   // na tesoura, a portinha fica no meio, embaixo
+    porta.obj.position.set(MED.BX / 2, (tesoura ? -1.75 : -1.15) + pulo, MED.P + 0.7); porta.obj.scale.setScalar(tam * k + 0.01); porta.obj.rotation.y = Math.sin(porta.t * 2) * 0.5;
+    if (porta.t > 3.5) { cena.remove(porta.obj); porta = null; }
+  }
+}
+// as máquinas de garra: prêmios e mira
+function desenharGarra(seg, dt) {
   // prêmios: posição e giro da física, olhos piscando, asas batendo, vivos se mexendo
   const vivos = !!MAQUINAS[pref.maquina].vivos, escala = MAQUINAS[pref.maquina].andam ? 1.4 : 1;
   m.premios.forEach((p, i) => {
@@ -413,14 +461,6 @@ function quadro(agora) {
     o.position.set(p.x, p.y + (escala > 1 ? p.r * 0.12 : 0), p.z); o.quaternion.set(p.q[0], p.q[1], p.q[2], p.q[3]); o.scale.setScalar(p.r * escala);
     if (!calmo) animar(o, seg, vivos && !p.preso, p.preso, p.passeio > 0);
   });
-  // o prêmio ganho aparece na portinha da frente
-  if (porta) {
-    porta.t += dt;
-    if (!porta.obj) { porta.obj = criarPremio(porta.tipo); cena.add(porta.obj); }
-    const k = Math.min(1, porta.t / 0.4), pulo = Math.abs(Math.sin(porta.t * 6)) * Math.max(0, 1 - porta.t / 2) * 0.3;
-    porta.obj.position.set(0.75, -1.15 + pulo, MED.P + 0.7); porta.obj.scale.setScalar(0.35 * k + 0.01); porta.obj.rotation.y = Math.sin(porta.t * 2) * 0.5;
-    if (porta.t > 3.5) { cena.remove(porta.obj); porta = null; }
-  }
   // mira (fácil e médio): o anel fica em cima do que está debaixo da garra
   let mira = null;
   if (m.fase === 'mirar' && m.nivel !== 'dificil') {
@@ -428,15 +468,6 @@ function quadro(agora) {
     m.premios.forEach((p) => { if (!p.ganho && Math.hypot(p.x - m.garra.x, p.z - m.garra.z) < p.r * 0.8) mira = Math.max(mira, p.y + p.r * 0.92); });
   }
   maq.atualizar(seg, m.garra, { dx: m.fase === 'mirar' ? apertando.dx : 0, dz: m.fase === 'mirar' ? apertando.dz : 0, podePegar: m.fase === 'mirar', apertado: botaoApertado > 0, mira });
-  if (!quadro.visorT || seg - quadro.visorT > 0.25) { quadro.visorT = seg; maq.visor(m.fichas, m.cfg.tempo ? Math.ceil(m.tempo) : null, m.ganhos.length); }
-  pintarBarra();
-  posicionarCamera();
-  // mostrar o 3D é o mais pesado. Num aparelho lento (o quadro que desenhou levou mais de 80 ms até o próximo), espera
-  // o mesmo tanto antes de desenhar de novo: a física e os toques continuam no tempo certo e a página não trava (no
-  // celular comum, com placa de vídeo, nada muda)
-  if (desenhouAntes && dt > 0.08) proximoDesenho = agora + dt * 1000;
-  desenhouAntes = false;
-  if (agora >= proximoDesenho) { render.render(cena, camera); desenhouAntes = true; }
 }
 
 /* ---------- instalar, service worker e começo ---------- */
@@ -463,20 +494,20 @@ if (TESTE) window.GarraDebug = {
   pronto: true, versao: APP_VERSION, festa: FESTA,
   estado() {
     if (!m) return { tela: telaAtual };
-    return { tela: telaAtual, fase: m.fase, fichas: m.fichas, tempo: m.tempo, nivel: m.nivel, maquina: pref.maquina, x: m.garra.x, z: m.garra.z, ganhos: m.ganhos.slice(),
-      semGanhar: m.semGanhar, fim: !$('fim').hidden, premios: m.premios.filter((p) => !p.ganho).length };
+    return { tela: telaAtual, fase: m.fase, fichas: m.fichas, tempo: m.tempo, nivel: m.nivel, maquina: pref.maquina, x: m.garra ? m.garra.x : m.x, z: m.garra ? m.garra.z : 0, ganhos: m.ganhos.slice(),
+      semGanhar: m.semGanhar, fim: !$('fim').hidden, premios: m.premios ? m.premios.filter((p) => !p.ganho).length : 1, fio: m.fioX ? m.fioX() : null };
   },
   // ponto da tela (px da página) de um ponto da máquina
   tela(x, y, z) { const v = new THREE.Vector3(x, y, z).project(camera), r = cv.getBoundingClientRect(); return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height }; },
   maisAlto() { const l = m.premios.filter((p) => !p.ganho && !(p.x < MED.BX && p.z > MED.P - MED.BZ)).sort((a, b) => (b.y + b.r) - (a.y + a.r)); return l[0] && { x: l[0].x, y: l[0].y, z: l[0].z, r: l[0].r, tipo: l[0].tipo }; },
-  forte(v) { m.cfg.sempreForte = !!v; },
+  forte(v) { m.cfg.sempreForte = !!v; m.cfg.sempre = !!v; },
   fichas(n) { m.fichas = n; },
   tempo(s) { m.tempo = s; },
   irPara(x, z) { m.irPara(x, z); },
   velocidade(v) { velocidade = v; },
   camera() { return Object.assign({}, cam); },
   colecao() { return Object.assign({}, colecao); },
-  tipos() { return [...new Set(m.premios.map((p) => p.tipo))]; }
+  tipos() { return m.premios ? [...new Set(m.premios.map((p) => p.tipo))] : [m.premio.tipo]; }
 };
 
 /* Botão "📲 Instalar" do Bolinho de Chuva: o cartão abre o jogo com ?instalar=1 e só então carrega a barra

@@ -36,6 +36,7 @@
     <p data-t="🎰 Igual à máquina de verdade: às vezes a garra fica fraca e solta o prêmio, mas a cada 2 a 5 tentativas ela vem forte. Mire bem no meio e não desista!|🎰 Just like a real machine: sometimes the claw is weak and drops the prize, but every 2 to 5 tries it comes strong. Aim right at the middle and don't give up!|🎰 Como en una máquina de verdad: a veces la garra está floja y suelta el premio, pero cada 2 a 5 intentos viene fuerte. ¡Apunta bien al centro y no te rindas!"></p>
     <p data-t="🎥 Arraste o dedo na máquina para girar a câmera (dá para ver bem de lado), use 🔍 para aproximar e 🎥 para ver de frente, de cima ou de lado.|🎥 Drag on the machine to turn the camera (all the way to the side), use 🔍 to zoom and 🎥 to look from the front, top or side.|🎥 Arrastra el dedo sobre la máquina para girar la cámara (se ve muy bien de lado), usa 🔍 para acercar y 🎥 para mirar de frente, desde arriba o de lado."></p>
     <p data-t="🎉 A máquina de Festas muda sozinha com a época do ano: Natal, Carnaval, Páscoa, Festa Junina, Dia das Crianças e Dia das Bruxas, cada uma com os seus prêmios.|🎉 The Holidays machine changes by itself through the year: Christmas, Carnival, Easter, June Festival, Children's Day and Halloween, each with its own prizes.|🎉 La máquina de Fiestas cambia sola según la época del año: Navidad, Carnaval, Pascua, San Juan, Día del Niño y Halloween, cada una con sus premios."></p>
+    <p data-t="✂️ No Boneco Gigante tem um boneco só, pendurado por um fio: segure o botão para a tesoura andar e solte bem em cima do fio. Cortou? O boneco cai e é seu!|✂️ In Giant Doll there is just one doll, hanging on a string: hold the button to move the scissors and let go right on the string. Cut it? The doll drops and it's yours!|✂️ En Muñeco Gigante hay un solo muñeco, colgado de un hilo: mantén el botón para que avancen las tijeras y suelta justo encima del hilo. ¿Lo has cortado? ¡El muñeco cae y es tuyo!"></p>
     <p data-t="🐕 Na máquina Bichos de Verdade, os filhotes andam pelo cobertor: espere ele parar e mire bem!|🐕 In the Real Animals machine the puppies walk around the blanket: wait for one to stop and aim well!|🐕 En la máquina Animales de Verdad, los cachorros caminan por la manta: ¡espera a que uno se pare y apunta bien!"></p>
   </div>
 
@@ -46,6 +47,8 @@
     <button class="cartao-maquina estrelas" type="button" role="radio" data-maquina="estrelas" aria-checked="false"><span class="ico" aria-hidden="true">⭐🐞</span><b data-t="Estrelas|Stars|Estrellas"></b><small data-t="Insetos|Bugs|Insectos"></small><small class="recorde" data-col="estrelas"></small></button>
     <button class="cartao-maquina lanchonete" type="button" role="radio" data-maquina="lanchonete" aria-checked="false"><span class="ico" aria-hidden="true">🍔🍟</span><b data-t="Lanchonete|Burger Bar|Hamburguesería"></b><small data-t="Hambúrgueres e lanches|Burgers and snacks|Hamburguesas y más"></small><small class="recorde" data-col="lanchonete"></small></button>
     <button class="cartao-maquina bichos" type="button" role="radio" data-maquina="bichos" aria-checked="false"><span class="ico" aria-hidden="true">🐕🐈</span><b data-t="Bichos de Verdade|Real Animals|Animales de Verdad"></b><small data-t="Filhotes que andam e se mexem|Puppies that walk and wiggle|Cachorros que caminan y se mueven"></small><small class="recorde" data-col="bichos"></small></button>
+    <button class="cartao-maquina gigantes" type="button" role="radio" data-maquina="gigantes" aria-checked="false"><span class="ico" aria-hidden="true">🧸🦕</span><b data-t="Gigantes|Giants|Gigantes"></b><small data-t="Pelúcias enormes, garra grande|Huge plushies, big claw|Peluches enormes, garra grande"></small><small class="recorde" data-col="gigantes"></small></button>
+    <button class="cartao-maquina tesoura" type="button" role="radio" data-maquina="tesoura" aria-checked="false"><span class="ico" aria-hidden="true">✂️🧸</span><b data-t="Boneco Gigante|Giant Doll|Muñeco Gigante"></b><small data-t="Corte o fio com a tesoura|Cut the string with the scissors|Corta el hilo con las tijeras"></small><small class="recorde" data-col="tesoura"></small></button>
     <button class="cartao-maquina festas" type="button" role="radio" data-maquina="festas" aria-checked="false"><span class="ico" id="festaIco" aria-hidden="true">🎉</span><b id="festaNome"></b><small data-t="Muda com a época do ano|Changes with the season|Cambia según la época del año"></small><small class="recorde" data-col="festas"></small></button>
   </div>
 
@@ -86,7 +89,7 @@
     <button id="btDir" class="seta" type="button" data-dx="1" data-dz="0" aria-label="Para a direita" data-rotulo="Para a direita|Right|A la derecha">➡</button>
     <button id="btBaixo" class="seta" type="button" data-dx="0" data-dz="1" aria-label="Para a frente" data-rotulo="Para a frente|Front|Hacia delante">⬇</button>
   </div>
-  <button id="btPegar" class="pegar" type="button" data-t="PEGAR|GRAB|COGER"></button>
+  <button id="btPegar" class="pegar" type="button"><span class="so-garra" data-t="PEGAR|GRAB|COGER"></span><span class="so-tesoura" data-t="✂️ SEGURE|✂️ HOLD|✂️ MANTÉN"></span></button>
 </section>
 
 <section id="colecao" class="tela" data-recurso="a-garra">
@@ -120,6 +123,7 @@
 
 <script src="maquina.js"></script>
 <script src="festas.js"></script>
+<script src="tesoura.js"></script>
 <script src="som.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>

@@ -41,6 +41,7 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 .titulo-escolha { margin: .5rem 0 .1rem; font-size: 1rem; font-weight: 600; color: #b9b2e6; text-transform: uppercase; letter-spacing: .08em; }
 .escolha { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; max-width: 44rem; }
 .maquinas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; max-width: 30rem; }
+@media (min-width: 760px) { .maquinas { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 50rem; } }
 .cartao-maquina {
   border: 3px solid transparent; border-radius: 20px; padding: .55rem .4rem; display: flex; flex-direction: column; align-items: center; gap: .1rem;
   min-height: 48px; color: #fff; transition: transform .15s ease-out; line-height: 1.15; text-align: center;
@@ -53,6 +54,12 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 .cartao-maquina.estrelas { background: linear-gradient(160deg, #2b3aa0, #101a4d); }
 .cartao-maquina.lanchonete { background: linear-gradient(160deg, #e8414f, #9c1b28); }
 .cartao-maquina.bichos { background: linear-gradient(160deg, #c9a27a, #6b4a2b); }
+.cartao-maquina.gigantes { background: linear-gradient(160deg, #b06bff, #3aa0ff); }
+.cartao-maquina.tesoura { background: linear-gradient(160deg, #1b1d1c, #050505); box-shadow: inset 0 0 0 2px #39ff6a, 0 0 12px rgba(57,255,106,.35); }
+/* tesoura: sem setas; o botão vira "segure" */
+.pegar .so-tesoura, body.modo-tesoura .pegar .so-garra { display: none; }
+body.modo-tesoura .pegar .so-tesoura { display: inline; }
+body.modo-tesoura .cruz { visibility: hidden; }
 .cartao-maquina.festas { background: linear-gradient(160deg, #e63946 0%, #9b5cff 50%, #1e88e5 100%); }
 [aria-checked="true"].cartao-maquina { border-color: #ffd166; transform: translateY(-3px) scale(1.02); }
 .cartao-nivel {
@@ -163,7 +170,7 @@ body.jogando .trilha:not(.mini) { max-width: calc(100% - var(--nav-largo, 9rem) 
   .bn-nav #menu .faixa { padding-left: var(--nav-largo); }
   .logo { font-size: 2.2rem; margin-top: -2.6rem; }
   .titulo-escolha { margin: .15rem 0 0; font-size: .8rem; }
-  .maquinas { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 40rem; }
+  .maquinas { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 46rem; }   /* 8 máquinas: duas fileiras */
   .cartao-maquina.bichos { grid-column: auto; }
   .cartao-maquina { padding: .25rem .3rem; }
   .cartao-maquina .ico { font-size: 1.3rem; }

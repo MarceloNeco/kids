@@ -6,13 +6,13 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.5.0 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.5.2 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.5.0'); assert.equal(a, s); assert.equal(v.versao, a);
-  assert.equal(v.data, '19/Nov/2026');
-  assert.match(ler('app.js'), /APP_DATA = \['19\/Nov\/2026', 'Nov\/19\/2026', '19\/nov\/2026'\]/);
+  assert.equal(a, '0.5.2'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(v.data, '20/Nov/2026');
+  assert.match(ler('app.js'), /APP_DATA = \['20\/Nov\/2026', 'Nov\/20\/2026', '20\/nov\/2026'\]/);
   for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
   assert.equal(v.pt.length, v.en.length, 'PT e EN com o mesmo número de itens');
   assert.equal(v.pt.length, v.es.length, 'PT e ES com o mesmo número de itens');
@@ -90,7 +90,7 @@ test('3D: a biblioteca Three.js mora na pasta, com a licença, e o service worke
   for (const f of ['libs/three.module.js', 'libs/three.core.js', 'libs/LICENSE-three.txt']) assert.ok(fs.existsSync(path.join(pasta, f)), 'falta ' + f);
   assert.match(ler('libs/three.module.js'), /from '\.\/three\.core\.js'/);
   const sw = ler('sw.js');
-  for (const f of ['festas.js', 'premios3d.js', 'cenario3d.js', 'libs/three.module.js', 'libs/three.core.js']) assert.ok(sw.includes("'" + f + "'"), 'sw.js sem ' + f);
+  for (const f of ['festas.js', 'tesoura.js', 'premios3d.js', 'cenario3d.js', 'libs/three.module.js', 'libs/three.core.js']) assert.ok(sw.includes("'" + f + "'"), 'sw.js sem ' + f);
   assert.match(ler('index.html'), /<script src="app\.js" type="module"><\/script>/);
   assert.match(ler('CREDITOS.md'), /Three\.js/);
 });
