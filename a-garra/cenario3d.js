@@ -10,13 +10,14 @@
    As medidas são as da física (maquina.js): x 0..L, z 0..P (fundo → frente), y 0..A.
      montarMaquina(cena, tema, M)  → { atualizar(t, garra, extra), alvo (Vector3 para a câmera), visor(fichas, tempo, ganhos) } */
 import * as THREE from './libs/three.module.js';
-import { criarPremio } from './premios3d.js';
+import { criarPremio, MAQUINAS } from './premios3d.js';
 
 const TEMAS = {
   telefone: { corpo: '#c8102e', escuro: '#8e0a20', fundo: '#2a1a1e', chao: '#3a1020', luz: '#ffe9d6', neon: null, borda: '#c8102e' },
   neon: { corpo: '#111214', escuro: '#050506', fundo: '#202322', chao: '#141a17', luz: '#e8fff0', neon: '#39ff6a', neon2: '#ffd400', borda: '#1a1a1a' },
   estrelas: { corpo: '#1d2c78', escuro: '#101a4d', fundo: '#1f3a8f', chao: '#1a2160', luz: '#e6efff', neon: '#3aa0ff', neon2: '#7ef9ff', borda: '#c9a24a' },
   lanchonete: { corpo: '#d62839', escuro: '#9c1b28', fundo: '#fff3df', chao: '#ffffff', luz: '#fff7e0', neon: '#ffd166', neon2: '#ff7ab8', borda: '#fff3df' },
+  gigantes: { corpo: '#f4f2ff', escuro: '#cfc6f0', fundo: '#bfe3ff', chao: '#e9e3ff', luz: '#ffffff', neon: '#b06bff', neon2: '#7ef9ff', borda: '#ffffff' },
   bichos: { corpo: '#e9ecef', escuro: '#b8bec6', fundo: '#e8e2d8', chao: '#efe3cf', luz: '#fff4e2', neon: '#7ef9ff', neon2: '#ffb3d1', borda: '#c9ced6' }
 };
 // a máquina de Festas (festas.js) troca de cor e de enfeite com a festa do dia
@@ -151,6 +152,17 @@ function fundoFesta(g, w, h) {
     tit('#ff8a1f', '#9b5cff');
   }
 }
+// letras gordinhas, cada uma de uma cor, com contorno branco (como os letreiros das cabines de pelúcia gigante)
+function bolhas(g, txt, x, y, px, larg) {
+  g.save(); g.font = '800 ' + px + 'px Fredoka, system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left';
+  const ws = [...txt].map((c) => g.measureText(c).width), tot = ws.reduce((a, b) => a + b, 0), k = larg && tot > larg ? larg / tot : 1;
+  g.translate(x - tot * k / 2, y); g.scale(k, 1);
+  let cx = 0; const cores = ['#ff6fae', '#ffb02e', '#39d353', '#3aa0ff', '#b06bff', '#ff4f6d'];
+  [...txt].forEach((c, i) => { g.lineWidth = px * 0.16; g.strokeStyle = '#ffffff'; g.lineJoin = 'round'; g.strokeText(c, cx, 0); g.fillStyle = cores[i % cores.length]; g.fillText(c, cx, 0); g.lineWidth = px * 0.03; g.strokeStyle = 'rgba(40,20,80,.5)'; g.strokeText(c, cx, 0); cx += ws[i]; });
+  g.restore();
+}
+function nuvem(g, x, y, s) { g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x, y, s, 0, 7); g.arc(x + s * 0.9, y + s * 0.15, s * 0.75, 0, 7); g.arc(x - s * 0.9, y + s * 0.2, s * 0.7, 0, 7); g.fill(); }
+const GIGANTES = () => tx('GIGANTES', 'GIANTS', 'GIGANTES');
 function fundoDe(tema) {
   return textura(1024, 1024, (g, w, h) => {
     if (tema === 'telefone') {
@@ -172,6 +184,11 @@ function fundoDe(tema) {
       });
       texto(g, tx('INSETOS OFICIAIS DA H-rraaa', 'OFFICIAL H-rraaa BUGS', 'INSECTOS OFICIALES DE H-rraaa'), w / 2, h * 0.6, '700 46px Fredoka, system-ui, sans-serif', 'rgba(255,255,255,.75)', null, w * 0.92);
     } else if (tema === 'festas') { fundoFesta(g, w, h);
+    } else if (tema === 'gigantes') {   // céu clarinho com nuvens e estrelas, letreiro de letras gordinhas
+      const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#9fd3ff'); gr.addColorStop(1, '#e6d9ff'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      [[0.2, 0.12, 50], [0.75, 0.08, 40], [0.5, 0.42, 46], [0.12, 0.45, 36], [0.88, 0.38, 42]].forEach(([x, y, r]) => nuvem(g, w * x, h * y, r));
+      for (let i = 0; i < 40; i++) estrela(g, (i * 97) % w, (i * 151) % (h * 0.6), 7 + (i % 3) * 3, 3, 'rgba(255,255,255,.85)');
+      bolhas(g, GIGANTES(), w / 2, h * 0.26, 130, w * 0.9);
     } else if (tema === 'bichos') {   // parede clara de pet shop, com patinhas e uma janelinha de luzes do fliperama
       const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#f4efe6'); gr.addColorStop(1, '#ddd3c4'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
       for (let i = 0; i < 18; i++) patinha(g, 80 + (i * 173) % (w - 160), 90 + (i * 97) % (h * 0.55), 22 + (i % 3) * 6, 'rgba(160,130,100,.25)', i * 0.7);
@@ -194,6 +211,7 @@ function placaDe(tema) {
     else if (tema === 'neon') { g.fillStyle = '#050505'; g.fillRect(0, 0, w, h); nomeColorido(g, w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#c6ffd4', '#39ff6a', w * 0.9); }
     else if (tema === 'estrelas') { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2b3aa0'); gr.addColorStop(1, '#101a4d'); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 30; i++) estrela(g, (i * 137) % w, (i * 71) % h, 6, 2.5, 'rgba(255,240,180,.7)'); nomeColorido(g, w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', w * 0.9); }
     else if (tema === 'festas') { const T = TEMAS_FESTA[festa]; g.fillStyle = T.escuro; g.fillRect(0, 0, w, h); if (festa === 'carnaval') confete(g, w, h, 60); if (festa === 'junina') bandeirinhas(g, w, 0, 12); nomeColorido(g, w / 2, h / 2 + 10, '800 140px Fredoka, system-ui, sans-serif', T.texto, T.neon, w * 0.62); const ic = [...(window.Festas ? window.Festas.LISTA[festa].ico : '🎉🎉')]; texto(g, ic[0], 110, h / 2 + 8, '100px system-ui, sans-serif', '#fff'); texto(g, ic[ic.length - 1], w - 110, h / 2 + 8, '100px system-ui, sans-serif', '#fff'); }
+    else if (tema === 'gigantes') { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#bfe3ff'); gr.addColorStop(1, '#9fd3ff'); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 24; i++) estrela(g, (i * 137) % w, (i * 71) % h, 8, 3, 'rgba(255,255,255,.8)'); bolhas(g, GIGANTES(), w * 0.36, h / 2 + 6, 120, w * 0.6); nomeColorido(g, w * 0.8, h / 2 + 6, '800 80px Fredoka, system-ui, sans-serif', '#5b3fa8', null, w * 0.3); }
     else if (tema === 'bichos') { g.fillStyle = '#f4f6f8'; g.fillRect(0, 0, w, h); nomeColorido(g, w / 2, h / 2 + 6, '800 150px Fredoka, system-ui, sans-serif', '#4a3a2c', null, w * 0.66); patinha(g, 110, h / 2, 46, '#b5652e', -0.3); patinha(g, w - 110, h / 2, 46, '#1d1715', 0.3); }
     else { g.fillStyle = '#d62839'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 64) { g.fillStyle = (x / 64) % 2 ? '#fff' : '#d62839'; g.fillRect(x, h - 40, 64, 40); } nomeColorido(g, w / 2, h / 2 - 12, '800 140px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', w * 0.6); burguerIcone(g, 110, h / 2, 110); burguerIcone(g, w - 110, h / 2, 110); }
   });
@@ -209,14 +227,15 @@ function frenteBase(tema) {
     if (tema === 'neon') { g.save(); brilho(g, '#39ff6a', 22); g.strokeStyle = '#39ff6a'; g.lineWidth = 12; g.strokeRect(40, 40, w - 80, h - 80); g.restore(); nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#39ff6a', '#39ff6a', 500); }
     if (tema === 'estrelas') { for (let i = 0; i < 80; i++) estrela(g, (i * 97) % w, (i * 151) % h, 6 + (i % 3) * 3, 2.6, 'rgba(255,240,180,.8)'); nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#ff9f1c', 500); }
     if (tema === 'bichos') { for (let i = 0; i < 10; i++) patinha(g, 480 + (i * 131) % 500, 520 + (i * 89) % 420, 26, 'rgba(120,100,80,.3)', i); nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#4a3a2c', null, 500); }
+    if (tema === 'gigantes') { for (let k = 0; k < 6; k++) { g.strokeStyle = ARCO_IRIS[k]; g.lineWidth = 26; g.beginPath(); g.arc(w * 0.72, h + 60, 420 - k * 26, Math.PI, 2 * Math.PI); g.stroke(); } bolhas(g, GIGANTES(), w * 0.66, h * 0.26, 110, 560); }
     if (tema === 'festas') { if (festa === 'carnaval' || festa === 'criancas') confete(g, w, h, 120); if (festa === 'natal') for (let i = 0; i < 60; i++) { g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc((i * 97) % w, (i * 151) % h, 4 + (i % 3) * 2, 0, 7); g.fill(); } if (festa === 'junina') bandeirinhas(g, w, 520, 10); if (festa === 'bruxas') morcegoDesenho(g, w * 0.7, h * 0.7, 60); texto(g, tituloFesta(), w * 0.66, h * 0.28, '800 74px Fredoka, system-ui, sans-serif', T.texto, T.neon, 560); }
     if (tema === 'lanchonete') { for (let y = 640; y < h; y += 64) for (let x = 0; x < w; x += 64) { g.fillStyle = ((x + y) / 64) % 2 ? '#fff' : '#111'; g.fillRect(x, y, 64, 64); } nomeColorido(g, w * 0.62, h * 0.28, '800 120px Fredoka, system-ui, sans-serif', '#ffd166', '#7a1020', 500); }
     // portinha do prêmio (embaixo do buraco, à esquerda)
     const px = 50, py = 120, pw = 330, ph = 330;
-    g.fillStyle = tema === 'lanchonete' || tema === 'bichos' ? '#fff3df' : tema === 'telefone' ? '#a00d24' : '#0b0b0b'; g.fillRect(px - 14, py - 14, pw + 28, ph + 28);
+    g.fillStyle = tema === 'lanchonete' || tema === 'bichos' || tema === 'gigantes' ? '#fff3df' : tema === 'telefone' ? '#a00d24' : '#0b0b0b'; g.fillRect(px - 14, py - 14, pw + 28, ph + 28);
     g.fillStyle = '#050505'; g.fillRect(px, py, pw, ph * 0.62);
     if (tema === 'telefone') for (let i = 0; i < 6; i++) for (let j = 0; j < 2; j++) { g.fillStyle = (i + j) % 2 ? '#fff' : '#111'; g.fillRect(px + i * pw / 6, py + ph * 0.66 + j * 28, pw / 6, 28); }
-    texto(g, tx('PRÊMIO', 'PRIZE', 'PREMIO'), px + pw / 2, py + ph * 0.9, '800 64px Fredoka, system-ui, sans-serif', tema === 'neon' ? '#39ff6a' : tema === 'estrelas' ? '#ffd166' : tema === 'lanchonete' ? '#d62839' : tema === 'bichos' ? '#4a3a2c' : tema === 'festas' ? TEMAS_FESTA[festa].texto : '#ffffff');
+    texto(g, tx('PRÊMIO', 'PRIZE', 'PREMIO'), px + pw / 2, py + ph * 0.9, '800 64px Fredoka, system-ui, sans-serif', tema === 'neon' ? '#39ff6a' : tema === 'estrelas' ? '#ffd166' : tema === 'lanchonete' ? '#d62839' : tema === 'bichos' || tema === 'gigantes' ? '#4a3a2c' : tema === 'festas' ? TEMAS_FESTA[festa].texto : '#ffffff');
   });
 }
 
@@ -250,6 +269,10 @@ export function montarMaquina(cena, tema, M, op) {
     else if (tema === 'bichos') {   // cobertor fofinho, como o do vídeo dos filhotes
       g.fillStyle = '#efe3cf'; g.fillRect(0, 0, w, h);
       for (let i = 0; i < 9000; i++) { const x = (i * 7919) % w, y = (i * 104729) % h, c = 200 + (i * 31) % 50; g.fillStyle = 'rgba(' + c + ',' + (c - 18) + ',' + (c - 45) + ',.55)'; g.beginPath(); g.arc(x, y, 2 + (i % 4), 0, 7); g.fill(); }
+    }
+    else if (tema === 'gigantes') {   // cobertor de pelúcia lilás
+      g.fillStyle = T.chao; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 6000; i++) { const x = (i * 7919) % w, y = (i * 104729) % h; g.fillStyle = i % 3 ? 'rgba(200,185,240,.55)' : 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(x, y, 2 + (i % 4), 0, 7); g.fill(); }
     }
     else if (tema === 'festas' && (festa === 'natal' || festa === 'pascoa')) {   // neve fofinha / gramado
       g.fillStyle = T.chao; g.fillRect(0, 0, w, h);
@@ -335,6 +358,10 @@ export function montarMaquina(cena, tema, M, op) {
     const tipos = (window.Festas ? window.Festas.LISTA[festa].tipos : []);
     [[-0.3, 0], [L / 2, 1], [L + 0.3, 2]].forEach(([x, i]) => { if (!tipos[i * 2]) return; const o = criarPremio(tipos[i * 2]); o.position.set(x, A + 2.15, P / 2 + 0.5); o.scale.setScalar(0.75); o.rotation.y = (1 - i) * 0.4; topo.add(o); });
   }
+  if (tema === 'gigantes') {   // pelúcias enormes sentadas em cima da cabine, como nas fotos
+    const tipos = MAQUINAS.gigantes.tipos;
+    [[-0.1, 0, 0.5], [L / 2, 3, 0], [L + 0.1, 5, -0.5]].forEach(([x, i, giro]) => { const o = criarPremio(tipos[i]); o.position.set(x, A + 2.25, P / 2 + 0.6); o.scale.setScalar(0.85); o.rotation.y = giro; topo.add(o); });
+  }
   if (tema === 'estrelas' || tema === 'lanchonete') caixa(new THREE.MeshStandardMaterial({ color: T.borda, roughness: 0.3, metalness: 0.6 }), -C, -0.16, P + C, L + C, -0.06, P + C + 0.03);
   // painel de controle (prateleira) com alavanca, botão e visor
   const painel = new THREE.Group(); painel.position.set(L / 2, -0.55, P + C + 0.45); raiz.add(painel);
@@ -369,20 +396,22 @@ export function montarMaquina(cena, tema, M, op) {
   aro.rotation.x = Math.PI / 2; aro.position.y = -0.1; garra.add(aro);
   const curvaDedo = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0.2, -0.22, 0), new THREE.Vector3(0.3, -0.5, 0), new THREE.Vector3(0.22, -0.72, 0), new THREE.Vector3(0.06, -0.8, 0)]);
   const geoDedo = new THREE.TubeGeometry(curvaDedo, 24, 0.028, 8);
-  const dedos = [0, 1, 2].map((i) => {
-    const piv = new THREE.Group(); piv.rotation.y = Math.PI / 2 + i * Math.PI * 2 / 3; piv.position.y = -0.12; garra.add(piv);
+  const nDedos = tema === 'gigantes' ? 2 : 3;   // a garra grande das cabines de pelúcia gigante tem dois braços
+  garra.scale.setScalar(M.PERNA / 0.9);
+  const dedos = Array.from({ length: nDedos }, (_, i) => i).map((i) => {
+    const piv = new THREE.Group(); piv.rotation.y = nDedos === 2 ? i * Math.PI : Math.PI / 2 + i * Math.PI * 2 / 3; piv.position.y = -0.12; garra.add(piv);   // dois braços: um de cada lado
     const dobra = new THREE.Group(); dobra.position.x = 0.1; piv.add(dobra);
-    const d = new THREE.Mesh(geoDedo, matMetal); d.castShadow = true; dobra.add(d);
+    const d = new THREE.Mesh(geoDedo, matMetal); d.castShadow = true; if (nDedos === 2) d.scale.set(1.9, 1.15, 1.6); dobra.add(d);   // gigantes: braços largos, em arco
     return dobra;
   });
   // mira: um anel embaixo da garra, em cima do que está no monte (o app liga só no fácil e no médio)
   const mira = new THREE.Mesh(new THREE.RingGeometry(0.22, 0.3, 32), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false }));
-  mira.rotation.x = -Math.PI / 2; mira.renderOrder = 4; raiz.add(mira);
+  mira.rotation.x = -Math.PI / 2; mira.scale.setScalar(M.PERNA / 0.9); mira.renderOrder = 4; raiz.add(mira);
 
   /* luzes */
   const amb = new THREE.HemisphereLight('#ffffff', '#3a3344', 1.1); raiz.add(amb);
   const sol = new THREE.DirectionalLight(T.luz, 2.4); sol.position.set(L / 2 + 0.4, A + 6, P / 2 + 1.2); sol.target.position.set(L / 2, 0, P / 2);
-  sol.castShadow = true; sol.shadow.mapSize.set(1024, 1024); sol.shadow.camera.left = -4; sol.shadow.camera.right = 4; sol.shadow.camera.top = 4; sol.shadow.camera.bottom = -4; sol.shadow.camera.near = 1; sol.shadow.camera.far = 20; sol.shadow.bias = -0.002;
+  sol.castShadow = true; sol.shadow.mapSize.set(1024, 1024); sol.shadow.camera.left = -L * 0.67; sol.shadow.camera.right = L * 0.67; sol.shadow.camera.top = L * 0.67; sol.shadow.camera.bottom = -L * 0.67; sol.shadow.camera.near = 1; sol.shadow.camera.far = 20; sol.shadow.bias = -0.002;
   raiz.add(sol); raiz.add(sol.target);
   const frenteLuz = new THREE.DirectionalLight('#ffffff', 0.9); frenteLuz.position.set(L / 2, 4, P + 8); raiz.add(frenteLuz);
   if (T.neon) { const n = new THREE.PointLight(T.neon, 6, 9, 1.6); n.position.set(L / 2, 2, P + 1.5); raiz.add(n); }

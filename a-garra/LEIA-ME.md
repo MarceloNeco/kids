@@ -31,6 +31,10 @@ o botão PEGAR vira GRAB · COGER.
     **Dia das Bruxas** (13–31/out). Cada festa tem cor, parede, letreiro e 6 prêmios de pelúcia + 1 dourado; colunas de
     lâmpadas que trocam de cor (como no vídeo do dono) e três prêmios sentados em cima do letreiro. A coleção mostra os 42
     prêmios do ano. `?festa=pascoa` (etc.) na barra de endereço força uma festa, para testar.
+  - **Gigantes** (0.5.1; dono, 19/Nov/2026, fotos da cabine de pelúcias gigantes): cabine maior (`Maquina.GIGANTE`: 8 × 6,5
+    × 9, buraco de 2,7), poucas pelúcias enormes (ursão do coração, coelhona orelhuda, dinossauro, axolote, baleia, gatão,
+    cachorrão; raro: ursão dourado), garra grande de **dois braços em arco**, céu com nuvens, letreiro de letras gordinhas
+    e pelúcias sentadas em cima da cabine. As medidas de cada máquina ficam em `m.med` (maquina.js).
 - **Controle**: ⬅ ➡ para os lados, ⬆ para o fundo, ⬇ para a frente (segurar), e **PEGAR**. Também dá para **tocar no
   prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
 - **Sortido**: cada partida tem outra mistura (cada tipo pelo menos uma vez, o resto sorteado), outro total, outro formato de

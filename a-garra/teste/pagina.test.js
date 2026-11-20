@@ -78,7 +78,7 @@ test('celular: tocar no prêmio leva a garra; com a garra forte ele vem, vai par
     // coleção: uma aba por máquina, a da lanchonete mostra o que veio; continua lá depois de recarregar
     await pg.click('#btFimColecao');
     assert.equal(await pg.isVisible('#colecao'), true);
-    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 6);
+    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 7);
     assert.equal(await pg.$$eval('#prateleira .item', l => l.length), 11);
     assert.ok(await pg.$$eval('#prateleira .item:not(.falta)', l => l.length) >= 1);
     await pg.reload(); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
@@ -149,7 +149,7 @@ test('computador: setas e espaço jogam; 🎥 troca a câmera, 🔍 aproxima e a
 test('as máquinas abrem sem erro, cada uma com os seus prêmios (os bichos de verdade são menos, soltos no cobertor)', async () => {
   const pg = await abrir(FONE, '&semente=2');
   try {
-    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17], ['festas', 36, 48]]) {
+    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17], ['festas', 36, 48], ['gigantes', 8, 14]]) {
       await pg.goto(base + '?teste&semente=2'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
       await jogar(pg, mq, 'facil');
       const e = await est(pg);

@@ -6,13 +6,14 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, FESTA, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.5.0', APP_DATA = ['19/Nov/2026', 'Nov/19/2026', '19/nov/2026'];
+const APP_VERSION = '0.5.1', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
 const SEMENTE_URL = (BUSCA.match(/[?&]semente=(\d+)/) || [])[1];
 const calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-const Maquina = window.Maquina, Som = window.Som, MED = Maquina.medidas;
+const Maquina = window.Maquina, Som = window.Som;
+let MED = Maquina.medidas;   // as medidas da máquina da partida (a dos gigantes é maior)
 const IDS = Object.keys(MAQUINAS), NIVEIS = ['facil', 'medio', 'dificil'];
 // trilha: músicas alegres de instrumentos de verdade que já moram na Bagunçolândia e na Purpurina (créditos em CREDITOS.md)
 const KM = 'Kevin MacLeod', CC = 'CC BY 4.0', PD = 'domínio público (CC0)';
@@ -168,8 +169,10 @@ function novaPartida() {
   if (!render) { mostrar('semTresD'); $('semTresD').hidden = false; return; }
   limparCena();
   const def = MAQUINAS[pref.maquina];
-  m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam, qtdFator: def.andam ? 0.32 : 1, raioFator: def.andam ? 1.12 : 1,
+  m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam,
+    qtdFator: def.andam ? 0.32 : def.gigante ? 0.24 : 1, raioFator: def.andam ? 1.12 : def.gigante ? 1.95 : 1, medidas: def.gigante ? Maquina.GIGANTE : undefined,
     semente: SEMENTE_URL ? +SEMENTE_URL : undefined, semGanhar: contador[chaveConta()] || 0 });
+  MED = m.med;
   cena = new THREE.Scene(); cena.background = new THREE.Color('#0b0a14'); cena.fog = new THREE.Fog('#0b0a14', 22, 45);
   maq = montarMaquina(cena, pref.maquina, MED, { festa: FESTA });
   objetos = m.premios.map((p) => { const o = criarPremio(p.tipo); o.userData.id = p.id; cena.add(o); return o; });
@@ -216,9 +219,9 @@ function medir() {
 function posicionarCamera() {
   // distância para a máquina inteira caber (largura ou altura), vezes o zoom; com zoom, a câmera chega perto da garra
   const meiaV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), meiaH = meiaV * camera.aspect;
-  const dist = Math.max(4.4 / meiaH, 5.6 / meiaV) * cam.zoom;
+  const dist = Math.max((MED.L / 2 + 1.4) / meiaH, 5.6 * (MED.A + 4.2) / 11.2 / meiaV) * cam.zoom;   // máquina maior, câmera mais longe
   const segue = m ? Math.max(0, Math.min(1, (1 - cam.zoom) / 0.5)) * 0.85 : 0;
-  const alvo = new THREE.Vector3(MED.L / 2, 2.4, MED.P / 2);
+  const alvo = new THREE.Vector3(MED.L / 2, 2.4 * MED.A / 7, MED.P / 2);
   if (m && segue) alvo.lerp(new THREE.Vector3(m.garra.x, Math.max(1.2, m.garra.y - 1.5), m.garra.z), segue);
   camAlvo.lerp(alvo, 0.12);
   const cp = Math.cos(cam.pitch);
@@ -418,7 +421,7 @@ function quadro(agora) {
     porta.t += dt;
     if (!porta.obj) { porta.obj = criarPremio(porta.tipo); cena.add(porta.obj); }
     const k = Math.min(1, porta.t / 0.4), pulo = Math.abs(Math.sin(porta.t * 6)) * Math.max(0, 1 - porta.t / 2) * 0.3;
-    porta.obj.position.set(0.75, -1.15 + pulo, MED.P + 0.7); porta.obj.scale.setScalar(0.35 * k + 0.01); porta.obj.rotation.y = Math.sin(porta.t * 2) * 0.5;
+    porta.obj.position.set(MED.BX / 2, -1.15 + pulo, MED.P + 0.7); porta.obj.scale.setScalar(0.35 * MED.BX / 1.5 * k + 0.01); porta.obj.rotation.y = Math.sin(porta.t * 2) * 0.5;
     if (porta.t > 3.5) { cena.remove(porta.obj); porta = null; }
   }
   // mira (fácil e médio): o anel fica em cima do que está debaixo da garra

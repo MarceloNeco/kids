@@ -53,6 +53,7 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 .cartao-maquina.estrelas { background: linear-gradient(160deg, #2b3aa0, #101a4d); }
 .cartao-maquina.lanchonete { background: linear-gradient(160deg, #e8414f, #9c1b28); }
 .cartao-maquina.bichos { background: linear-gradient(160deg, #c9a27a, #6b4a2b); }
+.cartao-maquina.gigantes { background: linear-gradient(160deg, #b06bff, #3aa0ff); }
 .cartao-maquina.festas { background: linear-gradient(160deg, #e63946 0%, #9b5cff 50%, #1e88e5 100%); }
 [aria-checked="true"].cartao-maquina { border-color: #ffd166; transform: translateY(-3px) scale(1.02); }
 .cartao-nivel {

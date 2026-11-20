@@ -2,6 +2,26 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.5.1",
+      "data": "20/Nov/2026",
+      "hora": "00:18:21",
+      "pt": [
+        "🧸 Máquina nova: Gigantes. Uma cabine maior, com poucas pelúcias enormes (ursão, coelhona, dinossauro, axolote, baleia, gatão e cachorrão) e um buraco grande",
+        "🦾 A garra dos Gigantes é grande, com dois braços em arco, como a das cabines de pelúcia gigante do fliperama",
+        "☁️ Céu com nuvens e estrelas, letreiro de letras coloridas e pelúcias sentadas em cima da cabine"
+      ],
+      "en": [
+        "🧸 New machine: Giants. A bigger booth with a few huge plushies (big bear, floppy bunny, dinosaur, axolotl, whale, big cat and big dog) and a big hole",
+        "🦾 The Giants claw is big, with two curved arms, like the giant plush booths at the arcade",
+        "☁️ Sky with clouds and stars, a colorful letter sign and plushies sitting on top of the booth"
+      ],
+      "es": [
+        "🧸 Máquina nueva: Gigantes. Una cabina más grande, con pocos peluches enormes (osote, conejota, dinosaurio, ajolote, ballena, gatote y perrazo) y un agujero grande",
+        "🦾 La garra de Gigantes es grande, con dos brazos en arco, como la de las cabinas de peluches gigantes de los recreativos",
+        "☁️ Cielo con nubes y estrellas, letrero de letras de colores y peluches sentados encima de la cabina"
+      ]
+    },
+    {
       "versao": "0.5.0",
       "data": "19/Nov/2026",
       "hora": "23:59:32",
