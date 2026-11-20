@@ -392,3 +392,33 @@ test('baladinha (dono, 20/Nov/2026): sala de luzes, amigas dançando e sombras c
   assert.match(app, /PurpurinaBalada\.iniciar/); assert.match(app, /purpurinaNova\.looks/);
   assert.match(fs.readFileSync(path.join(raiz, 'estilo.css'), 'utf8'), /\.bal-sombra svg \* \{ fill: currentColor !important/);
 });
+
+test('roupas de chuva (dono, 20/Nov/2026): capas com capuz por cima de qualquer roupa, guarda-chuva e bolsa/anel na mão do esqueleto', () => {
+  const capa = P.categoria('capa');
+  assert.deepEqual(capa.opcoes.map(o => o.id), ['nenhum', 'transparente', 'patinho', 'colorida', 'arcoiris']);
+  assert.ok(P.categoria('bolsa').opcoes.some(o => o.id === 'guardaChuva'));
+  // a capa vem com a cor do estilo (patinho amarela) e não tira a calça
+  let e = V.aplicar(V.limpar({ calca: 'legging' }), 'capa', 'patinho');
+  assert.equal(e.capaCor, 'amarelo'); assert.equal(e.calca, 'legging'); assert.ok(V.visivel(e, 'calca'));
+  for (const t of ['transparente', 'patinho', 'colorida', 'arcoiris']) {
+    for (const op of [{ rig: true }, {}, { angulo: 60 }, { angulo: 180 }]) {
+      const s = B.svg({ capa: t, bolsa: 'guardaChuva', idade: 'crianca' }, Object.assign({ id: 'ch' }, op));
+      assert.equal(bemFormado(s), '', t); assert.ok(!/NaN|undefined/.test(s), t);
+    }
+  }
+  // com o esqueleto, a bolsa de mão e o anel ficam dentro do braço (giram com ele)
+  const r = B.svg({ bolsa: 'coracao', anel: 'dois' }, { id: 'rg', rig: true }), iD = r.indexOf('class="rig-ombro-d"');
+  assert.ok(iD > 0 && r.slice(iD).includes('2.2 2'), 'bolsa na mão direita');
+  // combinação de roupa sem capa tira a capa
+  assert.ok(P.COMBOS.roupa.filter(c => c.id !== 'chuva').every(c => c.e.capa === 'nenhum'));
+  // braço sem "emenda": o antebraço sai em dois grupos (contorno e preenchimento) que o animador gira juntos
+  assert.equal((r.match(/class="rig-cotovelo-e"/g) || []).length, 2);
+  assert.match(require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8'), /querySelectorAll\('\.rig-cotovelo-'/);
+});
+
+test('placa de entrada da Baladinha (dono, 20/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path'), raiz = path.join(__dirname, '..');
+  const app = fs.readFileSync(path.join(raiz, 'app.js'), 'utf8'), css = fs.readFileSync(path.join(raiz, 'estilo.css'), 'utf8');
+  assert.match(app, /function placaBalada/); assert.match(app, /'Baladinha', 'Dance Party', 'Minidisco'/);
+  assert.match(css, /\.bal-placa \{/); assert.ok(global.PurpurinaAnim.POSES.abracao);
+});

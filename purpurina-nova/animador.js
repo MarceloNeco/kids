@@ -29,7 +29,9 @@
     umCimaE: { oE: 160, cE: 10, oD: 30, cD: 60, cab: 6, olho: 0.6, base: 'gingaD' },
     cotovelos: { oE: 70, cE: 115, oD: 70, cD: 115, cab: -4, olho: 0.5, base: 'gingaD' },
     palminhas: { oE: 28, cE: 135, fE: 0.6, oD: 28, cD: 135, fD: 0.6, cab: 4, olho: 0, base: 'reta' },
-    apontaCima: { oE: 50, cE: 120, oD: 165, cD: 0, cab: -8, olho: -0.8, base: 'gingaE' }
+    apontaCima: { oE: 50, cE: 120, oD: 165, cD: 0, cab: -8, olho: -0.8, base: 'gingaE' },
+    // pulando de braços abertos (placa da Baladinha)
+    abracao: { oE: 100, cE: -25, oD: 100, cD: -25, cab: 6, olho: 0, base: 'aberta' }
   };
   // pernas: [x, y, giro] do quadril (corpo) e de cada perna, e a saia inclinando (px do desenho, graus)
   var BASES = {
@@ -63,10 +65,11 @@
     function aplicarEm(svg, v, t) {
       var r = Math.sin(t / 650) * 1, ac = v.aceno * Math.sin(t / 95) * 16;   // respiração e o tchauzinho
       [['e', v.oE + r, v.cE, v.fE], ['d', v.oD + r, v.cD - ac, v.fD]].forEach(function (b) {
-        var om = svg.querySelector('.rig-ombro-' + b[0]), co = svg.querySelector('.rig-cotovelo-' + b[0]); if (!om || !co) return;
+        var om = svg.querySelector('.rig-ombro-' + b[0]), cos = svg.querySelectorAll('.rig-cotovelo-' + b[0]), co = cos[0]; if (!om || !co) return;
         var S = [+om.getAttribute('data-x'), +om.getAttribute('data-y')], E = [+co.getAttribute('data-x'), +co.getAttribute('data-y')];
         om.setAttribute('transform', B.transformaOmbro(b[0] === 'e' ? b[1] : -b[1], b[3], S));
-        co.setAttribute('transform', B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E));
+        var tc = B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E);
+        for (var q = 0; q < cos.length; q++) cos[q].setAttribute('transform', tc);   // contorno e preenchimento do antebraço
       });
       var cab = svg.querySelector('.rig-cabeca');
       var bate = op.ritmo ? Math.sin(t / op.ritmo * Math.PI * 2) * 4 : 0;   // dançando, a cabeça vai no ritmo

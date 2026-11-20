@@ -2,6 +2,29 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.7.0",
+      "data": "20/Nov/2026",
+      "hora": "14:13:33",
+      "pt": [
+        "☔ Roupas de chuva: nova parte \"Capas de chuva\" em Roupas, por cima de qualquer roupa e com capuz: transparente com unicórnios e arco-íris, de patinho (com olhinhos e bico no capuz), colorida com botões e arco-íris. E guarda-chuva em Acessórios → Bolsas. Combinação pronta \"Dia de chuva\" (capa de patinho, legging e galocha).",
+        "🪩 Baladinha com placa de entrada: \"Baladinha da Purpurina\" brilhando no fundo roxo, com estrelinhas, e ela pulando de braços abertos e piscando (toque para entrar).",
+        "💪 Braços sem emenda: o braço é uma peça só, sem as bolinhas no ombro e no cotovelo.",
+        "👜 A bolsa de mão e os anéis voltaram a aparecer e agora acompanham o braço quando ela se mexe."
+      ],
+      "en": [
+        "☔ Rain clothes: new \"Raincoats\" part in Clothes, over any outfit and with a hood: clear with unicorns and rainbows, duckling (with little eyes and a beak on the hood), colorful with snaps, and rainbow. Plus an umbrella in Accessories → Bags. Ready-made \"Rainy day\" combo (duckling raincoat, leggings and rain boots).",
+        "🪩 Dance party with a welcome sign: \"Dance Party with Purpurina\" glowing on a purple background, with sparkles, and her jumping with open arms and winking (tap to go in).",
+        "💪 Seamless arms: each arm is one piece, with no little balls at the shoulder and elbow.",
+        "👜 The handbag and rings are back and now move along with her arm."
+      ],
+      "es": [
+        "☔ Ropa de lluvia: nueva parte \"Chubasqueros\" en Ropa, encima de cualquier ropa y con capucha: transparente con unicornios y arcoíris, de patito (con ojitos y pico en la capucha), de colores con botones y arcoíris. Y un paraguas en Accesorios → Bolsos. Combinación lista \"Día de lluvia\" (chubasquero de patito, mallas y botas de agua).",
+        "🪩 Minidisco con cartel de entrada: \"Minidisco de Purpurina\" brillando sobre el fondo morado, con estrellitas, y ella saltando con los brazos abiertos y guiñando un ojo (toca para entrar).",
+        "💪 Brazos sin costura: cada brazo es una sola pieza, sin bolitas en el hombro ni en el codo.",
+        "👜 El bolso de mano y los anillos vuelven a aparecer y ahora siguen al brazo cuando se mueve."
+      ]
+    },
+    {
       "versao": "0.6.0",
       "data": "20/Nov/2026",
       "hora": "13:42:43",

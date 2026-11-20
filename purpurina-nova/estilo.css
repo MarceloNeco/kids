@@ -559,3 +559,23 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
   border-radius: 999px; background: rgba(0, 0, 0, .4); color: #fff; font-size: .85rem; white-space: nowrap; pointer-events: none; }
 .balada-botoes { grid-area: botoes; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: #0c0b1d; }
 @media (prefers-reduced-motion: reduce) { .bal-pula, .bal-lavar, .bal-flor, .bal-brilho { animation: none; } }
+/* placa de entrada da Baladinha: roxo, letreiro brilhando, estrelinhas e ela pulando de braços abertos */
+.bal-placa { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow: hidden; cursor: pointer;
+  background: radial-gradient(ellipse at 50% 30%, #8a52c8 0%, #5b2f93 45%, #34195e 100%); transition: opacity .45s ease, transform .45s ease; }
+.bal-placa::before { content: ""; position: absolute; inset: 0; opacity: .14; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 38px, #1a0b33 38px 41px), repeating-linear-gradient(90deg, transparent 0 78px, #1a0b33 78px 81px); }
+.bal-placa.saindo { opacity: 0; transform: scale(1.06); }
+.bal-letreiro { position: relative; margin: calc(var(--nav-alto, 52px) + 4vh) 0 0; text-align: center; line-height: 1; color: #fff6fb;
+  text-shadow: 0 0 6px #fff, 0 0 18px #ffb3e6, 0 0 36px #ff6ad5; animation: balNeon 2.2s ease-in-out infinite; }
+.bal-l1 { display: block; font-size: clamp(2.6rem, 13vw, 5.2rem); font-weight: 700; letter-spacing: .02em; }
+.bal-l2 { display: block; margin-top: .15em; font-size: clamp(1.8rem, 9vw, 3.6rem); font-style: italic; font-weight: 600; }
+@keyframes balNeon { 0%, 100% { opacity: 1; } 45% { opacity: .88; } 50% { opacity: 1; } 53% { opacity: .8; } 56% { opacity: 1; } }
+.bal-estrela { position: absolute; color: #fff; text-shadow: 0 0 10px #fff, 0 0 22px #ffc6f0; animation: balPisca 1.8s ease-in-out infinite; }
+.bal-estrela.e1 { left: 9%; top: 16%; font-size: 3.4rem; } .bal-estrela.e2 { right: 10%; top: 28%; font-size: 2.4rem; animation-delay: .5s; }
+.bal-estrela.e3 { left: 12%; top: 50%; font-size: 2rem; animation-delay: 1s; } .bal-estrela.e4 { right: 14%; bottom: 14%; font-size: 3rem; color: #ff9fd8; animation-delay: .3s; }
+@keyframes balPisca { 0%, 100% { transform: scale(.7); opacity: .6; } 50% { transform: scale(1.15); opacity: 1; } }
+.bal-placa-boneca { position: relative; flex: 1 1 auto; width: 100%; min-height: 0; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 2vh; }
+.bal-placa-pulo { height: 100%; max-height: 62vh; aspect-ratio: 400 / 720; animation: balPulo 1s cubic-bezier(.3, .7, .4, 1) infinite; }
+.bal-placa-pulo svg { width: 100%; height: 100%; display: block; overflow: visible; }
+@keyframes balPulo { 0%, 100% { transform: translateY(0) rotate(0); } 40% { transform: translateY(-9%) rotate(-3deg); } 60% { transform: translateY(-9%) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .bal-letreiro, .bal-estrela, .bal-placa-pulo { animation: none; } }

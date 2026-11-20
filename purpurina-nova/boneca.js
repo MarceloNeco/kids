@@ -376,17 +376,18 @@
 
     // ---------- vestido ou blusa ----------
     var iTop = out.length;
-    if (vis('vestido')) out.push(barra(vestido(e.vestido, C('vestido'), peca, linha, pele, peleE)));
-    else out.push(blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), peca, linha));
+    var roupaCima = vis('vestido') ? barra(vestido(e.vestido, C('vestido'), peca, linha, pele, peleE)) : blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), peca, linha);
+    // capa de chuva por cima de tudo, na mesma camada (as mangas seguem o braço como as da blusa)
+    out.push(vis('capa') ? roupaCima + barra(capa(e.capa, C('capa'), peca)) : roupaCima);
 
     // busto (adolescente e adulta): duas curvinhas da dobra da roupa embaixo do peito, da cor da peça mais escura
-    if (e.personagem !== 'menino' && (e.idade === 'adolescente' || e.idade === 'adulta')) {
+    if (e.personagem !== 'menino' && (e.idade === 'adolescente' || e.idade === 'adulta') && !vis('capa')) {
       var corB = vis('vestido') ? C('vestido').hex : e.blusa !== 'nenhum' ? C('blusa').hex : pele;
       out.push(p('M172,393 Q182,399 192,394 M208,394 Q218,399 228,393', { fill: 'none', stroke: esc(corB, 0.3), 'stroke-width': 1.3, 'stroke-linecap': 'round', opacity: 0.4 }));
     }
     // ---------- bolsa, mãos e joias do corpo ----------
     // bolsa de mão vai junto com a mão direita (não estica); a de ombro segue o corpo
-    if (vis('bolsa') && !tchau && !bracoPose && !rig) out.push(e.bolsa === 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : rigido(282, 496, bolsa(e.bolsa, C('bolsa'), peca, linha), [250, 354]));
+    if (vis('bolsa') && !tchau && !bracoPose && (!rig || e.bolsa === 'ombro')) out.push(e.bolsa === 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : rigido(282, 496, bolsa(e.bolsa, C('bolsa'), peca, linha), [250, 354]));
     var esmalte = { tipo: e.unhas, cor: C('unhas') };
     if (!semEsquerdo) out.push(rigido(118, 496, mao(118, -1, pele, peleE, esmalte), [150, 354]));
     if (!semDireito) out.push(rigido(282, 496, mao(282, 1, pele, peleE, esmalte), [250, 354]));
@@ -434,6 +435,7 @@
       out.push(cabeloTras(e, I, cab, cabE));
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
     } else {
+      if (vis('capa')) out.push(capuzAtras(e.capa, C('capa')));
       out.push(elip(116, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }), elip(284, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }));
       out.push(pintar(rosto, 'url(#' + I + 'pele)', esc(pele, 0.42), 1.1));
       out.push(luzLados(pele, menino), luzMeio(pele, I), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, olharV * 0.16, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, olharV * 0.16, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
@@ -449,6 +451,7 @@
       out.push('<g clip-path="url(#' + I + 'rostoF)"><g transform="translate(0 4)" opacity="' + n(0.2 + 0.25 * escuridao(pele)) + '">' +
         franjaF.replace(/fill="(url\([^)]*\)|#[0-9a-fA-F]{3,6})"/g, 'fill="' + esc(pele, 0.55) + '"').replace(/stroke="#[0-9a-fA-F]{3,6}"/g, 'stroke="' + esc(pele, 0.55) + '"') + '</g></g>');
       out.push(franjaF + fiosIlustra(franjaF, I, 'fiosF', e, cab, cabE));
+      if (vis('capa')) out.push(capuzFrente(e.capa, C('capa')));   // o capuz cobre o alto do cabelo
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
       if (vis('oculos')) out.push(oculos(e.oculos, C('oculos'), dO));
     }
@@ -476,7 +479,7 @@
       out.push(costas ? '<g transform="translate(400 0) scale(-1 1)">' + cabecaPronta + '</g>' : cabecaPronta);
     } else {
       // mão no cabelo: o braço sobe e a mão fica atrás da cabeça (desenhado antes da cabeça)
-      if (bracoPose === 'maoCabelo') out.push(bracosPose('maoCabeloAtras', tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
+      if (bracoPose === 'maoCabelo') out.push(bracosPose('maoCabeloAtras', tipoManga(), corDoTopo(), pele, peleE, esmalte, membro));
       out.push(cabecaPronta);
     }
     // o braço do tchau vai por cima de tudo (fica na frente do cabelo, do lado do rosto)
@@ -484,7 +487,7 @@
     if (tchau) out.push(rigido(250, 356, bracoTchau(pele, peleE, esmalte, membro, op.anim)));
     // beijinho: corações saindo da boca e subindo (na cabeça, para ficarem no lugar dela; .pp-beijo no estilo.css)
     if (bracoPose === 'beijo') out.push(grupo('<g class="pp-beijo">' + p(coracao(236, 256, 9), { fill: '#ff4f8b', stroke: '#fff', 'stroke-width': 1.5 }) + '</g><g class="pp-beijo pp-beijo2">' + p(coracao(252, 236, 6), { fill: '#ff8fc8', stroke: '#fff', 'stroke-width': 1.2 }) + '</g>'));
-    if (bracoPose) out.push(bracosPose(bracoPose, tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
+    if (bracoPose) out.push(bracosPose(bracoPose, tipoManga(), corDoTopo(), pele, peleE, esmalte, membro));
     // corpo de ilustração de moda: o corpo passa pela deformação e a cabeça (já pronta) só é reduzida e posta no lugar
     var cabecaGrupo = '<g transform="' + CABECA + '">';
     out = out.map(function (x) {
@@ -523,29 +526,37 @@
       var d = [(W[0] - S[0]) / L, (W[1] - S[1]) / L], Lu = L * 0.5, E = [S[0] + d[0] * Lu, S[1] + d[1] * Lu], k = DF.traco * 0.92 * DF.braco;
       function seg(A, B, w0, w1) {   // pedaço do braço: começa largo e afina, com as pontas redondas
         var nx = -(B[1] - A[1]), ny = B[0] - A[0], l = Math.sqrt(nx * nx + ny * ny) || 1; nx /= l; ny /= l;
-        return 'M' + n(A[0] + nx * w0) + ',' + n(A[1] + ny * w0) + ' L' + n(B[0] + nx * w1) + ',' + n(B[1] + ny * w1) + ' A' + n(w1) + ',' + n(w1) + ' 0 0 1 ' + n(B[0] - nx * w1) + ',' + n(B[1] - ny * w1) +
-          ' L' + n(A[0] - nx * w0) + ',' + n(A[1] - ny * w0) + ' A' + n(w0) + ',' + n(w0) + ' 0 0 1 ' + n(A[0] + nx * w0) + ',' + n(A[1] + ny * w0) + 'Z';
+        // pontas redondas para fora (sweep 0): no cotovelo as duas pontas se encaixam sem buraco
+        return 'M' + n(A[0] + nx * w0) + ',' + n(A[1] + ny * w0) + ' L' + n(B[0] + nx * w1) + ',' + n(B[1] + ny * w1) + ' A' + n(w1) + ',' + n(w1) + ' 0 0 0 ' + n(B[0] - nx * w1) + ',' + n(B[1] - ny * w1) +
+          ' L' + n(A[0] - nx * w0) + ',' + n(A[1] - ny * w0) + ' A' + n(w0) + ',' + n(w0) + ' 0 0 0 ' + n(A[0] + nx * w0) + ',' + n(A[1] + ny * w0) + 'Z';
       }
-      var traco = { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' };
-      var manga = tipoManga(), corTop = vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null);
-      var cima = p(seg(S, E, 11.5 * k, 8.5 * k), traco), baixo = p(seg(E, W, 8.5 * k, 6 * k), traco);
-      if (corTop && manga !== 'nada') {
-        var mangaT = { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' };
-        cima += manga === 'longa' ? p(seg(S, E, 13 * k, 10 * k), mangaT) : p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 14 * k, 12.5 * k), mangaT);
-        if (manga === 'longa') baixo += p(seg(E, [W[0] - d[0] * 4, W[1] - d[1] * 4], 10 * k, 7.5 * k), mangaT);
-      }
-      // ombro redondo por cima do resto da manga do desenho de baixo (some o "ganchinho" no ombro)
-      cima = circ(S[0], S[1], 15 * k, { fill: corTop && manga !== 'nada' ? corTop.hex : pele }) + cima;
+      /* sem "emenda" no cotovelo (dono, 20/Nov/2026): primeiro todos os contornos, depois todo o preenchimento por cima —
+         o braço e a manga viram uma peça só, sem as bolinhas de boneco articulado */
+      function duas(d, cor) { return { c: p(d, { fill: cor, stroke: esc(cor, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }), f: p(d, { fill: cor }) }; }
+      var manga = tipoManga(), corTop = corDoTopo();
+      var bc = duas(seg(S, E, 11.5 * k, 8.5 * k), pele), ab = duas(seg(E, W, 8.5 * k, 6 * k), pele);
+      var cimaC = bc.c, cimaF = bc.f, baixoC = ab.c, baixoF = ab.f;
+      if (corTop && manga === 'longa') {
+        var mc = duas(seg(S, E, 13 * k, 10 * k), corTop.hex), mb = duas(seg(E, [W[0] - d[0] * 4, W[1] - d[1] * 4], 10 * k, 7.5 * k), corTop.hex);
+        cimaC += mc.c; cimaF += mc.f; baixoC += mb.c; baixoF += mb.f;
+      } else if (corTop && manga !== 'nada') cimaF += p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 14 * k, 12.5 * k), { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
+      // ombro redondo por baixo do braço (some o "ganchinho" no ombro)
+      cimaC = circ(S[0], S[1], 13 * k, { fill: corTop && manga !== 'nada' ? corTop.hex : pele }) + cimaC;
       var esm = { tipo: e.unhas, cor: C('unhas') }, mk = DF.traco * 0.9;
-      var maoS = '<g transform="translate(' + n(W[0]) + ' ' + n(W[1]) + ') scale(' + n(mk * 100) / 100 + ') translate(' + (-wx0) + ' -497)">' + mao(wx0, lado, pele, peleE, esm) +
-        (lado < 0 && vis('pulseira') ? pulseira(e.pulseira, C('pulseira')) : '') + '</g>';
+      // a bolsa de mão (e o guarda-chuva) vai na mão direita e o anel no dedo: tudo dentro do grupo da mão, que gira com o braço
+      var naMao = lado > 0 && vis('bolsa') && e.bolsa !== 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : '';
+      var maoS = '<g transform="translate(' + n(W[0]) + ' ' + n(W[1]) + ') scale(' + n(mk * 100) / 100 + ') translate(' + (-wx0) + ' -497)">' + naMao + mao(wx0, lado, pele, peleE, esm) +
+        (lado < 0 && vis('pulseira') ? pulseira(e.pulseira, C('pulseira')) : '') + (vis('anel') ? anel(e.anel, C('anel'), lado) : '') + '</g>';
       // f: o braço de cima "vem para a frente" (fica mais curto na tela) — o antebraço desfaz o encolhimento e não deforma
       var pr = op.poseRig || {}, a = lado < 0 ? (pr.oE || 6) : -(pr.oD || 6), b = lado < 0 ? -(pr.cE || 8) : (pr.cD || 8), f0 = (lado < 0 ? pr.fE : pr.fD) || 1, lt = lado < 0 ? 'e' : 'd';
-      return '<g class="rig-ombro-' + lt + '" data-x="' + n(S[0]) + '" data-y="' + n(S[1]) + '" transform="' + transformaOmbro(a, f0, S) + '">' + cima +
-        '<g class="rig-cotovelo-' + lt + '" data-x="' + n(E[0]) + '" data-y="' + n(E[1]) + '" transform="' + transformaCotovelo(b, f0, E) + '">' + baixo + maoS + '</g>' +
-        circ(E[0], E[1], 8.5 * k, { fill: corTop && manga === 'longa' ? corTop.hex : pele }) + '</g>';
+      // o antebraço sai em dois grupos com a mesma classe (contorno e preenchimento): o animador gira os dois juntos
+      var cot = '<g class="rig-cotovelo-' + lt + '" data-x="' + n(E[0]) + '" data-y="' + n(E[1]) + '" transform="' + transformaCotovelo(b, f0, E) + '">';
+      return '<g class="rig-ombro-' + lt + '" data-x="' + n(S[0]) + '" data-y="' + n(S[1]) + '" transform="' + transformaOmbro(a, f0, S) + '">' + cimaC +
+        cot + baixoC + '</g>' + cimaF + cot + baixoF + maoS + '</g></g>';
     }
+    function corDoTopo() { return vis('capa') ? C('capa') : vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null); }
     function tipoManga() {
+      if (vis('capa')) return 'longa';
       var temVest = vis('vestido');
       return temVest ? (['casaco', 'macacao'].indexOf(e.vestido) >= 0 ? 'longa' : ['tomara', 'verao', 'jardineira'].indexOf(e.vestido) >= 0 ? 'nada' : 'curta') :
         (['sueter', 'jaqueta', 'pijama', 'moletom', 'camisa'].indexOf(e.blusa) >= 0 ? 'longa' : ['regata', 'ombro', 'colete', 'nenhum'].indexOf(e.blusa) >= 0 ? 'nada' : 'curta');
@@ -556,13 +567,13 @@
       var compVest = { princesa: 640, gala: 640, sereia: 640, camisola: 600, festa: 560, rodado: 560, verao: 540, fada: 540, tomara: 560, casaco: 540, jardineira: 530, macacao: 640 }[e.vestido] || 560;
       var compSaia = { curta: 510, tutu: 515, balone: 520, pregas: 540, jeans: 530, camadas: 560, longa: 630 }[e.saia] || 530;
       var compCalca = { shorts: 505, bermuda: 545 }[e.calca] || 636;
-      var manga = tipoManga();
+      var manga = tipoManga(), corBraco = vis('capa') ? C('capa') : corTop;
       // braço e perna de lá (atrás)
       var bracoLa = 'M197,356 Q186,424 182,492', pernaLa = 'M195,456 L190,640';
       s += membro(pernaLa, 27) + sombra(pernaLa, 27);
       if (vis('calca')) s += p(pernaLa.replace('640', String(compCalca)), { stroke: C('calca').hex, 'stroke-width': 31, 'stroke-linecap': 'round', fill: 'none' }) + sombra(pernaLa.replace('640', String(compCalca)), 31);
       s += sapatoLado(190, true);
-      s += membro(bracoLa, 21) + (manga === 'longa' && corTop ? p(bracoLa, { stroke: corTop.hex, 'stroke-width': 24, 'stroke-linecap': 'round', fill: 'none' }) : '') + sombra(bracoLa, 22) + maoLado(182, 497, true);
+      s += membro(bracoLa, 21) + (manga === 'longa' && corBraco ? p(bracoLa, { stroke: corBraco.hex, 'stroke-width': 24, 'stroke-linecap': 'round', fill: 'none' }) : '') + sombra(bracoLa, 22) + maoLado(182, 497, true);
       // perna de cá
       var pernaCa = 'M206,456 L210,640';
       s += membro(pernaCa, 29);
@@ -578,10 +589,12 @@
         s += peca('M' + (decote.split(' ')[0].slice(1)) + ' Q233,350 233,380 Q230,420 225,' + (temVest ? 452 : 462) + ' L177,' + (temVest ? 452 : 462) + ' Q171,420 172,382 Q170,356 ' + decote.split(' ')[0].slice(1) + 'Z', corTop, catTop);
         s += p(decote, { fill: 'none', stroke: esc(corTop.hex, 0.3), 'stroke-width': 1.6 });
       }
+      // capa de chuva de lado: por cima de tudo, até o joelho
+      if (vis('capa')) s += peca('M180,336 Q200,328 218,334 Q236,348 236,380 L254,562 Q204,572 154,562 L172,382 Q170,350 180,336Z', C('capa'), 'x');
       // braço de cá, na frente do tronco
       var bracoCa = 'M203,354 Q208,426 212,494';
       s += membro(bracoCa, 23);
-      if (corTop && manga !== 'nada') s += manga === 'longa' ? p('M203,352 Q208,424 212,486', { stroke: corTop.hex, 'stroke-width': 26, 'stroke-linecap': 'round', fill: 'none' }) + p('M203,352 Q208,424 212,486', { stroke: esc(corTop.hex, 0.3), 'stroke-width': 26, 'stroke-linecap': 'round', fill: 'none', opacity: 0.18 })
+      if (corBraco && manga !== 'nada') s += manga === 'longa' ? p('M203,352 Q208,424 212,486', { stroke: corBraco.hex, 'stroke-width': 26, 'stroke-linecap': 'round', fill: 'none' }) + p('M203,352 Q208,424 212,486', { stroke: esc(corBraco.hex, 0.3), 'stroke-width': 26, 'stroke-linecap': 'round', fill: 'none', opacity: 0.18 })
         : peca('M190,346 Q204,336 218,348 L220,392 Q206,398 192,392Z', corTop, catTop);
       s += maoLado(212, 499, false);
       return s;
@@ -1755,6 +1768,82 @@
     }
     return s;
   }
+  /* ---------- capa de chuva (dono, 20/Nov/2026, com foto de referência) ----------
+     Vai por cima de qualquer roupa, até o joelho, com mangas compridas e capuz na cabeça (capuzAtras / capuzFrente).
+     transparente: plástico rosinha que deixa ver a roupa, com unicórnios, arco-íris e estrelinhas; patinho: amarela,
+     bolsos com vivo vermelho e o capuz com olhinhos e bico; colorida: lisa com botões de pressão e bolsos de lapela;
+     arcoiris: listras de arco-íris. */
+  var CAPA_CORPO = 'M150,346 Q160,334 182,332 L218,332 Q240,334 250,346 L262,372 L286,566 Q200,580 114,566 L138,372Z';
+  function capaX(y, lado) { var k = (y - 372) / (566 - 372); return lado < 0 ? 138 - 24 * k : 262 + 24 * k; }   // borda da capa na altura y
+  function unicornio(x, y, k) {
+    k = k || 1;
+    function q(v) { return n(v * k); }
+    return '<g transform="translate(' + x + ' ' + y + ')">' +
+      p('M' + q(-6) + ',' + q(-7) + ' Q' + q(-12) + ',' + q(0) + ' ' + q(-8) + ',' + q(8), { fill: 'none', stroke: '#ff8fc8', 'stroke-width': n(3.4 * k), 'stroke-linecap': 'round' }) +   // crina
+      circ(0, 0, 7 * k, { fill: '#fff', stroke: '#c9b6d9', 'stroke-width': 0.8 }) + elip(5 * k, 3 * k, 4.6 * k, 3.6 * k, { fill: '#fff', stroke: '#c9b6d9', 'stroke-width': 0.8 }) +
+      p('M' + q(-1) + ',' + q(-6) + ' L' + q(2) + ',' + q(-15) + ' L' + q(4) + ',' + q(-5) + 'Z', { fill: '#ffd23f', stroke: '#d9a520', 'stroke-width': 0.6 }) +   // chifre
+      circ(1.5 * k, -1 * k, 1.1 * k, { fill: '#3a2440' }) + circ(6.5 * k, 3 * k, 0.7 * k, { fill: '#c9a0b8' }) + '</g>';
+  }
+  function unicornioPreso(x, y, k) { return rigido(x, y, unicornio(x, y, k)); }   // na capa: vai para o lugar certo do corpo sem esticar
+  function arcoIris(x, y, r) {
+    var s = '';
+    ['#ff5f6d', '#ffb03b', '#ffe14d', '#5fd38d', '#4fa3ff', '#a77bff'].forEach(function (c, i) {
+      var ri = r - i * r * 0.13;
+      s += p('M' + n(x - ri) + ',' + y + ' A' + n(ri) + ',' + n(ri) + ' 0 0 1 ' + n(x + ri) + ',' + y, { fill: 'none', stroke: c, 'stroke-width': n(r * 0.13 + 0.3) });
+    });
+    return s + circ(x - r, y, r * 0.28, { fill: '#fff' }) + circ(x + r, y, r * 0.28, { fill: '#fff' });
+  }
+  function capa(tipo, cor, peca) {
+    var c = esc(cor.hex, 0.3), s = '', formas = [CAPA_CORPO, MANGA_LONGA, espelhar(MANGA_LONGA)];
+    var vivo = tipo === 'patinho' ? '#e8384f' : tipo === 'transparente' ? esc(cor.hex, 0.12) : tipo === 'arcoiris' ? '#a77bff' : cla(cor.hex, 0.5);
+    if (tipo === 'transparente') {
+      s += '<g opacity=".55">' + peca(formas, cor, 'x') + '</g>';
+      s += unicornioPreso(226, 404, 1.7) + arcoIris(170, 432, 16) + unicornioPreso(168, 500, 1.5) + arcoIris(234, 506, 15) + unicornioPreso(232, 552, 1.3) + arcoIris(150, 552, 12);
+      [[196, 452], [244, 452], [180, 528], [210, 372]].forEach(function (q) { s += p(estrela4(q[0], q[1], 4), { fill: '#fff', opacity: 0.95 }); });
+      s += p('M158,364 Q148,450 146,548', { fill: 'none', stroke: '#fff', 'stroke-width': 5, opacity: 0.45, 'stroke-linecap': 'round' }) +   // brilho do plástico
+        p('M244,380 Q252,450 258,520', { fill: 'none', stroke: '#fff', 'stroke-width': 3, opacity: 0.35, 'stroke-linecap': 'round' });
+    } else if (tipo === 'arcoiris') {
+      s += peca(formas, cor, 'x');
+      var cores = ['#ff5f6d', '#ffb03b', '#ffe14d', '#5fd38d', '#4fa3ff', '#a77bff'];
+      for (var i = 0; i < 6; i++) {
+        var y0 = 372 + i * 32.3, y1 = y0 + 32.3;
+        s += p('M' + n(capaX(y0, -1)) + ',' + n(y0) + ' L' + n(capaX(y0, 1)) + ',' + n(y0) + ' L' + n(capaX(y1, 1)) + ',' + n(y1) + (i === 5 ? ' Q200,580 ' : ' L') + n(capaX(y1, -1)) + ',' + n(y1) + 'Z', { fill: cores[i], opacity: 0.92 });
+      }
+      s += p('M150,346 Q160,334 182,332 L218,332 Q240,334 250,346 L262,372 L138,372Z', { fill: cores[0], opacity: 0.92 });
+    } else s += peca(formas, cor, 'x');
+    // fecho no meio, botões de pressão, bolsos e a barra com vivo
+    s += p('M200,338 L200,574', { fill: 'none', stroke: esc(cor.hex, 0.35), 'stroke-width': 1.8, opacity: 0.7 });
+    [380, 420, 460, 500, 540].forEach(function (y) { s += circ(207, y, 3.4, { fill: tipo === 'transparente' ? '#fff' : cla(cor.hex, 0.75), stroke: c, 'stroke-width': 1 }); });
+    if (tipo === 'patinho' || tipo === 'colorida') {
+      [[148, 1], [216, 1]].forEach(function (q) {
+        var x = q[0];
+        s += p('M' + x + ',478 L' + (x + 36) + ',478 L' + (x + 36) + ',516 Q' + (x + 18) + ',520 ' + x + ',516Z', { fill: tipo === 'patinho' ? cor.hex : esc(cor.hex, 0.08), stroke: c, 'stroke-width': 1.2 });
+        s += p('M' + x + ',478 L' + (x + 36) + ',478', { fill: 'none', stroke: vivo, 'stroke-width': 3, 'stroke-linecap': 'round' });
+        if (tipo === 'colorida') s += p('M' + x + ',478 L' + (x + 36) + ',478 L' + (x + 32) + ',490 L' + (x + 4) + ',490Z', { fill: cla(cor.hex, 0.25), stroke: c, 'stroke-width': 1 }) + circ(x + 18, 486, 2.4, { fill: '#fff' });
+      });
+    }
+    s += p('M114,566 Q200,580 286,566', { fill: 'none', stroke: vivo, 'stroke-width': 3.2, 'stroke-linecap': 'round', opacity: 0.9 });
+    return s;
+  }
+  // capuz: a parte de dentro (atrás da cabeça) e o aro em volta do rosto, por cima do cabelo
+  var CAPUZ = 'M84,334 Q64,168 116,98 Q156,44 200,42 Q244,44 284,98 Q336,168 316,334 Q260,350 200,350 Q140,350 84,334Z';
+  var ABERTURA = 'M101,212 A99,112 0 1 0 299,212 A99,112 0 1 0 101,212Z';
+  function capuzAtras(tipo, cor) {
+    return p(CAPUZ, { fill: esc(cor.hex, 0.28), opacity: tipo === 'transparente' ? 0.5 : 1 });
+  }
+  function capuzFrente(tipo, cor) {
+    var c = esc(cor.hex, 0.35), transp = tipo === 'transparente';
+    var s = p(CAPUZ + ' ' + ABERTURA, { fill: cor.hex, 'fill-rule': 'evenodd', stroke: c, 'stroke-width': 1.6, opacity: transp ? 0.6 : 1 });
+    s += p(ABERTURA, { fill: 'none', stroke: tipo === 'patinho' ? '#e8384f' : esc(cor.hex, 0.2), 'stroke-width': 4, opacity: transp ? 0.8 : 1 });   // vivo em volta do rosto
+    s += p('M118,110 Q150,66 196,56', { fill: 'none', stroke: '#fff', 'stroke-width': 5, opacity: 0.4, 'stroke-linecap': 'round' });   // brilho do plástico
+    if (transp) s += unicornio(258, 92, 1.3) + p(estrela4(132, 120, 4), { fill: '#fff' }) + p(estrela4(176, 64, 3), { fill: '#fff' });
+    if (tipo === 'patinho') {
+      [170, 230].forEach(function (x) { s += circ(x, 70, 13, { fill: '#fff', stroke: '#3a2a20', 'stroke-width': 1.4 }) + circ(x + 2, 72, 6.5, { fill: '#222' }) + circ(x + 4, 69, 2.2, { fill: '#fff' }); });
+      s += p('M172,92 Q200,80 228,92 Q220,108 200,108 Q180,108 172,92Z', { fill: '#ff6a2b', stroke: '#c94a1a', 'stroke-width': 1.4 }) + p('M176,94 Q200,100 224,94', { fill: 'none', stroke: '#c94a1a', 'stroke-width': 1.2 });
+    }
+    if (tipo === 'colorida' || tipo === 'arcoiris') s += p('M150,318 L146,352 M250,318 L254,352', { fill: 'none', stroke: '#fff', 'stroke-width': 2.4, 'stroke-linecap': 'round' }) + circ(146, 354, 3.2, { fill: '#fff' }) + circ(254, 354, 3.2, { fill: '#fff' });   // cordinhas
+    return s;
+  }
   function asas(cor) {
     var o = { fill: cla(cor.hex, 0.45), opacity: 0.78, stroke: '#fff', 'stroke-width': 2.5 };
     function asa(cx, cy, rx, ry, ang) { return elip(cx, cy, rx, ry, Object.assign({ transform: 'rotate(' + ang + ' ' + cx + ' ' + cy + ')' }, o)) + elip(cx, cy, rx * 0.55, ry * 0.45, { fill: '#fff', opacity: 0.35, transform: 'rotate(' + ang + ' ' + cx + ' ' + cy + ')' }); }
@@ -1914,6 +2003,15 @@
         s += peca('M238,446 Q238,440 244,440 L282,440 Q288,440 288,446 L288,484 Q288,490 282,490 L244,490 Q238,490 238,484Z', cor, 'x');
         s += p('M238,444 L288,444 L287,466 Q263,476 239,466Z', { fill: esc(cor.hex, 0.13), stroke: c, 'stroke-width': 1 }) + costura('M241,447 L285,447 M241,463 Q263,472 285,463') + metal(259, 466, 8, 9) + elip(248, 480, 6, 2, { fill: '#fff', opacity: 0.22 });
         return s;
+      case 'guardaChuva':
+        // guarda-chuva fechado pendurado na mão: cabo em gancho na mão, haste e o pano enrolado com a fitinha
+        var g = p('M288,500 Q296,488 286,482 Q276,478 274,490 L274,516', { fill: 'none', stroke: '#8a5a2a', 'stroke-width': 4.4, 'stroke-linecap': 'round' }) +
+          p('M288,500 Q296,488 286,482 Q276,478 274,490 L274,516', { fill: 'none', stroke: '#c48a4c', 'stroke-width': 2.4, 'stroke-linecap': 'round' });
+        g += p('M274,512 L274,660', { stroke: '#9aa3b5', 'stroke-width': 2.2 });
+        g += peca('M274,514 Q262,560 266,632 L274,650 L282,632 Q286,560 274,514Z', cor, 'x');
+        g += p('M274,516 Q270,580 272,640', { fill: 'none', stroke: esc(cor.hex, 0.3), 'stroke-width': 1.2, opacity: 0.7 }) + p('M268,600 Q274,604 280,600', { fill: 'none', stroke: '#fff', 'stroke-width': 2.4, 'stroke-linecap': 'round' }) +
+          p('M267,560 L268,612', { fill: 'none', stroke: '#fff', 'stroke-width': 2, opacity: 0.45, 'stroke-linecap': 'round' }) + p('M274,650 L274,664', { stroke: '#6b7385', 'stroke-width': 2.6, 'stroke-linecap': 'round' });
+        return g;
       case 'coracao':
         return alca('M270,536 Q270,500 282,497 Q294,500 294,536', 3.4) + sombra(282, 572, 18) +
           peca(coracao(282, 548, 21), cor, 'x') + p(coracao(282, 548, 15), { fill: 'none', stroke: cl, 'stroke-width': 1.1, 'stroke-dasharray': '2.2 2' }) +
@@ -1977,7 +2075,7 @@
     }
     return s;
   }
-  function anel(tipo, cor) {
+  function anel(tipo, cor, soLado) {
     // anel visto de frente: só a faixinha que passa na frente do dedo anelar, com o enfeite em cima
     function um(lado, topo) {
       var q = dedoDoAnel(lado < 0 ? 118 : 282, lado), x = q[0], y = q[1];
@@ -1989,8 +2087,9 @@
       if (topo === 'estrela') t += p(estrela5(x, y + 0.6, 4, 1.8), { fill: cor.hex, stroke: esc(cor.hex, 0.3), 'stroke-width': 0.7 });
       return rigido(lado < 0 ? 118 : 282, 496, t, [lado < 0 ? 150 : 250, 354]);   // vai junto com a mão
     }
-    if (tipo === 'dois') return um(-1, 'pedra') + um(1, 'coracao');
-    return um(-1, tipo);
+    // soLado (esqueleto): só o anel daquela mão (-1 esquerda, 1 direita), para ir junto com o braço
+    if (tipo === 'dois') return (soLado !== 1 ? um(-1, 'pedra') : '') + (soLado !== -1 ? um(1, 'coracao') : '');
+    return soLado === 1 ? '' : um(-1, tipo);
   }
   function broche(tipo, cor) {
     var x = 174, y = 388, c = esc(cor.hex, 0.3);
