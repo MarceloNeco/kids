@@ -2,6 +2,29 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.5.5",
+      "data": "20/Nov/2026",
+      "hora": "16:26:43",
+      "pt": [
+        "✨ A máquina escolhida no menu fica bem clara: maior, com uma luz colorida que corre em volta, brilho piscando e um ✓ no canto",
+        "▶ O Jogar fica sempre à vista, preso embaixo, junto com o nível, numa linha só, e diz qual máquina você escolheu (\"Gigantes · Fácil\")",
+        "🎰 Em cima dos cartões: \"Escolha uma das 8 máquinas\"",
+        "🧸 Na Gigantes, a máquina fica cheia: o dobro de pelúcias, maiores, amontoadas umas nas outras, sem nenhuma parecendo flutuar"
+      ],
+      "en": [
+        "✨ The chosen machine on the menu is now easy to spot: bigger, with a colorful light running around it, a pulsing glow and a ✓ in the corner",
+        "▶ Play is always in sight, pinned at the bottom on one line with the level, and it says which machine you picked (\"Giants · Easy\")",
+        "🎰 Above the cards: \"Pick one of the 8 machines\"",
+        "🧸 On Giants, the machine is packed: twice as many plushies, bigger, piled on top of each other, none of them looking like they float"
+      ],
+      "es": [
+        "✨ La máquina elegida en el menú se ve clarísima: más grande, con una luz de colores que le da la vuelta, un brillo que parpadea y un ✓ en la esquina",
+        "▶ Jugar está siempre a la vista, fijo abajo junto con el nivel, en una sola línea, y dice qué máquina has elegido (\"Gigantes · Fácil\")",
+        "🎰 Encima de las tarjetas: \"Elige una de las 8 máquinas\"",
+        "🧸 En Gigantes, la máquina está llena: el doble de peluches, más grandes, amontonados unos sobre otros, sin ninguno que parezca flotar"
+      ]
+    },
+    {
       "versao": "0.5.4",
       "data": "20/Nov/2026",
       "hora": "13:50:20",

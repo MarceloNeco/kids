@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, FESTA, criarPremio, animar } from './premios3d.js';
 import { montarMaquina, montarTesoura, MEDIDAS_TESOURA } from './cenario3d.js';
 
-const APP_VERSION = '0.5.4', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
+const APP_VERSION = '0.5.5', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -80,6 +80,11 @@ const quantos = (id) => todosDe(id).filter((k) => colecao[k] > 0).length;
 function pintarMenu() {
   marcar('maquinas', 'data-maquina', pref.maquina); marcar('niveis', 'data-nivel', pref.nivel);
   const f = festaInfo(); $('festaIco').textContent = f.ico; $('festaNome').textContent = t(f.nome[0], f.nome[1], f.nome[2]);   // a festa de hoje
+  // quantas máquinas tem, e no Jogar: qual máquina e qual nível estão escolhidos (dono, 20/Nov/2026)
+  const n = IDS.length, mq = MAQUINAS[pref.maquina], nm = pref.maquina === 'festas' ? f.nome : mq.nome;
+  $('tituloMaquinas').textContent = t('Escolha uma das ' + n + ' máquinas', 'Pick one of the ' + n + ' machines', 'Elige una de las ' + n + ' máquinas');
+  $('jogarQual').textContent = document.querySelector('[data-maquina="' + pref.maquina + '"] .ico').textContent + ' ' + t(nm[0], nm[1], nm[2]) + ' · ' +
+    { facil: t('Fácil', 'Easy', 'Fácil'), medio: t('Médio', 'Medium', 'Medio'), dificil: t('Difícil', 'Hard', 'Difícil') }[pref.nivel];
   IDS.forEach((id) => { const n = quantos(id); document.querySelector('[data-col="' + id + '"]').textContent = n ? '🧸 ' + n + '/' + todosDe(id).length : ''; });
   const total = IDS.reduce((s, id) => s + quantos(id), 0), max = IDS.reduce((s, id) => s + todosDe(id).length, 0);
   $('colecaoConta').textContent = total ? total + '/' + max : '';
@@ -187,7 +192,8 @@ function novaPartida() {
     MED = MEDIDAS_TESOURA; maq = montarTesoura(cena); objetos = [];
   } else {
     m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam,
-      qtdFator: def.andam ? 0.32 : def.gigante ? 0.24 : 1, raioFator: def.andam ? 1.12 : def.gigante ? 1.95 : 1, medidas: def.gigante ? Maquina.GIGANTE : undefined, semente, semGanhar });
+      qtdFator: def.andam ? 0.32 : def.gigante ? 0.4 : 1, raioFator: def.andam ? 1.12 : def.gigante ? 1.9 : 1,   // gigantes: máquina cheia de pelúcias enormes (dono, 20/Nov/2026)
+       medidas: def.gigante ? Maquina.GIGANTE : undefined, semente, semGanhar });
     MED = m.med;
     maq = montarMaquina(cena, pref.maquina, MED, { festa: FESTA });
     objetos = m.premios.map((p) => { const o = criarPremio(p.tipo); o.userData.id = p.id; cena.add(o); return o; });
@@ -486,13 +492,15 @@ function mostrarPorta(dt) {
 // as máquinas de garra: prêmios e mira
 function desenharGarra(seg, dt) {
   // prêmios: posição e giro da física, olhos piscando, asas batendo, vivos se mexendo
-  const vivos = !!MAQUINAS[pref.maquina].vivos, escala = MAQUINAS[pref.maquina].andam ? 1.4 : 1;
+  const vivos = !!MAQUINAS[pref.maquina].vivos, gig = !!MAQUINAS[pref.maquina].gigante, escala = MAQUINAS[pref.maquina].andam ? 1.4 : gig ? 1.32 : 1;
+  // gigantes: o desenho é maior que a bola da física e afunda um pouco, para as pelúcias se apertarem umas nas outras
+  // (amontoadas, sem vão entre elas, nada "voando"); a bola continua cabendo no buraco
   m.premios.forEach((p, i) => {
     const o = objetos[i];
     o.visible = !(p.ganho && p.y < -p.r * 1.4);
     if (!o.visible) return;
     // os bichos de verdade aparecem maiores que a bola da física (são compridos), mas a bola continua cabendo no buraco
-    o.position.set(p.x, p.y + (escala > 1 ? p.r * 0.12 : 0), p.z); o.quaternion.set(p.q[0], p.q[1], p.q[2], p.q[3]); o.scale.setScalar(p.r * escala);
+    o.position.set(p.x, p.y + (gig ? -p.r * 0.08 : escala > 1 ? p.r * 0.12 : 0), p.z); o.quaternion.set(p.q[0], p.q[1], p.q[2], p.q[3]); o.scale.setScalar(p.r * escala);
     if (!calmo) animar(o, seg, vivos && !p.preso, p.preso, p.passeio > 0);
   });
   // mira (fácil e médio): o anel fica em cima do que está debaixo da garra
