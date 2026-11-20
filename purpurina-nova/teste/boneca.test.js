@@ -440,3 +440,13 @@ test('silhueta feminina natural (dono, 20/Nov/2026: "dois triângulos… o busto
   // com o braço se mexendo, a manga parada nem é desenhada (sem toco do lado)
   assert.match(require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8'), /function pecaTopo/);
 });
+
+test('desfile de modelo e dança no ritmo (dono, 20/Nov/2026: "quero desfile realista e baladinha")', () => {
+  const fs = require('fs'), path = require('path'), raiz = path.join(__dirname, '..');
+  const anim = fs.readFileSync(path.join(raiz, 'animador.js'), 'utf8'), app = fs.readFileSync(path.join(raiz, 'app.js'), 'utf8'), bal = fs.readFileSync(path.join(raiz, 'balada.js'), 'utf8');
+  assert.match(anim, /modo === 'andar'/); assert.match(anim, /modo === 'dancar'/); assert.match(anim, /modo: function/);
+  assert.match(anim, /var dentro = lado \* 7/, 'o pé vai para a linha do meio (catwalk)');
+  assert.match(app, /modo: 'andar', passoMs: PASSO_MS\[idade\]/, 'a modelo anda com o esqueleto');
+  assert.doesNotMatch(app, /mod\.classList\.add\('andando'\)/, 'sem o andar antigo de CSS na modelo');
+  assert.match(bal, /modo: 'dancar'/); assert.doesNotMatch(bal, /bal-pula/, 'na Baladinha as pernas dançam, a boneca não pula inteira');
+});

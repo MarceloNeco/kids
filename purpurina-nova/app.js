@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.7.2';
+  var APP_VERSION = '0.8.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -891,12 +891,15 @@
       ler('purpurinaNova.looks', []).map(function (l) { return V.limpar(l.e); }).filter(function (e) { return !V.iguais(e, estado); }).slice(0, 4).forEach(function (e, i) {
         depois(i * 900, function () {
           var f = document.createElement('div'), alt = ALT[e.idade] || 1, menino2 = e.personagem === 'menino';
-          f.className = 'modelo figurante idade-' + (e.idade || 'adulta') + (CALMO ? '' : ' andando');
-          f.innerHTML = '<div class="passarela-boneca">' + B.svg(e, { id: 'fig' + i, fundo: false, anim: false, realce: false, passos: true }) + '</div>';
+          f.className = 'modelo figurante idade-' + (e.idade || 'adulta');
+          f.innerHTML = '<div class="passarela-boneca">' + B.svg(e, { id: 'fig' + i, fundo: false, anim: false, realce: false, passos: true, rig: !CALMO, sorriso: true }) + '</div>';
+          // a amiga também entra andando de modelo (andar do animador.js) e depois troca de pose sem trocar de "foto"
+          var animF = CALMO ? null : PurpurinaAnim.criar(f.firstChild, { poses: ['relax'], enquanto: vale, modo: 'andar', passoMs: PASSO_MS[e.idade] || 980 });
           $('cameraDesfile').insertBefore(f, mod);
           var POSES_F = menino2 ? ['cruzados', 'bolsos', 'joinha'] : ['cintura', 'duasCintura', 'maoCabelo', 'carinha'];
           function posarF() {
             var pz = POSES_F[Math.floor(Math.random() * POSES_F.length)];
+            if (animF) { animF.modo(''); animF.trocar(NOME_RIG[pz] || 'relax'); return; }
             f.classList.remove('ginga-esq', 'ginga-dir'); f.classList.add(pz === 'cintura' ? 'ginga-dir' : pz === 'maoCabelo' ? 'ginga-esq' : (Math.random() < 0.5 ? 'ginga-esq' : 'ginga-dir'));
             f.firstChild.innerHTML = B.svg(e, { id: 'fig' + i, fundo: false, anim: false, realce: false, passos: true, sorriso: true, pose: pz });
           }
@@ -907,7 +910,7 @@
             if (!vale()) return;
             var k = Math.min(1, (agora - ini) / dur), e2 = 1 - Math.pow(1 - k, 1.5);
             lugarDe(f, 0.42 * e2, LADOS[i] * e2, alt);
-            if (k < 1) requestAnimationFrame(andar); else { f.classList.remove('andando'); posarF(); trocarF(); }
+            if (k < 1) requestAnimationFrame(andar); else { posarF(); trocarF(); }
           })(ini);
         });
       });
@@ -920,6 +923,7 @@
     // Nova Era: o corpo novo já tem a altura de cada idade (a criancinha é mais baixa no próprio desenho); 0,8 deixa ela
     // inteira na tela quando chega na frente (dono, 20/Nov/2026: "sai do quadro")
     var ALTURA = 0.8;
+    var PASSO_MS = { pequena: 600, crianca: 780, adolescente: 900, adulta: 980 };   // dois passos, mais rápido nas pequenas
     $('modelo').className = 'modelo idade-' + idade;
     var POSES_DESFILE = ({
       pequena: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'joinha', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'carinha', lado: '' }],
@@ -972,7 +976,10 @@
     if (CALMO) { lugar(1); posar(POSES_DESFILE[0]); entrarTurma(); }
     else {
       titulo.classList.add('esperando'); jur.classList.add('esperando');
-      lugar(0); pose({}); mod.classList.add('andando');
+      // andar de modelo (dono, 20/Nov/2026: "desfile realista"): o esqueleto anda — pé cruzando na linha do meio, quadril
+      // para o lado da perna de apoio, braços soltos e cabeça firme (animador.js, modo 'andar'), sem o andar de CSS
+      lugar(0); pose({ rig: true });
+      animD = PurpurinaAnim.criar(pas, { poses: ['relax'], enquanto: vale, modo: 'andar', passoMs: PASSO_MS[idade] || 980 });
       fogos(seq, 9000);
       var ini = performance.now(), dur = 3600;
       (function andar(agora) {
@@ -986,7 +993,8 @@
           // cintura, as duas mãos na cintura, mão no cabelo ou tchauzinho; menino: braços cruzados ou mãos nos bolsos — com a
           // "inclinadinha"; olha para um lado e para o outro; vira de três-quartos para um lado e para o outro
           // (Nova Era: sem volta inteira) e fica trocando de pose, sorteada, de tempos em tempos
-          mod.classList.remove('andando'); posar(sortear());
+          // chegou: para numa pose de modelo, sorrindo (o esqueleto sai do andar devagar, sem pulo)
+          pose({ sorriso: true, rig: true }); if (animD) animD.modo(''); posar(sortear());
           titulo.classList.remove('esperando'); jur.classList.remove('esperando');
           Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 400); confete();
           depois(1600, function () { if (animD) animD.trocar('olhaE'); depois(1400, function () { if (animD) animD.trocar('olhaD'); depois(1400, function () { posar(poseAtual); depois(900, function () {

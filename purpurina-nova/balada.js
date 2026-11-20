@@ -3,7 +3,8 @@
    (azul, rosa, amarelo), a flor de luz com o coração, o coração espelhado pendurado e o chão refletindo as cores. A
    personagem dança no meio e até 2 amigas dos lados (looks guardados; sem looks, combinações prontas); cada uma tem
    2 sombras coloridas na parede que fazem os mesmos passos (o animador.js mexe a dançarina e as sombras juntas).
-   Tocar na tela troca a cor da luz e todas fazem o mesmo passo juntas.
+   Tocar na tela troca a cor da luz e todas fazem o mesmo passo juntas. As pernas dançam no ritmo (animador.js, modo
+   'dancar': o peso passa de uma perna para a outra e o joelho dobra), em vez de a boneca inteira pular.
    PurpurinaBalada.iniciar(palco, [estado, amiga1, amiga2], { enquanto, calmo }) → { parar(), trocarLuz() }
    PurpurinaBalada.sala() → o SVG da sala (desenhado largo: em tela deitada aparece mais parede, sem cortar ninguém) */
 (function (raiz) {
@@ -84,14 +85,14 @@
     estados.slice(0, 3).map(function (e, i) { return { e: e, i: i }; }).reverse().forEach(function (d) {
       var L = LUGARES[d.i], minhas = [];
       SOMBRAS.forEach(function (sb, j) {
-        var c = document.createElement('div'); c.className = 'bal-caixa bal-sombra bal-pula'; c.style.color = sb.cor;
+        var c = document.createElement('div'); c.className = 'bal-caixa bal-sombra'; c.style.color = sb.cor;
         c.innerHTML = B.svg(d.e, { id: 'bs' + d.i + j, fundo: false, anim: false, realce: false, passos: !calmo, rig: !calmo });
         sombras.appendChild(c); minhas.push(c); caixas.push({ el: c, x: L.x + sb.dx, pe: PAREDE_PE + 6, alt: L.alt * 1.04 });
       });
-      var c = document.createElement('div'); c.className = 'bal-caixa bal-dancarina bal-pula';
+      var c = document.createElement('div'); c.className = 'bal-caixa bal-dancarina';
       c.innerHTML = B.svg(d.e, { id: 'bd' + d.i, fundo: false, anim: !calmo, realce: false, passos: !calmo, rig: !calmo, sorriso: true });
       gente.appendChild(c); caixas.push({ el: c, x: L.x, pe: L.pe, alt: L.alt });
-      if (!calmo) anims.push(A.criar(c, { poses: [PASSOS[d.i * 2 % PASSOS.length]], copias: minhas, copiasCada: 3, defasagem: d.i, dur: 380, segura: 1500 + d.i * 250, ritmo: 1000,
+      if (!calmo) anims.push(A.criar(c, { poses: [PASSOS[d.i * 2 % PASSOS.length]], copias: minhas, copiasCada: 3, defasagem: d.i, dur: 380, modo: 'dancar', batida: 500, segura: 1500 + d.i * 250, ritmo: 1000,
         enquanto: function () { return vivo && (!op.enquanto || op.enquanto()); },
         proxima: function (antes) { var l = PASSOS.filter(function (p) { return p !== antes; }); return l[Math.floor(Math.random() * l.length)]; } }));
     });

@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.8.0",
+      "data": "20/Nov/2026",
+      "hora": "16:08:32",
+      "pt": [
+        "👠 Desfile de modelo de verdade: ela anda com um pé na frente do outro, cruzando na linha do meio, o quadril vai para o lado da perna de apoio, o corpo sobe e desce de leve, os braços balançam soltos e a cabeça fica firme. Ao chegar, para numa pose e sorri. As amigas também entram andando assim.",
+        "🪩 Baladinha: as pernas dançam no ritmo — o peso passa de uma perna para a outra, o joelho dobra e o quadril balança — em vez de a boneca inteira pular."
+      ],
+      "en": [
+        "👠 A real model runway walk: one foot in front of the other on the center line, hips swinging toward the standing leg, a gentle bounce, loose swinging arms and a steady head. At the end she stops in a pose and smiles. Her friends walk in the same way.",
+        "🪩 Dance party: the legs dance to the beat — weight shifts from one leg to the other, the knee bends and the hips sway — instead of the whole doll jumping."
+      ],
+      "es": [
+        "👠 Desfile de modelo de verdad: camina con un pie delante del otro sobre la línea del centro, la cadera va hacia la pierna de apoyo, el cuerpo sube y baja un poco, los brazos se balancean sueltos y la cabeza se mantiene firme. Al llegar, se para en una pose y sonríe. Las amigas también entran caminando así.",
+        "🪩 Minidisco: las piernas bailan al ritmo — el peso pasa de una pierna a la otra, la rodilla se dobla y la cadera se mueve — en vez de saltar la muñeca entera."
+      ]
+    },
+    {
       "versao": "0.7.2",
       "data": "20/Nov/2026",
       "hora": "15:27:36",
