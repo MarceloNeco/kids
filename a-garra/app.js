@@ -3,10 +3,10 @@
    a som.js (window.Som). Aqui só junta tudo. Com ?teste aparece window.GarraDebug (usado pelos testes no navegador);
    ?semente=N repete a mesma máquina. Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 import * as THREE from './libs/three.module.js';
-import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
+import { MAQUINAS, NOMES, FESTA, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.4.6', APP_DATA = ['15/Nov/2026', 'Nov/15/2026', '15/nov/2026'];
+const APP_VERSION = '0.5.0', APP_DATA = ['19/Nov/2026', 'Nov/19/2026', '19/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -49,7 +49,9 @@ const IDX = { pt: 0, en: 1, es: 2 };
 const t = (pt, en, es) => { const l = lingua(); return l === 'en' ? en : l === 'es' && es != null ? es : pt; };
 const nome = (tipo) => { const n = NOMES[tipo] || [tipo, tipo, tipo]; return t(n[0], n[1], n[2]); };
 const LOGO = 'H-rraaa';   // o nome do jogo (dono, 14/Nov/2026), igual nos três idiomas; o H vai colorido
-const todosDe = (id) => MAQUINAS[id].tipos.concat([MAQUINAS[id].raro]);
+// a de Festas mostra na coleção os prêmios de todas as festas do ano (dá o ano inteiro para completar)
+const todosDe = (id) => (id === 'festas' && window.Festas ? window.Festas.todos() : MAQUINAS[id].tipos.concat([MAQUINAS[id].raro]));
+const festaInfo = () => window.Festas.LISTA[FESTA];
 function traduzir() {
   const l = lingua(), i = IDX[l];
   document.documentElement.lang = l === 'en' ? 'en' : l === 'es' ? 'es' : 'pt-BR';
@@ -76,6 +78,7 @@ function marcar(grupo, attr, valor) { document.querySelectorAll('#' + grupo + ' 
 const quantos = (id) => todosDe(id).filter((k) => colecao[k] > 0).length;
 function pintarMenu() {
   marcar('maquinas', 'data-maquina', pref.maquina); marcar('niveis', 'data-nivel', pref.nivel);
+  const f = festaInfo(); $('festaIco').textContent = f.ico; $('festaNome').textContent = t(f.nome[0], f.nome[1], f.nome[2]);   // a festa de hoje
   IDS.forEach((id) => { const n = quantos(id); document.querySelector('[data-col="' + id + '"]').textContent = n ? '🧸 ' + n + '/' + todosDe(id).length : ''; });
   const total = IDS.reduce((s, id) => s + quantos(id), 0), max = IDS.reduce((s, id) => s + todosDe(id).length, 0);
   $('colecaoConta').textContent = total ? total + '/' + max : '';
@@ -168,13 +171,15 @@ function novaPartida() {
   m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam, qtdFator: def.andam ? 0.32 : 1, raioFator: def.andam ? 1.12 : 1,
     semente: SEMENTE_URL ? +SEMENTE_URL : undefined, semGanhar: contador[chaveConta()] || 0 });
   cena = new THREE.Scene(); cena.background = new THREE.Color('#0b0a14'); cena.fog = new THREE.Fog('#0b0a14', 22, 45);
-  maq = montarMaquina(cena, pref.maquina, MED);
+  maq = montarMaquina(cena, pref.maquina, MED, { festa: FESTA });
   objetos = m.premios.map((p) => { const o = criarPremio(p.tipo); o.userData.id = p.id; cena.add(o); return o; });
   fichasIni = m.fichas; porta = null; fimT = null;
   $('infoTempo').hidden = !m.cfg.tempo;
   medir(); cam = Object.assign({}, VISTAS[0], { zoom: camera.aspect > 1.2 ? 0.8 : 1, vista: 0 });   // deitado: um pouco mais perto
   pintarBarra();
-  aviso(t('Leve a garra e aperte PEGAR!', 'Move the claw and press GRAB!', '¡Mueve la garra y pulsa COGER!'), 2.4);
+  const ola = festaInfo().ola;
+  if (pref.maquina === 'festas') aviso(festaInfo().ico + ' ' + t(ola[0], ola[1], ola[2]), 2.4);
+  else aviso(t('Leve a garra e aperte PEGAR!', 'Move the claw and press GRAB!', '¡Mueve la garra y pulsa COGER!'), 2.4);
 }
 function parar() { Som.motor(false); if (m) { m.mover(0, 0); m.irPara(null); } apertando = { dx: 0, dz: 0 }; }
 function pintarBarra() {
@@ -455,7 +460,7 @@ function comecar() {
 comecar();
 
 if (TESTE) window.GarraDebug = {
-  pronto: true, versao: APP_VERSION,
+  pronto: true, versao: APP_VERSION, festa: FESTA,
   estado() {
     if (!m) return { tela: telaAtual };
     return { tela: telaAtual, fase: m.fase, fichas: m.fichas, tempo: m.tempo, nivel: m.nivel, maquina: pref.maquina, x: m.garra.x, z: m.garra.z, ganhos: m.ganhos.slice(),
@@ -470,7 +475,8 @@ if (TESTE) window.GarraDebug = {
   irPara(x, z) { m.irPara(x, z); },
   velocidade(v) { velocidade = v; },
   camera() { return Object.assign({}, cam); },
-  colecao() { return Object.assign({}, colecao); }
+  colecao() { return Object.assign({}, colecao); },
+  tipos() { return [...new Set(m.premios.map((p) => p.tipo))]; }
 };
 
 /* Botão "📲 Instalar" do Bolinho de Chuva: o cartão abre o jogo com ?instalar=1 e só então carrega a barra

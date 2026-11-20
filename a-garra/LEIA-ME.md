@@ -25,6 +25,12 @@ o botão PEGAR vira GRAB · COGER.
     rajado, coelho, porquinho-da-índia, pinguim-imperador, pato, jabuti e leãozinho. Ficam de pé, **andam pelo cobertor**,
     olham em volta, abanam o rabo e respiram; na garra, esperneiam. São menos e maiores (o desenho é maior que a bola da
     física, que continua cabendo no buraco). Raro: o salsicha dourado.
+  - **Festas do Ano** (0.5.0; dono, 19/Nov/2026, "muda de acordo com a época do ano"): a máquina se enfeita sozinha pela
+    data (`festas.js`): **Natal** (1º/nov–6/jan), **Carnaval** (até a Quarta-feira de Cinzas), **Páscoa** (até uma semana
+    depois do domingo de Páscoa, no mínimo 30/abr), **Festa Junina** (até 15/ago), **Dia das Crianças** (até 12/out) e
+    **Dia das Bruxas** (13–31/out). Cada festa tem cor, parede, letreiro e 6 prêmios de pelúcia + 1 dourado; colunas de
+    lâmpadas que trocam de cor (como no vídeo do dono) e três prêmios sentados em cima do letreiro. A coleção mostra os 42
+    prêmios do ano. `?festa=pascoa` (etc.) na barra de endereço força uma festa, para testar.
 - **Controle**: ⬅ ➡ para os lados, ⬆ para o fundo, ⬇ para a frente (segurar), e **PEGAR**. Também dá para **tocar no
   prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
 - **Sortido**: cada partida tem outra mistura (cada tipo pelo menos uma vez, o resto sorteado), outro total, outro formato de
