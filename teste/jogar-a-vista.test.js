@@ -29,7 +29,8 @@ const JOGOS = {
   tijolaco: [[], '#btJogar'],
   'a-garra': [[], '#btJogar'],
   labirinto: [[], '#btJogar'],
-  cozinha: [['#btEntrar'], '#btCozinhar']
+  cozinha: [['#btEntrar'], '#btCozinhar'],
+  vruuum: [['#btEntrar'], '#btCorrer']
 };
 
 function servidor() {
