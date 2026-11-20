@@ -35,6 +35,11 @@ o botão PEGAR vira GRAB · COGER.
     × 9, buraco de 2,7), poucas pelúcias enormes (ursão do coração, coelhona orelhuda, dinossauro, axolote, baleia, gatão,
     cachorrão; raro: ursão dourado), garra grande de **dois braços em arco**, céu com nuvens, letreiro de letras gordinhas
     e pelúcias sentadas em cima da cabine. As medidas de cada máquina ficam em `m.med` (maquina.js).
+    Controle pequenininho no canto da frente à direita (0.5.4).
+  - **Introdução das máquinas gigantes** (0.5.4; dono, 20/Nov/2026: "não dá a impressão que é gigante"): na Gigantes e no
+    Boneco Gigante, a câmera começa de longe, na altura dos olhos de uma **menininha** de ~1,15 m (desenho próprio,
+    `criarMenina` no cenario3d.js) de pé ao lado da cabine, nunca na frente do vidro. Ela acena, vira e aponta para cima;
+    depois a câmera voa até a vista do jogo (4 s). O relógio espera; qualquer toque ou tecla pula. Nos testes só com `&intro`.
   - **Boneco Gigante** (0.5.2; dono, 19/Nov/2026, "aquele que só tem um boneco grande", foto da máquina da tesoura): cabine
     alta e preta com janela de neon verde de cantos redondos, **um boneco grande pendurado por um fio** e uma **tesoura**
     num trilho (`tesoura.js`, a regra; `montarTesoura` no cenario3d.js, o desenho). **Segurando** o botão (✂️ SEGURE,
