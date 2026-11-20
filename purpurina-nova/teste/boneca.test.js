@@ -335,3 +335,19 @@ test('Nova Era sem 3D e com corpo de moda (dono, 19/Nov/2026: "não seria 3D"; p
   const z = B.areaZoom(P.ZOOM.rosto, Object.assign(V.novo(), { idade: 'adulta' }));
   assert.ok(z[1] < 120 && z[2] < 200, JSON.stringify(z));
 });
+
+test('barras de ajuste (dono, 20/Nov/2026): tom claro/escuro em toda cor e intensidade da maquiagem', () => {
+  const e = Object.assign(V.novo(), { blush: 'redondo', pele: 'p6' });
+  const normal = B.corAjustada(e, 'pele').hex, escura = B.corAjustada(Object.assign({}, e, { peleTom: 0.8 }), 'pele').hex, clara = B.corAjustada(Object.assign({}, e, { peleTom: -0.8 }), 'pele').hex;
+  const luz = (h) => parseInt(h.slice(1, 3), 16) + parseInt(h.slice(3, 5), 16) + parseInt(h.slice(5, 7), 16);
+  assert.ok(luz(escura) < luz(normal) && luz(clara) > luz(normal), 'tom escurece e clareia');
+  // intensidade: a cor do blush vai para a cor da pele
+  const leve = B.corAjustada(Object.assign({}, e, { blushForca: 0.2 }), 'blush').hex, forte = B.corAjustada(e, 'blush').hex;
+  assert.notEqual(leve, forte);
+  assert.ok(Math.abs(luz(leve) - luz(B.corAjustada(e, 'pele').hex)) < Math.abs(luz(forte) - luz(B.corAjustada(e, 'pele').hex)));
+  // o ajuste fica guardado (limpar) e conta como mudança (iguais)
+  const guardado = V.limpar(Object.assign({}, e, { peleTom: 0.5, blushForca: 0.4, lixoTom: 3 }));
+  assert.equal(guardado.peleTom, 0.5); assert.equal(guardado.blushForca, 0.4); assert.equal(guardado.lixoTom, undefined);
+  assert.ok(!V.iguais(e, Object.assign({}, e, { peleTom: 0.5 })));
+  const s = B.svg(Object.assign({}, e, { peleTom: 0.6, blushForca: 0.3 }), { id: 'aj', fundo: false }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+});
