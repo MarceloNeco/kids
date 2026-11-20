@@ -837,7 +837,9 @@
     // e conforme a idade (dono, 14/Nov/2026): até 5 anos, poses de criancinha (tchau, mãos na cintura) sem inclinar; 6 a
     // 10, de criança; 11 a 15 e 16+, de modelo (menina: mão na cintura, no cabelo; menino: braços cruzados, mãos no bolso)
     var idade = estado.idade || 'adulta', menino = estado.personagem === 'menino';
-    var ALTURA = { pequena: 0.8, crianca: 0.9, adolescente: 0.96 }[idade] || 1;   // a pequenininha é mais baixa na passarela
+    // Nova Era: o corpo novo já tem a altura de cada idade (a criancinha é mais baixa no próprio desenho); 0,8 deixa ela
+    // inteira na tela quando chega na frente (dono, 20/Nov/2026: "sai do quadro")
+    var ALTURA = 0.8;
     $('modelo').className = 'modelo idade-' + idade;
     var POSES_DESFILE = ({
       pequena: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'joinha', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'carinha', lado: '' }],
@@ -864,10 +866,16 @@
       pose(Object.assign({ sorriso: true }, opPose(x)));
     }
     var camera = $('cameraDesfile'), corte = $('corteDesfile');
-    camera.classList.remove('take-perto');
+    camera.style.transform = '';
     function cortar(take) {
       corte.classList.remove('flash'); void corte.offsetWidth; corte.classList.add('flash');
-      camera.classList.toggle('take-perto', take === 'perto');
+      // de perto: a câmera enquadra do rosto até a cintura (antes cortava, só aparecia a cabeça)
+      if (take === 'perto') {
+        var z = B.areaZoom(P.ZOOM.busto, estado), rm = mod.getBoundingClientRect(), rc = camera.getBoundingClientRect();
+        var px = rm.left + rm.width * (z[0] + z[2] / 2) / 400 - rc.left, py = rm.top + rm.height * (z[1] + z[3] * 0.35) / 720 - rc.top;
+        camera.style.transformOrigin = px + 'px ' + py + 'px';
+        camera.style.transform = 'translate(' + Math.round(rc.width / 2 - px) + 'px, ' + Math.round(rc.height * 0.42 - py) + 'px) scale(1.7)';
+      } else camera.style.transform = '';
       var ANG_TAKE = { tresE: -28, tresD: 28, ladoE: -45, ladoD: 45 };
       if (ANG_TAKE[take]) {
         semPose();

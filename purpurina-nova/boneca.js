@@ -263,7 +263,9 @@
        vai sumindo atrás dela, e de costas sobra só cabelo. */
     function normal(a) { a = (((a || 0) % 360) + 360) % 360; return a < 0.5 || a > 359.5 ? 0 : a; }
     // opcoes.olhar: só a cabeça vira (o corpo fica de frente) — no desfile ela olha para os lados
-    var angB = normal(op.angulo), ang = angB || normal(op.olhar);
+    // Nova Era: "olhar" não gira a cabeça em 3D (parecia troca de foto): a cabeça inclina de leve e os olhos vão para o
+    // lado, contínuo (dono, 20/Nov/2026: "por que não tem o movimento do rosto?")
+    var angB = normal(op.angulo), ang = angB, olharV = angB ? 0 : (function (a) { return a > 180 ? a - 360 : a; })(normal(op.olhar));
     var rad = ang * Math.PI / 180, radS = ang > 180 ? rad - 2 * Math.PI : rad, cos = ang ? Math.cos(rad) : 1, sen = ang ? Math.sin(rad) : 0, cosB = Math.cos(angB * Math.PI / 180);
     var corpoCostas = cosB < 0, costas = false, virada = !!ang, escalaX = 1 - 0.55 * Math.pow(Math.abs(Math.sin(angB * Math.PI / 180)), 1.5);
     // opcoes.sorriso: sorriso aberto; opcoes.tchau: braço levantado dando tchau (mexendo, com opcoes.anim)
@@ -401,7 +403,7 @@
     } else {
       out.push(elip(116, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }), elip(284, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }));
       out.push(pintar(rosto, 'url(#' + I + 'pele)', esc(pele, 0.42), 1.1));
-      out.push(luzLados(pele, menino), luzMeio(pele, I), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, 0, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, 0, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
+      out.push(luzLados(pele, menino), luzMeio(pele, I), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, olharV * 0.16, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, olharV * 0.16, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
       out.push(deslocar(-dO, sobr(164, -1)), deslocar(dO, sobr(236, 1)));
       out.push(narizFrente(e.nariz, pele) + narizLuz(pele, menino));
       out.push(bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))));
@@ -426,7 +428,7 @@
     out.push(virada && enfeites ? '<g transform="translate(' + n(200 + sen * 22) + ' 0) scale(' + n((cos >= 0 ? 1 : -1) * Math.max(0.68, Math.abs(cos)) * 1000) / 1000 + ' 1) translate(-200 0)">' + enfeites + '</g>' : enfeites);
     var animAntes = ANIM; ANIM = ANIM && (virada || !ang);
     if (e.glitter === 'cabelo') out.push(virada ? torcer(glitter(e, C('glitter')), false, radS, sen >= 0 ? 1 : -1).frente : glitter(e, C('glitter')));
-    var cabecaPronta = grupo(out.join(''));
+    var cabecaPronta = grupo(olharV ? '<g transform="rotate(' + n(olharV * 0.16) + ' 200 300) translate(' + n(olharV * 0.12) + ' 0)">' + out.join('') + '</g>' : out.join(''));
     out = corpo;
     ANIM = animAntes && !ang;
     if (e.glitter === 'tudo') out.push(glitter(e, C('glitter')));
