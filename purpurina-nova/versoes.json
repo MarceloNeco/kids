@@ -2,7 +2,7 @@
   "app": "purpurina-nova",
   "versoes": [
     {
-      "versao": "0.4.4",
+      "versao": "0.4.5",
       "data": "20/Nov/2026",
       "hora": "11:06:14",
       "pt": [
@@ -13,6 +13,20 @@
       ],
       "es": [
         "🎵 Abierto desde Buñuelos de Lluvia, el juego empieza con la música ya sonando (sin tener que tocar la pantalla antes). Abierto directamente, desde su icono o en un iPhone, la música sigue empezando con el primer toque"
+      ]
+    },
+    {
+      "versao": "0.4.4",
+      "data": "20/Nov/2026",
+      "hora": "11:33:02",
+      "pt": [
+        "🎚️ Barras de arrastar: embaixo das bolinhas de cor, ☀️ mais claro ↔ mais escuro 🌙 em toda cor (pele, cabelo, olhos, maquiagem, roupas e joias) e, na maquiagem, a intensidade, de leve a forte. Arrastando, ela muda na hora; dá para desfazer com ↩."
+      ],
+      "en": [
+        "🎚️ Drag bars: under the color dots, ☀️ lighter ↔ darker 🌙 for every color (skin, hair, eyes, makeup, clothes and jewelry) and, for makeup, the intensity, from soft to bold. She changes as you drag; ↩ undoes it."
+      ],
+      "es": [
+        "🎚️ Barras para deslizar: debajo de los colores, ☀️ más claro ↔ más oscuro 🌙 en todos los colores (piel, pelo, ojos, maquillaje, ropa y joyas) y, en el maquillaje, la intensidad, de suave a intensa. Cambia al momento mientras deslizas; ↩ lo deshace."
       ]
     },
     {

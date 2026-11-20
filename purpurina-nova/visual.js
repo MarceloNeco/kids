@@ -64,6 +64,12 @@
     P.CATEGORIAS.forEach(function (cat) {
       if (cat.opcoes && temOpcao(cat, x[cat.id])) e[cat.id] = x[cat.id];
       if (cat.cores && temCor(cat, x[chaveCor(cat)])) e[chaveCor(cat)] = x[chaveCor(cat)];
+      // barras de ajuste: tom (-1 a 1) e intensidade da maquiagem (0,15 a 1)
+      if (cat.cores) {
+        var t = +x[cat.id + 'Tom'], fz = +x[cat.id + 'Forca'];
+        if (x[cat.id + 'Tom'] != null && isFinite(t) && t !== 0) e[cat.id + 'Tom'] = Math.round(Math.max(-1, Math.min(1, t)) * 100) / 100;
+        if (x[cat.id + 'Forca'] != null && isFinite(fz) && fz < 1) e[cat.id + 'Forca'] = Math.round(Math.max(0.15, fz) * 100) / 100;
+      }
     });
     if (e.vestido === 'nenhum') { if (e.saia === 'nenhum' && e.calca === 'nenhum') e.calca = 'shorts'; arrumar(e, 'saia'); }
     return e;
@@ -148,7 +154,8 @@
   Historico.prototype.limpar = function () { this.pilha = []; };
 
   // diferenças entre dois estados (para dizer em voz o que mudou e para testes)
-  function iguais(a, b) { for (var k in P.PADRAO) if (a[k] !== b[k]) return false; return true; }
+  // compara também os ajustes das barras (…Tom, …Forca), que não estão no PADRAO
+  function iguais(a, b) { var k; for (k in P.PADRAO) if (a[k] !== b[k]) return false; for (k in a) if (/(Tom|Forca)$/.test(k) && a[k] !== b[k]) return false; for (k in b) if (/(Tom|Forca)$/.test(k) && a[k] !== b[k]) return false; return true; }
 
   // frase curta do visual, para leitor de tela (aria-label do desenho)
   function resumo(e, lingua) {

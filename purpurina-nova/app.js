@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.4';
+  var APP_VERSION = '0.4.5';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -232,6 +232,32 @@
     setTimeout(function () { if (atual !== 'estudio' || angulo) return; piscaAte = Date.now() + 450; desenharBoneca(); setTimeout(function () { if (atual === 'estudio') desenharBoneca(); }, 500); }, 5200);
   }, 9000);
   var piscaAte = 0;
+  /* barras de ajuste (dono, 20/Nov/2026: "uma barra de rolar… arrasta de um lado para o outro… mais claro, mais escuro,
+     até mais intensidade da maquiagem"): embaixo das bolinhas, "☀️ claro ↔ escuro 🌙" em toda cor e "intensidade" na
+     maquiagem. Arrastando, a personagem muda na hora; ao soltar, entra no ↩ desfazer. */
+  function desenharBarras(cat) {
+    var caixa = $('barras'); caixa.innerHTML = ''; caixa.hidden = !cat.cores;
+    if (!cat.cores) return;
+    var base = B.corAjustada(Object.assign({}, estado, (function () { var o = {}; o[cat.id + 'Tom'] = 0; o[cat.id + 'Forca'] = 1; return o; })()), cat.id).hex;
+    var pele = B.corAjustada(estado, 'pele').hex;
+    function barra(campo, rot, esq, dir, min, max, padrao, fundo) {
+      var lin = document.createElement('label'); lin.className = 'barra';
+      var e1 = document.createElement('span'); e1.className = 'barra-ponta'; e1.textContent = esq;
+      var r = document.createElement('input'); r.type = 'range'; r.min = min; r.max = max; r.step = 1;
+      r.value = Math.round((estado[cat.id + campo] == null ? padrao : estado[cat.id + campo]) * 100);
+      r.setAttribute('aria-label', rot + ' — ' + N(cat)); r.style.background = fundo;
+      var e2 = document.createElement('span'); e2.className = 'barra-ponta'; e2.textContent = dir;
+      var antes = null;
+      function valor() { var v = +r.value / 100, nv = V.copiar(estado); if (Math.abs(v - padrao) < 0.03) delete nv[cat.id + campo]; else nv[cat.id + campo] = v; return nv; }
+      r.addEventListener('input', function () { if (!antes) antes = estado; estado = valor(); desenharBoneca(); });
+      r.addEventListener('change', function () { var nv = valor(), velho = antes || estado; antes = null; estado = velho; if (!V.iguais(nv, velho)) { hist.guardar(velho); estado = nv; aposMudar(); } });
+      lin.appendChild(e1); lin.appendChild(r); lin.appendChild(e2); caixa.appendChild(lin);
+    }
+    var claro = 'linear-gradient(90deg, ' + B.corAjustada(Object.assign({}, estado, (function () { var o = {}; o[cat.id + 'Tom'] = -1; o[cat.id + 'Forca'] = 1; return o; })()), cat.id).hex + ', ' + base + ', ' +
+      B.corAjustada(Object.assign({}, estado, (function () { var o = {}; o[cat.id + 'Tom'] = 1; o[cat.id + 'Forca'] = 1; return o; })()), cat.id).hex + ')';
+    barra('Tom', t('Mais claro ou mais escuro', 'Lighter or darker', 'Más claro o más oscuro'), '☀️', '🌙', -100, 100, 0, claro);
+    if (B.MAQUIAGEM.indexOf(cat.id) >= 0) barra('Forca', t('Intensidade', 'Intensity', 'Intensidad'), t('Leve', 'Soft', 'Suave'), t('Forte', 'Bold', 'Intenso'), 15, 100, 1, 'linear-gradient(90deg, ' + pele + ', ' + base + ')');
+  }
   function desenharDicas(comSom) {
     var d = desafioAtual(), ul = $('dicas');
     $('dicasCaixa').hidden = !d; if (!d) return;
@@ -397,10 +423,12 @@
         if (c.id === 'arco' && cat.id === 'glitter') b.style.background = 'conic-gradient(#ff7cc8, #ffd76a, #7ee8ff, #b892ff, #ff7cc8)';
         b.setAttribute('aria-label', N(c)); b.title = N(c);
         b.setAttribute('aria-pressed', String(estado[chave] === c.id && (!cat.opcoes || estado[cat.id] !== 'nenhum')));
-        b.addEventListener('click', function () { mudar(V.aplicar(estado, cat.id, c.id, true), cat.id); });
+        // escolher outra bolinha volta o tom ao normal (a cor aparece como ela é; depois ajusta na barra)
+        b.addEventListener('click', function () { var nv = V.aplicar(estado, cat.id, c.id, true); delete nv[cat.id + 'Tom']; mudar(nv, cat.id); });
         cores.appendChild(b);
       });
     }
+    desenharBarras(cat);
     if (cat.opcoes) {
       cat.opcoes.forEach(function (op, k) {
         var ehNada = op.id === semNada(cat);
