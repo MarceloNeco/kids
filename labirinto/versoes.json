@@ -2,6 +2,20 @@
   "app": "labirinto",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "20/Nov/2026",
+      "hora": "13:40:00",
+      "pt": [
+        "📱 No celular, o menu não rola mais: as escolhas vêm em etapas curtas (1 Formato · 2 Nível e jeito de brincar), com Voltar e Próximo, e o ▶ Jogar fica sempre à vista, já com a escolha da última vez"
+      ],
+      "en": [
+        "📱 On phones the menu no longer scrolls: the choices come in short steps (1 Shape · 2 Level and how to play), with Back and Next, and ▶ Play is always in sight, already set to your last choice"
+      ],
+      "es": [
+        "📱 En el móvil el menú ya no se desplaza: las opciones vienen en pasos cortos (1 Forma · 2 Nivel y cómo jugar), con Atrás y Siguiente, y ▶ Jugar está siempre a la vista, ya con la elección de la última vez"
+      ]
+    },
+    {
       "versao": "0.3.1",
       "data": "15/Nov/2026",
       "hora": "09:30:00",

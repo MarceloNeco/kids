@@ -12,3 +12,6 @@
 Desenhos de colorir, paisagens, adesivos animados, ícone, as 4 músicas do app e os sons: **originais, feitos em código** para este
 app. Nenhum desenho da Bobbie Goods, do Happy Color ou de outra marca foi copiado; os dois serviram só de referência
 do *jeito* de brincar (livro de colorir de contorno grosso e pintar por números).
+Os personagens da **Turminha** (20/Nov/2026) também são originais: as folhas de colorir que as filhas do dono pintaram
+serviram só de referência do estilo (personagem sozinho, cabeça grande, roupinha); nenhum personagem, pose ou roupa
+delas foi reproduzido, e nenhuma imagem delas entrou no repositório.

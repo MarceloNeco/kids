@@ -2,6 +2,20 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.3.2",
+      "data": "20/Nov/2026",
+      "hora": "13:31:00",
+      "pt": [
+        "📱 No celular em pé, o ▶ Jogar cabe sempre na tela, sem rolar: a capa repetida da prévia sai (a roda já mostra a capa)"
+      ],
+      "en": [
+        "📱 On an upright phone, ▶ Play always fits on the screen with no scrolling: the repeated cover in the preview is gone (the wheel already shows it)"
+      ],
+      "es": [
+        "📱 En el móvil en vertical, ▶ Jugar siempre cabe en la pantalla sin desplazar: la portada repetida de la vista previa desaparece (la rueda ya la muestra)"
+      ]
+    },
+    {
       "versao": "0.3.1",
       "data": "20/Nov/2026",
       "hora": "10:53:31",

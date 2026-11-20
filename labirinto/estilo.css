@@ -15,7 +15,13 @@ button:focus-visible, a:focus-visible { outline: 3px solid #ffd166; outline-offs
 .tela.ativa { display: flex; }
 
 /* ---------- menu ---------- */
-#menu { flex-direction: column; align-items: center; overflow-y: auto; padding: max(.6rem, env(safe-area-inset-top)) 1rem 5rem; gap: .35rem; }
+/* a página do menu nunca rola (dono, 20/Nov/2026): as escolhas ficam no meio (.menu-corpo) e o ▶ Jogar embaixo (.menu-pe),
+   sempre à vista. Tudo junto se couber; senão (celular) .etapas: uma etapa por vez, com Voltar/Próximo (app.js arrumarMenu) */
+#menu { flex-direction: column; align-items: center; overflow: hidden; padding: max(.6rem, env(safe-area-inset-top)) 1rem max(.4rem, env(safe-area-inset-bottom)); gap: .35rem; }
+.menu-corpo { flex: 0 1 auto; min-height: 0; width: 100%; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: center; gap: .35rem; padding: 0 0 .3rem; }
+.etapa { display: flex; flex-direction: column; align-items: center; gap: .35rem; width: 100%; }
+.menu-pe { flex: none; display: flex; flex-direction: column; align-items: center; gap: .45rem; width: 100%; }
+.passos, .resumo { display: none; }
 .faixa { display: flex; align-items: center; gap: .4rem; width: 100%; max-width: 40rem; }
 .espaco { flex: 1; }
 .mini {
@@ -30,7 +36,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid #ffd166; outline-offs
 .logo span:nth-child(5) { animation-delay: .4s; } .logo span:nth-child(6) { animation-delay: .5s; } .logo span:nth-child(7) { animation-delay: .6s; }
 .logo span:nth-child(8) { animation-delay: .7s; } .logo span:nth-child(9) { animation-delay: .8s; }
 @keyframes pula { 0%, 70%, 100% { transform: translateY(0); } 80% { transform: translateY(-10px) rotate(-4deg); } 90% { transform: translateY(0) rotate(2deg); } }
-.mascote { width: 160px; height: 120px; }
+.mascote { width: auto; height: min(120px, 15vh); aspect-ratio: 4 / 3; flex: none; }
 .ajuda { max-width: 36rem; background: rgba(255,255,255,.08); border-radius: 18px; padding: .3rem 1rem; font-size: 1rem; line-height: 1.4; }
 .titulo-escolha { margin: .6rem 0 .1rem; font-size: 1rem; font-weight: 600; color: #b9b2e6; text-transform: uppercase; letter-spacing: .08em; }
 .escolha { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; max-width: 40rem; }
@@ -53,6 +59,34 @@ button:focus-visible, a:focus-visible { outline: 3px solid #ffd166; outline-offs
 .grande:active { transform: scale(.96); }
 .medio { min-height: 48px; padding: .45rem 1.2rem; border: 0; border-radius: 999px; font-size: 1.1rem; font-weight: 600; background: rgba(255,255,255,.14); }
 .versao { font-size: .8rem; color: #8d86c0; margin: .6rem 0 0; }
+
+/* ---------- menu em etapas (celular): 1 Formato · 2 Nível e jeito de brincar ---------- */
+#menu.compacto .mascote { display: none; }
+#menu.etapas .menu-corpo { flex: 1 1 auto; }
+#menu.etapas .etapa { margin: auto 0; }                       /* a etapa fica no meio do espaço; o rodapé não pula */
+#menu.etapas .etapa:not(.atual) { display: none; }
+#menu.etapas .titulo-escolha { margin-top: .2rem; }
+#menu.etapas #formas { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; width: 100%; max-width: 21rem; }
+#menu.etapas .cartao-forma { padding: .6rem; font-size: 1.1rem; }
+#menu.etapas .cartao-forma svg { width: 3.4rem; height: 3.4rem; }
+#menu.etapas .ico-grande { font-size: 2.7rem; line-height: 3.4rem; }
+#menu.etapas #niveis { flex-wrap: nowrap; }
+#menu.etapas .cartao-nivel { min-width: 0; flex: 1 1 0; max-width: 7rem; }
+#menu.etapas #modos { flex-direction: column; align-items: stretch; width: 100%; max-width: 20rem; }
+#menu.etapas .chip-modo { justify-content: center; min-height: 52px; }
+#menu.etapas .menu-pe { padding-bottom: 3.3rem; position: relative; }   /* embaixo, o lugar do tocador da música */
+#menu.etapas .resumo {
+  display: block; margin: 0; max-width: 100%; font-size: .95rem; font-weight: 600; color: #d9d3ff; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#menu.etapas .passos { display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%; max-width: 22rem; }
+#menu.etapas .passos .medio { min-width: 7.2rem; }
+.ind-etapa { display: inline-flex; align-items: center; gap: .3rem; font-weight: 600; color: #b9b2e6; white-space: nowrap; }
+.ind-etapa i { width: .6rem; height: .6rem; border-radius: 50%; background: rgba(255,255,255,.25); }
+.ind-etapa i.atual { background: #ffd166; }
+#btProximo { background: rgba(255,209,102,.22); }
+#menu.etapas #btJogar { margin-top: 0; }
+#menu.etapas .versao { position: absolute; left: 0; bottom: 1.1rem; margin: 0; max-width: 40%; }
 
 /* ---------- jogo ---------- */
 #jogo { flex-direction: column; }
@@ -102,10 +136,28 @@ button:focus-visible, a:focus-visible { outline: 3px solid #ffd166; outline-offs
   .logo span, .fim-caixa, .fim-estrelas span, .missao.pulso { animation: none !important; }
   * { transition: none !important; }
 }
-/* 📱 celular deitado (06/Nov/2026): a capa encolhe (sem o cachorrinho grande) e o ▶ Jogar fica sempre à vista,
-   grudado embaixo, enquanto as escolhas rolam */
+/* celular pequeno em pé: o cachorrinho do menu encolhe para a etapa caber sem rolar */
+@media (orientation: portrait) and (max-height: 700px) {
+  #menu.etapas .mascote { height: 10vh; }
+  #menu.etapas .logo { font-size: 2.2rem; }
+  #menu.etapas .chip-modo { min-height: 48px; padding-top: .35rem; padding-bottom: .35rem; }
+}
+/* 📱 celular deitado: a capa encolhe (sem o cachorrinho grande, 🔊 ❓ na mesma linha do nome) */
 @media (orientation: landscape) and (max-height: 500px) {
   #menu #mascote { display: none; }
   #menu .logo { font-size: 2.4rem; }
-  #menu #btJogar { position: sticky; bottom: .5rem; z-index: 2; flex: none; }
+  #menu .faixa { position: absolute; top: max(.6rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); width: auto; }
+}
+/* deitado (celular ou tablet) em etapas: as escolhas numa fileira só, com Voltar · 1 de 2 · Próximo e o ▶ Jogar lado a
+   lado embaixo (20/Nov/2026) */
+@media (orientation: landscape) {
+  #menu.etapas #formas { display: flex; flex-wrap: nowrap; max-width: none; width: auto; }
+  #menu.etapas .cartao-forma { min-width: 6.2rem; padding: .45rem .6rem; }
+  #menu.etapas .cartao-forma svg { width: 2.8rem; height: 2.8rem; }
+  #menu.etapas .ico-grande { font-size: 2.3rem; line-height: 2.8rem; }
+  #menu.etapas #modos { flex-direction: row; max-width: none; width: auto; }
+  #menu.etapas .menu-pe { flex-direction: row; flex-wrap: wrap; justify-content: center; column-gap: 1rem; }
+  #menu.etapas .resumo { display: none; }
+  #menu.etapas .passos { width: auto; }
+  #menu.etapas #btJogar { min-height: 52px; font-size: 1.35rem; }
 }

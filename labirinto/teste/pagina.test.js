@@ -46,7 +46,10 @@ async function abrir(ctxOp, busca, idioma) {
 }
 const est = pg => pg.evaluate(() => LabirintoDebug.estado());
 async function jogar(pg, forma, nivel, modo) {
-  await pg.click(`[data-forma="${forma}"]`); await pg.click(`[data-nivel="${nivel}"]`); await pg.click(`[data-modo="${modo}"]`);
+  // no celular as escolhas vêm em etapas (1 Formato · 2 Nível e jeito de brincar); no computador, tudo junto
+  await pg.click(`[data-forma="${forma}"]`);
+  if (await pg.isVisible('#btProximo')) await pg.click('#btProximo');
+  await pg.click(`[data-nivel="${nivel}"]`); await pg.click(`[data-modo="${modo}"]`);
   await pg.click('#btJogar');
   await pg.waitForFunction(() => { const e = LabirintoDebug.estado(); return e.tela === 'jogo' && !e.intro && !e.glide; }, null, { timeout: 8000 });
 }
@@ -105,7 +108,7 @@ async function desenharCaminho(pg, de, para) {
 test('celular: menu abre sem erro, textos em português, trilha de música e versão', async () => {
   const pg = await abrir(FONE);
   assert.match(await pg.textContent('#btJogar'), /Jogar/);
-  assert.match(await pg.textContent('#versao'), /0\.3\.1 · 15\/Nov\/2026/);
+  assert.match(await pg.textContent('#versao'), /0\.4\.0 · 20\/Nov\/2026/);
   assert.ok(await pg.isVisible('.trilha'), 'tocador da trilha');
   assert.equal(await pg.evaluate(() => document.querySelectorAll('[data-recurso="labirinto"]').length), 2);
   assert.equal(await pg.$('#btLingua'), null, 'sem botão de idioma no jogo: o idioma vem da estante');
@@ -118,8 +121,80 @@ test('celular: menu abre sem erro, textos em português, trilha de música e ver
   await pg.ctx.close();
 });
 
+// dono, 20/Nov/2026: "o jogar tem que estar sempre lá (...) e não uma opção infinita que você tem que ficar rolando"
+async function semRolarComJogar(pg, onde) {
+  const r = await pg.evaluate(() => {
+    const j = document.getElementById('btJogar').getBoundingClientRect(), d = document.documentElement;
+    return { sh: d.scrollHeight, ih: innerHeight, mh: document.getElementById('menu').scrollHeight, top: j.top, bottom: j.bottom, w: j.width };
+  });
+  assert.ok(r.sh <= r.ih + 2 && r.mh <= r.ih + 2, onde + ': a página do menu não rola (' + r.sh + '/' + r.mh + ' > ' + r.ih + ')');
+  assert.ok(r.w > 0 && r.top >= 0 && r.bottom <= r.ih, onde + ': ▶ Jogar inteiro na tela (' + Math.round(r.top) + '–' + Math.round(r.bottom) + ')');
+}
+for (const [W, H] of [[360, 740], [390, 844]]) {
+  test(`celular ${W}×${H}: menu em etapas, sem rolar, ▶ Jogar à vista em cada etapa; Voltar do celular volta uma etapa`, async () => {
+    for (const lingua of ['pt', 'en', 'es']) {
+      const pg = await abrir({ viewport: { width: W, height: H }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }, '', lingua);
+      let e = await est(pg);
+      assert.equal(e.etapas, true, 'no celular em pé, em etapas'); assert.equal(e.etapa, 1);
+      assert.ok(await pg.isVisible('[data-forma="redondo"]') && !(await pg.isVisible('[data-nivel="medio"]')), 'etapa 1: só o formato');
+      assert.match(await pg.textContent('#indEtapa'), /1 (de|of) 2/);
+      assert.match(await pg.textContent('#resumo'), lingua === 'en' ? /Square · Easy · 🐶/ : lingua === 'es' ? /Cuadrado · Fácil · 🐶/ : /Quadrado · Fácil · 🐶/);
+      await semRolarComJogar(pg, lingua + ' etapa 1');
+      await pg.tap('[data-forma="colmeia"]');
+      await pg.tap('#btProximo');
+      e = await est(pg);
+      assert.equal(e.etapa, 2);
+      assert.ok(await pg.isVisible('[data-nivel="dificil"]') && await pg.isVisible('[data-modo="desenhar"]') && !(await pg.isVisible('[data-forma="redondo"]')), 'etapa 2: nível e jeito de brincar');
+      assert.match(await pg.textContent('#indEtapa'), /2 (de|of) 2/);
+      await semRolarComJogar(pg, lingua + ' etapa 2');
+      if (lingua !== 'pt') { await pg.ctx.close(); continue; }
+      await pg.tap('[data-nivel="medio"]');
+      assert.match(await pg.textContent('#resumo'), /Colmeia · Médio/);
+      // Voltar do celular na etapa 2: volta para a 1 (não sai do jogo); o ◀ Voltar da tela faz o mesmo
+      await pg.goBack();
+      await pg.waitForFunction(() => LabirintoDebug.estado().etapa === 1);
+      assert.equal((await est(pg)).tela, 'menu');
+      await pg.tap('#btProximo'); await pg.tap('#btVoltarEtapa');
+      await pg.waitForFunction(() => LabirintoDebug.estado().etapa === 1);
+      // jogar da etapa 1, com a escolha guardada; o Voltar do jogo volta para o menu
+      await pg.tap('#btJogar');
+      await pg.waitForFunction(() => LabirintoDebug.estado().tela === 'jogo');
+      e = await est(pg);
+      assert.equal(e.forma, 'colmeia'); assert.equal(e.nivel, 'medio');
+      await pg.goBack();
+      await pg.waitForFunction(() => LabirintoDebug.estado().tela === 'menu');
+      await semRolarComJogar(pg, 'de volta ao menu');
+      assert.deepEqual(pg.erros, []);
+      await pg.ctx.close();
+    }
+  });
+}
+
+test('celular deitado e computador: ▶ Jogar à vista sem rolar; no computador tudo junto e o teclado volta a etapa', async () => {
+  const deitado = await abrir({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
+  assert.equal((await est(deitado)).etapas, true);
+  await semRolarComJogar(deitado, 'deitado etapa 1');
+  await deitado.focus('#btProximo'); await deitado.keyboard.press('Enter');
+  await deitado.waitForFunction(() => LabirintoDebug.estado().etapa === 2);
+  assert.equal(await deitado.evaluate(() => document.activeElement.getAttribute('data-nivel')), 'facil', 'o foco foi para a escolha da etapa 2');
+  await semRolarComJogar(deitado, 'deitado etapa 2');
+  // teclado / controle remoto: Esc (ou o Voltar do controle) volta para a etapa 1 e o foco fica numa escolha
+  await deitado.keyboard.press('Escape');
+  await deitado.waitForFunction(() => LabirintoDebug.estado().etapa === 1);
+  assert.equal(await deitado.evaluate(() => document.activeElement.getAttribute('data-forma')), 'quadrado', 'o foco voltou para a escolha da etapa 1');
+  assert.deepEqual(deitado.erros, []);
+  await deitado.ctx.close();
+  const pc = await abrir(PC);
+  assert.equal((await est(pc)).etapas, false, 'no computador cabe tudo junto');
+  assert.ok(await pc.isVisible('[data-forma="redondo"]') && await pc.isVisible('[data-nivel="medio"]') && await pc.isVisible('[data-modo="desenhar"]'));
+  assert.ok(!(await pc.isVisible('#btProximo')), 'sem Próximo quando está tudo junto');
+  await semRolarComJogar(pc, 'computador');
+  assert.deepEqual(pc.erros, []);
+  await pc.ctx.close();
+});
+
 test('celular: abre no idioma da estante (inglês e espanhol), com o nome do jogo e a data em cada idioma', async () => {
-  for (const [cod, jogar, nome, lang, data] of [['en', /^▶ Play!$/, 'Maze', 'en', /Version 0\.3\.1 · Nov\/15\/2026/], ['es', /^▶ ¡Jugar!$/, 'Laberinto', 'es', /Versión 0\.3\.1 · 15\/nov\/2026/]]) {
+  for (const [cod, jogar, nome, lang, data] of [['en', /^▶ Play!$/, 'Maze', 'en', /Version 0\.4\.0 · Nov\/20\/2026/], ['es', /^▶ ¡Jugar!$/, 'Laberinto', 'es', /Versión 0\.4\.0 · 20\/nov\/2026/]]) {
     const pg = await abrir(FONE, '', cod);
     assert.match(await pg.textContent('#btJogar'), jogar);
     assert.match(await pg.evaluate(() => document.documentElement.lang), new RegExp('^' + lang));   // en ou en-US (o idioma.js usa en-US)

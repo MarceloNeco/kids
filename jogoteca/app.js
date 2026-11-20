@@ -16,7 +16,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.1', APP_DATA = '20/Nov/2026';
+  var APP_VERSION = '0.3.2', APP_DATA = '20/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA);
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);

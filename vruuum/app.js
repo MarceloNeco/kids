@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.30.0';
+  var APP_VERSION = '1.31.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -58,7 +58,6 @@
     var comDemo = id === 'entrada' || id === 'menu';
     document.body.classList.toggle('com-demo', comDemo); document.body.classList.toggle('demo-menu', id === 'menu');
     if (comDemo && !demo) try { iniciarDemo(); } catch (e) { demo = null; }
-    if (id === 'menu') setTimeout(tremerCenarios, 900);
   }
   var estadoTela = 'entrada';
 
@@ -113,7 +112,7 @@
     if (estadoTela !== 'entrada') return;
     Som.iniciar(); Som.tocar('whoosh'); Som.musica(true);
     $('entrada').classList.add('saindo');
-    setTimeout(function () { $('entrada').classList.remove('saindo'); tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
+    setTimeout(function () { $('entrada').classList.remove('saindo'); etapa = etapaDoHistorico(); tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
   }
   $('btEntrar').addEventListener('click', entrar);
   if (window.Trilha && Trilha.podeTocarJa && Trilha.podeTocarJa() && estadoTela === 'entrada') { Som.iniciar(); Som.musica(true); }   // aberto pelo Bolinho, já começa com música (dono, 20/Nov/2026); senão, no primeiro toque, como antes
@@ -160,6 +159,69 @@
     var t = $('mundosEsc'); if (!t || t.scrollWidth <= t.clientWidth + 4) return;
     t.classList.remove('treme'); void t.offsetWidth; t.classList.add('treme');
   }
+  // ---------- etapas do menu (1.30.0, dono 20/Nov/2026) ----------
+  /* Em vez de uma coluna comprida com o Correr lá no fim, as escolhas vêm em etapas curtas, cada uma cabendo na tela do
+     celular em pé: 1 Quem corre (jogadores, nível, rivais, duelo e TV) · 2 Cenários · 3 Veículo · 4 Piloto · 5 Música e
+     mais. O 🏁 Correr! fica sempre embaixo e corre com as escolhas de agora (as de padrão ou as da última vez).
+     O Voltar do celular volta uma etapa: cada avanço (feito com toque ou tecla) põe uma entrada no histórico, com a
+     etapa e o caminho até ela; voltar pelos botões anda para trás no próprio histórico, para os dois ficarem iguais.
+     A etapa de agora é sempre a da entrada do histórico em que o menu está (fora das nossas entradas: a 1). */
+  var ETAPAS = [['Quem corre', "Who's racing", 'Quién corre'], ['Cenários', 'Worlds', 'Escenarios'], ['Veículo', 'Ride', 'Vehículo'], ['Piloto', 'Driver', 'Piloto'], ['Música e mais', 'Music & more', 'Música y más']];
+  var etapa = 0;
+  function etapaDoHistorico() { var s = history.state; return s && typeof s.vruuumEtapa === 'number' && s.vruuumEtapa < ETAPAS.length ? s.vruuumEtapa : 0; }
+  function pintarEtapa() {
+    $('etapaNum').textContent = t('Etapa ', 'Step ', 'Paso ') + (etapa + 1) + t(' de ', ' of ', ' de ') + ETAPAS.length + ' ·';
+    $('etapaNome').textContent = tn(ETAPAS[etapa]);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ir-etapa]'), function (b) {
+      var k = +b.getAttribute('data-ir-etapa');
+      b.setAttribute('aria-label', t('Etapa ', 'Step ', 'Paso ') + (k + 1) + ': ' + tn(ETAPAS[k]));
+    });
+  }
+  // o escolhido (veículo, piloto) no meio da fileira de arrastar
+  function centrarEscolhido(sel, fileira) {
+    var b = document.querySelector(sel), c = $(fileira); if (!b || !c || b.offsetParent === null) return;
+    var rb = b.getBoundingClientRect(), rc = c.getBoundingClientRect();
+    if (c.scrollWidth > c.clientWidth) c.scrollLeft += (rb.left + rb.width / 2) - (rc.left + rc.width / 2);
+  }
+  function mostrarEtapa(n) {
+    etapa = Math.max(0, Math.min(ETAPAS.length - 1, n | 0));
+    $('menu').setAttribute('data-etapa', String(etapa));
+    Array.prototype.forEach.call(document.querySelectorAll('.etapa'), function (el) { el.hidden = (' ' + el.getAttribute('data-etapas') + ' ').indexOf(' ' + etapa + ' ') < 0; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ir-etapa]'), function (b) {
+      var k = +b.getAttribute('data-ir-etapa');
+      if (k === etapa) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      b.classList.toggle('feita', k < etapa);
+    });
+    var pri = etapa === 0, ult = etapa === ETAPAS.length - 1;
+    $('btVoltarEtapa').hidden = $('btVoltarEtapa').disabled = pri;
+    $('btProximo').hidden = $('btProximo').disabled = ult;
+    $('menuBaixo').classList.toggle('sem-voltar', pri); $('menuBaixo').classList.toggle('sem-proximo', ult);
+    pintarEtapa();
+    $('etapas').scrollTop = 0;
+    if (etapa === 1) setTimeout(tremerCenarios, 400);
+    if (etapa === 2) centrarEscolhido('.cartao-veic[aria-pressed="true"]', 'veiculos');
+    if (etapa === 3) centrarEscolhido('#bichos [aria-pressed="true"]', 'bichos');
+    var f = document.activeElement;   // o botão com o foco sumiu (Voltar na 1ª, Próximo na última): o foco vai para o Correr
+    if (estadoTela === 'menu' && f && f !== document.body && (f.disabled || f.offsetParent === null)) try { $('btCorrer').focus(); } catch (e) { /* ok */ }
+  }
+  function irEtapa(n) {   // a pessoa pediu (toque ou tecla)
+    if (n === etapa || n < 0 || n >= ETAPAS.length) return;
+    var s = history.state, pilha = s && Array.isArray(s.vruuumPilha) ? s.vruuumPilha : [0];
+    try {
+      if (n > etapa) history.pushState({ vruuumEtapa: n, vruuumPilha: pilha.concat(n) }, '');
+      else {
+        var i = pilha.length > 1 ? pilha.lastIndexOf(n, pilha.length - 2) : -1;
+        if (i >= 0) history.go(i - (pilha.length - 1));   // essa etapa está no histórico: volta até ela
+        else history.replaceState({ vruuumEtapa: n, vruuumPilha: pilha.slice(0, -1).concat(n) }, '');
+      }
+    } catch (e) { /* sem histórico: só troca a etapa */ }
+    Som.tocar('clique'); mostrarEtapa(n);
+  }
+  window.addEventListener('popstate', function () { if (estadoTela === 'menu' && montado) mostrarEtapa(etapaDoHistorico()); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ir-etapa]'), function (b) { b.addEventListener('click', function () { irEtapa(+b.getAttribute('data-ir-etapa')); }); });
+  $('btProximo').addEventListener('click', function () { irEtapa(etapa + 1); });
+  $('btVoltarEtapa').addEventListener('click', function () { irEtapa(etapa - 1); });
+
   function montarMenu() {
     if (!montado) {
       montado = true;
@@ -226,6 +288,7 @@
       traduzir();
     }
     marcar();
+    mostrarEtapa(etapa);
     animarPrevia();
   }
   // a prévia fica sempre animada enquanto o menu está aberto (hélice, rotor, fogo, estrada andando)
@@ -234,7 +297,7 @@
     var passo = function () {
       if (estadoTela !== 'menu') { animPrevia = 0; return; }
       var c = pref.carros[editando];
-      D.previa($('previa'), D.CORES[c.cor], D.PILOTOS[c.piloto], c.veic, fotoDe(editando), c.personagem, c.corpo);
+      if ($('previa').offsetParent !== null) D.previa($('previa'), D.CORES[c.cor], D.PILOTOS[c.piloto], c.veic, fotoDe(editando), c.personagem, c.corpo);
       animPrevia = requestAnimationFrame(passo);
     };
     animPrevia = requestAnimationFrame(passo);
@@ -364,7 +427,9 @@
   opcao('data-rivais', function (v) { pref.rivais = v; });
   opcao('data-visual', function (v) { pref.visual = v; D.definirEstilo(v); });
   $('btSom').addEventListener('click', function () { Som.iniciar(); var lig = Som.alternar(); $('btSom').textContent = $('btSomJogo').textContent = lig ? '🔊' : '🔇'; });
-  $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
+  function ajuda(abrir) { $('ajuda').hidden = !abrir; $('btAjuda').setAttribute('aria-expanded', String(abrir)); }
+  $('btAjuda').addEventListener('click', function () { ajuda($('ajuda').hidden); });
+  $('ajuda').addEventListener('click', function () { ajuda(false); });   // a ajuda fica por cima da etapa: um toque fecha
   $('btCorrer').addEventListener('click', function () { iniciarCorrida(); });
 
   // setas andam entre os botões visíveis (controle da TV e teclado)
@@ -656,6 +721,8 @@
       else if (n === 'dir' || n === 'baixo') { e.preventDefault(); moverFoco(1); }
       else if (n === 'voltar' && pausado) { e.preventDefault(); continuar(); }
       else if (n === 'voltar' && estadoTela === 'fim') { e.preventDefault(); irMenu(); }
+      else if (n === 'voltar' && estadoTela === 'menu' && !$('ajuda').hidden) { e.preventDefault(); ajuda(false); }
+      else if (n === 'voltar' && estadoTela === 'menu' && etapa > 0) { e.preventDefault(); irEtapa(etapa - 1); }   // controle da TV: Voltar volta uma etapa
       return;
     }
     if (!n) return;
@@ -1019,10 +1086,10 @@
     noInicio: function () { return estadoTela !== 'jogo' && estadoTela !== 'fim'; }, irParaInicio: irMenu,
     emAndamento: function () { return estadoTela === 'jogo' && rodando; } });
   // trocaram o idioma na estante (outra aba): o menu troca na hora; o que é desenhado na corrida, na próxima corrida
-  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); if (montado) marcar(); pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
+  if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); pintarEtapa(); if (montado) marcar(); pintarMusica(Som.listaMusicas()[Som.musicaAtual()]); });
   lerBordas();
   $('btSom').textContent = $('btSomJogo').textContent = Som.ligado() ? '🔊' : '🔇';
-  traduzir();
+  traduzir(); pintarEtapa();
   pintarMusica(Som.listaMusicas()[Som.musicaAtual()]);
   try { iniciarDemo(); } catch (e) { demo = null; }   // apresentação: se algo falhar, fica a tela de entrada parada
   if (TV) setTimeout(function () { try { $('btEntrar').focus(); } catch (e) { /* ok */ } }, 200);

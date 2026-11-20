@@ -142,6 +142,13 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   14/Nov/2026). Aberto sem a estante antes na aba (link de fora, hub de projetos; a estante marca a aba em `sessionStorage` "bolinho:estante", no `jogos.js`), o Voltar na tela de começo leva para a estante em vez de sair (dono, 14/Nov/2026). Jogo com aviso próprio passa `guarda: false`. Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
   `bn-nav`/`bn-dentro` e as medidas `--nav-alto`/`--nav-largo` no `<html>`. Na TV (`?tv=`) a barra some. Vigia:
   `teste/navegacao.test.js`.
+- **Escolhas em etapas e Jogar sempre à vista (dono, 20/Nov/2026; vale para todo jogo, atual e novo):** nada de uma
+  coluna comprida de opções (jogadores, nível, personagem, carrinho, cenário, música…) com o Jogar lá no fim. No celular
+  em pé, a tela de começo **não rola**: escolhas demais viram **etapas curtas** (ex.: 1 Quem joga e nível · 2 Cenário ·
+  3 Personagem), com "1 de 3", Voltar/Próximo, cada etapa cabendo na tela (fileira ou roda horizontal dentro da etapa
+  pode; o Voltar do celular volta uma etapa). O **Jogar fica visível em todas as etapas**, com escolha padrão (ou a da
+  última vez): dá para jogar sem passar pelas etapas. Tablet, computador e deitado podem juntar tudo numa tela, se
+  couber. Vigia: `teste/jogar-a-vista.test.js` (jogo novo = uma linha lá, com o botão de jogar dele).
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
   **Mudou algo que a pessoa vê ou joga?** Troque também o `atualizado: { data, pt, en, es }` do jogo no `catalogo.js` (a data

@@ -5,8 +5,8 @@
    ?teste no endereço: tempos de espera bem curtos e frutas já maduras (usado pelos testes automáticos). */
 (function () {
   'use strict';
-  var APP_VERSION = '0.12.4';
-  var APP_UPDATED = '15/Nov/2026';
+  var APP_VERSION = '0.12.5';
+  var APP_UPDATED = '20/Nov/2026';
   var D = window.CozinhaDados, L = window.CozinhaLogica, ART = window.CozinhaDesenhos, C = window.CozinhaCenas;
   var RAPIDO = /[?&]teste\b/.test(location.search);
   var V = RAPIDO ? 0.12 : 1;   // multiplica os tempos de espera
@@ -75,7 +75,7 @@
       });
     });
     document.title = ix(qs(document, '.logo[data-logo]').getAttribute('data-logo').split('|')) + ' — Bolinho de Chuva · SolverONE';
-    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + (en() ? 'Nov/15/2026' : lingua === 'es' ? APP_UPDATED.toLowerCase() : APP_UPDATED) +
+    $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + (en() ? 'Nov/20/2026' : lingua === 'es' ? APP_UPDATED.toLowerCase() : APP_UPDATED) +
       t(' · Músicas: Kevin MacLeod (incompetech.com), CC BY · ', ' · Music: Kevin MacLeod (incompetech.com), CC BY · ', ' · Música: Kevin MacLeod (incompetech.com), CC BY · ');
     var a = document.createElement('a'); a.href = 'CREDITOS.md'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = t('créditos', 'credits', 'créditos'); $('versao').appendChild(a);
     $('btVoz').setAttribute('aria-pressed', String(pref.voz)); $('btEfeitos').setAttribute('aria-pressed', String(pref.efeitos));
@@ -215,7 +215,14 @@
       if (jogo && jogo.seguir) { var sg = jogo.seguir; jogo.seguir = null; setTimeout(function () { if (atual === 'mapa' && jogo) irPara(sg); }, 700); }
     }
     if (id === 'cozinha' && jogo && jogo.cz) { if (jogo.cz.fase === 'feito') proximo(); else desenharCozinha(); }
-    if (id === 'menu') desenharMenu();
+    if (id === 'menu') { desenharMenu(); mostrarEscolhida(); }
+  }
+  // a receita do ▶ Cozinhar fica à vista na fileira das receitas (no celular a fileira corre para o lado)
+  function mostrarEscolhida() {
+    var f = $('receitas'), b = qs(f, '.escolhida');
+    if (!b || f.scrollWidth <= f.clientWidth + 1) return;
+    var l = b.offsetLeft - f.offsetLeft;
+    if (l < f.scrollLeft || l + b.offsetWidth > f.scrollLeft + f.clientWidth) f.scrollLeft = Math.max(0, l - 8);
   }
   function ir(id) { if (id === atual) return; pilha.push(atual); try { history.pushState({ cozinha: pilha.length }, ''); } catch (e) { /* sem histórico */ } mostrar(id); }
   function voltar() { if (pilha.length) history.back(); else mostrar('menu'); }
@@ -314,25 +321,36 @@
   });
   $('btAjuda').addEventListener('click', function () { var a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
 
+  // v0.12.5 (dono, 20/Nov/2026: "o jogar tem que estar sempre lá, com alguma opção padrão, visível"): o ▶ Cozinhar fica
+  // sempre à vista com a receita da última vez (ou a primeira); tocar num cartão continua abrindo a receita direto.
+  // No celular em pé tudo cabe sem rolar a página: as receitas viram uma fileira dupla que corre para o lado.
+  function recPadrao() { return D.receita[pref.rec] ? pref.rec : D.RECEITAS[0].id; }
   function desenharMenu() {
+    var nv = D.nivel[pref.nivel], rp = recPadrao(), fila = $('receitas'), x = fila.scrollLeft;
     $('niveis').innerHTML = D.NIVEIS.map(function (n) {
       return '<button type="button" class="nivel n-' + n.id + '" data-nivel="' + n.id + '" role="radio" aria-checked="' + (pref.nivel === n.id) + '">' +
         '<span class="nv-e">' + n.e + '</span><span class="nv-n">' + tx(n) + '</span><span class="nv-t">' + ix(n.txt) + '</span></button>';
     }).join('');
-    $('receitas').innerHTML = D.RECEITAS.map(function (r) {
+    $('nivelTexto').textContent = nv.e + ' ' + ix(nv.txt);
+    fila.innerHTML = D.RECEITAS.map(function (r) {
       var e = estrelasDe(r.id, pref.nivel);
-      return '<button type="button" class="rec" data-rec="' + r.id + '" style="--c:' + r.cor + ';--i:' + D.RECEITAS.indexOf(r) + '">' +
+      return '<button type="button" class="rec' + (r.id === rp ? ' escolhida' : '') + '" data-rec="' + r.id + '" style="--c:' + r.cor + ';--i:' + D.RECEITAS.indexOf(r) + '">' +
         '<span class="rec-e rec-foto" aria-hidden="true"><img src="' + ART.foto(r.id) + '" alt="" draggable="false" decoding="async"></span><span class="rec-n">' + tx(r) + '</span>' +
         '<span class="rec-est" aria-label="' + e + t(' estrelas', ' stars', ' estrellas') + '">' + '⭐'.repeat(e) + '<span class="apagada">' + '☆'.repeat(3 - e) + '</span></span></button>';
     }).join('');
+    fila.scrollLeft = x;
+    var r = D.receita[rp];
+    $('btCozinhar').innerHTML = '<span class="ic-foto" aria-hidden="true"><img src="' + ART.foto(r.id) + '" alt="" draggable="false"></span>' +
+      '<span class="cz-t">' + t('▶ Cozinhar', '▶ Cook', '▶ Cocinar') + '<b>' + tx(r) + '</b></span>';
   }
   $('niveis').addEventListener('click', function (e) { var b = e.target.closest('[data-nivel]'); if (!b) return; pref.nivel = b.getAttribute('data-nivel'); salvarPref(); Som.toca('toque'); desenharMenu(); });
   $('receitas').addEventListener('click', function (e) { var b = e.target.closest('[data-rec]'); if (!b) return; Som.toca('toque'); abrirReceita(b.getAttribute('data-rec')); });
+  $('btCozinhar').addEventListener('click', function () { Som.toca('toque'); abrirReceita(recPadrao()); });
 
   // ---------- ficha da receita (antes de sair para buscar) ----------
   var recEscolhida = null;
   function abrirReceita(id) {
-    var r = D.receita[id], nv = D.nivel[pref.nivel]; recEscolhida = id;
+    var r = D.receita[id], nv = D.nivel[pref.nivel]; recEscolhida = id; pref.rec = id; salvarPref();
     $('recTitulo').textContent = tx(r);
     $('recPrato').innerHTML = '<img src="' + ART.foto(r.id) + '" alt="" draggable="false">'; $('recPrato').style.setProperty('--c', r.cor);
     $('recNivel').textContent = nv.e + ' ' + t('Nível ', 'Level: ', 'Nivel: ') + tx(nv);

@@ -30,6 +30,9 @@
   </div>
   <h1 class="logo" aria-label="Labirinto"><span>L</span><span>a</span><span>b</span><span>i</span><span>r</span><span>i</span><span>n</span><span>t</span><span>o</span></h1>
   <canvas id="mascote" class="mascote" width="160" height="120" aria-hidden="true"></canvas>
+  <!-- escolhas (dono, 20/Nov/2026): no celular, em etapas curtas (1 Formato · 2 Nível e jeito de brincar), sem rolar a
+       página; no tablet e no computador, tudo junto se couber. O ▶ Jogar fica sempre à vista, embaixo (.menu-pe). -->
+  <div id="menuCorpo" class="menu-corpo">
   <div id="ajuda" class="ajuda" hidden>
     <p data-t="🧩 Escolha o formato e o nível. Cada partida é um labirinto novo, feito na hora.|🧩 Pick a shape and a level. Every game is a brand-new maze, made on the spot.|🧩 Elige la forma y el nivel. Cada partida es un laberinto nuevo, hecho en el momento."></p>
     <p data-t="🐶 Cachorrinho: toque onde o cachorrinho consegue ver, em linha reta, e ele vai andando até lá. Para virar, toque de novo depois da curva (ou arraste o dedo pelo caminho). Se ele fizer “hmm?”, toque numa casa que brilha. No computador, use as setas.|🐶 Puppy: tap where the puppy can see in a straight line and it walks there. To turn, tap again past the corner (or drag your finger along the path). If it goes “hmm?”, tap a glowing square. On a computer, use the arrow keys.|🐶 Perrito: toca donde el perrito pueda ver en línea recta y él irá andando hasta allí. Para girar, vuelve a tocar después de la curva (o desliza el dedo por el camino). Si hace “¿mmm?”, toca una casilla que brille. En el ordenador, usa las flechas."></p>
@@ -38,6 +41,7 @@
     <p data-t="🔍 Labirinto grande: dois dedos aproximam e arrastam (ou os botões 🔍). A câmera segue o cachorrinho.|🔍 Big maze: two fingers zoom and pan (or the 🔍 buttons). The camera follows the puppy.|🔍 Laberinto grande: con dos dedos acercas y mueves la vista (o con los botones 🔍). La cámara sigue al perrito."></p>
   </div>
 
+  <div class="etapa atual" data-etapa="1">
   <h2 class="titulo-escolha" data-t="Formato|Shape|Forma"></h2>
   <div class="escolha" id="formas" role="radiogroup" aria-label="Formato" data-rotulo="Formato|Shape|Forma">
     <button class="cartao-forma" type="button" role="radio" data-forma="quadrado" aria-checked="true">
@@ -57,7 +61,9 @@
       <span data-t="Surpresa|Surprise|Sorpresa"></span>
     </button>
   </div>
+  </div>
 
+  <div class="etapa" data-etapa="2">
   <h2 class="titulo-escolha" data-t="Nível|Level|Nivel"></h2>
   <div class="escolha" id="niveis" role="radiogroup" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
     <button class="cartao-nivel verde" type="button" role="radio" data-nivel="facil" aria-checked="true"><span data-t="Fácil|Easy|Fácil"></span><small class="recorde" data-rec="facil"></small></button>
@@ -70,10 +76,20 @@
     <button class="chip-modo" type="button" role="radio" data-modo="andar" aria-checked="true" data-t="🐶 Levar o cachorrinho|🐶 Walk the puppy|🐶 Llevar al perrito"></button>
     <button class="chip-modo" type="button" role="radio" data-modo="desenhar" aria-checked="false" data-t="✏️ Desenhar o caminho|✏️ Draw the path|✏️ Dibujar el camino"></button>
   </div>
+  </div>
+  </div>
 
-  <button id="btJogar" class="grande" type="button" data-t="▶ Jogar!|▶ Play!|▶ ¡Jugar!"></button>
-  <button id="btInstalar" class="medio" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
-  <p id="versao" class="versao"></p>
+  <div class="menu-pe">
+    <p id="resumo" class="resumo"></p>
+    <div class="passos">
+      <button id="btVoltarEtapa" class="medio" type="button" data-t="◀ Voltar|◀ Back|◀ Atrás"></button>
+      <span id="indEtapa" class="ind-etapa"></span>
+      <button id="btProximo" class="medio" type="button" data-t="Próximo ▶|Next ▶|Siguiente ▶"></button>
+    </div>
+    <button id="btJogar" class="grande" type="button" data-t="▶ Jogar!|▶ Play!|▶ ¡Jugar!"></button>
+    <button id="btInstalar" class="medio" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
+    <p id="versao" class="versao"></p>
+  </div>
 </section>
 
 <section id="jogo" class="tela" data-recurso="labirinto">

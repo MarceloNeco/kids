@@ -347,7 +347,7 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
-## 1.30.0 — Ursão de Pelúcia gigante (dono, 20/Nov/2026)
+## 1.31.0 — Ursão de Pelúcia gigante (dono, 20/Nov/2026)
 
 - `modelos3d.js`: `urso` — ursinho de pelúcia em 3D (laço na cor escolhida, costura nas costas, rabinho, solas
   claras); corre gingando, no pulinho abre os braços, rindo joga a cabeça para trás com as patas na barriga
@@ -358,6 +358,23 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   `risada` (no máximo uma a cada 2,6 s), `saltito`, `ursoEmpurra`, `ursoBate`.
 - `app.js`: o Ursão não é sorteado como rival nem na abertura (taparia a tela). Som `sons/risada.mp3` ("ho ho ho",
   CC0). Testes em `teste/urso.test.js`.
+
+## 1.30.0 — menu em etapas, Correr sempre à vista (dono, 20/Nov/2026)
+
+- `#menu` ocupa a tela inteira e não rola (`height: 100dvh`): no alto o logo, o 🔊 ❓ e as bolinhas `.passos`
+  (`[data-ir-etapa]`, "Etapa 2 de 5 · Cenários"); no meio `#etapas`, só a etapa da vez (`.etapa[data-etapas]`; se não
+  couber, rola por dentro); embaixo `#menuBaixo`: ◀ Voltar · 🏁 Correr! · Próximo ▶ (duas linhas no celular em pé,
+  uma só de 700 px para cima).
+- Etapas: 1 Quem corre (jogadores, nível, recorde, rivais; duelo e TV) · 2 Cenários (duas fileiras de arrastar) e
+  visual · 3 Veículo (prévia, fileira de veículos, cor) · 4 Piloto (prévia, corpo, pilotos) · 5 Música, como dirigir,
+  guardar no celular e créditos. A 3 e a 4 são a mesma garagem (`#menu[data-etapa]` esconde `.so-veic`/`.so-piloto`).
+  Deitado: as bolinhas sobem para a linha do 🚪, sem o logo; etapas 1 e 5 em duas colunas; garagem lado a lado.
+- `app.js`: `mostrarEtapa()`, `irEtapa()`. Cada avanço com toque põe uma entrada no histórico (`vruuumEtapa` e o caminho
+  `vruuumPilha`); voltar pelos botões anda para trás no próprio histórico, então o Voltar do celular volta uma etapa e a
+  guarda do `navegacao.js` continua valendo. A etapa do menu é sempre a da entrada do histórico em que ele está.
+  Controle da TV: Voltar volta uma etapa; a ajuda ❓ abre por cima da etapa (um toque fecha).
+- Testes: `teste/etapas.test.js` (360×740, 390×844 e 844×390: nenhuma etapa rola a página e o Correr fica inteiro na
+  tela; correr direto da etapa 1; Voltar do celular; nenhuma opção sumiu).
 
 ## 1.29.0 — ônibus de turismo de dois andares (dono, 19/Nov/2026)
 
