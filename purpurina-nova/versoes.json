@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.3",
+      "data": "20/Nov/2026",
+      "hora": "19:59:39",
+      "pt": [
+        "👖 Calça sem degraus: quando ela ginga, dança ou anda, a blusa e a calça se mexem juntas (antes a blusa ficava parada e a calça fazia um degrau no quadril).",
+        "🙂 Queixo de menina: rosto mais curto e arredondado embaixo, queixinho redondo sem ponta; a boca ficou um pouco menor e mais alta, e o sorriso aberto não passa do queixo."
+      ],
+      "en": [
+        "👖 No more steps in the pants: when she sways, dances or walks, the top and the pants move together (before, the top stood still and the pants made a step at the hips).",
+        "🙂 A girl's chin: a shorter face, rounded at the bottom, with a small round chin and no point; the mouth is a bit smaller and higher, and the open smile stays inside the chin."
+      ],
+      "es": [
+        "👖 Pantalón sin escalones: cuando se balancea, baila o camina, la blusa y el pantalón se mueven juntos (antes la blusa se quedaba quieta y el pantalón hacía un escalón en la cadera).",
+        "🙂 Barbilla de chica: cara más corta y redondeada abajo, con una barbilla pequeña y redonda, sin punta; la boca es un poco más pequeña y más alta, y la sonrisa abierta no pasa de la barbilla."
+      ]
+    },
+    {
       "versao": "0.9.2",
       "data": "20/Nov/2026",
       "hora": "19:27:25",

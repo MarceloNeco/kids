@@ -35,12 +35,14 @@
   };
   // pernas: [x, y, giro] do quadril (corpo) e de cada perna, e a saia inclinando (px do desenho, graus)
   var BASES = {
+    // (20/Nov/2026, dono: "aqueles quadrados da calça não acompanham"): parada, ela inteira vai junto para o lado — corpo
+    // e pernas com o mesmo deslocamento e sem girar separados (girar cada pedaço desencontrava a calça em degraus); o
+    // gingado fica no quadril indo para o lado, nos braços e na cabeça
     reta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
-    // (giros das pernas pequenos: a perna sai do quadril sem degrau na emenda da calça)
-    gingaD: { c: [14, 0, -3], e: [14, 1.6, 6], d: [14, -1.6, 1], s: -2 },
-    gingaE: { c: [-14, 0, 3], e: [-14, -1.6, -1], d: [-14, 1.6, -6], s: 2 },
-    cruzada: { c: [0, 0, 0], e: [0, 0, -2], d: [0, 8, 8], s: 0 },
-    aberta: { c: [0, 0, 0], e: [0, 0, 5], d: [0, 0, -5], s: 0 }
+    gingaD: { c: [10, 0, 0], e: [10, 0, 0], d: [10, 0, 0], s: -2 },
+    gingaE: { c: [-10, 0, 0], e: [-10, 0, 0], d: [-10, 0, 0], s: 2 },
+    cruzada: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
+    aberta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 }
   };
   function valores(nome) {
     var p = POSES[nome] || POSES.relax, b = BASES[p.base] || BASES.reta;
@@ -76,7 +78,12 @@
       var bate = op.ritmo && modo !== 'andar' ? Math.sin(t / op.ritmo * Math.PI * 2) * 4 : 0;   // dançando, a cabeça vai no ritmo
       if (cab) cab.setAttribute('transform', 'rotate(' + (v.cab * (0.5 + amp / 2) + Math.sin(t / 1100) * 1.2 + bate).toFixed(2) + ' ' + cab.getAttribute('data-x') + ' ' + cab.getAttribute('data-y') + ')');
       Array.prototype.forEach.call(svg.querySelectorAll('.rig-iris'), function (g) { g.setAttribute('transform', 'translate(' + (v.olho * 5).toFixed(2) + ' 0)'); });
-      function estilo(sel, x, y, rot, extra) { var g = svg.querySelector(sel); if (!g) return; g.style.transformBox = 'view-box'; g.style.transform = 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px) rotate(' + rot.toFixed(2) + 'deg)' + (extra || ''); }
+      // todos os grupos com a classe (o corpo vem em mais de um pedaço: antes e depois das pernas) — antes só o primeiro se
+      // mexia, e a blusa ficava parada enquanto as pernas iam para o lado (a calça desencontrava em degraus)
+      function estilo(sel, x, y, rot, extra) {
+        var t = 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px) rotate(' + rot.toFixed(2) + 'deg)' + (extra || '');
+        Array.prototype.forEach.call(svg.querySelectorAll(sel), function (g) { g.style.transformBox = 'view-box'; g.style.transform = t; });
+      }
       var resp = Math.sin(t / 650) * 1.1;
       estilo('.pp-corpo', v.cx * amp, v.cy * amp - resp, v.cr * amp);
       estilo('.pp-passo-e', v.ex * amp, v.ey * amp, v.er * amp, v.esy ? ' scaleY(' + v.esy.toFixed(3) + ')' : '');
@@ -101,13 +108,13 @@
         var P = op.passoMs || 980, f = ((t - modoIni) / P) % 1, a = Math.sin(2 * Math.PI * f);
         var e = perna(f, -1), d = perna((f + 0.5) % 1, 1);
         v.ex = e.x; v.ey = e.y; v.er = e.r; v.esy = e.sy; v.dx = d.x; v.dy = d.y; v.dr = d.r; v.dsy = d.sy;
-        v.cx = -14 * a; v.cr = 3.4 * a; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
+        v.cx = -12 * a; v.cr = 0; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
         v.ex += v.cx; v.dx += v.cx; v.ey += v.cy; v.dy += v.cy;   // as pernas saem do quadril: vão junto com ele
         v.oE = 9 + 5 * a; v.cE = 14 + 10 * Math.max(0, a); v.oD = 9 - 5 * a; v.cD = 14 + 10 * Math.max(0, -a); v.fE = 1; v.fD = 1;
         v.cab = -2 * a; v.olho = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
-        v.cx += lado * 10 * bat; v.cr += -lado * 3 * bat; v.cy += 5 * bat;
+        v.cx += lado * 10 * bat; v.cy += 5 * bat;
         v.ex += lado * 10 * bat; v.dx += lado * 10 * bat;   // as pernas vão junto com o quadril
         // a perna do lado contrário ao quadril dobra o joelho (sobe um pouco e encolhe)
         if (lado > 0) { v.esy = 1 - 0.07 * bat; v.ey += -6 * bat; v.er += 2 * bat; } else { v.dsy = 1 - 0.07 * bat; v.dy += -6 * bat; v.dr += -2 * bat; }

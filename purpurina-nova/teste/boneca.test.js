@@ -505,3 +505,15 @@ test('desfile sempre de frente, olhando para a plateia (dono, 20/Nov/2026: "nem 
   assert.ok(desfile.length > 1000);
   assert.doesNotMatch(desfile, /olhaE|olhaD|angulo:/, 'no desfile ela não olha nem vira para os lados');
 });
+
+test('calça sem degraus no gingado e queixo redondo (dono, 20/Nov/2026: "os quadrados da calça", "queixo masculino")', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  // o corpo vem em mais de um grupo .pp-corpo: todos se mexem juntos com as pernas
+  assert.match(anim, /svg\.querySelectorAll\(sel\)/, 'o movimento vale para todos os pedaços do corpo');
+  // o gingado é só um deslocamento igual para corpo e pernas (girar separado abre degrau na cintura)
+  assert.match(anim, /gingaD: \{ c: \[10, 0, 0\], e: \[10, 0, 0\], d: \[10, 0, 0\]/);
+  const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /adulta: \{[^}]*queixoY: 0, queixoL: 0\.95/, 'queixo da adulta curto e redondo, sem ponta');
+  assert.match(fonte, /r: \[v\.r\[0\] \* 1\.05, v\.r\[1\] \* 0\.85, v\.r\[2\] \* 0\.6\] \};   \/\/ queixinho redondo/);
+});
