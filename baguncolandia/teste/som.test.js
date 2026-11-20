@@ -15,8 +15,8 @@ let falhas=0; const conf=(c,m)=>{console.log((c?'✓ ':'✗ ')+m); if(!c) falhas
  const vis=id=>pg.evaluate(id=>{const e=document.getElementById(id); const r=e.getBoundingClientRect(); return r.width>0 && getComputedStyle(e).display!=='none';},id);
  conf(!(await vis('localPausa')), 'lobby: ⏸ escondido');
  conf(await vis('localMudo') && await vis('localMusica'), 'lobby: 🔊 e 🎵 à vista');
- const linhas=await pg.evaluate(()=>{const t=[...document.querySelectorAll('#localModos button')].map(b=>Math.round(b.getBoundingClientRect().top)); return new Set(t).size;});
- conf(linhas===1, 'os 6 modos numa fileira só ('+linhas+')');
+ const modos=await pg.evaluate(()=>{const bs=[...document.querySelectorAll('#localModos button')].filter(b=>b.offsetParent); return {linhas:new Set(bs.map(b=>Math.round(b.getBoundingClientRect().top))).size, comNome:bs.every(b=>{const s=b.querySelector('small'); return s && s.offsetHeight>0 && s.textContent.trim().length>2;})};});
+ conf(modos.linhas===2 && modos.comNome, 'em pé: os modos em 2 fileiras de cartões, cada um com o nome à vista ('+JSON.stringify(modos)+')');   // dono, 20/Nov/2026
  
  await pg.click('#localPessoas'); await pg.waitForTimeout(500);
  const l2=await pg.evaluate(()=>({bonecos:document.querySelectorAll('#lobbyJogadores canvas').length, dica:document.getElementById('lobbyDica').textContent}));
