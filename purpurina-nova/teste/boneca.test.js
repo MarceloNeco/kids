@@ -291,7 +291,7 @@ test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/No
   // os dois pés no chão (dono, 15/Nov/2026: "parece que tem um pé flutuando"): nenhuma paradinha levanta o pé
   assert.doesNotMatch(app, /perna-dobrada|perna-relaxada/);
   for (const m of css.matchAll(/\.modelo\.(perna-[a-z]+|ginga-[a-z]+) \.pp-passo-[ed] \{ transform: ([^}]*)\}/g)) assert.doesNotMatch(m[2], /translateY\(-|scaleY\(0?\.\d/, m[1] + ' tira o pé do chão');
-  assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.match(app, /girar\(0, -45/);
+  assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.doesNotMatch(app, /girar\(0, -45/, 'sem giro de lado no desfile (Nova Era sempre de frente)');
 });
 
 test('Nova Era: rosto natural que acompanha a idade, sem sombra escura embaixo (dono, 19/Nov/2026, referência do Poki)', () => {
@@ -317,7 +317,9 @@ test('Nova Era em ilustração (dono, 19/Nov/2026): olho amendoado com pálpebra
   // as vistas do estúdio, do desfile, do vídeo e da TV não passam de 45° (sem volta inteira, sem costas)
   const fs = require('fs'), path = require('path');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), tv = fs.readFileSync(path.join(__dirname, '..', 'tv.js'), 'utf8');
-  assert.match(app, /var VISTAS = \[0, 28, 45, -28, -45\];/);
+  // (20/Nov/2026, dono: "não precisa olhar pro lado, porque não será 3D"): o jogo não mostra mais vistas de lado
+  assert.doesNotMatch(app, /var VISTAS|proximaVista|ANG_TAKE|btGirar/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'), /btGirar|dicaGiro/);
   assert.doesNotMatch(app, /\* 360|e \* 360|-115|pointermove/); assert.doesNotMatch(tv, /e \* 360/);
   for (const a of [28, 45, -28, -45]) for (const idade of ['pequena', 'crianca', 'adolescente', 'adulta']) {
     const v = B.svg(Object.assign(V.novo(), { idade }), { id: 'v', angulo: a }); assert.equal(bemFormado(v), ''); assert.ok(!/NaN|undefined/.test(v), idade + a);
@@ -495,4 +497,11 @@ test('contorno dos dois lados da roupa e queixo curto (dono, 20/Nov/2026)', () =
   const g = s.match(/<g clip-path="url\(#sim-semManga\)">([\s\S]*?)<\/g>/)[1];
   const xs = (g.match(/<path d="([^"]+)"/) || [])[1].match(/-?[\d.]+(?=,)/g).map(Number);
   assert.ok(Math.abs((200 - Math.min(...xs)) - (Math.max(...xs) - 200)) < 2, 'blusa simétrica');
+});
+
+test('desfile sempre de frente, olhando para a plateia (dono, 20/Nov/2026: "nem no desfile")', () => {
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  const desfile = app.slice(app.indexOf('function desfilar()'), app.indexOf('// fogos de artifício'));
+  assert.ok(desfile.length > 1000);
+  assert.doesNotMatch(desfile, /olhaE|olhaD|angulo:/, 'no desfile ela não olha nem vira para os lados');
 });

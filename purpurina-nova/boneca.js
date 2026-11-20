@@ -19,8 +19,8 @@
   var IDADES = {
     pequena: { cab: 1.2, olho: 1.04, maxilar: 1.04, queixoY: -3, queixoL: 1.05, boca: [0.92, 0.95] },
     crianca: { cab: 1.12, olho: 1, maxilar: 0.97, queixoY: 0, queixoL: 0.95, boca: [1, 1] },
-    adolescente: { cab: 1.06, largura: 0.93, olho: 0.95, maxilar: 0.9, queixoY: 4, queixoL: 0.82, boca: [1.08, 1.2] },
-    adulta: { cab: 1.02, largura: 0.86, olho: 0.92, maxilar: 0.85, queixoY: 7, queixoL: 0.76, boca: [1.12, 1.32] }
+    adolescente: { cab: 1.06, largura: 0.93, olho: 0.95, maxilar: 0.9, queixoY: 4, queixoL: 0.82, boca: [1.02, 1.06] },
+    adulta: { cab: 1.02, largura: 0.86, olho: 0.92, maxilar: 0.85, queixoY: 7, queixoL: 0.76, boca: [1.04, 1.1] }
   };
   var IDADE = IDADES.crianca;
   /* ---------- corpo com medidas reais (Nova Era, 19/Nov/2026) ----------
@@ -478,7 +478,8 @@
       out.push(luzLados(pele, menino), luzMeio(pele, I), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, olharV * 0.16, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, olharV * 0.16, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
       out.push(deslocar(-dO, sobr(164, -1)), deslocar(dO, sobr(236, 1)));
       out.push(narizFrente(e.nariz, pele) + narizLuz(pele, menino));
-      out.push(bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))));
+      // menina: boca um pouco mais alta (o queixo ficou mais curto; a boca aberta não encosta na ponta do queixo)
+      out.push(menino ? bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))) : '<g transform="translate(0 -3)">' + bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))) + '</g>');
       if (menino && vis('bigode')) out.push(bocaIdade(bigode(e.bigode, cab)));
       if (vis('adesivo')) out.push(adesivo(e.adesivo, 266, 250, 13));
       if (e.glitter === 'bochechas' || e.glitter === 'olhos') out.push(glitter(e, C('glitter')));
