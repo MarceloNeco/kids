@@ -78,7 +78,7 @@ test('celular: tocar no prêmio leva a garra; com a garra forte ele vem, vai par
     // coleção: uma aba por máquina, a da lanchonete mostra o que veio; continua lá depois de recarregar
     await pg.click('#btFimColecao');
     assert.equal(await pg.isVisible('#colecao'), true);
-    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 5);
+    assert.equal(await pg.$$eval('#abas [data-aba]', l => l.length), 6);
     assert.equal(await pg.$$eval('#prateleira .item', l => l.length), 11);
     assert.ok(await pg.$$eval('#prateleira .item:not(.falta)', l => l.length) >= 1);
     await pg.reload(); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
@@ -105,7 +105,7 @@ test('celular: as setas ⬅ ➡ ⬆ ⬇ levam a garra; no médio tem relógio e 
     await pg.waitForTimeout(200);
     const e4 = await est(pg);
     assert.ok(Math.hypot(e4.x - e3.x, e4.z - e3.z) < 0.05, 'soltou, parou');
-    await pg.evaluate(() => GarraDebug.velocidade(20));   // 1 minuto de relógio, acelerado
+    await pg.evaluate(() => GarraDebug.tempo(1.5));   // pula para o fim do minuto (acelerar o relógio pulava uma rodada inteira no navegador lento)
     await pg.waitForFunction(() => GarraDebug.estado().fase !== 'mirar', null, { timeout: 30000 });
     assert.equal((await est(pg)).fichas, 9, 'o tempo acabou e gastou a ficha');
     assert.deepEqual(pg.erros, []);
@@ -146,15 +146,28 @@ test('computador: setas e espaço jogam; 🎥 troca a câmera, 🔍 aproxima e a
   } finally { await pg.ctx.close(); }
 });
 
-test('as 5 máquinas abrem sem erro, cada uma com os seus prêmios (os bichos de verdade são menos, soltos no cobertor)', async () => {
+test('as máquinas abrem sem erro, cada uma com os seus prêmios (os bichos de verdade são menos, soltos no cobertor)', async () => {
   const pg = await abrir(FONE, '&semente=2');
   try {
-    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17]]) {
+    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17], ['festas', 36, 48]]) {
       await pg.goto(base + '?teste&semente=2'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
       await jogar(pg, mq, 'facil');
       const e = await est(pg);
       assert.equal(e.maquina, mq); assert.ok(e.premios >= min && e.premios <= max, mq + ': ' + e.premios + ' prêmios');
     }
+    assert.deepEqual(pg.erros, []);
+  } finally { await pg.ctx.close(); }
+});
+
+test('máquina de Festas: o cartão mostra a festa e a máquina só tem os prêmios dela (?festa= escolhe)', async () => {
+  const pg = await abrir(FONE, '&semente=4&festa=pascoa');
+  try {
+    assert.equal(await pg.textContent('#festaNome'), 'Páscoa');
+    await jogar(pg, 'festas', 'facil');
+    const tipos = await pg.evaluate(() => GarraDebug.tipos()), lista = require('../festas.js').LISTA.pascoa;
+    assert.ok(tipos.length >= 6, 'todos os tipos: ' + tipos);
+    for (const t of tipos) assert.ok(lista.tipos.includes(t) || t === lista.raro, 'prêmio de outra festa: ' + t);
+    assert.match(await pg.textContent('#aviso'), /Feliz Páscoa/);
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
 });
