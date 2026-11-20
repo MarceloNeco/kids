@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.1';
+  var APP_VERSION = '0.4.2';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -122,6 +122,7 @@
     try { history.replaceState({ inicio: 1 }, ''); } catch (e) { /* ok */ }
     mostrar('menu');
   }
+  if (window.Trilha && Trilha.podeTocarJa && Trilha.podeTocarJa() && !semMusica()) { Som.iniciar(); Som.musica(true); }   // aberto pelo Bolinho, já começa com música (dono, 20/Nov/2026); senão, no primeiro toque, como antes
   $('btEntrar').addEventListener('click', entrar);
   function desenharMenu() {
     $('menuBoneca').innerHTML = B.svg(livre, { id: 'menu', fundo: false, area: [40, 40, 320, 640] });

@@ -2,6 +2,20 @@
   "app": "rabiscolandia",
   "versoes": [
     {
+      "versao": "0.1.18",
+      "data": "20/Nov/2026",
+      "hora": "11:06:14",
+      "pt": [
+        "🎵 Aberto pelo Bolinho, o jogo já começa com a música tocando (sem precisar tocar na tela antes). Aberto direto, pelo ícone ou no iPhone, a música continua começando no primeiro toque"
+      ],
+      "en": [
+        "🎵 Opened from Rainy Day Donuts, the game starts with the music already playing (no need to tap the screen first). Opened directly, from its icon or on an iPhone, the music still starts on the first tap"
+      ],
+      "es": [
+        "🎵 Abierto desde Buñuelos de Lluvia, el juego empieza con la música ya sonando (sin tener que tocar la pantalla antes). Abierto directamente, desde su icono o en un iPhone, la música sigue empezando con el primer toque"
+      ]
+    },
+    {
       "versao": "0.1.17",
       "data": "15/Nov/2026",
       "hora": "09:30:00",

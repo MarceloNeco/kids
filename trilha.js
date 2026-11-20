@@ -249,5 +249,15 @@
     return T;
   };
   T.volume = function () {}; T.tocando = function () { return false; }; T.parar = function () {}; T.musica = function () { return null; };
+  // O navegador já deixa tocar som sem toque? (dono, 20/Nov/2026: "como eles vêm do Bolinho, já deixa a musiquinha
+  // tocando".) Vindo da estante, o toque em "Jogar" vale também para a página do jogo (Chrome); aberto direto, pelo ícone
+  // ou no Safari, não: aí a música espera o primeiro toque, como antes. Os jogos com tocador próprio perguntam isto ao
+  // abrir. Teste: um AudioContext que já nasce "running" = pode tocar.
+  T.podeTocarJa = function () {
+    try {
+      var C = raiz.AudioContext || raiz.webkitAudioContext; if (!C) return false;
+      var c = new C(), ok = c.state === 'running'; if (c.close) c.close(); return ok;
+    } catch (e) { return false; }
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = T; else raiz.Trilha = T;
 })(typeof self !== 'undefined' ? self : this);

@@ -179,6 +179,9 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
     `bolinho-musicas`), mesmo que outras estejam no cache do jogo. Só se nem ela estiver guardada, toca a música feita
     no código ("estilo Atari") — ou silêncio, se o jogo não tiver.
   - Música feita no código (som de "Atari", 8 bits) **nunca toca com internet**, nem intercalada.
+  - **Aberto pelo Bolinho, já começa com a música** (dono, 20/Nov/2026): o toque em "Jogar" na estante vale para a página
+    do jogo. O `Trilha.iniciar` já tenta tocar ao abrir; tocador próprio pergunta `Trilha.podeTocarJa()` ao abrir e liga a
+    música. Aberto direto, pelo ícone ou no iPhone, começa no primeiro toque. Vigia: `teste/musica-ao-abrir.test.js`.
   - Prefira sempre gravações com instrumentos de verdade. Música gravada com som de videogame / 8 bits (chiptune) não
     entra na lista (deixe o arquivo na pasta, só tire da lista). Cada jogo continua com pelo menos 10 músicas.
   - **Biblioteca de músicas (dono, 14/Nov/2026):** o botão "Bolinho FM" (radinho tocando) da estante lista todas as músicas gravadas dos jogos e da

@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.29.0';
+  var APP_VERSION = '1.29.1';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -116,6 +116,7 @@
     setTimeout(function () { $('entrada').classList.remove('saindo'); tela('menu'); montarMenu(); focarPrimeiro(); }, 380);
   }
   $('btEntrar').addEventListener('click', entrar);
+  if (window.Trilha && Trilha.podeTocarJa && Trilha.podeTocarJa() && estadoTela === 'entrada') { Som.iniciar(); Som.musica(true); }   // aberto pelo Bolinho, já começa com música (dono, 20/Nov/2026); senão, no primeiro toque, como antes
 
   // ---------- menu e garagem ----------
   var montado = false, editando = 0, animPrevia = 0;

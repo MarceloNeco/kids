@@ -1,7 +1,7 @@
 /* Bagunçolândia — service worker: guarda o jogo inteiro no aparelho, de forma segura, pela peça comum ../sw-comum.js: a versão nova só entra
    quando chega INTEIRA (senão continua a anterior) e tudo abre da cópia do próprio jogo. Cache com o nome do app (nunca apaga o dos outros apps
    da mesma origem). Subir VERSAO a cada release (igual a APP_VERSION em app.js). */
-var VERSAO = '0.8.44';
+var VERSAO = '0.8.45';
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'app.js', 'jogo.js', 'casa.js', 'figuras.js', 'cenas.js', 'boneco.js', 'desenho.js', 'sala.js', 'voz.js', 'som.js', 'calibrar.js', 'config.js', 'batida.js', 'spotify.js', 'esqueleto.js', 'libs/supabase.js', 'fontes/fredoka.woff2', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../recursos.js', '../carregando.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../trilha.js'];
 // A parte da câmera (MediaPipe em libs/mediapipe/, ~28 MB) só baixava na primeira vez que alguém ligava o boneco;
 // sem internet, essa primeira vez falhava. Agora fica guardada sozinha depois de abrir, mas só no Wi-Fi.
