@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.44', APP_UPDATED = '15/11/2026';
+  var APP_VERSION = '0.8.45', APP_UPDATED = '20/11/2026';
   // o idioma vem da estante (../idioma.js): pt, en ou es; o jogo não tem botão de idioma próprio
   function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
   function T(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }
@@ -67,6 +67,8 @@
   aplicarSom(SOM.mudo, SOM.semMusica);
   if (window.SolverRecursos && !SolverRecursos.ligado('baguncolandia', true)) { tela('desligado'); return; }
   try { if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js'); } catch (e) {}
+  // aberto pelo Bolinho, já começa com música (dono, 20/Nov/2026); senão, no primeiro toque, como antes (o celular que vira controle da TV para a música no entrar(): quem toca é a TV)
+  if (!/[?&]tv=/.test(location.search) && window.Trilha && Trilha.podeTocarJa && Trilha.podeTocarJa() && !SOM.mudo && !SOM.semMusica) { Som.iniciar(); Som.musica(true); }
 
   var CFG_PADRAO = { modo: 'bagunca', jogadores: 1, celulares: 1, duracao: 60, dificuldade: 'normal', ambiente: 'paisagem', cena: 'aleatoria', turmas: { propria: true, publica: true, minhas: true } };
   function idYouTube(s) { s = (s || '').trim(); var m = s.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/); if (m) return m[1]; return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : ''; }
@@ -541,6 +543,7 @@
       if (!cel.toque && (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.RTCPeerConnection)) { erro.textContent = T('Este navegador não deixa usar a câmera. Abra no Chrome ou no Safari.', 'This browser cannot use the camera. Open it in Chrome or Safari.', 'Este navegador no deja usar la cámara. Ábrelo en Chrome o en Safari.'); erro.style.display = 'block'; return; }
       try { localStorage.setItem('bagunca:nome', nome); if (!cel.local) localStorage.setItem('bagunca:codigo', cod); } catch (e) {}
       $('btEntrar').disabled = true; Som.iniciar(); Voz.liberar();
+      if (!cel.local && !cel.toque) Som.musica(false);   // celular de controle: a música é da TV
       if (cel.toque) { TVApp.iniciar({ local: true, toque: true, nome: nome, gesto: true }); TVApp.comando(Object.assign({ acao: 'config' }, cel.cfg, { celulares: 1 })); mandarBonecos(); Nav.abrir(function () { sairDoJogoLocal('entrar'); Nav.inicio(); }); /* Voltar no meio do jogo = 🏠: vai para a tela inicial (dono, 14/Nov/2026) */ $('btEntrar').disabled = false; return; }
       if (cel.local) { entrarLocal(nome, erro); return; }
       cel.sala = Sala.celular({ nome: nome, codigo: cod, video: $('cam'), T: T, aoStatus: status, aoTV: daTV, aoConectado: function () { Som.tocar('ok'); mandarConfig(); }, aoCamera: function (c) { $('cam').style.transform = 'scaleX(-1)'; }, aoCameras: cameras });

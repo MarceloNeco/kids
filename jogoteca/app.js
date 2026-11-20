@@ -16,7 +16,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0', APP_DATA = '20/Nov/2026';
+  var APP_VERSION = '0.3.1', APP_DATA = '20/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA);
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -137,7 +137,7 @@
     tela = id; document.body.classList.toggle('jogando', id === 'jogo');
   }
   function pararJogo() { if (rodando && rodando.parar) { try { rodando.parar(); } catch (e) {} } rodando = null; $('palco').innerHTML = ''; }
-  function irMenu() { pararJogo(); fecharFim(); $('ajuda').hidden = true; mostrar('menu'); pintarMenu(); }
+  function irMenu() { pararJogo(); fecharFim(); $('ajuda').hidden = true; mostrar('menu'); pintarMenu(); fixarAltura(); }
   window.addEventListener('popstate', function () { empurrado = false; if (tela !== 'menu') irMenu(); });
   function voltarMenu() { if (empurrado) history.back(); else irMenu(); }
 
@@ -189,6 +189,19 @@
     return '<span class="capa-arte">' + arte + '</span><span class="capa-nome">' + tri(j.nome) + '</span>' +
       (j.breve ? '<span class="fita">' + t('Em breve', 'Coming soon', 'Muy pronto') + '</span>' : '');
   }
+  // em pé, as capas giram numa roda (../carrossel.js, dono 20/Nov/2026): a da frente é a escolhida
+  var roda = null, medindo = false;
+  // com a roda, a prévia fica com a altura da maior (a do jogo mais comprido): o ▶ Jogar não sobe e desce a cada giro
+  function fixarAltura() {
+    var pv = $('previa'); pv.style.minHeight = '';
+    if (!roda || !roda.ativo() || tela !== 'menu') return;
+    var guardado = pref.jogo, maior = 0; medindo = true;
+    LISTA.forEach(function (j) { pref.jogo = j.id; pintarMenu(); maior = Math.max(maior, pv.getBoundingClientRect().height); });
+    pref.jogo = guardado; pintarMenu(); medindo = false;
+    pv.style.minHeight = Math.ceil(maior) + 'px';
+  }
+  addEventListener('resize', function () { setTimeout(fixarAltura, 50); });
+  function emPe() { return !!(window.matchMedia && matchMedia('(orientation: portrait)').matches); }
   function montarCapas() {
     var c = $('capas'); c.innerHTML = '';
     LISTA.forEach(function (j) {
@@ -196,22 +209,34 @@
       b.type = 'button'; b.className = 'capa' + (j.breve ? ' breve' : ''); b.setAttribute('role', 'option');
       b.setAttribute('data-jogo', j.id); b.innerHTML = capaHTML(j);
       b.addEventListener('click', function () {
-        if (pref.jogo === j.id && !j.breve && innerWidth < 760) { jogar(); return; }   // 2º toque na mesma capa (celular): joga
+        var naRoda = roda && roda.ativo();
+        if (pref.jogo === j.id && !j.breve && (innerWidth < 760 || naRoda)) { jogar(); return; }   // 2º toque na mesma capa (celular) ou na capa da frente da roda: joga
         pref.jogo = j.id; salvarPref(); som('toque'); pintarMenu();
-        if (innerWidth < 760) $('previa').scrollIntoView({ block: 'nearest', behavior: calmo ? 'auto' : 'smooth' });
+        if (innerWidth < 760 && !naRoda) $('previa').scrollIntoView({ block: 'nearest', behavior: calmo ? 'auto' : 'smooth' });
       });
       c.appendChild(b);
     });
+    var botoes = [].slice.call(c.children);
+    if (!window.BolinhoCarrossel) return;
+    if (roda) roda.trocar(botoes);
+    else roda = BolinhoCarrossel.criar({ caixa: c, itens: botoes, ligado: emPe, inicial: Math.max(0, LISTA.indexOf(porId(pref.jogo))),
+      aoMudar: function (i) { pref.jogo = LISTA[i].id; pintarMenu(); } });
   }
   function pintarMenu() {
     var j = porId(pref.jogo) || LISTA[0], nivel = nivelDe(j.id);
+    if (roda && !medindo) roda.ir(LISTA.indexOf(j));
     document.querySelectorAll('.capa').forEach(function (b) {
       var sim = b.getAttribute('data-jogo') === j.id;
       b.classList.toggle('escolhida', sim); b.setAttribute('aria-selected', String(sim));
     });
     $('previaCapa').innerHTML = window.JogotecaCapas && JogotecaCapas[j.id] ? JogotecaCapas[j.id]() : '';
     $('previaNome').textContent = tri(j.nome); $('previaTexto').textContent = tri(j.texto);
-    $('linhaNivel').hidden = !!j.breve; $('btJogar').hidden = !!j.breve; $('emBreve').hidden = !j.breve;
+    // na roda (girando sozinha) a prévia não muda de altura: no jogo "Em breve" o ▶ Jogar fica apagado em vez de sumir
+    var naRoda = !!(roda && roda.ativo());
+    $('linhaNivel').hidden = !!j.breve && !naRoda; $('linhaNivel').style.visibility = j.breve && naRoda ? 'hidden' : '';
+    $('btJogar').hidden = !!j.breve && !naRoda; $('btJogar').disabled = !!j.breve;
+    $('btJogar').textContent = j.breve ? t('🛠️ Em breve', '🛠️ Coming soon', '🛠️ Muy pronto') : t('▶ Jogar', '▶ Play', '▶ Jugar');
+    $('emBreve').hidden = !j.breve || naRoda;
     document.querySelectorAll('#linhaNivel .chip').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-nivel') === nivel)); });
     var nt = NIVEL_TXT[j.id]; $('previaNivel').textContent = nt && !j.breve ? tri(nt[nivel === 'dificil' ? 2 : nivel === 'medio' ? 1 : 0]) : '';
   }
@@ -243,7 +268,7 @@
     document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = parte(el, 'data-t'); });
     document.querySelectorAll('[data-rotulo]').forEach(function (el) { el.setAttribute('aria-label', parte(el, 'data-rotulo')); });
     $('versao').textContent = 'Jogoteca · ' + t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + dataVersao();
-    montarCapas(); pintarMenu();
+    montarCapas(); pintarMenu(); fixarAltura();
     if (tela === 'jogo' && atual) { $('jogoNome').textContent = tri(atual.nome); $('jogoNivel').textContent = nomeNivel(nivelDe(atual.id)); }
   }
   if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(function (c) { lingua = c; traduzir(); });

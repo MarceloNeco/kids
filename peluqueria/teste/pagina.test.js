@@ -324,7 +324,7 @@ async function comecar(pg, nivel) {
 
   const pdb = await abrir(browser, base + '?debug&teste');
   await passo(pdb, 500);
-  confere(/v0\.6\.15/.test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
+  confere(new RegExp('v' + require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8').match(/APP_VERSION = '([\d.]+)'/)[1].replace(/\./g, '\\.')).test(await pdb.textContent('#debug')) && await pdb.isVisible('#debug'), '?debug mostra a versão');
   confere(await D(pdb, () => PeluqueriaDebug.leve === false), 'celular: modo leve desligado');
 
   /* ---------- revisão final ---------- */

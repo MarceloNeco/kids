@@ -3,7 +3,7 @@
    (PeluqueriaDebug.passo). Nada de innerHTML com dado de fora; textos por textContent. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.15', APP_UPDATED = '15/11/2026';
+  var APP_VERSION = '0.6.16', APP_UPDATED = '20/11/2026';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.Peluqueria;
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -58,6 +58,7 @@
   }
   aoTocar(document, ligarMusica, true);
   document.addEventListener('keydown', ligarMusica, true);
+  if (window.Trilha && Trilha.podeTocarJa && Trilha.podeTocarJa()) ligarMusica();   // aberto pelo Bolinho, já começa com música (dono, 20/Nov/2026); senão, no primeiro toque, como antes
   function falar(pt, en, es) { if (voz) voz.falar(pt, en, es); }
 
   var desenho = PeluqueriaDesenho.criar($('palco'), { leve: TV });

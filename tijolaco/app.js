@@ -4,7 +4,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.0', APP_DATA = '19/Nov/2026';
+  var APP_VERSION = '0.1.1', APP_DATA = '20/Nov/2026';
   var R = window.TijolacoRegras, F = window.TijolacoFases, A = window.TijolacoArte, Som = window.TijolacoSom;
   var $ = function (id) { return document.getElementById(id); };
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -83,15 +83,24 @@
       box.appendChild(b);
     });
   }
+  // em pé, os 5 modos giram numa roda (../carrossel.js, dono 20/Nov/2026); só o TijoLinto (o 1º) já joga
+  var modoFrente = 0, roda = null;
   function pintarMenu() {
     document.querySelectorAll('[data-nivel]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.nivel === pref.nivel)); });
-    $('btJogar').textContent = t('▶ Jogar · fase ', '▶ Play · level ', '▶ Jugar · fase ') + (faseSel + 1);
+    var breve = modoFrente > 0 && !!(roda && roda.ativo());
+    $('btJogar').disabled = breve; document.querySelector('#menu .coluna').classList.toggle('bloqueada', breve);
+    $('btJogar').textContent = breve ? t('🛠️ Em breve', '🛠️ Coming soon', '🛠️ Muy pronto') : t('▶ Jogar · fase ', '▶ Play · level ', '▶ Jugar · fase ') + (faseSel + 1);
     $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔇';
   }
   document.querySelectorAll('[data-nivel]').forEach(function (b) {
     b.addEventListener('click', function () { pref.nivel = b.dataset.nivel; salvarPref(); Som.toque(); pintarMenu(); });
   });
   $('mdLinto').addEventListener('click', function () { Som.toque(); });
+  if (window.BolinhoCarrossel) {
+    roda = BolinhoCarrossel.criar({ caixa: document.querySelector('#menu .modos'), itens: [].slice.call(document.querySelectorAll('#menu .modo')),
+      ligado: function () { return !!(window.matchMedia && matchMedia('(orientation: portrait)').matches); },
+      aoMudar: function (i) { modoFrente = i; pintarMenu(); } });
+  }
   $('btJogar').addEventListener('click', function () { Som.acordar(); jogar(faseSel, pref.nivel); });
   $('btEfeitos').addEventListener('click', function () { pref.efeitos = !pref.efeitos; Som.ligar(pref.efeitos); salvarPref(); pintarMenu(); Som.toque(); });
   $('btAjuda').addEventListener('click', function () { $('ajuda').hidden = false; $('btFecharAjuda').focus(); });

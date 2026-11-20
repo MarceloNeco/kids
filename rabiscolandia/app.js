@@ -4,7 +4,7 @@
    (banco "rabiscolandia"). Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.17';
+  var APP_VERSION = '0.1.18';
   var $ = function (id) { return document.getElementById(id); };
   var F = window.DesenhoFolha, P = window.DesenhoPaginas || { LISTA: [], CATEGORIAS: [] }, Pt = window.DesenhoPintura;
   var Som = window.DesenhoSom || { iniciar: function () {}, musica: function () {}, musicaLigada: function () { return false; }, efeito: function () {}, efeitos: function () {}, efeitosLigados: function () { return false; }, proxima: function () {}, nomeAtual: function () { return ''; } };
@@ -116,6 +116,7 @@
     if (/[?&]tv=auto\b/.test(location.search) && window.DesenhoTV) { mostrar('menu'); DesenhoTV.virarTV(); return; }
     mostrar('menu');
   });
+  if (window.Trilha && Trilha.podeTocarJa && Trilha.podeTocarJa()) { Som.iniciar(); aplicarSom(); }   // aberto pelo Bolinho, já começa com música (dono, 20/Nov/2026); senão, no primeiro toque, como antes
   function telaCheia() {
     if (tipoAparelho() !== 'celular') return;
     var d = document, el = d.documentElement;

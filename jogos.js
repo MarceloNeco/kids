@@ -53,17 +53,23 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
   function escopo(card) { return card.getAttribute('data-sw').replace(/[^\/]*$/, ''); }
 
   // ---------- guardar todos ----------
+  // espera a versão mais nova do jogo ficar ativa (a que está chegando, se houver); se ela falhar, vale a que já estava
   function esperarAtivo(reg) {
     return new Promise(function (ok) {
-      if (reg.active) return ok(true);
       var w = reg.installing || reg.waiting;
-      if (!w) return ok(false);
-      var fim = setTimeout(function () { ok(false); }, 45000);
+      if (!w) return ok(!!reg.active);
+      var fim = setTimeout(function () { ok(!!reg.active); }, 45000);
       w.addEventListener('statechange', function () {
         if (w.state === 'activated') { clearTimeout(fim); ok(true); }
-        if (w.state === 'redundant') { clearTimeout(fim); ok(false); }
+        if (w.state === 'redundant') { clearTimeout(fim); ok(!!reg.active); }
       });
     });
+  }
+  // "Guardar" também deixa todos na última versão (dono, 20/Nov/2026: "quando eu coloco guardar local, ele já tem que
+  // garantir que todos estejam atualizados"): jogo já guardado pergunta ao servidor se há versão nova e espera ela chegar
+  // inteira (sw-comum.js) — assim nenhum jogo pergunta "quer atualizar?" depois
+  function atualizarJa(reg) {
+    return (navigator.onLine === false ? Promise.resolve() : reg.update().catch(function () {})).then(function () { return reg; });
   }
   function guardarTodos(aoAndar) {
     if (!temSW) return Promise.resolve(0);
@@ -72,7 +78,7 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
       return fila.then(function () {
         if (aoAndar) aoAndar(i, nomeDe(card), feitos);
         return navigator.serviceWorker.register(card.getAttribute('data-sw'), { scope: escopo(card) })
-          .then(esperarAtivo).then(function (ok) { if (ok) { feitos++; marcar(card); } }).catch(function () {});
+          .then(atualizarJa).then(esperarAtivo).then(function (ok) { if (ok) { feitos++; marcar(card); } }).catch(function () {});
       });
     }, Promise.resolve()).then(function () { return feitos; });
   }
@@ -112,7 +118,7 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
       bGuardar.disabled = true;
       st.className = 'st';
       guardarTodos(function (i, nome) {
-        tri(st, '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…', '⬇ Saving ' + (i + 1) + ' of ' + instalaveis.length + ': ' + nome + '…', '⬇ Guardando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…');
+        tri(st, '⬇ Guardando e atualizando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…', '⬇ Saving and updating ' + (i + 1) + ' of ' + instalaveis.length + ': ' + nome + '…', '⬇ Guardando y actualizando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…');
       }).then(function (n) {
         return guardarMusicas(function (i, total) {
           tri(st, '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '…', '🎵 Saving the favorite songs: ' + (i + 1) + ' of ' + total + '…', '🎵 Guardando las canciones favoritas: ' + (i + 1) + ' de ' + total + '…');
@@ -125,9 +131,9 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
         bGuardar.disabled = false;
         if (n === instalaveis.length && m.feitas === m.total) {
           st.className = 'st ok';
-          tri(st, '✓ Pronto: os ' + n + ' jogos funcionam sem internet neste aparelho. As músicas e as partes pesadas terminam de baixar sozinhas no Wi-Fi.' + musicas,
-            '✓ All done: the ' + n + ' games work without the internet on this device. The music and the bigger files finish downloading on their own over Wi-Fi.' + musicasEn,
-            '✓ Listo: los ' + n + ' juegos funcionan sin internet en este dispositivo. La música y las partes pesadas terminan de bajar solas con el Wi-Fi.' + musicasEs);
+          tri(st, '✓ Pronto: os ' + n + ' jogos estão na última versão e funcionam sem internet neste aparelho. As músicas e as partes pesadas terminam de baixar sozinhas no Wi-Fi.' + musicas,
+            '✓ All done: the ' + n + ' games are on the latest version and work without the internet on this device. The music and the bigger files finish downloading on their own over Wi-Fi.' + musicasEn,
+            '✓ Listo: los ' + n + ' juegos están en la última versión y funcionan sin internet en este dispositivo. La música y las partes pesadas terminan de bajar solas con el Wi-Fi.' + musicasEs);
           tri(bGuardar, '✓ Todos guardados', '✓ All saved', '✓ Todos guardados');
         } else {
           tri(st, n + ' de ' + instalaveis.length + ' guardados.' + musicas + ' Confira a internet e toque de novo para terminar.',

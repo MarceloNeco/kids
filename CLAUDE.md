@@ -111,6 +111,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
   (PT/EN/ES escolhido na estante),
   `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos), `clipe.js` (📺 Clipe: telão com bichinhos dançando a música que toca, na rádio e no H-rraaa);
+  `carrossel.js` (roda em perspectiva que gira sozinha, em pé, nos jogos com vários joguinhos dentro: Jogoteca e TIJOLAÇO; dono, 20/Nov/2026);
   bibliotecas em `baguncolandia/libs/`. Cartões da estante (dono, 15/Nov/2026): compactos, montados pelo `catalogo.js` — ícone,
   nome inteiro, "? ⌄" que abre a explicação, ícones do campo `rec` (TV, corpo, inclinar, dois; sem internet/precisa de internet
   vêm de `instalar`/`soOnline`; tocar explica), ⬇ Instalar e **Jogar sempre na ponta direita**. Vigia: `teste/estante-cartoes.test.js`.
@@ -178,6 +179,9 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
     `bolinho-musicas`), mesmo que outras estejam no cache do jogo. Só se nem ela estiver guardada, toca a música feita
     no código ("estilo Atari") — ou silêncio, se o jogo não tiver.
   - Música feita no código (som de "Atari", 8 bits) **nunca toca com internet**, nem intercalada.
+  - **Aberto pelo Bolinho, já começa com a música** (dono, 20/Nov/2026): o toque em "Jogar" na estante vale para a página
+    do jogo. O `Trilha.iniciar` já tenta tocar ao abrir; tocador próprio pergunta `Trilha.podeTocarJa()` ao abrir e liga a
+    música. Aberto direto, pelo ícone ou no iPhone, começa no primeiro toque. Vigia: `teste/musica-ao-abrir.test.js`.
   - Prefira sempre gravações com instrumentos de verdade. Música gravada com som de videogame / 8 bits (chiptune) não
     entra na lista (deixe o arquivo na pasta, só tire da lista). Cada jogo continua com pelo menos 10 músicas.
   - **Biblioteca de músicas (dono, 14/Nov/2026):** o botão "Bolinho FM" (radinho tocando) da estante lista todas as músicas gravadas dos jogos e da
