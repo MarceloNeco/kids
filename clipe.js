@@ -1,7 +1,8 @@
 /*
   Clipe do Bolinho — peça comum (dono, 19/Nov/2026). Um "telão" por cima da página com bichinhos desenhados em código
   (canvas: sem vídeo, sem IA, sem nada baixado) dançando no ritmo da música que já está tocando.
-  Quem usa: a rádio da estante (radio.js, botão "📺 Clipe" no tocador) e o H-rraaa (a-garra/, botão "📺 Clipe" no menu).
+  Quem usa: a rádio da estante (radio.js, botão "📺 Clipe" no tocador), a página do Bolinho FM (biblioteca.js, a tela do
+  DJ no alto) e o H-rraaa (a-garra/, botão "📺 Clipe" no menu).
 
   Uso:
     estante:  <script src="/kids/clipe.js"></script>  (e 'clipe.js' no BASICO do sw.js da raiz)
@@ -10,7 +11,7 @@
     BolinhoClipe.abrir({ cenas: 'radio' | 'garra', audio: <o <audio> que já toca>,
                          musica: function () { return { t: 'Nome da música', au: 'Autor' }; } });
     BolinhoClipe.fechar();   BolinhoClipe.aberto();   BolinhoClipe.cena(n)  (vai para a cena n; usado nos testes e prints)
-    BolinhoClipe.telinha(caixa, audio) -> { ligar(), desligar() }   (a TELINHA dos DJs em cima da rádio; ver "A TELINHA")
+    BolinhoClipe.telinha(caixa, audio) -> { ligar(), desligar(), audio(outro) }   (a TELA DO DJ no Bolinho FM; ver "A TELINHA")
 
   Como funciona:
   - Cenas (arte própria): rádio = Festa na piscina (capivara DJ, coelhinha e guaxinim), Discoteca do Bolinho (globo
@@ -25,9 +26,10 @@
     para 1 e 30 quadros por segundo se o aparelho não der conta); o laço para quando o telão fecha ou a aba some.
   - Sai por ✕, Esc, Voltar do celular e Voltar do controle da TV; ⛶ põe o telão em tela cheia.
   - Vídeo de IA no lugar do desenho: ver CLIPES_VIDEO logo abaixo.
-  - Telinha dos DJs (dono, 20/Nov/2026): uma TV pequena presa em cima da rádio da estante, só enquanto a rádio toca
-    (radio.js monta a caixa, o ✕ e o aparecer/sumir; aqui fica o desenho). Mostra de perto a Festa na piscina: a
-    capivara DJ na mesa de som e a coelhinha dançando, no mesmo ritmo do telão. Tocar nela abre o telão.
+  - Tela do DJ (dono, 20/Nov/2026: "o DJ tem que aparecer sempre, só mexe quando estiver tocando música, dentro da
+    página do Bolinho FM"): uma TV 16:9 no alto da página do Bolinho FM (biblioteca.js monta a caixa e o ▶; aqui fica o
+    desenho). Mostra de perto a Festa na piscina: a capivara DJ na mesa de som e a coelhinha dançando, no mesmo ritmo do
+    telão; sem música, um quadro parado. Tocar nela abre o telão.
   Escrito em JavaScript antigo (sem =>) de propósito: o tablet Fire mais velho também roda.
 */
 (function (raiz) {
@@ -40,7 +42,7 @@
   // a da rádio ou do jogo) por cima do desenho, um vídeo por música; se o vídeo não abrir, fica o desenho.
   // Lista vazia = só o desenho. O sw.js da estante já deixa .mp4/.webm passar direto, como faz com .mp3 (vídeo grande
   // não vai para a gaveta do aparelho); ao pôr o primeiro vídeo do H-rraaa, faça o mesmo no service worker do jogo.
-  // telinha: a TV pequena em cima da rádio (só um vídeo, em laço, sem som). O vídeo de IA dos dois DJs vai assim:
+  // telinha: a tela do DJ no alto da página do Bolinho FM (só um vídeo, em laço, sem som). O vídeo de IA dos DJs vai assim:
   //   1. o arquivo em  clipes/radio-dj.mp4  (na raiz do repositório kids; 1920 × 1080, sem som, que emende em laço);
   //   2. aqui:  telinha: ['/kids/clipes/radio-dj.mp4'],  (e, se quiser o mesmo vídeo no telão grande, também em radio);
   //   3. suba a VERSAO do sw.js da raiz e o data-versao do index.html, e rode  node ferramentas/pecas-comuns.js .
@@ -1356,14 +1358,17 @@
   }
 
   // ======================================================================
-  // A TELINHA (dono, 20/Nov/2026): a TV pequena (16:9) presa em cima da rádio da estante. O radio.js monta a caixa
-  // (um <button> que abre o telão), o ✕ e o aparecer/sumir; aqui fica só o que passa nela:
+  // A TELINHA = a TELA DO DJ (dono, 20/Nov/2026): a TV 16:9 no alto da página do Bolinho FM (biblioteca.js). Primeiro
+  // ficava em cima da barra da rádio; o dono pediu dentro da página do Bolinho FM. O biblioteca.js monta a caixa (um
+  // <button> que abre o telão), o ▶ e o selo "Ao vivo"; aqui fica só o que passa nela:
   // - um pedaço da Festa na piscina visto de perto (a janela MINI do mundo de 1000 × 600): a capivara DJ de fone e
   //   óculos na mesa de som e a coelhinha dançando do lado, com notinhas subindo dos toca-discos;
   // - o mesmo ritmo do telão (ritmoPasso). Os dois nunca rodam juntos: com o telão aberto a telinha para e solta o som;
   // - nítida no celular e no tablet: pintada com devicePixelRatio até 2; no tablet Fire velho (ou aparelho fraco, ou
   //   se o desenho demorar) 30 quadros por segundo e devicePixelRatio 1;
-  // - o laço só roda com a telinha ligada (rádio tocando), a aba à vista e o telão fechado;
+  // - o laço só roda com a telinha ligada (página do Bolinho FM aberta), a aba à vista e o telão fechado; sem música
+  //   (o áudio que ela segue pausado) desenha um quadro e fica parada;
+  // - segue o ritmo de um <audio> por vez: o da biblioteca ou o da rádio, o que estiver tocando (api.audio troca);
   // - vídeo de IA: CLIPES_VIDEO.telinha (lá em cima). Com internet, toca por cima do desenho, sem som e em laço.
   // ======================================================================
   var nv = raiz.navigator || {};
@@ -1408,7 +1413,7 @@
     if (!tl.rodando) return;
     tl.raf = raiz.requestAnimationFrame(tlQuadro);
     if (tl.meia && agora - tl.ultimoDesenho < 31) return;   // 30 quadros por segundo
-    // rádio parada: os DJs ficam parados (dono, 20/Nov/2026: "aparece sempre, só mexe quando estiver tocando"): um quadro e chega
+    // sem música: os DJs ficam parados (dono, 20/Nov/2026: "aparece sempre, só mexe quando estiver tocando"): um quadro e chega
     var parada = !!(tl.audio && tl.audio.paused);
     if (parada && tl.parouDesenhado && tl.V && tl.caixa.clientWidth === tl.mw) return;
     tl.parouDesenhado = parada;
@@ -1478,7 +1483,14 @@
     d.addEventListener('visibilitychange', tlAtualizar);
     tl.api = {
       ligar: function () { tl.ligada = true; tlAtualizar(); },
-      desligar: function () { tl.ligada = false; tlAtualizar(); }
+      desligar: function () { tl.ligada = false; tlAtualizar(); },
+      // troca o <audio> de que a tela segue o ritmo (a música da biblioteca ou a da rádio, a que estiver tocando)
+      audio: function (outro) {
+        if (!outro || outro === tl.audio) return;
+        if (tl.rodando) desligarRitmo();
+        tl.audio = outro; tl.parouDesenhado = false;
+        if (tl.rodando) ligarRitmo(outro);
+      }
     };
     return tl.api;
   }
