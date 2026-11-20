@@ -124,9 +124,9 @@
   var CAV = function () { return raiz.VruuumCavalo; };
   var MOD = function () { return raiz.VruuumModelos; };
   // veículo em 3D (modelos3d.js) ao vivo: gira de lado na curva, inclina no morro e no pulo; o piloto vai dentro, na ordem certa
-  function modeloVivo(c, vv, x0, y0, cw, ch, info, fase, lado, inclina, semente, periodo, voo, orbita, barco) {
+  function modeloVivo(c, vv, x0, y0, cw, ch, info, fase, lado, inclina, semente, periodo, voo, orbita, barco, ri) {
     var tt = Date.now() / 1000, est = Cab() && Cab().estado ? Cab().estado(tt, semente, periodo) : { giro: 0 };
-    MOD().vivo(c, vv.modelo, x0, y0, cw, ch, info.cor, fase, lado, inclina, { t: tt, voo: voo, giroCabeca: est.giro, orbita: orbita || 0, barco: !!barco, corpo: info.corpo,
+    MOD().vivo(c, vv.modelo, x0, y0, cw, ch, info.cor, fase, lado, inclina, { t: tt, voo: voo, giroCabeca: est.giro, orbita: orbita || 0, barco: !!barco, corpo: info.corpo, ri: ri || 0,
       cabeca: vv.semPiloto ? null : function (c2, x, y, r) { if (Cab()) Cab().desenhar(c2, vv, x0, y0, cw, ch, info, tt, semente, periodo, { x: x, y: y, r: r }); } });
   }
   // onde fica a cabeça de quem monta o cavalo (sobe e desce com o galope); nos outros veículos, a do desenho
@@ -231,6 +231,9 @@
     else if (ev.tipo === 'vira' && ev.dracula) texto(vs, t('🧛 Conde Drácula!', '🧛 Count Dracula!', '🧛 ¡Conde Drácula!'), '#ff4d6d', 1.3);
     else if (ev.tipo === 'pulo' && VEIC[ev.j] && VEIC[ev.j].galinha) texto(vs, t('Cocoricóóó!', 'Cock-a-doodle-doo!', '¡Quiquiriquííí!'), '#ffffff', 1.4);
     else if (ev.tipo === 'looping') texto(vs, 'LOOPING!', '#ff4fd8', 1.8);
+    else if (ev.tipo === 'risada') texto(vs, t('🧸 HO HO HO!', '🧸 HO HO HO!', '🧸 ¡JO JO JO!'), '#ffd166', 1.8);
+    else if (ev.tipo === 'ursoBate') texto(vs, t('🧸 Ai! A beirada!', '🧸 Ouch! The edge!', '🧸 ¡Ay! ¡El borde!'), '#ffffff', 1.4);
+    else if (ev.tipo === 'ursoEmpurra') brilhinhos(vs, 8, '#ffd166');
     else if (ev.tipo === 'agua') { var vA = VEIC[ev.j] || {}; texto(vs, vA.cavalo || vA.galinha || vA.id === 'ovo' ? t('🌊 Nadando!', '🌊 Swimming!', '🌊 ¡A nadar!') : vA.id === 'skate' || vA.id === 'patins' ? t('🏄 Surfando!', '🏄 Surfing!', '🏄 ¡A surfear!') : t('🌊 Virou barco!', '🌊 Boat mode!', '🌊 ¡Ahora eres un barco!'), '#7cf9ff', 1.6); for (k = 0; k < 16; k++) vs.parts.push({ tipo: 'gota', cor: k % 2 ? '#ffffff' : '#7cd6ff', x: (Math.random() - 0.5) * 0.6, y: -0.1, vx: (Math.random() - 0.5) * 2.6, vy: -1.8 - Math.random(), vida: 0.9, max: 0.9 }); }
     else if (ev.tipo === 'terra') texto(vs, t('🚗 De volta à estrada!', '🚗 Back on the road!', '🚗 ¡De vuelta a la carretera!'), '#ffffff', 1.1);
     else if (ev.tipo === 'loopFeito') { texto(vs, t('Que looping!', 'What a loop!', '¡Menudo looping!'), '#c6ff3d', 1.5); fogos(vs, 2); confete(vs, 25, 'cima'); }
@@ -1229,12 +1232,12 @@
     else if (vv && vv.modelo && MOD()) {   // 3D: no morro inclina (subindo mostra a traseira de baixo, descendo mostra o teto) e no pulo empina
       var sg = P.achar(e.pista, j.z), alvoI = Math.atan((sg.p2.y - sg.p1.y) / SEG) * 1.4 + (j.pulo > 0 ? Math.sin(Math.PI * 2 * (1 - j.pulo / (j.puloMax || 1))) * 0.25 : 0);
       vs.incl = (vs.incl || 0) + (alvoI - (vs.incl || 0)) * 0.15;
-      modeloVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], spr.quadros ? faseQ : tt * 0.5, vs.lado + (derr ? j.ladoDerrapa * 0.5 : 0), vs.incl, j.n * 3.3, 7, j.pulo > 0 ? 1 : 0, 0, naAgua);
+      modeloVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], spr.quadros ? faseQ : tt * 0.5, vs.lado + (derr ? j.ladoDerrapa * 0.5 : 0), vs.incl, j.n * 3.3, 7, j.pulo > 0 ? 1 : 0, 0, naAgua, j.ri);
     }
     else c.drawImage((spr.quadros ? S.quadro(spr, faseQ) : spr).img, -cw / 2, -ch, cw, ch);
     if (!(vv && (vv.modelo || vv.semPiloto))) pilotoVivo(c, vv, -cw / 2, -ch, cw, ch, INFO[j.n], j.n * 3.3, 7, onde);
     if (naAgua) borrifos(c, cw, ch, tt, Math.min(1, j.vel / e.pista.cfg.velMax));
-    else if (!voa && vv && (vv.cavalo || vv.galinha || vv.id === 'ovo') && j.pulo <= 0) poeira(c, cw, ch, tt, Math.min(1, j.vel / e.pista.cfg.velMax));
+    else if (!voa && vv && (vv.cavalo || vv.galinha || vv.id === 'ovo' || vv.urso) && j.pulo <= 0) poeira(c, cw, ch, tt, Math.min(1, j.vel / e.pista.cfg.velMax));
     if (j.turbo > 0 && !voa && !naAgua && !(vv && (vv.cavalo || vv.semMotor))) fogoEscape(c, cw, ch, Math.min(1, j.turbo), j.foguete > 0);
     if (derr) faiscasDerrapa(c, cw, ch, nivD, j.ladoDerrapa);
     if (j.escudo > 0) bolhaEscudo(c, cw, ch, j.escudo, tt);
