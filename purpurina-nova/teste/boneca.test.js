@@ -268,7 +268,7 @@ test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/No
   const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8'), app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   // andando: os dois braços em grupos próprios que giram no ombro, também de manga comprida e de vestido
   for (const ex of [{}, { blusa: 'sueter' }, { vestido: 'festa', calca: 'nenhum' }]) {
-    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'a', fundo: false, passos: true });
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'a', fundo: false, passos: true, rig: false });
     assert.equal(bemFormado(s), '');
     assert.ok(s.includes('class="pp-braco-e"') && s.includes('class="pp-braco-d"'), 'os braços balançam');
   }
@@ -429,7 +429,7 @@ test('silhueta feminina natural (dono, 20/Nov/2026: "dois triângulos… o busto
   assert.ok(!s.includes('M172,393'), 'sem as curvinhas desenhadas no peito');
   // medidas da silhueta de referência: ombro ≥ busto, cintura bem menor que o quadril, e a largura muda em curva
   const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
-  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: 7[^\[]*larg: (\[[^\]]*\])/)[1]);
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
   assert.ok(L[0] >= L[1] && L[2] / L[3] < 0.75 && L[2] / L[3] > 0.6, 'ombro, busto, cintura e quadril');
   assert.match(fonte, /t = t \* t \* \(3 - 2 \* t\)/, 'largura em curva, não em reta');
   const clip = s.match(/<clipPath id="sl-semManga">([\s\S]*?)<\/clipPath>/)[1];
@@ -449,4 +449,40 @@ test('desfile de modelo e dança no ritmo (dono, 20/Nov/2026: "quero desfile rea
   assert.match(app, /modo: 'andar', passoMs: PASSO_MS\[idade\]/, 'a modelo anda com o esqueleto');
   assert.doesNotMatch(app, /mod\.classList\.add\('andando'\)/, 'sem o andar antigo de CSS na modelo');
   assert.match(bal, /modo: 'dancar'/); assert.doesNotMatch(bal, /bal-pula/, 'na Baladinha as pernas dançam, a boneca não pula inteira');
+});
+
+test('estilo masculino anos 70 (dono, 20/Nov/2026): camisa de gola, jaqueta, corrente, cinto, bigode e prontos', () => {
+  const fs = require('fs'), path = require('path');
+  ['disco', 'jaquetaGola'].forEach(id => assert.ok(P.categoria('blusa').opcoes.some(o => o.id === id), id));
+  assert.ok(P.categoria('colar').opcoes.some(o => o.id === 'corrente'));
+  assert.deepEqual(P.categoria('cinto').opcoes.map(o => o.id), ['nenhum', 'fivela', 'fino', 'corrente']);
+  const big = P.categoria('bigode'); assert.ok(big && big.menino, 'bigode só para menino');
+  assert.ok(P.ESTILOS.some(s => s.id === 'disco')); assert.ok(P.COMBOS.roupa.some(s => s.id === 'disco'));
+  const moco = P.PRONTAS.find(p => p.id === 'mocoDisco'); assert.equal(moco.e.personagem, 'menino');
+  const e = V.limpar(Object.assign({}, P.PADRAO, moco.e));
+  for (const op of [{ rig: true }, {}, { angulo: 60 }]) { const s = B.svg(e, Object.assign({ id: 'dd' }, op)); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s)); }
+  // menina não fica de bigode
+  assert.equal(V.aplicar(e, 'personagem', 'menina').bigode, 'nenhum');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /c\.menino && estado\.personagem !== 'menino'/); assert.match(app, /Brincar com ele/);
+});
+
+test('roupa acompanha o gingado e pescoço sem divisão (dono, 20/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta', calca: 'jeans' }, { id: 'gg', rig: true, passos: true, fundo: false });
+  assert.match(s, /<clipPath id="gg-quadrilP">/, 'o quadril da calça vai com o corpo');
+  assert.match(s, /<g clip-path="url\(#gg-quadrilP\)">/);
+  assert.doesNotMatch(s, /fill="#7a5ba8" opacity="0.1"\/>/, 'sem a faixa reta de sombra no pescoço');
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /v\.ex \+= v\.cx; v\.dx \+= v\.cx/, 'andando, as pernas saem do quadril');
+});
+
+test('esqueleto em todo desenho de frente, ombros femininos e queixo delicado (dono, 20/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta' }, { id: 'pd', fundo: false });
+  assert.match(s, /class="rig-ombro-e"/, 'sem pedir, o desenho de frente já usa o esqueleto (mangas acompanham os braços)');
+  assert.doesNotMatch(B.svg({}, { id: 'pr', fundo: false, rig: false }), /rig-ombro/, 'rig: false mantém o braço parado antigo');
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
+  assert.ok(L[0] < L[3], 'ombro mais estreito que o quadril');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /poseRig: poseCartao\(k\)/);
 });

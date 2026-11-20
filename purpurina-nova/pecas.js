@@ -166,6 +166,11 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       NENHUM('Sem mechas', 'No highlights', 'Sin mechones'), o('pontas', 'Pontas coloridas', 'Colored tips', 'Puntas de colores', ['pop']), o('frente', 'Mechas na frente', 'Front streaks', 'Mechones al frente', ['pop']),
       o('arco', 'Arco-íris', 'Rainbow', 'Arcoíris', ['pop', 'festa'])
     ] },
+    // bigode (dono, 20/Nov/2026, estilo anos 70): só aparece para menino (menino: true); da cor do cabelo
+    { id: 'bigode', grupo: 'eu', ico: '🥸', pt: 'Bigode', en: 'Mustache', es: 'Bigote', area: A.boca, zoom: 'boca', menino: true, opcoes: [
+      NENHUM('Sem bigode', 'No mustache', 'Sin bigote'), o('bigodao', 'Bigodão', 'Big mustache', 'Bigotazo', ['disco']),
+      o('fino', 'Bigode fino', 'Thin mustache', 'Bigote fino', ['festa']), o('cavanhaque', 'Bigode e cavanhaque', 'Mustache and goatee', 'Bigote y perilla', ['pop'])
+    ] },
     { id: 'olhos', grupo: 'eu', ico: '👀', pt: 'Olhos', en: 'Eyes', es: 'Ojos', cores: 'olhos', area: A.olhos, zoom: 'olho' },
 
     { id: 'base', grupo: 'make', ico: '🧴', pt: 'Base', en: 'Foundation', es: 'Base', area: A.rosto, zoom: 'rosto', opcoes: [
@@ -224,7 +229,10 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       o('jaqueta', 'Jaqueta', 'Jacket', 'Chaqueta', ['pop', 'inverno']), o('pijama', 'Blusa de pijama', 'Pajama top', 'Blusa de pijama', ['pijama']),
       o('moletom', 'Moletom com capuz', 'Hoodie', 'Sudadera con capucha', ['inverno', 'casual', 'esporte']), o('camisa', 'Camisa', 'Button shirt', 'Camisa', ['escola', 'casual']),
       o('ombro', 'Ombro a ombro', 'Off-shoulder', 'Hombros descubiertos', ['praia', 'verao', 'festa']), o('laco', 'Blusa de laço', 'Bow blouse', 'Blusa con lazo', ['festa', 'princesa', 'aniversario']),
-      o('colete', 'Colete', 'Vest', 'Chaleco', ['pop', 'casual'])
+      o('colete', 'Colete', 'Vest', 'Chaleco', ['pop', 'casual']),
+      // anos 70 (dono, 20/Nov/2026, com foto de referência): camisa de gola grande aberta e jaqueta com essa camisa por baixo
+      Object.assign(o('disco', 'Camisa de gola grande (anos 70)', 'Big-collar shirt (70s)', 'Camisa de cuello grande (años 70)', ['festa', 'pop', 'disco']), { cor: 'branco' }),
+      Object.assign(o('jaquetaGola', 'Jaqueta com camisa de gola (anos 70)', 'Jacket with big-collar shirt (70s)', 'Chaqueta con camisa de cuello (años 70)', ['festa', 'pop', 'disco']), { cor: 'roxo' })
     ] },
     { id: 'saia', grupo: 'roupa', ico: '🩰', pt: 'Saias', en: 'Skirts', es: 'Faldas', cores: 'roupa', area: A.cintura, opcoes: [
       NENHUM('Sem saia', 'No skirt', 'Sin falda'), o('curta', 'Curtinha', 'Mini skirt', 'Cortita', ['pop', 'festa', 'casual']),
@@ -303,7 +311,8 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       o('diamantes', 'De diamantes', 'Diamond necklace', 'De diamantes', ['princesa', 'festa', 'joia', 'brilho']), o('medalhao', 'Medalhão', 'Locket', 'Medallón', ['festa', 'joia']),
       o('micangas', 'Miçangas coloridas', 'Colorful beads', 'Cuentas de colores', ['pop', 'praia']), o('lua', 'Lua', 'Moon', 'Luna', ['pijama']), o('concha', 'Concha', 'Shell', 'Concha', ['praia', 'sereia']),
       o('laco', 'Gargantilha de laço', 'Bow choker', 'Gargantilla con lazo', ['festa', 'aniversario']), o('duplo', 'Duas correntes', 'Layered chains', 'Dos cadenas', ['pop', 'joia']),
-      o('borboleta', 'Borboleta', 'Butterfly', 'Mariposa', ['jardim'])
+      o('borboleta', 'Borboleta', 'Butterfly', 'Mariposa', ['jardim']),
+      Object.assign(o('corrente', 'Corrente grossa', 'Chunky chain', 'Cadena gruesa', ['pop', 'disco', 'joia']), { cor: 'dourado' })
     ] },
     { id: 'pulseira', grupo: 'joias', ico: '⌚', pt: 'Pulseiras', en: 'Bracelets', es: 'Pulseras', cores: 'roupa', area: A.mao, zoom: 'maos', opcoes: [
       NENHUM('Sem pulseira', 'No bracelet', 'Sin pulsera'), o('simples', 'Bracelete', 'Bangle', 'Brazalete', ['joia']), o('berloque', 'Berloques', 'Charm bracelet', 'Con colgantes', ['festa', 'joia']),
@@ -328,6 +337,11 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       o('redondoGrande', 'Redondo grandão', 'Big round frames', 'Redondas grandes', ['pop', 'casual']), o('aviador', 'Aviador', 'Aviator', 'Aviador', ['pop', 'verao']),
       o('meioAro', 'Meio aro', 'Half-rim', 'Medio aro', ['escola']), o('fininho', 'Aro fininho', 'Thin wire', 'Aro finito', ['escola', 'casual'])
     ] },
+    // cinto (dono, 20/Nov/2026, anos 70): por cima da roupa, na cintura
+    { id: 'cinto', grupo: 'acess', ico: '🔗', pt: 'Cintos', en: 'Belts', es: 'Cinturones', cores: 'roupa', area: A.cintura, opcoes: [
+      NENHUM('Sem cinto', 'No belt', 'Sin cinturón'), o('fivela', 'Fivela grande dourada', 'Big gold buckle', 'Hebilla grande dorada', ['disco', 'pop']),
+      o('fino', 'Cinto fino', 'Thin belt', 'Cinturón fino', ['festa', 'casual']), o('corrente', 'Cinto de corrente', 'Chain belt', 'Cinturón de cadena', ['pop', 'disco'])
+    ] },
     { id: 'bolsa', grupo: 'acess', ico: '👜', pt: 'Bolsas', en: 'Bags', es: 'Bolsos', cores: 'roupa', area: A.corpo, opcoes: [
       NENHUM('Sem bolsa', 'No bag', 'Sin bolso'), o('mao', 'Bolsinha de mão', 'Clutch', 'Bolsito de mano', ['festa', 'princesa']), o('ombro', 'Bolsa de ombro', 'Shoulder bag', 'Bolso de hombro', ['casual', 'pop']),
       o('coracao', 'Bolsa de coração', 'Heart bag', 'Bolso de corazón', ['festa', 'aniversario', 'pop']), o('cesta', 'Cesta de piquenique', 'Picnic basket', 'Cesta de pícnic', ['jardim', 'piquenique']),
@@ -347,7 +361,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
     base: 'nenhum', blush: 'nenhum', blushCor: 'rosa', sombra: 'nenhum', sombraCor: 'lilas', delineado: 'nenhum', delineadoCor: 'preto',
     cilios: 'curtos', ciliosCor: 'preto', unhas: 'nenhum', unhasCor: 'chiclete', batom: 'nenhum', batomCor: 'rosaclaro', glitter: 'nenhum', glitterCor: 'dourado', adesivo: 'nenhum',
     vestido: 'nenhum', vestidoCor: 'lilas', blusa: 'camiseta', blusaCor: 'rosaclaro', saia: 'nenhum', saiaCor: 'chiclete',
-    calca: 'jeans', calcaCor: 'ceu', estampa: 'liso', estampaCor: 'branco', capa: 'nenhum', capaCor: 'amarelo', sapatos: 'tenis', sapatosCor: 'branco',
+    calca: 'jeans', calcaCor: 'ceu', estampa: 'liso', estampaCor: 'branco', capa: 'nenhum', capaCor: 'amarelo', cinto: 'nenhum', cintoCor: 'preto', bigode: 'nenhum', sapatos: 'tenis', sapatosCor: 'branco',
     cabeca: 'nenhum', cabecaCor: 'dourado', laco: 'nenhum', lacoCor: 'chiclete', brincos: 'nenhum', brincosCor: 'dourado', pulseira: 'nenhum', pulseiraCor: 'dourado', anel: 'nenhum', anelCor: 'dourado', broche: 'nenhum', brocheCor: 'dourado',
     colar: 'nenhum', colarCor: 'dourado', oculos: 'nenhum', oculosCor: 'chiclete', bolsa: 'nenhum', bolsaCor: 'chiclete', cenario: 'quarto'
   };
@@ -356,6 +370,11 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
      óculos —, para brincar a partir dela. Pedido do dono, com fotos das filhas (que NÃO entram no repositório); os
      nomes são neutros de propósito, para não expor as crianças. Só o que muda em relação ao PADRAO. */
   var PRONTAS = [
+    // moço dos anos 70 (dono, 20/Nov/2026): cabelo comprido ondulado e bigodão
+    { id: 'mocoDisco', ico: '🕺', pt: 'Moço dos anos 70', en: '70s guy', es: 'Chico de los 70', e: {
+      personagem: 'menino', idade: 'adulta', pele: 'p3', rosto: 'oval', nariz: 'batatinha', formaOlho: 'amendoados', formaBoca: 'sorrisinho',
+      cabelo: 'ondasLongas', cabeloCor: 'preto', olhos: 'castanho', bigode: 'bigodao', cilios: 'nenhum', batom: 'nenhum', blusa: 'jaquetaGola', blusaCor: 'roxo', calca: 'jeans', calcaCor: 'preto',
+      sapatos: 'bota', sapatosCor: 'preto', colar: 'corrente', colarCor: 'dourado', cinto: 'fivela', cintoCor: 'preto' } },
     { id: 'morenaOculos', ico: '👓', pt: 'Morena de óculos', en: 'Brunette with glasses', es: 'Morena con gafas', e: {
       pele: 'p2', rosto: 'coracao', nariz: 'batatinha', formaOlho: 'amendoados', distOlhos: 'afastados', formaBoca: 'sorrisinho',
       cabelo: 'armadoLongo', cabeloCor: 'escuro', olhos: 'castanho', oculos: 'retangular', oculosCor: 'roxo', brincos: 'bolinha', brincosCor: 'dourado',
@@ -383,6 +402,11 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
      editar"): só a produção — roupa, maquiagem, acessórios, chapéu e cenário. Vestem a personagem que está no estúdio
      (pele, rosto, olhos, cabelo e idade continuam dela; menino fica sem saia, vestido e maquiagem — app.js, vestirEstilo). */
   var ESTILOS = [
+    // anos 70 (dono, 20/Nov/2026, com foto de referência): jaqueta roxa com camisa de gola grande, calça justa preta, bota,
+    // corrente e cinto de fivela dourada
+    { id: 'disco', ico: '🕺', pt: 'Disco anos 70', en: '70s disco', es: 'Disco de los 70', e: {
+      blusa: 'jaquetaGola', blusaCor: 'roxo', calca: 'jeans', calcaCor: 'preto', saia: 'nenhum', sapatos: 'bota', sapatosCor: 'preto',
+      colar: 'corrente', colarCor: 'dourado', cinto: 'fivela', cintoCor: 'preto', anel: 'nenhum', cenario: 'palco' } },
     { id: 'kpop', ico: '🎤', pt: 'K-pop', en: 'K-pop', es: 'K-pop', e: {
       blusa: 'jaqueta', blusaCor: 'preto', saia: 'pregas', saiaCor: 'preto', calca: 'nenhum', sapatos: 'botaCano', sapatosCor: 'preto',
       brincos: 'argola', brincosCor: 'prata', colar: 'gargantilha', colarCor: 'preto', laco: 'presilhas', lacoCor: 'rosaclaro', anel: 'dois', anelCor: 'prata',
@@ -454,16 +478,19 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       { id: 'inverno', ico: '❄️', pt: 'Inverno', en: 'Winter', es: 'Invierno', e: { vestido: 'nenhum', blusa: 'sueter', blusaCor: 'vermelho', saia: 'nenhum', calca: 'legging', calcaCor: 'preto', estampa: 'xadrez', estampaCor: 'branco', sapatos: 'botaNeve', sapatosCor: 'marrom' } },
       { id: 'gala', ico: '👗', pt: 'Gala', en: 'Gala', es: 'Gala', menina: true, e: { vestido: 'gala', vestidoCor: 'vinho', blusa: 'nenhum', saia: 'nenhum', calca: 'nenhum', estampa: 'liso', sapatos: 'scarpin', sapatosCor: 'dourado' } },
       { id: 'social', ico: '🤵', pt: 'Social', en: 'Smart', es: 'Elegante', menino: true, e: { vestido: 'nenhum', blusa: 'camisa', blusaCor: 'branco', saia: 'nenhum', calca: 'pantalona', calcaCor: 'preto', estampa: 'liso', sapatos: 'social', sapatosCor: 'preto' } },
+      { id: 'disco', ico: '🕺', pt: 'Disco anos 70', en: '70s disco', es: 'Disco de los 70', e: { vestido: 'nenhum', blusa: 'jaquetaGola', blusaCor: 'roxo', saia: 'nenhum', calca: 'jeans', calcaCor: 'preto', estampa: 'liso', sapatos: 'bota', sapatosCor: 'preto' } },
       // dia de chuva (dono, 20/Nov/2026): capa de patinho, legging e galocha
       { id: 'chuva', ico: '☔', pt: 'Dia de chuva', en: 'Rainy day', es: 'Día de lluvia', e: { vestido: 'nenhum', blusa: 'camiseta', blusaCor: 'branco', saia: 'nenhum', calca: 'legging', calcaCor: 'preto', estampa: 'liso', capa: 'patinho', capaCor: 'amarelo', sapatos: 'galocha', sapatosCor: 'amarelo' } }
     ],
     joias: [
+      { id: 'disco', ico: '🕺', pt: 'Corrente de ouro', en: 'Gold chain', es: 'Cadena de oro', e: { colar: 'corrente', colarCor: 'dourado', brincos: 'nenhum', pulseira: 'nenhum', anel: 'nenhum', broche: 'nenhum' } },
       { id: 'perolas', ico: '🤍', pt: 'Pérolas', en: 'Pearls', es: 'Perlas', e: { brincos: 'perola', brincosCor: 'branco', colar: 'perolas', colarCor: 'branco', pulseira: 'perolas', pulseiraCor: 'branco', anel: 'nenhum', broche: 'nenhum' } },
       { id: 'dourado', ico: '✨', pt: 'Dourado', en: 'Gold', es: 'Dorado', e: { brincos: 'argola', brincosCor: 'dourado', colar: 'medalhao', colarCor: 'dourado', pulseira: 'simples', pulseiraCor: 'dourado', anel: 'simples', anelCor: 'dourado', broche: 'nenhum' } },
       { id: 'fofura', ico: '💖', pt: 'Fofura', en: 'Cute', es: 'Monada', e: { brincos: 'coracao', brincosCor: 'chiclete', colar: 'coracao', colarCor: 'chiclete', pulseira: 'micangas', pulseiraCor: 'chiclete', anel: 'coracao', anelCor: 'chiclete', broche: 'nenhum' } },
       { id: 'brilhante', ico: '💎', pt: 'Brilhante', en: 'Sparkly', es: 'Brillante', e: { brincos: 'diamante', brincosCor: 'prata', colar: 'diamantes', colarCor: 'prata', pulseira: 'varias', pulseiraCor: 'prata', anel: 'pedra', anelCor: 'prata', broche: 'nenhum' } }
     ],
     acess: [
+      { id: 'disco', ico: '🕺', pt: 'Anos 70', en: '70s', es: 'Años 70', e: { cinto: 'fivela', cintoCor: 'preto', cabeca: 'nenhum', oculos: 'nenhum', bolsa: 'nenhum', laco: 'nenhum' } },
       { id: 'praia', ico: '🏖️', pt: 'Praia', en: 'Beach', es: 'Playa', e: { cabeca: 'chapeu', cabecaCor: 'nude', oculos: 'coracao', oculosCor: 'chiclete', bolsa: 'praia', bolsaCor: 'turquesa', laco: 'nenhum' } },
       { id: 'princesa', ico: '👑', pt: 'Princesa', en: 'Princess', es: 'Princesa', e: { cabeca: 'coroa', cabecaCor: 'dourado', oculos: 'nenhum', bolsa: 'mao', bolsaCor: 'prata', laco: 'nenhum' } },
       { id: 'estrela', ico: '😎', pt: 'Estrela do rock', en: 'Rock star', es: 'Estrella del rock', e: { cabeca: 'nenhum', oculos: 'aviador', oculosCor: 'preto', bolsa: 'ombro', bolsaCor: 'preto', laco: 'nenhum' } },

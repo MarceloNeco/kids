@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.0';
+  var APP_VERSION = '0.9.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -337,7 +337,8 @@
   var TIRAR_TUDO = { make: { pt: 'Tirar toda a maquiagem', en: 'Remove all makeup', es: 'Quitar todo el maquillaje' }, joias: { pt: 'Tirar todas as joias', en: 'Remove all jewelry', es: 'Quitar todas las joyas' }, acess: { pt: 'Tirar todos os acessórios', en: 'Remove all accessories', es: 'Quitar todos los accesorios' } };
 
   // abas (grupos), partes (categorias) e opções
-  function catsDoGrupo(g) { return P.CATEGORIAS.filter(function (c) { return c.grupo === g; }); }
+  // parte só de menino (bigode) não aparece para a menina
+  function catsDoGrupo(g) { return P.CATEGORIAS.filter(function (c) { return c.grupo === g && !(c.menino && estado.personagem !== 'menino'); }); }
   // tela estreita: o nome comprido da aba que não cabe troca pelo nome curto (Maquiagem → Make)
   function encaixarAbas() {
     Array.prototype.forEach.call(document.querySelectorAll('.grupo-bt .t'), function (t) {
@@ -619,7 +620,7 @@
   /* estilos prontos (pecas.js, ESTILOS): vestem a personagem do brincar livre com a produção inteira — roupa, maquiagem,
      acessórios, chapéu e cenário — e ela continua editando no estúdio. O corpo (pele, rosto, olhos, cabelo, idade) é dela.
      O que o estilo não diz fica sem nada (🚫); menino fica sem saia, vestido e maquiagem (o vestido vira camiseta). */
-  var CORPO = ['pele', 'personagem', 'idade', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'cabelo', 'cabeloCor', 'mechas', 'mechasCor', 'olhos'];
+  var CORPO = ['pele', 'personagem', 'idade', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'cabelo', 'cabeloCor', 'mechas', 'mechasCor', 'olhos', 'bigode'];
   var MAKE = ['base', 'blush', 'sombra', 'delineado', 'cilios', 'batom', 'glitter', 'adesivo', 'unhas'];
   function vestirEstilo(st, base) {
     var e = {};
@@ -637,13 +638,19 @@
     }
     return V.limpar(e);
   }
+  // cada cartão numa pose natural diferente (dono, 20/Nov/2026: "as poses são sempre as mesmas"), com o esqueleto
+  var POSES_CARTAO = ['cintura', 'bolsos', 'queixo', 'relax', 'duasCintura', 'cruzados', 'olhaE'];
+  function poseCartao(k) {
+    var q = PurpurinaAnim.POSES[POSES_CARTAO[k % POSES_CARTAO.length]];
+    return { oE: q.oE, cE: q.cE, fE: q.fE || 1, oD: q.oD, cD: q.cD, fD: q.fD || 1 };
+  }
   function listaEstilos() {
     var caixa = $('listaEstilos'); caixa.innerHTML = '';
     P.ESTILOS.forEach(function (st, k) {
       var card = document.createElement('div'); card.className = 'look';
       var mini = document.createElement('div'); mini.className = 'mini-boneca';
       var e = vestirEstilo(st, livre);
-      mini.innerHTML = B.svg(e, { id: 'estilo' + k, area: [0, 60, 400, 600], cortar: true });
+      mini.innerHTML = B.svg(e, { id: 'estilo' + k, area: [0, 60, 400, 600], cortar: true, poseRig: poseCartao(k) });
       var nome = document.createElement('p'); nome.className = 'nome-pronta'; nome.textContent = st.ico + ' ' + N(st);
       var linha = document.createElement('div'); linha.className = 'linha';
       var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('✨ Vestir e editar', '✨ Wear and edit', '✨ Ponérmelo y editar');
@@ -658,10 +665,10 @@
       var card = document.createElement('div'); card.className = 'look';
       var mini = document.createElement('div'); mini.className = 'mini-boneca';
       var e = V.limpar(Object.assign({}, P.PADRAO, pr.e));
-      mini.innerHTML = B.svg(e, { id: 'pronta' + k, area: [0, 60, 400, 600], cortar: true });
+      mini.innerHTML = B.svg(e, { id: 'pronta' + k, area: [0, 60, 400, 600], cortar: true, poseRig: poseCartao(k + 3) });
       var nome = document.createElement('p'); nome.className = 'nome-pronta'; nome.textContent = pr.ico + ' ' + N(pr);
       var linha = document.createElement('div'); linha.className = 'linha';
-      var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('✨ Brincar com ela', '✨ Play with her', '✨ Jugar con ella');
+      var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = pr.e.personagem === 'menino' ? t('✨ Brincar com ele', '✨ Play with him', '✨ Jugar con él') : t('✨ Brincar com ela', '✨ Play with her', '✨ Jugar con ella');
       vestir.addEventListener('click', function () { livre = e; gravar('purpurinaNova.atual', livre); Som.tocar('brilho'); comecar(null); });
       linha.appendChild(vestir); card.appendChild(mini); card.appendChild(nome); card.appendChild(linha); caixa.appendChild(card);
     });
@@ -674,7 +681,7 @@
     looks.forEach(function (l, k) {
       var card = document.createElement('div'); card.className = 'look';
       var mini = document.createElement('div'); mini.className = 'mini-boneca';
-      mini.innerHTML = B.svg(V.limpar(l.e), { id: 'look' + k, area: [0, 60, 400, 600], cortar: true });
+      mini.innerHTML = B.svg(V.limpar(l.e), { id: 'look' + k, area: [0, 60, 400, 600], cortar: true, poseRig: poseCartao(k + 1) });
       var linha = document.createElement('div'); linha.className = 'linha';
       var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('👗 Vestir', '👗 Wear', '👗 Ponérmelo');
       vestir.addEventListener('click', function () { livre = V.limpar(l.e); gravar('purpurinaNova.atual', livre); Som.tocar('brilho'); comecar(null); });
