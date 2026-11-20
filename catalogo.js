@@ -35,6 +35,7 @@
       en: "Fruit, sweets and funny characters fly across the TV, and you slice, catch, kick, jump and duck with your whole body. 1 or 2 players, a character you can dress up, or play with your finger on the phone.",
       es: "Frutas, dulces y personajes vuelan por la tele, y tú los cortas, los atrapas, les das patadas, saltas y te agachas con todo el cuerpo. 1 o 2 jugadores, un muñeco a tu gusto, o con el dedo en el móvil.",
       tag: '▶ Brincar / Play / Jugar', instalar: true,
+      atualizado: { data: '2026-11-20', pt: 'Abertura nova: uma piscina de bolas gigantes com luz neon, e o seu boneco mergulha e aparece no meio delas.', en: 'New opening: a giant ball pit with neon lights, and your character dives in and pops up among the balls.', es: 'Nueva entrada: una piscina de bolas gigantes con luces de neón, y tu muñeco se zambulle y asoma entre ellas.' },
       tv: { texto: 'Corte, pegue, chute, pule e abaixe com o corpo. A TV mostra o código; o celular filma.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
     { id: 'contador-de-historias', rec: ['tv'], nomes: { en: "Storyteller", es: "Cuentacuentos" }, nome: 'Contador de Histórias', ico: '📖', cor: '#3ee8ff', url: '/contador-de-historias/',
       texto: 'Histórias para dormir: um acervo para ler e ouvir, e a criação de histórias novas com os nomes da sua família.',
