@@ -359,8 +359,12 @@
        A saia e o vestido vêm depois, por cima, e balançam com o corpo. De frente apenas. */
     if (op.passos && !angB) {
       var pernas = out.splice(iniPernas).join('');
-      defs += deformar('<clipPath id="' + I + 'pernaE"><rect x="-200" y="0" width="400" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="200" y="0" width="400" height="900"/></clipPath>');
-      out.push('<g class="pp-passo-e"><g clip-path="url(#' + I + 'pernaE)">' + pernas + '</g></g>', '<g class="pp-passo-d"><g clip-path="url(#' + I + 'pernaD)">' + pernas + '</g></g>');
+      defs += deformar('<clipPath id="' + I + 'pernaE"><rect x="-200" y="462" width="403" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="197" y="462" width="403" height="900"/></clipPath>' +
+        '<clipPath id="' + I + 'quadrilP"><rect x="-200" y="0" width="800" height="474"/></clipPath>');
+      // o quadril da calça (cós, bolsos e gancho) vai junto com o corpo e as pernas saem dele (dono, 20/Nov/2026: "fica um
+      // pedaço reto da calça… tem que acompanhar o gingado do corpo")
+      out.push('<g class="pp-passo-e"><g clip-path="url(#' + I + 'pernaE)">' + pernas + '</g></g>', '<g class="pp-passo-d"><g clip-path="url(#' + I + 'pernaD)">' + pernas + '</g></g>',
+        '<g clip-path="url(#' + I + 'quadrilP)">' + pernas + '</g>');
     }
     // desfile: da cintura para baixo, a saia e a barra do vestido acompanham o passo (.pp-barra, estilo.css), sem tombar
     var andaBarra = op.passos && !angB;
@@ -369,7 +373,11 @@
     if (vis('saia')) out.push(andaBarra ? '<g class="pp-barra">' + saia(e.saia, C('saia'), peca, linha) + '</g>' : saia(e.saia, C('saia'), peca, linha));
 
     // ---------- pescoço, tronco e braços ----------
-    out.push(p('M187,270 L213,270 L214,318 Q218,336 248,342 L152,342 Q182,336 186,318Z', { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }), ret(187, 300, 26, 14, { fill: '#7a5ba8', opacity: 0.1 }));
+    // pescoço (20/Nov/2026, dono: "divisão bizarra da cabeça, pescoço e torso"): sem contorno grosso nem faixa reta de
+    // sombra — só um traço fino dos lados e uma sombra macia embaixo do queixo, para cabeça, pescoço e ombro serem um só
+    out.push(p('M187,262 L213,262 L214,318 Q218,336 248,342 L152,342 Q182,336 186,318Z', { fill: pele }) +
+      p('M187,268 L186,318 Q182,334 160,340 M213,268 L214,318 Q218,334 240,340', { fill: 'none', stroke: esc(pele, 0.3), 'stroke-width': 1.1, opacity: 0.7 }) +
+      p('M187,276 Q200,300 213,276 L213,268 L187,268Z', { fill: '#7a5ba8', opacity: 0.08 }));
     // tronco de pele um pouco mais estreito que qualquer roupa (a roupa cobre os lados: sem pele sobrando embaixo do braço)
     var TRONCO = 'M150,342 Q200,330 250,342 Q259,346 256,366 L248,458 L152,458 L144,366 Q141,346 150,342Z';
     out.push(p(TRONCO, { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p(TRONCO, { fill: 'url(#' + I + 'lado)' }));

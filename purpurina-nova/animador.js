@@ -36,10 +36,11 @@
   // pernas: [x, y, giro] do quadril (corpo) e de cada perna, e a saia inclinando (px do desenho, graus)
   var BASES = {
     reta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
-    gingaD: { c: [14, 0, -3], e: [14, 1.6, 11], d: [14, -1.6, 2], s: -2 },
-    gingaE: { c: [-14, 0, 3], e: [-14, -1.6, -2], d: [-14, 1.6, -11], s: 2 },
-    cruzada: { c: [0, 0, 0], e: [0, 0, -3], d: [0, 10, 12], s: 0 },
-    aberta: { c: [0, 0, 0], e: [0, 0, 7], d: [0, 0, -7], s: 0 }
+    // (giros das pernas pequenos: a perna sai do quadril sem degrau na emenda da calça)
+    gingaD: { c: [14, 0, -3], e: [14, 1.6, 6], d: [14, -1.6, 1], s: -2 },
+    gingaE: { c: [-14, 0, 3], e: [-14, -1.6, -1], d: [-14, 1.6, -6], s: 2 },
+    cruzada: { c: [0, 0, 0], e: [0, 0, -2], d: [0, 8, 8], s: 0 },
+    aberta: { c: [0, 0, 0], e: [0, 0, 5], d: [0, 0, -5], s: 0 }
   };
   function valores(nome) {
     var p = POSES[nome] || POSES.relax, b = BASES[p.base] || BASES.reta;
@@ -101,11 +102,13 @@
         var e = perna(f, -1), d = perna((f + 0.5) % 1, 1);
         v.ex = e.x; v.ey = e.y; v.er = e.r; v.esy = e.sy; v.dx = d.x; v.dy = d.y; v.dr = d.r; v.dsy = d.sy;
         v.cx = -14 * a; v.cr = 3.4 * a; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
+        v.ex += v.cx; v.dx += v.cx; v.ey += v.cy; v.dy += v.cy;   // as pernas saem do quadril: vão junto com ele
         v.oE = 9 + 5 * a; v.cE = 14 + 10 * Math.max(0, a); v.oD = 9 - 5 * a; v.cD = 14 + 10 * Math.max(0, -a); v.fE = 1; v.fD = 1;
         v.cab = -2 * a; v.olho = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
         v.cx += lado * 10 * bat; v.cr += -lado * 3 * bat; v.cy += 5 * bat;
+        v.ex += lado * 10 * bat; v.dx += lado * 10 * bat;   // as pernas vão junto com o quadril
         // a perna do lado contrário ao quadril dobra o joelho (sobe um pouco e encolhe)
         if (lado > 0) { v.esy = 1 - 0.07 * bat; v.ey += -6 * bat; v.er += 2 * bat; } else { v.dsy = 1 - 0.07 * bat; v.dy += -6 * bat; v.dr += -2 * bat; }
         v.oE += 4 * bat; v.oD += 4 * bat;

@@ -466,3 +466,12 @@ test('estilo masculino anos 70 (dono, 20/Nov/2026): camisa de gola, jaqueta, cor
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   assert.match(app, /c\.menino && estado\.personagem !== 'menino'/); assert.match(app, /Brincar com ele/);
 });
+
+test('roupa acompanha o gingado e pescoço sem divisão (dono, 20/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta', calca: 'jeans' }, { id: 'gg', rig: true, passos: true, fundo: false });
+  assert.match(s, /<clipPath id="gg-quadrilP">/, 'o quadril da calça vai com o corpo');
+  assert.match(s, /<g clip-path="url\(#gg-quadrilP\)">/);
+  assert.doesNotMatch(s, /fill="#7a5ba8" opacity="0.1"\/>/, 'sem a faixa reta de sombra no pescoço');
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /v\.ex \+= v\.cx; v\.dx \+= v\.cx/, 'andando, as pernas saem do quadril');
+});
