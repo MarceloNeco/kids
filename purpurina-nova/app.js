@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.5.0';
+  var APP_VERSION = '0.6.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -52,6 +52,8 @@
     Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
     atual = id; window.scrollTo(0, 0);
     if (id !== 'desfile') pararConfete();
+    if (balada) { balada.parar(); balada = null; }
+    if (id === 'balada') baladinha();
     if (id === 'menu') desenharMenu();
     if (id === 'desafios') listaDesafios();
     if (id === 'looks') listaLooks();
@@ -81,7 +83,7 @@
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'purpurina-nova',
     noInicio: function () { return atual === 'entrada' || atual === 'menu' || atual === 'desligado' || atual === 'tv'; },
     irParaInicio: function () { Som.tocar('clique'); if (janelaAberta) fecharPeloBotao(irMenu); else irMenu(); },
-    emAndamento: function () { return atual === 'estudio' || atual === 'desfile'; },
+    emAndamento: function () { return atual === 'estudio' || atual === 'desfile' || atual === 'balada'; },
     esconder: function () { return TV; } });
 
   if (window.SolverRecursos && !SolverRecursos.ligado('purpurina-nova', true)) { mostrar('desligado'); traduzir(); return; }
@@ -566,6 +568,26 @@
   $('btFoto').addEventListener('click', foto);
   $('btFotoDesfile').addEventListener('click', foto);
   $('btDesfilar').addEventListener('click', desfilar);
+
+  /* ---------- baladinha (dono, 20/Nov/2026, com vídeos de uma sala de luzes: "versão adicional de baladinha além do
+     desfile… e com as amigas dançando") ----------
+     A personagem dança no meio e 2 amigas dos lados: looks guardados (sorteados) e, faltando, combinações prontas.
+     Cada uma com sombras coloridas na parede (balada.js). Tocar na tela troca a luz e todas fazem o mesmo passo. */
+  var balada = null;
+  function baladinha() {
+    var amigas = ler('purpurinaNova.looks', []).map(function (l) { return V.limpar(l.e); }).filter(function (e) { return !V.iguais(e, estado); })
+      .sort(function () { return Math.random() - 0.5; }).slice(0, 2);
+    P.PRONTAS.slice().sort(function () { return Math.random() - 0.5; }).forEach(function (p) {
+      var e = V.limpar(p.e); if (amigas.length < 2 && !V.iguais(e, estado)) amigas.push(e);
+    });
+    balada = PurpurinaBalada.iniciar($('palcoBalada'), [estado].concat(amigas), { calmo: CALMO, enquanto: function () { return atual === 'balada'; } });
+  }
+  $('btBalada').addEventListener('click', function () { Som.tocar('brilho'); ir('balada'); });
+  function trocarLuz() { if (balada) { balada.trocarLuz(); Som.tocar('brilho'); } }
+  $('palcoBalada').addEventListener('click', trocarLuz);
+  $('palcoBalada').addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); trocarLuz(); } });
+  $('btBaladaVoltar').addEventListener('click', function () { Som.tocar('aba'); voltar(); });
+  $('btBaladaDesfile').addEventListener('click', desfilar);
 
   // ---------- looks favoritos ----------
   function guardarLook() {

@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.6.0",
+      "data": "20/Nov/2026",
+      "hora": "13:42:43",
+      "pt": [
+        "🪩 Baladinha: novo botão no estúdio, ao lado do Desfilar. A personagem dança com 2 amigas (looks guardados ou combinações prontas) numa sala de luzes coloridas, com flor de luz, coração pendurado e sombras de arco-íris na parede (verde, rosa e azul) que dançam junto. Toque na tela para trocar a luz: todas fazem o mesmo passo juntas."
+      ],
+      "en": [
+        "🪩 Dance party: new button in the studio, next to Runway. Your character dances with 2 friends (saved looks or ready-made combos) in a room of colorful lights, with a flower of light, a hanging heart and rainbow shadows on the wall (green, pink and blue) that dance along. Tap the screen to change the light: everyone does the same move together."
+      ],
+      "es": [
+        "🪩 Minidisco: nuevo botón en el estudio, al lado de Desfila. Tu personaje baila con 2 amigas (looks guardados o combinaciones listas) en una sala de luces de colores, con flor de luz, corazón colgante y sombras de arcoíris en la pared (verde, rosa y azul) que bailan con ellas. Toca la pantalla para cambiar la luz: todas hacen el mismo paso a la vez."
+      ]
+    },
+    {
       "versao": "0.5.0",
       "data": "20/Nov/2026",
       "hora": "13:24:43",

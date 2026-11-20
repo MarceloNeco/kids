@@ -21,7 +21,15 @@
     tchau: { oE: 8, cE: 14, oD: 62, cD: -95, cab: 4, olho: 0, base: 'reta', aceno: true },
     cruzados: { oE: 18, cE: 112, fE: 0.8, oD: 18, cD: 108, fD: 0.8, cab: 3, olho: 0, base: 'aberta' },
     olhaE: { oE: 8, cE: 12, oD: 8, cD: 12, cab: -4, olho: -1, base: 'gingaE' },
-    olhaD: { oE: 8, cE: 12, oD: 8, cD: 12, cab: 4, olho: 1, base: 'gingaD' }
+    olhaD: { oE: 8, cE: 12, oD: 8, cD: 12, cab: 4, olho: 1, base: 'gingaD' },
+    // passos da baladinha (dono, 20/Nov/2026, vídeos da sala de luzes): braços para cima, um braço para cima de cada
+    // lado, cotovelos dançando, palminhas e o dedo para cima da discoteca
+    bracosCima: { oE: 150, cE: 25, oD: 150, cD: 25, cab: 0, olho: 0, base: 'aberta' },
+    umCimaD: { oE: 30, cE: 60, oD: 160, cD: 10, cab: -6, olho: -0.6, base: 'gingaE' },
+    umCimaE: { oE: 160, cE: 10, oD: 30, cD: 60, cab: 6, olho: 0.6, base: 'gingaD' },
+    cotovelos: { oE: 70, cE: 115, oD: 70, cD: 115, cab: -4, olho: 0.5, base: 'gingaD' },
+    palminhas: { oE: 28, cE: 135, fE: 0.6, oD: 28, cD: 135, fD: 0.6, cab: 4, olho: 0, base: 'reta' },
+    apontaCima: { oE: 50, cE: 120, oD: 165, cD: 0, cab: -8, olho: -0.8, base: 'gingaE' }
   };
   // pernas: [x, y, giro] do quadril (corpo) e de cada perna, e a saia inclinando (px do desenho, graus)
   var BASES = {
@@ -44,10 +52,15 @@
     var lista = op.poses || ['relax'], i = 0, prox = performance.now() + (op.primeira || 1800);
     // amplitude do balanço (dono, 20/Nov/2026: maquiando, "zoom no olho, na boca, com um leve movimento"): 1 de corpo
     // inteiro; perto do rosto o quadril e as pernas quase param e sobra o sutil — cabeça, olhos, respiração
-    var amp = 1, ampAlvo = 1;
+    var amp = 1, ampAlvo = 1, quadros = op.defasagem || 0;
     function trocar(nome, ms) { nomeAtual = nome; de = atual; para = valores(nome); ini = performance.now(); dur = ms || 900; }
+    // copias (baladinha): outras caixas com o mesmo desenho (as sombras coloridas na parede) fazem os mesmos passos
+    // (as cópias andam a cada op.copiasCada quadros: desenhar 6 sombras todo quadro pesa no celular)
     function aplicar(v, t) {
-      var svg = caixa.querySelector('svg'); if (!svg) return;
+      var svg = caixa.querySelector('svg'); if (svg) aplicarEm(svg, v, t);
+      if (op.copias && quadros++ % (op.copiasCada || 1) === 0) op.copias.forEach(function (c) { var s2 = c.querySelector('svg'); if (s2) aplicarEm(s2, v, t); });
+    }
+    function aplicarEm(svg, v, t) {
       var r = Math.sin(t / 650) * 1, ac = v.aceno * Math.sin(t / 95) * 16;   // respiração e o tchauzinho
       [['e', v.oE + r, v.cE, v.fE], ['d', v.oD + r, v.cD - ac, v.fD]].forEach(function (b) {
         var om = svg.querySelector('.rig-ombro-' + b[0]), co = svg.querySelector('.rig-cotovelo-' + b[0]); if (!om || !co) return;
@@ -56,7 +69,8 @@
         co.setAttribute('transform', B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E));
       });
       var cab = svg.querySelector('.rig-cabeca');
-      if (cab) cab.setAttribute('transform', 'rotate(' + (v.cab * (0.5 + amp / 2) + Math.sin(t / 1100) * 1.2).toFixed(2) + ' ' + cab.getAttribute('data-x') + ' ' + cab.getAttribute('data-y') + ')');
+      var bate = op.ritmo ? Math.sin(t / op.ritmo * Math.PI * 2) * 4 : 0;   // dançando, a cabeça vai no ritmo
+      if (cab) cab.setAttribute('transform', 'rotate(' + (v.cab * (0.5 + amp / 2) + Math.sin(t / 1100) * 1.2 + bate).toFixed(2) + ' ' + cab.getAttribute('data-x') + ' ' + cab.getAttribute('data-y') + ')');
       Array.prototype.forEach.call(svg.querySelectorAll('.rig-iris'), function (g) { g.setAttribute('transform', 'translate(' + (v.olho * 5).toFixed(2) + ' 0)'); });
       function estilo(sel, x, y, rot, extra) { var g = svg.querySelector(sel); if (!g) return; g.style.transformBox = 'view-box'; g.style.transform = 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px) rotate(' + rot.toFixed(2) + 'deg)' + (extra || ''); }
       var resp = Math.sin(t / 650) * 1.1;
@@ -67,7 +81,8 @@
     function passo(t) {
       if (!vivo) return;
       if (op.enquanto && !op.enquanto()) { vivo = false; return; }   // a tela acabou (ex.: saiu do desfile)
-      if (lista.length > 1 && t > prox) { i = (i + 1) % lista.length; trocar(lista[i]); prox = t + (op.segura || 3200); if (op.aoTrocar) op.aoTrocar(lista[i], i); }
+      if (op.proxima && t > prox) { trocar(op.proxima(nomeAtual), op.dur); prox = t + (op.segura || 3200); }   // passo sorteado
+      else if (lista.length > 1 && t > prox) { i = (i + 1) % lista.length; trocar(lista[i], op.dur); prox = t + (op.segura || 3200); if (op.aoTrocar) op.aoTrocar(lista[i], i); }
       var k = Math.min(1, (t - ini) / dur), e = suave(k), v = {};
       for (var c in para) v[c] = de[c] + (para[c] - de[c]) * e;
       v.aceno = para.aceno;
@@ -78,7 +93,7 @@
     trocar(lista[0], 10);
     quadro = requestAnimationFrame(passo);
     return {
-      trocar: trocar,
+      trocar: function (nome, ms) { trocar(nome, ms); prox = performance.now() + (op.segura || 3200); },
       pose: function () { return nomeAtual; },
       amplitude: function (a) { ampAlvo = a; },
       parar: function () { vivo = false; cancelAnimationFrame(quadro); },
