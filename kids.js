@@ -19,8 +19,11 @@
   if (debug) { painel = document.createElement('pre'); painel.id = 'debug'; painel.textContent = 'DIAGNÓSTICO: aperte as setas e OK no controle…\n'; document.body.appendChild(painel); }
   function log(e) { if (!painel) return; var ae = document.activeElement; painel.textContent += e.type + '  key=' + JSON.stringify(e.key) + '  code=' + JSON.stringify(e.code) + '  keyCode=' + e.keyCode + '  foco=' + (ae && (ae.id || ae.tagName)) + '\n'; var linhas = painel.textContent.split('\n'); if (linhas.length > 10) painel.textContent = linhas.slice(-10).join('\n'); }
   // depois do último cartão, o 📺 Clipe da rádio (radio.js monta o botão depois deste arquivo)
-  function todos() { var b = document.querySelector('.radio .r-clipe'); return b ? cards.concat([b]) : cards; }
-  function foco(n, parado) { var l = todos(); i = (n + l.length) % l.length; try { l[i].focus({ preventScroll: !!parado }); } catch (e) { l[i].focus(); } cards.forEach(function (c, k) { c.closest('.card').classList.toggle('sel', k === i); }); }
+  function todos() {   // só os jogos que o filtro da estante deixou à vista (catalogo.js), e o 📺 da rádio no fim
+    var v = cards.filter(function (c) { return !c.closest('.card').classList.contains('filtrado'); }), b = document.querySelector('.radio .r-clipe');
+    return b ? v.concat([b]) : v;
+  }
+  function foco(n, parado) { var l = todos(); i = (n + l.length) % l.length; try { l[i].focus({ preventScroll: !!parado }); } catch (e) { l[i].focus(); } cards.forEach(function (c) { c.closest('.card').classList.toggle('sel', c === l[i]); }); }
 
   // Só assume o controle (foco inicial, navegação por setas) numa TV de verdade. No celular/tablet,
   // deixa o toque normal — senão um cartão fica "sedado" com borda de foco sem ninguém ter mexido.
@@ -44,7 +47,7 @@
     if (dir) foco(i + dir); else { var alvo = todos()[i]; if (alvo.href && alvo.href.indexOf('#') < 0) location.href = alvo.href; else alvo.click(); }
   }
   ['keydown', 'keypress', 'keyup'].forEach(function (t) { window.addEventListener(t, tecla, true); });
-  cards.forEach(function (c, n) { c.addEventListener('focus', function () { i = n; }); c.addEventListener('mouseenter', function () { i = n; }); });
+  cards.forEach(function (c) { c.addEventListener('focus', function () { i = Math.max(0, todos().indexOf(c)); }); c.addEventListener('mouseenter', function () { i = Math.max(0, todos().indexOf(c)); }); });
   var dica = document.getElementById('dicaCursor');
   document.addEventListener('cursorStateChange', function (e) { if (dica) dica.style.display = (e.detail && e.detail.visibility) ? 'block' : 'none'; }, false);
 })();
