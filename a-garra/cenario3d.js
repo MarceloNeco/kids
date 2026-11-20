@@ -437,7 +437,7 @@ export function montarMaquina(cena, tema, M, op) {
   // gigantes (cabine de ~3 m): o controle é pequenininho, do tamanho da mão de uma criança, no canto da frente à direita,
   // e uma menininha fica de pé ao lado, para dar a escala (dono, 20/Nov/2026)
   let menina = null;
-  if (tema === 'gigantes') { painel.scale.setScalar(0.4); painel.position.set(L - 1.7, -0.55, P + C + 0.2); menina = porMenina(raiz, 5.3, -1.6, P + 1.2, L / 2, P / 2); }
+  if (tema === 'gigantes') { painel.scale.setScalar(0.4); painel.position.set(L - 1.7, -0.55, P + C + 0.2); menina = porMenina(raiz, 5.3, -2.3, P + 1.2, L / 2, P / 2); }
 
   /* garra: trilhos, ponte, carrinho, cabo enrolado, cubo e 3 dedos */
   const trilhoY = A - 0.25;

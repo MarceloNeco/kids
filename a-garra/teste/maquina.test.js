@@ -178,18 +178,19 @@ test('1 minuto para mirar em todos os níveis; quando acaba, avisa (para o 0 apa
   }
 });
 
-test('gigantes: cabine maior, poucas pelúcias enormes que cabem no buraco grande; a garra forte traz o prêmio', () => {
-  const G = M.calcular(M.GIGANTE), op = { tipos: TIPOS, raro: 'estrela', medidas: M.GIGANTE, qtdFator: 0.24, raioFator: 1.95 };
+test('gigantes: cabine maior, cheia de pelúcias enormes que cabem no buraco grande, monte sem chegar no teto; a garra forte traz o prêmio', () => {
+  const G = M.calcular(M.GIGANTE), op = { tipos: TIPOS, raro: 'estrela', medidas: M.GIGANTE, qtdFator: 0.4, raioFator: 1.9 };
   for (const nivel of ['facil', 'medio', 'dificil']) for (let s = 1; s <= 8; s++) {
     const m = M.nova(Object.assign({ nivel, semente: s }, op));
     assert.equal(m.med.L, G.L);
-    assert.ok(m.premios.length >= 8 && m.premios.length <= 19, nivel + ': ' + m.premios.length + ' prêmios');
+    assert.ok(m.premios.length >= 14 && m.premios.length <= 34, nivel + ': ' + m.premios.length + ' prêmios');
     for (const p of m.premios) {
       assert.ok(p.r > 0.7, 'prêmio grande: ' + p.r);
       assert.ok(2 * p.r < Math.min(G.BX, G.BZ), nivel + ': gigante de raio ' + p.r.toFixed(2) + ' não cabe no buraco');
       assert.ok(!(p.x < G.BX && p.z > G.P - G.BZ), 'gigante no buraco antes de começar');
       assert.ok(p.x >= p.r - 0.01 && p.x <= G.L - p.r + 0.01 && p.z <= G.P - p.r + 0.01, 'fora do vidro grande');
     }
+    assert.ok(Math.max(...m.premios.map(p => p.y + p.r)) < G.A - 2, nivel + ': o monte deixa espaço para a garra');
   }
   // garra sempre forte e mira no meio: os gigantes vêm (e a máquina comum, jogada junto, continua com as medidas dela)
   const m = M.nova(Object.assign({ nivel: 'facil', semente: 5, ajustes: { sempreForte: true } }, op));

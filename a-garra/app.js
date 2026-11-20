@@ -63,7 +63,7 @@ function traduzir() {
   [...LOGO].forEach((c, k) => { const s = document.createElement('span'); if (c === '-') s.className = 'sep'; else if (!k) s.className = 'h'; s.textContent = c; logo.appendChild(s); });
   document.title = LOGO + ' — Bolinho de Chuva · SolverONE';
   $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + APP_DATA[i];
-  pintarMenu(); pintarEtapa();
+  pintarMenu();
   if (telaAtual === 'colecao') pintarColecao();
 }
 
@@ -80,10 +80,14 @@ const quantos = (id) => todosDe(id).filter((k) => colecao[k] > 0).length;
 function pintarMenu() {
   marcar('maquinas', 'data-maquina', pref.maquina); marcar('niveis', 'data-nivel', pref.nivel);
   const f = festaInfo(); $('festaIco').textContent = f.ico; $('festaNome').textContent = t(f.nome[0], f.nome[1], f.nome[2]);   // a festa de hoje
+  // quantas máquinas tem, e no Jogar: qual máquina e qual nível estão escolhidos (dono, 20/Nov/2026)
+  const n = IDS.length, mq = MAQUINAS[pref.maquina], nm = pref.maquina === 'festas' ? f.nome : mq.nome;
+  $('tituloMaquinas').textContent = t('Escolha uma das ' + n + ' máquinas', 'Pick one of the ' + n + ' machines', 'Elige una de las ' + n + ' máquinas');
+  $('jogarQual').textContent = document.querySelector('[data-maquina="' + pref.maquina + '"] .ico').textContent + ' ' + t(nm[0], nm[1], nm[2]) + ' · ' +
+    { facil: t('Fácil', 'Easy', 'Fácil'), medio: t('Médio', 'Medium', 'Medio'), dificil: t('Difícil', 'Hard', 'Difícil') }[pref.nivel];
   IDS.forEach((id) => { const n = quantos(id); document.querySelector('[data-col="' + id + '"]').textContent = n ? '🧸 ' + n + '/' + todosDe(id).length : ''; });
   const total = IDS.reduce((s, id) => s + quantos(id), 0), max = IDS.reduce((s, id) => s + todosDe(id).length, 0);
   $('colecaoConta').textContent = total ? total + '/' + max : '';
-  $('nivelAtual').textContent = document.querySelector('#niveis [aria-checked="true"]').textContent;   // o nível de agora, no botão da etapa 2
 }
 document.querySelectorAll('#maquinas [data-maquina]').forEach((b) => b.addEventListener('click', () => { pref.maquina = b.getAttribute('data-maquina'); salvarPref(); pintarMenu(); Som.toque(); }));
 document.querySelectorAll('#niveis [data-nivel]').forEach((b) => b.addEventListener('click', () => { pref.nivel = b.getAttribute('data-nivel'); salvarPref(); pintarMenu(); Som.toque(); }));
@@ -130,27 +134,6 @@ function telaCheia() {   // tela cheia no celular e no tablet (no botão de come
     if (pedir && matchMedia('(pointer: coarse)').matches && !document.fullscreenElement) { const p = pedir.call(el); if (p && p.catch) p.catch(() => {}); }
   } catch (e) { /* sem tela cheia */ }
 }
-/* ---------- etapas do menu (dono, 20/Nov/2026: "o jogar tem que estar sempre lá") ----------
-   No celular em pé (o mesmo critério do estilo.css) as escolhas viram duas etapas, 1 Máquina · 2 Nível, e o ▶ Jogar!
-   fica sempre à vista. A etapa 2 entra no histórico como uma tela de dentro: o Voltar do celular volta para a etapa 1. */
-const EM_PE = matchMedia('(orientation: portrait) and (max-width: 759.98px)');
-let etapa = 1;
-function pintarEtapa() {
-  $('menu').classList.toggle('etapa-2', etapa === 2);
-  $('passoTexto').textContent = t(etapa + ' de 2', etapa + ' of 2', etapa + ' de 2');
-}
-const sumiu = (el) => !el || el === document.body || !el.offsetParent || getComputedStyle(el).visibility === 'hidden';
-function irEtapa(n) {
-  if (n === etapa) return;
-  if (n === 1 && empurrado) { history.back(); return; }   // o popstate volta para a etapa 1
-  etapa = n; pintarEtapa();
-  if (n === 2 && !empurrado) { try { history.pushState({ garra: 1 }, ''); empurrado = true; } catch (e) { /* sem histórico */ } }
-  // o foco estava no botão que sumiu (teclado): vai para a escolha marcada da etapa nova
-  if (sumiu(document.activeElement)) document.querySelector(n === 2 ? '#niveis [aria-checked="true"]' : '#maquinas [aria-checked="true"]').focus({ preventScroll: true });
-}
-$('btProximo').addEventListener('click', () => { Som.toque(); irEtapa(2); });
-$('btAnterior').addEventListener('click', () => { Som.toque(); irEtapa(1); });
-EM_PE.addEventListener('change', () => { if (!EM_PE.matches && telaAtual === 'menu') irEtapa(1); });   // deitou o celular: tudo numa tela só
 $('btJogar').addEventListener('click', () => { Som.acordar(); telaCheia(); entrar('jogo'); novaPartida(); });
 $('btColecao').addEventListener('click', () => { Som.toque(); entrar('colecao'); colecaoAba = pref.maquina; pintarColecao(); });
 $('btColecaoJogar').addEventListener('click', () => { Som.acordar(); mostrar('jogo'); novaPartida(); });
@@ -158,8 +141,8 @@ $('btColecaoJogar').addEventListener('click', () => { Som.acordar(); mostrar('jo
 /* ---------- telas de dentro e Voltar do celular ---------- */
 let empurrado = false;
 function entrar(id) { mostrar(id); if (!empurrado) { try { history.pushState({ garra: 1 }, ''); empurrado = true; } catch (e) { /* sem histórico */ } } }
-function irMenu() { fecharFim(); parar(); m = null; mostrar('menu'); etapa = 1; pintarEtapa(); pintarMenu(); }
-window.addEventListener('popstate', () => { empurrado = false; if (telaAtual !== 'menu') irMenu(); else if (etapa === 2) irEtapa(1); });
+function irMenu() { fecharFim(); parar(); m = null; mostrar('menu'); pintarMenu(); }
+window.addEventListener('popstate', () => { empurrado = false; if (telaAtual !== 'menu') irMenu(); });
 function voltarMenu() { if (empurrado) history.back(); else irMenu(); }
 // navegação padrão (../navegacao.js): 🏠 Início = voltar ao menu (o mesmo do Voltar do celular), 🚪 Saída
 if (window.BolinhoNav) window.BolinhoNav.iniciar({ jogo: 'a-garra', noInicio: () => telaAtual === 'menu', irParaInicio: voltarMenu,
@@ -209,7 +192,8 @@ function novaPartida() {
     MED = MEDIDAS_TESOURA; maq = montarTesoura(cena); objetos = [];
   } else {
     m = Maquina.nova({ nivel: pref.nivel, tipos: def.tipos, raro: def.raro, vivos: !!def.vivos, andam: !!def.andam,
-      qtdFator: def.andam ? 0.32 : def.gigante ? 0.24 : 1, raioFator: def.andam ? 1.12 : def.gigante ? 1.95 : 1, medidas: def.gigante ? Maquina.GIGANTE : undefined, semente, semGanhar });
+      qtdFator: def.andam ? 0.32 : def.gigante ? 0.4 : 1, raioFator: def.andam ? 1.12 : def.gigante ? 1.9 : 1,   // gigantes: máquina cheia de pelúcias enormes (dono, 20/Nov/2026)
+       medidas: def.gigante ? Maquina.GIGANTE : undefined, semente, semGanhar });
     MED = m.med;
     maq = montarMaquina(cena, pref.maquina, MED, { festa: FESTA });
     objetos = m.premios.map((p) => { const o = criarPremio(p.tipo); o.userData.id = p.id; cena.add(o); return o; });
@@ -508,13 +492,15 @@ function mostrarPorta(dt) {
 // as máquinas de garra: prêmios e mira
 function desenharGarra(seg, dt) {
   // prêmios: posição e giro da física, olhos piscando, asas batendo, vivos se mexendo
-  const vivos = !!MAQUINAS[pref.maquina].vivos, escala = MAQUINAS[pref.maquina].andam ? 1.4 : 1;
+  const vivos = !!MAQUINAS[pref.maquina].vivos, gig = !!MAQUINAS[pref.maquina].gigante, escala = MAQUINAS[pref.maquina].andam ? 1.4 : gig ? 1.32 : 1;
+  // gigantes: o desenho é maior que a bola da física e afunda um pouco, para as pelúcias se apertarem umas nas outras
+  // (amontoadas, sem vão entre elas, nada "voando"); a bola continua cabendo no buraco
   m.premios.forEach((p, i) => {
     const o = objetos[i];
     o.visible = !(p.ganho && p.y < -p.r * 1.4);
     if (!o.visible) return;
     // os bichos de verdade aparecem maiores que a bola da física (são compridos), mas a bola continua cabendo no buraco
-    o.position.set(p.x, p.y + (escala > 1 ? p.r * 0.12 : 0), p.z); o.quaternion.set(p.q[0], p.q[1], p.q[2], p.q[3]); o.scale.setScalar(p.r * escala);
+    o.position.set(p.x, p.y + (gig ? -p.r * 0.08 : escala > 1 ? p.r * 0.12 : 0), p.z); o.quaternion.set(p.q[0], p.q[1], p.q[2], p.q[3]); o.scale.setScalar(p.r * escala);
     if (!calmo) animar(o, seg, vivos && !p.preso, p.preso, p.passeio > 0);
   });
   // mira (fácil e médio): o anel fica em cima do que está debaixo da garra
@@ -549,7 +535,7 @@ comecar();
 if (TESTE) window.GarraDebug = {
   pronto: true, versao: APP_VERSION, festa: FESTA,
   estado() {
-    if (!m) return { tela: telaAtual, etapa };
+    if (!m) return { tela: telaAtual };
     return { tela: telaAtual, fase: m.fase, fichas: m.fichas, tempo: m.tempo, nivel: m.nivel, maquina: pref.maquina, x: m.garra ? m.garra.x : m.x, z: m.garra ? m.garra.z : 0, ganhos: m.ganhos.slice(),
       semGanhar: m.semGanhar, fim: !$('fim').hidden, premios: m.premios ? m.premios.filter((p) => !p.ganho).length : 1, fio: m.fioX ? m.fioX() : null };
   },

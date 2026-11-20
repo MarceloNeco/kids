@@ -25,6 +25,9 @@
 > - **baladinha** (0.6.0): `balada.js` monta a sala de luzes em camadas (fundo parado; luzes borradas e flor de luz em
 >   camadas que só deslizam ou giram) e põe a personagem e 2 amigas dançando com o `animador.js`; cada uma tem 3 sombras
 >   coloridas (`copias` do animador, atualizadas a cada 3 quadros, sem recorte nem máscara) para o celular aguentar.
+> - **roupas de chuva** (0.7.0): categoria `capa` (pecas.js) por cima de qualquer roupa — `capa()` no boneca.js entra na mesma
+>   camada da blusa/vestido (as mangas seguem o braço), `capuzAtras`/`capuzFrente` na cabeça (só de frente); estilo com `cor:`
+>   já troca a cor (visual.aplicar). Braço do esqueleto em duas passadas (contorno, depois preenchimento): sem emenda.
 
 # Purpurina — maquiagem, roupas e muito brilho
 

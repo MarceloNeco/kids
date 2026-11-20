@@ -41,11 +41,7 @@
     <p data-t="🐕 Na máquina Bichos de Verdade, os filhotes andam pelo cobertor: espere ele parar e mire bem!|🐕 In the Real Animals machine the puppies walk around the blanket: wait for one to stop and aim well!|🐕 En la máquina Animales de Verdad, los cachorros caminan por la manta: ¡espera a que uno se pare y apunta bien!"></p>
   </div>
 
-  <!-- Escolhas (dono, 20/Nov/2026: "o jogar tem que estar sempre lá"): no celular em pé viram duas etapas curtas,
-       1 Máquina · 2 Nível, com o ▶ Jogar! sempre à vista embaixo; tablet, computador e deitado mostram tudo junto. -->
-  <div class="menu-corpo" id="menuCorpo">
-  <div class="etapa etapa-maquina" id="etapa1">
-  <h2 class="titulo-escolha" data-t="Máquina|Machine|Máquina"></h2>
+  <h2 id="tituloMaquinas" class="titulo-escolha" data-t="Máquina|Machine|Máquina"></h2>
   <div class="escolha maquinas" id="maquinas" role="radiogroup" aria-label="Máquina" data-rotulo="Máquina|Machine|Máquina">
     <button class="cartao-maquina telefone" type="button" role="radio" data-maquina="telefone" aria-checked="true"><span class="ico" aria-hidden="true">📞🧸</span><b data-t="Cabine de Telefone|Phone Booth|Cabina de Teléfono"></b><small data-t="Pelúcias|Plushies|Peluches"></small><small class="recorde" data-col="telefone"></small></button>
     <button class="cartao-maquina neon" type="button" role="radio" data-maquina="neon" aria-checked="false"><span class="ico" aria-hidden="true">💚🦖</span><b data-t="Neon|Neon|Neón"></b><small data-t="Bichinhos que mexem|Wiggly critters|Bichitos que se mueven"></small><small class="recorde" data-col="neon"></small></button>
@@ -56,29 +52,19 @@
     <button class="cartao-maquina tesoura" type="button" role="radio" data-maquina="tesoura" aria-checked="false"><span class="ico" aria-hidden="true">✂️🧸</span><b data-t="Boneco Gigante|Giant Doll|Muñeco Gigante"></b><small data-t="Corte o fio com a tesoura|Cut the string with the scissors|Corta el hilo con las tijeras"></small><small class="recorde" data-col="tesoura"></small></button>
     <button class="cartao-maquina festas" type="button" role="radio" data-maquina="festas" aria-checked="false"><span class="ico" id="festaIco" aria-hidden="true">🎉</span><b id="festaNome"></b><small data-t="Muda com a época do ano|Changes with the season|Cambia según la época del año"></small><small class="recorde" data-col="festas"></small></button>
   </div>
-  </div>
 
-  <div class="etapa etapa-nivel" id="etapa2">
-  <h2 class="titulo-escolha" data-t="Nível|Level|Nivel"></h2>
-  <div class="escolha" id="niveis" role="radiogroup" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
-    <button class="cartao-nivel verde" type="button" role="radio" data-nivel="facil" aria-checked="true"><span data-t="Fácil|Easy|Fácil"></span></button>
-    <button class="cartao-nivel amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false"><span data-t="Médio|Medium|Medio"></span></button>
-    <button class="cartao-nivel vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false"><span data-t="Difícil|Hard|Difícil"></span></button>
-  </div>
+
   <button id="btColecao" class="medio" type="button"><span data-t="🧸 Minha coleção|🧸 My collection|🧸 Mi colección"></span> <span id="colecaoConta" class="conta"></span></button>
   <button id="btInstalar" class="medio" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
-  </div>
-  </div>
-
-  <div class="rodape">
-    <nav class="passos" id="passos" aria-label="Etapas" data-rotulo="Etapas|Steps|Pasos">
-      <button id="btAnterior" class="passo-bt" type="button"><span aria-hidden="true">◀</span> <span data-t="Máquina|Machine|Máquina"></span></button>
-      <span class="passo-conta"><span class="pontos" aria-hidden="true"><i></i><i></i></span><span id="passoTexto"></span></span>
-      <button id="btProximo" class="passo-bt" type="button"><span data-t="Nível:|Level:|Nivel:"></span> <b id="nivelAtual"></b> <span aria-hidden="true">▶</span></button>
-    </nav>
-    <button id="btJogar" class="grande" type="button" data-t="▶ Jogar!|▶ Play!|▶ ¡Jugar!"></button>
-  </div>
   <p id="versao" class="versao"></p>
+  <!-- o Jogar fica sempre à vista, preso embaixo, dizendo qual máquina e qual nível estão escolhidos (dono, 20/Nov/2026) -->
+  <div class="barra-jogar">
+    <div class="escolha" id="niveis" role="radiogroup" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
+      <button class="cartao-nivel verde" type="button" role="radio" data-nivel="facil" aria-checked="true"><span data-t="Fácil|Easy|Fácil"></span></button>
+      <button class="cartao-nivel amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false"><span data-t="Médio|Medium|Medio"></span></button>
+      <button class="cartao-nivel vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false"><span data-t="Difícil|Hard|Difícil"></span></button>
+    </div>
+    <button id="btJogar" class="grande" type="button"><span data-t="▶ Jogar!|▶ Play!|▶ ¡Jugar!"></span><small id="jogarQual" class="jogar-qual"></small></button></div>
 </section>
 
 <section id="jogo" class="tela" data-recurso="a-garra">

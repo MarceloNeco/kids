@@ -23,4 +23,3 @@ Situação: 🟡 aberta · 🔵 em andamento · ⏸ aguardando o dono · ✅ fei
 | 17 | A garra estava difícil demais (1 em 4 / 7 / 10): agora vem forte mais ou menos a cada 3 tentativas, sorteado (fácil 2–3, médio 2–4, difícil 3–5). | Dono, 14/Nov/2026 | ✅ 0.4.4 |
 | 18 | 1 minuto para mirar em todos os níveis (o fácil não tinha relógio) e contagem animada dos 10 últimos segundos no canto de cima, à direita. | Dono, 15/Nov/2026 | ✅ 0.4.6 |
 | 19 | Máquina que **muda com a época do ano** (Natal, Carnaval, Páscoa…), máquina de **bichos gigantes** e máquina de **um boneco grande só** (cortar o fio com a tesoura). | Dono, 19/Nov/2026 (fotos e vídeo do fliperama) | ✅ Festas 0.5.0 · Gigantes 0.5.1 · Boneco Gigante (tesoura) 0.5.2 |
-| 20 | Menu com um monte de opção de uma vez e o ▶ Jogar lá no fim (no celular em pé precisava rolar): escolhas em etapas curtas (1 Máquina · 2 Nível), Jogar sempre à vista; celular deitado em duas colunas. | Dono, 20/Nov/2026 | ✅ 0.5.5 |
