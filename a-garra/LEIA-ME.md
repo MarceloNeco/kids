@@ -50,7 +50,7 @@ o botão PEGAR vira GRAB · COGER.
     sapo rei; raro: ursa dourada.
 - **Menu** (0.5.5; dono, 20/Nov/2026): a máquina escolhida fica maior, com uma luz colorida que corre em volta (borda em
   `conic-gradient` girando), brilho piscando e um ✓; as outras ficam um pouco apagadas. "Escolha uma das 8 máquinas" em cima.
-  O nível e o **▶ Jogar** ficam numa barra presa embaixo (sempre à vista, acima do tocador de música), e o Jogar diz a
+  O nível e o **▶ Jogar** ficam numa linha só, numa barra presa embaixo (sempre à vista, acima do tocador de música), e o Jogar diz a
   máquina e o nível escolhidos.
 - **Controle**: ⬅ ➡ para os lados, ⬆ para o fundo, ⬇ para a frente (segurar), e **PEGAR**. Também dá para **tocar no
   prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
