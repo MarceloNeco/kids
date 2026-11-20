@@ -1,6 +1,7 @@
 // Filtros da estante (dono, 20/Nov/2026): "Todos" aceso de começo; tocar num recurso (sem internet, em dois, com o
 // corpo, na TV, inclinar) apaga o "Todos" e mostra só os jogos que têm todos os recursos acesos; "Todos" volta tudo.
 // No celular só os ícones, cabendo sem rolar de 320 px para cima; na tela larga ícone + nome. O "?" explica.
+// Rolando a estante, a fileira fica presa no alto da tela (dono, 20/Nov/2026).
 // Rodar da raiz do repositório: node --test teste/estante-filtros.test.js
 const test = require('node:test');
 const assert = require('node:assert');
@@ -54,6 +55,12 @@ test('estante: filtros por recurso, Todos de começo, juntar filtros, caber no c
       assert.ok(!(await vistos()).includes('danca-na-sala'), 'a Dança na Sala precisa de internet');
       await pg.click('.f-todos');
       assert.strictEqual((await vistos()).length, w.BolinhoCatalogo.jogos.length, cod + ': Todos mostra tudo de novo');
+      await pg.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await pg.waitForTimeout(100);
+      const topo = await pg.$eval('.filtros', (f) => f.getBoundingClientRect().top);
+      assert.ok(topo >= 0 && topo < 24, cod + ': rolando a estante, os filtros ficam presos no alto (top ' + topo + ')');
+      await pg.click('.f-dois'); await pg.click('.f-dois');
+      await pg.evaluate(() => window.scrollTo(0, 0));
       await pg.click('.f-q');
       assert.ok(await pg.$eval('.c-bal', (e) => !e.hidden && e.textContent.length > 20), cod + ': o ? explica');
       assert.deepStrictEqual(erros, []);

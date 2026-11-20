@@ -118,3 +118,6 @@ html.trava-fundo,html.trava-fundo body{overflow:hidden!important;overscroll-beha
 @media (max-width:340px){.f-bt{min-width:34px;padding:0 .3rem;font-size:.82rem}.f-bt svg{width:18px;height:18px}.f-q{width:32px;min-width:32px}}
 .a-ic{display:inline-flex;align-items:center;gap:.3rem}.ic-rodape{width:1.05em;height:1.05em;flex:none}
 @media (max-width:460px){.f-todos svg{display:none}}
+/* Filtros presos no alto ao rolar a estante (dono, 20/Nov/2026) */
+.filtros{position:sticky;top:max(.5rem,env(safe-area-inset-top));z-index:12;background:rgba(26,20,70,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.card{scroll-margin-top:5rem}

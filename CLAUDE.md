@@ -114,7 +114,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   bibliotecas em `baguncolandia/libs/`. Cartões da estante (dono, 15/Nov/2026): compactos, montados pelo `catalogo.js` — ícone,
   nome inteiro, "? ⌄" que abre a explicação, ícones do campo `rec` (TV, corpo, inclinar, dois; sem internet/precisa de internet
   vêm de `instalar`/`soOnline`; tocar explica), ⬇ Instalar e **Jogar sempre na ponta direita**. Vigia: `teste/estante-cartoes.test.js`.
-  Jogo novo: diga no `rec` o que ele usa (é também o que os **filtros da estante** usam: Todos · Sem internet · Em dois · Com o corpo · Na TV · Inclinar, dono 20/Nov/2026; vigia `teste/estante-filtros.test.js`). (`cartoes-fundos.css` não é mais usado pela estante.)
+  Jogo novo: diga no `rec` o que ele usa (é também o que os **filtros da estante** usam: Todos · Sem internet · Em dois · Com o corpo · Na TV · Inclinar, dono 20/Nov/2026; a fileira fica presa no alto ao rolar; vigia `teste/estante-filtros.test.js`). (`cartoes-fundos.css` não é mais usado pela estante.)
 - Interruptores: todos os jogos obedecem o app **`kids`** ("Bolinho de Chuva") do RootifyONE, um interruptor por jogo.
 - **Backlog do Bolinho** (o dono chama de "backlog do Bolinho", "do hub" ou "da estante"): `PENDENCIAS.md`, seção
   "Backlog da estante e do acesso" (15/Nov/2026: cartões rodada 2, textos dos ícones, degustação/login/planos pelo RootifyONE,
