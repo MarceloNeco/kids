@@ -39,8 +39,8 @@
     // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
     pequena: { cabecas: 4.8, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.92, 0.94, 0.97, 1.04, 0.98, 0.9, 0.94, 0.86] },
     crianca: { cabecas: 5.8, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.88, 0.9, 0.86, 1.02, 0.98, 0.88, 0.94, 0.84] },
-    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.88, 0.98, 0.72, 1.14, 1.04, 0.86, 0.95, 0.8] },
-    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.9, 1.05, 0.72, 1.2, 1.08, 0.88, 0.97, 0.8] }
+    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.88, 1.02, 0.72, 1.14, 1.04, 0.86, 0.95, 0.8] },
+    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.9, 1.1, 0.72, 1.2, 1.08, 0.88, 0.97, 0.8] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
@@ -361,7 +361,9 @@
 
     // ---------- pescoço, tronco e braços ----------
     out.push(p('M187,270 L213,270 L214,318 Q218,336 248,342 L152,342 Q182,336 186,318Z', { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }), ret(187, 300, 26, 14, { fill: '#7a5ba8', opacity: 0.1 }));
-    out.push(p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: 'url(#' + I + 'lado)' }));
+    // tronco de pele um pouco mais estreito que qualquer roupa (a roupa cobre os lados: sem pele sobrando embaixo do braço)
+    var TRONCO = 'M150,342 Q200,330 250,342 Q259,346 256,366 L248,458 L152,458 L144,366 Q141,346 150,342Z';
+    out.push(p(TRONCO, { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p(TRONCO, { fill: 'url(#' + I + 'lado)' }));
     /* pose do fim da passarela (opcoes.pose): 'cintura' = mão direita na cintura (menina); 'cruzados' = braços cruzados
        (menino). Os braços da pose são desenhados no fim, por cima (bracosPose). */
     /* opcoes.rig (Nova Era, 20/Nov/2026: "as poses precisam de movimento, não ficar trocando de foto"): os braços viram um
@@ -376,15 +378,17 @@
 
     // ---------- vestido ou blusa ----------
     var iTop = out.length;
-    var roupaCima = vis('vestido') ? barra(vestido(e.vestido, C('vestido'), peca, linha, pele, peleE)) : blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), peca, linha);
-    // capa de chuva por cima de tudo, na mesma camada (as mangas seguem o braço como as da blusa)
-    out.push(vis('capa') ? roupaCima + barra(capa(e.capa, C('capa'), peca)) : roupaCima);
-
-    // busto (adolescente e adulta): duas curvinhas da dobra da roupa embaixo do peito, da cor da peça mais escura
-    if (e.personagem !== 'menino' && (e.idade === 'adolescente' || e.idade === 'adulta') && !vis('capa')) {
-      var corB = vis('vestido') ? C('vestido').hex : e.blusa !== 'nenhum' ? C('blusa').hex : pele;
-      out.push(p('M172,393 Q182,399 192,394 M208,394 Q218,399 228,393', { fill: 'none', stroke: esc(corB, 0.3), 'stroke-width': 1.3, 'stroke-linecap': 'round', opacity: 0.4 }));
+    // braço que se mexe (esqueleto ou pose) traz a própria manga: a manga parada do desenho de baixo nem é desenhada
+    // (senão sobrava um "toco" de manga do lado do corpo)
+    var MANGAS_E = [MANGA_CURTA, MANGA_LONGA, MANGA_BUFANTE], MANGAS_D = MANGAS_E.map(espelhar);
+    function pecaTopo(ds, cor, cat) {
+      var l = (typeof ds === 'string' ? [ds] : ds).filter(function (d) { return !(semEsquerdo && MANGAS_E.indexOf(d) >= 0) && !(semDireito && MANGAS_D.indexOf(d) >= 0); });
+      return l.length ? peca(l, cor, cat) : '';
     }
+    var roupaCima = vis('vestido') ? barra(vestido(e.vestido, C('vestido'), pecaTopo, linha, pele, peleE)) : blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), pecaTopo, linha);
+    out.push(roupaCima);
+    // (20/Nov/2026, dono: "dois triângulos pra baixo em cima da roupa"): sem as curvinhas desenhadas no peito — o busto
+    // aparece no próprio contorno do corpo (PROPORCAO.larg), saindo para os lados e afinando na cintura
     // ---------- bolsa, mãos e joias do corpo ----------
     // bolsa de mão vai junto com a mão direita (não estica); a de ombro segue o corpo
     if (vis('bolsa') && !tchau && !bracoPose && (!rig || e.bolsa === 'ombro')) out.push(e.bolsa === 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : rigido(282, 496, bolsa(e.bolsa, C('bolsa'), peca, linha), [250, 354]));
@@ -398,10 +402,16 @@
     // em pose, a manga pendurada (parada) some do lado do braço em pose: o braço da pose desenha a própria manga
     if (bracoPose || rig) {
       var vestP = vis('vestido');
-      defs += deformar('<clipPath id="' + I + 'semManga"><rect x="140" y="-200" width="120" height="1200"/>' + (semEsquerdo ? '' : '<rect x="-200" y="-200" width="350" height="1200"/>') +
+      /* o recorte do meio segue o contorno do corpo (um caminho, que a deformação curva em busto, cintura e quadril), e não
+         um retângulo reto (dono, 20/Nov/2026: a blusa virava um caixote e a pele aparecia dos lados, como um "sovaco") */
+      var faixa = 'M135,-200'; for (var yf = 290; yf <= 720; yf += 6) faixa += ' L135,' + yf;   // pontos juntinhos: a curva sai certa
+      faixa += ' L135,1000 L265,1000'; for (var yg = 720; yg >= 290; yg -= 6) faixa += ' L265,' + yg; faixa += ' L265,-200Z';
+      defs += deformar('<clipPath id="' + I + 'semManga"><path d="' + faixa + '"/>' + (semEsquerdo ? '' : '<rect x="-200" y="-200" width="350" height="1200"/>') +
         (semDireito ? '' : '<rect x="250" y="-200" width="400" height="1200"/>') + (vestP ? '<rect x="-200" y="455" width="800" height="800"/>' : '') + '</clipPath>');
       out[iTop] = '<g clip-path="url(#' + I + 'semManga)">' + out[iTop] + '</g>';
     }
+    // capa de chuva por cima de tudo, na mesma camada; com esqueleto ou pose, sem a manga parada do braço que se mexe
+    if (vis('capa')) out[iTop] += barra(capa(e.capa, C('capa'), peca, { e: !semEsquerdo, d: !semDireito }));
     /* desfile andando: cada braço balança a partir do ombro (.pp-braco-e / -d, estilo.css), junto com a perna do outro
        lado. Os braços, a roupa de cima (mangas), as mãos e as joias saem em três cópias recortadas: o meio do corpo
        (x 140–260) parado e cada lado (x < 150 e x > 250) girando no ombro. No vestido, só da cintura para cima vai com o
@@ -1609,7 +1619,7 @@
     switch (tipo) {
       case 'nenhum': s = peca('M162,344 L170,342 Q200,362 230,342 L238,344 Q250,354 250,376 L248,462 Q200,469 152,462 L150,376 Q150,354 162,344Z', { hex: '#fbf7ff' }, 'x'); break;
       case 'camiseta': s = peca([tronco(462), MANGA_CURTA, espelhar(MANGA_CURTA)], cor, 'blusa') + linha('M182,336 Q200,354 218,336', c, 3); break;
-      case 'regata': s = peca('M157,343 L171,338 Q200,370 229,338 L243,343 Q254,352 254,372 L251,462 Q200,469 149,462 L146,372 Q146,352 157,343Z', cor, 'blusa'); break;
+      case 'regata': s = peca('M157,343 L171,338 Q200,370 229,338 L243,343 Q256,352 260,372 L251,462 Q200,469 149,462 L140,372 Q144,352 157,343Z', cor, 'blusa'); break;
       case 'babados':
         s = peca([tronco(452), MANGA_BUFANTE, espelhar(MANGA_BUFANTE)], cor, 'blusa');
         var bab = 'M148,450'; for (var i = 0; i < 8; i++) bab += 'Q' + (154 + i * 13) + ',' + 476 + ' ' + (161 + i * 13) + ',' + 452;
@@ -1793,8 +1803,9 @@
     });
     return s + circ(x - r, y, r * 0.28, { fill: '#fff' }) + circ(x + r, y, r * 0.28, { fill: '#fff' });
   }
-  function capa(tipo, cor, peca) {
-    var c = esc(cor.hex, 0.3), s = '', formas = [CAPA_CORPO, MANGA_LONGA, espelhar(MANGA_LONGA)];
+  function capa(tipo, cor, peca, mangas) {
+    mangas = mangas || { e: true, d: true };
+    var c = esc(cor.hex, 0.3), s = '', formas = [CAPA_CORPO].concat(mangas.e ? [MANGA_LONGA] : [], mangas.d ? [espelhar(MANGA_LONGA)] : []);
     var vivo = tipo === 'patinho' ? '#e8384f' : tipo === 'transparente' ? esc(cor.hex, 0.12) : tipo === 'arcoiris' ? '#a77bff' : cla(cor.hex, 0.5);
     if (tipo === 'transparente') {
       s += '<g opacity=".55">' + peca(formas, cor, 'x') + '</g>';

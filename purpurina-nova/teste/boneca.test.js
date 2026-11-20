@@ -422,3 +422,15 @@ test('placa de entrada da Baladinha (dono, 20/Nov/2026)', () => {
   assert.match(app, /function placaBalada/); assert.match(app, /'Baladinha', 'Dance Party', 'Minidisco'/);
   assert.match(css, /\.bal-placa \{/); assert.ok(global.PurpurinaAnim.POSES.abracao);
 });
+
+test('silhueta feminina natural (dono, 20/Nov/2026: "dois triângulos… o busto saindo pros lados… sovaco aparecendo")', () => {
+  const s = B.svg({ blusa: 'camiseta', idade: 'adulta' }, { id: 'sl', rig: true, fundo: false });
+  assert.ok(!s.includes('M172,393'), 'sem as curvinhas desenhadas no peito');
+  const clip = s.match(/<clipPath id="sl-semManga">([\s\S]*?)<\/clipPath>/)[1];
+  assert.match(clip, /^<path d="/, 'o recorte do meio é um caminho que segue o corpo, não um retângulo');
+  // a borda do recorte faz curva: mais larga no busto que na cintura
+  const pts = clip.match(/L(-?[\d.]+),(-?[\d.]+)/g).map(t => t.slice(1).split(',').map(Number)).filter(q => q[0] < 200 && q[1] > 300 && q[1] < 600);
+  const xs = pts.map(q => q[0]); assert.ok(Math.max(...xs) - Math.min(...xs) > 12, 'curva de verdade');
+  // com o braço se mexendo, a manga parada nem é desenhada (sem toco do lado)
+  assert.match(require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8'), /function pecaTopo/);
+});
