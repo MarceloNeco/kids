@@ -471,3 +471,8 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 /* zoom no rosto da abertura: a câmera chega devagar e volta */
 .ab-camada { transition: opacity .8s ease-in-out, transform 1.1s ease-in-out; }
 .ab-viva { overflow: hidden; }
+/* escolhendo uma parte (dono, 20/Nov/2026: "olha o espaço que tá ocupando a paleta… o rosto tem que estar maior"): o painel
+   ocupa só o que precisa (no máximo 40% da tela) e a personagem fica com o resto */
+@media (orientation: portrait) {
+  #estudio.ativa.escolhendo { grid-template: "topo" auto "palco" minmax(0, 1fr) "dicas" auto "acoes" auto "painel" fit-content(40%) / minmax(0, 1fr); }
+}

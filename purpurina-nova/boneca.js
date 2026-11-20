@@ -229,7 +229,7 @@
     // a partir dos 11 anos o rosto fica oval: a cabeça estreita um pouco (largura) e alonga
     CABECA = 'translate(0 14) translate(200 297) scale(' + IDADE.cab * (IDADE.largura || 1) + ' ' + IDADE.cab + ') translate(-200 -297)';
     var C = function (cat) { var k = P.categoria(cat); return P.cor(k.cores, e[k.opcoes ? cat + 'Cor' : cat]); };
-    var pele = C('pele').hex, peleE = esc(pele, 0.24), cab = C('cabelo').hex, cabE = esc(cab, 0.3);
+    var pele = C('pele').hex, peleE = esc(pele, 0.24), cab = C('cabelo').hex, cabE = esc(cab, 0.3 + 0.3 * escuridao(pele));
     var vis = function (cat) { return V.visivel(e, cat); };
     var estNa = vis('vestido') ? 'vestido' : 'blusa', comEstampa = e.estampa !== 'liso';
     var area = op.soFundo ? [0, 0, W, H] : (op.area || [0, 0, W, H]);
@@ -401,7 +401,7 @@
     } else {
       out.push(elip(116, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }), elip(284, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }));
       out.push(pintar(rosto, 'url(#' + I + 'pele)', esc(pele, 0.42), 1.1));
-      out.push(luzLados(pele, menino), luzMeio(pele), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, 0, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, 0, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
+      out.push(luzLados(pele, menino), luzMeio(pele, I), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, 0, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, 0, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
       out.push(deslocar(-dO, sobr(164, -1)), deslocar(dO, sobr(236, 1)));
       out.push(narizFrente(e.nariz, pele) + narizLuz(pele, menino));
       out.push(bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))));
@@ -409,6 +409,10 @@
       if (e.glitter === 'bochechas' || e.glitter === 'olhos') out.push(glitter(e, C('glitter')));
       // ---------- cabelo da frente e acessórios do rosto ----------
       var franjaF = afinarCabelo(subirTesta(cabeloFrente(e, I, cab, cabE), TESTA[e.testa] || 0), cabE);
+      // sombra que a franja faz na testa (separa o cabelo do rosto; mais forte na pele escura)
+      defs += '<clipPath id="' + I + 'rostoF"><path d="' + rosto + '"/></clipPath>';
+      out.push('<g clip-path="url(#' + I + 'rostoF)"><g transform="translate(0 4)" opacity="' + n(0.2 + 0.25 * escuridao(pele)) + '">' +
+        franjaF.replace(/fill="(url\([^)]*\)|#[0-9a-fA-F]{3,6})"/g, 'fill="' + esc(pele, 0.55) + '"').replace(/stroke="#[0-9a-fA-F]{3,6}"/g, 'stroke="' + esc(pele, 0.55) + '"') + '</g></g>');
       out.push(franjaF + fiosIlustra(franjaF, I, 'fiosF', e, cab, cabE));
       if (vis('brincos')) out.push(brincos(e.brincos, C('brincos'), I));
       if (vis('oculos')) out.push(oculos(e.oculos, C('oculos'), dO));
@@ -696,7 +700,9 @@
       '<linearGradient id="' + I + 'vol" x1="0" y1="0" x2="1" y2="0"><stop offset=".74" stop-color="#7a5ba8" stop-opacity="0"/><stop offset=".74" stop-color="#7a5ba8" stop-opacity=".18"/></linearGradient>' +
       '<linearGradient id="' + I + 'shine" x1="0" y1="0" x2="1" y2="1"><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".6"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
       // sombra que o cabelo faz na testa, logo abaixo da linha do cabelo
-      '<linearGradient id="' + I + 'sombCab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + esc(cab, 0.2) + '" stop-opacity=".32"/><stop offset=".16" stop-color="' + esc(cab, 0.2) + '" stop-opacity="0"/></linearGradient>' +
+      '<radialGradient id="' + I + 'luzPele"><stop offset="0" stop-color="#ffe6c4" stop-opacity=".55"/><stop offset="1" stop-color="#ffe6c4" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="' + I + 'calorPele"><stop offset="0" stop-color="#c8452c" stop-opacity=".35"/><stop offset="1" stop-color="#c8452c" stop-opacity="0"/></radialGradient>' +
+      '<linearGradient id="' + I + 'sombCab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + esc(cab, 0.45) + '" stop-opacity="' + n(0.32 + 0.3 * escuridao(pele)) + '"/><stop offset=".16" stop-color="' + esc(cab, 0.2) + '" stop-opacity="0"/></linearGradient>' +
       // branco do olho com volume (mais escuro em cima, onde a pálpebra faz sombra)
       '<linearGradient id="' + I + 'esclera" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cde6"/><stop offset=".42" stop-color="#fff"/><stop offset="1" stop-color="#f6f1fb"/></linearGradient>' +
       gradienteCabelo(e, I, cab) +
@@ -1092,7 +1098,7 @@
     var N = { arrebitado: [5, 243, 0.5], fininho: [4, 247, 1], redondinho: [7, 246, 0.6], pequenino: [4, 246, 0.3], batatinha: [9, 246, 0.6], largo: [10, 247, 0.6], reto: [5, 247, 1] }[tipo] || [5.5, 246, 0.6];
     var w = N[0], y = N[1], ponte = N[2], c = esc(pele, 0.34);
     var s = p('M204,' + n(y - 12 - ponte * 18) + ' Q' + n(206 + w * 0.2) + ',' + n(y - 10) + ' ' + n(203 + w * 0.4) + ',' + n(y - 2), { fill: 'none', stroke: c, 'stroke-width': 1.5, 'stroke-linecap': 'round', opacity: 0.45 });
-    s += elip(200, y - 3, w * 0.45, 2.4, { fill: '#fff', opacity: 0.4 });
+    s += elip(200, y - 3, w * 0.45, 2.4, { fill: '#fff', opacity: n(0.4 * (1 - 0.6 * escuridao(pele))) });
     s += p('M' + n(200 - w) + ',' + n(y - 1) + ' Q' + n(200 - w - 2) + ',' + n(y + 4) + ' ' + n(200 - w * 0.45) + ',' + n(y + 4.5) + ' Q200,' + n(y + 6.5) + ' ' + n(200 + w * 0.45) + ',' + n(y + 4.5) + ' Q' + n(200 + w + 2) + ',' + n(y + 4) + ' ' + n(200 + w) + ',' + n(y - 1), { fill: 'none', stroke: c, 'stroke-width': 1.4, 'stroke-linecap': 'round', opacity: 0.75 });
     s += elip(200 - w * 0.5, y + 3, 1.7, 1, { fill: c, opacity: 0.55 }) + elip(200 + w * 0.5, y + 3, 1.7, 1, { fill: c, opacity: 0.55 });
     return s;
@@ -1173,12 +1179,25 @@
   // semMonolid: olho fininho sem a dobrinha da pálpebra (a linha da dobra não aparece)
   // (a dobrinha da pálpebra agora é desenhada junto com o olho)
   function luzLados(pele, menino) {
-    var rosa = menino ? 0.03 : 0.08;
+    var rosa = (menino ? 0.03 : 0.08) * (1 - escuridao(pele));
     return elip(152, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa }) + elip(248, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa });
   }
-  function luzMeio(pele) {
-    return elip(200, 290, 10, 3.5, { fill: '#fff', opacity: 0.12 });
+  function luzMeio(pele, I) {
+    return elip(200, 290, 10, 3.5, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);
   }
+  // quão escura é a pele (0 = branca, 1 = bem escura)
+  function escuridao(h) { var c = rgb(h), l = (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; return Math.max(0, Math.min(1, (0.72 - l) / 0.45)); }
+  /* pele escura de verdade (dono, 20/Nov/2026: "tá com a mesma cor do cabelo, falso"): tem brilho — luz dourada na testa,
+     na ponte e na ponta do nariz, nas maçãs do rosto e no queixo, e as bochechas com um calor avermelhado. Quanto mais
+     escura a pele, mais forte o brilho; na pele clara quase não aparece. */
+  function brilhoPele(pele, I) {
+    var k = escuridao(pele); if (k < 0.15) return '';
+    var o = function (v) { return n(v * k * 100) / 100; }, L = { fill: 'url(#' + I + 'luzPele)' }, Q = { fill: 'url(#' + I + 'calorPele)' };
+    return '<g opacity="' + o(0.85) + '">' + elip(200, 152, 40, 18, L) + elip(200, 230, 4, 18, L) +
+      elip(150, 234, 20, 10, Object.assign({ transform: 'rotate(-18 150 234)' }, L)) + elip(250, 234, 20, 10, Object.assign({ transform: 'rotate(18 250 234)' }, L)) +
+      elip(200, 289, 7, 3.5, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
+  }
+
 
   // braço levantado dando tchau: ombro → cotovelo → mão aberta; o antebraço balança (opcoes.anim)
   function bracoTchau(pele, peleE, esmalte, membro, anim) {

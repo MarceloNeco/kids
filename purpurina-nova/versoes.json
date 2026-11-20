@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.4.3",
+      "data": "20/Nov/2026",
+      "hora": "11:09:47",
+      "pt": [
+        "🤎 Pele negra e morena com brilho de verdade: luz suave dourada na testa, no nariz, nas maçãs do rosto e no queixo. O cabelo ganhou contorno mais escuro e sombra na testa, para não se misturar com o rosto.",
+        "🔍 Escolhendo uma parte (pele, olhos, boca…), o painel ocupa só o espaço que precisa e o rosto fica bem maior na tela."
+      ],
+      "en": [
+        "🤎 Dark and brown skin with a real glow: soft golden light on the forehead, nose, cheekbones and chin. The hair has a darker outline and casts a shadow on the forehead, so it no longer blends into the face.",
+        "🔍 When picking a part (skin, eyes, lips…), the panel only takes the space it needs and the face is much bigger on screen."
+      ],
+      "es": [
+        "🤎 Piel oscura y morena con brillo de verdad: una luz dorada suave en la frente, la nariz, los pómulos y la barbilla. El pelo tiene un contorno más oscuro y hace sombra en la frente, para no confundirse con la cara.",
+        "🔍 Al elegir una parte (piel, ojos, boca…), el panel ocupa solo el espacio que necesita y la cara se ve mucho más grande."
+      ]
+    },
+    {
       "versao": "0.4.2",
       "data": "20/Nov/2026",
       "hora": "10:36:30",
