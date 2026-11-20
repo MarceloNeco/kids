@@ -110,7 +110,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   `batalha-naval/`, `enigmas/`, `labirinto/`, `cozinha/`, `aqua/`, `glub-glub/`, `jogoteca/` (a **Jogoteca**, biblioteca de clássicos: jogo novo dentro dela segue `jogoteca/LEIA-ME.md`), `fruta-podre/` (**FRUTA PODRE**, estilingue com física: Matter.js em `fruta-podre/libs/`; especificação do dono em `fruta-podre/ESPECIFICACAO.md`), `tijolaco/` (**TIJOLAÇO**, o jogo da obra: hoje o modo TijoLinto; proposta e referências em `docs/tijolaco/`), e `danca-na-sala.html` na raiz. Atalhos de TV LG: `tv-lg*/`.
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
   (PT/EN/ES escolhido na estante),
-  `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos);
+  `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos), `clipe.js` (📺 Clipe: telão com bichinhos dançando a música que toca, na rádio e no H-rraaa);
   bibliotecas em `baguncolandia/libs/`. Cartões da estante (dono, 15/Nov/2026): compactos, montados pelo `catalogo.js` — ícone,
   nome inteiro, "? ⌄" que abre a explicação, ícones do campo `rec` (TV, corpo, inclinar, dois; sem internet/precisa de internet
   vêm de `instalar`/`soOnline`; tocar explica), ⬇ Instalar e **Jogar sempre na ponta direita**. Vigia: `teste/estante-cartoes.test.js`.

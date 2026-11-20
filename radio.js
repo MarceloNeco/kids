@@ -6,6 +6,7 @@
   - Quem pausou não é surpreendido: a página lembra (bolinho:radio:pausado) e só volta a tocar sozinha depois que
     alguém tocar ▶ de novo. Com "economia de dados" ligada, não toca sozinha.
   - ⏯ pausa e continua; ⏮ ⏭ trocam; as bolinhas mostram as 10 músicas e escolhem uma.
+  - 📺 Clipe (19/Nov/2026) abre o telão do clipe.js: bichinhos dançando a música que está tocando (parada, começa a tocar).
   - Cada música baixa só quando vai tocar (preload="none").
   - Ordem sorteada a cada vez que abre, com a favorita (Cool Rock) sempre por último (Trilha.embaralhar; regra do
     dono, 06/Nov/2026: com internet, todas as gravadas; a favorita, que é a de sem internet, nunca é a primeira).
@@ -62,7 +63,14 @@
     '.r-bolinhas i{display:block;width:12px;height:5px;border-radius:3px;background:#3a2f73}' +
     '.r-bolinhas button[aria-current] i{background:#c6ff3d;width:18px}' +
     /* as bolinhas só aparecem onde cabem com alvo de toque de 24 px; no celular, ⏮ ⏭ trocam */
-    '@media (min-width:34rem){.r-disco{display:block}.r-bolinhas{display:flex}}' +
+    '@media (min-width:36rem){.r-disco{display:block}.r-bolinhas{display:flex}}' +
+    // 📺 Clipe (dono, 19/Nov/2026): abre o telão com os bichinhos dançando a música que está tocando (clipe.js)
+    '.radio .r-clipe{width:auto;min-width:44px;height:44px;border-radius:999px;padding:0 .9rem 0 .75rem;gap:.35rem;font-weight:800;font-size:.92rem;' +
+    'background:linear-gradient(135deg,rgba(62,232,255,.24),rgba(198,255,61,.14));border:1.5px solid #3ee8ff;box-shadow:0 0 12px rgba(62,232,255,.28);white-space:nowrap}' +
+    '.r-clipe .r-tv{font-size:1.15rem;line-height:1}' +
+    // até 48rem, o botão fica compacto (📺 em cima, o nome embaixo) para as bolinhas das músicas continuarem cabendo
+    '@media (max-width:47.99rem){.radio .r-clipe{flex-direction:column;gap:1px;padding:0 .25rem;min-width:54px;max-width:62px;font-size:.62rem;line-height:1.05;white-space:normal;text-align:center}.r-clipe .r-tv{font-size:1.05rem}}' +
+    '@media (min-width:48rem){.radio{max-width:42rem}}' +
     '@media (prefers-reduced-motion:reduce){.radio.tocando .r-disco{animation:none}.r-titulo{transition:none}}';
   var estilo = document.createElement('style');
   estilo.textContent = css;
@@ -86,7 +94,9 @@
     '<button type="button" class="r-play" aria-label="' + T('Tocar', 'Play', 'Reproducir') + '">' + ICONE.play + '</button>' +
     '<button type="button" class="r-prox" aria-label="' + T('Próxima música', 'Next song', 'Siguiente canción') + '">' + ICONE.prox + '</button>' +
     '<div class="r-info"><div class="r-titulo" aria-live="polite"></div>' +
-    '<div class="r-autor"></div><div class="r-bolinhas">' + bolinhas + '</div></div>';
+    '<div class="r-autor"></div><div class="r-bolinhas">' + bolinhas + '</div></div>' +
+    '<button type="button" class="r-clipe" aria-label="' + T('Clipe: os bichinhos dançam a música', 'Music video: the critters dance to the song', 'Videoclip: los bichitos bailan la canción') + '">' +
+    '<span class="r-tv" aria-hidden="true">📺</span><span><span class="pt">Clipe</span><span class="en">Music video</span><span class="es">Videoclip</span></span></button>';
   document.body.appendChild(barra);
 
   var bPlay = barra.querySelector('.r-play');
@@ -134,6 +144,12 @@
     if (!comecou) { lembrarPausa(false); tocar(atual); return; }
     if (audio.paused) { lembrarPausa(false); var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
     else { lembrarPausa(true); audio.pause(); }
+  });
+  // 📺 Clipe: com a rádio parada, começa a tocar; o telão (clipe.js) dança a música atual e mostra o nome dela
+  barra.querySelector('.r-clipe').addEventListener('click', function () {
+    if (audio.paused) bPlay.click();
+    if (window.BolinhoClipe) window.BolinhoClipe.abrir({ cenas: 'radio', audio: audio,
+      musica: function () { return comecou ? { t: MUSICAS[atual].t, au: MUSICAS[atual].au } : null; } });
   });
   barra.querySelector('.r-ant').addEventListener('click', function () { lembrarPausa(false); tocar(atual - 1); });
   barra.querySelector('.r-prox').addEventListener('click', function () { lembrarPausa(false); tocar(atual + 1); });

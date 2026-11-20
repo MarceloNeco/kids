@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, criarPremio, animar } from './premios3d.js';
 import { montarMaquina } from './cenario3d.js';
 
-const APP_VERSION = '0.4.6', APP_DATA = ['15/Nov/2026', 'Nov/15/2026', '15/nov/2026'];
+const APP_VERSION = '0.4.7', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -110,6 +110,14 @@ document.querySelectorAll('.bt-tela').forEach((b) => b.addEventListener('click',
   } catch (e) { /* o navegador recusou */ }
 }));
 ['fullscreenchange', 'webkitfullscreenchange'].forEach((ev) => document.addEventListener(ev, pintarTela));
+// 📺 Clipe (dono, 19/Nov/2026): as pelúcias dançam a música do jogo num telão (../clipe.js). Música parada: começa a tocar.
+$('btClipe').addEventListener('click', () => {
+  if (!window.BolinhoClipe) return;
+  Som.toque();
+  const T = window.Trilha, bt = document.querySelector('.trilha .tr-som');
+  if (bt && !musicaTocando()) bt.click();
+  window.BolinhoClipe.abrir({ cenas: 'garra', audio: T && T._audio, musica: () => T && T.musica && T.musica() });
+});
 $('btAjuda').addEventListener('click', () => { const a = $('ajuda'); a.hidden = !a.hidden; $('btAjuda').setAttribute('aria-expanded', String(!a.hidden)); });
 function telaCheia() {   // tela cheia no celular e no tablet (no botão de começar, como os outros jogos)
   try {

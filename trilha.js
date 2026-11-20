@@ -9,6 +9,7 @@
        au: 'Kevin MacLeod', lic: 'CC BY 4.0' }, ... ], creditos: 'CREDITOS.md' });
      Trilha.volume(0.3)         // abaixa a música enquanto acontece outra coisa (null volta ao normal)
      Trilha.tocando()           // true ou false
+     Trilha.musica()            // a música que toca agora: { t, au, lic } (o 📺 Clipe mostra o nome)
 
    Como funciona:
    - Toca uma música depois da outra, sem parar, em ordem sorteada (Trilha.embaralhar): a favorita do jogo (a que
@@ -242,10 +243,11 @@
 
     T.volume = function (v) { volFator = v == null ? 1 : v; audio.volume = Math.max(0, Math.min(1, volBase * volFator)); };
     T.tocando = function () { return !audio.paused; };
+    T.musica = function () { return naFavorita ? favoritaDaLista() : lista[atual]; };   // { t, au, lic } da que toca (📺 Clipe)
     T.parar = function () { audio.pause(); };
     T._audio = audio;
     return T;
   };
-  T.volume = function () {}; T.tocando = function () { return false; }; T.parar = function () {};
+  T.volume = function () {}; T.tocando = function () { return false; }; T.parar = function () {}; T.musica = function () { return null; };
   if (typeof module !== 'undefined' && module.exports) module.exports = T; else raiz.Trilha = T;
 })(typeof self !== 'undefined' ? self : this);
