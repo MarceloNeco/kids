@@ -83,7 +83,6 @@ ul { list-style: none; }
 .boneca { position: absolute; inset: 0; cursor: grab; touch-action: none; }
 .giro { position: absolute; top: 6px; right: 6px; display: flex; gap: 6px; z-index: 2; }
 .giro .mini { background: rgba(42, 17, 70, .78); font-size: 1.3rem; }
-.dica-giro { position: absolute; left: 50%; bottom: 8px; z-index: 3; max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; transform: translateX(-50%); background: rgba(42, 17, 70, .85); border-radius: 999px; padding: 4px 12px; font-size: .9rem; white-space: nowrap; pointer-events: none; }
 .tirar-linha { display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
 .tirar-linha:empty, .tirar-linha:not(:has(button:not([hidden]))) { display: none; }
 .janela-caixa video { max-width: 100%; max-height: 52vh; margin: 0 auto; border-radius: 14px; }
@@ -435,7 +434,6 @@ body { background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 55%) fixed; 
 dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .pp-ia-caixa { color: var(--text); }
 .pp-ia-caixa input { border-color: var(--borda); background: #fff; color: var(--text); }
-.dica-giro { background: rgba(255, 255, 255, .92); color: var(--text); box-shadow: 0 2px 8px rgba(61, 35, 82, .12); }
 /* abertura e menu: a camada da personagem (o movimento vem do animador.js; a câmera chega no rosto com transform) */
 .ab-camada { position: absolute; inset: 0; opacity: 0; transition: opacity .8s ease-in-out; }
 .ab-camada.ativa { opacity: 1; }

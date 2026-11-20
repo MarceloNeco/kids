@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.1';
+  var APP_VERSION = '0.9.2';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -192,8 +192,8 @@
     if (d) { estado = baseDesafio(d); grupoAtual = 'roupa'; Som.proxima(); }
     else { estado = livre; grupoAtual = grupoAtual || 'eu'; }
     dicasAntes = d ? V.avaliar(estado, d).dicas : [];
-    vista = INTEIRA.slice(); zoomLigado = false; angulo = 0; vistaN = 0; animGiro++;
-    ir('estudio'); setTimeout(mostrarDicaGiro, 600); ponte('visual');
+    vista = INTEIRA.slice(); zoomLigado = false;
+    ir('estudio'); ponte('visual');
   }
   function mudar(novo, catId) {
     if (V.iguais(novo, estado)) return;
@@ -202,7 +202,6 @@
   function aposMudar() {
     if (!modo) { livre = estado; gravar('purpurinaNova.atual', estado); }
     ponte('visual');
-    if (angulo) { girarPara(0, 300); }
     desenharBoneca(); desenharOpcoes(); desenharDicas(true);
     $('btDesfazer').disabled = !hist.tem();
   }
@@ -224,7 +223,6 @@
     el.innerHTML = B.svg(estado, { id: 'palco', anim: viva, area: vista, angulo: angulo, realce: !mexendo, passos: viva, rig: viva, piscadinha: viva && Date.now() < piscaAte });
     if (viva && !animEstudio) { animEstudio = PurpurinaAnim.criar(el, { poses: POSES_INTEIRA, segura: 3600 }); posesVista = POSES_INTEIRA; movimentoDaVista(); }
     if (!viva && animEstudio) { animEstudio.parar(); animEstudio = null; }
-    $('btFrente').hidden = !angulo;
     if (angulo !== angMandado) { angMandado = angulo; ponte('giro'); }
     el.setAttribute('aria-label', V.resumo(estado, lingua));
   }
@@ -514,29 +512,9 @@
   /* ---------- vistas da personagem (Nova Era, 19/Nov/2026: sem giro de 360°) ----------
      O desenho agora é de ilustração, bonito de frente; ela não dá mais a volta inteira. Um toque nela (ou no 👀) mostra
      a próxima vista: três-quartos e de lado, para um lado e para o outro, e volta de frente. O 🙂 volta de frente. */
-  var VISTAS = [0, 28, 45, -28, -45];
-  var angulo = 0, animGiro = 0, angMandado = 0, girando = false, vistaN = 0;
-  function girarPara(alvo, dur) {
-    var id = ++animGiro, de = angulo > 180 ? angulo - 360 : angulo, ini = performance.now(), dif = alvo - de;
-    girando = true;
-    (function passo(agora) {
-      if (id !== animGiro) { girando = false; return; }
-      var k = Math.min(1, (agora - ini) / dur);
-      angulo = de + dif * (1 - Math.pow(1 - k, 3)); if (k >= 1) { angulo = alvo; girando = false; }
-      if (!alvo && k >= 1) vistaN = 0;
-      desenharBoneca(); if (k < 1) requestAnimationFrame(passo);
-    })(ini);
-  }
-  function proximaVista() { Som.tocar('clique'); vistaN = (vistaN + 1) % VISTAS.length; girarPara(VISTAS[vistaN], 350); }
-  var bonecaEl = $('boneca');
-  bonecaEl.addEventListener('click', proximaVista);
-  $('btGirar').addEventListener('click', proximaVista);
-  $('btFrente').addEventListener('click', function () { Som.tocar('clique'); girarPara(0, 350); });
-  var dicaGiroMostrada = false;
-  function mostrarDicaGiro() {
-    if (dicaGiroMostrada) return; dicaGiroMostrada = true;
-    var d = $('dicaGiro'); d.hidden = false; setTimeout(function () { d.hidden = true; }, 3500);
-  }
+  /* sem vistas de lado (dono, 20/Nov/2026: "não precisa olhar pro lado, porque não será 3D"): ela fica sempre de frente;
+     o ângulo continua 0 (o desenho e a TV ainda sabem desenhar de lado, mas o jogo não usa) */
+  var angulo = 0, angMandado = 0, girando = false;
 
   // ---------- botões do estúdio ----------
   $('btDesfazer').addEventListener('click', function () {
@@ -812,7 +790,7 @@
   }
   function fazerVideo(andamento) {
     var Wv = 540, Hv = 972, faixa = 76, QUADROS = 48, e = V.copiar(estado), imgs = [], d = desafioAtual();
-    function carregar(i) { return imagemDe(B.svg(e, { id: 'v' + i, fundo: false, realce: false, largura: Wv, altura: Hv, angulo: Math.round(40 * Math.sin(i * 2 * Math.PI / QUADROS)) })); }
+    function carregar(i) { return imagemDe(B.svg(e, { id: 'v' + i, fundo: false, realce: false, largura: Wv, altura: Hv, poseRig: (function (q) { return { oE: 8, cE: 14, oD: 8 + 42 * q, cD: 12 + 108 * q }; })((1 - Math.cos(i * 2 * Math.PI / QUADROS)) / 2) })); }
     var fundoImg = null, cadeia = imagemDe(B.svg(e, { id: 'vF', soFundo: true, largura: Wv, altura: Hv })).then(function (img) { fundoImg = img; });
     for (var i = 0; i < QUADROS; i++) (function (k) { cadeia = cadeia.then(function () { return carregar(k); }).then(function (img) { imgs[k] = img; andamento(Math.round((k + 1) / QUADROS * 70)); }); })(i);
     return cadeia.then(function () {
@@ -964,20 +942,7 @@
         camera.style.transformOrigin = px + 'px ' + py + 'px';
         camera.style.transform = 'translate(' + Math.round(rc.width / 2 - px) + 'px, ' + Math.round(rc.height * 0.42 - py) + 'px) scale(1.7)';
       } else camera.style.transform = '';
-      var ANG_TAKE = { tresE: -28, tresD: 28, ladoE: -45, ladoD: 45 };
-      if (ANG_TAKE[take]) {
-        semPose();
-        pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: !CALMO, angulo: ANG_TAKE[take], realce: false, sorriso: true });
-      } else posar(sortear());
-    }
-    function girar(de, para, ms, fim) {
-      var ini = performance.now();
-      (function passo(agora) {
-        if (!vale()) return;
-        var k = Math.min(1, (agora - ini) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-        pas.innerHTML = B.svg(estado, { id: 'desfile', fundo: false, anim: false, angulo: de + (para - de) * e, realce: false, sorriso: true });
-        if (k < 1) requestAnimationFrame(passo); else if (fim) fim();
-      })(ini);
+      posar(sortear());
     }
     var titulo = $('desfileTitulo'), jur = $('jurados');
     if (CALMO) { lugar(1); posar(POSES_DESFILE[0]); entrarTurma(); }
@@ -998,8 +963,8 @@
         else {
           // chegou na frente (dono, 14/Nov/2026, com fotos de referência): para numa pose sorteada — menina: mão na
           // cintura, as duas mãos na cintura, mão no cabelo ou tchauzinho; menino: braços cruzados ou mãos nos bolsos — com a
-          // "inclinadinha"; olha para um lado e para o outro; vira de três-quartos para um lado e para o outro
-          // (Nova Era: sem volta inteira) e fica trocando de pose, sorteada, de tempos em tempos
+          // "inclinadinha"; olha para um lado e para o outro e fica trocando de pose, sorteada, de tempos em tempos
+          // (Nova Era: sempre de frente, sem vistas de lado)
           // chegou: para numa pose de modelo, sorrindo (o esqueleto sai do andar devagar, sem pulo)
           pose({ sorriso: true, rig: true }); if (animD) animD.modo(''); posar(sortear());
           titulo.classList.remove('esperando'); jur.classList.remove('esperando');
@@ -1007,18 +972,16 @@
           depois(1600, function () { if (animD) animD.trocar('olhaE'); depois(1400, function () { if (animD) animD.trocar('olhaD'); depois(1400, function () { posar(poseAtual); depois(900, function () {
             depois(500, function () {
               semPose();
-              girar(0, -45, 520, function () { depois(600, function () { girar(-45, 45, 900, function () { depois(600, function () { girar(45, 0, 520, function () {
+              (function () {
                   if (!vale()) return;
                   posar(sortear()); entrarTurma();
-                  // takes: de 3 em 3 s um corte — corpo inteiro numa pose nova, de perto, de três-quartos ou de lado,
-                  // para um lado e para o outro, sem repetir o take de antes
+                  // takes: de 3 em 3 s um corte — corpo inteiro numa pose nova ou de perto (sempre de frente)
                   var takeAntes = 'inteira';
                   (function trocar() { depois(3200, function () {
-                    var opcoes = ['inteira', 'perto', 'tresE', 'tresD', 'ladoE', 'ladoD'].filter(function (x) { return x !== takeAntes; });
+                    var opcoes = ['inteira', 'perto', 'inteira'].filter(function (x) { return x !== takeAntes; });
                     cortar(takeAntes = opcoes[Math.floor(Math.random() * opcoes.length)]); trocar();
                   }); })();
-                });
-              }); }); }); });
+                })();
             });
           }); }); }); });
         }
