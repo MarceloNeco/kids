@@ -1089,6 +1089,420 @@
       l(circ(650, 696, 12));
     });
 
+  /* ========== Turminha: um personagem sozinho na folha, de roupinha (pedido do dono, 20/Nov/2026) ==========
+     Jeito "chibi": cabeça grande, olhos grandes com brilho, bochechas, corpo pequeno, contorno grosso e áreas grandes.
+     Personagens originais, criados aqui. A cabeça fica perto de (500, 360) e os pés perto de y = 930. */
+  // olhão: a bola do olho (cor nO) e o brilho grande (cor nB) por cima; o brilho pequeno e os cílios são só risco
+  function olhao(cx, cy, rx, ry, nO, nB, cilios) {
+    var F = [{ d: elip(cx, cy, rx, ry), n: nO }, { d: circ(cx - 0.3 * rx, cy - 0.32 * ry, Math.max(23, 0.5 * rx)), n: nB }];
+    var L = [circ(cx + 0.38 * rx, cy + 0.42 * ry, Math.max(5, 0.13 * rx))];
+    if (cilios) { // cílios só do lado de fora (cilios = -1 no olho da esquerda, 1 no da direita)
+      var s = cilios, bx = cx + s * 0.8 * rx, by = cy - 0.6 * ry;
+      L.push(curva([[bx, by], [bx + s * 0.24 * rx, by - 0.14 * ry], [bx + s * 0.44 * rx, by - 0.16 * ry]]));
+      bx = cx + s * 0.96 * rx; by = cy - 0.26 * ry;
+      L.push(curva([[bx, by], [bx + s * 0.22 * rx, by - 0.04 * ry], [bx + s * 0.4 * rx, by + 0.02 * ry]]));
+    }
+    return { f: F, l: L };
+  }
+  /* rostinho: dois olhões, bochechas e boca. o: { x, y (centro da cabeça), dx (meia distância entre os olhos),
+     ey (altura dos olhos), rx, ry (tamanho do olho), bochecha: [dx, y, rx, ry], cilios, boca: 'sorriso' | 'gato' | 'aberta' | null } */
+  function rostinho(o, c) {
+    var F = [], L = [], s;
+    function poe(b) { F.push.apply(F, b.f); L.push.apply(L, b.l); }
+    for (s = -1; s <= 1; s += 2) poe(olhao(o.x + s * o.dx, o.ey, o.rx, o.ry, c.olho, c.brilho, o.cilios ? s : 0));
+    if (o.bochecha && c.bochecha) for (s = -1; s <= 1; s += 2) F.push({ d: elip(o.x + s * o.bochecha[0], o.bochecha[1], o.bochecha[2], o.bochecha[3]), n: c.bochecha });
+    var by = o.boca_y;
+    if (o.boca === 'gato') L.push('M ' + pt(o.x - 30, by - 4) + ' Q ' + pt(o.x - 15, by + 16) + ' ' + pt(o.x, by) + ' Q ' + pt(o.x + 15, by + 16) + ' ' + pt(o.x + 30, by - 4));
+    else if (o.boca === 'sorriso') L.push('M ' + pt(o.x - 24, by) + ' Q ' + pt(o.x, by + 22) + ' ' + pt(o.x + 24, by));
+    return { f: F, l: L };
+  }
+
+  // nuvem fofa fechada (lã de ovelha, touca): n calombos em volta de uma elipse
+  function fofo(cx, cy, rx, ry, n) {
+    var p = [], i, s;
+    for (i = 0; i < n; i++) { var a = (i / n * 360 - 90) * Math.PI / 180; p.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); }
+    s = 'M ' + pt(p[0][0], p[0][1]);
+    for (i = 0; i < n; i++) { var b = p[(i + 1) % n], r = hyp(b[0] - p[i][0], b[1] - p[i][1]) * 0.62; s += ' A ' + q(r) + ' ' + q(r) + ' 0 0 1 ' + pt(b[0], b[1]); }
+    return s + ' Z';
+  }
+  // saia de tule: cintura em (cx, cy), roda com meia largura w e altura h, barra de n ondinhas
+  function tutu(cx, cy, w, h, n) {
+    var s = 'M ' + pt(cx - w * 0.42, cy - h * 0.1) + ' Q ' + pt(cx, cy - h * 0.3) + ' ' + pt(cx + w * 0.42, cy - h * 0.1) + ' L ' + pt(cx + w, cy + h), i, passo = 2 * w / n;
+    for (i = 1; i <= n; i++) s += ' A ' + q(passo * 0.6) + ' ' + q(passo * 0.6) + ' 0 0 1 ' + pt(cx + w - i * passo, cy + h);
+    return s + ' Z';
+  }
+
+  // ===== Gatinha de jardineira =====
+  pagina('turma-gatinha', 'Gatinha de jardineira', 'Kitty in overalls', 'Gatita con peto', 'turminha',
+    ['#fff7fb', '#ffd3a1', '#fff4e4', '#4a3448', '#ffffff', '#ff9fb4', '#ffd84d', '#86b8ff', '#ff6f9f'],
+    [v('Algodão-doce', 'Cotton candy', 'Algodón de azúcar', ['#f4f0ff', '#ffffff', '#ffe9f2', '#5a3a6a', '#ffffff', '#ffb3c7', '#b8f0d9', '#c9a7ff', '#ff8fc8']),
+      v('Cinzinha', 'Little grey', 'Grisita', ['#f2fbff', '#c9ccd6', '#f4f4f8', '#3a3a4a', '#ffffff', '#ffa3b5', '#ffe08a', '#ff9f6b', '#5aa9e6'])],
+    function (f, l, poe) {
+      var x = 500, y = 360;
+      f(ret(0, 0, 1000, 1000), 1);
+      // rabinho atrás de tudo
+      f(cobra([[590, 780, 24], [680, 790, 24], [745, 735, 24], [752, 655, 24], [715, 615, 24]]), 2);
+      // perninhas e sapatinhos
+      f(elip(442, 872, 72, 42), 9); f(elip(558, 872, 72, 42), 9);
+      l(curva([[392, 880], [442, 864], [492, 880]])); l(curva([[508, 880], [558, 864], [608, 880]]));
+      // blusa e jardineira (alças e botões)
+      f(suave([[500, 540], [585, 552], [628, 640], [642, 760], [500, 792], [358, 760], [372, 640], [415, 552]]), 5);
+      f(poliR([[426, 612], [574, 612], [582, 698], [640, 712], [656, 832], [512, 838], [500, 814], [488, 838], [344, 832], [360, 712], [418, 698]], 24), 8);
+      f(pilula(446, 630, 448, 545, 24), 8); f(pilula(554, 630, 552, 545, 24), 8);
+      f(circ(442, 632, 23), 7); f(circ(558, 632, 23), 7);
+      f(coracao(500, 668, 38), 9);
+      l(curva([[372, 712], [500, 722], [628, 712]]));
+      // bracinhos: um ao lado do corpo, o outro dando tchau
+      f(elip(378, 590, 54, 46), 5); f(elip(622, 590, 54, 46), 5);
+      f(pilula(368, 628, 346, 716, 34), 2);
+      f(pilula(636, 604, 690, 520, 34), 2);
+      l(reta([[333, 712], [340, 734]])); l(reta([[356, 718], [360, 740]]));
+      l(curva([[722, 470], [742, 450], [748, 425]])); l(curva([[738, 516], [765, 504], [778, 482]]));
+      // orelhas (o miolo claro por cima) e a cabeça
+      for (var s = -1; s <= 1; s += 2) {
+        f(poliR([[x + s * 210, y - 20], [x + s * 190, y - 276], [x + s * 20, y - 182]], 30), 2);
+        if (s < 0) l(curva([[x + s * 178, y - 140], [x + s * 172, y - 232], [x + s * 92, y - 186]]));
+      }
+      f(elip(x, y, 216, 190), 2);
+      f(elip(x, y + 112, 64, 42), 3);
+      poe(rostinho({ x: x, ey: y + 30, dx: 94, rx: 42, ry: 52, cilios: true, bochecha: [150, y + 104, 36, 23], boca: 'gato', boca_y: y + 110 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x, y + 88, 13, 9));
+      for (s = -1; s <= 1; s += 2) { l(reta([[x + s * 196, y + 70], [x + s * 250, y + 58]])); l(reta([[x + s * 196, y + 96], [x + s * 250, y + 104]])); }
+      // laço na orelha
+      f(poliR([[x + 112, y - 178], [x + 22, y - 236], [x + 30, y - 132]], 26), 9);
+      f(poliR([[x + 112, y - 178], [x + 200, y - 240], [x + 206, y - 132]], 26), 9);
+      f(circ(x + 112, y - 180, 28), 7);
+      l(curva([[x + 60, y - 188], [x + 72, y - 178], [x + 80, y - 160]])); l(curva([[x + 164, y - 196], [x + 152, y - 178], [x + 148, y - 160]]));
+    });
+
+  // ===== Ovelhinha de vestido e tiara =====
+  pagina('turma-ovelhinha', 'Ovelhinha de vestido', 'Little lamb in a dress', 'Ovejita con vestido', 'turminha',
+    ['#f6fbff', '#ffffff', '#ffe2c8', '#3d2f4c', '#ffffff', '#ff9fb0', '#c9a7ff', '#fff2a8', '#ffcf3f', '#ff6f9f', '#8f7ae6'],
+    [v('Primavera', 'Spring', 'Primavera', ['#f3fff0', '#fffdf5', '#ffe9d6', '#3a3a2a', '#ffffff', '#ffa8a8', '#9fe0a8', '#ffffff', '#ffd84d', '#ff8fb8', '#ff9f43']),
+      v('Rosinha', 'Pink', 'Rosita', ['#fff3f8', '#fff8fc', '#f7d9c4', '#4a2f45', '#ffffff', '#ff8fb1', '#ffb3d1', '#d7f3ff', '#c9a7ff', '#7fd1ff', '#ff6f9f'])],
+    function (f, l, poe) {
+      var x = 500, y = 360;
+      f(ret(0, 0, 1000, 1000), 1);
+      // pernas e sapatinhos de boneca
+      f(elip(448, 862, 62, 36), 11); f(elip(552, 862, 62, 36), 11);
+      l(reta([[414, 850], [486, 846]])); l(reta([[514, 846], [586, 850]]));
+      // vestido rodado com faixa, lacinho e barra
+      f(poliR([[425, 548], [575, 548], [690, 836], [310, 836]], 34), 7);
+      f(poliR([[331, 772], [669, 772], [690, 836], [310, 836]], 20), 8);
+      f(poliR([[398, 634], [602, 634], [619, 700], [381, 700]], 12), 8);
+      f(poliR([[500, 665], [438, 630], [440, 702]], 18), 10); f(poliR([[500, 665], [562, 630], [560, 702]], 18), 10);
+      f(circ(500, 665, 22), 10);
+      // mangas bufantes e bracinhos
+      f(elip(404, 586, 56, 46), 7); f(elip(596, 586, 56, 46), 7);
+      f(pilula(390, 620, 352, 720, 32), 3); f(pilula(610, 620, 648, 720, 32), 3);
+      // cabeça de lã, orelhas caídas e rostinho
+      f(fofo(x, y - 30, 248, 222, 14), 2);
+      f(elipR(x - 206, y + 46, 100, 46, 30), 3); f(elipR(x + 206, y + 46, 100, 46, -30), 3);
+      f(elip(x, y + 50, 172, 150), 3);
+      f(fofo(x, y - 78, 132, 62, 7), 2);
+      poe(rostinho({ x: x, ey: y + 64, dx: 78, rx: 40, ry: 50, cilios: true, bochecha: [128, y + 128, 32, 21], boca: 'sorriso', boca_y: y + 140 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x, y + 116, 12, 9));
+      // tiara de coroinha
+      f(poliR([[x - 92, y - 196], [x - 112, y - 286], [x - 50, y - 236], [x, y - 306], [x + 50, y - 236], [x + 112, y - 286], [x + 92, y - 196]], 14), 9);
+      f(circ(x, y - 228, 22), 10);
+      l(brilhinho(170, 180, 18)); l(brilhinho(830, 230, 14)); l(brilhinho(860, 700, 16));
+    });
+
+  // ===== Ursinho de capa de chuva =====
+  pagina('turma-ursinho', 'Ursinho de capa de chuva', 'Teddy in a raincoat', 'Osito con chubasquero', 'turminha',
+    ['#f2f8ff', '#c99a6e', '#f6dfc4', '#3b2a26', '#ffffff', '#ff9f9f', '#ffd23f', '#ff6b6b', '#9fd3ff', '#4aa3df'],
+    [v('Verdinho', 'Green', 'Verde', ['#f3fff4', '#a8794f', '#f2d6b8', '#2f2a26', '#ffffff', '#ffa3a3', '#7ed6a5', '#ffd23f', '#bfe6ff', '#ff8f70']),
+      v('Ursinho polar', 'Polar bear', 'Oso polar', ['#eef6ff', '#ffffff', '#eef2f8', '#2a3140', '#ffffff', '#ffb3c6', '#ff8fb8', '#7f8cff', '#c9e9ff', '#ffd84d'])],
+    function (f, l, poe) {
+      var x = 500, y = 360;
+      f(ret(0, 0, 1000, 1000), 1);
+      // poça e botas de chuva
+      f(elip(500, 912, 260, 56), 9);
+      l(curva([[300, 920], [340, 935], [380, 928]])); l(curva([[640, 900], [680, 912], [720, 905]]));
+      f(poliR([[410, 790], [492, 790], [494, 915], [366, 915], [366, 872], [410, 858]], 22), 8);
+      f(poliR([[508, 790], [590, 790], [590, 858], [634, 872], [634, 915], [506, 915]], 22), 8);
+      // capa de chuva com botões e bolsos
+      f(poliR([[420, 540], [580, 540], [668, 820], [332, 820]], 36), 7);
+      l(reta([[500, 560], [500, 820]]));
+      f(ret(372, 712, 92, 64, 16), 7); f(ret(536, 712, 92, 64, 16), 7);
+      f(circ(470, 610, 21), 10); f(circ(470, 680, 21), 10);
+      // capuz com orelhinhas
+      f(circ(x - 168, y - 196, 56), 7); f(circ(x + 168, y - 196, 56), 7);
+      f(elip(x, y - 10, 252, 228), 7);
+      l(curva([[x - 120, y - 214], [x, y - 238], [x + 120, y - 214]]));
+      // bracinhos: um para baixo, o outro aparando a chuva
+      f(pilula(420, 590, 368, 700, 38), 7); f(circ(358, 718, 32), 2);
+      f(pilula(590, 590, 676, 500, 38), 7); f(circ(692, 484, 32), 2);
+      // rosto
+      f(elip(x, y + 30, 198, 170), 2);
+      f(elip(x, y + 108, 66, 46), 3);
+      poe(rostinho({ x: x, ey: y + 36, dx: 90, rx: 38, ry: 47, bochecha: [142, y + 100, 32, 21], boca: 'gato', boca_y: y + 118 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x, y + 94, 16, 11));
+      // gotas
+      f(gota(780, 330, 26), 9); f(gota(860, 200, 22), 9); f(gota(170, 250, 24), 9); f(gota(120, 560, 22), 9);
+    });
+
+  // ===== Coelhinha bailarina =====
+  pagina('turma-bailarina', 'Coelhinha bailarina', 'Ballerina bunny', 'Conejita bailarina', 'turminha',
+    ['#fff8f3', '#ffffff', '#ffc2d6', '#3a2a40', '#ffffff', '#ff9fb0', '#ff8fc0', '#ffe3f0', '#ff5f97', '#b8a3ff', '#ffd84d'],
+    [v('Lavanda', 'Lavender', 'Lavanda', ['#f7f3ff', '#ffffff', '#e0ccff', '#352a4a', '#ffffff', '#ffb3c6', '#a98bff', '#f1eaff', '#7f62e0', '#ffb3d1', '#ffe08a']),
+      v('Menta', 'Mint', 'Menta', ['#f0fffa', '#f7efe6', '#ffd0c2', '#3a3030', '#ffffff', '#ff9f9f', '#6fd6b8', '#d8fff1', '#ff7a8a', '#ffd166', '#ff8fb8'])],
+    function (f, l, poe) {
+      var x = 500, y = 380;
+      f(ret(0, 0, 1000, 1000), 1);
+      // perninhas na ponta do pé, com sapatilhas
+      f(pilula(470, 770, 456, 868, 28), 2); f(pilula(530, 770, 548, 868, 28), 2);
+      f(elipR(450, 888, 30, 42, 10), 9); f(elipR(554, 888, 30, 42, -10), 9);
+      l(reta([[438, 852], [470, 828]])); l(reta([[440, 828], [474, 852]])); l(reta([[532, 852], [566, 828]])); l(reta([[530, 828], [562, 852]]));
+      // collant, saia de tule em duas camadas
+      f(suave([[500, 556], [566, 566], [592, 640], [574, 712], [426, 712], [408, 640], [434, 566]]), 7);
+      f(tutu(500, 690, 250, 108, 7), 3);
+      f(tutu(500, 690, 200, 70, 6), 8);
+      // bracinhos abertos, como quem dança
+      f(cobra([[446, 596, 28], [380, 610, 27], [318, 576, 26], [282, 520, 26]]), 2);
+      f(cobra([[554, 596, 28], [620, 610, 27], [682, 576, 26], [718, 520, 26]]), 2);
+      // orelhas compridas e a cabeça
+      f(elipR(x - 80, y - 236, 116, 62, 100), 2); f(elipR(x + 80, y - 236, 116, 62, 80), 2);
+      f(elipR(x - 77, y - 218, 76, 26, 100), 3); f(elipR(x + 77, y - 218, 76, 26, 80), 3);
+      f(elip(x, y, 206, 180), 2);
+      poe(rostinho({ x: x, ey: y + 30, dx: 88, rx: 40, ry: 50, cilios: true, bochecha: [140, y + 96, 32, 21], boca: 'gato', boca_y: y + 106 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x, y + 84, 13, 9));
+      // florzinha na orelha
+      f(flor(x + 132, y - 150, 72), 10); f(circ(x + 132, y - 150, 24), 11);
+      l(brilhinho(170, 200, 16)); l(brilhinho(840, 260, 18)); l(brilhinho(800, 760, 14)); l(brilhinho(190, 760, 14));
+    });
+
+  // ===== Dinossaurinho de moletom =====
+  pagina('turma-dino', 'Dinossaurinho de moletom', 'Little dino in a hoodie', 'Dinosaurito con sudadera', 'turminha',
+    ['#f4fff6', '#8fdc9c', '#eaffd9', '#2f3a2f', '#ffffff', '#ff9fa8', '#ffb347', '#6ec1ff', '#ff6b6b', '#556ee6'],
+    [v('Lilás', 'Lilac', 'Lila', ['#faf5ff', '#c9a7ff', '#f3eaff', '#3a2f4a', '#ffffff', '#ff9fb0', '#ffd166', '#7ad3a8', '#ff8f70', '#ff6f9f']),
+      v('Laranja', 'Orange', 'Naranja', ['#fff8ee', '#ffb36b', '#fff1d6', '#3d2a20', '#ffffff', '#ff8f8f', '#6fc276', '#ffd84d', '#4f8cff', '#8a6a5a'])],
+    function (f, l, poe) {
+      var x = 500, y = 360;
+      f(ret(0, 0, 1000, 1000), 1);
+      // rabo com espinhos
+      f(poliR([[656, 770], [700, 690], [736, 764]], 14), 7); f(poliR([[726, 760], [800, 646], [834, 732]], 14), 7);
+      f(cobra([[590, 790, 62], [690, 800, 48], [780, 768, 34], [846, 708, 22]]), 2);
+      // tênis (sola branca), pernas e bermuda
+      f(ret(370, 870, 150, 60, 26), 5); f(ret(480, 870, 150, 60, 26), 5);
+      f('M 378 890 Q 380 836 446 834 Q 514 836 516 890 Z', 9); f('M 484 890 Q 486 836 554 834 Q 620 836 622 890 Z', 9);
+      l(reta([[430, 852], [450, 868]])); l(reta([[450, 852], [430, 868]])); l(reta([[550, 852], [570, 868]])); l(reta([[570, 852], [550, 868]]));
+      f(poliR([[362, 772], [638, 772], [646, 846], [514, 852], [500, 830], [486, 852], [354, 846]], 20), 10);
+      // moletom com bolso canguru e cordão
+      f(suave([[500, 540], [598, 552], [646, 650], [652, 790], [500, 808], [348, 790], [354, 650], [402, 552]]), 8);
+      f(poliR([[418, 692], [582, 692], [614, 786], [386, 786]], 24), 8);
+      l(reta([[500, 692], [500, 786]]));
+      f(circ(500, 628, 30), 7);
+      l(curva([[468, 548], [466, 590], [462, 626]])); l(curva([[532, 548], [534, 590], [538, 626]]));
+      // capuz atrás do pescoço
+      f(elip(x, y + 196, 168, 54), 8);
+      // bracinhos: um acenando
+      f(pilula(408, 590, 366, 706, 38), 8); f(circ(356, 726, 32), 2);
+      f(pilula(600, 592, 684, 518, 38), 8); f(circ(700, 502, 32), 2);
+      l(curva([[742, 462], [762, 440], [764, 412]])); l(curva([[752, 510], [780, 500], [794, 476]]));
+      // crista de espinhos e a cabeça
+      f(poliR([[x - 56, y - 168], [x, y - 270], [x + 56, y - 168]], 18), 7);
+      f(poliR([[x - 140, y - 140], [x - 100, y - 240], [x - 36, y - 172]], 18), 7);
+      f(poliR([[x + 140, y - 140], [x + 100, y - 240], [x + 36, y - 172]], 18), 7);
+      f(elip(x, y, 222, 186), 2);
+      f(elip(x, y + 118, 92, 46), 3);
+      poe(rostinho({ x: x, ey: y + 22, dx: 96, rx: 40, ry: 50, bochecha: [156, y + 92, 34, 22], boca: 'sorriso', boca_y: y + 120 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x - 26, y + 96, 7, 9)); l(ponto(x + 26, y + 96, 7, 9));
+    });
+
+  // ===== Raposinho de boné e mochila =====
+  pagina('turma-raposinho', 'Raposinho de boné', 'Little fox in a cap', 'Zorrito con gorra', 'turminha',
+    ['#fffaf0', '#ff9a4d', '#fffaf3', '#3a2a24', '#ffffff', '#ff8f8f', '#4fb3ff', '#ffe066', '#6c8cff', '#7ad3a8', '#ff5c5c'],
+    [v('Noite', 'Night', 'Noche', ['#eef1ff', '#c4703c', '#f4ead8', '#2a2430', '#ffffff', '#ffa3a3', '#ff6f9f', '#bfe6ff', '#3d405b', '#ffd23f', '#7a5af5']),
+      v('Raposa do ártico', 'Arctic fox', 'Zorro ártico', ['#f2fbff', '#e8eef5', '#ffffff', '#2f3a4a', '#ffffff', '#ffb3c6', '#ff8f70', '#c9a7ff', '#7fc4ff', '#ffd166', '#5aa9e6'])],
+    function (f, l, poe) {
+      var x = 500, y = 360;
+      f(ret(0, 0, 1000, 1000), 1);
+      // rabo fofo com a ponta branca
+      f(suave([[380, 790], [272, 790], [190, 720], [176, 610], [232, 560], [262, 650], [330, 730]]), 2);
+      f(suave([[182, 640], [176, 590], [214, 548], [244, 566], [246, 620], [214, 652]]), 3);
+      // mochila atrás
+      f(ret(320, 572, 360, 214, 56), 10);
+      // tênis e bermuda
+      f(ret(370, 870, 150, 60, 26), 3); f(ret(480, 870, 150, 60, 26), 3);
+      f('M 378 890 Q 380 836 446 834 Q 514 836 516 890 Z', 11); f('M 484 890 Q 486 836 554 834 Q 620 836 622 890 Z', 11);
+      l(curva([[420, 852], [446, 846], [472, 852]])); l(curva([[528, 852], [554, 846], [580, 852]]));
+      f(poliR([[364, 760], [636, 760], [646, 846], [514, 852], [500, 830], [486, 852], [354, 846]], 20), 9);
+      // camiseta com estrela e as alças da mochila
+      f(suave([[500, 540], [592, 552], [636, 650], [640, 782], [500, 798], [360, 782], [364, 650], [408, 552]]), 8);
+      f(estrela(500, 680, 62, 32, 0), 7);
+      f(pilula(436, 560, 432, 760, 21), 10); f(pilula(564, 560, 568, 760, 21), 10);
+      // bracinhos segurando as alças
+      f(elip(386, 590, 52, 44), 8); f(elip(614, 590, 52, 44), 8);
+      f(pilula(372, 622, 396, 680, 30), 2); f(pilula(628, 622, 604, 680, 30), 2);
+      f(circ(420, 690, 30), 2); f(circ(580, 690, 30), 2);
+      // orelhas, cabeça e máscara branca
+      f(poliR([[x - 180, y - 70], [x - 214, y - 300], [x - 40, y - 180]], 26), 2);
+      f(poliR([[x + 180, y - 70], [x + 214, y - 300], [x + 40, y - 180]], 26), 2);
+      f(suave([[x, y - 186], [x + 150, y - 160], [x + 222, y - 60], [x + 250, y + 70], [x + 150, y + 150], [x, y + 178], [x - 150, y + 150], [x - 250, y + 70], [x - 222, y - 60], [x - 150, y - 160]]), 2);
+      f(suave([[x, y + 50], [x + 90, y + 40], [x + 200, y + 66], [x + 140, y + 136], [x, y + 172], [x - 140, y + 136], [x - 200, y + 66], [x - 90, y + 40]]), 3);
+      // boné com aba para a frente
+      f('M ' + pt(x - 178, y - 104) + ' C ' + pt(x - 170, y - 250) + ' ' + pt(x + 170, y - 250) + ' ' + pt(x + 178, y - 104) + ' Z', 7);
+      f('M ' + pt(x - 186, y - 112) + ' Q ' + pt(x, y + 10) + ' ' + pt(x + 186, y - 112) + ' Q ' + pt(x, y - 80) + ' ' + pt(x - 186, y - 112) + ' Z', 7);
+      f(circ(x, y - 160, 30), 8);
+      f(circ(x, y - 222, 21), 7);
+      poe(rostinho({ x: x, ey: y + 18, dx: 94, rx: 40, ry: 50, bochecha: [150, y + 92, 32, 21], boca: 'gato', boca_y: y + 112 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x, y + 88, 18, 13));
+    });
+
+  // ===== Pandinha astronauta =====
+  pagina('turma-panda', 'Pandinha astronauta', 'Astronaut panda', 'Pandita astronauta', 'turminha',
+    ['#eef1ff', '#ffffff', '#5d5d72', '#26262f', '#ffffff', '#ff9fb0', '#e3e8ff', '#ff8a5c', '#c4e8ff', '#ffd84d', '#7ad3a8'],
+    [v('Rosa', 'Pink', 'Rosa', ['#fff1f7', '#ffffff', '#5a4a5a', '#2a2228', '#ffffff', '#ff8fb1', '#ffe3f0', '#c9a7ff', '#d9f3ff', '#ffd166', '#ff8fc8']),
+      v('Espaço', 'Space', 'Espacio', ['#2b2d63', '#ffffff', '#4a4a5c', '#1f1f2a', '#ffffff', '#ff9fb0', '#cfd8ff', '#ffd23f', '#8fd3ff', '#fff3a3', '#ff6f9f'])],
+    function (f, l, poe) {
+      var x = 500, y = 350;
+      f(ret(0, 0, 1000, 1000), 1);
+      f(estrela(140, 170, 58, 28, 0), 10); f(estrela(870, 150, 48, 24, 12), 10); f(estrela(860, 640, 44, 22, -10), 10);
+      f(lua(150, 720, 66, 56), 10);
+      l(brilhinho(250, 520, 16)); l(brilhinho(780, 420, 14)); l(brilhinho(300, 90, 12));
+      // botas, pernas e traje
+      f(ret(388, 838, 112, 76, 30), 8); f(ret(500, 838, 112, 76, 30), 8);
+      f(pilula(452, 790, 452, 850, 40), 7); f(pilula(548, 790, 548, 850, 40), 7);
+      f(suave([[500, 600], [596, 612], [644, 700], [646, 800], [500, 822], [354, 800], [356, 700], [404, 612]]), 7);
+      f(ret(442, 670, 116, 82, 18), 11);
+      l(circ(472, 712, 12)); l(circ(528, 712, 12));
+      l(reta([[358, 770], [642, 770]]));
+      // capacete de vidro e gola
+      f(circ(x, y - 10, 272), 9);
+      f(ret(x - 140, y + 236, 280, 56, 28), 8);
+      // bracinhos com luvas
+      f(pilula(410, 650, 360, 740, 38), 7); f(circ(352, 758, 34), 8);
+      f(pilula(590, 650, 690, 590, 38), 7); f(circ(708, 578, 34), 8);
+      // orelhas e cabeça dentro do capacete
+      f(circ(x - 150, y - 146, 54), 3); f(circ(x + 150, y - 146, 54), 3);
+      f(elip(x, y, 206, 178), 2);
+      f(elipR(x - 92, y + 28, 74, 84, 20), 3); f(elipR(x + 92, y + 28, 74, 84, -20), 3);
+      poe(rostinho({ x: x, ey: y + 30, dx: 92, rx: 36, ry: 46, bochecha: [150, y + 112, 30, 20], boca: 'gato', boca_y: y + 126 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x, y + 104, 15, 10));
+      l(arco(x, y - 10, 236, 200, 240)); l(arco(x, y - 10, 236, 250, 262));
+    });
+
+  // ===== Porquinha confeiteira =====
+  pagina('turma-porquinha', 'Porquinha confeiteira', 'Little pig baker', 'Cerdita pastelera', 'turminha',
+    ['#fffaf2', '#ffc6d0', '#ff9fb4', '#4a2f3a', '#ffffff', '#ff7f9a', '#9fd8ff', '#c99bf0', '#fff0f6', '#ff4f6d'],
+    [v('Chocolate', 'Chocolate', 'Chocolate', ['#fff6ec', '#f6c9a8', '#e8a07a', '#3d2a20', '#ffffff', '#ff8f8f', '#ffd166', '#8a5a3a', '#c4865a', '#e63946']),
+      v('Pistache', 'Pistachio', 'Pistacho', ['#f4fff2', '#ffd9e2', '#ffb3c6', '#3a3030', '#ffffff', '#ff8fa3', '#b8e986', '#7ad3a8', '#fff3c4', '#ff6f9f'])],
+    function (f, l, poe) {
+      var x = 500, y = 370;
+      f(ret(0, 0, 1000, 1000), 1);
+      // rabinho enroladinho, pernas e sapatinhos
+      l(curva([[636, 760], [680, 760], [690, 728], [664, 716], [654, 740], [690, 770], [716, 760]]));
+      f(elip(448, 868, 62, 36), 8); f(elip(552, 868, 62, 36), 8);
+      l(reta([[414, 856], [486, 852]])); l(reta([[514, 852], [586, 856]]));
+      // vestido e avental com bolso de coração
+      f(poliR([[425, 556], [575, 556], [676, 846], [324, 846]], 34), 7);
+      f(poliR([[436, 612], [564, 612], [570, 676], [608, 690], [624, 800], [376, 800], [392, 690], [430, 676]], 24), 5);
+      f(coracao(500, 778, 36), 10);
+      l(reta([[396, 690], [604, 690]]));
+      // bracinhos segurando o bolinho
+      f(elip(406, 594, 52, 44), 7); f(elip(594, 594, 52, 44), 7);
+      f(pilula(396, 626, 410, 710, 30), 2); f(pilula(604, 626, 590, 710, 30), 2);
+      f(poliR([[426, 668], [574, 668], [552, 742], [448, 742]], 14), 8);
+      l(reta([[470, 674], [476, 738]])); l(reta([[500, 674], [500, 738]])); l(reta([[530, 674], [524, 738]]));
+      f(suave([[416, 676], [430, 630], [470, 606], [500, 590], [530, 606], [570, 630], [584, 676]]), 9);
+      f(circ(500, 584, 24), 10);
+      f(circ(414, 700, 30), 2); f(circ(586, 700, 30), 2);
+      // orelhas, cabeça, focinho
+      f(poliR([[x - 214, y - 50], [x - 250, y - 236], [x - 96, y - 164]], 28), 2);
+      f(poliR([[x + 214, y - 50], [x + 250, y - 236], [x + 96, y - 164]], 28), 2);
+      f(elip(x, y, 212, 182), 2);
+      f(elip(x, y + 92, 72, 48), 3);
+      l(ponto(x - 24, y + 92, 9, 14)); l(ponto(x + 24, y + 92, 9, 14));
+      poe(rostinho({ x: x, ey: y + 6, dx: 100, rx: 40, ry: 50, cilios: true, bochecha: [154, y + 92, 32, 21], boca: 'sorriso', boca_y: y + 146 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      // touca de confeiteira
+      f(suave([[x - 120, y - 150], [x - 176, y - 216], [x - 130, y - 296], [x - 50, y - 300], [x, y - 336], [x + 60, y - 304], [x + 136, y - 300], [x + 178, y - 222], [x + 120, y - 150]]), 5);
+      f(ret(x - 128, y - 196, 256, 66, 26), 5);
+      l(curva([[x - 60, y - 200], [x - 70, y - 250], [x - 50, y - 290]])); l(curva([[x + 60, y - 200], [x + 70, y - 250], [x + 50, y - 290]]));
+    });
+
+  // ===== Patinho marinheiro =====
+  pagina('turma-patinho', 'Patinho marinheiro', 'Little sailor duck', 'Patito marinero', 'turminha',
+    ['#f0faff', '#ffe066', '#ff9f43', '#2f2a3a', '#ffffff', '#ff9fb0', '#ffffff', '#3d7bd9', '#ff5c5c', '#9fd8ff'],
+    [v('Verão', 'Summer', 'Verano', ['#fffbe8', '#fff3b0', '#ff8f5c', '#2f2a3a', '#ffffff', '#ffa3a3', '#ffffff', '#2fb8a0', '#ffb703', '#7fd8f0']),
+      v('Algodão-doce', 'Cotton candy', 'Algodón de azúcar', ['#fff3f8', '#fff9d6', '#ffb07a', '#3a2a40', '#ffffff', '#ff9fc0', '#f7f2ff', '#a98bff', '#ff8fc8', '#c9f0ff'])],
+    function (f, l, poe) {
+      var x = 500, y = 360;
+      f(ret(0, 0, 1000, 1000), 1);
+      // ondinhas e barquinho de papel no chão
+      f(chao([[0, 900], [250, 880], [500, 900], [750, 880], [1000, 900]]), 10);
+      l(curva([[80, 950], [120, 935], [160, 950]])); l(curva([[820, 950], [860, 935], [900, 950]]));
+      f(poliR([[700, 820], [880, 820], [850, 870], [730, 870]], 12), 9);
+      f(poliR([[790, 700], [790, 810], [720, 810]], 10), 7);
+      // patas de pato, bermuda e blusa
+      f(suave([[392, 870], [420, 840], [470, 842], [496, 876], [470, 900], [440, 890], [412, 900]]), 3);
+      f(suave([[504, 876], [530, 842], [580, 840], [608, 870], [588, 900], [560, 890], [530, 900]]), 3);
+      f(poliR([[366, 740], [634, 740], [646, 846], [514, 852], [500, 830], [486, 852], [354, 846]], 20), 8);
+      f(suave([[500, 540], [592, 552], [636, 650], [640, 768], [500, 784], [360, 768], [364, 650], [408, 552]]), 7);
+      l(reta([[372, 730], [628, 730]]));
+      // gola de marinheiro com lenço
+      f(poliR([[378, 548], [622, 548], [646, 626], [500, 700], [354, 626]], 26), 8);
+      f(poliR([[440, 552], [560, 552], [500, 664]], 12), 7);
+      f(poliR([[464, 650], [536, 650], [500, 740]], 12), 9);
+      f(circ(500, 650, 24), 9);
+      // asinhas: uma dando tchau
+      f(elipR(372, 676, 78, 42, 70), 2);
+      f(elipR(654, 556, 78, 42, -40), 2);
+      l(curva([[722, 470], [742, 450], [748, 425]])); l(curva([[742, 518], [770, 506], [782, 484]]));
+      // cabeça e bico
+      f(elip(x, y, 212, 186), 2);
+      poe(rostinho({ x: x, ey: y + 18, dx: 92, rx: 40, ry: 50, bochecha: [152, y + 92, 32, 21] }, { olho: 4, brilho: 5, bochecha: 6 }));
+      f(elip(x, y + 108, 88, 38), 3);
+      l(curva([[x - 70, y + 110], [x, y + 122], [x + 70, y + 110]]));
+      // chapéu de marinheiro
+      f('M ' + pt(x - 110, y - 150) + ' L ' + pt(x - 94, y - 254) + ' Q ' + pt(x, y - 288) + ' ' + pt(x + 94, y - 254) + ' L ' + pt(x + 110, y - 150) + ' Z', 7);
+      f(ret(x - 104, y - 216, 208, 42, 12), 8);
+      f(ret(x - 150, y - 178, 300, 54, 27), 7);
+      l(brilhinho(160, 200, 16)); l(brilhinho(860, 240, 14)); l(brilhinho(170, 640, 14));
+    });
+
+  // ===== Cachorrinha de suéter e cachecol =====
+  pagina('turma-cachorrinha', 'Cachorrinha no frio', 'Puppy in a sweater', 'Perrita abrigada', 'turminha',
+    ['#f2f8ff', '#f0d2a8', '#fff6ea', '#3a2a26', '#ffffff', '#ff9fb0', '#fff3cc', '#ff8fa3', '#62cdb5', '#b07a4f', '#8a94ff'],
+    [v('Neve', 'Snow', 'Nieve', ['#eaf4ff', '#ffffff', '#f2f2f8', '#2a2f3a', '#ffffff', '#ffb3c6', '#ffffff', '#7fb2ff', '#ff6f9f', '#c9ccd6', '#5a6ad8']),
+      v('Outono', 'Autumn', 'Otoño', ['#fff4e6', '#d9a066', '#fff1dc', '#3a2618', '#ffffff', '#ff9f8f', '#fff0c2', '#e07a5f', '#f2b134', '#7a4e2d', '#3f7f6a'])],
+    function (f, l, poe) {
+      var x = 500, y = 360, i;
+      f(ret(0, 0, 1000, 1000), 1);
+      [[150, 180], [860, 220], [120, 560], [880, 600], [780, 860], [200, 860]].forEach(function (p) {
+        for (var k = 0; k < 3; k++) { var a = k * 60 * Math.PI / 180; l(reta([[p[0] - Math.cos(a) * 18, p[1] - Math.sin(a) * 18], [p[0] + Math.cos(a) * 18, p[1] + Math.sin(a) * 18]])); }
+      });
+      // botinhas, calça e suéter listrado
+      f(ret(388, 830, 112, 82, 32), 10); f(ret(500, 830, 112, 82, 32), 10);
+      f(poliR([[372, 760], [628, 760], [640, 850], [514, 856], [500, 834], [486, 856], [360, 850]], 20), 11);
+      function lado(yy, s) { return [500 + s * (92 + 50 * (yy - 545) / 255), yy]; }
+      var ys = [560, 642, 696, 750, 805];
+      for (i = 0; i < 4; i++) {
+        var a = lado(ys[i], -1), b = lado(ys[i], 1), c = lado(ys[i + 1], 1), d = lado(ys[i + 1], -1);
+        if (i === 3) f(poliR([a, b, c, d], 26), 8); else f(poli([a, b, c, d]), i % 2 ? 7 : 8);
+      }
+      // bracinhos com mangas listradas e luvas
+      f(pilula(414, 590, 372, 700, 38), 8); f(pilula(586, 590, 628, 700, 38), 8);
+      f(ret(334, 640, 76, 34, 10), 7); f(ret(590, 640, 76, 34, 10), 7);
+      f(circ(366, 724, 34), 9); f(circ(634, 724, 34), 9);
+      // cachecol com a ponta caindo
+      f(pilula(392, 560, 608, 560, 30), 9);
+      f(ret(454, 566, 66, 150, 22), 9);
+      for (i = 0; i < 3; i++) l(reta([[466 + i * 21, 716], [466 + i * 21, 744]]));
+      l(reta([[454, 626], [520, 626]]));
+      // orelhas caídas, cabeça e focinho
+      f(elipR(x - 206, y + 40, 112, 58, 80), 10); f(elipR(x + 206, y + 40, 112, 58, 100), 10);
+      f(elip(x, y, 206, 182), 2);
+      f(elip(x, y + 110, 76, 50), 3);
+      poe(rostinho({ x: x, ey: y + 24, dx: 90, rx: 40, ry: 50, cilios: true, bochecha: [146, y + 96, 32, 21], boca: 'gato', boca_y: y + 120 }, { olho: 4, brilho: 5, bochecha: 6 }));
+      l(ponto(x, y + 96, 17, 12));
+      // gorro com pompom
+      f('M ' + pt(x - 168, y - 92) + ' C ' + pt(x - 160, y - 286) + ' ' + pt(x + 160, y - 286) + ' ' + pt(x + 168, y - 92) + ' Z', 8);
+      f(ret(x - 186, y - 136, 372, 64, 30), 7);
+      for (i = -2; i <= 2; i++) l(reta([[x + i * 64, y - 128], [x + i * 64, y - 80]]));
+      f(circ(x, y - 252, 42), 7);
+    });
+
   // ---------- categorias (só as usadas) ----------
   var CATEGORIAS = [
     { id: 'bichos', pt: 'Bichinhos', en: 'Animals', es: 'Animalitos', ico: '🐻' },
@@ -1097,7 +1511,8 @@
     { id: 'festa', pt: 'Festas', en: 'Parties', es: 'Fiestas', ico: '🎂' },
     { id: 'fantasia', pt: 'Fantasia', en: 'Fantasy', es: 'Fantasía', ico: '🦄' },
     { id: 'natureza', pt: 'Natureza', en: 'Nature', es: 'Naturaleza', ico: '🌷' },
-    { id: 'veiculos', pt: 'Veículos', en: 'Vehicles', es: 'Vehículos', ico: '🚗' }
+    { id: 'veiculos', pt: 'Veículos', en: 'Vehicles', es: 'Vehículos', ico: '🚗' },
+    { id: 'turminha', pt: 'Turminha', en: 'Little friends', es: 'Pandilla', ico: '🧸' }
   ].filter(function (c) { return LISTA.some(function (p) { return p.cat === c.id; }); });
 
   var API = { LISTA: LISTA, CATEGORIAS: CATEGORIAS };

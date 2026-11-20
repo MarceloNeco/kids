@@ -57,9 +57,13 @@ test('estante: janela de novidades com os jogos da semana sempre que a estante a
     assert.deepStrictEqual(ids.sort(), ['a-garra', 'aqua', 'glub-glub', 'quem-e']);
     // atualizados até 15/11 (Mão na Massa em 14/11, Purpurina em 15/11), com a frase do que mudou; o H-rraaa, novo, não repete
     const atu = await pg.$$eval('.nov .nov-atu li a', (as) => as.map((a) => [a.getAttribute('data-jogo'), a.querySelector('.tx span').textContent]));
-    assert.deepStrictEqual(atu.map((a) => a[0]).sort(), ['cozinha', 'purpurina']);
-    assert.match(atu.find((a) => a[0] === 'cozinha')[1], /3D/);
-    assert.match(await pg.$$eval('.nov .sub', (s) => s.map((e) => e.textContent).join(' | ')), /2 jogos ganharam novidades/);
+    // os atualizados esperados saem do próprio catálogo (as datas mudam a cada versão nova de jogo)
+    const cat = {}; new Function('window', 'document', fs.readFileSync(path.join(raiz, 'catalogo.js'), 'utf8'))(cat, { querySelectorAll: () => [] });
+    const novosIds = ['a-garra', 'aqua', 'glub-glub', 'quem-e'];
+    const esperados = cat.BolinhoCatalogo.atualizados(hoje).filter((j) => !novosIds.includes(j.id));
+    assert.deepStrictEqual(atu.map((a) => a[0]).sort(), esperados.map((j) => j.id).sort());
+    for (const j of esperados) assert.strictEqual(atu.find((a) => a[0] === j.id)[1], j.atualizado.pt, j.id + ': a frase do que mudou');
+    if (esperados.length > 1) assert.match(await pg.$$eval('.nov .sub', (s) => s.map((e) => e.textContent).join(' | ')), new RegExp(esperados.length + ' jogos ganharam novidades'));
     assert.ok(await pg.$$eval('.nov li a .ic img', (is) => is.every((i) => i.complete && i.naturalWidth > 0)), 'ícones carregados');
     assert.ok(await pg.evaluate(() => document.querySelector('.nov-c').scrollWidth <= document.querySelector('.nov-c').clientWidth + 1), 'nada rola para o lado');
     assert.strictEqual(await pg.$$eval('.card .novo-selo', (s) => s.length), 4, 'selo ✨ Novo nos 4 cartões');

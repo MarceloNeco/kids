@@ -75,7 +75,7 @@
       es: "La nueva Purpurina: el mismo juego de maquillaje, ropa y desfile, que va ganando por etapas una cara más natural para cada edad, combinaciones listas y un diseño pensado para el móvil. La Purpurina de antes sigue justo encima.",
       tag: '▶ Brilhar / Sparkle / Brillar', instalar: true,
       tv: { texto: 'Maquiagem, roupas e desfile. A TV mostra um código: no celular, toque em 📺 Conectar na TV e brinque com o celular de controle.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'rabiscolandia', rec: ['tv', 'cam'], nome: 'Rabiscolândia', ico: '🎨', cor: '#c6ff3d', url: '/kids/rabiscolandia/',
+    { id: 'rabiscolandia', atualizado: { data: '2026-11-20', pt: 'Livro de colorir com a Turminha: 10 personagens de roupinha para pintar.', en: 'Coloring book: Little friends, 10 characters in cute outfits to color.', es: 'Libro para colorear: la Pandilla, 10 personajes con ropita para pintar.' }, rec: ['tv', 'cam'], nome: 'Rabiscolândia', ico: '🎨', cor: '#c6ff3d', url: '/kids/rabiscolandia/',
       texto: 'Desenhar, livro de colorir e pintar por números, com pincéis que mexem, adesivos animados, paisagens e música. Desenhe com a mão na frente da câmera ou na TV com o celular de controle.',
       en: "Drawing, a coloring book and paint by numbers, with brushes that move, animated stickers, landscapes and music. Draw with your hand in front of the camera, or on the TV using the phone as a remote.",
       es: "Dibujar, un libro para colorear y pintar por números, con pinceles que se mueven, pegatinas animadas, paisajes y música. Dibuja con la mano frente a la cámara o en la tele con el móvil como mando.",

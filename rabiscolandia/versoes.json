@@ -2,6 +2,20 @@
   "app": "rabiscolandia",
   "versoes": [
     {
+      "versao": "0.1.19",
+      "data": "20/Nov/2026",
+      "hora": "17:20:00",
+      "pt": [
+        "🧸 Livro de colorir com um tema novo, a Turminha: 10 personagens sozinhos na folha, de roupinha, cabeça grande e olhos brilhantes — gatinha de jardineira, ovelhinha de vestido, ursinho de capa de chuva, coelhinha bailarina, dinossaurinho de moletom, raposinho de boné, pandinha astronauta, porquinha confeiteira, patinho marinheiro e cachorrinha no frio. Todos têm colinha, outras cores e pintar por números"
+      ],
+      "en": [
+        "🧸 A new theme in the coloring book, Little friends: 10 characters on their own page, in cute outfits, with big heads and sparkly eyes — kitty in overalls, little lamb in a dress, teddy in a raincoat, ballerina bunny, little dino in a hoodie, little fox in a cap, astronaut panda, little pig baker, little sailor duck and a puppy in a sweater. Each one has a cheat sheet, other colors and paint by numbers"
+      ],
+      "es": [
+        "🧸 Un tema nuevo en el libro para colorear, la Pandilla: 10 personajes solos en la hoja, con ropita, cabeza grande y ojos brillantes — gatita con peto, ovejita con vestido, osito con chubasquero, conejita bailarina, dinosaurito con sudadera, zorrito con gorra, pandita astronauta, cerdita pastelera, patito marinero y perrita abrigada. Todos tienen modelo, otros colores y pintar por números"
+      ]
+    },
+    {
       "versao": "0.1.18",
       "data": "20/Nov/2026",
       "hora": "11:06:14",
