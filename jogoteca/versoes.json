@@ -2,6 +2,29 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "20/Nov/2026",
+      "hora": "01:27:48",
+      "pt": [
+        "⚔️ Chega o Jogo da Velha de guerra: espadas vermelhas contra escudos azuis. Quem vencer 3 batalhas vence a guerra!",
+        "♟️ Chega o Xadrez de guerra: Exército Azul contra Exército Vermelho, com as regras completas (roque, en passant, promoção, xeque-mate e empates)",
+        "💥 Cada captura vira batalha: espadas batendo, explosão, POW!, tela tremendo e a peça vai para a fila de prisioneiros; no xeque toca a corneta e no xeque-mate o rei tomba e sobem os fogos",
+        "🤖 Contra o computador (fácil, médio e difícil) ou em dois na mesma tela"
+      ],
+      "en": [
+        "⚔️ Tic-Tac-Toe at war is here: red swords against blue shields. Whoever wins 3 battles wins the war!",
+        "♟️ Chess at war is here: Blue Army against Red Army, with the full rules (castling, en passant, promotion, checkmate and draws)",
+        "💥 Every capture is a battle: clashing swords, an explosion, POW!, a shaking screen and the piece goes to the prisoners' line; check sounds the bugle and on checkmate the king topples and fireworks go up",
+        "🤖 Against the computer (easy, medium and hard) or with two players on one screen"
+      ],
+      "es": [
+        "⚔️ Llega el Tres en Raya en guerra: espadas rojas contra escudos azules. ¡Quien gane 3 batallas gana la guerra!",
+        "♟️ Llega el Ajedrez en guerra: Ejército Azul contra Ejército Rojo, con las reglas completas (enroque, captura al paso, coronación, jaque mate y tablas)",
+        "💥 Cada captura es una batalla: espadas chocando, explosión, ¡PAM!, la pantalla temblando y la pieza va a la fila de prisioneros; en el jaque suena la corneta y en el jaque mate el rey cae y suben los fuegos artificiales",
+        "🤖 Contra el ordenador (fácil, medio y difícil) o entre dos en la misma pantalla"
+      ]
+    },
+    {
       "versao": "0.2.1",
       "data": "19/Nov/2026",
       "hora": "23:30:00",

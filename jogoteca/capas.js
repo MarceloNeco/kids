@@ -94,6 +94,32 @@
         '<path d="M44 92 l8 6 l-2 -10z" fill="#8a5a2b"/><rect x="70" y="86" width="12" height="9" rx="1.5" fill="#6b8f3a" transform="rotate(-12 76 90)"/>' +
         '<rect x="22" y="112" width="76" height="12" rx="6" fill="#120b52" stroke="#6f8bff" stroke-width="1.5"/><rect x="22" y="128" width="76" height="12" rx="6" fill="#120b52" stroke="#6f8bff" stroke-width="1.5"/>');
     },
+    velha: function () {
+      // campo de batalha com a grade de madeira, espadas vermelhas, escudos azuis e o raio da vitória
+      var g = id('campo');
+      var espada = function (x, y) { return '<g transform="translate(' + x + ' ' + y + ')"><g transform="rotate(45)"><rect x="-2" y="-14" width="4" height="20" fill="#e8edf3" stroke="#5a6170"/><rect x="-7" y="5" width="14" height="3" fill="#d92b3a"/><rect x="-1.5" y="8" width="3" height="6" fill="#7a3a12"/></g><g transform="rotate(-45)"><rect x="-2" y="-14" width="4" height="20" fill="#e8edf3" stroke="#5a6170"/><rect x="-7" y="5" width="14" height="3" fill="#d92b3a"/><rect x="-1.5" y="8" width="3" height="6" fill="#7a3a12"/></g></g>'; };
+      var escudo = function (x, y) { return '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 -12 L11 -8 C11 4 6 10 0 14 C-6 10 -11 4 -11 -8 Z" fill="#2d6fe0" stroke="#0d2a66" stroke-width="1.5"/><polygon points="0,-6 2,-1 7,-1 3,2 4,7 0,4 -4,7 -3,2 -7,-1 -2,-1" fill="#ffcf4a"/></g>'; };
+      return svg('<defs><radialGradient id="' + g + '" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#6f9a42"/><stop offset="1" stop-color="#22341a"/></radialGradient></defs>' +
+        '<rect width="120" height="160" fill="url(#' + g + ')"/>' + reticula('#000', .12) +
+        '<g stroke="#5a3b17" stroke-width="5" stroke-linecap="round"><line x1="46" y1="36" x2="46" y2="114"/><line x1="74" y1="36" x2="74" y2="114"/><line x1="20" y1="62" x2="100" y2="62"/><line x1="20" y1="88" x2="100" y2="88"/></g>' +
+        espada(33, 49) + escudo(60, 49) + espada(87, 49) + escudo(33, 75) + espada(60, 75) + escudo(87, 101) + espada(33, 101) +
+        '<line x1="29" y1="45" x2="91" y2="105" stroke="#fff3a0" stroke-width="5" stroke-linecap="round" opacity=".9"/>' +
+        '<path d="M96 20 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#ffcf4a" stroke="#b45d0c"/>');
+    },
+    xadrez: function () {
+      // tabuleiro em perspectiva, rei azul e rei vermelho frente a frente, espadas cruzadas e explosão
+      var g = id('ceuX'), casas = '';
+      for (var r = 0; r < 4; r++) for (var c = 0; c < 6; c++) {
+        var y0 = 104 + r * 14, y1 = y0 + 14, k0 = 1 + r * 0.25, k1 = 1 + (r + 1) * 0.25, x = function (cc, k) { return 60 + (cc - 3) * 17 * k; };
+        casas += '<polygon points="' + x(c, k0) + ',' + y0 + ' ' + x(c + 1, k0) + ',' + y0 + ' ' + x(c + 1, k1) + ',' + y1 + ' ' + x(c, k1) + ',' + y1 + '" fill="' + ((r + c) % 2 ? '#6f9448' : '#d8c08a') + '"/>';
+      }
+      var rei = function (x, cor, borda) { return '<g transform="translate(' + x + ' 52) scale(.42)"><path d="M35 76 L40 46 H60 L65 76 Z M31 30 Q50 21 69 30 L62 46 H38 Z M24 76 H76 Q80 84 76 92 H24 Q20 84 24 76 Z" fill="' + cor + '" stroke="' + borda + '" stroke-width="4"/><path d="M47 3 H53 V9 H59 V15 H53 V23 H47 V15 H41 V9 H47 Z" fill="#ffcf4a" stroke="#7a4a00" stroke-width="3"/></g>'; };
+      return svg('<defs><linearGradient id="' + g + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b1d5c"/><stop offset="1" stop-color="#7a3a12"/></linearGradient></defs>' +
+        '<rect width="120" height="160" fill="url(#' + g + ')"/>' + reticula('#fff', .06) + casas +
+        '<circle cx="60" cy="62" r="22" fill="#ffcf4a" opacity=".85"/><path d="M60 34 l5 16 16 -6 -10 13 14 9 -17 1 2 17 -10 -13 -10 13 2 -17 -17 -1 14 -9 -10 -13 16 6z" fill="#ff7a2f" opacity=".9"/>' +
+        rei(6, '#3b82f0', '#0b1f4d') + rei(72, '#e23b3b', '#4d0b10') +
+        '<g transform="translate(60 66)"><g transform="rotate(40)"><rect x="-2" y="-22" width="4" height="30" fill="#e8edf3" stroke="#5a6170"/><rect x="-8" y="8" width="16" height="4" fill="#ffcf4a"/></g><g transform="rotate(-40)"><rect x="-2" y="-22" width="4" height="30" fill="#e8edf3" stroke="#5a6170"/><rect x="-8" y="8" width="16" height="4" fill="#ffcf4a"/></g></g>');
+    },
     bilhar: function () {
       var g = id('mesa'), bolas = '';
       [[60, 70, '#ffd23f'], [54, 80, '#2340b8'], [66, 80, '#e23b3b'], [48, 90, '#7b2cbf'], [60, 90, '#111'], [72, 90, '#ff7a2f']].forEach(function (b) {
