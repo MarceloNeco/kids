@@ -2,6 +2,26 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.4.3",
+      "data": "20/Nov/2026",
+      "hora": "11:09:47",
+      "pt": [
+        "🤎 Pele negra e morena com brilho de verdade: luz suave dourada na testa, no nariz, nas maçãs do rosto e no queixo. O cabelo ganhou contorno mais escuro e sombra na testa, para não se misturar com o rosto.",
+        "🔍 Estúdio revisto no celular: o painel ocupa no máximo 40% da tela (só o que precisa), as opções ficam numa fileira só que rola para o lado, os botões de cima ficaram menores e a personagem (ou o rosto, ao escolher maquiagem e joias) fica bem maior. As miniaturas das opções mostram o lugar certo (boca, orelhas, pés, mãos).",
+        "💃 Desfile: catwalk com um pé cruzando na frente do outro e rebolado de verdade (a saia acompanha), ela aparece inteira quando chega na frente, o close pega do rosto até a cintura, e ao olhar para os lados ela inclina a cabeça e mexe os olhos (sem 'troca de foto'). A parte de baixo ficou compacta e a passarela ocupa quase a tela toda."
+      ],
+      "en": [
+        "🤎 Dark and brown skin with a real glow: soft golden light on the forehead, nose, cheekbones and chin. The hair has a darker outline and casts a shadow on the forehead, so it no longer blends into the face.",
+        "🔍 Studio reworked for phones: the panel takes at most 40% of the screen (only what it needs), options sit in one row that scrolls sideways, the top buttons are smaller and the character (or her face, when picking makeup and jewelry) is much bigger. Option thumbnails show the right spot (lips, ears, feet, hands).",
+        "💃 Runway: a real catwalk with one foot crossing in front of the other and a hip sway (the skirt follows), she is fully visible when she reaches the front, the close-up frames her from face to waist, and when she looks around she tilts her head and moves her eyes (no more 'photo swaps'). The bottom panel is compact and the runway fills almost the whole screen."
+      ],
+      "es": [
+        "🤎 Piel oscura y morena con brillo de verdad: una luz dorada suave en la frente, la nariz, los pómulos y la barbilla. El pelo tiene un contorno más oscuro y hace sombra en la frente, para no confundirse con la cara.",
+        "🔍 Estudio rehecho para el móvil: el panel ocupa como mucho el 40% de la pantalla (solo lo que necesita), las opciones van en una sola fila que se desliza de lado, los botones de arriba son más pequeños y el personaje (o su cara, al elegir maquillaje y joyas) se ve mucho más grande. Las miniaturas muestran el sitio correcto (boca, orejas, pies, manos).",
+        "💃 Desfile: pasarela de verdad, con un pie cruzando delante del otro y movimiento de cadera (la falda acompaña), se ve entera al llegar al frente, el primer plano va de la cara a la cintura y, al mirar a los lados, inclina la cabeza y mueve los ojos (sin 'cambio de foto'). La parte de abajo es compacta y la pasarela ocupa casi toda la pantalla."
+      ]
+    },
+    {
       "versao": "0.4.2",
       "data": "20/Nov/2026",
       "hora": "10:36:30",
