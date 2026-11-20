@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.1",
+      "data": "20/Nov/2026",
+      "hora": "18:49:21",
+      "pt": [
+        "🙂 Queixo feminino de verdade: rosto curto e delicado, afinando numa pontinha suave (antes ficava comprido e largo).",
+        "👚 Contorno da roupa dos dois lados: o lado esquerdo da blusa e de outras peças perdia a linha e ficava reto; agora os dois lados têm contorno e acompanham a curva do corpo."
+      ],
+      "en": [
+        "🙂 A truly feminine chin: a short, delicate face tapering to a soft point (before it was long and wide).",
+        "👚 Clothing outline on both sides: the left side of tops and other pieces lost its line and went straight; now both sides have an outline and follow the body's curve."
+      ],
+      "es": [
+        "🙂 Barbilla femenina de verdad: cara corta y delicada que se afina en una puntita suave (antes era larga y ancha).",
+        "👚 Contorno de la ropa a los dos lados: el lado izquierdo de la blusa y de otras prendas perdía la línea y quedaba recto; ahora los dos lados tienen contorno y siguen la curva del cuerpo."
+      ]
+    },
+    {
       "versao": "0.9.0",
       "data": "20/Nov/2026",
       "hora": "16:41:56",

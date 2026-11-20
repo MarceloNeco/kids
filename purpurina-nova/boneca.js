@@ -159,7 +159,9 @@
       function dist(a, b) { return Math.sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1])); }
       while (i < tk.length) {
         if (/[MLQCZ]/.test(tk[i])) cmd = tk[i++];
-        if (cmd === 'Z') { out.push('Z'); cur = ini; continue; }
+        // o "fechar" (Z) também é uma reta que passa pela deformação (senão o lado que fecha a peça saía reto e o
+        // recorte comia o contorno — dono, 20/Nov/2026: "o contorno da roupa do lado esquerdo tem uma falha")
+        if (cmd === 'Z') { var z0 = cur, z1 = ini; if (dist(z0, z1) > 0.5) amostra(function (t) { return [z0[0] + (z1[0] - z0[0]) * t, z0[1] + (z1[1] - z0[1]) * t]; }, dist(z0, z1)); out.push('Z'); cur = ini; continue; }
         if (cmd === 'M') { cur = ini = pt(); poe(cur[0], cur[1], true); cmd = 'L'; continue; }
         var a = cur;
         if (cmd === 'L') { var b = pt(); amostra(function (t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }, dist(a, b)); cur = b; }
@@ -1135,8 +1137,8 @@
     /* menina: queixinho pequeno e recolhido (de lado não fica "queixudo") e maxilar suave — o cantinho do rosto
        quadradinho fica mais alto e redondinho. Continua sendo cada formato, só que delicado. */
     if (!menino) base0 = base0.map(function (v) {
-      if (v.c[0] === 0 && v.c[1] >= 70) return { c: [0, v.c[1] - 4, v.c[2] - 24], r: [v.r[0] * 0.75, v.r[1] * 0.8, v.r[2] * 0.6] };
-      if (v.c[0] === 0 && v.c[1] >= 30 && v.c[1] < 70) return { c: [0, v.c[1] + 1, v.c[2] - 8], r: [v.r[0] * 0.88, v.r[1] * 1.02, v.r[2] * 0.9] };   // maxilar mais estreito, afinando até o queixo
+      if (v.c[0] === 0 && v.c[1] >= 70) return { c: [0, v.c[1] - 5, v.c[2] - 24], r: [v.r[0] * 0.62, v.r[1] * 0.75, v.r[2] * 0.6] };   // só a pontinha do queixo
+      if (v.c[0] === 0 && v.c[1] >= 30 && v.c[1] < 70) return { c: [0, v.c[1] - 2, v.c[2] - 8], r: [v.r[0] * 0.84, v.r[1] * 0.86, v.r[2] * 0.9] };   // maxilar estreito e curto, afinando até o queixo (sem queixo comprido)
       // (20/Nov/2026, dono: "queixo de mulheres não femininos"): o crânio termina mais alto, para o rosto não fechar em "U"
       // largo; quem desenha a parte de baixo é o maxilar, que afina em V suave até um queixinho delicado
       if (v.c[0] === 0 && v.c[1] < 0) return { c: [0, v.c[1] - 6, v.c[2]], r: [v.r[0], v.r[1] - 8, v.r[2]] };
@@ -1305,7 +1307,7 @@
     return elip(152, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa }) + elip(248, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa });
   }
   function luzMeio(pele, I) {
-    return elip(200, 290, 10, 3.5, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);
+    return elip(200, 283, 9, 3.2, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);   // luzinha no queixo (dentro do queixo novo, mais curto)
   }
   // quão escura é a pele (0 = branca, 1 = bem escura)
   function escuridao(h) { var c = rgb(h), l = (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; return Math.max(0, Math.min(1, (0.72 - l) / 0.45)); }
@@ -1317,7 +1319,7 @@
     var o = function (v) { return n(v * k * 100) / 100; }, L = { fill: 'url(#' + I + 'luzPele)' }, Q = { fill: 'url(#' + I + 'calorPele)' };
     return '<g opacity="' + o(0.85) + '">' + elip(200, 152, 40, 18, L) + elip(200, 230, 4, 18, L) +
       elip(150, 234, 20, 10, Object.assign({ transform: 'rotate(-18 150 234)' }, L)) + elip(250, 234, 20, 10, Object.assign({ transform: 'rotate(18 250 234)' }, L)) +
-      elip(200, 289, 7, 3.5, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
+      elip(200, 283, 6.5, 3.2, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
   }
 
 
