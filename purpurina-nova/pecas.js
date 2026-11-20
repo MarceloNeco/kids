@@ -245,6 +245,16 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       o('flores', 'Florzinhas', 'Little flowers', 'Florecitas', ['jardim', 'praia']), o('xadrez', 'Xadrez', 'Plaid', 'Cuadros', ['piquenique', 'escola', 'inverno']),
       o('arcoiris', 'Arco-íris', 'Rainbow stripes', 'Rayas arcoíris', ['pop', 'festa']), o('oncinha', 'Oncinha', 'Leopard', 'Leopardo', ['pop'])
     ] },
+    // capas de chuva (dono, 20/Nov/2026, com foto de referência: capa rosa transparente com unicórnio e a amarela de
+    // patinho): vão por cima de qualquer roupa, com o capuz na cabeça; cada estilo já vem com a sua cor (cor:), que dá
+    // para trocar depois
+    { id: 'capa', grupo: 'roupa', ico: '☔', pt: 'Capas de chuva', en: 'Raincoats', es: 'Chubasqueros', cores: 'roupa', area: A.tudo, opcoes: [
+      NENHUM('Sem capa', 'No raincoat', 'Sin chubasquero'),
+      Object.assign(o('transparente', 'Transparente com unicórnio', 'Clear with unicorns', 'Transparente con unicornios', ['chuva']), { cor: 'rosaclaro' }),
+      Object.assign(o('patinho', 'De patinho', 'Duckling', 'De patito', ['chuva']), { cor: 'amarelo' }),
+      Object.assign(o('colorida', 'Colorida com botões', 'Colorful with snaps', 'De colores con botones', ['chuva']), { cor: 'turquesa' }),
+      Object.assign(o('arcoiris', 'Arco-íris', 'Rainbow', 'Arcoíris', ['chuva']), { cor: 'lilas' })
+    ] },
     { id: 'sapatos', grupo: 'roupa', ico: '👟', pt: 'Sapatos', en: 'Shoes', es: 'Zapatos', cores: 'roupa', area: [110, 500, 180, 190], zoom: 'pes', opcoes: [
       NENHUM('Descalça', 'Barefoot', 'Descalza'), o('tenis', 'Tênis', 'Sneakers', 'Zapatillas', ['casual', 'pop', 'esporte']), o('sapatilha', 'Sapatilha', 'Ballet flats', 'Bailarinas', ['bailarina', 'princesa', 'festa', 'jardim']),
       o('sandalia', 'Sandália', 'Sandals', 'Sandalias', ['praia', 'verao', 'jardim']), o('bota', 'Bota', 'Boots', 'Botas', ['inverno', 'pop']),
@@ -321,7 +331,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
     { id: 'bolsa', grupo: 'acess', ico: '👜', pt: 'Bolsas', en: 'Bags', es: 'Bolsos', cores: 'roupa', area: A.corpo, opcoes: [
       NENHUM('Sem bolsa', 'No bag', 'Sin bolso'), o('mao', 'Bolsinha de mão', 'Clutch', 'Bolsito de mano', ['festa', 'princesa']), o('ombro', 'Bolsa de ombro', 'Shoulder bag', 'Bolso de hombro', ['casual', 'pop']),
       o('coracao', 'Bolsa de coração', 'Heart bag', 'Bolso de corazón', ['festa', 'aniversario', 'pop']), o('cesta', 'Cesta de piquenique', 'Picnic basket', 'Cesta de pícnic', ['jardim', 'piquenique']),
-      o('praia', 'Bolsa de palha', 'Straw beach bag', 'Bolso de paja', ['praia', 'verao'])
+      o('praia', 'Bolsa de palha', 'Straw beach bag', 'Bolso de paja', ['praia', 'verao']), o('guardaChuva', 'Guarda-chuva', 'Umbrella', 'Paraguas', ['chuva'])
     ] },
 
     { id: 'cenario', grupo: 'fundo', ico: '🏞️', pt: 'Cenário', en: 'Scene', es: 'Escenario', area: null, opcoes: [
@@ -337,7 +347,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
     base: 'nenhum', blush: 'nenhum', blushCor: 'rosa', sombra: 'nenhum', sombraCor: 'lilas', delineado: 'nenhum', delineadoCor: 'preto',
     cilios: 'curtos', ciliosCor: 'preto', unhas: 'nenhum', unhasCor: 'chiclete', batom: 'nenhum', batomCor: 'rosaclaro', glitter: 'nenhum', glitterCor: 'dourado', adesivo: 'nenhum',
     vestido: 'nenhum', vestidoCor: 'lilas', blusa: 'camiseta', blusaCor: 'rosaclaro', saia: 'nenhum', saiaCor: 'chiclete',
-    calca: 'jeans', calcaCor: 'ceu', estampa: 'liso', estampaCor: 'branco', sapatos: 'tenis', sapatosCor: 'branco',
+    calca: 'jeans', calcaCor: 'ceu', estampa: 'liso', estampaCor: 'branco', capa: 'nenhum', capaCor: 'amarelo', sapatos: 'tenis', sapatosCor: 'branco',
     cabeca: 'nenhum', cabecaCor: 'dourado', laco: 'nenhum', lacoCor: 'chiclete', brincos: 'nenhum', brincosCor: 'dourado', pulseira: 'nenhum', pulseiraCor: 'dourado', anel: 'nenhum', anelCor: 'dourado', broche: 'nenhum', brocheCor: 'dourado',
     colar: 'nenhum', colarCor: 'dourado', oculos: 'nenhum', oculosCor: 'chiclete', bolsa: 'nenhum', bolsaCor: 'chiclete', cenario: 'quarto'
   };
@@ -443,7 +453,9 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       { id: 'esporte', ico: '⚽', pt: 'Esporte', en: 'Sporty', es: 'Deporte', e: { vestido: 'nenhum', blusa: 'camiseta', blusaCor: 'azul', saia: 'nenhum', calca: 'jogger', calcaCor: 'preto', estampa: 'listras', estampaCor: 'branco', sapatos: 'tenisLuz', sapatosCor: 'branco' } },
       { id: 'inverno', ico: '❄️', pt: 'Inverno', en: 'Winter', es: 'Invierno', e: { vestido: 'nenhum', blusa: 'sueter', blusaCor: 'vermelho', saia: 'nenhum', calca: 'legging', calcaCor: 'preto', estampa: 'xadrez', estampaCor: 'branco', sapatos: 'botaNeve', sapatosCor: 'marrom' } },
       { id: 'gala', ico: '👗', pt: 'Gala', en: 'Gala', es: 'Gala', menina: true, e: { vestido: 'gala', vestidoCor: 'vinho', blusa: 'nenhum', saia: 'nenhum', calca: 'nenhum', estampa: 'liso', sapatos: 'scarpin', sapatosCor: 'dourado' } },
-      { id: 'social', ico: '🤵', pt: 'Social', en: 'Smart', es: 'Elegante', menino: true, e: { vestido: 'nenhum', blusa: 'camisa', blusaCor: 'branco', saia: 'nenhum', calca: 'pantalona', calcaCor: 'preto', estampa: 'liso', sapatos: 'social', sapatosCor: 'preto' } }
+      { id: 'social', ico: '🤵', pt: 'Social', en: 'Smart', es: 'Elegante', menino: true, e: { vestido: 'nenhum', blusa: 'camisa', blusaCor: 'branco', saia: 'nenhum', calca: 'pantalona', calcaCor: 'preto', estampa: 'liso', sapatos: 'social', sapatosCor: 'preto' } },
+      // dia de chuva (dono, 20/Nov/2026): capa de patinho, legging e galocha
+      { id: 'chuva', ico: '☔', pt: 'Dia de chuva', en: 'Rainy day', es: 'Día de lluvia', e: { vestido: 'nenhum', blusa: 'camiseta', blusaCor: 'branco', saia: 'nenhum', calca: 'legging', calcaCor: 'preto', estampa: 'liso', capa: 'patinho', capaCor: 'amarelo', sapatos: 'galocha', sapatosCor: 'amarelo' } }
     ],
     joias: [
       { id: 'perolas', ico: '🤍', pt: 'Pérolas', en: 'Pearls', es: 'Perlas', e: { brincos: 'perola', brincosCor: 'branco', colar: 'perolas', colarCor: 'branco', pulseira: 'perolas', pulseiraCor: 'branco', anel: 'nenhum', broche: 'nenhum' } },
@@ -455,9 +467,12 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
       { id: 'praia', ico: '🏖️', pt: 'Praia', en: 'Beach', es: 'Playa', e: { cabeca: 'chapeu', cabecaCor: 'nude', oculos: 'coracao', oculosCor: 'chiclete', bolsa: 'praia', bolsaCor: 'turquesa', laco: 'nenhum' } },
       { id: 'princesa', ico: '👑', pt: 'Princesa', en: 'Princess', es: 'Princesa', e: { cabeca: 'coroa', cabecaCor: 'dourado', oculos: 'nenhum', bolsa: 'mao', bolsaCor: 'prata', laco: 'nenhum' } },
       { id: 'estrela', ico: '😎', pt: 'Estrela do rock', en: 'Rock star', es: 'Estrella del rock', e: { cabeca: 'nenhum', oculos: 'aviador', oculosCor: 'preto', bolsa: 'ombro', bolsaCor: 'preto', laco: 'nenhum' } },
-      { id: 'fadinha', ico: '🧚', pt: 'Fadinha', en: 'Little fairy', es: 'Hadita', e: { cabeca: 'estrelas', cabecaCor: 'lilas', oculos: 'nenhum', bolsa: 'coracao', bolsaCor: 'lilas', laco: 'nenhum' } }
+      { id: 'fadinha', ico: '🧚', pt: 'Fadinha', en: 'Little fairy', es: 'Hadita', e: { cabeca: 'estrelas', cabecaCor: 'lilas', oculos: 'nenhum', bolsa: 'coracao', bolsaCor: 'lilas', laco: 'nenhum' } },
+      { id: 'chuva', ico: '☔', pt: 'Dia de chuva', en: 'Rainy day', es: 'Día de lluvia', e: { cabeca: 'nenhum', oculos: 'nenhum', bolsa: 'guardaChuva', bolsaCor: 'chiclete', laco: 'nenhum' } }
     ]
   };
+  // combinação de roupa ou visual pronto sem capa de chuva tira a capa (senão a capa ficava por cima da roupa de festa)
+  COMBOS.roupa.concat(ESTILOS).forEach(function (c) { if (!('capa' in c.e)) c.e.capa = 'nenhum'; });
 
   /* Desafios: cada um tem 3 dicas. Estrelas = dicas cumpridas, mas sempre pelo menos 1 (ninguém perde).
      Forma das dicas (conferidas em visual.js):

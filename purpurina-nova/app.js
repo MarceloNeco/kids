@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.6.0';
+  var APP_VERSION = '0.7.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -53,6 +53,7 @@
     atual = id; window.scrollTo(0, 0);
     if (id !== 'desfile') pararConfete();
     if (balada) { balada.parar(); balada = null; }
+    var placa = document.querySelector('.bal-placa'); if (placa) placa.remove();
     if (id === 'balada') baladinha();
     if (id === 'menu') desenharMenu();
     if (id === 'desafios') listaDesafios();
@@ -581,6 +582,22 @@
       var e = V.limpar(p.e); if (amigas.length < 2 && !V.iguais(e, estado)) amigas.push(e);
     });
     balada = PurpurinaBalada.iniciar($('palcoBalada'), [estado].concat(amigas), { calmo: CALMO, enquanto: function () { return atual === 'balada'; } });
+    placaBalada();
+  }
+  /* placa de entrada (dono, 20/Nov/2026, com a foto de uma placa de balada infantil como inspiração): fundo roxo,
+     letreiro brilhando, estrelinhas e a personagem pulando de braços abertos e piscando. Some sozinha ou num toque. */
+  function placaBalada() {
+    var velha = document.querySelector('.bal-placa'); if (velha) velha.remove();
+    var pl = document.createElement('div'); pl.className = 'bal-placa'; pl.setAttribute('role', 'button');
+    pl.setAttribute('aria-label', t('Baladinha da Purpurina — toque para começar', 'Purpurina’s Dance Party — tap to start', 'Minidisco de Purpurina — toca para empezar'));
+    pl.innerHTML = '<span class="bal-estrela e1">✦</span><span class="bal-estrela e2">✦</span><span class="bal-estrela e3">✦</span><span class="bal-estrela e4">✦</span>' +
+      '<p class="bal-letreiro"><span class="bal-l1">' + t('Baladinha', 'Dance Party', 'Minidisco') + '</span><span class="bal-l2">' + t('da Purpurina', 'with Purpurina', 'de Purpurina') + '</span></p>' +
+      '<div class="bal-placa-boneca"><div class="bal-placa-pulo">' + B.svg(estado, { id: 'placa', fundo: false, anim: !CALMO, realce: false, rig: !CALMO, passos: !CALMO, sorriso: true, piscadinha: true }) + '</div></div>';
+    $('balada').appendChild(pl);
+    var anim = CALMO ? null : PurpurinaAnim.criar(pl.querySelector('.bal-placa-pulo'), { poses: ['abracao'], enquanto: function () { return pl.isConnected; } });
+    function tirar() { if (!pl.isConnected) return; pl.classList.add('saindo'); if (anim) anim.parar(); setTimeout(function () { pl.remove(); }, 450); }
+    pl.addEventListener('click', tirar);
+    setTimeout(tirar, CALMO ? 1800 : 3200);
   }
   $('btBalada').addEventListener('click', function () { Som.tocar('brilho'); ir('balada'); });
   function trocarLuz() { if (balada) { balada.trocarLuz(); Som.tocar('brilho'); } }
