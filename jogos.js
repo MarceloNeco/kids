@@ -71,16 +71,23 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
   function atualizarJa(reg) {
     return (navigator.onLine === false ? Promise.resolve() : reg.update().catch(function () {})).then(function () { return reg; });
   }
+  // 3 jogos ao mesmo tempo (dono, 20/Nov/2026: "travou no 15", era um por um esperando o H-rraaa inteiro chegar);
+  // aoAndar(prontos, total, nomes dos que estão baixando agora)
+  var JUNTOS = 3;
   function guardarTodos(aoAndar) {
     if (!temSW) return Promise.resolve(0);
-    var feitos = 0;
-    return instalaveis.reduce(function (fila, card, i) {
-      return fila.then(function () {
-        if (aoAndar) aoAndar(i, nomeDe(card), feitos);
-        return navigator.serviceWorker.register(card.getAttribute('data-sw'), { scope: escopo(card) })
-          .then(atualizarJa).then(esperarAtivo).then(function (ok) { if (ok) { feitos++; marcar(card); } }).catch(function () {});
-      });
-    }, Promise.resolve()).then(function () { return feitos; });
+    var feitos = 0, prontos = 0, prox = 0, agora = [];
+    function avisar() { if (aoAndar) aoAndar(prontos, instalaveis.length, agora.slice()); }
+    function um(card) {
+      var nome = nomeDe(card);
+      agora.push(nome); avisar();
+      return navigator.serviceWorker.register(card.getAttribute('data-sw'), { scope: escopo(card) })
+        .then(atualizarJa).then(esperarAtivo).then(function (ok) { if (ok) { feitos++; marcar(card); } }).catch(function () {})
+        .then(function () { agora.splice(agora.indexOf(nome), 1); prontos++; avisar(); });
+    }
+    function fila() { if (prox >= instalaveis.length) return Promise.resolve(); return um(instalaveis[prox++]).then(fila); }
+    var trilhas = []; for (var k = 0; k < Math.min(JUNTOS, instalaveis.length); k++) trilhas.push(fila());
+    return Promise.all(trilhas).then(function () { return feitos; });
   }
   // uma música favorita por jogo (e a da rádio), inteira no cache "bolinho-musicas": toca sem internet
   function guardarMusicas(aoAndar) {
@@ -117,8 +124,12 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
       try { localStorage.setItem(CH_SEMPRE, '1'); } catch (e) {}   // a partir daqui, o Bolinho mantém todos atualizados
       bGuardar.disabled = true;
       st.className = 'st';
-      guardarTodos(function (i, nome) {
-        tri(st, '⬇ Guardando e atualizando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…', '⬇ Saving and updating ' + (i + 1) + ' of ' + instalaveis.length + ': ' + nome + '…', '⬇ Guardando y actualizando ' + (i + 1) + ' de ' + instalaveis.length + ': ' + nome + '…');
+      tri(bGuardar, '⏳ Atualizando…', '⏳ Updating…', '⏳ Actualizando…');
+      guardarTodos(function (prontos, total, agora) {
+        var lista = agora.join(', ');
+        tri(st, '⬇ Guardando e atualizando: ' + prontos + ' de ' + total + ' prontos' + (lista ? ' · agora: ' + lista : '') + '…',
+          '⬇ Saving and updating: ' + prontos + ' of ' + total + ' done' + (lista ? ' · now: ' + lista : '') + '…',
+          '⬇ Guardando y actualizando: ' + prontos + ' de ' + total + ' listos' + (lista ? ' · ahora: ' + lista : '') + '…');
       }).then(function (n) {
         return guardarMusicas(function (i, total) {
           tri(st, '🎵 Guardando as músicas favoritas: ' + (i + 1) + ' de ' + total + '…', '🎵 Saving the favorite songs: ' + (i + 1) + ' of ' + total + '…', '🎵 Guardando las canciones favoritas: ' + (i + 1) + ' de ' + total + '…');
@@ -136,6 +147,7 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
             '✓ Listo: los ' + n + ' juegos están en la última versión y funcionan sin internet en este dispositivo. La música y las partes pesadas terminan de bajar solas con el Wi-Fi.' + musicasEs);
           tri(bGuardar, '✓ Todos guardados', '✓ All saved', '✓ Todos guardados');
         } else {
+          tri(bGuardar, '⬇ Guardar todos (jogar sem internet)', '⬇ Save them all (play offline)', '⬇ Guardar todos (jugar sin internet)');
           tri(st, n + ' de ' + instalaveis.length + ' guardados.' + musicas + ' Confira a internet e toque de novo para terminar.',
             n + ' of ' + instalaveis.length + ' saved.' + musicasEn + ' Check the internet and tap again to finish.',
             n + ' de ' + instalaveis.length + ' guardados.' + musicasEs + ' Comprueba la conexión a internet y toca otra vez para terminar.');
