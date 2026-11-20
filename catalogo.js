@@ -206,6 +206,7 @@
     var c = el('div', 'card');
     c.style.setProperty('--c', j.cor);
     c.setAttribute('data-jogo', j.id);
+    c.setAttribute('data-rec', recursos(j).join(' '));
     // interruptor do RootifyONE (Controle dos apps → Bolinho de Chuva): jogo desligado some da estante (recursos.js)
     if (/^\/kids\//.test(j.url)) c.setAttribute('data-recurso', j.id);
     if (j.tv) c.setAttribute('data-tv', j.tv.param || '?tv=auto');
@@ -247,6 +248,63 @@
     return c;
   }
 
+  // ---------- filtros da estante (dono, 20/Nov/2026) ----------
+  // Uma fileira de botões em cima dos cartões: "Todos" (aceso de começo) e um por recurso. Tocar num recurso apaga o
+  // "Todos" e mostra só os jogos que têm TODOS os recursos acesos (ex.: "Em dois" + "TV"); apagar todos, ou tocar em
+  // "Todos", volta a mostrar tudo. No celular, só os ícones; no tablet e no computador, ícone + nome. O "?" explica.
+  var FILTROS = [
+    ['off', 'Sem internet', 'Offline', 'Sin internet'],
+    ['dois', 'Em dois', 'Two players', 'Entre dos'],
+    ['cam', 'Com o corpo', 'Body moves', 'Con el cuerpo'],
+    ['tv', 'Na TV', 'On TV', 'En la tele'],
+    ['incl', 'Inclinar', 'Tilt', 'Inclinar']
+  ];
+  function filtros(grade) {
+    var barra = el('div', 'filtros'); barra.setAttribute('role', 'group');
+    rotulo(barra, 'Filtrar os jogos', 'Filter the games', 'Filtrar los juegos');
+    var todos = barra.appendChild(el('button', 'f-bt f-todos')); todos.type = 'button'; todos.setAttribute('aria-pressed', 'true');
+    tri(todos.appendChild(el('span', 'f-txt')), 'Todos', 'All', 'Todos');
+    var bts = FILTROS.map(function (f) {
+      var b = barra.appendChild(el('button', 'f-bt f-' + f[0])); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('data-f', f[0]);
+      b.innerHTML = svg(f[0]);
+      tri(b.appendChild(el('span', 'f-txt')), f[1], f[2], f[3]);
+      rotulo(b, f[1], f[2], f[3]);
+      return b;
+    });
+    var q = barra.appendChild(el('button', 'f-bt f-q', '?')); q.type = 'button';
+    rotulo(q, 'Como funcionam os filtros', 'How the filters work', 'Cómo funcionan los filtros');
+    var vazio = el('p', 'f-vazio'); vazio.hidden = true;
+    tri(vazio, 'Nenhum jogo tem tudo isso junto. Tente tirar um filtro.', 'No game has all of these together. Try removing a filter.', 'Ningún juego tiene todo eso a la vez. Prueba a quitar un filtro.');
+    grade.parentNode.insertBefore(barra, grade);
+    grade.parentNode.insertBefore(vazio, grade.nextSibling);
+    function aplicar() {
+      var on = bts.filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; }).map(function (b) { return b.getAttribute('data-f'); });
+      todos.setAttribute('aria-pressed', String(!on.length));
+      var cs = grade.querySelectorAll('.card'), vistos = 0;
+      for (var k = 0; k < cs.length; k++) {
+        var rec = ' ' + (cs[k].getAttribute('data-rec') || '') + ' ';
+        var mostra = on.every(function (f) { return rec.indexOf(' ' + f + ' ') >= 0; });
+        cs[k].classList.toggle('filtrado', !mostra);
+        if (mostra && !cs[k].hidden) vistos++;
+      }
+      vazio.hidden = vistos > 0;
+    }
+    todos.addEventListener('click', function () { bts.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); aplicar(); });
+    bts.forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); aplicar(); }); });
+    q.addEventListener('click', function (e) {
+      e.stopPropagation();
+      bal.innerHTML = '';
+      var tx = bal.appendChild(el('div'));
+      tx.appendChild(el('b', null, T('Filtros', 'Filters', 'Filtros')));
+      tx.appendChild(el('span', null, T('Toque num ícone para ver só os jogos que têm aquilo (dá para juntar vários: em dois e na TV, por exemplo). "Todos" mostra tudo de novo.',
+        'Tap an icon to see only the games that have it (you can combine several: two players and on TV, for example). "All" shows everything again.',
+        'Toca un icono para ver solo los juegos que lo tienen (puedes juntar varios: entre dos y en la tele, por ejemplo). "Todos" lo muestra todo otra vez.')));
+      bal.hidden = false;
+    });
+    window.BolinhoCatalogo.filtrar = function (lista) { bts.forEach(function (b) { b.setAttribute('aria-pressed', String((lista || []).indexOf(b.getAttribute('data-f')) >= 0)); }); aplicar(); };
+  }
+  var bal;   // balão de explicação (criado mais abaixo)
+
   // monta cada grade marcada com data-catalogo (o script vem logo depois dela)
   var grades = document.querySelectorAll('[data-catalogo]');
   for (var i = 0; i < grades.length; i++) {
@@ -254,11 +312,12 @@
     if (g.getAttribute('data-montado')) continue;
     JOGOS.forEach(function (j) { g.appendChild(cartao(j)); });
     g.setAttribute('data-montado', '1');
+    if (g.getAttribute('data-catalogo') === 'estante') filtros(g);
   }
   if (!grades.length) return;
 
   // ---------- abrir o cartão, explicar um ícone ----------
-  var bal = el('div', 'c-bal'); bal.hidden = true; bal.setAttribute('role', 'status'); document.body.appendChild(bal);
+  bal = el('div', 'c-bal'); bal.hidden = true; bal.setAttribute('role', 'status'); document.body.appendChild(bal);
   function explicar(k) {
     var n = INFO[k][0], t = INFO[k][1];
     bal.innerHTML = svg(k, 'c-bal-ic ic-' + k);

@@ -101,3 +101,18 @@ html.trava-fundo,html.trava-fundo body{overflow:hidden!important;overscroll-beha
 .bib,.nov,.nov-c,.bc-fundo,.bc-passos,.bc-corpo{overscroll-behavior:contain}
 /* várias colunas (tablet, computador, TV): ícones e botões um pouco menores para todo cartão caber numa altura só (dono, 19/Nov/2026: "cards de tamanhos diferentes") */
 @media (min-width:50rem){.c-r{gap:.3rem}.c-ics{gap:.15rem}.ic{width:25px;height:25px;border-radius:7px}.ic svg{width:17px;height:17px}.c-bts{gap:.3rem}.c-inst{width:42px;height:42px}.c-jogar{min-width:4.4rem;padding:0 .75rem}}
+/* filtros da estante (dono, 20/Nov/2026): Todos + um botão por recurso; celular só ícone, tela larga ícone + nome */
+.filtros{display:flex;align-items:center;gap:.35rem;margin-top:1rem;padding:.3rem;border-radius:999px;background:rgba(34,27,77,.6);border:1.5px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.filtros::-webkit-scrollbar{display:none}
+.f-bt{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;min-width:44px;height:44px;padding:0 .7rem;border-radius:999px;border:1.5px solid transparent;background:rgba(255,255,255,.07);color:#d9d3ff;font:inherit;font-size:.9rem;font-weight:800;cursor:pointer}
+.f-bt svg{width:22px;height:22px;flex:none}
+.f-bt .f-txt{display:none}.f-todos .f-txt{display:inline}
+.f-bt[aria-pressed="true"]{background:#c6ff3d;color:#1a1446;border-color:#c6ff3d;box-shadow:0 0 14px rgba(198,255,61,.45)}
+.f-off[aria-pressed="false"] svg{color:#c6ff3d}
+.f-q{margin-left:auto;padding:0;width:44px;border-color:#8b80d0;background:transparent}
+.f-bt:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.card.filtrado{display:none}
+.f-vazio{margin:1rem 0 0;padding:1rem;border-radius:16px;border:1.5px dashed var(--border);text-align:center;color:var(--muted)}
+@media (min-width:56rem){.f-bt .f-txt{display:inline}.f-bt{padding:0 .85rem}}
+@media (max-width:440px){.filtros{gap:.2rem;padding:.25rem}.f-bt{min-width:40px;height:40px;padding:0 .45rem}.f-q{width:36px;min-width:36px}.f-bt svg{width:20px;height:20px}}
+@media (max-width:340px){.f-bt{min-width:34px;padding:0 .3rem;font-size:.82rem}.f-bt svg{width:18px;height:18px}.f-q{width:32px;min-width:32px}}
