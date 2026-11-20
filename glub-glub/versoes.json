@@ -2,6 +2,20 @@
   "app": "glub-glub",
   "versoes": [
     {
+      "versao": "0.1.6",
+      "data": "20/Nov/2026",
+      "hora": "02:00:00",
+      "pt": [
+        "🐢 Modo leve no tablet Fire e em aparelho fraco: os bichos usam menos memória e menos desenho (sem a ondulação do corpo), para o jogo abrir e rodar liso"
+      ],
+      "en": [
+        "🐢 Light mode on Fire tablets and low-end devices: the creatures use less memory and less drawing (no body wave), so the game opens and runs smoothly"
+      ],
+      "es": [
+        "🐢 Modo ligero en la tableta Fire y en dispositivos modestos: los animales usan menos memoria y menos dibujo (sin la ondulación del cuerpo), para que el juego se abra y vaya fluido"
+      ]
+    },
+    {
       "versao": "0.1.5",
       "data": "19/Nov/2026",
       "hora": "18:10:00",
