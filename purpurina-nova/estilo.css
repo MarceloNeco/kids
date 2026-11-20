@@ -517,3 +517,17 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
   .desfile-botoes .grande { flex: 1 1 100%; }
   .desfile-botoes .medio { flex: 1 1 0; padding: 0 8px; }
 }
+/* barras de ajuste: tom (claro ↔ escuro) e intensidade da maquiagem — trilho com a própria cor e bolinha grande */
+.barras { display: grid; gap: 6px; padding: 2px 4px 4px; }
+.barra { display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 600; color: var(--muted); }
+.barra-ponta { flex: 0 0 auto; min-width: 2.2em; text-align: center; }
+.barra input[type=range] { flex: 1; -webkit-appearance: none; appearance: none; height: 14px; border-radius: 999px; border: 2px solid var(--borda); margin: 8px 0; }
+.barra input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 3px solid var(--rosa); box-shadow: 0 2px 6px rgba(61, 35, 82, .3); }
+.barra input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 3px solid var(--rosa); }
+/* os botões "Tirar" ficam lado a lado e menores (sobra espaço para as cores, as barras e as opções) */
+.tirar-linha { display: flex; gap: 6px; flex-wrap: wrap; }
+.tirar-linha .tirar-bt { min-height: 36px; font-size: .85rem; padding: 0 10px; }
+.opcoes-painel { gap: 6px; }
+.tirar-linha { flex-wrap: nowrap; overflow-x: auto; flex-shrink: 0; }
+.tirar-linha .tirar-bt { flex: 0 0 auto; white-space: nowrap; }
+.opcoes-painel > .cores, .opcoes-painel > .barras, .opcoes-painel > .estilos { flex-shrink: 0; }

@@ -43,6 +43,18 @@
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
     adolescente: [0.9, 0.9, 0.8, 0.86, 0.9, 0.82, 0.88, 0.78], adulta: [0.94, 0.94, 0.82, 0.88, 0.92, 0.82, 0.9, 0.78] };
+  /* barras de ajuste (dono, 20/Nov/2026: "uma barra de rolar… mais claro, mais escuro, até mais intensidade da maquiagem"):
+     <parte>Tom (-1 = bem mais claro … 1 = bem mais escuro) vale para toda cor; <parte>Forca (0,15 … 1) é a intensidade da
+     maquiagem — a cor vai se misturando com a pele até quase sumir. */
+  var MAQUIAGEM = ['blush', 'sombra', 'delineado', 'cilios', 'batom', 'glitter', 'unhas'];
+  function corAjustada(e, catId) {
+    var k = P.categoria(catId), c = P.cor(k.cores, e[k.opcoes ? catId + 'Cor' : catId]);
+    var tom = +e[catId + 'Tom'] || 0, forca = e[catId + 'Forca'] == null ? 1 : +e[catId + 'Forca'], h = c.hex;
+    if (!tom && forca >= 1) return c;
+    if (tom > 0) h = esc(h, tom * 0.5); else if (tom < 0) h = cla(h, -tom * 0.55);
+    if (forca < 1 && MAQUIAGEM.indexOf(catId) >= 0) h = mistura(corAjustada(e, 'pele').hex, h, forca);
+    return Object.assign({}, c, { hex: h });
+  }
   var DF = null;
   function deformacao(idade, menino) {
     var q = PROPORCAO[idade] || PROPORCAO.adulta, cab = IDADE.cab, L = q.larg.slice();
@@ -228,7 +240,7 @@
     DF = deformacao(e.idade, e.personagem === 'menino');
     // a partir dos 11 anos o rosto fica oval: a cabeça estreita um pouco (largura) e alonga
     CABECA = 'translate(0 14) translate(200 297) scale(' + IDADE.cab * (IDADE.largura || 1) + ' ' + IDADE.cab + ') translate(-200 -297)';
-    var C = function (cat) { var k = P.categoria(cat); return P.cor(k.cores, e[k.opcoes ? cat + 'Cor' : cat]); };
+    var C = function (cat) { return corAjustada(e, cat); };
     var pele = C('pele').hex, peleE = esc(pele, 0.24), cab = C('cabelo').hex, cabE = esc(cab, 0.3 + 0.3 * escuridao(pele));
     var vis = function (cat) { return V.visivel(e, cat); };
     var estNa = vis('vestido') ? 'vestido' : 'blusa', comEstampa = e.estampa !== 'liso';
@@ -677,7 +689,7 @@
 
   // ---------- gradientes e estampas ----------
   function defsSvg(e, I, pele, cab) {
-    var est = P.cor('roupa', e.estampaCor).hex, padrao = '';
+    var est = corAjustada(e, 'estampa').hex, padrao = '';
     var t = { patternUnits: 'userSpaceOnUse' };
     switch (e.estampa) {
       case 'bolinhas': padrao = '<pattern id="' + I + 'est" width="22" height="22"' + at(t) + '>' + circ(6, 6, 3.6, { fill: est }) + circ(17, 17, 3.6, { fill: est }) + '</pattern>'; break;
@@ -689,7 +701,7 @@
       case 'oncinha': padrao = '<pattern id="' + I + 'est" width="30" height="30"' + at(t) + '>' + circ(7, 8, 3.6, { fill: 'none', stroke: est, 'stroke-width': 2.2 }) + circ(7, 8, 1.6, { fill: est, opacity: 0.6 }) + circ(22, 20, 4, { fill: 'none', stroke: est, 'stroke-width': 2.2 }) + circ(22, 20, 1.8, { fill: est, opacity: 0.6 }) + circ(17, 5, 1.8, { fill: est }) + circ(5, 24, 1.6, { fill: est }) + '</pattern>'; break;
       case 'xadrez': padrao = '<pattern id="' + I + 'est" width="24" height="24"' + at(t) + '>' + ret(0, 0, 9, 24, { fill: est, opacity: 0.45 }) + ret(0, 0, 24, 9, { fill: est, opacity: 0.45 }) + '</pattern>'; break;
     }
-    var iris = P.cor('olhos', e.olhos).hex;
+    var iris = corAjustada(e, 'olhos').hex;
     return padrao +
       // Nova Era (ilustração 2D, sem volume 3D): pele de cor lisa
       '<linearGradient id="' + I + 'pele"><stop offset="0" stop-color="' + pele + '"/><stop offset="1" stop-color="' + pele + '"/></linearGradient>' +
@@ -709,8 +721,8 @@
       '<linearGradient id="' + I + 'esclera" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cde6"/><stop offset=".42" stop-color="#fff"/><stop offset="1" stop-color="#f6f1fb"/></linearGradient>' +
       gradienteCabelo(e, I, cab) +
       '<radialGradient id="' + I + 'iris" cx=".5" cy=".38" r=".6"><stop offset="0" stop-color="' + cla(iris, 0.35) + '"/><stop offset=".7" stop-color="' + iris + '"/><stop offset="1" stop-color="' + esc(iris, 0.45) + '"/></radialGradient>' +
-      '<radialGradient id="' + I + 'blush"><stop offset="0" stop-color="' + P.cor('blush', e.blushCor).hex + '" stop-opacity=".8"/><stop offset="1" stop-color="' + P.cor('blush', e.blushCor).hex + '" stop-opacity="0"/></radialGradient>' +
-      '<radialGradient id="' + I + 'lab" cx=".5" cy=".55" r=".6"><stop offset="0" stop-color="' + cla(P.cor('batom', e.batomCor).hex, 0.45) + '"/><stop offset="1" stop-color="' + P.cor('batom', e.batomCor).hex + '"/></radialGradient>' +
+      '<radialGradient id="' + I + 'blush"><stop offset="0" stop-color="' + corAjustada(e, 'blush').hex + '" stop-opacity=".8"/><stop offset="1" stop-color="' + corAjustada(e, 'blush').hex + '" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="' + I + 'lab" cx=".5" cy=".55" r=".6"><stop offset="0" stop-color="' + cla(corAjustada(e, 'batom').hex, 0.45) + '"/><stop offset="1" stop-color="' + corAjustada(e, 'batom').hex + '"/></radialGradient>' +
       '<clipPath id="' + I + 'olhoE"><path d="' + formaOlho(164) + '"/></clipPath><clipPath id="' + I + 'olhoD"><path d="' + formaOlho(236) + '"/></clipPath>';
   }
 
@@ -718,7 +730,7 @@
   // mechas: "pontas" e "arco" mudam o degradê do cabelo (vale para todos os cortes); "frente" desenha faixas
   function gradienteCabelo(e, I, cab) {
     // Nova Era: cor lisa, só uma sombra na raiz (o brilho vem das mechas de luz desenhadas)
-    var m = P.cor('cabelo', e.mechasCor).hex, st = [[0, esc(cab, 0.14)], [0.14, cab], [1, cab]];
+    var m = corAjustada(e, 'mechas').hex, st = [[0, esc(cab, 0.14)], [0.14, cab], [1, cab]];
     if (e.mechas === 'pontas') st = [[0, cla(cab, 0.18)], [0.45, cab], [0.8, m], [1, cla(m, 0.2)]];
     if (e.mechas === 'arco') st = [[0, cla(cab, 0.18)], [0.4, cab], [0.55, '#ff7cc8'], [0.68, '#ffd76a'], [0.8, '#7ee8ff'], [0.92, '#b892ff'], [1, '#86ecc8']];
     return '<linearGradient id="' + I + 'cab" x1="0" y1="0" x2="0" y2="1">' + st.map(function (s) { return '<stop offset="' + s[0] + '" stop-color="' + s[1] + '"/>'; }).join('') + '</linearGradient>';
@@ -980,7 +992,7 @@
         s += circ(126, 470, 8, { fill: '#ff4fa3', stroke: '#c22a78', 'stroke-width': 2 }) + circ(274, 470, 8, { fill: '#ff4fa3', stroke: '#c22a78', 'stroke-width': 2 });
         break;
     }
-    if (e.mechas === 'frente') { var mc = P.cor('cabelo', e.mechasCor).hex; s += p('M152,112 Q136,150 124,214', { fill: 'none', stroke: mc, 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0.9 }) + p('M246,110 Q266,148 278,210', { fill: 'none', stroke: mc, 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0.9 }); }
+    if (e.mechas === 'frente') { var mc = corAjustada(e, 'mechas').hex; s += p('M152,112 Q136,150 124,214', { fill: 'none', stroke: mc, 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0.9 }) + p('M246,110 Q266,148 278,210', { fill: 'none', stroke: mc, 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0.9 }); }
     // brilho do cabelo em ilustração: mechas de luz finas que seguem a curva da cabeça (no lugar da faixa larga)
     if (brilho) s += p('M150,124 Q176,108 196,106 M162,130 Q182,116 198,114 M250,124 Q224,108 204,106 M238,130 Q218,116 202,114', { fill: 'none', stroke: '#fff', 'stroke-width': 2.2, 'stroke-linecap': 'round', opacity: 0.3 });
     return s;
@@ -1402,7 +1414,7 @@
     if (['fininhos', 'fininhosPuxados'].indexOf(e.formaOlho) < 0)
       s += p('M' + pt(g.q(-10, -15 * g.r)) + 'C' + pt(g.q(-2, -23 * g.r)) + ' ' + pt(g.q(14, -25 * g.r)) + ' ' + pt(g.q(25, -9)), { fill: 'none', stroke: esc(pele, 0.3), 'stroke-width': 1.2, 'stroke-linecap': 'round', opacity: men ? 0.3 : 0.5 });
     var sombraDoOlho = s; s = '';
-    var forma = formaOlho(cx), clip = 'url(#' + I + (lado < 0 ? 'olhoE' : 'olhoD') + ')', corI = P.cor('olhos', e.olhos).hex, ri = 13 * (g.r > 1 ? 1.06 : 1);
+    var forma = formaOlho(cx), clip = 'url(#' + I + (lado < 0 ? 'olhoE' : 'olhoD') + ')', corI = corAjustada(e, 'olhos').hex, ri = 13 * (g.r > 1 ? 1.06 : 1);
     s += p(forma, { fill: 'url(#' + I + 'esclera)' });
     s += '<g clip-path="' + clip + '">' + circ(ix, cy + 1.5, ri, { fill: 'url(#' + I + 'iris)' }) + circ(ix, cy + 1.5, ri - 0.6, { fill: 'none', stroke: esc(corI, 0.6), 'stroke-width': 1.4 }) +
       p('M' + n(ix - ri * 0.7) + ',' + n(cy + 6) + ' Q' + ix + ',' + n(cy + ri + 1) + ' ' + n(ix + ri * 0.7) + ',' + n(cy + 6), { fill: 'none', stroke: cla(corI, 0.45), 'stroke-width': 2.4, opacity: 0.55, 'stroke-linecap': 'round' }) +
@@ -1697,7 +1709,7 @@
       p(estrela4(48, 340, 7), { fill: '#fff' }) + p(estrela4(352, 340, 7), { fill: '#fff' }) + circ(84, 470, 3, { fill: '#fff' }) + circ(316, 470, 3, { fill: '#fff' });
   }
   function sapatos(e, cor, pele, peleE, peca, deCostas) {
-    var s = '', c = esc(cor.hex, 0.3), esmalte = { tipo: e.unhas, cor: P.cor('roupa', e.unhasCor) };
+    var s = '', c = esc(cor.hex, 0.3), esmalte = { tipo: e.unhas, cor: corAjustada(e, 'unhas') };
     function salto(x, alt, larg) { return p('M' + n(x - larg / 2) + ',656 L' + n(x + larg / 2) + ',656 L' + n(x + larg / 3) + ',' + (656 + alt) + ' L' + n(x - larg / 3) + ',' + (656 + alt) + 'Z', { fill: esc(cor.hex, 0.25), stroke: esc(cor.hex, 0.45), 'stroke-width': 1 }); }
     function bico(x) { return 'M' + (x - 16) + ',652 Q' + (x - 17) + ',634 ' + x + ',632 Q' + (x + 17) + ',634 ' + (x + 16) + ',652 Q' + x + ',661 ' + (x - 16) + ',652Z'; }
     function frente(x) { return 'M' + (x - 16) + ',645 Q' + x + ',639 ' + (x + 16) + ',645 L' + (x + 16) + ',652 Q' + x + ',661 ' + (x - 16) + ',652Z'; }
@@ -2230,7 +2242,7 @@
     var w = Math.max(x2 - x1, 90), h = Math.max(y2 - y1, 90), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
     return [n(cx - w / 2), n(cy - h / 2), n(w), n(h)];
   }
-  var API = { svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
+  var API = { corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
   API.POSES = POSES;
   raiz.PurpurinaBoneca = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
