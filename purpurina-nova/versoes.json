@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.4.1",
+      "data": "19/Nov/2026",
+      "hora": "20:58:03",
+      "pt": [
+        "📏 Corpo com medidas de gente de verdade: 5 cabeças de altura aos 5 anos, 6 aos 10, 7 aos 15 e 7,5 na adulta; pernas com metade da altura (antes estavam compridas demais), tronco do tamanho certo, coxa mais grossa afinando até o tornozelo, quadril e ombros reais para cada idade.",
+        "✋ As mãos (com anel e pulseira) não esticam mais junto com as pernas: ficam do tamanho certo."
+      ],
+      "en": [
+        "📏 A body with real-life measurements: 5 heads tall at age 5, 6 at 10, 7 at 15 and 7.5 as an adult; legs are half the height (they were far too long), the torso is the right size, thighs are fuller and taper to the ankle, and hips and shoulders match each age.",
+        "✋ Hands (with ring and bracelet) no longer stretch with the legs: they stay the right size."
+      ],
+      "es": [
+        "📏 Un cuerpo con medidas de verdad: 5 cabezas de alto a los 5 años, 6 a los 10, 7 a los 15 y 7,5 de adulta; las piernas miden la mitad de la altura (antes eran demasiado largas), el torso tiene el tamaño correcto, los muslos son más llenos y se afinan hasta el tobillo, y caderas y hombros reales para cada edad.",
+        "✋ Las manos (con anillo y pulsera) ya no se estiran con las piernas: se quedan del tamaño correcto."
+      ]
+    },
+    {
       "versao": "0.4.0",
       "data": "19/Nov/2026",
       "hora": "20:41:11",
