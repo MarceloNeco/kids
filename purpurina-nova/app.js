@@ -638,13 +638,19 @@
     }
     return V.limpar(e);
   }
+  // cada cartão numa pose natural diferente (dono, 20/Nov/2026: "as poses são sempre as mesmas"), com o esqueleto
+  var POSES_CARTAO = ['cintura', 'bolsos', 'queixo', 'relax', 'duasCintura', 'cruzados', 'olhaE'];
+  function poseCartao(k) {
+    var q = PurpurinaAnim.POSES[POSES_CARTAO[k % POSES_CARTAO.length]];
+    return { oE: q.oE, cE: q.cE, fE: q.fE || 1, oD: q.oD, cD: q.cD, fD: q.fD || 1 };
+  }
   function listaEstilos() {
     var caixa = $('listaEstilos'); caixa.innerHTML = '';
     P.ESTILOS.forEach(function (st, k) {
       var card = document.createElement('div'); card.className = 'look';
       var mini = document.createElement('div'); mini.className = 'mini-boneca';
       var e = vestirEstilo(st, livre);
-      mini.innerHTML = B.svg(e, { id: 'estilo' + k, area: [0, 60, 400, 600], cortar: true });
+      mini.innerHTML = B.svg(e, { id: 'estilo' + k, area: [0, 60, 400, 600], cortar: true, poseRig: poseCartao(k) });
       var nome = document.createElement('p'); nome.className = 'nome-pronta'; nome.textContent = st.ico + ' ' + N(st);
       var linha = document.createElement('div'); linha.className = 'linha';
       var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('✨ Vestir e editar', '✨ Wear and edit', '✨ Ponérmelo y editar');
@@ -659,7 +665,7 @@
       var card = document.createElement('div'); card.className = 'look';
       var mini = document.createElement('div'); mini.className = 'mini-boneca';
       var e = V.limpar(Object.assign({}, P.PADRAO, pr.e));
-      mini.innerHTML = B.svg(e, { id: 'pronta' + k, area: [0, 60, 400, 600], cortar: true });
+      mini.innerHTML = B.svg(e, { id: 'pronta' + k, area: [0, 60, 400, 600], cortar: true, poseRig: poseCartao(k + 3) });
       var nome = document.createElement('p'); nome.className = 'nome-pronta'; nome.textContent = pr.ico + ' ' + N(pr);
       var linha = document.createElement('div'); linha.className = 'linha';
       var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = pr.e.personagem === 'menino' ? t('✨ Brincar com ele', '✨ Play with him', '✨ Jugar con él') : t('✨ Brincar com ela', '✨ Play with her', '✨ Jugar con ella');
@@ -675,7 +681,7 @@
     looks.forEach(function (l, k) {
       var card = document.createElement('div'); card.className = 'look';
       var mini = document.createElement('div'); mini.className = 'mini-boneca';
-      mini.innerHTML = B.svg(V.limpar(l.e), { id: 'look' + k, area: [0, 60, 400, 600], cortar: true });
+      mini.innerHTML = B.svg(V.limpar(l.e), { id: 'look' + k, area: [0, 60, 400, 600], cortar: true, poseRig: poseCartao(k + 1) });
       var linha = document.createElement('div'); linha.className = 'linha';
       var vestir = document.createElement('button'); vestir.type = 'button'; vestir.textContent = t('👗 Vestir', '👗 Wear', '👗 Ponérmelo');
       vestir.addEventListener('click', function () { livre = V.limpar(l.e); gravar('purpurinaNova.atual', livre); Som.tocar('brilho'); comecar(null); });

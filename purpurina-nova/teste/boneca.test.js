@@ -268,7 +268,7 @@ test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/No
   const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8'), app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   // andando: os dois braços em grupos próprios que giram no ombro, também de manga comprida e de vestido
   for (const ex of [{}, { blusa: 'sueter' }, { vestido: 'festa', calca: 'nenhum' }]) {
-    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'a', fundo: false, passos: true });
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'a', fundo: false, passos: true, rig: false });
     assert.equal(bemFormado(s), '');
     assert.ok(s.includes('class="pp-braco-e"') && s.includes('class="pp-braco-d"'), 'os braços balançam');
   }
@@ -474,4 +474,15 @@ test('roupa acompanha o gingado e pescoço sem divisão (dono, 20/Nov/2026)', ()
   assert.doesNotMatch(s, /fill="#7a5ba8" opacity="0.1"\/>/, 'sem a faixa reta de sombra no pescoço');
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
   assert.match(anim, /v\.ex \+= v\.cx; v\.dx \+= v\.cx/, 'andando, as pernas saem do quadril');
+});
+
+test('esqueleto em todo desenho de frente, ombros femininos e queixo delicado (dono, 20/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta' }, { id: 'pd', fundo: false });
+  assert.match(s, /class="rig-ombro-e"/, 'sem pedir, o desenho de frente já usa o esqueleto (mangas acompanham os braços)');
+  assert.doesNotMatch(B.svg({}, { id: 'pr', fundo: false, rig: false }), /rig-ombro/, 'rig: false mantém o braço parado antigo');
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: 7[^\[]*larg: (\[[^\]]*\])/)[1]);
+  assert.ok(L[0] < L[3], 'ombro mais estreito que o quadril');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /poseRig: poseCartao\(k\)/);
 });

@@ -35,14 +35,14 @@
          quadril mais estreito que os ombros. A cabeça inteira vai junto, só reduzida. */
   var PROPORCAO = {
     // larg: ombro, busto, cintura, quadril, coxa, joelho, panturrilha, tornozelo (curvas femininas; menino em MENINO)
-    // (20/Nov/2026, dono, com silhueta de referência medida): o ombro é o mais largo, o busto um pouco menor que o ombro,
+    // (20/Nov/2026, dono, com silhueta de referência medida; ombro feminino: um pouco mais estreito que o quadril): o busto do tamanho do ombro,
     // a cintura ~67% do quadril e tudo em curva contínua (gx) — antes o busto passava do ombro e a cintura fazia quina
     // (20/Nov/2026, dono: "a adulta ainda continua muito esticada… mais natural"): um pouco menos de cabeças e membros
     // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
     pequena: { cabecas: 4.8, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.92, 0.94, 0.97, 1.04, 0.98, 0.9, 0.94, 0.86] },
     crianca: { cabecas: 5.8, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.88, 0.9, 0.86, 1.02, 0.98, 0.88, 0.94, 0.84] },
-    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [1.1, 0.96, 0.8, 1.1, 1.06, 0.86, 0.95, 0.8] },
-    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [1.15, 1, 0.78, 1.16, 1.12, 0.88, 0.97, 0.8] }
+    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.98, 0.96, 0.8, 1.1, 1.06, 0.86, 0.95, 0.8] },
+    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [1, 1, 0.78, 1.16, 1.12, 0.88, 0.97, 0.8] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
@@ -386,7 +386,8 @@
     /* opcoes.rig (Nova Era, 20/Nov/2026: "as poses precisam de movimento, não ficar trocando de foto"): os braços viram um
        esqueleto — ombro, cotovelo e mão em grupos que giram (.rig-ombro-*, .rig-cotovelo-*), a cabeça inclina (.rig-cabeca)
        e as íris andam (.rig-iris). Quem mexe é o animador.js, de pose em pose, sem redesenhar. */
-    var rig = !!op.rig && !angB && !tchau;
+    // esqueleto em todo desenho de frente (dono, 20/Nov/2026: "manga torta" nos cartões): o braço parado antigo só com rig: false
+    var rig = op.rig !== false && !angB && !tchau && !(POSES.indexOf(op.pose) >= 0);
     var bracoPose = !rig && !angB && !tchau && POSES.indexOf(op.pose) >= 0 ? op.pose : '';
     var semDireito = tchau || !!bracoPose || rig, semEsquerdo = rig || (!!bracoPose && bracoPose !== 'cintura' && bracoPose !== 'beijo'), semBracos = semDireito && semEsquerdo;
     var iniBracos = out.length;
@@ -1127,7 +1128,10 @@
        quadradinho fica mais alto e redondinho. Continua sendo cada formato, só que delicado. */
     if (!menino) base0 = base0.map(function (v) {
       if (v.c[0] === 0 && v.c[1] >= 70) return { c: [0, v.c[1] - 4, v.c[2] - 24], r: [v.r[0] * 0.75, v.r[1] * 0.8, v.r[2] * 0.6] };
-      if (v.c[0] === 0 && v.c[1] >= 30 && v.c[1] < 70) return { c: [0, v.c[1] - 2, v.c[2] - 8], r: [v.r[0] * 0.97, v.r[1] * 0.92, v.r[2] * 0.9] };   // maxilar menor e mais para trás
+      if (v.c[0] === 0 && v.c[1] >= 30 && v.c[1] < 70) return { c: [0, v.c[1] + 1, v.c[2] - 8], r: [v.r[0] * 0.88, v.r[1] * 1.02, v.r[2] * 0.9] };   // maxilar mais estreito, afinando até o queixo
+      // (20/Nov/2026, dono: "queixo de mulheres não femininos"): o crânio termina mais alto, para o rosto não fechar em "U"
+      // largo; quem desenha a parte de baixo é o maxilar, que afina em V suave até um queixinho delicado
+      if (v.c[0] === 0 && v.c[1] < 0) return { c: [0, v.c[1] - 6, v.c[2]], r: [v.r[0], v.r[1] - 8, v.r[2]] };
       if (v.c[0] !== 0 && v.c[1] >= 60) return { c: [v.c[0] * 0.85, v.c[1] - 10, v.c[2] - 6], r: [v.r[0] * 0.85, v.r[1] * 0.8, v.r[2] * 0.85] };
       return v;
     });
