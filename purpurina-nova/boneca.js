@@ -401,7 +401,7 @@
     } else {
       out.push(elip(116, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }), elip(284, 216, 12, 17, { fill: pele, stroke: peleE, 'stroke-width': 2 }));
       out.push(pintar(rosto, 'url(#' + I + 'pele)', esc(pele, 0.42), 1.1));
-      out.push(luzLados(pele, menino), luzMeio(pele), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, 0, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, e, I, C, 0, op.anim))));
+      out.push(luzLados(pele, menino), luzMeio(pele), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, 0, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, 0, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
       out.push(deslocar(-dO, sobr(164, -1)), deslocar(dO, sobr(236, 1)));
       out.push(narizFrente(e.nariz, pele) + narizLuz(pele, menino));
       out.push(bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))));
