@@ -111,6 +111,7 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
 - Peças compartilhadas na raiz, usadas pelos jogos com `../`: `recursos.js` (interruptores do RootifyONE), `idioma.js`
   (PT/EN/ES escolhido na estante),
   `navegacao.js` (🏠 Início e 🚪 Saída), `atualizar.js` (aviso de versão nova), `telacheia.js`, `cofre.js`, `janela.js`, `trilha.js` (música dos jogos novos), `clipe.js` (📺 Clipe: telão com bichinhos dançando a música que toca, na rádio e no H-rraaa);
+  `carrossel.js` (roda em perspectiva que gira sozinha, em pé, nos jogos com vários joguinhos dentro: Jogoteca e TIJOLAÇO; dono, 20/Nov/2026);
   bibliotecas em `baguncolandia/libs/`. Cartões da estante (dono, 15/Nov/2026): compactos, montados pelo `catalogo.js` — ícone,
   nome inteiro, "? ⌄" que abre a explicação, ícones do campo `rec` (TV, corpo, inclinar, dois; sem internet/precisa de internet
   vêm de `instalar`/`soOnline`; tocar explica), ⬇ Instalar e **Jogar sempre na ponta direita**. Vigia: `teste/estante-cartoes.test.js`.

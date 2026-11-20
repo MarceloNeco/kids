@@ -2,6 +2,20 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.3.1",
+      "data": "20/Nov/2026",
+      "hora": "10:53:31",
+      "pt": [
+        "🎠 Com o celular ou o tablet em pé, as capas giram numa roda: a da frente é a escolhida, as outras aparecem menores atrás, e a roda vai mostrando todos os jogos até você tocar. Arraste para o lado para girar; toque na capa da frente para jogar"
+      ],
+      "en": [
+        "🎠 With the phone or tablet upright, the covers spin on a wheel: the front one is the chosen game, the others show smaller behind it, and the wheel keeps showing every game until you touch it. Swipe sideways to spin; tap the front cover to play"
+      ],
+      "es": [
+        "🎠 Con el móvil o la tablet en vertical, las portadas giran en una rueda: la de delante es la elegida, las demás se ven más pequeñas detrás, y la rueda va mostrando todos los juegos hasta que la tocas. Desliza hacia un lado para girarla; toca la portada de delante para jugar"
+      ]
+    },
+    {
       "versao": "0.3.0",
       "data": "20/Nov/2026",
       "hora": "01:27:48",

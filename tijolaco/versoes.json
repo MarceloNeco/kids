@@ -2,6 +2,20 @@
   "app": "tijolaco",
   "versoes": [
     {
+      "versao": "0.1.1",
+      "data": "20/Nov/2026",
+      "hora": "10:53:31",
+      "pt": [
+        "🎠 Com o celular ou o tablet em pé, os cinco modos giram numa roda para mostrar tudo o que vem por aí: o TijoLinto já joga, os outros aparecem com \"Em breve\". Arraste para o lado para girar"
+      ],
+      "en": [
+        "🎠 With the phone or tablet upright, the five modes spin on a wheel to show everything that's coming: Brickrinth is ready to play, the others say \"Coming soon\". Swipe sideways to spin"
+      ],
+      "es": [
+        "🎠 Con el móvil o la tablet en vertical, los cinco modos giran en una rueda para enseñar todo lo que viene: Ladrilaberinto ya se puede jugar, los demás dicen \"Muy pronto\". Desliza hacia un lado para girarla"
+      ]
+    },
+    {
       "versao": "0.1.0",
       "data": "19/Nov/2026",
       "hora": "20:00:00",

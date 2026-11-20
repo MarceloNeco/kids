@@ -194,3 +194,21 @@ body.deitado .faixa { left: calc(50% + var(--campo-esq, 110px) / 2); top: 14px; 
 }
 
 #desligado:not([hidden]) { display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; background: var(--placa); }
+
+/* em pé: os modos numa roda que gira (../carrossel.js, dono 20/Nov/2026); só o TijoLinto já joga */
+.modos.roda-3d { display: block; position: relative; height: 150px; margin: 0 -14px; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.modos.roda-3d .mini-modos { display: contents; }
+.modos.roda-3d .modo { position: absolute; left: 50%; top: 50%; width: 250px; height: 120px; min-height: 0; box-sizing: border-box; will-change: transform; }
+.modos.roda-3d .modo.breve { gap: 8px; background: linear-gradient(180deg, #4a5662, #2b343d); border-color: rgba(255, 255, 255, .22); color: #fff; }
+.modos.roda-3d .modo.breve .mo-ico { width: 52px; height: 52px; }
+.modos.roda-3d .modo.breve .mo-nome { font-size: 21px; }
+.modos.roda-3d .fita { top: 14px; right: -30px; width: 124px; font-size: 10px; }
+.coluna.bloqueada .grupo, .coluna.bloqueada .fases { opacity: .35; pointer-events: none; }
+.jogar:disabled { filter: grayscale(.7) brightness(.8); cursor: default; }
+@media (min-width: 600px) and (orientation: portrait) {
+  .modos.roda-3d { height: 190px; } .modos.roda-3d .modo { width: 320px; height: 150px; }
+}
+.modos.roda-3d .modo.destaque { flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px; padding: 10px 16px; width: 270px; }
+.modos.roda-3d .modo.destaque .mo-nome { font-size: 24px; } .modos.roda-3d .modo.destaque .mo-desc { font-size: 13.5px; }
+@media (min-width: 600px) and (orientation: portrait) { .modos.roda-3d .modo.destaque { width: 340px; } .modos.roda-3d .modo.destaque .mo-desc { font-size: 16px; } }
+@media (min-width: 600px) and (orientation: portrait) { .modos.roda-3d .modo.breve .mo-ico { width: 66px; height: 66px; } .modos.roda-3d .modo.breve .mo-nome { font-size: 25px; } }
