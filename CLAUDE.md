@@ -143,6 +143,9 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   `teste/navegacao.test.js`.
 - A cada versão de um jogo: subir `APP_VERSION` no `app.js`, `VERSAO` no `sw.js` e a entrada nova em `versoes.json`
   (PT/EN, data e hora) — os testes conferem que os três são iguais. Arquivo novo do jogo entra no `ARQUIVOS` do `sw.js`.
+  **Mudou algo que a pessoa vê ou joga?** Troque também o `atualizado: { data, pt, en, es }` do jogo no `catalogo.js` (a data
+  do dia e uma frase curta do que mudou): por 7 dias ele aparece em "✨ Novidades da semana", em "jogos que ganharam
+  novidades" (dono, 20/Nov/2026). Ajuste só técnico (carregamento, cache) não entra. Vigia: `teste/novidades.test.js`.
 - Testes: `node --test <jogo>/teste/*.test.js` (rodar da raiz deste repositório).
 - Jogo novo: pasta própria + entrada em `catalogo.js` (com `novo: 'AAAA-MM-DD'`, a data do dia: por 7 dias o cartão
   ganha "✨ Novo" e o jogo aparece na janela "✨ Novidades da semana" toda vez que a estante abre (não ao voltar de um jogo), até "Não mostrar mais esta

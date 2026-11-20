@@ -15,6 +15,9 @@
              sempre "Jogar / Play / Jugar" (igual em todos); este campo fica para quem quiser o verbo próprio.
     novo     data em que o jogo entrou na estante ('AAAA-MM-DD'). Por 7 dias o cartão ganha o selo "✨ Novo" e o jogo
              aparece na janela "✨ Novidades da semana" (novidades.js). Jogo novo = pôr a data do dia.
+    atualizado (opcional) { data: 'AAAA-MM-DD', pt, en, es }: a última novidade que a pessoa nota num jogo que já
+             existia (dono, 20/Nov/2026). Por 7 dias o jogo aparece em "Jogos atualizados" na mesma janela, com esta
+             frase. Versão nova de jogo com algo que se vê = trocar a data e a frase (uma só, curta, nos três idiomas).
     instalar true = pode ser instalado e funciona sem internet (o service worker fica em url + 'sw.js')
     soOnline true = precisa de internet (ex.: YouTube e TV); o cartão mostra "🌐 Só com internet"
     tv       { texto, tag, param } = abre na TV com este parâmetro; param vai no fim do endereço
@@ -33,6 +36,12 @@
       es: "Frutas, dulces y personajes vuelan por la tele, y tú los cortas, los atrapas, les das patadas, saltas y te agachas con todo el cuerpo. 1 o 2 jugadores, un muñeco a tu gusto, o con el dedo en el móvil.",
       tag: '▶ Brincar / Play / Jugar', instalar: true,
       tv: { texto: 'Corte, pegue, chute, pule e abaixe com o corpo. A TV mostra o código; o celular filma.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
+    { id: 'contador-de-historias', rec: ['tv'], nomes: { en: "Storyteller", es: "Cuentacuentos" }, nome: 'Contador de Histórias', ico: '📖', cor: '#3ee8ff', url: '/contador-de-historias/',
+      texto: 'Histórias para dormir: um acervo para ler e ouvir, e a criação de histórias novas com os nomes da sua família.',
+      en: "Bedtime stories: a library to read and listen to, and brand-new stories made up with your family's names.",
+      es: "Cuentos para dormir: una biblioteca para leer y escuchar, y cuentos nuevos inventados con los nombres de tu familia.",
+      tag: '▶ Ouvir / Listen / Escuchar', instalar: true,
+      tv: { texto: 'Histórias para ler e ouvir na tela grande, antes de dormir.', tag: '▶ Abrir', param: '' } },
     { id: 'peluqueria', rec: ['tv', 'cam', 'dois'], nome: 'Peluqueria', ico: '💇', cor: '#ffd166', url: '/kids/peluqueria/',
       texto: 'O provador maluco da família: uma coroa, um bigode ou uma peruca desce sobre o bicho e você toca na hora certa. Quanto mais perto, mais pontos. UHUL!',
       en: "The family's silly dressing room: a crown, a moustache or a wig comes down onto the animal and you tap at just the right moment. The closer you get, the more points. WOOHOO!",
@@ -45,13 +54,15 @@
       es: "La tele pone música de YouTube y muestra a todos los que bailan, con luces de neón, fuegos artificiales y un marcador de energía. El móvil graba y lo controla todo.",
       tag: '▶ Dançar / Dance / Bailar', soOnline: true,
       tv: { texto: 'Música do YouTube na TV e as câmeras dos celulares ao vivo, com neon e placar de energia.', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'vruuum', rec: ['tv', 'cam', 'incl', 'dois'], nome: 'Vruuum!', ico: '🏎️', cor: '#ff9f1c', url: '/kids/vruuum/',
+    { id: 'vruuum',
+      atualizado: { data: '2026-11-19', pt: 'Duelo cada um no seu celular, celulares como controle na TV e dois carrinhos novos: o Ônibus de Turismo e o Pula-Pula.', en: 'Duel with each player on their own phone, phones as controllers on the TV, and two new rides: the Tour Bus and the Trampoline.', es: 'Duelo cada uno con su móvil, los móviles como mando en la tele y dos vehículos nuevos: el Autobús Turístico y la Cama Elástica.' }, rec: ['tv', 'cam', 'incl', 'dois'], nome: 'Vruuum!', ico: '🏎️', cor: '#ff9f1c', url: '/kids/vruuum/',
       texto: 'Corrida de carrinho: desvie dos cones e da lama, pegue estrelas, turbo de arco-íris e rampas, passando pela praia, floresta, doces, neve e cidade neon. 1 ou 2 jogadores na mesma tela.',
       en: "Go-kart racing: dodge the cones and the mud, grab stars, use the rainbow turbo and jump the ramps, racing through the beach, the forest, candy land, the snow and a neon city. 1 or 2 players on the same screen.",
       es: "Carreras de karts: esquiva los conos y el barro, atrapa estrellas, usa el turbo arcoíris y salta las rampas, pasando por la playa, el bosque, el mundo de dulces, la nieve y una ciudad de neón. 1 o 2 jugadores en la misma pantalla.",
       tag: '▶ Correr / Race / Correr', instalar: true,
       tv: { texto: 'Corrida de carrinho: setas do controle para virar, OK para buzinar. Pegue as estrelas!', tag: '▶ Abrir na TV', param: '?tv=auto' } },
-    { id: 'purpurina', rec: ['tv'], nome: "Purpurina 80's", ico: '💄', cor: '#cfa8ff', url: '/kids/purpurina/',
+    { id: 'purpurina',
+      atualizado: { data: '2026-11-15', pt: 'Estilos prontos em Meus looks (K-pop, Praia, Vestido de gala, Rock and roll…) e um desfile com os braços balançando de verdade.', en: 'Ready-made styles in My looks (K-pop, Beach, Ball gown, Rock and roll…) and a runway walk with arms that really swing.', es: 'Estilos listos en Mis looks (K-pop, Playa, Vestido de gala, Rock and roll…) y un desfile con los brazos balanceándose de verdad.' }, rec: ['tv'], nome: "Purpurina 80's", ico: '💄', cor: '#cfa8ff', url: '/kids/purpurina/',
       texto: 'Maquiagem, roupas, joias e muito brilho: monte a personagem, faça a maquiagem com o pincel, vista roupas e acessórios, cumpra desafios e desfile com confete. Brinque na TV com o celular de controle e música do YouTube ou do Spotify.',
       en: "Makeup, clothes, jewelry and lots of sparkle: create your character, do the makeup with a brush, try on clothes and accessories, take on challenges and walk the runway with confetti. Play on the TV using the phone as a remote, with music from YouTube or Spotify.",
       es: "Maquillaje, ropa, joyas y mucho brillo: crea tu personaje, maquíllalo con el pincel, ponle ropa y accesorios, cumple retos y desfila con confeti. Juega en la tele con el móvil como mando y música de YouTube o Spotify.",
@@ -84,7 +95,8 @@
       en: "A brand-new maze every time, square, round or honeycomb-shaped, that pops up in 3D. Walk the puppy or draw the path with your finger, grab the bone in the middle and find the way out.",
       es: "Un laberinto nuevo cada vez, cuadrado, redondo o de panal, que aparece en 3D. Lleva al perrito o traza el camino con el dedo, coge el hueso del centro y encuentra la salida.",
       tag: '▶ Explorar / Explore / Explorar', instalar: true },
-    { id: 'cozinha', novo: '2026-11-06', nomes: { en: "My Little Big Chef", es: "Manos a la Masa" }, nome: 'Mão na Massa', ico: '🍳', img: '/kids/cozinha/icone.svg', cor: '#ff9f6e', url: '/kids/cozinha/',
+    { id: 'cozinha',
+      atualizado: { data: '2026-11-14', pt: 'A cidade virou 3D de verdade: prédios com luz e sombra, carros andando pelas ruas e fumaça nas chaminés. Dá para aproximar com dois dedos.', en: 'The town is now truly 3D: buildings with light and shadow, cars driving down the streets and smoke from the chimneys. Pinch with two fingers to zoom in.', es: 'La ciudad ahora es 3D de verdad: edificios con luces y sombras, coches por las calles y humo en las chimeneas. Acerca la vista con dos dedos.' }, novo: '2026-11-06', nomes: { en: "My Little Big Chef", es: "Manos a la Masa" }, nome: 'Mão na Massa', ico: '🍳', img: '/kids/cozinha/icone.svg', cor: '#ff9f6e', url: '/kids/cozinha/',
       texto: 'Escolha uma receita, saia pela vila para pescar, colher, comprar no mercado ou pedir emprestado à vizinha, e volte para cozinhar: misturar, bater, ligar o fogão e servir. 12 receitas.',
       en: "Pick a recipe, head out around the village to fish, pick fruit, shop at the market or borrow from the neighbor, then come back to cook: mix, whisk, turn on the stove and serve. 12 recipes.",
       es: "Elige una receta, sal por el pueblo a pescar, cosechar, comprar en el mercado o pedirle algo prestado a la vecina, y vuelve a cocinar: mezclar, batir, encender el fuego y servir. 12 recetas.",
@@ -104,7 +116,8 @@
       en: "Hide your ships and sink everyone else's: E4, F2... Play as a family, 2 to 4 players, each on their own phone, with a 4-letter code. You can also play against the computer or pass the phone around.",
       es: "Esconde tus barcos y hunde los de los demás: E4, F2... Juega en familia, de 2 a 4 personas, cada una en su móvil, con un código de 4 letras. También contra el ordenador o pasando el móvil.",
       tag: '▶ Navegar / Sail / Navegar', instalar: true },
-    { id: 'a-garra', novo: '2026-11-14', nome: 'H-rraaa', ico: '🧸', img: '/kids/a-garra/icone.svg', cor: '#39ff6a', url: '/kids/a-garra/',
+    { id: 'a-garra',
+      atualizado: { data: '2026-11-20', pt: 'Máquinas novas (Festas do Ano, Gigantes e Boneco Gigante) e o botão Clipe, com as pelúcias dançando a música.', en: 'New machines (Holidays, Giants and Giant Doll) and the Music video button, with the plushies dancing to the music.', es: 'Máquinas nuevas (Fiestas del Año, Gigantes y Muñeco Gigante) y el botón Videoclip, con los peluches bailando la música.' }, novo: '2026-11-14', nome: 'H-rraaa', ico: '🧸', img: '/kids/a-garra/icone.svg', cor: '#39ff6a', url: '/kids/a-garra/',
       texto: 'A máquina de pegar bichinho em 3D, igual à do fliperama: leve a garra com as setas, aperte PEGAR e torça para ela não soltar! Pelúcias, bichinhos que mexem, insetos, hambúrgueres, filhotes de verdade que andam, pelúcias gigantes, um boneco grande para cortar o fio com a tesoura e uma máquina de festas que muda com a época do ano.',
       en: "The 3D claw machine, just like at the arcade: move the claw with the arrows, press GRAB and hope it doesn't let go! Plushies, wiggly critters, bugs, burgers, real-looking puppies that walk around, giant plushies, a big doll whose string you cut with scissors and a holiday machine that changes through the year.",
       es: "La máquina de garra en 3D, igual que la de la feria: mueve la garra con las flechas, pulsa COGER ¡y cruza los dedos para que no lo suelte! Peluches, bichitos que se mueven, insectos, hamburguesas, cachorritos que caminan, peluches gigantes, un muñeco grande cuyo hilo cortas con tijeras y una máquina de fiestas que cambia según la época del año.",
@@ -114,7 +127,8 @@
       en: "Think of someone and the slime guesses who it is! More than 1,600 characters, and it learns the ones it doesn't know. Plus Face Duel: each player picks a secret face and asks \"glasses?\", \"a crown?\" until they find the other one's. With Melekento Blue and Pink Honey.",
       es: "¡Piensa en alguien y el slime adivina quién es! Más de 1600 personajes, y aprende los que no conoce. Y el Duelo de Caras: cada uno elige una cara en secreto y pregunta \"¿lleva gafas?\", \"¿tiene corona?\" hasta descubrir la del otro. Con Melekento Blue y Pink Honey.",
       tag: '▶ Adivinhar / Guess / Adivinar', instalar: true },
-    { id: 'jogoteca', rec: ['tv'], novo: '2026-11-19', nome: 'Jogoteca', ico: '📚', img: '/kids/jogoteca/icone.svg', cor: '#ffcf4a', url: '/kids/jogoteca/',
+    { id: 'jogoteca',
+      atualizado: { data: '2026-11-20', pt: 'Chegaram o Jogo da Velha de guerra e o Xadrez de guerra, com uma batalha a cada captura.', en: 'Tic-Tac-Toe at war and Chess at war have arrived, with a battle on every capture.', es: 'Llegan el Tres en raya en guerra y el Ajedrez en guerra, con una batalla en cada captura.' }, rec: ['tv'], novo: '2026-11-19', nome: 'Jogoteca', ico: '📚', img: '/kids/jogoteca/icone.svg', cor: '#ffcf4a', url: '/kids/jogoteca/',
       texto: 'A biblioteca dos jogos clássicos para jogar em família: Paciência, Sudoku, Boliche, o game show Bolinhas da Angústia e o Jogo da Velha e o Xadrez de guerra, cada um com três níveis. E vem mais por aí: Milionário José Pobre e Bilhar.',
       en: 'The library of classic games for the whole family: Solitaire, Sudoku, Bowling, the Nail-Biter Drop game show and Tic-Tac-Toe and Chess at war, each with three levels. And more on the way: Millionaire Joe Broke and Pool.',
       es: 'La biblioteca de los juegos clásicos para jugar en familia: Solitario, Sudoku, Bolos, el concurso Bolitas de la Angustia y el Tres en Raya y el Ajedrez en guerra, cada uno con tres niveles. Y vienen más: Millonario José Pobre y Billar.',
@@ -128,13 +142,8 @@
       texto: 'O jogo da obra! No TijoLinto, a betoneira-canhão atira tijolos na fila que rola pelo labirinto do canteiro: junte 3 da mesma cor, faça combos e abra os portões antes que a fila chegue na caçamba. Em breve: Obra, Demolição, Canteiro e Mutirão.',
       en: 'The construction game! In Brickrinth, the cement-mixer cannon fires bricks at a line rolling through the building-site maze: match 3 of a color, chain combos and swing the gates before the line reaches the dumpster. Coming soon: Build, Wrecking, Yard and Team-Up.',
       es: '¡El juego de la obra! En Ladrilaberinto, la hormigonera-cañón dispara ladrillos a la fila que rueda por el laberinto de la obra: junta 3 del mismo color, encadena combos y abre las compuertas antes de que la fila llegue al contenedor. Muy pronto: Obra, Derribo, Almacén y Faena.',
-      tag: '▶ Jogar / Play / Jugar', instalar: true },
-    { id: 'contador-de-historias', rec: ['tv'], nomes: { en: "Storyteller", es: "Cuentacuentos" }, nome: 'Contador de Histórias', ico: '📖', cor: '#3ee8ff', url: '/contador-de-historias/',
-      texto: 'Histórias para dormir: um acervo para ler e ouvir, e a criação de histórias novas com os nomes da sua família.',
-      en: "Bedtime stories: a library to read and listen to, and brand-new stories made up with your family's names.",
-      es: "Cuentos para dormir: una biblioteca para leer y escuchar, y cuentos nuevos inventados con los nombres de tu familia.",
-      tag: '▶ Ouvir / Listen / Escuchar', instalar: true,
-      tv: { texto: 'Histórias para ler e ouvir na tela grande, antes de dormir.', tag: '▶ Abrir', param: '' } }
+      tag: '▶ Jogar / Play / Jugar', instalar: true }
+
   ];
   // cartão final da estante (não é um jogo)
 
@@ -148,7 +157,11 @@
       var dias = ((hoje || Date.now()) - Date.parse(j.novo + 'T00:00:00')) / 864e5;
       return dias >= 0 && dias < 7;
     },
-    novos: function (hoje) { return JOGOS.filter(function (j) { return window.BolinhoCatalogo.ehNovo(j, hoje); }); }
+    novos: function (hoje) { return JOGOS.filter(function (j) { return window.BolinhoCatalogo.ehNovo(j, hoje); }); },
+    // ganhou novidade há 7 dias ou menos (campo "atualizado")
+    atualizados: function (hoje) {
+      return JOGOS.filter(function (j) { return j.atualizado && window.BolinhoCatalogo.ehNovo({ novo: j.atualizado.data }, hoje); });
+    }
   };
 
   function el(tag, classe, texto) {
