@@ -436,30 +436,10 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .pp-ia-caixa { color: var(--text); }
 .pp-ia-caixa input { border-color: var(--borda); background: #fff; color: var(--text); }
 .dica-giro { background: rgba(255, 255, 255, .92); color: var(--text); box-shadow: 0 2px 8px rgba(61, 35, 82, .12); }
-/* ---------- viva no estúdio (dono, 20/Nov/2026: "não precisa ficar parado... se movimentando, dando um tchauzinho") ----------
-   De frente, ela respira e passa o peso de uma perna para a outra, devagar (6 s); a perna do lado do peso fica esticada e a
-   outra relaxa o joelho; os braços balançam de leve; a saia acompanha o quadril. Os centros vêm do boneca.js (corpo novo). */
-.boneca.parada .pp-corpo { animation: vivaCorpo 6s ease-in-out infinite; transform-box: view-box; }
-.boneca.parada .pp-passo-e { animation: vivaPernaE 6s ease-in-out infinite; transform-box: view-box; }
-.boneca.parada .pp-passo-d { animation: vivaPernaD 6s ease-in-out infinite; transform-box: view-box; }
-.boneca.parada .pp-braco-e { animation: vivaBracoE 6s ease-in-out infinite; transform-box: view-box; }
-.boneca.parada .pp-braco-d { animation: vivaBracoD 6s ease-in-out infinite; transform-box: view-box; }
-.boneca.parada .pp-barra { animation: vivaBarra 6s ease-in-out infinite; transform-box: view-box; }
-@keyframes vivaCorpo { 0%, 100% { transform: translate(-1.2%, 0) rotate(.8deg); } 25% { transform: translate(0, -.4%); } 50% { transform: translate(1.2%, 0) rotate(-.8deg); } 75% { transform: translate(0, -.4%); } }
-@keyframes vivaPernaE { 0%, 100% { transform: translate(-1.2%, 0) rotate(2.2deg); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, .4%) rotate(1deg) scaleY(.985); } }
-@keyframes vivaPernaD { 0%, 100% { transform: translate(-1.2%, .4%) rotate(-1deg) scaleY(.985); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, 0) rotate(-2.2deg); } }
-@keyframes vivaBracoE { 0%, 100% { transform: rotate(2.5deg); } 50% { transform: rotate(-1.5deg); } }
-@keyframes vivaBracoD { 0%, 100% { transform: rotate(1.5deg); } 50% { transform: rotate(-2.5deg); } }
-@keyframes vivaBarra { 0%, 100% { transform: skewX(1.2deg); } 50% { transform: skewX(-1.2deg); } }
-/* abertura e menu com poses de modelo (troca suave entre duas camadas) e a mesma respiração do estúdio */
+/* abertura e menu: a camada da personagem (o movimento vem do animador.js; a câmera chega no rosto com transform) */
 .ab-camada { position: absolute; inset: 0; opacity: 0; transition: opacity .8s ease-in-out; }
 .ab-camada.ativa { opacity: 1; }
 .ab-camada svg { width: 100%; height: 100%; }
-.menu-boneca.ab-viva { position: relative; }
-.ab-viva .pp-corpo { animation: vivaCorpo 6s ease-in-out infinite; transform-box: view-box; }
-.ab-viva .pp-passo-e { animation: vivaPernaE 6s ease-in-out infinite; transform-box: view-box; }
-.ab-viva .pp-passo-d { animation: vivaPernaD 6s ease-in-out infinite; transform-box: view-box; }
-.ab-viva .pp-barra { animation: vivaBarra 6s ease-in-out infinite; transform-box: view-box; }
 /* beijinho: os corações saem da boca, sobem para o lado e somem */
 .pp-beijo { transform-box: fill-box; transform-origin: center; animation: beijo 1.6s ease-out infinite; }
 .pp-beijo2 { animation-delay: .5s; }
@@ -469,7 +449,6 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .entrada-boneca { animation: none; width: min(280px, 62vw); height: min(440px, 48vh); }
 /* zoom no rosto da abertura: a câmera chega devagar e volta */
 .ab-camada { transition: opacity .8s ease-in-out, transform 1.1s ease-in-out; }
-.ab-viva { overflow: hidden; }
 /* escolhendo uma parte (dono, 20/Nov/2026: "olha o espaço que tá ocupando a paleta… o rosto tem que estar maior"): o painel
    ocupa só o que precisa (no máximo 40% da tela) e a personagem fica com o resto */
 @media (orientation: portrait) {
@@ -531,3 +510,52 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .tirar-linha { flex-wrap: nowrap; overflow-x: auto; flex-shrink: 0; }
 .tirar-linha .tirar-bt { flex: 0 0 auto; white-space: nowrap; }
 .opcoes-painel > .cores, .opcoes-painel > .barras, .opcoes-painel > .estilos { flex-shrink: 0; }
+/* menu (dono, 20/Nov/2026: "os botões ocupam mais da metade da tela… no máximo um quarto"): a personagem fica com o
+   resto da tela; embaixo, Brincar livre numa faixa e Desafios, Meus looks, Música e TV pequenos numa linha só */
+@media (orientation: portrait) {
+  #menu.ativa { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; gap: 6px; padding-bottom: calc(6px + var(--sb)); }
+  #menu .logo.pequeno { font-size: clamp(1.9rem, 9vw, 2.8rem); }
+  #menu .menu-boneca { flex: 1 1 auto; width: 100%; height: auto; min-height: 0; }
+  .botoes-menu { width: 100%; max-width: 520px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; flex: 0 0 auto; }
+  .linha-menu { display: contents; }
+  .botoes-menu #btLivre { grid-column: 1 / -1; min-height: 52px; font-size: 1.3rem; padding: 4px 10px; }
+  .botoes-menu #btDesafios, .botoes-menu #btLooks, .botoes-menu #btMusica, .botoes-menu #btTV { min-height: 50px; font-size: .82rem; padding: 2px 4px; border-radius: 14px; line-height: 1.15; box-shadow: none; }
+  .botoes-menu #btLooks .bolha { font-size: .72rem; }
+  #menu .guardar .medio { min-height: 38px; font-size: .85rem; padding: 0 12px; }
+  #menu .rodape { font-size: .72rem; }
+}
+.ab-rig { position: relative; overflow: hidden; }
+
+/* ---------- Baladinha (dono, 20/Nov/2026): sala de luzes, a personagem e as amigas dançando, com sombras coloridas ---------- */
+#balada.ativa { display: grid; position: relative; height: 100vh; height: 100dvh; overflow: hidden; background: #0c0b1d;
+  grid-template: "palco" minmax(0, 1fr) "botoes" auto / minmax(0, 1fr); }
+.balada-palco { grid-area: palco; position: relative; overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.balada-palco:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+.bal-camada { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.bal-lavar, .bal-flor, .bal-caixa { will-change: transform; }
+.bal-lavar, .bal-flor { overflow: visible; }   /* a luz que desliza não mostra a borda da camada */
+.bal-sombras, .bal-gente { position: absolute; inset: 0; pointer-events: none; }
+.bal-caixa { position: absolute; }
+.bal-caixa svg { width: 100%; height: 100%; display: block; overflow: visible; }
+/* sombra colorida: o mesmo desenho, todo de uma cor só (a do refletor) */
+.bal-sombra { opacity: .72; }
+.bal-sombra svg * { fill: currentColor !important; stroke: currentColor !important; }
+.bal-sombra svg [fill="none"] { fill: none !important; }
+.bal-sombra svg * { clip-path: none !important; mask: none !important; }   /* sombra não precisa de recorte: mais leve */
+.bal-pula { animation: balPula .5s ease-in-out infinite alternate; }
+@keyframes balPula { from { transform: translateY(0); } to { transform: translateY(-1.8%); } }
+.bal-parede, .bal-lavar ellipse { transition: fill 1.2s ease; }
+.bal-luz-0 .bal-parede { fill: #b4b2ff; } .bal-luz-0 .bal-l1 { fill: #ff3bd0; } .bal-luz-0 .bal-l2 { fill: #3442e8; } .bal-luz-0 .bal-l3 { fill: #2f5bff; }
+.bal-luz-1 .bal-parede { fill: #ffb3ee; } .bal-luz-1 .bal-l1 { fill: #ffd84d; } .bal-luz-1 .bal-l2 { fill: #ff4f9a; } .bal-luz-1 .bal-l3 { fill: #3b6bff; }
+.bal-luz-2 .bal-parede { fill: #c3b0ff; } .bal-luz-2 .bal-l1 { fill: #3bff9a; } .bal-luz-2 .bal-l2 { fill: #2fc4ff; } .bal-luz-2 .bal-l3 { fill: #ff3bd0; }
+.bal-luz-3 .bal-parede { fill: #ffc2c9; } .bal-luz-3 .bal-l1 { fill: #ffb03b; } .bal-luz-3 .bal-l2 { fill: #ff3bd0; } .bal-luz-3 .bal-l3 { fill: #8a4dff; }
+.bal-lavar { animation: balLavar 7s ease-in-out infinite alternate; }
+@keyframes balLavar { from { transform: translateX(-40px); } to { transform: translateX(40px); } }
+.bal-flor { animation: balFlor 18s linear infinite; }
+@keyframes balFlor { to { transform: rotate(360deg); } }
+.bal-brilho { transform-box: fill-box; transform-origin: center; animation: balBrilho 1.6s ease-in-out infinite; }
+@keyframes balBrilho { 0%, 100% { opacity: .2; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.2); } }
+.balada-dica { position: absolute; left: 50%; top: calc(var(--nav-alto, 52px) + 6px); transform: translateX(-50%); margin: 0; padding: 4px 12px;
+  border-radius: 999px; background: rgba(0, 0, 0, .4); color: #fff; font-size: .85rem; white-space: nowrap; pointer-events: none; }
+.balada-botoes { grid-area: botoes; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: #0c0b1d; }
+@media (prefers-reduced-motion: reduce) { .bal-pula, .bal-lavar, .bal-flor, .bal-brilho { animation: none; } }

@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.5';
+  var APP_VERSION = '0.6.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -52,6 +52,8 @@
     Array.prototype.forEach.call(document.querySelectorAll('.tela'), function (s) { s.classList.toggle('ativa', s.id === id); });
     atual = id; window.scrollTo(0, 0);
     if (id !== 'desfile') pararConfete();
+    if (balada) { balada.parar(); balada = null; }
+    if (id === 'balada') baladinha();
     if (id === 'menu') desenharMenu();
     if (id === 'desafios') listaDesafios();
     if (id === 'looks') listaLooks();
@@ -81,7 +83,7 @@
   if (window.BolinhoNav) BolinhoNav.iniciar({ jogo: 'purpurina-nova',
     noInicio: function () { return atual === 'entrada' || atual === 'menu' || atual === 'desligado' || atual === 'tv'; },
     irParaInicio: function () { Som.tocar('clique'); if (janelaAberta) fecharPeloBotao(irMenu); else irMenu(); },
-    emAndamento: function () { return atual === 'estudio' || atual === 'desfile'; },
+    emAndamento: function () { return atual === 'estudio' || atual === 'desfile' || atual === 'balada'; },
     esconder: function () { return TV; } });
 
   if (window.SolverRecursos && !SolverRecursos.ligado('purpurina-nova', true)) { mostrar('desligado'); traduzir(); return; }
@@ -215,23 +217,23 @@
     var mexendo = girando;
     // viva no estúdio (dono, 20/Nov/2026: "não precisa ser estático"): de frente ela respira, passa o peso de uma perna
     // para a outra e balança os braços (classe .parada, estilo.css); de tempos em tempos dá tchauzinho (tchauAte)
+    // viva no estúdio: o esqueleto (opcoes.rig) e o animador.js — ela passa o peso de uma perna para a outra, olha em
+    // volta, põe a mão na cintura e dá tchauzinho, tudo aos poucos (sem redesenhar)
     var viva = !CALMO && !angulo;
-    el.classList.toggle('parada', viva);
-    el.innerHTML = B.svg(estado, { id: 'palco', anim: viva, area: vista, angulo: angulo, realce: !mexendo, passos: viva, tchau: viva && Date.now() < tchauAte, piscadinha: viva && Date.now() < piscaAte });
+    el.innerHTML = B.svg(estado, { id: 'palco', anim: viva, area: vista, angulo: angulo, realce: !mexendo, passos: viva, rig: viva, piscadinha: viva && Date.now() < piscaAte });
+    if (viva && !animEstudio) { animEstudio = PurpurinaAnim.criar(el, { poses: POSES_INTEIRA, segura: 3600 }); posesVista = POSES_INTEIRA; movimentoDaVista(); }
+    if (!viva && animEstudio) { animEstudio.parar(); animEstudio = null; }
     $('btFrente').hidden = !angulo;
     if (angulo !== angMandado) { angMandado = angulo; ponte('giro'); }
     el.setAttribute('aria-label', V.resumo(estado, lingua));
   }
   // tchauzinho de vez em quando no estúdio (a cada ~9 s, por 2,6 s), só de corpo inteiro e de frente
-  var tchauAte = 0;
+  // piscadinha de vez em quando no estúdio (os movimentos ficam com o animador.js)
+  var animEstudio = null, piscaAte = 0;
   setInterval(function () {
-    if (CALMO || atual !== 'estudio' || angulo || zoomLigado || document.hidden) return;
-    tchauAte = Date.now() + 2600; desenharBoneca();
-    setTimeout(function () { if (atual === 'estudio') desenharBoneca(); }, 2700);
-    // e, no meio do caminho, uma piscadinha
-    setTimeout(function () { if (atual !== 'estudio' || angulo) return; piscaAte = Date.now() + 450; desenharBoneca(); setTimeout(function () { if (atual === 'estudio') desenharBoneca(); }, 500); }, 5200);
+    if (CALMO || atual !== 'estudio' || angulo || document.hidden) return;
+    piscaAte = Date.now() + 450; desenharBoneca(); setTimeout(function () { if (atual === 'estudio') desenharBoneca(); }, 500);
   }, 9000);
-  var piscaAte = 0;
   /* barras de ajuste (dono, 20/Nov/2026: "uma barra de rolar… arrasta de um lado para o outro… mais claro, mais escuro,
      até mais intensidade da maquiagem"): embaixo das bolinhas, "☀️ claro ↔ escuro 🌙" em toda cor e "intensidade" na
      maquiagem. Arrastando, a personagem muda na hora; ao soltar, entra no ↩ desfazer. */
@@ -282,12 +284,24 @@
   var INTEIRA = [40, 30, 320, 650], vista = INTEIRA.slice(), zoomLigado = false, animZoom = 0;
   function catAtual() { return P.categoria(catPorGrupo[grupoAtual] || catsDoGrupo(grupoAtual)[0].id); }
   // corpo de ilustração de moda: a área de zoom vai para o lugar novo do rosto, das mãos ou dos pés (muda com a idade)
-  function alvoZoom() { var c = catAtual(); return B.areaZoom(P.ZOOM[(c && c.zoom) || 'rosto'], estado); }
+  function alvoZoom() { var c = catAtual(), z = (c && c.zoom) || 'rosto'; return B.areaZoom(P.ZOOM[z], estado, z === 'olho' || z === 'boca' ? 50 : 90); }
+  /* movimento conforme a vista (dono, 20/Nov/2026: "durante a montagem… movimento bem sutil, olhando para os lados… de
+     roupa, para ver como fica com o movimento do corpo… maquiando, zoom no olho, na boca, com um leve movimento"):
+     de corpo inteiro ela troca de pose e dá tchau; perto do rosto só olha para os lados, inclina a cabeça e respira;
+     no olho e na boca, mais sutil ainda (o quadril quase para, senão o olho sai do quadro) */
+  var POSES_INTEIRA = ['relax', 'olhaE', 'relax', 'cintura', 'olhaD', 'relax', 'tchau'], POSES_PERTO = ['relax', 'olhaE', 'relax', 'olhaD'], posesVista = POSES_INTEIRA;
+  function movimentoDaVista(para) {
+    if (!animEstudio) return;
+    var w = (para || vista)[2], perto = w < 300, lista = perto ? POSES_PERTO : POSES_INTEIRA;
+    animEstudio.amplitude(w >= 300 ? 1 : w >= 170 ? 0.3 : 0.1);
+    if (lista !== posesVista) { posesVista = lista; animEstudio.lista(lista); }
+  }
   function zoom(liga, animar) {
     zoomLigado = !!liga;
     var b = $('btZoom'); b.setAttribute('aria-pressed', String(zoomLigado)); b.textContent = zoomLigado ? '👗' : '🔍';   // 👗 (e não 🧍, que o Fire antigo mostra como um quadrado vazio)
     b.setAttribute('aria-label', zoomLigado ? t('Ver a personagem inteira', 'See the whole character', 'Ver al personaje entero') : t('Chegar perto (zoom)', 'Zoom in', 'Acercar (zoom)'));
     var de = vista.slice(), para = zoomLigado ? alvoZoom().slice() : INTEIRA.slice(), id = ++animZoom;
+    movimentoDaVista(para);
     if (de.join() === para.join()) return;
     var svg = $('boneca').querySelector('svg');
     if (!animar || CALMO || !svg) { vista = para; if (svg) svg.setAttribute('viewBox', vista.join(' ')); return; }
@@ -554,6 +568,26 @@
   $('btFoto').addEventListener('click', foto);
   $('btFotoDesfile').addEventListener('click', foto);
   $('btDesfilar').addEventListener('click', desfilar);
+
+  /* ---------- baladinha (dono, 20/Nov/2026, com vídeos de uma sala de luzes: "versão adicional de baladinha além do
+     desfile… e com as amigas dançando") ----------
+     A personagem dança no meio e 2 amigas dos lados: looks guardados (sorteados) e, faltando, combinações prontas.
+     Cada uma com sombras coloridas na parede (balada.js). Tocar na tela troca a luz e todas fazem o mesmo passo. */
+  var balada = null;
+  function baladinha() {
+    var amigas = ler('purpurinaNova.looks', []).map(function (l) { return V.limpar(l.e); }).filter(function (e) { return !V.iguais(e, estado); })
+      .sort(function () { return Math.random() - 0.5; }).slice(0, 2);
+    P.PRONTAS.slice().sort(function () { return Math.random() - 0.5; }).forEach(function (p) {
+      var e = V.limpar(p.e); if (amigas.length < 2 && !V.iguais(e, estado)) amigas.push(e);
+    });
+    balada = PurpurinaBalada.iniciar($('palcoBalada'), [estado].concat(amigas), { calmo: CALMO, enquanto: function () { return atual === 'balada'; } });
+  }
+  $('btBalada').addEventListener('click', function () { Som.tocar('brilho'); ir('balada'); });
+  function trocarLuz() { if (balada) { balada.trocarLuz(); Som.tocar('brilho'); } }
+  $('palcoBalada').addEventListener('click', trocarLuz);
+  $('palcoBalada').addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); trocarLuz(); } });
+  $('btBaladaVoltar').addEventListener('click', function () { Som.tocar('aba'); voltar(); });
+  $('btBaladaDesfile').addEventListener('click', desfilar);
 
   // ---------- looks favoritos ----------
   function guardarLook() {
@@ -875,24 +909,21 @@
       crianca: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'bolsos', lado: '' }, { pose: 'joinha', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'cintura', lado: '' }, { pose: 'carinha', lado: '' }, { pose: 'maosCabeca', lado: '' }],
       adolescente: menino ? [{ pose: 'cruzados', lado: '' }, { pose: 'bolsos', lado: 'dir' }, { pose: 'joinha', lado: '' }, { tchau: true, lado: '' }] : [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: '' }, { pose: 'maoCabelo', lado: '' }, { pose: 'carinha', lado: '' }, { pose: 'maosCabeca', lado: '' }, { tchau: true, lado: '' }]
     })[idade] || (menino ? [{ pose: 'cruzados', lado: 'esq' }, { pose: 'bolsos', lado: 'dir' }, { pose: 'cruzados', lado: 'dir' }, { pose: 'bolsos', lado: '' }] :
-      [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: 'dir' }, { pose: 'maoCabelo', lado: 'esq' }, { pose: 'maosCabeca', lado: 'dir' }, { tchau: true, lado: '' }]);
+      [{ pose: 'cintura', lado: 'esq' }, { pose: 'duasCintura', lado: 'dir' }, { pose: 'maoCabelo', lado: 'esq' }, { pose: 'beijo', lado: '' }, { pose: 'carinha', lado: '' }, { pose: 'joinha', lado: '' }, { tchau: true, lado: '' }]);
     var poseAtual = POSES_DESFILE[0];
     function sortear() { var l = POSES_DESFILE.filter(function (x) { return x !== poseAtual; }); return l[Math.floor(Math.random() * l.length)]; }
     function opPose(x) { return x.tchau ? { tchau: true } : { pose: x.pose }; }
-    // pernas da paradinha (fotos de desfile infantil do dono): sempre os dois pés no chão, nunca as duas pernas retinhas.
-    // Na maior parte das vezes a gingada (quadril para o lado da mão na cintura, a outra perna esticada para fora); às
-    // vezes o pé cruzado na frente ou as pernas abertas, com o corpo inclinado
-    var PERNAS = idade === 'pequena' || menino ? ['ginga', 'ginga', 'perna-aberta'] : ['ginga', 'ginga', 'perna-cruzada', 'perna-aberta'];
     function semPose() { mod.classList.remove('pose-esq', 'pose-dir', 'ginga-esq', 'ginga-dir', 'perna-cruzada', 'perna-aberta'); }
+    /* poses com movimento (dono, 20/Nov/2026): a personagem é desenhada uma vez com o esqueleto e o animador.js leva
+       braços, cabeça, olhos e pernas de uma pose para a outra, aos poucos (sem trocar de "foto") */
+    var NOME_RIG = { cintura: 'cintura', duasCintura: 'duasCintura', maoCabelo: 'cabeca', maosCabeca: 'cabeca', carinha: 'queixo', joinha: 'apontar', cruzados: 'cruzados', bolsos: 'bolsos', beijo: 'beijo' };
+    var animD = null;
     function posar(x) {
       poseAtual = x; semPose();
-      var pe = PERNAS[Math.floor(Math.random() * PERNAS.length)];
-      if (pe === 'ginga') {
-        // o quadril vai para o lado da mão na cintura: 'cintura' = direita da imagem; 'maoCabelo' = a esquerda na cintura
-        var lado = x.pose === 'cintura' ? 'dir' : x.pose === 'maoCabelo' ? 'esq' : (Math.random() < 0.5 ? 'esq' : 'dir');
-        mod.classList.add('ginga-' + lado);
-      } else mod.classList.add(pe, 'pose-' + (x.lado || (Math.random() < 0.5 ? 'esq' : 'dir')));
-      pose(Object.assign({ sorriso: true }, opPose(x)));
+      if (CALMO) { pose(Object.assign({ sorriso: true }, opPose(x))); return; }
+      if (!pas.querySelector('.rig-ombro-e')) pose({ sorriso: true, rig: true });
+      if (!animD) animD = PurpurinaAnim.criar(pas, { poses: ['relax'], enquanto: vale });
+      animD.trocar(x.tchau ? 'tchau' : (NOME_RIG[x.pose] || 'relax'));
     }
     var camera = $('cameraDesfile'), corte = $('corteDesfile');
     camera.style.transform = '';
@@ -920,15 +951,6 @@
         if (k < 1) requestAnimationFrame(passo); else if (fim) fim();
       })(ini);
     }
-    function olharPara(de, para, ms, fim) {
-      var ini = performance.now();
-      (function passo(agora) {
-        if (!vale()) return;
-        var k = Math.min(1, (agora - ini) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-        pose(Object.assign({ sorriso: true, olhar: de + (para - de) * e }, opPose(poseAtual)));
-        if (k < 1) requestAnimationFrame(passo); else if (fim) fim();
-      })(ini);
-    }
     var titulo = $('desfileTitulo'), jur = $('jurados');
     if (CALMO) { lugar(1); posar(POSES_DESFILE[0]); entrarTurma(); }
     else {
@@ -950,7 +972,7 @@
           mod.classList.remove('andando'); posar(sortear());
           titulo.classList.remove('esperando'); jur.classList.remove('esperando');
           Som.tocar('tada'); setTimeout(function () { Som.tocar('aplausos'); }, 400); confete();
-          depois(1600, function () { olharPara(0, -38, 450, function () { depois(600, function () { olharPara(-38, 38, 700, function () { depois(600, function () { olharPara(38, 0, 450, function () {
+          depois(1600, function () { if (animD) animD.trocar('olhaE'); depois(1400, function () { if (animD) animD.trocar('olhaD'); depois(1400, function () { posar(poseAtual); depois(900, function () {
             depois(500, function () {
               semPose();
               girar(0, -45, 520, function () { depois(600, function () { girar(-45, 45, 900, function () { depois(600, function () { girar(45, 0, 520, function () {
@@ -966,7 +988,7 @@
                 });
               }); }); }); });
             });
-          }); }); }); }); }); });
+          }); }); }); });
         }
       })(ini);
     }
@@ -1171,37 +1193,31 @@
      a personagem troca de pose a cada 2,8 s, com a troca suave (duas camadas que se cruzam), e entre uma e outra respira e
      passa o peso de uma perna para a outra. Quem pediu menos movimento vê ela parada. */
   var POSES_ABERTURA = ['maoCabelo', 'beijo', 'tchau', 'duasCintura', 'carinha', 'cintura'];
+  /* abertura e menu com movimento de verdade (dono, 20/Nov/2026: "as poses precisam de movimento, não ficar trocando de
+     foto"): a personagem é desenhada uma vez com o esqueleto (opcoes.rig) e o animador.js leva os braços, a cabeça, os
+     olhos e as pernas de uma pose para a outra, devagar, respirando no meio. De tempos em tempos a câmera chega no rosto,
+     ela dá uma piscadinha e a câmera volta. Quem pediu menos movimento vê ela parada. */
+  var POSES_ABERTURA = ['cintura', 'olhaE', 'cabeca', 'beijo', 'apontar', 'tchau', 'duasCintura', 'queixo', 'bolsos'];
   function abertura(el, nome) {
-    var menino = livre.personagem === 'menino', lista = menino ? ['cruzados', 'tchau', 'bolsos', 'joinha'] : POSES_ABERTURA;
-    function desenho(pz, k, extra) {
-      return B.svg(livre, Object.assign({ id: nome + k, fundo: false, area: [40, 40, 320, 640], anim: !CALMO, passos: !CALMO, pose: pz === 'tchau' || pz === 'rosto' ? '' : pz, tchau: pz === 'tchau', sorriso: pz !== 'beijo' }, extra || {}));
-    }
-    clearInterval(el._abertura); clearTimeout(el._zoom);
-    if (CALMO) { el.innerHTML = B.svg(livre, { id: nome, fundo: false, area: [40, 40, 320, 640] }); return; }
-    el.classList.add('ab-viva');
-    el.innerHTML = '<div class="ab-camada ativa">' + desenho(lista[0], 0) + '</div><div class="ab-camada"></div>';
-    // a cada 3 poses, a câmera chega no rosto: ela sorri, dá uma piscadinha e a câmera volta (dono, 20/Nov/2026)
-    var z = B.areaZoom(P.ZOOM.rosto, livre), fx = (z[0] + z[2] / 2 - 40) / 320 * 100, fy = (z[1] + z[3] / 2 - 40) / 640 * 100, ox = fx.toFixed(1) + '%', oy = fy.toFixed(1) + '%';
-    // o rosto vai para o meio da caixa e cresce em volta dele
+    var menino = livre.personagem === 'menino', lista = menino ? ['bolsos', 'olhaD', 'apontar', 'tchau', 'queixo', 'olhaE'] : POSES_ABERTURA;
+    function desenho(extra) { return B.svg(livre, Object.assign({ id: nome, fundo: false, area: [40, 30, 320, 650], anim: !CALMO, passos: true, rig: true, sorriso: true }, extra || {})); }
+    if (el._anim) el._anim.parar(); clearTimeout(el._zoom);
+    if (CALMO) { el.innerHTML = B.svg(livre, { id: nome, fundo: false, area: [40, 30, 320, 650] }); return; }
+    el.classList.add('ab-rig');
+    el.innerHTML = '<div class="ab-camada ativa">' + desenho() + '</div>';
+    var cam = el.firstChild;
+    var z = B.areaZoom(P.ZOOM.rosto, livre), fx = (z[0] + z[2] / 2 - 40) / 320 * 100, fy = (z[1] + z[3] / 2 - 30) / 620 * 100;
+    cam.style.transformOrigin = fx.toFixed(1) + '% ' + fy.toFixed(1) + '%';
     var perto = 'translate(' + (50 - fx).toFixed(1) + '%, ' + (45 - fy).toFixed(1) + '%) scale(3)';
-    var i = 0, passo = 0;
-    el._abertura = setInterval(function () {
-      if (document.hidden || !el.offsetParent) return;   // tela escondida: não gasta bateria
-      passo++;
-      var cs = el.children, nova = cs[passo % 2], velha = cs[(passo + 1) % 2], rosto = passo % 4 === 3;
-      nova.style.transform = ''; nova.style.transformOrigin = ox + ' ' + oy;
-      nova.innerHTML = rosto ? desenho('rosto', passo % 2) : desenho(lista[++i % lista.length], passo % 2);
-      nova.classList.add('ativa'); velha.classList.remove('ativa');
-      if (rosto) {
-        el._zoom = setTimeout(function () {
-          nova.style.transform = perto;
-          el._zoom = setTimeout(function () {
-            nova.innerHTML = desenho('rosto', passo % 2, { piscadinha: true });
-            el._zoom = setTimeout(function () { nova.innerHTML = desenho('rosto', passo % 2); el._zoom = setTimeout(function () { nova.style.transform = ''; }, 500); }, 700);
-          }, 1250);
-        }, 150);
-      }
-    }, 3600);
+    el._anim = PurpurinaAnim.criar(cam, { poses: lista, segura: 3400, aoTrocar: function (pz, i) {
+      if (i % 4 !== 3 || document.hidden || !el.offsetParent) return;
+      // a câmera vai ao rosto, piscadinha, e volta
+      cam.style.transform = perto;
+      el._zoom = setTimeout(function () {
+        cam.innerHTML = desenho({ piscadinha: true });
+        el._zoom = setTimeout(function () { cam.innerHTML = desenho(); el._zoom = setTimeout(function () { cam.style.transform = ''; }, 600); }, 700);
+      }, 1300);
+    } });
   }
   abertura($('entradaBoneca'), 'entrada');
   traduzir();

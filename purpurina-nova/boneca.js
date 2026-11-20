@@ -35,10 +35,12 @@
          quadril mais estreito que os ombros. A cabeça inteira vai junto, só reduzida. */
   var PROPORCAO = {
     // larg: ombro, busto, cintura, quadril, coxa, joelho, panturrilha, tornozelo (curvas femininas; menino em MENINO)
-    pequena: { cabecas: 5, topo: 150, ombro: 1.28, quadril: 2.3, larg: [0.9, 0.92, 0.95, 1.02, 0.96, 0.88, 0.92, 0.84] },
-    crianca: { cabecas: 6, topo: 100, ombro: 1.33, quadril: 2.8, larg: [0.84, 0.85, 0.8, 1.0, 0.95, 0.84, 0.9, 0.8] },
-    adolescente: { cabecas: 7, topo: 76, ombro: 1.38, quadril: 3.3, larg: [0.84, 0.95, 0.66, 1.12, 1.0, 0.82, 0.92, 0.76] },
-    adulta: { cabecas: 7.5, topo: 64, ombro: 1.4, quadril: 3.55, larg: [0.86, 1.02, 0.64, 1.18, 1.04, 0.82, 0.93, 0.76] }
+    // (20/Nov/2026, dono: "a adulta ainda continua muito esticada… mais natural"): um pouco menos de cabeças e membros
+    // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
+    pequena: { cabecas: 4.8, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.92, 0.94, 0.97, 1.04, 0.98, 0.9, 0.94, 0.86] },
+    crianca: { cabecas: 5.8, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.88, 0.9, 0.86, 1.02, 0.98, 0.88, 0.94, 0.84] },
+    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.88, 0.98, 0.72, 1.14, 1.04, 0.86, 0.95, 0.8] },
+    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.9, 1.05, 0.72, 1.2, 1.08, 0.88, 0.97, 0.8] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
@@ -55,10 +57,21 @@
     if (forca < 1 && MAQUIAGEM.indexOf(catId) >= 0) h = mistura(corAjustada(e, 'pele').hex, h, forca);
     return Object.assign({}, c, { hex: h });
   }
+  /* tipo de corpo (Eu → Corpo; dono, 20/Nov/2026: "mais gordinho, mais cheinho, mais magrinho, mais curvilíneo"): quanto
+     cada largura muda (ombro, busto, cintura, quadril, coxa, joelho, panturrilha, tornozelo) e a grossura dos braços */
+  var TIPOS = {
+    magrinho: { l: [0.94, 0.92, 0.9, 0.9, 0.88, 0.92, 0.9, 0.95], b: 0.88 },
+    medio: { l: [1, 1, 1, 1, 1, 1, 1, 1], b: 1 },
+    cheinho: { l: [1.04, 1.08, 1.18, 1.1, 1.12, 1.06, 1.08, 1.04], b: 1.12 },
+    gordinho: { l: [1.1, 1.15, 1.38, 1.22, 1.25, 1.12, 1.15, 1.08], b: 1.25 },
+    curvilineo: { l: [1, 1.12, 0.92, 1.18, 1.12, 1, 1.04, 1], b: 1.02 },
+    atletico: { l: [1.1, 1.02, 1, 1, 1.05, 1, 1.06, 1], b: 1.08 }
+  };
   var DF = null;
-  function deformacao(idade, menino) {
+  function deformacao(idade, menino, corpo) {
     var q = PROPORCAO[idade] || PROPORCAO.adulta, cab = IDADE.cab, L = q.larg.slice();
     if (menino) L = (MENINO[idade] || MENINO.adulta).slice();
+    var tipo = TIPOS[corpo] || TIPOS.medio; L = L.map(function (v, i) { return v * tipo.l[i]; });
     var queixo = 311 + ((IDADE === IDADES.pequena ? 275 : IDADE === IDADES.crianca ? 278 : IDADE === IDADES.adolescente ? 282 : 285) - 297) * cab;
     var alto = queixo - (311 - 205 * cab), h = (664 - q.topo) / q.cabecas, s = h / alto;
     var yC = q.topo + h, yS = q.topo + q.ombro * h, yW = q.topo + q.quadril * h;
@@ -76,7 +89,7 @@
       for (var i = 1; i < X.length; i++) if (y <= X[i][0]) { var a = X[i - 1], b = X[i]; return a[1] + (y - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); }
       return 0.95;
     }
-    return { s: s, traco: 1, queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
+    return { s: s, traco: 1, braco: tipo.b, queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
       cabeca: 'translate(200 ' + n(yC) + ') scale(' + n(s * 1000) / 1000 + ') translate(-200 ' + n(-queixo) + ')' };
   }
   // aplica a deformação em tudo o que é desenho do corpo (caminhos, círculos, elipses, retângulos e centros de giro)
@@ -98,7 +111,7 @@
       var P = [+x1, +y1], Q = [+x2, +y2], P2 = [D.fx(P[0], P[1]), D.fy(P[1])], Q2 = [D.fx(Q[0], Q[1]), D.fy(Q[1])];
       var v = [Q[0] - P[0], Q[1] - P[1]], w = [Q2[0] - P2[0], Q2[1] - P2[1]], lv = Math.sqrt(v[0] * v[0] + v[1] * v[1]) || 1, lw = Math.sqrt(w[0] * w[0] + w[1] * w[1]);
       if (lv > 120) { w = [w[0] * ENCURTA, w[1] * ENCURTA]; lw *= ENCURTA; }   // braço inteiro: um pouco mais curto (dono, 20/Nov/2026)
-      var av = Math.atan2(v[1], v[0]), aw = Math.atan2(w[1], w[0]), k = lw / lv, kl = 0.95;
+      var av = Math.atan2(v[1], v[0]), aw = Math.atan2(w[1], w[0]), k = lw / lv, kl = 0.95 * (D.braco || 1);
       // matriz = gira para o eixo do osso, estica no comprimento (k) e mantém a grossura (kl), gira para a direção nova
       var ca = Math.cos(aw), sa = Math.sin(aw), cb = Math.cos(-av), sb = Math.sin(-av);
       var m11 = ca * k * cb - sa * kl * sb, m12 = ca * k * -sb - sa * kl * cb, m21 = sa * k * cb + ca * kl * sb, m22 = sa * k * -sb + ca * kl * cb;
@@ -109,7 +122,11 @@
     return voltarRigidas(deformarResto(str, D), rigidas);
   }
   function voltarRigidas(str, rigidas) { return rigidas.length ? str.replace(/\u0001(\d+)\u0001/g, function (m, i) { return rigidas[+i]; }) : str; }
-  var ENCURTA = 0.9;   // quanto o braço inteiro encolhe depois de ir para o corpo novo
+  var ENCURTA = 0.9;
+  // transformações do esqueleto (as mesmas do animador.js): ombro gira e encolhe o braço de cima no eixo dele;
+  // o cotovelo desfaz o encolhimento em volta dele mesmo e gira o antebraço
+  function transformaOmbro(a, f, S) { return 'rotate(' + n(a) + ' ' + n(S[0]) + ' ' + n(S[1]) + ')' + (f < 0.999 ? ' translate(' + n(S[0]) + ' ' + n(S[1]) + ') scale(1 ' + n(f * 1000) / 1000 + ') translate(' + n(-S[0]) + ' ' + n(-S[1]) + ')' : ''); }
+  function transformaCotovelo(b, f, E) { return (f < 0.999 ? 'translate(' + n(E[0]) + ' ' + n(E[1]) + ') scale(1 ' + n(1000 / f) / 1000 + ') translate(' + n(-E[0]) + ' ' + n(-E[1]) + ') ' : '') + 'rotate(' + n(b) + ' ' + n(E[0]) + ' ' + n(E[1]) + ')'; }   // quanto o braço inteiro encolhe depois de ir para o corpo novo
   function rigido(x, y, s, ombro) { return s ? '<g data-rigido="' + x + ',' + y + (ombro ? ',' + ombro[0] + ',' + ombro[1] : '') + '">' + s + '</g><!--/rigido-->' : ''; }
   function deformarResto(str, D) {
     function par(x, y) { return n(D.fx(+x, +y)) + ',' + n(D.fy(+y)); }
@@ -237,7 +254,7 @@
     ANIM = !!op.anim;
     var e = V.limpar(e0), I = (op.id || 'b') + '-', fundo = op.fundo !== false, out = [];
     IDADE = IDADES[e.idade] || IDADES.adulta;
-    DF = deformacao(e.idade, e.personagem === 'menino');
+    DF = deformacao(e.idade, e.personagem === 'menino', e.corpo);
     // a partir dos 11 anos o rosto fica oval: a cabeça estreita um pouco (largura) e alonga
     CABECA = 'translate(0 14) translate(200 297) scale(' + IDADE.cab * (IDADE.largura || 1) + ' ' + IDADE.cab + ') translate(-200 -297)';
     var C = function (cat) { return corAjustada(e, cat); };
@@ -347,8 +364,12 @@
     out.push(p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p('M150,342 Q200,330 250,342 Q262,346 260,366 L248,458 L152,458 L140,366 Q138,346 150,342Z', { fill: 'url(#' + I + 'lado)' }));
     /* pose do fim da passarela (opcoes.pose): 'cintura' = mão direita na cintura (menina); 'cruzados' = braços cruzados
        (menino). Os braços da pose são desenhados no fim, por cima (bracosPose). */
-    var bracoPose = !angB && !tchau && POSES.indexOf(op.pose) >= 0 ? op.pose : '';
-    var semDireito = tchau || !!bracoPose, semEsquerdo = !!bracoPose && bracoPose !== 'cintura' && bracoPose !== 'beijo', semBracos = semDireito && semEsquerdo;
+    /* opcoes.rig (Nova Era, 20/Nov/2026: "as poses precisam de movimento, não ficar trocando de foto"): os braços viram um
+       esqueleto — ombro, cotovelo e mão em grupos que giram (.rig-ombro-*, .rig-cotovelo-*), a cabeça inclina (.rig-cabeca)
+       e as íris andam (.rig-iris). Quem mexe é o animador.js, de pose em pose, sem redesenhar. */
+    var rig = !!op.rig && !angB && !tchau;
+    var bracoPose = !rig && !angB && !tchau && POSES.indexOf(op.pose) >= 0 ? op.pose : '';
+    var semDireito = tchau || !!bracoPose || rig, semEsquerdo = rig || (!!bracoPose && bracoPose !== 'cintura' && bracoPose !== 'beijo'), semBracos = semDireito && semEsquerdo;
     var iniBracos = out.length;
     var bracos = (semEsquerdo ? [] : ['M150,354 Q126,420 118,498']).concat(semDireito ? [] : ['M250,354 Q274,420 282,498']);
     bracos.forEach(function (d) { out.push(membro(d, 23)); });
@@ -365,16 +386,16 @@
     }
     // ---------- bolsa, mãos e joias do corpo ----------
     // bolsa de mão vai junto com a mão direita (não estica); a de ombro segue o corpo
-    if (vis('bolsa') && !tchau && !bracoPose) out.push(e.bolsa === 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : rigido(282, 496, bolsa(e.bolsa, C('bolsa'), peca, linha), [250, 354]));
+    if (vis('bolsa') && !tchau && !bracoPose && !rig) out.push(e.bolsa === 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : rigido(282, 496, bolsa(e.bolsa, C('bolsa'), peca, linha), [250, 354]));
     var esmalte = { tipo: e.unhas, cor: C('unhas') };
     if (!semEsquerdo) out.push(rigido(118, 496, mao(118, -1, pele, peleE, esmalte), [150, 354]));
     if (!semDireito) out.push(rigido(282, 496, mao(282, 1, pele, peleE, esmalte), [250, 354]));
     if (!corpoCostas && vis('colar')) out.push(colar(e.colar, C('colar'), I));
     if (!corpoCostas && vis('broche')) out.push(broche(e.broche, C('broche')));
     if (vis('pulseira') && !tchau && !semEsquerdo) out.push(rigido(118, 496, pulseira(e.pulseira, C('pulseira')), [150, 354]));
-    if (!corpoCostas && vis('anel') && !tchau && !bracoPose) out.push(anel(e.anel, C('anel')));
+    if (!corpoCostas && vis('anel') && !tchau && !bracoPose && !rig) out.push(anel(e.anel, C('anel')));
     // em pose, a manga pendurada (parada) some do lado do braço em pose: o braço da pose desenha a própria manga
-    if (bracoPose) {
+    if (bracoPose || rig) {
       var vestP = vis('vestido');
       defs += deformar('<clipPath id="' + I + 'semManga"><rect x="140" y="-200" width="120" height="1200"/>' + (semEsquerdo ? '' : '<rect x="-200" y="-200" width="350" height="1200"/>') +
         (semDireito ? '' : '<rect x="250" y="-200" width="400" height="1200"/>') + (vestP ? '<rect x="-200" y="455" width="800" height="800"/>' : '') + '</clipPath>');
@@ -384,7 +405,7 @@
        lado. Os braços, a roupa de cima (mangas), as mãos e as joias saem em três cópias recortadas: o meio do corpo
        (x 140–260) parado e cada lado (x < 150 e x > 250) girando no ombro. No vestido, só da cintura para cima vai com o
        braço (a saia fica no lugar). */
-    if (op.passos && !angB && !tchau && !bracoPose) {
+    if (op.passos && !angB && !tchau && !bracoPose && !rig) {
       var camada = out.splice(iniBracos), topo = camada[iTop - iniBracos], vest = vis('vestido');
       var antesTop = camada.slice(0, iTop - iniBracos).join(''), depoisTop = camada.slice(iTop - iniBracos + 1).join('');
       defs += deformar('<clipPath id="' + I + 'brMeio"><rect x="140" y="-200" width="120" height="1200"/></clipPath>' +
@@ -468,12 +489,14 @@
     var cabecaGrupo = '<g transform="' + CABECA + '">';
     out = out.map(function (x) {
       if (x === cenarioS || x === sombraChao) return x;
+      if (x === cabecaPronta && rig) return '<g class="rig-cabeca" data-x="200" data-y="' + n(DF.yC) + '"><g transform="' + DF.cabeca + '">' + x + '</g></g>';
       if (x === cabecaPronta || x.indexOf(cabecaGrupo) === 0) return '<g transform="' + DF.cabeca + '">' + x + '</g>';
       return deformar(x).replace(/<g class="pp-(passo-e|passo-d|braco-e|braco-d)">/g, function (m, k) {
         var o = { 'passo-e': [177, 455], 'passo-d': [223, 455], 'braco-e': [150, 352], 'braco-d': [250, 352] }[k];
         return '<g class="pp-' + k + '" style="' + origem(o[0], o[1]) + '">';
       }).replace(/<g class="pp-barra">/g, '<g class="pp-barra" style="' + origem(200, 455) + '">');
     });
+    if (rig) out.push(bracoRig(-1), bracoRig(1));
     /* desfile (opcoes.passos): tudo menos as pernas e a sombra do chão vai para grupos .pp-corpo, que acompanham o
        quadril (o peso passa de um pé para o outro e o corpo sobe e desce um pouco) sem tombar de lado; as pernas
        (.pp-passo-e / -d) fazem o catwalk: um pé cruza e pousa na frente do outro, na linha do meio (estilo.css) */
@@ -492,6 +515,36 @@
        Desenho próprio de lado, com as cores e a estampa das peças escolhidas: braço e perna do lado de lá atrás
        (um pouco mais escuros), tronco de lado, saia, calça ou vestido de lado, braço do lado de cá na frente e
        sapatos de lado. */
+    // braço do esqueleto, já no corpo novo: ombro S, cotovelo E, pulso W (em repouso, pendurado); a pose inicial vem de
+    // opcoes.poseRig { oE, cE, oD, cD } (graus: o = abrir para fora, c = dobrar o cotovelo para dentro)
+    function bracoRig(lado) {
+      var sx0 = lado < 0 ? 150 : 250, wx0 = lado < 0 ? 118 : 282, S = [DF.fx(sx0, 354), DF.fy(354)], W0 = [DF.fx(wx0, 498), DF.fy(498)];
+      var W = [S[0] + (W0[0] - S[0]) * ENCURTA, S[1] + (W0[1] - S[1]) * ENCURTA], L = Math.sqrt((W[0] - S[0]) * (W[0] - S[0]) + (W[1] - S[1]) * (W[1] - S[1]));
+      var d = [(W[0] - S[0]) / L, (W[1] - S[1]) / L], Lu = L * 0.5, E = [S[0] + d[0] * Lu, S[1] + d[1] * Lu], k = DF.traco * 0.92 * DF.braco;
+      function seg(A, B, w0, w1) {   // pedaço do braço: começa largo e afina, com as pontas redondas
+        var nx = -(B[1] - A[1]), ny = B[0] - A[0], l = Math.sqrt(nx * nx + ny * ny) || 1; nx /= l; ny /= l;
+        return 'M' + n(A[0] + nx * w0) + ',' + n(A[1] + ny * w0) + ' L' + n(B[0] + nx * w1) + ',' + n(B[1] + ny * w1) + ' A' + n(w1) + ',' + n(w1) + ' 0 0 1 ' + n(B[0] - nx * w1) + ',' + n(B[1] - ny * w1) +
+          ' L' + n(A[0] - nx * w0) + ',' + n(A[1] - ny * w0) + ' A' + n(w0) + ',' + n(w0) + ' 0 0 1 ' + n(A[0] + nx * w0) + ',' + n(A[1] + ny * w0) + 'Z';
+      }
+      var traco = { fill: pele, stroke: esc(pele, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' };
+      var manga = tipoManga(), corTop = vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null);
+      var cima = p(seg(S, E, 11.5 * k, 8.5 * k), traco), baixo = p(seg(E, W, 8.5 * k, 6 * k), traco);
+      if (corTop && manga !== 'nada') {
+        var mangaT = { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' };
+        cima += manga === 'longa' ? p(seg(S, E, 13 * k, 10 * k), mangaT) : p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 14 * k, 12.5 * k), mangaT);
+        if (manga === 'longa') baixo += p(seg(E, [W[0] - d[0] * 4, W[1] - d[1] * 4], 10 * k, 7.5 * k), mangaT);
+      }
+      // ombro redondo por cima do resto da manga do desenho de baixo (some o "ganchinho" no ombro)
+      cima = circ(S[0], S[1], 15 * k, { fill: corTop && manga !== 'nada' ? corTop.hex : pele }) + cima;
+      var esm = { tipo: e.unhas, cor: C('unhas') }, mk = DF.traco * 0.9;
+      var maoS = '<g transform="translate(' + n(W[0]) + ' ' + n(W[1]) + ') scale(' + n(mk * 100) / 100 + ') translate(' + (-wx0) + ' -497)">' + mao(wx0, lado, pele, peleE, esm) +
+        (lado < 0 && vis('pulseira') ? pulseira(e.pulseira, C('pulseira')) : '') + '</g>';
+      // f: o braço de cima "vem para a frente" (fica mais curto na tela) — o antebraço desfaz o encolhimento e não deforma
+      var pr = op.poseRig || {}, a = lado < 0 ? (pr.oE || 6) : -(pr.oD || 6), b = lado < 0 ? -(pr.cE || 8) : (pr.cD || 8), f0 = (lado < 0 ? pr.fE : pr.fD) || 1, lt = lado < 0 ? 'e' : 'd';
+      return '<g class="rig-ombro-' + lt + '" data-x="' + n(S[0]) + '" data-y="' + n(S[1]) + '" transform="' + transformaOmbro(a, f0, S) + '">' + cima +
+        '<g class="rig-cotovelo-' + lt + '" data-x="' + n(E[0]) + '" data-y="' + n(E[1]) + '" transform="' + transformaCotovelo(b, f0, E) + '">' + baixo + maoS + '</g>' +
+        circ(E[0], E[1], 8.5 * k, { fill: corTop && manga === 'longa' ? corTop.hex : pele }) + '</g>';
+    }
     function tipoManga() {
       var temVest = vis('vestido');
       return temVest ? (['casaco', 'macacao'].indexOf(e.vestido) >= 0 ? 'longa' : ['tomara', 'verao', 'jardineira'].indexOf(e.vestido) >= 0 ? 'nada' : 'curta') :
@@ -1416,10 +1469,10 @@
     var sombraDoOlho = s; s = '';
     var forma = formaOlho(cx), clip = 'url(#' + I + (lado < 0 ? 'olhoE' : 'olhoD') + ')', corI = corAjustada(e, 'olhos').hex, ri = 13 * (g.r > 1 ? 1.06 : 1);
     s += p(forma, { fill: 'url(#' + I + 'esclera)' });
-    s += '<g clip-path="' + clip + '">' + circ(ix, cy + 1.5, ri, { fill: 'url(#' + I + 'iris)' }) + circ(ix, cy + 1.5, ri - 0.6, { fill: 'none', stroke: esc(corI, 0.6), 'stroke-width': 1.4 }) +
+    s += '<g clip-path="' + clip + '"><g class="rig-iris">' + circ(ix, cy + 1.5, ri, { fill: 'url(#' + I + 'iris)' }) + circ(ix, cy + 1.5, ri - 0.6, { fill: 'none', stroke: esc(corI, 0.6), 'stroke-width': 1.4 }) +
       p('M' + n(ix - ri * 0.7) + ',' + n(cy + 6) + ' Q' + ix + ',' + n(cy + ri + 1) + ' ' + n(ix + ri * 0.7) + ',' + n(cy + 6), { fill: 'none', stroke: cla(corI, 0.45), 'stroke-width': 2.4, opacity: 0.55, 'stroke-linecap': 'round' }) +
       circ(ix, cy + 1.5, ri * 0.44, { fill: '#160e14' }) +
-      circ(ix - lado * 4.5 - 1, cy - 4, ri * 0.3, { fill: '#fff' }) + circ(ix + lado * 4 + 1, cy + 7, ri * 0.13, { fill: '#fff', opacity: 0.9 }) +
+      circ(ix - lado * 4.5 - 1, cy - 4, ri * 0.3, { fill: '#fff' }) + circ(ix + lado * 4 + 1, cy + 7, ri * 0.13, { fill: '#fff', opacity: 0.9 }) + '</g>' +
       // sombra da pálpebra de cima no branco e na íris
       p('M' + pt(g.ini) + 'C' + pt(g.c1) + ' ' + pt(g.c2) + ' ' + pt(g.fim) + 'L' + pt(g.q(24, 3)) + 'C' + pt(g.q(10, -12 * g.r)) + ' ' + pt(g.q(-14, -4 * g.r)) + ' ' + pt(g.q(-20, 8)) + 'Z', { fill: '#2a0a1c', opacity: 0.16 }) + '</g>';
     // linha de baixo (bem fina) e o traço da pálpebra de cima
@@ -2233,16 +2286,17 @@
 
   /* área de zoom (rosto, mãos, pés…) no corpo de ilustração: a mesma área de antes (pecas.js → ZOOM) levada para o lugar
      novo da cabeça e do corpo, conforme a idade escolhida */
-  function areaZoom(a, e0) {
+  function areaZoom(a, e0, minimo) {
     var e = V.limpar(e0);
-    IDADE = IDADES[e.idade] || IDADES.adulta; DF = deformacao(e.idade, e.personagem === 'menino');
+    IDADE = IDADES[e.idade] || IDADES.adulta; DF = deformacao(e.idade, e.personagem === 'menino', e.corpo);
     var ym = a[1] + a[3] / 2, y1 = DF.fy(a[1]), y2 = DF.fy(a[1] + a[3]), x1 = DF.fx(a[0], ym), x2 = DF.fx(a[0] + a[2], ym);
     if (a[1] + a[3] > 600) y1 = Math.max(y1, y2 - a[3]);   // pés: os pés não esticam, a área continua do mesmo tamanho
     // não fica menor que um rosto de criancinha (detalhe demais some na tela)
-    var w = Math.max(x2 - x1, 90), h = Math.max(y2 - y1, 90), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+    // (no olho e na boca, maquiando, chega mais perto: minimo menor)
+    var m = minimo || 90, w = Math.max(x2 - x1, m), h = Math.max(y2 - y1, m), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
     return [n(cx - w / 2), n(cy - h / 2), n(w), n(h)];
   }
-  var API = { corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
+  var API = { transformaOmbro: transformaOmbro, transformaCotovelo: transformaCotovelo, corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
   API.POSES = POSES;
   raiz.PurpurinaBoneca = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
