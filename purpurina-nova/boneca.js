@@ -19,8 +19,8 @@
   var IDADES = {
     pequena: { cab: 1.2, olho: 1.04, maxilar: 1.04, queixoY: -3, queixoL: 1.05, boca: [0.92, 0.95] },
     crianca: { cab: 1.12, olho: 1, maxilar: 0.97, queixoY: 0, queixoL: 0.95, boca: [1, 1] },
-    adolescente: { cab: 1.06, largura: 0.93, olho: 0.95, maxilar: 0.9, queixoY: 4, queixoL: 0.82, boca: [1.02, 1.06] },
-    adulta: { cab: 1.02, largura: 0.86, olho: 0.92, maxilar: 0.85, queixoY: 7, queixoL: 0.76, boca: [1.04, 1.1] }
+    adolescente: { cab: 1.06, largura: 0.93, olho: 0.95, maxilar: 0.95, queixoY: 0, queixoL: 0.95, boca: [1.02, 1.06] },
+    adulta: { cab: 1.02, largura: 0.86, olho: 0.92, maxilar: 0.93, queixoY: 0, queixoL: 0.95, boca: [1.04, 1.1] }
   };
   var IDADE = IDADES.crianca;
   /* ---------- corpo com medidas reais (Nova Era, 19/Nov/2026) ----------
@@ -364,12 +364,12 @@
        A saia e o vestido vêm depois, por cima, e balançam com o corpo. De frente apenas. */
     if (op.passos && !angB) {
       var pernas = out.splice(iniPernas).join('');
-      defs += deformar('<clipPath id="' + I + 'pernaE"><rect x="-200" y="462" width="403" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="197" y="462" width="403" height="900"/></clipPath>' +
-        '<clipPath id="' + I + 'quadrilP"><rect x="-200" y="0" width="800" height="474"/></clipPath>');
-      // o quadril da calça (cós, bolsos e gancho) vai junto com o corpo e as pernas saem dele (dono, 20/Nov/2026: "fica um
-      // pedaço reto da calça… tem que acompanhar o gingado do corpo")
+      // as pernas começam na junta do quadril (y 456), por baixo da barra da blusa: a perna que anda gira ali e nada da
+      // calça escapa para fora da roupa (dono, 20/Nov/2026: "os quadrados da calça não acompanham")
+      defs += deformar('<clipPath id="' + I + 'pernaE"><rect x="-200" y="456" width="403" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="197" y="456" width="403" height="900"/></clipPath>');
       out.push('<g class="pp-passo-e"><g clip-path="url(#' + I + 'pernaE)">' + pernas + '</g></g>', '<g class="pp-passo-d"><g clip-path="url(#' + I + 'pernaD)">' + pernas + '</g></g>',
         '<g clip-path="url(#' + I + 'quadrilP)">' + pernas + '</g>');
+      defs += deformar('<clipPath id="' + I + 'quadrilP"><rect x="-200" y="0" width="800" height="458"/></clipPath>');   // o cós (escondido pela blusa), junto com o corpo
     }
     // desfile: da cintura para baixo, a saia e a barra do vestido acompanham o passo (.pp-barra, estilo.css), sem tombar
     var andaBarra = op.passos && !angB;
@@ -478,8 +478,8 @@
       out.push(luzLados(pele, menino), luzMeio(pele, I), base(e.base, pele, rosto), blush(e, C('blush').hex, I), deslocar(-dO, olhoIdade(164, olho(164, -1, e, I, C, olharV * 0.16, op.anim))), deslocar(dO, olhoIdade(236, olho(236, 1, op.piscadinha ? Object.assign({}, e, { formaOlho: 'sorridentes' }) : e, I, C, olharV * 0.16, op.anim && !op.piscadinha))   /* opcoes.piscadinha: o olho direito fecha num arquinho */));
       out.push(deslocar(-dO, sobr(164, -1)), deslocar(dO, sobr(236, 1)));
       out.push(narizFrente(e.nariz, pele) + narizLuz(pele, menino));
-      // menina: boca um pouco mais alta (o queixo ficou mais curto; a boca aberta não encosta na ponta do queixo)
-      out.push(menino ? bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))) : '<g transform="translate(0 -3)">' + bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))) + '</g>');
+      // menina: boca um pouco menor e mais alta (o queixo ficou curto e redondo; a boca aberta não passa da ponta do queixo)
+      out.push(menino ? bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))) : '<g transform="translate(200 262) scale(0.86) translate(-200 -270)">' + bocaIdade(formaDaBoca(e, boca(e, C('batom'), pele, I))) + '</g>');
       if (menino && vis('bigode')) out.push(bocaIdade(bigode(e.bigode, cab)));
       if (vis('adesivo')) out.push(adesivo(e.adesivo, 266, 250, 13));
       if (e.glitter === 'bochechas' || e.glitter === 'olhos') out.push(glitter(e, C('glitter')));
@@ -1138,8 +1138,8 @@
     /* menina: queixinho pequeno e recolhido (de lado não fica "queixudo") e maxilar suave — o cantinho do rosto
        quadradinho fica mais alto e redondinho. Continua sendo cada formato, só que delicado. */
     if (!menino) base0 = base0.map(function (v) {
-      if (v.c[0] === 0 && v.c[1] >= 70) return { c: [0, v.c[1] - 5, v.c[2] - 24], r: [v.r[0] * 0.62, v.r[1] * 0.75, v.r[2] * 0.6] };   // só a pontinha do queixo
-      if (v.c[0] === 0 && v.c[1] >= 30 && v.c[1] < 70) return { c: [0, v.c[1] - 2, v.c[2] - 8], r: [v.r[0] * 0.84, v.r[1] * 0.86, v.r[2] * 0.9] };   // maxilar estreito e curto, afinando até o queixo (sem queixo comprido)
+      if (v.c[0] === 0 && v.c[1] >= 70) return { c: [0, v.c[1] - 12, v.c[2] - 24], r: [v.r[0] * 1.05, v.r[1] * 0.85, v.r[2] * 0.6] };   // queixinho redondo e curto, nada de ponta
+      if (v.c[0] === 0 && v.c[1] >= 30 && v.c[1] < 70) return { c: [0, v.c[1] - 8, v.c[2] - 8], r: [v.r[0] * 1.0, v.r[1] * 0.72, v.r[2] * 0.9] };   // maxilar curto e arredondado (dono, 20/Nov/2026: "queixo ainda masculino"): bochecha cheia, sem rosto comprido
       // (20/Nov/2026, dono: "queixo de mulheres não femininos"): o crânio termina mais alto, para o rosto não fechar em "U"
       // largo; quem desenha a parte de baixo é o maxilar, que afina em V suave até um queixinho delicado
       if (v.c[0] === 0 && v.c[1] < 0) return { c: [0, v.c[1] - 6, v.c[2]], r: [v.r[0], v.r[1] - 8, v.r[2]] };
@@ -1308,7 +1308,7 @@
     return elip(152, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa }) + elip(248, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa });
   }
   function luzMeio(pele, I) {
-    return elip(200, 283, 9, 3.2, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);   // luzinha no queixo (dentro do queixo novo, mais curto)
+    return elip(200, 276, 8, 3, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);   // luzinha no queixo (dentro do queixo novo, mais curto)
   }
   // quão escura é a pele (0 = branca, 1 = bem escura)
   function escuridao(h) { var c = rgb(h), l = (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; return Math.max(0, Math.min(1, (0.72 - l) / 0.45)); }
@@ -1320,7 +1320,7 @@
     var o = function (v) { return n(v * k * 100) / 100; }, L = { fill: 'url(#' + I + 'luzPele)' }, Q = { fill: 'url(#' + I + 'calorPele)' };
     return '<g opacity="' + o(0.85) + '">' + elip(200, 152, 40, 18, L) + elip(200, 230, 4, 18, L) +
       elip(150, 234, 20, 10, Object.assign({ transform: 'rotate(-18 150 234)' }, L)) + elip(250, 234, 20, 10, Object.assign({ transform: 'rotate(18 250 234)' }, L)) +
-      elip(200, 283, 6.5, 3.2, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
+      elip(200, 276, 6, 3, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
   }
 
 
