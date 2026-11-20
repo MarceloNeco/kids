@@ -14,6 +14,9 @@ na vitrine com a fita "Em breve".
 | `jogos/boliche.js` | Boliche em canvas, 10 jogadas com placar de verdade; fácil com proteção nas canaletas |
 | `jogos/bolinhas.js` | Bolinhas da Angústia: game show na parede de pinos (física própria, leve), Solo + Parceiro virtual ou Dois na mesma tela, 3 fases e o Contrato; estúdio de TV em 2.5D com câmera de transmissão (segue a bolinha, quadrinhos, câmera lenta no fim) e modo leve automático; especificação do dono em `BOLINHAS-ESPECIFICACAO.md` |
 | `jogos/bolinhas-perguntas.js` | as 100 perguntas do Bolinhas (40 de 2 opções, 30 de 3, 30 de 4), dificuldade 1 a 3, em PT/EN/ES |
+| `jogos/batalha.js` | efeitos de guerra comuns ao Jogo da Velha e ao Xadrez: explosões, faíscas, tremor, letreiros de quadrinho (POW!), faixas (XEQUE!, VITÓRIA!), fogos e sons feitos no código |
+| `jogos/velha.js` | Jogo da Velha de guerra (dono, 20/Nov/2026): ⚔️ espadas (Vermelho) × 🛡️ escudos (Azul); cada partida é uma batalha, quem vence 3 vence a guerra; contra o computador (fácil se distrai, médio bloqueia, difícil não erra) ou em dois |
+| `jogos/xadrez.js` | Xadrez de guerra (dono, 20/Nov/2026): regras completas (roque, en passant, promoção — na tela o peão vira dama —, xeque-mate, afogado, empates); captura vira batalha animada; computador fácil (1 lance), médio (2) e difícil (3 + trocas); contra o computador ou em dois |
 | `estilo.css` | visual da casca (cada jogo traz o próprio estilo, prefixado) |
 | `sw.js`, `manifest.webmanifest`, `versoes.json` | instalar e jogar sem internet (peça comum `../sw-comum.js`), versão |
 

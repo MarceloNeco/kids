@@ -16,7 +16,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.1', APP_DATA = '19/Nov/2026';
+  var APP_VERSION = '0.3.0', APP_DATA = '20/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA);
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -56,6 +56,14 @@
       texto: ['O game show da parede gigante: responda, escolha de onde a bolinha cai e torça enquanto ela quica entre os pinos até o último segundo. Com um parceiro virtual ou em dois, passando o aparelho.',
         'The giant-wall game show: answer, pick where the ball drops and hold your breath as it bounces through the pegs until the very last second. With a virtual partner or as two, passing the device.',
         'El concurso de la pared gigante: responde, elige desde dónde cae la bolita y cruza los dedos mientras rebota entre los clavos hasta el último segundo. Con un compañero virtual o entre dos, pasándoos el aparato.'] },
+    { id: 'velha', nome: ['Jogo da Velha', 'Tic-Tac-Toe', 'Tres en Raya'],
+      texto: ['Espadas contra escudos no campo de batalha: faça uma linha de 3 antes do outro exército. Quem vencer 3 batalhas vence a guerra! Contra o computador ou em dois.',
+        'Swords against shields on the battlefield: make a line of 3 before the other army. Whoever wins 3 battles wins the war! Against the computer or with two players.',
+        'Espadas contra escudos en el campo de batalla: haz una línea de 3 antes que el otro ejército. ¡Quien gane 3 batallas gana la guerra! Contra el ordenador o entre dos.'] },
+    { id: 'xadrez', nome: ['Xadrez', 'Chess', 'Ajedrez'],
+      texto: ['O Exército Azul contra o Exército Vermelho: cada captura é uma batalha, com espadas, explosões e prisioneiros. Derrube o rei inimigo com um xeque-mate! Contra o computador ou em dois.',
+        'The Blue Army against the Red Army: every capture is a battle, with swords, explosions and prisoners. Topple the enemy king with a checkmate! Against the computer or with two players.',
+        'El Ejército Azul contra el Ejército Rojo: cada captura es una batalla, con espadas, explosiones y prisioneros. ¡Derriba al rey enemigo con un jaque mate! Contra el ordenador o entre dos.'] },
     { id: 'milionario', breve: true, nome: ['Milionário José Pobre', 'Millionaire Joe Broke', 'Millonario José Pobre'],
       texto: ['Perguntas de cultura geral com prêmio que sobe a cada acerto e ajudas para os apertos. Será que o José fica milionário?',
         'General-knowledge questions with a prize that grows with every right answer, and lifelines for tight spots. Will Joe get rich?',
@@ -77,7 +85,13 @@
       ['A bola faz curva e os pinos são mais teimosos.', 'The ball curves and the pins are more stubborn.', 'La bola hace curva y los bolos son más tozudos.']],
     bolinhas: [['Perguntas mais fáceis e parceiro virtual mais forte.', 'Easier questions and a stronger virtual partner.', 'Preguntas más fáciles y un compañero virtual más fuerte.'],
       ['Perguntas variadas e parceiro equilibrado.', 'Mixed questions and a balanced partner.', 'Preguntas variadas y un compañero equilibrado.'],
-      ['Perguntas difíceis e parceiro virtual mais fraco.', 'Hard questions and a weaker virtual partner.', 'Preguntas difíciles y un compañero virtual más flojo.']]
+      ['Perguntas difíceis e parceiro virtual mais fraco.', 'Hard questions and a weaker virtual partner.', 'Preguntas difíciles y un compañero virtual más flojo.']],
+    velha: [['O computador se distrai e deixa você ganhar.', 'The computer gets distracted and lets you win.', 'El ordenador se despista y te deja ganar.'],
+      ['O computador ataca e bloqueia as suas linhas.', 'The computer attacks and blocks your lines.', 'El ordenador ataca y bloquea tus líneas.'],
+      ['O computador não erra: o melhor é a trégua!', 'The computer never slips: a truce is the best you can get!', 'El ordenador no falla: ¡lo mejor es la tregua!']],
+    xadrez: [['O computador pensa 1 lance e se distrai.', 'The computer thinks 1 move ahead and gets distracted.', 'El ordenador piensa 1 jugada y se despista.'],
+      ['O computador pensa 2 lances à frente.', 'The computer thinks 2 moves ahead.', 'El ordenador piensa 2 jugadas por delante.'],
+      ['O computador pensa 3 lances e confere as trocas.', 'The computer thinks 3 moves ahead and checks every trade.', 'El ordenador piensa 3 jugadas y revisa los cambios.']]
   };
 
   /* ---------- preferências (no aparelho) ---------- */
