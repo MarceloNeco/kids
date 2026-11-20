@@ -112,7 +112,7 @@ test('grupos, nomes curtos e desafios (com as dicas) em PT, EN e ES', () => {
 
 test('toda parte que dá para tirar tem a opção 🚫 (nenhum), menos as do corpo (idade, pele, rosto, nariz, olhos, cabelo…) e cenário', () => {
   for (const c of P.CATEGORIAS) {
-    if (['personagem', 'idade', 'pele', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'olhos', 'cabelo', 'cenario'].includes(c.id)) continue;
+    if (['personagem', 'idade', 'corpo', 'pele', 'rosto', 'nariz', 'testa', 'formaOlho', 'distOlhos', 'formaBoca', 'olhos', 'cabelo', 'cenario'].includes(c.id)) continue;
     const ids = c.opcoes.map(o => o.id);
     assert.ok(ids[0] === 'nenhum' || (c.id === 'estampa' && ids[0] === 'liso'), c.id + ' sem 🚫');
   }
