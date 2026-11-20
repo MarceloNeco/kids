@@ -347,6 +347,19 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.33.0 — Bruxa na vassoura, que sobe e desce (dono, 20/Nov/2026)
+
+- `modelos3d.js`: `bruxa` — chapéu preto esquisito (aba larga, cone torto dobrado na ponta, faixa na cor, fivela,
+  remendo e estrelinha), vestido escuro na cor, capa preta esvoaçando (por dentro na cor), meias listradas, sapatos de
+  bico virado, vassoura de cabo torto com a palha abrindo, gato preto na garupa e rastro de purpurina roxa.
+- `veiculos.js`: grupo do céu na garagem, mas `voa('bruxa')` é falso: ela larga na estrada. `motor.js` (`BRUXA`): com
+  `j.mod.bruxa`, o PULAR troca `j.voando` (e `mod.voa`) — sobe para o céu ou desce para a estrada; a troca dura 0,9 s
+  (passa por cima de tudo) e depois tem a recarga normal do pulo. No chão, passa por cima do rio (sem virar barco).
+- `desenho.js`: `vs.subida` (0 a 1) leva a câmera do chão até a altura do voo; no meio a vista troca (`VOA[k]`) e
+  `atravessarNuvens()` cobre a troca de nuvens. O botão vira ⬆ VOAR / ⬇ DESCER. Eventos `bruxaSobe` e `bruxaDesce`.
+- `app.js`: a bruxa corre contra carros e voadores misturados; nunca é sorteada como rival. Voz: a risada do Drácula,
+  mais aguda (`bruxa` no `som.js`). Testes em `teste/bruxa.test.js`.
+
 ## 1.32.0 — Ursão mais disputado (dono, 20/Nov/2026)
 
 - `motor.js` `URSO`: velocidade ×1,10 (era ×1,25) e, na beirada, freia até 15% (`freioAte`; era 30%) com força 4

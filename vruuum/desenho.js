@@ -231,6 +231,8 @@
     else if (ev.tipo === 'vira' && ev.dracula) texto(vs, t('🧛 Conde Drácula!', '🧛 Count Dracula!', '🧛 ¡Conde Drácula!'), '#ff4d6d', 1.3);
     else if (ev.tipo === 'pulo' && VEIC[ev.j] && VEIC[ev.j].galinha) texto(vs, t('Cocoricóóó!', 'Cock-a-doodle-doo!', '¡Quiquiriquííí!'), '#ffffff', 1.4);
     else if (ev.tipo === 'looping') texto(vs, 'LOOPING!', '#ff4fd8', 1.8);
+    else if (ev.tipo === 'bruxaSobe') { texto(vs, t('🧹 Voando!', '🧹 Flying!', '🧹 ¡Volando!'), '#c77dff', 1.6); brilhinhos(vs, 14, '#c77dff'); }
+    else if (ev.tipo === 'bruxaDesce') { texto(vs, t('🧹 Descendo para a estrada!', '🧹 Down to the road!', '🧹 ¡A la carretera!'), '#c77dff', 1.3); brilhinhos(vs, 10, '#c77dff'); }
     else if (ev.tipo === 'risada') texto(vs, t('🧸 HO HO HO!', '🧸 HO HO HO!', '🧸 ¡JO JO JO!'), '#ffd166', 1.8);
     else if (ev.tipo === 'ursoBate') texto(vs, t('🧸 Ai! A beirada!', '🧸 Ouch! The edge!', '🧸 ¡Ay! ¡El borde!'), '#ffffff', 1.4);
     else if (ev.tipo === 'ursoEmpurra') brilhinhos(vs, 8, '#ffd166');
@@ -257,6 +259,11 @@
       vs.nuvemX = (vs.nuvemX + seg.curva * pct * dt * 0.007 + dt * 0.004 + 10) % 1;
       var alvo = (entradas && entradas[k] && entradas[k].dir) || 0;
       vs.lado += (alvo - vs.lado) * Math.min(1, dt * 8);
+      if (VEIC[k] && VEIC[k].bruxa) {   // a bruxa sobe para o céu ou desce para a estrada aos poucos; no meio, a vista troca
+        var alvoS = j.voando ? 1 : 0, M3 = raiz.VruuumMotor;
+        vs.subida = vs.subida == null ? alvoS : alvoS > vs.subida ? Math.min(1, vs.subida + dt / M3.BRUXA.troca) : Math.max(0, vs.subida - dt / M3.BRUXA.troca);
+        VOA[k] = vs.subida > 0.5;
+      }
       if (vs.faixa) { vs.faixa.ate -= dt; if (vs.faixa.ate <= 0) vs.faixa = null; }
       if (vs.chegouT >= 0) { vs.chegouT += dt; if (vs.chegouT < 2.5 && Math.random() < dt * 6) confete(vs, 6, 'cima'); if (vs.chegouT < 3 && Math.random() < dt * 2.5) fogos(vs, 1); }
       var novos = [];
@@ -310,7 +317,7 @@
     var baseI = Math.floor(camZ / SEG), basePct = (camZ % SEG) / SEG;
     var jSeg = P.achar(pista, j.z), jPct = (j.z % SEG) / SEG;
     var jY = jSeg.p1.y + (jSeg.p2.y - jSeg.p1.y) * jPct;
-    var voa = !!VOA[ji], camY = jY + ALTURA_CAM + (voa ? ALT_VOO : 0), camX = j.x * LARG;
+    var voa = !!VOA[ji], bruxa = !!(VEIC[ji] && VEIC[ji].bruxa), camY = jY + ALTURA_CAM + (bruxa ? ALT_VOO * (vs.subida || 0) : voa ? ALT_VOO : 0), camX = j.x * LARG;
     var lpV = voa ? null : loopDaCamera(pista, j.z), orb = voa || lpV ? null : orbitaAtiva(e, j, VEIC[ji]);
     if (lpV) vistaLoop(c, e, ji, lpV, g, w, h, vs);   // dentro do looping: a câmera gira junto (cena toda em 3D)
     else if (orb) vistaOrbita(c, e, ji, g, w, h, vs, orb);   // volta de 360° na largada e na chegada
@@ -625,6 +632,7 @@
     }
     if (!orb) desenharCarro(c, j, vs, g, h, w, e);
     linhasVelocidade(c, g, w, h, Math.min(1, j.turbo * 0.9) * (voa ? 0.6 : 1));
+    if (bruxa && vs.subida > 0 && vs.subida < 1) atravessarNuvens(c, w, h, vs.subida);
     desenharEfeitos(c, vs, g, w, h);
     if (!op.semPlacar) desenharPlacar(c, e, j, ji, w, h, K, op, v);
     c.restore();
@@ -770,6 +778,14 @@
     c.restore();
   }
   // linhas de velocidade saindo do horizonte (turbo, foguete, mini-turbo) e uma moldura azul nas beiradas
+  // a bruxa atravessando as nuvens, subindo ou descendo (1.33.0): o meio da troca fica todo branquinho
+  function atravessarNuvens(c, w, h, s) {
+    var a = Math.max(0, Math.min(1, 1.15 - Math.abs(s - 0.5) * 3.2)); if (a <= 0) return;
+    c.save(); c.globalAlpha = a * 0.6; c.fillStyle = '#f3efff'; c.fillRect(0, 0, w, h);
+    c.globalAlpha = a * 0.75; c.fillStyle = '#ffffff';
+    for (var k = 0; k < 9; k++) { var x = w * ((k * 0.37 + s * 0.6) % 1), y = h * (0.15 + ((k * 0.53) % 0.8)), r = Math.min(w, h) * (0.12 + (k % 3) * 0.05); c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.arc(x + r * 0.8, y + r * 0.2, r * 0.75, 0, Math.PI * 2); c.arc(x - r * 0.8, y + r * 0.25, r * 0.7, 0, Math.PI * 2); c.fill(); }
+    c.restore();
+  }
   function linhasVelocidade(c, g, w, h, forca) {
     if (forca <= 0.02) return;
     var ox = g.cx, oy = g.cy + g.KY * 0.15, R = Math.sqrt(w * w + h * h);
@@ -1454,7 +1470,8 @@
         c.font = '700 ' + fs + 'px ' + FONTE + ',' + EMOJI; c.textBaseline = 'middle'; c.lineWidth = fs * 0.22; c.strokeStyle = '#1a1446'; c.fillStyle = '#ffffff';
         c.textAlign = 'left'; c.strokeText(t('segure: virar', 'hold: steer', 'mantén: girar'), xl, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer', 'mantén: girar'), xl, ay - as - fs * 0.7);
         c.textAlign = 'right'; c.strokeText(t('segure: virar', 'hold: steer', 'mantén: girar'), xr, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer', 'mantén: girar'), xr, ay - as - fs * 0.7);
-        c.textAlign = 'center'; c.strokeText(t('toque: pular', 'tap: jump', 'toca: saltar'), bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8); c.fillText(t('toque: pular', 'tap: jump', 'toca: saltar'), bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8);
+        var dica = VEIC[ji] && VEIC[ji].bruxa ? t('toque: voar / descer', 'tap: fly / land', 'toca: volar / bajar') : t('toque: pular', 'tap: jump', 'toca: saltar');
+        c.textAlign = 'center'; c.strokeText(dica, bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8); c.fillText(dica, bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8);
         if (dois) {   // de quem é cada metade da tela
           var tj = (op.jogadores && op.jogadores[ji] ? (op.jogadores[ji].piloto || '') + ' ' : '') + t('Jogador ', 'Player ', 'Jugador ') + (ji + 1), fj = Math.round(Math.min(u * 0.95, w / 11));
           c.font = '700 ' + fj + 'px ' + FONTE + ',' + EMOJI; c.lineWidth = fj * 0.22;
@@ -1471,8 +1488,9 @@
       if (!pronto) { c.strokeStyle = '#c6ff3d'; c.beginPath(); c.arc(bx2, by2, bp.r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - j.recarga / raiz.VruuumMotor.RECARGA)); c.stroke(); }
       else { c.strokeStyle = '#c6ff3d'; c.stroke(); }
       c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.font = '700 ' + Math.round(u * 1.3) + 'px ' + FONTE; c.fillText('⬆', bx2, by2 - u * 0.25);
-      c.font = '700 ' + Math.round(u * 0.55) + 'px ' + FONTE; c.fillText(t('PULAR', 'JUMP', 'SALTAR'), bx2, by2 + u * 0.8);
+      var ehBruxa = VEIC[ji] && VEIC[ji].bruxa;   // a bruxa: o botão sobe para o céu ou desce para a estrada
+      c.font = '700 ' + Math.round(u * 1.3) + 'px ' + FONTE; c.fillText(ehBruxa && j.voando ? '⬇' : '⬆', bx2, by2 - u * 0.25);
+      c.font = '700 ' + Math.round(u * 0.55) + 'px ' + FONTE; c.fillText(ehBruxa ? (j.voando ? t('DESCER', 'LAND', 'BAJAR') : t('VOAR', 'FLY', 'VOLAR')) : t('PULAR', 'JUMP', 'SALTAR'), bx2, by2 + u * 0.8);
       c.globalAlpha = 1;
     }
   }
