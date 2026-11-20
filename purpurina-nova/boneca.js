@@ -71,11 +71,21 @@
   function deformar(str) {
     if (!DF || !str) return str;
     var D = DF, rigidas = [];
+    // a mão (com o anel e a pulseira) não estica junto com a perna: só vai para o lugar novo, do tamanho certo
+    str = str.replace(/<g data-rigido="(-?[\d.]+),(-?[\d.]+)(?:,(-?[\d.]+),(-?[\d.]+))?">([\s\S]*?)<\/g><!--\/rigido-->/g, function (m, x, y, sx, sy, c) {
+      var k = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8, X = D.fx(+x, +y), Y = D.fy(+y);
+      // mão: fica na ponta do braço encurtado (do ombro sx,sy até ela)
+      if (sx !== undefined) { var Sx = D.fx(+sx, +sy), Sy = D.fy(+sy); X = Sx + (X - Sx) * ENCURTA; Y = Sy + (Y - Sy) * ENCURTA; }
+      c = c.replace(/<g data-osso="[^"]*">/g, '<g>').replace(/<!--\/osso-->/g, '');   // dentro da peça rígida o braço vai junto, sem osso
+      rigidas.push('<g transform="translate(' + n(X) + ' ' + n(Y) + ') scale(' + n(k * 1000) / 1000 + ') translate(' + (-x) + ' ' + (-y) + ')">' + c + '</g>');
+      return '\u0001' + (rigidas.length - 1) + '\u0001';
+    });
     // braço (osso): só os dois pontas (ombro e pulso) vão para o lugar novo; o desenho entre elas gira e estica junto,
     // sem entortar com a curva da cintura
     str = str.replace(/<g data-osso="(-?[\d.]+),(-?[\d.]+),(-?[\d.]+),(-?[\d.]+)">([\s\S]*?)<\/g><!--\/osso-->/g, function (m, x1, y1, x2, y2, c) {
       var P = [+x1, +y1], Q = [+x2, +y2], P2 = [D.fx(P[0], P[1]), D.fy(P[1])], Q2 = [D.fx(Q[0], Q[1]), D.fy(Q[1])];
       var v = [Q[0] - P[0], Q[1] - P[1]], w = [Q2[0] - P2[0], Q2[1] - P2[1]], lv = Math.sqrt(v[0] * v[0] + v[1] * v[1]) || 1, lw = Math.sqrt(w[0] * w[0] + w[1] * w[1]);
+      if (lv > 120) { w = [w[0] * ENCURTA, w[1] * ENCURTA]; lw *= ENCURTA; }   // braço inteiro: um pouco mais curto (dono, 20/Nov/2026)
       var av = Math.atan2(v[1], v[0]), aw = Math.atan2(w[1], w[0]), k = lw / lv, kl = 0.95;
       // matriz = gira para o eixo do osso, estica no comprimento (k) e mantém a grossura (kl), gira para a direção nova
       var ca = Math.cos(aw), sa = Math.sin(aw), cb = Math.cos(-av), sb = Math.sin(-av);
@@ -84,16 +94,11 @@
       rigidas.push('<g transform="matrix(' + [m11, m21, m12, m22, e, f].map(function (z) { return Math.round(z * 10000) / 10000; }).join(' ') + ')">' + c + '</g>');
       return '\u0001' + (rigidas.length - 1) + '\u0001';
     });
-    // a mão (com o anel e a pulseira) não estica junto com a perna: só vai para o lugar novo, do tamanho certo
-    str = str.replace(/<g data-rigido="(-?[\d.]+),(-?[\d.]+)">([\s\S]*?)<\/g><!--\/rigido-->/g, function (m, x, y, c) {
-      var k = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8;
-      rigidas.push('<g transform="translate(' + n(D.fx(+x, +y)) + ' ' + n(D.fy(+y)) + ') scale(' + n(k * 1000) / 1000 + ') translate(' + (-x) + ' ' + (-y) + ')">' + c + '</g>');
-      return '\u0001' + (rigidas.length - 1) + '\u0001';
-    });
     return voltarRigidas(deformarResto(str, D), rigidas);
   }
   function voltarRigidas(str, rigidas) { return rigidas.length ? str.replace(/\u0001(\d+)\u0001/g, function (m, i) { return rigidas[+i]; }) : str; }
-  function rigido(x, y, s) { return s ? '<g data-rigido="' + x + ',' + y + '">' + s + '</g><!--/rigido-->' : ''; }
+  var ENCURTA = 0.9;   // quanto o braço inteiro encolhe depois de ir para o corpo novo
+  function rigido(x, y, s, ombro) { return s ? '<g data-rigido="' + x + ',' + y + (ombro ? ',' + ombro[0] + ',' + ombro[1] : '') + '">' + s + '</g><!--/rigido-->' : ''; }
   function deformarResto(str, D) {
     function par(x, y) { return n(D.fx(+x, +y)) + ',' + n(D.fy(+y)); }
     // arco (A rx,ry giro grande lado x,y): os raios só encolhem como a peça naquele ponto; o ponto final vai para o lugar novo
@@ -345,13 +350,14 @@
       out.push(p('M172,393 Q182,399 192,394 M208,394 Q218,399 228,393', { fill: 'none', stroke: esc(corB, 0.3), 'stroke-width': 1.3, 'stroke-linecap': 'round', opacity: 0.4 }));
     }
     // ---------- bolsa, mãos e joias do corpo ----------
-    if (vis('bolsa') && !tchau && !bracoPose) out.push(bolsa(e.bolsa, C('bolsa'), peca, linha));
+    // bolsa de mão vai junto com a mão direita (não estica); a de ombro segue o corpo
+    if (vis('bolsa') && !tchau && !bracoPose) out.push(e.bolsa === 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : rigido(282, 496, bolsa(e.bolsa, C('bolsa'), peca, linha), [250, 354]));
     var esmalte = { tipo: e.unhas, cor: C('unhas') };
-    if (!semEsquerdo) out.push(rigido(118, 496, mao(118, -1, pele, peleE, esmalte)));
-    if (!semDireito) out.push(rigido(282, 496, mao(282, 1, pele, peleE, esmalte)));
+    if (!semEsquerdo) out.push(rigido(118, 496, mao(118, -1, pele, peleE, esmalte), [150, 354]));
+    if (!semDireito) out.push(rigido(282, 496, mao(282, 1, pele, peleE, esmalte), [250, 354]));
     if (!corpoCostas && vis('colar')) out.push(colar(e.colar, C('colar'), I));
     if (!corpoCostas && vis('broche')) out.push(broche(e.broche, C('broche')));
-    if (vis('pulseira') && !tchau && !semEsquerdo) out.push(rigido(118, 496, pulseira(e.pulseira, C('pulseira'))));
+    if (vis('pulseira') && !tchau && !semEsquerdo) out.push(rigido(118, 496, pulseira(e.pulseira, C('pulseira')), [150, 354]));
     if (!corpoCostas && vis('anel') && !tchau && !bracoPose) out.push(anel(e.anel, C('anel')));
     // em pose, a manga pendurada (parada) some do lado do braço em pose: o braço da pose desenha a própria manga
     if (bracoPose) {
@@ -435,7 +441,8 @@
       out.push(cabecaPronta);
     }
     // o braço do tchau vai por cima de tudo (fica na frente do cabelo, do lado do rosto)
-    if (tchau) out.push(bracoTchau(pele, peleE, esmalte, membro, op.anim));
+    // o braço do tchau vai inteiro junto com o ombro (sem a mão encolher para cima do rosto na altura da cabeça)
+    if (tchau) out.push(rigido(250, 356, bracoTchau(pele, peleE, esmalte, membro, op.anim)));
     if (bracoPose) out.push(bracosPose(bracoPose, tipoManga(), vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null), pele, peleE, esmalte, membro));
     // corpo de ilustração de moda: o corpo passa pela deformação e a cabeça (já pronta) só é reduzida e posta no lugar
     var cabecaGrupo = '<g transform="' + CABECA + '">';
@@ -1888,7 +1895,7 @@
       if (topo === 'coracao') t += p(coracao(x, y + 0.4, 3), { fill: '#e8384f', stroke: '#fff', 'stroke-width': 0.7 });
       if (topo === 'flor') t += flor(x, y + 0.6, 1.9, '#ff8fc8', '#ffd23f');
       if (topo === 'estrela') t += p(estrela5(x, y + 0.6, 4, 1.8), { fill: cor.hex, stroke: esc(cor.hex, 0.3), 'stroke-width': 0.7 });
-      return rigido(lado < 0 ? 118 : 282, 496, t);   // vai junto com a mão
+      return rigido(lado < 0 ? 118 : 282, 496, t, [lado < 0 ? 150 : 250, 354]);   // vai junto com a mão
     }
     if (tipo === 'dois') return um(-1, 'pedra') + um(1, 'coracao');
     return um(-1, tipo);

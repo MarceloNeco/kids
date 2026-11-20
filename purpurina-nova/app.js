@@ -212,11 +212,22 @@
     var el = $('boneca');
     // trocando de vista: sem desfoque e sombra, para ficar liso
     var mexendo = girando;
-    el.innerHTML = B.svg(estado, { id: 'palco', anim: !CALMO && !angulo, area: vista, angulo: angulo, realce: !mexendo });
+    // viva no estúdio (dono, 20/Nov/2026: "não precisa ser estático"): de frente ela respira, passa o peso de uma perna
+    // para a outra e balança os braços (classe .parada, estilo.css); de tempos em tempos dá tchauzinho (tchauAte)
+    var viva = !CALMO && !angulo;
+    el.classList.toggle('parada', viva);
+    el.innerHTML = B.svg(estado, { id: 'palco', anim: viva, area: vista, angulo: angulo, realce: !mexendo, passos: viva, tchau: viva && Date.now() < tchauAte });
     $('btFrente').hidden = !angulo;
     if (angulo !== angMandado) { angMandado = angulo; ponte('giro'); }
     el.setAttribute('aria-label', V.resumo(estado, lingua));
   }
+  // tchauzinho de vez em quando no estúdio (a cada ~9 s, por 2,6 s), só de corpo inteiro e de frente
+  var tchauAte = 0;
+  setInterval(function () {
+    if (CALMO || atual !== 'estudio' || angulo || zoomLigado || document.hidden) return;
+    tchauAte = Date.now() + 2600; desenharBoneca();
+    setTimeout(function () { if (atual === 'estudio') desenharBoneca(); }, 2700);
+  }, 9000);
   function desenharDicas(comSom) {
     var d = desafioAtual(), ul = $('dicas');
     $('dicasCaixa').hidden = !d; if (!d) return;

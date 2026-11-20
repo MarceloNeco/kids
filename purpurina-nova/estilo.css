@@ -437,3 +437,18 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .pp-ia-caixa { color: var(--text); }
 .pp-ia-caixa input { border-color: var(--borda); background: #fff; color: var(--text); }
 .dica-giro { background: rgba(255, 255, 255, .92); color: var(--text); box-shadow: 0 2px 8px rgba(61, 35, 82, .12); }
+/* ---------- viva no estúdio (dono, 20/Nov/2026: "não precisa ficar parado... se movimentando, dando um tchauzinho") ----------
+   De frente, ela respira e passa o peso de uma perna para a outra, devagar (6 s); a perna do lado do peso fica esticada e a
+   outra relaxa o joelho; os braços balançam de leve; a saia acompanha o quadril. Os centros vêm do boneca.js (corpo novo). */
+.boneca.parada .pp-corpo { animation: vivaCorpo 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-passo-e { animation: vivaPernaE 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-passo-d { animation: vivaPernaD 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-braco-e { animation: vivaBracoE 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-braco-d { animation: vivaBracoD 6s ease-in-out infinite; transform-box: view-box; }
+.boneca.parada .pp-barra { animation: vivaBarra 6s ease-in-out infinite; transform-box: view-box; }
+@keyframes vivaCorpo { 0%, 100% { transform: translate(-1.2%, 0) rotate(.8deg); } 25% { transform: translate(0, -.4%); } 50% { transform: translate(1.2%, 0) rotate(-.8deg); } 75% { transform: translate(0, -.4%); } }
+@keyframes vivaPernaE { 0%, 100% { transform: translate(-1.2%, 0) rotate(2.2deg); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, .4%) rotate(1deg) scaleY(.985); } }
+@keyframes vivaPernaD { 0%, 100% { transform: translate(-1.2%, .4%) rotate(-1deg) scaleY(.985); } 25%, 75% { transform: none; } 50% { transform: translate(1.2%, 0) rotate(-2.2deg); } }
+@keyframes vivaBracoE { 0%, 100% { transform: rotate(2.5deg); } 50% { transform: rotate(-1.5deg); } }
+@keyframes vivaBracoD { 0%, 100% { transform: rotate(1.5deg); } 50% { transform: rotate(-2.5deg); } }
+@keyframes vivaBarra { 0%, 100% { transform: skewX(1.2deg); } 50% { transform: skewX(-1.2deg); } }
