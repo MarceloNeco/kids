@@ -3,7 +3,7 @@
    Partes: comum · TVApp (também o modo "só o celular") · CelApp · botões. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.8.46', APP_UPDATED = '20/11/2026';
+  var APP_VERSION = '0.8.47', APP_UPDATED = '20/11/2026';
   // o idioma vem da estante (../idioma.js): pt, en ou es; o jogo não tem botão de idioma próprio
   function lingua() { return window.BolinhoIdioma ? BolinhoIdioma.atual() : 'pt'; }
   function T(pt, en, es) { var l = lingua(); return l === 'en' ? en : l === 'es' ? (es != null ? es : pt) : pt; }
@@ -181,8 +181,8 @@
       var cores = Desenho.CORES.j;
       // o boneco escolhido aparece em cima do nome (os dois, quando uma câmera filma duas pessoas)
       function bonecoDe(chave, k, sozinho) { return function () { return (sozinho ? meuBoneco(chave) : (tv.bonecos[chave] || {})[k]) || Boneco.normalizar({}, k); }; }
-      function comBonecos(d, chave) { var w = document.createElement('div'); w.className = 'bonecos'; var n = tv.cfg.jogadores === 2 && (tv.local || tv.cfg.celulares === 1) ? 2 : 1; for (var k = 0; k < n; k++) { var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, n === 1)); } d.appendChild(w); }
-      function umBoneco(d, chave, k) { var w = document.createElement('div'); w.className = 'bonecos'; var cv = document.createElement('canvas'); cv.width = 120; cv.height = 160; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, !(tv.local && tv.cfg.jogadores === 2))); d.appendChild(w); }
+      function comBonecos(d, chave) { var w = document.createElement('div'); w.className = 'bonecos'; var n = tv.cfg.jogadores === 2 && (tv.local || tv.cfg.celulares === 1) ? 2 : 1; for (var k = 0; k < n; k++) { var cv = document.createElement('canvas'); cv.width = 240; cv.height = 320; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, n === 1)); } d.appendChild(w); }
+      function umBoneco(d, chave, k) { var w = document.createElement('div'); w.className = 'bonecos'; var cv = document.createElement('canvas'); cv.width = 240; cv.height = 320; cv.setAttribute('data-boneco', chave + ':' + k); w.appendChild(cv); animarBoneco(cv, bonecoDe(chave, k, !(tv.local && tv.cfg.jogadores === 2))); d.appendChild(w); }
       var dois = tv.local && tv.cfg.jogadores === 2;
       if (tv.local) for (var q = 0; q < (dois ? 2 : 1); q++) { var dq = document.createElement('div'); dq.className = 'jog'; dq.style.setProperty('--cor', cores[q]); umBoneco(dq, 'local', q); dq.classList.add('trocavel'); dq.title = T('Toque para trocar o boneco', 'Tap to change the avatar', 'Toca para cambiar el muñeco'); dq.onclick = (function (qq) { return function () { CelApp.trocarBoneco(dois ? qq : ((tv.bonecos.local || {}).eu || 0)); }; })(q); var nq = document.createElement('span'); if (q === 1) nq.id = 'lobbyNomeJ2'; nq.textContent = q === 0 ? (tv.nome1 || T('Você', 'You', 'Tú')) : (tv.nome2 || T('2ª pessoa', '2nd player', '2.ª persona')); dq.appendChild(nq); L.appendChild(dq); }
       $('lobbyNome2').style.display = dois ? '' : 'none';
@@ -826,6 +826,7 @@
   /* tela inicial em dois passos: 1) onde (só no celular / com a TV); 2) como. O Voltar (do celular ou o ← da caixa) volta ao 1 */
   function passoInicio(p) { $('inicio').setAttribute('data-passo', p); }
   function abrirPasso(p, foco) { passoInicio(p); Nav.abrir(function () { passoInicio('um'); }); var b = $(foco); if (b) b.focus(); }
+  if (window.ResizeObserver) new ResizeObserver(function () { var b = $('tvLocalBar'); if (b.offsetHeight) document.documentElement.style.setProperty('--barra', b.offsetHeight + 'px'); }).observe($('tvLocalBar'));   // altura da barra de baixo: o lobby em pé usa o resto para o boneco
   $('btPassoCel').onclick = function () { abrirPasso('cel', 'btToque'); };
   $('btPassoTV').onclick = function () { abrirPasso('tv', 'btTV'); };
   document.querySelectorAll('#inicio .voltaPasso').forEach(function (b) { b.onclick = function () { history.back(); }; });

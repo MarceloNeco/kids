@@ -2,6 +2,20 @@
   "app": "baguncolandia",
   "versoes": [
     {
+      "versao": "0.8.47",
+      "data": "20/Nov/2026",
+      "hora": "19:00:00",
+      "pt": [
+        "🧸 Tela \"Quem vai jogar\" sem espaço sobrando: com o celular em pé, os modos viram cartões grandes com o nome de cada um (Bagunça na casa, Corta-corta, Pula e abaixa…), o modo escolhido fica com o nome em destaque e o boneco cresce para ocupar a tela. Com duas pessoas, os dois bonecos ficam lado a lado. Deitado, o nome aparece embaixo de cada ícone."
+      ],
+      "en": [
+        "🧸 \"Who's playing\" screen with no wasted space: with the phone upright, the modes become big cards with each name (House mayhem, Slice, Jump and duck…), the chosen mode's name stands out, and the character grows to fill the screen. With two players, both characters sit side by side. In landscape, the name shows under each icon."
+      ],
+      "es": [
+        "🧸 Pantalla \"Quién juega\" sin huecos: con el móvil en vertical, los modos son tarjetas grandes con el nombre de cada uno (Alboroto en casa, Corta-corta, Salta y agáchate…), el modo elegido destaca su nombre y el muñeco crece para llenar la pantalla. Con dos personas, los dos muñecos van uno al lado del otro. En horizontal, el nombre sale debajo de cada icono."
+      ]
+    },
+    {
       "versao": "0.8.46",
       "data": "20/Nov/2026",
       "hora": "17:30:00",

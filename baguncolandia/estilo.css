@@ -289,3 +289,18 @@ select { font: inherit; width: 100%; padding: .7rem; border-radius: 14px; border
 #inicio .sub { text-shadow: 0 1px 6px rgba(0, 0, 0, .8); }
 #inicio .como { position: relative; background: rgba(14, 9, 40, .78); }
 #inicio footer { position: relative; text-shadow: 0 1px 4px #000, 0 0 10px rgba(0, 0, 0, .9); }
+
+/* modos com nome (dono, 20/Nov/2026): no celular em pé, os modos viram cartões 4 × 2 com o nome embaixo e ocupam o espaço
+   que sobrava entre o boneco e os botões; deitado continua a fileira de ícones */
+#localModos small { display: block; font-size: .6rem; font-weight: 800; line-height: 1.1; white-space: normal; margin-top: .15rem; color: var(--text); }   /* deitado: nome pequeno embaixo do ícone */
+#localModos button.ativo small { color: var(--lima); }
+@media (orientation: portrait) {
+  #tvLocalBar #localModos { display: grid; grid-template-columns: repeat(4, 1fr); gap: .45rem; }
+  #tvLocalBar #localModos button { max-width: none; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; padding: .5rem .15rem .45rem; font-size: 1.8rem; line-height: 1; }
+  #localModos small { display: block; font-size: .74rem; font-weight: 800; line-height: 1.15; color: var(--text); }
+  #localModos button.ativo small { color: var(--lima); }
+  #tv.local .cheia { padding-bottom: calc(var(--barra, 18rem) + .6rem); }
+  #tv.local .lobbyLista .bonecos canvas { height: clamp(130px, calc(100vh - var(--barra, 18rem) - 250px), min(48vh, 88vw)); width: auto; aspect-ratio: 3 / 4; max-height: none; max-width: 66vw; object-fit: contain; }
+  #tv.local .lobbyLista .bonecos canvas:not(:only-child), #tv.local .lobbyLista .jog:not(:only-child) .bonecos canvas { height: clamp(110px, calc(100vh - var(--barra, 18rem) - 420px), 46vw); max-width: 34vw; }   /* duas pessoas: dois bonecos lado a lado, menores */
+  #tv.local .lobbyLista { flex-wrap: nowrap; gap: .8rem; }   /* o boneco cresce com a altura do celular: sem buraco no meio */
+}
