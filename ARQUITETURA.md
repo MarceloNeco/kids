@@ -20,6 +20,7 @@ Progresso salvo e preferências não se perdem: tudo continua no mesmo site (sol
 | `kids.js` | Controle remoto da TV (setas e OK) e, numa TV de verdade, abre os jogos já no papel de TV (`?tv=auto`). | Sim |
 | `instalar.js` | Barra "Instalar o aplicativo" (estante e jogos com `?instalar=1`), passo a passo por aparelho. | Sim |
 | `radio.js` + `musicas/` | Rádio de rock no pé da estante. Créditos em `CREDITOS.md`. Sem internet toca a favorita (Cool Rock) pelo `Trilha.offline`: o `index.html` carrega `trilha.js` antes do `radio.js`. | Sim |
+| `clipe.js` | **📺 Clipe** (19/Nov/2026), peça comum: um telão por cima da página com bichinhos desenhados em código (canvas, sem vídeo e sem IA) dançando no ritmo da música que já toca (`captureStream` + `AnalyserNode`, sem mexer no som; sem isso, 120 BPM). Cenas da rádio (Festa na piscina, Discoteca do Bolinho, Luau na praia; botão no tocador do `radio.js`) e do H-rraaa (Pelúcias na balada, DJ Garra; botão no menu). Respeita "reduzir movimento", fundo pintado uma vez, para quando fecha. Vídeo de IA no lugar do desenho: lista `CLIPES_VIDEO` no começo do arquivo. Vigia: `teste/clipe.test.js`. | Sim |
 | `tela-cheia.js` | Tela cheia no primeiro toque (celular/tablet; no tablet Fire só instalando). | Sim |
 | `estante.css` | Visual da estante. | Sim |
 | `cartoes-fundos.css` + `cartoes/` | Fundo desenhado dos cartões antigos. **Fora da estante desde 15/Nov/2026** (cartões compactos no `catalogo.js`); os arquivos ficam para reaproveitar. | Não |

@@ -16,7 +16,7 @@
 <!--
   H-rraaa (pasta a-garra) — brincadeira da família Bolinho de Chuva (SolverONE · kids), em 3D (Three.js, em libs/).
   A máquina por dentro (física e regra de pagamento) em maquina.js, os prêmios em premios3d.js, as máquinas em cenario3d.js,
-  os efeitos em som.js, as telas em app.js. Música: a trilha comum (../trilha.js). Sem login, sem banco: tudo fica no aparelho.
+  os efeitos em som.js, as telas em app.js. Música: a trilha comum (../trilha.js). 📺 Clipe: ../clipe.js. Sem login, sem banco: tudo fica no aparelho.
   Nada de script inline: a CSP acima não permite. Mapa: LEIA-ME.md. Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
 -->
 </head>
@@ -26,6 +26,7 @@
   <div class="faixa">
     <span class="espaco"></span>
     <button class="mini bt-tela" type="button" aria-label="Tela cheia" data-rotulo="Tela cheia|Full screen|Pantalla completa" hidden><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6"/></svg></button>
+    <button id="btClipe" class="mini clipe" type="button" aria-label="Clipe: os bichinhos dançam a música" data-rotulo="Clipe: os bichinhos dançam a música|Music video: the critters dance to the music|Videoclip: los bichitos bailan la música"><span aria-hidden="true">📺</span><span data-t="Clipe|Music video|Videoclip"></span></button>
     <button id="btEfeitos" class="mini" type="button" aria-label="Som e música" data-rotulo="Som e música|Sound and music|Sonido y música">🔊</button>
     <button id="btAjuda" class="mini" type="button" aria-label="Como brincar" data-rotulo="Como brincar|How to play|Cómo se juega" aria-expanded="false">❓</button>
   </div>
@@ -131,6 +132,7 @@
 <script src="../atualizar.js" data-fora-do-arquivo></script>
 <script src="../telacheia.js" data-fora-do-arquivo></script>
 <script src="../trilha.js"></script>
+<script src="../clipe.js" data-fora-do-arquivo></script>
 <script src="app.js" type="module"></script>
 </body>
 </html>

@@ -18,7 +18,9 @@
   var debug = /[?&]debug\b/.test(location.search), painel = null;
   if (debug) { painel = document.createElement('pre'); painel.id = 'debug'; painel.textContent = 'DIAGNÓSTICO: aperte as setas e OK no controle…\n'; document.body.appendChild(painel); }
   function log(e) { if (!painel) return; var ae = document.activeElement; painel.textContent += e.type + '  key=' + JSON.stringify(e.key) + '  code=' + JSON.stringify(e.code) + '  keyCode=' + e.keyCode + '  foco=' + (ae && (ae.id || ae.tagName)) + '\n'; var linhas = painel.textContent.split('\n'); if (linhas.length > 10) painel.textContent = linhas.slice(-10).join('\n'); }
-  function foco(n, parado) { i = (n + cards.length) % cards.length; try { cards[i].focus({ preventScroll: !!parado }); } catch (e) { cards[i].focus(); } cards.forEach(function (c, k) { c.closest('.card').classList.toggle('sel', k === i); }); }
+  // depois do último cartão, o 📺 Clipe da rádio (radio.js monta o botão depois deste arquivo)
+  function todos() { var b = document.querySelector('.radio .r-clipe'); return b ? cards.concat([b]) : cards; }
+  function foco(n, parado) { var l = todos(); i = (n + l.length) % l.length; try { l[i].focus({ preventScroll: !!parado }); } catch (e) { l[i].focus(); } cards.forEach(function (c, k) { c.closest('.card').classList.toggle('sel', k === i); }); }
 
   // Só assume o controle (foco inicial, navegação por setas) numa TV de verdade. No celular/tablet,
   // deixa o toque normal — senão um cartão fica "sedado" com borda de foco sem ninguém ter mexido.
@@ -28,7 +30,7 @@
   window.addEventListener('load', function () { foco(i, true); });
   function tecla(e) {
     log(e);
-    if (document.body.classList.contains('bc-modal')) return;
+    if (document.body.classList.contains('bc-modal') || document.body.classList.contains('clipe-aberto')) return;   // o telão do clipe cuida das teclas dele
     var k = e.key || '', c = e.keyCode || e.which || 0, agora = Date.now();
     var dir = (k === 'ArrowRight' || k === 'Right' || c === 39) ? 1 : (k === 'ArrowDown' || k === 'Down' || c === 40) ? 1 : (k === 'ArrowLeft' || k === 'Left' || c === 37) ? -1 : (k === 'ArrowUp' || k === 'Up' || c === 38) ? -1 : 0;
     var ok = k === 'Enter' || k === 'OK' || k === ' ' || c === 13 || c === 32;
@@ -39,7 +41,7 @@
     if (agora - ultimo < 350 && ultimaTecla === assinatura) { e.preventDefault(); return; }
     ultimo = agora; ultimaTecla = assinatura;
     e.preventDefault();
-    if (dir) foco(i + dir); else { var alvo = cards[i]; if (alvo.href && alvo.href.indexOf('#') < 0) location.href = alvo.href; else alvo.click(); }
+    if (dir) foco(i + dir); else { var alvo = todos()[i]; if (alvo.href && alvo.href.indexOf('#') < 0) location.href = alvo.href; else alvo.click(); }
   }
   ['keydown', 'keypress', 'keyup'].forEach(function (t) { window.addEventListener(t, tecla, true); });
   cards.forEach(function (c, n) { c.addEventListener('focus', function () { i = n; }); c.addEventListener('mouseenter', function () { i = n; }); });

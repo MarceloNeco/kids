@@ -6,11 +6,11 @@ const path = require('path');
 const pasta = path.resolve(__dirname, '..');
 const ler = f => fs.readFileSync(path.join(pasta, f), 'utf8');
 
-test('versão 0.5.2 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
+test('versão 0.5.3 igual nos três lugares (app.js, sw.js, versoes.json)', () => {
   const a = ler('app.js').match(/APP_VERSION = '([\d.]+)'/)[1];
   const s = ler('sw.js').match(/VERSAO = '([\d.]+)'/)[1];
   const v = JSON.parse(ler('versoes.json')).versoes[0];
-  assert.equal(a, '0.5.2'); assert.equal(a, s); assert.equal(v.versao, a);
+  assert.equal(a, '0.5.3'); assert.equal(a, s); assert.equal(v.versao, a);
   assert.equal(v.data, '20/Nov/2026');
   assert.match(ler('app.js'), /APP_DATA = \['20\/Nov\/2026', 'Nov\/20\/2026', '20\/nov\/2026'\]/);
   for (const k of ['data', 'hora', 'pt', 'en', 'es']) assert.ok(v[k], 'versoes.json sem ' + k);
@@ -26,7 +26,7 @@ test('sw.js guarda todos os arquivos publicados, cache com o nome da pasta', () 
   for (const a of lista) if (a !== './') assert.ok(fs.existsSync(path.join(pasta, a)), 'falta no disco: ' + a);
   const publicados = fs.readdirSync(pasta).filter(f => /\.(js|css|html|json|png|webmanifest)$/.test(f) && f !== 'sw.js');
   for (const f of publicados) assert.ok(lista.includes(f), 'sw.js não guarda: ' + f);
-  for (const f of ['../trilha.js', '../recursos.js', '../atualizar.js', '../telacheia.js', '../rabiscolandia/fontes/fredoka.woff2']) assert.ok(lista.includes(f), 'sw.js não guarda ' + f);
+  for (const f of ['../trilha.js', '../clipe.js', '../recursos.js', '../atualizar.js', '../telacheia.js', '../rabiscolandia/fontes/fredoka.woff2']) assert.ok(lista.includes(f), 'sw.js não guarda ' + f);
 });
 
 test('index.html: CSP sem script inline, scripts existem, interruptor e textos PT|EN|ES, sem botão de idioma', () => {
