@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0';
+  var APP_VERSION = '0.4.1';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -239,7 +239,8 @@
      A animação só muda o viewBox do SVG (barato, sem redesenhar). */
   var INTEIRA = [0, 0, 400, 720], vista = INTEIRA.slice(), zoomLigado = false, animZoom = 0;
   function catAtual() { return P.categoria(catPorGrupo[grupoAtual] || catsDoGrupo(grupoAtual)[0].id); }
-  function alvoZoom() { var c = catAtual(); return P.ZOOM[(c && c.zoom) || 'rosto']; }
+  // corpo de ilustração de moda: a área de zoom vai para o lugar novo do rosto, das mãos ou dos pés (muda com a idade)
+  function alvoZoom() { var c = catAtual(); return B.areaZoom(P.ZOOM[(c && c.zoom) || 'rosto'], estado); }
   function zoom(liga, animar) {
     zoomLigado = !!liga;
     var b = $('btZoom'); b.setAttribute('aria-pressed', String(zoomLigado)); b.textContent = zoomLigado ? '👗' : '🔍';   // 👗 (e não 🧍, que o Fire antigo mostra como um quadrado vazio)

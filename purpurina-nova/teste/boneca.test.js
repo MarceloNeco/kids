@@ -62,7 +62,7 @@ test('giro: frente, lado e costas desenham; de costas não tem rosto', () => {
 test('anel e pulseira: só a parte da frente (arco aberto, sem círculo inteiro)', () => {
   const e = Object.assign(V.novo(), { anel: 'simples', pulseira: 'simples' });
   const s = B.svg(e, { id: 'j' });
-  assert.match(s, /A13\.5,4\.8 0 0 0/, 'pulseira em meio arco');
+  assert.match(s, /A[\d.]+,[\d.]+ 0 0 0/, 'pulseira em meio arco');   // Nova Era: raios afinam com o corpo de moda
   assert.ok(!/<ellipse cx="120\.5" cy="487"/.test(s), 'pulseira sem elipse inteira');
 });
 
@@ -214,10 +214,10 @@ test('glitter brilha de verdade: lantejoulas e faíscas animadas na tela, parada
 test('patins: de frente as rodas ficam de pé e estreitas; de lado, redondas', () => {
   const e = Object.assign(V.novo(), { sapatos: 'patins', calca: 'nenhum' });
   const frente = B.svg(e, { id: 'p' }), lado = B.svg(e, { id: 'p', angulo: 90 });
-  const rodas = [...frente.matchAll(/<rect x="[^"]*" y="651" width="9" height="16"/g)];
+  const rodas = [...frente.matchAll(/<rect x="[^"]*" y="651" width="[\d.]+" height="16"/g)];   // Nova Era: largura afina com o corpo
   assert.equal(rodas.length, 4, 'duas rodas da frente em cada pé, em pé');
   assert.ok(!/<circle cx="[^"]*" cy="661" r="6" fill="#ffd166"/.test(frente), 'sem roda redonda de frente');
-  assert.ok((lado.match(/r="6.5" fill="#ffd166"/g) || []).length >= 2, 'de lado as rodas são redondas');
+  assert.ok((lado.match(/<circle [^>]*r="[\d.]+" fill="#ffd166"/g) || []).length >= 2, 'de lado as rodas são redondas');
 });
 
 test('pés descalços: de frente, unha em cima de cada dedo (5 por pé); de costas, calcanhar sem unha', () => {
@@ -299,9 +299,8 @@ test('Nova Era: rosto natural que acompanha a idade, sem sombra escura embaixo (
   // a cabeça vai diminuindo com a idade (a criancinha tem a cabeça maior) e o rosto vai ficando oval
   const larg = idades.map(i => escala(svgDe(i)));
   for (let k = 1; k < larg.length; k++) assert.ok(larg[k] < larg[k - 1], idades[k] + ' com a cabeça menor que ' + idades[k - 1]);
-  // o volume do rosto é só nas laterais (degradê de lado a lado): nada escurece o queixo ("parecia barba")
-  assert.match(svgDe('adulta'), /<linearGradient id="r-volRosto" x1="0" x2="1" y1="0" y2="0">/);
-  assert.doesNotMatch(svgDe('adulta'), /<radialGradient id="r-volRosto"/);
+  // ilustração 2D (dono, 19/Nov/2026: "não seria 3D"): rosto de cor lisa, sem degradê de volume (nada escurece o queixo)
+  assert.doesNotMatch(svgDe('adulta'), /r-volRosto|r-volCab/);
 });
 
 test('Nova Era em ilustração (dono, 19/Nov/2026): olho amendoado com pálpebra, sobrancelha cheia, fios no cabelo e sem giro de 360°', () => {
@@ -320,4 +319,18 @@ test('Nova Era em ilustração (dono, 19/Nov/2026): olho amendoado com pálpebra
   for (const a of [28, 45, -28, -45]) for (const idade of ['pequena', 'crianca', 'adolescente', 'adulta']) {
     const v = B.svg(Object.assign(V.novo(), { idade }), { id: 'v', angulo: a }); assert.equal(bemFormado(v), ''); assert.ok(!/NaN|undefined/.test(v), idade + a);
   }
+});
+
+test('Nova Era sem 3D e com corpo de moda (dono, 19/Nov/2026: "não seria 3D"; pesquisa do Poki)', () => {
+  const s = B.svg(Object.assign(V.novo(), { idade: 'adulta' }), { id: 'm', fundo: false });
+  assert.equal(bemFormado(s), '');
+  // sem degradê redondo de volume (o "plástico" 3D): a sombra e a luz são faixas de corte reto
+  assert.doesNotMatch(s, /<radialGradient id="m-(vol|pele|volCab|volRosto)"/);
+  assert.match(s, /<linearGradient id="m-vol"[^>]*><stop offset=".74" stop-color="#7a5ba8" stop-opacity="0"\/><stop offset=".74"/);
+  // a cabeça fica pequena (corpo de moda): a adulta tem bem mais cabeças de altura que a criancinha
+  const escalaCabeca = (idade) => +B.svg(Object.assign(V.novo(), { idade }), { id: 'k', fundo: false }).match(/translate\(200 [\d.]+\) scale\(([\d.]+)\) translate\(-200/)[1];
+  assert.ok(escalaCabeca('adulta') < 0.5 && escalaCabeca('pequena') > escalaCabeca('adulta'));
+  // o zoom da maquiagem vai para o rosto no lugar novo
+  const z = B.areaZoom(P.ZOOM.rosto, Object.assign(V.novo(), { idade: 'adulta' }));
+  assert.ok(z[1] < 120 && z[2] < 200, JSON.stringify(z));
 });

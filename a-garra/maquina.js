@@ -5,6 +5,7 @@
 
    Uso:
      var m = Maquina.nova({ nivel: 'dificil', tipos: ['urso', ...], raro: 'urso-dourado', vivos: false, andam: false, semente: 7 });
+     (medidas: Maquina.GIGANTE para a cabine grande dos gigantes; m.med guarda as medidas da máquina)
      (vivos: os de cima dão pulinhos; andam: os bichos ficam de pé e, de vez em quando, dão uma voltinha pelo monte)
      m.mover(dx, dz)     segurar as setas (-1, 0 ou 1 em cada eixo; 0, 0 = soltou)   m.irPara(x, z) levar até (dedo)
      m.pegar()           desce a garra (só na fase "mirar")                          m.passo(dt)    anda dt segundos
@@ -19,9 +20,20 @@
    altura AB; ali não tem chão: quem cai lá dentro é prêmio. */
 (function (raiz) {
   'use strict';
-  var L = 6, P = 5, A = 7, BX = 1.5, BZ = 1.5, AB = 1.5, TRILHO = 6.3, PERNA = 0.9, G = 40;
-  var CASA = { x: BX / 2, z: P - BZ / 2 };
-  var LIM = { x0: 0.45, x1: L - 0.45, z0: 0.45, z1: P - 0.45 };
+  var G = 40;
+  // medidas da máquina comum; a de gigantes (op.medidas) é maior, com buraco e garra maiores
+  var PADRAO = { L: 6, P: 5, A: 7, BX: 1.5, BZ: 1.5, AB: 1.5, TRILHO: 6.3, PERNA: 0.9, MARGEM: 0.45 };
+  var L, P, A, BX, BZ, AB, TRILHO, PERNA, CASA, LIM;
+  function calcular(o) {
+    var d = Object.assign({}, PADRAO, o || {});
+    d.CASA = { x: d.BX / 2, z: d.P - d.BZ / 2 };
+    d.LIM = { x0: d.MARGEM, x1: d.L - d.MARGEM, z0: d.MARGEM, z1: d.P - d.MARGEM };
+    return d;
+  }
+  // as contas usam as medidas da máquina da vez (cada chamada de fora começa por aqui: dá para ter várias máquinas)
+  function usar(d) { L = d.L; P = d.P; A = d.A; BX = d.BX; BZ = d.BZ; AB = d.AB; TRILHO = d.TRILHO; PERNA = d.PERNA; CASA = d.CASA; LIM = d.LIM; }
+  var MEDIDAS = calcular();
+  usar(MEDIDAS);
 
   // cada nível: fichas, segundos para mirar em cada tentativa (1 minuto em todos, pedido do dono; 0 = sem relógio), quantos prêmios e de que tamanho, tol (quão perto do meio
   // a garra precisa fechar: 1 = até a borda) e cada [mín, máx]: depois de cada prêmio a máquina sorteia em quantas
@@ -48,12 +60,14 @@
     op = op || {};
     var nivel = NIVEIS[op.nivel] ? op.nivel : 'facil';
     var cfg = Object.assign({}, NIVEIS[nivel], op.ajustes || {});
+    var med = op.medidas ? calcular(op.medidas) : MEDIDAS;
+    usar(med);
     if (op.qtdFator) cfg.qtd = Math.round(cfg.qtd * op.qtdFator);   // ex.: os bichos que andam são menos e maiores, soltos no chão
     if (op.raioFator) cfg.raio = cfg.raio.map(function (r) { return r * op.raioFator; });
     var rnd = sorteador(op.semente != null ? op.semente : Math.floor(Math.random() * 1e9));
     var tiposBase = (op.tipos && op.tipos.length) ? op.tipos : ['bola'];
     var m = {
-      nivel: nivel, cfg: cfg, fase: 'mirar', fichas: cfg.fichas, tempo: cfg.tempo, t: 0, vivos: !!op.vivos, andam: !!op.andam,
+      nivel: nivel, cfg: cfg, med: med, fase: 'mirar', fichas: cfg.fichas, tempo: cfg.tempo, t: 0, vivos: !!op.vivos, andam: !!op.andam,
       garra: { x: CASA.x, y: TRILHO, z: CASA.z, abertura: 0.2, premio: null, forca: null, vx: 0, vz: 0, balanco: [0, 0], vb: [0, 0] },
       premios: [], ganhos: [], eventos: [], esvaziou: false, semGanhar: op.semGanhar || 0,
       _dx: 0, _dz: 0, _alvo: null, _fase: 0, _queda: null, _tique: -1, _rnd: rnd
@@ -106,7 +120,7 @@
       m.eventos.push({ tipo: 'ficha', fichas: m.fichas });
       return true;
     };
-    m.passo = function (dt) { passo(m, Math.min(dt, 0.05)); };
+    m.passo = function (dt) { usar(med); passo(m, Math.min(dt, 0.05)); };
     m.limites = LIM;
     return m;
   }
@@ -378,6 +392,8 @@
     return [x / l, y / l, z / l, w / l];
   }
 
-  var M = { nova: nova, NIVEIS: NIVEIS, medidas: { L: L, P: P, A: A, BX: BX, BZ: BZ, AB: AB, TRILHO: TRILHO, PERNA: PERNA, CASA: CASA, LIM: LIM } };
+  // a máquina de gigantes (dono, 19/Nov/2026, fotos da "mega pelúcia"): cabine maior, buraco e garra grandes, poucos prêmios enormes
+  var GIGANTE = { L: 8, P: 6.5, A: 9, BX: 2.7, BZ: 2.7, AB: 1.8, TRILHO: 8.2, PERNA: 1.6, MARGEM: 0.9 };
+  var M = { nova: nova, NIVEIS: NIVEIS, medidas: MEDIDAS, calcular: calcular, GIGANTE: GIGANTE };
   if (typeof module !== 'undefined' && module.exports) module.exports = M; else raiz.Maquina = M;
 })(typeof self !== 'undefined' ? self : this);

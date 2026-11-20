@@ -17,8 +17,19 @@ export const MAQUINAS = {
   lanchonete: { nome: ['Lanchonete', 'Burger Bar', 'Hamburguesería'], prem: ['Hambúrgueres e lanches', 'Burgers and snacks', 'Hamburguesas y más'],
     tipos: ['x-burguer', 'x-salada', 'x-bacon', 'duplo', 'x-frango', 'vegano', 'x-tudo', 'cachorro-quente', 'batata', 'milk-shake'], raro: 'burguer-dourado' },
   bichos: { nome: ['Bichos de Verdade', 'Real Animals', 'Animales de Verdad'], prem: ['Filhotes que andam', 'Puppies that walk', 'Cachorros que caminan'], andam: true,
-    tipos: ['salsicha', 'salsicha-caramelo', 'salsicha-malhado', 'labrador', 'gato-rajado', 'coelho-marrom', 'porquinho-da-india', 'pinguim-imperador', 'pato-real', 'jabuti', 'leaozinho'], raro: 'salsicha-dourado' }
+    tipos: ['salsicha', 'salsicha-caramelo', 'salsicha-malhado', 'labrador', 'gato-rajado', 'coelho-marrom', 'porquinho-da-india', 'pinguim-imperador', 'pato-real', 'jabuti', 'leaozinho'], raro: 'salsicha-dourado' },
+  // gigantes: poucas pelúcias enormes numa cabine grande, com garra grande (Maquina.GIGANTE)
+  gigantes: { nome: ['Gigantes', 'Giants', 'Gigantes'], prem: ['Pelúcias enormes', 'Huge plushies', 'Peluches enormes'], gigante: true,
+    tipos: ['ursao', 'coelhona', 'dinossauro', 'axolote', 'baleia', 'gatao', 'cachorrao'], raro: 'ursao-dourado' },
+  // tesoura: um boneco grande pendurado por um fio (tesoura.js); segurar o botão anda a tesoura, soltar corta
+  tesoura: { nome: ['Boneco Gigante', 'Giant Doll', 'Muñeco Gigante'], prem: ['Corte o fio com a tesoura', 'Cut the string with the scissors', 'Corta el hilo con las tijeras'], tesoura: true,
+    tipos: ['ursa-vestido', 'coelho-macacao', 'leao-juba', 'panda-gorro', 'sapo-coroa'], raro: 'ursa-vestido-dourada' },
+  // a de Festas muda com a época do ano (festas.js): os prêmios e o raro são os da festa de hoje
+  festas: { nome: ['Festas do Ano', 'Holidays', 'Fiestas del Año'], prem: ['Muda com a época do ano', 'Changes with the season', 'Cambia según la época del año'], tipos: [], raro: '' }
 };
+const FESTAS = typeof window !== 'undefined' ? window.Festas : null;
+export const FESTA = FESTAS ? FESTAS.atual(location.search) : 'natal';
+if (FESTAS) Object.assign(MAQUINAS.festas, { festa: FESTA, tipos: FESTAS.LISTA[FESTA].tipos, raro: FESTAS.LISTA[FESTA].raro });
 
 export const NOMES = {
   urso: ['Ursinho', 'Teddy', 'Osito'], coelho: ['Coelhinha', 'Bunny', 'Conejita'], gato: ['Gatinho', 'Kitty', 'Gatito'], cachorro: ['Cachorrinho', 'Puppy', 'Perrito'],
@@ -39,7 +50,29 @@ export const NOMES = {
   'porquinho-da-india': ['Porquinho-da-índia', 'Guinea pig', 'Cobaya'], 'pinguim-imperador': ['Pinguim-imperador', 'Emperor penguin', 'Pingüino emperador'],
   'pato-real': ['Pato', 'Mallard duck', 'Pato'], jabuti: ['Jabuti', 'Tortoise', 'Tortuga de tierra'], leaozinho: ['Leãozinho', 'Lion cub', 'Leoncito'],
   salsicha: ['Salsicha preto e caramelo', 'Black and tan dachshund', 'Salchicha negro y canela'], 'salsicha-caramelo': ['Salsicha caramelo', 'Red dachshund', 'Salchicha canela'],
-  'salsicha-malhado': ['Salsicha malhado', 'Dapple dachshund', 'Salchicha moteado'], 'salsicha-dourado': ['Salsicha dourado', 'Golden dachshund', 'Salchicha dorado']
+  'salsicha-malhado': ['Salsicha malhado', 'Dapple dachshund', 'Salchicha moteado'], 'salsicha-dourado': ['Salsicha dourado', 'Golden dachshund', 'Salchicha dorado'],
+  ursao: ['Ursão do coração', 'Big heart bear', 'Osote del corazón'], coelhona: ['Coelhona orelhuda', 'Floppy bunny', 'Conejota orejona'], dinossauro: ['Dinossauro', 'Dinosaur', 'Dinosaurio'],
+  axolote: ['Axolote', 'Axolotl', 'Ajolote'], baleia: ['Baleia', 'Whale', 'Ballena'], gatao: ['Gatão', 'Big cat', 'Gatote'], cachorrao: ['Cachorrão', 'Big dog', 'Perrazo'],
+  'ursao-dourado': ['Ursão dourado', 'Golden big bear', 'Osote dorado'],
+  'ursa-vestido': ['Ursa de vestido', 'Bear in a dress', 'Osa con vestido'], 'coelho-macacao': ['Coelha de macacão', 'Bunny in overalls', 'Coneja con peto'],
+  'leao-juba': ['Leão jubudo', 'Fluffy lion', 'León melenudo'], 'panda-gorro': ['Panda de gorro', 'Panda in a beanie', 'Panda con gorro'], 'sapo-coroa': ['Sapo rei', 'Frog king', 'Rana reina'],
+  'ursa-vestido-dourada': ['Ursa dourada', 'Golden bear', 'Osa dorada'],
+  // festas (festas.js)
+  'papai-noel': ['Papai Noel', 'Santa Claus', 'Papá Noel'], 'boneco-neve': ['Boneco de neve', 'Snowman', 'Muñeco de nieve'], rena: ['Rena', 'Reindeer', 'Reno'],
+  presente: ['Presente', 'Gift', 'Regalo'], 'arvore-natal': ['Árvore de Natal', 'Christmas tree', 'Árbol de Navidad'], biscoito: ['Biscoito de gengibre', 'Gingerbread man', 'Galleta de jengibre'],
+  'papai-noel-dourado': ['Papai Noel dourado', 'Golden Santa', 'Papá Noel dorado'],
+  mascara: ['Máscara', 'Mask', 'Máscara'], pandeiro: ['Pandeiro', 'Tambourine', 'Pandereta'], palhaco: ['Palhacinho', 'Little clown', 'Payasito'], coroa: ['Coroa do Rei Momo', 'Carnival crown', 'Corona de carnaval'],
+  arara: ['Arara', 'Macaw', 'Guacamayo'], chocalho: ['Chocalho', 'Maraca', 'Maraca'], 'mascara-dourada': ['Máscara dourada', 'Golden mask', 'Máscara dorada'],
+  'coelho-pascoa': ['Coelho da Páscoa', 'Easter bunny', 'Conejo de Pascua'], 'ovo-pascoa': ['Ovo pintado', 'Painted egg', 'Huevo pintado'], 'ovo-chocolate': ['Ovo de chocolate', 'Chocolate egg', 'Huevo de chocolate'],
+  'pintinho-casca': ['Pintinho na casca', 'Hatching chick', 'Pollito en el cascarón'], cenoura: ['Cenoura', 'Carrot', 'Zanahoria'], cesta: ['Cesta de ovos', 'Egg basket', 'Cesta de huevos'],
+  'ovo-pascoa-dourado': ['Ovo dourado', 'Golden egg', 'Huevo dorado'],
+  milho: ['Milho', 'Corn on the cob', 'Mazorca'], 'chapeu-palha': ['Chapéu de palha', 'Straw hat', 'Sombrero de paja'], fogueira: ['Fogueira', 'Bonfire', 'Hoguera'],
+  pipoca: ['Pipoca', 'Popcorn', 'Palomitas'], sanfona: ['Sanfona', 'Accordion', 'Acordeón'], 'maca-do-amor': ['Maçã do amor', 'Candy apple', 'Manzana de caramelo'], 'milho-dourado': ['Milho dourado', 'Golden corn', 'Mazorca dorada'],
+  piao: ['Pião', 'Spinning top', 'Peonza'], bola: ['Bola', 'Ball', 'Pelota'], ioio: ['Ioiô', 'Yo-yo', 'Yoyó'], carrinho: ['Carrinho', 'Toy car', 'Cochecito'],
+  pirulito: ['Pirulito', 'Lollipop', 'Piruleta'], robo: ['Robô', 'Robot', 'Robot'], 'robo-dourado': ['Robô dourado', 'Golden robot', 'Robot dorado'],
+  abobora: ['Abóbora', 'Pumpkin', 'Calabaza'], fantasma: ['Fantasminha', 'Little ghost', 'Fantasmita'], morcego: ['Morceguinho', 'Little bat', 'Murcielaguito'],
+  'gato-preto': ['Gato preto', 'Black cat', 'Gato negro'], 'chapeu-bruxa': ['Chapéu de bruxa', 'Witch hat', 'Sombrero de bruja'], aranha: ['Aranhinha', 'Little spider', 'Arañita'],
+  'abobora-dourada': ['Abóbora dourada', 'Golden pumpkin', 'Calabaza dorada']
 };
 
 /* ---------- peças básicas ---------- */
@@ -310,6 +343,306 @@ function burguer(k, recheio, carne) {
   for (let i = 0; i < 14; i++) { const a = i * 2.4, rr = 0.25 + (i % 4) * 0.13; k.bolinha('#fff4d6', [Math.cos(a) * rr, y + 0.02 + Math.sqrt(Math.max(0, 1 - (rr / 0.86) ** 2)) * 0.53, Math.sin(a) * rr], [0.05, 0.025, 0.03], [0, a, 0]); }
   k.olho([-0.24, y + 0.22, 0.75], 0.085).olho([0.24, y + 0.22, 0.75], 0.085); bochechas(k, y + 0.08, 0.8, 0.42); sorriso(k, y + 0.06, 0.83, '#5a2a12', 0.07);
 }
+
+/* ---------- gigantes (cabine grande): pelúcias enormes, desenho próprio ---------- */
+Object.assign(TIPOS, {
+  ursao(k) { const c = { corpo: '#f7e8ee', barriga: '#ffffff', pe: '#f3c6d6' }; const cy = bicho(k, c);
+    k.bola(c.corpo, [-0.42, cy + 0.48, 0], 0.2).bola(c.corpo, [0.42, cy + 0.48, 0], 0.2).bola('#ffb3c7', [-0.42, cy + 0.48, 0.1], [0.11, 0.11, 0.08]).bola('#ffb3c7', [0.42, cy + 0.48, 0.1], [0.11, 0.11, 0.08]);
+    focinho(k, '#ffffff', cy, '#ff8fab');
+    k.bola('#e63946', [-0.11, -0.22, 0.64], [0.15, 0.15, 0.1]).bola('#e63946', [0.11, -0.22, 0.64], [0.15, 0.15, 0.1]).cone('#e63946', [0, -0.4, 0.64], [0.21, 0.24, 0.1], [Math.PI, 0, 0]);
+    k.bola('#ff7a8a', [-0.1, -0.18, 0.72], [0.04, 0.03, 0.02]); },
+  coelhona(k) { const c = { corpo: '#c9b6f2', barriga: '#f4eeff', pe: '#b39ce8' }; const cy = bicho(k, c);
+    for (const s of [-1, 1]) { k.bola(c.corpo, [s * 0.52, cy - 0.05, -0.05], [0.15, 0.48, 0.11], [0, 0, s * 0.25]).bola('#ffc4dc', [s * 0.54, cy - 0.05, 0.03], [0.08, 0.38, 0.05], [0, 0, s * 0.25]); }
+    k.bolinha('#ff6f9f', [0, cy - 0.05, 0.62], [0.06, 0.05, 0.05]); sorriso(k, cy - 0.15, 0.6, MARROM, 0.05); },
+  dinossauro(k) { const c = { corpo: '#ff9a3c', barriga: '#fff1c4' }; const cy = bicho(k, c);
+    for (let i = 0; i < 6; i++) k.cone('#fff1c4', [0, cy + 0.55 - i * 0.25, -0.4], [0.12, 0.22, 0.12], [-0.6 - i * 0.25, 0, 0]);
+    k.bola(c.corpo, [0, -0.6, -0.6], [0.22, 0.2, 0.42], [0.4, 0, 0]);
+    sorriso(k, cy - 0.15, 0.6, '#7a3a12', 0.12); },
+  axolote(k) { const c = { corpo: '#ffb3c7', barriga: '#ffd9e3' }; const cy = bicho(k, c, { cab: 0.66 });
+    for (const s of [-1, 1]) for (let i = 0; i < 3; i++) k.bola('#ff6f9f', [s * (0.62 - i * 0.04), cy + 0.05 + i * 0.2, -0.05], [0.08, 0.24, 0.07], [0, 0, s * (1.2 - i * 0.45)]);
+    k.bola(c.corpo, [0, -0.62, -0.62], [0.12, 0.3, 0.42], [0.5, 0, 0]);
+    sorriso(k, cy - 0.12, 0.64, '#b34d6e', 0.16); },
+  baleia(k) {
+    k.bola('#5aa9e6', [0, -0.1, 0], [0.85, 0.62, 0.8]).bola('#e8f4ff', [0, -0.42, 0.25], [0.66, 0.28, 0.52]);
+    for (const s of [-1, 1]) { k.bola('#5aa9e6', [s * 0.28, 0.18, -0.85], [0.3, 0.08, 0.18], [0, 0, s * 0.4]); k.bola('#4a90d0', [s * 0.82, -0.32, 0.2], [0.24, 0.07, 0.15], [0, 0.3 * s, -s * 0.5]); }
+    k.cil('#a6e3ff', [0, 0.62, 0.1], [0.05, 0.25, 0.05]); [[-0.12, 0.82], [0.12, 0.82], [0, 0.9]].forEach(([x, y]) => k.bolinha('#a6e3ff', [x, y, 0.1], 0.08));
+    k.olho([-0.35, 0.02, 0.66], 0.085).olho([0.35, 0.02, 0.66], 0.085); bochechas(k, -0.12, 0.7, 0.45); sorriso(k, -0.15, 0.78, '#1f4f7a', 0.1); },
+  gatao(k) { const c = { corpo: '#9aa3b0', barriga: '#e4e8ee' }; const cy = bicho(k, c, { cab: 0.66 });
+    k.cone(c.corpo, [-0.37, cy + 0.6, 0], [0.18, 0.3, 0.12], [0, 0, 0.3]).cone(c.corpo, [0.37, cy + 0.6, 0], [0.18, 0.3, 0.12], [0, 0, -0.3]);
+    k.cone('#ffcfdd', [-0.36, cy + 0.58, 0.06], [0.1, 0.18, 0.05], [0, 0, 0.3]).cone('#ffcfdd', [0.36, cy + 0.58, 0.06], [0.1, 0.18, 0.05], [0, 0, -0.3]);
+    [-0.16, 0, 0.16].forEach((x) => k.caixa('#6e7684', [x, cy + 0.54, 0.38], [0.05, 0.16, 0.05]));
+    for (const s of [-1, 1]) for (const a of [-0.12, 0.12]) k.cil('#4a4f58', [s * 0.44, cy - 0.12 + a * 0.4, 0.52], [0.012, 0.32, 0.012], [0, 0, Math.PI / 2 + a * s]);
+    k.bolinha('#ff8fab', [0, cy - 0.06, 0.66], [0.06, 0.04, 0.04]); sorriso(k, cy - 0.15, 0.64, MARROM, 0.05); },
+  cachorrao(k) { const c = { corpo: '#c48a52', barriga: '#f2dcc0' }; const cy = bicho(k, c);
+    k.bola('#7a4f2b', [-0.6, cy - 0.05, 0], [0.17, 0.42, 0.17], [0, 0, 0.2]).bola('#7a4f2b', [0.6, cy - 0.05, 0], [0.17, 0.42, 0.17], [0, 0, -0.2]);
+    focinho(k, '#f2dcc0', cy, '#2b1d16'); k.bola('#ff8fab', [0, cy - 0.26, 0.6], [0.07, 0.09, 0.03]); }
+});
+
+/* ---------- bonecos grandes da Tesoura (um de cada vez, pendurado pelo fio) ---------- */
+Object.assign(TIPOS, {
+  'ursa-vestido'(k) { TIPOS.urso(k);
+    k.cone('#ffb3d1', [0, -0.5, 0], [0.8, 0.75, 0.72]);
+    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2, y = -0.6 + (i % 3) * 0.14, r = 0.8 * (0.5 - (y + 0.5) / 0.75) + 0.01; k.caixa('#ffffff', [Math.cos(a) * r, y, Math.sin(a) * r], [0.1, 0.06, 0.02], [0, Math.PI / 2 - a, 0]); }
+    k.bola(BRANCO, [0, -0.42, 0.5], [0.34, 0.36, 0.1]).toro('#ffb3d1', [0, -0.18, 0.55], [0.08, 0.05, 0.12]);
+    k.cone('#ff7ab8', [0.3, 0.98, 0.1], [0.12, 0.2, 0.08], [0, 0, -Math.PI / 2]).cone('#ff7ab8', [0.54, 0.98, 0.1], [0.12, 0.2, 0.08], [0, 0, Math.PI / 2]).bola('#ff7ab8', [0.42, 0.98, 0.12], 0.07); },
+  'coelho-macacao'(k) { TIPOS.coelho(k);
+    k.cil('#3a7bd5', [0, -0.52, 0], [0.7, 0.55, 0.62]).caixa('#3a7bd5', [0, -0.2, 0.52], [0.42, 0.3, 0.06]);
+    for (const s of [-1, 1]) { k.caixa('#3a7bd5', [s * 0.22, 0.0, 0.48], [0.08, 0.5, 0.05], [0.2, 0, 0]); k.bolinha('#ffd400', [s * 0.18, -0.12, 0.56], 0.05); } },
+  'leao-juba'(k) { const c = { corpo: '#e8b04a', barriga: '#fff1c4' }; const cy = bicho(k, c);
+    for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; k.bola(i % 2 ? '#b5652e' : '#c97a35', [Math.cos(a) * 0.6, cy + 0.05 + Math.sin(a) * 0.58, -0.12], 0.22); }
+    k.bola(c.corpo, [-0.38, cy + 0.48, 0.05], 0.13).bola(c.corpo, [0.38, cy + 0.48, 0.05], 0.13);
+    focinho(k, '#fff1c4', cy, '#6b3f2a'); k.bola('#b5652e', [0.55, -0.75, -0.4], 0.14); },
+  'panda-gorro'(k) { TIPOS.panda(k);
+    k.bola('#e63946', [0, 0.78, -0.02], [0.56, 0.32, 0.56]).cil('#ffffff', [0, 0.66, 0], [0.6, 0.1, 0.6]).bola('#ffffff', [0, 1.1, -0.02], 0.13); },
+  'sapo-coroa'(k) { TIPOS.sapo(k);
+    k.cil(OURO, [0, 0.95, -0.05], [0.32, 0.16, 0.32]);
+    for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; k.cone(OURO, [Math.cos(a) * 0.28, 1.12, -0.05 + Math.sin(a) * 0.28], [0.08, 0.2, 0.08]).bolinha('#e63946', [Math.cos(a) * 0.3, 0.95, -0.05 + Math.sin(a) * 0.3], 0.04); } }
+});
+
+/* ---------- prêmios das festas (festas.js): Natal, Carnaval, Páscoa, Festa Junina, Dia das Crianças, Dia das Bruxas ----------
+   Todos de pelúcia, com carinha, desenho próprio (nenhum personagem de marca). */
+const OURO = '#ffcc33';
+// olho em fundo escuro: uma bolinha clara atrás, para o olho aparecer
+function olhoClaro(k, pos, r, cor) { k.bola(cor || '#ffffff', [pos[0], pos[1], pos[2] - r * 0.9], r * 1.45); return k.olho(pos, r); }
+// fitinhas em volta de um ovo/bola (raio rx, meia altura ry, centro cy): um anel na altura y
+function anel(k, cor, cy, rx, ry, y, alto) { const r = rx * Math.sqrt(Math.max(0, 1 - ((y - cy) / ry) ** 2)); k.cil(cor, [0, y, 0], [r + 0.012, alto || 0.07, r + 0.012]); }
+// um pedacinho achatado colado na superfície de uma bola (direção d), para manchas e gomos
+function remendo(k, cor, d, raio, tam) {
+  const v = new THREE.Vector3(...d).normalize(), q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), v), e = new THREE.Euler().setFromQuaternion(q);
+  k.bola(cor, [v.x * raio, v.y * raio, v.z * raio], [tam, tam, tam * 0.3], [e.x, e.y, e.z]);
+}
+Object.assign(TIPOS, {
+  /* --- Natal --- */
+  'papai-noel'(k) {
+    k.bola('#d62839', [0, -0.35, 0], [0.72, 0.62, 0.62]).cil(PRETO, [0, -0.3, 0], [0.73, 0.13, 0.63]).caixa(OURO, [0, -0.3, 0.63], [0.22, 0.17, 0.04]);
+    k.bola('#d62839', [-0.62, -0.2, 0.2], [0.2, 0.32, 0.2], [0, 0, 0.6]).bola('#d62839', [0.62, -0.2, 0.2], [0.2, 0.32, 0.2], [0, 0, -0.6]);
+    k.bola(BRANCO, [-0.76, -0.42, 0.28], 0.13).bola(BRANCO, [0.76, -0.42, 0.28], 0.13);
+    k.bola(PRETO, [-0.3, -0.86, 0.3], [0.22, 0.15, 0.28]).bola(PRETO, [0.3, -0.86, 0.3], [0.22, 0.15, 0.28]);
+    k.bola('#f6cfb0', [0, 0.38, 0.05], 0.46);
+    k.bola(BRANCO, [0, 0.14, 0.3], [0.46, 0.36, 0.3]).bola(BRANCO, [-0.13, 0.3, 0.46], [0.16, 0.08, 0.08], [0, 0, 0.3]).bola(BRANCO, [0.13, 0.3, 0.46], [0.16, 0.08, 0.08], [0, 0, -0.3]);
+    k.bolinha('#ff8f8f', [0, 0.38, 0.5], 0.08);
+    k.olho([-0.16, 0.5, 0.41], 0.065).olho([0.16, 0.5, 0.41], 0.065); bochechas(k, 0.36, 0.42, 0.27);
+    k.cil(BRANCO, [0, 0.7, 0], [0.48, 0.14, 0.48]).cone('#d62839', [0, 0.98, -0.06], [0.42, 0.5, 0.42], [-0.35, 0, 0]).bola(BRANCO, [0, 1.15, -0.24], 0.12); },
+  'boneco-neve'(k) {
+    k.bola(BRANCO, [0, -0.45, 0], 0.58).bola(BRANCO, [0, 0.25, 0], 0.44);
+    k.toro('#e63946', [0, -0.04, 0], [0.4, 0.4, 0.55], [Math.PI / 2, 0, 0]).caixa('#e63946', [0.24, -0.26, 0.4], [0.14, 0.36, 0.06], [0, 0, 0.2]);
+    k.cone('#ff8a1f', [0, 0.24, 0.55], [0.07, 0.3, 0.07], [Math.PI / 2, 0, 0]);
+    k.olho([-0.15, 0.37, 0.39], 0.06).olho([0.15, 0.37, 0.39], 0.06); sorriso(k, 0.08, 0.42, PRETO, 0.08); bochechas(k, 0.2, 0.39, 0.25);
+    [-0.28, -0.5].forEach((y) => k.bolinha(PRETO, [0, y, 0.56], 0.06));
+    k.cil(PRETO, [0, 0.66, 0], [0.44, 0.06, 0.44]).cil(PRETO, [0, 0.86, 0], [0.29, 0.38, 0.29]).cil('#e63946', [0, 0.73, 0], [0.3, 0.07, 0.3]);
+    k.vara('#7a4a2b', [-0.38, 0.12, 0], [-0.86, 0.45, 0], 0.04).vara('#7a4a2b', [0.38, 0.12, 0], [0.86, 0.45, 0], 0.04); },
+  rena(k) { const c = { corpo: '#9a6235', barriga: '#e8c49a', pe: '#4a2c1a' }; const cy = bicho(k, c);
+    for (const s of [-1, 1]) {
+      k.vara('#6b4a2b', [s * 0.22, cy + 0.48, 0], [s * 0.42, cy + 0.78, -0.05], 0.045).vara('#6b4a2b', [s * 0.33, cy + 0.64, -0.02], [s * 0.18, cy + 0.82, 0], 0.035).vara('#6b4a2b', [s * 0.4, cy + 0.74, -0.04], [s * 0.6, cy + 0.84, -0.04], 0.035);
+      k.bola(c.corpo, [s * 0.56, cy + 0.28, 0], [0.18, 0.08, 0.1], [0, 0, -s * 0.4]);
+    }
+    focinho(k, '#e8c49a', cy, '#e63946'); k.bola('#e63946', [0, cy - 0.06, 0.7], 0.1); },
+  presente(k) {
+    k.caixa('#e63946', [0, -0.2, 0], [1.15, 1.0, 1.15]).caixa(OURO, [0, -0.2, 0], [0.2, 1.02, 1.17]).caixa(OURO, [0, -0.2, 0], [1.17, 1.02, 0.2]);
+    k.toro(OURO, [-0.2, 0.42, 0], [0.22, 0.22, 0.3], [0, 0, 0.6]).toro(OURO, [0.2, 0.42, 0], [0.22, 0.22, 0.3], [0, 0, -0.6]).bola(OURO, [0, 0.33, 0], 0.1);
+    k.olho([-0.3, -0.05, 0.6], 0.09).olho([0.3, -0.05, 0.6], 0.09); bochechas(k, -0.2, 0.59, 0.36); sorriso(k, -0.32, 0.6, MARROM, 0.08); },
+  'arvore-natal'(k) {
+    k.cil('#7a4a2b', [0, -0.82, 0], [0.18, 0.3, 0.18]);
+    [[-0.45, 0.55, 0.75], [0, 0.55, 0.6], [0.45, 0.5, 0.42]].forEach(([c, h, R], i) => {
+      k.cone('#2e9e4f', [0, c, 0], [R, h, R]);
+      for (let j = 0; j < 5 - i; j++) { const a = j / (5 - i) * Math.PI * 2 + i, y = c - h * 0.3, r = R * 0.8 + 0.02; k.bolinha(['#e63946', OURO, '#3aa0ff', '#ff7ab8'][(i + j) % 4], [Math.cos(a) * r, y, Math.sin(a) * r], 0.08); }
+    });
+    k.bola(OURO, [0, 0.78, 0], [0.16, 0.16, 0.07]);
+    for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + i * Math.PI * 2 / 5; k.cone(OURO, [Math.cos(a) * -0.14, 0.78 - Math.sin(a) * 0.14, 0], [0.07, 0.14, 0.05], [0, 0, a + Math.PI / 2]); }
+    k.olho([-0.12, 0.02, 0.33], 0.07).olho([0.12, 0.02, 0.33], 0.07); sorriso(k, -0.12, 0.38, MARROM, 0.06); },
+  biscoito(k) { const c = '#b5703a';
+    k.bola(c, [0, 0.5, 0], [0.42, 0.42, 0.22]).bola(c, [0, -0.2, 0], [0.45, 0.5, 0.22]);
+    k.bola(c, [-0.56, 0.02, 0], [0.3, 0.16, 0.18], [0, 0, 0.3]).bola(c, [0.56, 0.02, 0], [0.3, 0.16, 0.18], [0, 0, -0.3]);
+    k.bola(c, [-0.25, -0.72, 0], [0.18, 0.3, 0.18]).bola(c, [0.25, -0.72, 0], [0.18, 0.3, 0.18]);
+    for (const s of [-1, 1]) { k.caixa(BRANCO, [s * 0.74, 0.08, 0.14], [0.04, 0.18, 0.03], [0, 0, -s * 0.3]); k.caixa(BRANCO, [s * 0.25, -0.92, 0.15], [0.2, 0.04, 0.03]); }
+    k.bolinha('#e63946', [0, -0.05, 0.21], 0.07).bolinha('#39b54a', [0, -0.3, 0.2], 0.07);
+    k.olho([-0.13, 0.56, 0.2], 0.07).olho([0.13, 0.56, 0.2], 0.07); sorriso(k, 0.4, 0.21, BRANCO, 0.1); bochechas(k, 0.45, 0.19, 0.24); },
+
+  /* --- Carnaval --- */
+  mascara(k) {
+    k.bola('#7b2cbf', [0, 0.1, 0], [0.85, 0.45, 0.3]);
+    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; k.bolinha(OURO, [Math.cos(a) * 0.8, 0.1 + Math.sin(a) * 0.4, 0.12], 0.045); }
+    for (let i = 0; i < 12; i++) k.bolinha(['#ff4fd8', '#39d0ff', '#ffd400'][i % 3], [-0.6 + (i * 0.37) % 1.2, -0.12 + (i * 0.23) % 0.45, 0.24], 0.03);
+    for (const s of [-1, 1]) { k.bola(PRETO, [s * 0.33, 0.15, 0.2], [0.2, 0.13, 0.1]); k.olho([s * 0.33, 0.15, 0.25], 0.08); }
+    bochechas(k, -0.05, 0.25, 0.3);
+    k.cone('#ff4fd8', [0.45, 0.68, -0.05], [0.12, 0.6, 0.05], [0, 0, -0.3]).cone('#ffd400', [0.62, 0.6, -0.05], [0.1, 0.55, 0.05], [0, 0, -0.65]).cone('#39d0ff', [0.28, 0.72, -0.05], [0.1, 0.55, 0.05], [0, 0, -0.08]);
+    k.cil(OURO, [-0.72, -0.45, 0], [0.04, 0.9, 0.04], [0, 0, 0.4]); },
+  pandeiro(k) {
+    k.cil('#c98b4a', [0, 0, 0], [0.85, 0.28, 0.85], [Math.PI / 2, 0, 0]).cil('#f4e6c8', [0, 0, 0.01], [0.78, 0.3, 0.78], [Math.PI / 2, 0, 0]);
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + 0.2; k.bola('#d9dde4', [Math.cos(a) * 0.86, Math.sin(a) * 0.86, 0], [0.13, 0.13, 0.06]); }
+    k.caixa('#ff4fd8', [0.2, -0.95, 0.05], [0.08, 0.4, 0.02], [0, 0, 0.2]).caixa('#ffd400', [0.05, -0.97, 0.05], [0.08, 0.4, 0.02], [0, 0, -0.1]);
+    k.olho([-0.25, 0.15, 0.16], 0.09).olho([0.25, 0.15, 0.16], 0.09); bochechas(k, 0.0, 0.16, 0.38); sorriso(k, -0.12, 0.17, MARROM, 0.1); },
+  palhaco(k) {
+    k.bola('#ff4fd8', [0, -0.35, 0], [0.65, 0.6, 0.58]);
+    [[-0.3, -0.2], [0.25, -0.45], [0.05, -0.15], [-0.15, -0.6], [0.35, -0.15]].forEach(([x, y]) => remendo(k, '#ffd400', [x, y + 0.35, 0.6], 0.6, 0.1));
+    k.toro(BRANCO, [0, 0.02, 0], [0.48, 0.48, 0.7], [Math.PI / 2, 0, 0]);
+    k.bola('#fbe3cf', [0, 0.42, 0.03], 0.44).bola('#e63946', [0, 0.4, 0.46], 0.1);
+    for (const s of [-1, 1]) k.bola('#ff7a1f', [s * 0.42, 0.5, -0.05], 0.2).bola('#ff7a1f', [s * 0.3, 0.72, -0.12], 0.16).bola('#ff4fd8', [s * 0.62, -0.2, 0.25], [0.2, 0.3, 0.2], [0, 0, s * -0.6]).bola('#e63946', [s * 0.32, -0.88, 0.36], [0.22, 0.13, 0.32]);
+    k.cone('#39d0ff', [0, 0.95, -0.05], [0.22, 0.4, 0.22]).bola('#ffd400', [0, 1.16, -0.05], 0.07);
+    k.olho([-0.15, 0.53, 0.39], 0.065).olho([0.15, 0.53, 0.39], 0.065); sorriso(k, 0.24, 0.43, '#e63946', 0.13); bochechas(k, 0.36, 0.38, 0.26); },
+  coroa(k) {
+    k.bola('#c0392b', [0, -0.05, 0], [0.68, 0.55, 0.68]).cil(OURO, [0, -0.32, 0], [0.75, 0.62, 0.75]);
+    for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2 + Math.PI / 2; k.cone(OURO, [Math.cos(a) * 0.68, 0.18, Math.sin(a) * 0.68], [0.15, 0.4, 0.12]).bolinha(BRANCO, [Math.cos(a) * 0.68, 0.42, Math.sin(a) * 0.68], 0.06); }
+    for (let i = 1; i < 6; i++) { const a = Math.PI / 2 + i / 6 * Math.PI * 2; k.bolinha(['#39d0ff', '#39b54a', '#ff4fd8'][i % 3], [Math.cos(a) * 0.76, -0.3, Math.sin(a) * 0.76], 0.08); }
+    k.bola('#ffd400', [0, 0.52, 0], 0.1);
+    k.olho([-0.25, -0.22, 0.75], 0.09).olho([0.25, -0.22, 0.75], 0.09); bochechas(k, -0.38, 0.74, 0.4); sorriso(k, -0.45, 0.76, '#7a4a12', 0.08); },
+  arara(k) {
+    k.bola('#e63946', [0, -0.25, 0], [0.55, 0.65, 0.5]).bola('#e63946', [0, 0.45, 0.08], 0.42);
+    for (const s of [-1, 1]) {
+      k.bola('#ffffff', [s * 0.21, 0.47, 0.3], [0.16, 0.18, 0.1]); k.olho([s * 0.21, 0.5, 0.39], 0.065);
+      k.bola('#ffd400', [s * 0.5, -0.12, 0], [0.16, 0.42, 0.3], [0, 0, s * 0.2]).bola('#1e6fd9', [s * 0.55, -0.42, -0.05], [0.14, 0.35, 0.26], [0, 0, s * 0.15]);
+      k.bola('#7a7a7a', [s * 0.2, -0.88, 0.2], [0.13, 0.07, 0.18]);
+    }
+    k.bola('#f1efe9', [0, 0.33, 0.47], [0.14, 0.16, 0.18]).bola('#2b2b2b', [0, 0.2, 0.42], [0.1, 0.08, 0.1]);
+    k.bola('#1e6fd9', [0, -0.72, -0.42], [0.12, 0.42, 0.08], [0.7, 0, 0]).bola('#e63946', [0.14, -0.7, -0.38], [0.1, 0.36, 0.07], [0.7, 0, -0.2]).bola('#ffd400', [-0.14, -0.7, -0.38], [0.1, 0.36, 0.07], [0.7, 0, 0.2]); },
+  chocalho(k) {
+    k.bola('#39b54a', [0, 0.25, 0], [0.62, 0.6, 0.62]); anel(k, '#ffd400', 0.25, 0.62, 0.6, 0.62, 0.08); anel(k, '#e63946', 0.25, 0.62, 0.6, -0.12, 0.07);
+    k.cil('#c98b4a', [0, -0.58, 0], [0.12, 0.7, 0.12]).bola('#c98b4a', [0, -0.95, 0], 0.14);
+    k.olho([-0.2, 0.36, 0.56], 0.08).olho([0.2, 0.36, 0.56], 0.08); bochechas(k, 0.24, 0.57, 0.34); sorriso(k, 0.15, 0.6, MARROM, 0.07); },
+
+  /* --- Páscoa --- */
+  'coelho-pascoa'(k) { const c = { corpo: '#fbf8f2', barriga: '#ffffff', pe: '#f3e6ee' }; const cy = bicho(k, c);
+    k.bola(c.corpo, [-0.2, cy + 0.85, -0.05], [0.13, 0.42, 0.1], [0, 0, 0.15]).bola(c.corpo, [0.2, cy + 0.85, -0.05], [0.13, 0.42, 0.1], [0, 0, -0.15]);
+    k.bola('#ffb3d1', [-0.2, cy + 0.85, 0.03], [0.07, 0.32, 0.04], [0, 0, 0.15]).bola('#ffb3d1', [0.2, cy + 0.85, 0.03], [0.07, 0.32, 0.04], [0, 0, -0.15]);
+    k.bolinha('#ff6f9f', [0, cy - 0.05, 0.62], [0.06, 0.05, 0.05]); sorriso(k, cy - 0.15, 0.6, MARROM, 0.05);
+    k.cone('#7ec8ff', [-0.12, cy - 0.5, 0.36], [0.1, 0.14, 0.06], [0, 0, -Math.PI / 2]).cone('#7ec8ff', [0.12, cy - 0.5, 0.36], [0.1, 0.14, 0.06], [0, 0, Math.PI / 2]).bolinha('#5aa9e6', [0, cy - 0.5, 0.38], 0.05);
+    k.bola('#ffd166', [0, -0.35, 0.6], [0.2, 0.26, 0.18]).cil('#ff7ab8', [0, -0.35, 0.6], [0.205, 0.06, 0.185]); },
+  'ovo-pascoa'(k) {
+    k.bola('#a6e3ff', [0, -0.05, 0], [0.72, 0.92, 0.72]);
+    [[-0.55, '#ff7ab8'], [-0.3, '#ffd166'], [0.33, '#9be37d'], [0.58, '#c6a4ff']].forEach(([y, c]) => anel(k, c, -0.05, 0.72, 0.92, y, 0.08));
+    k.olho([-0.22, 0.1, 0.68], 0.085).olho([0.22, 0.1, 0.68], 0.085); bochechas(k, -0.02, 0.68, 0.36); sorriso(k, -0.08, 0.71, MARROM, 0.07); },
+  'ovo-chocolate'(k) {
+    k.bola('#6b3a22', [0, -0.05, 0], [0.7, 0.9, 0.7]); anel(k, '#ff7ab8', -0.05, 0.7, 0.9, -0.3, 0.12);
+    k.toro('#ff7ab8', [-0.18, 0.88, 0], [0.18, 0.18, 0.25], [0, 0, 0.6]).toro('#ff7ab8', [0.18, 0.88, 0], [0.18, 0.18, 0.25], [0, 0, -0.6]).bola('#ff7ab8', [0, 0.84, 0], 0.08);
+    olhoClaro(k, [-0.22, 0.18, 0.66], 0.08); olhoClaro(k, [0.22, 0.18, 0.66], 0.08); bochechas(k, 0.05, 0.67, 0.36); sorriso(k, 0.0, 0.7, '#ffd9a8', 0.07); },
+  'pintinho-casca'(k) {
+    k.bola(BRANCO, [0, -0.5, 0], [0.7, 0.5, 0.7]);
+    for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; k.cone(BRANCO, [Math.cos(a) * 0.6, -0.05, Math.sin(a) * 0.6], [0.14, 0.25, 0.1], [0, -a, 0]); }
+    k.bola('#ffd93b', [0, 0.25, 0], 0.5).cone('#ff9a1f', [0, 0.2, 0.52], [0.08, 0.16, 0.07], [Math.PI / 2, 0, 0]);
+    k.bola('#ffc61a', [-0.04, 0.78, 0], [0.07, 0.14, 0.05], [0, 0, 0.3]).bola('#ffc61a', [0.07, 0.76, 0], [0.06, 0.12, 0.05], [0, 0, -0.4]);
+    k.bola('#ffc61a', [-0.47, 0.12, 0.05], [0.1, 0.2, 0.15], [0, 0, 0.5]).bola('#ffc61a', [0.47, 0.12, 0.05], [0.1, 0.2, 0.15], [0, 0, -0.5]);
+    k.olho([-0.17, 0.35, 0.44], 0.075).olho([0.17, 0.35, 0.44], 0.075); bochechas(k, 0.2, 0.45, 0.28); },
+  cenoura(k) {
+    k.cone('#ff8a1f', [0, -0.15, 0], [0.5, 1.5, 0.5], [Math.PI, 0, 0]);
+    [-0.45, -0.1, 0.35].forEach((y, i) => { const r = 0.5 * (y + 0.9) / 1.5; k.caixa('#e06a10', [i % 2 ? 0.15 : -0.15, y, Math.sqrt(Math.max(0, r * r - 0.0225))], [0.16, 0.025, 0.02]); });
+    [-0.35, 0, 0.35].forEach((a) => k.bola('#4fb848', [Math.sin(a) * 0.15, 0.85, 0], [0.11, 0.3, 0.09], [0, 0, -a]));
+    k.olho([-0.13, 0.28, 0.36], 0.07).olho([0.13, 0.28, 0.36], 0.07); bochechas(k, 0.18, 0.33, 0.24); sorriso(k, 0.12, 0.33, MARROM, 0.06); },
+  cesta(k) {
+    k.cil('#c98b4a', [0, -0.45, 0], [0.8, 0.7, 0.8]); [-0.7, -0.45].forEach((y) => k.cil('#a8692f', [0, y, 0], [0.81, 0.06, 0.81]));
+    k.toro('#a8692f', [0, -0.1, 0], [0.8, 0.8, 0.45], [Math.PI / 2, 0, 0]).arco('#a8692f', [0, -0.1, 0], [0.75, 0.85, 0.45]);
+    [[-0.35, -0.02, 0.1, '#ff7ab8'], [0, 0.04, -0.2, '#ffd166'], [0.36, -0.02, 0.12, '#7ec8ff'], [0.05, -0.04, 0.3, '#9be37d']].forEach(([x, y, z, c]) => k.bola(c, [x, y, z], [0.2, 0.26, 0.2]));
+    for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; k.bola('#7bc043', [Math.cos(a) * 0.68, -0.08, Math.sin(a) * 0.68], [0.1, 0.05, 0.1]); }
+    k.olho([-0.25, -0.32, 0.8], 0.085).olho([0.25, -0.32, 0.8], 0.085); bochechas(k, -0.45, 0.8, 0.4); sorriso(k, -0.5, 0.81, '#5a2a12', 0.07); },
+
+  /* --- Festa Junina --- */
+  milho(k) {
+    k.capsula('#ffd84d', [0, 0.15, 0], [0.76, 0.75, 0.76]);
+    for (let y = -0.35; y <= 0.7; y += 0.13) for (let i = 0; i < 12; i++) {
+      const a = i / 12 * Math.PI * 2 + (Math.round(y * 10) % 2) * 0.26, s = Math.sin(a);
+      if (s > 0.75 && y > -0.05 && y < 0.5) continue;   // a carinha
+      const r = 0.37 * Math.sqrt(Math.max(0.05, 1 - Math.max(0, Math.abs(y - 0.15) - 0.38) ** 2 / 0.14));
+      k.bolinha('#f5b800', [Math.cos(a) * r, y, s * r], [0.06, 0.05, 0.06]);
+    }
+    [0.3, 2.4, 4.4].forEach((a) => k.bola('#7bc043', [Math.cos(a) * 0.32, -0.5, Math.sin(a) * 0.32], [0.2, 0.5, 0.1], [Math.sin(a) * 0.35, -a, -Math.cos(a) * 0.35]));
+    k.olho([-0.14, 0.3, 0.37], 0.075).olho([0.14, 0.3, 0.37], 0.075); bochechas(k, 0.18, 0.37, 0.24); sorriso(k, 0.1, 0.39, MARROM, 0.06); },
+  'chapeu-palha'(k) {
+    k.cil('#e8c06a', [0, -0.35, 0], [1.0, 0.08, 1.0]).cil('#e8c06a', [0, 0.0, 0], [0.55, 0.62, 0.55]).cil('#e63946', [0, -0.22, 0], [0.56, 0.12, 0.56]);
+    for (let i = 0; i < 24; i++) { const a = i * 2.39, r = 0.62 + (i % 4) * 0.09; k.caixa('#c99a40', [Math.cos(a) * r, -0.3, Math.sin(a) * r], [0.12, 0.012, 0.02], [0, -a, 0]); }
+    k.caixa('#3a7bd5', [0.3, 0.15, 0.44], [0.18, 0.16, 0.03], [0, 0.6, 0]).caixa('#ffd400', [-0.62, -0.3, 0.5], [0.22, 0.02, 0.18], [0, 0.4, 0]);
+    k.olho([-0.18, 0.1, 0.55], 0.08).olho([0.18, 0.1, 0.55], 0.08); bochechas(k, 0.0, 0.55, 0.3); sorriso(k, -0.06, 0.56, MARROM, 0.07); },
+  fogueira(k) {
+    k.capsula('#7a4a2b', [0, -0.78, 0], [0.3, 0.9, 0.3], [0, 0, Math.PI / 2]).capsula('#7a4a2b', [0, -0.78, 0], [0.3, 0.9, 0.3], [Math.PI / 2, 0, 0]).capsula('#6b3f22', [0, -0.68, 0], [0.28, 0.85, 0.28], [0, Math.PI / 4, Math.PI / 2]);
+    k.bola('#ff8a1f', [0, -0.15, 0], [0.6, 0.7, 0.55]).cone('#ff8a1f', [0, 0.5, 0], [0.42, 0.7, 0.38]);
+    k.cone('#ff5a1f', [-0.38, 0.18, 0], [0.2, 0.5, 0.18], [0, 0, 0.3]).cone('#ff5a1f', [0.38, 0.18, 0], [0.2, 0.5, 0.18], [0, 0, -0.3]);
+    k.bola('#ffd84d', [0, -0.2, 0.24], [0.38, 0.46, 0.3]).cone('#ffd84d', [0, 0.25, 0.26], [0.24, 0.45, 0.14]);
+    k.olho([-0.15, -0.08, 0.5], 0.08).olho([0.15, -0.08, 0.5], 0.08); bochechas(k, -0.22, 0.5, 0.26); sorriso(k, -0.28, 0.53, '#a8521a', 0.07); },
+  pipoca(k) {
+    k.cil(BRANCO, [0, -0.35, 0], [0.55, 1.0, 0.55]);
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 + Math.PI / 8; k.caixa('#e63946', [Math.cos(a) * 0.555, -0.35, Math.sin(a) * 0.555], [0.14, 1.0, 0.02], [0, Math.PI / 2 - a, 0]); }
+    for (let i = 0; i < 16; i++) { const a = i * 2.39, r = (i % 4) * 0.13; k.bola(i % 3 ? '#fff6d6' : '#ffe9a8', [Math.cos(a) * r, 0.25 + (i % 5) * 0.08 + (0.4 - r) * 0.5, Math.sin(a) * r], 0.18 + (i % 3) * 0.03); }
+    k.olho([-0.17, -0.22, 0.56], 0.08).olho([0.17, -0.22, 0.56], 0.08); bochechas(k, -0.36, 0.56, 0.3); sorriso(k, -0.42, 0.57, MARROM, 0.07); },
+  sanfona(k) {
+    k.caixa('#c0392b', [-0.58, 0, 0], [0.4, 0.85, 0.55]).caixa('#c0392b', [0.58, 0, 0], [0.4, 0.85, 0.55]);
+    for (let i = 0; i < 5; i++) k.caixa(i % 2 ? '#1b1512' : '#f4e6c8', [-0.3 + i * 0.15, 0, 0], [0.14, 0.8 - (i % 2) * 0.06, 0.5 - (i % 2) * 0.05]);
+    for (let i = 0; i < 6; i++) k.caixa(i % 2 ? '#1b1512' : BRANCO, [0.6, 0.3 - i * 0.12, 0.28], [0.26, 0.09, 0.02]);
+    for (const [x, y] of [[-0.72, -0.32], [-0.44, -0.32], [0.58, 0.38], [-0.58, 0.36]]) k.bolinha(OURO, [x, y, 0.28], 0.04);
+    k.olho([-0.68, 0.12, 0.28], 0.07).olho([-0.48, 0.12, 0.28], 0.07); k.arco(MARROM, [-0.58, 0.0, 0.285], [0.06, 0.06, 0.25], [0, 0, Math.PI]); },
+  'maca-do-amor'(k) {
+    k.bola('#d7263d', [0, -0.15, 0], [0.72, 0.68, 0.72]).bola('#a8122a', [0, 0.42, 0], [0.25, 0.08, 0.25]);
+    for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.3; k.bola('#e8394f', [Math.cos(a) * 0.6, -0.55, Math.sin(a) * 0.6], [0.12, 0.2, 0.12]); }
+    k.cil('#e8c99a', [0, 0.72, 0], [0.06, 0.7, 0.06]);
+    k.olho([-0.24, 0.0, 0.65], 0.085).olho([0.24, 0.0, 0.65], 0.085); bochechas(k, -0.12, 0.67, 0.36); sorriso(k, -0.18, 0.7, '#5a0a12', 0.07); },
+
+  /* --- Dia das Crianças --- */
+  piao(k) {
+    k.bola('#ffd400', [0, 0.15, 0], [0.75, 0.45, 0.75]).cone('#e63946', [0, -0.45, 0], [0.6, 0.8, 0.6], [Math.PI, 0, 0]);
+    k.cil('#9aa0a8', [0, -0.92, 0], [0.04, 0.15, 0.04]).cil('#3a7bd5', [0, 0.0, 0], [0.71, 0.08, 0.71]).cil('#e63946', [0, 0.62, 0], [0.12, 0.2, 0.12]);
+    k.olho([-0.22, 0.3, 0.67], 0.08).olho([0.22, 0.3, 0.67], 0.08); bochechas(k, 0.2, 0.68, 0.36); sorriso(k, 0.16, 0.72, MARROM, 0.07); },
+  bola(k) {
+    k.bola(BRANCO, [0, 0, 0], 0.85);
+    const cores = ['#e63946', '#3a7bd5', '#ffd400', '#39b54a'];
+    for (let i = 0; i < 14; i++) { const y = 1 - (i + 0.5) / 14 * 2, r = Math.sqrt(1 - y * y), a = i * 2.39996, d = [Math.cos(a) * r, y, Math.sin(a) * r]; if (d[2] > 0.55 && Math.abs(d[1]) < 0.55) continue; remendo(k, cores[i % 4], d, 0.83, 0.3); }
+    k.olho([-0.25, 0.15, 0.8], 0.1).olho([0.25, 0.15, 0.8], 0.1); bochechas(k, -0.02, 0.81, 0.4); sorriso(k, -0.1, 0.84, MARROM, 0.08); },
+  ioio(k) {
+    k.cil('#3a7bd5', [0, 0, 0.22], [0.85, 0.3, 0.85], [Math.PI / 2, 0, 0]).cil('#3a7bd5', [0, 0, -0.22], [0.85, 0.3, 0.85], [Math.PI / 2, 0, 0]).cil('#9aa0a8', [0, 0, 0], [0.25, 0.2, 0.25], [Math.PI / 2, 0, 0]);
+    k.toro('#ffd400', [0, 0, 0.37], [0.72, 0.72, 0.3]);
+    k.vara(BRANCO, [0, 0.2, 0], [0.12, 1.0, 0], 0.02).toro(BRANCO, [0.12, 1.02, 0], [0.06, 0.06, 0.2]);
+    k.olho([-0.25, 0.12, 0.38], 0.1).olho([0.25, 0.12, 0.38], 0.1); bochechas(k, -0.05, 0.38, 0.4); sorriso(k, -0.15, 0.38, MARROM, 0.09); },
+  carrinho(k) {
+    k.caixa('#e63946', [0, -0.3, 0], [1.0, 0.4, 1.5]).caixa('#e63946', [0, 0.05, -0.1], [0.8, 0.35, 0.75]).caixa('#a6e3ff', [0, 0.07, 0.276], [0.7, 0.26, 0.02]);
+    k.caixa(BRANCO, [0, -0.09, 0.5], [0.15, 0.02, 0.5]);
+    for (const x of [-0.5, 0.5]) for (const z of [-0.48, 0.48]) k.cil(PRETO, [x, -0.5, z], [0.22, 0.14, 0.22], [0, 0, Math.PI / 2]).cil('#c9ced6', [x * 1.08, -0.5, z], [0.1, 0.04, 0.1], [0, 0, Math.PI / 2]);
+    k.bolinha('#fff3a6', [-0.3, -0.27, 0.75], 0.08).bolinha('#fff3a6', [0.3, -0.27, 0.75], 0.08);
+    k.olho([-0.18, 0.08, 0.3], 0.09).olho([0.18, 0.08, 0.3], 0.09); sorriso(k, -0.45, 0.76, PRETO, 0.12); },
+  pirulito(k) {
+    k.cil('#ff7ab8', [0, 0.3, 0], [0.65, 0.2, 0.65], [Math.PI / 2, 0, 0]);
+    [[0.5, BRANCO], [0.32, '#ffd400'], [0.15, '#39d0ff']].forEach(([r, c]) => k.toro(c, [0, 0.3, 0.1], [r, r, 0.15]));
+    k.cil(BRANCO, [0, -0.55, 0], [0.06, 0.9, 0.06]);
+    k.cone('#3a7bd5', [-0.12, -0.3, 0], [0.1, 0.18, 0.06], [0, 0, -Math.PI / 2]).cone('#3a7bd5', [0.12, -0.3, 0], [0.1, 0.18, 0.06], [0, 0, Math.PI / 2]).bolinha('#2a5fb0', [0, -0.3, 0.02], 0.05);
+    k.olho([-0.2, 0.4, 0.15], 0.09).olho([0.2, 0.4, 0.15], 0.09); sorriso(k, 0.2, 0.15, MARROM, 0.08); },
+  robo(k) {
+    k.caixa('#9aa7b8', [0, -0.35, 0], [0.8, 0.75, 0.6]).caixa('#3a7bd5', [0, -0.35, 0.31], [0.4, 0.3, 0.02]);
+    k.bolinha('#e63946', [-0.1, -0.35, 0.33], 0.05).bolinha('#39b54a', [0.1, -0.35, 0.33], 0.05);
+    k.caixa('#c9d2de', [0, 0.35, 0], [0.7, 0.55, 0.55]).cil('#9aa0a8', [0, 0.72, 0], [0.03, 0.2, 0.03]).bola('#e63946', [0, 0.85, 0], 0.09);
+    for (const s of [-1, 1]) { k.cil('#9aa0a8', [s * 0.38, 0.35, 0], [0.1, 0.08, 0.1], [0, 0, Math.PI / 2]); k.capsula('#9aa0a8', [s * 0.55, -0.35, 0], [0.25, 0.45, 0.25]); k.caixa('#7a8494', [s * 0.2, -0.85, 0], [0.22, 0.25, 0.3]); olhoClaro(k, [s * 0.16, 0.4, 0.29], 0.09, '#bfe8ff'); }
+    k.caixa('#3a3f4a', [0, 0.2, 0.28], [0.3, 0.06, 0.02]); },
+
+  /* --- Dia das Bruxas (fofinho, nada de susto) --- */
+  abobora(k) {
+    k.bola('#ff8a1f', [0, -0.1, 0], [0.85, 0.62, 0.8]);
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + Math.PI / 8; k.bola(i % 2 ? '#f07a12' : '#ff9a33', [Math.cos(a) * 0.42, -0.1, Math.sin(a) * 0.38], [0.45, 0.6, 0.45]); }
+    k.cil('#5a7a2b', [0.03, 0.55, 0], [0.1, 0.28, 0.1], [0, 0, 0.2]).bola('#6cc04a', [0.22, 0.56, 0], [0.18, 0.05, 0.12], [0, 0, -0.3]);
+    k.olho([-0.25, 0.05, 0.76], 0.1).olho([0.25, 0.05, 0.76], 0.1); bochechas(k, -0.12, 0.76, 0.4); sorriso(k, -0.22, 0.79, '#5a2a12', 0.14); },
+  fantasma(k) {
+    k.bola(BRANCO, [0, 0.25, 0], [0.62, 0.62, 0.58]).bola(BRANCO, [0, -0.3, 0], [0.66, 0.6, 0.6]);
+    for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; k.bola(BRANCO, [Math.cos(a) * 0.48, -0.78, Math.sin(a) * 0.45], 0.2); }
+    k.bola(BRANCO, [-0.62, -0.05, 0.1], [0.22, 0.12, 0.12], [0, 0, 0.5]).bola(BRANCO, [0.62, -0.05, 0.1], [0.22, 0.12, 0.12], [0, 0, -0.5]);
+    k.olho([-0.2, 0.35, 0.53], 0.1).olho([0.2, 0.35, 0.53], 0.1); k.bola(PRETO, [0, 0.12, 0.57], [0.08, 0.1, 0.04]); bochechas(k, 0.18, 0.54, 0.34); },
+  morcego(k) {
+    k.bola('#4a2c6e', [0, -0.1, 0], [0.62, 0.7, 0.6]).bola('#7b5aa6', [0, -0.25, 0.32], [0.38, 0.42, 0.3]);
+    for (const s of [-1, 1]) { k.cone('#4a2c6e', [s * 0.32, 0.65, 0], [0.17, 0.35, 0.12], [0, 0, -s * 0.25]).cone('#ff9fb8', [s * 0.31, 0.62, 0.05], [0.09, 0.2, 0.04], [0, 0, -s * 0.25]); k.bola('#3b2357', [s * 0.2, -0.8, 0.15], [0.12, 0.08, 0.15]); }
+    k.olho([-0.2, 0.18, 0.52], 0.09).olho([0.2, 0.18, 0.52], 0.09); bochechas(k, 0.05, 0.55, 0.32); sorriso(k, 0.03, 0.58, '#ff9fb8', 0.07);
+    k.cone(BRANCO, [-0.07, -0.04, 0.56], [0.035, 0.08, 0.03], [Math.PI, 0, 0]).cone(BRANCO, [0.07, -0.04, 0.56], [0.035, 0.08, 0.03], [Math.PI, 0, 0]);
+    k.asa('#3b2357', [0.45, 0.1, -0.05], [0.7, 0.04, 0.42], 1, 0).asa('#3b2357', [-0.45, 0.1, -0.05], [0.7, 0.04, 0.42], -1, 0); },
+  'gato-preto'(k) { const c = { corpo: '#2a2530', barriga: '#3b3542', pe: '#2a2530' }; const cy = bicho(k, c);
+    k.cone(c.corpo, [-0.35, cy + 0.58, 0], [0.18, 0.32, 0.12], [0, 0, 0.3]).cone(c.corpo, [0.35, cy + 0.58, 0], [0.18, 0.32, 0.12], [0, 0, -0.3]);
+    k.cone('#ff9fb8', [-0.34, cy + 0.56, 0.06], [0.1, 0.2, 0.05], [0, 0, 0.3]).cone('#ff9fb8', [0.34, cy + 0.56, 0.06], [0.1, 0.2, 0.05], [0, 0, -0.3]);
+    k.bola('#ffd84d', [-0.22, cy + 0.1, 0.5], 0.12).bola('#ffd84d', [0.22, cy + 0.1, 0.5], 0.12);
+    for (const s of [-1, 1]) for (const a of [-0.12, 0.12]) k.cil('#f4efe6', [s * 0.42, cy - 0.12 + a * 0.4, 0.5], [0.012, 0.32, 0.012], [0, 0, Math.PI / 2 + a * s]);
+    k.bolinha('#ff8fab', [0, cy - 0.06, 0.62], [0.06, 0.04, 0.04]); sorriso(k, cy - 0.15, 0.6, '#ff9fb8', 0.05);
+    k.toro('#9b5cff', [0, -0.05, 0.03], [0.42, 0.42, 0.45], [Math.PI / 2, 0, 0]).bolinha(OURO, [0, -0.12, 0.47], 0.07);
+    k.capsula(c.corpo, [0.45, -0.2, -0.55], [0.14, 0.6, 0.14], [-0.6, 0, -0.5]); },
+  'chapeu-bruxa'(k) {
+    k.cil('#4a2c6e', [0, -0.6, 0], [1.0, 0.07, 1.0]).cone('#4a2c6e', [0, 0.05, -0.05], [0.55, 1.3, 0.55], [-0.12, 0, 0]).cone('#4a2c6e', [0.18, 0.78, -0.2], [0.18, 0.4, 0.18], [0, 0, -0.9]);
+    k.cil('#ff8a1f', [0, -0.47, 0], [0.5, 0.15, 0.5]).caixa(OURO, [0, -0.47, 0.49], [0.2, 0.17, 0.03]);
+    [[-0.2, 0.25], [0.15, 0.45], [0.25, 0.05]].forEach(([x, y]) => k.bolinha(OURO, [x, y, 0.55 * (0.5 - (y - 0.05) / 1.3) * 0.95], 0.05));
+    k.olho([-0.12, -0.12, 0.35], 0.075).olho([0.12, -0.12, 0.35], 0.075); bochechas(k, -0.24, 0.39, 0.22); sorriso(k, -0.27, 0.41, '#ffb3d1', 0.06); },
+  aranha(k) {
+    k.bola('#2b2140', [0, -0.15, -0.15], [0.6, 0.5, 0.6]).bola('#3b2d57', [0, 0.05, 0.42], 0.38);
+    [[-0.25, 0.1, -0.3], [0.2, 0.15, -0.1], [0, 0.3, -0.35]].forEach(([x, y, z]) => k.bolinha('#9b5cff', [x, y, z], [0.1, 0.06, 0.1]));
+    for (const s of [-1, 1]) for (let i = 0; i < 4; i++) { const z = 0.25 - i * 0.25; k.vara('#2b2140', [s * 0.3, -0.12, z], [s * 0.75, 0.12, z + (i - 1.5) * 0.08], 0.04).vara('#2b2140', [s * 0.75, 0.12, z + (i - 1.5) * 0.08], [s * 0.92, -0.72, z + (i - 1.5) * 0.15], 0.035); }
+    k.olho([-0.14, 0.14, 0.75], 0.1).olho([0.14, 0.14, 0.75], 0.1); bochechas(k, -0.02, 0.76, 0.26); sorriso(k, -0.06, 0.79, '#ff9fb8', 0.06); }
+});
 
 /* ---------- bichos de verdade (Zoológico): com articulações para andar, olhar e abanar o rabo ----------
    Cada um devolve as partes: tronco (parado), cabeça (gira no pescoço), patas (balançam ao andar) e rabo. O bicho olha

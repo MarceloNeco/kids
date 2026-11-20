@@ -3,7 +3,10 @@
 > Andamento: v0.1.0 (19/Nov) rosto natural pela idade e sem "barba" ✅ · v0.2.0 (19/Nov) combinações prontas no estúdio e
 > setinha de "tem mais para o lado" ✅ · v0.3.0 (19/Nov) desenho de ilustração (olhos, sobrancelhas, nariz, lábios, fios no
 > cabelo) e, no lugar do giro de 360° (dono escolheu "Ilustração, sem giro 360°"), vistas de três-quartos e de lado ✅ ·
-> a fazer: corpo e roupas também em traço de ilustração, corpo por idade, roupas e penteados mais caprichados, benchmark Poki.
+> v0.4.0 (19/Nov) sem 3D (cor lisa, sombra e luz de corte reto), corpo de moda por idade e telas claras na paleta da pesquisa ✅ ·
+> **próximo: arte pintada por IA (pesquisa "Anamnese Bolinho × Poki", no Drive): primeiro os fundos pintados, depois a
+> personagem em camadas.** Dono aprovou o Higgsfield (RTX PRO 6000, 98 créditos/h, até 1 h); em 19/Nov faltaram créditos
+> (nada gasto); o lembrete de sexta 20/Nov tenta de novo.
 
 Pedido do dono (15/Nov/2026): anotar tudo, com as mídias, num lugar fácil de achar (não perdido no histórico da
 conversa). **Retomar depois de quinta-feira (19/Nov), quando os créditos renovarem.** Antes disso, nada de trabalho

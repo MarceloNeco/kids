@@ -177,3 +177,32 @@ test('1 minuto para mirar em todos os níveis; quando acaba, avisa (para o 0 apa
     assert.equal(m.fichas, m.cfg.fichas - 1, nivel + ': gastou a ficha');
   }
 });
+
+test('gigantes: cabine maior, poucas pelúcias enormes que cabem no buraco grande; a garra forte traz o prêmio', () => {
+  const G = M.calcular(M.GIGANTE), op = { tipos: TIPOS, raro: 'estrela', medidas: M.GIGANTE, qtdFator: 0.24, raioFator: 1.95 };
+  for (const nivel of ['facil', 'medio', 'dificil']) for (let s = 1; s <= 8; s++) {
+    const m = M.nova(Object.assign({ nivel, semente: s }, op));
+    assert.equal(m.med.L, G.L);
+    assert.ok(m.premios.length >= 8 && m.premios.length <= 19, nivel + ': ' + m.premios.length + ' prêmios');
+    for (const p of m.premios) {
+      assert.ok(p.r > 0.7, 'prêmio grande: ' + p.r);
+      assert.ok(2 * p.r < Math.min(G.BX, G.BZ), nivel + ': gigante de raio ' + p.r.toFixed(2) + ' não cabe no buraco');
+      assert.ok(!(p.x < G.BX && p.z > G.P - G.BZ), 'gigante no buraco antes de começar');
+      assert.ok(p.x >= p.r - 0.01 && p.x <= G.L - p.r + 0.01 && p.z <= G.P - p.r + 0.01, 'fora do vidro grande');
+    }
+  }
+  // garra sempre forte e mira no meio: os gigantes vêm (e a máquina comum, jogada junto, continua com as medidas dela)
+  const m = M.nova(Object.assign({ nivel: 'facil', semente: 5, ajustes: { sempreForte: true } }, op));
+  const comum = M.nova({ nivel: 'facil', semente: 5, tipos: TIPOS });
+  let guarda = 0;
+  while (m.fase !== 'fim' && guarda++ < 200000) {
+    if (m.fase === 'mirar') {
+      const a = m.premios.filter(p => !p.ganho && !(p.x < G.BX && p.z > G.P - G.BZ)).sort((x, y) => (y.y + y.r) - (x.y + x.r))[0];
+      m.garra.x = Math.max(G.LIM.x0, Math.min(G.LIM.x1, a.x)); m.garra.z = Math.max(G.LIM.z0, Math.min(G.LIM.z1, a.z)); m.pegar();
+    }
+    m.passo(1 / 60); comum.passo(1 / 60);
+  }
+  assert.ok(m.ganhos.length >= 4, 'gigantes ganhos com a garra forte: ' + m.ganhos.length);
+  assert.ok(comum.premios.every(p => p.ganho || (p.x <= L && p.z <= P)), 'a máquina comum ficou nas medidas dela');
+  assert.equal(comum.ganhos.length, 0, 'a comum, parada, não ganhou nada');
+});
