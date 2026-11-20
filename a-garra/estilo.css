@@ -15,7 +15,7 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 .tela.ativa { display: flex; }
 
 /* ---------- menu ---------- */
-#menu { flex-direction: column; align-items: center; overflow-y: auto; padding: max(.6rem, env(safe-area-inset-top)) 1rem 5rem; gap: .35rem; }
+#menu { flex-direction: column; align-items: center; overflow-y: auto; padding: max(.6rem, env(safe-area-inset-top)) 1rem 0; gap: .35rem; }
 .faixa { display: flex; align-items: center; gap: .4rem; width: 100%; max-width: 44rem; }
 .espaco { flex: 1; }
 .mini {
@@ -65,7 +65,25 @@ button:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
 body.modo-tesoura .pegar .so-tesoura { display: inline; }
 body.modo-tesoura .cruz { visibility: hidden; }
 .cartao-maquina.festas { background: linear-gradient(160deg, #e63946 0%, #9b5cff 50%, #1e88e5 100%); }
-[aria-checked="true"].cartao-maquina { border-color: #ffd166; transform: translateY(-3px) scale(1.02); }
+/* a máquina escolhida (dono, 20/Nov/2026: "você não sabe se está selecionado"): maior, com uma luz que corre em volta,
+   brilho piscando e um ✓ no canto; as outras ficam um pouco apagadas */
+@property --giro { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.cartao-maquina { position: relative; transition: transform .2s ease-out, filter .2s; }
+.maquinas .cartao-maquina[aria-checked="false"] { filter: saturate(.75) brightness(.82); }
+[aria-checked="true"].cartao-maquina { border-color: transparent; transform: scale(1.08); z-index: 1; animation: pisca-escolhida 1.1s ease-in-out infinite alternate; }
+[aria-checked="true"].cartao-maquina::before {
+  content: ''; position: absolute; inset: -7px; border-radius: 26px; padding: 5px; pointer-events: none;
+  background: conic-gradient(from var(--giro), #ffd166 0 52%, #fff 60%, #ff4fd8 68%, #3ec7ff 76%, #39ff6a 84%, #ffd166 92%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: luz-gira 1.4s linear infinite;
+}
+[aria-checked="true"].cartao-maquina::after {
+  content: '✓'; position: absolute; top: -10px; right: -8px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; font-weight: 800; color: #0d1a10; background: #39ff6a; box-shadow: 0 0 0 3px #0d0b1e, 0 0 12px rgba(57,255,106,.8);
+}
+@keyframes luz-gira { to { --giro: 360deg; } }
+@keyframes pisca-escolhida { from { box-shadow: 0 0 10px 2px rgba(255,209,102,.45); } to { box-shadow: 0 0 28px 9px rgba(255,209,102,.95); } }
+@media (prefers-reduced-motion: reduce) { [aria-checked="true"].cartao-maquina, [aria-checked="true"].cartao-maquina::before { animation: none; } }
 .cartao-nivel {
   border: 3px solid transparent; border-radius: 20px; padding: .45rem .7rem; font-weight: 600; font-size: 1.1rem;
   min-width: 6rem; min-height: 48px; transition: transform .15s ease-out;
@@ -78,6 +96,21 @@ body.modo-tesoura .cruz { visibility: hidden; }
   background: linear-gradient(90deg, #39ff6a, #ffd400); box-shadow: 0 8px 24px rgba(57,255,106,.3);
 }
 .grande:active { transform: scale(.96); }
+/* o Jogar preso embaixo do menu (rolando, os cartões passam por trás); em cima do tocador de música */
+.barra-jogar {
+  position: sticky; bottom: 0; z-index: 3; width: calc(100% + 2rem); margin: auto -1rem 0; display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  padding: .9rem 1rem calc(env(safe-area-inset-bottom, 0px) + 3.7rem); pointer-events: none;
+  background: linear-gradient(rgba(13,11,30,0), #0d0b1e .85rem);
+}
+.barra-jogar #niveis { pointer-events: auto; flex-wrap: nowrap; }
+/* celular deitado: nível e Jogar numa fileira só, à esquerda do tocador de música */
+@media (orientation: landscape) and (max-height: 520px) {
+  .barra-jogar { flex-direction: row; justify-content: center; padding: .5rem 18.5rem calc(env(safe-area-inset-bottom, 0px) + .4rem) 1rem; }
+  .barra-jogar .cartao-nivel { min-width: 4.6rem; padding: .3rem .4rem; font-size: 1rem; }
+  .barra-jogar .grande { min-height: 52px; min-width: 0; padding: .3rem 1.4rem; font-size: 1.25rem; }
+}
+.barra-jogar .grande { pointer-events: auto; margin: 0; display: flex; flex-direction: column; align-items: center; line-height: 1.1; min-width: min(20rem, 88vw); }
+.jogar-qual { font-size: .95rem; font-weight: 600; opacity: .85; }
 .medio { min-height: 48px; padding: .45rem 1.2rem; border: 0; border-radius: 999px; font-size: 1.1rem; font-weight: 600; background: rgba(255,255,255,.14); }
 .conta { color: #ffd166; }
 .versao { font-size: .8rem; color: #8d86c0; margin: .5rem 0 0; }

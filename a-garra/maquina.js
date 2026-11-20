@@ -393,7 +393,7 @@
   }
 
   // a máquina de gigantes (dono, 19/Nov/2026, fotos da "mega pelúcia"): cabine maior, buraco e garra grandes, poucos prêmios enormes
-  var GIGANTE = { L: 8, P: 6.5, A: 9, BX: 2.7, BZ: 2.7, AB: 1.8, TRILHO: 8.2, PERNA: 1.6, MARGEM: 0.9 };
+  var GIGANTE = { L: 8, P: 6.5, A: 9, BX: 3.0, BZ: 3.0, AB: 1.8, TRILHO: 8.2, PERNA: 1.6, MARGEM: 0.9 };   // buraco de 3: cabe o maior dos gigantes
   var M = { nova: nova, NIVEIS: NIVEIS, medidas: MEDIDAS, calcular: calcular, GIGANTE: GIGANTE };
   if (typeof module !== 'undefined' && module.exports) module.exports = M; else raiz.Maquina = M;
 })(typeof self !== 'undefined' ? self : this);

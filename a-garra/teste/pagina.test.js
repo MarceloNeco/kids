@@ -149,7 +149,7 @@ test('computador: setas e espaço jogam; 🎥 troca a câmera, 🔍 aproxima e a
 test('as máquinas abrem sem erro, cada uma com os seus prêmios (os bichos de verdade são menos, soltos no cobertor)', async () => {
   const pg = await abrir(FONE, '&semente=2');
   try {
-    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17], ['festas', 36, 48], ['gigantes', 8, 14], ['tesoura', 1, 1]]) {
+    for (const [mq, min, max] of [['telefone', 36, 48], ['neon', 36, 48], ['estrelas', 36, 48], ['lanchonete', 36, 48], ['bichos', 11, 17], ['festas', 36, 48], ['gigantes', 14, 20], ['tesoura', 1, 1]]) {
       await pg.goto(base + '?teste&semente=2'); await pg.waitForFunction(() => window.GarraDebug && GarraDebug.pronto);
       await jogar(pg, mq, 'facil');
       const e = await est(pg);
