@@ -16,7 +16,10 @@ Endereço: https://solverone.com.br/kids/rabiscolandia/ · também pelo cartão 
   é só tocar no que quiser) e segue com as cores. Tocar no pincel de novo abre todos os pincéis:
   canetinha, lápis, giz de cera, pincel macio, spray e os **✨ vivos**, que mexem sozinhos — 🌈 arco-íris que corre,
   💡 neon que pisca, ✨ purpurina que brilha e 🐛 minhoca que dança (com carinha!).
-- **📚 Livro de colorir**: 23 desenhos originais em 7 temas (bichinhos, casa, passeio, festa, fantasia, natureza, veículos); escolha um; o 🪣 balde enche a área sem passar do contorno, e todos os pincéis
+- **📚 Livro de colorir**: 33 desenhos originais em 8 temas (bichinhos, casa, passeio, festa, fantasia, natureza, veículos e a
+  **🧸 Turminha**: um personagem sozinho na folha, de roupinha, cabeça grande e olhos brilhantes, como as folhas que as filhas
+  do dono adoram — gatinha de jardineira, ovelhinha de vestido, ursinho de capa de chuva, coelhinha bailarina, dinossaurinho
+  de moletom, raposinho de boné, pandinha astronauta, porquinha confeiteira, patinho marinheiro e cachorrinha no frio); escolha um; o 🪣 balde enche a área sem passar do contorno, e todos os pincéis
   funcionam. **👀 Colinha** mostra como pode ficar; **🎨** troca para outras cores (noite, outono, doce…) — a colinha e
   as cores da faixa mudam juntas.
 - **🔢 Pintar por números**: escolha a cor numerada embaixo e toque nas áreas com o mesmo número (a área da cor
@@ -90,7 +93,7 @@ diminuída junto). Nada vai para a internet; não há login, cookie nem coleta.
 | `estilo.css` | visual; barra embaixo/à direita/à esquerda (classes `barra-*` no `<html>`); respeita "reduzir movimento". |
 | `folha.js` | **puro**: mundo 8192 × 8192, vista, folha esperta ao girar, zoom, pinça e lado da barra. Testado no Node. |
 | `pintura.js` | o motor: camadas, pincéis (parados e vivos), balde, números, adesivos, fundos, desfazer por quadradinhos, foto, guardar/abrir. Entrada única `M.apontar(fonte, x, y, apertado)` para dedo, mão e celular. |
-| `paginas.js` | **só dados**: os desenhos de colorir (formas com número de cor, linhas de detalhe, paleta e variações). Desenho novo entra aqui. |
+| `paginas.js` | **só dados**: os desenhos de colorir (formas com número de cor, linhas de detalhe, paleta e variações). Desenho novo entra aqui. Os da Turminha usam `olhao`/`rostinho` (olhos grandes com brilho, bochechas, boca), `fofo` (lã, touca) e `tutu` (saia de tule). |
 | `fundos.js` | paisagens desenhadas em código (parte parada + parte viva). |
 | `adesivos.js` | emojis, adesivos animados e movimentos. |
 | `som.js` | músicas de fundo e efeitos sintetizados (WebAudio). |
@@ -101,7 +104,7 @@ diminuída junto). Nada vai para a internet; não há login, cookie nem coleta.
 | `app.js` | telas, barra, painéis, colinha, Meus desenhos, mão na tela, foto, instalar, teclado/TV. `APP_VERSION` aqui. |
 | `sw.js` | cache `rabiscolandia-v…` para funcionar sem internet. `VERSAO` aqui. |
 | `versoes.json` | novidades de cada versão (PT e EN). |
-| `teste/` | testes no Node: `node --test rabiscolandia/teste/*.test.js` (rodar da raiz do repositório). |
+| `teste/` | testes no Node: `node --test rabiscolandia/teste/*.test.js` (rodar da raiz do repositório). `regra-de-ouro.test.js` abre o Chromium (Playwright) e confere que toda área de todo desenho tem lugar para o número (bolinha de raio 16). |
 
 Depende de: `../recursos.js` (interruptor `data-recurso="rabiscolandia"`), `../baguncolandia/libs/mediapipe/`
 (biblioteca da mão + `hand_landmarker.task`) e `../baguncolandia/libs/supabase.js` (TV) — **não apague** essas pastas.

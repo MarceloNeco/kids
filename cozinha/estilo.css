@@ -979,3 +979,67 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
   .cesta .item .ces-n { display: inline; font-size: .68rem; }
   @container (max-width: 92px) { .ces-n { display: none !important; } }
 }
+
+/* ---------- v0.12.5 (dono, 20/Nov/2026: "o jogar tem que estar sempre lá, disponível com alguma opção padrão, visível";
+   "celular está muito ruim" de tanto rolar): o ▶ Cozinhar com a receita da última vez fica sempre à vista (preso embaixo
+   quando a página é maior que a tela). No celular, em pé ou deitado, a escolha cabe na tela sem rolar a página: o nível
+   vira uma fileira curtinha (a explicação do nível escolhido aparece embaixo) e as receitas uma fileira dupla que corre
+   para o lado, com o cartão da ponta cortado para mostrar que tem mais. Tablet e computador continuam com a grade. ---------- */
+.nivel-texto { display: none; }
+.rec { position: relative; }
+.rec.escolhida { background: #e9fbf1; }
+.rec.escolhida::before { content: '▶'; position: absolute; top: 5px; left: 8px; color: var(--verde); font-size: .95rem; line-height: 1; }
+.menu-jogar { display: flex; justify-content: center; width: 100%; position: sticky; bottom: calc(10px + var(--sb)); z-index: 3; }
+#btCozinhar { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; min-width: min(17rem, 100%); padding: 6px 22px 6px 8px; text-align: left; animation: chamaVerde 1.6s ease-out 1s infinite; }
+#btCozinhar .ic-foto { font-size: 2.1rem; }
+#btCozinhar .cz-t { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+#btCozinhar .cz-t b { font-size: .78em; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@keyframes chamaVerde { 0% { box-shadow: 0 6px 0 #1b8653, 0 0 0 0 rgba(43, 182, 115, .55); } 100% { box-shadow: 0 6px 0 #1b8653, 0 0 0 18px rgba(43, 182, 115, 0); } }
+#menu .versao { padding-bottom: 0; }
+#btBuscar { position: sticky; bottom: calc(12px + var(--sb)); z-index: 3; }   /* a ficha também: o 🧺 Vamos buscar! sempre à vista */
+/* receitas numa fileira dupla que corre para o lado (celular) */
+@media (orientation: portrait) and (max-width: 37.4rem), (orientation: landscape) and (max-height: 32rem) {
+  #menu { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; gap: 6px; }
+  #menu .ajuda { position: absolute; z-index: 5; top: calc(56px + var(--st)); left: 10px; right: 10px; margin: 0 auto; max-height: calc(100dvh - 70px - var(--st));
+    overflow-y: auto; border-style: solid; box-shadow: 0 12px 30px rgba(90, 45, 10, .3); }
+  #menu .titulo { font-size: 1.05rem; margin-top: 0; }
+  .nivel { flex-direction: row; justify-content: center; gap: 5px; padding: 4px 6px; min-height: 44px; border-radius: 14px; }
+  .nivel .nv-t { display: none; }
+  .nv-e { font-size: 1.3rem; } .nv-n { font-size: 1rem; }
+  .nivel-texto { display: block; font-size: .8rem; line-height: 1.2; color: var(--muted); text-align: center; min-height: 2.4em; max-width: 30rem; }
+  .receitas { flex: 1 1 0; min-height: 0; align-self: stretch; width: auto; max-width: none; margin: 0 calc(-12px - var(--sr)) 0 calc(-12px - var(--sl)); padding: 4px 12px 10px;
+    display: grid; grid-auto-flow: column; grid-template-columns: none; grid-template-rows: repeat(2, minmax(0, 1fr)); grid-auto-columns: calc((100% - 16px) / 2.35); gap: 8px;
+    overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding: 0 12px; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .receitas::-webkit-scrollbar { display: none; }
+  .rec { min-height: 0; padding: 6px 4px 5px; gap: 2px; justify-content: center; scroll-snap-align: start; border-radius: 18px; }
+  .rec { container-type: size; }   /* a foto fica redonda e do maior tamanho que cabe no cartão */
+  .rec .rec-foto { flex: none; width: min(100cqw - 8px, 100cqh - 54px); height: min(100cqw - 8px, 100cqh - 54px); border-width: 3px; }
+  .rec-n { font-size: .9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .rec-est { font-size: .78rem; line-height: 1; }
+  #menu .menu-jogar { position: static; }
+  #menu .versao { margin-top: 0; padding: 0 50px; min-height: 44px; font-size: .62rem; line-height: 1.25; }   /* embaixo, longe da bolinha 🎵 */
+}
+@media (orientation: portrait) and (max-width: 37.4rem) {
+  #menu { padding-top: calc(56px + var(--st)); padding-bottom: calc(4px + var(--sb)); }
+  #menu .logo.pequeno { font-size: 2rem; margin-top: 0; }
+  #btCozinhar { width: min(100%, 21rem); }
+}
+@media (orientation: portrait) and (max-width: 37.4rem) and (max-height: 700px) { .nivel-texto { display: none; } #menu .logo.pequeno { font-size: 1.6rem; } }
+/* celular deitado: nível e ▶ Cozinhar à esquerda, receitas à direita */
+@media (orientation: landscape) and (max-height: 32rem) {
+  #menu.ativa { display: grid; grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr); grid-template-rows: auto auto auto minmax(0, 1fr) auto; column-gap: 14px; row-gap: 4px;
+    align-items: start; padding: calc(6px + var(--st)) calc(12px + var(--sr)) calc(4px + var(--sb)) calc(12px + var(--sl)); }
+  #menu .logo.pequeno { grid-column: 1 / -1; grid-row: 1; justify-self: center; font-size: 1.7rem; margin: 0; padding-top: 10px; min-height: 48px; }
+  #menu .t-nivel { grid-column: 1; grid-row: 2; justify-self: center; }
+  #menu .niveis { grid-column: 1; grid-row: 3; grid-template-columns: 1fr; gap: 5px; }
+  #menu .nivel { min-height: 40px; }
+  #menu .nivel-texto { grid-column: 1; grid-row: 4; min-height: 0; font-size: .74rem; }
+  #menu .menu-jogar { grid-column: 1; grid-row: 5; align-self: end; padding-bottom: 8px; }
+  #menu .t-rec { grid-column: 2; grid-row: 2; justify-self: center; }
+  #menu .receitas { grid-column: 2; grid-row: 3 / 5; align-self: stretch; height: 100%; margin: 0 calc(-12px - var(--sr)) 0 0; padding-left: 4px;
+    grid-template-rows: minmax(0, 1fr); grid-auto-columns: calc((100% - 24px) / 3.3); }   /* deitado: uma fileira só, cartões altos */
+  #menu .versao { grid-column: 2; grid-row: 5; align-self: end; min-height: 0; padding: 0 50px 4px 0; }
+  #btCozinhar { width: 100%; min-width: 0; font-size: 1.1rem; padding: 4px 12px 4px 6px; }
+  #btCozinhar .ic-foto { font-size: 1.8rem; }
+  .rec-n { font-size: .82rem; } .rec-est { font-size: .7rem; }
+}
