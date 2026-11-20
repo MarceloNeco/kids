@@ -24,7 +24,7 @@
     pulo: 'pulo.mp3', boing: 'boing.mp3', gosma: 'gosma.mp3', splat: 'splat.mp3', bip: 'bip.mp3', vai: 'vai.mp3', chegou: 'chegou.mp3', aplausos: 'aplausos.mp3',
     fogos: 'fogos.mp3', explosao: 'explosao.mp3', escudo: 'escudo.mp3', caixa: 'caixa.mp3', aparece: 'aparece.mp3', plop: 'plop.mp3', buzina: 'buzina.mp3',
     ronco: 'ronco.mp3', galo: 'galo.mp3', galinha1: 'galinha1.mp3', galinha2: 'galinha2.mp3', asas: 'asas.mp3', cavalo: 'cavalo.mp3', dino: 'dino.mp3',
-    arara: 'arara.mp3', morcego: 'morcego.mp3', dracula: 'dracula.mp3', pipoca: 'pipoca.mp3', motor: 'motor.wav', derrapa: 'derrapa.wav' };
+    arara: 'arara.mp3', morcego: 'morcego.mp3', dracula: 'dracula.mp3', risada: 'risada.mp3', pipoca: 'pipoca.mp3', motor: 'motor.wav', derrapa: 'derrapa.wav' };
   var buf = {}, carregando = false;
   function carregarSons() {
     if (carregando || !ac || !raiz.fetch) return;
@@ -50,7 +50,8 @@
     splat: ['splat', 0.9], gosma: ['gosma', 0.8], looping: ['ronco', 0.8], loopFeito: ['aplausos', 0.55], fogos: ['fogos', 0.55], turboRival: ['ronco', 0.3, 1.1],
     torcida: ['aplausos', 0.8], whoosh: ['turbo', 0.55, 1.2], derrapa: ['tum', 0.15, 1.6], buzina: ['buzina', 0.8], escudo: ['escudo', 0.7], explosao: ['explosao', 0.7],
     galo: ['galo', 0.9], galinha: [Math.random() < 0.5 ? 'galinha1' : 'galinha2', 0.8], asas: ['asas', 0.7], cavalo: ['cavalo', 0.8], dino: ['dino', 0.85], arara: ['arara', 0.6],
-    morcego: ['morcego', 0.8], dracula: ['dracula', 0.85], pipoca: ['pipoca', 0.7], abobora: ['splat', 0.9, 0.75], agua: ['lama', 0.85, 1.25] };
+    morcego: ['morcego', 0.8], dracula: ['dracula', 0.85], pipoca: ['pipoca', 0.7], abobora: ['splat', 0.9, 0.75], agua: ['lama', 0.85, 1.25],
+    risada: ['risada', 0.95, 1.08], saltito: ['boing', 0.3, 0.8], ursoBate: ['batida', 0.6, 0.8], ursoEmpurra: ['tum', 0.9, 0.7] };   // Ursão de Pelúcia (1.30.0)
   function tom(tipo, f, ini, dur, vol, fFim, destino) {
     if (!ac) return;
     var o = ac.createOscillator(), g = ac.createGain();

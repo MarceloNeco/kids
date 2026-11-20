@@ -23,6 +23,10 @@
   var ROLETA = 1.1, ESCUDO = 6, FOGUETE = 3;
   var PONTOS_LUGAR = [800, 400, 200];   // 1º, 2º e 3º lugar na chegada
   var TOQUE = { estrela: 0.28, cone: 0.24, lama: 0.3, turbo: 0.3, rampa: 0.3, caixa: 0.33 };
+  /* Ursão de Pelúcia (1.30.0, dono 20/Nov/2026): gigante, mais rápido que todos, nada atrapalha (cone, lama e trânsito
+     são jogados para o lado), empurra os rivais para longe dando risada e, virando, vai dando pulinhos. O único jeito
+     de passarem por ele: quando ele encosta na beirada da pista, freia bastante. */
+  var URSO = { vel: 1.25, largura: 0.75, beirada: 0.92, saltito: 0.38, risada: 2.6 };
 
   // rivais (personagens): configs = [{ id, veic, mod: { vel, curva } }]
   function novaCorrida(nivel, semente, nJogadores, configs, mundos) {
@@ -52,6 +56,10 @@
     j.tCheck = e.t;
     return { tempo: tempo, bonus: Math.max(0, Math.round((alvo - tempo) * 30)) };
   }
+  function rir(e, j) {   // o urso dá risada (no máximo uma a cada 2,6 s, o tamanho da gravação)
+    if (e.t - (j.tRiu == null ? -99 : j.tRiu) < URSO.risada) return;
+    j.tRiu = e.t; j.ri = 1.4; e.eventos.push({ tipo: 'risada', j: j.n });
+  }
   function perder(e, j, q) {
     q = Math.min(q, j.estrelas);
     if (q > 0) { j.estrelas -= q; e.eventos.push({ tipo: 'perdeu', j: j.n, q: q }); }
@@ -59,7 +67,7 @@
 
   var FORA_MAX = 0.4;   // força da curva, no máximo, em fração do volante
   function moverJogador(e, j, ent, dt) {
-    var pista = e.pista, cfg = pista.cfg, mod = j.mod || {}, max = cfg.velMax * (mod.vel || 1);   // mod: jeito do veículo (veiculos.js)
+    var pista = e.pista, cfg = pista.cfg, mod = j.mod || {}, max = cfg.velMax * (mod.vel || 1) * (mod.urso ? URSO.vel : 1);   // mod: jeito do veículo (veiculos.js)
     var seg = P.achar(pista, j.z), pct = j.vel / max;
     var dir = Math.max(-1, Math.min(1, (ent && ent.dir) || 0));
     if (j.rodando > 0) { j.rodando = Math.max(0, j.rodando - dt); dir = 0; }
@@ -77,6 +85,8 @@
     if (ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou && !lp) {
       j.pulo = j.puloMax = PULINHO; j.recarga = RECARGA; e.eventos.push({ tipo: 'pulo', j: j.n, manual: true });
     }
+    // o urso, virando para o lado, vai saltitando (um pulinho atrás do outro enquanto segura)
+    if (mod.urso && Math.abs(dir) > 0.3 && j.pulo <= 0 && j.rodando <= 0 && !j.chegou && !lp) { j.pulo = j.puloMax = URSO.saltito; e.eventos.push({ tipo: 'saltito', j: j.n }); }
 
     // volante e força da curva (empurra para fora; no nível Criança quase nada). A força da curva nunca passa
     // de 40% do volante: segurando para dentro, sempre dá para fazer a curva (antes, nas curvas fortes, ela
@@ -113,6 +123,12 @@
     else if (j.vel < alvo) j.vel = Math.min(alvo, j.vel + max * (j.turbo > 0 ? 1.2 : 0.45) * dt);
     else j.vel = Math.max(alvo, j.vel - max * 0.6 * dt);
 
+    // o urso encostou na beirada da pista: freia bastante (é aí que os outros passam)
+    if (mod.urso && !lp) {
+      var naBeira = Math.abs(j.x) > URSO.beirada;
+      if (naBeira) { if (j.vel > max * 0.3) j.vel -= max * 2.4 * dt; j.tremor = 0.2; j.x -= (j.x > 0 ? 1 : -1) * dt * 0.25; if (!j.naBeira) e.eventos.push({ tipo: 'ursoBate', j: j.n }); }
+      j.naBeira = naBeira;
+    }
     // fora da estrada: grama, areia ou neve seguram o carro
     j.fora = Math.abs(j.x) > 1.05 && j.pulo <= 0;
     if (j.fora && j.vel > max * 0.4) { j.vel -= max * 1.3 * dt; j.tremor = 0.15; }
@@ -120,6 +136,7 @@
     if (j.tremor > 0) j.tremor = Math.max(0, j.tremor - dt);
     if (j.pulo > 0) j.pulo = Math.max(0, j.pulo - dt);
     if (j.empurrao > 0) j.empurrao = Math.max(0, j.empurrao - dt);
+    if (j.ri > 0) j.ri = Math.max(0, j.ri - dt);
     if (j.escudo > 0) j.escudo = Math.max(0, j.escudo - dt);
     if (j.foguete > 0) j.foguete = Math.max(0, j.foguete - dt);
     if (j.roleta > 0) { j.roleta -= dt; if (j.roleta <= 0) { j.roleta = 0; usarPoder(e, j, max); } }
@@ -168,6 +185,7 @@
         }
         if (noAr) continue;                               // no ar passa por cima de tudo
         c.pego[j.n] = true;
+        if (mod.urso && (c.tipo === 'cone' || c.tipo === 'lama')) { rir(e, j); continue; }   // o urso nem sente
         if (j.escudo > 0 && (c.tipo === 'cone' || c.tipo === 'lama')) { e.eventos.push({ tipo: 'escudoBate', j: j.n }); continue; }   // a bolha protege
         if (c.tipo === 'cone') {
           if (j.rodando > 0) continue;
@@ -185,10 +203,11 @@
     }
 
     // trânsito: bater por trás deixa lento, rodopia e derruba estrelas
-    if (j.pulo <= 0 && j.rodando <= 0 && !lp) {
+    if ((j.pulo <= 0 || mod.urso) && j.rodando <= 0 && !lp) {
       for (k = 0; k < e.carros.length; k++) {
         var car = e.carros[k];
-        if (Math.abs(car.x - j.x) < 0.42 && j.z > car.z - SEG * 0.8 && j.z < car.z + SEG * 0.4 && j.vel > car.vel) {
+        if (Math.abs(car.x - j.x) < (mod.urso ? URSO.largura : 0.42) && j.z > car.z - SEG * 0.8 && j.z < car.z + SEG * 0.4 && j.vel > car.vel) {
+          if (mod.urso) { if (!car.pulou) { car.pulou = 1; car.x += (car.x >= j.x ? 1 : -1) * 0.7; rir(e, j); } continue; }   // o urso joga o carrinho para o lado
           if (j.escudo > 0) {   // com a bolha: o carrinho é jogado para o lado e ninguém perde nada
             if (!car.pulou) { car.pulou = 1; car.x += (car.x >= j.x ? 1 : -1) * 0.5; e.eventos.push({ tipo: 'escudoBate', j: j.n }); }
             continue;
@@ -293,7 +312,16 @@
     // encostou num jogador: um empurrãozinho dos dois lados e o rival muda para a faixa do outro lado
     // (antes ele voltava para a mesma faixa, encostava de novo e ficava tremendo do lado do jogador)
     if (rv.encostou > 0) rv.encostou -= dt;
+    if (rv.empurrado > 0) rv.empurrado -= dt;
     e.jogadores.forEach(function (j) {
+      if (j.mod && j.mod.urso && !lpR && Math.abs(j.z - rv.z) < SEG * 0.9 && Math.abs(j.x - rv.x) < URSO.largura) {   // o urso joga o rival para longe
+        var ld = rv.x >= j.x ? 1 : -1;
+        rv.x = Math.max(-1.4, Math.min(1.4, j.x + ld * (URSO.largura + 0.1)));
+        rv.faixa = P.FAIXAS.filter(function (fx) { return ld > 0 ? fx > j.x + 0.3 : fx < j.x - 0.3; }).sort(function (a, b) { return Math.abs(a - rv.x) - Math.abs(b - rv.x); })[0] || rv.faixa;
+        rv.lento = Math.max(rv.lento, 0.7); rv.empurrado = 0.8;
+        e.eventos.push({ tipo: 'ursoEmpurra', j: j.n, r: rv.r }); rir(e, j);
+        return;
+      }
       if (j.pulo > 0 || lpR || Math.abs(j.z - rv.z) > SEG * 0.6 || Math.abs(j.x - rv.x) > 0.38) return;
       var lado = j.x <= rv.x ? -1 : 1, longe = P.FAIXAS.filter(function (fx) { return lado < 0 ? fx > j.x + 0.4 : fx < j.x - 0.4; });
       if (longe.length) rv.faixa = longe.sort(function (a, b) { return Math.abs(a - rv.x) - Math.abs(b - rv.x); })[0];
@@ -340,9 +368,11 @@
     // dois carros lado a lado: um empurrãozinho, sem perder nada
     if (e.jogadores.length === 2) {
       var a = e.jogadores[0], b = e.jogadores[1];
-      if (Math.abs(a.z - b.z) < SEG * 0.6 && Math.abs(a.x - b.x) < 0.38 && a.pulo <= 0 && b.pulo <= 0) {
+      var ua = a.mod && a.mod.urso, ub = b.mod && b.mod.urso;
+      if (Math.abs(a.z - b.z) < SEG * 0.6 && Math.abs(a.x - b.x) < (ua || ub ? URSO.largura : 0.38) && ((a.pulo <= 0 && b.pulo <= 0) || ua || ub)) {
         var lado = a.x <= b.x ? -1 : 1;
-        a.x += lado * 0.06; b.x -= lado * 0.06;
+        a.x += lado * (ub && !ua ? 0.25 : ua && !ub ? 0 : 0.06); b.x -= lado * (ua && !ub ? 0.25 : ub && !ua ? 0 : 0.06);
+        if (ua !== ub) rir(e, ua ? a : b);
         if (a.empurrao <= 0) { a.empurrao = b.empurrao = 0.5; e.eventos.push({ tipo: 'tum' }); }
       }
     }
@@ -357,7 +387,7 @@
     return e;
   }
 
-  var VruuumMotor = { nivelDerrapa: nivelDerrapa, DERRAPA: DERRAPA, MINI_TURBO: MINI_TURBO, ROLETA: ROLETA, ESCUDO: ESCUDO, FOGUETE: FOGUETE, usarPoder: usarPoder, PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
+  var VruuumMotor = { nivelDerrapa: nivelDerrapa, DERRAPA: DERRAPA, MINI_TURBO: MINI_TURBO, ROLETA: ROLETA, ESCUDO: ESCUDO, FOGUETE: FOGUETE, usarPoder: usarPoder, URSO: URSO, PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumMotor;
   else raiz.VruuumMotor = VruuumMotor;
 })(this);

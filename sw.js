@@ -7,7 +7,7 @@
   Este endereço (/kids/sw.js) é o mesmo da antiga página /kids do Portal: quem já tinha, atualiza sozinho.
   A cada mudança na estante, suba a VERSAO.
 */
-var VERSAO = 72;
+var VERSAO = 73;
 var PASTA = (self.registration.scope.replace(/\/$/, '').split('/').pop() || 'raiz');
 var PREFIXO = 'dgo-' + PASTA + '-';
 var CACHE = PREFIXO + 'v' + VERSAO;
@@ -40,6 +40,8 @@ self.addEventListener('fetch', function (e) {
   // com os três idiomas misturados (dono, 14/Nov/2026).
   // Música não passa por aqui: arquivo grande, tocado em pedaços pelo navegador; vem sempre da internet.
   if (/\.mp3$/i.test(url.pathname)) return;
+  // Vídeo também não (o vídeo de IA da telinha dos DJs e do telão do Clipe, em clipes/; ver CLIPES_VIDEO no clipe.js).
+  if (/\.(mp4|webm)$/i.test(url.pathname)) return;
   e.respondWith(new Promise(function (resolve) {
     var respondeu = false;
     function daCopia() {

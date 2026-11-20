@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.31.0",
+      "data": "20/Nov/2026",
+      "hora": "17:55:15",
+      "pt": [
+        "🧸 Ursão de Pelúcia: um ursinho gigante, que ocupa quase a tela toda! Nada atrapalha ele: cone, lama e carrinhos vão para o lado, e ele empurra os rivais rindo (HO HO HO!). Virando, ele vai dando pulinhos. Ele sempre chega primeiro... a não ser que encoste na beirada da pista: aí ele freia bastante e é a chance dos outros passarem."
+      ],
+      "en": [
+        "🧸 Giant Teddy Bear: a huge teddy that fills almost the whole screen! Nothing stops him: cones, mud and cars get pushed aside, and he shoves the rivals away laughing (HO HO HO!). When turning, he hops along. He always finishes first... unless he bumps into the edge of the road: then he slows right down and the others get their chance to pass."
+      ],
+      "es": [
+        "🧸 Osito de Peluche Gigante: ¡un osito enorme que ocupa casi toda la pantalla! Nada le frena: los conos, el barro y los coches salen volando a un lado, y aparta a los rivales riéndose (¡JO JO JO!). Al girar, va dando saltitos. Siempre llega el primero... a no ser que toque el borde de la carretera: entonces frena mucho y los demás tienen su oportunidad de adelantarle."
+      ]
+    },
+    {
       "versao": "1.30.0",
       "data": "20/Nov/2026",
       "hora": "13:45:34",

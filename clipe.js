@@ -10,6 +10,7 @@
     BolinhoClipe.abrir({ cenas: 'radio' | 'garra', audio: <o <audio> que já toca>,
                          musica: function () { return { t: 'Nome da música', au: 'Autor' }; } });
     BolinhoClipe.fechar();   BolinhoClipe.aberto();   BolinhoClipe.cena(n)  (vai para a cena n; usado nos testes e prints)
+    BolinhoClipe.telinha(caixa, audio) -> { ligar(), desligar() }   (a TELINHA dos DJs em cima da rádio; ver "A TELINHA")
 
   Como funciona:
   - Cenas (arte própria): rádio = Festa na piscina (capivara DJ, coelhinha e guaxinim), Discoteca do Bolinho (globo
@@ -24,6 +25,9 @@
     para 1 e 30 quadros por segundo se o aparelho não der conta); o laço para quando o telão fecha ou a aba some.
   - Sai por ✕, Esc, Voltar do celular e Voltar do controle da TV; ⛶ põe o telão em tela cheia.
   - Vídeo de IA no lugar do desenho: ver CLIPES_VIDEO logo abaixo.
+  - Telinha dos DJs (dono, 20/Nov/2026): uma TV pequena presa em cima da rádio da estante, só enquanto a rádio toca
+    (radio.js monta a caixa, o ✕ e o aparecer/sumir; aqui fica o desenho). Mostra de perto a Festa na piscina: a
+    capivara DJ na mesa de som e a coelhinha dançando, no mesmo ritmo do telão. Tocar nela abre o telão.
   Escrito em JavaScript antigo (sem =>) de propósito: o tablet Fire mais velho também roda.
 */
 (function (raiz) {
@@ -34,11 +38,17 @@
   // Ponha aqui o endereço de um vídeo .mp4 ou .webm guardado NO PRÓPRIO SITE (ex.: '/kids/clipes/festa-na-piscina.mp4';
   // o H-rraaa só aceita vídeo do mesmo site). Com internet, o telão toca o vídeo em laço e sem som (a música continua
   // a da rádio ou do jogo) por cima do desenho, um vídeo por música; se o vídeo não abrir, fica o desenho.
-  // Lista vazia = só o desenho. Ao pôr o primeiro vídeo, faça os service workers (sw.js da estante e do jogo) deixarem
-  // .mp4/.webm passar direto, como já fazem com .mp3 (vídeo grande não deve ir para a gaveta do aparelho).
+  // Lista vazia = só o desenho. O sw.js da estante já deixa .mp4/.webm passar direto, como faz com .mp3 (vídeo grande
+  // não vai para a gaveta do aparelho); ao pôr o primeiro vídeo do H-rraaa, faça o mesmo no service worker do jogo.
+  // telinha: a TV pequena em cima da rádio (só um vídeo, em laço, sem som). O vídeo de IA dos dois DJs vai assim:
+  //   1. o arquivo em  clipes/radio-dj.mp4  (na raiz do repositório kids; 1920 × 1080, sem som, que emende em laço);
+  //   2. aqui:  telinha: ['/kids/clipes/radio-dj.mp4'],  (e, se quiser o mesmo vídeo no telão grande, também em radio);
+  //   3. suba a VERSAO do sw.js da raiz e o data-versao do index.html, e rode  node ferramentas/pecas-comuns.js .
+  // Sem internet, ou se o vídeo não abrir, a telinha continua com o desenho.
   var CLIPES_VIDEO = {
     radio: [],
-    garra: []
+    garra: [],
+    telinha: []
   };
 
   var d = raiz.document, TAU = Math.PI * 2;
@@ -1317,6 +1327,7 @@
     montar();
     op = opcoes || {}; lista = CENAS[op.cenas] || CENAS.radio; if (CENAS[op.cenas] === undefined) op.cenas = 'radio';
     aberto = true; textoMusica = '\u0000';
+    tlAtualizar();   // a telinha descansa (e solta o ritmo) enquanto o telão está aberto
     tela.classList.add('aberto'); d.body.classList.add('clipe-aberto'); travar(true);
     pintarBotoes(); medir();
     quemAbriu = d.activeElement;
@@ -1341,12 +1352,138 @@
     iCena = (iCena + 1) % (lista ? lista.length : 1);   // a próxima vez começa na cena seguinte
     if (quemAbriu && quemAbriu.focus) { try { quemAbriu.focus({ preventScroll: true }); } catch (e3) { quemAbriu.focus(); } }
     quemAbriu = null;
+    tlAtualizar();   // a telinha volta a dançar
+  }
+
+  // ======================================================================
+  // A TELINHA (dono, 20/Nov/2026): a TV pequena (16:9) presa em cima da rádio da estante. O radio.js monta a caixa
+  // (um <button> que abre o telão), o ✕ e o aparecer/sumir; aqui fica só o que passa nela:
+  // - um pedaço da Festa na piscina visto de perto (a janela MINI do mundo de 1000 × 600): a capivara DJ de fone e
+  //   óculos na mesa de som e a coelhinha dançando do lado, com notinhas subindo dos toca-discos;
+  // - o mesmo ritmo do telão (ritmoPasso). Os dois nunca rodam juntos: com o telão aberto a telinha para e solta o som;
+  // - nítida no celular e no tablet: pintada com devicePixelRatio até 2; no tablet Fire velho (ou aparelho fraco, ou
+  //   se o desenho demorar) 30 quadros por segundo e devicePixelRatio 1;
+  // - o laço só roda com a telinha ligada (rádio tocando), a aba à vista e o telão fechado;
+  // - vídeo de IA: CLIPES_VIDEO.telinha (lá em cima). Com internet, toca por cima do desenho, sem som e em laço.
+  // ======================================================================
+  var nv = raiz.navigator || {};
+  var LEVE = /Silk\/|; KF[A-Z]{2,6}\b|\bKF[A-Z]{2,6} Build/.test(nv.userAgent || '') || (nv.hardwareConcurrency > 0 && nv.hardwareConcurrency <= 2) ||
+    (nv.deviceMemory > 0 && nv.deviceMemory <= 2) || /[?&]leve\b/.test(raiz.location.search);
+  var MINI = { x: 296, y: 196, w: 630 };   // a janela (16:9) da Festa na piscina que a telinha mostra
+  var MINI_COELHA = { tipo: 'coelha', cor: '#fbf4ff', barriga: '#ffffff', x: 742, y: 534, s: 0.92, danca: 'balanca', atraso: 0.06, vez: 12, esp: 'gira',
+    roupa: 'maio', acc: { oculos: 'rosa', forma: 'coracao', flor: '#ffd84a' }, pe: '#ffe3f0' };
+  var NOTAS = ['#c6ff3d', '#ff4fa3', '#3ee8ff', '#ffd84a'];
+  var tl = null;
+
+  function notinha(c, x, y, r, cor, al) {   // ♪ desenhada (sem depender de fonte)
+    c.globalAlpha = al; c.lineCap = 'round';
+    liso(c, cor, x, y, r, r * 0.78, -0.4);
+    c.beginPath(); c.moveTo(x + r * 0.85, y - r * 0.2); c.lineTo(x + r * 0.85, y - r * 3.2); c.quadraticCurveTo(x + r * 2, y - r * 2.6, x + r * 2.1, y - r * 1.6);
+    c.lineWidth = r * 0.5; c.strokeStyle = cor; c.stroke();
+    c.globalAlpha = 1;
+  }
+  function telinhaCena(c, R) {
+    if (!R.calmo) for (var i = 0; i < 4; i++) { var a = (Math.sin(R.t * 1.7 + i * 2.1) + 1) / 2; c.fillStyle = 'rgba(255,255,255,' + (a * 0.7).toFixed(2) + ')'; estrela(c, 360 + i * 150 + (i % 2) * 30, 340 + (i % 3) * 30, 5 + a * 4, 4, 0.3); c.fill(); }
+    bolinhoBoia(c, 640, 372 + Math.sin(R.t * 1.2 + 1) * 3, 0.6);
+    bicho(c, MINI_COELHA, R);
+    djNaMesa(c, PISCINA.dj, R, 500, 452, 330);
+    if (!R.calmo && R.tocando) for (var k = 0; k < 4; k++) {   // notinhas subindo dos toca-discos
+      var f = (R.t * 0.45 + k / 4) % 1, lado = k % 2 ? 1 : -1;
+      notinha(c, 500 + lado * 99 + Math.sin(f * 5 + k) * 14, 430 - f * 190, 8, NOTAS[k], Math.sin(f * Math.PI) * 0.9);
+    }
+  }
+  function tlMedir() {
+    var w = tl.caixa.clientWidth, h = tl.caixa.clientHeight;
+    if (!w || !h) return false;
+    tl.dpr = Math.min(raiz.devicePixelRatio || 1, tl.lento ? 1 : 2);
+    tl.cv.width = tl.bg.width = Math.max(1, Math.round(w * tl.dpr)); tl.cv.height = tl.bg.height = Math.max(1, Math.round(h * tl.dpr));
+    var k = w / MINI.w;
+    tl.V = { w: w, h: h, k: k, L: MINI.x, R: MINI.x + MINI.w, T: MINI.y, B: MINI.y + h / k };
+    tl.pronto = false; tl.mw = w; tl.mh = h;
+    return true;
+  }
+  function tlTransformar(c) { var k = tl.V.k * tl.dpr; c.setTransform(k, 0, 0, k, -MINI.x * k, -MINI.y * k); }
+  function tlQuadro(agora) {
+    tl.raf = 0;
+    if (!tl.rodando) return;
+    tl.raf = raiz.requestAnimationFrame(tlQuadro);
+    if (tl.meia && agora - tl.ultimoDesenho < 31) return;   // 30 quadros por segundo
+    var t = agora / 1000, dt = tl.ultimoT ? Math.min(0.1, Math.max(0.001, t - tl.ultimoT)) : 0.016;
+    tl.ultimoT = t; tl.ultimoDesenho = agora;
+    var R = ritmoPasso(dt, t);
+    if (tl.caixa.classList.contains('com-video')) return;   // o vídeo está tocando: o desenho descansa
+    if (!tl.V || tl.caixa.clientWidth !== tl.mw || tl.caixa.clientHeight !== tl.mh) { if (!tlMedir()) return; }
+    var ini = raiz.performance ? performance.now() : 0, ret = RET;
+    RET = false;
+    if (!tl.pronto) {
+      tl.bgc.setTransform(1, 0, 0, 1, 0, 0); tl.bgc.clearRect(0, 0, tl.bg.width, tl.bg.height);
+      tlTransformar(tl.bgc); PISCINA.fundo(tl.bgc, tl.V); gcDe = null; tl.pronto = true;
+    }
+    var c = tl.c;
+    c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(tl.bg, 0, 0);
+    tlTransformar(c); telinhaCena(c, R);
+    RET = ret;
+    if (raiz.performance && !tl.lento) {   // aparelho que não dá conta: 30 quadros por segundo e 1×
+      var gasto = performance.now() - ini; tl.nQ++;
+      tl.media += (gasto - tl.media) * 0.1;
+      if (tl.nQ > 45 && tl.media > 9) { tl.lento = tl.meia = true; tlMedir(); }
+    }
+  }
+  function tlVideo() {
+    var l = CLIPES_VIDEO.telinha;
+    if (tl.video || tl.semVideo || !l || !l.length || nv.onLine === false) return;
+    var v = tl.video = d.createElement('video');
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+    v.addEventListener('playing', function () { tl.caixa.classList.add('com-video'); });
+    v.addEventListener('error', function () {   // não abriu: fica o desenho (e não tenta de novo até recarregar a página)
+      tl.semVideo = true; tl.caixa.classList.remove('com-video');
+      try { v.removeAttribute('src'); v.load(); } catch (e) { /* ok */ }
+      if (v.parentNode) v.parentNode.removeChild(v);
+      tl.video = null;
+    });
+    v.src = l[0];
+    tl.caixa.appendChild(v);
+  }
+  // liga ou para o laço conforme o momento: telinha ligada, aba à vista e telão fechado
+  function tlAtualizar() {
+    if (!tl) return;
+    var deve = tl.ligada && !d.hidden && !aberto;
+    if (deve === tl.rodando) return;
+    tl.rodando = deve;
+    if (deve) {
+      ligarRitmo(tl.audio);
+      tlVideo();
+      if (tl.video) { var p = tl.video.play(); if (p && p.catch) p.catch(function () {}); }
+      tl.ultimoT = 0; tl.raf = raiz.requestAnimationFrame(tlQuadro);
+    } else {
+      if (tl.raf) raiz.cancelAnimationFrame(tl.raf);
+      tl.raf = 0;
+      if (tl.video) try { tl.video.pause(); } catch (e) { /* ok */ }
+      desligarRitmo();   // solta o som (o telão, ao abrir, liga o dele logo depois)
+    }
+  }
+  function telinha(caixa, audio) {
+    if (tl) return tl.api;
+    var cv = d.createElement('canvas'), bg = d.createElement('canvas');
+    cv.setAttribute('aria-hidden', 'true');
+    caixa.appendChild(cv);
+    tl = { caixa: caixa, audio: audio, cv: cv, c: cv.getContext('2d'), bg: bg, bgc: bg.getContext('2d'), video: null, semVideo: false,
+      ligada: false, rodando: false, raf: 0, V: null, dpr: 1, pronto: false, mw: 0, mh: 0, ultimoT: 0, ultimoDesenho: 0,
+      lento: LEVE, meia: LEVE, media: 0, nQ: 0 };
+    d.addEventListener('visibilitychange', tlAtualizar);
+    tl.api = {
+      ligar: function () { tl.ligada = true; tlAtualizar(); },
+      desligar: function () { tl.ligada = false; tlAtualizar(); }
+    };
+    return tl.api;
   }
 
   raiz.BolinhoClipe = {
     abrir: abrir,
     fechar: function () { fechar(); },
     aberto: function () { return aberto; },
-    cena: function (n) { if (aberto) { trocar(n); fade = 0; } }
+    cena: function (n) { if (aberto) { trocar(n); fade = 0; } },
+    telinha: telinha
   };
 })(window);
