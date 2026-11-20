@@ -383,7 +383,10 @@
       p('M187,276 Q200,300 213,276 L213,268 L187,268Z', { fill: '#7a5ba8', opacity: 0.08 }));
     // tronco de pele um pouco mais estreito que qualquer roupa (a roupa cobre os lados: sem pele sobrando embaixo do braço)
     var TRONCO = 'M150,342 Q200,330 250,342 Q259,346 256,366 L248,458 L152,458 L144,366 Q141,346 150,342Z';
-    out.push(p(TRONCO, { fill: pele, stroke: peleE, 'stroke-width': 1.4 }) + p(TRONCO, { fill: 'url(#' + I + 'lado)' }));
+    // sem contorno em cima (dono, 20/Nov/2026: "divisão dos ombros e pescoço"): só os lados do tronco têm traço; pescoço,
+    // ombros e tronco são uma pele só
+    out.push(p(TRONCO, { fill: pele }) + p(TRONCO, { fill: 'url(#' + I + 'lado)' }) +
+      p('M144,366 L152,458 M256,366 L248,458', { fill: 'none', stroke: peleE, 'stroke-width': 1.4 }));
     /* pose do fim da passarela (opcoes.pose): 'cintura' = mão direita na cintura (menina); 'cruzados' = braços cruzados
        (menino). Os braços da pose são desenhados no fim, por cima (bracosPose). */
     /* opcoes.rig (Nova Era, 20/Nov/2026: "as poses precisam de movimento, não ficar trocando de foto"): os braços viram um
@@ -575,6 +578,8 @@
       } else if (corTop && manga !== 'nada') cimaF += p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 14 * k, 12.5 * k), { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
       // ombro redondo por baixo do braço (some o "ganchinho" no ombro)
       cimaC = circ(S[0], S[1], 13 * k, { fill: corTop && manga !== 'nada' ? corTop.hex : pele }) + cimaC;
+      // sem manga: o arco do contorno do braço não risca o ombro (a pele do braço continua a do ombro)
+      if (!corTop || manga === 'nada') cimaF += circ(S[0], S[1], 12 * k + 1.2, { fill: pele });
       var esm = { tipo: e.unhas, cor: C('unhas') }, mk = DF.traco * 0.9;
       // a bolsa de mão (e o guarda-chuva) vai na mão direita e o anel no dedo: tudo dentro do grupo da mão, que gira com o braço
       var naMao = lado > 0 && vis('bolsa') && e.bolsa !== 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : '';
@@ -591,7 +596,7 @@
     function tipoManga() {
       if (vis('capa')) return 'longa';
       var temVest = vis('vestido');
-      return temVest ? (['casaco', 'macacao'].indexOf(e.vestido) >= 0 ? 'longa' : ['tomara', 'verao', 'jardineira'].indexOf(e.vestido) >= 0 ? 'nada' : 'curta') :
+      return temVest ? (['casaco', 'macacao'].indexOf(e.vestido) >= 0 ? 'longa' : ['tomara', 'verao', 'jardineira', 'festa', 'fada', 'sereia', 'gala'].indexOf(e.vestido) >= 0 ? 'nada' : 'curta')   /* vestidos sem manga: o braço fica de pele */ :
         (['sueter', 'jaqueta', 'pijama', 'moletom', 'camisa', 'disco', 'jaquetaGola'].indexOf(e.blusa) >= 0 ? 'longa' : ['regata', 'ombro', 'colete', 'nenhum'].indexOf(e.blusa) >= 0 ? 'nada' : 'curta');
     }
     function corpoLado() {
