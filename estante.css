@@ -116,3 +116,5 @@ html.trava-fundo,html.trava-fundo body{overflow:hidden!important;overscroll-beha
 @media (min-width:56rem){.f-bt .f-txt{display:inline}.f-bt{padding:0 .85rem}}
 @media (max-width:440px){.filtros{gap:.2rem;padding:.25rem}.f-bt{min-width:40px;height:40px;padding:0 .45rem}.f-q{width:36px;min-width:36px}.f-bt svg{width:20px;height:20px}}
 @media (max-width:340px){.f-bt{min-width:34px;padding:0 .3rem;font-size:.82rem}.f-bt svg{width:18px;height:18px}.f-q{width:32px;min-width:32px}}
+.a-ic{display:inline-flex;align-items:center;gap:.3rem}.ic-rodape{width:1.05em;height:1.05em;flex:none}
+@media (max-width:460px){.f-todos svg{display:none}}

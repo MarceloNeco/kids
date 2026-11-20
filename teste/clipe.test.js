@@ -62,7 +62,8 @@ test('telão: abre pelo 📺 da rádio e do H-rraaa, anima, fecha pelo ✕ e pel
     assert.ok(caixa.height >= 44, 'botão com pelo menos 44 px de altura');
     assert.ok(caixa.x + caixa.width <= radio.x + radio.width && caixa.y >= radio.y - 1, 'botão dentro do tocador');
     assert.ok(Math.abs((caixa.y + caixa.height / 2) - (play.y + play.height / 2)) < 3, 'botão na mesma linha do ▶');
-    assert.strictEqual((await bt.innerText()).replace(/\s+/g, ' ').trim(), '📺 Clipe');
+    assert.strictEqual((await bt.innerText()).replace(/\s+/g, ' ').trim(), 'Clipe');
+    assert.strictEqual(await bt.locator('svg.r-tv').count(), 1, 'ícone de traço, no estilo dos cartões (nada de emoji)');
     await bt.click();
     await pg.waitForSelector('.clp.aberto canvas');
     assert.ok(await pg.evaluate(() => BolinhoClipe.aberto()), 'telão aberto');

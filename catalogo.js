@@ -175,6 +175,7 @@
     incl: '<rect x="8.6" y="5.6" width="6.8" height="12.8" rx="1.6" transform="rotate(25 12 12)"/><path d="M3.3 9.7A9 9 0 0 1 8.9 3.5M7.4 5.7l1.5-2.1-2.5-.7M20.7 14.3a9 9 0 0 1-5.6 6.2M16.6 18.3l-1.5 2.1 2.5.7" stroke-width="1.9"/>',
     dois: '<circle cx="8" cy="7.5" r="3"/><circle cx="16.5" cy="7.5" r="3"/><path d="M2.5 20.5c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6"/><path d="M14.5 14.6c.6-.1 1.3-.1 2-.1 3 0 5.5 2.4 5.5 6"/>',
     baixar: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+    todos: '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>',
     seta: '<path d="M6 9l6 6 6-6"/>'
   };
   var INFO = {
@@ -263,6 +264,7 @@
     var barra = el('div', 'filtros'); barra.setAttribute('role', 'group');
     rotulo(barra, 'Filtrar os jogos', 'Filter the games', 'Filtrar los juegos');
     var todos = barra.appendChild(el('button', 'f-bt f-todos')); todos.type = 'button'; todos.setAttribute('aria-pressed', 'true');
+    todos.innerHTML = svg('todos');
     tri(todos.appendChild(el('span', 'f-txt')), 'Todos', 'All', 'Todos');
     var bts = FILTROS.map(function (f) {
       var b = barra.appendChild(el('button', 'f-bt f-' + f[0])); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('data-f', f[0]);
