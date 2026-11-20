@@ -33,16 +33,19 @@
        - larguras em cabeças (larg = quanto a largura do desenho de baixo vira no ombro, na cintura, no quadril e nas
          pernas): adulta com ombros ~1,65, cintura ~1,05 e quadril ~1,45 cabeça; criança quase sem cintura; menino com
          quadril mais estreito que os ombros. A cabeça inteira vai junto, só reduzida. */
+  /* (20/Nov/2026, dono: "grossura do corpo totalmente desproporcional… use a pesquisa do Poki"): cabeça grande como no
+     estilo do Poki (mais perto de 5 cabeças), tronco mais estreito (ombro, busto, cintura e quadril), braços e pernas
+     afinando nas juntas — o corpo deixa de ser largo perto de braços finos */
   var PROPORCAO = {
     // larg: ombro, busto, cintura, quadril, coxa, joelho, panturrilha, tornozelo (curvas femininas; menino em MENINO)
     // (20/Nov/2026, dono, com silhueta de referência medida; ombro feminino: um pouco mais estreito que o quadril): o busto do tamanho do ombro,
     // a cintura ~67% do quadril e tudo em curva contínua (gx) — antes o busto passava do ombro e a cintura fazia quina
     // (20/Nov/2026, dono: "a adulta ainda continua muito esticada… mais natural"): um pouco menos de cabeças e membros
     // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
-    pequena: { cabecas: 4.8, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.92, 0.94, 0.97, 1.04, 0.98, 0.9, 0.94, 0.86] },
-    crianca: { cabecas: 5.8, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.88, 0.9, 0.86, 1.02, 0.98, 0.88, 0.94, 0.84] },
-    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.98, 0.96, 0.8, 1.1, 1.06, 0.86, 0.95, 0.8] },
-    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [1, 1, 0.78, 1.16, 1.12, 0.88, 0.97, 0.8] }
+    pequena: { cabecas: 4.5, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.87, 0.89, 0.92, 0.99, 0.98, 0.9, 0.94, 0.86] },
+    crianca: { cabecas: 5.2, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.82, 0.84, 0.8, 0.95, 0.96, 0.88, 0.94, 0.84] },
+    adolescente: { cabecas: 5.8, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.86, 0.85, 0.71, 0.97, 0.98, 0.84, 0.93, 0.78] },
+    adulta: { cabecas: 6.2, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.88, 0.88, 0.69, 1.02, 1.0, 0.84, 0.94, 0.78] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
@@ -564,7 +567,7 @@
          o braço e a manga viram uma peça só, sem as bolinhas de boneco articulado */
       function duas(d, cor) { return { c: p(d, { fill: cor, stroke: esc(cor, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }), f: p(d, { fill: cor }) }; }
       var manga = tipoManga(), corTop = corDoTopo();
-      var bc = duas(seg(S, E, 11.5 * k, 8.5 * k), pele), ab = duas(seg(E, W, 8.5 * k, 6 * k), pele);
+      var bc = duas(seg(S, E, 12 * k, 8 * k), pele), ab = duas(seg(E, W, 8.2 * k, 5.6 * k), pele);   // braço afina do ombro ao punho
       var cimaC = bc.c, cimaF = bc.f, baixoC = ab.c, baixoF = ab.f;
       if (corTop && manga === 'longa') {
         var mc = duas(seg(S, E, 13 * k, 10 * k), corTop.hex), mb = duas(seg(E, [W[0] - d[0] * 4, W[1] - d[1] * 4], 10 * k, 7.5 * k), corTop.hex);

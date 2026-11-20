@@ -429,7 +429,7 @@ test('silhueta feminina natural (dono, 20/Nov/2026: "dois triângulos… o busto
   assert.ok(!s.includes('M172,393'), 'sem as curvinhas desenhadas no peito');
   // medidas da silhueta de referência: ombro ≥ busto, cintura bem menor que o quadril, e a largura muda em curva
   const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
-  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: 7[^\[]*larg: (\[[^\]]*\])/)[1]);
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
   assert.ok(L[0] >= L[1] && L[2] / L[3] < 0.75 && L[2] / L[3] > 0.6, 'ombro, busto, cintura e quadril');
   assert.match(fonte, /t = t \* t \* \(3 - 2 \* t\)/, 'largura em curva, não em reta');
   const clip = s.match(/<clipPath id="sl-semManga">([\s\S]*?)<\/clipPath>/)[1];
@@ -481,7 +481,7 @@ test('esqueleto em todo desenho de frente, ombros femininos e queixo delicado (d
   assert.match(s, /class="rig-ombro-e"/, 'sem pedir, o desenho de frente já usa o esqueleto (mangas acompanham os braços)');
   assert.doesNotMatch(B.svg({}, { id: 'pr', fundo: false, rig: false }), /rig-ombro/, 'rig: false mantém o braço parado antigo');
   const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
-  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: 7[^\[]*larg: (\[[^\]]*\])/)[1]);
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
   assert.ok(L[0] < L[3], 'ombro mais estreito que o quadril');
   const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
   assert.match(app, /poseRig: poseCartao\(k\)/);
