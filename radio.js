@@ -7,10 +7,8 @@
     alguém tocar ▶ de novo. Com "economia de dados" ligada, não toca sozinha.
   - ⏯ pausa e continua; ⏮ ⏭ trocam; as bolinhas mostram as 10 músicas e escolhem uma.
   - 📺 Clipe (19/Nov/2026) abre o telão do clipe.js: bichinhos dançando a música que está tocando (parada, começa a tocar).
-  - Telinha dos DJs (dono, 20/Nov/2026): uma TV pequena (16:9) presa em cima do tocador, sempre à vista (com a rádio
-    parada os DJs esperam com um ▶ e tocar na telinha liga a música). Dois bichinhos DJ dançando a música (desenho do clipe.js, BolinhoClipe.telinha; vídeo de
-    IA no lugar do desenho: CLIPES_VIDEO.telinha, no clipe.js). Tocar nela abre o telão do Clipe. O ✕ esconde e o aparelho
-    lembra (bolinho:radio:telinha); ela volta ao tocar no botão Clipe. Na TV (?tv= ou navegador de TV) não aparece.
+  - A telinha dos DJs não fica mais aqui (dono, 20/Nov/2026: "é dentro da página do Bolinho FM"): mora no alto da
+    biblioteca (biblioteca.js), que segue também o som desta rádio por window.BolinhoRadio = { audio, musica() }.
   - Cada música baixa só quando vai tocar (preload="none").
   - Ordem sorteada a cada vez que abre, com a favorita (Cool Rock) sempre por último (Trilha.embaralhar; regra do
     dono, 06/Nov/2026: com internet, todas as gravadas; a favorita, que é a de sem internet, nunca é a primeira).
@@ -75,35 +73,7 @@
     // até 48rem, o botão fica compacto (📺 em cima, o nome embaixo) para as bolinhas das músicas continuarem cabendo
     '@media (max-width:47.99rem){.radio .r-clipe{flex-direction:column;gap:1px;padding:0 .25rem;min-width:54px;max-width:62px;font-size:.62rem;line-height:1.05;white-space:normal;text-align:center}.r-clipe .r-tv{width:20px;height:20px}}' +
     '@media (min-width:48rem){.radio{max-width:42rem}}' +
-    // telinha dos DJs: encostada em cima do tocador, centralizada; aparece crescendo de baixo e some devagar
-    '.r-telinha{position:absolute;left:50%;bottom:calc(100% - 2px);width:clamp(150px,50vw,288px);padding:4px 4px 5px;border-radius:16px 16px 7px 7px;' +
-    'background:linear-gradient(160deg,#2f2478,#14103a);border:1.5px solid #4a3d8f;box-shadow:0 -8px 24px rgba(0,0,0,.42),0 0 16px rgba(198,255,61,.18);' +
-    'opacity:0;visibility:hidden;transform:translate(-50%,18px) scale(.88);transform-origin:50% 100%;' +
-    'transition:opacity .35s ease,transform .4s cubic-bezier(.2,.9,.3,1.2),visibility 0s linear .4s}' +
-    '.r-telinha.rt-vis{opacity:1;visibility:visible;transform:translate(-50%,0) scale(1);transition:opacity .35s ease,transform .4s cubic-bezier(.2,.9,.3,1.2),visibility 0s}' +
-    '.radio .rt-tela{display:block;position:relative;width:100%;height:0;padding:56.25% 0 0;border-radius:12px 12px 4px 4px;overflow:hidden;background:#0b0a1f;cursor:pointer}' +
-    '.rt-tela canvas,.rt-tela video{position:absolute;left:0;top:0;width:100%;height:100%;display:block}' +
-    '.rt-tela video{object-fit:cover;opacity:0;transition:opacity .4s}.rt-tela.com-video video{opacity:1}' +
-    '.rt-vivo{position:absolute;left:6px;top:6px;z-index:1;display:inline-flex;align-items:center;gap:4px;padding:2px 7px 2px 6px;border-radius:999px;' +
-    'background:rgba(14,10,40,.74);color:#f3f0ff;font-size:.6rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;line-height:1.3;pointer-events:none}' +
-    '.rt-vivo i{width:7px;height:7px;border-radius:50%;background:#ff4fa3;box-shadow:0 0 6px #ff4fa3;animation:rt-pisca 1.2s ease-in-out infinite}' +
-    '@keyframes rt-pisca{50%{opacity:.3}}' +
-    // parada: um ▶ grande no meio da telinha (tocar liga a rádio); o selo "Ao vivo" e o ampliar só com música
-    '.rt-tocar{position:absolute;left:50%;top:50%;z-index:1;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(14,10,40,.78);color:#c6ff3d;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #c6ff3d,0 4px 14px rgba(0,0,0,.5);pointer-events:none;transition:opacity .3s,transform .3s}' +
-    '.rt-tocar svg{width:24px;height:24px;margin-left:3px}' +
-    '.radio.tocando .rt-tocar{opacity:0;transform:scale(.6)}' +
-    '.radio:not(.tocando) .rt-vivo,.radio:not(.tocando) .rt-amplia{opacity:0}' +
-    '.rt-amplia{position:absolute;right:6px;bottom:6px;z-index:1;width:24px;height:24px;border-radius:50%;background:rgba(14,10,40,.74);color:#c6ff3d;display:flex;align-items:center;justify-content:center;pointer-events:none}' +
-    '.radio .rt-amplia svg,.radio .rt-x svg{width:14px;height:14px;fill:none}' +
-    '.radio .rt-x{position:absolute;right:-8px;top:-8px;z-index:2;width:30px;height:30px;border:1.5px solid #8b80d0;background:#1a1446;box-shadow:0 2px 8px rgba(0,0,0,.4)}' +
-    '.radio .rt-x::before{content:"";position:absolute;left:-7px;top:-7px;right:-7px;bottom:-7px}' +
-    '.rt-aviso{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:max-content;max-width:calc(100vw - 2rem);padding:.45rem .85rem;border-radius:999px;' +
-    'background:#1a1446;border:1.5px solid #c6ff3d;font-size:.82rem;font-weight:700;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.4);opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s linear .3s;pointer-events:none}' +
-    '.rt-aviso.rt-vis{opacity:1;visibility:visible;transition:opacity .3s,visibility 0s}' +
-    // a página ganha espaço embaixo para os últimos cartões subirem acima da telinha
-    'body.com-telinha{padding-bottom:calc(8.5rem + clamp(84px,28vw,164px))!important}' +
-    '@media (prefers-reduced-motion:reduce){.radio.tocando .r-disco{animation:none}.r-titulo{transition:none}' +
-    '.r-telinha,.r-telinha.rt-vis{transform:translate(-50%,0)}.rt-vivo i{animation:none}}';
+    '@media (prefers-reduced-motion:reduce){.radio.tocando .r-disco{animation:none}.r-titulo{transition:none}}';
   var estilo = document.createElement('style');
   estilo.textContent = css;
   document.head.appendChild(estilo);
@@ -130,42 +100,6 @@
     '<button type="button" class="r-clipe" aria-label="' + T('Clipe: os bichinhos dançam a música', 'Music video: the critters dance to the song', 'Videoclip: los bichitos bailan la canción') + '">' +
     '<svg class="r-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="13" rx="2.5"/><path d="M10 8.3v5.4l4.6-2.7z" fill="currentColor"/><path d="M8 21h8"/></svg><span><span class="pt">Clipe</span><span class="en">Music video</span><span class="es">Videoclip</span></span></button>';
   document.body.appendChild(barra);
-
-  // 📺 Telinha dos DJs em cima do tocador (só fora da TV: ?tv= ou navegador de TV, o mesmo teste do kids.js)
-  var CHAVE_TELINHA = 'bolinho:radio:telinha';
-  function telinhaOculta() { try { return localStorage.getItem(CHAVE_TELINHA) === 'oculta'; } catch (e) { return false; } }
-  var naTV = /[?&]tv=/.test(location.search) || /AFT|SMART-?TV|SmartTV|Tizen|Web0S|webOS|NetCast|BRAVIA|Android TV|GoogleTV|CrKey|HbbTV|AppleTV|Roku|Viera|Philips|Hisense|VIDAA/i.test(navigator.userAgent || '');
-  var telinha = null, tela = null, aviso = null, tl = null, tlEspera = 0, avisoEspera = 0;
-  if (!naTV) {
-    telinha = document.createElement('div');
-    telinha.className = 'r-telinha';
-    telinha.innerHTML = '<button type="button" class="rt-tela" aria-label="' + T('Telinha dos DJs: toque para ver o clipe grande', 'DJ screen: tap to see the big music video', 'Pantallita de los DJ: toca para ver el videoclip en grande') + '">' +
-      '<span class="rt-vivo" aria-hidden="true"><i></i><span class="pt">Ao vivo</span><span class="en">Live</span><span class="es">En directo</span></span>' +
-      '<span class="rt-tocar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg></span>' +
-      '<span class="rt-amplia" aria-hidden="true"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></span></button>' +
-      '<button type="button" class="rt-x" aria-label="' + T('Esconder a telinha (volta pelo botão Clipe)', 'Hide the little screen (bring it back with the Music video button)', 'Ocultar la pantallita (vuelve con el botón Videoclip)') + '">' +
-      '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
-    aviso = document.createElement('div');
-    aviso.className = 'rt-aviso';
-    aviso.setAttribute('role', 'status');
-    barra.appendChild(telinha);
-    barra.appendChild(aviso);
-    tela = telinha.querySelector('.rt-tela');
-  }
-  function mostrarTelinha(sim) {
-    if (sim && !tl && window.BolinhoClipe && window.BolinhoClipe.telinha) tl = window.BolinhoClipe.telinha(tela, audio);
-    if (sim && !tl) return;   // sem o clipe.js, nada de telinha
-    telinha.classList.toggle('rt-vis', sim);
-    document.body.classList.toggle('com-telinha', sim);
-    if (tl) { if (sim) tl.ligar(); else tl.desligar(); }
-  }
-  // sempre à vista em cima do tocador (dono, 20/Nov/2026: "não achei o DJ" — só aparecia com a música tocando): parada,
-  // os DJs esperam com um ▶ e tocar na telinha liga a rádio; tocando, eles dançam e tocar abre o telão. Some só pelo ✕.
-  function telinhaAtualizar() {
-    if (!telinha) return;
-    clearTimeout(tlEspera);
-    mostrarTelinha(!telinhaOculta());
-  }
 
   var bPlay = barra.querySelector('.r-play');
   var titulo = barra.querySelector('.r-titulo');
@@ -208,6 +142,10 @@
     if (p && p.catch) p.catch(function () { botaoPlay(); });
   }
 
+  function musicaAtual() { return comecou ? { t: MUSICAS[atual].t, au: MUSICAS[atual].au } : null; }
+  // a tela do DJ do Bolinho FM (biblioteca.js) dança no ritmo desta rádio quando é ela que está tocando
+  window.BolinhoRadio = { audio: audio, musica: musicaAtual };
+
   bPlay.addEventListener('click', function () {
     if (!comecou) { lembrarPausa(false); tocar(atual); return; }
     if (audio.paused) { lembrarPausa(false); var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
@@ -215,23 +153,9 @@
   });
   // 📺 Clipe: com a rádio parada, começa a tocar; o telão (clipe.js) dança a música atual e mostra o nome dela
   barra.querySelector('.r-clipe').addEventListener('click', function () {
-    if (telinhaOculta()) { try { localStorage.removeItem(CHAVE_TELINHA); } catch (e) {} }   // o Clipe traz a telinha de volta
     if (audio.paused) bPlay.click();
-    if (window.BolinhoClipe) window.BolinhoClipe.abrir({ cenas: 'radio', audio: audio,
-      musica: function () { return comecou ? { t: MUSICAS[atual].t, au: MUSICAS[atual].au } : null; } });
-    telinhaAtualizar();
+    if (window.BolinhoClipe) window.BolinhoClipe.abrir({ cenas: 'radio', audio: audio, musica: musicaAtual });
   });
-  if (telinha) {
-    tela.addEventListener('click', function () { if (audio.paused) bPlay.click(); else barra.querySelector('.r-clipe').click(); });
-    telinha.querySelector('.rt-x').addEventListener('click', function () {
-      try { localStorage.setItem(CHAVE_TELINHA, 'oculta'); } catch (e) {}
-      telinhaAtualizar();
-      barra.querySelector('.r-clipe').focus();   // o foco não some junto com a telinha
-      aviso.innerHTML = '<span class="pt">Telinha escondida. Para ela voltar, toque em Clipe.</span><span class="en">Little screen hidden. Tap Music video to bring it back.</span><span class="es">Pantallita oculta. Para que vuelva, toca Videoclip.</span>';
-      aviso.classList.add('rt-vis'); clearTimeout(avisoEspera);
-      avisoEspera = setTimeout(function () { aviso.classList.remove('rt-vis'); }, 4000);
-    });
-  }
   barra.querySelector('.r-ant').addEventListener('click', function () { lembrarPausa(false); tocar(atual - 1); });
   barra.querySelector('.r-prox').addEventListener('click', function () { lembrarPausa(false); tocar(atual + 1); });
   for (var j = 0; j < listaBolinhas.length; j++) {
@@ -240,10 +164,6 @@
 
   audio.addEventListener('play', botaoPlay);
   audio.addEventListener('pause', botaoPlay);
-  audio.addEventListener('playing', telinhaAtualizar);
-  audio.addEventListener('pause', telinhaAtualizar);
-  // a telinha aparece logo que a estante abre (o clipe.js carrega depois deste arquivo)
-  if (document.readyState === 'complete') setTimeout(telinhaAtualizar, 0); else addEventListener('load', telinhaAtualizar);
   audio.addEventListener('playing', function () {
     falhas = 0;
     if (OFF && !guardou && !naFavorita && navigator.onLine !== false) { guardou = true; OFF.guardar(['estante']); }   // guarda a favorita

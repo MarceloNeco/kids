@@ -4,8 +4,9 @@
 // - no H-rraaa, o botão 📺 do menu abre o telão;
 // - as peças estão ligadas: clipe.js no sw.js da estante e no ARQUIVOS do H-rraaa;
 // - nenhum erro no console;
-// - telinha dos DJs (dono, 20/Nov/2026): a TV pequena em cima da rádio fica sempre à vista (parada, ▶ liga a rádio), abre o telão
-//   ao ser tocada, o ✕ esconde e o aparelho lembra (o botão Clipe traz de volta), não cobre o ▶ e não aparece na TV.
+// - tela do DJ (dono, 20/Nov/2026: "é dentro da página do Bolinho FM"): aparece no alto da página do Bolinho FM ao abrir,
+//   fica parada sem música e dança com a música da página e também com a rádio da estante tocando; tocando, tocar nela
+//   abre o telão (e a página continua aberta ao fechar o telão); a barra da rádio não tem mais telinha; não aparece na TV.
 // Rodar da raiz do repositório: node --test teste/clipe.test.js
 const test = require('node:test');
 const assert = require('node:assert');
@@ -32,7 +33,10 @@ test('clipe.js ligado: estante (index.html e sw.js) e H-rraaa (index.html e sw.j
   assert.match(c, /\n    telinha: \[[^\]]*\]\n/, 'lugar para o vídeo de IA da telinha');
   assert.match(ler('sw.js'), /if \(\/\\\.\(mp4\|webm\)\$\/i\.test\(url\.pathname\)\) return;/, 'sw.js da estante deixa o vídeo passar direto (sem gaveta)');
   for (const m of r.matchAll(/\bT\(('[^']*'), ('[^']*')(, '[^']*')?\)/g)) assert.ok(m[3], 'T() sem o espanhol no radio.js: ' + m[0]);
-  assert.ok(r.includes('<span class="pt">Ao vivo</span><span class="en">Live</span><span class="es">En directo</span>'), 'selo da telinha nos três idiomas');
+  assert.ok(!/r-telinha|rt-tela|com-telinha|bolinho:radio:telinha/.test(r), 'a barra da rádio não tem mais telinha');
+  const bib = ler('biblioteca.js');
+  assert.ok(bib.includes('<span class="pt">Ao vivo</span><span class="en">Live</span><span class="es">En directo</span>'), 'selo da tela do DJ nos três idiomas');
+  for (const m of bib.matchAll(/\bT\(('[^']*'), ('[^']*')(, '[^']*')?\)/g)) assert.ok(m[3], 'T() sem o espanhol no biblioteca.js: ' + m[0]);
 });
 
 test('telão: abre pelo 📺 da rádio e do H-rraaa, anima, fecha pelo ✕ e pelo Esc, sem erro no console', async () => {
@@ -106,7 +110,7 @@ test('telão: abre pelo 📺 da rádio e do H-rraaa, anima, fecha pelo ✕ e pel
   } finally { await b.close(); srv.close(); }
 });
 
-test('telinha dos DJs: sempre à vista (parada, ▶ liga a rádio), tocando abre o telão, ✕ esconde e lembra, fora da TV', async () => {
+test('tela do DJ no Bolinho FM: sempre à vista, parada sem música, dança com a música da página e com a rádio, abre o telão, fora da TV', async () => {
   const { chromium } = require('playwright');
   const srv = http.createServer((q, r) => {
     let p = decodeURIComponent(q.url.split('?')[0]);
@@ -121,97 +125,107 @@ test('telinha dos DJs: sempre à vista (parada, ▶ liga a rádio), tocando abre
   const b = await chromium.launch();
   try {
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-    // começa parada (quem pausou antes): a telinha já aparece, com os DJs esperando e um ▶ (dono, 20/Nov/2026: "não achei o DJ")
-    await ctx.addInitScript(() => { localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); localStorage.setItem('bolinho:idioma', 'pt');
-      if (!sessionStorage.getItem('ja')) { sessionStorage.setItem('ja', '1'); localStorage.setItem('bolinho:radio:pausado', '1'); } });
+    // a rádio começa parada (quem pausou antes): a tela do DJ tem que aparecer mesmo assim, com os DJs parados e um ▶
+    await ctx.addInitScript(() => { localStorage.setItem('bolinho:novidades-ocultas', '["*"]'); localStorage.setItem('bolinho:idioma', 'pt'); localStorage.setItem('bolinho:radio:pausado', '1'); });
     await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
     await ctx.route('**/solverone-dados/**', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"recursos":{}}' }));
     const pg = await ctx.newPage();
     const erros = [];
     pg.on('pageerror', (e) => erros.push(e.message));
     pg.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|net::ERR_/.test(m.text())) erros.push(m.text()); });
-    const quadro = () => pg.evaluate(() => { const c = document.querySelector('.rt-tela canvas'), x = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < x.length; i += 53) h = (h * 31 + x[i]) >>> 0; return h; });
-    const visivel = () => pg.locator('.r-telinha').evaluate((e) => e.classList.contains('rt-vis') && getComputedStyle(e).visibility === 'visible');
-    const tocando = () => pg.evaluate(() => document.querySelector('.radio').classList.contains('tocando'));
+    const quadro = () => pg.evaluate(() => { const c = document.querySelector('.bib-tela canvas'), x = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < x.length; i += 53) h = (h * 31 + x[i]) >>> 0; return h; });
+    const mexe = async () => { const a = await quadro(); await pg.waitForTimeout(350); return a !== await quadro(); };
+    const dancando = () => pg.locator('.bib-dj').evaluate((e) => e.classList.contains('tocando'));
+    const opac = (sel) => pg.locator(sel).evaluate((e) => getComputedStyle(e).opacity);
+    const radioTocando = () => pg.evaluate(() => document.querySelector('.radio').classList.contains('tocando'));
 
     await pg.goto(base);
-    await pg.waitForTimeout(600);
-    assert.strictEqual(await pg.locator('.r-telinha').count(), 1, 'a telinha existe');
-    await pg.waitForSelector('.r-telinha.rt-vis', { timeout: 8000 });
-    assert.ok(await visivel(), 'com a rádio parada, a telinha já está à vista');
-    assert.ok(!(await tocando()), 'e a rádio continua parada');
-    assert.ok(await pg.locator('.rt-tocar').evaluate((e) => getComputedStyle(e).opacity === '1'), 'parada: o ▶ aparece no meio da telinha');
+    await pg.waitForTimeout(500);
+    assert.strictEqual(await pg.locator('.r-telinha, .rt-tela').count(), 0, 'a barra da rádio não tem mais telinha');
+    assert.ok(!(await pg.evaluate(() => document.body.classList.contains('com-telinha'))), 'nem o espaço extra embaixo');
+    assert.ok(!(await radioTocando()), 'a rádio está parada');
 
-    // tocar na telinha parada liga a rádio; aí ela fica encostada em cima do tocador, centralizada, sem cobrir o ▶, e dança
-    await pg.click('.r-telinha .rt-tela');
-    await pg.waitForFunction(() => document.querySelector('.radio').classList.contains('tocando'), null, { timeout: 8000 });
-    assert.ok(!(await pg.evaluate(() => BolinhoClipe.aberto())), 'com a rádio parada, o toque na telinha só liga a música (não abre o telão)');
-    await pg.waitForTimeout(700);
-    assert.ok(await visivel(), 'a telinha continua à vista');
-    const tel = await pg.locator('.r-telinha').boundingBox(), radio = await pg.locator('.radio').boundingBox(), play = await pg.locator('.radio .r-play').boundingBox();
-    assert.ok(Math.abs(tel.y + tel.height - radio.y) < 6, 'encostada em cima do tocador: ' + (tel.y + tel.height) + ' x ' + radio.y);
-    assert.ok(Math.abs((tel.x + tel.width / 2) - (radio.x + radio.width / 2)) < 2, 'centralizada no tocador');
-    assert.ok(tel.width >= 150 && tel.width <= 205, 'no celular, entre 150 e 200 px: ' + tel.width);
-    const cruza = (a, c) => a.x < c.x + c.width && c.x < a.x + a.width && a.y < c.y + c.height && c.y < a.y + a.height;
-    assert.ok(!cruza(tel, play), 'a telinha não cobre o ▶');
-    const x = await pg.locator('.r-telinha .rt-x').boundingBox();
-    assert.ok(!cruza(x, play) && x.y + x.height <= radio.y, 'o ✕ também não');
-    const nit = await pg.evaluate(() => { const c = document.querySelector('.rt-tela canvas'); return [c.width, c.clientWidth]; });
+    // abre o Bolinho FM: a tela do DJ logo abaixo do título, larga, 16:9, centralizada
+    await pg.click('#btBiblioteca');
+    await pg.waitForSelector('.bib .bib-dj .bib-tela canvas');
+    assert.ok(await pg.evaluate(() => document.querySelector('.bib-topo').nextElementSibling.classList.contains('bib-dj')), 'logo abaixo do título');
+    const dj = await pg.locator('.bib-dj').boundingBox(), tela = await pg.locator('.bib-tela').boundingBox();
+    assert.ok(await pg.locator('.bib-dj').isVisible(), 'à vista');
+    assert.ok(dj.width >= 390 - 2 * 16 - 2 && dj.width <= 390 - 2 * 16 + 1, 'no celular, a largura da tela menos as margens: ' + dj.width);
+    assert.ok(Math.abs(tela.width / tela.height - 16 / 9) < 0.02, 'tela 16:9: ' + tela.width + 'x' + tela.height);
+    assert.ok(dj.y + dj.height < 844, 'inteira na primeira tela');
+    await pg.waitForTimeout(500);
+    const nit = await pg.evaluate(() => { const c = document.querySelector('.bib-tela canvas'); return [c.width, c.clientWidth]; });
     assert.strictEqual(nit[0], Math.round(nit[1] * 2), 'nítida: pintada com devicePixelRatio 2');
-    const a1 = await quadro(); await pg.waitForTimeout(300); const a2 = await quadro();
-    assert.notStrictEqual(a1, a2, 'os DJs dançam');
 
-    // ⏸: a telinha fica, com o ▶ de novo
-    await pg.click('.radio .r-play');
-    await pg.waitForTimeout(700);
-    assert.ok(await visivel(), 'pausou: a telinha continua à vista');
-    assert.ok(await pg.locator('.rt-tocar').evaluate((e) => getComputedStyle(e).opacity === '1'), 'pausou: o ▶ volta');
-    const p1 = await quadro(); await pg.waitForTimeout(400); const p2 = await quadro();
-    assert.strictEqual(p1, p2, 'pausou: os DJs ficam parados (só mexem com música)');
+    // sem música: DJs parados, ▶ no meio, sem o selo "Ao vivo"
+    assert.ok(!(await dancando()), 'sem música, não está dançando');
+    assert.strictEqual(await opac('.bib-tocar'), '1', 'parada: o ▶ aparece');
+    assert.strictEqual(await opac('.bib-vivo'), '0', 'parada: sem o selo Ao vivo');
+    assert.ok(!(await mexe()), 'sem música, os DJs ficam parados');
 
-    // tocando, tocar na telinha abre o telão (e a telinha descansa enquanto ele está aberto)
-    await pg.click('.radio .r-play');
-    await pg.waitForFunction(() => document.querySelector('.radio').classList.contains('tocando')); await pg.waitForTimeout(600);
-    await pg.click('.r-telinha .rt-tela');
-    await pg.waitForSelector('.clp.aberto canvas');
-    assert.ok(await pg.evaluate(() => BolinhoClipe.aberto()), 'a telinha abriu o telão');
+    // trocar o idioma remonta a página: a mesma tela volta ao lugar (uma só, com um canvas só)
+    await pg.evaluate(() => { window.__dj = document.querySelector('.bib-dj'); BolinhoIdioma.escolher('en'); });
     await pg.waitForTimeout(200);
-    const t1 = await quadro(); await pg.waitForTimeout(300); const t2 = await quadro();
-    assert.strictEqual(t1, t2, 'com o telão aberto, a telinha não desenha');
+    assert.ok(await pg.evaluate(() => document.querySelector('.bib-dj') === window.__dj && document.querySelectorAll('.bib-dj').length === 1 && document.querySelectorAll('.bib-tela canvas').length === 1), 'a mesma tela depois de remontar');
+    assert.ok(await pg.evaluate(() => document.querySelector('.bib-topo').nextElementSibling === window.__dj), 'de volta logo abaixo do título');
+    assert.match(await pg.locator('.bib-tela').getAttribute('aria-label'), /DJ screen/);
+
+    // música da página: dançam, selo Ao vivo
+    await pg.click('.bib li .tocar');
+    await pg.waitForFunction(() => document.querySelector('.bib-dj').classList.contains('tocando'), null, { timeout: 8000 });
+    await pg.waitForTimeout(500);
+    assert.ok(await mexe(), 'com a música da página, os DJs dançam');
+    assert.strictEqual(await opac('.bib-vivo'), '1', 'tocando: selo Ao vivo');
+
+    // tocando, tocar na tela abre o telão por cima da página (e a tela descansa); fechar o telão volta para a página
+    await pg.click('.bib-tela');
+    await pg.waitForSelector('.clp.aberto canvas');
+    assert.ok(await pg.evaluate(() => BolinhoClipe.aberto()), 'a tela do DJ abriu o telão');
+    assert.ok(await pg.evaluate(() => +getComputedStyle(document.querySelector('.clp')).zIndex > +getComputedStyle(document.querySelector('.bib')).zIndex), 'telão por cima da página');
+    assert.match(await pg.textContent('.clp-musica'), /\S/, 'letreiro com a música');
+    await pg.waitForTimeout(200);
+    assert.ok(!(await mexe()), 'com o telão aberto, a tela do DJ não desenha');
+    await pg.click('.clp-x');
+    await pg.waitForTimeout(400);
+    assert.ok(!(await pg.evaluate(() => BolinhoClipe.aberto())), 'o ✕ fechou o telão');
+    assert.ok(await pg.locator('.bib').isVisible(), 'a página do Bolinho FM continua aberta');
+    assert.ok(await mexe(), 'fechou o telão: os DJs voltam a dançar');
+
+    // pausou: parados de novo, com o ▶; tocar na tela parada começa a primeira música da lista
+    await pg.click('.bib li .tocar');
+    await pg.waitForFunction(() => !document.querySelector('.bib-dj').classList.contains('tocando'));
+    await pg.waitForTimeout(400);
+    assert.ok(!(await mexe()), 'pausou: os DJs param');
+    assert.strictEqual(await opac('.bib-tocar'), '1', 'pausou: o ▶ volta');
+    await pg.click('.bib-tela');
+    await pg.waitForFunction(() => document.querySelector('.bib-dj').classList.contains('tocando'), null, { timeout: 8000 });
+    assert.ok(!(await pg.evaluate(() => BolinhoClipe.aberto())), 'parada, o toque na tela só começa a música (não abre o telão)');
+    assert.ok(await pg.locator('.bib li').first().evaluate((e) => e.classList.contains('toca')), 'tocou a primeira música da lista');
+
+    // fecha a página (a música dela para) e liga a rádio da estante: ao abrir o Bolinho FM, os DJs dançam a rádio
+    await pg.click('.bib-x');
+    await pg.click('.radio .r-play');
+    await pg.waitForFunction(() => document.querySelector('.radio').classList.contains('tocando'), null, { timeout: 8000 });
+    await pg.click('#btBiblioteca');
+    await pg.waitForSelector('.bib .bib-dj');
+    await pg.waitForTimeout(600);
+    assert.ok(await dancando(), 'com a rádio tocando, a tela está ao vivo');
+    assert.ok(await mexe(), 'com a rádio tocando, os DJs dançam');
+    await pg.click('.bib-tela');
+    await pg.waitForSelector('.clp.aberto');
+    const nomeRadio = (await pg.textContent('.radio .r-titulo')).trim();
+    assert.ok((await pg.textContent('.clp-musica')).includes(nomeRadio), 'o telão mostra a música da rádio: ' + nomeRadio);
     await pg.keyboard.press('Escape');
     assert.ok(!(await pg.evaluate(() => BolinhoClipe.aberto())), 'o Esc fechou o telão');
-    await pg.waitForTimeout(300);
-    const v1 = await quadro(); await pg.waitForTimeout(300); const v2 = await quadro();
-    assert.notStrictEqual(v1, v2, 'fechou o telão: a telinha volta a dançar');
-
-    // ✕ esconde, avisa como voltar e o aparelho lembra
-    await pg.click('.r-telinha .rt-x');
-    await pg.waitForTimeout(600);
-    assert.ok(!(await visivel()), 'o ✕ escondeu a telinha');
-    assert.ok(await tocando(), 'a música continua');
-    assert.strictEqual(await pg.evaluate(() => localStorage.getItem('bolinho:radio:telinha')), 'oculta');
-    assert.match(await pg.textContent('.rt-aviso'), /Clipe/, 'avisa que volta pelo botão Clipe');
-    await pg.reload();
-    await pg.waitForTimeout(500);
-    if (!(await tocando())) await pg.click('.radio .r-play');
-    await pg.waitForFunction(() => document.querySelector('.radio').classList.contains('tocando'));
-    await pg.waitForTimeout(1000);
-    assert.ok(!(await visivel()), 'depois de recarregar, continua escondida');
-    // o botão Clipe traz de volta
-    await pg.click('.radio .r-clipe');
-    await pg.waitForSelector('.clp.aberto');
-    await pg.keyboard.press('Escape');
-    await pg.waitForSelector('.r-telinha.rt-vis'); await pg.waitForTimeout(600);
-    assert.ok(await visivel(), 'o botão Clipe trouxe a telinha de volta');
-    assert.strictEqual(await pg.evaluate(() => localStorage.getItem('bolinho:radio:telinha')), null);
+    assert.ok(await pg.locator('.bib').isVisible(), 'e a página continua aberta');
 
     // na TV não aparece
     await pg.goto(base + '?tv=auto');
     await pg.waitForTimeout(500);
-    if (!(await tocando())) await pg.click('.radio .r-play');
-    await pg.waitForFunction(() => document.querySelector('.radio').classList.contains('tocando'));
-    await pg.waitForTimeout(800);
-    assert.strictEqual(await pg.locator('.r-telinha').count(), 0, 'na TV não tem telinha');
+    await pg.evaluate(() => document.getElementById('btBiblioteca').click());
+    await pg.waitForTimeout(300);
+    assert.strictEqual(await pg.locator('.bib-dj').count(), 0, 'na TV não tem tela do DJ');
 
     assert.deepStrictEqual(erros, [], 'erro no console');
     await ctx.close();
