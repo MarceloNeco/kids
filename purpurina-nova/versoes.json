@@ -2,6 +2,26 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.7.2",
+      "data": "20/Nov/2026",
+      "hora": "15:27:36",
+      "pt": [
+        "👗 Contorno feminino natural, medido numa silhueta de referência: ombro, busto um pouco menor que o ombro, cintura afinando em curva e quadril redondo, em todos os tipos de corpo. A roupa acompanha a curva, sem quinas nem cortes retos.",
+        "🎨 Sombra das roupas macia (antes eram faixas retas que pareciam um retângulo).",
+        "✋ O braço esticado (apontando) não é mais cortado na borda."
+      ],
+      "en": [
+        "👗 Natural feminine outline, measured from a reference silhouette: shoulders, bust a little narrower than the shoulders, waist curving in and round hips, for every body type. Clothes follow the curve, with no corners or straight cuts.",
+        "🎨 Soft shading on clothes (before, hard stripes looked like a rectangle).",
+        "✋ The outstretched arm (pointing) is no longer cut off at the edge."
+      ],
+      "es": [
+        "👗 Contorno femenino natural, medido en una silueta de referencia: hombros, busto un poco más estrecho que los hombros, cintura que se curva y cadera redonda, en todos los tipos de cuerpo. La ropa sigue la curva, sin esquinas ni cortes rectos.",
+        "🎨 Sombra suave en la ropa (antes eran franjas rectas que parecían un rectángulo).",
+        "✋ El brazo estirado (señalando) ya no se corta en el borde."
+      ]
+    },
+    {
       "versao": "0.7.1",
       "data": "20/Nov/2026",
       "hora": "14:51:10",
