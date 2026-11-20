@@ -7,7 +7,7 @@
   Este endereço (/kids/sw.js) é o mesmo da antiga página /kids do Portal: quem já tinha, atualiza sozinho.
   A cada mudança na estante, suba a VERSAO.
 */
-var VERSAO = 82;
+var VERSAO = 83;
 var PASTA = (self.registration.scope.replace(/\/$/, '').split('/').pop() || 'raiz');
 var PREFIXO = 'dgo-' + PASTA + '-';
 var CACHE = PREFIXO + 'v' + VERSAO;
