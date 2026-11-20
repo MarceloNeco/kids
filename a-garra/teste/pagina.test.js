@@ -42,8 +42,11 @@ async function abrir(ctxOp, busca) {
   return pg;
 }
 const est = pg => pg.evaluate(() => GarraDebug.estado());
+// no celular em pé a máquina e o nível ficam em duas etapas (Nível ▶); no resto, tudo numa tela
 async function jogar(pg, maquina, nivel) {
-  await pg.click(`[data-maquina="${maquina}"]`); await pg.click(`[data-nivel="${nivel}"]`); await pg.click('#btJogar');
+  await pg.click(`[data-maquina="${maquina}"]`);
+  if (await pg.isVisible('#btProximo')) await pg.click('#btProximo');
+  await pg.click(`[data-nivel="${nivel}"]`); await pg.click('#btJogar');
   await pg.waitForFunction(() => GarraDebug.estado().fase === 'mirar', null, { timeout: 20000 });
 }
 // segura uma seta da tela por um tempo
@@ -216,13 +219,29 @@ test('máquinas gigantes: introdução com a menininha ao lado (o relógio esper
   } finally { await pg.ctx.close(); }
 });
 
-test('Voltar do celular e 🏠 voltam ao menu', async () => {
+test('Voltar do celular e 🏠 voltam ao menu; na etapa 2 o Voltar volta para a etapa 1', async () => {
   const pg = await abrir(FONE, '&semente=2');
   try {
     await pg.click('#btJogar');
     await pg.waitForSelector('.bolinho-nav .bn-casa:not([hidden])');
     await pg.goBack();
     await pg.waitForFunction(() => GarraDebug.estado().tela === 'menu');
+    // etapa 2 (Nível): o Voltar do celular volta para a etapa 1 (Máquina), sem sair do jogo; o ◀ da tela também
+    await pg.click('#btProximo');
+    assert.equal(await pg.isVisible('[data-nivel="medio"]'), true);
+    assert.equal(await pg.isVisible('[data-maquina="neon"]'), false);
+    await pg.goBack();
+    await pg.waitForFunction(() => GarraDebug.estado().etapa === 1);
+    assert.equal(await pg.isVisible('[data-maquina="neon"]'), true);
+    assert.ok(pg.url().includes('/a-garra/'), 'continua no jogo');
+    await pg.click('#btProximo'); await pg.click('#btAnterior');
+    await pg.waitForFunction(() => GarraDebug.estado().etapa === 1);
+    // da etapa 2 para o jogo e o Voltar: menu na etapa 1
+    await pg.click('#btProximo'); await pg.click('#btJogar');
+    await pg.waitForFunction(() => GarraDebug.estado().tela === 'jogo');
+    await pg.goBack();
+    await pg.waitForFunction(() => GarraDebug.estado().tela === 'menu' && GarraDebug.estado().etapa === 1);
+    await pg.click('#btProximo');
     await pg.click('#btColecao');
     assert.equal(await pg.isVisible('#colecao'), true);
     await pg.click('.bolinho-nav .bn-casa');
@@ -245,6 +264,7 @@ test('três idiomas, escolhidos na estante: nome, botões e prêmios no idioma c
       assert.equal(await pg.$eval('#logo span:first-child', (el) => el.className + ':' + el.textContent), 'h:H', 'o H é o colorido');
       assert.equal(await pg.title(), 'H-rraaa — Bolinho de Chuva · SolverONE');
       assert.equal(await pg.textContent('#btPegar .so-garra'), pegar);
+      await pg.click('#btProximo');
       await pg.click('#btColecao');
       assert.ok((await pg.textContent('#prateleira')).includes(premio), cod + ': prêmio com o nome no idioma');
     } finally { await ctx.close(); }
@@ -304,6 +324,45 @@ test('contagem dos 10 últimos segundos: número no canto de cima à direita, se
       await pg.evaluate(() => GarraDebug.velocidade(3));
       await pg.waitForFunction(() => document.getElementById('contagemNum').textContent === '0' && !document.getElementById('contagem').hidden, null, { timeout: 20000 });
       assert.notEqual((await est(pg)).fase, 'mirar', onde + ': a garra desceu sozinha');
+      assert.deepEqual(pg.erros, []);
+    } finally { await pg.ctx.close(); }
+  }
+});
+
+test('menu: o ▶ Jogar! sempre à vista sem rolar; no celular em pé, duas etapas (Máquina · Nível) que cabem na tela', async () => {
+  const dentro = (pg, sel) => pg.$eval(sel, (e) => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight + 0.5 && r.right <= innerWidth + 0.5 && r.height > 0; });
+  const naoRola = (pg) => pg.evaluate(() => { const mn = document.getElementById('menu'), c = document.getElementById('menuCorpo'); return scrollY === 0 && mn.scrollHeight <= mn.clientHeight + 1 && document.documentElement.scrollHeight <= innerHeight + 1 && c.scrollHeight <= c.clientHeight + 1; });
+  for (const [w, h] of [[360, 740], [390, 844]]) {
+    const pg = await abrir({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 }, '&semente=2');
+    const onde = w + '×' + h;
+    try {
+      // etapa 1: as 8 máquinas inteiras, o Jogar e o "Nível ▶" à vista, sem rolar
+      assert.equal(await pg.textContent('#passoTexto'), '1 de 2', onde);
+      assert.ok(await naoRola(pg), onde + ': etapa 1 rola');
+      for (const sel of ['#btJogar', '#btProximo', ...['telefone', 'neon', 'estrelas', 'lanchonete', 'bichos', 'gigantes', 'tesoura', 'festas'].map((q) => `[data-maquina="${q}"]`)]) assert.ok(await dentro(pg, sel), onde + ': etapa 1, fora da tela: ' + sel);
+      assert.equal(await pg.isVisible('[data-nivel="facil"]'), false, onde + ': o nível fica na etapa 2');
+      assert.match(await pg.textContent('#btProximo'), /Fácil/, onde + ': o botão da etapa 2 mostra o nível de agora');
+      // etapa 2: os níveis, a coleção e o Jogar à vista, sem rolar
+      await pg.click('[data-maquina="neon"]'); await pg.click('#btProximo');
+      assert.equal(await pg.textContent('#passoTexto'), '2 de 2', onde);
+      assert.ok(await naoRola(pg), onde + ': etapa 2 rola');
+      for (const sel of ['#btJogar', '#btAnterior', '#btColecao', '[data-nivel="facil"]', '[data-nivel="medio"]', '[data-nivel="dificil"]']) assert.ok(await dentro(pg, sel), onde + ': etapa 2, fora da tela: ' + sel);
+      // o Jogar usa o que foi escolhido nas etapas
+      await pg.click('[data-nivel="medio"]'); await pg.click('#btJogar');
+      await pg.waitForFunction(() => GarraDebug.estado().fase === 'mirar', null, { timeout: 20000 });
+      const e = await est(pg);
+      assert.equal(e.maquina, 'neon'); assert.equal(e.nivel, 'medio');
+      assert.deepEqual(pg.erros, []);
+    } finally { await pg.ctx.close(); }
+  }
+  // deitado, tablet e computador: tudo numa tela só (sem etapas), com o Jogar à vista e sem rolar
+  for (const [vp, movel] of [[{ width: 740, height: 360 }, true], [{ width: 915, height: 412 }, true], [{ width: 820, height: 1180 }, true], [PC.viewport, false]]) {
+    const pg = await abrir({ viewport: vp, hasTouch: movel, isMobile: movel, deviceScaleFactor: 1 }, '&semente=2');
+    const onde = vp.width + '×' + vp.height;
+    try {
+      assert.equal(await pg.isVisible('#passos'), false, onde + ': sem etapas');
+      assert.ok(await naoRola(pg), onde + ': o menu rola');
+      for (const sel of ['#btJogar', '#btColecao', '[data-maquina="telefone"]', '[data-maquina="festas"]', '[data-nivel="dificil"]']) assert.ok(await dentro(pg, sel), onde + ': fora da tela: ' + sel);
       assert.deepEqual(pg.erros, []);
     } finally { await pg.ctx.close(); }
   }

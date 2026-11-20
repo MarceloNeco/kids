@@ -2,6 +2,23 @@
   "app": "a-garra",
   "versoes": [
     {
+      "versao": "0.5.5",
+      "data": "20/Nov/2026",
+      "hora": "16:36:00",
+      "pt": [
+        "▶ No celular em pé, o botão Jogar fica sempre à vista, sem rolar a tela: as escolhas viraram duas etapas curtas (1 Máquina, 2 Nível), com \"1 de 2\" e os botões Nível ▶ e ◀ Máquina; o Voltar do celular volta uma etapa",
+        "📱 Com o celular deitado, o menu ficou em duas colunas: as máquinas à esquerda e o nível, o Jogar e a coleção à direita, tudo à vista"
+      ],
+      "en": [
+        "▶ On a phone held upright, the Play button is always in sight, no scrolling: the choices are now two short steps (1 Machine, 2 Level), with \"1 of 2\" and the Level ▶ and ◀ Machine buttons; the phone's Back button goes back one step",
+        "📱 With the phone sideways, the menu is now in two columns: the machines on the left and the level, Play and the collection on the right, all in sight"
+      ],
+      "es": [
+        "▶ Con el móvil en vertical, el botón Jugar está siempre a la vista, sin desplazar la pantalla: las opciones ahora son dos pasos cortos (1 Máquina, 2 Nivel), con \"1 de 2\" y los botones Nivel ▶ y ◀ Máquina; el botón Atrás del móvil vuelve un paso",
+        "📱 Con el móvil en horizontal, el menú queda en dos columnas: las máquinas a la izquierda y el nivel, Jugar y la colección a la derecha, todo a la vista"
+      ]
+    },
+    {
       "versao": "0.5.4",
       "data": "20/Nov/2026",
       "hora": "13:50:20",

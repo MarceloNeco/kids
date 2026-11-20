@@ -26,7 +26,8 @@ const JOGOS = {
   'quem-e': [[], '#btBlue'],
   jogoteca: [[], '#btJogar'],
   'fruta-podre': [[], '#btJogar'],
-  tijolaco: [[], '#btJogar']
+  tijolaco: [[], '#btJogar'],
+  'a-garra': [[], '#btJogar']
 };
 
 function servidor() {

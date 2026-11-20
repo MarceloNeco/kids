@@ -6,7 +6,7 @@ import * as THREE from './libs/three.module.js';
 import { MAQUINAS, NOMES, FESTA, criarPremio, animar } from './premios3d.js';
 import { montarMaquina, montarTesoura, MEDIDAS_TESOURA } from './cenario3d.js';
 
-const APP_VERSION = '0.5.4', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
+const APP_VERSION = '0.5.5', APP_DATA = ['20/Nov/2026', 'Nov/20/2026', '20/nov/2026'];
 const $ = (id) => document.getElementById(id);
 const BUSCA = location.search;
 const TESTE = /[?&]teste\b/.test(BUSCA);
@@ -63,7 +63,7 @@ function traduzir() {
   [...LOGO].forEach((c, k) => { const s = document.createElement('span'); if (c === '-') s.className = 'sep'; else if (!k) s.className = 'h'; s.textContent = c; logo.appendChild(s); });
   document.title = LOGO + ' — Bolinho de Chuva · SolverONE';
   $('versao').textContent = t('Versão ', 'Version ', 'Versión ') + APP_VERSION + ' · ' + APP_DATA[i];
-  pintarMenu();
+  pintarMenu(); pintarEtapa();
   if (telaAtual === 'colecao') pintarColecao();
 }
 
@@ -83,6 +83,7 @@ function pintarMenu() {
   IDS.forEach((id) => { const n = quantos(id); document.querySelector('[data-col="' + id + '"]').textContent = n ? '🧸 ' + n + '/' + todosDe(id).length : ''; });
   const total = IDS.reduce((s, id) => s + quantos(id), 0), max = IDS.reduce((s, id) => s + todosDe(id).length, 0);
   $('colecaoConta').textContent = total ? total + '/' + max : '';
+  $('nivelAtual').textContent = document.querySelector('#niveis [aria-checked="true"]').textContent;   // o nível de agora, no botão da etapa 2
 }
 document.querySelectorAll('#maquinas [data-maquina]').forEach((b) => b.addEventListener('click', () => { pref.maquina = b.getAttribute('data-maquina'); salvarPref(); pintarMenu(); Som.toque(); }));
 document.querySelectorAll('#niveis [data-nivel]').forEach((b) => b.addEventListener('click', () => { pref.nivel = b.getAttribute('data-nivel'); salvarPref(); pintarMenu(); Som.toque(); }));
@@ -129,6 +130,27 @@ function telaCheia() {   // tela cheia no celular e no tablet (no botão de come
     if (pedir && matchMedia('(pointer: coarse)').matches && !document.fullscreenElement) { const p = pedir.call(el); if (p && p.catch) p.catch(() => {}); }
   } catch (e) { /* sem tela cheia */ }
 }
+/* ---------- etapas do menu (dono, 20/Nov/2026: "o jogar tem que estar sempre lá") ----------
+   No celular em pé (o mesmo critério do estilo.css) as escolhas viram duas etapas, 1 Máquina · 2 Nível, e o ▶ Jogar!
+   fica sempre à vista. A etapa 2 entra no histórico como uma tela de dentro: o Voltar do celular volta para a etapa 1. */
+const EM_PE = matchMedia('(orientation: portrait) and (max-width: 759.98px)');
+let etapa = 1;
+function pintarEtapa() {
+  $('menu').classList.toggle('etapa-2', etapa === 2);
+  $('passoTexto').textContent = t(etapa + ' de 2', etapa + ' of 2', etapa + ' de 2');
+}
+const sumiu = (el) => !el || el === document.body || !el.offsetParent || getComputedStyle(el).visibility === 'hidden';
+function irEtapa(n) {
+  if (n === etapa) return;
+  if (n === 1 && empurrado) { history.back(); return; }   // o popstate volta para a etapa 1
+  etapa = n; pintarEtapa();
+  if (n === 2 && !empurrado) { try { history.pushState({ garra: 1 }, ''); empurrado = true; } catch (e) { /* sem histórico */ } }
+  // o foco estava no botão que sumiu (teclado): vai para a escolha marcada da etapa nova
+  if (sumiu(document.activeElement)) document.querySelector(n === 2 ? '#niveis [aria-checked="true"]' : '#maquinas [aria-checked="true"]').focus({ preventScroll: true });
+}
+$('btProximo').addEventListener('click', () => { Som.toque(); irEtapa(2); });
+$('btAnterior').addEventListener('click', () => { Som.toque(); irEtapa(1); });
+EM_PE.addEventListener('change', () => { if (!EM_PE.matches && telaAtual === 'menu') irEtapa(1); });   // deitou o celular: tudo numa tela só
 $('btJogar').addEventListener('click', () => { Som.acordar(); telaCheia(); entrar('jogo'); novaPartida(); });
 $('btColecao').addEventListener('click', () => { Som.toque(); entrar('colecao'); colecaoAba = pref.maquina; pintarColecao(); });
 $('btColecaoJogar').addEventListener('click', () => { Som.acordar(); mostrar('jogo'); novaPartida(); });
@@ -136,8 +158,8 @@ $('btColecaoJogar').addEventListener('click', () => { Som.acordar(); mostrar('jo
 /* ---------- telas de dentro e Voltar do celular ---------- */
 let empurrado = false;
 function entrar(id) { mostrar(id); if (!empurrado) { try { history.pushState({ garra: 1 }, ''); empurrado = true; } catch (e) { /* sem histórico */ } } }
-function irMenu() { fecharFim(); parar(); m = null; mostrar('menu'); pintarMenu(); }
-window.addEventListener('popstate', () => { empurrado = false; if (telaAtual !== 'menu') irMenu(); });
+function irMenu() { fecharFim(); parar(); m = null; mostrar('menu'); etapa = 1; pintarEtapa(); pintarMenu(); }
+window.addEventListener('popstate', () => { empurrado = false; if (telaAtual !== 'menu') irMenu(); else if (etapa === 2) irEtapa(1); });
 function voltarMenu() { if (empurrado) history.back(); else irMenu(); }
 // navegação padrão (../navegacao.js): 🏠 Início = voltar ao menu (o mesmo do Voltar do celular), 🚪 Saída
 if (window.BolinhoNav) window.BolinhoNav.iniciar({ jogo: 'a-garra', noInicio: () => telaAtual === 'menu', irParaInicio: voltarMenu,
@@ -527,7 +549,7 @@ comecar();
 if (TESTE) window.GarraDebug = {
   pronto: true, versao: APP_VERSION, festa: FESTA,
   estado() {
-    if (!m) return { tela: telaAtual };
+    if (!m) return { tela: telaAtual, etapa };
     return { tela: telaAtual, fase: m.fase, fichas: m.fichas, tempo: m.tempo, nivel: m.nivel, maquina: pref.maquina, x: m.garra ? m.garra.x : m.x, z: m.garra ? m.garra.z : 0, ganhos: m.ganhos.slice(),
       semGanhar: m.semGanhar, fim: !$('fim').hidden, premios: m.premios ? m.premios.filter((p) => !p.ganho).length : 1, fio: m.fioX ? m.fioX() : null };
   },

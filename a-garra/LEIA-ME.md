@@ -48,6 +48,14 @@ o botão PEGAR vira GRAB · COGER.
     balança (mais no difícil) e a folga para acertar diminui. Cortou: o alçapão abre, o boneco cai e aparece na portinha;
     vem outro boneco. Sem setas nessa máquina. Bonecos: ursa de vestido, coelha de macacão, leão jubudo, panda de gorro,
     sapo rei; raro: ursa dourada.
+- **Menu em etapas** (0.5.5; dono, 20/Nov/2026: "o jogar tem que estar sempre lá, disponível com alguma opção padrão,
+  visível"): no **celular em pé** o menu não rola. As escolhas são duas etapas curtas — **1 Máquina** (as 8 máquinas numa
+  grade de 2 × 4) e **2 Nível** (os três níveis e a 🧸 coleção) —, com "1 de 2", os botões **Nível: Fácil ▶** e
+  **◀ Máquina** e o **▶ Jogar!** sempre embaixo, com a escolha da última vez (dá para jogar sem passar pela etapa 2). O
+  Voltar do celular na etapa 2 volta para a etapa 1 (ela entra no histórico como uma tela de dentro). Embaixo do Jogar
+  fica o lugar do tocador de música. **Celular deitado**: duas colunas, máquinas à esquerda e nível, Jogar e coleção à
+  direita. **Tablet, computador e TV**: tudo numa tela, como antes. O critério do "em pé" (retrato e até 759 px de
+  largura) está igual no `estilo.css` e no `app.js` (`EM_PE`). Teste: "menu: o ▶ Jogar! sempre à vista" em `teste/pagina.test.js`.
 - **Controle**: ⬅ ➡ para os lados, ⬆ para o fundo, ⬇ para a frente (segurar), e **PEGAR**. Também dá para **tocar no
   prêmio** que você quer (a garra vai até ele). No computador: setas e espaço.
 - **Sortido**: cada partida tem outra mistura (cada tipo pelo menos uma vez, o resto sorteado), outro total, outro formato de
