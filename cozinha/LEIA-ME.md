@@ -7,7 +7,7 @@ certos. No fim aparece a **receita da família**, com estrelas. Sem login, e **s
 
 Endereço: https://solverone.com.br/kids/cozinha/
 
-Versão atual: **0.12.0** (14/Nov/2026) — **cidade em 3D de verdade** (`cidade3d.js`, three.js em `libs/`, módulo ES): 10
+Versão atual: **0.12.5** (20/Nov/2026) — **jogar sempre à vista** (dono: "o jogar tem que estar sempre lá, com alguma opção padrão, visível"; "celular está muito ruim" de tanto rolar): no menu, o **▶ Cozinhar** (`#btCozinhar`) abre a receita da última vez (`pref.rec`; sem ela, a primeira), e o cartão dela ganha ▶ e fundo verde (`.rec.escolhida`); tocar num cartão continua abrindo a receita direto. No celular, em pé e deitado, o menu cabe na tela sem rolar a página: níveis numa fileira curtinha (a explicação do escolhido em `#nivelTexto`), receitas numa fileira dupla (deitado, uma) que corre para o lado, ❓ abre por cima. Tablet e computador continuam com a grade; o ▶ Cozinhar fica preso embaixo se a página rolar. Na ficha, o 🧺 Vamos buscar! também fica preso embaixo. Não usamos a roda (`../carrossel.js`): com 15 receitas ela fica apertada e a receita da vez mudaria sozinha a cada 3 s. Antes — Versão **0.12.0** (14/Nov/2026) — **cidade em 3D de verdade** (`cidade3d.js`, three.js em `libs/`, módulo ES): 10
 lugares montados em código com luz e sombra, ruas com carros, fumaça, cata-vento, galinhas; girar com o dedo ou ⟲ ⟳, zoom
 com dois dedos; o cozinheirinho anda pela rua até a porta (`Cidade3D.andar`); os nomes são os botões `data-lugar` postos em
 cima de cada prédio. Sem WebGL (ou com `?vila2d`, e nos testes sem `&vila3d`) fica a vila desenhada de antes. **Janela do
@@ -227,6 +227,7 @@ leva cerca de 4 minutos).
   ou utensílio inteiro na tela fica embaixo dela (na cozinha, em todas as posições da rolagem); **celular deitado**
   915 × 412 e 844 × 390: entrada, menu, ficha, vila, os 7 lugares, cozinha e pronto cabem, sem rolar para o lado, com
   os botões principais na tela (acima da cesta).
+- `menu.test.js` (v0.12.5) — em 360 × 740, 390 × 844, 740 × 360 e 915 × 412 (celular) o menu não rola a página, os 3 níveis e o ▶ Cozinhar ficam dentro da tela (também depois de trocar o nível e com o ❓ aberto), as receitas correm para o lado, o ▶ Cozinhar abre a primeira receita e depois a última escolhida, e o 🧺 Vamos buscar! da ficha fica à vista; no computador o ▶ Cozinhar continua à vista ao rolar e abre com Enter; ▶ Cook / ▶ Cocinar em inglês e espanhol.
 - `lojas.test.js` (v0.10.0) — onde se compra cada coisa, o pão contando nas moedas, a jaboticabeira; no Médio compra pão na padaria e tomate na feira com moedas; no Fácil colhe jabuticabas no tronco.
 - `familia.test.js` (v0.8.0) — no Médio, chamar 3 pessoas dobra as quantidades e as moedas, o 5º entra no lugar do 1º, a escolha fica guardada, o passo da cozinha fala as quantidades da família e no fim os 3 comem com a foto do prato; no Fácil cabem 2 e, sozinho, ninguém aparece à mesa.
 - `vila.test.js` (v0.7.0) — cada lugar com o seu bloquinho; ruas; o cozinheirinho começa na porta de casa; faixa da missão e seta (Médio), sem seta no Difícil; ele anda com movimento (sai do lugar, pernas mexendo, entra) e entra direto com movimento reduzido; missão fluida no Fácil (segue sozinho para o próximo lugar e para casa) e no Difícil só volta à vila.

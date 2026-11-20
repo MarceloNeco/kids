@@ -2,6 +2,26 @@
   "app": "cozinha",
   "versoes": [
     {
+      "versao": "0.12.5",
+      "data": "20/Nov/2026",
+      "hora": "16:41:00",
+      "pt": [
+        "▶ O botão Cozinhar fica sempre à vista no menu, já com a receita da última vez: é só tocar para brincar.",
+        "📱 No celular a escolha cabe na tela sem rolar: os níveis numa fileira curtinha e as receitas numa fileira que corre para o lado.",
+        "🧺 Na ficha da receita, o Vamos buscar! fica sempre à vista, preso embaixo da tela."
+      ],
+      "en": [
+        "▶ The Cook button is always in sight on the menu, already set to the last recipe: just tap it to play.",
+        "📱 On phones the choice fits on the screen with no scrolling: the levels in a short row and the recipes in a row you swipe sideways.",
+        "🧺 On the recipe card, Let's go get them! is always in sight, pinned to the bottom of the screen."
+      ],
+      "es": [
+        "▶ El botón Cocinar está siempre a la vista en el menú, ya con la receta de la última vez: solo tienes que tocarlo para jugar.",
+        "📱 En el móvil la elección cabe en la pantalla sin bajar: los niveles en una fila cortita y las recetas en una fila que se desliza hacia el lado.",
+        "🧺 En la ficha de la receta, ¡Vamos a buscarlos! está siempre a la vista, fijo abajo en la pantalla."
+      ]
+    },
+    {
       "versao": "0.12.4",
       "data": "15/Nov/2026",
       "hora": "11:30:00",
