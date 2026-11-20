@@ -327,9 +327,10 @@ test('Nova Era em ilustração (dono, 19/Nov/2026): olho amendoado com pálpebra
 test('Nova Era sem 3D e com corpo de moda (dono, 19/Nov/2026: "não seria 3D"; pesquisa do Poki)', () => {
   const s = B.svg(Object.assign(V.novo(), { idade: 'adulta' }), { id: 'm', fundo: false });
   assert.equal(bemFormado(s), '');
-  // sem degradê redondo de volume (o "plástico" 3D): a sombra e a luz são faixas de corte reto
+  // sem degradê redondo de volume (o "plástico" 3D): sombra e luz são lineares, de lado a lado (20/Nov/2026: macias, sem a
+  // borda dura que desenhava um retângulo na roupa)
   assert.doesNotMatch(s, /<radialGradient id="m-(vol|pele|volCab|volRosto)"/);
-  assert.match(s, /<linearGradient id="m-vol"[^>]*><stop offset=".74" stop-color="#7a5ba8" stop-opacity="0"\/><stop offset=".74"/);
+  assert.match(s, /<linearGradient id="m-vol"[^>]*><stop offset=".55" stop-color="#7a5ba8" stop-opacity="0"\/><stop offset="1"/);
   // a cabeça fica pequena (corpo de moda): a adulta tem bem mais cabeças de altura que a criancinha
   const escalaCabeca = (idade) => +B.svg(Object.assign(V.novo(), { idade }), { id: 'k', fundo: false }).match(/translate\(200 [\d.]+\) scale\(([\d.]+)\) translate\(-200/)[1];
   assert.ok(escalaCabeca('adulta') < 0.5 && escalaCabeca('pequena') > escalaCabeca('adulta'));
@@ -426,6 +427,11 @@ test('placa de entrada da Baladinha (dono, 20/Nov/2026)', () => {
 test('silhueta feminina natural (dono, 20/Nov/2026: "dois triângulos… o busto saindo pros lados… sovaco aparecendo")', () => {
   const s = B.svg({ blusa: 'camiseta', idade: 'adulta' }, { id: 'sl', rig: true, fundo: false });
   assert.ok(!s.includes('M172,393'), 'sem as curvinhas desenhadas no peito');
+  // medidas da silhueta de referência: ombro ≥ busto, cintura bem menor que o quadril, e a largura muda em curva
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: 7[^\[]*larg: (\[[^\]]*\])/)[1]);
+  assert.ok(L[0] >= L[1] && L[2] / L[3] < 0.75 && L[2] / L[3] > 0.6, 'ombro, busto, cintura e quadril');
+  assert.match(fonte, /t = t \* t \* \(3 - 2 \* t\)/, 'largura em curva, não em reta');
   const clip = s.match(/<clipPath id="sl-semManga">([\s\S]*?)<\/clipPath>/)[1];
   assert.match(clip, /^<path d="/, 'o recorte do meio é um caminho que segue o corpo, não um retângulo');
   // a borda do recorte faz curva: mais larga no busto que na cintura

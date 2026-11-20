@@ -35,12 +35,14 @@
          quadril mais estreito que os ombros. A cabeça inteira vai junto, só reduzida. */
   var PROPORCAO = {
     // larg: ombro, busto, cintura, quadril, coxa, joelho, panturrilha, tornozelo (curvas femininas; menino em MENINO)
+    // (20/Nov/2026, dono, com silhueta de referência medida): o ombro é o mais largo, o busto um pouco menor que o ombro,
+    // a cintura ~67% do quadril e tudo em curva contínua (gx) — antes o busto passava do ombro e a cintura fazia quina
     // (20/Nov/2026, dono: "a adulta ainda continua muito esticada… mais natural"): um pouco menos de cabeças e membros
     // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
     pequena: { cabecas: 4.8, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.92, 0.94, 0.97, 1.04, 0.98, 0.9, 0.94, 0.86] },
     crianca: { cabecas: 5.8, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.88, 0.9, 0.86, 1.02, 0.98, 0.88, 0.94, 0.84] },
-    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.88, 1.02, 0.72, 1.14, 1.04, 0.86, 0.95, 0.8] },
-    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.9, 1.1, 0.72, 1.2, 1.08, 0.88, 0.97, 0.8] }
+    adolescente: { cabecas: 6.5, topo: 76, ombro: 1.36, quadril: 3.15, larg: [1.1, 0.96, 0.8, 1.1, 1.06, 0.86, 0.95, 0.8] },
+    adulta: { cabecas: 7, topo: 64, ombro: 1.38, quadril: 3.4, larg: [1.15, 1, 0.78, 1.16, 1.12, 0.88, 0.97, 0.8] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
@@ -84,9 +86,16 @@
     }
     // largura: a cabeça (e o que fica na altura dela, como a mão no cabelo) reduz junto; do ombro para baixo, normal
     var X = [[queixo, s], [342, L[0]], [378, L[1]], [425, L[2]], [466, L[3]], [515, L[4]], [552, L[5]], [588, L[6]], [626, L[7]], [646, 0.95]];
+    /* entre um ponto e outro a largura muda em CURVA, não em linha reta (dono, 20/Nov/2026: "retângulo, triângulo de
+       corte… não tem contorno natural"): com a reta, o contorno virava retas com quinas (um "V" na cintura); com a curva
+       (suave nas pontas), busto, cintura e quadril ficam redondos, como uma silhueta de verdade */
     function gx(y) {
       if (y <= X[0][0]) return s;
-      for (var i = 1; i < X.length; i++) if (y <= X[i][0]) { var a = X[i - 1], b = X[i]; return a[1] + (y - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); }
+      for (var i = 1; i < X.length; i++) if (y <= X[i][0]) {
+        var a = X[i - 1], b = X[i], t = (y - a[0]) / (b[0] - a[0]);
+        if (i > 1) t = t * t * (3 - 2 * t);   // do queixo ao ombro continua reto (pescoço)
+        return a[1] + (b[1] - a[1]) * t;
+      }
       return 0.95;
     }
     return { s: s, traco: 1, braco: tipo.b, queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
@@ -759,7 +768,8 @@
         out = ['<g filter="url(#' + I + 'desf)">' + cen + '</g>' + ret(0, 0, W, H, { fill: 'url(#' + I + 'luzE)' }), '<g filter="url(#' + I + 'somb)">' + out.join('') + '</g>'];
       }
       return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + area.join(' ') + '"' + (w ? ' width="' + w + '" height="' + h + '"' : '') +
-        ' preserveAspectRatio="xMidYMid ' + (op.cortar ? 'slice' : 'meet') + '"><defs>' + defs + '</defs>' + out.join('') + '</svg>';
+        // sem cenário, o braço que estica (apontando, tchau) não é cortado na borda do desenho
+        ' preserveAspectRatio="xMidYMid ' + (op.cortar ? 'slice' : 'meet') + '"' + (fundo || op.soFundo ? '' : ' overflow="visible"') + '><defs>' + defs + '</defs>' + out.join('') + '</svg>';
     }
   }
 
@@ -782,12 +792,12 @@
       // Nova Era (ilustração 2D, sem volume 3D): pele de cor lisa
       '<linearGradient id="' + I + 'pele"><stop offset="0" stop-color="' + pele + '"/><stop offset="1" stop-color="' + pele + '"/></linearGradient>' +
       // luz de desenho: uma faixa de luz de corte reto do lado esquerdo (a luz vem de cima, à esquerda)
-      '<linearGradient id="' + I + 'lado" x1="0" y1="0" x2="1" y2="0"><stop offset=".1" stop-color="#fff" stop-opacity="0"/><stop offset=".1" stop-color="#fff" stop-opacity=".22"/><stop offset=".2" stop-color="#fff" stop-opacity=".22"/><stop offset=".2" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+      '<linearGradient id="' + I + 'lado" x1="0" y1="0" x2="1" y2="0"><stop offset=".04" stop-color="#fff" stop-opacity="0"/><stop offset=".2" stop-color="#fff" stop-opacity=".2"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
       '<filter id="' + I + 'somb" x="-30%" y="-15%" width="160%" height="135%"><feDropShadow dx="5" dy="9" stdDeviation="8" flood-color="#2a0a3c" flood-opacity=".38"/></filter>' +
       '<filter id="' + I + 'desf" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.2"/></filter>' +
       '<radialGradient id="' + I + 'luzE" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff8e8" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#1a0630" stop-opacity=".28"/></radialGradient>' +
       // sombra de desenho: uma faixa lilás de corte reto do lado direito (18%, como na bíblia de estilo da pesquisa)
-      '<linearGradient id="' + I + 'vol" x1="0" y1="0" x2="1" y2="0"><stop offset=".74" stop-color="#7a5ba8" stop-opacity="0"/><stop offset=".74" stop-color="#7a5ba8" stop-opacity=".18"/></linearGradient>' +
+      '<linearGradient id="' + I + 'vol" x1="0" y1="0" x2="1" y2="0"><stop offset=".55" stop-color="#7a5ba8" stop-opacity="0"/><stop offset="1" stop-color="#7a5ba8" stop-opacity=".2"/></linearGradient>' +
       '<linearGradient id="' + I + 'shine" x1="0" y1="0" x2="1" y2="1"><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".6"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
       // sombra que o cabelo faz na testa, logo abaixo da linha do cabelo
       '<radialGradient id="' + I + 'luzPele"><stop offset="0" stop-color="#ffe6c4" stop-opacity=".55"/><stop offset="1" stop-color="#ffe6c4" stop-opacity="0"/></radialGradient>' +
@@ -1617,7 +1627,7 @@
   function blusa(tipo, cor, peca, linha) {
     var c = esc(cor.hex, 0.3), s = '';
     switch (tipo) {
-      case 'nenhum': s = peca('M162,344 L170,342 Q200,362 230,342 L238,344 Q250,354 250,376 L248,462 Q200,469 152,462 L150,376 Q150,354 162,344Z', { hex: '#fbf7ff' }, 'x'); break;
+      case 'nenhum': s = peca('M162,344 L170,342 Q200,362 230,342 L238,344 Q254,352 257,376 L249,462 Q200,469 151,462 L143,376 Q146,352 162,344Z', { hex: '#fbf7ff' }, 'x'); break;
       case 'camiseta': s = peca([tronco(462), MANGA_CURTA, espelhar(MANGA_CURTA)], cor, 'blusa') + linha('M182,336 Q200,354 218,336', c, 3); break;
       case 'regata': s = peca('M157,343 L171,338 Q200,370 229,338 L243,343 Q256,352 260,372 L251,462 Q200,469 149,462 L140,372 Q144,352 157,343Z', cor, 'blusa'); break;
       case 'babados':
