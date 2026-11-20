@@ -486,3 +486,13 @@ test('esqueleto em todo desenho de frente, ombros femininos e queixo delicado (d
   const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
   assert.match(app, /poseRig: poseCartao\(k\)/);
 });
+
+test('contorno dos dois lados da roupa e queixo curto (dono, 20/Nov/2026)', () => {
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /if \(cmd === 'Z'\) \{ var z0 = cur, z1 = ini;/, 'o fechar (Z) também segue a curva do corpo');
+  // a blusa sai simétrica: o ponto mais à esquerda e o mais à direita ficam à mesma distância do meio
+  const s = B.svg({ blusa: 'camiseta' }, { id: 'sim', fundo: false });
+  const g = s.match(/<g clip-path="url\(#sim-semManga\)">([\s\S]*?)<\/g>/)[1];
+  const xs = (g.match(/<path d="([^"]+)"/) || [])[1].match(/-?[\d.]+(?=,)/g).map(Number);
+  assert.ok(Math.abs((200 - Math.min(...xs)) - (Math.max(...xs) - 200)) < 2, 'blusa simétrica');
+});
