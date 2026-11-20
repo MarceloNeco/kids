@@ -1,4 +1,4 @@
-/* Vruuum! — a garagem: 31 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
+/* Vruuum! — a garagem: 32 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
    na curva aparece a lateral, no morro o teto. Grupos: carros, "moto, skate e montarias" e os que voam (desenho.js troca
    a estrada por uma rota no ar e os obstáculos por pássaros, nuvens de tempestade, anéis e correntes de ar).
    Estilos inspirados em carros esportivos famosos, mas sem marca, logotipo ou nome de fabricante.
@@ -52,6 +52,7 @@
     em3d('treno', { id: 'treno', semMotor: true, quadros: 8, grupo: 'ar', nome: ['Trenó do Papai Noel', "Santa's Sleigh", 'Trineo de Papá Noel'], w: 880, h: 1180, vel: 1.0, curva: 1.05 }),
     em3d('arara', { id: 'arara', semMotor: true, voz: 'arara', quadros: 8, grupo: 'ar', nome: ['Arara Gigante', 'Giant Macaw', 'Guacamayo Gigante'], w: 1300, h: 1000, vel: 1.04, curva: 1.08 }),
     em3d('morcego', { id: 'morcego', quadros: 8, dracula: true, abobora: true, semMotor: true, voz: 'morcego', grupo: 'ar', nome: ['Morcego (vira Drácula!)', 'Bat (turns into Dracula!)', 'Murciélago (¡se vuelve Drácula!)'], w: 1300, h: 1000, vel: 1.02, curva: 1.1 }),
+    em3d('bruxa', { id: 'bruxa', bruxa: true, semMotor: true, voz: 'bruxa', quadros: 8, grupo: 'ar', nome: ['Bruxa na Vassoura (sobe e desce!)', 'Witch on a Broom (up and down!)', 'Bruja en Escoba (¡sube y baja!)'], w: 820, h: 1180, vel: 1.02, curva: 1.08 }),
     em3d('heli', { id: 'heli', grupo: 'ar', nome: ['Helicóptero', 'Helicopter', 'Helicóptero'], w: 1100, h: 900, vel: 0.95, curva: 1.12 })
   ];
   var GRUPOS = [
@@ -60,7 +61,7 @@
     { id: 'ar', nome: ['✈️ No céu (voa!)', '✈️ In the sky (flies!)', '✈️ En el cielo (¡vuela!)'] }
   ];
   function achar(id) { for (var k = 0; k < LISTA.length; k++) if (LISTA[k].id === id) return LISTA[k]; return null; }
-  function voa(id) { var v = achar(id); return !!(v && v.grupo === 'ar'); }
+  function voa(id) { var v = achar(id); return !!(v && v.grupo === 'ar' && !v.bruxa); }   // a bruxa começa no chão e sobe ou desce (motor.js)
 
   var VruuumVeiculos = { LISTA: LISTA, GRUPOS: GRUPOS, achar: achar, voa: voa, tom: tom };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumVeiculos;

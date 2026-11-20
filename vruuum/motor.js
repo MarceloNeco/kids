@@ -26,6 +26,9 @@
   /* Ursão de Pelúcia (1.30.0, dono 20/Nov/2026): gigante, mais rápido que todos, nada atrapalha (cone, lama e trânsito
      são jogados para o lado), empurra os rivais para longe dando risada e, virando, vai dando pulinhos. O único jeito
      de passarem por ele: quando ele encosta na beirada da pista, freia bastante. */
+  /* Bruxa na vassoura (1.33.0, dono 20/Nov/2026): começa no chão, junto com os carros; o botão PULAR faz ela subir
+     para o céu (junto com os que voam) e, de novo, descer. A troca leva BRUXA.troca segundos (passa por cima de tudo). */
+  var BRUXA = { troca: 0.9 };
   var URSO = { vel: 1.1, largura: 0.75, beirada: 0.92, freio: 4, freioAte: 0.15, saltito: 0.38, risada: 2.6 };   // 1.32.0 (dono): um pouco mais lento (era 1,25) e freando mais na beirada (era até 30%)
 
   // rivais (personagens): configs = [{ id, veic, mod: { vel, curva } }]
@@ -68,6 +71,7 @@
   var FORA_MAX = 0.4;   // força da curva, no máximo, em fração do volante
   function moverJogador(e, j, ent, dt) {
     var pista = e.pista, cfg = pista.cfg, mod = j.mod || {}, max = cfg.velMax * (mod.vel || 1) * (mod.urso ? URSO.vel : 1);   // mod: jeito do veículo (veiculos.js)
+    if (mod.bruxa) mod.voa = !!j.voando;   // a bruxa voa ou anda no chão, conforme o botão
     var seg = P.achar(pista, j.z), pct = j.vel / max;
     var dir = Math.max(-1, Math.min(1, (ent && ent.dir) || 0));
     if (j.rodando > 0) { j.rodando = Math.max(0, j.rodando - dt); dir = 0; }
@@ -77,12 +81,15 @@
     else if (!lp && j.loop) { j.loop = null; j.loopings++; e.eventos.push({ tipo: 'loopFeito', j: j.n }); somar(e, j, PONTOS.looping, 'looping'); }
     if (lp) { dir = 0; j.x = Math.max(-0.8, Math.min(0.8, j.x)); j.vel = Math.max(j.vel, max * 0.9); }
     // rio (1.18.0): ao entrar na água o veículo vira barco (e volta a ser carro na saída); quem voa passa por cima
-    var ag = !mod.voa && !!seg.agua;
+    var ag = !mod.voa && !mod.bruxa && !!seg.agua;   // a vassoura passa por cima do rio (não vira barco)
     if (ag !== !!j.agua) { j.agua = ag; e.eventos.push({ tipo: ag ? 'agua' : 'terra', j: j.n }); }
     if (j.chegou) dir *= 0.5;
     // botão PULAR: um pulinho que passa por cima de cone, lama e carrinho
     if (j.recarga > 0) j.recarga = Math.max(0, j.recarga - dt);
-    if (ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou && !lp) {
+    if (mod.bruxa && ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou && !lp) {
+      j.voando = !j.voando; mod.voa = j.voando; j.pulo = j.puloMax = BRUXA.troca; j.recarga = RECARGA;
+      e.eventos.push({ tipo: j.voando ? 'bruxaSobe' : 'bruxaDesce', j: j.n });
+    } else if (ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou && !lp) {
       j.pulo = j.puloMax = PULINHO; j.recarga = RECARGA; e.eventos.push({ tipo: 'pulo', j: j.n, manual: true });
     }
     // o urso, virando para o lado, vai saltitando (um pulinho atrás do outro enquanto segura)
@@ -387,7 +394,7 @@
     return e;
   }
 
-  var VruuumMotor = { nivelDerrapa: nivelDerrapa, DERRAPA: DERRAPA, MINI_TURBO: MINI_TURBO, ROLETA: ROLETA, ESCUDO: ESCUDO, FOGUETE: FOGUETE, usarPoder: usarPoder, URSO: URSO, PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
+  var VruuumMotor = { nivelDerrapa: nivelDerrapa, DERRAPA: DERRAPA, MINI_TURBO: MINI_TURBO, ROLETA: ROLETA, ESCUDO: ESCUDO, FOGUETE: FOGUETE, usarPoder: usarPoder, URSO: URSO, BRUXA: BRUXA, PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumMotor;
   else raiz.VruuumMotor = VruuumMotor;
 })(this);

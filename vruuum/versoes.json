@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.33.0",
+      "data": "20/Nov/2026",
+      "hora": "21:52:08",
+      "pt": [
+        "🧹 Bruxa na Vassoura: com chapéu preto torto, capa esvoaçando, meias listradas e um gato preto na garupa. Ela é especial: começa na estrada, junto com os carros, e o botão ⬆ VOAR leva ela lá para o céu, junto com os que voam (passando pelas nuvens); ⬇ DESCER traz de volta para a estrada. Sobe e desce quantas vezes quiser!"
+      ],
+      "en": [
+        "🧹 Witch on a Broom: with a crooked black hat, a flapping cape, striped stockings and a black cat riding behind. She's special: she starts on the road with the cars, and the ⬆ FLY button takes her up into the sky with the flyers (through the clouds); ⬇ LAND brings her back down to the road. Up and down as often as you like!"
+      ],
+      "es": [
+        "🧹 Bruja en Escoba: con sombrero negro torcido, capa al viento, medias de rayas y un gato negro montado detrás. Es especial: empieza en la carretera con los coches, y el botón ⬆ VOLAR la sube al cielo con los que vuelan (atravesando las nubes); ⬇ BAJAR la devuelve a la carretera. ¡Sube y baja todas las veces que quieras!"
+      ]
+    },
+    {
       "versao": "1.32.0",
       "data": "20/Nov/2026",
       "hora": "19:40:51",
