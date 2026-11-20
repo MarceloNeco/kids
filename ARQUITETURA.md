@@ -62,3 +62,5 @@ Vale para todo jogo e para a rádio da estante:
 `node --test <jogo>/teste/*.test.js` na raiz deste repositório (Node + Playwright com o Chromium do ambiente).
 `node --test teste/*.test.js` é o vigia da estante: todo jogo do catálogo tem interruptor, obedece o app `kids`, e quem usa a
 trilha comum toca pelo menos 10 músicas que existem.
+
+- `diagnostico.html` + `diagnostico.js` (20/Nov/2026, tablet Fire em que o GLUB GLUB não abria): mostra no aparelho o espaço usado e livre, memória, núcleos, navegador e cada jogo guardado (service worker e gavetas com a versão no nome); "🔧 Consertar" apaga o service worker e as gavetas de um jogo (a próxima abertura com internet baixa a versão nova do zero) e "Apagar todos" limpa tudo menos as músicas favoritas, as estrelas e as preferências. Link no rodapé da estante ("🔧 Algum jogo não abre?").

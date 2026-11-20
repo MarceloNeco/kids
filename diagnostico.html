@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Diagnóstico — Bolinho de Chuva</title>
+<style>
+  body { margin: 0; padding: 16px; font: 16px/1.4 system-ui, sans-serif; background: #17123a; color: #fff; }
+  h1 { font-size: 22px; margin: 0 0 6px; } h2 { font-size: 17px; margin: 18px 0 6px; color: #c6ff3d; }
+  .caixa { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 10px 12px; margin: 6px 0; }
+  .linha { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .linha:last-child { border-bottom: 0; } .nome { font-weight: 700; flex: 1 1 140px; } .det { font-size: 13px; opacity: .85; flex: 1 1 200px; word-break: break-all; }
+  button { font: inherit; font-weight: 700; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 0; background: #ffcf4a; color: #2a1d00; cursor: pointer; }
+  button.forte { background: #ff6b6b; color: #fff; } button:disabled { opacity: .5; }
+  .ok { color: #7dff9b; } .ruim { color: #ff8f8f; } a { color: #8fe3ff; }
+</style>
+</head>
+<body>
+<h1>🔧 <span data-t="Diagnóstico do Bolinho de Chuva|Rainy Day Donuts check-up|Diagnóstico de Buñuelos de Lluvia"></span></h1>
+<p data-t="Mostra o que está guardado neste aparelho e conserta um jogo que não abre (apaga a cópia guardada dele e baixa de novo, com internet).|Shows what is saved on this device and fixes a game that won't open (deletes its saved copy and downloads it again, with internet).|Muestra lo que hay guardado en este dispositivo y arregla un juego que no se abre (borra su copia guardada y la descarga otra vez, con internet)."></p>
+<h2 data-t="Aparelho|Device|Dispositivo"></h2>
+<div id="aparelho" class="caixa"></div>
+<h2 data-t="Jogos guardados|Saved games|Juegos guardados"></h2>
+<div id="jogos" class="caixa"></div>
+<h2 data-t="Tudo de uma vez|Everything at once|Todo a la vez"></h2>
+<div class="caixa">
+  <p data-t="Apaga todos os jogos guardados neste aparelho (as estrelas e os recordes ficam). Depois, abra o Bolinho com internet e toque em Guardar todos.|Deletes all saved games on this device (stars and records stay). Then open Bolinho with internet and tap Save them all.|Borra todos los juegos guardados en este dispositivo (las estrellas y los récords se quedan). Después, abre Bolinho con internet y toca Guardar todos."></p>
+  <button id="btTudo" class="forte" type="button" data-t="🧹 Apagar todos e começar de novo|🧹 Delete all and start over|🧹 Borrar todos y empezar de nuevo"></button>
+</div>
+<p><a href="/kids/" data-t="← Voltar ao Bolinho de Chuva|← Back to Rainy Day Donuts|← Volver a Buñuelos de Lluvia"></a></p>
+<script src="/kids/idioma.js" data-fora-do-arquivo></script>
+<script src="/kids/diagnostico.js"></script>
+</body>
+</html>
