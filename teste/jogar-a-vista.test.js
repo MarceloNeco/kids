@@ -27,7 +27,8 @@ const JOGOS = {
   jogoteca: [[], '#btJogar'],
   'fruta-podre': [[], '#btJogar'],
   tijolaco: [[], '#btJogar'],
-  'a-garra': [[], '#btJogar']
+  'a-garra': [[], '#btJogar'],
+  labirinto: [[], '#btJogar']
 };
 
 function servidor() {
