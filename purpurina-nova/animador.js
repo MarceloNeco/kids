@@ -72,14 +72,44 @@
         for (var q = 0; q < cos.length; q++) cos[q].setAttribute('transform', tc);   // contorno e preenchimento do antebraço
       });
       var cab = svg.querySelector('.rig-cabeca');
-      var bate = op.ritmo ? Math.sin(t / op.ritmo * Math.PI * 2) * 4 : 0;   // dançando, a cabeça vai no ritmo
+      var bate = op.ritmo && modo !== 'andar' ? Math.sin(t / op.ritmo * Math.PI * 2) * 4 : 0;   // dançando, a cabeça vai no ritmo
       if (cab) cab.setAttribute('transform', 'rotate(' + (v.cab * (0.5 + amp / 2) + Math.sin(t / 1100) * 1.2 + bate).toFixed(2) + ' ' + cab.getAttribute('data-x') + ' ' + cab.getAttribute('data-y') + ')');
       Array.prototype.forEach.call(svg.querySelectorAll('.rig-iris'), function (g) { g.setAttribute('transform', 'translate(' + (v.olho * 5).toFixed(2) + ' 0)'); });
       function estilo(sel, x, y, rot, extra) { var g = svg.querySelector(sel); if (!g) return; g.style.transformBox = 'view-box'; g.style.transform = 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px) rotate(' + rot.toFixed(2) + 'deg)' + (extra || ''); }
       var resp = Math.sin(t / 650) * 1.1;
       estilo('.pp-corpo', v.cx * amp, v.cy * amp - resp, v.cr * amp);
-      estilo('.pp-passo-e', v.ex * amp, v.ey * amp, v.er * amp); estilo('.pp-passo-d', v.dx * amp, v.dy * amp, v.dr * amp);
+      estilo('.pp-passo-e', v.ex * amp, v.ey * amp, v.er * amp, v.esy ? ' scaleY(' + v.esy.toFixed(3) + ')' : '');
+      estilo('.pp-passo-d', v.dx * amp, v.dy * amp, v.dr * amp, v.dsy ? ' scaleY(' + v.dsy.toFixed(3) + ')' : '');
       Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
+    }
+    /* andar de modelo (dono, 20/Nov/2026: "desfile realista"): ciclo de 2 passos. A perna de apoio fica embaixo do
+       corpo e a que anda sobe (o joelho dobra) e pousa cruzando na linha do meio, um pé na frente do outro; o quadril vai
+       para o lado da perna de apoio e inclina, o corpo sobe e desce um pouco, os braços balançam soltos ao contrário das
+       pernas e a cabeça fica firme, olhando para a frente.
+       dançar (Baladinha): no ritmo, o peso vai de uma perna para a outra, o joelho do outro lado dobra, o quadril
+       balança e o corpo desce em cada batida — sem a boneca inteira pular. */
+    var modo = op.modo || '', modoIni = performance.now();
+    function perna(u, lado) {   // u: 0 → 1 do ciclo desta perna (0 – 0,5 apoio; 0,5 – 1 no ar); lado -1 esquerda, 1 direita
+      var dentro = lado * 7;   // pé na linha do meio (girar a perna para dentro, até o pé cruzar)
+      if (u < 0.5) return { x: 0, y: 0, r: dentro, sy: 1 };
+      var w = (u - 0.5) / 0.5, sob = Math.sin(Math.PI * w);
+      return { x: 0, y: -10 * sob + 4 * w * w, r: dentro * (0.3 + 0.7 * w) + lado * 3 * sob + dentro * 0.25 * w, sy: 1 - 0.1 * sob };
+    }
+    function mover(v, t) {
+      if (modo === 'andar') {
+        var P = op.passoMs || 980, f = ((t - modoIni) / P) % 1, a = Math.sin(2 * Math.PI * f);
+        var e = perna(f, -1), d = perna((f + 0.5) % 1, 1);
+        v.ex = e.x; v.ey = e.y; v.er = e.r; v.esy = e.sy; v.dx = d.x; v.dy = d.y; v.dr = d.r; v.dsy = d.sy;
+        v.cx = -14 * a; v.cr = 3.4 * a; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
+        v.oE = 9 + 5 * a; v.cE = 14 + 10 * Math.max(0, a); v.oD = 9 - 5 * a; v.cD = 14 + 10 * Math.max(0, -a); v.fE = 1; v.fD = 1;
+        v.cab = -2 * a; v.olho = 0;
+      } else if (modo === 'dancar') {
+        var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
+        v.cx += lado * 10 * bat; v.cr += -lado * 3 * bat; v.cy += 5 * bat;
+        // a perna do lado contrário ao quadril dobra o joelho (sobe um pouco e encolhe)
+        if (lado > 0) { v.esy = 1 - 0.07 * bat; v.ey += -6 * bat; v.er += 2 * bat; } else { v.dsy = 1 - 0.07 * bat; v.dy += -6 * bat; v.dr += -2 * bat; }
+        v.oE += 4 * bat; v.oD += 4 * bat;
+      }
     }
     function passo(t) {
       if (!vivo) return;
@@ -89,6 +119,7 @@
       var k = Math.min(1, (t - ini) / dur), e = suave(k), v = {};
       for (var c in para) v[c] = de[c] + (para[c] - de[c]) * e;
       v.aceno = para.aceno;
+      if (modo) mover(v, t);
       amp += (ampAlvo - amp) * 0.06;   // muda de amplitude devagar, sem tranco
       atual = v; aplicar(v, t);
       quadro = requestAnimationFrame(passo);
@@ -99,6 +130,7 @@
       trocar: function (nome, ms) { trocar(nome, ms); prox = performance.now() + (op.segura || 3200); },
       pose: function () { return nomeAtual; },
       amplitude: function (a) { ampAlvo = a; },
+      modo: function (m) { if (m !== modo) { modo = m || ''; modoIni = performance.now(); } },
       parar: function () { vivo = false; cancelAnimationFrame(quadro); },
       lista: function (l) { lista = l; i = 0; prox = performance.now() + (op.segura || 3200); trocar(l[0]); }
     };
