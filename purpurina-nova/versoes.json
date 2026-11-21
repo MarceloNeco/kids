@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.7",
+      "data": "21/Nov/2026",
+      "hora": "09:01:54",
+      "pt": [
+        "🙋‍♀️ Mão na nuca de verdade: o braço sobe pelo lado e o antebraço e a mão passam para trás da cabeça e do cabelo (antes o braço ficava na frente do rosto). Só os dedinhos aparecem do lado da cabeça."
+      ],
+      "en": [
+        "🙋‍♀️ A real hand behind the head: the arm goes up at the side and the forearm and hand go behind the head and hair (before, the arm covered the face). Only the fingertips peek out beside the head."
+      ],
+      "es": [
+        "🙋‍♀️ Mano en la nuca de verdad: el brazo sube por el lado y el antebrazo y la mano pasan por detrás de la cabeza y del pelo (antes el brazo tapaba la cara). Solo asoman las puntas de los dedos junto a la cabeza."
+      ]
+    },
+    {
       "versao": "0.9.6",
       "data": "21/Nov/2026",
       "hora": "23:06:31",

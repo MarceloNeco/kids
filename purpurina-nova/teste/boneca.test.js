@@ -415,7 +415,8 @@ test('roupas de chuva (dono, 20/Nov/2026): capas com capuz por cima de qualquer 
   // combinação de roupa sem capa tira a capa
   assert.ok(P.COMBOS.roupa.filter(c => c.id !== 'chuva').every(c => c.e.capa === 'nenhum'));
   // braço sem "emenda": o antebraço sai em dois grupos (contorno e preenchimento) que o animador gira juntos
-  assert.equal((r.match(/class="rig-cotovelo-e"/g) || []).length, 2);
+  // (mais a cópia de trás da cabeça, para a mão na nuca: 2 na frente + 2 atrás)
+  assert.equal((r.match(/class="rig-cotovelo-e"/g) || []).length, 4);
   assert.match(require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8'), /querySelectorAll\('\.rig-cotovelo-'/);
 });
 
@@ -559,4 +560,18 @@ test('jeito de andar do vídeo de referência (dono, 21/Nov/2026)', () => {
   assert.match(andar, /v\.cab = -1 \* a/, 'cabeça quase parada');
   const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
   assert.match(app, /PASSO_MS = \{ pequena: 800, crianca: 1000, adolescente: 1150, adulta: 1250 \}/, 'sem pressa');
+});
+
+test('mão na nuca: antebraço e mão atrás da cabeça e do cabelo da frente (dono, 21/Nov/2026)', () => {
+  assert.ok(B.maoAtras(150, -110) && !B.maoAtras(40, 105) && !B.maoAtras(150, 25), 'só quando a mão vai para trás da cabeça');
+  const s = B.svg({ blusa: 'camiseta' }, { id: 'nc', rig: true, poseRig: { oE: 150, cE: -110, oD: 40, cD: 105 } });
+  assert.equal(bemFormado(s), '');
+  const iAtras = s.indexOf('class="rig-atras-e"'), iCab = s.indexOf('class="rig-cabeca"'), iFrente = s.indexOf('class="rig-frente-e"');
+  assert.ok(iAtras > 0 && iAtras < iCab && iFrente > iCab, 'a cópia de trás vem antes da cabeça e a da frente depois');
+  assert.doesNotMatch(s.slice(iAtras, iAtras + 60), /display:none/, 'na mão na nuca aparece a de trás');
+  assert.match(s.slice(iFrente, iFrente + 60), /display:none/, 'e a da frente some');
+  const r = B.svg({ blusa: 'camiseta' }, { id: 'nr', rig: true });
+  assert.match(r.slice(r.indexOf('class="rig-atras-e"'), r.indexOf('class="rig-atras-e"') + 60), /display:none/, 'braço normal: na frente');
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /B\.maoAtras\(b\[1\], b\[2\]\)/, 'o animador troca a camada quando a pose muda');
 });
