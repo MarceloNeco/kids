@@ -600,3 +600,15 @@ test('vitrine dos sapatos e roupa sem zoom afasta (dono, 21/Nov/2026)', () => {
   assert.match(app, /c\.id === 'sapatos' && naParte \? 'vitrine' : ''/, 'só na parte dos sapatos');
   assert.match(app, /cm\.grupo === 'roupa' && !cm\.zoom && zoomLigado\) zoom\(false, true\)/, 'vestido e outras roupas: afasta para mostrar inteira');
 });
+
+test('estúdio enxuto: ferramentas no ⋯, barra de tom só depois de tocar na cor, roupas em 2 fileiras (dono, 21/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const ferr = html.slice(html.indexOf('id="ferramentas"'), html.indexOf('</div>', html.indexOf('id="ferramentas"')));
+  for (const id of ['btZoom', 'btDesfazer', 'btSurpresa', 'btRecomecar', 'btMusicaPalco', 'btSemMusica', 'btProxMusica']) assert.ok(ferr.includes('id="' + id + '"'), id + ' dentro do ⋯');
+  assert.match(html, /id="btFerramentas"[^>]*aria-expanded="false"/);
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /caixa\.classList\.toggle\('escondida', tomDaCat !== cat\.id\)/, 'barra de tom escondida até tocar numa cor');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
+  assert.match(css, /grid-template-rows: repeat\(2, auto\)/, 'roupas em duas fileiras');
+});
