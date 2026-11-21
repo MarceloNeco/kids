@@ -549,3 +549,14 @@ test('proporções normais: pescoço, braços e pernas com grossura de verdade (
   assert.ok(+fonte.match(/adulta: \{ cabecas: [\d.]+, topo: \d+, ombro: [\d.]+, quadril: ([\d.]+)/)[1] <= 2.85, 'pernas compridas (gancho perto da metade da altura)');
   assert.equal(bemFormado(B.svg({ idade: 'adulta', vestido: 'verao' }, { id: 'pn', fundo: false })), '');
 });
+
+test('jeito de andar do vídeo de referência (dono, 21/Nov/2026)', () => {
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  const andar = anim.slice(anim.indexOf("if (modo === 'andar') {"), anim.indexOf("} else if (modo === 'dancar')"));
+  assert.match(andar, /v\.q = -1\.25 \* a/, 'quadril gingando para o lado da perna de apoio');
+  assert.match(andar, /v\.cE = 8 \+ 30 \* fa; v\.fE = 1 - 0\.12 \* fa/, 'braço que vai à frente dobra o cotovelo');
+  assert.match(andar, /v\.cD = 8 \+ 30 \* fb/, 'braços ao contrário um do outro');
+  assert.match(andar, /v\.cab = -1 \* a/, 'cabeça quase parada');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /PASSO_MS = \{ pequena: 800, crianca: 1000, adolescente: 1150, adulta: 1250 \}/, 'sem pressa');
+});

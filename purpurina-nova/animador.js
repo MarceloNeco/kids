@@ -128,10 +128,17 @@
         var e = perna(f, -1), d = perna((f + 0.5) % 1, 1);
         v.ex = e.x; v.ey = e.y; v.er = e.r; v.esy = e.sy; v.dx = d.x; v.dy = d.y; v.dr = d.r; v.dsy = d.sy;
         // o quadril vai para o lado da perna de apoio pelo rebolado (curva do corpo inteiro), sem arrastar pedaços
-        v.cx = 0; v.cr = 0; v.q = -a; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
+        // (dono, 21/Nov/2026, vídeo de mulheres andando: "jeito de andar"): quadril gingando bem para o lado da perna de
+        // apoio, ombros firmes, cabeça parada olhando para a frente, o corpo descendo de leve em cada passo
+        v.cx = 0; v.cr = 0; v.q = -1.25 * a; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
         v.ey += v.cy; v.dy += v.cy;   // as pernas sobem e descem junto com o corpo
-        v.oE = 9 + 5 * a; v.cE = 14 + 10 * Math.max(0, a); v.oD = 9 - 5 * a; v.cD = 14 + 10 * Math.max(0, -a); v.fE = 1; v.fD = 1;
-        v.cab = -2 * a; v.olho = 0;
+        // braços soltos e colados ao corpo, ao contrário das pernas: o que vai para a frente dobra o cotovelo, a mão sobe
+        // e vem um pouco para o meio (o braço de cima "encurta" vindo para a frente); o que vai para trás fica quase reto,
+        // com a mão um pouquinho para fora do quadril
+        var fa = Math.max(0, a), fb = Math.max(0, -a);
+        v.oE = 7 - 3 * a; v.cE = 8 + 30 * fa; v.fE = 1 - 0.12 * fa;
+        v.oD = 7 + 3 * a; v.cD = 8 + 30 * fb; v.fD = 1 - 0.12 * fb;
+        v.cab = -1 * a; v.olho = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
         v.q += lado * bat;   // o quadril rebola para o lado da batida (curva do corpo inteiro; sem descer só o tronco)
