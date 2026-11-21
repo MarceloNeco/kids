@@ -347,6 +347,18 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.35.0 — veículo sempre à vista, escolha pelo carrossel (dono, 21/Nov/2026)
+
+- Pedido (com prints): "tinha que mostrar sempre o carrinho que você escolheu e você faz a escolha pelo carrossel, assim
+  tá ruim, tem que ficar navegando" (a grade de veículos rolava e a prévia sumia).
+- Etapa do Veículo: a prévia (`#previa`) fica grande e parada em cima (`.vitrine` presa no alto), dentro de `.palco` com
+  ◀ `#veicAnt` e ▶ `#veicProx` dos lados (trocam para o vizinho, dando a volta). Embaixo, `#veiculos` é um carrossel de
+  uma fileira só, com encaixe no meio (`scroll-snap` center e folga de meia tela nas pontas): arrastar e soltar escolhe o
+  do meio (`carrosselVeic()`, só depois de toque/arraste/roda da pessoa, nunca quando o jogo centraliza sozinho); tocar
+  num veículo escolhe e traz para o meio (`escolherVeic()`). Vale também deitado e no computador (lá era uma grade).
+- Teste: `teste/etapas.test.js` "1.35.0" (360×740 e 390×844: prévia inteira, uma fileira, escolhido no meio, ◀ ▶ e
+  arrastar escolhem).
+
 ## 1.34.0 — Bruxinha no estilo da figura do dono; Piloto por último e só quando aparece (dono, 21/Nov/2026)
 
 - `modelos3d.js` `bruxa` refeita: ela é a própria personagem (`semPiloto`), com rosto (olhos grandes roxos, sardas,

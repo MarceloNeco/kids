@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.35.0",
+      "data": "21/Nov/2026",
+      "hora": "17:30:31",
+      "pt": [
+        "🎠 Escolher o veículo ficou mais fácil: o veículo escolhido fica sempre grande, parado em cima, e a escolha é num carrossel de uma fileira só. Arraste para o lado e solte (o do meio é o escolhido), toque num veículo ou use as setas ◀ ▶ dos lados. Sem precisar rolar a tela."
+      ],
+      "en": [
+        "🎠 Picking a ride is easier: the chosen ride always stays big at the top, and you pick from a one-row carousel. Swipe sideways and let go (the one in the middle is picked), tap a ride, or use the ◀ ▶ arrows on the sides. No more scrolling."
+      ],
+      "es": [
+        "🎠 Elegir el vehículo es más fácil: el elegido se queda siempre grande arriba, y se elige en un carrusel de una sola fila. Desliza hacia un lado y suelta (el del medio es el elegido), toca un vehículo o usa las flechas ◀ ▶ de los lados. Sin tener que desplazar la pantalla."
+      ]
+    },
+    {
       "versao": "1.34.0",
       "data": "21/Nov/2026",
       "hora": "12:28:54",
