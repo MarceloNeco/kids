@@ -49,6 +49,17 @@
     return { oE: p.oE, cE: p.cE, fE: p.fE || 1, oD: p.oD, cD: p.cD, fD: p.fD || 1, cab: p.cab, olho: p.olho,
       cx: b.c[0], cy: b.c[1], cr: b.c[2], ex: b.e[0], ey: b.e[1], er: b.e[2], dx: b.d[0], dy: b.d[1], dr: b.d[2], s: b.s, q: b.q || 0, aceno: p.aceno ? 1 : 0 };
   }
+  /* perfis de movimento (dono, 21/Nov/2026, especificação "motor biomecânico dual"): a menina continua como está; o
+     menino (criança, adolescente ou adulto) anda com as pernas em trilhos paralelos (sem cruzar o pé na linha do meio),
+     o quadril quase parado (só passa o peso de leve, sem rebolar), os braços balançando mais soltos e um pouco afastados
+     do corpo, e parado fica plantado (sem quadril jogado para o lado, sem mão na cintura). Tudo aqui num lugar só. */
+  var BIO = {
+    feminino: { quadril: 1.25, parado: 1, cruza: 1, abre: 7, abreVai: 3, cotovelo: 30, frente: 0.12, quique: 1, cadencia: 1, troca: {} },
+    masculino: { quadril: 0.2, parado: 0.2, cruza: 0, abre: 10, abreVai: 4, cotovelo: 24, frente: 0.18, quique: 1, cadencia: 1,
+      troca: { cintura: 'bolsos', duasCintura: 'cruzados', cabeca: 'relax', beijo: 'tchau', maoCabelo: 'olhaD', carinha: 'relax' } },
+    // menino pequeno anda mais rápido e quica mais; adolescente e adulto, passos mais compassados
+    idadeMasculino: { pequena: { cadencia: 1.25, quique: 1.3 }, crianca: { cadencia: 1.25, quique: 1.3 }, adolescente: { cadencia: 0.95, quique: 1 }, adulta: { cadencia: 0.95, quique: 1 } }
+  };
   function suave(k) { return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; }
 
   function criar(caixa, op) {
@@ -58,7 +69,16 @@
     // amplitude do balanço (dono, 20/Nov/2026: maquiando, "zoom no olho, na boca, com um leve movimento"): 1 de corpo
     // inteiro; perto do rosto o quadril e as pernas quase param e sobra o sutil — cabeça, olhos, respiração
     var amp = 1, ampAlvo = 1, quadros = op.defasagem || 0;
-    function trocar(nome, ms) { nomeAtual = nome; de = atual; para = valores(nome); ini = performance.now(); dur = ms || 900; }
+    // o perfil vem do próprio desenho (boneca.js marca data-perfil e data-idade no <svg>)
+    function perfil() {
+      var s = caixa.querySelector('svg'), m = s && s.getAttribute('data-perfil') === 'masculino', b = m ? BIO.masculino : BIO.feminino;
+      if (!m) return b;
+      var ida = BIO.idadeMasculino[s.getAttribute('data-idade')] || {}, o = {};
+      for (var k in b) o[k] = b[k];
+      if (ida.cadencia) o.cadencia = ida.cadencia; if (ida.quique) o.quique = ida.quique;
+      return o;
+    }
+    function trocar(nome, ms) { nome = perfil().troca[nome] || nome; nomeAtual = nome; de = atual; para = valores(nome); ini = performance.now(); dur = ms || 900; }
     // copias (baladinha): outras caixas com o mesmo desenho (as sombras coloridas na parede) fazem os mesmos passos
     // (as cópias andam a cada op.copiasCada quadros: desenhar 6 sombras todo quadro pesa no celular)
     function aplicar(v, t) {
@@ -88,9 +108,10 @@
       // duas, então nada desencaixa (boneca.js, .pp-rebola)
       var rb = svg.querySelector('.pp-rebola'), tC = 0;
       if (rb) {
-        var h = (v.q + (modo === 'andar' ? 0 : Math.sin(t / 1700) * 0.3)) * amp * 12;
+        var h = (v.q + (modo === 'andar' ? 0 : Math.sin(t / 1700) * 0.3 * (v.qParado == null ? 1 : v.qParado))) * amp * 12;
         var yJ = +rb.getAttribute('data-y'), yS = +rb.getAttribute('data-ombro'), yP = +rb.getAttribute('data-pe');
-        var sB = -h / (yP - yJ); tC = 0.25 * h / (yJ - yS);
+        // os ombros voltam com um pouquinho de atraso em relação ao quadril (v.qS, andando): nada chega junto ao mesmo tempo
+        var sB = -h / (yP - yJ); tC = 0.25 * (v.qS != null ? v.qS * amp * 12 : h) / (yJ - yS);
         var mB = 'matrix(1 0 ' + sB.toFixed(5) + ' 1 ' + (-sB * yP).toFixed(3) + ' 0)', mC = 'matrix(1 0 ' + tC.toFixed(5) + ' 1 ' + (h - tC * yJ).toFixed(3) + ' 0)';
         Array.prototype.forEach.call(svg.querySelectorAll('.pp-banda-baixo'), function (g) { g.setAttribute('transform', mB); });
         Array.prototype.forEach.call(svg.querySelectorAll('.pp-banda-cima'), function (g) { g.setAttribute('transform', mC); });
@@ -123,32 +144,35 @@
        dançar (Baladinha): no ritmo, o peso vai de uma perna para a outra, o joelho do outro lado dobra, o quadril
        balança e o corpo desce em cada batida — sem a boneca inteira pular. */
     var modo = op.modo || '', modoIni = performance.now();
-    function perna(u, lado) {   // u: 0 → 1 do ciclo desta perna (0 – 0,5 apoio; 0,5 – 1 no ar); lado -1 esquerda, 1 direita
-      var dentro = lado * 7;   // pé na linha do meio (girar a perna para dentro, até o pé cruzar)
+    function perna(u, lado, cruza) {   // u: 0 → 1 do ciclo desta perna (0 – 0,5 apoio; 0,5 – 1 no ar); lado -1 esquerda, 1 direita
+      var dentro = lado * 7 * cruza;   // pé na linha do meio (girar a perna para dentro, até o pé cruzar); menino: 0 (trilhos paralelos)
       if (u < 0.5) return { x: 0, y: 0, r: dentro, sy: 1 };
       var w = (u - 0.5) / 0.5, sob = Math.sin(Math.PI * w);
       return { x: 0, y: -10 * sob + 4 * w * w, r: dentro * (0.3 + 0.7 * w) + lado * 3 * sob + dentro * 0.25 * w, sy: 1 - 0.1 * sob };
     }
     function mover(v, t) {
       if (modo === 'andar') {
-        var P = op.passoMs || 980, f = ((t - modoIni) / P) % 1, a = Math.sin(2 * Math.PI * f);
-        var e = perna(f, -1), d = perna((f + 0.5) % 1, 1);
+        var pf = perfil(), P = (op.passoMs || 980) / pf.cadencia, f = ((t - modoIni) / P) % 1, W = 2 * Math.PI * f, a = Math.sin(W);
+        // passo assimétrico: a perna sai do chão com impulso e desacelera antes de pousar (fase distorcida, não seno puro)
+        function fase(x) { return (x + 0.22 * Math.sin(2 * Math.PI * x) / (2 * Math.PI) + 1) % 1; }
+        var e = perna(fase(f), -1, pf.cruza), d = perna(fase((f + 0.5) % 1), 1, pf.cruza);
         v.ex = e.x; v.ey = e.y; v.er = e.r; v.esy = e.sy; v.dx = d.x; v.dy = d.y; v.dr = d.r; v.dsy = d.sy;
         // o quadril vai para o lado da perna de apoio pelo rebolado (curva do corpo inteiro), sem arrastar pedaços
         // (dono, 21/Nov/2026, vídeo de mulheres andando: "jeito de andar"): quadril gingando bem para o lado da perna de
         // apoio, ombros firmes, cabeça parada olhando para a frente, o corpo descendo de leve em cada passo
-        v.cx = 0; v.cr = 0; v.q = -1.25 * a; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
+        v.cx = 0; v.cr = 0; v.q = -pf.quadril * a; v.qS = -pf.quadril * Math.sin(W - 0.15); v.cy = (-3 * Math.abs(Math.sin(W)) + 1.5) * pf.quique; v.s = -3 * a * pf.quadril / 1.25;
         v.ey += v.cy; v.dy += v.cy;   // as pernas sobem e descem junto com o corpo
         // braços soltos e colados ao corpo, ao contrário das pernas: o que vai para a frente dobra o cotovelo, a mão sobe
         // e vem um pouco para o meio (o braço de cima "encurta" vindo para a frente); o que vai para trás fica quase reto,
         // com a mão um pouquinho para fora do quadril
-        var fa = Math.max(0, a), fb = Math.max(0, -a);
-        v.oE = 7 - 3 * a; v.cE = 8 + 30 * fa; v.fE = 1 - 0.12 * fa;
-        v.oD = 7 + 3 * a; v.cD = 8 + 30 * fb; v.fD = 1 - 0.12 * fb;
-        v.cab = -1 * a; v.olho = 0;
+        // (atrasos: o ombro vem 0,15 depois do quadril, o cotovelo 0,30 depois do ombro e a cabeça por último)
+        var aO = Math.sin(W - 0.15), aC = Math.sin(W - 0.45), fa = Math.max(0, aO), fb = Math.max(0, -aO), ca = Math.max(0, aC), cb = Math.max(0, -aC);
+        v.oE = pf.abre - pf.abreVai * aO; v.cE = 8 + pf.cotovelo * ca; v.fE = 1 - pf.frente * fa;
+        v.oD = pf.abre + pf.abreVai * aO; v.cD = 8 + pf.cotovelo * cb; v.fD = 1 - pf.frente * fb;
+        v.cab = -1 * Math.sin(W - 0.6); v.olho = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
-        v.q += lado * bat;   // o quadril rebola para o lado da batida (curva do corpo inteiro; sem descer só o tronco)
+        v.q += lado * bat * perfil().parado;   // o quadril rebola para o lado da batida (menino: só passa o peso de leve)
         // a perna do lado contrário ao quadril dobra o joelho (sobe um pouco e encolhe)
         if (lado > 0) { v.esy = 1 - 0.07 * bat; v.ey += -6 * bat; v.er += 2 * bat; } else { v.dsy = 1 - 0.07 * bat; v.dy += -6 * bat; v.dr += -2 * bat; }
         v.oE += 4 * bat; v.oD += 4 * bat;
@@ -162,6 +186,11 @@
       var k = Math.min(1, (t - ini) / dur), e = suave(k), v = {};
       for (var c in para) v[c] = de[c] + (para[c] - de[c]) * e;
       v.aceno = para.aceno;
+      // nunca 100% parada: duas ondas de ritmos diferentes somadas (não se repetem iguais) na cabeça, nos cotovelos e no
+      // tronco; e o menino parado fica plantado (o quadril quase não vai para o lado)
+      var pf0 = perfil(), seg = t / 1000, micro = Math.sin(seg * 1.7) * 0.6 + Math.cos(seg * 2.9) * 0.4;
+      v.qParado = pf0.parado; v.q *= pf0.parado;
+      if (modo !== 'andar') { v.cab += micro * 0.4; v.cE += micro * 0.6; v.cD -= micro * 0.6; v.q += micro * 0.04; }
       if (modo) mover(v, t);
       amp += (ampAlvo - amp) * 0.06;   // muda de amplitude devagar, sem tranco
       atual = v; aplicar(v, t);

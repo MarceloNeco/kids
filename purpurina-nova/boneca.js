@@ -842,6 +842,8 @@
         out = ['<g filter="url(#' + I + 'desf)">' + cen + '</g>' + ret(0, 0, W, H, { fill: 'url(#' + I + 'luzE)' }), '<g filter="url(#' + I + 'somb)">' + out.join('') + '</g>'];
       }
       return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + area.join(' ') + '"' + (w ? ' width="' + w + '" height="' + h + '"' : '') +
+        // perfil de movimento para o animador (menino anda e fica parado diferente) e a idade
+        ' data-perfil="' + (e.personagem === 'menino' ? 'masculino' : 'feminino') + '" data-idade="' + (e.idade || 'adulta') + '"' +
         // sem cenário, o braço que estica (apontando, tchau) não é cortado na borda do desenho
         ' preserveAspectRatio="xMidYMid ' + (op.cortar ? 'slice' : 'meet') + '"' + (fundo || op.soFundo ? '' : ' overflow="visible"') + '><defs>' + defs + '</defs>' + out.join('') + '</svg>';
     }

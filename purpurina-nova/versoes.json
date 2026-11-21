@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.8",
+      "data": "21/Nov/2026",
+      "hora": "14:46:46",
+      "pt": [
+        "🧍‍♂️ Menino anda e fica parado como menino: pernas paralelas (sem cruzar o pé), quadril firme (sem rebolar), braços balançando mais soltos e um pouco afastados do corpo, e parado sem mão na cintura (mão no bolso ou braços cruzados). O menino pequeno anda mais rápido e quicando.",
+        "✨ Movimento mais natural para todos: a perna sai do chão com impulso e pousa devagar, ombro, cotovelo e cabeça chegam um pouquinho depois do quadril, e parada ela nunca fica dura (pequenos movimentos que não se repetem iguais)."
+      ],
+      "en": [
+        "🧍‍♂️ Boys walk and stand like boys: parallel legs (no crossing feet), steady hips (no swaying), arms swinging more loosely and a bit away from the body, and standing without hands on hips (hand in pocket or arms crossed). Little boys walk faster and bouncier.",
+        "✨ More natural movement for everyone: the leg pushes off and lands softly, shoulder, elbow and head arrive a little after the hips, and standing still she never looks stiff (small movements that never repeat exactly)."
+      ],
+      "es": [
+        "🧍‍♂️ Los chicos caminan y se quedan de pie como chicos: piernas paralelas (sin cruzar los pies), cadera firme (sin contoneo), brazos que se balancean más sueltos y un poco separados del cuerpo, y de pie sin la mano en la cintura (mano en el bolsillo o brazos cruzados). Los niños pequeños caminan más rápido y con más rebote.",
+        "✨ Movimiento más natural para todos: la pierna se impulsa y aterriza suave, hombro, codo y cabeza llegan un poquito después de la cadera, y quieta nunca se ve rígida (pequeños movimientos que nunca se repiten iguales)."
+      ]
+    },
+    {
       "versao": "0.9.7",
       "data": "21/Nov/2026",
       "hora": "09:01:54",

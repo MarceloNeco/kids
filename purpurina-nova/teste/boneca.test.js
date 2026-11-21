@@ -554,10 +554,11 @@ test('proporções normais: pescoço, braços e pernas com grossura de verdade (
 test('jeito de andar do vídeo de referência (dono, 21/Nov/2026)', () => {
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
   const andar = anim.slice(anim.indexOf("if (modo === 'andar') {"), anim.indexOf("} else if (modo === 'dancar')"));
-  assert.match(andar, /v\.q = -1\.25 \* a/, 'quadril gingando para o lado da perna de apoio');
-  assert.match(andar, /v\.cE = 8 \+ 30 \* fa; v\.fE = 1 - 0\.12 \* fa/, 'braço que vai à frente dobra o cotovelo');
-  assert.match(andar, /v\.cD = 8 \+ 30 \* fb/, 'braços ao contrário um do outro');
-  assert.match(andar, /v\.cab = -1 \* a/, 'cabeça quase parada');
+  // (desde a 0.9.8 os números vêm do perfil BIO: menina = quadril 1,25, cotovelo 30, frente 0,12)
+  assert.match(andar, /v\.q = -pf\.quadril \* a/, 'quadril gingando para o lado da perna de apoio');
+  assert.match(andar, /v\.cE = 8 \+ pf\.cotovelo \* ca; v\.fE = 1 - pf\.frente \* fa/, 'braço que vai à frente dobra o cotovelo');
+  assert.match(andar, /v\.cD = 8 \+ pf\.cotovelo \* cb/, 'braços ao contrário um do outro');
+  assert.match(andar, /v\.cab = -1 \* Math\.sin\(W - 0\.6\)/, 'cabeça quase parada');
   const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
   assert.match(app, /PASSO_MS = \{ pequena: 800, crianca: 1000, adolescente: 1150, adulta: 1250 \}/, 'sem pressa');
 });
@@ -574,4 +575,17 @@ test('mão na nuca: antebraço e mão atrás da cabeça e do cabelo da frente (d
   assert.match(r.slice(r.indexOf('class="rig-atras-e"'), r.indexOf('class="rig-atras-e"') + 60), /display:none/, 'braço normal: na frente');
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
   assert.match(anim, /B\.maoAtras\(b\[1\], b\[2\]\)/, 'o animador troca a camada quando a pose muda');
+});
+
+test('perfis de movimento: menino anda firme e paralelo, menina com o andar dela + polimento (dono, 21/Nov/2026)', () => {
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /masculino: \{ quadril: 0\.2, parado: 0\.2, cruza: 0,/, 'menino: quadril quase parado e pernas sem cruzar');
+  assert.match(anim, /feminino: \{ quadril: 1\.25, parado: 1, cruza: 1,/, 'menina: como estava');
+  assert.match(anim, /troca: \{ cintura: 'bolsos', duasCintura: 'cruzados'/, 'menino parado: sem mão na cintura');
+  assert.match(anim, /pequena: \{ cadencia: 1\.25, quique: 1\.3 \}/, 'menino pequeno anda mais rápido e quica mais');
+  assert.match(anim, /x \+ 0\.22 \* Math\.sin\(2 \* Math\.PI \* x\)/, 'passo assimétrico (impulso e pouso)');
+  assert.match(anim, /Math\.sin\(W - 0\.15\)[\s\S]*Math\.sin\(W - 0\.45\)/, 'ombro e cotovelo com atraso');
+  assert.match(anim, /Math\.sin\(seg \* 1\.7\) \* 0\.6 \+ Math\.cos\(seg \* 2\.9\) \* 0\.4/, 'micro-movimento parado');
+  assert.match(B.svg({ personagem: 'menino', idade: 'crianca' }, { id: 'pm', fundo: false }), /data-perfil="masculino" data-idade="crianca"/);
+  assert.match(B.svg({}, { id: 'pf', fundo: false }), /data-perfil="feminino"/);
 });
