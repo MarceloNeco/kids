@@ -16,7 +16,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.2', APP_DATA = '20/Nov/2026';
+  var APP_VERSION = '0.4.0', APP_DATA = '21/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA);
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -53,9 +53,9 @@
         'Swipe to throw the ball and knock down all 10 pins. A 10-frame game with strikes, spares and a real scoreboard.',
         'Desliza el dedo para lanzar la bola y derriba los 10 bolos. Una partida de 10 tiradas, con pleno, semipleno y marcador de verdad.'] },
     { id: 'bolinhas', nome: ['Bolinhas da Angústia', 'Nail-Biter Drop', 'Bolitas de la Angustia'],
-      texto: ['O game show da parede gigante: responda, escolha de onde a bolinha cai e torça enquanto ela quica entre os pinos até o último segundo. Com um parceiro virtual ou em dois, passando o aparelho.',
-        'The giant-wall game show: answer, pick where the ball drops and hold your breath as it bounces through the pegs until the very last second. With a virtual partner or as two, passing the device.',
-        'El concurso de la pared gigante: responde, elige desde dónde cae la bolita y cruza los dedos mientras rebota entre los clavos hasta el último segundo. Con un compañero virtual o entre dos, pasándoos el aparato.'] },
+      texto: ['O game show da parede gigante, em duas modalidades: na Queda Livre você responde enquanto as bolinhas caem; no Sem pressa escolhe de onde elas caem e responde com calma. Acertou, ficam verdes e somam; errou, vermelhas e descontam.',
+        'The giant-wall game show, in two modes: in Free Fall you answer while the balls are falling; in No Rush you pick where they drop and answer calmly. Get it right and they turn green and add up; get it wrong and they turn red and take away.',
+        'El concurso de la pared gigante, en dos modalidades: en la Caída Libre respondes mientras caen las bolitas; en Sin prisa eliges desde dónde caen y respondes con calma. Si aciertas, se vuelven verdes y suman; si fallas, rojas y restan.'] },
     { id: 'velha', nome: ['Jogo da Velha', 'Tic-Tac-Toe', 'Tres en Raya'],
       texto: ['Espadas contra escudos no campo de batalha: faça uma linha de 3 antes do outro exército. Quem vencer 3 batalhas vence a guerra! Contra o computador ou em dois.',
         'Swords against shields on the battlefield: make a line of 3 before the other army. Whoever wins 3 battles wins the war! Against the computer or with two players.',
@@ -83,9 +83,9 @@
     boliche: [['Pista com proteção nas canaletas: a bola nunca cai.', 'Bumpers on the gutters: the ball never falls in.', 'Barreras en los canales: la bola nunca cae.'],
       ['Pista normal, sem proteção.', 'Regular lane, no bumpers.', 'Pista normal, sin barreras.'],
       ['A bola faz curva e os pinos são mais teimosos.', 'The ball curves and the pins are more stubborn.', 'La bola hace curva y los bolos son más tozudos.']],
-    bolinhas: [['Perguntas mais fáceis e parceiro virtual mais forte.', 'Easier questions and a stronger virtual partner.', 'Preguntas más fáciles y un compañero virtual más fuerte.'],
-      ['Perguntas variadas e parceiro equilibrado.', 'Mixed questions and a balanced partner.', 'Preguntas variadas y un compañero equilibrado.'],
-      ['Perguntas difíceis e parceiro virtual mais fraco.', 'Hard questions and a weaker virtual partner.', 'Preguntas difíciles y un compañero virtual más flojo.']],
+    bolinhas: [['Perguntas mais fáceis e mais tempo para ler na Queda Livre.', 'Easier questions and more reading time in Free Fall.', 'Preguntas más fáciles y más tiempo para leer en la Caída Libre.'],
+      ['Perguntas variadas.', 'Mixed questions.', 'Preguntas variadas.'],
+      ['Perguntas difíceis e pouco tempo para ler na Queda Livre.', 'Hard questions and little reading time in Free Fall.', 'Preguntas difíciles y poco tiempo para leer en la Caída Libre.']],
     velha: [['O computador se distrai e deixa você ganhar.', 'The computer gets distracted and lets you win.', 'El ordenador se despista y te deja ganar.'],
       ['O computador ataca e bloqueia as suas linhas.', 'The computer attacks and blocks your lines.', 'El ordenador ataca y bloquea tus líneas.'],
       ['O computador não erra: o melhor é a trégua!', 'The computer never slips: a truce is the best you can get!', 'El ordenador no falla: ¡lo mejor es la tregua!']],

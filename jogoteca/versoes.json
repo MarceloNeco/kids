@@ -2,6 +2,35 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.4.0",
+      "data": "21/Nov/2026",
+      "hora": "12:40:00",
+      "pt": [
+        "🎯 Bolinhas da Angústia agora é para uma pessoa só, em duas modalidades: ⏱ Queda Livre (2 opções, responda enquanto as bolinhas caem) e 🧘 Sem pressa (4 opções, sem tempo: escolha 3 zonas lá no alto e depois responda). Acertou, as bolinhas caem verdes e somam; errou, vermelhas e descontam. No fim, o placar",
+        "👋 Saíram o parceiro virtual, o modo de dois jogadores, a Sala de Isolamento e o Contrato",
+        "🎥 Câmera da bolinha: a queda começa colada nela, passando pelos pinos, e depois a câmera acompanha bem de perto. A bolinha ficou um pouco maior",
+        "💡 Painel de LED animado atrás dos pinos (azul, verde no acerto, vermelho no erro) e um arco de luz em volta da parede",
+        "🎻 Música de tensão enquanto as bolinhas caem; quando a última bate no fundo, a música do jogo volta de onde parou",
+        "❓ 30 perguntas ganharam uma 4ª opção: o Sem pressa tem 60 perguntas de 4 opções"
+      ],
+      "en": [
+        "🎯 Nail-Biter Drop is now for one player, in two modes: ⏱ Free Fall (2 options, answer while the balls are falling) and 🧘 No Rush (4 options, no timer: pick 3 zones at the top, then answer). Get it right and the balls drop green and add up; get it wrong and they drop red and take away. A scoreboard at the end",
+        "👋 The virtual partner, the two-player mode, the Isolation Booth and the Contract are gone",
+        "🎥 Ball cam: the drop starts right on the ball, flying past the pegs, and then the camera follows it up close. The ball is a little bigger",
+        "💡 An animated LED panel behind the pegs (blue, green when you get it right, red when you get it wrong) and an arch of light around the wall",
+        "🎻 Tense music while the balls are falling; when the last one hits the bottom, the game music picks up where it left off",
+        "❓ 30 questions got a 4th option: No Rush has 60 four-option questions"
+      ],
+      "es": [
+        "🎯 Bolitas de la Angustia ahora es para una sola persona, en dos modalidades: ⏱ Caída Libre (2 opciones, responde mientras caen las bolitas) y 🧘 Sin prisa (4 opciones, sin tiempo: elige 3 zonas arriba y luego responde). Si aciertas, las bolitas caen verdes y suman; si fallas, rojas y restan. Al final, el marcador",
+        "👋 Se van el compañero virtual, el modo de dos jugadores, la Cabina de Aislamiento y el Contrato",
+        "🎥 Cámara de la bolita: la caída empieza pegada a ella, pasando entre los clavos, y luego la cámara la sigue muy de cerca. La bolita es un poco más grande",
+        "💡 Panel de LED animado detrás de los clavos (azul, verde al acertar, rojo al fallar) y un arco de luz alrededor de la pared",
+        "🎻 Música de tensión mientras caen las bolitas; cuando la última llega al fondo, la música del juego sigue donde se quedó",
+        "❓ 30 preguntas tienen ahora una 4.ª opción: Sin prisa tiene 60 preguntas de 4 opciones"
+      ]
+    },
+    {
       "versao": "0.3.2",
       "data": "20/Nov/2026",
       "hora": "13:31:00",

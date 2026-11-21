@@ -10,7 +10,18 @@
 Nada foi copiado dos jogos de referência que o dono fotografou no avião (`../docs/referencias/jogoteca/`): nem arte, nem
 nomes, nem personagens. Elas servem só de régua de qualidade. Os jogos de auditório (Bolinhas da Angústia, já pronto,
 e Milionário José Pobre, que vem por aí) usam só a mecânica dos programas de TV, com nome, visual, vinheta e música próprios.
-O Bolinhas da Angústia tem parede, personagens, perguntas e sons próprios (sons sintetizados no WebAudio pelo próprio jogo).
+O Bolinhas da Angústia tem parede, painel de LED, perguntas e sons próprios (sons sintetizados no WebAudio pelo próprio
+jogo). As fotos do programa de TV que o dono mandou em 21/Nov/2026 serviram só de referência de estilo (painel de LED atrás
+dos pinos, arco de luz): nada de nome, logotipo, marca ou patrocinador do programa foi usado.
+
+## Música de tensão do Bolinhas da Angústia
+
+Toca só durante a queda das bolinhas (não entra na lista da trilha). Recortada (1 min 32 s, sem o silêncio do começo),
+volume igualado e convertida de OGG para MP3 (96 kbps) em 21/Nov/2026.
+
+| Música | Arquivo | Crédito |
+|---|---|---|
+| “Interloper” | `musicas/tensao-interloper.mp3` | "Interloper" by Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 — https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100401 ; arquivo tirado do pacote "Minstrel: Music I" (https://github.com/Sayshal/minstrel-packs-music-01, `assets/audio/interloper.ogg`, créditos em `assets/audio/ATTRIBUTION.txt`) |
 
 ## Músicas da trilha
 
