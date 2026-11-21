@@ -135,6 +135,15 @@
       estilo('.pp-corpo', v.cx * amp, v.cy * amp - resp, v.cr * amp);
       estilo('.pp-passo-e', v.ex * amp, v.ey * amp, v.er * amp, v.esy ? ' scaleY(' + v.esy.toFixed(3) + ')' : '');
       estilo('.pp-passo-d', v.dx * amp, v.dy * amp, v.dr * amp, v.dsy ? ' scaleY(' + v.dsy.toFixed(3) + ')' : '');
+      // vitrine dos sapatos: troca o sapato de frente pelo de lado só na perna que está levantada
+      [['e', !!v.ladoE], ['d', !!v.ladoD]].forEach(function (pl) {
+        var g = svg.querySelector('.pp-passo-' + pl[0]), lig = pl[1] ? '1' : '0'; if (!g || g.getAttribute('data-lado') === lig) return;
+        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0]), function (gg) {
+          gg.setAttribute('data-lado', lig);
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-lado-' + pl[0]), function (x) { x.style.display = pl[1] ? '' : 'none'; });
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-frente'), function (x) { x.style.display = pl[1] ? 'none' : ''; });
+        });
+      });
       Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
     }
     /* andar de modelo (dono, 20/Nov/2026: "desfile realista"): ciclo de 2 passos. A perna de apoio fica embaixo do
@@ -170,6 +179,14 @@
         v.oE = pf.abre - pf.abreVai * aO; v.cE = 8 + pf.cotovelo * ca; v.fE = 1 - pf.frente * fa;
         v.oD = pf.abre + pf.abreVai * aO; v.cD = 8 + pf.cotovelo * cb; v.fD = 1 - pf.frente * fb;
         v.cab = -1 * Math.sin(W - 0.6); v.olho = 0;
+      } else if (modo === 'vitrine') {
+        /* vitrine dos sapatos (dono, 21/Nov/2026): um pé de cada vez sobe um pouco, vira para fora e mostra o sapato de
+           lado; desce e volta de frente; depois o outro. O peso vai para a perna que fica no chão. Ciclo de 4,8 s. */
+        var T = 4800, ph = ((t - modoIni) % T) / T, seg4 = Math.floor(ph * 4), u = ph * 4 - seg4, sobe = Math.sin(Math.PI * u);
+        v.ladoE = false; v.ladoD = false;
+        if (seg4 === 0) { v.ey += -12 * sobe; v.esy = 1 - 0.04 * sobe; v.er += 6 * sobe; v.q = 0.5 * sobe; v.ladoE = sobe > 0.35; }
+        else if (seg4 === 2) { v.dy += -12 * sobe; v.dsy = 1 - 0.04 * sobe; v.dr += -6 * sobe; v.q = -0.5 * sobe; v.ladoD = sobe > 0.35; }
+        else v.q = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
         v.q += lado * bat * perfil().parado;   // o quadril rebola para o lado da batida (menino: só passa o peso de leve)

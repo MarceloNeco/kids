@@ -198,6 +198,8 @@
   function mudar(novo, catId) {
     if (V.iguais(novo, estado)) return;
     hist.guardar(estado); estado = novo; aposMudar(); efeito(catId);
+    // roupa sem zoom próprio (vestido, blusa, saia, calça, capa…): se estava de perto, afasta para mostrar a roupa inteira
+    var cm = catId && P.categoria(catId); if (cm && cm.grupo === 'roupa' && !cm.zoom && zoomLigado) zoom(false, true);
   }
   function aposMudar() {
     if (!modo) { livre = estado; gravar('purpurinaNova.atual', estado); }
@@ -314,7 +316,8 @@
     })(ini);
   }
   // ao trocar de parte: zoom automático conforme a parte
-  function zoomDaParte() { var c = catAtual(); zoom(!!(c && c.zoom), true); }
+  // sapatos: os pés fazem a vitrine (um de cada vez sobe e vira de lado para mostrar o sapato); nas outras partes, normal
+  function zoomDaParte() { var c = catAtual(); zoom(!!(c && c.zoom), true); if (animEstudio) animEstudio.modo(c && c.id === 'sapatos' && naParte ? 'vitrine' : ''); }
   $('btZoom').addEventListener('click', function () { Som.tocar('clique'); zoom(!zoomLigado, true); });
 
 

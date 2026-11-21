@@ -589,3 +589,14 @@ test('perfis de movimento: menino anda firme e paralelo, menina com o andar dela
   assert.match(B.svg({ personagem: 'menino', idade: 'crianca' }, { id: 'pm', fundo: false }), /data-perfil="masculino" data-idade="crianca"/);
   assert.match(B.svg({}, { id: 'pf', fundo: false }), /data-perfil="feminino"/);
 });
+
+test('vitrine dos sapatos e roupa sem zoom afasta (dono, 21/Nov/2026)', () => {
+  const s = B.svg({ sapatos: 'salto' }, { id: 'vt', rig: true, passos: true, fundo: false });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  assert.match(s, /class="pp-sapato-frente"/); assert.match(s, /class="pp-sapato-lado-e" style="display:none"/); assert.match(s, /class="pp-sapato-lado-d" style="display:none"/);
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /modo === 'vitrine'/, 'um pé de cada vez sobe e vira de lado');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /c\.id === 'sapatos' && naParte \? 'vitrine' : ''/, 'só na parte dos sapatos');
+  assert.match(app, /cm\.grupo === 'roupa' && !cm\.zoom && zoomLigado\) zoom\(false, true\)/, 'vestido e outras roupas: afasta para mostrar inteira');
+});

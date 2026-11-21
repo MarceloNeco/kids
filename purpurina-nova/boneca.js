@@ -378,7 +378,17 @@
     var iniPernas = out.length;
     // pernas com forma de verdade: coxa larga em cima, joelho, panturrilha e tornozelo fino (cabem dentro das calças)
     [[177, 173], [223, 227]].forEach(function (q) { out.push(perna(q[0], q[1])); });
-    out.push(sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas));
+    // vitrine dos sapatos (dono, 21/Nov/2026: "o pezinho tem que estar movimentado… virar para o lado… de frente você não
+    // consegue ver o sapatinho"): com o esqueleto, cada pé também tem o sapato de lado (bico para fora), escondido; o
+    // animador levanta um pé de cada vez e mostra o sapato de perfil (.pp-sapato-lado), depois volta ao de frente
+    var vitrine = op.rig !== false && op.passos && !angB && !(POSES.indexOf(op.pose) >= 0);   // (o rig ainda não foi decidido aqui)
+    if (vitrine) {
+      var XE = DF.fx(177, 650);
+      out.push('<g class="pp-sapato-frente">' + sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas) + '</g>');
+      // (cada pé com o seu: na perna esquerda só o sapato de lado esquerdo, senão a ponta do outro aparecia no corte)
+      out.push('<g class="pp-sapato-lado-e" style="display:none"><g transform="translate(' + n(2 * XE) + ' 0) scale(-1 1)">' + sapatoLado(167, false) + '</g></g>' +
+        '<g class="pp-sapato-lado-d" style="display:none">' + sapatoLado(213, false) + '</g>');
+    } else out.push(sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas));
 
     // ---------- parte de baixo ----------
     if (vis('calca')) out.push(calca(e.calca, C('calca'), peca, linha, pele));
