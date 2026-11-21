@@ -1,17 +1,20 @@
 /*
-  Rádio do Bolinho: 10 músicas de rock alegre gravadas (Kevin MacLeod, CC BY 4.0, e HoliznaCC0, domínio público; pasta musicas/,
+  Rádio do Bolinho: a abertura orquestral e 10 músicas de rock alegre gravadas (Kevin MacLeod, CC BY 4.0, e HoliznaCC0, domínio público; pasta musicas/,
   créditos em CREDITOS.md) tocando uma depois da outra, num player fixo no pé da página.
   - Começa sozinha ao abrir a página. Celular e computador costumam bloquear som antes de a pessoa tocar na
     página: nesse caso começa no PRIMEIRO TOQUE EM QUALQUER LUGAR (menos no próprio player, que tem os botões dele).
   - Quem pausou não é surpreendido: a página lembra (bolinho:radio:pausado) e só volta a tocar sozinha depois que
     alguém tocar ▶ de novo. Com "economia de dados" ligada, não toca sozinha.
-  - ⏯ pausa e continua; ⏮ ⏭ trocam; as bolinhas mostram as 10 músicas e escolhem uma.
+  - ⏯ pausa e continua; ⏮ ⏭ trocam; as bolinhas mostram as 11 músicas e escolhem uma.
   - 📺 Clipe (19/Nov/2026) abre o telão do clipe.js: bichinhos dançando a música que está tocando (parada, começa a tocar).
   - A telinha dos DJs não fica mais aqui (dono, 20/Nov/2026: "é dentro da página do Bolinho FM"): mora no alto da
     biblioteca (biblioteca.js), que segue também o som desta rádio por window.BolinhoRadio = { audio, musica() }.
   - Cada música baixa só quando vai tocar (preload="none").
-  - Ordem sorteada a cada vez que abre, com a favorita (Cool Rock) sempre por último (Trilha.embaralhar; regra do
-    dono, 06/Nov/2026: com internet, todas as gravadas; a favorita, que é a de sem internet, nunca é a primeira).
+  - Abertura (dono, 21/Nov/2026): a "Abertura do Bolinho FM" (fantasia orquestral, composição original da SolverONE, CC0;
+    musicas/bolinho-abertura.mp3, refeita por ferramentas/musica-abertura.py) é SEMPRE a primeira quando a rádio começa;
+    só sai da frente se alguém a tirar do repertório na Biblioteca (Trilha.desligada). Não é a favorita sem internet.
+  - Depois dela, ordem sorteada a cada vez que abre, com a favorita (Cool Rock) sempre por último (Trilha.embaralhar;
+    regra do dono, 06/Nov/2026: com internet, todas as gravadas; a favorita, que é a de sem internet, nunca é a primeira).
   - Tela de bloqueio do celular mostra a música e os botões (Media Session).
   - Sem internet (ou se a música não abre): toca em laço a favorita da estante, guardada no aparelho pelo
     Trilha.offline (trilha.js, carregado antes deste arquivo). Com internet, ela é guardada na primeira música que toca.
@@ -20,6 +23,7 @@
   function T(pt, en, es) { return window.BolinhoIdioma ? BolinhoIdioma.t(pt, en, es) : pt; }
   // Rock alegre e leve, para criança: tom maior, pouca distorção (medido em cada faixa antes de entrar).
   var K = 'Kevin MacLeod', H = 'HoliznaCC0';
+  var ABERTURA = { t: T('Abertura do Bolinho FM', 'Rainy Day FM Opening', 'Apertura de Buñuelos FM'), a: 'bolinho-abertura', au: 'SolverONE' };
   var MUSICAS = [
     { t: 'Classic', a: 'classic', au: H },
     { t: 'Chipper', a: 'chipper', au: K },
@@ -33,6 +37,8 @@
     { t: 'RetroFuture Clean', a: 'retrofuture-clean', au: K }
   ];
   if (window.Trilha && window.Trilha.embaralhar) MUSICAS = window.Trilha.embaralhar(MUSICAS, 'estante', function (m) { return '/kids/musicas/' + m.a + '.mp3'; });
+  // a abertura vem sempre na frente (menos se foi tirada do repertório na Biblioteca)
+  if (!(window.Trilha && window.Trilha.desligada && window.Trilha.desligada('estante', '/kids/musicas/' + ABERTURA.a + '.mp3'))) MUSICAS.unshift(ABERTURA);
   var CHAVE_PAUSA = 'bolinho:radio:pausado';
   function pausouAntes() { try { return localStorage.getItem(CHAVE_PAUSA) === '1'; } catch (e) { return false; } }
   function lembrarPausa(sim) { try { if (sim) localStorage.setItem(CHAVE_PAUSA, '1'); else localStorage.removeItem(CHAVE_PAUSA); } catch (e) {} }
@@ -46,7 +52,7 @@
 
   var css = '' +
     'body{padding-bottom:7.5rem!important}' +
-    '.radio{position:fixed;left:50%;bottom:.8rem;transform:translateX(-50%);z-index:15;width:calc(100% - 1.6rem);max-width:36rem;display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem .55rem .55rem;border-radius:999px;background:rgba(26,20,70,.92);border:1px solid #3a2f73;box-shadow:0 10px 30px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#f3f0ff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
+    '.radio{position:fixed;left:50%;bottom:.8rem;transform:translateX(-50%);z-index:15;width:calc(100% - 1.6rem);max-width:37rem;display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem .55rem .55rem;border-radius:999px;background:rgba(26,20,70,.92);border:1px solid #3a2f73;box-shadow:0 10px 30px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#f3f0ff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
     '.radio button{flex:none;border:0;cursor:pointer;color:inherit;background:transparent;border-radius:50%;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;font:inherit}' +
     '.radio button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}' +
     '.radio svg{width:22px;height:22px;fill:currentColor}' +
@@ -65,7 +71,7 @@
     '.r-bolinhas i{display:block;width:12px;height:5px;border-radius:3px;background:#3a2f73}' +
     '.r-bolinhas button[aria-current] i{background:#c6ff3d;width:18px}' +
     /* as bolinhas só aparecem onde cabem com alvo de toque de 24 px; no celular, ⏮ ⏭ trocam */
-    '@media (min-width:36rem){.r-disco{display:block}.r-bolinhas{display:flex}}' +
+    '@media (min-width:38rem){.r-disco{display:block}.r-bolinhas{display:flex}}' +   /* 38rem: cabem as 11 bolinhas */
     // 📺 Clipe (dono, 19/Nov/2026): abre o telão com os bichinhos dançando a música que está tocando (clipe.js)
     '.radio .r-clipe{width:auto;min-width:44px;height:44px;border-radius:999px;padding:0 .9rem 0 .75rem;gap:.35rem;font-weight:800;font-size:.92rem;' +
     'background:linear-gradient(135deg,rgba(62,232,255,.24),rgba(198,255,61,.14));border:1.5px solid #3ee8ff;box-shadow:0 0 12px rgba(62,232,255,.28);white-space:nowrap}' +
@@ -114,7 +120,7 @@
       titulo.classList.remove('troca');
     }, 120);
     var m = MUSICAS[atual];
-    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === H ? 'CC0' : 'CC BY 4.0') : '<span class="pt">Tocar</span><span class="en">Play</span><span class="es">Reproducir</span>') + ' · <a href="https://github.com/MarceloNeco/kids/blob/main/CREDITOS.md" target="_blank" rel="noopener"><span class="pt">créditos</span><span class="en">credits</span><span class="es">créditos</span></a>';
+    autor.innerHTML = (comecou ? (atual + 1) + '/' + MUSICAS.length + ' · ' + m.au + ' · ' + (m.au === K ? 'CC BY 4.0' : 'CC0') : '<span class="pt">Tocar</span><span class="en">Play</span><span class="es">Reproducir</span>') + ' · <a href="https://github.com/MarceloNeco/kids/blob/main/CREDITOS.md" target="_blank" rel="noopener"><span class="pt">créditos</span><span class="en">credits</span><span class="es">créditos</span></a>';
     for (var i = 0; i < listaBolinhas.length; i++) {
       if (i === atual) listaBolinhas[i].setAttribute('aria-current', 'true'); else listaBolinhas[i].removeAttribute('aria-current');
     }

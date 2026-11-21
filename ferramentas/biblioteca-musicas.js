@@ -9,7 +9,7 @@ const path = require('path');
 const raiz = path.join(__dirname, '..');
 const LISTAS = require('../teste/listas-musica.js');
 
-const AUTORES = /(Kevin MacLeod|Weirwood|Kalsan|ALBatross|Rafael Krux|Bryan Teoh|Alexander Nakarada|HoliznaCC0|Holizna|Anthem of Rain|Komiku|Lobo Loco|Loyalty Freak Music|John Bartmann|Jason Shaw|Brian Boyko|Scott Holmes|Monplaisir|Ketsa|Tri-Tachyon)/i;
+const AUTORES = /(Kevin MacLeod|Weirwood|Kalsan|ALBatross|Rafael Krux|Bryan Teoh|Alexander Nakarada|HoliznaCC0|Holizna|Anthem of Rain|Komiku|Lobo Loco|Loyalty Freak Music|John Bartmann|Jason Shaw|Brian Boyko|Scott Holmes|Monplaisir|Ketsa|Tri-Tachyon|SolverONE)/i;
 function creditos() {
   const lista = [];
   for (const d of fs.readdirSync(raiz)) {
