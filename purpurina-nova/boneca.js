@@ -44,12 +44,12 @@
     // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
     pequena: { cabecas: 4.5, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.87, 0.89, 0.92, 0.99, 0.98, 0.9, 0.94, 0.86] },
     crianca: { cabecas: 5.2, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.82, 0.84, 0.8, 0.95, 0.96, 0.88, 0.94, 0.84] },
-    adolescente: { cabecas: 6.2, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.82, 0.82, 0.65, 1.0, 0.97, 0.76, 0.86, 0.68] },
-    adulta: { cabecas: 6.8, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.84, 0.84, 0.65, 1.06, 1.0, 0.74, 0.86, 0.64] }
+    adolescente: { cabecas: 6.2, topo: 76, ombro: 1.31, quadril: 2.72, larg: [0.82, 0.82, 0.65, 1.0, 1.25, 1.0, 1.05, 0.9] },
+    adulta: { cabecas: 6.8, topo: 64, ombro: 1.32, quadril: 2.8, larg: [0.84, 0.84, 0.65, 1.06, 1.3, 1.05, 1.1, 0.95] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
-    adolescente: [0.9, 0.9, 0.8, 0.86, 0.9, 0.82, 0.88, 0.78], adulta: [0.94, 0.94, 0.82, 0.88, 0.92, 0.82, 0.9, 0.78] };
+    adolescente: [0.9, 0.9, 0.8, 0.86, 1.15, 0.98, 1.02, 0.88], adulta: [0.94, 0.94, 0.82, 0.88, 1.2, 1.02, 1.06, 0.92] };
   /* barras de ajuste (dono, 20/Nov/2026: "uma barra de rolar… mais claro, mais escuro, até mais intensidade da maquiagem"):
      <parte>Tom (-1 = bem mais claro … 1 = bem mais escuro) vale para toda cor; <parte>Forca (0,15 … 1) é a intensidade da
      maquiagem — a cor vai se misturando com a pele até quase sumir. */
@@ -101,17 +101,31 @@
       }
       return 0.95;
     }
-    return { s: s, traco: 1, braco: tipo.b, queixo: queixo, yC: yC, fy: fy, fx: function (x, y) { return 200 + (x - 200) * gx(y); },
+    /* pernas (dono, 21/Nov/2026: "a grossura dos braços e das pernas tem que ser proporcional"): abaixo do gancho cada
+       perna engrossa ou afina em volta do PRÓPRIO meio (x 174 / 226), e não em volta do meio do corpo — assim joelho,
+       panturrilha e tornozelo ganham a grossura certa sem as pernas se abrirem em "O". No gancho (470) as duas contas
+       dão o mesmo lugar, então não há emenda. L[4..7] = grossura da coxa, joelho, panturrilha e tornozelo. */
+    var GG = gx(470), XP = [[470, GG], [515, L[4]], [552, L[5]], [588, L[6]], [626, L[7]], [646, L[7] * 1.1], [700, L[7] * 1.1]];
+    function gp(y) {
+      for (var i = 1; i < XP.length; i++) if (y <= XP[i][0]) { var a = XP[i - 1], b = XP[i], t = (y - a[0]) / (b[0] - a[0]); t = t * t * (3 - 2 * t); return a[1] + (b[1] - a[1]) * t; }
+      return XP[XP.length - 1][1];
+    }
+    function fx(x, y) {
+      if (y <= 470) return 200 + (x - 200) * gx(y);
+      var lado = x < 200 ? -1 : 1, c0 = 200 + lado * 26;
+      return 200 + lado * 26 * GG + (x - c0) * gp(y);
+    }
+    return { s: s, traco: 1, braco: tipo.b, queixo: queixo, yC: yC, fy: fy, gx: gx, fx: fx,
       cabeca: 'translate(200 ' + n(yC) + ') scale(' + n(s * 1000) / 1000 + ') translate(-200 ' + n(-queixo) + ')' };
   }
   // aplica a deformação em tudo o que é desenho do corpo (caminhos, círculos, elipses, retângulos e centros de giro)
   function deformar(str) {
     if (!DF || !str) return str;
     var D = DF, rigidas = [];
-    // peça solta (saia, vestido): abaixo do quadril nunca fica mais estreita que o quadril
+    // peça solta (saia, vestido): abaixo do quadril fica com a largura do quadril (cai do jeito que foi desenhada)
     str = str.replace(/<g data-solta="">([\s\S]*?)<\/g><!--\/solta-->/g, function (m, c) {
-      var g = function (y) { return D.fx(201, y) - 200; }, gq = g(466);
-      var D2 = Object.assign({}, D, { fx: function (x, y) { return 200 + (x - 200) * (y > 466 ? Math.max(g(y), gq) : g(y)); } });
+      var g = D.gx, gq = g(466);
+      var D2 = Object.assign({}, D, { fx: function (x, y) { return 200 + (x - 200) * (y > 466 ? gq : g(y)); } });
       rigidas.push('<g>' + deformarResto(c, D2) + '</g>');
       return '\u0001' + (rigidas.length - 1) + '\u0001';
     });
@@ -389,9 +403,10 @@
     // ---------- pescoço, tronco e braços ----------
     // pescoço (20/Nov/2026, dono: "divisão bizarra da cabeça, pescoço e torso"): sem contorno grosso nem faixa reta de
     // sombra — só um traço fino dos lados e uma sombra macia embaixo do queixo, para cabeça, pescoço e ombro serem um só
-    out.push(p('M187,262 L213,262 L214,318 Q218,336 248,342 L152,342 Q182,336 186,318Z', { fill: pele }) +
-      p('M187,268 L186,318 Q182,334 160,340 M213,268 L214,318 Q218,334 240,340', { fill: 'none', stroke: esc(pele, 0.3), 'stroke-width': 1.1, opacity: 0.7 }) +
-      p('M187,276 Q200,300 213,276 L213,268 L187,268Z', { fill: '#7a5ba8', opacity: 0.08 }));
+    // (dono, 21/Nov/2026: proporção normal) pescoço com a grossura de um pescoço de verdade (~5,5% da altura), não um palito
+    out.push(p('M173,262 L227,262 L226,312 Q230,334 252,342 L148,342 Q170,334 174,312Z', { fill: pele }) +
+      p('M173,268 L174,312 Q170,332 156,340 M227,268 L226,312 Q230,332 244,340', { fill: 'none', stroke: esc(pele, 0.3), 'stroke-width': 1.1, opacity: 0.7 }) +
+      p('M174,276 Q200,304 226,276 L226,268 L174,268Z', { fill: '#7a5ba8', opacity: 0.08 }));
     // tronco de pele um pouco mais estreito que qualquer roupa (a roupa cobre os lados: sem pele sobrando embaixo do braço)
     var TRONCO = 'M150,342 Q200,330 250,342 Q259,346 256,366 L248,458 L152,458 L144,366 Q141,346 150,342Z';
     // sem contorno em cima (dono, 20/Nov/2026: "divisão dos ombros e pescoço"): só os lados do tronco têm traço; pescoço,
@@ -586,7 +601,7 @@
     function bracoRig(lado) {
       var sx0 = lado < 0 ? 150 : 250, wx0 = lado < 0 ? 118 : 282, S = [DF.fx(sx0, 354), DF.fy(354)], W0 = [DF.fx(wx0, 498), DF.fy(498)];
       var W = [S[0] + (W0[0] - S[0]) * ENCURTA, S[1] + (W0[1] - S[1]) * ENCURTA], L = Math.sqrt((W[0] - S[0]) * (W[0] - S[0]) + (W[1] - S[1]) * (W[1] - S[1]));
-      var d = [(W[0] - S[0]) / L, (W[1] - S[1]) / L], Lu = L * 0.5, E = [S[0] + d[0] * Lu, S[1] + d[1] * Lu], k = DF.traco * 0.92 * DF.braco;
+      var d = [(W[0] - S[0]) / L, (W[1] - S[1]) / L], Lu = L * 0.5, E = [S[0] + d[0] * Lu, S[1] + d[1] * Lu], k = DF.traco * 1.3 * DF.braco;   // grossura de braço de verdade (dono, 21/Nov/2026)
       function seg(A, B, w0, w1) {   // pedaço do braço: começa largo e afina, com as pontas redondas
         var nx = -(B[1] - A[1]), ny = B[0] - A[0], l = Math.sqrt(nx * nx + ny * ny) || 1; nx /= l; ny /= l;
         // pontas redondas para fora (sweep 0): no cotovelo as duas pontas se encaixam sem buraco
@@ -600,9 +615,9 @@
       var bc = duas(seg(S, E, 12 * k, 8 * k), pele), ab = duas(seg(E, W, 8.2 * k, 5.6 * k), pele);   // braço afina do ombro ao punho
       var cimaC = bc.c, cimaF = bc.f, baixoC = ab.c, baixoF = ab.f;
       if (corTop && manga === 'longa') {
-        var mc = duas(seg(S, E, 13 * k, 10 * k), corTop.hex), mb = duas(seg(E, [W[0] - d[0] * 4, W[1] - d[1] * 4], 10 * k, 7.5 * k), corTop.hex);
+        var mc = duas(seg(S, E, 12.8 * k, 9.2 * k), corTop.hex), mb = duas(seg(E, [W[0] - d[0] * 4, W[1] - d[1] * 4], 9.2 * k, 6.8 * k), corTop.hex);
         cimaC += mc.c; cimaF += mc.f; baixoC += mb.c; baixoF += mb.f;
-      } else if (corTop && manga !== 'nada') cimaF += p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 14 * k, 12.5 * k), { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
+      } else if (corTop && manga !== 'nada') cimaF += p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 13 * k, 11 * k), { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
       // ombro redondo por baixo do braço (some o "ganchinho" no ombro)
       cimaC = circ(S[0], S[1], 13 * k, { fill: corTop && manga !== 'nada' ? corTop.hex : pele }) + cimaC;
       // sem manga: o arco do contorno do braço não risca o ombro (a pele do braço continua a do ombro)
