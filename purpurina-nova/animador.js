@@ -73,6 +73,13 @@
         var S = [+om.getAttribute('data-x'), +om.getAttribute('data-y')], E = [+co.getAttribute('data-x'), +co.getAttribute('data-y')];
         var to = B.transformaOmbro(b[0] === 'e' ? b[1] : -b[1], b[3], S);
         for (var m = 0; m < oms.length; m++) oms[m].setAttribute('transform', to);
+        // mão na nuca: o antebraço e a mão passam para trás da cabeça (a cópia de trás aparece e a da frente some)
+        var atr = B.maoAtras(b[1], b[2]) ? '1' : '0';
+        if (om.getAttribute('data-atras') !== atr) {
+          om.setAttribute('data-atras', atr);
+          Array.prototype.forEach.call(svg.querySelectorAll('.rig-atras-' + b[0]), function (g) { g.style.display = atr === '1' ? '' : 'none'; });
+          Array.prototype.forEach.call(svg.querySelectorAll('.rig-frente-' + b[0]), function (g) { g.style.display = atr === '1' ? 'none' : ''; });
+        }
         var tc = B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E);
         for (var q = 0; q < cos.length; q++) cos[q].setAttribute('transform', tc);   // contorno e preenchimento do antebraço
       });
