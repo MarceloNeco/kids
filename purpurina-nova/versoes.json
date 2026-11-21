@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.5",
+      "data": "21/Nov/2026",
+      "hora": "22:39:34",
+      "pt": [
+        "📏 Proporções de gente de verdade: pescoço, braços e pernas com a grossura certa (antes eram finos como palitos), coxa mais cheia afinando até o joelho, panturrilha e tornozelo fino, e pernas mais compridas (o gancho perto da metade da altura).",
+        "👚 Mangas na medida do braço novo e vestidos caindo retos do quadril, sem virar balão."
+      ],
+      "en": [
+        "📏 Real-person proportions: neck, arms and legs with the right thickness (before they were stick-thin), fuller thighs tapering to the knee, calves and slim ankles, and longer legs (the crotch near half the height).",
+        "👚 Sleeves sized to the new arms and dresses falling straight from the hips, without ballooning."
+      ],
+      "es": [
+        "📏 Proporciones de persona de verdad: cuello, brazos y piernas con el grosor adecuado (antes eran finos como palillos), muslos más llenos que se afinan hasta la rodilla, pantorrillas y tobillos finos, y piernas más largas (la entrepierna cerca de la mitad de la altura).",
+        "👚 Mangas a la medida del brazo nuevo y vestidos que caen rectos desde la cadera, sin hacer globo."
+      ]
+    },
+    {
       "versao": "0.9.4",
       "data": "21/Nov/2026",
       "hora": "22:21:47",

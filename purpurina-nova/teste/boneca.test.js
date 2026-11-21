@@ -537,3 +537,15 @@ test('rebolado do corpo inteiro, sem emenda, e saia solta (dono, 21/Nov/2026)', 
   assert.match(B.svg({ vestido: 'verao', blusa: 'nenhum', calca: 'nenhum' }, { id: 'vs', fundo: false }), /<g><path/);
   assert.doesNotMatch(B.svg({ vestido: 'verao' }, { id: 'vt', fundo: false }), /data-solta/, 'a marca some depois de deformar');
 });
+
+test('proporções normais: pescoço, braços e pernas com grossura de verdade (dono, 21/Nov/2026)', () => {
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /M173,262 L227,262/, 'pescoço de ~5,5% da altura, não um palito');
+  assert.match(fonte, /k = DF\.traco \* 1\.3 \* DF\.braco/, 'braço com a grossura de um braço');
+  // cada perna engrossa em volta do próprio meio (não abre em "O") e as contas se encontram no gancho
+  assert.match(fonte, /var lado = x < 200 \? -1 : 1, c0 = 200 \+ lado \* 26;/);
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
+  assert.ok(L[4] > L[5] && L[6] > L[5] && L[5] > L[7], 'coxa > joelho < panturrilha > tornozelo');
+  assert.ok(+fonte.match(/adulta: \{ cabecas: [\d.]+, topo: \d+, ombro: [\d.]+, quadril: ([\d.]+)/)[1] <= 2.85, 'pernas compridas (gancho perto da metade da altura)');
+  assert.equal(bemFormado(B.svg({ idade: 'adulta', vestido: 'verao' }, { id: 'pn', fundo: false })), '');
+});
