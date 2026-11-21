@@ -16,7 +16,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.1', APP_DATA = '21/Nov/2026';
+  var APP_VERSION = '0.4.2', APP_DATA = '21/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA);
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -53,9 +53,9 @@
         'Swipe to throw the ball and knock down all 10 pins. A 10-frame game with strikes, spares and a real scoreboard.',
         'Desliza el dedo para lanzar la bola y derriba los 10 bolos. Una partida de 10 tiradas, con pleno, semipleno y marcador de verdad.'] },
     { id: 'bolinhas', nome: ['Bolinhas da Angústia', 'Nail-Biter Drop', 'Bolitas de la Angustia'],
-      texto: ['O game show da parede gigante, em duas modalidades: na Queda Livre você responde enquanto as bolinhas caem; no Sem pressa escolhe de onde elas caem e responde com calma. Acertou, ficam verdes e somam; errou, vermelhas e descontam.',
-        'The giant-wall game show, in two modes: in Free Fall you answer while the balls are falling; in No Rush you pick where they drop and answer calmly. Get it right and they turn green and add up; get it wrong and they turn red and take away.',
-        'El concurso de la pared gigante, en dos modalidades: en la Caída Libre respondes mientras caen las bolitas; en Sin prisa eliges desde dónde caen y respondes con calma. Si aciertas, se vuelven verdes y suman; si fallas, rojas y restan.'] },
+      texto: ['O game show da parede gigante, em duas modalidades: na Queda Livre você responde enquanto as bolinhas caem; no Sem pressa escolhe de onde elas caem e responde com calma. Acertou, ficam verdes e somam; errou, vermelhas e descontam. Suba a escada de pontos até a 🏆, com portos seguros pelo caminho.',
+        'The giant-wall game show, in two modes: in Free Fall you answer while the balls are falling; in No Rush you pick where they drop and answer calmly. Get it right and they turn green and add up; get it wrong and they turn red and take away. Climb the points ladder to the 🏆, with safe havens along the way.',
+        'El concurso de la pared gigante, en dos modalidades: en la Caída Libre respondes mientras caen las bolitas; en Sin prisa eliges desde dónde caen y respondes con calma. Si aciertas, se vuelven verdes y suman; si fallas, rojas y restan. Sube la escalera de puntos hasta el 🏆, con puertos seguros por el camino.'] },
     { id: 'velha', nome: ['Jogo da Velha', 'Tic-Tac-Toe', 'Tres en Raya'],
       texto: ['Espadas contra escudos no campo de batalha: faça uma linha de 3 antes do outro exército. Quem vencer 3 batalhas vence a guerra! Contra o computador ou em dois.',
         'Swords against shields on the battlefield: make a line of 3 before the other army. Whoever wins 3 battles wins the war! Against the computer or with two players.',

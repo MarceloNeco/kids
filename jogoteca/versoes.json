@@ -2,6 +2,26 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.4.2",
+      "data": "21/Nov/2026",
+      "hora": "17:32:00",
+      "pt": [
+        "🪜 Escada de pontos no Bolinhas da Angústia: suba 6 degraus até a 🏆 (30.000 na Queda Livre, 50.000 no Sem pressa). O 2º e o 4º degraus são 🛟 portos seguros: alcançou, ficam garantidos e as vermelhas não derrubam abaixo deles. A rodada segue até a meta, 12 perguntas ou 3 erros seguidos, e as perguntas ficam mais difíceis conforme você sobe",
+        "🧘 Bolinhas da Angústia, modo Sem pressa em 2 passos bem claros: 1) “Onde as bolinhas vão cair?” — toque em 3 dos 7 botões numerados (ou em 🎲 Sortear; ↩ desfaz); 2) “Agora responda!” — aparecem as 4 opções para tocar",
+        "📺 O selo “Ao vivo” saiu de cima das zonas e nada mais fica embaixo da bolinha 🎵 da música"
+      ],
+      "en": [
+        "🪜 Points ladder in Nail-Biter Drop: climb 6 steps to the 🏆 (30,000 in Free Fall, 50,000 in No Rush). The 2nd and 4th steps are 🛟 safe havens: reach one and it is locked in, so red balls can't drop you below it. The round goes on until the goal, 12 questions or 3 wrong in a row, and the questions get harder as you climb",
+        "🧘 Nail-Biter Drop, No Rush mode in 2 clear steps: 1) “Where will the balls drop?” — tap 3 of the 7 numbered buttons (or 🎲 Random; ↩ undoes); 2) “Now answer!” — the 4 options show up, ready to tap",
+        "📺 The “Live” badge no longer covers the zones, and nothing sits under the 🎵 music bubble anymore"
+      ],
+      "es": [
+        "🪜 Escalera de puntos en Bolitas de la Angustia: sube 6 peldaños hasta el 🏆 (30.000 en la Caída Libre, 50.000 en Sin prisa). El 2.º y el 4.º peldaños son 🛟 puertos seguros: al alcanzarlos quedan asegurados y las rojas no te bajan de ahí. La ronda sigue hasta la meta, 12 preguntas o 3 fallos seguidos, y las preguntas se vuelven más difíciles según subes",
+        "🧘 Bolitas de la Angustia, modo Sin prisa en 2 pasos bien claros: 1) «¿Dónde caerán las bolitas?» — toca 3 de los 7 botones numerados (o 🎲 Al azar; ↩ deshace); 2) «¡Ahora responde!» — aparecen las 4 opciones para tocar",
+        "📺 La etiqueta «En directo» ya no tapa las zonas y nada queda debajo de la bolita 🎵 de la música"
+      ]
+    },
+    {
       "versao": "0.4.1",
       "data": "21/Nov/2026",
       "hora": "10:34:57",
