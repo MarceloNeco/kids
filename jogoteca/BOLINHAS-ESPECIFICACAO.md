@@ -1,4 +1,37 @@
-# Bolinhas da Angústia — especificação do dono (19/Nov/2026)
+# Bolinhas da Angústia — especificação do dono
+
+## Decisão do dono de 21/Nov/2026 (vale por cima do que está abaixo)
+
+Palavras do dono: "você não tem que responder só, não tem que ter dois jogadores, não precisa disso, tá? (...) Pode ser,
+enfim, modalidades de jogo. Uma é essa que eu gostei até, de você responder enquanto a bolinha tá caindo, com duas opções.
+E uma que não tem tempo, que você responde entre quatro opções (...) E aí você escolhe onde que as bolinhas estão antes de
+responder as perguntas. E aí depois que você responder, se tá errado ou certo, o verde ou vermelho, ele cai lá para tirar ou
+te dar ponto."
+
+- **Uma pessoa joga sozinha.** Saíram o modo Solo + Parceiro (os parceiros virtuais com afinidades — nenhum personagem
+  parceiro fica no jogo, nem o tio de bigode que o dono pediu para tirar), o modo Dois na mesma tela (passar o aparelho), a
+  Sala de Isolamento, as Fases 2 e 3, o Contrato e a revelação.
+- **Duas modalidades**, escolhidas em cartões na tela de começo (o ▶ Começar fica sempre à vista, com a última escolhida):
+  - **⏱ Queda Livre** (a de antes, que o dono gostou): 5 perguntas de 2 opções; três bolinhas brancas caem das zonas 1, 4 e
+    7 e é preciso responder antes que a primeira chegue lá embaixo. Acertou: verdes, somam. Errou (ou não respondeu):
+    vermelhas, descontam.
+  - **🧘 Sem pressa** (EN "No Rush", ES "Sin prisa"): 5 perguntas de 4 opções, **sem tempo**. Lida a pergunta, a pessoa
+    escolhe 3 zonas no alto (pode repetir; ↩ desfaz) e só então responde. Acertou: as bolinhas caem verdes e somam o valor
+    da canaleta; errou: caem vermelhas e descontam.
+  - No fim de cada rodada, o placar (saldo, acertos, recorde por modalidade e nível). O saldo nunca fica abaixo de zero.
+    Os valores das 15 canaletas são os da antiga Fase 1. O nível da Jogoteca escolhe a dificuldade das perguntas (e, na
+    Queda Livre, o tempo para ler).
+- Mais pedidos do mesmo dia, com fotos do programa de TV como referência de estilo (sem nome, logotipo ou marca dele):
+  música de **tensão e emoção** durante a queda, do soltar até a última bolinha bater no fundo, e depois a trilha volta do
+  ponto onde parou; **câmera do ponto de vista da bolinha** (começa colada nela, passando pelos pinos, e depois acompanha);
+  **acompanhamento bem mais perto** e a **bolinha um pouco maior** (raio 14, com a gravidade recalibrada para a queda
+  continuar em ~5,8 s); **painel de LED animado** atrás dos pinos (quadradinhos que acendem em ondas: azul no normal, verde
+  no acerto, vermelho no erro) e um **arco de luz** em volta da parede. Com "reduzir movimento", sem câmera da bolinha e sem
+  câmera lenta.
+
+---
+
+## Especificação original (19/Nov/2026)
 
 Pedido do dono: "Dentro do jogoteca, o The Wall não pode chamar The Wall, mas sim Bolinhas da Angústia". Texto do dono,
 como veio (duas partes: a descrição do programa e a especificação de game design):

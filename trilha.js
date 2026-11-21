@@ -245,10 +245,12 @@
     T.tocando = function () { return !audio.paused; };
     T.musica = function () { return naFavorita ? favoritaDaLista() : lista[atual]; };   // { t, au, lic } da que toca (📺 Clipe)
     T.parar = function () { audio.pause(); };
+    // volta a tocar do ponto onde parou (ex.: depois da música de tensão de um jogo); respeita o 🔇 da pessoa
+    T.continuar = function () { if (!mudo() && audio.src && audio.paused) tocar(); };
     T._audio = audio;
     return T;
   };
-  T.volume = function () {}; T.tocando = function () { return false; }; T.parar = function () {}; T.musica = function () { return null; };
+  T.volume = function () {}; T.tocando = function () { return false; }; T.parar = function () {}; T.continuar = function () {}; T.musica = function () { return null; };
   // O navegador já deixa tocar som sem toque? (dono, 20/Nov/2026: "como eles vêm do Bolinho, já deixa a musiquinha
   // tocando".) Vindo da estante, o toque em "Jogar" vale também para a página do jogo (Chrome); aberto direto, pelo ícone
   // ou no Safari, não: aí a música espera o primeiro toque, como antes. Os jogos com tocador próprio perguntam isto ao

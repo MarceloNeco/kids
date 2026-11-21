@@ -1,6 +1,9 @@
 // Testes do Bolinhas da Angústia: node --test jogoteca/teste/bolinhas.test.js (rodar da raiz do repositório kids).
-// 1) Regras, perguntas e física (lógica pura, no Node). 2) Página no Chromium (Playwright): Fase 1, travar a resposta,
-// a partida inteira até o Contrato e a revelação, e o modo Dois na mesma tela (cortina, Sala de Isolamento, assinar).
+// Decisão do dono (21/Nov/2026): uma pessoa joga sozinha, em duas modalidades — Queda Livre (2 opções, responder enquanto
+// as bolinhas caem) e Sem pressa (4 opções, sem tempo, escolher 3 zonas antes de responder). Sem parceiro virtual, sem dois
+// jogadores, sem Contrato.
+// 1) Regras, perguntas e física (lógica pura, no Node). 2) Página no Chromium (Playwright): escolher a modalidade, uma
+// rodada de cada até o placar, a câmera da bolinha, a música de tensão e nada de parceiro em lugar nenhum.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('http');
@@ -15,33 +18,47 @@ const L = jogo.logica;
 const BANCO = window.JogotecaBolinhasPerguntas;
 
 /* ---------------- regras ---------------- */
-test('tabelas de valores das 3 fases (as da especificação do dono)', () => {
-  assert.deepEqual(L.VALORES[1], [1, 500, 100, 2000, 10, 1000, 5, 10000, 1, 5000, 10, 2500, 100, 1500, 1]);
-  assert.deepEqual(L.VALORES[2], [1, 2500, 500, 10000, 50, 5000, 25, 50000, 1, 25000, 50, 12500, 500, 7500, 1]);
-  assert.deepEqual(L.VALORES[3], [1, 10000, 2500, 50000, 250, 25000, 100, 150000, 1, 75000, 250, 35000, 2500, 15000, 1]);
-  for (const f of [1, 2, 3]) {
-    const v = L.VALORES[f];
-    assert.equal(v.length, 15);
-    assert.equal(v[0] + v[14], 2, 'as pontas valem o mínimo');
-    assert.ok(v[7] === Math.max(...v), 'o maior valor fica no centro');
-  }
+test('valores das 15 canaletas (tabela da especificação): pontas no mínimo, o maior no centro', () => {
+  assert.deepEqual(L.VALORES, [1, 500, 100, 2000, 10, 1000, 5, 10000, 1, 5000, 10, 2500, 100, 1500, 1]);
+  assert.equal(L.VALORES[0] + L.VALORES[14], 2);
+  assert.equal(L.VALORES[7], Math.max(...L.VALORES));
   assert.equal(L.GEO.ZONAS, 7); assert.equal(L.GEO.CANALETAS, 15);
 });
 
-test('saldo: verde soma, vermelha desconta e nunca fica abaixo de zero', () => {
+test('duas modalidades: Queda Livre com 2 opções e tempo; Sem pressa com 4 opções e sem tempo', () => {
+  assert.deepEqual(Object.keys(L.MODALIDADES).sort(), ['calma', 'queda']);
+  const q = L.MODALIDADES.queda, c = L.MODALIDADES.calma;
+  assert.equal(q.opcoes, 2); assert.equal(c.opcoes, 4);
+  assert.ok(q.perguntas >= 3 && c.perguntas >= 3, 'várias perguntas por rodada');
+  assert.deepEqual(q.zonas, [0, 3, 6], 'na Queda Livre as bolinhas caem das zonas 1, 4 e 7');
+  assert.equal(c.zonas, null, 'no Sem pressa quem escolhe as zonas é a pessoa');
+  assert.equal(L.tempoDeLeitura('calma', 'facil'), null); assert.equal(L.tempoDeLeitura('calma', 'dificil'), null);
+  assert.ok(L.tempoDeLeitura('queda', 'facil') > L.tempoDeLeitura('queda', 'medio'));
+  assert.ok(L.tempoDeLeitura('queda', 'medio') > L.tempoDeLeitura('queda', 'dificil'));
+});
+
+test('pontos: acertou = verde soma; errou = vermelha desconta, e o saldo nunca fica abaixo de zero', () => {
+  assert.equal(L.corDaResposta(true), 'verde'); assert.equal(L.corDaResposta(false), 'vermelha');
   assert.equal(L.aplicarBola(100, 500, 'verde'), 600);
   assert.equal(L.aplicarBola(600, 500, 'vermelha'), 100);
   assert.equal(L.aplicarBola(100, 500, 'vermelha'), 0);
-  assert.equal(L.aplicarBola(0, 10000, 'vermelha'), 0);
+  // um lote inteiro: as canaletas onde caíram (7 = 10.000, 1 = 500, 14 = 1)
+  assert.equal(L.aplicarLote(0, [7, 1, 14], 'verde'), 10501);
+  assert.equal(L.aplicarLote(10501, [1, 14], 'vermelha'), 10000);
+  assert.equal(L.aplicarLote(300, [7, 1], 'vermelha'), 0);
 });
 
-test('contrato = saldo da Fase 1 + acertos F2 × 5.000 + acertos F3 × 10.000', () => {
-  assert.equal(L.valorContrato(12500, 2, 1), 32500);
-  assert.equal(L.valorContrato(0, 0, 0), 0);
-  assert.equal(L.valorContrato(1, 3, 3), 45001);
-  assert.deepEqual(L.multiplicadores(0), [1]);
-  assert.deepEqual(L.multiplicadores(1), [1, 2]);
-  assert.deepEqual(L.multiplicadores(2), [1, 3]);
+test('Sem pressa: as zonas vêm antes da resposta (3 bolinhas, a mesma zona pode repetir)', () => {
+  const max = L.MODALIDADES.calma.bolas;
+  assert.equal(max, 3);
+  let z = [];
+  assert.equal(L.zonasProntas(z, max), false);
+  z = L.adicionarZona(z, 3, max); z = L.adicionarZona(z, 3, max);
+  assert.equal(L.zonasProntas(z, max), false, 'com 2 ainda não responde');
+  z = L.adicionarZona(z, 9, max);
+  assert.deepEqual(z, [3, 3, 6], 'zona fora da parede vira a da ponta');
+  assert.equal(L.zonasProntas(z, max), true);
+  assert.deepEqual(L.adicionarZona(z, 1, max), [3, 3, 6], 'não passa de 3');
 });
 
 test('moeda por idioma: R$ em PT, $ em EN, € em ES (os mesmos números)', () => {
@@ -51,12 +68,26 @@ test('moeda por idioma: R$ em PT, $ em EN, € em ES (os mesmos números)', () =
   assert.equal(L.dinheiro(0, 'pt'), 'R$ 0');
 });
 
+test('sem parceiro, sem dois jogadores, sem Contrato e nenhum personagem parceiro no código, nos textos e na documentação', () => {
+  for (const k of ['PERSONAGENS', 'afinidades', 'iaResponder', 'iaContrato', 'valorContrato', 'multiplicadores', 'BONUS']) assert.equal(L[k], undefined, k);
+  const pasta = path.resolve(__dirname, '..');
+  const arquivos = ['jogos/bolinhas.js', 'jogos/bolinhas-perguntas.js', 'app.js', 'LEIA-ME.md', 'BOLINHAS-ESPECIFICACAO.md', 'teste/bolinhas.test.js'];
+  for (const a of arquivos) {
+    const txt = fs.readFileSync(path.join(pasta, a), 'utf8');
+    assert.ok(!new RegExp('Rub' + 'ens', 'i').test(txt), a + ': ainda fala do personagem tirado');
+  }
+  const js = fs.readFileSync(path.join(pasta, 'jogos/bolinhas.js'), 'utf8');
+  for (const r of [/Sala de Isolamento/, /Dois na mesma tela/, /assinar/i]) assert.ok(!r.test(js), 'bolinhas.js ainda tem ' + r);
+  const ajuda = jogo.ajuda((pt) => pt);
+  assert.match(ajuda, /Queda Livre/); assert.match(ajuda, /Sem pressa/); assert.doesNotMatch(ajuda, /parceiro/i);
+});
+
 /* ---------------- perguntas ---------------- */
-test('banco: 40 de 2 opções, 30 de 3 e 30 de 4, nos 3 idiomas, com a certa válida', () => {
+test('banco: 40 de 2 opções e 60 de 4, nos 3 idiomas, com a certa válida', () => {
   const por = n => BANCO.filter(q => q.o.length === n);
   assert.ok(por(2).length >= 40, '2 opções: ' + por(2).length);
-  assert.ok(por(3).length >= 30, '3 opções: ' + por(3).length);
-  assert.ok(por(4).length >= 30, '4 opções: ' + por(4).length);
+  assert.ok(por(4).length >= 60, '4 opções: ' + por(4).length);
+  assert.equal(BANCO.length, por(2).length + por(4).length, 'só perguntas de 2 ou de 4 opções');
   const ids = new Set();
   for (const q of BANCO) {
     assert.ok(!ids.has(q.id), 'id repetido: ' + q.id); ids.add(q.id);
@@ -70,51 +101,28 @@ test('banco: 40 de 2 opções, 30 de 3 e 30 de 4, nos 3 idiomas, com a certa vá
       assert.equal(new Set(textos).size, textos.length, q.id + ': opções repetidas no idioma ' + i);
     }
   }
-  // as 10 categorias aparecem em cada fase, e as 3 dificuldades também
-  for (const n of [2, 3, 4]) {
+  for (const n of [2, 4]) {
     assert.equal(new Set(por(n).map(q => q.cat)).size, 10, n + ' opções: as 10 categorias');
     assert.deepEqual([...new Set(por(n).map(q => q.d))].sort(), [1, 2, 3]);
   }
 });
 
-test('sorteio: nada repete na partida e o nível escolhe a dificuldade', () => {
-  for (const nivel of ['facil', 'medio', 'dificil']) {
-    const usadas = {}, s = L.criarSorte(11), ids = [];
-    for (const [n, k] of [[2, 5], [3, 3], [4, 3]]) for (let i = 0; i < k; i++) {
-      const q = L.sortearPergunta(BANCO, n, nivel, usadas, s);
-      assert.equal(q.o.length, n); ids.push(q.id);
+test('sorteio: nada repete na rodada e o nível escolhe a dificuldade', () => {
+  for (const nivel of ['facil', 'medio', 'dificil']) for (const mod of ['queda', 'calma']) {
+    const R = L.MODALIDADES[mod], usadas = {}, s = L.criarSorte(11), ids = [];
+    for (let i = 0; i < R.perguntas; i++) {
+      const q = L.sortearPergunta(BANCO, R.opcoes, nivel, usadas, s);
+      assert.equal(q.o.length, R.opcoes); ids.push(q.id);
       if (nivel === 'facil') assert.equal(q.d, 1, 'fácil começa pelas fáceis');
       if (nivel === 'dificil') assert.equal(q.d, 3, 'difícil começa pelas difíceis');
     }
-    assert.equal(new Set(ids).size, ids.length, nivel + ': sem repetir');
+    assert.equal(new Set(ids).size, ids.length, nivel + ' ' + mod + ': sem repetir');
   }
-  // esgotou a dificuldade preferida, pega a seguinte; esgotou tudo, devolve null
   const usadas = {}, s = L.criarSorte(3), vistas = new Set();
-  let q; while ((q = L.sortearPergunta(BANCO, 2, 'facil', usadas, s))) { assert.ok(!vistas.has(q.id)); vistas.add(q.id); }
-  assert.equal(vistas.size, BANCO.filter(x => x.o.length === 2).length);
-  // opções embaralhadas, com a certa acompanhando
+  let q; while ((q = L.sortearPergunta(BANCO, 4, 'facil', usadas, s))) { assert.ok(!vistas.has(q.id)); vistas.add(q.id); }
+  assert.equal(vistas.size, BANCO.filter(x => x.o.length === 4).length);
   const p = L.prepararPergunta(BANCO.find(x => x.id === 'g3c'), L.criarSorte(5));
   assert.equal(p.o[p.c][1], 'Canberra');
-});
-
-test('parceiro virtual: 4 a 6 personagens, afinidades de 0,2 a 0,95, nível muda a força', () => {
-  assert.ok(L.PERSONAGENS.length >= 4 && L.PERSONAGENS.length <= 6);
-  for (const p of L.PERSONAGENS) {
-    for (const nv of ['facil', 'medio', 'dificil']) {
-      const a = L.afinidades(p, nv);
-      assert.equal(Object.keys(a).length, 10);
-      for (const v of Object.values(a)) assert.ok(v >= 0.2 && v <= 0.95, p.nome + ' ' + nv + ': ' + v);
-    }
-    const f = L.afinidades(p, 'facil'), d = L.afinidades(p, 'dificil');
-    assert.ok(Object.keys(f).some(k => f[k] > d[k]), 'fácil = parceiro mais forte');
-  }
-  // responde pela afinidade: forte acerta muito mais que fraco
-  const q = L.prepararPergunta(BANCO.find(x => x.o.length === 3 && x.d === 1), L.criarSorte(1));
-  const taxa = (v) => { const s = L.criarSorte(9); let ok = 0; for (let i = 0; i < 2000; i++) if (L.iaResponder({ [q.cat]: v }, q, s).indice === q.c) ok++; return ok / 2000; };
-  assert.ok(taxa(0.95) > 0.9, 'forte'); assert.ok(taxa(0.2) < 0.55, 'fraco');
-  // no Contrato: muita certeza rasga, muito chute assina
-  assert.equal(L.iaContrato([0.9, 0.92, 0.88, 0.95], L.criarSorte(2)), 'rasgar');
-  assert.equal(L.iaContrato([0.2, 0.3, 0.25], L.criarSorte(2)), 'assinar');
 });
 
 /* ---------------- física ---------------- */
@@ -155,7 +163,7 @@ const server = http.createServer((req, res) => {
   if (!f.startsWith(raiz) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
   res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res);
 });
-const IGNORAR = /solverone-dados|favicon|\.mp3/i;
+const IGNORAR = /solverone-dados|favicon|\.mp3|media/i;
 let browser, base;
 
 test.describe('no navegador', () => {
@@ -182,39 +190,138 @@ test.describe('no navegador', () => {
   }
   const estado = pg => pg.evaluate(() => BolinhasDebug.estado());
 
-  for (const [w, h] of [[390, 844], [915, 412]]) {
-    test(w + '×' + h + ': a Fase 1 aparece com a pergunta e as bolinhas caindo; responder trava', async () => {
+  for (const [w, h] of [[360, 740], [390, 844]]) {
+    test(w + '×' + h + ': começo com as duas modalidades em cartões e o Começar à vista, sem rolar', async () => {
       const pg = await abrir({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true }, 'facil');
+      assert.equal(await pg.locator('.jt-bol2-modo[data-mod]').count(), 2);
+      const txt = await pg.textContent('.jt-bol2-cena');
+      assert.match(txt, /Queda Livre/); assert.match(txt, /Sem pressa/);
+      assert.doesNotMatch(txt, /parceiro|Sala de Isolamento|Dois na mesma tela/i);
+      const r = await pg.$eval('.jt-bol2-cena [data-comecar]', e => { const b = e.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, rola: e.closest('.jt-bol2-cena').scrollHeight > e.closest('.jt-bol2-cena').clientHeight + 1 }; });
+      assert.ok(r.top >= 0 && r.bottom <= h, 'Começar inteiro na tela: ' + JSON.stringify(r));
+      assert.equal(r.rola, false, 'a tela de começo não rola');
+      // escolha padrão: a Queda Livre já vem marcada; tocar no outro cartão troca e o botão diz qual vai começar
+      assert.equal(await pg.getAttribute('.jt-bol2-modo[data-mod="queda"]', 'aria-pressed'), 'true');
+      await pg.click('.jt-bol2-modo[data-mod="calma"]');
+      assert.equal(await pg.getAttribute('.jt-bol2-modo[data-mod="calma"]', 'aria-pressed'), 'true');
+      assert.match(await pg.textContent('.jt-bol2-cena [data-comecar]'), /Sem pressa/);
       await pg.click('.jt-bol2-cena [data-comecar]');
-      await pg.waitForSelector('.jt-bol2-fasecard [data-ok]');
-      await pg.click('.jt-bol2-fasecard [data-ok]');
-      assert.equal((await estado(pg)).etapa, 'leitura');
-      assert.ok((await pg.textContent('.jt-bol2-perg')).length > 8, 'a pergunta aparece');
-      assert.equal(await pg.locator('.jt-bol2-ops .jt-bol2-op').count(), 2);
-      // a parede ocupa boa parte da tela
-      const r = await pg.$eval('.jt-bol2-parede', e => { const b = e.getBoundingClientRect(); return { w: b.width, h: b.height }; });
-      assert.ok(r.h >= (h - 52) * 0.6, 'parede alta: ' + r.h);
-      await pg.evaluate(() => BolinhasDebug.velocidade(4));
-      await pg.waitForFunction(() => BolinhasDebug.estado().caindo === 3, null, { timeout: 15000 });
-      await pg.evaluate(() => BolinhasDebug.velocidade(1));
-      assert.equal((await estado(pg)).etapa, 'queda');
-      // responder trava: a escolhida fica marcada, as outras não aceitam mais toque
-      const e0 = await estado(pg);
-      const outra = e0.certa === 0 ? 1 : 0;
-      await pg.click('.jt-bol2-ops .jt-bol2-op[data-op="' + e0.certa + '"]');
-      assert.equal((await estado(pg)).resposta, e0.certa);
-      assert.equal(await pg.$eval('.jt-bol2-ops .jt-bol2-op[data-op="' + outra + '"]', b => b.disabled), true);
-      await pg.evaluate(o => BolinhasDebug.responder(o), outra);
-      assert.equal((await estado(pg)).resposta, e0.certa, 'a resposta travada não muda');
-      await pg.evaluate(() => BolinhasDebug.velocidade(6));
-      await pg.waitForFunction(() => BolinhasDebug.estado().saldo > 0, null, { timeout: 15000 });
-      assert.ok(await pg.$eval('.jt-bol2-op.certa', b => !!b));
+      assert.equal((await estado(pg)).modalidade, 'calma');
       assert.deepEqual(pg.erros, []);
       await pg.ctx.close();
     });
   }
 
-  test('câmera de TV: desce junto com a bolinha (com zoom e câmera lenta no fim) e volta ao plano aberto', { timeout: 60000 }, async () => {
+  test('390×844, Queda Livre: 2 opções, responder enquanto caem, verdes somam, rodada inteira até o placar', { timeout: 120000 }, async () => {
+    const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }, 'facil');
+    await pg.click('.jt-bol2-cena [data-comecar]');
+    await pg.waitForSelector('.jt-bol2-fasecard [data-ok]');
+    await pg.click('.jt-bol2-fasecard [data-ok]');
+    let e = await estado(pg);
+    assert.equal(e.modalidade, 'queda'); assert.equal(e.etapa, 'leitura'); assert.equal(e.opcoes, 2);
+    assert.equal(await pg.locator('.jt-bol2-ops .jt-bol2-op').count(), 2);
+    assert.ok((await pg.textContent('.jt-bol2-perg')).length > 8, 'a pergunta aparece');
+    // o tempo de leitura acaba e as 3 bolinhas brancas caem; responder durante a queda trava a resposta
+    await pg.evaluate(() => BolinhasDebug.velocidade(4));
+    await pg.waitForFunction(() => BolinhasDebug.estado().caindo === 3, null, { timeout: 15000 });
+    await pg.evaluate(() => BolinhasDebug.velocidade(1));
+    e = await estado(pg);
+    assert.equal(e.etapa, 'queda'); assert.ok(e.tensao, 'música de tensão durante a queda');
+    await pg.click('.jt-bol2-ops .jt-bol2-op[data-op="' + e.certa + '"]');
+    await pg.evaluate(o => BolinhasDebug.responder(o), e.certa === 0 ? 1 : 0);
+    assert.equal((await estado(pg)).resposta, e.certa, 'a resposta travada não muda');
+    await pg.evaluate(() => BolinhasDebug.velocidade(6));
+    await pg.waitForFunction(() => BolinhasDebug.estado().cores.includes('verde'), null, { timeout: 15000 });
+    await pg.waitForFunction(() => BolinhasDebug.estado().saldo > 0 && BolinhasDebug.estado().rodada === 1, null, { timeout: 20000 });
+    e = await estado(pg);
+    assert.equal(e.tensao, false, 'a tensão acaba quando a última bolinha bate no fundo');
+    assert.deepEqual(e.marcas, [true]);
+    // o resto da rodada: uma errada (sem responder = erro) e as outras certas
+    await pg.evaluate(() => BolinhasDebug.velocidade(14));
+    const vistas = new Set();
+    for (let i = 0; i < 1200; i++) {
+      e = await estado(pg); vistas.add(e.etapa);
+      if (e.etapa === 'fim') break;
+      if (e.etapa === 'leitura' && e.resposta === null && e.rodada !== 2) await pg.evaluate(() => BolinhasDebug.responderCerto());
+      await pg.waitForTimeout(50);
+    }
+    assert.equal(e.etapa, 'fim', 'chegou ao placar; passou por ' + [...vistas].join(' '));
+    assert.equal(e.marcas.length, 5); assert.equal(e.marcas[2], false, 'sem resposta = erro');
+    assert.equal(e.acertos, 4);
+    const txt = await pg.textContent('.jt-bol2-placar');
+    assert.ok(txt.includes(L.dinheiro(e.saldo, 'pt')), 'placar com o saldo'); assert.match(txt, /4 de 5 certas/);
+    await pg.click('.jt-bol2-placar [data-trocar]');
+    assert.equal((await estado(pg)).etapa, 'inicio', 'trocar de modalidade volta ao começo');
+    assert.deepEqual(pg.erros, []);
+    await pg.ctx.close();
+  });
+
+  test('390×844, Sem pressa: sem tempo, 4 opções, 3 zonas antes de responder, vermelhas descontam, rodada até o placar', { timeout: 120000 }, async () => {
+    const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }, 'medio');
+    await pg.click('.jt-bol2-modo[data-mod="calma"]');
+    await pg.click('.jt-bol2-cena [data-comecar]');
+    await pg.evaluate(() => BolinhasDebug.velocidade(20));
+    await pg.waitForTimeout(1500);
+    assert.equal((await estado(pg)).etapa, 'cartao', 'nada anda sozinho no Sem pressa');
+    await pg.evaluate(() => BolinhasDebug.pularCartao());
+    let e = await estado(pg);
+    assert.equal(e.etapa, 'zonas'); assert.equal(e.opcoes, 4);
+    assert.equal(await pg.locator('.jt-bol2-ops .jt-bol2-op').count(), 4);
+    assert.ok(await pg.$eval('.jt-bol2-ops .jt-bol2-op', b => b.disabled), 'as opções esperam as zonas');
+    // sem relógio: o tempo passa (rápido) e nada cai
+    await pg.waitForTimeout(2500);
+    e = await estado(pg);
+    assert.equal(e.etapa, 'zonas'); assert.equal(e.bolas, 0); assert.equal(e.timers, 0, 'nenhum relógio agendado');
+    // responder antes das 3 zonas não vale
+    await pg.evaluate(() => BolinhasDebug.responderCerto());
+    assert.equal((await estado(pg)).resposta, null);
+    // as zonas: tocar na parede (zona 4), teclado (← e OK = zona 3) e desfazer
+    const box = await pg.$eval('.jt-bol2-parede', el => { const b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; });
+    await pg.mouse.click(box.x + box.w / 2, box.y + box.h * 0.06);
+    assert.deepEqual((await estado(pg)).zonas, [3]);
+    await pg.keyboard.press('ArrowLeft'); await pg.keyboard.press('Enter');
+    assert.deepEqual((await estado(pg)).zonas, [3, 2]);
+    await pg.click('.jt-bol2-acoes [data-desfazer]');
+    assert.deepEqual((await estado(pg)).zonas, [3]);
+    await pg.evaluate(() => { BolinhasDebug.zona(6); BolinhasDebug.zona(6); });
+    e = await estado(pg);
+    assert.deepEqual(e.zonas, [3, 6, 6]); assert.equal(e.etapa, 'resposta');
+    assert.equal(await pg.$eval('.jt-bol2-ops .jt-bol2-op', b => b.disabled), false, 'com as 3 zonas, as opções se soltam');
+    // errou: as 3 caem vermelhas das zonas escolhidas e descontam (saldo começa em 0 e não fica negativo)
+    await pg.evaluate(() => BolinhasDebug.velocidade(1));
+    await pg.evaluate(() => BolinhasDebug.responderErrado());
+    e = await estado(pg);
+    assert.deepEqual(e.cores, ['vermelha', 'vermelha', 'vermelha']); assert.ok(e.tensao);
+    assert.ok(await pg.$eval('.jt-bol2-op.errada', b => !!b));
+    await pg.evaluate(() => BolinhasDebug.velocidade(8));
+    await pg.waitForFunction(() => BolinhasDebug.estado().rodada === 1 && BolinhasDebug.estado().etapa === 'zonas', null, { timeout: 30000 });
+    e = await estado(pg);
+    assert.equal(e.saldo, 0); assert.deepEqual(e.marcas, [false]); assert.equal(e.tensao, false);
+    // acertou: verdes que somam
+    await pg.evaluate(() => { BolinhasDebug.zona(3); BolinhasDebug.zona(3); BolinhasDebug.zona(3); BolinhasDebug.responderCerto(); });
+    assert.deepEqual((await estado(pg)).cores.slice(-3), ['verde', 'verde', 'verde'], 'as 3 novas caem verdes');
+    await pg.waitForFunction(() => BolinhasDebug.estado().rodada === 2, null, { timeout: 30000 });
+    assert.ok((await estado(pg)).saldo > 0, 'as verdes somaram');
+    await pg.evaluate(() => BolinhasDebug.velocidade(14));
+    for (let i = 0; i < 1200; i++) {
+      e = await estado(pg);
+      if (e.etapa === 'fim') break;
+      if (e.etapa === 'zonas') await pg.evaluate(() => { BolinhasDebug.zona(1); BolinhasDebug.zona(3); BolinhasDebug.zona(5); });
+      else if (e.etapa === 'resposta') await pg.evaluate(() => BolinhasDebug.responderCerto());
+      await pg.waitForTimeout(50);
+    }
+    assert.equal(e.etapa, 'fim');
+    assert.equal(e.acertos, 4); assert.equal(e.marcas.length, 5);
+    assert.match(await pg.textContent('.jt-bol2-placar'), /Sem pressa/);
+    await pg.click('.jt-bol2-placar [data-denovo]');
+    e = await estado(pg);
+    assert.equal(e.modalidade, 'calma'); assert.equal(e.etapa, 'cartao'); assert.equal(e.saldo, 0);
+    assert.doesNotMatch(await pg.textContent('body'), new RegExp('Rub' + 'ens|parceiro', 'i'));
+    assert.deepEqual(pg.erros, []);
+    await pg.ctx.close();
+  });
+
+  test('câmera: começa na câmera da bolinha (bem perto), depois acompanha de perto, câmera lenta no fim e volta ao plano aberto', { timeout: 60000 }, async () => {
     const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }, 'facil');
     await pg.click('.jt-bol2-cena [data-comecar]');
     await pg.evaluate(() => BolinhasDebug.pularCartao());
@@ -228,96 +335,40 @@ test.describe('no navegador', () => {
       if (s.e.rodada >= 1) break;
       await pg.waitForTimeout(100);
     }
-    const seguindo = amostras.filter(s => s.c.lider && (s.c.plano === 'segue' || s.c.plano === 'lenta' || s.c.plano === 'grupo'));
-    assert.ok(seguindo.length >= 5, 'a câmera seguiu a queda: ' + seguindo.length + ' amostras');
-    assert.ok(seguindo.some(s => s.c.z > 1.6), 'aproxima (zoom)');
-    const meio = seguindo.slice(Math.floor(seguindo.length / 3));
-    assert.ok(meio[meio.length - 1].c.y > meio[0].c.y + 120, 'o centro da câmera desce junto: ' + meio[0].c.y.toFixed(0) + ' → ' + meio[meio.length - 1].c.y.toFixed(0));
-    for (const s of meio) assert.ok(Math.abs(s.c.y - s.c.lider.y) < 360, 'a bolinha fica no quadro');
+    const pov = amostras.filter(s => s.c.plano === 'pov');
+    assert.ok(pov.length >= 3, 'câmera da bolinha: ' + pov.length + ' amostras');
+    assert.ok(pov.some(s => s.c.z > 4), 'a câmera da bolinha chega bem perto');
+    for (const s of pov.filter(s => s.c.z > 4)) assert.ok(Math.abs(s.c.x - s.c.lider.x) < 60 && Math.abs(s.c.y - s.c.lider.y) < 80, 'colada na bolinha');
+    const segue = amostras.filter(s => s.c.lider && (s.c.plano === 'segue' || s.c.plano === 'lenta' || s.c.plano === 'grupo'));
+    assert.ok(segue.length >= 3, 'depois acompanha: ' + segue.length);
+    assert.ok(segue.some(s => s.c.z > 2.8), 'acompanhamento bem perto');
+    const i0 = amostras.indexOf(pov[0]), i1 = amostras.indexOf(segue[0]);
+    assert.ok(i0 < i1, 'primeiro a câmera da bolinha, depois o acompanhamento');
     assert.ok(amostras.some(s => s.c.lenta), 'câmera lenta perto das canaletas');
-    // terminou a queda: volta ao plano aberto
     await pg.waitForFunction(() => { const c = BolinhasDebug.camera(); return !c.lider && Math.abs(c.z - 1) < 0.03 && Math.abs(c.y - c.aberto.y) < 12 && Math.abs(c.x - c.aberto.x) < 12; }, null, { timeout: 15000 });
-    assert.equal((await pg.evaluate(() => BolinhasDebug.camera())).lenta, false);
     assert.deepEqual(pg.erros, []);
     await pg.ctx.close();
   });
 
-  test('390×844, Solo + Parceiro: a partida inteira até o Contrato e a revelação', { timeout: 150000 }, async () => {
-    const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }, 'medio');
+  test('reduzir movimento: sem câmera da bolinha e sem câmera lenta', { timeout: 60000 }, async () => {
+    const pg = await abrir({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' }, 'facil');
     await pg.click('.jt-bol2-cena [data-comecar]');
-    await pg.evaluate(() => BolinhasDebug.velocidade(14));
-    const vistas = new Set();
-    let e;
-    for (let i = 0; i < 1500; i++) {
-      e = await estado(pg);
-      vistas.add(e.fase + ':' + e.etapa);
-      if (e.etapa === 'revelacao' || e.etapa === 'fim') break;
-      if (e.etapa === 'cartao') await pg.evaluate(() => BolinhasDebug.pularCartao());
-      else if (e.fase === 1 && (e.etapa === 'leitura' || e.etapa === 'queda') && e.resposta === null) await pg.evaluate(() => BolinhasDebug.responderCerto());
-      else if (e.etapa === 'verdes' || e.etapa === 'zona') await pg.evaluate(z => { BolinhasDebug.zona(z); BolinhasDebug.soltar(); }, (i % 5) + 1);
-      await pg.waitForTimeout(60);
+    await pg.evaluate(() => BolinhasDebug.pularCartao());
+    await pg.evaluate(() => { BolinhasDebug.velocidade(2); BolinhasDebug.responderCerto(); });
+    const planos = new Set(); let lenta = false;
+    for (let i = 0; i < 120; i++) {
+      const s = await pg.evaluate(() => ({ c: BolinhasDebug.camera(), e: BolinhasDebug.estado() }));
+      planos.add(s.c.plano); lenta = lenta || s.c.lenta;
+      if (s.e.rodada >= 1) break;
+      await pg.waitForTimeout(80);
     }
-    assert.equal(e.etapa, 'revelacao', 'chegou à revelação; passou por ' + [...vistas].join(' '));
-    for (const k of ['1:queda', '2:verdes', '2:zona', '2:pensando', '2:vermelhas', '3:verdes', '3:zona', '3:vermelhas', '4:contrato'])
-      assert.ok(vistas.has(k), 'passou por ' + k);
-    assert.ok(e.saldoF1 > 0, 'acertou as 5 da Fase 1');
-    assert.equal(e.contrato, e.saldoF1 + e.acertos[0] * 5000 + e.acertos[1] * 10000, 'contrato pela fórmula');
-    assert.ok(['assinar', 'rasgar'].includes(e.decisao));
-    assert.equal(await pg.isVisible('.jt-bol2-revela'), true);
-    const txt = await pg.textContent('.jt-bol2-revela');
-    assert.ok(txt.includes(L.dinheiro(e.saldo, 'pt')) && txt.includes(L.dinheiro(e.contrato, 'pt')), 'painel e contrato lado a lado');
-    assert.match(txt, /Vocês levam R\$ [\d.]+!/);
-    // jogar de novo volta para a escolha do modo
-    await pg.click('.jt-bol2-revela [data-denovo]');
-    assert.equal((await estado(pg)).etapa, 'inicio');
-    assert.deepEqual(pg.erros, []);
+    assert.ok(!planos.has('pov'), 'sem câmera da bolinha: ' + [...planos].join(' '));
+    assert.equal(lenta, false);
     await pg.ctx.close();
   });
 
-  test('915×412, Dois na mesma tela: cortina, Sala de Isolamento, contrato assinado com caneta e revelação', { timeout: 60000 }, async () => {
-    const pg = await abrir({ viewport: { width: 915, height: 412 }, hasTouch: true, isMobile: true }, 'dificil');
-    await pg.click('.jt-bol2-modo[data-modo="dois"]');
-    assert.equal(await pg.isVisible('.jt-bol2-perfil'), false, 'sem parceiro virtual');
-    await pg.click('.jt-bol2-cena [data-comecar]');
-    assert.equal((await estado(pg)).modo, 'dois');
-    // uma pergunta da Fase 2: o Palco escolhe a zona (teclado), passa o aparelho; a Sala responde
-    await pg.evaluate(() => BolinhasDebug.pularPara('zona', { fase: 2, rodada: 1, saldo: 5000, saldoF1: 5000, memo: [1, 5] }));
-    assert.equal(await pg.isVisible('.jt-bol2-perg'), false, 'o Palco não vê a pergunta');
-    await pg.keyboard.press('ArrowRight'); await pg.keyboard.press('ArrowRight');
-    await pg.keyboard.press('ArrowDown');
-    let e = await estado(pg);
-    assert.equal(e.mult, 2, 'Duplo na 2ª pergunta');
-    await pg.keyboard.press('Enter');
-    await pg.waitForSelector('.jt-bol2-cortina [data-ok]');
-    assert.match(await pg.textContent('.jt-bol2-cortina'), /não olhe/);
-    await pg.click('.jt-bol2-cortina [data-ok]');
-    assert.ok((await pg.textContent('.jt-bol2-cena .jt-bol2-perg')).length > 8, 'a Sala vê a pergunta completa');
-    assert.equal(await pg.locator('.jt-bol2-cena .jt-bol2-odo').count(), 0, 'a Sala não vê o saldo');
-    e = await estado(pg);
-    await pg.click('.jt-bol2-cena [data-sala="' + e.certa + '"]');
-    await pg.click('.jt-bol2-cortina [data-ok]');
-    await pg.evaluate(() => BolinhasDebug.velocidade(8));
-    await pg.waitForFunction(() => BolinhasDebug.estado().caindo >= 1, null, { timeout: 10000 });
-    await pg.waitForFunction(() => BolinhasDebug.estado().rodada === 2 && BolinhasDebug.estado().etapa === 'zona', null, { timeout: 20000 });
-    e = await estado(pg);
-    assert.equal(e.acertos[0], 1);
-    // o Contrato: passa para a Sala, assina, chama os dois, revela
-    await pg.evaluate(() => BolinhasDebug.pularPara('contrato', { saldo: 120000, saldoF1: 5000, acertos: [1, 2] }));
-    await pg.click('.jt-bol2-cortina [data-ok]');
-    assert.match(await pg.textContent('.jt-bol2-papel .valor'), /R\$ 30\.000/);
-    await pg.click('.jt-bol2-cena [data-assinar]');
-    assert.equal(await pg.$eval('.jt-bol2-papel', p => p.classList.contains('assina')), true, 'animação da caneta');
-    await pg.waitForSelector('.jt-bol2-cortina [data-ok]', { timeout: 10000 });
-    await pg.click('.jt-bol2-cortina [data-ok]');
-    await pg.waitForSelector('.jt-bol2-revela');
-    const txt = await pg.textContent('.jt-bol2-revela');
-    assert.match(txt, /ASSINOU/); assert.match(txt, /Vocês levam R\$ 30\.000!/); assert.match(txt, /R\$ 120\.000/);
-    assert.deepEqual(pg.erros, []);
-    await pg.ctx.close();
-  });
-
-  test('inglês e espanhol: moeda e textos do jogo no idioma escolhido', async () => {
-    for (const [cod, re, moeda] of [['en', /Start/, /\$0/], ['es', /Empezar/, /0€/]]) {
+  test('1280×800 e inglês/espanhol: textos e moeda no idioma escolhido', async () => {
+    for (const [cod, re, moeda, mod] of [['en', /Start/, /\$0/, /No Rush/], ['es', /Empezar/, /0€/, /Sin prisa/]]) {
       const ctx = await browser.newContext({ locale: 'pt-BR', viewport: { width: 1280, height: 800 } });
       await ctx.addInitScript(c => localStorage.setItem('bolinho:idioma', c), cod);
       const pg = await ctx.newPage();
@@ -326,6 +377,7 @@ test.describe('no navegador', () => {
       await pg.evaluate(() => JogotecaDebug.jogar('bolinhas', 'facil'));
       await pg.waitForSelector('.jt-bol2-cena [data-comecar]');
       assert.match(await pg.textContent('.jt-bol2-cena [data-comecar]'), re);
+      assert.match(await pg.textContent('.jt-bol2-cena'), mod);
       assert.match((await pg.getAttribute('.jt-bol2-odo', 'aria-label')).replace(/\s/g, ''), moeda);
       await ctx.close();
     }
