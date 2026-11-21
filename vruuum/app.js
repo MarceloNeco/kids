@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.34.0';
+  var APP_VERSION = '1.35.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -182,10 +182,41 @@
     });
   }
   // o escolhido (veículo, piloto) no meio da fileira de arrastar
-  function centrarEscolhido(sel, fileira) {
+  function centrarEscolhido(sel, fileira, suave) {
     var b = document.querySelector(sel), c = $(fileira); if (!b || !c || b.offsetParent === null) return;
     var rb = b.getBoundingClientRect(), rc = c.getBoundingClientRect();
-    if (c.scrollWidth > c.clientWidth) c.scrollLeft += (rb.left + rb.width / 2) - (rc.left + rc.width / 2);
+    if (c.scrollWidth <= c.clientWidth) return;
+    var x = c.scrollLeft + (rb.left + rb.width / 2) - (rc.left + rc.width / 2);
+    if (suave && c.scrollTo) c.scrollTo({ left: x, behavior: 'smooth' }); else c.scrollLeft = x;
+  }
+  // 1.35.0 (dono): o veículo escolhido fica grande em cima; a escolha é pelo carrossel (arrastar e soltar escolhe o do
+  // meio; tocar ou ◀ ▶ escolhe e traz para o meio)
+  var mexeuVeic = 0;
+  function escolherVeic(id, som) {
+    pref.carros[editando].veic = id; salvar(); Som.tocar(som || 'buzina', editando); marcar();
+    if (som !== 'clique') { mexeuVeic = 0; centrarEscolhido('.cartao-veic[aria-pressed="true"]', 'veiculos', true); }
+  }
+  function vizinhoVeic(d) {
+    var l = document.querySelectorAll('#veiculos .cartao-veic'), i = 0;
+    for (var k = 0; k < l.length; k++) if (l[k].getAttribute('data-veic') === pref.carros[editando].veic) i = k;
+    escolherVeic(l[(i + d + l.length) % l.length].getAttribute('data-veic'));
+  }
+  function carrosselVeic() {
+    var c = $('veiculos'), espera = null;
+    ['touchstart', 'pointerdown', 'wheel'].forEach(function (ev) { c.addEventListener(ev, function () { mexeuVeic = Date.now(); }, { passive: true }); });
+    c.addEventListener('scroll', function () {
+      clearTimeout(espera);
+      espera = setTimeout(function () {
+        if (!mexeuVeic || Date.now() - mexeuVeic > 4000) return;   // só quando a pessoa arrastou (não ao centralizar sozinho)
+        var rc = c.getBoundingClientRect(), meio = rc.left + rc.width / 2, melhor = null, dm = 1e9;
+        Array.prototype.forEach.call(c.querySelectorAll('.cartao-veic'), function (b) {
+          var r = b.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - meio); if (d < dm) { dm = d; melhor = b; }
+        });
+        if (melhor && melhor.getAttribute('data-veic') !== pref.carros[editando].veic) escolherVeic(melhor.getAttribute('data-veic'), 'clique');
+      }, 180);
+    }, { passive: true });
+    $('veicAnt').addEventListener('click', function () { vizinhoVeic(-1); });
+    $('veicProx').addEventListener('click', function () { vizinhoVeic(1); });
   }
   // mostra ou esconde a etapa do Piloto (bolinha, "de 4/5", botão Próximo) conforme o veículo escolhido
   function ajustarEtapas() {
@@ -244,7 +275,7 @@
         var h3 = document.createElement('h3'); h3.setAttribute('data-t', gr.nome.join('|')); g.appendChild(h3);
         var lista = document.createElement('div'); lista.className = 'cartoes'; g.appendChild(lista);
         VE.LISTA.filter(function (v) { return v.grupo === gr.id; }).forEach(function (v) {
-          var b = botao('cartao-veic' + (v.grupo === 'ar' ? ' ar' : ''), v.nome, function () { pref.carros[editando].veic = v.id; salvar(); Som.tocar('buzina', editando); marcar(); });
+          var b = botao('cartao-veic' + (v.grupo === 'ar' ? ' ar' : ''), v.nome, function () { escolherVeic(v.id); });
           b.setAttribute('data-veic', v.id);
           var cv = document.createElement('canvas'); cv.width = 192; cv.height = 128; b.appendChild(cv);
           var sp = document.createElement('span'); sp.setAttribute('data-t', v.nome.join('|')); b.appendChild(sp);
@@ -252,6 +283,7 @@
         });
         caixa.appendChild(g);
       });
+      carrosselVeic();
       D.CORES.forEach(function (cor, k) {
         var b = botao('cor', ['Cor ' + (k + 1), 'Color ' + (k + 1), 'Color ' + (k + 1)], function () { pref.carros[editando].cor = k; salvar(); Som.tocar('clique'); marcar(); });
         b.style.background = cor; b.setAttribute('data-cor', k); $('cores').appendChild(b);
@@ -291,7 +323,7 @@
       });
       fotosDosMundos();
       Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
-        b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); });
+        b.addEventListener('click', function () { editando = +b.getAttribute('data-aba'); Som.tocar('clique'); marcar(); if (etapa === 2) centrarEscolhido('.cartao-veic[aria-pressed="true"]', 'veiculos'); });
       });
       if ($('tirarJ2')) $('tirarJ2').addEventListener('click', function () { pref.jogadores = 1; editando = 0; salvar(); Som.tocar('clique'); marcar(); });
       Array.prototype.forEach.call(document.querySelectorAll('[data-corpo]'), function (b) {

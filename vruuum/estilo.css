@@ -323,13 +323,27 @@ a { color: var(--ciano); }
   .bichos { grid-template-rows: repeat(2, 46px); }
   .menu-baixo #btCorrer { font-size: 1.4rem; padding: 8px 20px; }
 }
-/* computador: listas inteiras, sem arrastar (a roda do mouse rola a etapa) */
+/* computador: pilotos em lista inteira, sem arrastar (os veículos ficam no carrossel, 1.35.0) */
 @media (min-width: 1000px) and (min-height: 600px) {
-  .veiculos { flex-direction: column; overflow: visible; width: 100%; margin: 0; padding: 0; }
-  .veiculos .cartoes { grid-auto-flow: row; grid-template-rows: none; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); grid-auto-columns: auto; }
   .bichos { display: flex; flex-wrap: wrap; justify-content: center; overflow: visible; width: 100%; margin: 0; padding: 0; }
 }
 @media (min-width: 1000px) {
   .mundos-trilho { display: flex; flex-wrap: wrap; justify-content: center; overflow: visible; width: 100%; margin: 0; padding: 4px 0 10px; }
   .cartao-mundo { flex: 0 0 160px; }
 }
+
+/* 1.35.0 (dono, 21/Nov/2026): "tinha que mostrar sempre o carrinho que você escolheu e você faz a escolha pelo carrossel".
+   Na etapa do veículo, o escolhido fica grande e parado em cima, com ◀ ▶ dos lados; embaixo, um carrossel de uma fileira
+   só: arrastar para o lado e soltar escolhe o do meio; tocar num veículo escolhe e traz ele para o meio. */
+.palco { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+.seta-veic { flex: none; width: 46px; height: 64px; border-radius: 16px; background: rgba(34,27,77,.85); border: 2px solid var(--borda); color: var(--ouro); font-size: 1.4rem; }
+.seta-veic:active { transform: scale(.92); }
+#menu[data-etapa="4"] .seta-veic { display: none; }
+#menu[data-etapa="2"] .etapa-garagem .vitrine { position: sticky; top: 0; z-index: 3; }
+.veiculos { scroll-snap-type: x mandatory; padding: 0 calc(50% - 36px) 2px; }
+.grupo-veic { scroll-snap-align: none; }
+.grupo-veic h3 { white-space: nowrap; }
+.veiculos .cartoes { grid-template-rows: auto; }
+.veiculos .cartao-veic { scroll-snap-align: center; }
+.veiculos .cartao-veic span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (orientation: portrait) { #menu[data-etapa="2"] .etapa-garagem .previa { height: min(clamp(110px, 24vh, 300px), calc((100vw - 130px) * 0.607)); } }

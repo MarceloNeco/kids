@@ -165,3 +165,31 @@ test('1.34.0: o Piloto é a última etapa e só aparece quando o personagem apar
     assert.deepEqual(erros, []);
   } finally { await ctx.close(); }
 });
+
+test('1.35.0: na etapa do veículo, o escolhido fica à vista em cima e a escolha é pelo carrossel', async () => {
+  for (const [w, h] of [[360, 740], [390, 844]]) {
+    const { ctx, pg, erros } = await abrirMenu(w, h);
+    try {
+      await pg.click('[data-ir-etapa="2"]'); await pg.waitForTimeout(300);
+      const ver = () => pg.evaluate(() => {
+        const pr = document.getElementById('previa').getBoundingClientRect(), car = document.getElementById('veiculos'), rc = car.getBoundingClientRect();
+        const esc = document.querySelector('.cartao-veic[aria-pressed="true"]').getBoundingClientRect();
+        const topos = new Set(Array.from(car.querySelectorAll('.cartao-veic')).map((b) => Math.round(b.getBoundingClientRect().top)));
+        return { previa: pr.top >= 0 && pr.bottom <= innerHeight && pr.height >= 100, fileiras: topos.size,
+          meio: Math.abs(esc.left + esc.width / 2 - (rc.left + rc.width / 2)), veic: document.querySelector('.cartao-veic[aria-pressed="true"]').getAttribute('data-veic') };
+      });
+      let v = await ver();
+      assert.ok(v.previa, w + ': o veículo escolhido aparece inteiro'); assert.equal(v.fileiras, 1, 'carrossel de uma fileira só');
+      assert.ok(v.meio < 4, 'o escolhido fica no meio do carrossel (' + v.meio + ')');
+      const antes = v.veic;
+      await pg.click('#veicProx'); await pg.waitForTimeout(700);
+      v = await ver(); assert.notEqual(v.veic, antes, '▶ troca o veículo'); assert.ok(v.previa); assert.ok(v.meio < 4, '▶ traz o novo para o meio');
+      await pg.click('#veicAnt'); await pg.waitForTimeout(700);
+      v = await ver(); assert.equal(v.veic, antes, '◀ volta');
+      await pg.evaluate(() => { const c = document.getElementById('veiculos'); c.dispatchEvent(new Event('pointerdown')); c.scrollLeft += 600; });
+      await pg.waitForTimeout(900);
+      v = await ver(); assert.notEqual(v.veic, antes, 'arrastar e soltar escolhe o do meio'); assert.ok(v.meio < 4); assert.ok(v.previa, 'e ele aparece em cima');
+      assert.deepEqual(erros, []);
+    } finally { await ctx.close(); }
+  }
+});
