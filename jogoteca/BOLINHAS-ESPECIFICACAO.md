@@ -18,9 +18,26 @@ te dar ponto."
   - **🧘 Sem pressa** (EN "No Rush", ES "Sin prisa"): 5 perguntas de 4 opções, **sem tempo**. Lida a pergunta, a pessoa
     escolhe 3 zonas no alto (pode repetir; ↩ desfaz) e só então responde. Acertou: as bolinhas caem verdes e somam o valor
     da canaleta; errou: caem vermelhas e descontam.
+    Depois do teste do dono no celular ("não sei onde é o botão de start", 21/Nov/2026, 0.4.2): 2 passos bem claros no
+    painel de baixo — **1/2 "Onde as bolinhas vão cair?"** (a pergunta e 7 botões grandes numerados como as zonas; tocar
+    na parede também vale; ↩ desfaz; 🎲 sorteia as que faltam; nenhuma opção à vista) e **2/2 "Agora responda!"** (os
+    botões somem e aparecem as 4 opções). O selo "Ao vivo" fica no piso, longe das zonas, e o painel deixa livre o canto
+    da bolinha 🎵 da música.
   - No fim de cada rodada, o placar (saldo, acertos, recorde por modalidade e nível). O saldo nunca fica abaixo de zero.
     Os valores das 15 canaletas são os da antiga Fase 1. O nível da Jogoteca escolhe a dificuldade das perguntas (e, na
     Queda Livre, o tempo para ler).
+- **Escada de pontos com portos seguros** (dono, 21/Nov/2026: "tinha que ter evolução por pontos, até você atingir (...) que
+  tem os portos seguros"; mecânica livre de game show, com nomes e visual próprios), nas duas modalidades (0.4.2):
+  - 6 degraus até a 🏆 meta. Queda Livre: 1.000 · 4.000 🛟 · 8.000 · 14.000 🛟 · 20.000 · 🏆 30.000. Sem pressa: 2.000 ·
+    6.000 🛟 · 12.000 · 22.000 🛟 · 35.000 · 🏆 50.000 (a Queda Livre sobe mais devagar, com as zonas 1, 4 e 7 fixas). Medido
+    com 400 rodadas simuladas na física do jogo: acertando 3 de cada 4, chega-se à meta em cerca de metade das rodadas, em 8 a
+    12 perguntas.
+  - **Portos seguros** no 2º e no 4º degraus: alcançou, fica garantido 🔒 — as vermelhas nunca derrubam o saldo abaixo do
+    último porto alcançado. Degrau novo e porto travado têm aviso, som e brilho (sem animação com "reduzir movimento").
+  - A rodada não para mais em 5 perguntas: segue até a **meta (vitória)**, até **12 perguntas** ou até **3 erros seguidos**
+    (explicado no ❓). As perguntas ficam mais difíceis conforme sobe a escada; o nível da Jogoteca muda o começo.
+  - A escada fica à vista: deitado/computador, numa coluna ao lado da parede (meta no alto); no celular em pé, numa faixa de
+    6 degraus embaixo do placar. No fim, o placar mostra o degrau alcançado, o porto garantido e o recorde.
 - Mais pedidos do mesmo dia, com fotos do programa de TV como referência de estilo (sem nome, logotipo ou marca dele):
   música de **tensão e emoção** durante a queda, do soltar até a última bolinha bater no fundo, e depois a trilha volta do
   ponto onde parou; **câmera do ponto de vista da bolinha** (começa colada nela, passando pelos pinos, e depois acompanha);
