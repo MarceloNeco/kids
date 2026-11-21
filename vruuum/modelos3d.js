@@ -596,8 +596,6 @@
       bola(cam, L, [0.5, 2.3, -0.35], 0.26, 0.27, 0.26, ['#ffe0c8', '#f2c9a0', '#c8946a']); bola(cam, L, [0.5, 2.2, -0.2], 0.27, 0.24, 0.2, ['#ffffff', '#f4f4f4', '#cfcfd8'], -0.02);
       cano(cam, L, [0.5, 2.48, -0.35], [0.62, 2.95, -0.5], 0.27, 0.04, VERM); bola(cam, L, [0.64, 2.98, -0.52], 0.1, 0.1, 0.1, tres('#ffffff')); caixa(cam, L, [0.5, 2.47, -0.35], [0.58, 0.1, 0.56], '#ffffff');
       cano(cam, L, [0.3, 1.9, -0.25], [0.1, 1.85, 0.5], 0.09, 0.07, VERM);   // segurando as rédeas
-      // quem pilota, do lado esquerdo
-      bola(cam, L, [-0.5, 1.65, -0.4], 0.3, 0.34, 0.26, tres(cor)); piloto(cam, L, [-0.5, 2.12, -0.4], 0.4, op);
       // as renas: 2 pares e a do nariz vermelho na frente, galopando no ar
       [[-0.55, 2.6, 0], [0.55, 2.6, 0.3], [-0.55, 4.1, 0.55], [0.55, 4.1, 0.85], [0, 5.6, 1.1]].forEach(function (r, k) {
         var x = r[0], z = r[1], pa = Math.sin(a + r[2] * PI * 2), y = 1.7 + k * 0.12 + Math.sin(a + r[2] * PI * 2 + 1) * 0.08, MARROM = ['#b07a45', '#8b5a2b', '#5a3a1a'];
@@ -833,12 +831,15 @@
     } },
 
     // ---------- 1.28.0 (dono, 19/Nov/2026: "um desses pula-pula como transporte e carrinhos de passeio de neném") ----------
-    /* bruxa na vassoura (1.33.0, dono 20/Nov/2026): "um chapéu preto esquisito" — aba larga e o cone torto, dobrado na
-       ponta, com faixa na cor escolhida e fivela dourada; vestido escuro na cor, capa preta (por dentro na cor)
-       esvoaçando, meias listradas e sapatos de bico virado; vassoura de cabo torto com a palha abrindo atrás, e um
-       gato preto sentado na garupa, de rabo enrolado. Rastro de purpurina roxa. Voa e anda no chão (motor.js). */
+    /* bruxinha na vassoura (1.33.0; 1.34.0, dono 21/Nov/2026, com uma figura de referência: "deixa ela mais ou menos com
+       um estilo assim, bem bonito"): ela é a própria personagem (como o Ovo e o Ursão), com rosto e cabelo dela — cabelo
+       castanho comprido e ondulado, olhos grandes roxos, sardinhas e sorriso; chapéu roxo de aba larga e ondulada, com a
+       ponta enrolada para o lado, faixa escura e fivela cor de bronze; vestido roxo-escuro rodado, mangas compridas,
+       botinhas. Vassoura de cabo torto com a palha abrindo, gato preto na garupa e purpurina roxa. A cor escolhida
+       aparece no laço do cabelo e na fita da vassoura. Voa e anda no chão (motor.js). */
     bruxa: { alt: 4.5, y: 1.55, larg: 0, comp: 0, semSombra: true, montar: function (cam, L, cor, f, op) {
-      var Y = Math.sin(relogio * 2.6) * 0.07, VEST = tom(cor, -0.5), PRETO = '#1b1626', PELE = '#f2c9a0', PALHA = ['#e0b04a', '#c08a2e', '#d9a03c'];
+      var Y = Math.sin(relogio * 2.6) * 0.07, ROXO = '#6b3fa0', ROXO_E = '#3e2560', VEST = '#3a2a52', BOTA = '#2a1f36', PELE = '#e3a877',
+        CAB = '#5b3a24', CAB2 = '#7a5034', PALHA = ['#e0b04a', '#c08a2e', '#d9a03c'];
       function vy(z) { return 1.0 + Y + (z + 1.2) * 0.09; }   // o cabo sobe um pouquinho para a frente
       cano(cam, L, [0, vy(-1.25), -1.25], [0.02, vy(0.6), 0.6], 0.065, 0.06, '#7a4a24');
       cano(cam, L, [0.02, vy(0.6), 0.6], [-0.03, vy(1.65) + 0.04, 1.65], 0.06, 0.05, '#6b3f1d');   // cabo torto na ponta
@@ -846,7 +847,7 @@
         var a = k / 16 * PI * 2, onda = Math.sin(relogio * 9 + k) * 0.04;
         cano(cam, L, [Math.cos(a) * 0.08, vy(-1.2) + Math.sin(a) * 0.08, -1.2], [Math.cos(a) * (0.36 + onda), vy(-1.2) - 0.05 + Math.sin(a) * (0.3 + onda), -2.15 - (k % 3) * 0.08], 0.05, 0.02, PALHA[k % 3]);
       }
-      bola(cam, L, [0, vy(-1.2), -1.2], 0.13, 0.13, 0.1, tres('#8b1e2d'), -0.05);   // amarração
+      bola(cam, L, [0, vy(-1.2), -1.2], 0.13, 0.13, 0.1, tres(cor), -0.05);   // fita amarrando a palha (na cor escolhida)
       rastro(cam, L, [0, vy(-1.2), -2.2], '#c77dff', 0.07, 3);
       // o gato preto na garupa
       var gz = -0.85, gy = vy(gz);
@@ -856,35 +857,57 @@
       var r0 = [0, gy + 0.08, gz - 0.16], r1 = [Math.sin(relogio * 3) * 0.12, gy + 0.32, gz - 0.32], r2 = [Math.sin(relogio * 3 + 1) * 0.2, gy + 0.5, gz - 0.24];
       cano(cam, L, r0, r1, 0.035, 0.03, '#26222e', -0.03); cano(cam, L, r1, r2, 0.03, 0.02, '#26222e', -0.03);   // rabo enrolado
       [-1, 1].forEach(function (l) { bola(cam, L, [l * 0.05, gy + 0.47, gz + 0.15], 0.03, 0.035, 0.01, ['#fff7a0', '#ffd23f', '#a07a00'], -0.04); });   // olhinhos (de frente)
-      // a bruxa: pernas de meia listrada e sapato de bico virado
+      // a bruxinha: botinhas, vestido rodado caindo dos dois lados da vassoura, mangas compridas
       var bz = -0.05, by = vy(bz);
       [-1, 1].forEach(function (l) {
-        var q = [l * 0.18, by + 0.12, bz], pe = [l * 0.3, by - 0.5 + Math.sin(relogio * 4 + l) * 0.03, bz + 0.38];
-        for (var s = 0; s < 4; s++) { var a0 = s / 4, a1 = (s + 1) / 4; cano(cam, L, add(q, mul(sub(pe, q), a0)), add(q, mul(sub(pe, q), a1)), 0.085, 0.08, s % 2 ? PRETO : cor); }
-        cano(cam, L, pe, add(pe, [0, 0.02, 0.28]), 0.09, 0.04, PRETO); cano(cam, L, add(pe, [0, 0.02, 0.28]), add(pe, [0, 0.14, 0.36]), 0.04, 0.015, PRETO);
+        var q = [l * 0.18, by + 0.1, bz], pe = [l * 0.3, by - 0.48 + Math.sin(relogio * 4 + l) * 0.03, bz + 0.34];
+        cano(cam, L, q, pe, 0.08, 0.075, BOTA);
+        cano(cam, L, pe, add(pe, [0, -0.02, 0.24]), 0.1, 0.08, BOTA); bola(cam, L, add(pe, [0, -0.02, 0.24]), 0.08, 0.07, 0.08, tres(BOTA));
       });
-      bola(cam, L, [0, by + 0.18, bz], 0.36, 0.2, 0.32, tres(VEST));   // saia
-      bola(cam, L, [0, by + 0.6, bz], 0.3, 0.4, 0.24, tres(VEST));   // vestido
+      tronco(cam, L, [0, by - 0.05, bz - 0.02], [1.05, 0.85], [0.5, 0.42, 0], 0.5, VEST, { tras: function (c) { retangulo(c, 0, 0, 100, 100, VEST); c.fillStyle = 'rgba(255,255,255,.08)'; for (var x = 8; x < 100; x += 18) c.fillRect(x, 0, 5, 100); } }, { chanfro: 0.08 });   // saia rodada, com as pregas
+      bola(cam, L, [0, by + 0.5, bz], 0.27, 0.34, 0.22, tres(VEST));   // corpinho
       [-1, 1].forEach(function (l) {   // braços segurando o cabo
-        var omb = [l * 0.27, by + 0.85, bz], mao = [l * 0.1, vy(0.55) + 0.06, 0.55];
-        cano(cam, L, omb, mao, 0.085, 0.07, VEST); bola(cam, L, mao, 0.07, 0.07, 0.07, tres(PELE));
+        var omb = [l * 0.24, by + 0.72, bz], mao = [l * 0.1, vy(0.55) + 0.06, 0.55];
+        cano(cam, L, omb, mao, 0.08, 0.075, VEST); bola(cam, L, mao, 0.07, 0.07, 0.07, tres(PELE));
       });
-      // capa preta esvoaçando para trás (por dentro, na cor)
-      for (var c2 = 0; c2 < 3; c2++) {
-        var u0 = c2 / 3, u1 = (c2 + 1) / 3, w0 = Math.sin(relogio * 7 + c2) * 0.08, w1 = Math.sin(relogio * 7 + c2 + 1) * 0.08;
-        chapa(cam, L, [[-0.3 + u0 * 0.6, by + 0.95, bz - 0.15], [-0.3 + u1 * 0.6, by + 0.95, bz - 0.15], [-0.62 + u1 * 1.24, by + 0.15 + w1, bz - 0.85 + w1], [-0.62 + u0 * 1.24, by + 0.15 + w0, bz - 0.85 + w0]], PRETO, { verso: cor });
+      // a cabeça: rosto (de frente), cabelo comprido e ondulado (de costas aparece todo), laço na cor escolhida
+      var cab = [0, by + 1.18, bz + 0.02], vento = Math.sin(relogio * 5);
+      bola(cam, L, add(cab, [0, -0.28, 0]), 0.09, 0.1, 0.09, tres(PELE));   // pescoço
+      bola(cam, L, cab, 0.36, 0.38, 0.34, tres(PELE));
+      [-1, 1].forEach(function (l) {   // olhos grandes roxos, com cílios e brilho
+        bola(cam, L, add(cab, [l * 0.13, 0.03, 0.31]), 0.085, 0.1, 0.03, ['#ffffff', '#ffffff', '#ddd'], -0.03);
+        bola(cam, L, add(cab, [l * 0.13, 0.02, 0.335]), 0.058, 0.07, 0.02, ['#c9a0ff', '#7a3fc4', '#3a1470'], -0.04);
+        bola(cam, L, add(cab, [l * 0.13, 0.02, 0.345]), 0.03, 0.036, 0.01, ['#222', '#000', '#000'], -0.05);
+        bola(cam, L, add(cab, [l * 0.13 - 0.02, 0.05, 0.35]), 0.014, 0.014, 0.01, ['#fff', '#fff', '#fff'], -0.06);
+        cano(cam, L, add(cab, [l * 0.07, 0.13, 0.31]), add(cab, [l * 0.2, 0.15, 0.3]), 0.012, 0.012, CAB, -0.05);   // sobrancelha
+        for (var s2 = 0; s2 < 3; s2++) bola(cam, L, add(cab, [l * (0.1 + s2 * 0.04), -0.08 - (s2 % 2) * 0.02, 0.32]), 0.009, 0.009, 0.005, ['#c2703e', '#b0612f', '#8a4a22'], -0.05);   // sardinhas
+        bola(cam, L, add(cab, [l * 0.35, -0.02, 0.02]), 0.05, 0.07, 0.04, tres(PELE), 0.01);   // orelha
+      });
+      bola(cam, L, add(cab, [0, -0.05, 0.36]), 0.03, 0.025, 0.02, tres('#d38a5c'), -0.05);   // narizinho
+      cano(cam, L, add(cab, [-0.08, -0.15, 0.32]), add(cab, [0, -0.19, 0.33]), 0.016, 0.016, '#a8323c', -0.05); cano(cam, L, add(cab, [0, -0.19, 0.33]), add(cab, [0.09, -0.14, 0.32]), 0.016, 0.016, '#a8323c', -0.05);   // sorriso
+      bola(cam, L, add(cab, [0, 0.12, 0.05]), 0.4, 0.3, 0.37, tres(CAB), -0.01);   // cabelo em cima
+      bola(cam, L, add(cab, [0, 0.0, -0.12]), 0.44, 0.42, 0.34, tres(CAB), -0.02);   // cabelo atrás da cabeça
+      [-1, 0, 1].forEach(function (l) {   // mechas compridas e onduladas caindo pelas costas, voando com o vento
+        for (var m = 0; m < 3; m++) {
+          var p = add(cab, [l * (0.22 + m * 0.05) + Math.sin(m * 1.9 + vento + l) * 0.06, -0.26 - m * 0.27, -0.22 - m * 0.06 - Math.abs(vento) * 0.04 * m]);
+          bola(cam, L, p, (l ? 0.16 : 0.19) - m * 0.02, 0.24, 0.13, tres(m === 1 ? CAB2 : CAB), -0.03 - m * 0.002);
+        }
+        bola(cam, L, add(cab, [l * 0.34 + Math.sin(vento + l) * 0.06, -0.98, -0.42]), 0.07, 0.06, 0.06, tres(CAB2), -0.05);   // cachinho na ponta
+      });
+      [-1, 1].forEach(function (l) { bola(cam, L, add(cab, [l * 0.33, -0.25, 0.08]), 0.1, 0.22, 0.1, tres(CAB), -0.02); });   // mechas do lado do rosto
+      [-1, 1].forEach(function (l) { bola(cam, L, add(cab, [l * 0.1, 0.06, -0.42]), 0.09, 0.06, 0.04, tres(cor), -0.08); }); bola(cam, L, add(cab, [0, 0.06, -0.44]), 0.04, 0.04, 0.03, tres(tom(cor, -0.2)), -0.09);   // laço no cabelo
+      // o chapéu roxo: aba larga e ondulada (roxo-escuro por baixo), cone torto com a ponta enrolada, faixa e fivela
+      var topo = add(cab, [0, 0.3, 0]), N = 20, aba = [];
+      for (var i = 0; i <= N; i++) { var an = i / N * PI * 2, rr = 0.82 + Math.sin(an * 5 + 0.6) * 0.06; aba.push([Math.cos(an) * rr, topo[1] - 0.02 + Math.sin(an * 4) * 0.05 - (Math.sin(an) < 0 ? 0.05 : 0), topo[2] + Math.sin(an) * rr * 0.92]); }
+      for (i = 0; i < N; i++) {
+        var a0 = i / N * PI * 2, a1 = (i + 1) / N * PI * 2;
+        chapa(cam, L, [[Math.cos(a0) * 0.3, topo[1] + 0.04, topo[2] + Math.sin(a0) * 0.28], [Math.cos(a1) * 0.3, topo[1] + 0.04, topo[2] + Math.sin(a1) * 0.28], aba[i + 1], aba[i]], ROXO, { verso: ROXO_E, vies: -0.5 });
       }
-      var cab = [0, by + 1.28, bz + 0.02];
-      piloto(cam, L, cab, 0.36, op);
-      // o chapéu preto esquisito: aba larga, cone torto e dobrado na ponta, faixa e fivela
-      var bal = Math.sin(relogio * 3.2) * 0.06;
-      bola(cam, L, add(cab, [0, 0.27, 0]), 0.66, 0.05, 0.62, tres(PRETO), -0.5);
-      bola(cam, L, add(cab, [0, 0.35, 0]), 0.31, 0.07, 0.3, tres(cor), -0.52);
-      var h0 = add(cab, [0, 0.3, 0]), h1 = add(cab, [0.05, 0.78, -0.06]), h2 = add(cab, [0.16 + bal, 1.12, -0.2]), h3 = add(cab, [0.42 + bal * 1.5, 1.24, -0.42]), h4 = add(cab, [0.55 + bal * 2, 1.06, -0.52]);
-      cano(cam, L, h0, h1, 0.3, 0.2, PRETO, -0.53); cano(cam, L, h1, h2, 0.2, 0.12, PRETO, -0.54); cano(cam, L, h2, h3, 0.12, 0.06, PRETO, -0.55); cano(cam, L, h3, h4, 0.06, 0.02, PRETO, -0.56);
-      caixa(cam, L, add(cab, [0.12, 0.62, -0.2]), [0.14, 0.12, 0.02], '#6a4c93', null, { chanfro: 0, vies: -0.6 });   // remendo
-      bola(cam, L, h4, 0.05, 0.05, 0.05, ['#fff7c2', '#ffd23f', '#a07a00'], -0.57); luzinha(cam, L, h4, 0.35, '#ffd23f', 0.5);   // estrelinha na ponta
-      caixa(cam, L, add(cab, [0, 0.35, 0.3]), [0.14, 0.1, 0.02], '#ffd23f', null, { chanfro: 0, vies: -0.6 });   // fivela (de frente)
+      var bal = Math.sin(relogio * 3.2) * 0.05;
+      var h0 = add(topo, [0, 0.02, 0]), h1 = add(topo, [0.03, 0.42, -0.04]), h2 = add(topo, [0.1 + bal, 0.78, -0.12]), h3 = add(topo, [-0.05 + bal, 1.02, -0.2]), h4 = add(topo, [-0.32 + bal * 1.5, 1.08, -0.18]), h5 = add(topo, [-0.5 + bal * 2, 0.95, -0.1]);
+      cano(cam, L, h0, h1, 0.31, 0.22, ROXO, -0.52); cano(cam, L, h1, h2, 0.22, 0.14, ROXO, -0.53); cano(cam, L, h2, h3, 0.14, 0.08, ROXO, -0.54); cano(cam, L, h3, h4, 0.08, 0.04, ROXO, -0.55); cano(cam, L, h4, h5, 0.04, 0.015, ROXO, -0.56);
+      bola(cam, L, add(topo, [0, 0.1, 0]), 0.31, 0.07, 0.3, tres(ROXO_E), -0.535);   // faixa
+      caixa(cam, L, add(topo, [0.27, 0.1, 0.12]), [0.03, 0.13, 0.16], '#b07a3a', { dir: function (c) { retangulo(c, 0, 0, 100, 100, '#b07a3a'); retangulo(c, 25, 25, 50, 50, ROXO_E); } }, { chanfro: 0, vies: -0.6 });   // fivela cor de bronze
     } },
     /* Ursão de Pelúcia gigante (1.30.0, dono 20/Nov/2026): ursinho de pelúcia enorme, marrom, com laço no pescoço (na
        cor escolhida), costura nas costas, rabinho redondo e solas das patas mais claras (aparecem quando o pé vai para

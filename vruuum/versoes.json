@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.34.0",
+      "data": "21/Nov/2026",
+      "hora": "12:28:54",
+      "pt": [
+        "🧹 Bruxinha nova, bem mais bonita: chapéu roxo de aba larga e ondulada, com a ponta enrolada e fivela; cabelo castanho comprido e ondulado (voando com o vento), olhos grandes roxos e sardinhas; vestido roxo rodado e botinhas. Ela é a própria personagem, com o gato preto na garupa.",
+        "🏁 No menu, a escolha do personagem agora é a última etapa, e só aparece quando o personagem aparece no veículo. Com o Ovo, o Ursão, a Bruxinha ou o trenó do Papai Noel (que agora conduz sozinho), são só 4 etapas."
+      ],
+      "en": [
+        "🧹 A new, much prettier Little Witch: a purple hat with a wide wavy brim, a curled tip and a buckle; long wavy brown hair (blowing in the wind), big purple eyes and freckles; a twirly purple dress and little boots. She's a character in her own right, with her black cat riding behind.",
+        "🏁 In the menu, choosing the driver is now the last step, and it only shows up when the driver actually appears on the ride. With the Egg, the Teddy Bear, the Little Witch or Santa's sleigh (Santa now drives by himself), there are just 4 steps."
+      ],
+      "es": [
+        "🧹 Una Brujita nueva, mucho más bonita: sombrero morado de ala ancha y ondulada, con la punta enrollada y hebilla; pelo castaño largo y ondulado (al viento), ojos grandes morados y pecas; vestido morado con vuelo y botines. Es un personaje propio, con su gato negro montado detrás.",
+        "🏁 En el menú, elegir el piloto es ahora el último paso, y solo aparece cuando el piloto se ve en el vehículo. Con el Huevo, el Osito, la Brujita o el trineo de Papá Noel (que ahora conduce él solo), son solo 4 pasos."
+      ]
+    },
+    {
       "versao": "1.33.0",
       "data": "20/Nov/2026",
       "hora": "21:52:08",
