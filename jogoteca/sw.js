@@ -3,7 +3,7 @@
    gravadas (*.mp3, inclusive musicas/tensao-interloper.mp3, a da queda do Bolinhas): o service worker não mexe (o navegador
    busca direto).
    Subir VERSAO a cada release (igual a APP_VERSION em app.js e a versoes.json). Jogo novo em jogos/ entra no ARQUIVOS. */
-var VERSAO = '0.4.0';
+var VERSAO = '0.4.1';
 var ARQUIVOS = ['./', 'index.html', 'estilo.css', 'capas.js', 'jogos/paciencia.js', 'jogos/sudoku.js', 'jogos/boliche.js', 'jogos/bolinhas-perguntas.js', 'jogos/bolinhas.js', 'jogos/batalha.js', 'jogos/velha.js', 'jogos/xadrez.js', 'app.js',
   'icone.svg', 'icone-192.png', 'icone-512.png', 'manifest.webmanifest', 'versoes.json', '../rabiscolandia/fontes/fredoka.woff2',
   '../recursos.js', '../carregando.js', '../idioma.js', '../navegacao.js', '../atualizar.js', '../telacheia.js', '../carrossel.js', '../trilha.js', '../instalar.js'];

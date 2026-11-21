@@ -2,6 +2,20 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.4.1",
+      "data": "21/Nov/2026",
+      "hora": "10:34:57",
+      "pt": [
+        "🏆 Bolinhas da Angústia: o placar agora é em pontos (ex.: 1.500 pts), não em dinheiro"
+      ],
+      "en": [
+        "🏆 Nail-Biter Drop: the score is now in points (e.g. 1,500 pts), not money"
+      ],
+      "es": [
+        "🏆 Bolitas de la Angustia: el marcador ahora es en puntos (p. ej., 1.500 pts), no en dinero"
+      ]
+    },
+    {
       "versao": "0.4.0",
       "data": "21/Nov/2026",
       "hora": "12:40:00",

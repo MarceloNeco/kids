@@ -61,11 +61,11 @@ test('Sem pressa: as zonas vêm antes da resposta (3 bolinhas, a mesma zona pode
   assert.deepEqual(L.adicionarZona(z, 1, max), [3, 3, 6], 'não passa de 3');
 });
 
-test('moeda por idioma: R$ em PT, $ em EN, € em ES (os mesmos números)', () => {
-  assert.equal(L.dinheiro(12500, 'pt'), 'R$ 12.500');
-  assert.equal(L.dinheiro(12500, 'en'), '$12,500');
-  assert.equal(L.dinheiro(12500, 'es'), '12.500 €');
-  assert.equal(L.dinheiro(0, 'pt'), 'R$ 0');
+test('placar em pontos, não em dinheiro (dono, 21/Nov/2026), com o separador do idioma', () => {
+  assert.equal(L.dinheiro(12500, 'pt'), '12.500 pts');
+  assert.equal(L.dinheiro(12500, 'en'), '12,500 pts');
+  assert.equal(L.dinheiro(12500, 'es'), '12.500 pts');
+  assert.equal(L.dinheiro(0, 'pt'), '0 pts');
 });
 
 test('sem parceiro, sem dois jogadores, sem Contrato e nenhum personagem parceiro no código, nos textos e na documentação', () => {
@@ -368,7 +368,7 @@ test.describe('no navegador', () => {
   });
 
   test('1280×800 e inglês/espanhol: textos e moeda no idioma escolhido', async () => {
-    for (const [cod, re, moeda, mod] of [['en', /Start/, /\$0/, /No Rush/], ['es', /Empezar/, /0€/, /Sin prisa/]]) {
+    for (const [cod, re, moeda, mod] of [['en', /Start/, /0\s*pts/, /No Rush/], ['es', /Empezar/, /0\s*pts/, /Sin prisa/]]) {
       const ctx = await browser.newContext({ locale: 'pt-BR', viewport: { width: 1280, height: 800 } });
       await ctx.addInitScript(c => localStorage.setItem('bolinho:idioma', c), cod);
       const pg = await ctx.newPage();
