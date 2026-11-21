@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.6",
+      "data": "21/Nov/2026",
+      "hora": "23:06:31",
+      "pt": [
+        "🚶‍♀️ Novo jeito de andar no desfile, como mulheres de verdade: quadril gingando para o lado do pé de apoio, um pé quase na frente do outro, ombros firmes e cabeça olhando para a frente, braços soltos balançando ao contrário das pernas (o que vai à frente dobra o cotovelo) e passos sem pressa."
+      ],
+      "en": [
+        "🚶‍♀️ A new runway walk, like real women: hips swaying toward the supporting foot, one foot almost in front of the other, steady shoulders and head looking ahead, relaxed arms swinging opposite the legs (the one going forward bends at the elbow) and unhurried steps."
+      ],
+      "es": [
+        "🚶‍♀️ Nueva forma de caminar en el desfile, como mujeres de verdad: la cadera se balancea hacia el pie de apoyo, un pie casi delante del otro, hombros firmes y la cabeza mirando al frente, brazos sueltos que se mueven al contrario de las piernas (el que va delante dobla el codo) y pasos sin prisa."
+      ]
+    },
+    {
       "versao": "0.9.5",
       "data": "21/Nov/2026",
       "hora": "22:39:34",

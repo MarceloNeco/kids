@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.5';
+  var APP_VERSION = '0.9.6';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -908,7 +908,7 @@
     // Nova Era: o corpo novo já tem a altura de cada idade (a criancinha é mais baixa no próprio desenho); 0,8 deixa ela
     // inteira na tela quando chega na frente (dono, 20/Nov/2026: "sai do quadro")
     var ALTURA = 0.8;
-    var PASSO_MS = { pequena: 600, crianca: 780, adolescente: 900, adulta: 980 };   // dois passos, mais rápido nas pequenas
+    var PASSO_MS = { pequena: 800, crianca: 1000, adolescente: 1150, adulta: 1250 };   // dois passos, sem pressa (vídeo de referência do dono); mais rápido nas pequenas
     $('modelo').className = 'modelo idade-' + idade;
     var POSES_DESFILE = ({
       pequena: menino ? [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'joinha', lado: '' }] : [{ tchau: true, lado: '' }, { pose: 'duasCintura', lado: '' }, { pose: 'carinha', lado: '' }],
