@@ -159,6 +159,8 @@
   // transformações do esqueleto (as mesmas do animador.js): ombro gira e encolhe o braço de cima no eixo dele;
   // o cotovelo desfaz o encolhimento em volta dele mesmo e gira o antebraço
   function transformaOmbro(a, f, S) { return 'rotate(' + n(a) + ' ' + n(S[0]) + ' ' + n(S[1]) + ')' + (f < 0.999 ? ' translate(' + n(S[0]) + ' ' + n(S[1]) + ') scale(1 ' + n(f * 1000) / 1000 + ') translate(' + n(-S[0]) + ' ' + n(-S[1]) + ')' : ''); }
+  // a mão vai para trás da cabeça? (braço erguido bem alto e o cotovelo dobrando de volta para a cabeça: mão na nuca)
+  function maoAtras(o, c) { return o > 110 && c < -60; }
   function transformaCotovelo(b, f, E) { return (f < 0.999 ? 'translate(' + n(E[0]) + ' ' + n(E[1]) + ') scale(1 ' + n(1000 / f) / 1000 + ') translate(' + n(-E[0]) + ' ' + n(-E[1]) + ') ' : '') + 'rotate(' + n(b) + ' ' + n(E[0]) + ' ' + n(E[1]) + ')'; }   // quanto o braço inteiro encolhe depois de ir para o corpo novo
   function rigido(x, y, s, ombro) { return s ? '<g data-rigido="' + x + ',' + y + (ombro ? ',' + ombro[0] + ',' + ombro[1] : '') + '">' + s + '</g><!--/rigido-->' : ''; }
   function deformarResto(str, D) {
@@ -562,7 +564,12 @@
         return '<g class="pp-' + k + '" style="' + origem(o[0], o[1]) + '">';
       }).replace(/<g class="pp-barra">/g, '<g class="pp-barra" style="' + origem(200, 455) + '">');
     });
-    if (rig) out.push(bracoRig(-1), bracoRig(1));
+    if (rig) {
+      out.push(bracoRig(-1), bracoRig(1));
+      // a cópia de trás do antebraço e da mão vai logo antes da cabeça (atrás do rosto e do cabelo da frente)
+      var iCab = -1; out.forEach(function (x, k) { if (iCab < 0 && x.indexOf('<g class="rig-cabeca"') === 0) iCab = k; });
+      if (iCab >= 0) out.splice(iCab, 0, bracoRig(-1, true) + bracoRig(1, true));
+    }
     /* desfile (opcoes.passos): tudo menos as pernas e a sombra do chão vai para grupos .pp-corpo, que acompanham o
        quadril (o peso passa de um pé para o outro e o corpo sobe e desce um pouco) sem tombar de lado; as pernas
        (.pp-passo-e / -d) fazem o catwalk: um pé cruza e pousa na frente do outro, na linha do meio (estilo.css) */
@@ -598,7 +605,7 @@
        sapatos de lado. */
     // braço do esqueleto, já no corpo novo: ombro S, cotovelo E, pulso W (em repouso, pendurado); a pose inicial vem de
     // opcoes.poseRig { oE, cE, oD, cD } (graus: o = abrir para fora, c = dobrar o cotovelo para dentro)
-    function bracoRig(lado) {
+    function bracoRig(lado, atras) {
       var sx0 = lado < 0 ? 150 : 250, wx0 = lado < 0 ? 118 : 282, S = [DF.fx(sx0, 354), DF.fy(354)], W0 = [DF.fx(wx0, 498), DF.fy(498)];
       var W = [S[0] + (W0[0] - S[0]) * ENCURTA, S[1] + (W0[1] - S[1]) * ENCURTA], L = Math.sqrt((W[0] - S[0]) * (W[0] - S[0]) + (W[1] - S[1]) * (W[1] - S[1]));
       var d = [(W[0] - S[0]) / L, (W[1] - S[1]) / L], Lu = L * 0.5, E = [S[0] + d[0] * Lu, S[1] + d[1] * Lu], k = DF.traco * 1.3 * DF.braco;   // grossura de braço de verdade (dono, 21/Nov/2026)
@@ -631,8 +638,14 @@
       var pr = op.poseRig || {}, a = lado < 0 ? (pr.oE || 6) : -(pr.oD || 6), b = lado < 0 ? -(pr.cE || 8) : (pr.cD || 8), f0 = (lado < 0 ? pr.fE : pr.fD) || 1, lt = lado < 0 ? 'e' : 'd';
       // o antebraço sai em dois grupos com a mesma classe (contorno e preenchimento): o animador gira os dois juntos
       var cot = '<g class="rig-cotovelo-' + lt + '" data-x="' + n(E[0]) + '" data-y="' + n(E[1]) + '" transform="' + transformaCotovelo(b, f0, E) + '">';
-      return '<g class="rig-ombro-' + lt + '" data-x="' + n(S[0]) + '" data-y="' + n(S[1]) + '" transform="' + transformaOmbro(a, f0, S) + '">' + cimaC +
-        cot + baixoC + '</g>' + cimaF + cot + baixoF + maoS + '</g></g>';
+      /* mão na nuca (dono, 21/Nov/2026): o antebraço e a mão saem duas vezes — uma na frente de tudo e outra atrás da
+         cabeça e do cabelo da frente (mas na frente do cabelo de trás). Só uma aparece: quando a mão vai para trás da
+         cabeça (maoAtras), aparece a de trás; o braço de cima fica sempre na frente do ombro. */
+      var vaiAtras = maoAtras(lado < 0 ? (pr.oE || 6) : (pr.oD || 6), lado < 0 ? (pr.cE || 8) : (pr.cD || 8));
+      var ombroG = '<g class="rig-ombro-' + lt + '" data-x="' + n(S[0]) + '" data-y="' + n(S[1]) + '" transform="' + transformaOmbro(a, f0, S) + '">';
+      if (atras) return '<g class="rig-atras-' + lt + '"' + (vaiAtras ? '' : ' style="display:none"') + '>' + ombroG + cot + baixoC + '</g>' + cot + baixoF + maoS + '</g></g></g>';
+      var fr = '<g class="rig-frente-' + lt + '"' + (vaiAtras ? ' style="display:none"' : '') + '>';
+      return ombroG + cimaC + fr + cot + baixoC + '</g></g>' + cimaF + fr + cot + baixoF + maoS + '</g></g></g>';
     }
     function corDoTopo() { return vis('capa') ? C('capa') : vis('vestido') ? C('vestido') : (e.blusa !== 'nenhum' ? C('blusa') : null); }
     function tipoManga() {
@@ -2522,7 +2535,7 @@
     var m = minimo || 90, w = Math.max(x2 - x1, m), h = Math.max(y2 - y1, m), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
     return [n(cx - w / 2), n(cy - h / 2), n(w), n(h)];
   }
-  var API = { transformaOmbro: transformaOmbro, transformaCotovelo: transformaCotovelo, corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
+  var API = { maoAtras: maoAtras, transformaOmbro: transformaOmbro, transformaCotovelo: transformaCotovelo, corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
   API.POSES = POSES;
   raiz.PurpurinaBoneca = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
