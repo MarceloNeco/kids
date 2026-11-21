@@ -4,7 +4,7 @@
    Uma pessoa joga sozinha (dono, 21/Nov/2026: sem parceiro virtual, sem dois jogadores), em duas modalidades escolhidas no começo:
    - Queda Livre (queda): 5 perguntas de 2 opções; lida a pergunta, três bolinhas brancas caem das zonas 1, 4 e 7 e é preciso
      responder antes que a primeira chegue lá embaixo (sem resposta = erro). Acertou: viram verdes e somam o valor da canaleta;
-     errou: viram vermelhas e descontam. O tempo de leitura muda com o nível (fácil 6 s, médio 4,5 s, difícil 3 s).
+     errou: viram vermelhas e descontam. Tempo de leitura de 6 s, o mesmo em todos os níveis (dono, 21/Nov/2026, 0.4.3).
    - Sem pressa (calma): 5 perguntas de 4 opções, sem relógio nenhum, em 2 passos no painel (0.4.2): 1/2 "Onde as bolinhas vão
      cair?" — a pergunta e 7 botões numerados como as zonas (tocar na parede também vale; ↩ desfaz; 🎲 sorteia); 2/2 "Agora
      responda!" — os botões somem e aparecem as 4 opções (↩ zonas volta). Respondeu: as bolinhas caem verdes (acertou,
@@ -13,9 +13,15 @@
    20 mil · 30 mil; Sem pressa 2 mil · 6 mil · 12 mil · 22 mil · 35 mil · 50 mil, medidos com rodadas simuladas na física do jogo).
    O 2º e o 4º degraus são portos seguros: alcançou, trava 🔒 e as vermelhas nunca derrubam o saldo abaixo dele. Degrau novo e
    porto travado ganham aviso, som e brilho. A rodada vai pergunta após pergunta até a meta (vitória), 12 perguntas ou 3 erros
-   seguidos; as perguntas endurecem conforme sobe (alvoDificuldade), e o nível da Jogoteca muda o começo. No fim, o placar
+   seguidos; as perguntas endurecem conforme sobe (faixaAlvo), e o nível da Jogoteca muda o começo. No fim, o placar
    (degrau alcançado, porto garantido, acertos, recorde por modalidade e nível). Escada: deitado, coluna ao lado da parede;
    em pé, faixa de 6 degraus embaixo do placar.
+   Sorte e saber (dono, 21/Nov/2026, 0.4.3: "as bolinhas caindo têm que ser verdadeiramente aleatórias, questões de física. A
+   dificuldade é somente associada ao nível de perguntas"): nada escolhe a canaleta antes nem empurra para um valor; cada
+   queda começa com um desvio minúsculo vindo do acaso de verdade (crypto do navegador, acasoReal) e o resto é física. Só com
+   ?teste a física usa a semente (testes repetíveis). O nível e a escada mudam APENAS as perguntas: faixaAlvo dá a janela de
+   2 faixas (de 1 a 5) pelo degrau, e o nível só desloca o começo; sortearPergunta varia o tema, não repete na rodada e
+   evita as 150 últimas vistas no aparelho (ctx 'recentes'). Banco e régua: bolinhas-perguntas.js e BOLINHAS-PERGUNTAS-BENCH.md.
    Física própria e leve (círculo com círculo, passo fixo de 1/120 s), sem biblioteca: pinos em grade intercalada, divisórias de
    pontas redondas, sensor no fundo de cada canaleta e empurrãozinho se a bolinha parar. A restituição de um choque é o produto das
    duas (bolinha 0,6 × pino 0,75 = 0,45; bolinha com parede 0,6), com gravidade calibrada para a queda durar ~5,8 s
@@ -50,7 +56,7 @@
   // as duas modalidades (dono, 21/Nov/2026). leitura = segundos até as bolinhas caírem (null = sem relógio)
   // perguntas = o máximo da rodada (a rodada acaba antes na meta ou com 3 erros seguidos)
   var MODALIDADES = {
-    queda: { opcoes: 2, perguntas: 12, bolas: 3, zonas: [0, 3, 6], leitura: { facil: 6, medio: 4.5, dificil: 3 } },
+    queda: { opcoes: 2, perguntas: 12, bolas: 3, zonas: [0, 3, 6], leitura: 6 },
     calma: { opcoes: 4, perguntas: 12, bolas: 3, zonas: null, leitura: null }
   };
   // escada de pontos com portos seguros (dono, 21/Nov/2026: "evolução por pontos (...) que tem os portos seguros").
@@ -70,11 +76,14 @@
     if (feitas >= max) return 'limite';
     return null;
   }
-  // as perguntas endurecem conforme sobe a escada; o nível da Jogoteca muda o começo (1 fácil · 2 média · 3 difícil)
-  function alvoDificuldade(nivel, degrau) {
-    return Math.min(3, nivel === 'dificil' ? 2 + Math.ceil(degrau / 2) : nivel === 'medio' ? 1 + Math.ceil(degrau / 2) : 1 + Math.floor(degrau / 2));
+  // a faixa das perguntas (1 muito fácil … 5 difícil; régua em BOLINHAS-PERGUNTAS-BENCH.md) sobe com a escada: janela de 2
+  // faixas [a, a + 1]; o nível da Jogoteca só desloca o começo (fácil 1–2, médio 2–3, difícil 3–4) e no alto chega a 4–5
+  function faixaAlvo(nivel, degrau) {
+    var a = Math.min(4, (nivel === 'dificil' ? 3 : nivel === 'medio' ? 2 : 1) + Math.floor(degrau / 2));
+    return [a, a + 1];
   }
-  function tempoDeLeitura(mod, nivel) { var l = MODALIDADES[mod].leitura; return l ? (l[nivel] || l.medio) : null; }
+  // o mesmo tempo para todos os níveis (dono, 21/Nov/2026: a dificuldade é só a das perguntas)
+  function tempoDeLeitura(mod) { return MODALIDADES[mod].leitura; }
   // verde soma; vermelha subtrai, e o saldo nunca fica abaixo do porto seguro garantido (nem de zero)
   function aplicarBola(saldo, valor, cor, piso) { return cor === 'verde' ? saldo + valor : Math.max(piso || 0, saldo - valor); }
   function corDaResposta(acertou) { return acertou ? 'verde' : 'vermelha'; }
@@ -105,30 +114,38 @@
     musica: { ico: '🎵', n: ['Música', 'Music', 'Música'] },
     comida: { ico: '🍕', n: ['Comida', 'Food', 'Comida'] },
     linguas: { ico: '🔤', n: ['Línguas', 'Languages', 'Idiomas'] },
-    corpo: { ico: '💪', n: ['Corpo Humano', 'Human Body', 'Cuerpo Humano'] }
+    corpo: { ico: '💪', n: ['Corpo Humano', 'Human Body', 'Cuerpo Humano'] },
+    matematica: { ico: '📐', n: ['Matemática', 'Math', 'Matemáticas'] },
+    cotidiano: { ico: '🏠', n: ['Dia a dia', 'Everyday Life', 'Día a día'] },
+    artes: { ico: '🎨', n: ['Artes', 'Arts', 'Artes'] },
+    espaco: { ico: '🚀', n: ['Espaço', 'Space', 'Espacio'] },
+    tecnologia: { ico: '💻', n: ['Tecnologia', 'Technology', 'Tecnología'] }
   };
 
-  // o nível escolhe a dificuldade: fácil começa pelas fáceis, difícil pelas difíceis, médio sorteia entre todas
-  var PREF = { facil: [1, 2, 3], dificil: [3, 2, 1] };
-  // alvo (1 a 3, opcional): a dificuldade que a escada pede; sem a dele, vai para a mais perto
-  function sortearPergunta(banco, nOpcoes, nivel, usadas, sorte, alvo) {
-    var cand = banco.filter(function (q) { return q.o.length === nOpcoes && !usadas[q.id]; });
+  // uma pergunta serve à modalidade? Sem pressa: só as de 4 opções; Queda Livre: as de 2 e as de 4 (reduzidas a 2)
+  function serve(q, nOpcoes) { return nOpcoes === 2 ? q.o.length === 2 || q.o.length === 4 : q.o.length === nOpcoes; }
+  // sorteia a próxima pergunta: nunca uma já usada na rodada; de preferência dentro da faixa pedida, fora das vistas há pouco
+  // (o aparelho lembra as últimas) e de um tema diferente dos 2 últimos. Faltou, afrouxa nesta ordem: tema, vistas, faixa.
+  // faixa = [min, max]; extra = { recentes: { id: true }, temas: ['ultimo', 'penultimo'] }
+  function sortearPergunta(banco, nOpcoes, faixa, usadas, sorte, extra) {
+    extra = extra || {};
+    var rec = extra.recentes || {}, temas = extra.temas || [], cand = banco.filter(function (q) { return serve(q, nOpcoes) && !usadas[q.id]; });
     if (!cand.length) return null;
     embaralhar(cand, sorte);
-    var ordem = alvo ? [alvo, alvo - 1, alvo + 1, alvo - 2, alvo + 2].filter(function (d) { return d >= 1 && d <= 3; }) : PREF[nivel];
-    if (ordem) {
-      var melhor = 9;
-      cand.forEach(function (q) { melhor = Math.min(melhor, ordem.indexOf(q.d)); });
-      cand = cand.filter(function (q) { return ordem.indexOf(q.d) === melhor; });
-    }
-    usadas[cand[0].id] = true;
-    return cand[0];
+    function dist(q) { return q.d < faixa[0] ? faixa[0] - q.d : q.d > faixa[1] ? q.d - faixa[1] : 0; }
+    function nota(q) { return dist(q) * 100 + (rec[q.id] ? 10 : 0) + (temas.indexOf(q.cat) >= 0 ? 1 : 0); }
+    var melhor = cand[0];
+    for (var i = 1; i < cand.length; i++) if (nota(cand[i]) < nota(melhor)) melhor = cand[i];
+    usadas[melhor.id] = true;
+    return melhor;
   }
-  // a pergunta pronta para a partida: opções embaralhadas, c = índice da certa já na ordem nova
-  function prepararPergunta(q, sorte) {
-    var ordem = [], i;
-    for (i = 0; i < q.o.length; i++) ordem.push(i);
-    embaralhar(ordem, sorte);
+  // a pergunta pronta para a partida: na Queda Livre, uma de 4 vira de 2 (a certa e o primeiro distrator, o mais
+  // plausível); opções embaralhadas, c = índice da certa já na ordem nova
+  function prepararPergunta(q, sorte, nOpcoes) {
+    var idx = [], i;
+    if (nOpcoes === 2 && q.o.length > 2) { idx.push(q.c); for (i = 0; i < q.o.length; i++) if (i !== q.c) { idx.push(i); break; } }
+    else for (i = 0; i < q.o.length; i++) idx.push(i);
+    var ordem = idx.slice(); embaralhar(ordem, sorte);
     return { id: q.id, cat: q.cat, d: q.d, q: q.q, o: ordem.map(function (k) { return q.o[k]; }), c: ordem.indexOf(q.c) };
   }
   /* ======================= física (lógica pura, unidades do mundo: a parede tem 750 × 1050) ======================= */
@@ -150,10 +167,18 @@
     return { lista: p, filas: filas };
   }
   function criarMundo() { var pp = criarPinos(); return { pinos: pp.lista, filas: pp.filas, bolas: [], t: 0, n: 0 }; }
-  // solta uma bolinha da zona (0 a 6), com o jitter de ±1,5 a 3 px (duas bolinhas da mesma zona nunca repetem o caminho)
+  // acaso de verdade (dono, 21/Nov/2026: "as bolinhas caindo têm que ser verdadeiramente aleatórias, questões de física"):
+  // números do crypto do navegador (ou do Node); sem crypto, Math.random. Os testes passam uma semente e ficam repetíveis.
+  function acasoReal() {
+    var c = (typeof window !== 'undefined' && window.crypto) || (typeof globalThis !== 'undefined' && globalThis.crypto);
+    if (c && c.getRandomValues) { var u = new Uint32Array(1); c.getRandomValues(u); return u[0] / 4294967296; }
+    return Math.random();
+  }
+  // solta uma bolinha da zona (0 a 6): começa com um desvio minúsculo e aleatório (posição ±1,5 a 3 px e velocidade lateral
+  // de até ±6 px/s) e daí em diante é só física — nada escolhe a canaleta antes nem empurra para um valor
   function soltar(m, zona, cor, sorte, espera) {
-    var j = (1.5 + 1.5 * sorte()) * (sorte() < 0.5 ? -1 : 1);
-    var b = { id: ++m.n, zona: zona, cor: cor, x: zonaX(zona) + j, y: GEO.Y_SOLTA, vx: 0, vy: 0, t: 0, espera: espera || 0, pousou: false,
+    var j = (1.5 + 1.5 * sorte()) * (sorte() < 0.5 ? -1 : 1), vx0 = (sorte() * 2 - 1) * 6;
+    var b = { id: ++m.n, zona: zona, cor: cor, x: zonaX(zona) + j, y: GEO.Y_SOLTA, vx: vx0, vy: 0, t: 0, espera: espera || 0, pousou: false,
       canaleta: -1, tPouso: 0, parado: 0, empurroes: 0, aplicada: false };
     m.bolas.push(b);
     return b;
@@ -235,9 +260,9 @@
     }
     for (i = 0; i < ativas.length; i++) for (j = i + 1; j < ativas.length; j++) choqueBolas(ativas[i], ativas[j]);
   }
-  // uma queda inteira sem desenhar (testes): devolve a canaleta e o tempo até o sensor
+  // uma queda inteira sem desenhar (testes): devolve a canaleta e o tempo até o sensor; sem semente, acaso de verdade
   function simularQueda(zona, semente) {
-    var m = criarMundo(), s = criarSorte(semente), b = soltar(m, zona, 'branca', s);
+    var m = criarMundo(), s = semente == null ? acasoReal : criarSorte(semente), b = soltar(m, zona, 'branca', s);
     while (!b.pousou && b.t < 60) passoMundo(m, 1 / 120, s);
     return { canaleta: b.canaleta, tempo: b.tPouso, empurroes: b.empurroes, pousou: b.pousou };
   }
@@ -440,6 +465,8 @@
     var semente = Math.floor(Math.random() * 1e9);
     if (ctx.teste) { var ms = /[?&]semente=(\d+)/.exec(location.search); semente = ms ? +ms[1] : 7; }
     var sorte = criarSorte(semente), som = criarSom(ctx);
+    // a física usa o acaso de verdade; com ?teste, a semente (para os testes repetirem a mesma queda)
+    var acasoFisica = ctx.teste ? sorte : acasoReal;
     function tx(v) { return typeof v === 'string' ? v : (v[IDX] != null ? v[IDX] : v[0]); }
     function din(v) { return dinheiro(v, L); }
     function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
@@ -486,7 +513,7 @@
     function novoEstado() {
       return { mod: modalidade, etapa: 'inicio', saldo: 0, rodada: 0, marcas: [], acertos: 0, perg: null, resposta: null,
         zonas: [], zona: 3, zonaOk: false, usadas: {}, lote: null, leituraAte: 0,
-        piso: 0, degrauMax: 0, erros: 0, motivo: null };   // escada: porto seguro garantido, maior degrau, erros seguidos
+        piso: 0, degrauMax: 0, erros: 0, motivo: null, temas: [] };   // escada: porto seguro garantido, maior degrau, erros seguidos
     }
     function R() { return MODALIDADES[G.mod]; }
     function E() { return ESCADA[G.mod]; }
@@ -1023,7 +1050,7 @@
 
     /* ---------- bolinhas e lotes ---------- */
     function novoLote(total, fim) { var l = { total: total, bolas: [], fim: fim, acabou: false }; G.lote = l; return l; }
-    function lancar(lote, zona, cor, atraso) { var b = soltar(mundo, zona, cor, sorte, atraso || 0.05); b.lote = lote; b.rastro = []; lote.bolas.push(b); sujo = true; return b; }
+    function lancar(lote, zona, cor, atraso) { var b = soltar(mundo, zona, cor, acasoFisica, atraso || 0.05); b.lote = lote; b.rastro = []; lote.bolas.push(b); sujo = true; return b; }
     function aplicar(b) {
       if (b.aplicada || b.cor === 'branca' || !b.pousou) return;
       b.aplicada = true;
@@ -1226,7 +1253,7 @@
         '2 options: three balls drop from zones 1, 4 and 7 and you must answer before the first one reaches the bottom. ',
         '2 opciones: tres bolitas caen de las zonas 1, 4 y 7 y hay que responder antes de que la primera llegue abajo. ') :
         t('4 opções, sem relógio: escolha 3 zonas e depois responda. ', '4 options, no clock: pick 3 zones, then answer. ', '4 opciones, sin reloj: elige 3 zonas y luego responde. ')) +
-        t('Suba a escada até a 🏆 ', 'Climb the ladder to the 🏆 ', 'Sube la escalera hasta el 🏆 ') + din(E()[5]) + t('! Os 🛟 portos seguros, quando alcançados, ficam garantidos. Até 12 perguntas; 3 erros seguidos encerram.', '! Reach a 🛟 safe haven and those points are locked in. Up to 12 questions; 3 wrong in a row ends the round.', '! Los 🛟 puertos seguros, al alcanzarlos, quedan asegurados. Hasta 12 preguntas; 3 fallos seguidos terminan la ronda.');
+        t('Suba a escada até a 🏆 ', 'Climb the ladder to the 🏆 ', 'Sube la escalera hasta el 🏆 ') + din(E()[5]) + t('! Os 🛟 portos seguros, quando alcançados, ficam garantidos. Até 12 perguntas; 3 erros seguidos encerram. As bolinhas caem só pela física; quanto mais alto, mais difíceis as perguntas.', '! Reach a 🛟 safe haven and those points are locked in. Up to 12 questions; 3 wrong in a row ends the round. The balls fall by physics alone; the higher you climb, the harder the questions.', '! Los 🛟 puertos seguros, al alcanzarlos, quedan asegurados. Hasta 12 preguntas; 3 fallos seguidos terminan la ronda. Las bolitas caen solo por la física; cuanto más alto, más difíciles las preguntas.');
       abrirCena('<div class="jt-bol2-caixa jt-bol2-fasecard"><span class="num">' + (queda ? '⏱' : '🧘') + ' ' + t('Modalidade', 'Mode', 'Modalidad') + '</span><h2>' + nomeMod(G.mod) + '</h2><p>' + sub + '</p>' +
         '<button type="button" class="jt-bol2-btn" data-foco data-ok>' + t('Vamos!', 'Let’s go!', '¡Vamos!') + '</button></div>', 'vidro');
       var seguiu = false, seguir = function () { if (seguiu) return; seguiu = true; fecharCena(); proxima(); };
@@ -1238,11 +1265,22 @@
       if (fim) { G.motivo = fim; return placar(); }
       if (G.mod === 'queda') perguntaQueda(); else perguntaCalma();
     }
+    // as últimas 150 perguntas que apareceram ficam guardadas no aparelho, para não voltarem logo na rodada seguinte
+    var recentes = { lista: [], mapa: {} };
+    (function () { var l = ctx.ler('recentes'); if (Array.isArray(l)) l.slice(-150).forEach(function (id) { recentes.lista.push(id); recentes.mapa[id] = true; }); })();
+    function lembrar(id) {
+      if (recentes.mapa[id]) recentes.lista.splice(recentes.lista.indexOf(id), 1);
+      recentes.lista.push(id); recentes.mapa[id] = true;
+      while (recentes.lista.length > 150) delete recentes.mapa[recentes.lista.shift()];
+      ctx.gravar('recentes', recentes.lista);
+    }
     function novaPergunta() {
-      var alvo = alvoDificuldade(nivel, degrauDe(G.saldo, E()));   // sobe a escada, endurecem as perguntas
-      var q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte, alvo);
-      if (!q) { G.usadas = {}; q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte, alvo); }   // banco esgotado: recomeça
-      G.perg = prepararPergunta(q, sorte); G.resposta = null;
+      var faixa = faixaAlvo(nivel, degrauDe(G.saldo, E()));   // sobe a escada, endurecem as perguntas
+      var extra = { recentes: recentes.mapa, temas: G.temas.slice(-2) };
+      var q = sortearPergunta(banco, R().opcoes, faixa, G.usadas, sorte, extra);
+      if (!q) { G.usadas = {}; q = sortearPergunta(banco, R().opcoes, faixa, G.usadas, sorte, extra); }   // banco esgotado: recomeça
+      G.temas.push(q.cat); lembrar(q.id);
+      G.perg = prepararPergunta(q, sorte, R().opcoes); G.resposta = null;
       limparPainel();
       catEl.innerHTML = categoriaHTML(G.perg);
       pergEl.hidden = false; pergEl.textContent = tx(G.perg.q);
@@ -1252,7 +1290,7 @@
     /* ---------- Queda Livre: 2 opções, responder enquanto as bolinhas caem ---------- */
     function perguntaQueda() {
       novaPergunta();
-      var seg = tempoDeLeitura('queda', nivel);
+      var seg = tempoDeLeitura('queda');
       G.etapa = 'leitura'; G.leituraAte = relogio + seg;
       pintarFase();
       montarOps(G.perg, responderQueda);
@@ -1513,7 +1551,7 @@
       rodarTimers();
       acum += dt;
       var n = 0;
-      while (acum >= PASSO && n < 400) { passoMundo(mundo, PASSO, sorte, aoEvento); acum -= PASSO; n++; }
+      while (acum >= PASSO && n < 400) { passoMundo(mundo, PASSO, acasoFisica, aoEvento); acum -= PASSO; n++; }
       if (n >= 400) acum = 0;
       checarLote();
       var i, b, p, mexe = false;
@@ -1825,13 +1863,16 @@
         '<p><b>🪜 ' + t('Escada de pontos', 'Points ladder', 'Escalera de puntos') + ':</b> ' + t('suba degrau por degrau até a 🏆 (30.000 na Queda Livre, 50.000 no Sem pressa). O 2º e o 4º degraus são 🛟 portos seguros: alcançou, ficam garantidos 🔒 e as vermelhas não derrubam o saldo abaixo deles. A rodada acaba na 🏆, depois de 12 perguntas ou com 3 erros seguidos. Quanto mais alto, mais difíceis as perguntas.',
           'climb step by step to the 🏆 (30,000 in Free Fall, 50,000 in No Rush). The 2nd and 4th steps are 🛟 safe havens: reach one and it is locked in 🔒, so red balls can never drop your score below it. The round ends at the 🏆, after 12 questions or with 3 wrong in a row. The higher you climb, the harder the questions.',
           'sube peldaño a peldaño hasta el 🏆 (30.000 en la Caída Libre, 50.000 en Sin prisa). El 2.º y el 4.º peldaños son 🛟 puertos seguros: al alcanzarlos quedan asegurados 🔒 y las rojas no bajan la puntuación de ahí. La ronda termina en el 🏆, tras 12 preguntas o con 3 fallos seguidos. Cuanto más alto, más difíciles las preguntas.') + '</p>' +
-        '<p>' + t('O nível muda as perguntas (e, na Queda Livre, o tempo para ler). Teclado ou controle da TV: ← → passam pelas zonas ou pelas opções, OK confirma e ⌫ desfaz a zona. O botão «+ −» põe + e − dentro das bolinhas.',
-          'The level changes the questions (and, in Free Fall, the reading time). Keyboard or TV remote: ← → move through the zones or the options, OK confirms and ⌫ undoes a zone. The «+ −» button puts + and − inside the balls.',
-          'El nivel cambia las preguntas (y, en la Caída Libre, el tiempo para leer). Teclado o mando de la tele: ← → recorren las zonas o las opciones, OK confirma y ⌫ deshace la zona. El botón «+ −» pone + y − dentro de las bolitas.') + '</p>';
+        '<p><b>🎲 ' + t('Sorte e saber', 'Luck and knowledge', 'Suerte y saber') + ':</b> ' + t('as bolinhas caem só pela física, de verdade ao acaso: ninguém escolhe a canaleta. O nível (fácil, médio, difícil) e a subida na escada mudam APENAS as perguntas — o tempo para ler (6 s na Queda Livre), as bolinhas e a parede são iguais para todo mundo.',
+          'the balls fall by physics alone, truly at random: nobody picks the slot. The level (easy, medium, hard) and climbing the ladder change ONLY the questions — the reading time (6 s in Free Fall), the balls and the wall are the same for everyone.',
+          'las bolitas caen solo por la física, de verdad al azar: nadie elige la casilla. El nivel (fácil, medio, difícil) y la subida por la escalera cambian SOLO las preguntas: el tiempo para leer (6 s en la Caída Libre), las bolitas y la pared son iguales para todos.') + '</p>' +
+        '<p>' + t('Teclado ou controle da TV: ← → passam pelas zonas ou pelas opções, OK confirma e ⌫ desfaz a zona. O botão «+ −» põe + e − dentro das bolinhas.',
+          'Keyboard or TV remote: ← → move through the zones or the options, OK confirms and ⌫ undoes a zone. The «+ −» button puts + and − inside the balls.',
+          'Teclado o mando de la tele: ← → recorren las zonas o las opciones, OK confirma y ⌫ deshace la zona. El botón «+ −» pone + y − dentro de las bolitas.') + '</p>';
     },
     iniciar: iniciar,
     logica: { VALORES: VALORES, MODALIDADES: MODALIDADES, ESCADA: ESCADA, PORTOS: PORTOS, ERROS_SEGUIDOS: ERROS_SEGUIDOS, degrauDe: degrauDe,
-      novoPiso: novoPiso, fimDaRodada: fimDaRodada, alvoDificuldade: alvoDificuldade, GEO: GEO, FIS: FIS, CATEGORIAS: CATEGORIAS, aplicarBola: aplicarBola, aplicarLote: aplicarLote,
+      novoPiso: novoPiso, fimDaRodada: fimDaRodada, faixaAlvo: faixaAlvo, serve: serve, GEO: GEO, FIS: FIS, CATEGORIAS: CATEGORIAS, aplicarBola: aplicarBola, aplicarLote: aplicarLote,
       corDaResposta: corDaResposta, tempoDeLeitura: tempoDeLeitura, adicionarZona: adicionarZona, zonasProntas: zonasProntas,
       criarSorte: criarSorte, sortearPergunta: sortearPergunta, prepararPergunta: prepararPergunta,
       criarMundo: criarMundo, soltar: soltar, passoMundo: passoMundo, simularQueda: simularQueda, dinheiro: dinheiro, zonaX: zonaX }

@@ -24,8 +24,8 @@ te dar ponto."
     botões somem e aparecem as 4 opções). O selo "Ao vivo" fica no piso, longe das zonas, e o painel deixa livre o canto
     da bolinha 🎵 da música.
   - No fim de cada rodada, o placar (saldo, acertos, recorde por modalidade e nível). O saldo nunca fica abaixo de zero.
-    Os valores das 15 canaletas são os da antiga Fase 1. O nível da Jogoteca escolhe a dificuldade das perguntas (e, na
-    Queda Livre, o tempo para ler).
+    Os valores das 15 canaletas são os da antiga Fase 1. O nível da Jogoteca escolhe só a dificuldade das perguntas
+    (desde a 0.4.3 o tempo para ler é um só, 6 s).
 - **Escada de pontos com portos seguros** (dono, 21/Nov/2026: "tinha que ter evolução por pontos, até você atingir (...) que
   tem os portos seguros"; mecânica livre de game show, com nomes e visual próprios), nas duas modalidades (0.4.2):
   - 6 degraus até a 🏆 meta. Queda Livre: 1.000 · 4.000 🛟 · 8.000 · 14.000 🛟 · 20.000 · 🏆 30.000. Sem pressa: 2.000 ·
@@ -38,6 +38,16 @@ te dar ponto."
     (explicado no ❓). As perguntas ficam mais difíceis conforme sobe a escada; o nível da Jogoteca muda o começo.
   - A escada fica à vista: deitado/computador, numa coluna ao lado da parede (meta no alto); no celular em pé, numa faixa de
     6 degraus embaixo do placar. No fim, o placar mostra o degrau alcançado, o porto garantido e o recorde.
+- **Sorte e saber** (dono, 21/Nov/2026, 0.4.3: "As bolinhas caindo têm que ser verdadeiramente aleatórias, questões de
+  física. A dificuldade é somente associada ao nível de perguntas. Faz um bench extenso de como são as perguntas, com vários
+  temas (...) Mas não de fazer conta. Perguntas que variam, vai ficando mais difícil a cada vez que os pontos vão aumentando."):
+  - A queda é só física: nada escolhe a canaleta antes nem empurra para um valor. Cada bolinha começa com um desvio
+    minúsculo (posição e velocidade) vindo do acaso de verdade do aparelho (crypto); só os testes usam semente. Um teste
+    estatístico confere que muitas quedas da mesma zona se espalham em sino, sem canaleta viciada.
+  - O nível (fácil, médio, difícil) e a escada mudam só as perguntas: tempo de leitura único (6 s), bolinhas e física iguais.
+  - Banco de 325 perguntas em 15 temas e 5 faixas (régua, formatos e cuidados em `BOLINHAS-PERGUNTAS-BENCH.md`). A faixa
+    sobe com a escada (janela de 2 faixas; no alto, 4–5); o nível só desloca o começo (fácil 1–2, médio 2–3, difícil 3–4).
+    Temas variados em sequência, sem repetir na rodada, e o aparelho lembra as 150 últimas para não voltarem logo.
 - Mais pedidos do mesmo dia, com fotos do programa de TV como referência de estilo (sem nome, logotipo ou marca dele):
   música de **tensão e emoção** durante a queda, do soltar até a última bolinha bater no fundo, e depois a trilha volta do
   ponto onde parou; **câmera do ponto de vista da bolinha** (começa colada nela, passando pelos pinos, e depois acompanha);

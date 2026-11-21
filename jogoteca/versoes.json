@@ -2,6 +2,23 @@
   "app": "jogoteca",
   "versoes": [
     {
+      "versao": "0.4.3",
+      "data": "21/Nov/2026",
+      "hora": "18:10:00",
+      "pt": [
+        "🎲 Bolinhas da Angústia: as bolinhas caem só pela física, de verdade ao acaso — nada escolhe a canaleta. O nível e a escada mudam apenas as perguntas (o tempo para ler é um só, 6 s, para todo mundo)",
+        "❓ Banco novo com 325 perguntas em 15 temas (inclusive matemática sem conta, dia a dia, artes, espaço e tecnologia) e 5 faixas de dificuldade: quanto mais alto na escada, mais difíceis; temas variados e sem repetir as que você viu há pouco"
+      ],
+      "en": [
+        "🎲 Nail-Biter Drop: the balls fall by physics alone, truly at random — nothing picks the slot. The level and the ladder change only the questions (the reading time is the same 6 s for everyone)",
+        "❓ A new bank of 325 questions across 15 themes (including math without sums, everyday life, arts, space and technology) and 5 difficulty bands: the higher you climb, the harder they get; themes vary and the ones you saw recently stay away"
+      ],
+      "es": [
+        "🎲 Bolitas de la Angustia: las bolitas caen solo por la física, de verdad al azar — nada elige la casilla. El nivel y la escalera cambian solo las preguntas (el tiempo para leer es el mismo, 6 s, para todos)",
+        "❓ Banco nuevo de 325 preguntas en 15 temas (incluidas matemáticas sin cuentas, día a día, artes, espacio y tecnología) y 5 franjas de dificultad: cuanto más alto en la escalera, más difíciles; temas variados y sin repetir las que viste hace poco"
+      ]
+    },
+    {
       "versao": "0.4.2",
       "data": "21/Nov/2026",
       "hora": "17:32:00",

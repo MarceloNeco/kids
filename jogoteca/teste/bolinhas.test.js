@@ -32,9 +32,10 @@ test('duas modalidades: Queda Livre com 2 opções e tempo; Sem pressa com 4 op�
   assert.ok(q.perguntas >= 3 && c.perguntas >= 3, 'várias perguntas por rodada');
   assert.deepEqual(q.zonas, [0, 3, 6], 'na Queda Livre as bolinhas caem das zonas 1, 4 e 7');
   assert.equal(c.zonas, null, 'no Sem pressa quem escolhe as zonas é a pessoa');
-  assert.equal(L.tempoDeLeitura('calma', 'facil'), null); assert.equal(L.tempoDeLeitura('calma', 'dificil'), null);
-  assert.ok(L.tempoDeLeitura('queda', 'facil') > L.tempoDeLeitura('queda', 'medio'));
-  assert.ok(L.tempoDeLeitura('queda', 'medio') > L.tempoDeLeitura('queda', 'dificil'));
+  assert.equal(L.tempoDeLeitura('calma'), null);
+  // dono, 21/Nov/2026: a dificuldade é só a das perguntas — um tempo de leitura só, confortável, para todos os níveis
+  assert.equal(L.tempoDeLeitura('queda'), 6);
+  assert.equal(L.MODALIDADES.queda.leitura, 6, 'nada de tempo por nível');
 });
 
 test('pontos: acertou = verde soma; errou = vermelha desconta, e o saldo nunca fica abaixo de zero', () => {
@@ -110,57 +111,87 @@ test('fim da rodada: a meta encerra com vitória; senão 12 perguntas ou 3 erros
   assert.equal(L.fimDaRodada(500, E, 5, 3, max), 'erros');
   assert.equal(L.fimDaRodada(500, E, 12, 1, max), 'limite');
   assert.equal(L.fimDaRodada(500, E, 11, 2, max), null, 'continua');
-  // perguntas mais difíceis conforme sobe; o nível muda o começo
+});
+
+test('faixa das perguntas: sobe com a escada (no alto, 4–5) e o nível só desloca o começo', () => {
+  assert.deepEqual(L.faixaAlvo('facil', 0), [1, 2]); assert.deepEqual(L.faixaAlvo('medio', 0), [2, 3]); assert.deepEqual(L.faixaAlvo('dificil', 0), [3, 4]);
   for (const nv of ['facil', 'medio', 'dificil']) {
     let ant = 0;
-    for (let d = 0; d <= 6; d++) { const a = L.alvoDificuldade(nv, d); assert.ok(a >= ant && a >= 1 && a <= 3, nv + ' degrau ' + d); ant = a; }
+    for (let d = 0; d <= 6; d++) { const f = L.faixaAlvo(nv, d); assert.ok(f[0] >= ant && f[0] >= 1 && f[1] <= 5 && f[1] === f[0] + 1, nv + ' degrau ' + d); ant = f[0]; }
+    assert.deepEqual(L.faixaAlvo(nv, 6), [4, 5], nv + ': no topo, 4–5');
   }
-  assert.equal(L.alvoDificuldade('facil', 0), 1); assert.equal(L.alvoDificuldade('dificil', 0), 2); assert.equal(L.alvoDificuldade('facil', 6), 3);
-  const s = L.criarSorte(4), q = L.sortearPergunta(BANCO, 4, 'facil', {}, s, 3);
-  assert.equal(q.d, 3, 'a escada pede pergunta difícil');
+  // a seleção respeita a faixa enquanto houver pergunta nela
+  for (const [nOp, faixa] of [[4, [1, 2]], [4, [4, 5]], [2, [2, 3]], [2, [4, 5]]]) {
+    const s = L.criarSorte(4), usadas = {};
+    for (let i = 0; i < 12; i++) {
+      const q = L.sortearPergunta(BANCO, nOp, faixa, usadas, s, {});
+      assert.ok(q.d >= faixa[0] && q.d <= faixa[1], nOp + ' opções, faixa ' + faixa + ': veio ' + q.d);
+    }
+  }
 });
 
 /* ---------------- perguntas ---------------- */
-test('banco: 40 de 2 opções e 60 de 4, nos 3 idiomas, com a certa válida', () => {
-  const por = n => BANCO.filter(q => q.o.length === n);
-  assert.ok(por(2).length >= 40, '2 opções: ' + por(2).length);
-  assert.ok(por(4).length >= 60, '4 opções: ' + por(4).length);
-  assert.equal(BANCO.length, por(2).length + por(4).length, 'só perguntas de 2 ou de 4 opções');
-  const ids = new Set();
+test('banco (bench de 21/Nov/2026): pelo menos 300 perguntas, 15 temas, faixas 1 a 5, 3 idiomas, certa válida, sem conta', () => {
+  assert.ok(BANCO.length >= 300, 'perguntas: ' + BANCO.length);
+  const TEMAS = ['historia', 'geografia', 'ciencias', 'animais', 'esportes', 'cinema', 'musica', 'comida', 'linguas', 'corpo',
+    'matematica', 'cotidiano', 'artes', 'espaco', 'tecnologia'];
+  for (const t of TEMAS) assert.ok(L.CATEGORIAS[t], 'tema ' + t);
+  const ids = new Set(), CONTA = /\d\s*[×x*+÷/−-]\s*\d|quanto é|how much is|cuánto es|metade de|half of|la mitad de|dobro de|double of|el doble de/i;
   for (const q of BANCO) {
     assert.ok(!ids.has(q.id), 'id repetido: ' + q.id); ids.add(q.id);
-    assert.ok(L.CATEGORIAS[q.cat], q.id + ': categoria ' + q.cat);
-    assert.ok([1, 2, 3].includes(q.d), q.id + ': dificuldade');
+    assert.ok(TEMAS.includes(q.cat), q.id + ': tema ' + q.cat);
+    assert.ok([1, 2, 3, 4, 5].includes(q.d), q.id + ': faixa ' + q.d);
+    assert.ok(q.o.length === 2 || q.o.length === 4, q.id + ': 2 ou 4 opções');
     assert.ok(Array.isArray(q.q) && q.q.length === 3 && q.q.every(s => typeof s === 'string' && s.trim().length > 5), q.id + ': pergunta nos 3 idiomas');
-    assert.ok(Number.isInteger(q.c) && q.c >= 0 && q.c < q.o.length, q.id + ': correctIndex');
+    assert.ok(Number.isInteger(q.c) && q.c >= 0 && q.c < q.o.length, q.id + ': a certa está entre as opções');
     for (const o of q.o) assert.ok(typeof o === 'string' ? o.trim() : (o.length === 3 && o.every(s => typeof s === 'string' && s.trim())), q.id + ': opção nos 3 idiomas');
     for (let i = 0; i < 3; i++) {
       const textos = q.o.map(o => typeof o === 'string' ? o : o[i]);
       assert.equal(new Set(textos).size, textos.length, q.id + ': opções repetidas no idioma ' + i);
+      assert.ok(!CONTA.test(q.q[i]), q.id + ': parece pedir conta: ' + q.q[i]);
     }
   }
-  for (const n of [2, 4]) {
-    assert.equal(new Set(por(n).map(q => q.cat)).size, 10, n + ' opções: as 10 categorias');
-    assert.deepEqual([...new Set(por(n).map(q => q.d))].sort(), [1, 2, 3]);
+  // cada tema tem perguntas em várias faixas, e cada faixa tem perguntas de muitos temas
+  for (const t of TEMAS) {
+    const fx = new Set(BANCO.filter(q => q.cat === t).map(q => q.d));
+    assert.ok(BANCO.filter(q => q.cat === t).length >= 15, t + ': pelo menos 15');
+    assert.ok(fx.size >= 4, t + ': faixas ' + [...fx]);
   }
+  for (let d = 1; d <= 5; d++) {
+    const n = BANCO.filter(q => q.d === d);
+    assert.ok(n.length >= 40, 'faixa ' + d + ': ' + n.length);
+    assert.ok(new Set(n.map(q => q.cat)).size >= 12, 'faixa ' + d + ': temas variados');
+  }
+  // 4 opções servem às duas modalidades; 2 opções, só à Queda Livre
+  assert.ok(BANCO.filter(q => L.serve(q, 4)).length >= 250);
+  assert.equal(BANCO.filter(q => L.serve(q, 2)).length, BANCO.length);
 });
 
-test('sorteio: nada repete na rodada e o nível escolhe a dificuldade', () => {
+test('sorteio: sem repetir na rodada, temas variados em sequência e as vistas há pouco ficam para depois', () => {
   for (const nivel of ['facil', 'medio', 'dificil']) for (const mod of ['queda', 'calma']) {
-    const R = L.MODALIDADES[mod], usadas = {}, s = L.criarSorte(11), ids = [];
-    for (let i = 0; i < 5; i++) {
-      const q = L.sortearPergunta(BANCO, R.opcoes, nivel, usadas, s);
-      assert.equal(q.o.length, R.opcoes); ids.push(q.id);
-      if (nivel === 'facil') assert.equal(q.d, 1, 'fácil começa pelas fáceis');
-      if (nivel === 'dificil') assert.equal(q.d, 3, 'difícil começa pelas difíceis');
+    const R = L.MODALIDADES[mod], usadas = {}, s = L.criarSorte(11), ids = [], temas = [];
+    for (let i = 0; i < 12; i++) {
+      const q = L.sortearPergunta(BANCO, R.opcoes, L.faixaAlvo(nivel, Math.floor(i / 2)), usadas, s, { temas: temas.slice(-2) });
+      assert.ok(L.serve(q, R.opcoes)); ids.push(q.id);
+      assert.ok(temas.slice(-2).indexOf(q.cat) < 0, nivel + ' ' + mod + ': tema repetido em sequência (' + q.cat + ')');
+      temas.push(q.cat);
     }
     assert.equal(new Set(ids).size, ids.length, nivel + ' ' + mod + ': sem repetir');
   }
-  const usadas = {}, s = L.criarSorte(3), vistas = new Set();
-  let q; while ((q = L.sortearPergunta(BANCO, 4, 'facil', usadas, s))) { assert.ok(!vistas.has(q.id)); vistas.add(q.id); }
+  // as vistas na rodada anterior não voltam enquanto houver outras na faixa
+  const s = L.criarSorte(5), rec = {}, primeira = [];
+  for (let i = 0; i < 12; i++) { const q = L.sortearPergunta(BANCO, 4, [2, 3], {}, s, {}); rec[q.id] = true; }
+  const usadas = {};
+  for (let i = 0; i < 12; i++) { const q = L.sortearPergunta(BANCO, 4, [2, 3], usadas, s, { recentes: rec }); primeira.push(q.id); assert.ok(!rec[q.id], 'voltou uma vista há pouco: ' + q.id); }
+  // esgotou tudo: devolve null (o jogo recomeça o baralho)
+  const u2 = {}, vistas = new Set();
+  let q; while ((q = L.sortearPergunta(BANCO, 4, [1, 2], u2, s, {}))) { assert.ok(!vistas.has(q.id)); vistas.add(q.id); }
   assert.equal(vistas.size, BANCO.filter(x => x.o.length === 4).length);
-  const p = L.prepararPergunta(BANCO.find(x => x.id === 'g3c'), L.criarSorte(5));
-  assert.equal(p.o[p.c][1], 'Canberra');
+  // na Queda Livre, uma de 4 vira de 2: a certa e o primeiro distrator
+  const g = BANCO.find(x => x.id === 'g3c'), p2 = L.prepararPergunta(g, L.criarSorte(5), 2);
+  assert.equal(p2.o.length, 2); assert.equal(p2.o[p2.c][1], 'Canberra');
+  const p4 = L.prepararPergunta(g, L.criarSorte(5), 4);
+  assert.equal(p4.o.length, 4); assert.equal(p4.o[p4.c][1], 'Canberra');
 });
 
 /* ---------------- física ---------------- */
@@ -189,6 +220,28 @@ test('física: 500 quedas de cada zona sempre terminam numa canaleta, com a qued
   const m = L.criarMundo(), s = L.criarSorte(8), a = L.soltar(m, 3, 'branca', s), b = L.soltar(m, 3, 'branca', s);
   const ja = Math.abs(a.x - L.zonaX(3)), jb = Math.abs(b.x - L.zonaX(3));
   assert.ok(ja >= 1.5 && ja <= 3 && jb >= 1.5 && jb <= 3 && a.x !== b.x, 'jitter de ±1,5 a 3 px');
+});
+
+test('queda de verdade ao acaso: sem semente, a mesma zona espalha em sino por várias canaletas, sem canaleta viciada', () => {
+  const N = 1200;
+  // zonas do meio (perto das paredes laterais as bolinhas se juntam na canaleta da ponta: é a física da parede, não vício)
+  for (const z of [3, 2]) {
+    const cont = new Array(15).fill(0);
+    for (let i = 0; i < N; i++) cont[L.simularQueda(z).canaleta]++;
+    const usadas = cont.filter(c => c > 0).length, maior = Math.max(...cont);
+    assert.ok(usadas >= 9, 'zona ' + (z + 1) + ': espalhou por ' + usadas + ' canaletas: ' + cont.join(' '));
+    assert.ok(maior / N < 0.25, 'zona ' + (z + 1) + ': nenhuma canaleta leva mais de 25% (' + (maior / N).toFixed(2) + ')');
+    // sino: o pico fica perto da zona e cai para os dois lados
+    const pico = cont.indexOf(maior), centro = 1.5 + 2 * z;
+    assert.ok(Math.abs(pico - centro) <= 3, 'zona ' + (z + 1) + ': pico em ' + pico);
+    const lado = (a, b) => cont.slice(a, b).reduce((x, y) => x + y, 0);
+    assert.ok(lado(Math.max(0, pico - 1), pico + 2) > lado(0, Math.max(0, pico - 4)), 'zona ' + (z + 1) + ': a ponta esquerda tem menos que o meio');
+    assert.ok(lado(Math.max(0, pico - 1), pico + 2) > lado(pico + 5, 15), 'zona ' + (z + 1) + ': a ponta direita tem menos que o meio');
+  }
+  // duas quedas sem semente quase nunca são iguais (o acaso é de verdade, não uma semente fixa)
+  const a = [], b = [];
+  for (let i = 0; i < 40; i++) { a.push(L.simularQueda(3).tempo); b.push(L.simularQueda(3).tempo); }
+  assert.notDeepEqual(a, b);
 });
 
 /* ---------------- página no Chromium ---------------- */

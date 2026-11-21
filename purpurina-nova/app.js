@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.7';
+  var APP_VERSION = '0.9.8';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -146,6 +146,11 @@
   $('btTV').addEventListener('click', function () { Som.tocar('aba'); ir('conectar'); });
   $('btMusica').addEventListener('click', function () { Som.tocar('aba'); ir('musica'); });
   $('btMusicaPalco').addEventListener('click', function () { Som.tocar('aba'); ir('musica'); });
+  // ⋯ abre e fecha a caixinha das ferramentas; escolher uma ferramenta (menos desfazer) ou tocar fora fecha
+  function ferramentas(abrir) { $('ferramentas').hidden = !abrir; $('btFerramentas').setAttribute('aria-expanded', String(!!abrir)); }
+  $('btFerramentas').addEventListener('click', function (ev) { ev.stopPropagation(); Som.tocar('aba'); ferramentas($('ferramentas').hidden); });
+  $('ferramentas').addEventListener('click', function (ev) { if (ev.target.closest('button') && ev.target.closest('button').id !== 'btDesfazer') ferramentas(false); });
+  document.addEventListener('click', function (ev) { if (!$('ferramentas').hidden && !ev.target.closest('#ferramentas') && !ev.target.closest('#btFerramentas')) ferramentas(false); });
   // ponte com a TV (tv.js): quando o celular está conectado, cada mudança vai para a TV
   function ponte(tipo, extra) { if (window.PurpurinaTV && PurpurinaTV.conectado()) PurpurinaTV.mandar(tipo, extra); }
   $('btLooks').addEventListener('click', function () { Som.tocar('aba'); ir('looks'); });
@@ -198,6 +203,8 @@
   function mudar(novo, catId) {
     if (V.iguais(novo, estado)) return;
     hist.guardar(estado); estado = novo; aposMudar(); efeito(catId);
+    // roupa sem zoom próprio (vestido, blusa, saia, calça, capa…): se estava de perto, afasta para mostrar a roupa inteira
+    var cm = catId && P.categoria(catId); if (cm && cm.grupo === 'roupa' && !cm.zoom && zoomLigado) zoom(false, true);
   }
   function aposMudar() {
     if (!modo) { livre = estado; gravar('purpurinaNova.atual', estado); }
@@ -236,8 +243,10 @@
   /* barras de ajuste (dono, 20/Nov/2026: "uma barra de rolar… arrasta de um lado para o outro… mais claro, mais escuro,
      até mais intensidade da maquiagem"): embaixo das bolinhas, "☀️ claro ↔ escuro 🌙" em toda cor e "intensidade" na
      maquiagem. Arrastando, a personagem muda na hora; ao soltar, entra no ↩ desfazer. */
+  var tomDaCat = null;   // parte em que a barra de tom está aberta (abre ao tocar numa cor)
   function desenharBarras(cat) {
-    var caixa = $('barras'); caixa.innerHTML = ''; caixa.hidden = !cat.cores;
+    // a barra de tom só aparece depois de tocar numa cor (menos botão, mais roupa — dono, 21/Nov/2026)
+    var caixa = $('barras'); caixa.innerHTML = ''; caixa.hidden = !cat.cores; caixa.classList.toggle('escondida', tomDaCat !== cat.id);
     if (!cat.cores) return;
     var base = B.corAjustada(Object.assign({}, estado, (function () { var o = {}; o[cat.id + 'Tom'] = 0; o[cat.id + 'Forca'] = 1; return o; })()), cat.id).hex;
     var pele = B.corAjustada(estado, 'pele').hex;
@@ -314,7 +323,8 @@
     })(ini);
   }
   // ao trocar de parte: zoom automático conforme a parte
-  function zoomDaParte() { var c = catAtual(); zoom(!!(c && c.zoom), true); }
+  // sapatos: os pés fazem a vitrine (um de cada vez sobe e vira de lado para mostrar o sapato); nas outras partes, normal
+  function zoomDaParte() { var c = catAtual(); zoom(!!(c && c.zoom), true); if (animEstudio) animEstudio.modo(c && c.id === 'sapatos' && naParte ? 'vitrine' : ''); }
   $('btZoom').addEventListener('click', function () { Som.tocar('clique'); zoom(!zoomLigado, true); });
 
 
@@ -438,7 +448,7 @@
         b.setAttribute('aria-label', N(c)); b.title = N(c);
         b.setAttribute('aria-pressed', String(estado[chave] === c.id && (!cat.opcoes || estado[cat.id] !== 'nenhum')));
         // escolher outra bolinha volta o tom ao normal (a cor aparece como ela é; depois ajusta na barra)
-        b.addEventListener('click', function () { var nv = V.aplicar(estado, cat.id, c.id, true); delete nv[cat.id + 'Tom']; mudar(nv, cat.id); });
+        b.addEventListener('click', function () { tomDaCat = cat.id; var nv = V.aplicar(estado, cat.id, c.id, true); delete nv[cat.id + 'Tom']; mudar(nv, cat.id); desenharBarras(cat); });
         cores.appendChild(b);
       });
     }

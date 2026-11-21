@@ -2,6 +2,29 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.8",
+      "data": "21/Nov/2026",
+      "hora": "14:46:46",
+      "pt": [
+        "🧍‍♂️ Menino anda e fica parado como menino: pernas paralelas (sem cruzar o pé), quadril firme (sem rebolar), braços balançando mais soltos e um pouco afastados do corpo, e parado sem mão na cintura (mão no bolso ou braços cruzados). O menino pequeno anda mais rápido e quicando.",
+        "✨ Movimento mais natural para todos: a perna sai do chão com impulso e pousa devagar, ombro, cotovelo e cabeça chegam um pouquinho depois do quadril, e parada ela nunca fica dura (pequenos movimentos que não se repetem iguais).",
+        "👟 Sapatos à mostra: escolhendo sapatos, um pé de cada vez sobe, vira de lado e mostra o sapato de perfil, depois o outro. E ao escolher vestido, blusa, saia ou calça estando de perto, a tela se afasta para mostrar a roupa inteira.",
+        "📱 Menos botão e mais roupa: as ferramentas (lupa, desfazer, surpresa, recomeçar e música) ficam num botão só, ⋯; Foto, Guardar, Baladinha e Desfilar numa fileira fina; a barra de tom aparece só depois de tocar numa cor; as roupas aparecem em duas fileiras e a personagem ficou bem maior."
+      ],
+      "en": [
+        "🧍‍♂️ Boys walk and stand like boys: parallel legs (no crossing feet), steady hips (no swaying), arms swinging more loosely and a bit away from the body, and standing without hands on hips (hand in pocket or arms crossed). Little boys walk faster and bouncier.",
+        "✨ More natural movement for everyone: the leg pushes off and lands softly, shoulder, elbow and head arrive a little after the hips, and standing still she never looks stiff (small movements that never repeat exactly).",
+        "👟 Shoes on display: when choosing shoes, one foot at a time lifts, turns sideways and shows the shoe in profile, then the other. And when you pick a dress, top, skirt or pants while zoomed in, the view zooms out to show the whole outfit.",
+        "📱 Fewer buttons, more clothes: the tools (zoom, undo, surprise, start over and music) are in a single ⋯ button; Photo, Save, Dance party and Runway in one slim row; the shade bar only appears after you tap a color; clothes show in two rows and the character is much bigger."
+      ],
+      "es": [
+        "🧍‍♂️ Los chicos caminan y se quedan de pie como chicos: piernas paralelas (sin cruzar los pies), cadera firme (sin contoneo), brazos que se balancean más sueltos y un poco separados del cuerpo, y de pie sin la mano en la cintura (mano en el bolsillo o brazos cruzados). Los niños pequeños caminan más rápido y con más rebote.",
+        "✨ Movimiento más natural para todos: la pierna se impulsa y aterriza suave, hombro, codo y cabeza llegan un poquito después de la cadera, y quieta nunca se ve rígida (pequeños movimientos que nunca se repiten iguales).",
+        "👟 Zapatos a la vista: al elegir zapatos, un pie cada vez se levanta, se gira de lado y muestra el zapato de perfil, luego el otro. Y al elegir vestido, blusa, falda o pantalón estando de cerca, la vista se aleja para mostrar la ropa entera.",
+        "📱 Menos botones y más ropa: las herramientas (lupa, deshacer, sorpresa, empezar de nuevo y música) están en un solo botón, ⋯; Foto, Guardar, Minidisco y Desfilar en una fila fina; la barra de tono solo aparece después de tocar un color; la ropa sale en dos filas y el personaje es mucho más grande."
+      ]
+    },
+    {
       "versao": "0.9.7",
       "data": "21/Nov/2026",
       "hora": "09:01:54",
