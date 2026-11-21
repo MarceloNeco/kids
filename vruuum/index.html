@@ -10,7 +10,7 @@
 <script src="../carregando.js" data-fora-do-arquivo></script>
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#0b0a1f">
-<meta name="versao" content="1.34.0">
+<meta name="versao" content="1.35.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Corrida de carrinho para a família: desvie, pegue estrelas, pule rampas e passe por 4 mundos. 1 ou 2 jogadores. / Family kart race: dodge, grab stars, jump ramps across 4 worlds.">
 <link rel="stylesheet" href="estilo.css">
@@ -187,7 +187,11 @@
           <button class="aba" type="button" role="tab" data-aba="1"></button>
           <button id="tirarJ2" class="aba tirar" type="button" data-t="✕ Só 1 jogador|✕ Just 1 player|✕ Solo 1 jugador"></button>
         </div>
-        <canvas id="previa" class="previa" width="560" height="340" aria-hidden="true"></canvas>
+        <div class="palco">
+          <button id="veicAnt" class="seta-veic" type="button" aria-label="Veículo anterior" data-aria="Veículo anterior|Previous vehicle|Vehículo anterior">◀</button>
+          <canvas id="previa" class="previa" width="560" height="340" aria-hidden="true"></canvas>
+          <button id="veicProx" class="seta-veic" type="button" aria-label="Próximo veículo" data-aria="Próximo veículo|Next vehicle|Siguiente vehículo">▶</button>
+        </div>
         <p id="nomeVeic" class="nome-veic" aria-live="polite"></p>
         <div class="fichas so-veic">
           <span data-t="Velocidade|Speed|Velocidad"></span><span class="barra"><i id="barraVel"></i></span>
