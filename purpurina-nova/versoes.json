@@ -2,6 +2,29 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.4",
+      "data": "21/Nov/2026",
+      "hora": "22:21:47",
+      "pt": [
+        "💃 Rebolado de volta, com o corpo inteiro: o quadril vai para o lado e a cintura, as pernas, a blusa e a calça acompanham juntas, sem degrau; os pés ficam no chão e a cabeça vai junto com o pescoço. Vale parada, no desfile e na Baladinha.",
+        "👗 Silhueta de tamanho normal: cabeça um pouco menor, ombros mais estreitos, cintura fina, quadril e coxa cheios, joelho e tornozelo finos.",
+        "💪 Braços na medida: um pouco mais curtos, mãos menores e, com a mão na cintura, os cotovelos não abrem tanto.",
+        "👗 Saia e vestido caem soltos do quadril (a barra não fica mais ondulada)."
+      ],
+      "en": [
+        "💃 The hip sway is back, with the whole body: the hips move to the side and the waist, legs, top and pants follow together, with no step; the feet stay on the floor and the head moves with the neck. Standing, on the runway and at the dance party.",
+        "👗 A normal-sized silhouette: slightly smaller head, narrower shoulders, slim waist, fuller hips and thighs, slim knees and ankles.",
+        "💪 Arms the right size: a bit shorter, smaller hands, and with hands on hips the elbows don't stick out so much.",
+        "👗 Skirts and dresses fall loose from the hips (the hem is no longer wavy)."
+      ],
+      "es": [
+        "💃 Vuelve el contoneo, con todo el cuerpo: la cadera va hacia un lado y la cintura, las piernas, la blusa y el pantalón la siguen juntas, sin escalón; los pies se quedan en el suelo y la cabeza va con el cuello. De pie, en el desfile y en la minidisco.",
+        "👗 Silueta de tamaño normal: cabeza un poco más pequeña, hombros más estrechos, cintura fina, cadera y muslos llenos, rodillas y tobillos finos.",
+        "💪 Brazos a la medida: un poco más cortos, manos más pequeñas y, con las manos en la cintura, los codos no se abren tanto.",
+        "👗 Faldas y vestidos caen sueltos desde la cadera (el bajo ya no queda ondulado)."
+      ]
+    },
+    {
       "versao": "0.9.3",
       "data": "20/Nov/2026",
       "hora": "19:59:39",

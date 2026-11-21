@@ -475,7 +475,7 @@ test('roupa acompanha o gingado e pescoço sem divisão (dono, 20/Nov/2026)', ()
   assert.match(s, /<g clip-path="url\(#gg-quadrilP\)">/);
   assert.doesNotMatch(s, /fill="#7a5ba8" opacity="0.1"\/>/, 'sem a faixa reta de sombra no pescoço');
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
-  assert.match(anim, /v\.ex \+= v\.cx; v\.dx \+= v\.cx/, 'andando, as pernas saem do quadril');
+  assert.match(anim, /v\.ey \+= v\.cy; v\.dy \+= v\.cy/, 'andando, as pernas sobem e descem com o corpo');
 });
 
 test('esqueleto em todo desenho de frente, ombros femininos e queixo delicado (dono, 20/Nov/2026)', () => {
@@ -512,8 +512,28 @@ test('calça sem degraus no gingado e queixo redondo (dono, 20/Nov/2026: "os qua
   // o corpo vem em mais de um grupo .pp-corpo: todos se mexem juntos com as pernas
   assert.match(anim, /svg\.querySelectorAll\(sel\)/, 'o movimento vale para todos os pedaços do corpo');
   // o gingado é só um deslocamento igual para corpo e pernas (girar separado abre degrau na cintura)
-  assert.match(anim, /gingaD: \{ c: \[10, 0, 0\], e: \[10, 0, 0\], d: \[10, 0, 0\]/);
+  assert.match(anim, /gingaD: \{ c: \[0, 0, 0\], e: \[0, 0, 0\], d: \[0, 0, 0\], s: -2, q: 1 \}/, 'parada, corpo e pernas não se mexem separados');
   const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
   assert.match(fonte, /adulta: \{[^}]*queixoY: 0, queixoL: 0\.95/, 'queixo da adulta curto e redondo, sem ponta');
   assert.match(fonte, /r: \[v\.r\[0\] \* 1\.05, v\.r\[1\] \* 0\.85, v\.r\[2\] \* 0\.6\] \};   \/\/ queixinho redondo/);
+});
+
+test('rebolado do corpo inteiro, sem emenda, e saia solta (dono, 21/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta', calca: 'jeans' }, { id: 'rb', rig: true, passos: true, fundo: false });
+  assert.equal(bemFormado(s), '');
+  // duas cópias cortadas na mesma linha do quadril: pernas inclinam a partir dos pés, tronco a partir do quadril
+  const m = s.match(/<g class="pp-rebola" data-y="([\d.]+)"/); assert.ok(m, 'tem o rebolado');
+  assert.equal((s.match(/class="pp-banda-baixo"/g) || []).length, 1);
+  assert.equal((s.match(/class="pp-banda-cima"/g) || []).length, 1);
+  const yJ = +m[1], cima = s.match(/<clipPath id="rb-bandaC"><rect [^>]*height="([\d.]+)"/)[1], baixo = s.match(/<clipPath id="rb-bandaB"><rect x="-1000" y="([\d.]+)"/)[1];
+  assert.ok(Math.abs(-2000 + +cima - yJ) <= 2 && Math.abs(+baixo - yJ) <= 2, 'as duas partes se encontram no quadril');
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  // as duas matrizes levam a linha do quadril para o mesmo lugar: baixo = -h/(pé-yJ)·(y-pé); cima = h + t·(y-yJ)
+  const h = 12, yP = 664, sB = -h / (yP - yJ), tC = 0.03;
+  assert.ok(Math.abs((sB * yJ - sB * yP) - (h + tC * yJ - tC * yJ)) < 1e-9);
+  assert.match(anim, /'\.pp-banda-baixo'/); assert.match(anim, /'\.pp-banda-cima'/);
+  assert.doesNotMatch(anim, /feDisplacementMap|rig-rebola/, 'nada de filtro pesado');
+  // saia e vestido não apertam no joelho
+  assert.match(B.svg({ vestido: 'verao', blusa: 'nenhum', calca: 'nenhum' }, { id: 'vs', fundo: false }), /<g><path/);
+  assert.doesNotMatch(B.svg({ vestido: 'verao' }, { id: 'vt', fundo: false }), /data-solta/, 'a marca some depois de deformar');
 });

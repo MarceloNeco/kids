@@ -11,9 +11,9 @@
   // cab = inclinar a cabeça, olho = para onde os olhos vão (-1 esquerda … 1 direita), base = como estão as pernas
   var POSES = {
     relax: { oE: 6, cE: 8, oD: 6, cD: 8, cab: 0, olho: 0, base: 'reta' },
-    cintura: { oE: 8, cE: 14, oD: 50, cD: 120, cab: -5, olho: 0.4, base: 'gingaD' },
-    duasCintura: { oE: 50, cE: 120, oD: 50, cD: 120, cab: 4, olho: 0, base: 'aberta' },
-    cabeca: { oE: 150, cE: -110, oD: 50, cD: 120, cab: 5, olho: -0.3, base: 'gingaD' },
+    cintura: { oE: 8, cE: 14, oD: 40, cD: 105, cab: -5, olho: 0.4, base: 'gingaD' },
+    duasCintura: { oE: 40, cE: 105, oD: 40, cD: 105, cab: 4, olho: 0, base: 'aberta' },
+    cabeca: { oE: 150, cE: -110, oD: 40, cD: 105, cab: 5, olho: -0.3, base: 'gingaD' },
     beijo: { oE: 8, cE: 14, oD: -10, cD: 172, fD: 0.45, cab: 6, olho: 0, base: 'cruzada' },
     queixo: { oE: 25, cE: 95, oD: -20, cD: 165, fD: 0.6, cab: -6, olho: 0.6, base: 'reta' },
     apontar: { oE: 78, cE: 5, oD: -5, cD: 150, fD: 0.6, cab: -8, olho: -1, base: 'gingaE' },
@@ -29,25 +29,25 @@
     umCimaE: { oE: 160, cE: 10, oD: 30, cD: 60, cab: 6, olho: 0.6, base: 'gingaD' },
     cotovelos: { oE: 70, cE: 115, oD: 70, cD: 115, cab: -4, olho: 0.5, base: 'gingaD' },
     palminhas: { oE: 28, cE: 135, fE: 0.6, oD: 28, cD: 135, fD: 0.6, cab: 4, olho: 0, base: 'reta' },
-    apontaCima: { oE: 50, cE: 120, oD: 165, cD: 0, cab: -8, olho: -0.8, base: 'gingaE' },
+    apontaCima: { oE: 40, cE: 105, oD: 165, cD: 0, cab: -8, olho: -0.8, base: 'gingaE' },
     // pulando de braços abertos (placa da Baladinha)
     abracao: { oE: 100, cE: -25, oD: 100, cD: -25, cab: 6, olho: 0, base: 'aberta' }
   };
   // pernas: [x, y, giro] do quadril (corpo) e de cada perna, e a saia inclinando (px do desenho, graus)
+  // q = rebolado: o quadril para a direita (1) ou para a esquerda (-1). Não mexe pedaços separados: o desenho inteiro
+  // passa por uma curva só (boneca.js, .pp-rebola: duas cópias cortadas no quadril), com os pés parados e tudo ligado (dono, 21/Nov/2026)
   var BASES = {
-    // (20/Nov/2026, dono: "aqueles quadrados da calça não acompanham"): parada, ela inteira vai junto para o lado — corpo
-    // e pernas com o mesmo deslocamento e sem girar separados (girar cada pedaço desencontrava a calça em degraus); o
-    // gingado fica no quadril indo para o lado, nos braços e na cabeça
-    reta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
-    gingaD: { c: [10, 0, 0], e: [10, 0, 0], d: [10, 0, 0], s: -2 },
-    gingaE: { c: [-10, 0, 0], e: [-10, 0, 0], d: [-10, 0, 0], s: 2 },
+    // (20/Nov/2026, dono: "aqueles quadrados da calça não acompanham"): corpo e pernas nunca se mexem separados parados
+    reta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0, q: 0 },
+    gingaD: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: -2, q: 1 },
+    gingaE: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 2, q: -1 },
     cruzada: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
     aberta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 }
   };
   function valores(nome) {
     var p = POSES[nome] || POSES.relax, b = BASES[p.base] || BASES.reta;
     return { oE: p.oE, cE: p.cE, fE: p.fE || 1, oD: p.oD, cD: p.cD, fD: p.fD || 1, cab: p.cab, olho: p.olho,
-      cx: b.c[0], cy: b.c[1], cr: b.c[2], ex: b.e[0], ey: b.e[1], er: b.e[2], dx: b.d[0], dy: b.d[1], dr: b.d[2], s: b.s, aceno: p.aceno ? 1 : 0 };
+      cx: b.c[0], cy: b.c[1], cr: b.c[2], ex: b.e[0], ey: b.e[1], er: b.e[2], dx: b.d[0], dy: b.d[1], dr: b.d[2], s: b.s, q: b.q || 0, aceno: p.aceno ? 1 : 0 };
   }
   function suave(k) { return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; }
 
@@ -68,15 +68,34 @@
     function aplicarEm(svg, v, t) {
       var r = Math.sin(t / 650) * 1, ac = v.aceno * Math.sin(t / 95) * 16;   // respiração e o tchauzinho
       [['e', v.oE + r, v.cE, v.fE], ['d', v.oD + r, v.cD - ac, v.fD]].forEach(function (b) {
-        var om = svg.querySelector('.rig-ombro-' + b[0]), cos = svg.querySelectorAll('.rig-cotovelo-' + b[0]), co = cos[0]; if (!om || !co) return;
+        // (o desenho pode sair em duas cópias, para o rebolado: tudo com a mesma classe se mexe igual)
+        var oms = svg.querySelectorAll('.rig-ombro-' + b[0]), om = oms[0], cos = svg.querySelectorAll('.rig-cotovelo-' + b[0]), co = cos[0]; if (!om || !co) return;
         var S = [+om.getAttribute('data-x'), +om.getAttribute('data-y')], E = [+co.getAttribute('data-x'), +co.getAttribute('data-y')];
-        om.setAttribute('transform', B.transformaOmbro(b[0] === 'e' ? b[1] : -b[1], b[3], S));
+        var to = B.transformaOmbro(b[0] === 'e' ? b[1] : -b[1], b[3], S);
+        for (var m = 0; m < oms.length; m++) oms[m].setAttribute('transform', to);
         var tc = B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E);
         for (var q = 0; q < cos.length; q++) cos[q].setAttribute('transform', tc);   // contorno e preenchimento do antebraço
       });
-      var cab = svg.querySelector('.rig-cabeca');
+      // rebolado: o quadril vai até ~12 px para o lado (e devagarinho sempre um pouco, para ela nunca ficar dura). Pernas
+      // inclinam a partir dos pés; o tronco sai do quadril e volta um pouco nos ombros; a linha do quadril é a mesma nas
+      // duas, então nada desencaixa (boneca.js, .pp-rebola)
+      var rb = svg.querySelector('.pp-rebola'), tC = 0;
+      if (rb) {
+        var h = (v.q + (modo === 'andar' ? 0 : Math.sin(t / 1700) * 0.3)) * amp * 12;
+        var yJ = +rb.getAttribute('data-y'), yS = +rb.getAttribute('data-ombro'), yP = +rb.getAttribute('data-pe');
+        var sB = -h / (yP - yJ); tC = 0.25 * h / (yJ - yS);
+        var mB = 'matrix(1 0 ' + sB.toFixed(5) + ' 1 ' + (-sB * yP).toFixed(3) + ' 0)', mC = 'matrix(1 0 ' + tC.toFixed(5) + ' 1 ' + (h - tC * yJ).toFixed(3) + ' 0)';
+        Array.prototype.forEach.call(svg.querySelectorAll('.pp-banda-baixo'), function (g) { g.setAttribute('transform', mB); });
+        Array.prototype.forEach.call(svg.querySelectorAll('.pp-banda-cima'), function (g) { g.setAttribute('transform', mC); });
+      }
+      var cabs = svg.querySelectorAll('.rig-cabeca'), cab = cabs[0];
       var bate = op.ritmo && modo !== 'andar' ? Math.sin(t / op.ritmo * Math.PI * 2) * 4 : 0;   // dançando, a cabeça vai no ritmo
-      if (cab) cab.setAttribute('transform', 'rotate(' + (v.cab * (0.5 + amp / 2) + Math.sin(t / 1100) * 1.2 + bate).toFixed(2) + ' ' + cab.getAttribute('data-x') + ' ' + cab.getAttribute('data-y') + ')');
+      if (cab) {
+        var cx0 = cab.getAttribute('data-x'), cy0 = +cab.getAttribute('data-y');
+        // a cabeça não entorta com o tronco: desfaz a inclinação em volta do queixo (vai inteira junto com o pescoço)
+        var tcab = (tC ? 'matrix(1 0 ' + (-tC).toFixed(5) + ' 1 ' + (tC * cy0).toFixed(3) + ' 0) ' : '') + 'rotate(' + (v.cab * (0.5 + amp / 2) + Math.sin(t / 1100) * 1.2 + bate).toFixed(2) + ' ' + cx0 + ' ' + cy0 + ')';
+        for (var cc = 0; cc < cabs.length; cc++) cabs[cc].setAttribute('transform', tcab);
+      }
       Array.prototype.forEach.call(svg.querySelectorAll('.rig-iris'), function (g) { g.setAttribute('transform', 'translate(' + (v.olho * 5).toFixed(2) + ' 0)'); });
       // todos os grupos com a classe (o corpo vem em mais de um pedaço: antes e depois das pernas) — antes só o primeiro se
       // mexia, e a blusa ficava parada enquanto as pernas iam para o lado (a calça desencontrava em degraus)
@@ -108,14 +127,14 @@
         var P = op.passoMs || 980, f = ((t - modoIni) / P) % 1, a = Math.sin(2 * Math.PI * f);
         var e = perna(f, -1), d = perna((f + 0.5) % 1, 1);
         v.ex = e.x; v.ey = e.y; v.er = e.r; v.esy = e.sy; v.dx = d.x; v.dy = d.y; v.dr = d.r; v.dsy = d.sy;
-        v.cx = -12 * a; v.cr = 0; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
-        v.ex += v.cx; v.dx += v.cx; v.ey += v.cy; v.dy += v.cy;   // as pernas saem do quadril: vão junto com ele
+        // o quadril vai para o lado da perna de apoio pelo rebolado (curva do corpo inteiro), sem arrastar pedaços
+        v.cx = 0; v.cr = 0; v.q = -a; v.cy = -3 * Math.abs(Math.sin(2 * Math.PI * f)) + 1.5; v.s = -3 * a;
+        v.ey += v.cy; v.dy += v.cy;   // as pernas sobem e descem junto com o corpo
         v.oE = 9 + 5 * a; v.cE = 14 + 10 * Math.max(0, a); v.oD = 9 - 5 * a; v.cD = 14 + 10 * Math.max(0, -a); v.fE = 1; v.fD = 1;
         v.cab = -2 * a; v.olho = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
-        v.cx += lado * 10 * bat; v.cy += 5 * bat;
-        v.ex += lado * 10 * bat; v.dx += lado * 10 * bat;   // as pernas vão junto com o quadril
+        v.q += lado * bat;   // o quadril rebola para o lado da batida (curva do corpo inteiro; sem descer só o tronco)
         // a perna do lado contrário ao quadril dobra o joelho (sobe um pouco e encolhe)
         if (lado > 0) { v.esy = 1 - 0.07 * bat; v.ey += -6 * bat; v.er += 2 * bat; } else { v.dsy = 1 - 0.07 * bat; v.dy += -6 * bat; v.dr += -2 * bat; }
         v.oE += 4 * bat; v.oD += 4 * bat;

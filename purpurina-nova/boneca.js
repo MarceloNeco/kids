@@ -44,8 +44,8 @@
     // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
     pequena: { cabecas: 4.5, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.87, 0.89, 0.92, 0.99, 0.98, 0.9, 0.94, 0.86] },
     crianca: { cabecas: 5.2, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.82, 0.84, 0.8, 0.95, 0.96, 0.88, 0.94, 0.84] },
-    adolescente: { cabecas: 5.8, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.86, 0.85, 0.71, 0.97, 0.98, 0.84, 0.93, 0.78] },
-    adulta: { cabecas: 6.2, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.88, 0.88, 0.69, 1.02, 1.0, 0.84, 0.94, 0.78] }
+    adolescente: { cabecas: 6.2, topo: 76, ombro: 1.36, quadril: 3.15, larg: [0.82, 0.82, 0.65, 1.0, 0.97, 0.76, 0.86, 0.68] },
+    adulta: { cabecas: 6.8, topo: 64, ombro: 1.38, quadril: 3.4, larg: [0.84, 0.84, 0.65, 1.06, 1.0, 0.74, 0.86, 0.64] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
@@ -108,6 +108,13 @@
   function deformar(str) {
     if (!DF || !str) return str;
     var D = DF, rigidas = [];
+    // peça solta (saia, vestido): abaixo do quadril nunca fica mais estreita que o quadril
+    str = str.replace(/<g data-solta="">([\s\S]*?)<\/g><!--\/solta-->/g, function (m, c) {
+      var g = function (y) { return D.fx(201, y) - 200; }, gq = g(466);
+      var D2 = Object.assign({}, D, { fx: function (x, y) { return 200 + (x - 200) * (y > 466 ? Math.max(g(y), gq) : g(y)); } });
+      rigidas.push('<g>' + deformarResto(c, D2) + '</g>');
+      return '\u0001' + (rigidas.length - 1) + '\u0001';
+    });
     // a mão (com o anel e a pulseira) não estica junto com a perna: só vai para o lugar novo, do tamanho certo
     str = str.replace(/<g data-rigido="(-?[\d.]+),(-?[\d.]+)(?:,(-?[\d.]+),(-?[\d.]+))?">([\s\S]*?)<\/g><!--\/rigido-->/g, function (m, x, y, sx, sy, c) {
       var k = (D.fx(+x + 4, +y) - D.fx(+x - 4, +y)) / 8, X = D.fx(+x, +y), Y = D.fy(+y);
@@ -134,7 +141,7 @@
     return voltarRigidas(deformarResto(str, D), rigidas);
   }
   function voltarRigidas(str, rigidas) { return rigidas.length ? str.replace(/\u0001(\d+)\u0001/g, function (m, i) { return rigidas[+i]; }) : str; }
-  var ENCURTA = 0.9;
+  var ENCURTA = 0.86;
   // transformações do esqueleto (as mesmas do animador.js): ombro gira e encolhe o braço de cima no eixo dele;
   // o cotovelo desfaz o encolhimento em volta dele mesmo e gira o antebraço
   function transformaOmbro(a, f, S) { return 'rotate(' + n(a) + ' ' + n(S[0]) + ' ' + n(S[1]) + ')' + (f < 0.999 ? ' translate(' + n(S[0]) + ' ' + n(S[1]) + ') scale(1 ' + n(f * 1000) / 1000 + ') translate(' + n(-S[0]) + ' ' + n(-S[1]) + ')' : ''); }
@@ -375,7 +382,9 @@
     var andaBarra = op.passos && !angB;
     if (andaBarra) defs += deformar('<clipPath id="' + I + 'acimaCint"><rect x="-200" y="-200" width="800" height="658"/></clipPath><clipPath id="' + I + 'abaixoCint"><rect x="-200" y="455" width="800" height="600"/></clipPath>');
     function barra(x) { return andaBarra ? '<g clip-path="url(#' + I + 'acimaCint)">' + x + '</g><g class="pp-barra"><g clip-path="url(#' + I + 'abaixoCint)">' + x + '</g></g>' : x; }
-    if (vis('saia')) out.push(andaBarra ? '<g class="pp-barra">' + saia(e.saia, C('saia'), peca, linha) + '</g>' : saia(e.saia, C('saia'), peca, linha));
+    // saia e vestido caem soltos do quadril: não apertam no joelho como a perna (com a perna fina, a barra ficava ondulada)
+    function solta(x) { return '<g data-solta="">' + x + '</g><!--/solta-->'; }
+    if (vis('saia')) out.push(andaBarra ? '<g class="pp-barra">' + solta(saia(e.saia, C('saia'), peca, linha)) + '</g>' : solta(saia(e.saia, C('saia'), peca, linha)));
 
     // ---------- pescoço, tronco e braços ----------
     // pescoço (20/Nov/2026, dono: "divisão bizarra da cabeça, pescoço e torso"): sem contorno grosso nem faixa reta de
@@ -411,7 +420,7 @@
       var l = (typeof ds === 'string' ? [ds] : ds).filter(function (d) { return !(semEsquerdo && MANGAS_E.indexOf(d) >= 0) && !(semDireito && MANGAS_D.indexOf(d) >= 0); });
       return l.length ? peca(l, cor, cat) : '';
     }
-    var roupaCima = vis('vestido') ? barra(vestido(e.vestido, C('vestido'), pecaTopo, linha, pele, peleE)) : blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), pecaTopo, linha, pele);
+    var roupaCima = vis('vestido') ? barra(solta(vestido(e.vestido, C('vestido'), pecaTopo, linha, pele, peleE))) : blusa(e.blusa === 'nenhum' ? 'nenhum' : e.blusa, C('blusa'), pecaTopo, linha, pele);
     out.push(roupaCima);
     // (20/Nov/2026, dono: "dois triângulos pra baixo em cima da roupa"): sem as curvinhas desenhadas no peito — o busto
     // aparece no próprio contorno do corpo (PROPORCAO.larg), saindo para os lados e afinando na cintura
@@ -545,11 +554,26 @@
     if (op.passos && !angB) {
       var junto = [], soltos = [];
       out.forEach(function (x) {
-        if (x === sombraChao || x.indexOf('<g class="pp-passo-') === 0) { if (soltos.length) junto.push('<g class="pp-corpo" style="' + origem(200, 455) + '">' + soltos.join('') + '</g>'); soltos = []; junto.push(x); }
+        if (x === cenarioS || x === sombraChao || x.indexOf('<g class="pp-passo-') === 0) { if (soltos.length) junto.push('<g class="pp-corpo" style="' + origem(200, 455) + '">' + soltos.join('') + '</g>'); soltos = []; junto.push(x); }
         else soltos.push(x);
       });
       if (soltos.length) junto.push('<g class="pp-corpo" style="' + origem(200, 455) + '">' + soltos.join('') + '</g>');
       out = junto;
+    }
+    /* rebolado (dono, 21/Nov/2026: "o corpo tem que se movimentar como um todo, todos os pontos se conectarem de maneira
+       natural e fluida"): o desenho da personagem sai duas vezes, cortado na linha do quadril — embaixo as pernas, que
+       inclinam a partir dos pés (os pés ficam no chão e o quadril vai para o lado), e em cima o tronco, que sai do quadril
+       já deslocado e volta um pouco nos ombros. As duas inclinações levam a linha do quadril exatamente para o mesmo
+       lugar, então nada desencaixa (sem degrau na calça); a cabeça vai junto com o pescoço, sem entortar. Tudo o que está
+       na mesma altura vai junto (a mão na cintura fica na cintura). O animador só muda as duas matrizes (.pp-banda-*). */
+    if (rig && op.passos && op.rebolar !== false) {
+      var yJ = DF.fy(456), fica = cenarioS && out[0] === cenarioS ? [out.shift()] : [], chao = out.indexOf(sombraChao) >= 0 ? [sombraChao] : [];
+      var fig = out.filter(function (x) { return x !== sombraChao; }).join('');
+      defs += '<clipPath id="' + I + 'bandaC"><rect x="-1000" y="-2000" width="2400" height="' + n(2000 + yJ + 1.5) + '"/></clipPath>' +
+        '<clipPath id="' + I + 'bandaB"><rect x="-1000" y="' + n(yJ - 1.5) + '" width="2400" height="2000"/></clipPath>';
+      out = fica.concat(chao, ['<g class="pp-rebola" data-y="' + n(yJ) + '" data-ombro="' + n(DF.fy(354)) + '" data-pe="664" data-queixo="' + n(DF.yC) + '">' +
+        '<g clip-path="url(#' + I + 'bandaB)"><g class="pp-banda-baixo">' + fig + '</g></g>' +
+        '<g clip-path="url(#' + I + 'bandaC)"><g class="pp-banda-cima">' + fig + '</g></g></g>']);
     }
     return fechar();
 
@@ -583,7 +607,7 @@
       cimaC = circ(S[0], S[1], 13 * k, { fill: corTop && manga !== 'nada' ? corTop.hex : pele }) + cimaC;
       // sem manga: o arco do contorno do braço não risca o ombro (a pele do braço continua a do ombro)
       if (!corTop || manga === 'nada') cimaF += circ(S[0], S[1], 12 * k + 1.2, { fill: pele });
-      var esm = { tipo: e.unhas, cor: C('unhas') }, mk = DF.traco * 0.9;
+      var esm = { tipo: e.unhas, cor: C('unhas') }, mk = DF.traco * 0.78;
       // a bolsa de mão (e o guarda-chuva) vai na mão direita e o anel no dedo: tudo dentro do grupo da mão, que gira com o braço
       var naMao = lado > 0 && vis('bolsa') && e.bolsa !== 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : '';
       var maoS = '<g transform="translate(' + n(W[0]) + ' ' + n(W[1]) + ') scale(' + n(mk * 100) / 100 + ') translate(' + (-wx0) + ' -497)">' + naMao + mao(wx0, lado, pele, peleE, esm) +
