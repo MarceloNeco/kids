@@ -16,7 +16,7 @@
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.4.2', APP_DATA = '21/Nov/2026';
+  var APP_VERSION = '0.4.3', APP_DATA = '21/Nov/2026';
   var $ = function (id) { return document.getElementById(id); };
   var BUSCA = location.search, TESTE = /[?&]teste\b/.test(BUSCA);
   var calmo = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -83,9 +83,9 @@
     boliche: [['Pista com proteção nas canaletas: a bola nunca cai.', 'Bumpers on the gutters: the ball never falls in.', 'Barreras en los canales: la bola nunca cae.'],
       ['Pista normal, sem proteção.', 'Regular lane, no bumpers.', 'Pista normal, sin barreras.'],
       ['A bola faz curva e os pinos são mais teimosos.', 'The ball curves and the pins are more stubborn.', 'La bola hace curva y los bolos son más tozudos.']],
-    bolinhas: [['Perguntas mais fáceis e mais tempo para ler na Queda Livre.', 'Easier questions and more reading time in Free Fall.', 'Preguntas más fáciles y más tiempo para leer en la Caída Libre.'],
-      ['Perguntas variadas.', 'Mixed questions.', 'Preguntas variadas.'],
-      ['Perguntas difíceis e pouco tempo para ler na Queda Livre.', 'Hard questions and little reading time in Free Fall.', 'Preguntas difíciles y poco tiempo para leer en la Caída Libre.']],
+    bolinhas: [['Começa com perguntas muito fáceis. O nível só muda as perguntas.', 'Starts with very easy questions. The level only changes the questions.', 'Empieza con preguntas muy fáciles. El nivel solo cambia las preguntas.'],
+      ['Começa com perguntas médias. O nível só muda as perguntas.', 'Starts with medium questions. The level only changes the questions.', 'Empieza con preguntas medias. El nivel solo cambia las preguntas.'],
+      ['Começa com perguntas puxadas. O nível só muda as perguntas.', 'Starts with tougher questions. The level only changes the questions.', 'Empieza con preguntas difíciles. El nivel solo cambia las preguntas.']],
     velha: [['O computador se distrai e deixa você ganhar.', 'The computer gets distracted and lets you win.', 'El ordenador se despista y te deja ganar.'],
       ['O computador ataca e bloqueia as suas linhas.', 'The computer attacks and blocks your lines.', 'El ordenador ataca y bloquea tus líneas.'],
       ['O computador não erra: o melhor é a trégua!', 'The computer never slips: a truce is the best you can get!', 'El ordenador no falla: ¡lo mejor es la tregua!']],
