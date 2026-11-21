@@ -347,6 +347,17 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.34.0 — Bruxinha no estilo da figura do dono; Piloto por último e só quando aparece (dono, 21/Nov/2026)
+
+- `modelos3d.js` `bruxa` refeita: ela é a própria personagem (`semPiloto`), com rosto (olhos grandes roxos, sardas,
+  sorriso) e cabelo castanho comprido e ondulado em mechas que voam; chapéu roxo de aba ondulada (20 pedaços, roxo-escuro
+  por baixo), cone com a ponta enrolada para o lado, faixa e fivela cor de bronze; vestido roxo rodado, botinhas. A cor
+  escolhida fica no laço do cabelo e na fita da vassoura. Desenho próprio, só inspirado no estilo da figura.
+- Trenó: o Papai Noel conduz sozinho (`semPiloto`; saiu o piloto do lado esquerdo).
+- Menu (`app.js`): etapas 1 Quem corre · 2 Cenários · 3 Veículo · 4 Música e mais · 5 Piloto. `temPiloto()`/`nEtapas()`:
+  se nenhum jogador escolheu veículo com piloto à vista, o Piloto some (bolinha, "de 4", Próximo) — `ajustarEtapas()`
+  roda a cada escolha. Teste novo em `teste/etapas.test.js`.
+
 ## 1.33.0 — Bruxa na vassoura, que sobe e desce (dono, 20/Nov/2026)
 
 - `modelos3d.js`: `bruxa` — chapéu preto esquisito (aba larga, cone torto dobrado na ponta, faixa na cor, fivela,

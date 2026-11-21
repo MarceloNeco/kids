@@ -273,7 +273,7 @@ a { color: var(--ciano); }
 .etapa-garagem .previa { height: clamp(90px, 14vh, 260px); }
 .etapa-garagem { gap: 8px; }
 .etapa-garagem .garagem { width: 100%; gap: 8px; }
-#menu[data-etapa="2"] .so-piloto, #menu[data-etapa="3"] .so-veic { display: none; }
+#menu[data-etapa="2"] .so-piloto, #menu[data-etapa="4"] .so-veic { display: none; }
 .vitrine .fichas.so-veic { display: grid; }
 .linha-cor { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .linha-cor .cores { flex-wrap: nowrap; gap: 5px; }

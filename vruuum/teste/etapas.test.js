@@ -137,3 +137,31 @@ test('etapas: nenhuma opção do menu sumiu, e cada uma está numa etapa', async
     assert.equal(r.veic, r.total, 'todos os veículos'); assert.equal(r.mundos, r.totalMundos, 'todos os cenários e a surpresa');
   } finally { await ctx.close(); }
 });
+
+test('1.34.0: o Piloto é a última etapa e só aparece quando o personagem aparece no veículo', async () => {
+  const { ctx, pg, erros } = await abrirMenu(390, 844);
+  try {
+    const estado = () => pg.evaluate(() => ({
+      etapa: +document.getElementById('menu').getAttribute('data-etapa'), num: document.getElementById('etapaNum').textContent,
+      nome: document.getElementById('etapaNome').textContent,
+      bolinhas: Array.from(document.querySelectorAll('[data-ir-etapa]')).filter((b) => !b.parentNode.hidden).length,
+      proximo: !document.getElementById('btProximo').hidden, bichos: document.getElementById('bichos').offsetParent !== null }));
+    const escolher = (id) => pg.evaluate((v) => document.querySelector('[data-veic="' + v + '"]').click(), id);
+    await pg.click('[data-ir-etapa="2"]'); await pg.waitForTimeout(150);
+    await escolher('classico'); await pg.waitForTimeout(100);
+    let e = await estado();
+    assert.equal(e.bolinhas, 5); assert.match(e.num, /de 5/);
+    await pg.click('#btProximo'); await pg.waitForTimeout(150);
+    e = await estado(); assert.equal(e.etapa, 3); assert.match(e.nome, /Música/); assert.ok(e.proximo, 'depois da música vem o Piloto');
+    await pg.click('#btProximo'); await pg.waitForTimeout(150);
+    e = await estado(); assert.equal(e.etapa, 4); assert.match(e.nome, /Piloto/); assert.ok(e.bichos, 'os personagens aparecem'); assert.ok(!e.proximo, 'é a última');
+    for (const id of ['urso', 'bruxa', 'treno', 'ovo']) {   // personagem não aparece: 4 etapas, a da música é a última
+      await pg.click('[data-ir-etapa="2"]'); await pg.waitForTimeout(150);
+      await escolher(id); await pg.waitForTimeout(100);
+      e = await estado(); assert.equal(e.bolinhas, 4, id); assert.match(e.num, /de 4/, id);
+      await pg.click('#btProximo'); await pg.waitForTimeout(150);
+      e = await estado(); assert.equal(e.etapa, 3, id); assert.ok(!e.proximo, id + ': a música é a última');
+    }
+    assert.deepEqual(erros, []);
+  } finally { await ctx.close(); }
+});

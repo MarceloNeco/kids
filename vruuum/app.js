@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.33.0';
+  var APP_VERSION = '1.34.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -161,16 +161,20 @@
   }
   // ---------- etapas do menu (1.30.0, dono 20/Nov/2026) ----------
   /* Em vez de uma coluna comprida com o Correr lá no fim, as escolhas vêm em etapas curtas, cada uma cabendo na tela do
-     celular em pé: 1 Quem corre (jogadores, nível, rivais, duelo e TV) · 2 Cenários · 3 Veículo · 4 Piloto · 5 Música e
-     mais. O 🏁 Correr! fica sempre embaixo e corre com as escolhas de agora (as de padrão ou as da última vez).
+     celular em pé: 1 Quem corre (jogadores, nível, rivais, duelo e TV) · 2 Cenários · 3 Veículo · 4 Música e mais ·
+     5 Piloto (só quando o personagem aparece no veículo; 1.34.0). O 🏁 Correr! fica sempre embaixo e corre com as escolhas de agora (as de padrão ou as da última vez).
      O Voltar do celular volta uma etapa: cada avanço (feito com toque ou tecla) põe uma entrada no histórico, com a
      etapa e o caminho até ela; voltar pelos botões anda para trás no próprio histórico, para os dois ficarem iguais.
      A etapa de agora é sempre a da entrada do histórico em que o menu está (fora das nossas entradas: a 1). */
-  var ETAPAS = [['Quem corre', "Who's racing", 'Quién corre'], ['Cenários', 'Worlds', 'Escenarios'], ['Veículo', 'Ride', 'Vehículo'], ['Piloto', 'Driver', 'Piloto'], ['Música e mais', 'Music & more', 'Música y más']];
-  var etapa = 0;
-  function etapaDoHistorico() { var s = history.state; return s && typeof s.vruuumEtapa === 'number' && s.vruuumEtapa < ETAPAS.length ? s.vruuumEtapa : 0; }
+  /* 1.34.0 (dono, 21/Nov/2026): o Piloto é a última etapa, e só aparece quando o personagem aparece no veículo
+     (no Ovo, no Ursão, na Bruxinha e no trenó do Papai Noel não tem por que escolher: são 4 etapas). */
+  var ETAPAS = [['Quem corre', "Who's racing", 'Quién corre'], ['Cenários', 'Worlds', 'Escenarios'], ['Veículo', 'Ride', 'Vehículo'], ['Música e mais', 'Music & more', 'Música y más'], ['Piloto', 'Driver', 'Piloto']];
+  var ETAPA_PILOTO = 4, etapa = 0;
+  function temPiloto() { for (var k = 0; k < pref.jogadores; k++) { var v = VE.achar(pref.carros[k].veic); if (!v || !v.semPiloto) return true; } return false; }
+  function nEtapas() { return temPiloto() ? ETAPAS.length : ETAPAS.length - 1; }
+  function etapaDoHistorico() { var s = history.state; return s && typeof s.vruuumEtapa === 'number' && s.vruuumEtapa < nEtapas() ? s.vruuumEtapa : 0; }
   function pintarEtapa() {
-    $('etapaNum').textContent = t('Etapa ', 'Step ', 'Paso ') + (etapa + 1) + t(' de ', ' of ', ' de ') + ETAPAS.length + ' ·';
+    $('etapaNum').textContent = t('Etapa ', 'Step ', 'Paso ') + (etapa + 1) + t(' de ', ' of ', ' de ') + nEtapas() + ' ·';
     $('etapaNome').textContent = tn(ETAPAS[etapa]);
     Array.prototype.forEach.call(document.querySelectorAll('[data-ir-etapa]'), function (b) {
       var k = +b.getAttribute('data-ir-etapa');
@@ -183,8 +187,17 @@
     var rb = b.getBoundingClientRect(), rc = c.getBoundingClientRect();
     if (c.scrollWidth > c.clientWidth) c.scrollLeft += (rb.left + rb.width / 2) - (rc.left + rc.width / 2);
   }
+  // mostra ou esconde a etapa do Piloto (bolinha, "de 4/5", botão Próximo) conforme o veículo escolhido
+  function ajustarEtapas() {
+    var n = nEtapas();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ir-etapa]'), function (b) { b.parentNode.hidden = +b.getAttribute('data-ir-etapa') >= n; });
+    var ult = etapa >= n - 1;
+    $('btProximo').hidden = $('btProximo').disabled = ult;
+    $('menuBaixo').classList.toggle('sem-proximo', ult);
+    pintarEtapa();
+  }
   function mostrarEtapa(n) {
-    etapa = Math.max(0, Math.min(ETAPAS.length - 1, n | 0));
+    etapa = Math.max(0, Math.min(nEtapas() - 1, n | 0));
     $('menu').setAttribute('data-etapa', String(etapa));
     Array.prototype.forEach.call(document.querySelectorAll('.etapa'), function (el) { el.hidden = (' ' + el.getAttribute('data-etapas') + ' ').indexOf(' ' + etapa + ' ') < 0; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-ir-etapa]'), function (b) {
@@ -192,20 +205,19 @@
       if (k === etapa) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
       b.classList.toggle('feita', k < etapa);
     });
-    var pri = etapa === 0, ult = etapa === ETAPAS.length - 1;
+    var pri = etapa === 0;
     $('btVoltarEtapa').hidden = $('btVoltarEtapa').disabled = pri;
-    $('btProximo').hidden = $('btProximo').disabled = ult;
-    $('menuBaixo').classList.toggle('sem-voltar', pri); $('menuBaixo').classList.toggle('sem-proximo', ult);
-    pintarEtapa();
+    $('menuBaixo').classList.toggle('sem-voltar', pri);
+    ajustarEtapas();
     $('etapas').scrollTop = 0;
     if (etapa === 1) setTimeout(tremerCenarios, 400);
     if (etapa === 2) centrarEscolhido('.cartao-veic[aria-pressed="true"]', 'veiculos');
-    if (etapa === 3) centrarEscolhido('#bichos [aria-pressed="true"]', 'bichos');
+    if (etapa === ETAPA_PILOTO) centrarEscolhido('#bichos [aria-pressed="true"]', 'bichos');
     var f = document.activeElement;   // o botão com o foco sumiu (Voltar na 1ª, Próximo na última): o foco vai para o Correr
     if (estadoTela === 'menu' && f && f !== document.body && (f.disabled || f.offsetParent === null)) try { $('btCorrer').focus(); } catch (e) { /* ok */ }
   }
   function irEtapa(n) {   // a pessoa pediu (toque ou tecla)
-    if (n === etapa || n < 0 || n >= ETAPAS.length) return;
+    if (n === etapa || n < 0 || n >= nEtapas()) return;
     var s = history.state, pilha = s && Array.isArray(s.vruuumPilha) ? s.vruuumPilha : [0];
     try {
       if (n > etapa) history.pushState({ vruuumEtapa: n, vruuumPilha: pilha.concat(n) }, '');
@@ -410,11 +422,12 @@
       if (fot) { var desenhaFoto = function () { var x = bf.querySelector('canvas').getContext('2d'); x.clearRect(0, 0, 76, 76); x.save(); x.beginPath(); x.arc(38, 38, 37, 0, Math.PI * 2); x.clip(); x.drawImage(fot.img, 0, 0, 76, 76); x.restore(); }; if (fot.img.complete) desenhaFoto(); else fot.img.onload = function () { desenhaFoto(); marcar(); }; }
     }
     if (c.foto && !fot) c.foto = false;
-    $('nomeVeic').textContent = (pref.jogadores === 2 || c.personagem ? nomePiloto(editando) + ' · ' : '') + tn(v.nome) + (v.bruxa ? t(' · voa e desce 🧹', ' · flies and lands 🧹', ' · vuela y baja 🧹') : VE.voa(v.id) ? t(' · voa no céu ✈️', ' · flies in the sky ✈️', ' · vuela por el cielo ✈️') : '');
+    $('nomeVeic').textContent = (pref.jogadores === 2 || (c.personagem && !v.semPiloto) ? nomePiloto(editando) + ' · ' : '') + tn(v.nome) + (v.bruxa ? t(' · voa e desce 🧹', ' · flies and lands 🧹', ' · vuela y baja 🧹') : VE.voa(v.id) ? t(' · voa no céu ✈️', ' · flies in the sky ✈️', ' · vuela por el cielo ✈️') : '');
     $('barraVel').style.width = barra(v.vel); $('barraCurva').style.width = barra(v.curva);
     var dica = $('dicaTecla'); dica.hidden = TOQUE || pref.jogadores < 2;
     dica.textContent = editando ? t('Teclado: setas e ⬆', 'Keyboard: arrows and ⬆', 'Teclado: flechas y ⬆') : t('Teclado: A, D e W', 'Keyboard: A, D and W', 'Teclado: A, D y W');
     $('recordeMenu').textContent = D.milhar(ler('vruuum.recordePts.' + pref.nivel, 0));
+    if (montado) ajustarEtapas();
   }
   function opcao(atributo, fn) {
     Array.prototype.forEach.call(document.querySelectorAll('[' + atributo + ']'), function (b) {

@@ -49,10 +49,10 @@
     em3d('ovo', { id: 'ovo', quadros: 8, semPiloto: true, semMotor: true, grupo: 'moto', nome: ['Ovo Corredor', 'Running Egg', 'Huevo Corredor'], w: 720, h: 1000, vel: 0.97, curva: 1.14 }),
     em3d('aviao', { id: 'aviao', grupo: 'ar', nome: ['Aviãozinho', 'Little Plane', 'Avioncito'], w: 1500, h: 760, vel: 1, curva: 1.05 }),
     em3d('jato', { id: 'jato', grupo: 'ar', nome: ['Jato', 'Jet', 'Jet'], w: 1300, h: 700, vel: 1.1, curva: 0.92 }),
-    em3d('treno', { id: 'treno', semMotor: true, quadros: 8, grupo: 'ar', nome: ['Trenó do Papai Noel', "Santa's Sleigh", 'Trineo de Papá Noel'], w: 880, h: 1180, vel: 1.0, curva: 1.05 }),
+    em3d('treno', { id: 'treno', semPiloto: true, semMotor: true, quadros: 8, grupo: 'ar', nome: ['Trenó do Papai Noel', "Santa's Sleigh", 'Trineo de Papá Noel'], w: 880, h: 1180, vel: 1.0, curva: 1.05 }),
     em3d('arara', { id: 'arara', semMotor: true, voz: 'arara', quadros: 8, grupo: 'ar', nome: ['Arara Gigante', 'Giant Macaw', 'Guacamayo Gigante'], w: 1300, h: 1000, vel: 1.04, curva: 1.08 }),
     em3d('morcego', { id: 'morcego', quadros: 8, dracula: true, abobora: true, semMotor: true, voz: 'morcego', grupo: 'ar', nome: ['Morcego (vira Drácula!)', 'Bat (turns into Dracula!)', 'Murciélago (¡se vuelve Drácula!)'], w: 1300, h: 1000, vel: 1.02, curva: 1.1 }),
-    em3d('bruxa', { id: 'bruxa', bruxa: true, semMotor: true, voz: 'bruxa', quadros: 8, grupo: 'ar', nome: ['Bruxa na Vassoura (sobe e desce!)', 'Witch on a Broom (up and down!)', 'Bruja en Escoba (¡sube y baja!)'], w: 820, h: 1180, vel: 1.02, curva: 1.08 }),
+    em3d('bruxa', { id: 'bruxa', bruxa: true, semPiloto: true, semMotor: true, voz: 'bruxa', quadros: 8, grupo: 'ar', nome: ['Bruxinha na Vassoura (sobe e desce!)', 'Little Witch on a Broom (up and down!)', 'Brujita en Escoba (¡sube y baja!)'], w: 820, h: 1180, vel: 1.02, curva: 1.08 }),
     em3d('heli', { id: 'heli', grupo: 'ar', nome: ['Helicóptero', 'Helicopter', 'Helicóptero'], w: 1100, h: 900, vel: 0.95, curva: 1.12 })
   ];
   var GRUPOS = [
