@@ -215,7 +215,8 @@
 
   /* ======================= números e moeda ======================= */
   function milhar(v, lingua) { return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, lingua === 'en' ? ',' : '.'); }
-  function dinheiro(v, lingua) { return lingua === 'en' ? '$' + milhar(v, 'en') : lingua === 'es' ? milhar(v, 'es') + ' €' : 'R$ ' + milhar(v, 'pt'); }
+  // pontos, não dinheiro (dono, 21/Nov/2026): "1.500 pts" (EN "1,500 pts")
+  function dinheiro(v, lingua) { return milhar(v, lingua) + ' pts'; }
 
   /* ======================= estilo (DOM) ======================= */
   var CSS = '' +
