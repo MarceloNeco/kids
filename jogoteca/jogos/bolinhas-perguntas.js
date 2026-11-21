@@ -2,12 +2,12 @@
    Cada pergunta: { id, cat (categoria), d (dificuldade 1 fácil · 2 média · 3 difícil), q: [pt, en, es], o: [opções], c (índice da certa) }.
    Opção em texto único (número, nome próprio) vale para os três idiomas; senão [pt, en, es].
    As opções são embaralhadas na hora do jogo; a certa é sempre o índice c daqui. Só fatos firmes, conferidos.
-   Fase 1 usa as de 2 opções, a Fase 2 as de 3 e a Fase 3 as de 4. Na categoria Línguas, a pergunta muda de língua conforme o idioma
+   A Queda Livre usa as de 2 opções (40) e o Sem pressa as de 4 (60). Na categoria Línguas, a pergunta muda de língua conforme o idioma
    do jogo (quem joga em inglês aprende uma palavra em espanhol, e vice-versa), com a mesma resposta certa. */
 (function () {
   'use strict';
   var B = [
-    /* ---------------- 2 opções (Fase 1) ---------------- */
+    /* ---------------- 2 opções (Queda Livre) ---------------- */
     { id: 'h2a', cat: 'historia', d: 1, q: ['Quem foi o primeiro presidente dos Estados Unidos?', 'Who was the first president of the United States?', '¿Quién fue el primer presidente de Estados Unidos?'],
       o: ['George Washington', 'Abraham Lincoln'], c: 0 },
     { id: 'h2b', cat: 'historia', d: 2, q: ['Em que ano o Brasil declarou a independência de Portugal?', 'In what year did Brazil declare independence from Portugal?', '¿En qué año declaró Brasil su independencia de Portugal?'],
@@ -98,78 +98,78 @@
     { id: 'b2d', cat: 'corpo', d: 3, q: ['Quantos ossos tem o esqueleto de um adulto?', 'How many bones are there in an adult skeleton?', '¿Cuántos huesos tiene el esqueleto de un adulto?'],
       o: ['150', '206'], c: 1 },
 
-    /* ---------------- 3 opções (Fase 2) ---------------- */
+    /* ---------------- 4 opções (Sem pressa; até 20/Nov/2026 tinham 3, a 4ª opção entrou em 21/Nov/2026) ---------------- */
     { id: 'h3a', cat: 'historia', d: 1, q: ['Como eram chamados os reis do Egito Antigo?', 'What were the kings of Ancient Egypt called?', '¿Cómo se llamaba a los reyes del Antiguo Egipto?'],
-      o: [['Faraós', 'Pharaohs', 'Faraones'], ['Czares', 'Tsars', 'Zares'], ['Xoguns', 'Shoguns', 'Sogunes']], c: 0 },
+      o: [['Faraós', 'Pharaohs', 'Faraones'], ['Czares', 'Tsars', 'Zares'], ['Xoguns', 'Shoguns', 'Sogunes'], ['Marajás', 'Maharajas', 'Marajás']], c: 0 },
     { id: 'h3b', cat: 'historia', d: 2, q: ['Em que ano o ser humano pisou na Lua pela primeira vez?', 'In what year did a human first walk on the Moon?', '¿En qué año pisó el ser humano la Luna por primera vez?'],
-      o: ['1959', '1969', '1979'], c: 1 },
+      o: ['1959', '1969', '1979', '1989'], c: 1 },
     { id: 'h3c', cat: 'historia', d: 3, q: ['Qual cidade romana foi soterrada pela erupção do Vesúvio no ano 79?', 'Which Roman city was buried by the eruption of Vesuvius in the year 79?', '¿Qué ciudad romana quedó sepultada por la erupción del Vesubio en el año 79?'],
-      o: [['Atenas', 'Athens', 'Atenas'], ['Esparta', 'Sparta', 'Esparta'], ['Pompeia', 'Pompeii', 'Pompeya']], c: 2 },
+      o: [['Atenas', 'Athens', 'Atenas'], ['Esparta', 'Sparta', 'Esparta'], ['Pompeia', 'Pompeii', 'Pompeya'], ['Troia', 'Troy', 'Troya']], c: 2 },
 
     { id: 'g3a', cat: 'geografia', d: 1, q: ['Qual é o maior país do mundo em área?', 'What is the largest country in the world by area?', '¿Cuál es el país más grande del mundo en superficie?'],
-      o: [['Rússia', 'Russia', 'Rusia'], ['Canadá', 'Canada', 'Canadá'], ['China', 'China', 'China']], c: 0 },
+      o: [['Rússia', 'Russia', 'Rusia'], ['Canadá', 'Canada', 'Canadá'], ['China', 'China', 'China'], ['Brasil', 'Brazil', 'Brasil']], c: 0 },
     { id: 'g3b', cat: 'geografia', d: 2, q: ['Qual é a montanha mais alta do mundo?', 'What is the highest mountain in the world?', '¿Cuál es la montaña más alta del mundo?'],
-      o: [['Aconcágua', 'Aconcagua', 'Aconcagua'], ['Everest', 'Everest', 'Everest'], ['Kilimanjaro', 'Kilimanjaro', 'Kilimanjaro']], c: 1 },
+      o: [['Aconcágua', 'Aconcagua', 'Aconcagua'], ['Everest', 'Everest', 'Everest'], ['Kilimanjaro', 'Kilimanjaro', 'Kilimanjaro'], ['Monte Branco', 'Mont Blanc', 'Mont Blanc']], c: 1 },
     { id: 'g3c', cat: 'geografia', d: 3, q: ['Qual é a capital da Austrália?', 'What is the capital of Australia?', '¿Cuál es la capital de Australia?'],
-      o: ['Sydney', 'Melbourne', ['Camberra', 'Canberra', 'Canberra']], c: 2 },
+      o: ['Sydney', 'Melbourne', ['Camberra', 'Canberra', 'Canberra'], 'Perth'], c: 2 },
 
     { id: 'c3a', cat: 'ciencias', d: 1, q: ['Qual é a estrela mais perto da Terra?', 'What is the closest star to Earth?', '¿Cuál es la estrella más cercana a la Tierra?'],
-      o: [['O Sol', 'The Sun', 'El Sol'], ['A Lua', 'The Moon', 'La Luna'], ['Marte', 'Mars', 'Marte']], c: 0 },
+      o: [['O Sol', 'The Sun', 'El Sol'], ['A Lua', 'The Moon', 'La Luna'], ['Marte', 'Mars', 'Marte'], ['Júpiter', 'Jupiter', 'Júpiter']], c: 0 },
     { id: 'c3b', cat: 'ciencias', d: 2, q: ['Qual é o maior planeta do Sistema Solar?', 'What is the largest planet in the Solar System?', '¿Cuál es el planeta más grande del Sistema Solar?'],
-      o: [['Saturno', 'Saturn', 'Saturno'], ['Júpiter', 'Jupiter', 'Júpiter'], ['Netuno', 'Neptune', 'Neptuno']], c: 1 },
+      o: [['Saturno', 'Saturn', 'Saturno'], ['Júpiter', 'Jupiter', 'Júpiter'], ['Netuno', 'Neptune', 'Neptuno'], ['Terra', 'Earth', 'Tierra']], c: 1 },
     { id: 'c3c', cat: 'ciencias', d: 3, q: ['Qual metal é líquido na temperatura ambiente?', 'Which metal is liquid at room temperature?', '¿Qué metal es líquido a temperatura ambiente?'],
-      o: [['Ferro', 'Iron', 'Hierro'], ['Alumínio', 'Aluminum', 'Aluminio'], ['Mercúrio', 'Mercury', 'Mercurio']], c: 2 },
+      o: [['Ferro', 'Iron', 'Hierro'], ['Alumínio', 'Aluminum', 'Aluminio'], ['Mercúrio', 'Mercury', 'Mercurio'], ['Cobre', 'Copper', 'Cobre']], c: 2 },
 
     { id: 'a3a', cat: 'animais', d: 1, q: ['Qual é o maior animal do mundo?', 'What is the largest animal in the world?', '¿Cuál es el animal más grande del mundo?'],
-      o: [['Baleia-azul', 'Blue whale', 'Ballena azul'], ['Elefante', 'Elephant', 'Elefante'], ['Girafa', 'Giraffe', 'Jirafa']], c: 0 },
+      o: [['Baleia-azul', 'Blue whale', 'Ballena azul'], ['Elefante', 'Elephant', 'Elefante'], ['Girafa', 'Giraffe', 'Jirafa'], ['Tubarão-branco', 'Great white shark', 'Tiburón blanco']], c: 0 },
     { id: 'a3b', cat: 'animais', d: 2, q: ['Como se chama o filhote do cavalo?', 'What is a baby horse called?', '¿Cómo se llama la cría del caballo?'],
-      o: [['Bezerro', 'Calf', 'Ternero'], ['Potro', 'Foal', 'Potro'], ['Cordeiro', 'Lamb', 'Cordero']], c: 1 },
+      o: [['Bezerro', 'Calf', 'Ternero'], ['Potro', 'Foal', 'Potro'], ['Cordeiro', 'Lamb', 'Cordero'], ['Leitão', 'Piglet', 'Lechón']], c: 1 },
     { id: 'a3c', cat: 'animais', d: 3, q: ['Quantos corações tem um polvo?', 'How many hearts does an octopus have?', '¿Cuántos corazones tiene un pulpo?'],
-      o: ['1', '2', '3'], c: 2 },
+      o: ['1', '2', '3', '4'], c: 2 },
 
     { id: 'e3a', cat: 'esportes', d: 1, q: ['Quantos anéis tem o símbolo dos Jogos Olímpicos?', 'How many rings are there in the Olympic symbol?', '¿Cuántos anillos tiene el símbolo de los Juegos Olímpicos?'],
-      o: ['5', '4', '6'], c: 0 },
+      o: ['5', '4', '6', '7'], c: 0 },
     { id: 'e3b', cat: 'esportes', d: 2, q: ['No vôlei de quadra, quantos jogadores de cada time ficam em jogo?', 'In indoor volleyball, how many players from each team are on the court?', 'En el voleibol de pista, ¿cuántos jugadores de cada equipo hay en juego?'],
-      o: ['5', '6', '7'], c: 1 },
+      o: ['5', '6', '7', '4'], c: 1 },
     { id: 'e3c', cat: 'esportes', d: 3, q: ['Quantos buracos tem uma volta completa num campo de golfe oficial?', 'How many holes are there in a full round on an official golf course?', '¿Cuántos hoyos tiene un recorrido completo en un campo de golf oficial?'],
-      o: ['9', '12', '18'], c: 2 },
+      o: ['9', '12', '18', '24'], c: 2 },
 
     { id: 'f3a', cat: 'cinema', d: 1, q: ['Como se chama o caubói de "Toy Story"?', 'What is the name of the cowboy in "Toy Story"?', '¿Cómo se llama el vaquero de "Toy Story"?'],
-      o: ['Woody', 'Buzz', 'Rex'], c: 0 },
+      o: ['Woody', 'Buzz', 'Rex', ['Sr. Cabeça de Batata', 'Mr. Potato Head', 'Señor Patata']], c: 0 },
     { id: 'f3b', cat: 'cinema', d: 2, q: ['Em "O Rei Leão", como se chama o pai do Simba?', 'In "The Lion King", what is the name of Simba’s father?', 'En "El rey león", ¿cómo se llama el padre de Simba?'],
-      o: ['Scar', 'Mufasa', ['Timão', 'Timon', 'Timón']], c: 1 },
+      o: ['Scar', 'Mufasa', ['Timão', 'Timon', 'Timón'], ['Pumba', 'Pumbaa', 'Pumba']], c: 1 },
     { id: 'f3c', cat: 'cinema', d: 3, q: ['Como se chama a fadinha amiga do Peter Pan?', 'What is the name of Peter Pan’s fairy friend?', '¿Cómo se llama el hada amiga de Peter Pan?'],
-      o: [['Fada Madrinha', 'Fairy Godmother', 'Hada Madrina'], ['Malévola', 'Maleficent', 'Maléfica'], ['Sininho', 'Tinker Bell', 'Campanilla']], c: 2 },
+      o: [['Fada Madrinha', 'Fairy Godmother', 'Hada Madrina'], ['Malévola', 'Maleficent', 'Maléfica'], ['Sininho', 'Tinker Bell', 'Campanilla'], ['Cinderela', 'Cinderella', 'Cenicienta']], c: 2 },
 
     { id: 'm3a', cat: 'musica', d: 1, q: ['Qual destes instrumentos tem teclas?', 'Which of these instruments has keys?', '¿Cuál de estos instrumentos tiene teclas?'],
-      o: [['Piano', 'Piano', 'Piano'], ['Violino', 'Violin', 'Violín'], ['Trompete', 'Trumpet', 'Trompeta']], c: 0 },
+      o: [['Piano', 'Piano', 'Piano'], ['Violino', 'Violin', 'Violín'], ['Trompete', 'Trumpet', 'Trompeta'], ['Tambor', 'Drum', 'Tambor']], c: 0 },
     { id: 'm3b', cat: 'musica', d: 2, q: ['Quantos integrantes tinham os Beatles?', 'How many members did the Beatles have?', '¿Cuántos miembros tenían los Beatles?'],
-      o: ['3', '4', '5'], c: 1 },
+      o: ['3', '4', '5', '6'], c: 1 },
     { id: 'm3c', cat: 'musica', d: 3, q: ['Em qual destes países nasceu o tango?', 'In which of these countries was the tango born?', '¿En cuál de estos países nació el tango?'],
-      o: [['Brasil', 'Brazil', 'Brasil'], ['México', 'Mexico', 'México'], ['Argentina', 'Argentina', 'Argentina']], c: 2 },
+      o: [['Brasil', 'Brazil', 'Brasil'], ['México', 'Mexico', 'México'], ['Argentina', 'Argentina', 'Argentina'], ['Japão', 'Japan', 'Japón']], c: 2 },
 
     { id: 'k3a', cat: 'comida', d: 1, q: ['Qual animal produz o mel?', 'Which animal makes honey?', '¿Qué animal produce la miel?'],
-      o: [['A abelha', 'The bee', 'La abeja'], ['A formiga', 'The ant', 'La hormiga'], ['A borboleta', 'The butterfly', 'La mariposa']], c: 0 },
+      o: [['A abelha', 'The bee', 'La abeja'], ['A formiga', 'The ant', 'La hormiga'], ['A borboleta', 'The butterfly', 'La mariposa'], ['A vaca', 'The cow', 'La vaca']], c: 0 },
     { id: 'k3b', cat: 'comida', d: 2, q: ['A paella é um prato típico de qual país?', 'Paella is a typical dish from which country?', '¿De qué país es típica la paella?'],
-      o: [['Portugal', 'Portugal', 'Portugal'], ['Espanha', 'Spain', 'España'], ['Itália', 'Italy', 'Italia']], c: 1 },
+      o: [['Portugal', 'Portugal', 'Portugal'], ['Espanha', 'Spain', 'España'], ['Itália', 'Italy', 'Italia'], ['França', 'France', 'Francia']], c: 1 },
     { id: 'k3c', cat: 'comida', d: 3, q: ['O tofu é feito de quê?', 'What is tofu made from?', '¿De qué está hecho el tofu?'],
-      o: [['Arroz', 'Rice', 'Arroz'], ['Milho', 'Corn', 'Maíz'], ['Soja', 'Soybeans', 'Soja']], c: 2 },
+      o: [['Arroz', 'Rice', 'Arroz'], ['Milho', 'Corn', 'Maíz'], ['Soja', 'Soybeans', 'Soja'], ['Trigo', 'Wheat', 'Trigo']], c: 2 },
 
     { id: 'l3a', cat: 'linguas', d: 1, q: ['Como se diz "obrigado" em inglês?', 'How do you say "thank you" in Spanish?', '¿Cómo se dice "gracias" en inglés?'],
-      o: [['Thank you', 'Gracias', 'Thank you'], ['Please', 'Por favor', 'Please'], ['Sorry', 'Perdón', 'Sorry']], c: 0 },
+      o: [['Thank you', 'Gracias', 'Thank you'], ['Please', 'Por favor', 'Please'], ['Sorry', 'Perdón', 'Sorry'], ['Goodbye', 'Adiós', 'Goodbye']], c: 0 },
     { id: 'l3b', cat: 'linguas', d: 2, q: ['Qual é a língua mais falada no México?', 'What is the most spoken language in Mexico?', '¿Cuál es la lengua más hablada en México?'],
-      o: [['Português', 'Portuguese', 'Portugués'], ['Espanhol', 'Spanish', 'Español'], ['Inglês', 'English', 'Inglés']], c: 1 },
+      o: [['Português', 'Portuguese', 'Portugués'], ['Espanhol', 'Spanish', 'Español'], ['Inglês', 'English', 'Inglés'], ['Francês', 'French', 'Francés']], c: 1 },
     { id: 'l3c', cat: 'linguas', d: 3, q: ['A palavra "chocolate" vem de qual língua?', 'Which language does the word "chocolate" come from?', '¿De qué lengua viene la palabra "chocolate"?'],
-      o: [['Grego', 'Greek', 'Griego'], ['Latim', 'Latin', 'Latín'], ['Náuatle, a língua dos astecas', 'Nahuatl, the language of the Aztecs', 'Náhuatl, la lengua de los aztecas']], c: 2 },
+      o: [['Grego', 'Greek', 'Griego'], ['Latim', 'Latin', 'Latín'], ['Náuatle, a língua dos astecas', 'Nahuatl, the language of the Aztecs', 'Náhuatl, la lengua de los aztecas'], ['Árabe', 'Arabic', 'Árabe']], c: 2 },
 
     { id: 'b3a', cat: 'corpo', d: 1, q: ['Quais órgãos usamos para respirar?', 'Which organs do we use to breathe?', '¿Qué órganos usamos para respirar?'],
-      o: [['Os pulmões', 'The lungs', 'Los pulmones'], ['Os rins', 'The kidneys', 'Los riñones'], ['O estômago', 'The stomach', 'El estómago']], c: 0 },
+      o: [['Os pulmões', 'The lungs', 'Los pulmones'], ['Os rins', 'The kidneys', 'Los riñones'], ['O estômago', 'The stomach', 'El estómago'], ['O coração', 'The heart', 'El corazón']], c: 0 },
     { id: 'b3b', cat: 'corpo', d: 2, q: ['Quantos dentes tem um adulto, contando os sisos?', 'How many teeth does an adult have, counting the wisdom teeth?', '¿Cuántos dientes tiene un adulto, contando las muelas del juicio?'],
-      o: ['28', '32', '36'], c: 1 },
+      o: ['28', '32', '36', '24'], c: 1 },
     { id: 'b3c', cat: 'corpo', d: 3, q: ['Qual é o menor osso do corpo humano?', 'What is the smallest bone in the human body?', '¿Cuál es el hueso más pequeño del cuerpo humano?'],
-      o: [['O fêmur', 'The femur', 'El fémur'], ['A costela', 'A rib', 'La costilla'], ['O estribo, no ouvido', 'The stapes, in the ear', 'El estribo, en el oído']], c: 2 },
+      o: [['O fêmur', 'The femur', 'El fémur'], ['A costela', 'A rib', 'La costilla'], ['O estribo, no ouvido', 'The stapes, in the ear', 'El estribo, en el oído'], ['A rótula', 'The kneecap', 'La rótula']], c: 2 },
 
-    /* ---------------- 4 opções (Fase 3) ---------------- */
+    /* ---------------- 4 opções (Sem pressa) ---------------- */
     { id: 'h4a', cat: 'historia', d: 1, q: ['Quem foi o primeiro ser humano a pisar na Lua?', 'Who was the first person to walk on the Moon?', '¿Quién fue el primer ser humano en pisar la Luna?'],
       o: ['Neil Armstrong', 'Yuri Gagarin', 'Buzz Aldrin', 'Santos Dumont'], c: 0 },
     { id: 'h4b', cat: 'historia', d: 2, q: ['Em que país começou a Revolução Industrial?', 'In which country did the Industrial Revolution begin?', '¿En qué país empezó la Revolución Industrial?'],

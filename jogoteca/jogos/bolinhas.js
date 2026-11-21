@@ -12,13 +12,20 @@
    a dificuldade das perguntas.
    Física própria e leve (círculo com círculo, passo fixo de 1/120 s), sem biblioteca: pinos em grade intercalada, divisórias de
    pontas redondas, sensor no fundo de cada canaleta e empurrãozinho se a bolinha parar. A restituição de um choque é o produto das
-   duas (bolinha 0,6 × pino 0,75 = 0,45; bolinha com parede 0,6), com gravidade calibrada para a queda durar ~5,7 s.
+   duas (bolinha 0,6 × pino 0,75 = 0,45; bolinha com parede 0,6), com gravidade calibrada para a queda durar ~5,8 s
+   (bolinha de raio 14 desde 21/Nov/2026, um pouco maior, a pedido do dono).
    Visual (dono, 19/Nov/2026: "mais realista, a câmera seguindo a bola"): estúdio de TV em 2.5D num <canvas> do palco inteiro —
    parede alta de acrílico escuro na moldura de metal escovado com parafusos e LEDs que correm, pinos cromados com sombra, placas de
    valor de LED, piso brilhante refletindo a parede, feixes de luz na cor do momento, plateia na penumbra e paralaxe do fundo.
-   Câmera de transmissão: plano aberto antes de soltar; desce junto com a bolinha (zoom 2×, com atraso de cinegrafista), enquadra o
-   grupo ou segue a mais adiantada com as outras em quadrinhos (CÂM 2, CÂM 3); nos últimos 15% da queda, câmera lenta (0,4×) e zoom
-   nas canaletas; na chegada, flash da cor e volta ao plano aberto. Com ctx.calmo: cortes secos e sem câmera lenta.
+   Mais pedidos do dono em 21/Nov/2026 (fotos do programa só como referência de estilo): painel de LED atrás dos pinos
+   (quadradinhos de 50 × 50 que acendem em ondas, anéis, chuva e brilho salteado; azul no normal, verde no acerto, vermelho no
+   erro), pintado numa tela pequenina esticada sobre a parede numa só cópia; arco de luz (tubo de neon) em volta da parede com
+   luzes que correm; música de tensão ("Interloper", Kevin MacLeod, CC BY 4.0, musicas/tensao-interloper.mp3) do soltar até a
+   última bolinha bater no fundo — a trilha do jogo pausa e volta do ponto onde parou (Trilha.parar / Trilha.continuar).
+   Câmera de transmissão: plano aberto antes de soltar; primeiro a CÂMERA DA BOLINHA (ponto de vista: colada numa bolinha, zoom
+   4,4×, riscos de velocidade, até perto do meio da parede); depois acompanha bem de perto (3,1×) a mais adiantada, com as
+   outras em quadrinhos (CÂM 2, CÂM 3), ou enquadra o grupo; nos últimos 15% da queda, câmera lenta (0,4×) e zoom nas canaletas;
+   na chegada, flash da cor e volta ao plano aberto. Com ctx.calmo: cortes secos, sem câmera da bolinha e sem câmera lenta.
    Desempenho: o cenário fixo é pintado UMA vez por resolução (plano aberto e, logo depois, a do zoom); cada quadro só copia o pedaço
    que aparece e desenha por cima bolinhas, brilhos e luzes. Ficou lento (< 36 quadros/s na queda), liga sozinho o modo leve
    (sem feixes, vinheta nem quadrinhos; resolução 1×). HUD e painel em DOM por cima do estúdio.
@@ -96,9 +103,9 @@
     return { id: q.id, cat: q.cat, d: q.d, q: q.q, o: ordem.map(function (k) { return q.o[k]; }), c: ordem.indexOf(q.c) };
   }
   /* ======================= física (lógica pura, unidades do mundo: a parede tem 750 × 1050) ======================= */
-  var GEO = { W: 750, H: 1050, RB: 12, RP: 5, Y0: 130, DY: 50, FILAS: 15, YDIV: 900, RDIV: 3.5, SENSOR: 1000, CHAO: 1045, Y_SOLTA: 50,
+  var GEO = { W: 750, H: 1050, RB: 14, RP: 5, Y0: 130, DY: 50, FILAS: 15, YDIV: 900, RDIV: 3.5, SENSOR: 1000, CHAO: 1045, Y_SOLTA: 50,
     ZONAS: 7, CANALETAS: 15, LARG: 50 };
-  var FIS = { g: 1000, arrasto: 0.5, arrastoX: 1, vmax: 600, eBola: 0.6, ePino: 0.75 };
+  var FIS = { g: 1250, arrasto: 0.5, arrastoX: 1, vmax: 600, eBola: 0.6, ePino: 0.75 };
   FIS.eChoque = FIS.eBola * FIS.ePino;
   function zonaX(z) { return 75 + 100 * z; }
   // a última fila fica em cima das divisórias (x = 50k); as outras se alternam meio passo para o lado
@@ -525,7 +532,7 @@
     };
     function rgba(l, a) { return 'rgba(' + l[0] + ',' + l[1] + ',' + l[2] + ',' + a + ')'; }
     function sprite(n, fn) { var cv = novoCanvas(n, n); fn(cv.getContext('2d'), cv.width); return cv; }
-    function escMax() { return s0 * dpr * 2.5; }
+    function escMax() { return s0 * dpr * 4.5; }   // até o zoom da câmera da bolinha
     function prepararSprites() {
       var S = escMax(), rb = GEO.RB * 1.08 * S;
       Object.keys(CORES).forEach(function (k) {
@@ -569,6 +576,13 @@
         g.fillStyle = gr; g.fillRect(0, 0, n, n);
       });
       SPR.led = {};
+      // pino cromado nítido, desenhado por cima do cenário quando a câmera chega muito perto (a câmera da bolinha)
+      SPR.pino = sprite(26 * S, function (q, n) {
+        var e2 = n / 26, rp = GEO.RP * 1.3, m = 13, gq; q.scale(e2, e2);
+        gq = q.createRadialGradient(m - rp * 0.35, m - rp * 0.42, rp * 0.05, m, m, rp);
+        gq.addColorStop(0, '#ffffff'); gq.addColorStop(0.25, '#e9eef8'); gq.addColorStop(0.6, '#7b86a6'); gq.addColorStop(0.85, '#2b3352'); gq.addColorStop(1, '#8fb4ff');
+        circ(q, m, m, rp); q.fillStyle = gq; q.fill();
+      });
     }
     // pontinho de LED da moldura, na cor do momento (feito só quando a cor aparece)
     function ledSprite(cor) {
@@ -582,6 +596,57 @@
       return SPR.led[cor];
     }
     var COR_CLIMA = { calma: 'rgb(80,170,255)', tensao: 'rgb(255,176,48)', verde: 'rgb(45,255,136)', vermelho: 'rgb(255,47,85)' };
+    // painel de LED atrás dos pinos (dono, 21/Nov/2026, fotos do programa): quadradinhos de 50 × 50 com os pinos nos cantos,
+    // acendendo em ondas; azul no normal, verde quando acerta, vermelho quando erra
+    var LEDW = { y0: GEO.Y0, cols: 15, linhas: 15, lado: 50 };
+    var COR_LED = { azul: [40, 120, 255], verde: [20, 255, 80], vermelho: [255, 20, 40] };
+    function corLed() { return climaAtual === 'verde' ? 'verde' : climaAtual === 'vermelho' ? 'vermelho' : 'azul'; }
+    // o padrão do LED muda a cada 7 s: onda diagonal, anéis do centro, chuva nas colunas e brilho salteado
+    function brilhoTile(i, j, tm) {
+      var pad = Math.floor(tm / 7) % 4, v, dx = i - 7, dy = j - 7;
+      if (climaAtual === 'verde' || climaAtual === 'vermelho') {   // resultado: anéis fortes saindo do centro
+        v = 0.5 + 0.5 * Math.sin(Math.sqrt(dx * dx + dy * dy) * 0.9 - tm * 7);
+        return 0.3 + 0.6 * v * v;
+      }
+      var vel2 = climaAtual === 'tensao' ? 2.2 : 1;
+      if (pad === 0) v = 0.5 + 0.5 * Math.sin((i + j) * 0.55 - tm * 2.4 * vel2);
+      else if (pad === 1) v = 0.5 + 0.5 * Math.sin(Math.sqrt(dx * dx + dy * dy) * 0.8 - tm * 2.6 * vel2);
+      else if (pad === 2) { var f = ((j - tm * 6 * vel2 + ((i * 7) % 5) * 3) % 15 + 15) % 15; v = f < 4 ? 1 - f / 4 : 0; }
+      else { var h = Math.sin(i * 12.9898 + j * 78.233) * 43758.5453; h -= Math.floor(h); v = 0.5 + 0.5 * Math.sin(tm * (1.5 + 2 * h) * vel2 + h * 6.28); v = v * v * v; }
+      return 0.12 + 0.55 * v + (climaAtual === 'tensao' ? 0.25 * batida : 0);
+    }
+    // as luzes são pintadas numa tela pequenina (um quadradinho de 12 px por LED) e esticadas sobre a parede numa só cópia,
+    // com suavização: vira brilho difuso por cima dos quadradinhos apagados do cenário (leve até no tablet velho)
+    var ledCv = null, LEDPX = 12;
+    function desenharLeds() {
+      if (!ledCv) ledCv = novoCanvas(LEDW.cols * LEDPX, LEDW.linhas * LEDPX);
+      var g = ledCv.getContext('2d'), co = COR_LED[corLed()], tm = leve ? 0 : relReal, i, j, b;
+      g.clearRect(0, 0, ledCv.width, ledCv.height);
+      g.fillStyle = 'rgb(' + co[0] + ',' + co[1] + ',' + co[2] + ')';
+      for (j = 0; j < LEDW.linhas; j++) for (i = 0; i < LEDW.cols; i++) {
+        b = brilhoTile(i, j, tm); if (b < 0.04) continue;
+        g.globalAlpha = Math.min(1, b); g.fillRect(i * LEDPX + 2, j * LEDPX + 2, LEDPX - 4, LEDPX - 4);
+      }
+      // miolo mais claro dos LEDs bem acesos
+      g.fillStyle = 'rgb(' + Math.min(255, co[0] + 140) + ',' + Math.min(255, co[1] + 140) + ',' + Math.min(255, co[2] + 140) + ')';
+      for (j = 0; j < LEDW.linhas; j++) for (i = 0; i < LEDW.cols; i++) {
+        b = brilhoTile(i, j, tm); if (b < 0.55) continue;
+        g.globalAlpha = Math.min(1, (b - 0.55) * 1.6); g.fillRect(i * LEDPX + 4, j * LEDPX + 4, LEDPX - 8, LEDPX - 8);
+      }
+      g.globalAlpha = 1;
+      c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.85;
+      c.drawImage(ledCv, 0, LEDW.y0, LEDW.cols * LEDW.lado, LEDW.linhas * LEDW.lado);
+      c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1;
+    }
+    // arco de luz em volta da parede: pernas no piso e meia elipse por cima (centro 375, 560; topo em y = −120)
+    var ARCO = { x: 375, y: 560, rx: 470, ry: 680 }, ARCO_PERNA = 1092 - 560;
+    function pontoArco(u) {   // u de 0 a 1: perna esquerda subindo, arco, perna direita descendo
+      var L1 = ARCO_PERNA, L2 = Math.PI * (ARCO.rx + ARCO.ry) / 2, tot = 2 * L1 + L2, d = u * tot;
+      if (d < L1) return [ARCO.x - ARCO.rx, ARCO.y + L1 - d];
+      d -= L1;
+      if (d < L2) { var a = Math.PI + Math.PI * d / L2; return [ARCO.x + Math.cos(a) * ARCO.rx, ARCO.y + Math.sin(a) * ARCO.ry]; }
+      d -= L2; return [ARCO.x + ARCO.rx, ARCO.y + d];
+    }
 
     /* ---------- cenário fixo: pintado UMA vez por resolução (plano aberto e zoom), nunca a cada quadro ---------- */
     var MAIOR = Math.max.apply(null, VALORES);
@@ -605,6 +670,11 @@
       gr = g.createRadialGradient(375, 520, 100, 375, 520, 760);
       gr.addColorStop(0, 'rgba(70,110,255,.32)'); gr.addColorStop(0.6, 'rgba(110,50,220,.12)'); gr.addColorStop(1, 'rgba(110,50,220,0)');
       g.fillStyle = gr; g.fillRect(MUNDO.x0, MUNDO.y0, MUNDO.x1 - MUNDO.x0, PISO - MUNDO.y0);
+      // arco de luz (tubo de neon) atrás da moldura; as luzes que correm nele vêm no desenho de cada quadro
+      [[16, 'rgba(90,160,255,.10)'], [9, 'rgba(120,190,255,.22)'], [3.5, 'rgba(215,235,255,.85)']].forEach(function (q) {
+        g.beginPath(); for (i = 0; i <= 120; i++) { var pa = pontoArco(i / 120); if (i) g.lineTo(pa[0], pa[1]); else g.moveTo(pa[0], pa[1]); }
+        g.lineWidth = q[0]; g.strokeStyle = q[1]; g.lineCap = 'round'; g.stroke();
+      });
       // moldura de metal escovado, com chanfro
       rr(g, -40, -40, 830, 1130, 34); g.fillStyle = metal(g, -40, -40, 790, 1090); g.fill();
       g.save(); rr(g, -40, -40, 830, 1130, 34); g.clip();
@@ -636,7 +706,11 @@
       gr = g.createRadialGradient(375, 480, 30, 375, 480, 560); gr.addColorStop(0, 'rgba(90,150,255,.2)'); gr.addColorStop(1, 'rgba(90,150,255,0)');
       g.fillStyle = gr; g.fillRect(0, 0, GEO.W, GEO.H);
       g.strokeStyle = 'rgba(140,200,255,.035)'; g.lineWidth = 1;
-      for (x = 50; x < GEO.W; x += 50) { g.beginPath(); g.moveTo(x, 92); g.lineTo(x, GEO.YDIV); g.stroke(); }
+      // os quadradinhos do painel de LED, apagados (as luzes acendem por cima, a cada quadro)
+      for (k = 0; k < LEDW.linhas; k++) for (i = 0; i < LEDW.cols; i++) {
+        rr(g, i * LEDW.lado + 2.5, LEDW.y0 + k * LEDW.lado + 2.5, LEDW.lado - 5, LEDW.lado - 5, 8);
+        g.fillStyle = 'rgba(70,82,130,.16)'; g.fill(); g.lineWidth = 1; g.strokeStyle = 'rgba(160,180,230,.12)'; g.stroke();
+      }
       // reflexos do acrílico (faixas diagonais e brilho no alto)
       [[120, 90, 0.05], [330, 34, 0.035], [560, 140, 0.045]].forEach(function (q) {
         var gg = g.createLinearGradient(q[0], 0, q[0] + q[1], 0);
@@ -821,7 +895,7 @@
       timerZ = setTimeout(function () {
         if (!vivo) return;
         var mw = MUNDO.x1 - MUNDO.x0, mh = MUNDO.y1 - MUNDO.y0, lim = leve ? 2.2e6 : 6e6;
-        elZ = Math.min(s0 * dpr * 2.5, Math.sqrt(lim / (mw * mh)), 4096 / mh);
+        elZ = Math.min(s0 * dpr * 3.4, Math.sqrt(lim / (mw * mh)), 4096 / mh);
         if (elZ > el1 * 1.2 && !leve) cenZ = pintarCenario(elZ);
         sujo = true;
       }, 500);
@@ -881,6 +955,7 @@
       if (!l || l.acabou || l.bolas.length < l.total) return;
       for (var i = 0; i < l.bolas.length; i++) { var b = l.bolas[i]; if (!b.pousou || (b.cor !== 'branca' && !b.aplicada) || b.cor === 'branca') return; }
       l.acabou = true;
+      tensaoDesligar();   // a última bateu no fundo: a trilha volta
       agendar(1.1, function () {
         l.bolas.forEach(function (b) { b.sumir = 1; });
         clima('calma');
@@ -896,6 +971,37 @@
       raiz.classList.remove('calma', 'tensao', 'verde', 'vermelho'); raiz.classList.add(k); climaAtual = k;
       if (k === 'tensao') proxBatida = relogio + 0.2;
     }
+    /* ---------- música de tensão na queda (dono, 21/Nov/2026): do soltar até a ÚLTIMA bolinha bater no fundo; a trilha do
+       jogo pausa e depois continua do ponto onde parou. "Interloper", Kevin MacLeod, CC BY 4.0 (créditos em CREDITOS.md).
+       A tensão também continua de onde parou na queda seguinte. É efeito do momento: obedece ao 🔊 dos efeitos. ---------- */
+    var tensao = { audio: null, ativa: false, pausouTrilha: false, vol: 0, alvo: 0 };
+    function tensaoLigar() {
+      if (tensao.ativa) return;
+      tensao.ativa = true; tensao.alvo = 0.6;
+      if (window.Trilha && window.Trilha.tocando && window.Trilha.tocando()) { window.Trilha.parar(); tensao.pausouTrilha = true; }
+      if (ctx.somLigado && !ctx.somLigado()) return;
+      try {
+        if (!tensao.audio) { tensao.audio = new Audio('musicas/tensao-interloper.mp3'); tensao.audio.loop = true; tensao.audio.preload = 'auto'; }
+        tensao.audio.volume = tensao.vol;
+        var pr = tensao.audio.play(); if (pr && pr.catch) pr.catch(function () {});
+      } catch (e) { /* sem áudio neste aparelho */ }
+    }
+    function tensaoDesligar() {
+      if (!tensao.ativa) return;
+      tensao.ativa = false; tensao.alvo = 0;
+    }
+    // volume em rampa (entra em 0,3 s, sai em 0,7 s); calada, pausa e devolve a trilha do jogo
+    function tensaoPasso(dt) {
+      var a = tensao.audio;
+      if (tensao.vol !== tensao.alvo) {
+        tensao.vol = tensao.alvo > tensao.vol ? Math.min(tensao.alvo, tensao.vol + dt / 0.3 * 0.6) : Math.max(0, tensao.vol - dt / 0.7 * 0.6);
+        if (a) a.volume = tensao.vol;
+      }
+      if (!tensao.ativa && tensao.vol === 0) {
+        if (a && !a.paused) a.pause();
+        if (tensao.pausouTrilha) { tensao.pausouTrilha = false; if (window.Trilha && window.Trilha.continuar) window.Trilha.continuar(); }
+      }
+    }
     function bater() {
       som.coracao();
       if (!calmo) { aura.classList.remove('bate'); void aura.offsetWidth; aura.classList.add('bate'); }
@@ -903,375 +1009,260 @@
 
     /* ---------- painel ---------- */
     function msg(s) { msgEl.textContent = s || ''; }
-    function limparPainel() { msg(''); catEl.innerHTML = ''; pergEl.textContent = ''; pergEl.hidden = true; opsEl.innerHTML = ''; acoesEl.innerHTML = ''; fala.hidden = true; }
+    function limparPainel() { msg(''); catEl.innerHTML = ''; pergEl.textContent = ''; pergEl.hidden = true; opsEl.innerHTML = ''; acoesEl.innerHTML = ''; }
     var LETRAS = ['A', 'B', 'C', 'D'];
-    function montarOps(p, clicavel, aoEscolher) {
-      opsEl.innerHTML = ''; opsEl.className = 'jt-bol2-ops n' + p.o.length + (clicavel ? '' : ' jt-bol2-so');
+    function montarOps(p, aoEscolher) {
+      opsEl.innerHTML = ''; opsEl.className = 'jt-bol2-ops n' + p.o.length;
       p.o.forEach(function (o, i) {
-        var b = el('button', 'jt-bol2-op' + (clicavel ? '' : ' so')); b.type = 'button';
+        var b = el('button', 'jt-bol2-op'); b.type = 'button';
         b.innerHTML = '<span class="l">' + LETRAS[i] + '</span><span>' + esc(tx(o)) + '</span>';
         b.setAttribute('data-op', i);
-        if (clicavel) b.addEventListener('click', function () { aoEscolher(i); }); else b.disabled = true;
+        b.addEventListener('click', function () { aoEscolher(i); });
         opsEl.appendChild(b);
       });
     }
-    function marcarOps(certa, escolhida, rotulo) {
+    // no Sem pressa as opções ficam à mostra, mas só se soltam depois das 3 zonas escolhidas
+    function opsAtivas(sim) {
+      Array.prototype.forEach.call(opsEl.children, function (b) { b.disabled = !sim; b.classList.toggle('espera', !sim); });
+    }
+    function marcarOps(certa, escolhida) {
       Array.prototype.forEach.call(opsEl.children, function (b, i) {
-        b.disabled = true; b.classList.remove('trava');
+        b.disabled = true; b.classList.remove('trava', 'espera');
         if (i === certa) b.classList.add('certa'); else if (i === escolhida) b.classList.add('errada'); else b.classList.add('apagada');
-        if (i === escolhida && rotulo) { var q = el('span', 'quem'); q.textContent = rotulo; b.appendChild(q); }
       });
     }
-    function categoriaHTML(p, comForca) {
-      var c = CATEGORIAS[p.cat], h = '<span class="jt-bol2-chip">' + c.ico + ' ' + esc(tx(c.n)) + '</span>';
-      if (comForca && G.modo === 'ia') {
-        var v = G.af[p.cat];
-        h += '<span class="forca" style="color:' + (v >= 0.7 ? '#2dff88' : v >= 0.45 ? '#ffc23a' : '#ff6f86') + '">' + esc(parceiro.nome) + ': ' + Math.round(v * 100) + '%</span>';
-      }
-      return h;
+    function categoriaHTML(p) {
+      var c = CATEGORIAS[p.cat];
+      return '<span class="jt-bol2-chip">' + c.ico + ' ' + esc(tx(c.n)) + '</span>';
     }
+    function focar(b) { if (b) try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
 
     /* ---------- cenas (por cima de tudo) ---------- */
     function abrirCena(html, classe) {
-      cena.className = 'jt-bol2-cena' + (classe ? ' ' + classe : ''); cena.innerHTML = html; cena.hidden = false; fala.hidden = true; pop.hidden = true;
+      cena.className = 'jt-bol2-cena' + (classe ? ' ' + classe : ''); cena.innerHTML = html; cena.hidden = false;
       var b = cena.querySelector('[data-foco]') || cena.querySelector('button');
-      if (b) setTimeout(function () { if (!cena.hidden) try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }, 30);
+      if (b) setTimeout(function () { if (!cena.hidden) focar(b); }, 30);
       return cena;
     }
     function fecharCena() { cena.hidden = true; cena.innerHTML = ''; }
     function aoClicarCena(sel, fn) { var b = cena.querySelector(sel); if (b) b.addEventListener('click', function () { ctx.som('toque'); fn(b); }); }
 
-    /* ---------- começo: modo e parceiro ---------- */
+    /* ---------- começo: as duas modalidades em cartões, Começar sempre à vista (com a última escolhida) ---------- */
+    // desenhinho de cada modalidade: a parede neon com pinos; na Queda Livre três brancas caindo das zonas 1, 4 e 7,
+    // no Sem pressa três bolinhas esperando nas zonas escolhidas e as cores do resultado embaixo
+    function arteMod(m) {
+      var h = '<svg viewBox="0 0 150 96" aria-hidden="true"><defs><radialGradient id="jtb2g' + m + '" cx=".38" cy=".35" r=".7">' +
+        '<stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#e4efff"/><stop offset="1" stop-color="#8aa6dc"/></radialGradient></defs>' +
+        '<rect x="5" y="3" width="140" height="90" rx="12" fill="#0b1650" stroke="#7fdcff" stroke-width="2.5"/>' +
+        '<rect x="12" y="9" width="126" height="13" rx="4" fill="#05071c"/>', f, k, x;
+      for (k = 0; k < 7; k++) h += '<rect x="' + (15 + k * 18) + '" y="10.5" width="12" height="10" rx="3" fill="#2a3a8a"/>';
+      for (f = 0; f < 4; f++) for (k = 0; k < (f % 2 ? 7 : 8); k++) {
+        x = (f % 2 ? 21 : 12) + k * 18; h += '<circle cx="' + x + '" cy="' + (32 + f * 12) + '" r="2" fill="#c8d6ff" opacity=".75"/>';
+      }
+      for (k = 0; k < 8; k++) h += '<rect x="' + (12 + k * 16) + '" y="80" width="2" height="10" fill="#8b93a8"/>';
+      if (m === 'queda') {
+        [[24, 46], [75, 34], [117, 58]].forEach(function (q) {
+          h += '<path d="M' + q[0] + ' ' + (q[1] - 22) + ' L' + q[0] + ' ' + (q[1] - 7) + '" stroke="#bff3ff" stroke-width="5" stroke-linecap="round" opacity=".35"/>' +
+            '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="6.5" fill="url(#jtb2g' + m + ')"/>';
+        });
+        h += '<circle cx="128" cy="84" r="0" />';
+      } else {
+        [[39, '#2dff88'], [75, '#2dff88'], [111, '#ff3b5c']].forEach(function (q) {
+          h += '<circle cx="' + q[0] + '" cy="16" r="5.5" fill="url(#jtb2g' + m + ')"/>' +
+            '<circle cx="' + q[0] + '" cy="16" r="8.5" fill="none" stroke="' + q[1] + '" stroke-width="2"/>';
+        });
+        h += '<circle cx="63" cy="85" r="5" fill="#2dff88"/><circle cx="87" cy="85" r="5" fill="#ff3b5c"/>';
+      }
+      return h + '</svg>';
+    }
+    function textoComecar() { return '▶ ' + t('Começar', 'Start', 'Empezar') + ' · ' + nomeMod(modalidade); }
     function telaInicio() {
-      G = novoEstado(); timers = []; mundo.bolas = []; parts = []; flutua = []; flashes = [];
-      clima('calma'); pintarOdo(0, true); pintarFase(); pintarParc(); limparPainel(); desenharFundo();
-      var cv = '<canvas data-rosto></canvas>';
+      G = novoEstado(); timers = []; mundo.bolas = []; parts = []; flutua = []; flashes = []; tensaoDesligar();
+      clima('calma'); pintarOdo(0, true); pintarFase(); limparPainel(); desenharFundo();
+      function cartao(m, ico, sub, selo) {
+        return '<button type="button" class="jt-bol2-modo" data-mod="' + m + '" aria-pressed="' + (modalidade === m) + '">' + arteMod(m) +
+          '<b>' + ico + ' ' + nomeMod(m) + '</b><span class="selo">' + selo + '</span><small>' + sub + '</small></button>';
+      }
       var html = '<div class="jt-bol2-caixa larga">' +
         '<h2 class="jt-bol2-logo cheia">' + t('Bolinhas', 'Nail-Biter', 'Bolitas') + '<span>' + t('da Angústia', 'Drop', 'de la Angustia') + '</span></h2>' +
-        '<p class="cheia">' + t('Responda, escolha a zona e torça: cada bolinha quica entre os pinos até o último segundo!',
-          'Answer, pick a zone and hold your breath: every ball bounces through the pegs until the very last second!',
-          '¡Responde, elige la zona y cruza los dedos: cada bolita rebota entre los clavos hasta el último segundo!') + '</p>' +
-        '<div class="jt-bol2-modos">' +
-        '<button type="button" class="jt-bol2-modo" data-modo="ia" aria-pressed="' + (modo === 'ia') + '">' + cv + '<b>' + t('Solo + Parceiro', 'Solo + Partner', 'Solo + Compañero') + '</b><small>' +
-        t('Você no Palco; o parceiro responde na Sala de Isolamento.', 'You on Stage; your partner answers in the Isolation Booth.', 'Tú en el Plató; tu compañero responde en la Cabina de Aislamiento.') + '</small></button>' +
-        '<button type="button" class="jt-bol2-modo" data-modo="dois" aria-pressed="' + (modo === 'dois') + '"><span class="ic">👥</span><b>' +
-        t('Dois na mesma tela', 'Two on one screen', 'Dos en la misma pantalla') + '</b><small>' +
-        t('Um no Palco, o outro na Sala. Passem o aparelho!', 'One on Stage, the other in the Booth. Pass the device!', 'Uno en el Plató y el otro en la Cabina. ¡Pasaos el aparato!') + '</small></button></div>' +
-        '<div class="jt-bol2-perfil" ' + (modo === 'dois' ? 'hidden' : '') + '><div class="jt-bol2-ptopo">' + cv + '<b>' + esc(parceiro.nome) + '</b>' +
-        '<button type="button" class="jt-bol2-mini" data-outro aria-label="' + t('Sortear outro parceiro', 'Draw another partner', 'Sortear otro compañero') + '">🎲</button></div>' +
-        '<small>' + t('Afinidades (lembre na hora de escolher a zona!)', 'Strengths (remember them when picking a zone!)', 'Afinidades (¡recuérdalas al elegir la zona!)') + '</small><div data-afin></div></div>' +
-        '<button type="button" class="jt-bol2-btn ouro cheia" data-comecar data-foco>▶ ' + t('Começar', 'Start', 'Empezar') + '</button></div>';
+        '<p class="cheia">' + t('Acertou, as bolinhas ficam verdes e somam. Errou, ficam vermelhas e descontam. Escolha como quer jogar:',
+          'Get it right and the balls turn green and add up. Get it wrong and they turn red and take away. Choose how you want to play:',
+          'Si aciertas, las bolitas se vuelven verdes y suman. Si fallas, se vuelven rojas y restan. Elige cómo quieres jugar:') + '</p>' +
+        '<div class="jt-bol2-modos cheia">' +
+        cartao('queda', '⏱', t('Responda enquanto as bolinhas caem!', 'Answer while the balls are falling!', '¡Responde mientras caen las bolitas!'),
+          t('2 opções · com tempo', '2 options · timed', '2 opciones · con tiempo')) +
+        cartao('calma', '🧘', t('Escolha de onde as bolinhas caem e responda com calma.', 'Pick where the balls drop, then answer calmly.', 'Elige desde dónde caen las bolitas y responde con calma.'),
+          t('4 opções · sem tempo', '4 options · no timer', '4 opciones · sin tiempo')) +
+        '</div>' +
+        '<button type="button" class="jt-bol2-btn ouro cheia" data-comecar data-foco>' + textoComecar() + '</button></div>';
       abrirCena(html);
-      Array.prototype.forEach.call(cena.querySelectorAll('canvas[data-rosto]'), function (k) { desenharRosto(k, parceiro, 52); });
-      var af = cena.querySelector('[data-afin]'); if (af) { af.appendChild(afinEl); }
-      Array.prototype.forEach.call(cena.querySelectorAll('[data-modo]'), function (b) {
-        b.addEventListener('click', function () { ctx.som('toque'); modo = b.getAttribute('data-modo'); ctx.gravar('modo', modo); telaInicio(); });
+      Array.prototype.forEach.call(cena.querySelectorAll('[data-mod]'), function (b) {
+        b.addEventListener('click', function () {
+          ctx.som('toque');
+          if (modalidade === b.getAttribute('data-mod')) return comecar(modalidade);   // tocou de novo no escolhido: começa
+          modalidade = b.getAttribute('data-mod'); ctx.gravar('modalidade', modalidade);
+          Array.prototype.forEach.call(cena.querySelectorAll('[data-mod]'), function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+          cena.querySelector('[data-comecar]').textContent = textoComecar();
+        });
       });
-      aoClicarCena('[data-outro]', function () {
-        var i = PERSONAGENS.indexOf(parceiro); parceiro = PERSONAGENS[(i + 1 + Math.floor(sorte() * (PERSONAGENS.length - 1))) % PERSONAGENS.length];
-        desenharRosto(parcCv, parceiro, 40); telaInicio();
-      });
-      aoClicarCena('[data-comecar]', function () { comecar(modo); });
+      aoClicarCena('[data-comecar]', function () { comecar(modalidade); });
     }
     function comecar(m) {
-      modo = m === 'dois' ? 'dois' : 'ia';
-      G = novoEstado(); G.modo = modo;
-      fecharCena(); pintarParc(); pintarOdo(0, true);
-      iniciarFase(1);
+      modalidade = m === 'calma' ? 'calma' : 'queda'; ctx.gravar('modalidade', modalidade);
+      G = novoEstado(); timers = []; mundo.bolas = []; parts = []; flutua = []; flashes = []; clima('calma'); tensaoDesligar();
+      fecharCena(); pintarOdo(0, true); medir();
+      cartaoRodada();
     }
 
-    /* ---------- cartão de fase ---------- */
-    function iniciarFase(f) {
-      G.fase = f; G.rodada = 0; G.etapa = 'cartao'; G.perg = null;
-      desenharFundo(); pintarFase(); pintarParc(); limparPainel();
-      var sub = f === 1 ? t('5 perguntas de 2 opções. Trave a resposta antes que a primeira bolinha chegue lá embaixo!',
-        '5 questions with 2 options. Lock your answer before the first ball reaches the bottom!', '5 preguntas de 2 opciones. ¡Bloquea la respuesta antes de que la primera bolita llegue abajo!') :
-        f === 2 ? (G.modo === 'ia' ? parceiro.nome + t(' vai para a Sala de Isolamento 🔒. Os valores aumentam!', ' goes to the Isolation Booth 🔒. The values go up!', ' se va a la Cabina de Aislamiento 🔒. ¡Los valores suben!') :
-          t('Um de vocês vai para a Sala de Isolamento 🔒. Os valores aumentam!', 'One of you goes to the Isolation Booth 🔒. The values go up!', 'Uno de vosotros se va a la Cabina de Aislamiento 🔒. ¡Los valores suben!')) :
-          t('4 opções, valores enormes e 4 vermelhas no fim. Coragem!', '4 options, huge values and 4 reds at the end. Be brave!', '4 opciones, valores enormes y 4 rojas al final. ¡Valor!');
-      abrirCena('<div class="jt-bol2-caixa jt-bol2-fasecard"><span class="num">' + t('Fase ', 'Round ', 'Fase ') + f + '</span><h2>' + nomeFase(f) + '</h2><p>' + sub + '</p>' +
+    /* ---------- cartão da rodada (as regras em uma frase) ---------- */
+    function cartaoRodada() {
+      G.etapa = 'cartao'; G.rodada = 0; G.perg = null;
+      pintarFase(); limparPainel();
+      var queda = G.mod === 'queda';
+      var sub = queda ? t('5 perguntas de 2 opções. Três bolinhas caem das zonas 1, 4 e 7: responda antes que a primeira chegue lá embaixo!',
+        '5 questions with 2 options. Three balls drop from zones 1, 4 and 7: answer before the first one reaches the bottom!',
+        '5 preguntas de 2 opciones. Tres bolitas caen de las zonas 1, 4 y 7: ¡responde antes de que la primera llegue abajo!') :
+        t('5 perguntas de 4 opções, sem relógio. Leia, toque em 3 zonas lá no alto (o centro vale mais, as pontas arriscam menos) e depois responda.',
+          '5 questions with 4 options, no clock. Read, tap 3 zones at the top (the middle pays more, the edges risk less) and then answer.',
+          '5 preguntas de 4 opciones, sin reloj. Lee, toca 3 zonas de arriba (el centro vale más, los lados arriesgan menos) y luego responde.');
+      abrirCena('<div class="jt-bol2-caixa jt-bol2-fasecard"><span class="num">' + (queda ? '⏱' : '🧘') + ' ' + t('Modalidade', 'Mode', 'Modalidad') + '</span><h2>' + nomeMod(G.mod) + '</h2><p>' + sub + '</p>' +
         '<button type="button" class="jt-bol2-btn" data-foco data-ok>' + t('Vamos!', 'Let’s go!', '¡Vamos!') + '</button></div>', 'vidro');
-      var seguiu = false, seguir = function () {
-        if (seguiu) return; seguiu = true; fecharCena();
-        if (f === 1) perguntaF1(); else verdes();
-      };
+      var seguiu = false, seguir = function () { if (seguiu) return; seguiu = true; fecharCena(); proxima(); };
       aoClicarCena('[data-ok]', seguir);
-      agendar(calmo ? 6 : 4.5, function () { if (G.etapa === 'cartao' && G.fase === f) seguir(); });
+      if (queda) agendar(calmo ? 6 : 4.5, function () { if (G.etapa === 'cartao') seguir(); });   // no Sem pressa, nada anda sozinho
     }
-
-    /* ---------- Fase 1: Queda Livre ---------- */
-    var LEITURA = { facil: 6, medio: 4.5, dificil: 3 };
-    function perguntaF1() {
-      if (G.rodada >= PERGUNTAS[1]) return fimF1();
-      var q = sortearPergunta(banco, 2, nivel, G.usadas, sorte);
-      G.perg = prepararPergunta(q, sorte); G.resposta = null; G.etapa = 'leitura'; G.leituraAte = relogio + LEITURA[nivel];
-      limparPainel(); pintarFase(); pintarParc();
-      catEl.innerHTML = categoriaHTML(G.perg, false);
+    function proxima() {
+      if (G.rodada >= R().perguntas) return placar();
+      if (G.mod === 'queda') perguntaQueda(); else perguntaCalma();
+    }
+    function novaPergunta() {
+      var q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte);
+      if (!q) { G.usadas = {}; q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte); }   // banco esgotado: recomeça
+      G.perg = prepararPergunta(q, sorte); G.resposta = null;
+      limparPainel();
+      catEl.innerHTML = categoriaHTML(G.perg);
       pergEl.hidden = false; pergEl.textContent = tx(G.perg.q);
-      montarOps(G.perg, true, responderF1);
-      G.timerLeitura = agendar(LEITURA[nivel], soltarF1);
-      if (G.modo === 'ia') agendar(1.4, function () { if (G.etapa === 'leitura' || G.etapa === 'queda') dicaParceiro(); });
     }
-    function dicaParceiro() {
-      if (G.resposta !== null || !G.perg) return;
-      var r = iaResponder(G.af, G.perg, sorte), op = '«' + tx(G.perg.o[r.indice]) + '»';
-      fala.textContent = parceiro.nome + ': ' + (r.confianca >= 0.6 ? t('Tenho certeza: é ', 'I’m sure: it’s ', '¡Seguro que es ') + op + t('!', '!', '!') :
-        t('Hmm… acho que é ', 'Hmm… I think it’s ', 'Mmm… creo que es ') + op + '?');
-      var rb = parcBt.getBoundingClientRect(), rr2 = raiz.getBoundingClientRect();
-      fala.style.left = Math.max(6, rb.left - rr2.left) + 'px'; fala.style.top = (rb.bottom - rr2.top + 10) + 'px'; fala.hidden = false;
-      agendar(4, function () { fala.hidden = true; });
+    function marcar(acertou) { G.marcas[G.rodada] = acertou; if (acertou) G.acertos++; pintarFase(); }
+
+    /* ---------- Queda Livre: 2 opções, responder enquanto as bolinhas caem ---------- */
+    function perguntaQueda() {
+      novaPergunta();
+      var seg = tempoDeLeitura('queda', nivel);
+      G.etapa = 'leitura'; G.leituraAte = relogio + seg;
+      pintarFase();
+      montarOps(G.perg, responderQueda);
+      G.timerLeitura = agendar(seg, soltarQueda);
     }
-    function soltarF1() {
+    function soltarQueda() {
       if (G.etapa !== 'leitura') return;
       cancelar(G.timerLeitura);
       G.etapa = 'queda';
-      var l = novoLote(3, function () { G.rodada++; perguntaF1(); });
-      [0, 3, 6].forEach(function (z) { lancar(l, z, 'branca', 0.05); });
-      clima('tensao');
-      msg(G.resposta === null ? t('Rápido! Trave a resposta antes que a primeira caia!', 'Quick! Lock your answer before the first one lands!', '¡Rápido! ¡Bloquea la respuesta antes de que caiga la primera!') :
+      var l = novoLote(R().bolas, function () { G.rodada++; proxima(); });
+      R().zonas.forEach(function (z) { lancar(l, z, 'branca', 0.05); });
+      clima('tensao'); tensaoLigar();
+      msg(G.resposta === null ? t('Rápido! Responda antes que a primeira caia!', 'Quick! Answer before the first one lands!', '¡Rápido! ¡Responde antes de que caiga la primera!') :
         t('Resposta travada… lá vão elas!', 'Answer locked… here they go!', 'Respuesta bloqueada… ¡allá van!'));
-      if (G.resposta !== null) agendar(0.9, revelarF1);
+      if (G.resposta !== null) agendar(0.9, revelarQueda);
     }
-    function responderF1(i) {
-      if (G.resposta !== null || (G.etapa !== 'leitura' && G.etapa !== 'queda')) return;
-      G.resposta = i; ctx.som('toque'); fala.hidden = true;
+    function responderQueda(i) {
+      if (G.mod !== 'queda' || G.resposta !== null || (G.etapa !== 'leitura' && G.etapa !== 'queda')) return;
+      G.resposta = i; ctx.som('toque');
       Array.prototype.forEach.call(opsEl.children, function (b, k) { b.disabled = true; if (k === i) b.classList.add('trava'); else b.classList.add('apagada'); });
       msg(t('Resposta travada!', 'Answer locked!', '¡Respuesta bloqueada!'));
-      if (G.etapa === 'leitura') agendar(0.35, soltarF1);
-      else agendar(0.6, revelarF1);
+      if (G.etapa === 'leitura') agendar(0.35, soltarQueda);
+      else agendar(0.6, revelarQueda);
     }
-    function revelarF1() {
-      if (!G.lote || G.lote.revelado || G.fase !== 1) return;
+    function revelarQueda() {
+      if (!G.lote || G.lote.revelado || G.mod !== 'queda') return;
       var acertou = G.resposta === G.perg.c;
-      G.marcas[1][G.rodada] = acertou; pintarFase();
-      marcarOps(G.perg.c, G.resposta, null);
+      marcar(acertou);
+      marcarOps(G.perg.c, G.resposta);
       msg(G.resposta === null ? t('O tempo acabou! Vermelhas…', 'Time’s up! Reds…', '¡Se acabó el tiempo! Rojas…') :
         acertou ? t('Acertou! Bolinhas verdes: tudo soma!', 'Correct! Green balls: it all adds up!', '¡Acierto! Bolitas verdes: ¡todo suma!') :
           t('Errou… bolinhas vermelhas: tudo desconta!', 'Wrong… red balls: it all comes off!', 'Fallo… bolitas rojas: ¡todo resta!'));
       revelarLote(acertou);
     }
-    function fimF1() {
-      G.saldoF1 = G.saldo;
-      if (G.saldo <= 0) return fimDeJogo();
-      iniciarFase(2);
-    }
-    function fimDeJogo() {
-      G.etapa = 'fim'; limparPainel();
-      abrirCena('<div class="jt-bol2-caixa"><h2>😬 ' + t('Saldo zerado!', 'Balance wiped out!', '¡Saldo a cero!') + '</h2><p>' +
-        t('As vermelhas levaram tudo na Queda Livre. Fim de jogo… mas a parede espera a revanche!', 'The reds took everything in Free Fall. Game over… but the wall is waiting for a rematch!',
-          'Las rojas se lo llevaron todo en la Caída Libre. Fin del juego… ¡pero la pared espera la revancha!') + '</p>' +
-        '<button type="button" class="jt-bol2-btn ouro" data-foco data-denovo>🔄 ' + t('Jogar de novo', 'Play again', 'Jugar otra vez') + '</button></div>', 'vidro');
-      aoClicarCena('[data-denovo]', telaInicio);
-    }
 
-    /* ---------- Fases 2 e 3: verdes grátis, perguntas com zona, vermelhas obrigatórias ---------- */
-    function verdes() {
-      var n = VERDES[G.fase];
-      G.etapa = 'verdes'; G.memo = []; G.zonaOk = false; G.perg = null; G.mult = 1;
-      limparPainel(); pintarFase(); pintarParc(); clima('verde');
-      novoLote(n, function () { perguntaZona(0); });
-      montarAcoes();
-      textoVerdes();
+    /* ---------- Sem pressa: 4 opções, sem tempo; primeiro as 3 zonas, depois a resposta ---------- */
+    function perguntaCalma() {
+      novaPergunta();
+      G.zonas = []; G.zonaOk = false; G.etapa = 'zonas';
+      pintarFase(); clima('calma');
+      montarOps(G.perg, responderCalma); opsAtivas(false);
+      montarAcoesZonas();
     }
-    function textoVerdes() {
-      var n = VERDES[G.fase];
-      msg(t('Bolinhas verdes grátis! Escolha ', 'Free green balls! Pick ', '¡Bolitas verdes gratis! Elige ') + n + t(' zonas', ' zones', ' zonas') +
-        ' (' + Math.min(n, G.memo.length + 1) + '/' + n + ')');
-      catEl.innerHTML = '<span class="jt-bol2-chip">⚠️ ' + t('Guarde as zonas: as vermelhas obrigatórias caem delas no fim da fase!', 'Remember these zones: the mandatory reds drop from them at the end of the round!',
-        '¡Recuerda las zonas: las rojas obligatorias caen de ellas al final de la fase!') + '</span>';
-    }
-    function perguntaZona(k) {
-      if (k >= PERGUNTAS[G.fase]) return vermelhas();
-      G.rodada = k; G.etapa = 'zona'; G.zonaOk = false; G.mult = 1; G.resposta = null; G.parc = null;
-      var q = sortearPergunta(banco, OPCOES[G.fase], nivel, G.usadas, sorte);
-      G.perg = prepararPergunta(q, sorte);
-      limparPainel(); pintarFase(); pintarParc(); clima('calma');
-      msg(t('Você só vê as opções. Escolha a zona pela confiança no parceiro!', 'You only see the options. Pick a zone by how much you trust your partner!',
-        'Solo ves las opciones. ¡Elige la zona según tu confianza en el compañero!'));
-      catEl.innerHTML = categoriaHTML(G.perg, true);
-      montarOps(G.perg, false);
-      montarAcoes();
-    }
-    function montarAcoes() {
+    function montarAcoesZonas() {
       acoesEl.innerHTML = '';
-      var ms = G.etapa === 'zona' ? multiplicadores(G.rodada) : [1];
-      if (ms.length > 1) {
-        var seg = el('div', 'jt-bol2-seg'); seg.setAttribute('role', 'group');
-        ms.forEach(function (m) {
-          var b = el('button'); b.type = 'button'; b.setAttribute('data-mult', m); b.setAttribute('aria-pressed', String(G.mult === m));
-          b.textContent = m === 1 ? '×1' : m === 2 ? t('Duplo ×2', 'Double ×2', 'Doble ×2') : t('Triplo ×3', 'Triple ×3', 'Triple ×3');
-          b.setAttribute('aria-label', m === 1 ? t('1 bolinha', '1 ball', '1 bolita') : m === 2 ? t('Lance Duplo: 2 bolinhas', 'Double drop: 2 balls', 'Tirada Doble: 2 bolitas') : t('Lance Triplo: 3 bolinhas', 'Triple drop: 3 balls', 'Tirada Triple: 3 bolitas'));
-          b.addEventListener('click', function () { G.mult = m; ctx.som('toque'); montarAcoes(); });
-          seg.appendChild(b);
-        });
-        acoesEl.appendChild(seg);
+      var n = G.zonas.length, max = R().bolas, pronto = zonasProntas(G.zonas, max);
+      var des = el('button', 'jt-bol2-btn fino'); des.type = 'button'; des.setAttribute('data-desfazer', '');
+      des.innerHTML = '<span aria-hidden="true">↩</span>'; des.setAttribute('aria-label', t('Desfazer a última zona', 'Undo the last zone', 'Deshacer la última zona'));
+      des.disabled = n === 0;
+      des.addEventListener('click', function () { desfazerZona(); });
+      var st = el('span', 'jt-bol2-status' + (pronto ? ' pronto' : '')); st.setAttribute('data-status', '');
+      st.textContent = pronto ? '✔ ' + t('Agora é só responder!', 'Now pick your answer!', '¡Ahora elige la respuesta!') :
+        '👆 ' + t('Toque nas zonas do alto: ', 'Tap the zones at the top: ', 'Toca las zonas de arriba: ') + n + '/' + max;
+      acoesEl.appendChild(des); acoesEl.appendChild(st);
+    }
+    function colocarZona(z) {
+      if (G.mod !== 'calma' || G.etapa !== 'zonas') return;
+      G.zonas = adicionarZona(G.zonas, z, R().bolas); G.zona = clamp(Math.round(z), 0, 6); G.zonaOk = true; sujo = true;
+      som.comporta();
+      if (zonasProntas(G.zonas, R().bolas)) {
+        G.etapa = 'resposta'; opsAtivas(true);
+        var foco = document.activeElement;
+        if (!foco || foco === document.body || foco === tela || foco.hasAttribute('data-desfazer')) focar(opsEl.firstChild);
       }
-      var bt = el('button', 'jt-bol2-btn' + (G.etapa === 'verdes' ? ' ouro' : '')); bt.type = 'button'; bt.setAttribute('data-soltar', '');
-      bt.disabled = !G.zonaOk;
-      bt.textContent = G.zonaOk ? '⬇ ' + t('Soltar na zona ', 'Drop at zone ', 'Soltar en la zona ') + (G.zona + 1) : '👆 ' + t('Toque numa zona', 'Tap a zone', 'Toca una zona');
-      bt.addEventListener('click', confirmarZona);
-      acoesEl.appendChild(bt);
+      montarAcoesZonas();
     }
-    function escolherZona(z) {
-      if (G.etapa !== 'verdes' && G.etapa !== 'zona') return;
-      G.zona = clamp(z, 0, 6); G.zonaOk = true; sujo = true; ctx.som('toque'); montarAcoes();
+    function desfazerZona() {
+      if (G.mod !== 'calma' || (G.etapa !== 'zonas' && G.etapa !== 'resposta') || !G.zonas.length) return;
+      ctx.som('toque');
+      G.zonas = G.zonas.slice(0, -1); G.etapa = 'zonas'; opsAtivas(false); sujo = true;
+      montarAcoesZonas();
     }
-    function confirmarZona() {
-      if (!G.zonaOk) return;
-      if (G.etapa === 'verdes') {
-        G.memo.push(G.zona); lancar(G.lote, G.zona, 'verde', 0.25); som.comporta();
-        G.zonaOk = false;
-        if (G.memo.length >= VERDES[G.fase]) {
-          G.etapa = 'quedaVerdes'; acoesEl.innerHTML = '';
-          msg(t('Lá vão as verdes! Zonas guardadas: ', 'Here go the greens! Zones saved: ', '¡Allá van las verdes! Zonas guardadas: ') + G.memo.map(function (z) { return z + 1; }).join(', '));
-        } else { montarAcoes(); textoVerdes(); }
-        return;
-      }
-      if (G.etapa !== 'zona') return;
-      G.zonaEscolhida = G.zona; G.etapa = 'resposta'; acoesEl.innerHTML = '';
-      if (G.modo === 'ia') {
-        G.etapa = 'pensando'; pintarParc();
-        msg(parceiro.nome + t(' está pensando na Sala de Isolamento…', ' is thinking in the Isolation Booth…', ' está pensando en la Cabina de Aislamiento…'));
-        agendar(1.3 + sorte() * 1.1, function () {
-          G.parc = iaResponder(G.af, G.perg, sorte); G.resposta = G.parc.indice; G.confs.push(G.parc.confianca);
-          G.etapa = 'resposta'; pintarParc(); soltarPergunta();
-        });
-      } else cortinaParaSala();
-    }
-    function soltarPergunta() {
-      G.etapa = 'queda';
-      msg(t('Resposta travada na Sala! Lá vai…', 'Answer locked in the Booth! Here it goes…', '¡Respuesta bloqueada en la Cabina! Allá va…'));
-      var l = novoLote(G.mult, function () { perguntaZona(G.rodada + 1); });
-      for (var i = 0; i < G.mult; i++) lancar(l, G.zonaEscolhida, 'branca', 0.1 + i * 0.5);
-      clima('tensao');
-      agendar(1.7 + (G.mult - 1) * 0.3, revelarPergunta);
-    }
-    function revelarPergunta() {
-      var acertou = G.resposta === G.perg.c;
-      G.marcas[G.fase][G.rodada] = acertou; if (acertou) G.acertos[G.fase]++;
-      pintarFase();
-      pergEl.hidden = false; pergEl.textContent = tx(G.perg.q);
-      marcarOps(G.perg.c, G.resposta, G.modo === 'ia' ? parceiro.nome : t('Sala', 'Booth', 'Cabina'));
-      msg(acertou ? (G.modo === 'ia' ? parceiro.nome : t('A Sala', 'The Booth', 'La Cabina')) + t(' acertou! Verde!', ' got it right! Green!', ' ha acertado. ¡Verde!') :
-        (G.modo === 'ia' ? parceiro.nome : t('A Sala', 'The Booth', 'La Cabina')) + t(' errou… vermelha!', ' got it wrong… red!', ' ha fallado… ¡roja!'));
-      revelarLote(acertou);
-    }
-    function vermelhas() {
-      G.etapa = 'vermelhas'; G.perg = null; limparPainel(); pintarFase(); pintarParc(); clima('vermelho');
-      msg(t('Hora das vermelhas obrigatórias! Das zonas ', 'Time for the mandatory reds! From zones ', '¡Hora de las rojas obligatorias! De las zonas ') + G.memo.map(function (z) { return z + 1; }).join(', ') + '…');
-      var l = novoLote(G.memo.length, function () { if (G.fase === 2) iniciarFase(3); else irContrato(); });
-      agendar(1.4, function () { G.memo.forEach(function (z, i) { lancar(l, z, 'vermelha', i * 0.6); }); clima('tensao'); agendar(0.4, function () { clima('vermelho'); }); });
+    function responderCalma(i) {
+      if (G.mod !== 'calma' || G.etapa !== 'resposta' || G.resposta !== null) return;
+      var acertou = i === G.perg.c, cor = corDaResposta(acertou);
+      G.resposta = i; G.etapa = 'quedaCalma'; ctx.som('toque');
+      marcar(acertou); marcarOps(G.perg.c, i); acoesEl.innerHTML = '';
+      msg(acertou ? t('Acertou! As bolinhas caem verdes: tudo soma!', 'Correct! The balls drop green: it all adds up!', '¡Acierto! Las bolitas caen verdes: ¡todo suma!') :
+        t('Errou… as bolinhas caem vermelhas: tudo desconta!', 'Wrong… the balls drop red: it all comes off!', 'Fallo… las bolitas caen rojas: ¡todo resta!'));
+      clima(acertou ? 'verde' : 'vermelho');
+      if (acertou) som.acerto(); else som.erro();
+      var l = novoLote(G.zonas.length, function () { G.rodada++; proxima(); });
+      tensaoLigar();
+      G.zonas.forEach(function (z, k) { var b = lancar(l, z, cor, 0.6 + k * 0.45); b.troca = 1; explodir(zonaX(z), GEO.Y_SOLTA, cor, 8); });
     }
 
-    /* ---------- dois na mesma tela: cortina e Sala de Isolamento ---------- */
-    function cortinaParaSala() {
-      G.etapa = 'cortina';
-      abrirCena('<div class="jt-bol2-caixa"><div class="olho">🙈</div><h2>' + t('Passe o aparelho para quem está na Sala de Isolamento', 'Pass the device to whoever is in the Isolation Booth',
-        'Pasa el aparato a quien está en la Cabina de Aislamiento') + '</h2><p><b>' + t('Palco: não olhe!', 'Stage: don’t look!', 'Plató: ¡no mires!') + '</b></p>' +
-        '<button type="button" class="jt-bol2-btn rosa" data-foco data-ok>🔒 ' + t('Sou da Sala, pode mostrar', 'I’m in the Booth, show me', 'Soy de la Cabina, enséñamelo') + '</button></div>', 'jt-bol2-cortina');
-      aoClicarCena('[data-ok]', telaSala);
-    }
-    function telaSala() {
-      G.etapa = 'sala';
-      var p = G.perg, h = '<div class="jt-bol2-caixa"><h2>🔒 ' + t('Sala de Isolamento', 'Isolation Booth', 'Cabina de Aislamiento') + '</h2>' +
-        '<p>' + t('Você não vê o saldo nem as quedas. Responda com calma!', 'You can’t see the balance or the drops. Take your time!', 'No ves el saldo ni las caídas. ¡Responde con calma!') + '</p>' +
-        '<div class="jt-bol2-cat">' + categoriaHTML(p, false) + '</div><p class="jt-bol2-perg">' + esc(tx(p.q)) + '</p><div class="jt-bol2-ops n' + p.o.length + '">';
-      p.o.forEach(function (o, i) { h += '<button type="button" class="jt-bol2-op" data-sala="' + i + '"' + (i === 0 ? ' data-foco' : '') + '><span class="l">' + LETRAS[i] + '</span><span>' + esc(tx(o)) + '</span></button>'; });
-      abrirCena(h + '</div></div>', 'jt-bol2-cortina');
-      Array.prototype.forEach.call(cena.querySelectorAll('[data-sala]'), function (b) {
-        b.addEventListener('click', function () { ctx.som('toque'); responderSala(+b.getAttribute('data-sala')); });
-      });
-    }
-    function responderSala(i) {
-      if (G.etapa !== 'sala') return;
-      G.resposta = i; G.etapa = 'cortina2';
-      abrirCena('<div class="jt-bol2-caixa"><div class="olho">✅</div><h2>' + t('Resposta travada!', 'Answer locked!', '¡Respuesta bloqueada!') + '</h2><p>' +
-        t('Agora devolva o aparelho para o Palco.', 'Now hand the device back to the Stage.', 'Ahora devuelve el aparato al Plató.') + '</p>' +
-        '<button type="button" class="jt-bol2-btn" data-foco data-ok>🎤 ' + t('Sou do Palco, continuar', 'I’m on Stage, continue', 'Soy del Plató, seguir') + '</button></div>', 'jt-bol2-cortina');
-      aoClicarCena('[data-ok]', function () { fecharCena(); soltarPergunta(); });
-    }
-
-    /* ---------- o Contrato ---------- */
-    function papelHTML(extra) {
-      return '<div class="jt-bol2-papel' + (extra || '') + '"><h3>' + t('CONTRATO', 'CONTRACT', 'CONTRATO') + '</h3><p>' +
-        t('A dupla recebe, garantido, o valor de:', 'The pair is guaranteed to receive:', 'La pareja recibe, garantizado, el valor de:') + '</p><div class="valor">' + din(G.contrato) + '</div>' +
-        '<p style="font-size:12px">' + t('Queda Livre ', 'Free Fall ', 'Caída Libre ') + din(G.saldoF1) + ' + ' + G.acertos[2] + ' × ' + din(BONUS[2]) + ' + ' + G.acertos[3] + ' × ' + din(BONUS[3]) + '</p>' +
-        '<div class="linha"></div><p style="font-size:11px;opacity:.7">' + t('assinatura', 'signature', 'firma') + '</p>' +
-        '<svg viewBox="0 0 200 50" aria-hidden="true"><path d="M5 35 C 20 5, 30 45, 45 25 S 70 10, 80 30 S 100 45, 112 20 S 135 8, 140 32 C 150 45, 165 15, 195 22"/></svg><span class="caneta" aria-hidden="true">✒️</span></div>';
-    }
-    function irContrato() {
-      G.fase = 4; G.etapa = 'contrato'; G.contrato = valorContrato(G.saldoF1, G.acertos[2], G.acertos[3]);
-      limparPainel(); pintarFase(); clima('calma');
-      if (G.modo === 'ia') {
-        abrirCena('<div class="jt-bol2-caixa"><h2>📜 ' + nomeFase(4) + '</h2><p>' + esc(parceiro.nome) +
-          t(' não sabe o saldo do painel. Vai assinar o contrato ou rasgar?', ' doesn’t know the balance on the board. Will they sign the contract or tear it up?',
-            ' no sabe el saldo del panel. ¿Firmará el contrato o lo romperá?') + '</p>' + '<div data-papel>' + papelHTML('') + '</div>' +
-          '<p data-pensa>🔒 ' + esc(parceiro.nome) + t(' está decidindo…', ' is deciding…', ' está decidiendo…') + '</p></div>', 'vidro');
-        agendar(2.8, function () { decidir(iaContrato(G.confs, sorte)); });
-      } else {
-        abrirCena('<div class="jt-bol2-caixa"><div class="olho">🙈</div><h2>' + t('Passe o aparelho para a Sala de Isolamento', 'Pass the device to the Isolation Booth', 'Pasa el aparato a la Cabina de Aislamiento') +
-          '</h2><p><b>' + t('Palco: não conte nada!', 'Stage: don’t say a word!', 'Plató: ¡no cuentes nada!') + '</b></p>' +
-          '<button type="button" class="jt-bol2-btn rosa" data-foco data-ok>🔒 ' + t('Sou da Sala, mostrar o contrato', 'I’m in the Booth, show the contract', 'Soy de la Cabina, ver el contrato') + '</button></div>', 'jt-bol2-cortina');
-        aoClicarCena('[data-ok]', function () {
-          G.etapa = 'contratoSala';
-          abrirCena('<div class="jt-bol2-caixa"><h2>📜 ' + nomeFase(4) + '</h2><p>' + t('Você não sabe quanto a dupla tem no painel. Assina e garante este valor, ou rasga e fica com o saldo do painel?',
-            'You don’t know what the pair has on the board. Sign and lock in this amount, or tear it up and take the board balance?',
-            'No sabes cuánto tiene la pareja en el panel. ¿Firmas y aseguras este valor, o lo rompes y te quedas con el saldo del panel?') + '</p>' +
-            '<div data-papel>' + papelHTML('') + '</div><div class="jt-bol2-decide">' +
-            '<button type="button" class="jt-bol2-btn ouro" data-assinar data-foco>✍️ ' + t('Assinar', 'Sign', 'Firmar') + '</button>' +
-            '<button type="button" class="jt-bol2-btn rosa" data-rasgar>✂️ ' + t('Rasgar', 'Tear up', 'Romper') + '</button></div></div>', 'vidro');
-          aoClicarCena('[data-assinar]', function () { decidir('assinar'); });
-          aoClicarCena('[data-rasgar]', function () { decidir('rasgar'); });
-        });
-      }
-    }
-    function decidir(d) {
-      if (G.decisao) return;
-      G.decisao = d; G.etapa = 'decisao';
-      var lugar = cena.querySelector('[data-papel]'), pensa = cena.querySelector('[data-pensa]'), dec = cena.querySelector('.jt-bol2-decide');
-      if (dec) dec.hidden = true;
-      if (pensa) pensa.textContent = d === 'assinar' ? '✍️ ' + parceiro.nome + t(' assinou!', ' signed!', ' ha firmado.') : '✂️ ' + parceiro.nome + t(' rasgou!', ' tore it up!', ' lo ha roto.');
-      if (G.modo === 'dois' && pensa === null) {
-        var p = el('p'); p.textContent = d === 'assinar' ? t('✍️ Assinado!', '✍️ Signed!', '✍️ ¡Firmado!') : t('✂️ Rasgado!', '✂️ Torn up!', '✂️ ¡Roto!'); lugar.parentNode.appendChild(p);
-      }
-      if (d === 'assinar') { lugar.innerHTML = papelHTML(' assina'); som.caneta(); }
-      else { lugar.innerHTML = '<div class="jt-bol2-rasgo rasga">' + papelHTML(' esq') + papelHTML(' dir') + '</div>'; som.rasgo(); }
-      agendar(2.4, function () {
-        if (G.modo === 'dois') {
-          abrirCena('<div class="jt-bol2-caixa"><div class="olho">🎉</div><h2>' + t('Chamem os dois!', 'Call both players!', '¡Llamad a los dos!') + '</h2><p>' +
-            t('Hora da revelação, todo mundo junto no Palco.', 'Time for the big reveal, everyone together on Stage.', 'Hora de la revelación, todos juntos en el Plató.') + '</p>' +
-            '<button type="button" class="jt-bol2-btn ouro" data-foco data-ok>🎬 ' + t('Revelar', 'Reveal', 'Revelar') + '</button></div>', 'jt-bol2-cortina');
-          aoClicarCena('[data-ok]', revelacao);
-        } else revelacao();
-      });
-    }
-    function revelacao() {
-      G.etapa = 'revelacao';
-      var leva = G.decisao === 'assinar' ? G.contrato : G.saldo, outro = G.decisao === 'assinar' ? G.saldo : G.contrato;
-      var veredito = leva > outro ? t('Escolha certeira!', 'Spot-on choice!', '¡Elección acertada!') : leva === outro ? t('Deu no mesmo!', 'It came out even!', '¡Ha dado lo mismo!') :
-        t('Que angústia! O outro valia mais…', 'Nail-biting! The other one was worth more…', '¡Qué angustia! El otro valía más…');
-      var ch = 'recorde-' + nivel, rec = +ctx.ler(ch) || 0, novo = leva > rec;
-      if (novo) ctx.gravar(ch, leva);
-      clima(leva >= outro ? 'verde' : 'vermelho');
-      if (leva >= outro) som.acerto(); else som.erro();
-      abrirCena('<div class="jt-bol2-caixa jt-bol2-revela"><h2>🎬 ' + t('A revelação', 'The big reveal', 'La revelación') + '</h2>' +
-        '<span class="jt-bol2-carimbo ' + (G.decisao === 'assinar' ? 'assinou">✍️ ' + t('ASSINOU', 'SIGNED', 'FIRMÓ') : 'rasgou">✂️ ' + t('RASGOU', 'TORE IT UP', 'LO ROMPIÓ')) + '</span>' +
-        '<div class="jt-bol2-lado"><div class="' + (G.decisao === 'rasgar' ? 'leva' : '') + '"><small>' + t('Painel', 'Board', 'Panel') + '</small><strong>' + din(G.saldo) + '</strong><em>' +
-        (G.decisao === 'rasgar' ? t('✔ vocês levam', '✔ you take it', '✔ os lo lleváis') : '') + '</em></div>' +
-        '<div class="' + (G.decisao === 'assinar' ? 'leva' : '') + '"><small>' + t('Contrato', 'Contract', 'Contrato') + '</small><strong>' + din(G.contrato) + '</strong><em>' +
-        (G.decisao === 'assinar' ? t('✔ vocês levam', '✔ you take it', '✔ os lo lleváis') : '') + '</em></div></div>' +
-        '<p class="jt-bol2-final">' + t('Vocês levam ', 'You take home ', 'Os lleváis ') + din(leva) + '!</p><p>' + veredito +
-        (novo && leva > 0 ? ' 🏆 ' + t('Novo recorde!', 'New record!', '¡Nuevo récord!') : rec ? ' · ' + t('Recorde: ', 'Record: ', 'Récord: ') + din(Math.max(rec, leva)) : '') + '</p>' +
-        '<button type="button" class="jt-bol2-btn ouro" data-foco data-denovo>🔄 ' + t('Jogar de novo', 'Play again', 'Jugar otra vez') + '</button></div>', 'vidro');
-      aoClicarCena('[data-denovo]', telaInicio);
+    /* ---------- placar no fim da rodada ---------- */
+    function placar() {
+      G.etapa = 'fim'; limparPainel(); pintarFase();
+      var n = R().perguntas, ch = 'recorde-' + G.mod + '-' + nivel, rec = +ctx.ler(ch) || 0, novo = G.saldo > rec;
+      if (novo) ctx.gravar(ch, G.saldo);
+      var bols = ''; for (var i = 0; i < n; i++) bols += '<i class="' + (G.marcas[i] ? 'sim' : 'nao') + '"></i>';
+      var frase = G.acertos === n ? t('Gabaritou! 🤩', 'A perfect round! 🤩', '¡Pleno total! 🤩') : G.acertos >= 3 ? t('Mandou bem! 👏', 'Well played! 👏', '¡Muy bien! 👏') :
+        t('A parede quer revanche! 💪', 'The wall wants a rematch! 💪', '¡La pared quiere la revancha! 💪');
+      clima(G.acertos >= 3 ? 'verde' : 'calma');
+      if (G.acertos >= 3) som.acerto();
+      abrirCena('<div class="jt-bol2-caixa jt-bol2-placar"><span class="num">🏁 ' + t('Placar', 'Final score', 'Marcador') + ' · ' + nomeMod(G.mod) + '</span>' +
+        '<div class="jt-bol2-total" data-total>' + din(G.saldo) + '</div>' +
+        '<div class="jt-bol2-pontos">' + bols + '</div>' +
+        '<p><b>' + G.acertos + '</b> ' + t('de ', 'out of ', 'de ') + n + t(' certas', ' right', ' aciertos') + '</p>' +
+        '<p class="frase">' + frase + '</p>' +
+        '<p>' + (novo && G.saldo > 0 ? '🏆 ' + t('Novo recorde!', 'New record!', '¡Nuevo récord!') : rec ? t('Recorde: ', 'Record: ', 'Récord: ') + din(rec) : '') + '</p>' +
+        '<div class="jt-bol2-decide"><button type="button" class="jt-bol2-btn ouro" data-foco data-denovo>🔄 ' + t('Jogar de novo', 'Play again', 'Jugar otra vez') + '</button>' +
+        '<button type="button" class="jt-bol2-btn" data-trocar>🎛 ' + t('Trocar modalidade', 'Change mode', 'Cambiar modalidad') + '</button></div></div>', 'vidro');
+      aoClicarCena('[data-denovo]', function () { comecar(G.mod); });
+      aoClicarCena('[data-trocar]', telaInicio);
     }
 
     /* ---------- toque na parede e teclado ---------- */
     function aoTocar(ev) {
-      if (G.etapa !== 'verdes' && G.etapa !== 'zona') return;
+      if (G.mod !== 'calma' || G.etapa !== 'zonas') return;
       var r = tela.getBoundingClientRect(), x = cam.x + (ev.clientX - r.left - Lt.jx) / (s0 * cam.z);
       if (x < -60 || x > GEO.W + 60) return;
-      escolherZona(Math.round((x - 75) / 100));
+      colocarZona(Math.round((x - 75) / 100));
       ev.preventDefault();
     }
     tela.addEventListener('pointerdown', aoTocar);
@@ -1284,20 +1275,22 @@
       if (!ev.key || document.querySelector('.ajuda:not([hidden]), .fim:not([hidden])')) return;
       var k = ev.key, seta = /^Arrow/.test(k), d = k === 'ArrowRight' || k === 'ArrowDown' ? 1 : -1, emBotao = ev.target && ev.target.tagName === 'BUTTON';
       if (!cena.hidden) { if (seta) { focarEntre(cena.querySelectorAll('button'), d); ev.preventDefault(); } return; }
-      if (G.etapa === 'verdes' || G.etapa === 'zona') {
-        if (k === 'ArrowLeft' || k === 'ArrowRight') { escolherZona((G.zonaOk ? G.zona : 3 - d) + d); ev.preventDefault(); }
-        else if ((k === 'ArrowUp' || k === 'ArrowDown') && G.etapa === 'zona') {
-          var ms = multiplicadores(G.rodada); if (ms.length > 1) { G.mult = G.mult === 1 ? ms[1] : 1; montarAcoes(); } ev.preventDefault();
-        } else if ((k === 'Enter' || k === ' ') && (!emBotao || ev.target.hasAttribute('data-soltar'))) { ev.preventDefault(); confirmarZona(); }
-        return;
+      if (G.mod === 'calma' && (G.etapa === 'zonas' || G.etapa === 'resposta')) {
+        if (k === 'Backspace' || k === 'Delete') { desfazerZona(); ev.preventDefault(); return; }
+        if (G.etapa === 'zonas') {
+          if (k === 'ArrowLeft' || k === 'ArrowRight') { G.zona = clamp((G.zonaOk ? G.zona : 3 - d) + d, 0, 6); G.zonaOk = true; sujo = true; ctx.som('toque'); ev.preventDefault(); }
+          else if ((k === 'Enter' || k === ' ') && !emBotao) { ev.preventDefault(); colocarZona(G.zonaOk ? G.zona : 3); }
+          return;
+        }
       }
-      if ((G.etapa === 'leitura' || G.etapa === 'queda') && G.resposta === null && seta) { focarEntre(opsEl.children, d); ev.preventDefault(); }
+      if ((G.etapa === 'leitura' || G.etapa === 'queda' || G.etapa === 'resposta') && G.resposta === null && seta) { focarEntre(opsEl.children, d); ev.preventDefault(); }
     }
     window.addEventListener('keydown', aoTeclar);
 
     /* ---------- câmera de transmissão: plano aberto, desce com a bolinha, câmera lenta no último segundo ---------- */
     var relReal = 0, escala = 1, camLider = null, pips = [], segura = null, ultCorte = -9, tipoPlano = 'aberto', flashTela = null, batida = 0;
-    var LIMIAR_LENTA = GEO.SENSOR - 0.15 * (GEO.SENSOR - GEO.Y_SOLTA);
+    var liderAnt = null, alvoPov = null;
+    var LIMIAR_LENTA = GEO.SENSOR - 0.15 * (GEO.SENSOR - GEO.Y_SOLTA), POV_ATE = 470;   // a câmera da bolinha vai até perto do meio da parede
     function caindoAgora() { return mundo.bolas.filter(function (b) { return b.espera <= 0 && !b.pousou && b.sumir === undefined; }); }
     function limitarCam(a) {
       var hw = Lt.pw / (2 * s0 * a.z), hh = Lt.ph / (2 * s0 * a.z);
@@ -1310,44 +1303,54 @@
       pips = []; camLider = null;
       if (segura && relReal < segura.ate) return { a: segura.a, tipo: 'segura', lenta: false };
       segura = null;
-      if (!cai.length) return { a: { x: CAM0.x, y: CAM0.y, z: 1 }, tipo: 'aberto', lenta: false };
-      var lider = cai[0], x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+      if (!cai.length) { alvoPov = null; liderAnt = null; return { a: { x: CAM0.x, y: CAM0.y, z: 1 }, tipo: 'aberto', lenta: false }; }
+      // a líder só troca quando outra passa com folga (3 bolinhas soltas juntas não fazem a câmera pular de uma para outra)
+      var lider = cai.indexOf(liderAnt) >= 0 ? liderAnt : cai[0], x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
       for (i = 0; i < cai.length; i++) {
-        b = cai[i]; if (b.y > lider.y) lider = b;
+        b = cai[i]; if (b.y > lider.y + 40) lider = b;
         x0 = Math.min(x0, b.x); x1 = Math.max(x1, b.x); y0 = Math.min(y0, b.y); y1 = Math.max(y1, b.y);
       }
+      liderAnt = lider;
+      if (cai.indexOf(alvoPov) < 0) alvoPov = lider;   // a câmera da bolinha fica na mesma bolinha até ela passar do meio
+      if (!calmo && alvoPov.y < POV_ATE) lider = alvoPov;
       camLider = lider;
-      var zf = Math.min(Lt.pw / (s0 * (x1 - x0 + 260)), Lt.ph / (s0 * (y1 - y0 + 340)));
-      if (cai.length > 1 && zf >= 1.55) { a = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 + 70, z: Math.min(2.2, zf) }; tipo = 'grupo'; }
-      else if (cai.length > 1 && leve) { a = { x: CAM0.x, y: CAM0.y, z: 1 }; tipo = 'aberto'; }
-      else {
-        a = { x: lider.x, y: lider.y + 90, z: 2.1 }; tipo = 'segue';
-        for (i = 0; i < cai.length && pips.length < 2; i++) if (cai[i] !== lider) pips.push(cai[i]);
+      var zf = Math.min(Lt.pw / (s0 * (x1 - x0 + 200)), Lt.ph / (s0 * (y1 - y0 + 260)));
+      if (!calmo && lider.y < POV_ATE) {
+        // câmera da bolinha (dono, 21/Nov/2026): colada na mais adiantada, bem perto, os pinos passando por ela
+        a = { x: lider.x, y: lider.y + 22, z: 4.4 }; tipo = 'pov';
+        if (!leve) for (i = 0; i < cai.length && pips.length < 2; i++) if (cai[i] !== lider) pips.push(cai[i]);
       }
-      if (lider.y > LIMIAR_LENTA) { a = { x: lider.x, y: Math.max(lider.y + 30, 930), z: 2.5 }; tipo = 'lenta'; lenta = !calmo; }
+      else if (cai.length > 1 && zf >= 1.8) { a = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 + 50, z: Math.min(2.8, zf) }; tipo = 'grupo'; }
+      else {
+        a = { x: lider.x, y: lider.y + 55, z: 3.1 }; tipo = 'segue';   // acompanhamento bem perto (dono, 21/Nov/2026)
+        if (!leve) for (i = 0; i < cai.length && pips.length < 2; i++) if (cai[i] !== lider) pips.push(cai[i]);   // modo leve: sem quadrinhos
+      }
+      if (lider.y > LIMIAR_LENTA) { a = { x: lider.x, y: Math.max(lider.y + 25, 940), z: 3.4 }; tipo = 'lenta'; lenta = !calmo; }
       return { a: limitarCam(a), tipo: tipo, lenta: lenta };
     }
     function atualizarCamera(dt) {
       relReal += dt;
+      tensaoPasso(dt);
       var p = planoDesejado(), a = p.a;
       escala += ((p.lenta ? 0.4 : 1) - escala) * Math.min(1, dt * 5);
       if (calmo) {   // reduzir movimento: cortes secos em vez de a câmera andar, e sem câmera lenta
         escala = 1;
         if (p.tipo !== tipoPlano || (p.tipo === 'segue' && relReal - ultCorte > 1.5)) { cam.x = a.x; cam.y = a.y; cam.z = a.z; ultCorte = relReal; sujo = true; }
       } else {
-        var k = 1 - Math.exp(-dt * 3.2), kz = 1 - Math.exp(-dt * 2.6);
+        var pov = p.tipo === 'pov', k = 1 - Math.exp(-dt * (pov ? 14 : 3.6)), kz = 1 - Math.exp(-dt * (pov ? 3.4 : 2.6));
         var dx = a.x - cam.x, dy = a.y - cam.y, dz = a.z - cam.z;
         if (Math.abs(dx) + Math.abs(dy) > 0.05 || Math.abs(dz) > 0.0005) { cam.x += dx * k; cam.y += dy * k; cam.z += dz * kz; sujo = true; }
       }
       tipoPlano = p.tipo;
-      var tagTxt = escala < 0.75 ? '⏱ ' + t('Câmera lenta', 'Slow motion', 'Cámara lenta') : jogando() ? '● ' + t('Ao vivo', 'Live', 'En directo') : '';
+      var tagTxt = escala < 0.75 ? '⏱ ' + t('Câmera lenta', 'Slow motion', 'Cámara lenta') : p.tipo === 'pov' ? '🎥 ' + t('Câmera da bolinha', 'Ball cam', 'Cámara de la bolita') :
+        jogando() ? '● ' + t('Ao vivo', 'Live', 'En directo') : '';
       if (tag.textContent !== tagTxt) { tag.textContent = tagTxt; tag.hidden = !tagTxt; tag.classList.toggle('lenta', escala < 0.75); }
       if (flashTela) { flashTela.v -= dt * 2.4; if (flashTela.v <= 0) flashTela = null; sujo = true; }
       if (batida > 0) batida = Math.max(0, batida - dt * 3);
     }
     function aoPousarCamera(b) {
       flashTela = { cor: b.cor === 'verde' ? '45,255,136' : b.cor === 'vermelha' ? '255,47,85' : '200,228,255', v: 1 };
-      if (b === camLider && !calmo) segura = { ate: relReal + 0.7, a: limitarCam({ x: b.x, y: 960, z: 2.3 }) };
+      if (b === camLider && !calmo) segura = { ate: relReal + 0.7, a: limitarCam({ x: b.x, y: 960, z: 3 }) };
     }
 
     /* ---------- laço: física em passo fixo, desenho só quando algo se mexe ---------- */
@@ -1380,9 +1383,10 @@
         if (Math.abs(a - portas[i]) > 0.002) mexe = true;
         portas[i] = a;
       }
-      if (G.etapa === 'verdes' || G.etapa === 'zona' || climaAtual === 'tensao') mexe = true;
+      if (G.etapa === 'zonas' || G.etapa === 'resposta' || climaAtual === 'tensao') mexe = true;
+      if (!leve && (cena.hidden || jogando())) mexe = true;   // o painel de LED está sempre se mexendo
       // coração: bate mais rápido quanto mais perto do fundo estão as bolinhas
-      if (climaAtual === 'tensao' && relogio >= proxBatida) {
+      if ((climaAtual === 'tensao' || (G.etapa === 'quedaCalma' && caindoAgora().length)) && relogio >= proxBatida) {
         var fundoY = 0; mundo.bolas.forEach(function (bb) { if (!bb.pousou && bb.espera <= 0) fundoY = Math.max(fundoY, bb.y); });
         var prog = clamp(fundoY / GEO.SENSOR, 0, 1);
         bater(); batida = 1; proxBatida = relogio + (0.95 - 0.5 * prog);
@@ -1430,7 +1434,16 @@
     }
     function dinamicos(S, simples) {
       var i, b, p, k, x, sp, sw;
+      if (!simples) desenharLeds();
       if (!simples) {
+        // luzes que correm pelo arco, na cor do clima
+        var corA = COR_CLIMA[climaAtual] || COR_CLIMA.calma, ledA = ledSprite(corA), la = ledA.width / escMax() * 1.6, nA = 64, u0 = (leve ? 0 : relReal) * (climaAtual === 'tensao' ? 0.12 : 0.05);
+        c.globalCompositeOperation = 'lighter';
+        for (k = 0; k < nA; k++) {
+          var pa = pontoArco(k / (nA - 1)), on = 0.5 + 0.5 * Math.sin((k / nA - u0) * Math.PI * 12);
+          c.globalAlpha = 0.25 + 0.75 * on * on; c.drawImage(ledA, pa[0] - la / 2, pa[1] - la / 2, la, la);
+        }
+        c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1;
         // LEDs que correm pela moldura, na cor do clima (mais fortes na batida do coração)
         var cor = COR_CLIMA[climaAtual] || COR_CLIMA.calma, led = ledSprite(cor), lw = led.width / escMax(), vel2 = climaAtual === 'tensao' ? 520 : 260;
         var cometas = leve ? 3 : 6, cauda = leve ? 2 : 6;
@@ -1441,7 +1454,7 @@
         }
         c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1;
         // feixe de mira da zona escolhida
-        if ((G.etapa === 'verdes' || G.etapa === 'zona') && G.zonaOk) {
+        if (G.etapa === 'zonas' && G.zonaOk) {
           x = zonaX(G.zona);
           var pulso = 0.55 + 0.45 * Math.sin(relogio * 5), gr = c.createLinearGradient(0, 80, 0, GEO.YDIV);
           gr.addColorStop(0, 'rgba(127,230,255,' + (0.3 * pulso + 0.1) + ')'); gr.addColorStop(1, 'rgba(127,230,255,0)');
@@ -1452,6 +1465,14 @@
           var fl = flashes[i];
           c.fillStyle = (fl.cor === 'verde' ? 'rgba(45,255,136,' : 'rgba(255,59,92,') + (0.5 * fl.vida) + ')';
           c.fillRect(fl.k * GEO.LARG + 3, GEO.YDIV, GEO.LARG - 6, GEO.H - GEO.YDIV - 3);
+        }
+      }
+      // bem de perto (câmera da bolinha), os pinos ganham a versão nítida por cima do cenário ampliado
+      if (!simples && S > (cenZ ? elZ : el1) * 1.3) {
+        var vx0 = cam.x - Lt.W * dpr / S, vx1 = cam.x + Lt.W * dpr / S, vy0 = cam.y - Lt.H * dpr / S, vy1 = cam.y + Lt.H * dpr / S;
+        for (i = 0; i < mundo.pinos.length; i++) {
+          p = mundo.pinos[i]; if (p.x < vx0 || p.x > vx1 || p.y < vy0 || p.y > vy1) continue;
+          c.drawImage(SPR.pino, p.x - 13, p.y - 13, 26, 26);
         }
       }
       // pinos tocados acendem e pulsam
@@ -1467,13 +1488,20 @@
         // comportas: portinhola que abre, contorno aceso na escolhida, luzinhas das zonas guardadas
         for (k = 0; k < 7; k++) {
           x = zonaX(k);
-          var escolhida = (G.etapa === 'verdes' || G.etapa === 'zona') && G.zonaOk && G.zona === k;
+          var escolhida = G.etapa === 'zonas' && G.zonaOk && G.zona === k;
           if (escolhida) { c.lineWidth = 4; c.strokeStyle = 'rgba(160,240,255,' + (0.6 + 0.4 * Math.sin(relogio * 6)) + ')'; rr(c, x - 38, 3, 76, 82, 14); c.stroke(); }
           var ab = portas[k], meia = 24 * (1 - ab);
           c.fillStyle = '#b3bbcd'; c.fillRect(x - 25, 64, meia, 6); c.fillRect(x + 25 - meia, 64, meia, 6);
           c.fillStyle = 'rgba(255,255,255,.7)'; c.fillRect(x - 25, 64, meia, 1.2); c.fillRect(x + 25 - meia, 64, meia, 1.2);
-          var nm = 0; for (i = 0; i < G.memo.length; i++) if (G.memo[i] === k) nm++;
-          for (i = 0; i < nm; i++) { circ(c, x - 22 + i * 9, 79, 3.2); c.fillStyle = G.etapa === 'vermelhas' ? '#ff3b5c' : '#2dff88'; c.fill(); }
+          // Sem pressa: as bolinhas já escolhidas esperam na janelinha da comporta (e um pontinho por bolinha embaixo)
+          if (G.etapa === 'zonas' || G.etapa === 'resposta') {
+            var nm = 0; for (i = 0; i < G.zonas.length; i++) if (G.zonas[i] === k) nm++;
+            if (nm) {
+              var spb = SPR.branca, swb = spb.width / escMax();
+              for (i = 0; i < nm; i++) c.drawImage(spb, x + (i - (nm - 1) / 2) * 13 - swb / 2, GEO.Y_SOLTA + 4 - swb / 2, swb, swb);
+              for (i = 0; i < nm; i++) { circ(c, x - (nm - 1) * 4.5 + i * 9, 79, 3.2); c.fillStyle = '#ffe08a'; c.fill(); }
+            }
+          }
         }
       }
       for (i = 0; i < mundo.bolas.length; i++) desenharBola(mundo.bolas[i], S, simples);
@@ -1516,6 +1544,19 @@
       dinamicos(S, false);
       c.setTransform(1, 0, 0, 1, 0, 0);
       if (!leve) { feixes(0.028); c.drawImage(vinheta, 0, 0, W, H); }
+      if (tipoPlano === 'pov' && camLider) {
+        // câmera da bolinha: riscos de velocidade subindo pela tela e a borda escurecida da lente
+        var vy = Math.max(0, camLider.vy || 0), nr = 16, Wd = W, Hd = H;
+        c.globalCompositeOperation = 'lighter'; c.strokeStyle = 'rgba(190,230,255,1)'; c.lineCap = 'round';
+        for (i = 0; i < nr; i++) {
+          var hx = ((i * 0.6180339 * Wd) % Wd), off = ((relReal * (300 + vy * 2.2) * dpr + i * 97 * dpr) % (Hd * 1.3)), comp = (30 + vy * 0.18) * dpr;
+          if (Math.abs(hx - Wd / 2) < Wd * 0.12) continue;   // o meio fica limpo para a bolinha
+          c.globalAlpha = 0.07 + 0.1 * Math.min(1, vy / 400); c.lineWidth = (1.5 + (i % 3)) * dpr;
+          c.beginPath(); c.moveTo(hx, Hd - off); c.lineTo(hx, Hd - off + comp); c.stroke();
+        }
+        c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1;
+        if (vinheta) { c.globalAlpha = 0.8; c.drawImage(vinheta, 0, 0, W, H); c.globalAlpha = 1; }
+      }
       if (flashTela) { c.globalCompositeOperation = 'lighter'; c.fillStyle = 'rgba(' + flashTela.cor + ',' + (0.3 * flashTela.v) + ')'; c.fillRect(0, 0, W, H); c.globalCompositeOperation = 'source-over'; }
       // quadros pequenos (picture-in-picture) com as outras bolinhas
       for (i = 0; i < pips.length; i++) {
@@ -1555,8 +1596,8 @@
       leve = !!v; dprMax = leve ? 1 : 2; raiz.classList.toggle('jt-bol2-leve', leve); medir();
     }
     function aoVisibilidade() {
-      if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
-      else if (vivo && !raf) { ultimo = 0; sujo = true; raf = requestAnimationFrame(laco); }
+      if (document.hidden) { cancelAnimationFrame(raf); raf = 0; if (tensao.audio) tensao.audio.pause(); }
+      else if (vivo && !raf) { ultimo = 0; sujo = true; raf = requestAnimationFrame(laco); if (tensao.ativa && tensao.audio) { var pr = tensao.audio.play(); if (pr && pr.catch) pr.catch(function () {}); } }
     }
     document.addEventListener('visibilitychange', aoVisibilidade);
     var obs = null;
@@ -1579,37 +1620,31 @@
 
     if (ctx.teste) window.BolinhasDebug = {
       estado: function () {
-        return { fase: G.fase, etapa: G.etapa, saldo: G.saldo, saldoF1: G.saldoF1, acertos: [G.acertos[2], G.acertos[3]], rodada: G.rodada, modo: G.modo,
-          bolas: mundo.bolas.length, caindo: mundo.bolas.filter(function (b) { return b.espera <= 0 && !b.pousou; }).length, contrato: G.contrato, decisao: G.decisao,
-          resposta: G.resposta, certa: G.perg ? G.perg.c : null, opcoes: G.perg ? G.perg.o.length : 0, memo: G.memo.slice(), parceiro: parceiro.nome, semente: semente, mult: G.mult };
+        return { modalidade: G.mod, etapa: G.etapa, saldo: G.saldo, rodada: G.rodada, acertos: G.acertos, marcas: G.marcas.slice(),
+          bolas: mundo.bolas.length, caindo: mundo.bolas.filter(function (b) { return b.espera <= 0 && !b.pousou; }).length,
+          cores: mundo.bolas.map(function (b) { return b.cor; }), resposta: G.resposta, certa: G.perg ? G.perg.c : null,
+          opcoes: G.perg ? G.perg.o.length : 0, zonas: G.zonas.slice(), timers: timers.length, semente: semente, nivel: nivel, tensao: tensao.ativa };
       },
-      comecar: function (m) { comecar(m || 'ia'); },
+      comecar: function (m) { comecar(m || 'queda'); },
       velocidade: function (v) { vel = v || 1; },
-      responder: function (i) { if (G.etapa === 'sala') responderSala(i); else responderF1(i); },
-      responderCerto: function () { if (G.perg) { if (G.etapa === 'sala') responderSala(G.perg.c); else responderF1(G.perg.c); } },
-      zona: function (z) { escolherZona(z); },
+      responder: function (i) { if (G.mod === 'calma') responderCalma(i); else responderQueda(i); },
+      responderCerto: function () { if (G.perg) BolinhasDebug.responder(G.perg.c); },
+      responderErrado: function () { if (G.perg) BolinhasDebug.responder((G.perg.c + 1) % G.perg.o.length); },
+      zona: function (z) { colocarZona(z); },
+      desfazer: function () { desfazerZona(); },
       camera: function () {
         return { x: cam.x, y: cam.y, z: cam.z, escala: escala, lenta: escala < 0.75, plano: tipoPlano, pips: pips.length, aberto: { x: CAM0.x, y: CAM0.y },
           lider: camLider ? { x: camLider.x, y: camLider.y } : null, leve: leve, zoomPronto: !!cenZ };
       },
       leve: function (v, auto) { medidas.auto = auto !== false; ligarLeve(v); },
-      soltar: function () { confirmarZona(); },
-      pularCartao: function () { var b = cena.querySelector('[data-ok]'); if (G.etapa === 'cartao' && b) b.click(); },
-      pularPara: function (f, dados) {
-        timers = []; mundo.bolas = []; fecharCena(); G.lote = null;
-        dados = dados || {};
-        if (dados.saldo != null) G.saldo = dados.saldo; if (dados.saldoF1 != null) G.saldoF1 = dados.saldoF1;
-        if (dados.acertos) { G.acertos[2] = dados.acertos[0]; G.acertos[3] = dados.acertos[1]; }
-        if (dados.confs) G.confs = dados.confs.slice();
-        pintarOdo(G.saldo);
-        if (f === 'contrato') irContrato(); else if (f === 'zona') { G.fase = dados.fase || 2; G.memo = dados.memo || [1, 5]; desenharFundo(); perguntaZona(dados.rodada || 0); }
-        else iniciarFase(f);
-      }
+      pularCartao: function () { var b = cena.querySelector('[data-ok]'); if (G.etapa === 'cartao' && b) b.click(); }
     };
 
     return {
       parar: function () {
         vivo = false; cancelAnimationFrame(raf); clearTimeout(timerZ);
+        if (tensao.audio) { tensao.audio.pause(); tensao.audio.src = ''; }
+        if (tensao.pausouTrilha && window.Trilha && window.Trilha.continuar) window.Trilha.continuar();
         window.removeEventListener('keydown', aoTeclar);
         document.removeEventListener('visibilitychange', aoVisibilidade);
         if (obs) obs.disconnect(); else window.removeEventListener('resize', aoRedimensionar);
@@ -1622,26 +1657,23 @@
   (window.JogotecaJogos = window.JogotecaJogos || []).push({
     id: 'bolinhas',
     ajuda: function (t) {
-      return '<p>' + t('Um game show numa parede gigante de pinos! As bolinhas brancas viram <b>verdes</b> (somam o valor da canaleta onde caem) ou <b>vermelhas</b> (descontam; o saldo nunca fica abaixo de zero).',
-        'A game show on a giant wall of pegs! White balls turn <b>green</b> (they add the value of the slot they land in) or <b>red</b> (they take it away; the balance never goes below zero).',
-        '¡Un concurso en una pared gigante de clavos! Las bolitas blancas se vuelven <b>verdes</b> (suman el valor de la casilla donde caen) o <b>rojas</b> (lo restan; el saldo nunca baja de cero).') + '</p>' +
-        '<p><b>' + t('Fase 1 · Queda Livre', 'Round 1 · Free Fall', 'Fase 1 · Caída Libre') + ':</b> ' + t('5 perguntas de 2 opções. Três bolinhas caem das zonas 1, 4 e 7: trave a resposta antes que a primeira chegue lá embaixo. Terminou com saldo zero, acabou o jogo.',
-          '5 questions with 2 options. Three balls drop from zones 1, 4 and 7: lock your answer before the first one reaches the bottom. Finish with zero and the game is over.',
-          '5 preguntas de 2 opciones. Tres bolitas caen de las zonas 1, 4 y 7: bloquea la respuesta antes de que la primera llegue abajo. Si terminas con cero, se acaba el juego.') + '</p>' +
-        '<p><b>' + t('Fases 2 e 3', 'Rounds 2 and 3', 'Fases 2 y 3') + ':</b> ' + t('o parceiro vai para a Sala de Isolamento. Primeiro você escolhe zonas para as verdes grátis (guarde: as vermelhas obrigatórias caem delas no fim!). Em cada pergunta você vê só as opções e escolhe a zona pela confiança no parceiro: centro vale mais, pontas arriscam menos. Na 2ª pergunta pode pedir Duplo, na 3ª Triplo.',
-          'your partner goes to the Isolation Booth. First you pick zones for the free greens (remember them: the mandatory reds drop from there at the end!). For each question you only see the options and pick a zone by how much you trust your partner: the middle pays more, the edges risk less. On the 2nd question you can go Double, on the 3rd Triple.',
-          'tu compañero se va a la Cabina de Aislamiento. Primero eliges zonas para las verdes gratis (recuérdalas: ¡las rojas obligatorias caen de ahí al final!). En cada pregunta solo ves las opciones y eliges la zona según tu confianza en el compañero: el centro paga más, los lados arriesgan menos. En la 2.ª pregunta puedes pedir Doble y en la 3.ª, Triple.') + '</p>' +
-        '<p><b>' + t('O Contrato', 'The Contract', 'El Contrato') + ':</b> ' + t('quem está na Sala, sem saber o saldo, assina (leva o valor garantido: Queda Livre + 5.000 por acerto na Fase 2 + 10.000 por acerto na Fase 3) ou rasga (leva o saldo do painel).',
-          'whoever is in the Booth, without knowing the balance, signs (takes the guaranteed amount: Free Fall + 5,000 per right answer in Round 2 + 10,000 per right answer in Round 3) or tears it up (takes the board balance).',
-          'quien está en la Cabina, sin saber el saldo, firma (se lleva el valor garantizado: Caída Libre + 5.000 por acierto en la Fase 2 + 10.000 por acierto en la Fase 3) o lo rompe (se lleva el saldo del panel).') + '</p>' +
-        '<p>' + t('Fácil: perguntas mais fáceis e parceiro mais forte. Difícil: perguntas difíceis e parceiro mais fraco. Teclado ou controle da TV: ← → escolhem a zona ou a opção, ↑ ↓ o Duplo/Triplo e Enter confirma. O botão «+ −» põe + e − dentro das bolinhas.',
-          'Easy: easier questions and a stronger partner. Hard: hard questions and a weaker partner. Keyboard or TV remote: ← → pick the zone or the option, ↑ ↓ the Double/Triple and Enter confirms. The «+ −» button puts + and − inside the balls.',
-          'Fácil: preguntas más fáciles y compañero más fuerte. Difícil: preguntas difíciles y compañero más flojo. Teclado o mando de la tele: ← → eligen la zona o la opción, ↑ ↓ el Doble/Triple y Enter confirma. El botón «+ −» pone + y − dentro de las bolitas.') + '</p>';
+      return '<p>' + t('Um game show numa parede gigante de pinos! As bolinhas ficam <b>verdes</b> quando você acerta (somam o valor da canaleta onde caem) e <b>vermelhas</b> quando erra (descontam; o saldo nunca fica abaixo de zero).',
+        'A game show on a giant wall of pegs! The balls turn <b>green</b> when you get it right (they add the value of the slot they land in) and <b>red</b> when you get it wrong (they take it away; the balance never goes below zero).',
+        '¡Un concurso en una pared gigante de clavos! Las bolitas se vuelven <b>verdes</b> cuando aciertas (suman el valor de la casilla donde caen) y <b>rojas</b> cuando fallas (lo restan; el saldo nunca baja de cero).') + '</p>' +
+        '<p><b>⏱ ' + t('Queda Livre', 'Free Fall', 'Caída Libre') + ':</b> ' + t('5 perguntas de 2 opções. Três bolinhas brancas caem das zonas 1, 4 e 7: responda antes que a primeira chegue lá embaixo. Sem resposta, vale como erro.',
+          '5 questions with 2 options. Three white balls drop from zones 1, 4 and 7: answer before the first one reaches the bottom. No answer counts as wrong.',
+          '5 preguntas de 2 opciones. Tres bolitas blancas caen de las zonas 1, 4 y 7: responde antes de que la primera llegue abajo. Sin respuesta, cuenta como fallo.') + '</p>' +
+        '<p><b>🧘 ' + t('Sem pressa', 'No Rush', 'Sin prisa') + ':</b> ' + t('5 perguntas de 4 opções, sem relógio. Leia a pergunta, toque em 3 zonas lá no alto (pode repetir a mesma; ↩ desfaz) e depois responda. O centro vale mais e as pontas arriscam menos.',
+          '5 questions with 4 options, no clock. Read the question, tap 3 zones at the top (you can repeat one; ↩ undoes) and then answer. The middle pays more and the edges risk less.',
+          '5 preguntas de 4 opciones, sin reloj. Lee la pregunta, toca 3 zonas de arriba (puedes repetir la misma; ↩ deshace) y luego responde. El centro vale más y los lados arriesgan menos.') + '</p>' +
+        '<p>' + t('O nível muda as perguntas (e, na Queda Livre, o tempo para ler). Teclado ou controle da TV: ← → passam pelas zonas ou pelas opções, OK confirma e ⌫ desfaz a zona. O botão «+ −» põe + e − dentro das bolinhas.',
+          'The level changes the questions (and, in Free Fall, the reading time). Keyboard or TV remote: ← → move through the zones or the options, OK confirms and ⌫ undoes a zone. The «+ −» button puts + and − inside the balls.',
+          'El nivel cambia las preguntas (y, en la Caída Libre, el tiempo para leer). Teclado o mando de la tele: ← → recorren las zonas o las opciones, OK confirma y ⌫ deshace la zona. El botón «+ −» pone + y − dentro de las bolitas.') + '</p>';
     },
     iniciar: iniciar,
-    logica: { VALORES: VALORES, BONUS: BONUS, GEO: GEO, FIS: FIS, CATEGORIAS: CATEGORIAS, PERSONAGENS: PERSONAGENS, aplicarBola: aplicarBola, valorContrato: valorContrato,
-      multiplicadores: multiplicadores, criarSorte: criarSorte, afinidades: afinidades, sortearPergunta: sortearPergunta, prepararPergunta: prepararPergunta,
-      iaResponder: iaResponder, iaContrato: iaContrato, criarMundo: criarMundo, soltar: soltar, passoMundo: passoMundo, simularQueda: simularQueda,
-      dinheiro: dinheiro, zonaX: zonaX }
+    logica: { VALORES: VALORES, MODALIDADES: MODALIDADES, GEO: GEO, FIS: FIS, CATEGORIAS: CATEGORIAS, aplicarBola: aplicarBola, aplicarLote: aplicarLote,
+      corDaResposta: corDaResposta, tempoDeLeitura: tempoDeLeitura, adicionarZona: adicionarZona, zonasProntas: zonasProntas,
+      criarSorte: criarSorte, sortearPergunta: sortearPergunta, prepararPergunta: prepararPergunta,
+      criarMundo: criarMundo, soltar: soltar, passoMundo: passoMundo, simularQueda: simularQueda, dinheiro: dinheiro, zonaX: zonaX }
   });
 })();
