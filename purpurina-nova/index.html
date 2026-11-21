@@ -152,18 +152,19 @@
   <div class="topo">
     <div class="linha-titulo">
       <p id="titulo" class="titulo"></p>
-      <div class="palco-esq">
-        <button id="btMusicaPalco" class="mini" type="button" aria-label="Música" data-rotulo="Música|Music|Música">🎵</button>
-        <button id="btSemMusica" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🎶</button>
-        <button id="btProxMusica" class="mini" type="button" aria-label="Próxima música" data-rotulo="Próxima música|Next song|Siguiente canción">⏭</button>
-        <button id="seloTV" class="mini selo-tv" type="button" hidden aria-label="TV"></button>
-      </div>
+      <!-- menos botão e mais roupa (dono, 21/Nov/2026): as 7 ferramentas (zoom, desfazer, surpresa, recomeçar e música)
+           ficam guardadas num botão só, ⋯, que abre e fecha a caixinha -->
+      <button id="btFerramentas" class="mini" type="button" aria-expanded="false" aria-controls="ferramentas" aria-label="Mais botões" data-rotulo="Mais botões|More buttons|Más botones">⋯</button>
+      <button id="seloTV" class="mini selo-tv" type="button" hidden aria-label="TV"></button>
     </div>
-    <div class="botoes-topo">
+    <div id="ferramentas" class="ferramentas" hidden>
       <button id="btZoom" class="mini" type="button" aria-pressed="false" aria-label="Zoom">🔍</button>
       <button id="btDesfazer" class="mini" type="button" aria-label="Desfazer" data-rotulo="Desfazer|Undo|Deshacer">↩</button>
       <button id="btSurpresa" class="mini" type="button" aria-label="Surpresa" data-rotulo="Surpresa|Surprise|Sorpresa">🎲</button>
       <button id="btRecomecar" class="mini" type="button" aria-label="Começar de novo" data-rotulo="Começar de novo|Start over|Empezar de nuevo">🔄</button>
+      <button id="btMusicaPalco" class="mini" type="button" aria-label="Música" data-rotulo="Música|Music|Música">🎵</button>
+      <button id="btSemMusica" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🎶</button>
+      <button id="btProxMusica" class="mini" type="button" aria-label="Próxima música" data-rotulo="Próxima música|Next song|Siguiente canción">⏭</button>
     </div>
   </div>
   <div id="palco" class="palco">
