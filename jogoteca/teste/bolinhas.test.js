@@ -82,6 +82,44 @@ test('sem parceiro, sem dois jogadores, sem Contrato e nenhum personagem parceir
   assert.match(ajuda, /Queda Livre/); assert.match(ajuda, /Sem pressa/); assert.doesNotMatch(ajuda, /parceiro/i);
 });
 
+test('escada de pontos: 6 degraus até a meta, portos seguros no 2º e no 4º, e o saldo nunca cai abaixo do porto alcançado', () => {
+  for (const mod of ['queda', 'calma']) {
+    const E = L.ESCADA[mod];
+    assert.equal(E.length, 6);
+    for (let i = 1; i < E.length; i++) assert.ok(E[i] > E[i - 1], mod + ': a escada sobe');
+  }
+  assert.deepEqual(L.PORTOS, [1, 3]);
+  const E = L.ESCADA.calma;
+  assert.equal(L.degrauDe(0, E), 0); assert.equal(L.degrauDe(E[0], E), 1); assert.equal(L.degrauDe(E[5] + 1, E), 6);
+  // o porto só trava quando é alcançado e nunca desce
+  assert.equal(L.novoPiso(0, E[1] - 1, E), 0);
+  let piso = L.novoPiso(0, E[1], E); assert.equal(piso, E[1]);
+  piso = L.novoPiso(piso, 10, E); assert.equal(piso, E[1], 'o porto fica garantido mesmo se o saldo baixar');
+  piso = L.novoPiso(piso, E[3] + 500, E); assert.equal(piso, E[3]);
+  // as vermelhas não derrubam abaixo do porto
+  assert.equal(L.aplicarBola(E[3] + 500, 10000, 'vermelha', E[3]), E[3]);
+  assert.equal(L.aplicarLote(E[1] + 100, [7, 7, 7], 'vermelha', E[1]), E[1]);
+  assert.equal(L.aplicarBola(E[1] + 5000, 1000, 'vermelha', E[1]), E[1] + 4000, 'acima do porto, desconta normal');
+});
+
+test('fim da rodada: a meta encerra com vitória; senão 12 perguntas ou 3 erros seguidos', () => {
+  const E = L.ESCADA.queda, max = L.MODALIDADES.queda.perguntas;
+  assert.equal(max, 12); assert.equal(L.ERROS_SEGUIDOS, 3);
+  assert.equal(L.fimDaRodada(E[5], E, 4, 0, max), 'meta');
+  assert.equal(L.fimDaRodada(E[5], E, 12, 3, max), 'meta', 'chegou na meta, venceu');
+  assert.equal(L.fimDaRodada(500, E, 5, 3, max), 'erros');
+  assert.equal(L.fimDaRodada(500, E, 12, 1, max), 'limite');
+  assert.equal(L.fimDaRodada(500, E, 11, 2, max), null, 'continua');
+  // perguntas mais difíceis conforme sobe; o nível muda o começo
+  for (const nv of ['facil', 'medio', 'dificil']) {
+    let ant = 0;
+    for (let d = 0; d <= 6; d++) { const a = L.alvoDificuldade(nv, d); assert.ok(a >= ant && a >= 1 && a <= 3, nv + ' degrau ' + d); ant = a; }
+  }
+  assert.equal(L.alvoDificuldade('facil', 0), 1); assert.equal(L.alvoDificuldade('dificil', 0), 2); assert.equal(L.alvoDificuldade('facil', 6), 3);
+  const s = L.criarSorte(4), q = L.sortearPergunta(BANCO, 4, 'facil', {}, s, 3);
+  assert.equal(q.d, 3, 'a escada pede pergunta difícil');
+});
+
 /* ---------------- perguntas ---------------- */
 test('banco: 40 de 2 opções e 60 de 4, nos 3 idiomas, com a certa válida', () => {
   const por = n => BANCO.filter(q => q.o.length === n);
@@ -110,7 +148,7 @@ test('banco: 40 de 2 opções e 60 de 4, nos 3 idiomas, com a certa válida', ()
 test('sorteio: nada repete na rodada e o nível escolhe a dificuldade', () => {
   for (const nivel of ['facil', 'medio', 'dificil']) for (const mod of ['queda', 'calma']) {
     const R = L.MODALIDADES[mod], usadas = {}, s = L.criarSorte(11), ids = [];
-    for (let i = 0; i < R.perguntas; i++) {
+    for (let i = 0; i < 5; i++) {
       const q = L.sortearPergunta(BANCO, R.opcoes, nivel, usadas, s);
       assert.equal(q.o.length, R.opcoes); ids.push(q.id);
       if (nivel === 'facil') assert.equal(q.d, 1, 'fácil começa pelas fáceis');
@@ -236,20 +274,21 @@ test.describe('no navegador', () => {
     e = await estado(pg);
     assert.equal(e.tensao, false, 'a tensão acaba quando a última bolinha bate no fundo');
     assert.deepEqual(e.marcas, [true]);
-    // o resto da rodada: uma errada (sem responder = erro) e as outras certas
+    // o resto: sem responder (= erro) três vezes seguidas, e a rodada acaba
+    const piso0 = e.piso;
     await pg.evaluate(() => BolinhasDebug.velocidade(14));
     const vistas = new Set();
     for (let i = 0; i < 1200; i++) {
       e = await estado(pg); vistas.add(e.etapa);
       if (e.etapa === 'fim') break;
-      if (e.etapa === 'leitura' && e.resposta === null && e.rodada !== 2) await pg.evaluate(() => BolinhasDebug.responderCerto());
       await pg.waitForTimeout(50);
     }
     assert.equal(e.etapa, 'fim', 'chegou ao placar; passou por ' + [...vistas].join(' '));
-    assert.equal(e.marcas.length, 5); assert.equal(e.marcas[2], false, 'sem resposta = erro');
-    assert.equal(e.acertos, 4);
+    assert.deepEqual(e.marcas, [true, false, false, false], 'sem resposta = erro; 3 seguidos encerram');
+    assert.equal(e.motivo, 'erros'); assert.ok(e.saldo >= piso0);
     const txt = await pg.textContent('.jt-bol2-placar');
-    assert.ok(txt.includes(L.dinheiro(e.saldo, 'pt')), 'placar com o saldo'); assert.match(txt, /4 de 5 certas/);
+    assert.ok(txt.includes(L.dinheiro(e.saldo, 'pt')), 'placar com o saldo'); assert.match(txt, /1 de 4 certas/); assert.match(txt, /3 erros seguidos/);
+    assert.match(txt, /Degrau \d de 6/);
     await pg.click('.jt-bol2-placar [data-trocar]');
     assert.equal((await estado(pg)).etapa, 'inicio', 'trocar de modalidade volta ao começo');
     assert.deepEqual(pg.erros, []);
@@ -266,8 +305,12 @@ test.describe('no navegador', () => {
     await pg.evaluate(() => BolinhasDebug.pularCartao());
     let e = await estado(pg);
     assert.equal(e.etapa, 'zonas'); assert.equal(e.opcoes, 4);
-    assert.equal(await pg.locator('.jt-bol2-ops .jt-bol2-op').count(), 4);
-    assert.ok(await pg.$eval('.jt-bol2-ops .jt-bol2-op', b => b.disabled), 'as opções esperam as zonas');
+    // passo 1 (dono, 21/Nov/2026: "não sei onde é o botão de start"): a pergunta, 7 botões de zona e NENHUMA opção à vista
+    assert.match(await pg.textContent('.jt-bol2-passo'), /1\/2.*Onde as bolinhas vão cair/);
+    assert.ok((await pg.textContent('.jt-bol2-perg')).length > 8, 'a pergunta já aparece');
+    assert.equal(await pg.locator('.jt-bol2-zonas .jt-bol2-zbt').count(), 7);
+    assert.deepEqual(await pg.$$eval('.jt-bol2-zbt', bs => bs.map(b => b.textContent.trim())), ['1', '2', '3', '4', '5', '6', '7']);
+    assert.equal(await pg.locator('.jt-bol2-op').count(), 0, 'nenhuma opção "morta" no passo 1');
     // sem relógio: o tempo passa (rápido) e nada cai
     await pg.waitForTimeout(2500);
     e = await estado(pg);
@@ -283,15 +326,29 @@ test.describe('no navegador', () => {
     assert.deepEqual((await estado(pg)).zonas, [3, 2]);
     await pg.click('.jt-bol2-acoes [data-desfazer]');
     assert.deepEqual((await estado(pg)).zonas, [3]);
-    await pg.evaluate(() => { BolinhasDebug.zona(6); BolinhasDebug.zona(6); });
+    await pg.click('.jt-bol2-zbt[data-zona="6"]');
+    assert.match(await pg.textContent('.jt-bol2-acoes [data-status]'), /2 de 3/);
+    assert.equal(await pg.textContent('.jt-bol2-zbt[data-zona="6"] i'), '●', 'o botão mostra a bolinha posta');
+    await pg.click('.jt-bol2-zbt[data-zona="6"]');
     e = await estado(pg);
     assert.deepEqual(e.zonas, [3, 6, 6]); assert.equal(e.etapa, 'resposta');
-    assert.equal(await pg.$eval('.jt-bol2-ops .jt-bol2-op', b => b.disabled), false, 'com as 3 zonas, as opções se soltam');
+    // passo 2: os botões de zona somem e as 4 opções aparecem, tocáveis; ↩ volta ao passo 1
+    assert.match(await pg.textContent('.jt-bol2-passo'), /2\/2.*Agora responda/);
+    assert.equal(await pg.locator('.jt-bol2-zbt').count(), 0);
+    assert.equal(await pg.locator('.jt-bol2-ops .jt-bol2-op:not([disabled])').count(), 4, 'com as 3 zonas, as 4 opções aparecem');
+    await pg.click('.jt-bol2-passo [data-desfazer]');
+    assert.deepEqual((await estado(pg)).zonas, [3, 6]); assert.equal(await pg.locator('.jt-bol2-op').count(), 0);
+    await pg.click('.jt-bol2-acoes [data-sortear]');
+    e = await estado(pg); assert.equal(e.zonas.length, 3); assert.equal(e.etapa, 'resposta', '🎲 completa as zonas');
+    await pg.click('.jt-bol2-passo [data-desfazer]'); await pg.click('.jt-bol2-zbt[data-zona="6"]');
+    assert.deepEqual((await estado(pg)).zonas.slice(0, 2), [3, 6]);
     // errou: as 3 caem vermelhas das zonas escolhidas e descontam (saldo começa em 0 e não fica negativo)
     await pg.evaluate(() => BolinhasDebug.velocidade(1));
-    await pg.evaluate(() => BolinhasDebug.responderErrado());
+    const certa0 = (await estado(pg)).certa;
+    await pg.click('.jt-bol2-op[data-op="' + ((certa0 + 1) % 4) + '"]');
     e = await estado(pg);
     assert.deepEqual(e.cores, ['vermelha', 'vermelha', 'vermelha']); assert.ok(e.tensao);
+    assert.deepEqual(e.zonas.slice(0, 2), [3, 6]);
     assert.ok(await pg.$eval('.jt-bol2-op.errada', b => !!b));
     await pg.evaluate(() => BolinhasDebug.velocidade(8));
     await pg.waitForFunction(() => BolinhasDebug.estado().rodada === 1 && BolinhasDebug.estado().etapa === 'zonas', null, { timeout: 30000 });
@@ -311,12 +368,71 @@ test.describe('no navegador', () => {
       await pg.waitForTimeout(50);
     }
     assert.equal(e.etapa, 'fim');
-    assert.equal(e.acertos, 4); assert.equal(e.marcas.length, 5);
+    assert.ok(['meta', 'limite'].includes(e.motivo), 'acertando, a rodada vai até a meta ou até 12: ' + e.motivo);
+    assert.ok(e.marcas.length <= 12); assert.equal(e.acertos, e.marcas.length - 1);
+    if (e.motivo === 'meta') { assert.ok(e.saldo >= L.ESCADA.calma[5]); assert.match(await pg.textContent('.jt-bol2-placar'), /Meta alcançada/); }
+    else assert.equal(e.marcas.length, 12);
     assert.match(await pg.textContent('.jt-bol2-placar'), /Sem pressa/);
     await pg.click('.jt-bol2-placar [data-denovo]');
     e = await estado(pg);
     assert.equal(e.modalidade, 'calma'); assert.equal(e.etapa, 'cartao'); assert.equal(e.saldo, 0);
     assert.doesNotMatch(await pg.textContent('body'), new RegExp('Rub' + 'ens|parceiro', 'i'));
+    assert.deepEqual(pg.erros, []);
+    await pg.ctx.close();
+  });
+
+  for (const [w, h] of [[360, 740], [390, 844]]) {
+    test(w + '×' + h + ', Sem pressa em pé: o selo AO VIVO não cobre as zonas, nada fica embaixo da bolinha 🎵 e o painel não rola', { timeout: 60000 }, async () => {
+      const pg = await abrir({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true }, 'dificil');
+      await pg.evaluate(() => { BolinhasDebug.comecar('calma'); BolinhasDebug.pularCartao(); });
+      // a bolinha recolhida da trilha: 36 px a .6rem do canto de baixo à direita (trilha.js)
+      const bolinha = { x0: w - 10 - 36, y0: h - 10 - 36, x1: w - 10, y1: h - 10 };
+      const cruza = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
+      const caixas = sel => pg.$$eval(sel, els => els.filter(e => e.offsetParent).map(e => { const r = e.getBoundingClientRect(); return { x0: r.left, y0: r.top, x1: r.right, y1: r.bottom, s: e.className }; }));
+      for (const passo of [1, 2]) {
+        if (passo === 2) await pg.evaluate(() => { BolinhasDebug.zona(1); BolinhasDebug.zona(3); BolinhasDebug.zona(5); });
+        for (const c of await caixas('.jt-bol2-painel button, .jt-bol2-painel [data-status], .jt-bol2-passo')) {
+          assert.ok(!cruza(c, bolinha), 'passo ' + passo + ': ' + c.s + ' embaixo da bolinha 🎵 ' + JSON.stringify(c));
+          assert.ok(c.y1 <= h && c.y0 >= 0, 'passo ' + passo + ': ' + c.s + ' fora da tela');
+        }
+        assert.equal(await pg.$eval('.jt-bol2-painel', e => e.scrollHeight > e.clientHeight + 1), false, 'passo ' + passo + ': o painel não rola');
+      }
+      // o selo fica no piso, longe das 7 comportas do alto da parede
+      const tag = (await caixas('.jt-bol2-tag'))[0], par = (await caixas('.jt-bol2-parede'))[0];
+      assert.ok(tag, 'selo à mostra');
+      const zonas = { x0: par.x0, y0: par.y0, x1: par.x1, y1: par.y0 + (par.y1 - par.y0) * 0.1 };
+      assert.ok(!cruza(tag, zonas), 'o selo AO VIVO cobre as zonas: ' + JSON.stringify(tag));
+      assert.deepEqual(pg.erros, []);
+      await pg.ctx.close();
+    });
+  }
+
+  test('escada à vista; porto seguro trava com festa e segura as vermelhas; a meta encerra com vitória', { timeout: 90000 }, async () => {
+    const pg = await abrir({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }, 'facil');
+    await pg.evaluate(() => { BolinhasDebug.comecar('calma'); BolinhasDebug.pularCartao(); });
+    const E = L.ESCADA.calma;
+    assert.equal(await pg.locator('.jt-bol2-escada .d').count(), 6, 'os 6 degraus à mostra no celular em pé');
+    assert.equal(await pg.locator('.jt-bol2-escada .porto').count(), 2);
+    // a escada fica no placar de cima, sem tapar a parede
+    const esc = await pg.$eval('.jt-bol2-escada', e => e.getBoundingClientRect().bottom), par = await pg.$eval('.jt-bol2-parede', e => e.getBoundingClientRect().top);
+    assert.ok(esc <= par + 2, 'a escada não cobre as zonas: ' + esc + ' > ' + par);
+    await pg.evaluate(v => BolinhasDebug.saldo(v), E[1] + 400);
+    let e = await estado(pg);
+    assert.equal(e.piso, E[1]); assert.match(e.festa, /Porto seguro/);
+    assert.ok(await pg.$eval('.jt-bol2-escada [data-degrau="1"]', li => li.classList.contains('travado')), 'o degrau vira 🔒');
+    // errou com tudo no centro: as vermelhas descontam, mas nunca abaixo do porto
+    await pg.evaluate(() => { BolinhasDebug.zona(3); BolinhasDebug.zona(3); BolinhasDebug.zona(3); BolinhasDebug.responderErrado(); BolinhasDebug.velocidade(8); });
+    await pg.waitForFunction(() => BolinhasDebug.estado().rodada === 1, null, { timeout: 30000 });
+    e = await estado(pg);
+    assert.ok(e.saldo >= E[1], 'o porto segurou: ' + e.saldo);
+    // perto da meta, uma certa leva à vitória
+    await pg.evaluate(v => BolinhasDebug.saldo(v), E[5] - 1);
+    await pg.evaluate(() => { BolinhasDebug.zona(3); BolinhasDebug.zona(3); BolinhasDebug.zona(3); BolinhasDebug.responderCerto(); });
+    await pg.waitForFunction(() => BolinhasDebug.estado().etapa === 'fim', null, { timeout: 30000 });
+    e = await estado(pg);
+    assert.equal(e.motivo, 'meta'); assert.equal(e.degrau, 6);
+    const txt = await pg.textContent('.jt-bol2-placar');
+    assert.match(txt, /Meta alcançada/); assert.match(txt, /Degrau 6 de 6/); assert.match(txt, /garantido: 22\.000 pts/);
     assert.deepEqual(pg.erros, []);
     await pg.ctx.close();
   });

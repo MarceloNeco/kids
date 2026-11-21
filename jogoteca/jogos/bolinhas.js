@@ -5,11 +5,17 @@
    - Queda Livre (queda): 5 perguntas de 2 opções; lida a pergunta, três bolinhas brancas caem das zonas 1, 4 e 7 e é preciso
      responder antes que a primeira chegue lá embaixo (sem resposta = erro). Acertou: viram verdes e somam o valor da canaleta;
      errou: viram vermelhas e descontam. O tempo de leitura muda com o nível (fácil 6 s, médio 4,5 s, difícil 3 s).
-   - Sem pressa (calma): 5 perguntas de 4 opções, sem relógio nenhum. Lida a pergunta, você escolhe 3 zonas no alto (pode repetir
-     a mesma; ↩ desfaz) e só então as opções se soltam. Respondeu: as bolinhas caem verdes (acertou, somam) ou vermelhas (errou,
-     descontam) das zonas escolhidas. Centro vale mais, pontas arriscam menos.
-   O saldo nunca fica abaixo de zero; no fim, o placar (saldo, acertos, recorde por modalidade e nível). O nível da Jogoteca escolhe
-   a dificuldade das perguntas.
+   - Sem pressa (calma): 5 perguntas de 4 opções, sem relógio nenhum, em 2 passos no painel (0.4.2): 1/2 "Onde as bolinhas vão
+     cair?" — a pergunta e 7 botões numerados como as zonas (tocar na parede também vale; ↩ desfaz; 🎲 sorteia); 2/2 "Agora
+     responda!" — os botões somem e aparecem as 4 opções (↩ zonas volta). Respondeu: as bolinhas caem verdes (acertou,
+     somam) ou vermelhas (errou, descontam) das zonas escolhidas. Centro vale mais, pontas arriscam menos.
+   Escada de pontos com portos seguros (dono, 21/Nov/2026, 0.4.2): 6 degraus até a 🏆 (Queda Livre 1 mil · 4 mil · 8 mil · 14 mil ·
+   20 mil · 30 mil; Sem pressa 2 mil · 6 mil · 12 mil · 22 mil · 35 mil · 50 mil, medidos com rodadas simuladas na física do jogo).
+   O 2º e o 4º degraus são portos seguros: alcançou, trava 🔒 e as vermelhas nunca derrubam o saldo abaixo dele. Degrau novo e
+   porto travado ganham aviso, som e brilho. A rodada vai pergunta após pergunta até a meta (vitória), 12 perguntas ou 3 erros
+   seguidos; as perguntas endurecem conforme sobe (alvoDificuldade), e o nível da Jogoteca muda o começo. No fim, o placar
+   (degrau alcançado, porto garantido, acertos, recorde por modalidade e nível). Escada: deitado, coluna ao lado da parede;
+   em pé, faixa de 6 degraus embaixo do placar.
    Física própria e leve (círculo com círculo, passo fixo de 1/120 s), sem biblioteca: pinos em grade intercalada, divisórias de
    pontas redondas, sensor no fundo de cada canaleta e empurrãozinho se a bolinha parar. A restituição de um choque é o produto das
    duas (bolinha 0,6 × pino 0,75 = 0,45; bolinha com parede 0,6), com gravidade calibrada para a queda durar ~5,8 s
@@ -42,16 +48,38 @@
   // valores das 15 canaletas (tabela da Queda Livre da especificação): pontas valem o mínimo, o centro o máximo
   var VALORES = [1, 500, 100, 2000, 10, 1000, 5, 10000, 1, 5000, 10, 2500, 100, 1500, 1];
   // as duas modalidades (dono, 21/Nov/2026). leitura = segundos até as bolinhas caírem (null = sem relógio)
+  // perguntas = o máximo da rodada (a rodada acaba antes na meta ou com 3 erros seguidos)
   var MODALIDADES = {
-    queda: { opcoes: 2, perguntas: 5, bolas: 3, zonas: [0, 3, 6], leitura: { facil: 6, medio: 4.5, dificil: 3 } },
-    calma: { opcoes: 4, perguntas: 5, bolas: 3, zonas: null, leitura: null }
+    queda: { opcoes: 2, perguntas: 12, bolas: 3, zonas: [0, 3, 6], leitura: { facil: 6, medio: 4.5, dificil: 3 } },
+    calma: { opcoes: 4, perguntas: 12, bolas: 3, zonas: null, leitura: null }
   };
+  // escada de pontos com portos seguros (dono, 21/Nov/2026: "evolução por pontos (...) que tem os portos seguros").
+  // Medida com 400 rodadas simuladas na física do jogo: acertando 3 em 4, chega à 🏆 em ~metade das rodadas, em 8 a 12
+  // perguntas. A Queda Livre sobe mais devagar (zonas 1, 4 e 7 fixas), por isso a escada dela é mais baixa.
+  var ESCADA = { queda: [1000, 4000, 8000, 14000, 20000, 30000], calma: [2000, 6000, 12000, 22000, 35000, 50000] };
+  var PORTOS = [1, 3];   // o 2º e o 4º degraus: alcançou, fica garantido
+  var ERROS_SEGUIDOS = 3;
+  // quantos degraus o saldo alcança (0 a 6)
+  function degrauDe(saldo, escada) { var n = 0; while (n < escada.length && saldo >= escada[n]) n++; return n; }
+  // o porto seguro garantido: o maior porto que o saldo já alcançou (nunca desce)
+  function novoPiso(piso, saldo, escada) { PORTOS.forEach(function (i) { if (saldo >= escada[i]) piso = Math.max(piso, escada[i]); }); return piso; }
+  // a rodada acaba: 'meta' (vitória), 'erros' (3 erros seguidos) ou 'limite' (12 perguntas); null = continua
+  function fimDaRodada(saldo, escada, feitas, errosSeguidos, max) {
+    if (saldo >= escada[escada.length - 1]) return 'meta';
+    if (errosSeguidos >= ERROS_SEGUIDOS) return 'erros';
+    if (feitas >= max) return 'limite';
+    return null;
+  }
+  // as perguntas endurecem conforme sobe a escada; o nível da Jogoteca muda o começo (1 fácil · 2 média · 3 difícil)
+  function alvoDificuldade(nivel, degrau) {
+    return Math.min(3, nivel === 'dificil' ? 2 + Math.ceil(degrau / 2) : nivel === 'medio' ? 1 + Math.ceil(degrau / 2) : 1 + Math.floor(degrau / 2));
+  }
   function tempoDeLeitura(mod, nivel) { var l = MODALIDADES[mod].leitura; return l ? (l[nivel] || l.medio) : null; }
-  // verde soma; vermelha subtrai, e o saldo nunca fica abaixo de zero
-  function aplicarBola(saldo, valor, cor) { return cor === 'verde' ? saldo + valor : Math.max(0, saldo - valor); }
+  // verde soma; vermelha subtrai, e o saldo nunca fica abaixo do porto seguro garantido (nem de zero)
+  function aplicarBola(saldo, valor, cor, piso) { return cor === 'verde' ? saldo + valor : Math.max(piso || 0, saldo - valor); }
   function corDaResposta(acertou) { return acertou ? 'verde' : 'vermelha'; }
   // o que um lote de bolinhas da mesma cor faz com o saldo (as canaletas onde caíram, na ordem em que caíram)
-  function aplicarLote(saldo, canaletas, cor) { canaletas.forEach(function (k) { saldo = aplicarBola(saldo, VALORES[k], cor); }); return saldo; }
+  function aplicarLote(saldo, canaletas, cor, piso) { canaletas.forEach(function (k) { saldo = aplicarBola(saldo, VALORES[k], cor, piso); }); return saldo; }
   // Sem pressa: as zonas são escolhidas ANTES de responder (até "max" bolinhas; a mesma zona pode repetir)
   function adicionarZona(zonas, z, max) { return zonas.length >= max ? zonas.slice() : zonas.concat([clamp(Math.round(z), 0, 6)]); }
   function zonasProntas(zonas, max) { return zonas.length === max; }
@@ -82,11 +110,12 @@
 
   // o nível escolhe a dificuldade: fácil começa pelas fáceis, difícil pelas difíceis, médio sorteia entre todas
   var PREF = { facil: [1, 2, 3], dificil: [3, 2, 1] };
-  function sortearPergunta(banco, nOpcoes, nivel, usadas, sorte) {
+  // alvo (1 a 3, opcional): a dificuldade que a escada pede; sem a dele, vai para a mais perto
+  function sortearPergunta(banco, nOpcoes, nivel, usadas, sorte, alvo) {
     var cand = banco.filter(function (q) { return q.o.length === nOpcoes && !usadas[q.id]; });
     if (!cand.length) return null;
     embaralhar(cand, sorte);
-    var ordem = PREF[nivel];
+    var ordem = alvo ? [alvo, alvo - 1, alvo + 1, alvo - 2, alvo + 2].filter(function (d) { return d >= 1 && d <= 3; }) : PREF[nivel];
     if (ordem) {
       var melhor = 9;
       cand.forEach(function (q) { melhor = Math.min(melhor, ordem.indexOf(q.d)); });
@@ -238,7 +267,26 @@
     '.jt-bol2-hud,.jt-bol2-painel{position:absolute;box-sizing:border-box;display:flex;flex-direction:column}' +
     '.jt-bol2-hud{gap:8px}.deitado .jt-bol2-hud{justify-content:center;align-items:center;gap:14px}.deitado .jt-bol2-hud>*{width:100%;max-width:440px}' +
     '.deitado .jt-bol2-mini{width:auto;align-self:center}' +
-    '.retrato .jt-bol2-hud{flex-direction:row;align-items:center;padding:4px 8px;gap:8px}' +
+    '.retrato .jt-bol2-hud{flex-direction:row;flex-wrap:wrap;align-items:center;padding:4px 8px;gap:4px 8px}' +
+    // escada de pontos (dono, 21/Nov/2026): em pé, faixa de 6 degraus da esquerda (1º) para a direita (🏆); deitado, coluna com a 🏆 no alto
+    '.jt-bol2-escada{list-style:none;margin:0;padding:0;display:flex;gap:4px}' +
+    '.retrato .jt-bol2-escada{order:3;flex:1 1 100%;flex-direction:row-reverse;height:24px}' +
+    '.deitado .jt-bol2-escada{flex-direction:column;gap:5px;max-width:260px}' +
+    '.jt-bol2-escada .d{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:3px;border-radius:8px;border:1.5px solid rgba(127,220,255,.35);' +
+    'background:rgba(8,14,60,.7);color:#9fb8e8;font:700 12px/1 Fredoka,system-ui,sans-serif;white-space:nowrap;transition:background .3s,color .3s}' +
+    '.deitado .jt-bol2-escada .d{flex:0 0 auto;min-height:34px;font-size:17px;padding:0 12px;justify-content:space-between}' +
+    '.jt-bol2-escada .ic{font-size:.95em}.jt-bol2-escada .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}' +
+    '.jt-bol2-escada .porto{border-color:#ffc23a;color:#ffe08a}' +
+    '.jt-bol2-escada .ok{background:linear-gradient(180deg,#14a35a,#0a6a39);border-color:#2dff88;color:#fff}' +
+    '.jt-bol2-escada .travado{background:linear-gradient(180deg,#ffd24a,#d78a10);border-color:#ffe58a;color:#3a2300;box-shadow:0 0 12px rgba(255,194,58,.6)}' +
+    '.jt-bol2-escada .alvo{border-color:#fff;color:#fff;box-shadow:0 0 0 1.5px #7fdcff,0 0 12px rgba(127,220,255,.6)}' +
+    '.jt-bol2-escada .meta{border-color:#ff9be0;color:#ffd1f0}.jt-bol2-escada .meta.ok{background:linear-gradient(180deg,#ff5fd0,#9b2ad6);color:#fff}' +
+    '.jt-bol2-escada .brilha{animation:jtb2Degrau .9s ease-out}' +
+    '@keyframes jtb2Degrau{0%{transform:scale(1);filter:brightness(1)}30%{transform:scale(1.18);filter:brightness(1.8)}100%{transform:scale(1);filter:brightness(1)}}' +
+    '.jt-bol2-festa{position:absolute;z-index:7;box-sizing:border-box;padding:10px 14px;border-radius:16px;text-align:center;font:700 20px/1.2 Fredoka,system-ui,sans-serif;' +
+    'color:#fff;background:rgba(10,90,50,.92);border:2px solid #2dff88;box-shadow:0 0 28px rgba(45,255,136,.55);pointer-events:none}' +
+    '.jt-bol2-festa.porto{background:rgba(110,70,0,.94);border-color:#ffe58a;color:#fff3c4;box-shadow:0 0 34px rgba(255,194,58,.7)}' +
+    '.jt-bol2-festa.anima{animation:jtb2Entra .45s cubic-bezier(.2,1.3,.4,1)}' +
     '.jt-bol2-saldo{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}' +
     '.jt-bol2-fase{font-size:13px;font-weight:600;letter-spacing:.4px;color:#9fe9ff;text-transform:uppercase;display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;line-height:1.1}' +
     '.jt-bol2-pontos{display:inline-flex;gap:4px}' +
@@ -256,7 +304,19 @@
     '@keyframes jtb2Sobe{30%{color:#7dffb4;text-shadow:0 0 16px #2dff88,0 0 34px #2dff88}}@keyframes jtb2Desce{30%{color:#ff9aac;text-shadow:0 0 16px #ff3b5c,0 0 34px #ff3b5c}}' +
     '.jt-bol2-mini{min-width:44px;min-height:44px;border-radius:999px;border:2px solid #7fdcff;background:rgba(8,14,60,.8);color:#eaf6ff;font:700 22px/1 Fredoka,system-ui,sans-serif;padding:0 10px;flex:0 0 auto}' +
     '.jt-bol2-mini[aria-pressed="true"]{background:#fff;color:#0a0b3a}' +
-    '.jt-bol2-painel{gap:6px;padding:6px 10px calc(8px + env(safe-area-inset-bottom,0px));align-items:stretch;justify-content:flex-start;overflow-y:auto}' +
+    // embaixo fica uma faixa livre de 46 px: é onde mora a bolinha 🎵 da trilha (canto de baixo à direita)
+    '.jt-bol2-painel{gap:6px;padding:6px 10px calc(46px + env(safe-area-inset-bottom,0px));align-items:stretch;justify-content:flex-start;overflow-y:auto}' +
+    '.jt-bol2-passo{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:16px;color:#ffe08a;line-height:1.15;min-height:26px}' +
+    '.jt-bol2-passo .n{flex:0 0 auto;padding:2px 9px;border-radius:999px;background:#ffc23a;color:#3a2300;font-size:14px}' +
+    '.jt-bol2-volta{flex:0 0 auto;min-height:32px;padding:0 12px;border-radius:999px;border:2px solid rgba(127,220,255,.7);background:rgba(8,14,60,.8);color:#eaf6ff;font:600 14px/1 Fredoka,system-ui,sans-serif}' +
+    '.jt-bol2-zonas{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}' +
+    '.jt-bol2-zbt{position:relative;min-height:54px;padding:3px 0 4px;border-radius:12px;border:2px solid rgba(255,255,255,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;' +
+    'background:linear-gradient(180deg,#c8cedb,#7d8599 45%,#e9edf4 70%,#6a7288);box-shadow:0 3px 0 #2b3352,0 0 12px rgba(63,208,255,.25);color:#d6f8ff;cursor:pointer}' +
+    '.jt-bol2-zbt b{display:flex;align-items:center;justify-content:center;width:80%;max-width:34px;height:28px;border-radius:7px;background:#03040e;font:700 21px/1 Fredoka,system-ui,sans-serif;text-shadow:0 0 6px rgba(80,200,255,.8)}' +
+    '.jt-bol2-zbt i{font-style:normal;font-size:10px;line-height:10px;height:10px;letter-spacing:1px;color:#fff;text-shadow:0 0 4px #7fdcff}' +
+    '.jt-bol2-zbt.tem{border-color:#ffe08a;box-shadow:0 3px 0 #2b3352,0 0 16px rgba(255,224,138,.6)}' +
+    '.jt-bol2-zbt:active{transform:translateY(2px);box-shadow:0 1px 0 #2b3352}.jt-bol2-zbt:disabled{filter:brightness(.75)}' +
+    '.jt-bol2-status .bb{letter-spacing:3px;color:#fff;margin-right:4px}' +
     '.deitado .jt-bol2-painel{justify-content:center}' +
     '.jt-bol2-painel>*{width:100%;max-width:560px;margin:0 auto;flex-shrink:0}.deitado .jt-bol2-saldo{flex:0 0 auto}' +
     '.jt-bol2-msg{margin:0;font-size:15px;font-weight:600;text-align:center;color:#ffe08a;min-height:1.2em;line-height:1.2}.jt-bol2-msg:empty{display:none}' +
@@ -320,8 +380,9 @@
     'text-shadow:0 0 12px rgba(80,220,255,.9),0 0 34px rgba(80,160,255,.7);animation:jtb2Entra .6s cubic-bezier(.2,1.3,.4,1) both}' +
     '.jt-bol2-placar .jt-bol2-pontos{justify-content:center;gap:8px}.jt-bol2-placar .jt-bol2-pontos i{width:22px;height:22px;border-width:2.5px}' +
     '.jt-bol2-placar .frase{font-size:20px;font-weight:700;color:#ffe08a}' +
+    '.jt-bol2-placar h2{font-size:24px}.jt-bol2-placar .degraus{font-size:17px;color:#ffe08a}.jt-bol2-placar .jt-bol2-pontos i{width:16px;height:16px}' +
     '@media (orientation:landscape) and (max-height:560px){.jt-bol2-modo{padding:6px 6px 8px}.jt-bol2-modo small{font-size:12px}.jt-bol2-modo svg{max-width:110px}}' +
-    '@media (prefers-reduced-motion:reduce){.jt-bol2-aura.bate,.jt-bol2-fasecard,.jt-bol2-placar .jt-bol2-total,.jt-bol2-odo.sobe,.jt-bol2-odo.desce{animation:none}}' +
+    '@media (prefers-reduced-motion:reduce){.jt-bol2-escada .brilha,.jt-bol2-festa.anima,.jt-bol2-aura.bate,.jt-bol2-fasecard,.jt-bol2-placar .jt-bol2-total,.jt-bol2-odo.sobe,.jt-bol2-odo.desce{animation:none}}' +
     '@media (max-height:520px){.jt-bol2-perg{font-size:16px}.jt-bol2-op{min-height:42px;font-size:15px}.jt-bol2-btn{min-height:44px;font-size:17px}.jt-bol2-msg{font-size:14px}}';
   function injetarEstilo() {
     if (document.getElementById('jt-bolinhas-css')) return;
@@ -365,7 +426,9 @@
       erro: function () { var a = ac(); if (!a) return; nota(a, 150, 0, 0.7, 'sawtooth', 0.09, 50); nota(a, 75, 0, 0.8, 'sine', 0.25, 38); },
       verde: function () { var a = ac(); if (!a) return; nota(a, 880, 0, 0.12, 'triangle', 0.07); nota(a, 1320, 0.07, 0.18, 'triangle', 0.06); },
       vermelha: function () { var a = ac(); if (!a) return; nota(a, 120, 0, 0.3, 'square', 0.04, 70); nota(a, 90, 0, 0.35, 'sine', 0.2, 50); },
-      comporta: function () { var a = ac(); if (!a) return; nota(a, 240, 0, 0.06, 'square', 0.03, 140); }
+      comporta: function () { var a = ac(); if (!a) return; nota(a, 240, 0, 0.06, 'square', 0.03, 140); },
+      degrau: function () { var a = ac(); if (!a) return; [660, 880, 1175].forEach(function (f, i) { nota(a, f, i * 0.06, 0.22, 'triangle', 0.07); }); },
+      porto: function () { var a = ac(); if (!a) return; [523, 659, 784, 1047, 1319].forEach(function (f, i) { nota(a, f, i * 0.08, 0.45, 'triangle', 0.08); }); nota(a, 262, 0, 0.9, 'sine', 0.12); }
     };
   }
 
@@ -402,14 +465,18 @@
     faseEl.appendChild(faseNome); faseEl.appendChild(pontosEl);
     var odo = el('div', 'jt-bol2-odo' + (calmo ? ' calmo' : '')); odo.setAttribute('role', 'status');
     saldoBox.appendChild(faseEl); saldoBox.appendChild(odo);
+    // a escada de pontos: deitado, coluna ao lado da parede (meta no alto); em pé, uma faixa compacta embaixo do placar
+    var escadaEl = el('ol', 'jt-bol2-escada'); escadaEl.setAttribute('aria-label', t('Escada de pontos', 'Points ladder', 'Escalera de puntos'));
+    var festaEl = el('div', 'jt-bol2-festa'); festaEl.hidden = true; festaEl.setAttribute('role', 'status');
     var contrasteBt = el('button', 'jt-bol2-mini', '<span aria-hidden="true">+ −</span>'); contrasteBt.type = 'button';
     contrasteBt.setAttribute('aria-label', t('Alto contraste: + e − dentro das bolinhas', 'High contrast: + and − inside the balls', 'Alto contraste: + y − dentro de las bolitas'));
 
     // painel: aviso, categoria, pergunta, opções, ações
     var msgEl = el('p', 'jt-bol2-msg'); msgEl.setAttribute('aria-live', 'polite');
     var catEl = el('div', 'jt-bol2-cat'); var pergEl = el('p', 'jt-bol2-perg'); var opsEl = el('div', 'jt-bol2-ops'); var acoesEl = el('div', 'jt-bol2-acoes');
-    [msgEl, catEl, pergEl, opsEl, acoesEl].forEach(function (e) { painel.appendChild(e); });
-    var cena = el('div', 'jt-bol2-cena'); cena.hidden = true; raiz.appendChild(cena);
+    var passo = el('div', 'jt-bol2-passo'); passo.hidden = true; passo.setAttribute('aria-live', 'polite');
+    [passo, msgEl, catEl, pergEl, opsEl, acoesEl].forEach(function (e) { painel.appendChild(e); });
+    var cena = el('div', 'jt-bol2-cena'); cena.hidden = true; raiz.appendChild(festaEl); raiz.appendChild(cena);
 
     /* ---------- estado ---------- */
     var contraste = !!ctx.ler('contraste');
@@ -418,9 +485,11 @@
     var mundo = criarMundo();
     function novoEstado() {
       return { mod: modalidade, etapa: 'inicio', saldo: 0, rodada: 0, marcas: [], acertos: 0, perg: null, resposta: null,
-        zonas: [], zona: 3, zonaOk: false, usadas: {}, lote: null, leituraAte: 0 };
+        zonas: [], zona: 3, zonaOk: false, usadas: {}, lote: null, leituraAte: 0,
+        piso: 0, degrauMax: 0, erros: 0, motivo: null };   // escada: porto seguro garantido, maior degrau, erros seguidos
     }
     function R() { return MODALIDADES[G.mod]; }
+    function E() { return ESCADA[G.mod]; }
     function jogando() { return G.etapa !== 'inicio' && G.etapa !== 'fim'; }
     G = novoEstado();
 
@@ -473,6 +542,43 @@
         h += '<i class="' + (m === true ? 'sim' : m === false ? 'nao' : i === G.rodada && jogando() && G.etapa !== 'cartao' ? 'agora' : '') + '"></i>';
       }
       pontosEl.innerHTML = h;
+      pintarEscada();
+    }
+    function curto(v) {   // 14000 → "14 mil" / "14K"
+      if (v < 1000) return milhar(v, L);
+      var k = v / 1000; return (k % 1 ? k.toFixed(1).replace('.', L === 'en' ? '.' : ',') : k) + (L === 'en' ? 'K' : ' mil');
+    }
+    function pintarEscada() {
+      var esc2 = E(), d = degrauDe(G.saldo, esc2), h = '';
+      for (var i = esc2.length - 1; i >= 0; i--) {
+        var porto = PORTOS.indexOf(i) >= 0, travado = porto && G.piso >= esc2[i], meta = i === esc2.length - 1;
+        var cls = (i < d ? ' ok' : '') + (i === d ? ' alvo' : '') + (porto ? ' porto' : '') + (travado ? ' travado' : '') + (meta ? ' meta' : '');
+        var ico = meta ? '🏆' : travado ? '🔒' : porto ? '🛟' : '';
+        h += '<li class="d' + cls + '" data-degrau="' + i + '"><span class="ic" aria-hidden="true">' + ico + '</span><span class="v">' + curto(esc2[i]) + '</span>' +
+          '<span class="sr">' + (porto ? t(' (porto seguro)', ' (safe haven)', ' (puerto seguro)') : '') + (i < d ? ' ✔' : '') + '</span></li>';
+      }
+      escadaEl.innerHTML = h;
+      escadaEl.hidden = G.etapa === 'inicio';
+    }
+    // degrau novo e porto seguro travado: um aviso curto por cima da parede, som e brilho (sem pulo com "reduzir movimento")
+    var festaTm = null;
+    function festa(txt, porto) {
+      festaEl.textContent = txt; festaEl.className = 'jt-bol2-festa' + (porto ? ' porto' : '') + (calmo ? '' : ' anima'); festaEl.hidden = false;
+      pos(festaEl, Lt.px + 8, Lt.py + Lt.ph * 0.42, Lt.pw - 16, null);
+      if (festaTm) cancelar(festaTm);
+      festaTm = agendar(porto ? 2.6 : 1.8, function () { festaEl.hidden = true; });
+      if (porto) som.porto(); else som.degrau();
+    }
+    function atualizarEscada() {
+      var esc2 = E(), d = degrauDe(G.saldo, esc2), piso = novoPiso(G.piso, G.saldo, esc2);
+      if (piso > G.piso) {
+        G.piso = piso;
+        festa('🔒 ' + t('Porto seguro! ', 'Safe haven! ', '¡Puerto seguro! ') + din(piso) + t(' garantidos', ' locked in', ' asegurados'), true);
+      } else if (d > G.degrauMax && d < esc2.length) festa('⬆ ' + t('Degrau ', 'Step ', 'Peldaño ') + d + ' · ' + din(esc2[d - 1]), false);
+      if (d > G.degrauMax) G.degrauMax = d;
+      pintarEscada();
+      var li = escadaEl.querySelector('[data-degrau="' + (d - 1) + '"]');
+      if (li && !calmo) { li.classList.remove('brilha'); void li.offsetWidth; li.classList.add('brilha'); }
     }
     contrasteBt.addEventListener('click', function () {
       contraste = !contraste; ctx.gravar('contraste', contraste); contrasteBt.setAttribute('aria-pressed', String(contraste));
@@ -495,23 +601,23 @@
       hud.innerHTML = '';
       if (retrato) {
         // o Sem pressa precisa de mais painel (pergunta + 4 opções + zonas); a parede encolhe um pouco
-        var topo = clamp(Math.round(H * 0.08), 56, 86), baixo = G.mod === 'calma' ? clamp(Math.round(H * 0.35), 252, 380) : clamp(Math.round(H * 0.25), 188, 320);
+        var topo = clamp(Math.round(H * 0.08), 56, 86) + 30, baixo = G.mod === 'calma' ? clamp(Math.round(H * 0.4), 272, 400) : clamp(Math.round(H * 0.29), 224, 340);   // + a faixa livre da bolinha 🎵
         ph = Math.min((W - 6) * RZ, H - topo - baixo - 4); pw = ph / RZ;
         px = (W - pw) / 2; py = topo;
         pos(hud, 0, 0, W, topo); pos(painel, 0, py + ph + 2, W, H - py - ph - 2);
-        hud.appendChild(saldoBox); hud.appendChild(contrasteBt);
-        raiz.style.setProperty('--odo', clamp(Math.round(topo * 0.5), 28, 44) + 'px');
+        hud.appendChild(saldoBox); hud.appendChild(contrasteBt); hud.appendChild(escadaEl);
+        raiz.style.setProperty('--odo', clamp(Math.round((topo - 30) * 0.5), 28, 44) + 'px');
       } else {
         ph = H - 10; pw = ph / RZ;
         var lado = (W - pw) / 2 - 14;
         if (lado < 190) { lado = 190; pw = W - 2 * (lado + 14); ph = pw * RZ; }
         px = (W - pw) / 2; py = (H - ph) / 2;
         pos(hud, 10, 8, lado, H - 16); pos(painel, px + pw + 10, 6, lado, H - 12);
-        hud.appendChild(saldoBox); hud.appendChild(contrasteBt);
+        hud.appendChild(saldoBox); hud.appendChild(escadaEl); hud.appendChild(contrasteBt);
         raiz.style.setProperty('--odo', clamp(Math.round(Math.min(lado / 6.5, H / 7)), 30, 96) + 'px');
       }
       pos(parede, px, py, pw, ph);
-      if (retrato) pos(tag, px + 8, py + 8, null, null); else pos(tag, px + 10, py + ph - 30, null, null);   // deitado: no piso, para não tapar as zonas
+      pos(tag, px + 10, py + ph - 30, null, null);   // no piso, embaixo à esquerda: nunca tapa as zonas do alto (dono, 21/Nov/2026)
       dpr = Math.min(dprMax, window.devicePixelRatio || 1);
       tela.width = Math.round(W * dpr); tela.height = Math.round(H * dpr);
       s0 = Math.min(pw / (ABERTO.x1 - ABERTO.x0), ph / (ABERTO.y1 - ABERTO.y0));
@@ -922,8 +1028,8 @@
       if (b.aplicada || b.cor === 'branca' || !b.pousou) return;
       b.aplicada = true;
       var v = VALORES[b.canaleta], mx = MAIOR;
-      G.saldo = aplicarBola(G.saldo, v, b.cor);
-      pintarOdo(G.saldo);
+      G.saldo = aplicarBola(G.saldo, v, b.cor, G.piso);
+      pintarOdo(G.saldo); atualizarEscada();
       flashes.push({ k: b.canaleta, cor: b.cor, vida: 1 });
       flutua.push({ x: (b.canaleta + 0.5) * GEO.LARG, y: GEO.YDIV - 20, txt: (b.cor === 'verde' ? '+' : '−') + milhar(v, L), cor: b.cor, vida: 1.6 });
       explodir(b.x, b.y, b.cor, 14);
@@ -1010,7 +1116,7 @@
 
     /* ---------- painel ---------- */
     function msg(s) { msgEl.textContent = s || ''; }
-    function limparPainel() { msg(''); catEl.innerHTML = ''; pergEl.textContent = ''; pergEl.hidden = true; opsEl.innerHTML = ''; acoesEl.innerHTML = ''; }
+    function limparPainel() { passo.hidden = true; passo.innerHTML = ''; msg(''); catEl.innerHTML = ''; pergEl.textContent = ''; pergEl.hidden = true; opsEl.innerHTML = ''; acoesEl.innerHTML = ''; }
     var LETRAS = ['A', 'B', 'C', 'D'];
     function montarOps(p, aoEscolher) {
       opsEl.innerHTML = ''; opsEl.className = 'jt-bol2-ops n' + p.o.length;
@@ -1021,10 +1127,6 @@
         b.addEventListener('click', function () { aoEscolher(i); });
         opsEl.appendChild(b);
       });
-    }
-    // no Sem pressa as opções ficam à mostra, mas só se soltam depois das 3 zonas escolhidas
-    function opsAtivas(sim) {
-      Array.prototype.forEach.call(opsEl.children, function (b) { b.disabled = !sim; b.classList.toggle('espera', !sim); });
     }
     function marcarOps(certa, escolhida) {
       Array.prototype.forEach.call(opsEl.children, function (b, i) {
@@ -1120,12 +1222,11 @@
       G.etapa = 'cartao'; G.rodada = 0; G.perg = null;
       pintarFase(); limparPainel();
       var queda = G.mod === 'queda';
-      var sub = queda ? t('5 perguntas de 2 opções. Três bolinhas caem das zonas 1, 4 e 7: responda antes que a primeira chegue lá embaixo!',
-        '5 questions with 2 options. Three balls drop from zones 1, 4 and 7: answer before the first one reaches the bottom!',
-        '5 preguntas de 2 opciones. Tres bolitas caen de las zonas 1, 4 y 7: ¡responde antes de que la primera llegue abajo!') :
-        t('5 perguntas de 4 opções, sem relógio. Leia, toque em 3 zonas lá no alto (o centro vale mais, as pontas arriscam menos) e depois responda.',
-          '5 questions with 4 options, no clock. Read, tap 3 zones at the top (the middle pays more, the edges risk less) and then answer.',
-          '5 preguntas de 4 opciones, sin reloj. Lee, toca 3 zonas de arriba (el centro vale más, los lados arriesgan menos) y luego responde.');
+      var sub = (queda ? t('2 opções: três bolinhas caem das zonas 1, 4 e 7 e é preciso responder antes que a primeira chegue lá embaixo. ',
+        '2 options: three balls drop from zones 1, 4 and 7 and you must answer before the first one reaches the bottom. ',
+        '2 opciones: tres bolitas caen de las zonas 1, 4 y 7 y hay que responder antes de que la primera llegue abajo. ') :
+        t('4 opções, sem relógio: escolha 3 zonas e depois responda. ', '4 options, no clock: pick 3 zones, then answer. ', '4 opciones, sin reloj: elige 3 zonas y luego responde. ')) +
+        t('Suba a escada até a 🏆 ', 'Climb the ladder to the 🏆 ', 'Sube la escalera hasta el 🏆 ') + din(E()[5]) + t('! Os 🛟 portos seguros, quando alcançados, ficam garantidos. Até 12 perguntas; 3 erros seguidos encerram.', '! Reach a 🛟 safe haven and those points are locked in. Up to 12 questions; 3 wrong in a row ends the round.', '! Los 🛟 puertos seguros, al alcanzarlos, quedan asegurados. Hasta 12 preguntas; 3 fallos seguidos terminan la ronda.');
       abrirCena('<div class="jt-bol2-caixa jt-bol2-fasecard"><span class="num">' + (queda ? '⏱' : '🧘') + ' ' + t('Modalidade', 'Mode', 'Modalidad') + '</span><h2>' + nomeMod(G.mod) + '</h2><p>' + sub + '</p>' +
         '<button type="button" class="jt-bol2-btn" data-foco data-ok>' + t('Vamos!', 'Let’s go!', '¡Vamos!') + '</button></div>', 'vidro');
       var seguiu = false, seguir = function () { if (seguiu) return; seguiu = true; fecharCena(); proxima(); };
@@ -1133,18 +1234,20 @@
       if (queda) agendar(calmo ? 6 : 4.5, function () { if (G.etapa === 'cartao') seguir(); });   // no Sem pressa, nada anda sozinho
     }
     function proxima() {
-      if (G.rodada >= R().perguntas) return placar();
+      var fim = fimDaRodada(G.saldo, E(), G.rodada, G.erros, R().perguntas);
+      if (fim) { G.motivo = fim; return placar(); }
       if (G.mod === 'queda') perguntaQueda(); else perguntaCalma();
     }
     function novaPergunta() {
-      var q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte);
-      if (!q) { G.usadas = {}; q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte); }   // banco esgotado: recomeça
+      var alvo = alvoDificuldade(nivel, degrauDe(G.saldo, E()));   // sobe a escada, endurecem as perguntas
+      var q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte, alvo);
+      if (!q) { G.usadas = {}; q = sortearPergunta(banco, R().opcoes, nivel, G.usadas, sorte, alvo); }   // banco esgotado: recomeça
       G.perg = prepararPergunta(q, sorte); G.resposta = null;
       limparPainel();
       catEl.innerHTML = categoriaHTML(G.perg);
       pergEl.hidden = false; pergEl.textContent = tx(G.perg.q);
     }
-    function marcar(acertou) { G.marcas[G.rodada] = acertou; if (acertou) G.acertos++; pintarFase(); }
+    function marcar(acertou) { G.marcas[G.rodada] = acertou; if (acertou) G.acertos++; G.erros = acertou ? 0 : G.erros + 1; pintarFase(); }
 
     /* ---------- Queda Livre: 2 opções, responder enquanto as bolinhas caem ---------- */
     function perguntaQueda() {
@@ -1185,48 +1288,87 @@
       revelarLote(acertou);
     }
 
-    /* ---------- Sem pressa: 4 opções, sem tempo; primeiro as 3 zonas, depois a resposta ---------- */
+    /* ---------- Sem pressa: 4 opções, sem tempo, em 2 passos BEM claros no painel (dono, 21/Nov/2026: "não sei onde é o
+       botão de start") ----------
+       Passo 1 "Onde as bolinhas vão cair?": a pergunta (para já ir pensando) e, no lugar das opções, 7 botões grandes
+       numerados como as zonas da parede (tocar na parede também vale), ↩ desfaz, 🎲 sorteia as que faltam.
+       Passo 2 "Agora responda": com as 3 bolinhas no lugar, os botões de zona somem e aparecem as 4 opções. ↩ volta ao passo 1. */
     function perguntaCalma() {
       novaPergunta();
       G.zonas = []; G.zonaOk = false; G.etapa = 'zonas';
       pintarFase(); clima('calma');
-      montarOps(G.perg, responderCalma); opsAtivas(false);
-      montarAcoesZonas();
+      passoZonas();
     }
-    function montarAcoesZonas() {
+    function passoEl(n, txt, comVolta) {
+      passo.innerHTML = '<span class="n">' + n + '/2</span><span class="t">' + esc(txt) + '</span>'; passo.hidden = false;
+      if (comVolta) {
+        var v = el('button', 'jt-bol2-volta'); v.type = 'button'; v.setAttribute('data-desfazer', '');
+        v.innerHTML = '↩ <span>' + t('zonas', 'zones', 'zonas') + '</span>';
+        v.setAttribute('aria-label', t('Voltar e mudar as zonas', 'Go back and change the zones', 'Volver y cambiar las zonas'));
+        v.addEventListener('click', function () { desfazerZona(); });
+        passo.appendChild(v);
+      }
+    }
+    function passoZonas() {
+      var n = G.zonas.length, max = R().bolas, ativo = document.activeElement, focoZona = ativo && ativo.getAttribute && ativo.getAttribute('data-zona');
+      passoEl(1, t('Onde as bolinhas vão cair?', 'Where will the balls drop?', '¿Dónde caerán las bolitas?'), false);
+      // os 7 botões das zonas, numerados como as comportas da parede; os pontinhos mostram quantas bolinhas já estão em cada uma
+      opsEl.innerHTML = ''; opsEl.className = 'jt-bol2-zonas';
+      for (var k = 0; k < 7; k++) (function (k) {
+        var q = 0; G.zonas.forEach(function (z) { if (z === k) q++; });
+        var b = el('button', 'jt-bol2-zbt' + (q ? ' tem' : '')); b.type = 'button'; b.setAttribute('data-zona', k);
+        b.setAttribute('aria-label', t('Zona ', 'Zone ', 'Zona ') + (k + 1) + (q ? ' (' + q + ')' : ''));
+        b.innerHTML = '<b>' + (k + 1) + '</b><i>' + new Array(q + 1).join('●') + '</i>';
+        b.disabled = n >= max;
+        b.addEventListener('click', function () { colocarZona(k); });
+        b.addEventListener('focus', function () { G.zona = k; G.zonaOk = true; sujo = true; });
+        opsEl.appendChild(b);
+      })(k);
       acoesEl.innerHTML = '';
-      var n = G.zonas.length, max = R().bolas, pronto = zonasProntas(G.zonas, max);
       var des = el('button', 'jt-bol2-btn fino'); des.type = 'button'; des.setAttribute('data-desfazer', '');
       des.innerHTML = '<span aria-hidden="true">↩</span>'; des.setAttribute('aria-label', t('Desfazer a última zona', 'Undo the last zone', 'Deshacer la última zona'));
       des.disabled = n === 0;
       des.addEventListener('click', function () { desfazerZona(); });
-      var st = el('span', 'jt-bol2-status' + (pronto ? ' pronto' : '')); st.setAttribute('data-status', '');
-      st.textContent = pronto ? '✔ ' + t('Agora é só responder!', 'Now pick your answer!', '¡Ahora elige la respuesta!') :
-        '👆 ' + t('Toque nas zonas do alto: ', 'Tap the zones at the top: ', 'Toca las zonas de arriba: ') + n + '/' + max;
-      acoesEl.appendChild(des); acoesEl.appendChild(st);
+      var st = el('span', 'jt-bol2-status'); st.setAttribute('data-status', '');
+      var bolas = ''; for (var i = 0; i < max; i++) bolas += i < n ? '●' : '○';
+      st.innerHTML = '<span class="bb">' + bolas + '</span> ' + n + t(' de ', ' of ', ' de ') + max;
+      var sor = el('button', 'jt-bol2-btn fino'); sor.type = 'button'; sor.setAttribute('data-sortear', '');
+      sor.textContent = '🎲 ' + t('Sortear', 'Random', 'Al azar');
+      sor.setAttribute('aria-label', t('Sortear as zonas que faltam', 'Pick the missing zones at random', 'Elegir al azar las zonas que faltan'));
+      sor.addEventListener('click', function () { sortearZonas(); });
+      acoesEl.appendChild(des); acoesEl.appendChild(st); acoesEl.appendChild(sor);
+      if (focoZona != null) focar(opsEl.children[+focoZona]);
+    }
+    function passoResposta() {
+      passoEl(2, t('Agora responda!', 'Now answer!', '¡Ahora responde!'), true);
+      acoesEl.innerHTML = '';
+      montarOps(G.perg, responderCalma);
+      if (teclou) focar(opsEl.firstChild);
     }
     function colocarZona(z) {
       if (G.mod !== 'calma' || G.etapa !== 'zonas') return;
       G.zonas = adicionarZona(G.zonas, z, R().bolas); G.zona = clamp(Math.round(z), 0, 6); G.zonaOk = true; sujo = true;
       som.comporta();
-      if (zonasProntas(G.zonas, R().bolas)) {
-        G.etapa = 'resposta'; opsAtivas(true);
-        var foco = document.activeElement;
-        if (!foco || foco === document.body || foco === tela || foco.hasAttribute('data-desfazer')) focar(opsEl.firstChild);
-      }
-      montarAcoesZonas();
+      if (zonasProntas(G.zonas, R().bolas)) { G.etapa = 'resposta'; passoResposta(); }
+      else passoZonas();
+    }
+    function sortearZonas() {
+      if (G.mod !== 'calma' || G.etapa !== 'zonas') return;
+      ctx.som('toque');
+      while (G.etapa === 'zonas') colocarZona(Math.floor(sorte() * 7));
     }
     function desfazerZona() {
       if (G.mod !== 'calma' || (G.etapa !== 'zonas' && G.etapa !== 'resposta') || !G.zonas.length) return;
       ctx.som('toque');
-      G.zonas = G.zonas.slice(0, -1); G.etapa = 'zonas'; opsAtivas(false); sujo = true;
-      montarAcoesZonas();
+      G.zonas = G.zonas.slice(0, -1); G.etapa = 'zonas'; sujo = true;
+      passoZonas();
+      if (teclou) focar(opsEl.children[G.zona]);
     }
     function responderCalma(i) {
       if (G.mod !== 'calma' || G.etapa !== 'resposta' || G.resposta !== null) return;
       var acertou = i === G.perg.c, cor = corDaResposta(acertou);
       G.resposta = i; G.etapa = 'quedaCalma'; ctx.som('toque');
-      marcar(acertou); marcarOps(G.perg.c, i); acoesEl.innerHTML = '';
+      marcar(acertou); marcarOps(G.perg.c, i); acoesEl.innerHTML = ''; passo.hidden = true; passo.innerHTML = '';
       msg(acertou ? t('Acertou! As bolinhas caem verdes: tudo soma!', 'Correct! The balls drop green: it all adds up!', '¡Acierto! Las bolitas caen verdes: ¡todo suma!') :
         t('Errou… as bolinhas caem vermelhas: tudo desconta!', 'Wrong… the balls drop red: it all comes off!', 'Fallo… las bolitas caen rojas: ¡todo resta!'));
       clima(acertou ? 'verde' : 'vermelho');
@@ -1239,18 +1381,21 @@
     /* ---------- placar no fim da rodada ---------- */
     function placar() {
       G.etapa = 'fim'; limparPainel(); pintarFase();
-      var n = R().perguntas, ch = 'recorde-' + G.mod + '-' + nivel, rec = +ctx.ler(ch) || 0, novo = G.saldo > rec;
+      var esc2 = E(), feitas = G.marcas.length, ch = 'recorde-' + G.mod + '-' + nivel, rec = +ctx.ler(ch) || 0, novo = G.saldo > rec;
       if (novo) ctx.gravar(ch, G.saldo);
-      var bols = ''; for (var i = 0; i < n; i++) bols += '<i class="' + (G.marcas[i] ? 'sim' : 'nao') + '"></i>';
-      var frase = G.acertos === n ? t('Gabaritou! 🤩', 'A perfect round! 🤩', '¡Pleno total! 🤩') : G.acertos >= 3 ? t('Mandou bem! 👏', 'Well played! 👏', '¡Muy bien! 👏') :
-        t('A parede quer revanche! 💪', 'The wall wants a rematch! 💪', '¡La pared quiere la revancha! 💪');
-      clima(G.acertos >= 3 ? 'verde' : 'calma');
-      if (G.acertos >= 3) som.acerto();
-      abrirCena('<div class="jt-bol2-caixa jt-bol2-placar"><span class="num">🏁 ' + t('Placar', 'Final score', 'Marcador') + ' · ' + nomeMod(G.mod) + '</span>' +
+      var venceu = G.motivo === 'meta', d = degrauDe(G.saldo, esc2);
+      var bols = ''; for (var i = 0; i < feitas; i++) bols += '<i class="' + (G.marcas[i] ? 'sim' : 'nao') + '"></i>';
+      var titulo = venceu ? '🏆 ' + t('Meta alcançada!', 'Goal reached!', '¡Meta alcanzada!') :
+        G.motivo === 'erros' ? '😬 ' + t('3 erros seguidos', '3 wrong in a row', '3 fallos seguidos') : '🏁 ' + t('Fim das 12 perguntas', 'All 12 questions done', 'Fin de las 12 preguntas');
+      clima(venceu || G.acertos >= feitas / 2 ? 'verde' : 'calma');
+      if (venceu || G.acertos >= feitas / 2) som.acerto();
+      abrirCena('<div class="jt-bol2-caixa jt-bol2-placar"><span class="num">' + t('Placar', 'Final score', 'Marcador') + ' · ' + nomeMod(G.mod) + '</span>' +
+        '<h2 data-titulo>' + titulo + '</h2>' +
         '<div class="jt-bol2-total" data-total>' + din(G.saldo) + '</div>' +
+        '<p class="degraus"><b>' + t('Degrau ', 'Step ', 'Peldaño ') + d + t(' de ', ' of ', ' de ') + esc2.length + '</b>' +
+        (G.piso ? ' · 🔒 ' + t('garantido: ', 'locked in: ', 'asegurado: ') + din(G.piso) : '') + '</p>' +
         '<div class="jt-bol2-pontos">' + bols + '</div>' +
-        '<p><b>' + G.acertos + '</b> ' + t('de ', 'out of ', 'de ') + n + t(' certas', ' right', ' aciertos') + '</p>' +
-        '<p class="frase">' + frase + '</p>' +
+        '<p><b>' + G.acertos + '</b> ' + t('de ', 'out of ', 'de ') + feitas + t(' certas', ' right', ' aciertos') + '</p>' +
         '<p>' + (novo && G.saldo > 0 ? '🏆 ' + t('Novo recorde!', 'New record!', '¡Nuevo récord!') : rec ? t('Recorde: ', 'Record: ', 'Récord: ') + din(rec) : '') + '</p>' +
         '<div class="jt-bol2-decide"><button type="button" class="jt-bol2-btn ouro" data-foco data-denovo>🔄 ' + t('Jogar de novo', 'Play again', 'Jugar otra vez') + '</button>' +
         '<button type="button" class="jt-bol2-btn" data-trocar>🎛 ' + t('Trocar modalidade', 'Change mode', 'Cambiar modalidad') + '</button></div></div>', 'vidro');
@@ -1272,15 +1417,22 @@
       if (!bs.length) return;
       var i = bs.indexOf(document.activeElement); i = i < 0 ? 0 : (i + d + bs.length) % bs.length; bs[i].focus();
     }
+    var teclou = false;   // usou teclado ou controle da TV: o foco acompanha os passos
     function aoTeclar(ev) {
+      teclou = true;
       if (!ev.key || document.querySelector('.ajuda:not([hidden]), .fim:not([hidden])')) return;
       var k = ev.key, seta = /^Arrow/.test(k), d = k === 'ArrowRight' || k === 'ArrowDown' ? 1 : -1, emBotao = ev.target && ev.target.tagName === 'BUTTON';
       if (!cena.hidden) { if (seta) { focarEntre(cena.querySelectorAll('button'), d); ev.preventDefault(); } return; }
       if (G.mod === 'calma' && (G.etapa === 'zonas' || G.etapa === 'resposta')) {
         if (k === 'Backspace' || k === 'Delete') { desfazerZona(); ev.preventDefault(); return; }
         if (G.etapa === 'zonas') {
-          if (k === 'ArrowLeft' || k === 'ArrowRight') { G.zona = clamp((G.zonaOk ? G.zona : 3 - d) + d, 0, 6); G.zonaOk = true; sujo = true; ctx.som('toque'); ev.preventDefault(); }
+          // passo 1: ← → andam pelos 7 botões das zonas (a mira acompanha na parede), OK põe a bolinha
+          if (k === 'ArrowLeft' || k === 'ArrowRight') {
+            var zs = opsEl.children, at = Array.prototype.indexOf.call(zs, document.activeElement);
+            focar(zs[clamp((at >= 0 ? at : G.zonaOk ? G.zona : 3 - d) + d, 0, 6)]); ev.preventDefault();
+          }
           else if ((k === 'Enter' || k === ' ') && !emBotao) { ev.preventDefault(); colocarZona(G.zonaOk ? G.zona : 3); }
+          else if (k === 'ArrowDown' || k === 'ArrowUp') { focarEntre(painel.querySelectorAll('button'), d); ev.preventDefault(); }
           return;
         }
       }
@@ -1624,7 +1776,8 @@
         return { modalidade: G.mod, etapa: G.etapa, saldo: G.saldo, rodada: G.rodada, acertos: G.acertos, marcas: G.marcas.slice(),
           bolas: mundo.bolas.length, caindo: mundo.bolas.filter(function (b) { return b.espera <= 0 && !b.pousou; }).length,
           cores: mundo.bolas.map(function (b) { return b.cor; }), resposta: G.resposta, certa: G.perg ? G.perg.c : null,
-          opcoes: G.perg ? G.perg.o.length : 0, zonas: G.zonas.slice(), timers: timers.length, semente: semente, nivel: nivel, tensao: tensao.ativa };
+          opcoes: G.perg ? G.perg.o.length : 0, zonas: G.zonas.slice(), piso: G.piso, degrau: degrauDe(G.saldo, E()), erros: G.erros,
+          motivo: G.motivo, dificuldade: G.perg ? G.perg.d : null, festa: !festaEl.hidden ? festaEl.textContent : '', timers: timers.length, semente: semente, nivel: nivel, tensao: tensao.ativa };
       },
       comecar: function (m) { comecar(m || 'queda'); },
       velocidade: function (v) { vel = v || 1; },
@@ -1633,6 +1786,8 @@
       responderErrado: function () { if (G.perg) BolinhasDebug.responder((G.perg.c + 1) % G.perg.o.length); },
       zona: function (z) { colocarZona(z); },
       desfazer: function () { desfazerZona(); },
+      sortear: function () { sortearZonas(); },
+      saldo: function (v) { G.saldo = v; pintarOdo(v); atualizarEscada(); },
       camera: function () {
         return { x: cam.x, y: cam.y, z: cam.z, escala: escala, lenta: escala < 0.75, plano: tipoPlano, pips: pips.length, aberto: { x: CAM0.x, y: CAM0.y },
           lider: camLider ? { x: camLider.x, y: camLider.y } : null, leve: leve, zoomPronto: !!cenZ };
@@ -1661,18 +1816,22 @@
       return '<p>' + t('Um game show numa parede gigante de pinos! As bolinhas ficam <b>verdes</b> quando você acerta (somam o valor da canaleta onde caem) e <b>vermelhas</b> quando erra (descontam; o saldo nunca fica abaixo de zero).',
         'A game show on a giant wall of pegs! The balls turn <b>green</b> when you get it right (they add the value of the slot they land in) and <b>red</b> when you get it wrong (they take it away; the balance never goes below zero).',
         '¡Un concurso en una pared gigante de clavos! Las bolitas se vuelven <b>verdes</b> cuando aciertas (suman el valor de la casilla donde caen) y <b>rojas</b> cuando fallas (lo restan; el saldo nunca baja de cero).') + '</p>' +
-        '<p><b>⏱ ' + t('Queda Livre', 'Free Fall', 'Caída Libre') + ':</b> ' + t('5 perguntas de 2 opções. Três bolinhas brancas caem das zonas 1, 4 e 7: responda antes que a primeira chegue lá embaixo. Sem resposta, vale como erro.',
-          '5 questions with 2 options. Three white balls drop from zones 1, 4 and 7: answer before the first one reaches the bottom. No answer counts as wrong.',
-          '5 preguntas de 2 opciones. Tres bolitas blancas caen de las zonas 1, 4 y 7: responde antes de que la primera llegue abajo. Sin respuesta, cuenta como fallo.') + '</p>' +
-        '<p><b>🧘 ' + t('Sem pressa', 'No Rush', 'Sin prisa') + ':</b> ' + t('5 perguntas de 4 opções, sem relógio. Leia a pergunta, toque em 3 zonas lá no alto (pode repetir a mesma; ↩ desfaz) e depois responda. O centro vale mais e as pontas arriscam menos.',
-          '5 questions with 4 options, no clock. Read the question, tap 3 zones at the top (you can repeat one; ↩ undoes) and then answer. The middle pays more and the edges risk less.',
-          '5 preguntas de 4 opciones, sin reloj. Lee la pregunta, toca 3 zonas de arriba (puedes repetir la misma; ↩ deshace) y luego responde. El centro vale más y los lados arriesgan menos.') + '</p>' +
+        '<p><b>⏱ ' + t('Queda Livre', 'Free Fall', 'Caída Libre') + ':</b> ' + t('2 opções. Três bolinhas brancas caem das zonas 1, 4 e 7: responda antes que a primeira chegue lá embaixo. Sem resposta, vale como erro.',
+          '2 options. Three white balls drop from zones 1, 4 and 7: answer before the first one reaches the bottom. No answer counts as wrong.',
+          '2 opciones. Tres bolitas blancas caen de las zonas 1, 4 y 7: responde antes de que la primera llegue abajo. Sin respuesta, cuenta como fallo.') + '</p>' +
+        '<p><b>🧘 ' + t('Sem pressa', 'No Rush', 'Sin prisa') + ':</b> ' + t('4 opções, sem relógio, em 2 passos: primeiro toque em 3 zonas (os botões 1 a 7 ou a parede; pode repetir; ↩ desfaz; 🎲 sorteia), depois responda. O centro vale mais e as pontas arriscam menos.',
+          '4 options, no clock, in 2 steps: first tap 3 zones (buttons 1 to 7 or the wall; you can repeat one; ↩ undoes; 🎲 picks at random), then answer. The middle pays more and the edges risk less.',
+          '4 opciones, sin reloj, en 2 pasos: primero toca 3 zonas (los botones del 1 al 7 o la pared; puedes repetir; ↩ deshace; 🎲 elige al azar) y luego responde. El centro vale más y los lados arriesgan menos.') + '</p>' +
+        '<p><b>🪜 ' + t('Escada de pontos', 'Points ladder', 'Escalera de puntos') + ':</b> ' + t('suba degrau por degrau até a 🏆 (30.000 na Queda Livre, 50.000 no Sem pressa). O 2º e o 4º degraus são 🛟 portos seguros: alcançou, ficam garantidos 🔒 e as vermelhas não derrubam o saldo abaixo deles. A rodada acaba na 🏆, depois de 12 perguntas ou com 3 erros seguidos. Quanto mais alto, mais difíceis as perguntas.',
+          'climb step by step to the 🏆 (30,000 in Free Fall, 50,000 in No Rush). The 2nd and 4th steps are 🛟 safe havens: reach one and it is locked in 🔒, so red balls can never drop your score below it. The round ends at the 🏆, after 12 questions or with 3 wrong in a row. The higher you climb, the harder the questions.',
+          'sube peldaño a peldaño hasta el 🏆 (30.000 en la Caída Libre, 50.000 en Sin prisa). El 2.º y el 4.º peldaños son 🛟 puertos seguros: al alcanzarlos quedan asegurados 🔒 y las rojas no bajan la puntuación de ahí. La ronda termina en el 🏆, tras 12 preguntas o con 3 fallos seguidos. Cuanto más alto, más difíciles las preguntas.') + '</p>' +
         '<p>' + t('O nível muda as perguntas (e, na Queda Livre, o tempo para ler). Teclado ou controle da TV: ← → passam pelas zonas ou pelas opções, OK confirma e ⌫ desfaz a zona. O botão «+ −» põe + e − dentro das bolinhas.',
           'The level changes the questions (and, in Free Fall, the reading time). Keyboard or TV remote: ← → move through the zones or the options, OK confirms and ⌫ undoes a zone. The «+ −» button puts + and − inside the balls.',
           'El nivel cambia las preguntas (y, en la Caída Libre, el tiempo para leer). Teclado o mando de la tele: ← → recorren las zonas o las opciones, OK confirma y ⌫ deshace la zona. El botón «+ −» pone + y − dentro de las bolitas.') + '</p>';
     },
     iniciar: iniciar,
-    logica: { VALORES: VALORES, MODALIDADES: MODALIDADES, GEO: GEO, FIS: FIS, CATEGORIAS: CATEGORIAS, aplicarBola: aplicarBola, aplicarLote: aplicarLote,
+    logica: { VALORES: VALORES, MODALIDADES: MODALIDADES, ESCADA: ESCADA, PORTOS: PORTOS, ERROS_SEGUIDOS: ERROS_SEGUIDOS, degrauDe: degrauDe,
+      novoPiso: novoPiso, fimDaRodada: fimDaRodada, alvoDificuldade: alvoDificuldade, GEO: GEO, FIS: FIS, CATEGORIAS: CATEGORIAS, aplicarBola: aplicarBola, aplicarLote: aplicarLote,
       corDaResposta: corDaResposta, tempoDeLeitura: tempoDeLeitura, adicionarZona: adicionarZona, zonasProntas: zonasProntas,
       criarSorte: criarSorte, sortearPergunta: sortearPergunta, prepararPergunta: prepararPergunta,
       criarMundo: criarMundo, soltar: soltar, passoMundo: passoMundo, simularQueda: simularQueda, dinheiro: dinheiro, zonaX: zonaX }
