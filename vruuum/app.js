@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.35.0';
+  var APP_VERSION = '1.36.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -515,13 +515,16 @@
     var configs = [];
     if (dl) configs = dl.riv.map(function (r) { return { id: r.id, veic: r.veic, cor: r.cor, mod: { vel: r.vel, curva: r.curva } }; });   // os rivais de quem criou
     else if (pref.rivais === 'com' && PE) {
-      var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return (jogs[0] && VE.achar(jogs[0].veic) && VE.achar(jogs[0].veic).bruxa ? true : VE.voa(v.id) === voa1) && !v.urso && !v.bruxa; });   // a bruxa corre contra carros e voadores (ela sobe e desce)   // o Ursão gigante não é rival (taparia a tela)
+      var voa1 = VE.voa(jogs[0].veic), opcoes = VE.LISTA.filter(function (v) { return (jogs[0] && VE.achar(jogs[0].veic) && VE.achar(jogs[0].veic).bruxa ? true : VE.voa(v.id) === voa1) && !v.urso; });   // a bruxa corre contra carros e voadores (ela sobe e desce)   // o Ursão gigante não é rival (taparia a tela)
       // 1.13.0: ninguém repetido — nem o personagem, nem o veículo de quem joga (escolheu a galinha, não corre contra galinha)
       var livres = opcoes.filter(function (v) { return jogs.every(function (j) { return j.veic !== v.id; }); });
       for (var q = livres.length - 1; q > 0; q--) { var w = Math.floor(Math.random() * (q + 1)), tq = livres[q]; livres[q] = livres[w]; livres[w] = tq; }
-      PE.sortear(pref.jogadores === 1 ? 5 : 3, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {   // 1.11.0: mais rivais, disputa de perto
+      // 1.36.0 (dono): a Bruxinha do computador (solta raio de vez em quando) aparece em mais ou menos metade das corridas
+      var nRiv = pref.jogadores === 1 ? 5 : 3;
+      for (q = 0; q < livres.length; q++) if (livres[q].bruxa) { var vb = livres.splice(q, 1)[0]; if (Math.random() < 0.5) livres.splice(Math.floor(Math.random() * Math.min(livres.length, nRiv)), 0, vb); break; }
+      PE.sortear(nRiv, jogs.map(function (j) { return j.personagem; })).forEach(function (p, k) {   // 1.11.0: mais rivais, disputa de perto
         var v = livres.length ? livres[k % livres.length] : opcoes[k % opcoes.length];
-        configs.push({ id: p.id, veic: v.id, cor: p.cor || D.CORES[(k + 3) % D.CORES.length], mod: { vel: v.vel, curva: v.curva } });
+        configs.push({ id: p.id, veic: v.id, cor: p.cor || D.CORES[(k + 3) % D.CORES.length], mod: { vel: v.vel, curva: v.curva, bruxa: !!v.bruxa } });
       });
     }
     var semente = dl ? dl.sem : (Date.now() % 1000000007) | 0, nivel = dl ? dl.niv : pref.nivel, mundos = dl ? dl.mun : pref.mundos;
@@ -543,7 +546,7 @@
     estado.jogadores.forEach(function (j, k) { var v = VE.achar(jogs[k].veic); j.mod = { vel: v.vel, curva: v.curva, voa: VE.voa(v.id), urso: !!v.urso, bruxa: !!v.bruxa }; });
     D.preparar(estado, jogs, lingua, pref.visual);
     tela('jogo'); redimensionar();
-    $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false];
+    $('pausa').hidden = true; pausado = false; ponteiros = {}; pularPend = [false, false]; raioPend = [false, false];
     lerBordas(); telaCheia(true);
     ligarMaos();
     // a música escolhida no menu continua na corrida; sem escolha, cada corrida começa uma música nova
@@ -608,9 +611,9 @@
     requestAnimationFrame(quadro);
   }
 
-  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1, agua: 1, risada: 1, saltito: 1, ursoBate: 1, ursoEmpurra: 1, bruxaSobe: 1, bruxaDesce: 1 };
+  var SONS = { estrela: 1, cone: 1, batida: 1, lama: 1, turbo: 1, pulo: 1, perdeu: 1, tum: 1, bip: 1, vai: 1, mundo: 1, chegou: 1, derrapa: 1, caixa: 1, poder: 1, escudoBate: 1, splat: 1, looping: 1, loopFeito: 1, turboRival: 1, agua: 1, risada: 1, saltito: 1, ursoBate: 1, ursoEmpurra: 1, bruxaSobe: 1, bruxaDesce: 1, raio: 1, raioNada: 1, raioAviso: 1, raioPegou: 1, raioDesviou: 1 };
   // o aparelho treme junto (celular e tablet que deixam; iPhone não deixa): milissegundos de vibração e de pausa
-  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120], agua: [40, 30, 40], ursoBate: [80, 40, 80], ursoEmpurra: [40] };
+  var TREME = { batida: [90, 40, 90], cone: [50], lama: [40, 30, 40, 30, 40], turbo: [35], miniturbo: [30, 30, 60], caixa: [15], poder: [20, 40, 20], escudoBate: [60], splat: [25], looping: [40, 60, 40, 60, 40, 60, 80], loopFeito: [30, 40, 30], chegou: [100, 60, 100, 60, 200], tum: [30], pulo: [20], faisca: [15], vai: [120], agua: [40, 30, 40], ursoBate: [80, 40, 80], ursoEmpurra: [40], raio: [30, 30, 60], raioAviso: [20, 60, 20], raioPegou: [120, 50, 120] };
   function tremer(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) { /* sem vibrar */ } }
   function tratar(ev) {
     if (ev.tipo === 'vai') mov.fimCalibrar();   // no 3-2-1 só descobre o sinal do sensor; o meio é o reto de verdade
@@ -722,7 +725,7 @@
     });
     if (estado.rivais.length) {   // classificação com os rivais
       var todos = js.map(function (j) { return { nome: (jogs[j.n].personagem && PE ? tn(PE.achar(jogs[j.n].personagem).nome) : jogs[j.n].piloto) + (js.length === 2 ? ' (' + t('Jogador ', 'Player ', 'Jugador ') + (j.n + 1) + ')' : ' (' + t('você', 'you', 'tú') + ')'), fim: j.chegou ? j.tempo : Infinity, z: j.z, eu: true }; })
-        .concat(estado.rivais.map(function (r) { var p = PE.achar(r.id); return { nome: r.nome ? '🌐 ' + r.nome : tn(p.nome), fim: r.chegou ? r.tempo : Infinity, z: r.z, eu: false }; }));
+        .concat(estado.rivais.map(function (r) { var p = PE.achar(r.id); return { nome: r.nome ? '🌐 ' + r.nome : r.veic === 'bruxa' ? t('🧹 Bruxinha', '🧹 Little Witch', '🧹 Brujita') : tn(p.nome), fim: r.chegou ? r.tempo : Infinity, z: r.z, eu: false }; }));
       todos.sort(function (a, b) { return a.fim !== b.fim ? a.fim - b.fim : b.z - a.z; });
       var ol = document.createElement('ol'); ol.className = 'classificacao';
       todos.forEach(function (o, k) { var li = document.createElement('li'); if (o.eu) li.className = 'eu'; li.textContent = ['🥇', '🥈', '🥉'][k] || ((k + 1) + 'º'); var sp = document.createElement('span'); sp.textContent = o.nome; li.appendChild(sp); ol.appendChild(li); });
@@ -743,6 +746,8 @@
   // ---------- controles ----------
   var pularPend = [false, false];
   function pular(j) { if (estado && j < estado.jogadores.length && !pausado) pularPend[j] = true; }
+  var raioPend = [false, false];   // ⚡ RAIO da Bruxinha (1.36.0)
+  function raio(j) { if (estado && j < estado.jogadores.length && !pausado) raioPend[j] = true; }
   var teclas = {}, ponteiros = {}, botoesAntes = [{}, {}];
   function nomeTecla(e) {
     var k = e.key || '', c = e.keyCode || e.which || 0;
@@ -754,7 +759,7 @@
     if (k === ' ' || c === 32) return 'espaco';
     if (k === 'Escape' || k === 'GoBack' || k === 'BrowserBack' || c === 27 || c === 461 || c === 10009) return 'voltar';
     var l = k.toLowerCase();
-    if (l === 'a' || l === 'd' || l === 'w' || l === 's' || l === 'p' || l === 'h') return l;
+    if (l === 'a' || l === 'd' || l === 'w' || l === 's' || l === 'p' || l === 'h' || l === 'e' || l === 'r') return l;
     return '';
   }
   document.addEventListener('keydown', function (e) {
@@ -779,6 +784,8 @@
     if (n === 'cima' || n === 'ok' || n === 'espaco') pular(dois ? 1 : 0);
     if (n === 'w') pular(0);
     if (n === 'h') buzinar(0);
+    if (n === 'e') raio(0);
+    if (n === 'r') raio(dois ? 1 : 0);
   });
   document.addEventListener('keyup', function (e) { var n = nomeTecla(e); if (n) teclas[n] = false; });
   window.addEventListener('blur', function () { teclas = {}; });
@@ -797,6 +804,16 @@
     for (var k = 0; k < vv.length; k++) { var b = D.botaoPulo(vv[k], D.margemLocal(vv[k], W, H, bordas)); if (Math.pow(x - b.x, 2) + Math.pow(y - b.y, 2) <= Math.pow(b.r * 1.25, 2)) return k; }
     return -1;
   }
+  // botão ⚡ RAIO (só de quem está de Bruxinha)
+  function noBotaoRaio(x, y) {
+    if (!estado) return -1;
+    var vv = D.vistas(W, H, estado.jogadores.length);
+    for (var k = 0; k < vv.length; k++) {
+      if (!jogs[k] || jogs[k].veic !== 'bruxa') continue;
+      var b = D.botaoRaio(vv[k], D.margemLocal(vv[k], W, H, bordas)); if (Math.pow(x - b.x, 2) + Math.pow(y - b.y, 2) <= Math.pow(b.r * 1.25, 2)) return k;
+    }
+    return -1;
+  }
   var inicioToque = {};
   function tocou(e) {
     if (estadoTela !== 'jogo' || pausado) return;
@@ -813,8 +830,9 @@
     cv.addEventListener('pointerdown', function (e) {
       try { cv.setPointerCapture(e.pointerId); } catch (x) { /* ok */ }
       if (estadoTela !== 'jogo' || pausado) return;
-      var bj = noBotaoPulo(e.clientX, e.clientY);
+      var bj = noBotaoPulo(e.clientX, e.clientY), br = noBotaoRaio(e.clientX, e.clientY);
       if (bj >= 0) { e.preventDefault(); pular(bj); ponteiros[e.pointerId] = { j: bj, dir: 0, pulo: true }; return; }
+      if (br >= 0) { e.preventDefault(); raio(br); ponteiros[e.pointerId] = { j: br, dir: 0, pulo: true }; return; }
       inicioToque[e.pointerId] = { x: e.clientX, y: e.clientY, t: Date.now() };
       tocou(e);
     });
@@ -823,8 +841,8 @@
   } else {
     var porToque = function (e) {
       e.preventDefault();
-      if (e.type === 'touchstart') Array.prototype.forEach.call(e.changedTouches, function (tq) { var bj = noBotaoPulo(tq.clientX, tq.clientY); if (bj >= 0) pular(bj); });
-      ponteiros = {}; Array.prototype.forEach.call(e.touches, function (tq) { if (noBotaoPulo(tq.clientX, tq.clientY) >= 0) return; var r = ondeToque(tq.clientX, tq.clientY); if (r) ponteiros[tq.identifier] = r; });
+      if (e.type === 'touchstart') Array.prototype.forEach.call(e.changedTouches, function (tq) { var bj = noBotaoPulo(tq.clientX, tq.clientY), br = noBotaoRaio(tq.clientX, tq.clientY); if (bj >= 0) pular(bj); else if (br >= 0) raio(br); });
+      ponteiros = {}; Array.prototype.forEach.call(e.touches, function (tq) { if (noBotaoPulo(tq.clientX, tq.clientY) >= 0 || noBotaoRaio(tq.clientX, tq.clientY) >= 0) return; var r = ondeToque(tq.clientX, tq.clientY); if (r) ponteiros[tq.identifier] = r; });
     };
     ['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach(function (t) { cv.addEventListener(t, porToque, { passive: false }); });
   }
@@ -867,18 +885,19 @@
       if (b[14] && b[14].pressed) ent[alvo].dir -= 1;
       if (b[15] && b[15].pressed) ent[alvo].dir += 1;
       if ((b[13] && b[13].pressed) || (b[1] && b[1].pressed)) ent[alvo].freio = true;
-      var pul = !!(b[0] && b[0].pressed), buz = !!(b[2] && b[2].pressed), pausa = !!(b[9] && b[9].pressed);
+      var pul = !!(b[0] && b[0].pressed), buz = !!(b[2] && b[2].pressed), pausa = !!(b[9] && b[9].pressed), rai = !!(b[3] && b[3].pressed);
       if (pul && !botoesAntes[k].pul) pular(alvo);
+      if (rai && !botoesAntes[k].rai) raio(alvo);
       if (buz && !botoesAntes[k].buz) buzinar(alvo);
       if (pausa && !botoesAntes[k].pausa) setTimeout(pausar, 0);
-      botoesAntes[k] = { pul: pul, buz: buz, pausa: pausa };
+      botoesAntes[k] = { pul: pul, buz: buz, pausa: pausa, rai: rai };
     }
     if (tvc) for (k = 0; k < n; k++) {   // 1.27.0: celular como controle (o jogador k é o k-ésimo celular que entrou)
       var sc = tvc.ctl[k]; if (!sc || performance.now() - sc.visto > 1500) continue;
       ent[k].dir += sc.d;
       if (sc.p > sc.pAnt) { sc.pAnt = sc.p; pularPend[k] = true; }
     }
-    for (k = 0; k < n; k++) { ent[k].dir = Math.max(-1, Math.min(1, ent[k].dir)); ent[k].pular = pularPend[k]; pularPend[k] = false; }
+    for (k = 0; k < n; k++) { ent[k].dir = Math.max(-1, Math.min(1, ent[k].dir)); ent[k].pular = pularPend[k]; pularPend[k] = false; ent[k].raio = raioPend[k]; raioPend[k] = false; }
     if (usaMov && mov.pulou()) ent[0].pular = true;
     if (maosLigadas && estado.fase === 'corrida') for (k = 0; k < n; k++) {
       var cm = ctrlMaos[k]; if (!cm) continue;

@@ -200,6 +200,37 @@
     var u = tamU(v), r = u * 1.7;
     return { x: v.x + v.w - ml.r - u * 2.6, y: v.y + v.h - ml.b - u * 7.6, r: r };
   }
+  // botão ⚡ RAIO (só a Bruxinha, 1.36.0): logo acima do PULAR
+  function botaoRaio(v, ml) {
+    var b = botaoPulo(v, ml), u = tamU(v);
+    return { x: b.x, y: b.y - b.r * 2 - u * 1.6, r: b.r };
+  }
+  // relâmpago em zigue-zague de (x0, y0) até (x1, y1): brilho roxo por fora, branco no meio
+  function relampago(c, x0, y0, x1, y1, larg, sem) {
+    var n = 9, pts = [], dx = x1 - x0, dy = y1 - y0, L = Math.sqrt(dx * dx + dy * dy) || 1, nx = -dy / L, ny = dx / L;
+    for (var k = 0; k <= n; k++) {
+      var f = k / n, des = k === 0 || k === n ? 0 : Math.sin(sem * 12.9898 + k * 78.233) * 43758.5453 % 1;
+      pts.push([x0 + dx * f + nx * des * L * 0.09, y0 + dy * f + ny * des * L * 0.09]);
+    }
+    c.save(); c.globalCompositeOperation = 'lighter'; c.lineJoin = 'round'; c.lineCap = 'round';
+    [[larg * 3.2, 'rgba(199,125,255,.35)'], [larg * 1.6, 'rgba(160,220,255,.7)'], [larg * 0.6, '#ffffff']].forEach(function (camada) {
+      c.lineWidth = Math.max(1, camada[0]); c.strokeStyle = camada[1]; c.beginPath();
+      pts.forEach(function (p, k) { if (k) c.lineTo(p[0], p[1]); else c.moveTo(p[0], p[1]); }); c.stroke();
+    });
+    var g = c.createRadialGradient(x1, y1, 0, x1, y1, larg * 9); g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(199,125,255,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(x1, y1, larg * 9, 0, Math.PI * 2); c.fill();
+    c.restore();
+  }
+  // nuvem de tempestade (aviso do raio da bruxa do computador), piscando cada vez mais rápido
+  function nuvemRaio(c, x, y, r, resta, tt) {
+    c.save();
+    c.fillStyle = '#3a3150'; c.globalAlpha = 0.92;
+    [[-0.9, 0.1, 0.55], [-0.35, -0.2, 0.7], [0.3, -0.25, 0.65], [0.85, 0.1, 0.5], [0, 0.2, 0.6]].forEach(function (b) { c.beginPath(); c.arc(x + b[0] * r, y + b[1] * r, b[2] * r, 0, Math.PI * 2); c.fill(); });
+    c.fillStyle = '#5c4f7a'; c.beginPath(); c.arc(x - 0.3 * r, y - 0.35 * r, 0.4 * r, 0, Math.PI * 2); c.fill();
+    var pisca = Math.sin(tt * (10 + 30 / Math.max(0.2, resta))) > 0.3;
+    if (pisca) { c.globalAlpha = 1; c.font = '700 ' + Math.round(r * 0.9) + 'px ' + FONTE + ',' + EMOJI; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('⚡', x, y + r * 0.85); }
+    c.restore();
+  }
 
   // ---------- efeitos ----------
   // horizonte a ~30% da altura e o veículo com a base a 90%: a tela fica cheia, em pé ou deitado.
@@ -233,6 +264,11 @@
     else if (ev.tipo === 'looping') texto(vs, 'LOOPING!', '#ff4fd8', 1.8);
     else if (ev.tipo === 'bruxaSobe') { texto(vs, t('🧹 Voando!', '🧹 Flying!', '🧹 ¡Volando!'), '#c77dff', 1.6); brilhinhos(vs, 14, '#c77dff'); }
     else if (ev.tipo === 'bruxaDesce') { texto(vs, t('🧹 Descendo para a estrada!', '🧹 Down to the road!', '🧹 ¡A la carretera!'), '#c77dff', 1.3); brilhinhos(vs, 10, '#c77dff'); }
+    else if (ev.tipo === 'raio') { texto(vs, t('⚡ ZAP! Raio na mosca!', '⚡ ZAP! Bullseye!', '⚡ ¡ZAS! ¡En el blanco!'), '#e0b3ff', 1.6); brilhinhos(vs, 12, '#c77dff'); }
+    else if (ev.tipo === 'raioNada') texto(vs, t('Ninguém na frente!', 'Nobody ahead!', '¡No hay nadie delante!'), '#ffffff', 1.1);
+    else if (ev.tipo === 'raioAviso') vs.faixa = { txt: t('⚡ Raio! PULE!', '⚡ Zap! JUMP!', '⚡ ¡Rayo! ¡SALTA!'), ate: 1.6, cor: '#c77dff' };
+    else if (ev.tipo === 'raioPegou') texto(vs, t('⚡ Bzzzt!', '⚡ Bzzzt!', '⚡ ¡Bzzzt!'), '#e0b3ff', 1.8);
+    else if (ev.tipo === 'raioDesviou') { texto(vs, t('Ufa! Desviou do raio!', 'Phew! Dodged it!', '¡Uf! ¡Lo esquivaste!'), '#c6ff3d', 1.5); brilhinhos(vs, 10, '#c6ff3d'); }
     else if (ev.tipo === 'risada') texto(vs, t('🧸 HO HO HO!', '🧸 HO HO HO!', '🧸 ¡JO JO JO!'), '#ffd166', 1.8);
     else if (ev.tipo === 'ursoBate') texto(vs, t('🧸 Ai! A beirada!', '🧸 Ouch! The edge!', '🧸 ¡Ay! ¡El borde!'), '#ffffff', 1.4);
     else if (ev.tipo === 'ursoEmpurra') brilhinhos(vs, 8, '#ffd166');
@@ -615,6 +651,7 @@
         if (vivo) { pilotoVivo(c, rd.veic, rX - rW / 2, rY - rH, rW, rH, rd.info, 10 + rs[k2] * 2.1, 6, ondeCabeca(rd.veic, rX - rW / 2, rY - rH, rW, rH, faseR)); }
         if (rv.turbo > 0 && !rd.voa && rW > 6) { c.save(); c.translate(rX, rY); fogoEscape(c, rW, rH, Math.min(1, rv.turbo), false); c.restore(); }
         if (rv.gosma > 0 && rW > 6) gosmaEm(c, rX - rW / 2, rY - rH, rW, rH, rv.gosma, rv.gosmaCor);
+        if (rv.raio > 0) relampago(c, rX + rW * 0.3, 0, rX, rY - rH * 0.55, Math.max(2, rW * 0.05), Math.floor(e.t * 20) + k2);   // ⚡ da Bruxinha
         var luzR = s.tunel ? 1 : ntS;
         if (!rd.voa && luzR > 0.02 && rY <= clip + 2) { c.save(); c.globalCompositeOperation = 'lighter'; luz(c, rX - rW * 0.36, rY - rH * 0.4, rW * 0.25, '#ff2a2a', 0.7 * luzR); luz(c, rX + rW * 0.36, rY - rH * 0.4, rW * 0.25, '#ff2a2a', 0.7 * luzR); c.restore(); }
       }
@@ -631,6 +668,15 @@
 
     }
     if (!orb) desenharCarro(c, j, vs, g, h, w, e);
+    if (!orb && (j.raioAviso > 0 || j.raio > 0)) {   // ⚡ raio da bruxa do computador: nuvem de aviso em cima e depois o raio
+      var cwR = carrosJog[j.n].w * g.K / ALTURA_CAM, chR = carrosJog[j.n].h * g.K / ALTURA_CAM, chaoR = g.cy + g.KY;
+      var yNuvem = Math.max(g.K * 0.2, chaoR - chR * 0.78);   // o desenho do veículo tem folga em cima: a nuvem fica logo acima do teto
+      if (j.raioAviso > 0) nuvemRaio(c, g.cx, yNuvem, Math.min(cwR * 0.4, g.K * 0.17), j.raioAviso, e.t);
+      if (j.raio > 0) {
+        relampago(c, g.cx + g.K * 0.04, Math.max(0, yNuvem - g.K * 0.5), g.cx, chaoR - chR * 0.4, Math.max(3, g.K * 0.014), Math.floor(e.t * 20));
+        c.save(); c.globalAlpha = Math.min(0.45, j.raio); c.fillStyle = '#efe0ff'; c.fillRect(0, 0, w, h); c.restore();
+      }
+    }
     linhasVelocidade(c, g, w, h, Math.min(1, j.turbo * 0.9) * (voa ? 0.6 : 1));
     if (bruxa && vs.subida > 0 && vs.subida < 1) atravessarNuvens(c, w, h, vs.subida);
     desenharEfeitos(c, vs, g, w, h);
@@ -1471,7 +1517,11 @@
         c.textAlign = 'left'; c.strokeText(t('segure: virar', 'hold: steer', 'mantén: girar'), xl, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer', 'mantén: girar'), xl, ay - as - fs * 0.7);
         c.textAlign = 'right'; c.strokeText(t('segure: virar', 'hold: steer', 'mantén: girar'), xr, ay - as - fs * 0.7); c.fillText(t('segure: virar', 'hold: steer', 'mantén: girar'), xr, ay - as - fs * 0.7);
         var dica = VEIC[ji] && VEIC[ji].bruxa ? t('toque: voar / descer', 'tap: fly / land', 'toca: volar / bajar') : t('toque: pular', 'tap: jump', 'toca: saltar');
-        c.textAlign = 'center'; c.strokeText(dica, bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8); c.fillText(dica, bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8);
+        if (VEIC[ji] && VEIC[ji].bruxa) {   // a bruxa tem dois botões, um em cima do outro: as dicas vão do lado
+          var bRg = botaoRaio(v, ml), dR = t('toque: raio ⚡', 'tap: zap ⚡', 'toca: rayo ⚡');
+          c.textAlign = 'right'; c.strokeText(dica, bpg.x - v.x - bpg.r - fs * 0.4, bpg.y - v.y); c.fillText(dica, bpg.x - v.x - bpg.r - fs * 0.4, bpg.y - v.y);
+          c.strokeText(dR, bRg.x - v.x - bRg.r - fs * 0.4, bRg.y - v.y); c.fillText(dR, bRg.x - v.x - bRg.r - fs * 0.4, bRg.y - v.y);
+        } else { c.textAlign = 'center'; c.strokeText(dica, bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8); c.fillText(dica, bpg.x - v.x, bpg.y - v.y - bpg.r - fs * 0.8); }
         if (dois) {   // de quem é cada metade da tela
           var tj = (op.jogadores && op.jogadores[ji] ? (op.jogadores[ji].piloto || '') + ' ' : '') + t('Jogador ', 'Player ', 'Jugador ') + (ji + 1), fj = Math.round(Math.min(u * 0.95, w / 11));
           c.font = '700 ' + fj + 'px ' + FONTE + ',' + EMOJI; c.lineWidth = fj * 0.22;
@@ -1480,6 +1530,17 @@
           c.font = '700 ' + f2 + 'px ' + FONTE; c.lineWidth = f2 * 0.22; c.fillStyle = '#ffffff';
           c.strokeText(t2, w / 2, h * 0.6 + fj * 0.95); c.fillText(t2, w / 2, h * 0.6 + fj * 0.95);
         }
+      }
+      if (VEIC[ji] && VEIC[ji].bruxa) {   // ⚡ RAIO (1.36.0): acima do VOAR; o anel mostra a recarga
+        var bR = botaoRaio(v, ml), rx2 = bR.x - v.x, ry2 = bR.y - v.y, recR = raiz.VruuumMotor.RAIO.recarga, prontoR = !(j.raioRec > 0) && e.fase === 'corrida';
+        c.globalAlpha = prontoR ? 0.9 : 0.45;
+        c.fillStyle = prontoR ? 'rgba(90,40,140,.7)' : 'rgba(26,20,70,.55)'; c.beginPath(); c.arc(rx2, ry2, bR.r, 0, Math.PI * 2); c.fill();
+        c.lineWidth = u * 0.22; c.strokeStyle = 'rgba(255,255,255,.35)'; c.stroke();
+        c.strokeStyle = '#e0b3ff'; c.beginPath(); c.arc(rx2, ry2, bR.r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (prontoR ? 1 : Math.max(0, 1 - (j.raioRec || 0) / recR))); c.stroke();
+        c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.font = '700 ' + Math.round(u * 1.3) + 'px ' + FONTE + ',' + EMOJI; c.fillText('⚡', rx2, ry2 - u * 0.25);
+        c.font = '700 ' + Math.round(u * 0.55) + 'px ' + FONTE; c.fillText(t('RAIO', 'ZAP', 'RAYO'), rx2, ry2 + u * 0.8);
+        c.globalAlpha = 1;
       }
       var bp = botaoPulo(v, ml), bx2 = bp.x - v.x, by2 = bp.y - v.y, pronto = j.recarga <= 0 && j.pulo <= 0;
       c.globalAlpha = pronto ? 0.85 : 0.45;
@@ -1644,5 +1705,5 @@
   }
 
   function definirEstilo(v) { ESTILO = v === 'colorido' || v === 'neon' ? v : 'misto'; cachePal = []; }
-  raiz.VruuumDesenho = { podio: podio, definirEstilo: definirEstilo, preparar: preparar, desenhar: desenhar, passo: passo, evento: evento, vistas: vistas, margemLocal: margemLocal, botaoPulo: botaoPulo, previa: previa, miniatura: miniatura, milhar: milhar, ALT_VOO: ALT_VOO, TEMAS: TEMAS, CORES: CORES, PILOTOS: PILOTOS };
+  raiz.VruuumDesenho = { podio: podio, definirEstilo: definirEstilo, preparar: preparar, desenhar: desenhar, passo: passo, evento: evento, vistas: vistas, margemLocal: margemLocal, botaoPulo: botaoPulo, botaoRaio: botaoRaio, previa: previa, miniatura: miniatura, milhar: milhar, ALT_VOO: ALT_VOO, TEMAS: TEMAS, CORES: CORES, PILOTOS: PILOTOS };
 })(this);

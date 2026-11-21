@@ -34,9 +34,9 @@
 
   // pedacos: tamanho da corrida (~100 s em velocidade cheia); obst: quanto obstáculo (0 a 1)
   var NIVEIS = {
-    crianca: { loops: 1, pedacos: 3600, velMax: 7200, obst: 0.35, carros: 6, tuneis: 2, rios: 1, velCarro: [0.25, 0.4], perdeCarro: 1, perdeCone: 0, curva: 0.6, morro: 0.5, centrifuga: 0.12, limiteX: 1.3, ajuda: true },
-    normal: { loops: 2, pedacos: 4800, velMax: 9600, obst: 0.7, carros: 14, tuneis: 3, rios: 2, velCarro: [0.3, 0.55], perdeCarro: 3, perdeCone: 1, curva: 1, morro: 1, centrifuga: 0.25, limiteX: 1.5, ajuda: false },
-    turbo: { loops: 3, pedacos: 6000, velMax: 12000, obst: 1, carros: 24, tuneis: 4, rios: 2, velCarro: [0.32, 0.65], perdeCarro: 5, perdeCone: 2, curva: 1.3, morro: 1.2, centrifuga: 0.32, limiteX: 1.6, ajuda: false }
+    crianca: { loops: 1, pedacos: 3600, velMax: 7200, obst: 0.35, carros: 6, tuneis: 2, rios: 1, velCarro: [0.25, 0.4], perdeCarro: 1, perdeCone: 0, curva: 0.6, morro: 0.5, centrifuga: 0.12, limiteX: 1.3, ajuda: true, raioCada: [18, 26], raioAviso: 1.8, raioFreia: 0.75 },
+    normal: { loops: 2, pedacos: 4800, velMax: 9600, obst: 0.7, carros: 14, tuneis: 3, rios: 2, velCarro: [0.3, 0.55], perdeCarro: 3, perdeCone: 1, curva: 1, morro: 1, centrifuga: 0.25, limiteX: 1.5, ajuda: false, raioCada: [12, 18], raioAviso: 1.4, raioFreia: 0.6 },
+    turbo: { loops: 3, pedacos: 6000, velMax: 12000, obst: 1, carros: 24, tuneis: 4, rios: 2, velCarro: [0.32, 0.65], perdeCarro: 5, perdeCone: 2, curva: 1.3, morro: 1.2, centrifuga: 0.32, limiteX: 1.6, ajuda: false, raioCada: [9, 14], raioAviso: 1.2, raioFreia: 0.5 }
   };
 
   // sorteio com semente (mulberry32): mesma semente, mesma sequência

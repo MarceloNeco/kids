@@ -14,7 +14,7 @@ function corrida() {
 }
 function passo(e, ent, n = 1) { const ev = []; for (let k = 0; k < n; k++) { M.atualizar(e, [ent], 1 / 60); ev.push(...e.eventos); } return ev; }
 
-test('a bruxa está na garagem (grupo do céu), mas começa no chão e não é sorteada como rival', () => {
+test('a bruxa está na garagem (grupo do céu), mas começa no chão', () => {
   const b = V.achar('bruxa');
   assert.ok(b && b.bruxa && b.modelo === 'bruxa');
   assert.equal(b.grupo, 'ar');
