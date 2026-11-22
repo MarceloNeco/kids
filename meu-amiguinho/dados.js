@@ -72,7 +72,9 @@
     tiara: ['rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'vermelho', 'azul', 'roxo', 'preto', 'branco', 'prata', 'dourado', 'holo'],
     bones: ['rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'vermelho', 'azul', 'roxo', 'preto', 'branco', 'marinho', 'marrom'],
     capacete: ['rosa-choque', 'azul', 'lima', 'roxo', 'preto', 'marinho', 'rosa', 'prata'],
-    fones: ['prata', 'dourado', 'holo', 'rosa', 'lilas']
+    fones: ['prata', 'dourado', 'holo', 'rosa', 'lilas'],
+    perolas: ['branco', 'rosa', 'lilas', 'dourado', 'azul-bebe'],
+    medalha: ['dourado', 'prata', 'rosa']
   };
 
   // ---------- pelo (cores lisas e degradês tie-dye pastel) ----------
@@ -342,6 +344,16 @@
     { id: 'colar-bolinhas', caixa: 'pescoco', n: ['Colar de bolinhas', 'Bead necklace', 'Collar de bolitas'], e: ['colar de bolinhas', 'bead necklace', 'collar de bolitas'], facil: 1 },
     { id: 'colar-coracao', caixa: 'pescoco', n: ['Colar de coração', 'Heart necklace', 'Collar de corazón'], e: ['colar de coração', 'heart necklace', 'collar de corazón'] },
     { id: 'lenco', caixa: 'pescoco', n: ['Bandana de florzinha', 'Flower bandana', 'Bandana de florecitas'], e: ['bandana {c}', '{c} bandana', 'bandana {c}'], paleta: 'geral', cor: 'rosa' },
+    { id: 'colar-perolas', caixa: 'pescoco', n: ['Colar de pérolas', 'Pearl necklace', 'Collar de perlas'], e: ['colar de pérolas', 'pearl necklace', 'collar de perlas'], paleta: 'perolas', cor: 'branco', facil: 1 },
+    { id: 'colar-flores', caixa: 'pescoco', n: ['Colar de florzinhas', 'Daisy chain', 'Collar de florecitas'], e: ['colar de florzinhas', 'daisy chain', 'collar de florecitas'] },
+    { id: 'colar-letras', caixa: 'pescoco', n: ['Colar de miçangas com o nome', 'Name bead necklace', 'Collar de cuentas con el nombre'], e: ['colar de miçangas com letrinhas', 'letter bead necklace', 'collar de cuentas con letras'], facil: 1 },
+    { id: 'medalhinha', caixa: 'pescoco', n: ['Medalhinha com a inicial', 'Initial pendant', 'Medallita con la inicial'], e: ['medalhinha', 'initial pendant', 'medallita'], paleta: 'medalha', cor: 'dourado' },
+    { id: 'cachecol-xadrez', caixa: 'pescoco', n: ['Cachecol xadrez', 'Plaid scarf', 'Bufanda de cuadros'], e: ['cachecol xadrez', 'plaid scarf', 'bufanda de cuadros'], paleta: 'vivas', cor: 'vermelho', facil: 1 },
+    { id: 'cachecol-trico', caixa: 'pescoco', n: ['Cachecol de tricô', 'Knitted scarf', 'Bufanda de punto'], e: ['cachecol de tricô', 'knitted scarf', 'bufanda de punto'], paleta: 'vivas', cor: 'roxo' },
+    { id: 'gola-babado', caixa: 'pescoco', n: ['Gola de babado', 'Ruffle collar', 'Cuello de volantes'], e: ['gola de babado', 'ruffle collar', 'cuello de volantes'], paleta: 'vivas', cor: 'vermelho' },
+    { id: 'gravata-borboleta', caixa: 'pescoco', n: ['Gravatinha borboleta', 'Bow tie', 'Pajarita'], e: ['gravatinha borboleta', 'bow tie', 'pajarita'], paleta: 'lacos', cor: 'vermelho' },
+    { id: 'cordao', caixa: 'pescoco', n: ['Cordão com estrelinha', 'Cord with a little star', 'Cordón con estrellita'], e: ['cordão com estrelinha', 'cord with a little star', 'cordón con estrellita'], paleta: 'vivas', cor: 'branco' },
+    { id: 'cracha', caixa: 'pescoco', n: ['Cordão com crachá', 'Lanyard with a badge', 'Cordón con tarjeta'], e: ['cordão com crachá', 'lanyard with a badge', 'cordón con tarjeta'], paleta: 'vivas', cor: 'azul' },
     { id: 'coleira', caixa: 'pescoco', n: ['Coleira com guia', 'Collar and leash', 'Collar con correa'], e: ['coleira {c}', '{c} collar and leash', 'collar {c}'], paleta: 'coleira', cor: 'vermelho' },
     { id: 'coleira-pata', caixa: 'pescoco', n: ['Guia com controle de patinha', 'Leash with paw remote', 'Correa con mando de patita'], e: ['guia de patinha', 'paw remote leash', 'correa de patita'], paleta: 'coleira', cor: 'azul-bebe' },
     { id: 'pulseira-strass', caixa: 'pulso', n: ['Pulseira de strass', 'Rhinestone bracelet', 'Pulsera de brillantes'], e: ['pulseira de strass', 'rhinestone bracelet', 'pulsera de brillantes'] },
