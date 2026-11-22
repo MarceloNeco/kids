@@ -2,6 +2,14 @@
   "app": "meu-amiguinho",
   "versoes": [
     {
+      "versao": "0.2.1",
+      "data": "22/Nov/2026",
+      "hora": "19:30:00",
+      "pt": ["☀️🌙 Barra de tom: arraste para deixar a cor do pelo, da roupa e de cada acessório mais clara ou mais escura"],
+      "en": ["☀️🌙 Shade slider: drag to make the fur, outfit and each accessory color lighter or darker"],
+      "es": ["☀️🌙 Barra de tono: arrastra para que el color del pelo, de la ropa y de cada accesorio sea más claro o más oscuro"]
+    },
+    {
       "versao": "0.2.0",
       "data": "22/Nov/2026",
       "hora": "18:50:00",
