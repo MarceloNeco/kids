@@ -190,6 +190,9 @@
     { id: 'ovelha-preta', g: 'f', corpos: ['q', 'pe'], pelo: 'branco', familia: 'ovelha',
       esp: ['ovelhinha de carinha preta', 'black-faced lamb', 'ovejita de cara negra'], apelido: ['Pimenta', 'Pepper', 'Pimienta'],
       frase: ['Fala pouco e ouve muito: é a melhor amiga para contar segredos.', 'Says little and listens a lot: the best friend to tell secrets to.', 'Habla poco y escucha mucho: la mejor amiga para contar secretos.'] },
+    { id: 'robo', g: 'm', corpos: ['pe'], pelo: 'azul', facil: 1,
+      esp: ['robozinho', 'little robot', 'robotito'], apelido: ['Bip', 'Beep', 'Bip'],
+      frase: ['Inventor de pelúcia: a carinha é uma telinha que acende de alegria.', 'A plush inventor: his face is a little screen that lights up with joy.', 'Inventor de peluche: su carita es una pantallita que se ilumina de alegría.'] },
     { id: 'porquinho', g: 'm', corpos: ['pe', 'q'], pelo: 'rosa', facil: 1,
       esp: ['porquinho', 'piglet', 'cerdito'], apelido: ['Torresmo', 'Muffin', 'Rosquilla'],
       frase: ['Cozinheiro de mão cheia: faz panqueca colorida e pula em poça de lama.', 'A great little cook: makes colorful pancakes and jumps in mud puddles.', 'Un gran cocinero: hace tortitas de colores y salta en los charcos.'] }
@@ -230,6 +233,7 @@
     { id: 'heroi-gota', heroi: 1, n: ['Heroína Gota', 'Droplet Heroine', 'Heroína Gota'], e: ['de Heroína Gota', 'as the Droplet Heroine', 'de Heroína Gota'] },
     { id: 'heroi-folha', heroi: 1, n: ['Herói Folha', 'Leaf Hero', 'Héroe Hoja'], e: ['de Herói Folha', 'as the Leaf Hero', 'de Héroe Hoja'] },
     { id: 'heroi-lua', heroi: 1, n: ['Heroína Lua', 'Moon Heroine', 'Heroína Luna'], e: ['de Heroína Lua', 'as the Moon Heroine', 'de Heroína Luna'] },
+    { id: 'duende', n: ['Roupa de duende de Natal', 'Holiday elf outfit', 'Traje de duende navideño'], e: ['de duende de Natal', 'as a holiday elf', 'de duende navideño'], capuz: 1 },
     { id: 'dino', n: ['Fantasia de dinossauro', 'Dinosaur costume', 'Disfraz de dinosaurio'], e: ['fantasiado de dinossauro', 'dressed as a dinosaur', 'disfrazado de dinosaurio'], cores: 1, capuz: 1, padrao: { cor: 'verde' } },
     { id: 'noel', n: ['Casaco de Papai Noel', 'Santa coat', 'Abrigo de Papá Noel'], e: ['de casaco de Papai Noel', 'in a Santa coat', 'con abrigo de Papá Noel'], capuz: 1, facil: 1 },
     { id: 'abobora', n: ['Fantasia de abóbora', 'Pumpkin costume', 'Disfraz de calabaza'], e: ['fantasiado de abóbora', 'dressed as a pumpkin', 'disfrazado de calabaza'], capuz: 1 },

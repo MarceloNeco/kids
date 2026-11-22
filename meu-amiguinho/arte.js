@@ -242,6 +242,7 @@
     s += elip(150, by, bw, bh, { fill: corB, opacity: a.base === 'pinguim' ? 1 : 0.8 }) + elip(150, by, bw - 3, bh - 3, { fill: 'none', stroke: T.s, 'stroke-width': 1.2, 'stroke-dasharray': '3 3', opacity: 0.5 });
     if (a.base === 'dino') for (var k = -2; k <= 2; k++) s += p('M' + n(150 - bw * 0.8) + ',' + n(by + k * bh * 0.34) + ' Q150,' + n(by + k * bh * 0.34 + 5) + ' ' + n(150 + bw * 0.8) + ',' + n(by + k * bh * 0.34), { stroke: T.s, 'stroke-width': 1, fill: 'none', opacity: 0.35 });
     if (a.base === 'girafa') s += manchas(g, T, [[124, 220, 9], [176, 236, 11], [130, 268, 8], [172, 282, 7]]);
+    if (a.base === 'robo') s += ret(124, t.y0 + 40, 52, 40, { rx: 10, fill: '#dfe4ec', stroke: '#8a94a4', 'stroke-width': 2 }) + circ(138, t.y0 + 60, 5, { fill: '#ff8fb3' }) + circ(150, t.y0 + 60, 5, { fill: '#ffd447' }) + circ(162, t.y0 + 60, 5, { fill: '#6ff0c8' });
     // o coraçãozinho bordado no peito (fica por baixo da roupa)
     s += p(coracaoD(168, t.y0 + 30, 7), { fill: T.coracao, stroke: '#ffffff', 'stroke-width': 1.2, 'stroke-dasharray': '2 1.6' });
     return s;
@@ -498,6 +499,7 @@
       var x0 = cb.x, y0 = cb.y + cb.ry * 0.5, x1 = g.corpo === 'q' ? g.b.x - g.b.rx * 0.6 : 150, y1 = g.corpo === 'q' ? g.b.y - 10 : g.t.y0 + 10;
       s += lin(x0, y0, x1, y1, { stroke: T.s, 'stroke-width': 50, 'stroke-linecap': 'round' }) + lin(x0, y0, x1, y1, { stroke: T.f, 'stroke-width': 45.4, 'stroke-linecap': 'round' }) + manchas(g, T, [[n((x0 + x1) / 2 - 6), n((y0 + y1) / 2), 7], [n((x0 * 0.3 + x1 * 0.7) + 6), n(y0 * 0.3 + y1 * 0.7), 6]]);
     }
+    if (id === 'robo') return cabecaRobo(c, a, g, T, capuzAtras);
     if (b === 'leao') s += juba(g, T);
     if (id === 'lulu') s += juba(g, Object.assign({}, T, { m: claro(T.base, 0.2), s: T.s }));
     if (b === 'unicornio') s += crina(c, g, false);
@@ -510,6 +512,44 @@
     if (b === 'ovelha' || id === 'poodle') s += la(g, T, cb);
     if (b === 'unicornio') s += crina(c, g, true);
     if (T.brilho) s += brilhos(cb.x, cb.y, cb.rx, cb.ry, 7);
+    return s;
+  }
+  // robozinho de pelúcia: cabeça arredondada, telinha escura com olhos e boca de LED (pontinhos), antena que brilha
+  var EXPRESSOES = ['feliz', 'piscando', 'coracao', 'estrela', 'surpresa', 'dormindo'];
+  A.EXPRESSOES = EXPRESSOES;
+  function mapaLed(expr) {   // grade de 15 x 7: '#' acende
+    var M = {
+      feliz: ['...............', '..#.......#....', '.#.#.....#.#...', '...............', '...............', '....#.....#....', '.....#####.....'],
+      piscando: ['...............', '..#.......###..', '.#.#...........', '...............', '...............', '....#.....#....', '.....#####.....'],
+      coracao: ['.##.##...##.##.', '#######.#######', '.#####...#####.', '..###.....###..', '...#.......#...', '.....#####.....', '...............'],
+      estrela: ['..#........#...', '.###......###..', '#####....#####.', '.#.#......#.#..', '...............', '.....#####.....', '......###......'],
+      surpresa: ['.###.....###...', '#...#...#...#..', '.###.....###...', '...............', '......###......', '.....#...#.....', '......###......'],
+      dormindo: ['...............', '...............', '.###.....###...', '...............', '...............', '......###......', '...............'],
+      fala: ['...............', '..#.......#....', '.#.#.....#.#...', '...............', '.....#####.....', '....#.....#....', '.....#####.....']
+    };
+    return M[expr] || M.feliz;
+  }
+  A.telaLed = function (expr, g, cor) {
+    var cb = g.cab, w = cb.rx * 1.36, h = cb.ry * 0.9, x0 = cb.x - w / 2, y0 = cb.y - h / 2 + 8, m = mapaLed(expr), s = '', passo = w / 15.5, r = passo * 0.36;
+    var cores = { coracao: '#ff5fa2', estrela: '#ffd447', surpresa: '#7fe0ff', dormindo: '#9aa8ff' }, cc = cores[expr] || cor || '#6ff0c8';
+    for (var l = 0; l < 7; l++) for (var k = 0; k < 15; k++) {
+      var on = m[l].charAt(k) === '#', cx = x0 + passo * (k + 0.75), cy = y0 + h * 0.12 + l * (h * 0.76 / 6.5);
+      s += circ(cx, cy, r, { fill: on ? cc : '#2a3346', opacity: on ? 1 : 0.55, 'class': on ? 'led on' : 'led', style: 'animation-delay:' + n((k + l) * 0.025) + 's' });
+    }
+    return s;
+  };
+  function cabecaRobo(c, a, g, T, capuzAtras) {
+    var cb = g.cab, s = '';
+    s += capuzAtras || '';
+    // anteninha
+    s += lin(cb.x, cb.y - cb.ry + 6, cb.x + 6, cb.y - cb.ry - 30, { stroke: '#9aa6b8', 'stroke-width': 5, 'stroke-linecap': 'round' }) + circ(cb.x + 6, cb.y - cb.ry - 34, 10, { fill: '#ff8fb3', stroke: '#d0507a', 'stroke-width': 2, 'class': 'ma-antena' }) + circ(cb.x + 3, cb.y - cb.ry - 37, 3, { fill: '#ffffff', opacity: 0.8 });
+    // "orelhas": discos prateados dos lados
+    s += gr([-1, 1].map(function (k) { var x = cb.x + k * (cb.rx + 2); return elip(x, cb.y + 2, 14, 24, { fill: '#c9d0dc', stroke: '#7a8494', 'stroke-width': 2 }) + elip(x, cb.y + 2, 6, 12, { fill: '#e8ecf2' }); }).join(''), { 'class': 'ma-orelhas', 'data-px': n(cb.x), 'data-py': n(cb.y) });
+    var d = 'M' + n(cb.x - cb.rx) + ',' + n(cb.y - cb.ry + 34) + ' Q' + n(cb.x - cb.rx) + ',' + n(cb.y - cb.ry) + ' ' + n(cb.x - cb.rx + 34) + ',' + n(cb.y - cb.ry) + ' L' + n(cb.x + cb.rx - 34) + ',' + n(cb.y - cb.ry) + ' Q' + n(cb.x + cb.rx) + ',' + n(cb.y - cb.ry) + ' ' + n(cb.x + cb.rx) + ',' + n(cb.y - cb.ry + 34) + ' L' + n(cb.x + cb.rx) + ',' + n(cb.y + cb.ry - 30) + ' Q' + n(cb.x + cb.rx) + ',' + n(cb.y + cb.ry) + ' ' + n(cb.x + cb.rx - 34) + ',' + n(cb.y + cb.ry) + ' L' + n(cb.x - cb.rx + 34) + ',' + n(cb.y + cb.ry) + ' Q' + n(cb.x - cb.rx) + ',' + n(cb.y + cb.ry) + ' ' + n(cb.x - cb.rx) + ',' + n(cb.y + cb.ry - 30) + 'Z';
+    s += p(d, { fill: T.f, stroke: T.s, 'stroke-width': 2.5 }) + p(d, { fill: T.tex }) + p(d, { fill: T.vol });
+    var w = cb.rx * 1.5, h = cb.ry * 1.06;
+    s += ret(cb.x - w / 2, cb.y - h / 2 + 8, w, h, { rx: 26, fill: '#1c2232', stroke: '#c9d0dc', 'stroke-width': 4 }) + ret(cb.x - w / 2 + 6, cb.y - h / 2 + 14, w * 0.4, 8, { rx: 4, fill: '#ffffff', opacity: 0.12 });
+    s += gr(A.telaLed(a.expressao || 'feliz', g), { 'class': 'ma-tela' });
     return s;
   }
   function brilhos(x, y, rx, ry, k) {
@@ -555,6 +595,7 @@
       pinguim: { capa: { cor: '#2b2a36', forro: '#fbfaf7' }, capuz: { tipo: 'pinguim' } },
       'heroi-raio': heroi('#2ec4b6', '#ffd447', 'raio'), 'heroi-estrela': heroi('#8a5cd6', '#ffd447', 'estrela'), 'heroi-coracao': heroi('#ff7a59', '#ffffff', 'coracao'),
       'heroi-gota': heroi('#4fb3f0', '#e8f7ff', 'gota'), 'heroi-folha': heroi('#5fbf5a', '#fff09a', 'folha'), 'heroi-lua': heroi('#3a3f7a', '#f2e6ff', 'lua'),
+      duende: { top: { cor: '#2fa37a', mangas: 'longa', gola: 'redonda', barra: '#f4e6c8', cinto: '#5a3418', bolinhas: 1 }, baixo: { tipo: 'calca', cor: '#d8435f' }, capuz: { tipo: 'gorro-duende', cor: '#2fa37a' }, sapatoPonta: '#d8435f' },
       'boneco-neve': { capa: { cor: '#f7f7fa', forro: '#dfe6f2', botoes: 1 }, capuz: { tipo: 'neve' }, cachecol: '#d8434f' }
     }[id];
     return S || null;
@@ -639,6 +680,7 @@
         s += tecido(c, cinto, B.cor, B.est, { 'clip-path': corteB });
         if (B.costura) s += p('M' + n(x) + ',' + n(cintura + 4) + ' L' + x + ',' + n(t.y1 + 6), { stroke: '#f2c14e', 'stroke-width': 1.3, 'stroke-dasharray': '3 2', fill: 'none' });
       }
+      if (S.sapatoPonta) for (var sk = 0; sk < 2; sk++) { var pp = g.pe[sk], kk = sk ? 1 : -1; s += p('M' + n(pp[0] - g.peRx) + ',' + n(pp[1] + 8) + ' Q' + n(pp[0] - g.peRx) + ',' + n(pp[1] - 14) + ' ' + pp[0] + ',' + n(pp[1] - 14) + ' Q' + n(pp[0] + kk * 30) + ',' + n(pp[1] - 12) + ' ' + n(pp[0] + kk * 36) + ',' + n(pp[1] - 22) + ' Q' + n(pp[0] + kk * 34) + ',' + n(pp[1] + 8) + ' ' + n(pp[0] + g.peRx * kk) + ',' + n(pp[1] + 8) + 'Z', { fill: S.sapatoPonta, stroke: escuro(S.sapatoPonta, 0.35), 'stroke-width': 1.8 }) + circ(pp[0] + kk * 36, pp[1] - 24, 4.5, { fill: '#f2c14e', stroke: '#a8801e', 'stroke-width': 1 }); }
       if (S.meias) for (var mk = 0; mk < 2; mk++) { var pe2 = g.pe[mk]; s += capsula(pe2[0], pe2[1] - 30, pe2[0], pe2[1] - 8, g.rp + 2, S.meias.cor, escuro(S.meias.cor, 0.35)) + lin(pe2[0] - g.rp, pe2[1] - 26, pe2[0] + g.rp, pe2[1] - 26, { stroke: '#ffffff', 'stroke-width': 3 }); }
     }
     // blusa
@@ -813,7 +855,7 @@
     var cor = C.cor || (C.tipo === 'pinguim' ? '#2b2a36' : C.tipo === 'neve' ? '#f7f7fa' : C.tipo === 'abobora' ? '#f7922e' : '#d92f3a');
     var rx = cb.rx + 12, ry = cb.ry + 12;
     if (!frente) {
-      if (C.tipo === 'touca' || C.tipo === 'abobora') return '';
+      if (C.tipo === 'touca' || C.tipo === 'abobora' || C.tipo === 'gorro-duende') return '';
       return elip(cb.x, cb.y + 2, rx, ry, { fill: cor, stroke: escuro(cor, 0.35), 'stroke-width': 2.2 }) + elip(cb.x, cb.y + 2, rx, ry, { fill: c.volume(), opacity: 0.6 });
     }
     if (C.tipo === 'touca') {   // touca combinando
@@ -821,6 +863,13 @@
       s += tecido(c, d, C.cor, C.est);
       s += p('M' + n(cb.x - cb.rx + 2) + ',' + n(cb.y - cb.ry * 0.28) + ' Q' + cb.x + ',' + n(cb.y - cb.ry * 0.5) + ' ' + n(cb.x + cb.rx - 2) + ',' + n(cb.y - cb.ry * 0.28), { stroke: escuro(C.cor, 0.2), 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
       s += circ(cb.x, cb.y - cb.ry - 18, 11, { fill: claro(C.cor, 0.5), stroke: escuro(C.cor, 0.3), 'stroke-width': 1.6 });
+      return s;
+    }
+    if (C.tipo === 'gorro-duende') {
+      var gx = cb.x, gy = cb.y - cb.ry * 0.36;
+      s += p('M' + n(gx - cb.rx * 0.86) + ',' + n(gy) + ' C' + n(gx - cb.rx * 0.7) + ',' + n(gy - 70) + ' ' + n(gx + 20) + ',' + n(gy - 110) + ' ' + n(gx + cb.rx + 30) + ',' + n(gy - 70) + ' C' + n(gx + 40) + ',' + n(gy - 80) + ' ' + n(gx + cb.rx * 0.6) + ',' + n(gy - 30) + ' ' + n(gx + cb.rx * 0.86) + ',' + n(gy) + 'Z', { fill: C.cor, stroke: escuro(C.cor, 0.35), 'stroke-width': 2.2 });
+      s += p('M' + n(gx - cb.rx * 0.9) + ',' + n(gy) + ' Q' + gx + ',' + n(gy - 22) + ' ' + n(gx + cb.rx * 0.9) + ',' + n(gy), { stroke: '#f4e6c8', 'stroke-width': 13, fill: 'none', 'stroke-linecap': 'round' });
+      s += circ(gx + cb.rx + 32, gy - 70, 11, { fill: '#f4e6c8', stroke: '#c8b898', 'stroke-width': 1.6 }) + circ(gx + cb.rx + 32, gy - 54, 6, { fill: '#f2c14e', stroke: '#a8801e', 'stroke-width': 1.2 });
       return s;
     }
     if (C.tipo === 'abobora') {
