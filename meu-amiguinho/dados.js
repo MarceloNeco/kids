@@ -36,7 +36,11 @@
     'branco': { hex: '#fbfaf7', n: ['branco', 'white', 'blanco'] },
     'preto': { hex: '#2e2a33', n: ['preto', 'black', 'negro'] },
     'prata': { hex: '#c9ced8', n: ['prateado', 'silver', 'plateado'] },
-    'dourado': { hex: '#f2c14e', n: ['dourado', 'gold', 'dorado'] }
+    'dourado': { hex: '#f2c14e', n: ['dourado', 'gold', 'dorado'] },
+    'turquesa': { hex: '#2ec4c4', n: ['azul-turquesa', 'turquoise', 'turquesa'] },
+    'cinza': { hex: '#9aa0aa', n: ['cinza', 'gray', 'gris'] },
+    'caramelo': { hex: '#c98a4b', n: ['caramelo', 'caramel', 'caramelo'] },
+    'holo': { hex: '#cfd8f0', n: ['holográfico', 'holographic', 'holográfico'] }
   };
   var PALETAS = {
     lacos: ['rosa', 'rosa-choque', 'vermelho', 'laranja', 'amarelo', 'lima', 'menta', 'azul-bebe', 'azul', 'lilas', 'roxo', 'marrom', 'bege', 'branco', 'preto', 'prata', 'dourado'],
@@ -45,7 +49,13 @@
     oculos: ['vermelho', 'rosa', 'azul', 'roxo', 'preto', 'dourado'],
     sol: ['branco', 'preto', 'rosa-choque'],
     coracaoOc: ['vermelho', 'rosa'],
-    geral: ['rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'vermelho', 'azul', 'roxo', 'preto', 'branco']
+    geral: ['rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'vermelho', 'azul', 'roxo', 'preto', 'branco'],
+    roupa2: ['branco', 'cinza', 'marinho', 'preto', 'azul-bebe', 'turquesa', 'rosa', 'lilas', 'amarelo', 'vermelho', 'verde'],
+    tenis: ['rosa', 'rosa-choque', 'dourado', 'prata', 'holo', 'branco'],
+    patins: ['azul', 'rosa', 'preto', 'lilas', 'menta'],
+    skate: ['rosa-choque', 'azul', 'lima', 'roxo', 'preto'],
+    coleira: ['vermelho', 'holo', 'azul-bebe', 'azul', 'preto', 'rosa'],
+    bone: ['marinho', 'rosa', 'vermelho', 'azul', 'preto', 'lima']
   };
 
   // ---------- pelo (cores lisas e degradês tie-dye pastel) ----------
@@ -157,6 +167,9 @@
     { id: 'leao', g: 'm', corpos: ['pe', 'q'], pelo: 'amarelo',
       esp: ['leãozinho', 'little lion', 'leoncito'], apelido: ['Juba', 'Mane', 'Melena'],
       frase: ['Corajoso de coração mole: ruge bem alto, mas tem medo de cosquinha.', 'Brave with a soft heart: roars really loud, but is scared of tickles.', 'Valiente con corazón blandito: ruge muy fuerte, pero le dan miedo las cosquillas.'] },
+    { id: 'braquio', g: 'm', corpos: ['q'], pelo: 'menta',
+      esp: ['dinossaurinho pescoçudo', 'long-neck dino', 'dinosaurito cuellilargo'], apelido: ['Pescoção', 'Treetop', 'Copa'],
+      frase: ['Come folhinha lá do alto da árvore e dá carona para os amigos nas costas.', 'Munches leaves from the treetops and gives friends rides on his back.', 'Come hojitas de lo alto del árbol y lleva a sus amigos a caballito.'] },
     { id: 'porquinho', g: 'm', corpos: ['pe', 'q'], pelo: 'rosa', facil: 1,
       esp: ['porquinho', 'piglet', 'cerdito'], apelido: ['Torresmo', 'Muffin', 'Rosquilla'],
       frase: ['Cozinheiro de mão cheia: faz panqueca colorida e pula em poça de lama.', 'A great little cook: makes colorful pancakes and jumps in mud puddles.', 'Un gran cocinero: hace tortitas de colores y salta en los charcos.'] }
@@ -183,6 +196,14 @@
     { id: 'social', n: ['Camisa social azul', 'Blue dress shirt', 'Camisa azul de vestir'], e: ['de camisa social', 'in a dress shirt', 'con camisa de vestir'] },
     { id: 'futebol', n: ['Uniforme de futebol', 'Soccer kit', 'Equipación de fútbol'], e: ['de uniforme de futebol', 'in a soccer kit', 'con equipación de fútbol'], cores: 1, padrao: { cor: 'amarelo' }, facil: 1 },
     { id: 'tutu', n: ['Tutu de bailarina', 'Ballerina tutu', 'Tutú de bailarina'], e: ['de tutu de bailarina', 'in a ballerina tutu', 'con tutú de bailarina'], cores: 1, padrao: { cor: 'rosa' }, facil: 1 },
+    { id: 'polo', n: ['Camisa polo', 'Polo shirt', 'Polo'], e: ['de camisa polo', 'in a polo shirt', 'con polo'], cores: 1, paleta: 'roupa2', padrao: { cor: 'preto' } },
+    { id: 'camiseta-lisa', n: ['Camiseta lisa e bermuda jeans', 'Plain tee and denim shorts', 'Camiseta lisa y bermudas vaqueras'], e: ['de camiseta e bermuda jeans', 'in a tee and denim shorts', 'con camiseta y bermudas vaqueras'], cores: 1, paleta: 'roupa2', padrao: { cor: 'cinza' }, facil: 1 },
+    { id: 'play', n: ['Camiseta PLAY', 'PLAY tee', 'Camiseta PLAY'], e: ['de camiseta PLAY', 'in a PLAY tee', 'con camiseta PLAY'], cores: 1, paleta: 'roupa2', padrao: { cor: 'branco' } },
+    { id: 'corta-vento', n: ['Corta-vento com zíper', 'Zip windbreaker', 'Cortavientos con cremallera'], e: ['de corta-vento', 'in a windbreaker', 'con cortavientos'], cores: 1, paleta: 'roupa2', padrao: { cor: 'turquesa' } },
+    { id: 'jardineira-curta', n: ['Jardineira jeans curta', 'Denim shortalls', 'Peto vaquero corto'], e: ['de jardineira curta', 'in denim shortalls', 'con peto corto'], cores: 1, padrao: { cor: 'branco' } },
+    { id: 'skatista', n: ['Colete jeans de skatista', 'Skater denim vest', 'Chaleco vaquero de skater'], e: ['de colete jeans', 'in a denim vest', 'con chaleco vaquero'], cores: 1, paleta: 'roupa2', padrao: { cor: 'branco' } },
+    { id: 'vestido-doces', n: ['Vestido de docinhos', 'Candy dress', 'Vestido de golosinas'], e: ['de vestido de docinhos', 'in a candy dress', 'con vestido de golosinas'], cores: 1, padrao: { cor: 'rosa' } },
+    { id: 'neve', n: ['Macacão de neve', 'Snowsuit', 'Mono de nieve'], e: ['de macacão de neve', 'in a snowsuit', 'con mono de nieve'], cores: 1, padrao: { cor: 'azul' }, capuz: 1 },
     { id: 'dino', n: ['Fantasia de dinossauro', 'Dinosaur costume', 'Disfraz de dinosaurio'], e: ['fantasiado de dinossauro', 'dressed as a dinosaur', 'disfrazado de dinosaurio'], cores: 1, capuz: 1, padrao: { cor: 'verde' } },
     { id: 'noel', n: ['Casaco de Papai Noel', 'Santa coat', 'Abrigo de Papá Noel'], e: ['de casaco de Papai Noel', 'in a Santa coat', 'con abrigo de Papá Noel'], capuz: 1, facil: 1 },
     { id: 'abobora', n: ['Fantasia de abóbora', 'Pumpkin costume', 'Disfraz de calabaza'], e: ['fantasiado de abóbora', 'dressed as a pumpkin', 'disfrazado de calabaza'], capuz: 1 },
@@ -197,8 +218,14 @@
     { id: 'coracoes', n: ['Coraçõezinhos', 'Little hearts', 'Corazoncitos'] },
     { id: 'esportes', n: ['Bolas de esporte', 'Sports balls', 'Balones'] },
     { id: 'nuvens', n: ['Nuvenzinhas', 'Little clouds', 'Nubecitas'] },
-    { id: 'controle', n: ['Controle de videogame', 'Game controller', 'Mando de videojuego'] }
+    { id: 'controle', n: ['Controle de videogame', 'Game controller', 'Mando de videojuego'] },
+    { id: 'praia', n: ['Pranchas e coqueiros', 'Surfboards and palms', 'Tablas y palmeras'] },
+    { id: 'bichinhos', n: ['Bichinhos', 'Little critters', 'Animalitos'] }
   ];
+  // patches para colar no peito da roupa: as letras de A a Z (a inicial do amiguinho) e figurinhas
+  var PATCHES = [{ id: 'nenhum', n: ['Sem', 'None', 'Sin'] }, { id: 'coracao', n: ['Coração', 'Heart', 'Corazón'] }, { id: 'arco-iris', n: ['Arco-íris', 'Rainbow', 'Arcoíris'] },
+    { id: 'estrela', n: ['Estrela', 'Star', 'Estrella'] }, { id: 'capivara', n: ['Capivara', 'Capybara', 'Capibara'] }];
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(function (l) { PATCHES.push({ id: 'letra-' + l, letra: l, n: [l, l, l] }); });
 
   // ---------- acessórios: um por caixinha (lugar), vários ao mesmo tempo ----------
   var CAIXAS = [
@@ -206,7 +233,7 @@
     { id: 'cabeca', n: ['Tiaras e chapéus', 'Headbands & hats', 'Diademas y sombreros'] },
     { id: 'olhos', n: ['Óculos', 'Glasses', 'Gafas'] },
     { id: 'pescoco', n: ['Colares', 'Necklaces', 'Collares'] },
-    { id: 'pulso', n: ['Pulseiras', 'Bracelets', 'Pulseras'] },
+    { id: 'pulso', n: ['Pulseiras e pochete', 'Bracelets & belt bag', 'Pulseras y riñonera'] },
     { id: 'costas', n: ['Mochilas e asas', 'Backpacks & wings', 'Mochilas y alas'] },
     { id: 'mao', n: ['Na mãozinha', 'In the paw', 'En la manita'] },
     { id: 'colo', n: ['Filhotinho', 'Little baby', 'Bebé'] },
@@ -229,12 +256,18 @@
     { id: 'coroa-flores', caixa: 'cabeca', n: ['Coroa de flores', 'Flower crown', 'Corona de flores'], e: ['coroa de flores', 'flower crown', 'corona de flores'] },
     { id: 'chapeu', caixa: 'cabeca', n: ['Chapéu de sol', 'Sun hat', 'Pamela'], e: ['chapéu de sol', 'sun hat', 'pamela'], paleta: 'geral', cor: 'amarelo' },
     { id: 'bone', caixa: 'cabeca', n: ['Boné', 'Cap', 'Gorra'], e: ['boné', 'cap', 'gorra'], paleta: 'geral', cor: 'vermelho', facil: 1 },
+    { id: 'capacete', caixa: 'cabeca', n: ['Capacete', 'Helmet', 'Casco'], e: ['capacete {c}', '{c} helmet', 'casco {c}'], paleta: 'skate', cor: 'azul' },
+    { id: 'viseira', caixa: 'cabeca', n: ['Viseira', 'Visor', 'Visera'], e: ['viseira', 'visor', 'visera'], paleta: 'bone', cor: 'rosa' },
+    { id: 'tiara-sapinho', caixa: 'cabeca', n: ['Tiara de sapinho', 'Froggy headband', 'Diadema de ranita'], e: ['tiara de sapinho', 'froggy headband', 'diadema de ranita'] },
+    { id: 'tiara-chifres', caixa: 'cabeca', n: ['Tiara de anteninhas', 'Antenna headband', 'Diadema de antenitas'], e: ['tiara de anteninhas', 'antenna headband', 'diadema de antenitas'] },
     { id: 'oculos', caixa: 'olhos', n: ['Óculos', 'Glasses', 'Gafas'], e: ['óculos {c}', '{c} glasses', 'gafas {c}'], paleta: 'oculos', cor: 'vermelho', facil: 1 },
     { id: 'oculos-sol', caixa: 'olhos', n: ['Óculos de sol', 'Sunglasses', 'Gafas de sol'], e: ['óculos de sol', 'sunglasses', 'gafas de sol'], paleta: 'sol', cor: 'preto', facil: 1 },
     { id: 'oculos-coracao', caixa: 'olhos', n: ['Óculos de coração', 'Heart glasses', 'Gafas de corazón'], e: ['óculos de coração', 'heart glasses', 'gafas de corazón'], paleta: 'coracaoOc', cor: 'rosa' },
     { id: 'colar-bolinhas', caixa: 'pescoco', n: ['Colar de bolinhas', 'Bead necklace', 'Collar de bolitas'], e: ['colar de bolinhas', 'bead necklace', 'collar de bolitas'], facil: 1 },
     { id: 'colar-coracao', caixa: 'pescoco', n: ['Colar de coração', 'Heart necklace', 'Collar de corazón'], e: ['colar de coração', 'heart necklace', 'collar de corazón'] },
     { id: 'lenco', caixa: 'pescoco', n: ['Lencinho', 'Bandana', 'Pañuelo'], e: ['lencinho', 'bandana', 'pañuelo'], paleta: 'geral', cor: 'vermelho' },
+    { id: 'coleira', caixa: 'pescoco', n: ['Coleira com guia', 'Collar and leash', 'Collar con correa'], e: ['coleira {c}', '{c} collar and leash', 'collar {c}'], paleta: 'coleira', cor: 'vermelho' },
+    { id: 'pochete', caixa: 'pulso', n: ['Pochete camuflada', 'Camo belt bag', 'Riñonera de camuflaje'], e: ['pochete', 'belt bag', 'riñonera'] },
     { id: 'pulseira-strass', caixa: 'pulso', n: ['Pulseira de strass', 'Rhinestone bracelet', 'Pulsera de brillantes'], e: ['pulseira de strass', 'rhinestone bracelet', 'pulsera de brillantes'] },
     { id: 'pulseira-bolinhas', caixa: 'pulso', n: ['Pulseira de bolinhas', 'Bead bracelet', 'Pulsera de bolitas'], e: ['pulseira de bolinhas', 'bead bracelet', 'pulsera de bolitas'] },
     { id: 'mochila', caixa: 'costas', n: ['Mochila', 'Backpack', 'Mochila'], e: ['mochila', 'backpack', 'mochila'], paleta: 'geral', cor: 'azul', facil: 1 },
@@ -250,11 +283,14 @@
     { id: 'abracadinho-braco', caixa: 'abraco', n: ['Abraçado no braço', 'Hugging the arm', 'Abrazado al brazo'], e: ['unicorninho abraçado no braço', 'a little unicorn hugging the arm', 'un unicornito abrazado al brazo'] },
     { id: 'abracadinho-perna', caixa: 'abraco', n: ['Abraçado na perna', 'Hugging the leg', 'Abrazado a la pierna'], e: ['unicorninho abraçado na perna', 'a little unicorn hugging the leg', 'un unicornito abrazado a la pierna'] },
     { id: 'tenis', caixa: 'pes', n: ['Tênis branco', 'White sneakers', 'Zapatillas blancas'], e: ['tênis branco', 'white sneakers', 'zapatillas blancas'], facil: 1 },
-    { id: 'tenis-brilho', caixa: 'pes', n: ['Tênis holográfico', 'Holographic high-tops', 'Zapatillas holográficas'], e: ['tênis holográfico', 'holographic high-tops', 'zapatillas holográficas'] },
+    { id: 'tenis-brilho', caixa: 'pes', n: ['Tênis de cano alto', 'High-top sneakers', 'Zapatillas altas'], e: ['tênis de cano alto {c}', '{c} high-tops', 'zapatillas altas {c}'], paleta: 'tenis', cor: 'holo' },
+    { id: 'tenis-strass', caixa: 'pes', n: ['Tênis com bico de strass', 'Rhinestone-toe sneakers', 'Zapatillas con puntera de brillantes'], e: ['tênis de strass', 'rhinestone sneakers', 'zapatillas de brillantes'] },
     { id: 'botinhas', caixa: 'pes', n: ['Botinhas pretas', 'Black boots', 'Botitas negras'], e: ['botinhas pretas', 'black boots', 'botitas negras'] },
+    { id: 'coturno', caixa: 'pes', n: ['Coturno caramelo', 'Caramel lace-up boots', 'Botas caramelo'], e: ['coturno', 'lace-up boots', 'botas de cordones'] },
+    { id: 'sapatinho', caixa: 'pes', n: ['Sapatinho preto', 'Black Mary Janes', 'Merceditas negras'], e: ['sapatinho preto', 'black Mary Janes', 'merceditas negras'] },
     { id: 'sapatilhas', caixa: 'pes', n: ['Sapatilhas', 'Ballet flats', 'Bailarinas'], e: ['sapatilhas', 'ballet flats', 'bailarinas'], paleta: 'geral', cor: 'rosa' },
-    { id: 'patins', caixa: 'pes', n: ['Patins', 'Roller skates', 'Patines'], e: ['patins', 'roller skates', 'patines'], paleta: 'geral', cor: 'lilas', facil: 1 },
-    { id: 'skate', caixa: 'chao', n: ['Skate', 'Skateboard', 'Monopatín'], e: ['skate', 'skateboard', 'monopatín'], paleta: 'geral', cor: 'azul', facil: 1 },
+    { id: 'patins', caixa: 'pes', n: ['Patins', 'Roller skates', 'Patines'], e: ['patins', 'roller skates', 'patines'], paleta: 'patins', cor: 'azul', facil: 1 },
+    { id: 'skate', caixa: 'chao', n: ['Skate', 'Skateboard', 'Monopatín'], e: ['skate', 'skateboard', 'monopatín'], paleta: 'skate', cor: 'rosa-choque', facil: 1 },
     { id: 'muletas', caixa: 'apoio', n: ['Muletas', 'Crutches', 'Muletas'], e: ['muletas', 'crutches', 'muletas'], so: 'pe' },
     { id: 'cadeira', caixa: 'apoio', n: ['Cadeira de rodas', 'Wheelchair', 'Silla de ruedas'], e: ['cadeira de rodas', 'a wheelchair', 'silla de ruedas'], facil: 1 }
   ];
@@ -283,10 +319,10 @@
 
   var D = { ETAPAS: ETAPAS, CORES: CORES, PALETAS: PALETAS, PELOS: PELOS, OLHOS: OLHOS, ESTILOS_OLHO: ESTILOS_OLHO, BOCHECHAS: BOCHECHAS,
     CORACOES: CORACOES, BASES: BASES, ROUPAS: ROUPAS, ESTAMPAS: ESTAMPAS, CAIXAS: CAIXAS, ACESS: ACESS, CONFLITOS: CONFLITOS, VOZES: VOZES,
-    NOMES: NOMES, NIVEIS: NIVEIS };
+    NOMES: NOMES, NIVEIS: NIVEIS, PATCHES: PATCHES };
   function porId(lista) { var m = {}; lista.forEach(function (x) { m[x.id] = x; }); return m; }
   D.base = porId(BASES); D.pelo = porId(PELOS); D.olho = porId(OLHOS); D.coracao = porId(CORACOES); D.roupa = porId(ROUPAS);
-  D.acess = porId(ACESS); D.caixa = porId(CAIXAS); D.voz = porId(VOZES); D.estampa = porId(ESTAMPAS);
+  D.acess = porId(ACESS); D.caixa = porId(CAIXAS); D.voz = porId(VOZES); D.estampa = porId(ESTAMPAS); D.patch = porId(PATCHES);
   raiz.AmiguinhoDados = D;
   if (typeof module === 'object' && module.exports) module.exports = D;
 })(typeof window !== 'undefined' ? window : globalThis);
