@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.10",
+      "data": "22/Nov/2026",
+      "hora": "08:14:19",
+      "pt": [
+        "🎞️ GIF para compartilhar: no fim do desfile e na Baladinha tem o botão 🎞️ GIF. No desfile ela entra de novo pela passarela enquanto o jogo grava; na Baladinha, grava a dança com as amigas. O GIF é feito no próprio celular (nada vai para a internet) e aparece com 📤 Compartilhar (WhatsApp e os outros apps) e 💾 Salvar."
+      ],
+      "en": [
+        "🎞️ GIFs to share: at the end of the runway and at the dance party there's a 🎞️ GIF button. On the runway she walks in again while the game records; at the dance party it records the dance with her friends. The GIF is made on the phone itself (nothing goes to the internet) and shows up with 📤 Share (WhatsApp and other apps) and 💾 Save."
+      ],
+      "es": [
+        "🎞️ GIF para compartir: al final del desfile y en la minidisco hay un botón 🎞️ GIF. En el desfile vuelve a entrar por la pasarela mientras el juego graba; en la minidisco, graba el baile con sus amigas. El GIF se hace en el propio móvil (nada va a internet) y aparece con 📤 Compartir (WhatsApp y las demás apps) y 💾 Guardar."
+      ]
+    },
+    {
       "versao": "0.9.9",
       "data": "22/Nov/2026",
       "hora": "00:33:39",

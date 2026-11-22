@@ -633,3 +633,21 @@ test('pé no chão: sapato reto no piso e sombrinha de cada pé (dono, 22/Nov/20
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
   assert.match(anim, /scale\(1 ' \+ \(1 \/ sy\)\.toFixed\(4\) \+ '\) rotate\(' \+ \(-rr\)/, 'o sapato gira e estica ao contrário da perna');
 });
+
+test('GIF do desfile e da Baladinha para compartilhar (dono, 22/Nov/2026)', async () => {
+  const fs = require('fs'), path = require('path'), G = require('../gif.js');
+  const W = 40, H = 30, qs = [0, 1].map(f => { const d = new Uint8ClampedArray(W * H * 4); for (let i = 0; i < W * H; i++) { d[i * 4] = (i * 7 + f * 90) % 256; d[i * 4 + 1] = (i * 3) % 256; d[i * 4 + 2] = 128; d[i * 4 + 3] = 255; } return { width: W, height: H, data: d }; });
+  const b = new Uint8Array(await G.codificar(qs, 10).arrayBuffer());
+  assert.equal(String.fromCharCode(...b.slice(0, 6)), 'GIF89a', 'cabeçalho do GIF');
+  assert.equal(b[6] | (b[7] << 8), W); assert.equal(b[8] | (b[9] << 8), H);
+  assert.ok(String.fromCharCode(...b.slice(16, 27)) === 'NETSCAPE2.0', 'repete para sempre');
+  assert.equal(b[b.length - 1], 0x3B, 'termina certo');
+  assert.equal([...b].filter((x, i) => x === 0x2C && b[i - 8] === 0x21 && b[i - 7] === 0xF9).length, 2, 'dois quadros');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  assert.match(html, /id="btGifDesfile"/); assert.match(html, /id="btGifBalada"/); assert.match(html, /<script src="gif\.js"><\/script>/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'), /'gif\.js'/, 'funciona sem internet');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /navigator\.share\(\{ files: \[arq\], title: 'Purpurina' \}\)/, 'compartilhar (WhatsApp e outros)');
+  assert.match(app, /type: 'image\/gif'/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'balada.js'), 'utf8'), /data-de', 'bd' \+ d\.i/, 'sombras usam o desenho da dançarina');
+});

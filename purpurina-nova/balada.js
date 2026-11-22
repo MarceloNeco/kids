@@ -85,11 +85,11 @@
     estados.slice(0, 3).map(function (e, i) { return { e: e, i: i }; }).reverse().forEach(function (d) {
       var L = LUGARES[d.i], minhas = [];
       SOMBRAS.forEach(function (sb, j) {
-        var c = document.createElement('div'); c.className = 'bal-caixa bal-sombra'; c.style.color = sb.cor;
+        var c = document.createElement('div'); c.className = 'bal-caixa bal-sombra'; c.style.color = sb.cor; c.setAttribute('data-de', 'bd' + d.i);   // (GIF: a sombra usa o desenho da dançarina)
         c.innerHTML = B.svg(d.e, { id: 'bs' + d.i + j, fundo: false, anim: false, realce: false, passos: !calmo, rig: !calmo });
         sombras.appendChild(c); minhas.push(c); caixas.push({ el: c, x: L.x + sb.dx, pe: PAREDE_PE + 6, alt: L.alt * 1.04 });
       });
-      var c = document.createElement('div'); c.className = 'bal-caixa bal-dancarina';
+      var c = document.createElement('div'); c.className = 'bal-caixa bal-dancarina'; c.setAttribute('data-id', 'bd' + d.i);
       c.innerHTML = B.svg(d.e, { id: 'bd' + d.i, fundo: false, anim: !calmo, realce: false, passos: !calmo, rig: !calmo, sorriso: true });
       gente.appendChild(c); caixas.push({ el: c, x: L.x, pe: L.pe, alt: L.alt });
       if (!calmo) anims.push(A.criar(c, { poses: [PASSOS[d.i * 2 % PASSOS.length]], copias: minhas, copiasCada: 3, defasagem: d.i, dur: 380, modo: 'dancar', batida: 500, segura: 1500 + d.i * 250, ritmo: 1000,
