@@ -1446,6 +1446,42 @@
   function pulsoAcess(c, a, g, id) {
     var m = g.pulso, s = '';
     var x = m[0], yy = m[1] - (g.corpo === 'q' ? 0 : 16), cs = id === 'pulseira-strass' ? ['#f4f8ff', '#dfe8f4'] : ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4'];
+    var cor = acessCor(a, id), R = 19, cy = yy + 6;
+    var arco = function (nb, f) { var r0 = []; for (var k = 0; k < nb; k++) { var t = rad(180 - k * 180 / (nb - 1)); r0.push([x + Math.cos(t) * R * (f || 1), cy + Math.sin(t) * 6]); } return r0; };
+    var faixa = 'M' + n(x - R) + ',' + n(cy) + ' A' + R + ',6 0 0 0 ' + n(x + R) + ',' + n(cy);
+    if (id === 'pulseira-arco-iris' || id === 'pulseira-perolas') {
+      var ca = ['#f9707f', '#ffb04d', '#ffe45c', '#6fd68a', '#5fb0f0', '#b07be6'];
+      arco(9, 0.96).forEach(function (q0, k) {
+        var cc = id === 'pulseira-perolas' ? cor : ca[k % 6];
+        s += circ(q0[0], q0[1], id === 'pulseira-perolas' ? 3.4 : 3.8, { fill: id === 'pulseira-perolas' ? c.radial([[0, '#ffffff'], [0.6, claro(cc, 0.25)], [1, escuro(cc, 0.12)]], 0.35, 0.3, 0.75) : cc, stroke: escuro(cc, 0.3), 'stroke-width': 0.7 }) + circ(q0[0] - 1, q0[1] - 1, 1, { fill: '#ffffff', opacity: 0.8 });
+      });
+      return s;
+    }
+    if (id === 'pulseira-pingentes') {
+      s += p(faixa, { stroke: escuro(cor, 0.35), 'stroke-width': 3, fill: 'none' }) + p(faixa, { stroke: claro(cor, 0.2), 'stroke-width': 1.8, fill: 'none', 'stroke-dasharray': '2.4 1.4' });
+      var pg = arco(5);
+      s += lin(pg[1][0], pg[1][1], pg[1][0], pg[1][1] + 5, { stroke: cor, 'stroke-width': 1.2 }) + p(coracaoD(pg[1][0], pg[1][1] + 8, 3.6), { fill: '#f06292', stroke: '#b8306a', 'stroke-width': 0.6 });
+      s += lin(pg[2][0], pg[2][1], pg[2][0], pg[2][1] + 5, { stroke: cor, 'stroke-width': 1.2 }) + p(estrelaD(pg[2][0], pg[2][1] + 9, 4.6, 2), { fill: '#ffd447', stroke: '#c9962a', 'stroke-width': 0.6 });
+      return s + lin(pg[3][0], pg[3][1], pg[3][0], pg[3][1] + 5, { stroke: cor, 'stroke-width': 1.2 }) + p('M' + n(pg[3][0] + 1) + ',' + n(pg[3][1] + 4) + ' a4.4,4.4 0 1 0 0,8.8 a3.2,3.2 0 1 1 0,-8.8z', { fill: '#c9d8f8', stroke: '#7a8ab8', 'stroke-width': 0.6 });
+    }
+    if (id === 'bracelete') {
+      s += p(faixa, { stroke: escuro(cor, 0.4), 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' }) + p(faixa, { stroke: metalico(c, cor), 'stroke-width': 6.6, fill: 'none', 'stroke-linecap': 'round' });
+      return s + circ(x, cy + 6, 3.2, { fill: '#f06292', stroke: '#ffffff', 'stroke-width': 1 }) + p(brilhoD(x - 9, cy + 3, 2.4), { fill: '#ffffff' });
+    }
+    if (id === 'relogio') {
+      s += p(faixa, { stroke: escuro(cor, 0.35), 'stroke-width': 7.5, fill: 'none', 'stroke-linecap': 'round' }) + p(faixa, { stroke: cor, 'stroke-width': 5.4, fill: 'none', 'stroke-linecap': 'round' });
+      s += circ(x, cy + 6, 8, { fill: '#c9ced8', stroke: '#7a808c', 'stroke-width': 1.2 }) + circ(x, cy + 6, 6.2, { fill: '#ffffff' });
+      return s + lin(x, cy + 6, x, cy + 2, { stroke: '#2e2a33', 'stroke-width': 1.3, 'stroke-linecap': 'round' }) + lin(x, cy + 6, x + 3, cy + 7, { stroke: '#2e2a33', 'stroke-width': 1.3, 'stroke-linecap': 'round' }) + circ(x, cy + 6, 0.9, { fill: cor });
+    }
+    if (id === 'pulseira-amizade') {
+      s += p(faixa, { stroke: escuro(cor, 0.4), 'stroke-width': 6.4, fill: 'none', 'stroke-linecap': 'round' }) + p(faixa, { stroke: cor, 'stroke-width': 4.4, fill: 'none', 'stroke-linecap': 'round' });
+      s += p(faixa, { stroke: '#ffffff', 'stroke-width': 4.4, fill: 'none', 'stroke-dasharray': '2.2 4.4' }) + p(faixa, { stroke: '#ffd447', 'stroke-width': 4.4, fill: 'none', 'stroke-dasharray': '2.2 4.4', 'stroke-dashoffset': 2.2 });
+      return s + lin(x + R - 2, cy + 1, x + R + 2, cy + 9, { stroke: cor, 'stroke-width': 1.6, 'stroke-linecap': 'round' }) + lin(x + R - 4, cy + 2, x + R - 2, cy + 10, { stroke: '#ffd447', 'stroke-width': 1.6, 'stroke-linecap': 'round' });
+    }
+    if (id === 'elastico-pulso') {
+      arco(8, 0.98).forEach(function (q0) { s += elip(q0[0], q0[1], 5, 4.4, { fill: c.radial([[0, claro(cor, 0.3)], [1, escuro(cor, 0.2)]], 0.4, 0.35, 0.7), stroke: escuro(cor, 0.4), 'stroke-width': 0.8 }); });
+      return s;
+    }
     for (var i = 0; i < 7; i++) { var an = rad(200 + i * 22), bx = x + Math.cos(an) * 19, by = yy + Math.sin(an) * 6 + 6; s += circ(bx, by, id === 'pulseira-strass' ? 3 : 3.6, { fill: cs[i % cs.length], stroke: id === 'pulseira-strass' ? '#8aa0c0' : escuro(cs[i % cs.length], 0.3), 'stroke-width': 0.8 }) + (id === 'pulseira-strass' ? circ(bx - 0.8, by - 0.8, 1, { fill: '#ffffff' }) : ''); }
     return s;
   }
