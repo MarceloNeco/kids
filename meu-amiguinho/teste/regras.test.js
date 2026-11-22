@@ -154,6 +154,44 @@ test('coleção: os 2 exemplos sempre lá; salvar, editar e apagar; dado estraga
   const l = C.meus(); assert.equal(l.length, 1); assert.equal(l[0].pelo, 'caramelo'); assert.equal(l[0].roupa, 'nenhuma'); assert.deepEqual(l[0].acess, { cabeca: 'coroa' }); assert.equal(l[0].frases[0].texto.length, 60);
 });
 
+// Barra de tom ☀️ ↔ 🌙 (dono, 22/Nov/2026: "assim como no Purpurina… mais escuro, mais claro, com vários tons").
+test('tom: clareia e escurece o pelo, a roupa e cada acessório no desenho; fica lembrado; amiguinho antigo sem tom fica igual', () => {
+  const luz = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.substr(i, 2), 16)); return c[0] * 0.3 + c[1] * 0.59 + c[2] * 0.11; };
+  const a = R.novo('urso'); R.vestir(a, 'pijama'); R.porAcess(a, 'laco');
+  const antes = A.svg(a, { id: 't' });
+  const pelo = D.pelo[a.pelo].cor, roupa = D.CORES[a.corRoupa].hex, laco = D.CORES[D.acess.laco.cor].hex;
+  for (const h of [pelo, roupa, laco]) assert.ok(antes.includes(h), 'cor de sempre ' + h);
+  assert.ok(R.tom(a, 'pelo', 0.6)); assert.ok(R.tom(a, 'roupa', -0.5)); assert.ok(R.tom(a, 'acess', 0.8, 'laco'));
+  assert.ok(!R.tom(a, 'acess', 0.5, 'nao-existe')); assert.ok(!R.tom(a, 'nariz', 0.5));
+  const depois = A.svg(a, { id: 't' });
+  for (const [h, v] of [[pelo, 0.6], [roupa, -0.5], [laco, 0.8]]) {
+    const nova = A.comTom(h, v);
+    assert.ok(depois.includes(nova), 'tom aplicado em ' + h);
+    assert.ok(v > 0 ? luz(nova) < luz(h) - 10 : luz(nova) > luz(h) + 10, 'mais ' + (v > 0 ? 'escuro' : 'claro') + ': ' + h + ' → ' + nova);
+  }
+  assert.ok(!depois.includes('fill="' + pelo + '"'), 'o pelo inteiro mudou de tom');
+  // o contorno e a parte clarinha do pelo acompanham a cor nova
+  assert.ok(!depois.includes(A.util.escuro(pelo, 0.38)) && depois.includes(A.util.escuro(A.comTom(pelo, 0.6), 0.38)), 'contorno acompanha');
+  // lembrado: o amiguinho guardado (coleção e rascunho passam pelo validar) volta com o mesmo tom e o mesmo desenho
+  const mem = {}, st = { getItem: (k) => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); } };
+  const guardado = R.Colecao(st).salvar(a);
+  assert.deepEqual(R.Colecao(st).obter(guardado.id).tom, { pelo: 0.6, roupa: -0.5, acess: { laco: 0.8 } });
+  assert.equal(A.svg(R.validar(JSON.parse(JSON.stringify(a))), { id: 't' }), depois);
+  // voltar para o meio tira o tom
+  R.tom(a, 'pelo', 0); R.tom(a, 'roupa', 0.01); R.tom(a, 'acess', 0, 'laco');
+  assert.equal(a.tom, undefined); assert.equal(A.svg(a, { id: 't' }), antes);
+  // amiguinho antigo, sem o campo tom: o desenho é o de sempre
+  const velho = R.validar({ base: 'coelha', pelo: 'rosa', roupa: 'pijama', corRoupa: 'menta', acess: { laco: 'laco' }, corAcess: { laco: 'azul' } });
+  assert.equal(velho.tom, undefined);
+  const igual = R.novo('coelha'); igual.id = velho.id; igual.pelo = 'rosa'; R.vestir(igual, 'pijama'); R.corRoupa(igual, 'menta'); R.porAcess(igual, 'laco'); R.corAcess(igual, 'laco', 'azul');
+  igual.nome = velho.nome; igual.nasceu = velho.nasceu;
+  assert.equal(A.svg(velho, { id: 't' }), A.svg(igual, { id: 't' }));
+  // valor estragado: fica no limite ou é ignorado
+  assert.deepEqual(R.validar({ base: 'urso', tom: { pelo: 'x', roupa: 9, acess: { 'nao-existe': 0.5, laco: -3 } } }).tom, { roupa: 1, acess: { laco: -1 } });
+  // o holográfico (arco-íris) não tem claro e escuro
+  assert.equal(A.comTom('#cfd8f0', 1), '#cfd8f0');
+});
+
 test('frases: prontas nos 3 idiomas com o nome da criança, escritas até 60 letras', () => {
   assert.equal(R.textoFrase({ pronta: 'teamo' }, 'pt', 'Bia'), 'Eu te amo, Bia!');
   assert.equal(R.textoFrase({ pronta: 'teamo' }, 'en', ''), 'I love you!');

@@ -16,6 +16,11 @@ fica sempre à vista (o resto já vem escolhido). O Voltar do celular volta uma 
    preta, robozinho de pelúcia (telinha de LED com expressões animadas) e porquinho. A pelúcia começa "sem roupa".
 2. **Me dá cor!** — 22 pelos (lisos, tie-dye pastel e lilás com brilho), cor e jeito dos olhos (brilhantes, com cílios,
    bordados) e bochechas.
+   **Barra de tom ☀️ ↔ 🌙** (dono, 22/Nov/2026, "como no Purpurina"): tocou numa cor do pelo, da roupa ou de um acessório,
+   aparece embaixo das bolinhas a barra "Mais claro ou mais escuro", com o degradê daquela cor; arrastando, o amiguinho
+   muda na hora. Fica em `amigo.tom` (`{ pelo, roupa, acess: { id } }`, de −1 a 1; `R.tom`, `A.comTom`); o contorno, a
+   sombra e o focinho acompanham. Amiguinho antigo, sem `tom`, fica igual. O holográfico não tem tom (é arco-íris). No
+   balcão, enquanto a barra aparece, saem os nomes "Cor" e o da caixinha aberta (a etapa continua sem rolar).
 3. **Me deixa fofinho!** — o **coraçãozinho** (6 cores): segurar = beijinho + desejo, e ele voa para dentro da pelúcia;
    a **máquina de fofura** (carrocinha com rodas, janela de flocos girando e luzes que trocam): segure o botão, os flocos
    voam pelo bico e a pelúcia incha; medidor pouco · no ponto · cheio demais; no ponto = estrelinhas; cheio demais =

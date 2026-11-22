@@ -5,7 +5,7 @@
    Histórico: cada tela de dentro (cada etapa também) é uma entrada; o Voltar do celular volta uma etapa. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.0', APP_DATA = '22/Nov/2026';
+  var APP_VERSION = '0.2.1', APP_DATA = '22/Nov/2026';
   var D = window.AmiguinhoDados, A = window.AmiguinhoArte, R = window.AmiguinhoRegras, V = window.AmiguinhoVoz, VIVO = window.AmiguinhoVivo;
   var $ = function (id) { return document.getElementById(id); };
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -142,6 +142,7 @@
     $('maquina').hidden = etapa !== 2; $('medidor').hidden = etapa !== 2;
     if (etapa === 2) { if (!$('maquina').firstChild) $('maquina').innerHTML = A.maquina({ id: 'mq' }); pintarMedidor(); }
     $('fala').hidden = true;
+    if (pintarOficina.etapa !== etapa) { tomAberto = null; pintarOficina.etapa = etapa; }
     atualizarPelucia();
     $('painel').scrollTop = 0;
     PAINEL[E.id](); depoisDoPainel();
@@ -170,6 +171,27 @@
   function amostraCor(hex) { return '<i class="amostra" style="background:' + hex + '"></i>'; }
   function amostraPelo(p) { return '<i class="amostra" style="background:' + (p.grad ? 'linear-gradient(135deg,' + p.grad.join(',') + ')' : p.cor) + '"></i>'; }
   function rolarAteSel(caixa) { var s = caixa.querySelector('.sel'); if (s && caixa.scrollWidth > caixa.clientWidth) caixa.scrollLeft = Math.max(0, s.offsetLeft - caixa.offsetLeft - caixa.clientWidth / 2 + s.offsetWidth / 2); }
+  /* barra de tom (dono, 22/Nov/2026: "assim como no Purpurina, aquele botão de arrastar… mais escuro, mais claro, com vários
+     tons"): aparece embaixo das bolinhas depois de tocar numa cor (do pelo, da roupa, da parte de baixo ou do acessório);
+     arrastando, o amiguinho muda na hora; o fundo mostra o degradê do claro ao escuro daquela cor. */
+  var tomAberto = null;   // 'pelo' | 'roupa' | 'baixo' | 'acess:<id>'
+  function linhaTom(parte, id, hex) {
+    var l = el('div', 'linha-tom'), rot = t('Mais claro ou mais escuro', 'Lighter or darker', 'Más claro o más oscuro');
+    l.appendChild(el('span', 'rot rot-tom', rot));
+    $('painel').classList.add('com-tom');
+    var b = el('label', 'barra', '<span class="barra-ponta" aria-hidden="true">☀️</span><input type="range" min="-100" max="100" step="1"><span class="barra-ponta" aria-hidden="true">🌙</span>');
+    var r = b.querySelector('input'), raf = 0;
+    r.value = String(Math.round(R.tomDe(amigo, parte, id) * 100));
+    r.setAttribute('aria-label', rot); r.dataset.tom = parte;
+    r.style.background = 'linear-gradient(90deg, ' + A.comTom(hex, -1) + ', ' + hex + ', ' + A.comTom(hex, 1) + ')';
+    r.addEventListener('input', function () {
+      R.tom(amigo, parte, +r.value / 100, id);
+      if (!raf) raf = requestAnimationFrame(function () { raf = 0; if (vOf) vOf.trocar(amigo); });
+    });
+    r.addEventListener('change', function () { guardarRascunho(); });
+    l.appendChild(b);
+    return l;
+  }
   var cacheMini = {};
   function mini(chave, f) { if (!cacheMini[chave]) cacheMini[chave] = f(); return cacheMini[chave]; }
 
@@ -188,7 +210,7 @@
   }
   function miniDoAcess(a, id, cor, idSvg) {
     var it = D.acess[id]; if (!it) return '';
-    var b = Object.assign({}, a, { acess: {}, roupa: 'nenhuma', corAcess: {} });
+    var b = Object.assign({}, a, { acess: {}, roupa: 'nenhuma', corAcess: {}, tom: a.tom && a.tom.pelo ? { pelo: a.tom.pelo } : undefined });
     b.acess[it.caixa] = id; if (cor) b.corAcess[id] = cor;
     if (b.corpo === 'q' && it.so === 'pe') b.corpo = 'pe';
     var com = A.svg(b, { id: idSvg }), sem = A.svg(Object.assign({}, b, { acess: {} }), { id: idSvg + 's' });
@@ -239,6 +261,7 @@
     });
   }
   function depoisDoPainel() { encaixarTextos($('painel')); marcarRolagem($('painel')); }
+  function limparPainel() { var p = $('painel'); p.innerHTML = ''; p.classList.remove('com-tom'); return p; }
   // fileira que corre para o lado: marca se tem mais para ver (a ponta fica esfumada até chegar no fim)
   function marcarRolagem(raiz) {
     raiz.querySelectorAll('.roda').forEach(function (r) {
@@ -249,7 +272,7 @@
 
   var PAINEL = {
     bicho: function () {
-      var p = $('painel'); p.innerHTML = '';
+      var p = limparPainel();
       var L = linha(t('Escolha o seu bichinho', 'Choose your buddy', 'Elige tu animalito'), 'bichos');
       D.BASES.forEach(function (b) {
         var a = R.novo(b.id);
@@ -266,7 +289,7 @@
       rolarAteSel(L.r);
     },
     pelo: function () {
-      var p = $('painel'); p.innerHTML = '';
+      var p = limparPainel();
       var L1 = linha(t('Cor do pelo', 'Fur color', 'Color del pelo'));
       D.PELOS.forEach(function (x) { L1.r.appendChild(opc(amostraPelo(x), amigo.pelo === x.id, tr(x.n), { pelo: x.id })); });
       var L2 = linha(t('Olhinhos', 'Eyes', 'Ojitos'));
@@ -274,11 +297,13 @@
       D.ESTILOS_OLHO.forEach(function (x) { L2.r.appendChild(opc('<span>' + tr(x.n) + '</span>', amigo.estiloOlho === x.id, null, { estiloOlho: x.id })); });
       var L3 = linha(t('Bochechas', 'Cheeks', 'Mejillas'));
       D.BOCHECHAS.forEach(function (x) { L3.r.appendChild(opc('<span>' + tr(x.n) + '</span>', amigo.bochecha === x.id, null, { bochecha: x.id })); });
-      p.appendChild(L1.l); p.appendChild(L2.l); p.appendChild(L3.l);
+      p.appendChild(L1.l);
+      if (tomAberto === 'pelo') { var pe = D.pelo[amigo.pelo]; p.appendChild(linhaTom('pelo', null, pe.grad ? pe.grad[Math.floor(pe.grad.length / 2)] : pe.cor)); }
+      p.appendChild(L2.l); p.appendChild(L3.l);
       rolarAteSel(L1.r);
     },
     fofura: function () {
-      var p = $('painel'); p.innerHTML = '';
+      var p = limparPainel();
       var L1 = linha(t('Coraçãozinho', 'Little heart', 'Corazoncito'));
       D.CORACOES.forEach(function (x) { L1.r.appendChild(opc('<i class="cor-coracao" style="' + (x.grad ? 'background:linear-gradient(135deg,' + x.grad.join(',') + ')' : 'background:' + x.cor) + '"></i>', amigo.coracao === x.id, tr(x.n), { coracao: x.id })); });
       p.appendChild(L1.l);
@@ -297,7 +322,7 @@
       ligarMaquina();
     },
     roupa: function () {
-      var p = $('painel'); p.innerHTML = '';
+      var p = limparPainel();
       var L1 = linha(t('Guarda-roupa', 'Wardrobe', 'Armario'), 'cabides');
       D.ROUPAS.forEach(function (r) {
         var svg = mini('cb-' + r.id + '-' + lingua, function () { var a = R.novo('urso'); R.vestir(a, r.id); a.lang = lingua; return A.cabide(a, r.id, { id: 'cb' + r.id }); });
@@ -309,6 +334,7 @@
         var L2 = linha(t('Cor', 'Color', 'Color'));
         D.PALETAS[R0.paleta || 'roupa'].forEach(function (c) { L2.r.appendChild(opc(amostraCor(D.CORES[c].hex), amigo.corRoupa === c, tr(D.CORES[c].n), { corRoupa: c })); });
         p.appendChild(L2.l);
+        if (tomAberto === 'roupa' && D.CORES[amigo.corRoupa]) p.appendChild(linhaTom('roupa', null, D.CORES[amigo.corRoupa].hex));
       }
       if (R0 && R0.estampa) {
         var L3 = linha(t('Estampa', 'Print', 'Estampado'));
@@ -326,7 +352,7 @@
       rolarAteSel(L1.r);
     },
     acess: function () {
-      var p = $('painel'); p.innerHTML = '';
+      var p = limparPainel();
       var balcao = el('div', 'balcao'); balcao.setAttribute('role', 'tablist'); balcao.setAttribute('aria-label', t('Balcão de acessórios', 'Accessory counter', 'Mostrador de accesorios'));
       var ICO = { laco: '🎀', cabeca: '👑', olhos: '👓', pescoco: '📿', pulso: '💎', costas: '🎒', mao: '🪄', colo: '🧸', abraco: '🦄', pes: '👟', chao: '🛹', apoio: '♿' };
       D.CAIXAS.forEach(function (cx) {
@@ -344,7 +370,7 @@
       D.ACESS.filter(function (it) { return it.caixa === caixaAberta; }).forEach(function (it) {
         var pode = R.podeUsar(amigo, it.id);
         var cor = (amigo.corAcess && amigo.corAcess[it.id]) || it.cor || '';
-        var svg = mini('ac-' + amigo.base + amigo.corpo + amigo.pelo + it.id + cor, function () { return miniDoAcess(amigo, it.id, cor, 'ac' + it.id); });
+        var svg = mini('ac-' + amigo.base + amigo.corpo + amigo.pelo + R.tomDe(amigo, 'pelo') + it.id + cor, function () { return miniDoAcess(amigo, it.id, cor, 'ac' + it.id); });
         var b = opc(svg + '<small>' + tr(it.n) + '</small>', amigo.acess[caixaAberta] === it.id, tr(it.n), { acess: it.id });
         if (!pode) { b.disabled = true; b.title = t('Só para quem fica em pé', 'Only for standing buddies', 'Solo para los que están de pie'); }
         L.r.appendChild(b);
@@ -355,11 +381,13 @@
         var L2 = linha(t('Cor', 'Color', 'Color'));
         D.PALETAS[atual.paleta].forEach(function (c) { var hex = c === 'holo' ? 'linear-gradient(135deg,#f8c6f0,#c6e8f8,#e8f8c6)' : D.CORES[c].hex; L2.r.appendChild(opc(amostraCor(hex), ((amigo.corAcess || {})[atual.id] || atual.cor) === c, tr(D.CORES[c].n), { corAcess: c, item: atual.id })); });
         p.appendChild(L2.l);
+        var corA = (amigo.corAcess || {})[atual.id] || atual.cor;   // (o holográfico é arco-íris: não tem claro e escuro)
+        if (tomAberto === 'acess:' + atual.id && corA !== 'holo' && D.CORES[corA]) p.appendChild(linhaTom('acess', atual.id, D.CORES[corA].hex));
       }
       rolarAteSel(L.r);
     },
     voz: function () {
-      var p = $('painel'); p.innerHTML = '';
+      var p = limparPainel();
       var i = amigo.frase || 0, fr = amigo.frases[i] || { pronta: 'teamo' };
       var abas = el('div', 'abas');
       amigo.frases.forEach(function (f, k) { var b = el('button', 'aba' + (k === i ? ' sel' : ''), t('Frase ', 'Phrase ', 'Frase ') + (k + 1)); b.type = 'button'; b.dataset.frase = String(k); abas.appendChild(b); });
@@ -394,7 +422,7 @@
       $('chkEfeito').addEventListener('change', function () { if (amigo.frases[i].gravada) { amigo.frases[i].efeito = this.checked; guardarRascunho(); } });
     },
     nome: function () {
-      var p = $('painel'); p.innerHTML = '';
+      var p = limparPainel();
       var b = D.base[amigo.base];
       var f = el('div', 'formulario');
       var campo = function (id, rot, val, ph, max) { return '<label class="campo"><span>' + rot + '</span><input id="' + id + '" type="text" maxlength="' + (max || 20) + '" autocomplete="off" value="' + A.util.esc(val || '') + '" placeholder="' + A.util.esc(ph || '') + '"></label>'; };
@@ -419,19 +447,19 @@
     var d = b.dataset, mudouDesenho = true, repintar = true;
     if (d.base) { if (amigo.base === d.base) return; R.escolherBase(amigo, d.base); mostrarFala(falaBase()); V.pop(); }
     else if (d.corpo) R.escolherCorpo(amigo, d.corpo);
-    else if (d.pelo) amigo.pelo = d.pelo;
+    else if (d.pelo) { amigo.pelo = d.pelo; tomAberto = 'pelo'; }
     else if (d.olhos) amigo.olhos = d.olhos;
     else if (d.estiloOlho) amigo.estiloOlho = d.estiloOlho;
     else if (d.bochecha) amigo.bochecha = d.bochecha;
     else if (d.coracao) { amigo.coracao = d.coracao; }
-    else if (d.roupa) { R.vestir(amigo, d.roupa); if (vOf) setTimeout(function () { vOf.acao('cabeca'); }, 50); }
-    else if (d.corRoupa) R.corRoupa(amigo, d.corRoupa);
+    else if (d.roupa) { R.vestir(amigo, d.roupa); tomAberto = null; if (vOf) setTimeout(function () { vOf.acao('cabeca'); }, 50); }
+    else if (d.corRoupa) { R.corRoupa(amigo, d.corRoupa); tomAberto = 'roupa'; }
     else if (d.estampa) R.estampa(amigo, d.estampa);
     else if (d.patch) amigo.patch = d.patch;
-    else if (d.caixa) { caixaAberta = d.caixa; mudouDesenho = false; }
+    else if (d.caixa) { caixaAberta = d.caixa; tomAberto = null; mudouDesenho = false; }
     else if (d.tirar) R.tirarAcess(amigo, d.tirar);
     else if (d.acess) { R.alternarAcess(amigo, d.acess); if (vOf) setTimeout(function () { vOf.acao('pulinho'); }, 50); }
-    else if (d.corAcess) R.corAcess(amigo, d.item, d.corAcess);
+    else if (d.corAcess) { R.corAcess(amigo, d.item, d.corAcess); tomAberto = 'acess:' + d.item; }
     else if (d.frase) { amigo.frase = +d.frase; mudouDesenho = false; }
     else if (d.maisFrase) { amigo.frases.push({ pronta: 'abraco' }); amigo.frase = amigo.frases.length - 1; mudouDesenho = false; }
     else if (d.tirarFrase) { var k = +d.tirarFrase; if (amigo.frases[k] && amigo.frases[k].gravada) V.apagar(amigo.id + ':' + k); amigo.frases.splice(k, 1); if (!amigo.frases.length) amigo.frases = [{ pronta: 'teamo' }]; amigo.frase = 0; mudouDesenho = false; }

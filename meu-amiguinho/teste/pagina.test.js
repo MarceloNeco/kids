@@ -65,6 +65,42 @@ for (const [w, h] of [[360, 740], [390, 844]]) {
   });
 }
 
+// Barra de tom (dono, 22/Nov/2026: "como no Purpurina… mais escuro, mais claro"): só aparece depois de tocar numa cor; arrastar
+// muda o bichinho na hora e fica no rascunho; a etapa continua sem rolar.
+test('barra de tom ☀️ ↔ 🌙 no pelo, na roupa e no acessório: aparece ao tocar na cor, muda o desenho e fica lembrada', async () => {
+  const pg = await abrir(360, 740);
+  try {
+    const arrastar = (v) => pg.evaluate((x) => { const r = document.querySelector('#painel input[type=range]'); r.value = String(x); r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+    const desenho = () => pg.evaluate(() => document.querySelector('#pelucia').innerHTML.replace(/ id="[^"]*"|url\(#[^)]*\)/g, ''));
+    await pg.click('#btCriar'); await pg.waitForTimeout(200);
+    await pg.click('#btProximo'); await pg.waitForTimeout(200);
+    assert.equal(await pg.locator('#painel input[type=range]').count(), 0, 'a barra só aparece depois de tocar numa cor');
+    await pg.click('#painel [data-pelo="rosa"]'); await pg.waitForTimeout(150);
+    assert.equal(await pg.locator('#painel input[type=range]').count(), 1);
+    assert.match(await pg.textContent('#painel .linha-tom'), /Mais claro ou mais escuro/);
+    let antes = await desenho(); await arrastar(80); await pg.waitForTimeout(150);
+    assert.notEqual(await desenho(), antes, 'o pelo mudou de tom');
+    assert.equal((await est(pg)).amigo.tom.pelo, 0.8);
+    assert.ok(await naoRola(pg), 'etapa 2 rola com a barra');
+    for (let i = 0; i < 2; i++) { await pg.click('#btProximo'); await pg.waitForTimeout(200); }
+    await pg.click('#painel [data-roupa="pijama"]'); await pg.waitForTimeout(150);
+    await pg.click('#painel [data-cor-roupa="menta"]'); await pg.waitForTimeout(150);
+    antes = await desenho(); await arrastar(-70); await pg.waitForTimeout(150);
+    assert.notEqual(await desenho(), antes, 'a roupa mudou de tom');
+    assert.equal((await est(pg)).amigo.tom.roupa, -0.7);
+    assert.ok(await naoRola(pg), 'etapa 4 rola com a barra');
+    await pg.click('#btProximo'); await pg.waitForTimeout(200);
+    await pg.click('#painel [data-acess="laco"]'); await pg.waitForTimeout(150);
+    await pg.click('#painel [data-cor-acess="azul"]'); await pg.waitForTimeout(150);
+    antes = await desenho(); await arrastar(50); await pg.waitForTimeout(150);
+    assert.notEqual(await desenho(), antes, 'o laço mudou de tom');
+    assert.ok(await naoRola(pg), 'etapa 5 rola com a barra');
+    const r = await pg.evaluate(() => JSON.parse(localStorage.getItem('bolinho:meu-amiguinho:rascunho')).amigo.tom);
+    assert.deepEqual(r, { pelo: 0.8, roupa: -0.7, acess: { laco: 0.5 } }, 'o tom fica no rascunho');
+    assert.deepEqual(pg.erros, []);
+  } finally { await pg.ctx.close(); }
+});
+
 test('montar uma coala do jeito da Alice, Pronto: caixinha, amiguinho vivo com ❤, certidão em PNG e coleção', async () => {
   const pg = await abrir(390, 844);
   try {
