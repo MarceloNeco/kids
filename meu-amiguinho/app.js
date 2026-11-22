@@ -5,7 +5,7 @@
    Histórico: cada tela de dentro (cada etapa também) é uma entrada; o Voltar do celular volta uma etapa. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.1.1', APP_DATA = '22/Nov/2026';
+  var APP_VERSION = '0.1.2', APP_DATA = '22/Nov/2026';
   var D = window.AmiguinhoDados, A = window.AmiguinhoArte, R = window.AmiguinhoRegras, V = window.AmiguinhoVoz, VIVO = window.AmiguinhoVivo;
   var $ = function (id) { return document.getElementById(id); };
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -163,7 +163,8 @@
   $('pontos').addEventListener('click', function (e) { var l = e.target.closest('li'); if (!l) return; irEtapa([].indexOf.call(l.parentNode.children, l)); });
   $('pelucia').addEventListener('click', function () { if (vOf) { vOf.tocar(); V.pop(); } });
 
-  function mostrarFala(txt, ms) { var f = $('fala'); f.textContent = txt; f.hidden = !txt; clearTimeout(mostrarFala.t); if (ms) mostrarFala.t = setTimeout(function () { f.hidden = true; }, ms); }
+  // o balão aparece embaixo do bichinho, some sozinho (5 s) e fecha num toque (dono, 22/Nov/2026: "o escrito tampa toda a cabeça")
+  function mostrarFala(txt, ms) { var f = $('fala'); f.textContent = txt; f.hidden = !txt; clearTimeout(mostrarFala.t); if (txt) mostrarFala.t = setTimeout(function () { f.hidden = true; }, ms || 5000); }
   function falaBase() { var b = D.base[amigo.base]; return tr(b.apelido) + ': ' + tr(b.frase); }
 
   // pedaços de painel
@@ -670,6 +671,7 @@
 
   if (window.SolverRecursos && !SolverRecursos.ligado('meu-amiguinho', true)) { document.querySelectorAll('.tela').forEach(function (s) { s.classList.remove('ativa'); }); $('desligado').hidden = false; traduzir(); return; }
   traduzir();
+  ['fala', 'falaAmigo'].forEach(function (id) { var el = $(id); if (el) el.addEventListener('click', function (e) { e.stopPropagation(); el.hidden = true; }); });   // um toque fecha o balão
   if (window.Trilha && !TESTE) Trilha.iniciar({ jogo: 'meu-amiguinho', musicas: MUSICAS, creditos: 'CREDITOS.md' });
   // limpeza: vozes gravadas de amiguinhos que não existem mais (nem no rascunho)
   setTimeout(function () {

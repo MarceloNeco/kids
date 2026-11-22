@@ -69,8 +69,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .medidor i { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(0deg, #a9d2f5, #8fdcc0 45%, #ffd447 75%, #ff8fb3); transition: height .1s linear; }
 .medidor .z1, .medidor .z2 { position: absolute; left: 0; right: 0; height: 2px; background: var(--tinta); opacity: .5; }
 .medidor .z1 { bottom: 37.5%; } .medidor .z2 { bottom: 70.8%; }
-.fala { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); z-index: 3; max-width: 86%; padding: 7px 12px; border-radius: 16px; background: #fff; box-shadow: 0 4px 12px rgba(90, 58, 106, .18); font-size: 14px; line-height: 1.25; text-align: center; color: var(--tinta); pointer-events: none; }
-.fala::after { content: ""; position: absolute; left: 50%; bottom: -8px; margin-left: -8px; border: 8px solid transparent; border-bottom: 0; border-top-color: #fff; }
+/* balão embaixo, nos pés: nunca tampa a cabeça; some sozinho e fecha num toque (dono, 22/Nov/2026) */
+.fala { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 3; max-width: 88%; padding: 6px 12px; border-radius: 16px; background: rgba(255, 255, 255, .94); box-shadow: 0 4px 12px rgba(90, 58, 106, .18); font-size: 13px; line-height: 1.25; text-align: center; color: var(--tinta); cursor: pointer; }
 .painel { flex: none; display: flex; flex-direction: column; gap: 5px; max-height: 50%; overflow: hidden; }
 .linha { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .rot { font-size: 13px; font-weight: 600; color: var(--tinta2); padding-left: 4px; }
@@ -124,7 +124,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .campo { display: flex; flex-direction: column; gap: 2px; font-size: 13px; font-weight: 600; color: var(--tinta2); }
 .nome-linha { display: flex; align-items: flex-end; gap: 6px; } .nome-linha .campo { flex: 1; }
 .nasceu { margin: 0; font-size: 14px; }
-.of-rodape { flex: none; display: flex; gap: 6px; align-items: center; }
+.of-rodape { flex: none; display: flex; gap: 6px; align-items: center; padding-right: 50px; }   /* espaço para a bolinha 🎵 da música não tampar o Pronto */
 .of-rodape .principal { flex: 1.2; min-height: 52px; padding: 8px 10px; }
 .of-rodape .secundario { flex: 1; padding: 8px 10px; }
 .of-rodape .mini { flex: none; }
@@ -235,7 +235,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
   .of-rodape { grid-area: rodape; }
   .of-rodape .principal, .of-rodape .secundario { min-height: 46px; }
   .selo { width: 44px; height: 36px; font-size: 20px; }
-  .fala { top: auto; bottom: 8px; } .fala::after { display: none; }
   .am-acoes { grid-template-columns: repeat(5, auto); justify-content: center; }
   #amigo.ativa .palco-amigo { min-height: 0; }
 }

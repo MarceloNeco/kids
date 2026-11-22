@@ -2,6 +2,14 @@
   "app": "meu-amiguinho",
   "versoes": [
     {
+      "versao": "0.1.2",
+      "data": "22/Nov/2026",
+      "hora": "14:45:00",
+      "pt": ["💬 O balão com o jeitinho do bichinho fica embaixo, nos pés: não tampa mais a cabeça, some sozinho e fecha num toque", "🎵 A bolinha da música não tampa mais o botão Pronto"],
+      "en": ["💬 The buddy's speech bubble now sits at the bottom, by the feet: it no longer covers the head, fades on its own and closes with a tap", "🎵 The music button no longer covers the Done button"],
+      "es": ["💬 El bocadillo del peluche ahora sale abajo, en los pies: ya no tapa la cabeza, se va solo y se cierra con un toque", "🎵 El botón de la música ya no tapa el botón Listo"]
+    },
+    {
       "versao": "0.1.1",
       "data": "22/Nov/2026",
       "hora": "14:20:00",
