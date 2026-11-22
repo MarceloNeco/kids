@@ -32,7 +32,10 @@ fica sempre à vista (o resto já vem escolhido). O Voltar do celular volta uma 
    de rodas). Escolher um pode tirar outro (patins × skate etc., `CONFLITOS` no `dados.js`).
 6. **Me dá uma voz!** — uma ou duas frases: prontas (com o nome de quem cuida), escritas (até 60 letras) ou **gravadas**
    (5 s, efeito "voz de bichinho" = mais agudo). A gravação fica **só no aparelho** (IndexedDB), nunca é enviada; o
-   microfone só é pedido no toque em Gravar. Jeito de falar (fininha, de urso, devagarinho) e sons fofos.
+   microfone só é pedido no toque em Gravar. **Voz de menininha (♀) ou de menininho (♂)** (`amigo.genero`; sem escolha,
+   vem do bichinho, o `g` da turma; amiguinho antigo sem o campo também): a fala do aparelho escolhe pelo nome uma voz
+   feminina ou masculina do idioma, com tom de criança (menininha mais aguda; com uma voz só no aparelho, o tom
+   diferencia). Jeito de falar (fininha, de urso, devagarinho, sempre no gênero escolhido) e sons fofos.
 7. **Me dá um nome!** — nome (🎲 sorteia), nome do filhotinho, quem vai cuidar, padrinho/madrinha e a data de hoje.
 
 **Pronto!** → caixinha-casinha balança, o telhado abre e o amiguinho pula com confete → tela do amiguinho: ele respira,
@@ -41,9 +44,17 @@ troca a carinha), dança com a música; o **❤ no peito** fala a frase (alterna
 (salva como PNG no aparelho). **📚 Minha coleção**: vitrine com casinhas; já vem com dois exemplos (a coala Alice com a
 nenenzinha Kaká, e a ovelhinha Coraçãozinho de casaco de Papai Noel), que não se apagam (editar vira um novo).
 
-**Níveis:** 🐣 Fácil (menos opções em cada etapa) · 🐥 Médio (tudo) · 📋 Encomenda (difícil: um cartão pede um amiguinho,
-"uma coelhinha de pelo rosa, de pijaminha lilás, com laço azul e patins", às vezes com cor do coração e ponto de fofura;
-estrelas por acerto).
+**Sem níveis nem Encomenda** (dono, 22/Nov/2026: "é só para desenho tranquilo"): a tela de começo tem só ✨ Criar e
+📚 Minha coleção, e todas as opções ficam liberadas sempre. Rascunhos e amiguinhos guardados antes (com `nivel`, `enc`
+ou estrelas de encomenda) abrem normal; esses campos são ignorados. `D.NIVEIS` e o campo `facil` no `dados.js` não são
+mais usados.
+
+**Tela sem texto saindo da caixinha:** nomes dos cartões quebram em até 2 linhas e, se preciso, a fonte diminui um pouco
+(`encaixarTextos`); nada de reticências; o balcão mostra **todas** as caixinhas em fileiras (aguenta 14 a 16); a fileira de
+itens corre para o lado com a ponta esfumada enquanto tem mais; nada embaixo da bolinha 🎵. Vigia: `teste/textos.test.js`.
+**Miniatura de acessório** (`miniDoAcess` no `app.js`): desenha com e sem a peça, dá zoom nas partes novas (pés,
+cabeça, mão…) e, se a peça fica atrás do corpo (mochila), mostra a peça sozinha. **📤 Compartilhar** a certidão (quando o
+aparelho deixa compartilhar arquivo; senão, só 💾 Salvar).
 
 **Personagens entre os jogos:** cada amiguinho salvo vai para `../personagens.js` (`'amiguinho:' + id`, retrato 256×256 e
 corpo 384×512) e aparece no Vruuum! e na Purpurina; apagar tira de lá.
@@ -54,10 +65,10 @@ corpo 384×512) e aparece no Vruuum! e na Purpurina; apagar tira de lá.
 |---|---|
 | `dados.js` | Etapas, cores, pelos, olhos, turma (bases), roupas, estampas, patches, caixinhas e acessórios, conflitos, vozes, frases prontas, níveis. |
 | `arte.js` | Todo o desenho em SVG: geometria e **pontos de ancoragem** por base (`AmiguinhoArte.geo`), camadas, roupas em pé e de 4 patas, acessórios, robozinho e LED, máquina, caixinha, cabide, certidão, vitrine. |
-| `regras.js` | Montar (base, corpo, roupa, acessórios com conflitos), fofura, frases, Encomenda (pedido e estrelas), validar dado lido, coleção no `localStorage` (`bolinho:meu-amiguinho:colecao`) com os exemplos. |
-| `voz.js` | Efeitos WebAudio, fala do aparelho (voz mais fininha), gravação e IndexedDB (`meu-amiguinho`/`vozes`), vozes prontas (`vozes/lista.json`, hoje vazia). |
+| `regras.js` | Montar (base, corpo, roupa, acessórios com conflitos), fofura, frases, gênero da voz (`R.genero`), validar dado lido (peça que mudou de caixinha vai para a caixinha atual), coleção no `localStorage` (`bolinho:meu-amiguinho:colecao`) com os exemplos. |
+| `voz.js` | Efeitos WebAudio, fala do aparelho (voz de menininha ou de menininho), gravação e IndexedDB (`meu-amiguinho`/`vozes`), vozes prontas (`vozes/lista.json`, hoje vazia; `vozes/<idioma>/<f\|m>/<frase>.mp3`). |
 | `vivo.js` | A pelúcia viva: partes com pivô animadas com curvas suaves; ~30 qps no aparelho fraco; "reduzir movimento" = só pisca. |
 | `app.js` | Telas, histórico (uma entrada por etapa), painéis, máquina, Pronto, certidão PNG, coleção, personagens. `?teste` → `window.AmiguinhoDebug`. |
-| `teste/` | `regras.test.js` (montagem, encaixe de cada peça em cada base, encomenda, coleção), `arquivos.test.js`, `pagina.test.js` (no Chromium). |
+| `teste/` | `regras.test.js` (montagem, encaixe de cada peça em cada base, coleção), `arquivos.test.js`, `pagina.test.js`, `textos.test.js` (nenhum texto fora da caixinha, 2 tamanhos × 3 idiomas × todas as opções), `voz.test.js` (menininha/menininho), `alinhamento.test.js` (no Chromium). |
 
 Versão: `APP_VERSION` no `app.js` = `VERSAO` no `sw.js` = 1ª entrada do `versoes.json`.

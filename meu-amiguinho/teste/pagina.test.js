@@ -1,5 +1,5 @@
 // A página no Chromium (Playwright): node --test meu-amiguinho/teste/pagina.test.js (rodar da raiz do repositório kids).
-// Com ?teste o jogo expõe window.AmiguinhoDebug: estado(), encher(f), encomendar(semente), certidaoPng(), vivo().
+// Com ?teste o jogo expõe window.AmiguinhoDebug: estado(), encher(f), certidaoPng(), vivo().
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
@@ -47,12 +47,11 @@ for (const [w, h] of [[360, 740], [390, 844]]) {
     try {
       assert.ok(await inteiro(pg, '#btCriar')); assert.ok(await naoRola(pg), 'o começo rola');
       assert.match(await pg.textContent('#nColecao'), /2/);
-      await pg.click('[data-nivel="medio"]');
       await pg.click('#btCriar'); await pg.waitForTimeout(300);
       for (let i = 0; i < 7; i++) {
         const e = await est(pg); assert.equal(e.tela, 'oficina'); assert.equal(e.etapa, i);
         assert.equal(await pg.textContent('#seloNum'), String(i + 1));
-        assert.match(await pg.textContent('#etConta'), new RegExp((i + 1) + ' de 7'));
+        assert.match(await pg.textContent('#etConta'), new RegExp((i + 1) + '\\sde\\s7'));
         assert.ok(await naoRola(pg), 'etapa ' + (i + 1) + ' rola');
         assert.ok(await inteiro(pg, '#btPronto'), 'etapa ' + (i + 1) + ': Pronto fora da tela');
         assert.ok(await inteiro(pg, '#palco'), 'etapa ' + (i + 1) + ': o bichinho fora da tela');
@@ -69,7 +68,7 @@ for (const [w, h] of [[360, 740], [390, 844]]) {
 test('montar uma coala do jeito da Alice, Pronto: caixinha, amiguinho vivo com ❤, certidão em PNG e coleção', async () => {
   const pg = await abrir(390, 844);
   try {
-    await pg.click('[data-nivel="medio"]'); await pg.click('#btCriar');
+    await pg.click('#btCriar');
     await pg.click('#painel [data-base="coala"]');
     assert.equal((await est(pg)).amigo.base, 'coala');
     assert.match(await pg.textContent('#fala'), /Eucalipta/);
@@ -123,20 +122,37 @@ test('montar uma coala do jeito da Alice, Pronto: caixinha, amiguinho vivo com �
   } finally { await pg.ctx.close(); }
 });
 
-test('Encomenda (difícil): o cartão pede, o jogo dá estrelas por acerto', async () => {
-  const pg = await abrir(390, 844);
+// Dono, 22/Nov/2026: sem níveis e sem Encomenda ("é só para desenho tranquilo"); tudo liberado sempre.
+test('sem níveis nem Encomenda: começo só com Criar e Coleção, todas as opções sempre; rascunho antigo abre normal', async () => {
+  const pg = await abrir(360, 740);
   try {
-    await pg.click('[data-nivel="dificil"]'); await pg.click('#btCriar'); await pg.waitForTimeout(200);
-    assert.ok(await pg.isVisible('#encomenda')); assert.match(await pg.textContent('#encTexto'), /^Quero /);
-    const enc = await pg.evaluate(() => AmiguinhoDebug.encomendar(7));
-    await pg.evaluate((e) => { const a = AmiguinhoDebug.amigo(), R = AmiguinhoRegras; R.escolherBase(a, e.base); a.pelo = e.pelo; R.vestir(a, e.roupa); if (e.corRoupa) R.corRoupa(a, e.corRoupa);
-      Object.keys(e.acess).forEach((c) => { R.porAcess(a, e.acess[c].id); if (e.acess[c].cor) R.corAcess(a, e.acess[c].id, e.acess[c].cor); }); if (e.coracao) a.coracao = e.coracao; if (e.fofura) a.fofura = e.fofura === 'cheio' ? 100 : 70; }, enc);
-    assert.ok(await inteiro(pg, '#btPronto'));
-    await pg.click('#btPronto');
-    await pg.waitForFunction(() => AmiguinhoDebug.estado().tela === 'amigo', null, { timeout: 8000 });
-    assert.match(await pg.textContent('#amEstrelas'), /⭐⭐⭐/);
+    assert.equal(await pg.locator('[data-nivel]').count(), 0, 'sem Fácil/Médio/Encomenda');
+    assert.equal(await pg.$('#encomenda'), null);
+    await pg.click('#btCriar'); await pg.waitForTimeout(200);
+    assert.equal(await pg.locator('#painel [data-base]').count(), await pg.evaluate(() => AmiguinhoDados.BASES.length), 'todos os bichinhos');
+    for (let i = 0; i < 4; i++) await pg.click('#btProximo');
+    const n = await pg.evaluate(() => AmiguinhoDados.ACESS.filter((x) => x.caixa === 'laco').length);
+    assert.equal(await pg.locator('#painel [data-acess]').count(), n, 'todos os laços');
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
+  // rascunho guardado por uma versão antiga (com nivel e enc) e preferência com nivel: abre normal, sem cartão de encomenda
+  const pg2 = await abrir(360, 740, 'pt', {});
+  try {
+    await pg2.evaluate(() => {
+      localStorage.setItem('bolinho:meu-amiguinho:pref', JSON.stringify({ nivel: 'dificil', efeitos: true }));
+      localStorage.setItem('bolinho:meu-amiguinho:rascunho', JSON.stringify({ amigo: { id: 'velho', base: 'gato', corpo: 'pe', pelo: 'cinza', acess: { laco: 'laco' }, frases: [{ pronta: 'teamo' }] },
+        enc: { base: 'coelha', pelo: 'rosa', roupa: 'pijama', acess: {} }, etapa: 3, nivel: 'dificil' }));
+    });
+    await pg2.reload(); await pg2.waitForFunction(() => window.AmiguinhoDebug && AmiguinhoDebug.pronto);
+    assert.ok(await pg2.isVisible('#btContinuar'));
+    await pg2.click('#btContinuar'); await pg2.waitForTimeout(200);
+    const e = await est(pg2); assert.equal(e.tela, 'oficina'); assert.equal(e.etapa, 3); assert.equal(e.amigo.base, 'gato'); assert.deepEqual(e.amigo.acess, { laco: 'laco' });
+    await pg2.click('#btPronto');
+    await pg2.waitForFunction(() => AmiguinhoDebug.estado().tela === 'amigo', null, { timeout: 8000 });
+    assert.ok((await pg2.textContent('#amNome')).length > 0);
+    assert.equal(await pg2.evaluate(() => localStorage.getItem('bolinho:meu-amiguinho:rascunho')), null, 'o rascunho virou amiguinho na coleção');
+    assert.deepEqual(pg2.erros, []);
+  } finally { await pg2.ctx.close(); }
 });
 
 test('voz: gravar (microfone de mentira) guarda só no aparelho e toca com efeito', async () => {
@@ -171,7 +187,7 @@ for (const [lang, titulo, criar] of [['en', 'Pick me!', 'Make my buddy'], ['es',
 test('4 patas e robozinho vivos: patas andam, telinha de LED troca de carinha', async () => {
   const pg = await abrir(390, 844);
   try {
-    await pg.click('[data-nivel="medio"]'); await pg.click('#btCriar');
+    await pg.click('#btCriar');
     await pg.click('#painel [data-base="ovelha"]'); assert.equal((await est(pg)).amigo.corpo, 'q');
     assert.equal(await pg.locator('#pelucia .ma-pata').count(), 4);
     await pg.click('#painel [data-corpo="pe"]'); assert.equal((await est(pg)).amigo.corpo, 'pe');
@@ -203,3 +219,34 @@ test('balão: fica embaixo (nunca na cabeça), some sozinho, fecha num toque; a 
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
 });
+
+// Dono, 22/Nov/2026: onde dá para salvar a imagem, dá também para 📤 Compartilhar (WhatsApp etc.), só se o aparelho deixa.
+for (const comSuporte of [true, false]) {
+  test('certidão: 📤 Compartilhar ' + (comSuporte ? 'aparece e manda o PNG' : 'some quando o aparelho não compartilha arquivo'), async () => {
+    const pg = await abrir(390, 844);
+    try {
+      await pg.evaluate((sim) => {
+        window.__mandou = null;
+        if (sim) {
+          Navigator.prototype.canShare = function (d) { return !!(d && d.files && d.files.length && d.files.every((f) => f instanceof File)); };
+          Navigator.prototype.share = function (d) { window.__mandou = { titulo: d.title, arquivos: d.files.map((f) => ({ nome: f.name, tipo: f.type, tam: f.size })) }; return Promise.reject(new DOMException('cancelou', 'AbortError')); };
+        } else { delete Navigator.prototype.canShare; delete Navigator.prototype.share; }
+      }, comSuporte);
+      await pg.click('#btColecao'); await pg.waitForTimeout(300);
+      await pg.click('.cartao-amigo >> nth=0'); await pg.waitForTimeout(300);
+      await pg.click('#btCertidao'); await pg.waitForSelector('#certJanela:not([hidden]) .ct-svg');
+      if (comSuporte) {
+        await pg.waitForSelector('#btCompartilhar:not([hidden])', { timeout: 8000 });
+        assert.equal(await pg.textContent('#btCompartilhar'), '📤 Compartilhar');
+        await pg.click('#btCompartilhar'); await pg.waitForTimeout(200);
+        const m = await pg.evaluate(() => window.__mandou);
+        assert.equal(m.arquivos.length, 1); assert.equal(m.arquivos[0].tipo, 'image/png'); assert.match(m.arquivos[0].nome, /^certidao-alice\.png$/); assert.ok(m.arquivos[0].tam > 20000);
+        assert.ok(await pg.isVisible('#certJanela'), 'cancelar não fecha nem dá erro');
+      } else {
+        await pg.waitForTimeout(1500);
+        assert.ok(await pg.isHidden('#btCompartilhar')); assert.ok(await pg.isVisible('#btSalvarPng'));
+      }
+      assert.deepEqual(pg.erros, []);
+    } finally { await pg.ctx.close(); }
+  });
+}
