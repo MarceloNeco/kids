@@ -107,6 +107,8 @@
       // inclinam a partir dos pés; o tronco sai do quadril e volta um pouco nos ombros; a linha do quadril é a mesma nas
       // duas, então nada desencaixa (boneca.js, .pp-rebola)
       var rb = svg.querySelector('.pp-rebola'), tC = 0;
+      // pulo: a personagem inteira sobe e desce (a sombra no chão fica no chão)
+      if (rb) { if (v.pulo) rb.setAttribute('transform', 'translate(0 ' + (v.pulo * amp).toFixed(2) + ')'); else if (rb.hasAttribute('transform')) rb.removeAttribute('transform'); }
       if (rb) {
         var h = (v.q + (modo === 'andar' ? 0 : Math.sin(t / 1700) * 0.3 * (v.qParado == null ? 1 : v.qParado))) * amp * 12;
         var yJ = +rb.getAttribute('data-y'), yS = +rb.getAttribute('data-ombro'), yP = +rb.getAttribute('data-pe');
@@ -158,7 +160,8 @@
           var dx = p[0] - q[0], dy = (p[1] - q[1]) * sy;
           sb.setAttribute('cx', (q[0] + pl[3] * amp + Math.cos(ra) * dx - Math.sin(ra) * dy).toFixed(1));
           sb.setAttribute('cy', Math.min(670, q[1] + Math.sin(ra) * dx + Math.cos(ra) * dy).toFixed(1));
-          sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4])).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4])).toFixed(3));
+          var ar = v.noAr || 0;
+          sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4]) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4]) * (1 - 0.6 * ar)).toFixed(3));
         }
       });
       // vitrine dos sapatos: troca o sapato de frente pelo de lado só na perna que está levantada
@@ -189,10 +192,13 @@
       var dentro = lado * 7 * cruza;   // pé na linha do meio (girar a perna para dentro, até o pé cruzar); menino: 0 (trilhos paralelos)
       var frente = u < 0.5 ? 1 - 4 * u : -1 + 4 * (u - 0.5);
       var compr = 1 + 0.05 * frente;   // pé da frente mais embaixo (perna "mais comprida" na tela), o de trás mais em cima
-      var cruzado = dentro * (0.55 + 0.45 * (frente + 1) / 2);   // o pé da frente cruza mais (pousa na linha do meio)
+      // (dono, 22/Nov/2026: "as pernas passam uma no meio da outra, como fantasma"): só o pé da frente cruza para a linha
+      // do meio; o de trás volta para o próprio lado. No ar, a perna CONTORNA a de apoio por fora (abre para o lado dela)
+      // em vez de atravessar — e é bem aí, com as duas afastadas, que a ordem de quem fica na frente troca
+      var cruzado = dentro * Math.max(0, frente);
       if (u < 0.5) return { x: 0, y: 0, r: cruzado, sy: compr, frente: frente };
       var w = (u - 0.5) / 0.5, sob = Math.sin(Math.PI * w);
-      return { x: 0, y: -9 * sob, r: cruzado + lado * 3 * sob, sy: compr * (1 - 0.1 * sob), frente: frente, sobe: sob };
+      return { x: 0, y: -9 * sob, r: cruzado - lado * 6 * sob * cruza, sy: compr * (1 - 0.1 * sob), frente: frente, sobe: sob };
     }
     function mover(v, t) {
       if (modo === 'andar') {
@@ -224,6 +230,22 @@
         if (seg4 === 0) { v.ey += -12 * sobe; v.esy = 1 - 0.04 * sobe; v.er += 6 * sobe; v.q = 0.5 * sobe; v.ladoE = sobe > 0.35; }
         else if (seg4 === 2) { v.dy += -12 * sobe; v.dsy = 1 - 0.04 * sobe; v.dr += -6 * sobe; v.q = -0.5 * sobe; v.ladoD = sobe > 0.35; }
         else v.q = 0;
+      } else if (modo === 'pular') {
+        /* pulo de verdade (dono, 22/Nov/2026: "aquele pulinho sem movimentos de pulo… tá muito ruim"): agacha dobrando os
+           joelhos (o corpo desce e os braços vão para trás), estica as pernas e sai do chão (braços sobem), no ar as
+           pernas encolhem um pouco, pousa dobrando os joelhos para amortecer e volta a ficar em pé. Os pés só saem do
+           chão no ar; a sombra no chão fica e diminui quando ela sobe. Ciclo de op.puloMs (1,1 s). */
+        var TP = op.puloMs || 1100, up0 = ((t - modoIni) % TP) / TP, ag = 0, alto = 0, enc = 0, bra = 0;
+        if (up0 < 0.28) { ag = Math.sin(up0 / 0.28 * Math.PI / 2); bra = -ag; }                       // agacha
+        else if (up0 < 0.4) { var k1 = (up0 - 0.28) / 0.12; ag = 1 - k1; bra = -1 + 2 * k1; }          // impulso
+        else if (up0 < 0.74) { var k2 = (up0 - 0.4) / 0.34; alto = Math.sin(Math.PI * k2); enc = alto; bra = 1; }   // no ar
+        else if (up0 < 0.9) { var k3 = (up0 - 0.74) / 0.16; ag = 0.6 * Math.sin(Math.PI * k3); bra = 1 - k3; }  // pousa
+        var syP = 1 - 0.065 * ag - 0.035 * enc;
+        v.esy = syP; v.dsy = syP; v.ey = 0; v.dy = 0; v.er = 4 * ag - 3 * enc; v.dr = -4 * ag + 3 * enc; v.q = 0;   // agachada: joelhos abrem um pouco
+        v.pulo = 23 * ag - 48 * alto; v.noAr = alto;   // agachado o corpo desce o mesmo tanto que a perna encolhe (pés no chão)
+        var braco = Math.max(0, bra), atras = Math.max(0, -bra);
+        v.oE = 22 + 128 * braco - 8 * atras; v.oD = v.oE; v.cE = 12 - 30 * braco + 18 * atras; v.cD = v.cE; v.fE = 1; v.fD = 1;
+        v.cab = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);
         v.q += lado * bat * perfil().parado;   // o quadril rebola para o lado da batida (menino: só passa o peso de leve)

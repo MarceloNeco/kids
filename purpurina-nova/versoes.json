@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.11",
+      "data": "22/Nov/2026",
+      "hora": "09:16:02",
+      "pt": [
+        "👠 Pernas sem atravessar uma na outra no desfile: no ar, a perna contorna a de apoio por fora e só cruza na frente na hora de pousar; a perna de trás volta para o próprio lado.",
+        "🤸‍♀️ Pulo de verdade na entrada da Baladinha: ela agacha com os braços para trás, impulsiona, sai do chão com os braços para cima (a sombra fica no chão) e pousa dobrando os joelhos."
+      ],
+      "en": [
+        "👠 Legs no longer pass through each other on the runway: in the air the leg goes around the supporting leg on the outside and only crosses in front when it lands; the back leg returns to its own side.",
+        "🤸‍♀️ A real jump at the dance party entrance: she crouches with her arms back, pushes off, leaves the floor with her arms up (the shadow stays on the floor) and lands bending her knees."
+      ],
+      "es": [
+        "👠 Las piernas ya no se atraviesan en el desfile: en el aire, la pierna rodea por fuera a la de apoyo y solo cruza por delante al apoyarse; la pierna de atrás vuelve a su lado.",
+        "🤸‍♀️ Salto de verdad en la entrada de la minidisco: se agacha con los brazos atrás, se impulsa, despega con los brazos arriba (la sombra se queda en el suelo) y aterriza doblando las rodillas."
+      ]
+    },
+    {
       "versao": "0.9.10",
       "data": "22/Nov/2026",
       "hora": "08:14:19",

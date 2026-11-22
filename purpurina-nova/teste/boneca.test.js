@@ -651,3 +651,14 @@ test('GIF do desfile e da Baladinha para compartilhar (dono, 22/Nov/2026)', asyn
   assert.match(app, /type: 'image\/gif'/);
   assert.match(fs.readFileSync(path.join(__dirname, '..', 'balada.js'), 'utf8'), /data-de', 'bd' \+ d\.i/, 'sombras usam o desenho da dançarina');
 });
+
+test('catwalk sem pernas fantasma e pulo de verdade na Baladinha (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /var cruzado = dentro \* Math\.max\(0, frente\);/, 'só o pé da frente cruza');
+  assert.match(anim, /r: cruzado - lado \* 6 \* sob \* cruza/, 'no ar a perna contorna a outra por fora');
+  assert.match(anim, /modo === 'pular'/); assert.match(anim, /v\.pulo = 23 \* ag - 48 \* alto/, 'agacha, sobe e pousa');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /modo: 'pular', puloMs: 1100/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8'), /\.bal-placa-pulo \{[^}]*animation: balPulo/, 'sem o pulinho de CSS');
+});
