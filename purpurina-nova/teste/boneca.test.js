@@ -595,7 +595,7 @@ test('perfis de movimento: menino anda firme e paralelo, menina com o andar dela
 test('vitrine dos sapatos e roupa sem zoom afasta (dono, 21/Nov/2026)', () => {
   const s = B.svg({ sapatos: 'salto' }, { id: 'vt', rig: true, passos: true, fundo: false });
   assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
-  assert.match(s, /class="pp-sapato-frente"/); assert.match(s, /class="pp-sapato-lado-e" style="display:none"/); assert.match(s, /class="pp-sapato-lado-d" style="display:none"/);
+  assert.match(s, /class="pp-sapato-frente pp-sapato-frente-e"/); assert.match(s, /class="pp-sapato-lado-e" style="display:none"/); assert.match(s, /class="pp-sapato-lado-d" style="display:none"/);
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
   assert.match(anim, /modo === 'vitrine'/, 'um pé de cada vez sobe e vira de lado');
   const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
@@ -630,7 +630,7 @@ test('andar de passarela de verdade: pé da frente embaixo, perna da frente por 
 
 test('pé no chão: sapato reto no piso e sombrinha de cada pé (dono, 22/Nov/2026)', () => {
   const s = B.svg({}, { id: 'pc', rig: true, passos: true, fundo: false });
-  assert.match(s, /class="pp-sapato-frente" data-ae="[\d.]+,640" data-ad="[\d.]+,640"/, 'tornozelos marcados');
+  assert.match(s, /class="pp-sapato-frente pp-sapato-frente-e" data-ae="[\d.]+,640"/, 'tornozelos marcados'); assert.match(s, /class="pp-sapato-frente pp-sapato-frente-d" data-ad="[\d.]+,640"/);
   assert.match(s, /class="pp-sombra-pe-e" data-p="[\d.]+,662" data-q=/); assert.match(s, /class="pp-sombra-pe-d"/);
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
   assert.match(anim, /' scale\(' \+ kx\.toFixed\(3\) \+ ' ' \+ \(1 \/ sy\)\.toFixed\(4\) \+ '\) rotate\(' \+ \(-rr\)/, 'o sapato gira e estica ao contrário da perna (kx: o pé virando)');
@@ -694,8 +694,8 @@ test('parada, peso numa perna: a outra dobra o joelho e o pé vira de lado (dono
   const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
   // mão no ombro/nuca com o braço esquerdo (quadril para a direita): a perna esquerda fica solta, e vice-versa
   assert.match(anim, /gingaD: \{[^}]*q: 1, solta: -1 \}/); assert.match(anim, /gingaE: \{[^}]*q: -1, solta: 1 \}/);
-  assert.match(anim, /if \(!modo && v\.solta\) \{\s*var sl = v\.solta \* pf0\.cruza/, 'só parada, e o menino fica plantado (cruza 0)');
-  assert.match(anim, /v\.kE = -0\.24 \* wE/, 'canela volta: joelho dobrado');
+  assert.match(anim, /if \(!modo && v\.solta\) pernaSolta\(v, v\.solta \* pf0\.cruza, \(v\.cruz \|\| 0\) \* pf0\.cruza\);/, 'parada, e o menino fica plantado (cruza 0)');
+  assert.match(anim, /k = 0\.24 \* \(1 - 0\.4 \* cruz\);\s*v\.er -= r \* wE; v\.esy = 1 - 0\.012 \* wE; v\.peE = wE; v\.kE = -k \* wE;/, 'canela volta: joelho dobrado');
   assert.match(anim, /bb\.height > 60/, 'bota e cano alto não giram (o cano ficaria fora da calça)');
 });
 
@@ -713,7 +713,8 @@ test('descanso natural: braço caído sem parêntese, mão de lado e peso numa p
   const c = B.svg(V.novo(), { id: 'n', rig: true, poseRig: { oE: 8, cE: 14, oD: 40, cD: 105 } });
   assert.match(c, /<g class="rig-mao-frente-d">/); assert.match(c, /<g class="rig-mao-lado-d" style="display:none">/);
   const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
-  assert.match(anim, /B\.maoSolta\(b\[1\], b\[2\]\)/, 'o animador troca a mão conforme o braço');
+  // (0.9.16, dono: "nada de aparecer de uma posição depois aparecer em outra"): a mão troca aos poucos
+  assert.match(anim, /var wl = Math\.max\(0, Math\.min\(1, \(35 - b\[1\]\) \/ 14, \(45 - b\[2\]\) \/ 14, \(b\[2\] \+ 40\) \/ 14\)\)/, 'o animador troca a mão aos poucos, conforme o braço');
   // descanso com o peso na perna esquerda, a direita solta (sem simetria de soldado)
   assert.match(anim, /relax: \{[^}]*base: 'leve' \}/); assert.match(anim, /leve: \{[^}]*q: -0\.7, solta: 1 \}/);
   assert.match(anim, /feminino: \{[^}]*abre: 1,/, 'andando, os braços balançam perto do corpo');
@@ -728,11 +729,21 @@ test('pé virado de lado com o desenho de lado, não o de frente entortado (dono
   assert.doesNotMatch(anim, /skewX\(' \+ \(-pl\[6\]/, 'nada de entortar o sapato de frente');
   // (0.9.16, dono: "o pé vira para o lado de uma vez"): o pé gira aos poucos, de 0 (frente) a 1 (lado), sem troca seca
   // (dono, referências: o pé solto vira PARA FORA, como o da vitrine; bota fica de frente)
-  assert.match(anim, /var tt = Math\.max\(0, Math\.min\(1, \(\(pl\[0\] === 'e' \? v\.viraE : v\.viraD\) \|\| 0\) \|\| \(alto \? 0 : \(pl\[5\] - 0\.15\) \/ 0\.55\)\)\)/, 'perna solta parada: vira para fora aos poucos');
+  assert.match(anim, /var tt = alto \? 0 : Math\.max\(0, Math\.min\(1, \(pl\[5\] - 0\.15\) \/ 0\.55\)\)/, 'perna solta: vira para fora aos poucos');
   assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8'), /pp-sapato-dentro/, 'sem o pé virado para dentro');
-  assert.match(anim, /\['\.pp-sapato-frente', 1 - 0\.5 \* tt, 1 - sm, true\]/, 'o de frente estreita e some devagar');
-  assert.match(anim, /v\.viraE = Math\.min\(1, sobe \/ 0\.75\)/, 'vitrine: vira enquanto sobe');
+  assert.match(anim, /\['\.pp-sapato-frente-' \+ pl\[0\], 1 - 1\.4 \* Math\.min\(tt, 0\.5\), 1 - sm, true\]/, 'o de frente estreita até ficar fininho e vira o de lado (como um cartão)');
+  // vitrine (zoom no pé): passa o peso de uma perna para a outra, devagar, e o pé da solta vira para fora
+  assert.match(anim, /pernaSolta\(v, sv, 0\); v\.q = -0\.8 \* sv;/, 'vitrine: perna solta alternando');
+  // troca de modo sem pulo (andar → pose, vitrine) e o pé girando na batida da Baladinha
+  assert.match(anim, /misturaDe = atual; misturaIni = modoIni;/); assert.match(anim, /if \(lado > 0\) v\.peE = 0\.85 \* bat; else v\.peD = 0\.85 \* bat;/);
+  // pernas cruzadas (segunda foto de referência)
+  assert.match(anim, /cruzada: \{[^}]*solta: -1, cruz: 1 \}/);
   assert.doesNotMatch(anim, /data-lado/, 'sem a troca seca de antes');
   const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
-  assert.match(fonte, /fundo = salto \? 647 : 656\.5/, 'salto: calcanhar no alto e a sola descendo até a ponta');
+  // sapato de lado com medidas de pé (dono: "cadê o sapatinho de lado… que coisa torta"): tornozelo em cima do calcanhar,
+  // comprido e baixo; salto com o calcanhar no alto e o salto fino embaixo; pé e perna sem emenda riscada
+  assert.match(fonte, /var t = e\.sapatos, c = C\('sapatos'\), s, A = x \+ 10, F = 663, K = 1\.22;/);
+  assert.match(fonte, /function peNu\(w\)/, 'o contorno não risca a emenda do pé com a perna');
+  const lado = B.svg(V.aplicar(V.novo(), 'sapatos', 'scarpin'), { id: 'sl', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(lado), ''); assert.ok(!/NaN|undefined/.test(lado));
 });

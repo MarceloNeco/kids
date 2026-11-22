@@ -63,6 +63,27 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Faixas do chão deslizando | ❌ | Quem anda é a modelo, não a câmera; com o chão andando parece esteira |
 | Sombra colada nos pés | ✅ | `drop-shadow(0 3px 4px)` (antes 12 px, parecia flutuar) |
 
+## 5b. Pé de lado, vitrine e transições (0.9.16)
+
+- **Sapato de lado** (`sapatoLado()` no `boneca.js`; dono: "cadê o sapatinho de lado… que coisa torta"): medidas de pé de
+  verdade — comprido e baixo, o tornozelo (`A = x + 10`) em cima do calcanhar e o pé indo para a frente, calcanhar redondo,
+  boca do sapato em curva, peito do pé, ponta arredondada e sola marcada; tênis com cadarço. Salto: o calcanhar no alto, o
+  arco do pé descendo até a ponta e o salto fino embaixo. Descalça: arco, calcanhar e dedão. O contorno do pé não risca a
+  emenda com a perna (`peNu`). Bota e cano alto sobem pela perna.
+- **Sapato de frente em dois grupos** (`.pp-sapato-frente-e/-d`, cada um recortado no seu lado por dentro): estreitando um
+  pé ao virar, o pedaço do outro pé não entra no recorte da perna (era um "fantasminha").
+- **Virar como cartão**: o de frente estreita até 30% e, nesse instante, vira o de lado, também fininho, que alarga. Nunca os
+  dois ao mesmo tempo meio transparentes.
+- **Zoom no pé (vitrine)**: ela passa o peso de uma perna para a outra (ciclo de 6 s, curva suave), a perna solta dobra o
+  joelho e o pé vira para fora; sem levantar o pé no ar. O calcanhar quase não sobe (`esy` 1,2%), senão o pé de lado
+  parecia flutuar.
+- **Sem pulo ao trocar de modo** (`misturaDe`): andar → pose no fim do desfile, entrar e sair da vitrine: o corpo vai do
+  último quadro para o novo em 0,6 s.
+- **Mão** de frente ↔ de lado aos poucos (`wl`, pelo ângulo do ombro e do cotovelo).
+- **Baladinha**: o pé da perna que dobra gira para fora na batida (`peE`/`peD` = 0,85 · batida).
+- **Pernas cruzadas** (base `cruzada`, segunda foto de referência): a perna solta gira mais e a canela volta menos, o pé
+  pousa na frente do outro.
+
 ## 6. Pulo (0.9.11)
 
 Modo `pular` do animador (placa de entrada da Baladinha): agacha (pernas encolhem a partir do quadril, joelhos abrem um

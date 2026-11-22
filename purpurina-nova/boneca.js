@@ -388,10 +388,14 @@
     if (vitrine) {
       var XE = DF.fx(177, 650);
       // tornozelos (para o animador manter o sapato reto no chão mesmo com a perna inclinada ou esticada)
-      out.push('<g class="pp-sapato-frente" data-ae="' + n(DF.fx(177, 640)) + ',640" data-ad="' + n(DF.fx(223, 640)) + ',640">' + sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas) + '</g>');
+      // (um grupo por pé, cada um recortado no seu lado por dentro: estreitando o pé ao virar, o pedaço do outro pé não
+      // entra no recorte da perna — dono, 22/Nov/2026: nada de "fantasma")
+      var sapF = sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas);
+      defs += deformar('<clipPath id="' + I + 'peE"><rect x="-200" y="0" width="400" height="900"/></clipPath><clipPath id="' + I + 'peD"><rect x="200" y="0" width="400" height="900"/></clipPath>');
+      out.push('<g class="pp-sapato-frente pp-sapato-frente-e" data-ae="' + n(DF.fx(177, 640)) + ',640"><g clip-path="url(#' + I + 'peE)">' + sapF + '</g></g>' +
+        '<g class="pp-sapato-frente pp-sapato-frente-d" data-ad="' + n(DF.fx(223, 640)) + ',640"><g clip-path="url(#' + I + 'peD)">' + sapF + '</g></g>');
       // (cada pé com o seu: na perna esquerda só o sapato de lado esquerdo, senão a ponta do outro aparecia no corte)
-      // (do tamanho do sapato de frente: cresce a partir do tornozelo, y 632, e a sola encosta no chão)
-      var XD = DF.fx(223, 650), TQ = 1.02, TY = 1.25, Y0 = 632 * (1 - TY);
+      var XD = DF.fx(223, 650), TQ = 1, TY = 1, Y0 = 0;   // (desenhado já no tamanho de pé de verdade)
       out.push('<g class="pp-sapato-lado-e" style="display:none" data-ae="' + n(DF.fx(177, 640)) + ',640"><g transform="translate(' + n(XE * (1 + TQ)) + ' ' + n(Y0) + ') scale(' + (-TQ) + ' ' + TY + ')">' + sapatoLado(167, false) + '</g></g>' +
         '<g class="pp-sapato-lado-d" style="display:none" data-ad="' + n(DF.fx(223, 640)) + ',640"><g transform="translate(' + n(XD * (1 - TQ)) + ' ' + n(Y0) + ') scale(' + TQ + ' ' + TY + ')">' + sapatoLado(213, false) + '</g></g>');
     } else out.push(sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas));
@@ -736,34 +740,61 @@
       return s + (la ? elip(x, y, 10, 12, { fill: '#2a0a3c', opacity: 0.16 }) : '');
     }
     // sapato de lado (bico para a frente); descalça mostra o pé
+    /* sapato de lado (dono, 22/Nov/2026: "cadê o sapatinho de lado… que coisa torta"): medidas de pé de verdade — comprido
+       e baixo (a altura é um terço do comprimento), o tornozelo em cima do calcanhar (A = x + 10) e o pé indo para a
+       frente; calcanhar redondo, boca do sapato em curva, peito do pé descendo até a ponta arredondada, um pouco erguida, e
+       a sola marcada. Salto: o calcanhar no alto, o arco do pé descendo até a ponta e o salto fino embaixo. Descalça: o
+       pé com o arco, o calcanhar e o dedão. */
     function sapatoLado(x, la) {
-      var t = e.sapatos, c = C('sapatos'), s;
-      // descalça: calcanhar atrás, peito do pé descendo até os dedos na frente, sola reta e a unha do dedão em cima
-      var forma = 'M' + (x - 10) + ',634 L' + (x - 10) + ',632 L' + (x + 8) + ',632 L' + (x + 30) + ',648 Q' + (x + 30) + ',656 ' + (x + 18) + ',656 L' + (x - 10) + ',656Z';
+      // (K: do tamanho do sapato de frente, crescendo a partir do tornozelo e do chão)
+      var t = e.sapatos, c = C('sapatos'), s, A = x + 10, F = 663, K = 1.22;
+      function X(d) { return n(A + d * K); } function Y(d) { return n(F + d * K); }
+      var salto = ['salto', 'scarpin', 'saltoMedio', 'princesa', 'anabela', 'plataforma'].indexOf(t) >= 0;
+      var cano = t === 'bota' || t === 'galocha' || t === 'botaNeve' ? 600 : t === 'botaCano' ? 560 : t === 'patins' ? 610 : t === 'tenisAlto' ? 628 : 0;
+      // pé (descalço, ou a pele que aparece no sapato aberto e no salto): arco, calcanhar, sola e dedos
+      var pe = salto ?
+        'M' + X(-7) + ',' + Y(-30) + ' L' + X(-7) + ',' + Y(-26) + ' C' + X(-8) + ',' + Y(-18) + ' ' + X(-11) + ',' + Y(-14) + ' ' + X(-10) + ',' + Y(-11) + ' L' + X(-3) + ',' + Y(-10) +
+        ' C' + X(6) + ',' + Y(-9) + ' ' + X(14) + ',' + Y(-3) + ' ' + X(22) + ',' + Y(-1) + ' Q' + X(33) + ',' + Y(0) + ' ' + X(33) + ',' + Y(-3) +
+        ' Q' + X(32) + ',' + Y(-6) + ' ' + X(24) + ',' + Y(-7.5) + ' C' + X(15) + ',' + Y(-10) + ' ' + X(9) + ',' + Y(-17) + ' ' + X(7) + ',' + Y(-26) + ' L' + X(7) + ',' + Y(-30) :
+        'M' + X(-8) + ',' + Y(-30) + ' L' + X(-8) + ',' + Y(-24) + ' C' + X(-9) + ',' + Y(-14) + ' ' + X(-13) + ',' + Y(-8) + ' ' + X(-12) + ',' + Y(-3) + ' Q' + X(-11) + ',' + Y(0) + ' ' + X(-6) + ',' + Y(0) +
+        ' L' + X(28) + ',' + Y(0) + ' Q' + X(34) + ',' + Y(0) + ' ' + X(33.5) + ',' + Y(-3) + ' Q' + X(33) + ',' + Y(-6.5) + ' ' + X(27) + ',' + Y(-7.5) +
+        ' C' + X(19) + ',' + Y(-9) + ' ' + X(12) + ',' + Y(-12) + ' ' + X(8) + ',' + Y(-24) + ' L' + X(8) + ',' + Y(-30);
+      // (o contorno só em volta do pé: a emenda de cima, onde entra a perna, não é riscada — perna e pé numa peça só)
+      function peNu(w) { return p(pe + 'Z', { fill: pele }) + p(pe, { fill: 'none', stroke: peleE, 'stroke-width': w, 'stroke-linejoin': 'round' }); }
+      var forma = pe + 'Z';
       if (t === 'nenhum') {
-        var volta = 'M' + (x + 7) + ',628 Q' + (x + 8) + ',637 ' + (x + 14) + ',641 Q' + (x + 24) + ',644 ' + (x + 28) + ',650 Q' + (x + 30) + ',656 ' + (x + 24) + ',656 L' + (x - 6) + ',656 Q' + (x - 13) + ',655 ' + (x - 12) + ',646 Q' + (x - 11) + ',638 ' + (x - 9) + ',628';
-        forma = volta + 'Z';
-        // contorno sem o risco de cima (o pé continua a perna, sem "meia")
-        s = p(forma, { fill: pele }) + p(volta, { fill: 'none', stroke: peleE, 'stroke-width': 1.6, 'stroke-linejoin': 'round' }) +
-          p('M' + (x + 20) + ',652 Q' + (x + 21) + ',655 ' + (x + 19) + ',656', { fill: 'none', stroke: esc(pele, 0.2), 'stroke-width': 1, 'stroke-linecap': 'round' });
-        if (!la) s += unhas([[x + 26, 650, 0.85]], { tipo: e.unhas, cor: C('unhas') }, pele);
+        s = peNu(1.6) +
+          p('M' + X(26) + ',' + Y(-7) + ' Q' + X(28) + ',' + Y(-4) + ' ' + X(27) + ',' + Y(-0.5), { fill: 'none', stroke: esc(pele, 0.2), 'stroke-width': 0.9, 'stroke-linecap': 'round' });
+        if (!la) s += unhas([[A + 31, F - 4.2, 0.85]], { tipo: e.unhas, cor: C('unhas') }, pele);
+      } else if (salto) {
+        // scarpin de lado: o pé arqueado aparece (pele) e o sapato cobre o calcanhar e a ponta; salto fino embaixo do calcanhar
+        var copa = 'M' + X(-11) + ',' + Y(-19) + ' Q' + X(-12.5) + ',' + Y(-13) + ' ' + X(-10) + ',' + Y(-11) + ' L' + X(-1) + ',' + Y(-10) + ' Q' + X(-1.5) + ',' + Y(-16) + ' ' + X(-4) + ',' + Y(-19.5) + 'Z';
+        var bico = 'M' + X(12) + ',' + Y(-5) + ' C' + X(16) + ',' + Y(-2.6) + ' ' + X(20) + ',' + Y(-1.2) + ' ' + X(24) + ',' + Y(-0.8) + ' Q' + X(33.5) + ',' + Y(-0.2) + ' ' + X(33.5) + ',' + Y(-3) +
+          ' Q' + X(33) + ',' + Y(-6.5) + ' ' + X(25) + ',' + Y(-8.2) + ' Q' + X(17) + ',' + Y(-9.4) + ' ' + X(12) + ',' + Y(-5) + 'Z';
+        s = peNu(1.4) +
+          p('M' + X(-10) + ',' + Y(-11) + ' L' + X(-5.5) + ',' + Y(-10.6) + ' L' + X(-7.2) + ',' + Y(0) + ' L' + X(-8.8) + ',' + Y(0) + 'Z', { fill: esc(c.hex, 0.25), stroke: esc(c.hex, 0.45), 'stroke-width': 0.7 }) +
+          peca([copa, bico], c, 'sapatos') +
+          p('M' + X(-10) + ',' + Y(-11) + ' L' + X(-3) + ',' + Y(-10) + ' C' + X(6) + ',' + Y(-9) + ' ' + X(14) + ',' + Y(-3) + ' ' + X(22) + ',' + Y(-1) + ' L' + X(31) + ',' + Y(-0.4), { fill: 'none', stroke: esc(c.hex, 0.4), 'stroke-width': 1.3, 'stroke-linecap': 'round' });
       } else {
-        var salto = ['salto', 'scarpin', 'saltoMedio', 'princesa', 'anabela', 'plataforma'].indexOf(t) >= 0, cano = t === 'bota' || t === 'galocha' || t === 'botaNeve' ? 600 : t === 'botaCano' ? 560 : t === 'patins' ? 598 : 0;
-        /* perfil de sapato de verdade (dono, 22/Nov/2026, print do "bloquinho"): calcanhar redondo atrás, a boca do
-           sapato descendo um pouco para a frente, o peito do pé em curva até a ponta arredondada e a sola reta */
-        // (salto: o calcanhar fica no alto e a sola desce inclinada até a ponta, com o salto embaixo do calcanhar)
-        var top = cano || 631, bocaF = cano ? cano : 635, pz = salto ? 652 : 649, fundo = salto ? 647 : 656.5;
-        var d = 'M' + (x - 8) + ',' + top + ' L' + (x + 7) + ',' + bocaF + ' L' + (x + 8) + ',' + (cano ? 637 : bocaF + 2) +
-          ' C' + (x + 13) + ',' + (salto ? 640 : 638.5) + ' ' + (x + 21) + ',' + (salto ? 645 : 641) + ' ' + (x + 27) + ',' + pz +
-          ' Q' + (x + 32) + ',' + (pz + 3) + ' ' + (x + 29) + ',655.5 Q' + (x + 27) + ',656.5 ' + (x + 20) + ',656.5 L' + (x - 5) + ',' + fundo +
-          ' Q' + (x - 12) + ',' + fundo + ' ' + (x - 12) + ',' + (fundo - 7) + ' Q' + (x - 12) + ',' + (top + 6) + ' ' + (x - 8) + ',' + top + 'Z';
-        s = peca(d, c, 'sapatos'); forma = d;
-        if (salto) s += p('M' + (x - 10) + ',' + (fundo - 1) + ' L' + (x - 3) + ',' + (fundo - 0.5) + ' L' + (x - 5.5) + ',656.5 L' + (x - 8.5) + ',656.5Z', { fill: esc(c.hex, 0.25), stroke: esc(c.hex, 0.45), 'stroke-width': 0.8 });
-        if (t === 'tenis' || t === 'tenisAlto' || t === 'tenisLuz' || t === 'tenisGlitter') s += p('M' + (x - 11) + ',652.5 L' + (x + 28) + ',652.5', { stroke: '#fff', 'stroke-width': 3, 'stroke-linecap': 'round' }) + p('M' + (x + 9) + ',639 L' + (x + 13) + ',641.5 M' + (x + 12) + ',640 L' + (x + 16) + ',643', { stroke: '#fff', 'stroke-width': 1.4, opacity: 0.85, 'stroke-linecap': 'round' });
-        // patins de lado: aqui sim as rodas aparecem redondas, uma na frente e uma atrás, com o freio na ponta
+        // tênis, sapatilha, bota…: calcanhar redondo, boca do sapato em curva (ou o cano subindo), peito do pé até a ponta
+        var topo = cano ? 'M' + X(-12) + ',' + n(cano) + ' L' + X(8.5) + ',' + n(cano) + ' L' + X(9) + ',' + Y(-15) :
+          'M' + X(-11) + ',' + Y(-17) + ' Q' + X(-3) + ',' + Y(-20.5) + ' ' + X(8) + ',' + Y(-16.5);
+        var d = topo + ' C' + X(14) + ',' + Y(-15.5) + ' ' + X(22) + ',' + Y(-13) + ' ' + X(28) + ',' + Y(-9) + ' Q' + X(36) + ',' + Y(-5.5) + ' ' + X(35) + ',' + Y(-2.4) +
+          ' Q' + X(34.5) + ',' + Y(0) + ' ' + X(30) + ',' + Y(0) + ' L' + X(-9) + ',' + Y(0) + ' Q' + X(-14) + ',' + Y(0) + ' ' + X(-13.6) + ',' + Y(-6) +
+          (cano ? ' L' + X(-12) + ',' + n(cano) + 'Z' : ' Q' + X(-13.2) + ',' + Y(-13) + ' ' + X(-11) + ',' + Y(-17) + 'Z');
+        var sola = 'M' + X(-13.5) + ',' + Y(-4.2) + ' L' + X(35.3) + ',' + Y(-4.2) + ' Q' + X(34.6) + ',' + Y(0) + ' ' + X(30) + ',' + Y(0) + ' L' + X(-9) + ',' + Y(0) + ' Q' + X(-13.8) + ',' + Y(0) + ' ' + X(-13.5) + ',' + Y(-4.2) + 'Z';
+        s = peca(d, c, 'sapatos') + p(sola, { fill: t === 'tenis' || t === 'tenisAlto' || t === 'tenisLuz' || t === 'tenisGlitter' || t === 'clog' ? '#f7f5fb' : esc(c.hex, 0.25), stroke: esc(c.hex, 0.4), 'stroke-width': 1 });
+        forma = d;
+        if (t === 'tenis' || t === 'tenisAlto' || t === 'tenisLuz' || t === 'tenisGlitter') {
+          // cadarço no peito do pé, o reforço da ponta e o do calcanhar
+          s += p('M' + X(11) + ',' + Y(-14.6) + ' L' + X(13.4) + ',' + Y(-13) + ' M' + X(15) + ',' + Y(-13.6) + ' L' + X(17.4) + ',' + Y(-12) + ' M' + X(19) + ',' + Y(-12.4) + ' L' + X(21.4) + ',' + Y(-10.8), { stroke: '#ff7ab8', 'stroke-width': 1.5, 'stroke-linecap': 'round' }) +
+            p('M' + X(26) + ',' + Y(-4.2) + ' Q' + X(27) + ',' + Y(-8.5) + ' ' + X(32) + ',' + Y(-6.6), { fill: 'none', stroke: esc(c.hex, 0.3), 'stroke-width': 1, 'stroke-linecap': 'round' }) +
+            p('M' + X(-13) + ',' + Y(-8) + ' Q' + X(-8) + ',' + Y(-12) + ' ' + X(-6) + ',' + Y(-4.2), { fill: 'none', stroke: esc(c.hex, 0.3), 'stroke-width': 1, 'stroke-linecap': 'round' });
+        }
+        // patins de lado: as rodas redondas, uma na frente e uma atrás, com o freio na ponta
         if (t === 'patins') {
-          s += ret(x - 12, 654, 44, 5, { fill: '#9aa3b5', stroke: '#6f7788', 'stroke-width': 1, rx: 2.5 }) + circ(x + 33, 659, 3.6, { fill: '#ff8fb1', stroke: '#d0567c', 'stroke-width': 1.1 });
-          [x - 4, x + 22].forEach(function (rx) { s += circ(rx, 664, 6.5, { fill: '#ffd166', stroke: '#c9932a', 'stroke-width': 1.5 }) + circ(rx, 664, 2.6, { fill: '#fff', stroke: '#c9932a', 'stroke-width': 0.8 }); });
+          s += ret(A - 14, F - 1, 50, 5, { fill: '#9aa3b5', stroke: '#6f7788', 'stroke-width': 1, rx: 2.5 }) + circ(A + 37, F + 3, 3.6, { fill: '#ff8fb1', stroke: '#d0567c', 'stroke-width': 1.1 });
+          [A - 6, A + 24].forEach(function (rx) { s += circ(rx, F + 8, 6.5, { fill: '#ffd166', stroke: '#c9932a', 'stroke-width': 1.5 }) + circ(rx, F + 8, 2.6, { fill: '#fff', stroke: '#c9932a', 'stroke-width': 0.8 }); });
         }
       }
       // o pé de lá fica um pouco mais escuro (na sombra), só no desenho dele, sem caixa em volta
