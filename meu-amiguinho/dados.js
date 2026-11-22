@@ -75,6 +75,8 @@
     { id: 'chocolate', cor: '#8a5a3c', n: ['chocolate', 'chocolate', 'chocolate'] },
     { id: 'laranja', cor: '#f0a060', n: ['laranja', 'orange', 'naranja'] },
     { id: 'preto', cor: '#3b3640', n: ['preto', 'black', 'negro'] },
+    { id: 'marinho', cor: '#46557a', n: ['azul-noite', 'midnight blue', 'azul noche'] },
+    { id: 'brilho-lilas', cor: '#cdb6ec', brilho: 1, n: ['lilás com brilho', 'sparkly lilac', 'lila con brillo'] },
     { id: 'algodao', grad: ['#f9b9d6', '#d9c2f2', '#a9d8f5'], n: ['algodão-doce', 'cotton candy', 'algodón de azúcar'], facil: 1 },
     { id: 'arco-iris', grad: ['#f9b4c4', '#fbd9a0', '#f6ef9e', '#b8ecc8', '#b0d4f6', '#d4b8f2'], n: ['arco-íris', 'rainbow', 'arcoíris'] },
     { id: 'por-do-sol', grad: ['#ffd8a8', '#f7a9c0', '#c9a6ea'], n: ['pôr do sol', 'sunset', 'atardecer'] },
@@ -170,6 +172,24 @@
     { id: 'braquio', g: 'm', corpos: ['q'], pelo: 'menta',
       esp: ['dinossaurinho pescoçudo', 'long-neck dino', 'dinosaurito cuellilargo'], apelido: ['Pescoção', 'Treetop', 'Copa'],
       frase: ['Come folhinha lá do alto da árvore e dá carona para os amigos nas costas.', 'Munches leaves from the treetops and gives friends rides on his back.', 'Come hojitas de lo alto del árbol y lleva a sus amigos a caballito.'] },
+    { id: 'poodle', g: 'm', corpos: ['q', 'pe'], pelo: 'chocolate', familia: 'cachorro',
+      esp: ['poodlezinho', 'little poodle', 'caniche'], apelido: ['Cachinho', 'Curly', 'Rizos'],
+      frase: ['Vaidoso e dançarino: penteia os cachinhos antes de cada passeio.', 'A dapper dancer: brushes his curls before every walk.', 'Coqueto y bailarín: se peina los rizos antes de cada paseo.'] },
+    { id: 'corgi', g: 'm', corpos: ['q', 'pe'], pelo: 'laranja', familia: 'raposa',
+      esp: ['cãozinho laranja', 'orange pup', 'perrito naranja'], apelido: ['Mostarda', 'Biscotti', 'Mostaza'],
+      frase: ['Perninhas curtas e coração gigante: corre atrás de bolinha o dia todo.', 'Short legs and a giant heart: chases balls all day long.', 'Patitas cortas y corazón gigante: persigue la pelota todo el día.'] },
+    { id: 'lulu', g: 'f', corpos: ['q', 'pe'], pelo: 'branco', familia: 'gato',
+      esp: ['lulu fofinha', 'fluffy pom', 'pomerania'], apelido: ['Neve', 'Snowball', 'Copito'],
+      frase: ['Uma nuvem que late: adora colo, laço e um carinho atrás da orelha.', 'A cloud that barks: loves cuddles, bows and a scratch behind the ear.', 'Una nube que ladra: le encantan los mimos, los lazos y las caricias.'] },
+    { id: 'husky', g: 'm', corpos: ['q', 'pe'], pelo: 'cinza', olhos: 'azul', familia: 'gato',
+      esp: ['huskyzinho', 'little husky', 'huskito'], apelido: ['Flocão', 'Blizzard', 'Ventisca'],
+      frase: ['Aventureiro da neve: uiva junto com a música e ama correr no frio.', 'A snow explorer: howls along with the music and loves running in the cold.', 'Aventurero de la nieve: aúlla con la música y adora correr en el frío.'] },
+    { id: 'gato-rajado', g: 'm', corpos: ['q', 'pe'], pelo: 'cinza', olhos: 'verde', familia: 'gato',
+      esp: ['gatinho rajado', 'tabby kitty', 'gatito atigrado'], apelido: ['Listrado', 'Stripes', 'Rayitas'],
+      frase: ['Caçador de novelo: tem listrinhas e um ronrom que acalma todo mundo.', 'A yarn hunter: has little stripes and a purr that calms everyone down.', 'Cazador de ovillos: tiene rayitas y un ronroneo que calma a todos.'] },
+    { id: 'ovelha-preta', g: 'f', corpos: ['q', 'pe'], pelo: 'branco', familia: 'ovelha',
+      esp: ['ovelhinha de carinha preta', 'black-faced lamb', 'ovejita de cara negra'], apelido: ['Pimenta', 'Pepper', 'Pimienta'],
+      frase: ['Fala pouco e ouve muito: é a melhor amiga para contar segredos.', 'Says little and listens a lot: the best friend to tell secrets to.', 'Habla poco y escucha mucho: la mejor amiga para contar secretos.'] },
     { id: 'porquinho', g: 'm', corpos: ['pe', 'q'], pelo: 'rosa', facil: 1,
       esp: ['porquinho', 'piglet', 'cerdito'], apelido: ['Torresmo', 'Muffin', 'Rosquilla'],
       frase: ['Cozinheiro de mão cheia: faz panqueca colorida e pula em poça de lama.', 'A great little cook: makes colorful pancakes and jumps in mud puddles.', 'Un gran cocinero: hace tortitas de colores y salta en los charcos.'] }
@@ -204,6 +224,12 @@
     { id: 'skatista', n: ['Colete jeans de skatista', 'Skater denim vest', 'Chaleco vaquero de skater'], e: ['de colete jeans', 'in a denim vest', 'con chaleco vaquero'], cores: 1, paleta: 'roupa2', padrao: { cor: 'branco' } },
     { id: 'vestido-doces', n: ['Vestido de docinhos', 'Candy dress', 'Vestido de golosinas'], e: ['de vestido de docinhos', 'in a candy dress', 'con vestido de golosinas'], cores: 1, padrao: { cor: 'rosa' } },
     { id: 'neve', n: ['Macacão de neve', 'Snowsuit', 'Mono de nieve'], e: ['de macacão de neve', 'in a snowsuit', 'con mono de nieve'], cores: 1, padrao: { cor: 'azul' }, capuz: 1 },
+    { id: 'heroi-raio', heroi: 1, n: ['Herói do Raio', 'Lightning Hero', 'Héroe del Rayo'], e: ['de Herói do Raio', 'as the Lightning Hero', 'de Héroe del Rayo'], facil: 1 },
+    { id: 'heroi-estrela', heroi: 1, n: ['Heroína Estrela', 'Star Heroine', 'Heroína Estrella'], e: ['de Heroína Estrela', 'as the Star Heroine', 'de Heroína Estrella'], facil: 1 },
+    { id: 'heroi-coracao', heroi: 1, n: ['Herói Coração', 'Heart Hero', 'Héroe Corazón'], e: ['de Herói Coração', 'as the Heart Hero', 'de Héroe Corazón'] },
+    { id: 'heroi-gota', heroi: 1, n: ['Heroína Gota', 'Droplet Heroine', 'Heroína Gota'], e: ['de Heroína Gota', 'as the Droplet Heroine', 'de Heroína Gota'] },
+    { id: 'heroi-folha', heroi: 1, n: ['Herói Folha', 'Leaf Hero', 'Héroe Hoja'], e: ['de Herói Folha', 'as the Leaf Hero', 'de Héroe Hoja'] },
+    { id: 'heroi-lua', heroi: 1, n: ['Heroína Lua', 'Moon Heroine', 'Heroína Luna'], e: ['de Heroína Lua', 'as the Moon Heroine', 'de Heroína Luna'] },
     { id: 'dino', n: ['Fantasia de dinossauro', 'Dinosaur costume', 'Disfraz de dinosaurio'], e: ['fantasiado de dinossauro', 'dressed as a dinosaur', 'disfrazado de dinosaurio'], cores: 1, capuz: 1, padrao: { cor: 'verde' } },
     { id: 'noel', n: ['Casaco de Papai Noel', 'Santa coat', 'Abrigo de Papá Noel'], e: ['de casaco de Papai Noel', 'in a Santa coat', 'con abrigo de Papá Noel'], capuz: 1, facil: 1 },
     { id: 'abobora', n: ['Fantasia de abóbora', 'Pumpkin costume', 'Disfraz de calabaza'], e: ['fantasiado de abóbora', 'dressed as a pumpkin', 'disfrazado de calabaza'], capuz: 1 },
@@ -245,7 +271,7 @@
   // e = como aparece na encomenda ("com laço azul"); {c} = nome da cor
   var ACESS = [
     { id: 'laco', caixa: 'laco', n: ['Laço', 'Bow', 'Lazo'], e: ['laço {c}', '{c} bow', 'lazo {c}'], paleta: 'lacos', cor: 'rosa', facil: 1 },
-    { id: 'lacos2', caixa: 'laco', n: ['Dois laços', 'Two bows', 'Dos lazos'], e: ['dois laços {c}', 'two {c} bows', 'dos lazos {c}'], paleta: 'lacos', cor: 'azul', facil: 1 },
+    { id: 'lacos2', caixa: 'laco', n: ['Dois laços', 'Two bows', 'Dos lazos'], e: ['laço duplo {c}', '{c} double bows', 'lazo doble {c}'], paleta: 'lacos', cor: 'azul', facil: 1 },
     { id: 'laco-glitter', caixa: 'laco', n: ['Laço de glitter', 'Glitter bow', 'Lazo de purpurina'], e: ['laço de glitter {c}', '{c} glitter bow', 'lazo de purpurina {c}'], paleta: 'glitter', cor: 'roxo' },
     { id: 'laco-pedrinhas', caixa: 'laco', n: ['Laço com pedrinhas', 'Rhinestone bow', 'Lazo con brillantes'], e: ['laço com pedrinhas', 'rhinestone bow', 'lazo con brillantes'], paleta: 'lacos', cor: 'bege' },
     { id: 'laco-gigante', caixa: 'laco', n: ['Laço gigante', 'Giant bow', 'Lazo gigante'], e: ['laço gigante', 'giant bow', 'lazo gigante'], paleta: 'lacos', cor: 'lima', facil: 1 },
@@ -265,8 +291,9 @@
     { id: 'oculos-coracao', caixa: 'olhos', n: ['Óculos de coração', 'Heart glasses', 'Gafas de corazón'], e: ['óculos de coração', 'heart glasses', 'gafas de corazón'], paleta: 'coracaoOc', cor: 'rosa' },
     { id: 'colar-bolinhas', caixa: 'pescoco', n: ['Colar de bolinhas', 'Bead necklace', 'Collar de bolitas'], e: ['colar de bolinhas', 'bead necklace', 'collar de bolitas'], facil: 1 },
     { id: 'colar-coracao', caixa: 'pescoco', n: ['Colar de coração', 'Heart necklace', 'Collar de corazón'], e: ['colar de coração', 'heart necklace', 'collar de corazón'] },
-    { id: 'lenco', caixa: 'pescoco', n: ['Lencinho', 'Bandana', 'Pañuelo'], e: ['lencinho', 'bandana', 'pañuelo'], paleta: 'geral', cor: 'vermelho' },
+    { id: 'lenco', caixa: 'pescoco', n: ['Bandana de florzinha', 'Flower bandana', 'Bandana de florecitas'], e: ['bandana {c}', '{c} bandana', 'bandana {c}'], paleta: 'geral', cor: 'rosa' },
     { id: 'coleira', caixa: 'pescoco', n: ['Coleira com guia', 'Collar and leash', 'Collar con correa'], e: ['coleira {c}', '{c} collar and leash', 'collar {c}'], paleta: 'coleira', cor: 'vermelho' },
+    { id: 'coleira-pata', caixa: 'pescoco', n: ['Guia com controle de patinha', 'Leash with paw remote', 'Correa con mando de patita'], e: ['guia de patinha', 'paw remote leash', 'correa de patita'], paleta: 'coleira', cor: 'azul-bebe' },
     { id: 'pochete', caixa: 'pulso', n: ['Pochete camuflada', 'Camo belt bag', 'Riñonera de camuflaje'], e: ['pochete', 'belt bag', 'riñonera'] },
     { id: 'pulseira-strass', caixa: 'pulso', n: ['Pulseira de strass', 'Rhinestone bracelet', 'Pulsera de brillantes'], e: ['pulseira de strass', 'rhinestone bracelet', 'pulsera de brillantes'] },
     { id: 'pulseira-bolinhas', caixa: 'pulso', n: ['Pulseira de bolinhas', 'Bead bracelet', 'Pulsera de bolitas'], e: ['pulseira de bolinhas', 'bead bracelet', 'pulsera de bolitas'] },
@@ -310,6 +337,15 @@
     { id: 'beijo', tipo: 'som', n: ['Beijinho', 'Kisses', 'Besitos'], ico: '💋' },
     { id: 'minha', tipo: 'gravada', n: ['Minha voz', 'My own voice', 'Mi voz'], ico: '🎙️', facil: 1 }
   ];
+  // frases prontas (dono, 22/Nov/2026): {c} = o nome da criança (se ela quiser pôr)
+  var FRASES = [
+    { id: 'teamo', t: ['Eu te amo{, c}!', 'I love you{, c}!', '¡Te quiero mucho{, c}!'] },
+    { id: 'abraco', t: ['Me dá um abraço{, c}?', 'Can I have a hug{, c}?', '¿Me das un abrazo{, c}?'] },
+    { id: 'amigo', t: ['Você é meu melhor amigo{, c}!', 'You are my best friend{, c}!', '¡Eres mi mejor amigo{, c}!'] },
+    { id: 'noite', t: ['Boa noite{, c}, durma bem!', 'Good night{, c}, sleep tight!', '¡Buenas noches{, c}, que duermas bien!'] },
+    { id: 'brincar', t: ['Vamos brincar{, c}?', 'Let\'s play{, c}!', '¿Jugamos{, c}?'] },
+    { id: 'beijo', t: ['Me dá um beijinho{, c}?', 'Can I have a little kiss{, c}?', '¿Me das un besito{, c}?'] }
+  ];
   var NOMES = ['Biscoito', 'Fofura', 'Algodão', 'Bolinha', 'Pipoca', 'Docinho', 'Nuvem', 'Mel', 'Paçoca', 'Jujuba', 'Pingo', 'Pudinzinho',
     'Brigadeiro', 'Cocada', 'Estrela', 'Lua', 'Sol', 'Bombom', 'Cookie', 'Tutti', 'Lili', 'Fifi', 'Bibi', 'Teteu', 'Nina', 'Lulu', 'Tico', 'Malu'];
 
@@ -319,10 +355,10 @@
 
   var D = { ETAPAS: ETAPAS, CORES: CORES, PALETAS: PALETAS, PELOS: PELOS, OLHOS: OLHOS, ESTILOS_OLHO: ESTILOS_OLHO, BOCHECHAS: BOCHECHAS,
     CORACOES: CORACOES, BASES: BASES, ROUPAS: ROUPAS, ESTAMPAS: ESTAMPAS, CAIXAS: CAIXAS, ACESS: ACESS, CONFLITOS: CONFLITOS, VOZES: VOZES,
-    NOMES: NOMES, NIVEIS: NIVEIS, PATCHES: PATCHES };
+    NOMES: NOMES, NIVEIS: NIVEIS, PATCHES: PATCHES, FRASES: FRASES };
   function porId(lista) { var m = {}; lista.forEach(function (x) { m[x.id] = x; }); return m; }
   D.base = porId(BASES); D.pelo = porId(PELOS); D.olho = porId(OLHOS); D.coracao = porId(CORACOES); D.roupa = porId(ROUPAS);
-  D.acess = porId(ACESS); D.caixa = porId(CAIXAS); D.voz = porId(VOZES); D.estampa = porId(ESTAMPAS); D.patch = porId(PATCHES);
+  D.acess = porId(ACESS); D.caixa = porId(CAIXAS); D.voz = porId(VOZES); D.estampa = porId(ESTAMPAS); D.patch = porId(PATCHES); D.frase = porId(FRASES);
   raiz.AmiguinhoDados = D;
   if (typeof module === 'object' && module.exports) module.exports = D;
 })(typeof window !== 'undefined' ? window : globalThis);
