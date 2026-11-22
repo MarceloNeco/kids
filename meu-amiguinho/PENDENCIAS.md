@@ -12,3 +12,4 @@
 | 8 | Levar o amiguinho para dentro de outros jogos além do Vruuum! e da Purpurina (pendência 55 do Bolinho) | depois |
 | 9 | `D.NIVEIS` e o campo `facil` no `dados.js` ficaram sem uso (níveis e Encomenda saíram em 22/Nov/2026): apagar numa arrumação do `dados.js` | a fazer |
 | 10 | Mochila de costas no bichinho em pé: a miniatura mostra a peça sozinha (o desenho não tem vista de costas); uma vista de costas/perfil no `arte.js` deixaria mais bonito | a fazer |
+| 11 | Peças das fotos que já existiam e ficaram sem um detalhe: polo com gola listrada e ursinho bordado, uniforme de futebol com listras brancas, colete de moletom sem o capuz aparecendo de frente (a cabeça tampa). A gola de marinheiro fica quase toda atrás da cabeça (aparece o V com as listras) | a fazer |

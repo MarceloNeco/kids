@@ -1,7 +1,9 @@
 // Alinhamento e "realismo" dos bichinhos — teste OBRIGATÓRIO (dono, 22/Nov/2026: "tem que colocar um teste obrigatório de ver
 // o realismo dos bichinhos, alinhamento dos corpos, das cabeças. Não pode deixar nada desalinhado").
-// Desenha CADA bichinho, em pé e de 4 patas, sem nada, com CADA roupa e com CADA acessório (e a preguiça pendurada no galho),
-// e olha a imagem pronta, pixel a pixel:
+// Desenha CADA bichinho, em pé e de 4 patas, sem nada, com CADA roupa, com CADA parte de baixo (sozinha e com uma parte de
+// cima), com CADA acessório (e a preguiça pendurada no galho) e, nos bichinhos de forma mais diferente (urso, preguiça de braço
+// comprido, pinguim largo; ovelha, girafa e elefante de 4 patas), TODA parte de cima com TODA parte de baixo; e olha a imagem
+// pronta, pixel a pixel:
 //   1. uma peça só: cabeça, corpo, orelhas, patas, rabo, roupa e acessório ligados (nada solto ou flutuando);
 //   2. apoiado no chão: o ponto mais baixo encosta no chão (nem flutua, nem afunda);
 //   3. nada cortado: tudo dentro da imagem (0 a 300 de largura);
@@ -45,7 +47,7 @@ function medirNoNavegador() {
   };
 }
 
-test('alinhamento: todo bichinho × corpo × roupa × acessório é uma peça só, apoiada no chão, inteira na imagem e no eixo', { timeout: 600000 }, async () => {
+test('alinhamento: todo bichinho × corpo × roupa × parte de baixo × acessório é uma peça só, apoiada no chão, inteira na imagem e no eixo', { timeout: 900000 }, async () => {
   const b = await chromium.launch();
   try {
     const pg = await b.newPage();
@@ -54,18 +56,23 @@ test('alinhamento: todo bichinho × corpo × roupa × acessório é uma peça s�
     await pg.addScriptTag({ content: '(' + medirNoNavegador.toString() + ')()' });
     const r = await pg.evaluate(async () => {
       const D = window.AmiguinhoDados, A = window.AmiguinhoArte, R = window.AmiguinhoRegras, ruins = [];
+      const cimas = D.ROUPAS.filter((x) => x.grupo === 'cima').map((x) => x.id), baixos = D.BAIXOS.map((x) => x.id);
+      const TODAS = { 'urso/pe': 1, 'preguica/pe': 1, 'pinguim/pe': 1, 'ovelha/q': 1, 'girafa/q': 1, 'elefante/q': 1 };
       let n = 0;
       for (const b of D.BASES) for (const corpo of b.corpos) {
         const casos = [[null, null, null]]
           .concat(D.ROUPAS.filter((x) => x.id !== 'nenhuma').map((x) => [x.id, null, null]))
           .concat(D.ACESS.map((x) => [null, x.id, null]));
         if (b.id === 'preguica' && corpo === 'pe') casos.push([null, null, 'pendurada']);
-        for (const [ro, ac, pose] of casos) {
+        baixos.forEach((bx, i) => { casos.push([null, null, null, bx]); casos.push([cimas[i % cimas.length], null, null, bx]); });
+        if (TODAS[b.id + '/' + corpo]) for (const ro of cimas) for (const bx of baixos) casos.push([ro, null, null, bx]);
+        for (const [ro, ac, pose, bx] of casos) {
           const a = R.novo(b.id); R.escolherCorpo(a, corpo);
           if (ro) R.vestir(a, ro);
+          if (bx && !R.vestirBaixo(a, bx)) continue;   // parte de baixo que esse corpo não usa
           if (ac && !R.porAcess(a, ac)) continue;   // acessório que esse corpo não usa
           const g = A.geo(a.base, a.corpo, pose, a), m = await window.medirAmiguinho(a, { pose });
-          const nome = b.id + '/' + corpo + (ro ? ' roupa ' + ro : '') + (ac ? ' acessório ' + ac : '') + (pose ? ' ' + pose : '');
+          const nome = b.id + '/' + corpo + (ro ? ' roupa ' + ro : '') + (bx ? ' parte de baixo ' + bx : '') + (ac ? ' acessório ' + ac : '') + (pose ? ' ' + pose : '');
           const erros = [];
           if (m.soltos.length) erros.push('peça solta em ' + m.soltos.map((c) => '[' + c.join(',') + ']').join(' '));
           if (m.fora) erros.push(m.fora + ' px cortados fora da imagem');
@@ -87,7 +94,7 @@ test('alinhamento: todo bichinho × corpo × roupa × acessório é uma peça s�
       }
       return { n, ruins };
     });
-    assert.ok(r.n > 3000, 'poucos casos desenhados: ' + r.n);
+    assert.ok(r.n > 8000, 'poucos casos desenhados: ' + r.n);
     assert.deepEqual(r.ruins.slice(0, 40), [], r.ruins.length + ' desenhos desalinhados (mostrando até 40)');
   } finally { await b.close(); }
 });
