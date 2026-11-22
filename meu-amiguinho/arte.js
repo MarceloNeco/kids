@@ -113,6 +113,8 @@
     }
     else if (tipo === 'camuflado') { w = 26; h = 26; s = p('M2,4 q6,-3 9,2 q-4,5 -9,2z M14,14 q6,-4 10,1 q-3,6 -10,2z M3,18 q4,-3 7,1 q-3,4 -7,1z', { fill: '#5a6b3a' }) + p('M14,3 q5,0 6,4 q-4,2 -6,-1z M8,10 q3,-1 4,2 q-2,2 -4,0z', { fill: '#3a3226' }); }
     else if (tipo === 'glitter') { w = 14; h = 14; s = circ(3, 3, 1, { fill: '#fff' }) + circ(10, 8, 0.8, { fill: '#fff8d0' }) + circ(6, 11, 0.6, { fill: '#fff' }); }
+    else if (tipo === 'bolinhas-mini') { w = 9; h = 9; s = circ(2.5, 2.5, 1.7, { fill: tinta, opacity: 0.9 }) + circ(7, 7, 1.7, { fill: tinta, opacity: 0.9 }); }
+    else if (tipo === 'xadrez') { w = 8; h = 8; s = ret(0, 0, 4, 8, { fill: cl ? escuro(cor, 0.35) : '#ffffff', opacity: 0.35 }) + ret(0, 0, 8, 4, { fill: cl ? escuro(cor, 0.35) : '#ffffff', opacity: 0.35 }); }
     else if (tipo === 'lantejoula') { w = 10; h = 9; s = circ(2.5, 2.5, 2.4, { fill: claro(cor, 0.2), stroke: escuro(cor, 0.25), 'stroke-width': 0.5 }) + circ(7.5, 7, 2.4, { fill: claro(cor, 0.5), stroke: escuro(cor, 0.25), 'stroke-width': 0.5 }) + circ(2, 2, 0.6, { fill: '#fff' }) + circ(7, 6.4, 0.5, { fill: '#fff' }); }
     else if (tipo === 'paete') { w = 10; h = 9; s = circ(2.5, 2.5, 2.4, { fill: '#ff9ed0', stroke: '#e0559a', 'stroke-width': 0.5 }) + circ(7.5, 7, 2.4, { fill: '#ffc2e2', stroke: '#e0559a', 'stroke-width': 0.5 }) + circ(2, 2, 0.6, { fill: '#fff' }); }
     else return null;
@@ -964,13 +966,16 @@
   }
 
   /* ---------- acessórios ---------- */
-  function lacoD(x, y, cor, e, estilo, ang) {   // laço: duas alças, nó e pontinhas
+  function lacoD(x, y, cor, e, estilo, ang, tecido) {   // laço: duas alças, nó e pontinhas (tecido: estampa por cima das alças)
     e = e || 1; var cont = escuro(cor, 0.35), s = '';
     s += p('M0,4 L-10,22 L-4,21 L-2,26 L4,8 Z M0,4 L10,22 L4,21 L2,26 L-4,8 Z', { fill: escuro(cor, 0.1), stroke: cont, 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
     s += p('M0,0 C-8,-14 -30,-18 -30,-2 C-30,12 -10,10 0,0 Z', { fill: cor, stroke: cont, 'stroke-width': 1.6 }) + p('M0,0 C8,-14 30,-18 30,-2 C30,12 10,10 0,0 Z', { fill: cor, stroke: cont, 'stroke-width': 1.6 });
+    if (tecido) s += p('M0,0 C-8,-14 -30,-18 -30,-2 C-30,12 -10,10 0,0 Z M0,0 C8,-14 30,-18 30,-2 C30,12 10,10 0,0 Z', { fill: tecido });
     s += p('M-6,-2 C-12,-8 -22,-10 -24,-3 M6,-2 C12,-8 22,-10 24,-3', { stroke: claro(cor, 0.45), 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round', opacity: 0.8 });
     if (estilo === 'glitter') { var r = sorteio(9); for (var i = 0; i < 16; i++) { var gx = (r() - 0.5) * 52, gy = (r() - 0.6) * 18; if (Math.abs(gx) > 4) s += circ(gx, gy, 0.9 + r() * 1.1, { fill: i % 3 ? '#ffffff' : '#fff2a8', opacity: 0.9 }); } }
     s += ret(-6, -7, 12, 13, { rx: 4, fill: escuro(cor, 0.06), stroke: cont, 'stroke-width': 1.6 });
+    if (estilo === 'perola') s += circ(0, -0.5, 5, { fill: '#fbf8f4', stroke: '#cfc6d6', 'stroke-width': 0.9 }) + circ(-1.6, -2, 1.6, { fill: '#ffffff' });
+    if (estilo === 'flor') { for (var fl = 0; fl < 5; fl++) { var fa = rad(fl * 72 - 90); s += circ(Math.cos(fa) * 3.6, -0.5 + Math.sin(fa) * 3.6, 2.8, { fill: '#9a6a44', stroke: '#5e3c22', 'stroke-width': 0.5 }); } s += circ(0, -0.5, 2.4, { fill: '#f4f8ff', stroke: '#9ab0c8', 'stroke-width': 0.6 }); [-20, 20].forEach(function (gx) { s += circ(gx, -3, 1.6, { fill: '#f4f8ff', stroke: '#9ab0c8', 'stroke-width': 0.5 }); }); }
     if (estilo === 'pedrinhas') { s += circ(0, -0.5, 3.4, { fill: '#e8f4ff', stroke: '#9ab0c8', 'stroke-width': 0.8 }) + circ(-1, -1.5, 1, { fill: '#fff' }); [-20, -12, 12, 20].forEach(function (gx, j) { s += circ(gx, -4 + (j % 2) * 4, 2, { fill: '#f4f8ff', stroke: '#9ab0c8', 'stroke-width': 0.6 }); }); }
     return '<g transform="translate(' + n(x) + ' ' + n(y) + ') rotate(' + (ang || 0) + ') scale(' + e + ')">' + s + '</g>';
   }
@@ -1172,6 +1177,55 @@
     if (id === 'laco-pedrinhas') return lacoD(L[1][0], L[1][1], cor, 0.8, 'pedrinhas', 16);
     if (id === 'laco-gigante') return lacoD(g.cab.x - 26, g.topo[1] + 2, cor, 1.35, null, -12);
     if (id === 'mini-lacos') { var cs = ['#f9707f', '#ffb04d', '#ffe45c', '#6fd68a', '#5fb0f0', '#b07be6']; cs.forEach(function (cc, i) { var an = rad(-150 + i * 24), cb = g.cab; s += lacoD(cb.x + Math.cos(an) * cb.rx * 0.92, cb.y + Math.sin(an) * cb.ry * 0.95, cc, 0.32, null, -150 + i * 24 + 90); }); return s; }
+    var cb = g.cab, k, an;
+    var bordaCab = function (graus, f) { var r0 = rad(graus); return [cb.x + Math.cos(r0) * cb.rx * (f || 0.9), cb.y + Math.sin(r0) * cb.ry * (f || 0.9)]; };
+    if (id === 'laco-bolinhas') return lacoD(L[0][0], L[0][1], cor, 0.8, null, -18, c.estampa('bolinhas-mini', cor));
+    if (id === 'laco-xadrez') return lacoD(L[1][0], L[1][1], cor, 0.8, null, 16, c.estampa('xadrez', cor));
+    if (id === 'laco-perola') return lacoD(L[0][0], L[0][1], cor, 0.82, 'perola', -18, c.lin([claro(cor, 0.5), cor, claro(cor, 0.35), escuro(cor, 0.1)], 0, 0, 1, 1));
+    if (id === 'lacos-flor') return lacoD(L[0][0] - 2, L[0][1] + 4, cor, 0.62, 'flor', -22) + lacoD(L[1][0] + 2, L[1][1] + 4, cor, 0.62, 'flor', 22);
+    if (id === 'laco-topo') return lacoD(g.topo[0], g.topo[1] + 6, cor, 0.5, 'glitter', 0);
+    if (id === 'laco-coracao') {   // as alças do laço são dois coraçõezinhos
+      var x = L[0][0], y = L[0][1], ct = escuro(cor, 0.35);
+      s += p('M0,4 L-8,20 L-3,19 L-1,24 L3,8 Z M0,4 L8,20 L3,19 L1,24 L-3,8 Z', { fill: escuro(cor, 0.1), stroke: ct, 'stroke-width': 1.3, 'stroke-linejoin': 'round' });
+      [-1, 1].forEach(function (k) { s += '<g transform="translate(' + (k * 15) + ' -2) rotate(' + (k * 90) + ')">' + p(coracaoD(0, 0, 13), { fill: cor, stroke: ct, 'stroke-width': 1.6 }) + '</g>'; });
+      s += ret(-5, -6, 10, 11, { rx: 4, fill: escuro(cor, 0.06), stroke: ct, 'stroke-width': 1.5 }) + p(brilhoD(-17, -6, 3), { fill: '#ffffff', opacity: 0.8 });
+      return '<g transform="translate(' + n(x) + ' ' + n(y) + ') rotate(-18) scale(0.85)">' + s + '</g>';
+    }
+    if (id === 'presilhas-estrela') {   // três presilhas de estrela na beirada da cabeça
+      [-62, -44, -26].forEach(function (gr0, i) {
+        var q0 = bordaCab(gr0, 0.92), r0 = i === 1 ? 10 : 8;
+        s += lin(q0[0] - 9, q0[1] + 4, q0[0] + 9, q0[1] - 2, { stroke: '#a8aebc', 'stroke-width': 2.6, 'stroke-linecap': 'round', transform: 'rotate(' + (gr0 + 90) + ' ' + n(q0[0]) + ' ' + n(q0[1]) + ')' });
+        s += p(estrelaD(q0[0], q0[1], r0, r0 * 0.48), { fill: cor, stroke: escuro(cor, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' }) + circ(q0[0] - r0 * 0.25, q0[1] - r0 * 0.25, 1.4, { fill: '#ffffff', opacity: 0.9 });
+      });
+      return s;
+    }
+    if (id === 'chuquinhas' || id === 'scrunchie') {   // tufinhos de pelo presos com elástico
+      var pe0 = D.pelo[a.pelo] || D.PELOS[0], pc = pe0.grad ? pe0.grad[Math.floor(pe0.grad.length / 2)] : pe0.cor;
+      (id === 'scrunchie' ? [-58] : [-138, -42]).forEach(function (gr0) {
+        var q0 = bordaCab(gr0, 0.9), t0 = '';
+        for (k = -1; k <= 1; k++) { an = rad(gr0 + k * 22); t0 += elip(q0[0] + Math.cos(an) * 14, q0[1] + Math.sin(an) * 14, 7, 13, { fill: pc, stroke: escuro(pc, 0.4), 'stroke-width': 1.4, transform: 'rotate(' + n(gr0 + 90 + k * 22) + ' ' + n(q0[0] + Math.cos(an) * 14) + ' ' + n(q0[1] + Math.sin(an) * 14) + ')' }); }
+        s += t0;
+        if (id === 'scrunchie') {
+          for (k = 0; k < 10; k++) { an = rad(k * 36); s += elip(q0[0] + Math.cos(an) * 8, q0[1] + Math.sin(an) * 5, 5.4, 4.4, { fill: c.radial([[0, claro(cor, 0.25)], [1, escuro(cor, 0.25)]], 0.4, 0.35, 0.7), stroke: escuro(cor, 0.4), 'stroke-width': 0.8 }); }
+        } else {
+          s += elip(q0[0], q0[1], 8, 4, { fill: cor, stroke: escuro(cor, 0.35), 'stroke-width': 1.2, transform: 'rotate(' + n(gr0 + 90) + ' ' + n(q0[0]) + ' ' + n(q0[1]) + ')' });
+          [-1, 1].forEach(function (k) { var bx = q0[0] + k * 6 * Math.cos(rad(gr0 + 90)), by = q0[1] + k * 6 * Math.sin(rad(gr0 + 90)); s += circ(bx, by, 4.6, { fill: cor, stroke: escuro(cor, 0.35), 'stroke-width': 1 }) + circ(bx - 1.4, by - 1.4, 1.3, { fill: '#ffffff', opacity: 0.85 }); });
+        }
+      });
+      return s;
+    }
+    if (id === 'garra') {   // piranha (garra) de cabelo
+      var gq = bordaCab(-50, 0.9), dente = '';
+      for (k = 0; k < 6; k++) dente += 'M' + n(-15 + k * 6) + ',2 l2,13 2,-13 ';
+      s += p('M-18,2 Q0,-12 18,2 Z', { fill: cor, stroke: escuro(cor, 0.5), 'stroke-width': 1.4 }) + p(dente, { fill: cor, stroke: escuro(cor, 0.5), 'stroke-width': 1.2, 'stroke-linejoin': 'round' }) + p('M-12,-1 Q0,-8 12,-1', { stroke: claro(cor, 0.5), 'stroke-width': 1.6, fill: 'none', opacity: 0.8 });
+      return '<g transform="translate(' + n(gq[0]) + ' ' + n(gq[1]) + ') rotate(40)">' + s + '</g>';
+    }
+    if (id === 'tiara-laco') {
+      var arco = 'M' + n(cb.x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.42) + ' A' + n(cb.rx * 0.9) + ',' + n(cb.ry * 0.95) + ' 0 0 1 ' + n(cb.x + cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.42);
+      s += p(arco, { stroke: escuro(cor, 0.35), 'stroke-width': 11, fill: 'none', 'stroke-linecap': 'round' }) + p(arco, { stroke: cor, 'stroke-width': 7.5, fill: 'none', 'stroke-linecap': 'round' });
+      var tq = bordaCab(-118, 0.95);
+      return s + lacoD(tq[0], tq[1], cor, 1.05, null, -22);
+    }
     if (id === 'laco-fitas') {   // laço de fitinhas coloridas, preso perto da orelha
       var x = L[0][0], y = L[0][1], fs = ['#8a5cd6', '#ffd447', '#4f8fe0', '#f06292', '#8a5cd6', '#ffd447', '#4f8fe0', '#f06292', '#6fd68a'];
       fs.forEach(function (cc, i) { var an = rad(i * 40 + 10), l = 16 + (i % 3) * 3; s += p('M' + n(x) + ',' + n(y) + ' q' + n(Math.cos(an + 0.5) * l * 0.6) + ',' + n(Math.sin(an + 0.5) * l * 0.6) + ' ' + n(Math.cos(an) * l) + ',' + n(Math.sin(an) * l), { stroke: escuro(cc, 0.25), 'stroke-width': 6.5, fill: 'none', 'stroke-linecap': 'round' }) + p('M' + n(x) + ',' + n(y) + ' q' + n(Math.cos(an + 0.5) * l * 0.6) + ',' + n(Math.sin(an + 0.5) * l * 0.6) + ' ' + n(Math.cos(an) * l) + ',' + n(Math.sin(an) * l), { stroke: cc, 'stroke-width': 4.5, fill: 'none', 'stroke-linecap': 'round' }); });
@@ -1597,7 +1651,7 @@
     if (e.pescoco) cab += pescocoAcess(c, a, g, e.pescoco, corA(e.pescoco));
     if (S && S.heroi) cab += mascara(g, S.heroi);
     if (e.cabeca && !capuzVestido) cab += cabecaAcess(c, a, g, e.cabeca, corA(e.cabeca));
-    if (e.laco) cab += lacos(c, a, g, e.laco, corA(e.laco));
+    if (e.laco && !(capuzVestido && /^(tiara-laco|chuquinhas|scrunchie|laco-topo)$/.test(e.laco))) cab += lacos(c, a, g, e.laco, corA(e.laco));
     if (e.olhos) cab += oculos(c, a, g, e.olhos, corA(e.olhos));
     var frente = '';
     if (e.mao && q) frente += maoAcess(c, a, g, e.mao);

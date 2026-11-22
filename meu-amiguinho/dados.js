@@ -40,10 +40,11 @@
     'turquesa': { hex: '#2ec4c4', n: ['azul-turquesa', 'turquoise', 'turquesa'] },
     'cinza': { hex: '#9aa0aa', n: ['cinza', 'gray', 'gris'] },
     'caramelo': { hex: '#c98a4b', n: ['caramelo', 'caramel', 'caramelo'] },
-    'holo': { hex: '#cfd8f0', n: ['holográfico', 'holographic', 'holográfico'] }
+    'holo': { hex: '#cfd8f0', n: ['holográfico', 'holographic', 'holográfico'] },
+    'azul-cinza': { hex: '#a9b8cc', n: ['azul-acinzentado', 'blue-gray', 'gris azulado'] }
   };
   var PALETAS = {
-    lacos: ['rosa', 'rosa-choque', 'vermelho', 'laranja', 'amarelo', 'lima', 'menta', 'azul-bebe', 'azul', 'lilas', 'roxo', 'marrom', 'bege', 'branco', 'preto', 'prata', 'dourado'],
+    lacos: ['rosa', 'rosa-choque', 'vermelho', 'laranja', 'amarelo', 'lima', 'menta', 'azul-bebe', 'azul', 'azul-cinza', 'lilas', 'roxo', 'marrom', 'bege', 'branco', 'preto', 'prata', 'dourado'],
     glitter: ['preto', 'roxo', 'rosa', 'prata', 'dourado'],
     roupa: ['rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'laranja', 'vermelho', 'azul', 'marinho', 'roxo', 'verde', 'branco', 'preto'],
     oculos: ['vermelho', 'rosa', 'azul', 'roxo', 'preto', 'dourado'],
@@ -292,6 +293,17 @@
     { id: 'laco-pedrinhas', caixa: 'laco', n: ['Laço com pedrinhas', 'Rhinestone bow', 'Lazo con brillantes'], e: ['laço com pedrinhas', 'rhinestone bow', 'lazo con brillantes'], paleta: 'lacos', cor: 'bege' },
     { id: 'laco-gigante', caixa: 'laco', n: ['Laço gigante', 'Giant bow', 'Lazo gigante'], e: ['laço gigante', 'giant bow', 'lazo gigante'], paleta: 'lacos', cor: 'lima', facil: 1 },
     { id: 'mini-lacos', caixa: 'laco', n: ['Mini laços arco-íris', 'Rainbow mini bows', 'Minilazos arcoíris'], e: ['mini laços arco-íris', 'rainbow mini bows', 'minilazos arcoíris'] },
+    { id: 'laco-bolinhas', caixa: 'laco', n: ['Laço de bolinhas', 'Polka-dot bow', 'Lazo de lunares'], e: ['laço de bolinhas {c}', '{c} polka-dot bow', 'lazo de lunares {c}'], paleta: 'lacos', cor: 'vermelho', facil: 1 },
+    { id: 'laco-xadrez', caixa: 'laco', n: ['Laço xadrez', 'Gingham bow', 'Lazo de cuadros'], e: ['laço xadrez {c}', '{c} gingham bow', 'lazo de cuadros {c}'], paleta: 'lacos', cor: 'azul' },
+    { id: 'laco-perola', caixa: 'laco', n: ['Laço de cetim com pérola', 'Satin bow with a pearl', 'Lazo de satén con perla'], e: ['laço de cetim {c}', '{c} satin bow', 'lazo de satén {c}'], paleta: 'lacos', cor: 'lilas' },
+    { id: 'laco-coracao', caixa: 'laco', n: ['Laço de coração', 'Heart bow', 'Lazo de corazón'], e: ['laço de coração {c}', '{c} heart bow', 'lazo de corazón {c}'], paleta: 'lacos', cor: 'vermelho' },
+    { id: 'laco-topo', caixa: 'laco', n: ['Lacinho no topo', 'Tiny top bow', 'Lacito arriba'], e: ['lacinho no topo {c}', 'tiny {c} top bow', 'lacito arriba {c}'], paleta: 'lacos', cor: 'roxo', facil: 1 },
+    { id: 'lacos-flor', caixa: 'laco', n: ['Dois laços com flor de strass', 'Two bows with a gem flower', 'Dos lazos con flor de brillantes'], e: ['laços com flor {c}', '{c} bows with gem flowers', 'lazos con flor {c}'], paleta: 'lacos', cor: 'prata' },
+    { id: 'presilhas-estrela', caixa: 'laco', n: ['Presilhas de estrela', 'Star hair clips', 'Horquillas de estrella'], e: ['presilhas de estrela na cor {c}', '{c} star clips', 'horquillas de estrella de color {c}'], paleta: 'lacos', cor: 'amarelo', facil: 1 },
+    { id: 'chuquinhas', caixa: 'laco', n: ['Chuquinhas com elástico', 'Pigtails with hair ties', 'Coletas con gomitas'], e: ['chuquinhas com elástico {c}', 'pigtails with {c} ties', 'coletas con gomitas de color {c}'], paleta: 'lacos', cor: 'rosa-choque' },
+    { id: 'scrunchie', caixa: 'laco', n: ['Elástico de veludo', 'Velvet scrunchie', 'Coletero de terciopelo'], e: ['elástico de veludo {c}', '{c} velvet scrunchie', 'coletero de terciopelo {c}'], paleta: 'lacos', cor: 'preto' },
+    { id: 'garra', caixa: 'laco', n: ['Piranha de cabelo', 'Hair claw clip', 'Pinza de pelo'], e: ['piranha de cabelo na cor {c}', '{c} hair claw', 'pinza de pelo de color {c}'], paleta: 'lacos', cor: 'preto' },
+    { id: 'tiara-laco', caixa: 'laco', n: ['Tiara com laço grande', 'Big bow headband', 'Diadema con lazo grande'], e: ['tiara com laço {c}', '{c} big bow headband', 'diadema con lazo {c}'], paleta: 'lacos', cor: 'rosa', facil: 1 },
     { id: 'laco-fitas', caixa: 'laco', n: ['Laço de fitinhas', 'Ribbon bow', 'Lazo de cintas'], e: ['laço de fitinhas', 'ribbon bow', 'lazo de cintas'] },
     { id: 'tiara', caixa: 'cabeca', n: ['Tiara', 'Headband', 'Diadema'], e: ['tiara', 'headband', 'diadema'], paleta: 'geral', cor: 'rosa', facil: 1 },
     { id: 'coroa', caixa: 'cabeca', n: ['Coroa', 'Crown', 'Corona'], e: ['coroa', 'crown', 'corona'], facil: 1 },
@@ -376,7 +388,9 @@
     { id: 'cadeira', caixa: 'apoio', n: ['Cadeira de rodas', 'Wheelchair', 'Silla de ruedas'], e: ['cadeira de rodas', 'a wheelchair', 'silla de ruedas'], facil: 1 }
   ];
   // escolher um tira o outro (não dá para usar os dois ao mesmo tempo)
-  var CONFLITOS = [['patins', 'skate'], ['cadeira', 'skate'], ['cadeira', 'patins'], ['muletas', 'skate'], ['muletas', 'patins'], ['patins-linha', 'skate'], ['cadeira', 'patins-linha'], ['muletas', 'patins-linha'], ['cadeira', 'abracadinho-perna']];
+  var CONFLITOS = [['patins', 'skate'], ['cadeira', 'skate'], ['cadeira', 'patins'], ['muletas', 'skate'], ['muletas', 'patins'], ['patins-linha', 'skate'], ['cadeira', 'patins-linha'], ['muletas', 'patins-linha'], ['cadeira', 'abracadinho-perna'],
+    ['tiara-laco', 'tiara'], ['tiara-laco', 'tiara-sapinho'], ['tiara-laco', 'tiara-chifres'], ['tiara-laco', 'coroa-flores'], ['tiara-laco', 'bone'], ['tiara-laco', 'viseira'], ['tiara-laco', 'capacete'], ['tiara-laco', 'chapeu'],
+    ['chuquinhas', 'bone'], ['chuquinhas', 'capacete'], ['chuquinhas', 'chapeu']];
 
   // ---------- vozes ----------
   // fala: voz do aparelho no idioma escolhido (fininha, de urso, devagarinho); sons: feitos no WebAudio; minha: gravada aqui
