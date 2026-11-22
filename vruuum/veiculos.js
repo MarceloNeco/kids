@@ -1,4 +1,4 @@
-/* Vruuum! — a garagem: 32 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
+/* Vruuum! — a garagem: 37 veículos, todos em 3D, desenhados em código (modelos3d.js; cavalo e dinossauro no cavalo.js):
    na curva aparece a lateral, no morro o teto. Grupos: carros, "moto, skate e montarias" e os que voam (desenho.js troca
    a estrada por uma rota no ar e os obstáculos por pássaros, nuvens de tempestade, anéis e correntes de ar).
    Estilos inspirados em carros esportivos famosos, mas sem marca, logotipo ou nome de fabricante.
@@ -26,9 +26,11 @@
     em3d('conversivel', { id: 'conversivel', grupo: 'terra', nome: ['Conversível Rosa', 'Pink Convertible', 'Descapotable Rosa'], w: 820, h: 1120, vel: 1.02, curva: 1.04 }),
     em3d('gt', { id: 'gt', grupo: 'terra', nome: ['GT Redondo', 'Round GT', 'GT Redondo'], w: 820, h: 990, vel: 1.04, curva: 1.03 }),
     em3d('super', { id: 'super', grupo: 'terra', nome: ['Superesportivo', 'Supercar', 'Superdeportivo'], w: 920, h: 960, vel: 1.08, curva: 0.95 }),
+    em3d('policia', { id: 'policia', quadros: 8, voz: 'sirene', grupo: 'terra', nome: ['Viatura de Polícia', 'Police Car', 'Coche de Policía'], w: 800, h: 1120, vel: 1.02, curva: 1.0 }),
     em3d('kart', { id: 'kart', capacete: true, grupo: 'terra', nome: ['Kart', 'Kart', 'Kart'], w: 720, h: 760, vel: 0.96, curva: 1.12 }),
     em3d('monstrao', { id: 'monstrao', grupo: 'terra', nome: ['Monstrão', 'Monster Truck', 'Camión Monstruo'], w: 960, h: 1550, vel: 0.95, curva: 0.98 }),
     em3d('moto', { id: 'moto', capacete: true, grupo: 'moto', nome: ['Moto', 'Motorbike', 'Moto'], w: 520, h: 1250, vel: 1.03, curva: 1.1 }),
+    em3d('motopolicia', { id: 'motopolicia', capacete: true, quadros: 8, voz: 'sirene', grupo: 'moto', nome: ['Moto de Polícia', 'Police Motorbike', 'Moto de Policía'], w: 560, h: 1250, vel: 1.03, curva: 1.1 }),
     em3d('skate', { id: 'skate', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Skate', 'Skateboard', 'Skate'], w: 560, h: 1050, vel: 0.94, curva: 1.15 }),
     { id: 'cavalo', semMotor: true, voz: 'cavalo', janela: { elipse: [0.5, 0.16, 0.3, 0.2] }, cab: [0.5, 0.16, 0.132], aberto: true, quadros: 12, cavalo: true, grupo: 'moto', nome: ['Cavalo', 'Horse', 'Caballo'], w: 720, h: 1050, vel: 0.97, curva: 1.12, desenhar: function (c, W, H, cor, e, f, corpo) { CAV.desenhar(c, W, H, cor, e, f, corpo); } },
     { id: 'dino', semMotor: true, voz: 'dino', janela: { elipse: [0.5, 0.16, 0.3, 0.2] }, cab: [0.5, 0.16, 0.132], aberto: true, quadros: 12, cavalo: true, bicho: 'dino', grupo: 'moto', nome: ['Dinossauro', 'Dinosaur', 'Dinosaurio'], w: 720, h: 1050, vel: 0.98, curva: 1.08, desenhar: function (c, W, H, cor, e, f, corpo) { CAV.desenhar(c, W, H, cor, e, f, corpo, 'dino'); } },
@@ -39,12 +41,15 @@
     em3d('furgao', { id: 'furgao', grupo: 'terra', nome: ['Furgão de Surfe', 'Surf Van', 'Furgoneta de Surf'], w: 900, h: 1000, vel: 0.99, curva: 1.0 }),
     em3d('escolar', { id: 'escolar', quadros: 8, grupo: 'terra', nome: ['Ônibus Escolar', 'School Bus', 'Autobús Escolar'], w: 1000, h: 1100, vel: 0.95, curva: 0.96 }),
     em3d('turismo', { id: 'turismo', quadros: 8, grupo: 'terra', nome: ['Ônibus de Turismo', 'Tour Bus', 'Autobús Turístico'], w: 1050, h: 1320, vel: 0.94, curva: 0.95 }),
+    em3d('van', { id: 'van', quadros: 8, grupo: 'terra', nome: ['Van Verde de Passeio', 'Green Shuttle Van', 'Furgoneta Verde de Paseo'], w: 1000, h: 1180, vel: 0.95, curva: 0.96 }),
     em3d('pelucias', { id: 'pelucias', quadros: 8, grupo: 'terra', nome: ['Caminhão de Pelúcias', 'Plush Claw Truck', 'Camión de Peluches'], w: 1000, h: 1060, vel: 0.96, curva: 0.98 }),
     em3d('patins', { id: 'patins', capacete: true, semMotor: true, quadros: 12, grupo: 'moto', nome: ['Patins', 'Roller Skates', 'Patines'], w: 700, h: 1170, vel: 0.95, curva: 1.15 }),
     em3d('guincho', { id: 'guincho', quadros: 8, grupo: 'terra', nome: ['Caminhão Guincho', 'Tow Truck', 'Camión Grúa'], w: 760, h: 1290, vel: 0.95, curva: 0.96 }),
     em3d('pulapula', { id: 'pulapula', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Pula-Pula', 'Trampoline', 'Cama Elástica'], w: 740, h: 1150, vel: 0.93, curva: 1.1 }),
     em3d('bebe', { id: 'bebe', semMotor: true, quadros: 6, grupo: 'terra', nome: ['Carrinho de Bebê', 'Baby Stroller', 'Carrito de Bebé'], w: 760, h: 1080, vel: 0.94, curva: 1.12 }),
     em3d('empurrar', { id: 'empurrar', semMotor: true, grupo: 'terra', nome: ['Carrinho de Empurrar', 'Push Car', 'Correpasillos'], w: 720, h: 1040, vel: 0.95, curva: 1.1 }),
+    em3d('bolha', { id: 'bolha', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Bolha Gigante (anda dentro!)', 'Giant Bubble Ball (walk inside!)', 'Burbuja Gigante (¡caminas dentro!)'], w: 900, h: 1000, vel: 0.95, curva: 1.08 }),
+    em3d('palhaco', { id: 'palhaco', semPiloto: true, semMotor: true, voz: 'fonfom', quadros: 12, grupo: 'moto', nome: ['Palhaço de Bicicleta', 'Clown on a Bike', 'Payaso en Bici'], w: 600, h: 1100, vel: 0.96, curva: 1.12 }),
     em3d('urso', { id: 'urso', urso: true, quadros: 8, semPiloto: true, semMotor: true, voz: 'risada', grupo: 'moto', nome: ['Ursão de Pelúcia', 'Giant Teddy Bear', 'Osito de Peluche Gigante'], w: 1650, h: 1750, vel: 1, curva: 1.05 }),
     em3d('ovo', { id: 'ovo', quadros: 8, semPiloto: true, semMotor: true, grupo: 'moto', nome: ['Ovo Corredor', 'Running Egg', 'Huevo Corredor'], w: 720, h: 1000, vel: 0.97, curva: 1.14 }),
     em3d('aviao', { id: 'aviao', grupo: 'ar', nome: ['Aviãozinho', 'Little Plane', 'Avioncito'], w: 1500, h: 760, vel: 1, curva: 1.05 }),

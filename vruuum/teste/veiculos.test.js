@@ -3,9 +3,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const V = require('../veiculos.js');
 
-test('32 veículos, ids únicos, nome em PT, EN e ES, grupo que existe', () => {
-  assert.equal(V.LISTA.length, 32);
-  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 32);
+test('37 veículos, ids únicos, nome em PT, EN e ES, grupo que existe', () => {
+  assert.equal(V.LISTA.length, 37);
+  assert.equal(new Set(V.LISTA.map(v => v.id)).size, 37);
   const grupos = V.GRUPOS.map(g => g.id);
   for (const g of V.GRUPOS) assert.equal(g.nome.length, 3, g.id);
   for (const v of V.LISTA) {
@@ -50,7 +50,7 @@ test('bichos e carrinhos sem motor de carro: cada um tem a sua voz gravada', () 
 
 test('veículos em 3D (modelos3d.js): giram de lado, e a cabeça do piloto fica dentro do quadro em qualquer giro', () => {
   const M3 = require('../modelos3d.js');
-  for (const id of ['furgao', 'escolar', 'pelucias', 'pipoca', 'sorvete', 'hamburguer', 'galinha', 'pulapula', 'bebe', 'empurrar', 'turismo']) {
+  for (const id of ['furgao', 'escolar', 'pelucias', 'pipoca', 'sorvete', 'hamburguer', 'galinha', 'pulapula', 'bebe', 'empurrar', 'turismo', 'policia', 'motopolicia', 'van', 'bolha']) {
     const v = V.achar(id);
     assert.equal(v.modelo, id);
     for (const lado of [-1, 0, 1]) for (const incl of [-0.3, 0, 0.3]) {
