@@ -37,8 +37,8 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Sombra de cada pé no chão | ✅ | `.pp-sombra-pe-*`: escura no apoio, mais clara e menor quando o pé sobe (0.9.9) |
 | Braço caído sem "parêntese" | ✅ | 0.9.15 (dono/Gemini: "braços armados como parênteses ( )"). O braço de base (`bracoRig`) já desce 10° para fora (ombro x 150, punho x 124), então o braço caído usa o ombro **para dentro** (`o` −6 a −4) e o cotovelo quase reto (`c` −3 a −5): o cotovelo fica perto da cintura. Vale no `relax`, no braço solto de `cintura`, `beijo`, `tchau`, `olhaE`/`olhaD` (do lado para onde o quadril vai, −1: acompanha o quadril) e no desenho sem pose. Andando: `abre` 1 (menina) e 5 (menino). Manga um pouco menos bufante (12,3k / 10,3k) |
 | Mão relaxada de lado (sem "punho cerrado de frente") | ✅ | 0.9.15. `maoDeLado()` no `boneca.js`: palma virada para a coxa, fina e comprida vista de frente, polegar na frente, dedos curvando para a perna, aliança e esmalte. As duas mãos saem no desenho (`.rig-mao-frente-*` / `.rig-mao-lado-*`) e o animador mostra uma só: `maoSolta(o, c)` = braço caído (`o < 35`, `−40 < c < 45`) |
-| Descanso assimétrico | ✅ | 0.9.15: `relax` com base `leve` (quadril 6 px para a esquerda, `solta` 0,75: a perna direita dobra de leve e o pé vira de lado); antes era `reta`, simétrica |
-| Parada: peso numa perna, a outra solta (contrapposto) | ✅ | 0.9.14 (dono: "mão no ombro com o braço esquerdo… a perna e o pezinho virar para o lado direito"). `solta` nas `BASES` `gingaD`/`gingaE` (o quadril vai para o lado do peso). A perna solta gira 6° para o meio (joelho para dentro), a canela volta (`kE`/`kD` = ∓0,17), encolhe 3% (calcanhar sai do chão), passa na frente da outra e o pé vira de lado — com o **desenho do sapato de lado** (`.pp-sapato-dentro-*`, `sapatoLado()` com calcanhar redondo, peito do pé e ponta, do tamanho do sapato de frente), nunca o de frente entortado (0.9.15; na 0.9.14 era `rotate/skewX` e virava um "bloquinho torto"). **Giro contínuo** (0.9.16, dono: "o pé vira para o lado de uma vez"): sem troca seca de `display`. Um número de 0 (frente) a 1 (lado) anda junto com a perna (`tDentro`, da `solta` interpolada; na vitrine `viraE`/`viraD`, do quanto o pé subiu): o sapato de frente estreita (`scaleX 1 − 0,5t`) e some devagar, o de lado cresce a partir do tornozelo (`0,3 + 0,7t`) e aparece devagar (cruzamento entre 0,3 e 0,7). Vale para todos os calçados sem redesenhar nenhum. (O morphing ponto a ponto sugerido pelo Gemini pediria refazer os 27 calçados com os mesmos pontos.) Só parada (`modo` vazio: estúdio, apresentação, fim do desfile); menino fica plantado (`cruza` 0). Bota, galocha, patins e cano alto (sapato com mais de 60 de altura) não giram nem desentortam: vão inteiros com a perna, senão o cano sai da calça |
+| Descanso assimétrico | ✅ | 0.9.15: `relax` com base `leve`; antes era `reta`, simétrica. 0.9.16: quadril 8 px para a esquerda e `solta` 1 (a perna direita dobra e o pé vira para fora) |
+| Parada: peso numa perna, a outra solta (contrapposto) | ✅ | 0.9.14 (dono: "mão no ombro com o braço esquerdo… a perna e o pezinho virar para o lado direito"). `solta` nas `BASES` `gingaD`/`gingaE` (o quadril vai para o lado do peso). A perna solta gira 8° para o meio (joelho para dentro), a canela volta (`kE`/`kD` = ∓0,24), encolhe 3,5% (calcanhar sai do chão), passa na frente da outra e o pé vira **para fora** (ponta para o lado de fora do corpo, como nas referências de pose do dono, 22/Nov/2026; a primeira versão virava para dentro e foi trocada) — com o **desenho do sapato de lado** (`.pp-sapato-lado-*`, o mesmo da vitrine, `sapatoLado()` com calcanhar redondo, peito do pé e ponta, do tamanho do sapato de frente), nunca o de frente entortado (0.9.15; na 0.9.14 era `rotate/skewX` e virava um "bloquinho torto"). **Giro contínuo** (0.9.16, dono: "o pé vira para o lado de uma vez"): sem troca seca de `display`. Um número de 0 (frente) a 1 (lado) anda junto com a perna (`tDentro`, da `solta` interpolada; na vitrine `viraE`/`viraD`, do quanto o pé subiu): o sapato de frente estreita (`scaleX 1 − 0,5t`) e some devagar, o de lado cresce a partir do tornozelo (`0,3 + 0,7t`) e aparece devagar (cruzamento entre 0,3 e 0,7). Vale para todos os calçados sem redesenhar nenhum. (O morphing ponto a ponto sugerido pelo Gemini pediria refazer os 27 calçados com os mesmos pontos.) Só parada (`modo` vazio: estúdio, apresentação, fim do desfile); menino fica plantado (`cruza` 0). Bota, galocha, patins e cano alto (sapato com mais de 60 de altura) não giram nem desentortam: vão inteiros com a perna, senão o cano sai da calça |
 | Piscar natural | ✅ | O olho pisca sozinho de tempos em tempos (`anim`); sem piscadinha fixa na placa da Baladinha (0.9.13) |
 
 ## 4. Perfis menina × menino (`BIO` no `animador.js`)
@@ -76,13 +76,27 @@ diminui), pousa amortecendo e volta. Ciclo de 1,1 s.
 Baladinha, com 📤 Compartilhar (WhatsApp e outros apps) e 💾 Salvar. Ainda não roda no módulo `Fundo` (o jogo não
 tem): se sair da tela no meio, o GIF se perde.
 
-## 8. O que fica para quando houver créditos no Higgsfield
+## 8. Referências de pose do dono (22/Nov/2026)
+
+Fotos e figuras que o dono mandou como "pose natural decente". **Ficam só como referência: nenhuma foto entra no repositório**
+(é público, e as fotos têm direito de imagem). O que cada uma ensina:
+
+- **Foto de campanha de moda (modelo encostada numa barra)**: o peso numa perna só, reta, com o quadril bem para esse lado;
+  o joelho da outra dobra para dentro, quase encostando no outro; o pé dela fica um pouco à frente, virado para fora,
+  com o calcanhar um pouco erguido; ombros e cabeça inclinam para o lado contrário do quadril; olha para o lado, sorrindo.
+- **Folhas de personagem de criança (frente, três quartos, perfil, costas) e poses de menina de vestido**: na pose solta o
+  pé relaxado vira para fora e o joelho dobra para dentro; de três quartos os pés apontam para o lado do corpo; o pé de
+  lado é comprido, com calcanhar, peito do pé e ponta (nunca o pé de frente entortado).
+- **Silhuetas de ginástica e balé**: braços e pernas longos e soltos, mãos alongadas (nunca "bolinhas"), pontas dos pés
+  esticadas.
+
+## 9. O que fica para quando houver créditos no Higgsfield
 
 Fundos pintados (salão, provador, manicure, maquiagem, passarela), músicas compostas e ícones 3D: ver a tarefa
 programada "Purpurina: checar créditos do Higgsfield" e `../purpurina/AGENDA.md`. Personagem pintada por IA em
 camadas (pendência da Nova Era) só depois dos fundos.
 
-## 9. Como conferir sem celular
+## 10. Como conferir sem celular
 
 - `node --test purpurina-nova/teste/*.test.js` (os testes da Nova Era conferem cada item acima).
 - Quadros do andar: criar o animador com `modo: 'andar'` num desenho com `{ rig: true, passos: true }` e fotografar a

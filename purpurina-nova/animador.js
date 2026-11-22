@@ -48,7 +48,7 @@
     // (dono, 22/Nov/2026: "mão no ombro com o braço esquerdo… a perna e o pezinho virar para o lado direito")
     gingaD: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: -2, q: 1, solta: -1 },
     gingaE: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 2, q: -1, solta: 1 },
-    leve: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 1, q: -0.5, solta: 0.75 },   // descanso: peso na esquerda, de leve
+    leve: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 1, q: -0.7, solta: 1 },   // descanso: peso na esquerda (foto de referência do dono, 22/Nov/2026: joelhos quase se encostando)
     cruzada: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
     aberta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 }
   };
@@ -180,11 +180,11 @@
         /* o pé vira aos poucos (dono, 22/Nov/2026: "o pé vira para o lado de uma vez… não está natural"): um número de 0
            (de frente) a 1 (de lado) anda junto com a perna; o sapato de frente vai estreitando e some devagar enquanto o de
            lado cresce a partir do tornozelo (a ponta vai saindo para o lado) e aparece devagar — como um pé girando, sem
-           troca seca. Vitrine: ponta para fora (pé levantado); perna solta parada: ponta para o meio (bota: fica de frente) */
-        var tFora = Math.max(0, Math.min(1, (pl[0] === 'e' ? v.viraE : v.viraD) || 0));
-        var tDentro = alto || tFora ? 0 : Math.max(0, Math.min(1, (pl[5] - 0.15) / 0.55));
-        var tt = Math.max(tFora, tDentro), sm = tt <= 0.3 ? 0 : tt >= 0.7 ? 1 : (function (u) { return u * u * (3 - 2 * u); })((tt - 0.3) / 0.4);
-        [['.pp-sapato-frente', 1 - 0.5 * tt, 1 - sm, true], ['.pp-sapato-lado-' + pl[0], 0.3 + 0.7 * tFora, tFora ? sm : 0, false], ['.pp-sapato-dentro-' + pl[0], 0.3 + 0.7 * tDentro, tDentro ? sm : 0, false]].forEach(function (sp) {
+           troca seca. Na vitrine (pé levantado) e na perna solta parada, a ponta vai para fora */
+        // (dono, 22/Nov/2026, referências: o pé solto vira PARA FORA — a ponta para o lado de fora do corpo — e o joelho dobra
+        // para dentro; a bota e o cano alto ficam de frente)
+        var tt = Math.max(0, Math.min(1, ((pl[0] === 'e' ? v.viraE : v.viraD) || 0) || (alto ? 0 : (pl[5] - 0.15) / 0.55))), sm = tt <= 0.3 ? 0 : tt >= 0.7 ? 1 : (function (u) { return u * u * (3 - 2 * u); })((tt - 0.3) / 0.4);
+        [['.pp-sapato-frente', 1 - 0.5 * tt, 1 - sm, true], ['.pp-sapato-lado-' + pl[0], 0.3 + 0.7 * tt, sm, false]].forEach(function (sp) {
           Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' ' + sp[0]), function (g) {
             var vis = sp[2] > 0.01;
             g.style.display = vis ? '' : 'none'; if (!vis) return;
@@ -304,14 +304,15 @@
       if (modo !== 'andar') { v.cab += micro * 0.4; v.cE += micro * 0.6; v.cD -= micro * 0.6; v.q += micro * 0.04; }
       /* parada (apresentação e estúdio), o peso fica numa perna só (dono, 22/Nov/2026: "o pezinho está sempre de frente,
          isso não é natural… a perna tem que dar uma leve arqueadinha e o pezinho um pouquinho dobrado"): a outra dobra o
-         joelho de leve (encolhe, o calcanhar sai do chão), vem um pouco para o meio, passa na frente e o pé vira de lado.
+         joelho de leve (encolhe, o calcanhar sai do chão), vem um pouco para o meio, passa na frente e o pé vira para fora.
          Menino fica plantado (cruza 0); andando, dançando, pulando ou na vitrine dos sapatos, não */
       v.peE = 0; v.peD = 0; v.kE = 0; v.kD = 0;
       if (!modo && v.solta) {
         var sl = v.solta * pf0.cruza, wE = Math.max(0, -sl), wD = Math.max(0, sl);
-        // a coxa gira para o meio (o joelho vai para dentro) e a canela volta (joelho dobrado): o pé quase não sai do lugar
-        v.er -= 6 * wE; v.esy = 1 - 0.03 * wE; v.peE = wE; v.kE = -0.17 * wE;
-        v.dr += 6 * wD; v.dsy = 1 - 0.03 * wD; v.peD = wD; v.kD = 0.17 * wD;
+        // a coxa gira para o meio (o joelho vai para dentro, quase encostando no outro) e a canela volta (joelho dobrado):
+        // o pé quase não sai do lugar (mais marcado depois da foto de referência do dono, 22/Nov/2026)
+        v.er -= 8 * wE; v.esy = 1 - 0.035 * wE; v.peE = wE; v.kE = -0.24 * wE;
+        v.dr += 8 * wD; v.dsy = 1 - 0.035 * wD; v.peD = wD; v.kD = 0.24 * wD;
         if (Math.abs(sl) > 0.3) v.frenteE = wE > wD;
       }
       if (modo) mover(v, t);

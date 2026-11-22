@@ -394,11 +394,6 @@
       var XD = DF.fx(223, 650), TQ = 1.02, TY = 1.25, Y0 = 632 * (1 - TY);
       out.push('<g class="pp-sapato-lado-e" style="display:none" data-ae="' + n(DF.fx(177, 640)) + ',640"><g transform="translate(' + n(XE * (1 + TQ)) + ' ' + n(Y0) + ') scale(' + (-TQ) + ' ' + TY + ')">' + sapatoLado(167, false) + '</g></g>' +
         '<g class="pp-sapato-lado-d" style="display:none" data-ad="' + n(DF.fx(223, 640)) + ',640"><g transform="translate(' + n(XD * (1 - TQ)) + ' ' + n(Y0) + ') scale(' + TQ + ' ' + TY + ')">' + sapatoLado(213, false) + '</g></g>');
-      /* perna solta, parada (dono, 22/Nov/2026, print do pé "bloquinho torto"): o pé vira para o meio — o sapato DE LADO
-         (desenho próprio, com calcanhar, peito do pé e biqueira), um pouco mais curto para ficar em três quartos; nunca o
-         de frente entortado */
-      out.push('<g class="pp-sapato-dentro-e" style="display:none" data-ae="' + n(DF.fx(177, 640)) + ',640"><g transform="translate(' + n(XE * (1 - TQ)) + ' ' + n(Y0) + ') scale(' + TQ + ' ' + TY + ')">' + sapatoLado(167, false) + '</g></g>' +
-        '<g class="pp-sapato-dentro-d" style="display:none" data-ad="' + n(DF.fx(223, 640)) + ',640"><g transform="translate(' + n(XD * (1 + TQ)) + ' ' + n(Y0) + ') scale(' + (-TQ) + ' ' + TY + ')">' + sapatoLado(213, false) + '</g></g>');
     } else out.push(sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas));
 
     // ---------- parte de baixo ----------
