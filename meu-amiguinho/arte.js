@@ -2014,6 +2014,8 @@
     if (caixa === 'laco' || caixa === 'cabeca') vb = [cb.x - cb.rx - 34, cb.y - cb.ry - 64, cb.rx * 2 + 68, cb.rx * 2 + 68];
     else if (caixa === 'olhos') vb = [cb.x - cb.rx, g.olhoY - cb.rx * 0.9, cb.rx * 2, cb.rx * 1.8];
     else if (caixa === 'pescoco') vb = id === 'coleira' ? [cb.x - 100, cb.y - 10, 220, 220] : [g.pescoco[0] - 70, g.pescoco[1] - 60, 140, 140];
+    else if (caixa === 'pulso') vb = [g.pulso[0] - 45, g.pulso[1] - (b.corpo === 'q' ? 40 : 56), 90, 90];   // miniatura de perto: a pulseira é pequena
+    else if (caixa === 'pes') { var xs = g.pes.map(function (q0) { return q0[0]; }), x0 = Math.min.apply(null, xs) - 36, x1 = Math.max.apply(null, xs) + 36; vb = [x0, g.chao - 90, x1 - x0, 100]; }
     else vb = [0, -24, 300, 396];
     return A.svg(b, { id: op.id, viewBox: vb });
   };
