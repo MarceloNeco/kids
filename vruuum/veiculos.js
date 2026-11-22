@@ -48,7 +48,7 @@
     em3d('pulapula', { id: 'pulapula', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Pula-Pula', 'Trampoline', 'Cama Elástica'], w: 740, h: 1150, vel: 0.93, curva: 1.1 }),
     em3d('bebe', { id: 'bebe', semMotor: true, quadros: 6, grupo: 'terra', nome: ['Carrinho de Bebê', 'Baby Stroller', 'Carrito de Bebé'], w: 760, h: 1080, vel: 0.94, curva: 1.12 }),
     em3d('empurrar', { id: 'empurrar', semMotor: true, grupo: 'terra', nome: ['Carrinho de Empurrar', 'Push Car', 'Correpasillos'], w: 720, h: 1040, vel: 0.95, curva: 1.1 }),
-    em3d('bolha', { id: 'bolha', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Bolha Gigante (anda dentro!)', 'Giant Bubble Ball (walk inside!)', 'Burbuja Gigante (¡caminas dentro!)'], w: 900, h: 1000, vel: 0.95, curva: 1.08 }),
+    em3d('bolha', { id: 'bolha', semMotor: true, quadros: 12, grupo: 'moto', nome: ['Bolha Gigante (anda dentro!)', 'Giant Bubble Ball (walk inside!)', 'Burbuja Gigante (¡caminas dentro!)'], w: 1000, h: 1120, vel: 0.95, curva: 1.08 }),
     em3d('palhaco', { id: 'palhaco', semPiloto: true, semMotor: true, voz: 'fonfom', quadros: 12, grupo: 'moto', nome: ['Palhaço de Bicicleta', 'Clown on a Bike', 'Payaso en Bici'], w: 600, h: 1100, vel: 0.96, curva: 1.12 }),
     em3d('urso', { id: 'urso', urso: true, quadros: 8, semPiloto: true, semMotor: true, voz: 'risada', grupo: 'moto', nome: ['Ursão de Pelúcia', 'Giant Teddy Bear', 'Osito de Peluche Gigante'], w: 1650, h: 1750, vel: 1, curva: 1.05 }),
     em3d('ovo', { id: 'ovo', quadros: 8, semPiloto: true, semMotor: true, grupo: 'moto', nome: ['Ovo Corredor', 'Running Egg', 'Huevo Corredor'], w: 720, h: 1000, vel: 0.97, curva: 1.14 }),

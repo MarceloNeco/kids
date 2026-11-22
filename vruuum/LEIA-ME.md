@@ -495,6 +495,18 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   é efeito, não música). `desenho.js`: a moto de polícia deita nas curvas como a moto.
 - Testes: `teste/policia.test.js` (garagem, nomes, sirene piscando nos quadros e no relógio, a bolha rolando, o palhaço pedalando).
 
+## 1.40.0 — 🫧 bolha maior, com gomos, e a criança correndo dentro (dono, 22/Nov/2026)
+
+- Pedidos (com as mesmas fotos): "não pode ser diretamente no chão", "a bexiga tem que ter divisões, igual uma bola",
+  "tem uma bolha dentro da outra bolha", "tem que correr enquanto está na corrida" e a bola "tem que ser maior" que a pessoa.
+- `modelos3d.js` (`bolha`): raio 1,2 → 1,5 (`alt` 4.0); a criança ficou do mesmo tamanho, com pouco mais da metade da
+  altura da bola, pisando no fundo a 0,18 do chão. 8 gomos (costuras que se juntam nos dois polos) que giram com a bola;
+  cada costura é cortada em pedacinhos: os da frente vão na camada da frente (mais fortes), os de trás na de trás
+  (fraquinhos). Sem anel nos polos nem piso desenhado: pareciam uma bolha dentro da outra.
+- A criança corre: na corrida pelo relógio (`op.t`), nos quadros dos rivais pela fase — joelho da frente sobe, pé de trás
+  chuta, braços dobrados balançando ao contrário das pernas, pulinhos. Sombra redonda própria (`semSombra`).
+- `veiculos.js`: a bolha ficou um pouco maior na pista (`w` 1000, `h` 1120).
+
 ## 1.39.0 — 🫧 bolha transparente (dono, 22/Nov/2026)
 
 - Pedido (com fotos de bolas de andar na água): "quero que a bola seja transparente".
