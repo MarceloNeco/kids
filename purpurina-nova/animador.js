@@ -205,7 +205,8 @@
           sb.setAttribute('cx', (q[0] + pl[3] * amp + Math.cos(ra) * dx - Math.sin(ra) * dy + kk * Math.max(0, p[1] - jo)).toFixed(1));
           sb.setAttribute('cy', Math.min(670, q[1] + Math.sin(ra) * dx + Math.cos(ra) * dy).toFixed(1));
           var ar = v.noAr || 0;
-          sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4]) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4]) * (1 - 0.6 * ar)).toFixed(3));
+          var pq = Math.max(0, Math.min(1, pl[4])); ar = Math.max(0, Math.min(1, ar));   // (nunca tamanho negativo: a sombra sumia num quadro)
+          sb.setAttribute('rx', (20 * (1 - 0.35 * pq) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pq) * (1 - 0.6 * ar)).toFixed(3));
         }
       });
       Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
