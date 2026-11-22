@@ -153,3 +153,122 @@ test('estante: botão de instalar com a frase de cada aparelho, numa linha, nos 
     }
   } finally { await b.close(); srv.close(); }
 });
+
+// Lembrar que já instalou (dono, 22/Nov/2026: 4 ícones "Bolinho de Chuva" repetidos no tablet Fire, onde o navegador só cria
+// atalho e não sabe dizer que já instalou): aberto pelo ícone grava a marca; depois, no navegador, o botão vira
+// "✓ Na tela inicial", não chama prompt() de novo e só o link "Pôr outro ícone mesmo assim" instala outra vez.
+test('instalado: lembra o ícone, botão "✓ Na tela inicial", sem prompt de novo; "Pôr outro ícone" funciona; vale para cada jogo', async () => {
+  const { chromium } = require('playwright');
+  const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
+  const srv = http.createServer((q, r) => {
+    let p = decodeURIComponent(q.url.split('?')[0]);
+    if (!p.startsWith('/kids/')) { r.writeHead(404); return r.end(); }
+    p = p.slice(6); if (!p || p.endsWith('/')) p += 'index.html';
+    const f = path.join(raiz, p);
+    if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
+    r.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
+  });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const base = 'http://127.0.0.1:' + srv.address().port + '/kids/';
+  const FIRE = 'Mozilla/5.0 (Linux; Android 11; KFTRWI) AppleWebKit/537.36 (KHTML, like Gecko) Silk/120.4.1 like Chrome/120.0.6099.230 Safari/537.36';
+  const b = await chromium.launch();
+  // "#app" no endereço = página aberta pelo ícone (janela de app); "#prompt" = o navegador oferece a janela de instalar
+  const contexto = async (ua, cod) => {
+    const ctx = await b.newContext({ viewport: { width: 1024, height: 600 }, userAgent: ua, serviceWorkers: 'block' });
+    await ctx.addInitScript((c) => {
+      localStorage.setItem('bolinho:idioma', c); localStorage.setItem('bolinho:novidades-ocultas', '["*"]');
+      const app = /app/.test(location.hash), mm = window.matchMedia.bind(window);
+      window.matchMedia = (q) => app && /display-mode:\s*standalone/.test(q) ? { matches: true, media: q, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} } : mm(q);
+      window.__prompts = 0;
+      if (/prompt/.test(location.hash)) window.addEventListener('load', () => setTimeout(() => {
+        const e = new Event('beforeinstallprompt', { cancelable: true });
+        e.prompt = () => { window.__prompts++; }; e.userChoice = Promise.resolve({ outcome: 'dismissed' });
+        window.dispatchEvent(e);
+      }, 30));
+    }, cod);
+    await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+    return ctx;
+  };
+  const marca = (pg, p) => pg.evaluate((k) => localStorage.getItem(k), 'bolinho:instalado:' + p);
+  try {
+    // 1) Fire: aberto pelo ícone do Bolinho grava a marca; no navegador, mesmo com a janela de instalar, não instala de novo
+    {
+      const ctx = await contexto(FIRE, 'pt');
+      const pg = await ctx.newPage();
+      await pg.goto(base + '?app=1#app'); await pg.waitForTimeout(300);
+      assert.strictEqual(await pg.$('.bc-inst'), null, 'pelo ícone: sem barra');
+      assert.strictEqual(await marca(pg, '/kids/'), '1', 'aberto pelo ícone grava "instalado"');
+      const nav = await ctx.newPage();
+      await nav.goto(base + '#prompt'); await nav.waitForTimeout(400);
+      assert.strictEqual((await nav.textContent('.bc-btn')).trim(), '✓ Na tela inicial');
+      assert.ok(await nav.$eval('.bc-btn', (e) => e.classList.contains('na-tela')), 'botão discreto');
+      assert.strictEqual(await marca(nav, '/kids/'), '1', 'no Fire a janela de instalar não apaga a marca');
+      await nav.click('.bc-btn');
+      await nav.waitForSelector('.bc-fundo:not([hidden])');
+      assert.strictEqual(await nav.evaluate(() => window.__prompts), 0, 'não chamou prompt() de novo');
+      const txt = await nav.textContent('.bc-corpo');
+      assert.match(txt, /já tem um ícone/, 'explica que o ícone já existe');
+      assert.match(txt, /segure o dedo.*Remover/, 'Fire: ensina a tirar os repetidos');
+      assert.ok(!(await nav.isVisible('.bc-ja')), 'sem "Já instalei" nesta janela');
+      await nav.click('.bc-outro');
+      await nav.waitForTimeout(100);
+      assert.strictEqual(await nav.evaluate(() => window.__prompts), 1, '"Pôr outro ícone mesmo assim" chama a janela de instalar');
+      assert.strictEqual(await marca(nav, '/kids/'), null, 'e esquece a marca');
+      assert.notStrictEqual((await nav.textContent('.bc-btn')).trim(), '✓ Na tela inicial', 'o botão volta a ser o de instalar');
+      await ctx.close();
+    }
+    // 2) rótulo nos três idiomas
+    for (const [cod, t] of [['en', '✓ On home screen'], ['es', '✓ En la pantalla de inicio']]) {
+      const ctx = await contexto(FIRE, cod);
+      await ctx.addInitScript(() => localStorage.setItem('bolinho:instalado:/kids/', '1'));
+      const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(300);
+      assert.strictEqual((await pg.textContent('.bc-btn')).trim(), t, cod);
+      await ctx.close();
+    }
+    // 3) sem janela de instalar (iPhone): "Pôr outro ícone" mostra o passo a passo; "Já instalei" grava de novo
+    {
+      const ctx = await contexto(UA.iphone, 'pt');
+      await ctx.addInitScript(() => { if (!sessionStorage.getItem('t')) { sessionStorage.setItem('t', '1'); localStorage.setItem('bolinho:instalado:/kids/', '1'); } });
+      const pg = await ctx.newPage(); await pg.goto(base); await pg.waitForTimeout(300);
+      await pg.click('.bc-btn'); await pg.waitForSelector('.bc-fundo:not([hidden])');
+      assert.doesNotMatch(await pg.textContent('.bc-corpo'), /Remover/, 'fora do Fire, sem a dica dos repetidos');
+      await pg.click('.bc-outro');
+      assert.match(await pg.textContent('.bc-corpo'), /Adicionar à Tela de Início/, 'passo a passo do aparelho');
+      assert.ok(await pg.isVisible('.bc-ja'));
+      assert.strictEqual(await marca(pg, '/kids/'), null);
+      await pg.click('.bc-ja');
+      assert.strictEqual(await marca(pg, '/kids/'), '1', '"Já instalei" grava a marca');
+      await ctx.close();
+    }
+    // 4) fora do Fire, a janela de instalar do navegador quer dizer "não está instalado" (apagou o app): a marca sai
+    {
+      const ctx = await contexto(UA.computador, 'pt');
+      await ctx.addInitScript(() => { if (!sessionStorage.getItem('t')) { sessionStorage.setItem('t', '1'); localStorage.setItem('bolinho:instalado:/kids/', '1'); } });
+      const pg = await ctx.newPage(); await pg.goto(base + '#prompt'); await pg.waitForTimeout(400);
+      assert.strictEqual((await pg.textContent('.bc-btn')).trim(), 'Instalar o Bolinho no computador');
+      assert.strictEqual(await marca(pg, '/kids/'), null);
+      await ctx.close();
+    }
+    // 5) jogos: aberto pelo próprio ícone grava a marca do jogo (navegacao.js); o cartão troca ⬇ por ✓ e a barra do jogo
+    //    diz "✓ Na tela inicial". Aberto dentro da janela do Bolinho (a estante antes, na mesma aba), não grava.
+    {
+      const ctx = await contexto(FIRE, 'pt');
+      const pg = await ctx.newPage();
+      await pg.goto(base + 'campo-minado/#app'); await pg.waitForTimeout(500);
+      assert.strictEqual(await marca(pg, '/kids/campo-minado/'), '1', 'jogo aberto pelo ícone grava a marca dele');
+      const est = await ctx.newPage();
+      await est.goto(base + '?app=1#app'); await est.waitForTimeout(300);
+      await est.goto(base + 'labirinto/#app'); await est.waitForTimeout(500);
+      assert.strictEqual(await marca(est, '/kids/labirinto/'), null, 'dentro da janela do Bolinho não conta como ícone do jogo');
+      await est.goto(base); await est.waitForTimeout(400);
+      const r = await est.evaluate(() => ['campo-minado', 'labirinto'].map((id) => { const a = document.querySelector('.card[data-jogo="' + id + '"] .c-inst'); return { feito: a.classList.contains('feito'), rot: a.getAttribute('aria-label') }; }));
+      assert.ok(r[0].feito && /já está na tela inicial/.test(r[0].rot), 'cartão do jogo instalado: ✓ ' + JSON.stringify(r[0]));
+      assert.ok(!r[1].feito && /^Instalar/.test(r[1].rot), 'cartão do jogo sem ícone: ⬇');
+      await est.goto(base + 'campo-minado/?instalar=1#prompt'); await est.waitForSelector('.bc-btn'); await est.waitForTimeout(300);
+      assert.strictEqual((await est.textContent('.bc-btn')).trim(), '✓ Na tela inicial', 'a barra do jogo também lembra');
+      await est.click('.bc-btn');
+      assert.strictEqual(await est.evaluate(() => window.__prompts), 0, 'jogo: sem prompt() de novo');
+      await ctx.close();
+    }
+  } finally { await b.close(); srv.close(); }
+});
