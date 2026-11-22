@@ -3,7 +3,7 @@
 Guardado a pedido do dono em 22/Nov/2026: "a ideia é ter um funcionamento minimamente decente antes de eu ter os
 créditos do Higgsfield recarregados". Reúne as especificações que ele trouxe (geradas no Gemini, 21–22/Nov/2026) e o
 estado real de cada item no jogo, com o porquê das decisões. **Leia antes de mexer no movimento, no desfile, na
-Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.11**.
+Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.12**.
 
 Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌ não feito, com o motivo.
 
@@ -23,7 +23,7 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Pedido | Situação | Onde |
 |---|---|---|
 | Mão na nuca: antebraço e mão atrás da cabeça e do cabelo da frente, na frente do cabelo de trás | ✅ | `bracoRig(lado, atras)` desenha o antebraço duas vezes (`.rig-frente-*` e `.rig-atras-*`); `maoAtras(o, c)` escolhe; o animador troca (0.9.7) |
-| Catwalk: a perna que vem para a frente fica por cima da outra | ✅ | O animador reordena `.pp-passo-e` / `.pp-passo-d` no DOM a cada troca (0.9.9). Sem "perna fantasma" (0.9.11): no ar a perna contorna a de apoio por fora (`- lado * 6 * sob`) e só o pé da frente cruza (`dentro * max(0, frente)`); a troca de camada acontece com as pernas afastadas |
+| Catwalk: a perna que vem para a frente fica por cima da outra | ✅ | O animador reordena `.pp-passo-e` / `.pp-passo-d` no DOM a cada troca (0.9.9). **Linha única** (0.9.12, GIF do dono mostrou as pernas abrindo em "A"): na menina as pernas sempre fecham para a linha do meio (`dentro * (0,62 + 0,38 * max(0, frente))`, nunca para fora do quadril) e no ar a perna vem reta para a frente; uma passa NA FRENTE da outra pela troca de camada. (A tentativa da 0.9.11 de contornar por fora abriu as pernas demais e foi desfeita.) |
 
 ## 3. Movimento orgânico
 

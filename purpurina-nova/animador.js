@@ -192,13 +192,15 @@
       var dentro = lado * 7 * cruza;   // pé na linha do meio (girar a perna para dentro, até o pé cruzar); menino: 0 (trilhos paralelos)
       var frente = u < 0.5 ? 1 - 4 * u : -1 + 4 * (u - 0.5);
       var compr = 1 + 0.05 * frente;   // pé da frente mais embaixo (perna "mais comprida" na tela), o de trás mais em cima
-      // (dono, 22/Nov/2026: "as pernas passam uma no meio da outra, como fantasma"): só o pé da frente cruza para a linha
-      // do meio; o de trás volta para o próprio lado. No ar, a perna CONTORNA a de apoio por fora (abre para o lado dela)
-      // em vez de atravessar — e é bem aí, com as duas afastadas, que a ordem de quem fica na frente troca
-      var cruzado = dentro * Math.max(0, frente);
+      /* linha única de passarela (dono, 22/Nov/2026, com o GIF do desfile: "as pernas abrem para fora, como montando a
+         cavalo"): na menina as pernas SEMPRE fecham para a linha do meio — nunca abrem para fora do quadril. O pé da frente
+         cruza por inteiro (pousa na frente do outro, na linha do meio); o de trás fica um pouco menos cruzado. No ar a perna
+         vem reta para a frente, sem contornar por fora; a perna que está na frente é desenhada por cima (troca no meio da
+         passada), então uma passa NA FRENTE da outra, não "por dentro". Menino: cruza = 0 (trilhos paralelos). */
+      var cruzado = dentro * (0.62 + 0.38 * Math.max(0, frente));
       if (u < 0.5) return { x: 0, y: 0, r: cruzado, sy: compr, frente: frente };
       var w = (u - 0.5) / 0.5, sob = Math.sin(Math.PI * w);
-      return { x: 0, y: -9 * sob, r: cruzado - lado * 6 * sob * cruza, sy: compr * (1 - 0.1 * sob), frente: frente, sobe: sob };
+      return { x: 0, y: -9 * sob, r: cruzado, sy: compr * (1 - 0.1 * sob), frente: frente, sobe: sob };
     }
     function mover(v, t) {
       if (modo === 'andar') {
