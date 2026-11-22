@@ -73,6 +73,11 @@ test('encaixe: cada roupa e cada acessório em cada bichinho (em pé e de 4 pata
     }
     assert.equal(g.pes.length, corpo === 'q' ? 4 : 2);
     for (const pe of g.pes) assert.ok(pe[1] > g.cab.y + g.cab.ry - 10 && pe[1] < g.chao, base + ': pé abaixo da cabeça e acima do chão');
+    // 4 patas: a cabeça encosta no corpo (dono, 22/Nov/2026: "por que os corpos estão separados das cabeças?")
+    if (corpo === 'q' && !g.pescocoLongo) {
+      const x = g.b.x - g.b.rx * 0.5, fundoCab = g.cab.y + g.cab.ry * Math.sqrt(Math.max(0, 1 - ((x - g.cab.x) / g.cab.rx) ** 2)), topoCorpo = g.b.y - g.b.ry * Math.sqrt(1 - 0.25);
+      assert.ok(fundoCab >= topoCorpo - 2, base + ': cabeça de 4 patas encostada no corpo (' + fundoCab.toFixed(0) + ' / ' + topoCorpo.toFixed(0) + ')');
+    }
     for (const l of g.laco) { const dx = (l[0] - g.cab.x) / g.cab.rx, dy = (l[1] - g.cab.y) / g.cab.ry; assert.ok(Math.abs(Math.hypot(dx, dy) - 0.9) < 0.01, base + ': laço na borda da cabeça'); }
     const nu = R.novo(base); R.escolherCorpo(nu, corpo);
     const semNada = A.svg(nu, { id: 't' });

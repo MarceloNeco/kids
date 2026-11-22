@@ -126,8 +126,9 @@
       omb: [[110, 206], [190, 206]], mao: [[84, 262], [216, 262]], rb: 18,
       qua: [[127, 288], [173, 288]], pe: [[121, 336], [179, 336]], rp: 21, peRx: 25, peRy: 15, chao: 354, olhoDx: 31, olhoR: 13.5 };
   };
+  // a cabeça encosta na frente do corpo (dono, 22/Nov/2026: "corpo separado da cabeça")
   var GEO_Q = function () {
-    return { corpo: 'q', cab: { x: 100, y: 142, rx: 74, ry: 64 }, b: { x: 196, y: 262, rx: 90, ry: 58 },
+    return { corpo: 'q', cab: { x: 116, y: 156, rx: 74, ry: 64 }, b: { x: 196, y: 262, rx: 90, ry: 58 },
       // pernas: [topo, pé]; as duas de longe primeiro (frente, trás), mais escuras; depois as de perto (frente, trás)
       pernas: [[[172, 282], [172, 334]], [[252, 282], [252, 334]], [[140, 292], [140, 342]], [[224, 292], [224, 342]]],
       rp: 21, peRx: 22, peRy: 13, chao: 356, olhoDx: 28, olhoR: 13, cauda: [284, 242] };
@@ -1293,6 +1294,8 @@
         if ((i === 2 && e.abraco === 'abracadinho-braco') || (i === 3 && e.abraco === 'abracadinho-perna')) extra += abracadinho(c, a, g, e.abraco);
         return pataQ(c, a, g, T, i, extra);
       });
+      // pescocinho de pelúcia atrás do corpo e da cabeça: liga os dois (girafa e pescoçudo têm o pescoço comprido deles)
+      if (!g.pescocoLongo) corpo += capsula(g.cab.x + 16, g.cab.y + g.cab.ry * 0.45, g.b.x - g.b.rx * 0.5, g.b.y - g.b.ry * 0.25, 30, T.f, T.s);
       corpo += corpoQ(c, a, g, T, roupaCorpo, patas);
       if (e.pulso === 'pochete') corpo += pulsoAcess(c, a, g, e.pulso);
       if (e.costas) corpo += costasAcess(c, a, g, e.costas, corA(e.costas), true);

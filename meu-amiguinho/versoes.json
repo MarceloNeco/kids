@@ -2,6 +2,14 @@
   "app": "meu-amiguinho",
   "versoes": [
     {
+      "versao": "0.1.1",
+      "data": "22/Nov/2026",
+      "hora": "14:20:00",
+      "pt": ["🐾 Bichinhos de 4 patas com a cabeça encostada no corpo, com pescocinho de pelúcia (antes a cabeça ficava solta)"],
+      "en": ["🐾 Four-legged buddies now have their head attached to the body, with a little plush neck (before, the head floated)"],
+      "es": ["🐾 Los peluches de 4 patas ya tienen la cabeza pegada al cuerpo, con un cuellito de peluche (antes la cabeza flotaba)"]
+    },
+    {
       "versao": "0.1.0",
       "data": "22/Nov/2026",
       "hora": "18:00:00",
