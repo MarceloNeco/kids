@@ -38,6 +38,24 @@
   R.corRoupa = function (a, cor) { var r = D.roupa[a.roupa]; if (!r || !r.cores || !D.CORES[cor]) return false; a.corRoupa = cor; return true; };
   R.estampa = function (a, est) { var r = D.roupa[a.roupa]; if (!r || !r.estampa || !D.estampa[est]) return false; a.estampa = est; return true; };
 
+  /* ---------- tom (barra ☀️ ↔ 🌙, como na Purpurina; dono, 22/Nov/2026) ---------- */
+  // a.tom = { pelo, roupa, baixo, acess: { id } }, de -1 (bem mais claro) a 1 (bem mais escuro); 0 tira. Sem tom = a cor da paleta.
+  R.tom = function (a, parte, v, id) {
+    v = Math.round(Math.max(-1, Math.min(1, +v || 0)) * 100) / 100;
+    if (Math.abs(v) < 0.03) v = 0;
+    var T = a.tom && typeof a.tom === 'object' ? a.tom : {};
+    if (parte === 'acess') {
+      if (!D.acess[id]) return false;
+      T.acess = T.acess || {};
+      if (v) T.acess[id] = v; else delete T.acess[id];
+      if (!Object.keys(T.acess).length) delete T.acess;
+    } else if (parte === 'pelo' || parte === 'roupa' || parte === 'baixo') { if (v) T[parte] = v; else delete T[parte]; }
+    else return false;
+    if (Object.keys(T).length) a.tom = T; else delete a.tom;
+    return true;
+  };
+  R.tomDe = function (a, parte, id) { var T = a && a.tom; if (!T) return 0; return (parte === 'acess' ? T.acess && T.acess[id] : T[parte]) || 0; };
+
   /* ---------- acessórios: um por caixinha, vários ao mesmo tempo ---------- */
   R.podeUsar = function (a, id) { var it = D.acess[id]; return !!it && !(it.so && it.so !== a.corpo); };
   R.porAcess = function (a, id) {
@@ -94,6 +112,10 @@
     // cada peça vai para a caixinha ATUAL dela (peças que mudaram de caixinha não se perdem); duas na mesma caixinha: fica a primeira
     Object.keys(x.acess || {}).forEach(function (k) { var it = D.acess[x.acess[k]]; if (it && !a.acess[it.caixa]) R.porAcess(a, it.id); });
     Object.keys(x.corAcess || {}).forEach(function (id) { R.corAcess(a, id, x.corAcess[id]); });
+    if (x.tom && typeof x.tom === 'object') {   // (amiguinho antigo, sem tom: fica sem, com as cores de sempre)
+      ['pelo', 'roupa', 'baixo'].forEach(function (k) { if (typeof x.tom[k] === 'number') R.tom(a, k, x.tom[k]); });
+      Object.keys(x.tom.acess || {}).forEach(function (id) { if (typeof x.tom.acess[id] === 'number') R.tom(a, 'acess', x.tom.acess[id], id); });
+    }
     if (D.voz[x.voz] && D.voz[x.voz].tipo === 'fala') a.voz = x.voz;
     if (D.voz[x.som] && D.voz[x.som].tipo === 'som') a.som = x.som;
     if (x.genero === 'f' || x.genero === 'm') a.genero = x.genero;

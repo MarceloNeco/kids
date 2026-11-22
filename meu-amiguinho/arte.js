@@ -47,6 +47,20 @@
   function sorteio(s) { s = s >>> 0 || 1; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
   function fam(id) { var b = D.base[id]; return (b && b.familia) || id; }
   function corHex(id, pad) { var c = D.CORES[id]; return c ? c.hex : (pad || '#cccccc'); }
+  /* tom (dono, 22/Nov/2026: "assim como no Purpurina, aquele botão de arrastar… mais escuro, mais claro"): a.tom guarda
+     { pelo, roupa, baixo, acess: { id } } de -1 (bem mais claro) a 1 (bem mais escuro); sem tom, a cor fica igual.
+     As cores que saem da cor-base (contorno, sombra, focinho) acompanham sozinhas. */
+  var TOM_BASE = {};   // cor com tom → a cor da paleta (o brilho de glitter e o metálico olham a cor da paleta)
+  function comTom(h, tom) {
+    tom = Math.max(-1, Math.min(1, +tom || 0));
+    if (!tom || !h || h.charAt(0) !== '#' || h === '#cfd8f0') return h;   // o holográfico (arco-íris) não tem claro e escuro
+    var r = tom > 0 ? escuro(h, tom * 0.5) : claro(h, -tom * 0.55);
+    if (!TOM_BASE[r]) TOM_BASE[r] = TOM_BASE[h] || h;
+    return r;
+  }
+  function corDaPaleta(h) { return TOM_BASE[h] || h; }
+  function tomDe(a, parte, id) { var T = a && a.tom; if (!T || typeof T !== 'object') return 0; return id ? (T.acess && +T.acess[id]) || 0 : +T[parte] || 0; }
+  A.comTom = comTom;
   A.util = { mistura: mistura, escuro: escuro, claro: claro, coracaoD: coracaoD, estrelaD: estrelaD, esc: esc };
 
   /* ---------- contexto de um desenho: ids únicos, gradientes, recortes e estampas ---------- */
@@ -181,12 +195,13 @@
 
   /* ---------- cores do pelo ---------- */
   function tintas(c, a) {
-    var pe = D.pelo[a.pelo] || D.PELOS[0], T = {};
+    var pe = D.pelo[a.pelo] || D.PELOS[0], T = {}, tp = tomDe(a, 'pelo');
     if (pe.grad) {
-      T.f = c.lin(pe.grad, 30, 20, 270, 370, true);
-      T.base = pe.grad[Math.floor(pe.grad.length / 2)];
-      T.grad = pe.grad;
-    } else { T.f = pe.cor; T.base = pe.cor; }
+      var gd = pe.grad.map(function (h) { return comTom(h, tp); });
+      T.f = c.lin(gd, 30, 20, 270, 370, true);
+      T.base = gd[Math.floor(gd.length / 2)];
+      T.grad = gd;
+    } else { T.f = comTom(pe.cor, tp); T.base = T.f; }
     T.s = escuro(T.base, luz(T.base) > 0.5 ? 0.38 : 0.5);
     T.cl = claro(T.base, 0.62);           // focinho, barriga, parte de dentro da orelha
     T.esc = escuro(T.base, 0.22);         // orelhas de cachorro, sombras
@@ -583,6 +598,7 @@
     var id = a.roupa || 'nenhuma', cor = D.CORES[a.corRoupa] ? D.CORES[a.corRoupa].hex : null, est = a.estampa;
     var R = D.roupa[id] || D.ROUPAS[0], pad = R.padrao || {};
     if (!cor || !R.cores) cor = corHex(pad.cor, '#f59ac0');
+    if (R.cores) cor = comTom(cor, tomDe(a, 'roupa'));
     if (!R.estampa) est = pad.estampa || 'lisa';
     var S = {
       pijama: { top: { cor: cor, est: est, mangas: 'longa', gola: 'pijama', botoes: 1 }, baixo: { tipo: 'calca', cor: cor, est: est } },
@@ -983,7 +999,7 @@
   }
   A.lacoD = lacoD;
   var HOLO = '#cfd8f0';
-  function acessCor(a, id) { var it = D.acess[id], cid = (a.corAcess && a.corAcess[id]) || (it && it.cor); return corHex(cid, '#f59ac0'); }
+  function acessCor(a, id) { var it = D.acess[id], cid = (a.corAcess && a.corAcess[id]) || (it && it.cor); return comTom(corHex(cid, '#f59ac0'), tomDe(a, null, id)); }
   function sapato(c, id, cor, x, y, g, sentado, lado) {
     var s = '', rx = g.peRx + 3, ry = g.peRy + 4;
     if (sentado) {
@@ -1002,7 +1018,7 @@
       var base = id === 'tenis-brilho' ? (cor === '#cfd8f0' ? c.lin(['#f8c6f0', '#c6e8f8', '#e8f8c6', '#f8d8c6', '#d8c6f8'], 0, 0, 1, 0.6) : cor) : '#fbfaf7';
       var cano = id === 'tenis-brilho' ? 18 : 0;
       s += p('M' + n(x - rx) + ',' + n(y + 4) + ' Q' + n(x - rx) + ',' + n(topoY - cano) + ' ' + n(x - 6) + ',' + n(topoY - cano) + ' L' + n(x + 6) + ',' + n(topoY - cano) + ' Q' + n(x + rx) + ',' + n(topoY - cano) + ' ' + n(x + rx) + ',' + n(y + 4) + 'Z', { fill: base, stroke: '#9a94a4', 'stroke-width': 1.8 });
-      if (/^#(f2c14e|c9ced8|f59ac0|ff3d8b)$/.test(cor) && id === 'tenis-brilho') s += p('M' + n(x - rx) + ',' + n(y + 4) + ' Q' + n(x - rx) + ',' + n(topoY - cano) + ' ' + n(x - 6) + ',' + n(topoY - cano) + ' L' + n(x + 6) + ',' + n(topoY - cano) + ' Q' + n(x + rx) + ',' + n(topoY - cano) + ' ' + n(x + rx) + ',' + n(y + 4) + 'Z', { fill: c.estampa('glitter', cor) });
+      if (/^#(f2c14e|c9ced8|f59ac0|ff3d8b)$/.test(corDaPaleta(cor)) && id === 'tenis-brilho') s += p('M' + n(x - rx) + ',' + n(y + 4) + ' Q' + n(x - rx) + ',' + n(topoY - cano) + ' ' + n(x - 6) + ',' + n(topoY - cano) + ' L' + n(x + 6) + ',' + n(topoY - cano) + ' Q' + n(x + rx) + ',' + n(topoY - cano) + ' ' + n(x + rx) + ',' + n(y + 4) + 'Z', { fill: c.estampa('glitter', cor) });
       s += ret(x - rx - 1, y + 2, (rx + 1) * 2, 7, { rx: 3.5, fill: id === 'tenis' ? '#c99a6a' : '#ffffff', stroke: id === 'tenis' ? '#8a5a3c' : '#b8b2c0', 'stroke-width': 1.2 });
       if (id === 'tenis') s += elip(x, y + 1, 9, 4, { fill: '#efe2cc' }) + p('M' + n(x - rx + 4) + ',' + n(y - 2) + ' Q' + x + ',' + n(y - 8) + ' ' + n(x + rx - 4) + ',' + n(y - 2), { stroke: '#4f8fe0', 'stroke-width': 3, fill: 'none' });
       for (var l = 0; l < 3; l++) s += lin(x - 6, topoY - cano + 5 + l * 5, x + 6, topoY - cano + 5 + l * 5, { stroke: id === 'tenis' ? '#c8c2cc' : '#ffffff', 'stroke-width': 1.8, 'stroke-linecap': 'round' });
@@ -1080,7 +1096,7 @@
       if (id === 'sapato-boneca') for (var m1 = 0; m1 < 6; m1++) s += circ(x - rx + 6 + m1 * ((rx * 2 - 12) / 5), topoY + 1, 3.6, { fill: '#ffffff', stroke: '#d8d0dc', 'stroke-width': 0.8 });
       s += baixo(sb) + elip(x - 9, topoY + 8, 5, 2.4, { fill: '#ffffff', opacity: 0.55 });
       if (id === 'sapato-boneca') s += lin(x - rx + 4, topoY + 6, x + rx - 4, topoY + 6, { stroke: escuro(cor, 0.3), 'stroke-width': 3.4, 'stroke-linecap': 'round' }) + ret(x + rx - 12, topoY + 3, 7, 6, { rx: 1.4, fill: 'none', stroke: '#e8c060', 'stroke-width': 1.6 });
-      else s += cadarco(topoY + 5, 2, cor === '#2e2a33' ? '#fbfaf7' : escuro(cor, 0.45)) + ret(x - rx - 1, y + 2, (rx + 1) * 2, 6, { rx: 3, fill: escuro(cor === HOLO ? '#c9a8e8' : cor, 0.45) });
+      else s += cadarco(topoY + 5, 2, corDaPaleta(cor) === '#2e2a33' ? '#fbfaf7' : escuro(cor, 0.45)) + ret(x - rx - 1, y + 2, (rx + 1) * 2, 6, { rx: 3, fill: escuro(cor === HOLO ? '#c9a8e8' : cor, 0.45) });
       return s;
     }
     if (id === 'babuche') {
@@ -1090,7 +1106,7 @@
       return s + sola(claro(cor, 0.35), 6);
     }
     if (id === 'bota-cadarco') {
-      s += cano(22, cor) + cadarco(topoY - 18, 4, cor === '#2e2a33' ? '#fbfaf7' : '#ffffff');
+      s += cano(22, cor) + cadarco(topoY - 18, 4, corDaPaleta(cor) === '#2e2a33' ? '#fbfaf7' : '#ffffff');
       for (var il = 0; il < 4; il++) [-1, 1].forEach(function (k) { s += circ(x + k * 8, topoY - 17 + il * 6, 1.5, { fill: '#f2c14e', stroke: '#a8862a', 'stroke-width': 0.5 }); });
       return s + sola(escuro(cor, 0.45), 7) + elip(x - rx * 0.5, topoY - 8, 2.6, 7, { fill: '#ffffff', opacity: 0.3 });
     }
@@ -1130,7 +1146,7 @@
     if (id === 'tiara' || id === 'tiara-sapinho' || id === 'tiara-chifres') {
       var tc = id === 'tiara' ? cor : id === 'tiara-sapinho' ? '#5fbf5a' : '#d8434f';
       var arco = 'M' + n(x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.42) + ' A' + n(cb.rx * 0.9) + ',' + n(cb.ry * 0.95) + ' 0 0 1 ' + n(x + cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.42);
-      s += p(arco, { stroke: escuro(tc, 0.35), 'stroke-width': 11, fill: 'none', 'stroke-linecap': 'round' }) + p(arco, { stroke: id === 'tiara' && /^#(c9ced8|f2c14e|cfd8f0)$/.test(cor) ? metalico(c, cor) : tc, 'stroke-width': 7.5, fill: 'none', 'stroke-linecap': 'round' });
+      s += p(arco, { stroke: escuro(tc, 0.35), 'stroke-width': 11, fill: 'none', 'stroke-linecap': 'round' }) + p(arco, { stroke: id === 'tiara' && /^#(c9ced8|f2c14e|cfd8f0)$/.test(corDaPaleta(cor)) ? metalico(c, cor) : tc, 'stroke-width': 7.5, fill: 'none', 'stroke-linecap': 'round' });
       if (id === 'tiara') for (var i = -2; i <= 2; i++) { var an = rad(-90 + i * 22); s += circ(x + Math.cos(an) * cb.rx * 0.9, cb.y + Math.sin(an) * cb.ry * 0.95 + 2, 3.2, { fill: '#ffffff', opacity: 0.9 }); }
       if (id === 'tiara-sapinho') [-1, 1].forEach(function (k) { var ex = x + k * 24, ey = y - 8; s += circ(ex, ey, 14, { fill: '#5fbf5a', stroke: '#2f7a2e', 'stroke-width': 1.8 }) + circ(ex, ey - 1, 9, { fill: '#ffffff' }) + circ(ex, ey, 5, { fill: '#1a1220' }) + circ(ex + 2, ey - 2, 1.8, { fill: '#ffffff' }); });
       if (id === 'tiara-chifres') [-1, 1].forEach(function (k) { var bx = x + k * 26, by = y + 6; s += p('M' + bx + ',' + by + ' q' + (k * 4) + ',-24 ' + (k * 16) + ',-34 M' + n(bx + k * 6) + ',' + n(by - 16) + ' q' + (k * 10) + ',-2 ' + (k * 16) + ',6 M' + n(bx + k * 10) + ',' + n(by - 26) + ' q' + (k * -6) + ',-8 ' + (k * -4) + ',-16', { stroke: '#a8202e', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' }) + p('M' + bx + ',' + by + ' q' + (k * 4) + ',-24 ' + (k * 16) + ',-34 M' + n(bx + k * 6) + ',' + n(by - 16) + ' q' + (k * 10) + ',-2 ' + (k * 16) + ',6 M' + n(bx + k * 10) + ',' + n(by - 26) + ' q' + (k * -6) + ',-8 ' + (k * -4) + ',-16', { stroke: '#e5404f', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }); });
@@ -1208,7 +1224,7 @@
       if (id === 'viseira-sapo') cor = '#9ad83c';
       if (id === 'capacete') {
         s += p('M' + n(x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + ' C' + n(x - cb.rx * 0.9) + ',' + n(y - 30) + ' ' + n(x + cb.rx * 0.9) + ',' + n(y - 30) + ' ' + n(x + cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + ' Q' + x + ',' + n(cb.y - cb.ry * 0.5) + ' ' + n(x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + 'Z', { fill: cor, stroke: escuro(cor, 0.4), 'stroke-width': 2 });
-        if (/^#(c9ced8|f2c14e|cfd8f0|ff3d8b|f59ac0)$/.test(cor)) s += p('M' + n(x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + ' C' + n(x - cb.rx * 0.9) + ',' + n(y - 30) + ' ' + n(x + cb.rx * 0.9) + ',' + n(y - 30) + ' ' + n(x + cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + ' Q' + x + ',' + n(cb.y - cb.ry * 0.5) + ' ' + n(x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + 'Z', { fill: c.estampa('glitter', cor) });
+        if (/^#(c9ced8|f2c14e|cfd8f0|ff3d8b|f59ac0)$/.test(corDaPaleta(cor))) s += p('M' + n(x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + ' C' + n(x - cb.rx * 0.9) + ',' + n(y - 30) + ' ' + n(x + cb.rx * 0.9) + ',' + n(y - 30) + ' ' + n(x + cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + ' Q' + x + ',' + n(cb.y - cb.ry * 0.5) + ' ' + n(x - cb.rx * 0.86) + ',' + n(cb.y - cb.ry * 0.3) + 'Z', { fill: c.estampa('glitter', cor) });
         s += p('M' + n(x - 40) + ',' + n(y - 4) + ' Q' + x + ',' + n(y - 22) + ' ' + n(x + 40) + ',' + n(y - 4), { stroke: claro(cor, 0.4), 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' }) + [-14, 0, 14].map(function (dx) { return ret(x + dx - 3, y - 12, 6, 10, { rx: 3, fill: escuro(cor, 0.3) }); }).join('');
         s += p('M' + n(x - cb.rx * 0.84) + ',' + n(cb.y - cb.ry * 0.3) + ' Q' + n(x - cb.rx * 0.7) + ',' + n(cb.y + 40) + ' ' + n(x - 30) + ',' + n(cb.y + cb.ry * 0.7), { stroke: '#2e2a33', 'stroke-width': 3, fill: 'none' }) + ret(x - 36, cb.y + cb.ry * 0.66, 12, 9, { rx: 2, fill: '#c9ced8', stroke: '#6a707c' });
         return s;
@@ -1255,7 +1271,7 @@
       return s;
     }
     if (id === 'chuquinhas' || id === 'scrunchie') {   // tufinhos de pelo presos com elástico
-      var pe0 = D.pelo[a.pelo] || D.PELOS[0], pc = pe0.grad ? pe0.grad[Math.floor(pe0.grad.length / 2)] : pe0.cor;
+      var pe0 = D.pelo[a.pelo] || D.PELOS[0], pc = comTom(pe0.grad ? pe0.grad[Math.floor(pe0.grad.length / 2)] : pe0.cor, tomDe(a, 'pelo'));
       (id === 'scrunchie' ? [-58] : [-138, -42]).forEach(function (gr0) {
         var q0 = bordaCab(gr0, 0.9), t0 = '';
         for (k = -1; k <= 1; k++) { an = rad(gr0 + k * 22); t0 += elip(q0[0] + Math.cos(an) * 14, q0[1] + Math.sin(an) * 14, 7, 13, { fill: pc, stroke: escuro(pc, 0.4), 'stroke-width': 1.4, transform: 'rotate(' + n(gr0 + 90 + k * 22) + ' ' + n(q0[0] + Math.cos(an) * 14) + ' ' + n(q0[1] + Math.sin(an) * 14) + ')' }); }
@@ -1638,7 +1654,7 @@
       return s + elip(x - 12, y + 17, 4, 2, { fill: '#ffffff', opacity: 0.4 });
     }
     if (id === 'sacola-presente') {
-      var rosa = cor !== '#ff9a4d', alcaC = rosa ? '#ff3d8b' : '#c85a1a';
+      var rosa = corDaPaleta(cor) !== '#ff9a4d', alcaC = rosa ? '#ff3d8b' : '#c85a1a';
       [-1, 1].forEach(function (k) { s += p('M' + n(x + k * 8) + ',' + n(y + 15) + ' Q' + n(x + k * 7) + ',' + n(y - 4) + ' ' + x + ',' + n(y) + '', { stroke: alcaC, 'stroke-width': 2.4, fill: 'none', 'stroke-linecap': 'round' }); });
       s += p('M' + n(x - 12) + ',' + n(y + 15) + ' L' + n(x - 4) + ',' + n(y + 5) + ' L' + n(x + 1) + ',' + n(y + 14) + ' L' + n(x + 7) + ',' + n(y + 4) + ' L' + n(x + 12) + ',' + n(y + 15) + 'Z', { fill: '#fdf6fb', stroke: '#d8c8d8', 'stroke-width': 0.8 });
       s += ret(x - 17, y + 14, 34, 34, { rx: 2, fill: rosa ? '#fbd5e6' : cor, stroke: escuro(cor, 0.35), 'stroke-width': 1.6 });
