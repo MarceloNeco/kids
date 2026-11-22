@@ -1,4 +1,4 @@
-/* Meu Amiguinho — as regras, sem tela (roda no navegador e no Node, para os testes):
+/* Meu Pequeno Amiguinho — as regras, sem tela (roda no navegador e no Node, para os testes):
    montar o amiguinho (bichinho, pelo, coração e fofura, roupa, acessórios, voz, nome), a Encomenda do nível Difícil
    (pedido + estrelas por acerto) e a coleção guardada no aparelho (localStorage), com os dois amiguinhos de exemplo. */
 (function (raiz) {

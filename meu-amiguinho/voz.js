@@ -1,4 +1,4 @@
-/* Meu Amiguinho — sons e vozes.
+/* Meu Pequeno Amiguinho — sons e vozes.
    - fala(texto, estilo): a voz do aparelho no idioma escolhido, o mais fininha e suave possível (voz infantil não vem
      pronta nos navegadores: escolhemos a voz mais aguda/feminina/"child" que existir, com tom alto e um pouco mais devagar).
    - Frases gravadas com o microfone: ficam SÓ neste aparelho (IndexedDB "meu-amiguinho", gaveta "vozes"); nunca são

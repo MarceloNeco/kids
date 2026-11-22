@@ -10,7 +10,7 @@ const raiz = path.join(__dirname, '..');
 const ler = (f) => fs.readFileSync(path.join(raiz, f), 'utf8');
 const Trilha = require('../trilha.js');
 const FAV = Trilha.offline.FAVORITAS;
-const IDS = ['estante', 'baguncolandia', 'peluqueria', 'vruuum', 'purpurina', 'rabiscolandia', 'campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub', 'jogoteca', 'fruta-podre', 'tijolaco'];
+const IDS = ['estante', 'baguncolandia', 'peluqueria', 'vruuum', 'purpurina', 'rabiscolandia', 'campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub', 'jogoteca', 'fruta-podre', 'tijolaco', 'meu-amiguinho'];
 const arquivo = (u) => u.replace(/^.*?\/kids\//, '');
 
 test('favoritas: uma por jogo e a da estante, arquivo que existe, até 4 MB', () => {
@@ -23,7 +23,8 @@ test('favoritas: uma por jogo e a da estante, arquivo que existe, até 4 MB', ()
     const tam = fs.statSync(path.join(raiz, f)).size; total += tam;
     assert.ok(tam <= 4 * 1024 * 1024, id + ': ' + f + ' tem ' + (tam / 1048576).toFixed(1) + ' MB');
   }
-  assert.ok(total < 30 * 1048576, 'total ' + (total / 1048576).toFixed(1) + ' MB');
+  // limite subiu de 30 para 32 MB em 22/Nov/2026 (a favorita do Meu Pequeno Amiguinho, 1,1 MB)
+  assert.ok(total < 32 * 1048576, 'total ' + (total / 1048576).toFixed(1) + ' MB');
 });
 
 test('cada favorita é uma música que o próprio jogo já toca', () => {
@@ -33,7 +34,7 @@ test('cada favorita é uma música que o próprio jogo já toca', () => {
   assert.ok(ler('peluqueria/musicas/musicas.json').includes('"' + nome('peluqueria') + '"'), 'peluqueria');
   for (const id of ['vruuum', 'purpurina']) assert.ok(ler(id + '/som.js').includes("'musicas/" + nome(id) + "'"), id);
   assert.ok(ler('rabiscolandia/som.js').includes("gr('" + nome('rabiscolandia').replace('.mp3', '') + "'"), 'rabiscolandia');
-  for (const id of ['campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub', 'jogoteca', 'fruta-podre', 'tijolaco']) {
+  for (const id of ['campo-minado', 'batalha-naval', 'enigmas', 'labirinto', 'cozinha', 'a-garra', 'aqua', 'quem-e', 'glub-glub', 'jogoteca', 'fruta-podre', 'tijolaco', 'meu-amiguinho']) {
     assert.ok(ler(id + '/app.js').includes(nome(id).replace('.mp3', '')), id + ': ' + nome(id));
   }
 });
@@ -71,7 +72,7 @@ const VIGIA = () => {
 };
 const tocandoBlob = (pg) => pg.evaluate(() => window.__audios.filter(a => !a.paused && a.currentTime > 0 && !a.error).map(a => a.src.slice(0, 5)).join(','));
 
-test('Guardar todos guarda as 18 favoritas; sem internet a rádio, a Bagunçolândia, o Vruuum! e o Campo Minado tocam a favorita por blob:', { timeout: 420000 }, async () => {
+test('Guardar todos guarda as 19 favoritas; sem internet a rádio, a Bagunçolândia, o Vruuum! e o Campo Minado tocam a favorita por blob:', { timeout: 420000 }, async () => {
   const { chromium } = require('playwright');
   const srv = servidor(); await new Promise(r => srv.listen(0, r));
   const base = 'http://127.0.0.1:' + srv.address().port + '/kids/';
@@ -84,13 +85,13 @@ test('Guardar todos guarda as 18 favoritas; sem internet a rádio, a Bagunçolâ
     await pg.goto(base);
     await pg.evaluate(() => navigator.serviceWorker.ready);
 
-    // (1) ⬇ Guardar todos → as 18 favoritas no cache "bolinho-musicas"
+    // (1) ⬇ Guardar todos → as 19 favoritas no cache "bolinho-musicas"
     await pg.click('#todos button.forte');
     await pg.waitForFunction(() => /músicas favoritas guardadas/.test(document.querySelector('#todos .st').textContent), null, { timeout: 300000 });
     const guardadas = await pg.evaluate(() => caches.open('bolinho-musicas').then(c => c.keys()).then(k => k.map(r => r.url)));
     const esperadas = IDS.map(id => base + arquivo(FAV[id]));
     assert.deepStrictEqual(guardadas.slice().sort(), [...new Set(esperadas)].sort(), 'cache bolinho-musicas');
-    assert.match(await pg.textContent('#todos .st'), /18 de 18 músicas favoritas/);
+    assert.match(await pg.textContent('#todos .st'), /19 de 19 músicas favoritas/);
 
     // o Vruuum! guarda todas as músicas dele no próprio cache; tira esse cache para testar só a favorita
     await pg.waitForFunction(() => caches.open('vruuum-musicas-v1').then(c => c.keys()).then(k => k.length >= 36), null, { timeout: 120000 }).catch(() => {});

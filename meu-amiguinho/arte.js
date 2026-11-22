@@ -1,4 +1,4 @@
-/* Meu Amiguinho — todo o desenho, em SVG feito em código (nenhuma imagem de fora; tudo original).
+/* Meu Pequeno Amiguinho — todo o desenho, em SVG feito em código (nenhuma imagem de fora; tudo original).
    AmiguinhoArte.svg(amigo, op) devolve o <svg> da pelúcia montada, em camadas:
      sombra → apoio de trás (cadeira) → costas (mochila, asas) → cauda → pernas e pés → corpo → roupa → sapatos →
      braços e mangas → pescoço → cabeça (orelhas, focinho, olhos, nariz, bochechas) → capuz → laços e chapéus → óculos →
@@ -1111,11 +1111,15 @@
     if (id === 'colar-bolinhas') { var cs = ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4', '#a8e8c0']; for (var i = 0; i <= 10; i++) { var t = i / 10, bx = x - w + t * w * 2, by = y + Math.sin(t * Math.PI) * 18 - (q ? 6 : 0); s += circ(bx, by, 4.6, { fill: cs[i % 5], stroke: escuro(cs[i % 5], 0.25), 'stroke-width': 0.8 }) + circ(bx - 1.4, by - 1.4, 1.3, { fill: '#ffffff', opacity: 0.8 }); } return s; }
     if (id === 'colar-coracao') return p('M' + n(x - w) + ',' + n(y - 2) + ' Q' + x + ',' + n(y + 30) + ' ' + n(x + w) + ',' + n(y - 2), { stroke: '#e0b848', 'stroke-width': 2, fill: 'none', 'stroke-dasharray': '2 1.5' }) + p(coracaoD(x, y + 22, 8), { fill: '#f06292', stroke: '#c0406a', 'stroke-width': 1.4 }) + circ(x - 3, y + 19, 1.6, { fill: '#ffffff', opacity: 0.8 });
     if (id === 'lenco') return p('M' + n(x - w) + ',' + n(y - 4) + ' Q' + x + ',' + n(y + 8) + ' ' + n(x + w) + ',' + n(y - 4) + ' L' + x + ',' + n(y + 34) + 'Z', { fill: cor, stroke: escuro(cor, 0.35), 'stroke-width': 1.6, 'stroke-linejoin': 'round' }) + circ(x - 10, y + 6, 2, { fill: '#ffffff' }) + circ(x + 8, y + 10, 2, { fill: '#ffffff' }) + circ(x, y + 20, 2, { fill: '#ffffff' });
-    if (id === 'coleira') {
+    if (id === 'coleira' || id === 'coleira-pata') {
       var holo = cor === '#cfd8f0' ? c.lin(['#f8c6f0', '#c6e8f8', '#e8f8c6', '#d8c6f8'], 0, 0, 1, 0) : cor;
       s += p('M' + n(x - w) + ',' + n(y - 4) + ' Q' + x + ',' + n(y + 14) + ' ' + n(x + w) + ',' + n(y - 4), { stroke: escuro(cor, 0.35), 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' }) + p('M' + n(x - w) + ',' + n(y - 4) + ' Q' + x + ',' + n(y + 14) + ' ' + n(x + w) + ',' + n(y - 4), { stroke: holo, 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' });
       s += circ(x, y + 9, 5, { fill: 'none', stroke: '#c9ced8', 'stroke-width': 2.2 }) + p('M' + x + ',' + n(y + 13) + ' C' + n(x + (q ? -70 : 70)) + ',' + n(y + 40) + ' ' + n(x + (q ? -80 : 90)) + ',' + n(y + 120) + ' ' + n(x + (q ? -60 : 64)) + ',' + n(y + 150), { stroke: escuro(cor, 0.35), 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }) + p('M' + x + ',' + n(y + 13) + ' C' + n(x + (q ? -70 : 70)) + ',' + n(y + 40) + ' ' + n(x + (q ? -80 : 90)) + ',' + n(y + 120) + ' ' + n(x + (q ? -60 : 64)) + ',' + n(y + 150), { stroke: holo, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' });
-      s += ret(x + (q ? -66 : 56), y + 146, 16, 12, { rx: 5, fill: holo, stroke: escuro(cor, 0.35), 'stroke-width': 1.4 });
+      var hx = x + (q ? -60 : 64), hy = y + 152;
+      if (id === 'coleira-pata') {   // controle em forma de patinha na ponta da guia
+        s += elip(hx, hy + 10, 14, 12, { fill: '#fbfaf7', stroke: escuro(cor, 0.35), 'stroke-width': 1.6 }) + elip(hx, hy + 12, 7, 6, { fill: holo });
+        [-9, -3, 3, 9].forEach(function (dx, i) { s += circ(hx + dx, hy - 2 - (i === 1 || i === 2 ? 3 : 0), 3.4, { fill: holo, stroke: escuro(cor, 0.3), 'stroke-width': 0.8 }); });
+      } else s += ret(hx - 8, hy - 6, 16, 12, { rx: 5, fill: holo, stroke: escuro(cor, 0.35), 'stroke-width': 1.4 });
       return s;
     }
     return s;
@@ -1334,7 +1338,7 @@
     }
     var conteudo = gr(gr(corpo + murcho, { 'class': op.anim ? 'ma-corpo' : null, 'data-px': q ? 196 : 150, 'data-py': g.chao }) + gr(cab, { 'class': op.anim ? 'ma-cabeca' : null, 'data-px': n(g.cab.x), 'data-py': n(q ? g.cab.y + g.cab.ry * 0.7 : g.t.y0 + 10) }) + frente, { 'class': op.anim ? 'ma-respira' : null, 'data-px': q ? 196 : 150, 'data-py': g.chao });
     var trans = (lev ? 'translate(0 ' + (-lev) + ') ' : '') + transformaFofura(g, f);
-    return gr(gr(conteudo, { transform: trans, 'class': 'ma-fofura' }), { 'class': op.anim ? 'ma-viva' : null });
+    return gr(s + gr(conteudo, { transform: trans, 'class': 'ma-fofura' }), { 'class': op.anim ? 'ma-viva' : null });
   }
   function galho() {
     return p('M10,10 Q150,-4 290,12', { stroke: '#7a5236', 'stroke-width': 14, fill: 'none', 'stroke-linecap': 'round' }) + p('M10,10 Q150,-4 290,12', { stroke: '#9a6a46', 'stroke-width': 8, fill: 'none', 'stroke-linecap': 'round' }) +
@@ -1487,13 +1491,15 @@
   /* ---------- vitrine (fundo da coleção): pedestais listrados, neve de algodão e luzinhas ---------- */
   A.vitrine = function (op) {
     op = op || {};
-    var c = new Ctx(op.id || 'vt'), s = '', W = 400, H = 300;
+    var c = new Ctx(op.id || 'vt'), s = '', W = 400, H = op.alto ? 860 : 300;
     s += ret(0, 0, W, H, { fill: c.lin(['#7a2a3a', '#a83a4a', '#6a2232'], 0, 0, 0, 1) });
-    for (var i = 0; i < 14; i++) s += circ(14 + i * 28, 10, 5, { fill: '#ffe9a8', 'class': 'vt-luz' }) + circ(14 + i * 28, 10, 10, { fill: '#ffe9a8', opacity: 0.25 });
-    for (var j = 1; j < 10; j++) s += circ(8, 10 + j * 28, 5, { fill: '#ffe9a8', 'class': 'vt-luz' }) + circ(W - 8, 10 + j * 28, 5, { fill: '#ffe9a8', 'class': 'vt-luz' });
+    // listras de bengalinha nas laterais e luzinhas de camarim douradas em volta
+    for (var y0 = -20; y0 < H; y0 += 26) { s += p('M0,' + y0 + ' L14,' + (y0 + 12) + ' L14,' + (y0 + 24) + ' L0,' + (y0 + 12) + 'Z', { fill: '#ffffff', opacity: 0.85 }) + p('M' + W + ',' + y0 + ' L' + (W - 14) + ',' + (y0 + 12) + ' L' + (W - 14) + ',' + (y0 + 24) + ' L' + W + ',' + (y0 + 12) + 'Z', { fill: '#ffffff', opacity: 0.85 }); }
+    for (var i = 0; i < 14; i++) s += circ(14 + i * 28, 8, 9, { fill: '#ffe9a8', opacity: 0.22 }) + circ(14 + i * 28, 8, 4.2, { fill: '#ffe9a8', 'class': 'vt-luz' });
+    for (var j = 1; j < Math.floor(H / 34); j++) s += circ(22, 8 + j * 34, 3.6, { fill: '#ffe9a8', 'class': 'vt-luz' }) + circ(W - 22, 8 + j * 34, 3.6, { fill: '#ffe9a8', 'class': 'vt-luz' });
     var r = sorteio(2);
-    for (var k = 0; k < 40; k++) s += circ(20 + r() * 360, 30 + r() * 220, 1.4 + r() * 2.4, { fill: '#ffffff', opacity: 0.7 });
-    s += p('M0,250 Q60,232 120,248 Q200,226 280,246 Q340,232 400,248 L400,300 L0,300Z', { fill: '#fbfaf7' });
+    for (var k = 0; k < (op.alto ? 90 : 40); k++) s += circ(34 + r() * 332, 26 + r() * (H - 90), 1.2 + r() * 2, { fill: '#ffffff', opacity: 0.65 });
+    s += p('M0,' + (H - 50) + ' Q60,' + (H - 68) + ' 120,' + (H - 52) + ' Q200,' + (H - 74) + ' 280,' + (H - 54) + ' Q340,' + (H - 68) + ' 400,' + (H - 52) + ' L400,' + H + ' L0,' + H + 'Z', { fill: '#fbfaf7' });
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>' + c.defs.join('') + '</defs>' + s + '</svg>';
   };
   A.pedestal = function (op) {

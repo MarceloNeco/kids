@@ -177,6 +177,14 @@
         "en": "BrickFreak (construction game)"
       },
       "pagina": "tijolaco/"
+    },
+    {
+      "id": "meu-amiguinho",
+      "nome": {
+        "pt": "Meu Pequeno Amiguinho (oficina de pelúcia)",
+        "en": "My Little Buddy (plush workshop)"
+      },
+      "pagina": "meu-amiguinho/"
     }
   ]
 }

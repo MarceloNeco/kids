@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.17",
+      "data": "22/Nov/2026",
+      "hora": "16:38:35",
+      "pt": [
+        "🏎️ A sua personagem do Brincar livre agora viaja para os outros jogos: no Vruuum! ela pode pilotar o carrinho (aparece em \"Amigos dos outros jogos\")"
+      ],
+      "en": [
+        "🏎️ Your Free play character now travels to the other games: in Vruuum! she can drive the car (look for \"Friends from other games\")"
+      ],
+      "es": [
+        "🏎️ Tu personaje del Juego libre ahora viaja a los otros juegos: en Vruuum! puede conducir el coche (búscalo en \"Amigos de otros juegos\")"
+      ]
+    },
+    {
       "versao": "0.9.16",
       "data": "22/Nov/2026",
       "hora": "15:12:00",

@@ -400,3 +400,8 @@ dialog.pp-ia::backdrop { background: rgba(20, 6, 36, .72); }
 .titulo-prontas { margin: 14px 4px 6px; font-size: 1.05rem; color: #ffe1f3; }
 .nome-pronta { margin: 4px 0 2px; text-align: center; font-weight: 700; font-size: .95rem; }
 
+
+/* ---------- 🧸 amiguinho de outro jogo (amigos.js + ../personagens.js, 0.25.0) ---------- */
+.janela-botoes .amigo-bt { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 96px; }
+.janela-botoes .amigo-bt img { width: 64px; height: 64px; max-height: none; border-radius: 50%; background: rgba(255,255,255,.85); margin: 0; }
+.janela-botoes .amigo-bt.escolhido { outline: 3px solid var(--rosa); }

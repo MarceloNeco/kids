@@ -1,4 +1,4 @@
-/* Meu Amiguinho — telas, etapas da oficina, máquina de fofura, voz, caixinha-casinha, certidão e coleção.
+/* Meu Pequeno Amiguinho (pasta meu-amiguinho) — telas, etapas da oficina, máquina de fofura, voz, caixinha-casinha, certidão e coleção.
    Dados em dados.js (AmiguinhoDados), desenho em arte.js (AmiguinhoArte), regras e coleção em regras.js (AmiguinhoRegras),
    sons e vozes em voz.js (AmiguinhoVoz), pelúcia viva em vivo.js (AmiguinhoVivo). Com ?teste aparece window.AmiguinhoDebug.
    Versão: APP_VERSION aqui = VERSAO no sw.js = primeira entrada do versoes.json.
@@ -48,7 +48,7 @@
   }
   function traduzir() {
     document.documentElement.lang = t('pt-BR', 'en-US', 'es-ES');
-    document.title = t('Meu Amiguinho', 'My Little Buddy', 'Mi Amiguito') + ' — ' + t('Bolinho de Chuva', 'Rainy Day Donuts', 'Buñuelos de Lluvia') + ' · SolverONE';
+    document.title = t('Meu Pequeno Amiguinho', 'My Little Buddy', 'Mi Pequeño Amiguito') + ' — ' + t('Bolinho de Chuva', 'Rainy Day Donuts', 'Buñuelos de Lluvia') + ' · SolverONE';
     function parte(el, at) { var p = el.getAttribute(at).split('|'); return p[li()] != null ? p[li()] : p[0]; }
     document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = parte(el, 'data-t'); });
     document.querySelectorAll('[data-rotulo]').forEach(function (el) { el.setAttribute('aria-label', parte(el, 'data-rotulo')); });
@@ -99,6 +99,7 @@
     $('nColecao').textContent = String(lista.length);
     $('btContinuar').hidden = !lerJSON(CH_RASC, null);
     var est = $('estante'), mostrar3 = lista.slice(0, 3);
+    if (mostrar3.length < 3) mostrar3.splice(1, 0, (function () { var x = R.novo('urso'); R.porAcess(x, 'laco'); return x; })());
     est.innerHTML = mostrar3.map(function (x, i) { return '<div class="na-estante">' + A.svg(x, { id: 'es' + i }) + '</div>'; }).join('');
   }
   document.querySelectorAll('[data-nivel]').forEach(function (b) {
@@ -151,6 +152,7 @@
     if (etapa === 2) { if (!$('maquina').firstChild) $('maquina').innerHTML = A.maquina({ id: 'mq' }); pintarMedidor(); }
     $('fala').hidden = true;
     atualizarPelucia();
+    $('painel').scrollTop = 0;
     PAINEL[E.id]();
     if (E.id === 'bicho') mostrarFala(falaBase());
   }
@@ -175,7 +177,7 @@
   }
   function amostraCor(hex) { return '<i class="amostra" style="background:' + hex + '"></i>'; }
   function amostraPelo(p) { return '<i class="amostra" style="background:' + (p.grad ? 'linear-gradient(135deg,' + p.grad.join(',') + ')' : p.cor) + '"></i>'; }
-  function rolarAteSel(caixa) { var s = caixa.querySelector('.sel'); if (s && s.scrollIntoView) try { s.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {} }
+  function rolarAteSel(caixa) { var s = caixa.querySelector('.sel'); if (s && caixa.scrollWidth > caixa.clientWidth) caixa.scrollLeft = Math.max(0, s.offsetLeft - caixa.offsetLeft - caixa.clientWidth / 2 + s.offsetWidth / 2); }
   var cacheMini = {};
   function mini(chave, f) { if (!cacheMini[chave]) cacheMini[chave] = f(); return cacheMini[chave]; }
 
@@ -485,6 +487,7 @@
     if (!salvo) { avisar(t('Não consegui guardar no aparelho (sem espaço?).', 'Couldn\'t save on this device (out of space?).', 'No pude guardar en el aparato (¿sin espacio?).'), 3500); return; }
     if (salvo.id !== amigo.id) { [0, 1].forEach(function (k) { if (amigo.frases[k] && amigo.frases[k].gravada) V.ler(amigo.id + ':' + k).then(function (b) { if (b) V.guardar(salvo.id + ':' + k, b); }); }); }
     gravarJSON(CH_RASC, null);
+    exportarPersonagem(salvo);
     mostrado = salvo; amigo = null; enc = null;
     caixinha(salvo, function () { voltarMenu(function () { ir({ tela: 'amigo', id: salvo.id }); }); });
   }
@@ -526,7 +529,17 @@
     $('btApagar').hidden = !!a.exemplo;
     $('btBrincar').textContent = pose === 'pendurada' ? t('🌿 Balançar', '🌿 Swing', '🌿 Columpiarse') : a.base === 'robo' ? t('💡 Carinha', '💡 Face', '💡 Carita') : a.corpo === 'q' ? t('🐾 Passear', '🐾 Walk', '🐾 Pasear') : t('👋 Acenar', '👋 Wave', '👋 Saludar');
     V.carregarProntas();
+    posicionarCoracao();
   }
+  // o botãozinho de coração fica no peito da pelúcia (o desenho encolhe/cresce com a tela)
+  function posicionarCoracao() {
+    var a = mostrado, svg = $('peluciaAmigo').querySelector('svg'); if (!a || !svg) return;
+    var caixa = $('palcoAmigo').getBoundingClientRect(), r = svg.getBoundingClientRect(), g = A.geo(a.base, a.corpo, poseDe(a), a);
+    var x = a.corpo === 'q' ? g.b.x - 4 : 150, y = (a.corpo === 'q' ? g.b.y - 8 : g.t.y0 + 46) - A.levantar(a);
+    var s = Math.min(r.width / 300, r.height / 396), ox = r.left + (r.width - 300 * s) / 2, oy = r.top + (r.height - 396 * s) / 2;
+    var b = $('btCoracao'); b.style.left = Math.round(ox + x * s - caixa.left) + 'px'; b.style.top = Math.round(oy + (y + 24) * s - caixa.top) + 'px';
+  }
+  window.addEventListener('resize', function () { if (tela === 'amigo') posicionarCoracao(); });
   $('peluciaAmigo').addEventListener('click', function () {
     if (!vAm) return;
     vAm.tocar();
@@ -554,7 +567,7 @@
   $('btApagarNao').addEventListener('click', function () { $('apagarJanela').hidden = true; });
   $('btApagarSim').addEventListener('click', function () {
     var id = mostrado.id; $('apagarJanela').hidden = true;
-    col.apagar(id); V.apagar(id + ':0'); V.apagar(id + ':1');
+    col.apagar(id); V.apagar(id + ':0'); V.apagar(id + ':1'); removerPersonagem(id);
     avisar(t('Apagado.', 'Deleted.', 'Borrado.'));
     history.back();
   });
@@ -613,10 +626,31 @@
     }).catch(function () { avisar(t('Não deu para salvar a imagem aqui.', 'Couldn\'t save the picture here.', 'No se pudo guardar la imagen aquí.')); });
   });
 
+  /* ---------- personagens que viajam entre os jogos (../personagens.js; sem ela, nada acontece) ---------- */
+  function pngDeSvg(svg, w, h) {
+    return new Promise(function (ok, erro) {
+      var img = new Image(), url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+      img.onload = function () { var cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url); try { ok(cv.toDataURL('image/png')); } catch (e) { erro(e); } };
+      img.onerror = function () { URL.revokeObjectURL(url); erro(new Error('svg')); };
+      img.src = url;
+    });
+  }
+  function exportarPersonagem(a) {
+    var P = window.BolinhoPersonagens; if (!P || !P.salvar || !a) return Promise.resolve(false);
+    var g = A.geo(a.base, a.corpo, null, a), cb = g.cab, r = Math.max(cb.rx, cb.ry) + 46;
+    var retrato = A.svg(a, { id: 'pr' + a.id, viewBox: [cb.x - r, cb.y - r + 14, r * 2, r * 2], largura: 256, altura: 256 });
+    var corpo = A.svg(a, { id: 'pc' + a.id, viewBox: [-2, -30, 304, 405], largura: 384, altura: 512 });
+    return Promise.all([pngDeSvg(retrato, 256, 256), pngDeSvg(corpo, 384, 512)]).then(function (im) {
+      try { P.salvar({ id: 'amiguinho:' + a.id, jogo: 'meu-amiguinho', nome: a.nome || tr(D.base[a.base].apelido), tipo: a.base === 'robo' ? 'robo' : 'bicho', retrato: im[0], corpo: im[1] }); return true; } catch (e) { return false; }
+    }).catch(function () { return false; });
+  }
+  function removerPersonagem(id) { var P = window.BolinhoPersonagens; if (P && P.remover) try { P.remover('amiguinho:' + id); } catch (e) {} }
+
   /* ---------- minha coleção (vitrine) ---------- */
   function pintarColecao() {
-    if (!$('vitrineFundo').firstChild) $('vitrineFundo').innerHTML = A.vitrine({ id: 'vt' });
+    if (!$('vitrineFundo').firstChild) $('vitrineFundo').innerHTML = A.vitrine({ id: 'vt', alto: innerHeight > innerWidth });
     var g = $('grade'); g.innerHTML = '';
+    if (!pintarColecao.exemplos) { pintarColecao.exemplos = true; R.EXEMPLOS.forEach(function (x) { exportarPersonagem(R.validar(JSON.parse(JSON.stringify(x)))); }); }
     col.listar().forEach(function (a, i) {
       var b = el('button', 'cartao-amigo'); b.type = 'button'; b.dataset.id = a.id;
       var pd = A.pedacos(a, { id: 'cl' + i, pose: poseDe(a) }), miolo = '<g transform="translate(150 286) scale(0.5) translate(-150 -186)">' + pd.corpo + '</g>';
@@ -662,7 +696,7 @@
   if (!/[?&]instalar\b/.test(location.search) || location.protocol === 'file:') return;
   var s = document.createElement('script');
   s.src = '../instalar.js';
-  s.setAttribute('data-nome', 'Meu Amiguinho'); s.setAttribute('data-icone', 'icone-192.png');
+  s.setAttribute('data-nome', 'Meu Pequeno Amiguinho'); s.setAttribute('data-icone', 'icone-192.png');
   s.setAttribute('data-so-com', 'instalar'); s.setAttribute('data-flutuante', ''); s.setAttribute('data-sw', 'nao');
   document.body.appendChild(s);
 })();

@@ -64,6 +64,8 @@ const JOGOS = [
     jogar: async (pg) => { await pg.click('#btJogar'); await pg.waitForTimeout(800); } },
   { id: 'tijolaco', url: 'tijolaco/?teste', capa: ['#btJogar'], alvo: '#cena',
     jogar: async (pg) => { await pg.click('#btJogar'); await pg.waitForTimeout(800); } },
+  { id: 'meu-amiguinho', url: 'meu-amiguinho/?teste', capa: ['#btCriar'], alvo: '#palco',
+    jogar: async (pg) => { await pg.click('#btCriar'); await pg.waitForTimeout(800); } },
   { id: 'danca-na-sala', url: 'danca-na-sala.html?teste', capa: ['#btTV', '#btCel', '#btSolo'], alvo: '#jogo .camBox', corpo: true,
     jogar: async (pg) => { await pg.click('#btSolo'); await pg.fill('#nome', 'Lara').catch(() => {}); await pg.click('#btEntrar'); await pg.waitForSelector('#jogo.solo', { timeout: 15000 }); await pg.waitForTimeout(800); } },
 ];

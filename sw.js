@@ -13,7 +13,7 @@ var PREFIXO = 'dgo-' + PASTA + '-';
 var CACHE = PREFIXO + 'v' + VERSAO;
 var BASICO = ['./', 'manifest.webmanifest', 'estante.css', 'catalogo.js', 'jogos.js', 'kids.js', 'instalar.js', 'recursos.js', 'idioma.js', 'navegacao.js', 'trilha.js', 'versao.js',
   'radio.js', 'clipe.js', 'tela-cheia.js', 'telacheia.js', 'biblioteca.js', 'biblioteca-musicas.js', 'novidades.js', 'icone-192.png', 'icone-512.png', 'icone-180.png',
-  'campo-minado/icone.svg', 'batalha-naval/icone.svg', 'enigmas/icone.svg', 'labirinto/icone.svg', 'cozinha/icone.svg', 'a-garra/icone.svg', 'aqua/icone.svg', 'quem-e/icone.svg', 'glub-glub/icone-192.png', 'jogoteca/icone.svg', 'fruta-podre/icone.svg', 'tijolaco/icone.svg',
+  'campo-minado/icone.svg', 'batalha-naval/icone.svg', 'enigmas/icone.svg', 'labirinto/icone.svg', 'cozinha/icone.svg', 'a-garra/icone.svg', 'aqua/icone.svg', 'quem-e/icone.svg', 'glub-glub/icone-192.png', 'jogoteca/icone.svg', 'fruta-podre/icone.svg', 'tijolaco/icone.svg', 'meu-amiguinho/icone.svg',
   'cartoes-fundos.css', 'cartoes/baguncolandia.svg', 'cartoes/peluqueria.svg', 'cartoes/danca-na-sala.svg', 'cartoes/vruuum.svg',
   'cartoes/purpurina.svg', 'cartoes/rabiscolandia.svg', 'cartoes/generico.svg', 'baguncolandia/icone.svg',
   'bandeiras/br.svg', 'bandeiras/us.svg', 'bandeiras/es.svg'];

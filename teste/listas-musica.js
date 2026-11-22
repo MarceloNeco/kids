@@ -22,6 +22,7 @@ const LISTAS = {
   'glub-glub': () => [...ler('glub-glub/app.js').matchAll(/a: (?:(B|RB) \+ )?'([^']+\.mp3)'/g)].map(m => (m[1] === 'B' ? 'baguncolandia/musicas/' : m[1] === 'RB' ? 'rabiscolandia/musicas/' : '') + m[2].replace(/^\.\.\//, '')),
   jogoteca: () => [...ler('jogoteca/app.js').matchAll(/a: (RB|PP) \+ '([a-z0-9-]+\.mp3)'/g)].map(m => (m[1] === 'RB' ? 'rabiscolandia' : 'purpurina') + '/musicas/' + m[2]),
   'fruta-podre': () => [...ler('fruta-podre/app.js').matchAll(/a: (RB|B) \+ '([a-z0-9-]+\.mp3)'/g)].map(m => (m[1] === 'RB' ? 'rabiscolandia' : 'baguncolandia') + '/musicas/' + m[2]),
-  tijolaco: () => [...ler('tijolaco/app.js').matchAll(/a: (VR|P) \+ '([a-z0-9-]+\.mp3)'/g)].map(m => (m[1] === 'VR' ? 'vruuum' : 'purpurina') + '/musicas/' + m[2])
+  tijolaco: () => [...ler('tijolaco/app.js').matchAll(/a: (VR|P) \+ '([a-z0-9-]+\.mp3)'/g)].map(m => (m[1] === 'VR' ? 'vruuum' : 'purpurina') + '/musicas/' + m[2]),
+  'meu-amiguinho': () => [...ler('meu-amiguinho/app.js').matchAll(/a: (B|RB) \+ '([a-z0-9-]+\.mp3)'/g)].map(m => (m[1] === 'RB' ? 'rabiscolandia' : 'baguncolandia') + '/musicas/' + m[2])
 };
 module.exports = LISTAS;

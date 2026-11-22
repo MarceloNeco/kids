@@ -1,4 +1,4 @@
-/* Meu Amiguinho — a pelúcia viva. Desenha o amiguinho (arte.js) numa caixa e anima as partes com pivô
+/* Meu Pequeno Amiguinho — a pelúcia viva. Desenha o amiguinho (arte.js) numa caixa e anima as partes com pivô
    (corpo, cabeça, orelhas, braços, patas, rabo, olhos, a telinha do robozinho) com curvas suaves, sem saltos:
    - sempre: respira, pisca de vez em quando, balança de leve as orelhas e o rabo; dança no ritmo quando a música toca;
    - ao tocar: abraço (aperta e solta), acena, dá um pulinho, balança a cabeça; os de 4 patas andam (patas alternadas,
@@ -26,7 +26,7 @@
     andar: { d: 4.2, f: function (u, P) {
       // vai para a esquerda, vira, volta para a direita, vira de novo (a cabeça é de frente: virar é espelhar o corpo)
       var ida = u < 0.45, vira1 = u >= 0.45 && u < 0.55, volta = u >= 0.55 && u < 0.95, x;
-      if (ida) x = -70 * suave(u / 0.45); else if (vira1) x = -70; else if (volta) x = -70 + 70 * suave((u - 0.55) / 0.4); else x = 0;
+      if (ida) x = -50 * suave(u / 0.45); else if (vira1) x = -50; else if (volta) x = -50 + 50 * suave((u - 0.55) / 0.4); else x = 0;
       P.corpo.x += x;
       var dir = u < 0.45 ? 1 : u < 0.55 ? Math.cos(Math.PI * (u - 0.45) / 0.1) : u < 0.95 ? -1 : -Math.cos(Math.PI * (u - 0.95) / 0.05);
       P.corpo.sx *= dir;

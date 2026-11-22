@@ -1,4 +1,4 @@
-/* Meu Amiguinho — os dados da oficina: a turma (bichinhos), cores, roupinhas, acessórios, vozes e as etapas.
+/* Meu Pequeno Amiguinho — os dados da oficina: a turma (bichinhos), cores, roupinhas, acessórios, vozes e as etapas.
    Tudo nos três idiomas: [português, inglês, espanhol]. Nada de desenho aqui (o desenho mora no arte.js);
    nada de tela (app.js). Roda no navegador (window.AmiguinhoDados) e no Node (require), para os testes.
    Nomes e personalidades da turma são deste jogo (originais). */
@@ -8,7 +8,7 @@
   // ---------- a jornada (7 etapas, cada uma com o seu selo oval numerado) ----------
   var ETAPAS = [
     { id: 'bicho', titulo: ['Me escolhe!', 'Pick me!', '¡Elígeme!'], sub: ['O bichinho', 'Your buddy', 'Tu amiguito'] },
-    { id: 'pelo', titulo: ['Me pinta de carinho!', 'Color me in!', '¡Píntame con cariño!'], sub: ['Pelo e olhinhos', 'Fur and eyes', 'Pelo y ojitos'] },
+    { id: 'pelo', titulo: ['Me dá cor!', 'Color me in!', '¡Dame color!'], sub: ['Pelo e olhinhos', 'Fur and eyes', 'Pelo y ojitos'] },
     { id: 'fofura', titulo: ['Me deixa fofinho!', 'Make me fluffy!', '¡Hazme blandito!'], sub: ['Coração e fofura', 'Heart and fluff', 'Corazón y relleno'] },
     { id: 'roupa', titulo: ['Me veste!', 'Dress me!', '¡Vísteme!'], sub: ['Roupinha', 'Outfit', 'Ropita'] },
     { id: 'acess', titulo: ['Me enfeita!', 'Deck me out!', '¡Ponme guapo!'], sub: ['Acessórios', 'Accessories', 'Accesorios'] },

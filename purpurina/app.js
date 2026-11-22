@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.24.1';
+  var APP_VERSION = '0.25.0';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -85,6 +85,8 @@
     esconder: function () { return TV; } });
 
   if (window.SolverRecursos && !SolverRecursos.ligado('purpurina', true)) { mostrar('desligado'); traduzir(); return; }
+  // personagens que viajam entre os jogos (amigos.js + ../personagens.js): exporta a personagem e traz o amiguinho
+  if (window.PurpurinaAmigos) PurpurinaAmigos.iniciar({ t: t, abrirJanela: function (o) { abrirJanela(o); }, redesenhar: function (inteira) { if (atual === 'estudio') { if (inteira) zoom(false, true); desenharBoneca(); if (grupoAtual === 'acess') desenharGrupos(); } } });
 
   // ---------- janela (foto, confirmar) ----------
   var aposFechar = null;
@@ -93,7 +95,7 @@
     var img = $('janelaImg'); img.hidden = !o.img; if (o.img) { img.src = o.img; img.alt = o.alt || ''; }
     var caixa = $('janelaBotoes'); caixa.innerHTML = '';
     o.botoes.forEach(function (b) {
-      var bt = document.createElement('button'); bt.type = 'button'; bt.className = b.classe || 'medio'; bt.textContent = b.t;
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = b.classe || 'medio'; bt.textContent = b.t; if (b.img) { var im = document.createElement('img'); im.src = b.img; im.alt = ''; bt.insertBefore(im, bt.firstChild); }
       bt.addEventListener('click', function () { if (b.ficar) { b.fn(); return; } fecharPeloBotao(b.fn); });
       caixa.appendChild(bt);
     });
@@ -213,7 +215,7 @@
     var el = $('boneca');
     // girando (arrastando, dando a volta ou voltando de frente): sem desfoque e sombra, para o giro ficar liso
     var mexendo = !!(arraste && arraste.mexeu) || emVolta || girando;
-    el.innerHTML = B.svg(estado, { id: 'palco', anim: !CALMO && !angulo, area: vista, angulo: angulo, realce: !mexendo });
+    el.innerHTML = B.svg(estado, { id: 'palco', anim: !CALMO && !angulo, area: vista, angulo: angulo, realce: !mexendo, amigo: true });
     $('btFrente').hidden = !angulo;
     if (angulo !== angMandado && !emVolta) { angMandado = angulo; ponte('giro'); }
     el.setAttribute('aria-label', V.resumo(estado, lingua));
@@ -330,6 +332,7 @@
       b.addEventListener('click', function () { catPorGrupo[grupoAtual] = c.id; Som.tocar('clique'); entrarNaParte(); desenharGrupos(); desenharOpcoes(); $('opcoes').scrollTop = 0; zoomDaParte(); chegar($('cores'), $('estilos')); });
       cc.appendChild(b);
     });
+    if (grupoAtual === 'acess' && window.PurpurinaAmigos) cc.appendChild(PurpurinaAmigos.botao());   // 🧸 amiguinho do Meu Pequeno Amiguinho (amigos.js)
   }
   function desenharOpcoes() {
     var cat = P.categoria(catPorGrupo[grupoAtual] || catsDoGrupo(grupoAtual)[0].id);
@@ -655,7 +658,7 @@
     var Wf = 1080, Hf = 1944, faixa = 150;
     var fonte = document.fonts && document.fonts.load ? document.fonts.load('700 56px Fredoka').catch(function () {}) : Promise.resolve();
     return fonte.then(function () {
-      return Promise.all([imagemDe(B.svg(estado, { id: 'fotoF', soFundo: true, largura: Wf, altura: Hf })), imagemDe(B.svg(estado, { id: 'fotoB', fundo: false, realce: false, largura: Wf, altura: Hf }))]);
+      return Promise.all([imagemDe(B.svg(estado, { id: 'fotoF', soFundo: true, largura: Wf, altura: Hf })), imagemDe(B.svg(estado, { id: 'fotoB', fundo: false, realce: false, largura: Wf, altura: Hf, amigo: true }))]);
     }).then(function (imgs) {
       return new Promise(function (ok, erro) {
         var cv = document.createElement('canvas'); cv.width = Wf; cv.height = Hf + faixa;

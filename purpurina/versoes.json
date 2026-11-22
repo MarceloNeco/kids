@@ -2,6 +2,23 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.25.0",
+      "data": "22/Nov/2026",
+      "hora": "16:35:41",
+      "pt": [
+        "🧸 Meu amiguinho no colo: em Acessórios tem o quadradinho 🧸 Amiguinho. Escolha um amiguinho montado no Meu Pequeno Amiguinho e ele fica ao lado da sua personagem, de mãos dadas (aparece no palco e na foto). Sem nenhum amiguinho ainda, o botão leva para montar um",
+        "🏎️ A sua personagem do Brincar livre agora viaja para os outros jogos: no Vruuum! ela pode pilotar o carrinho (aparece em \"Amigos dos outros jogos\")"
+      ],
+      "en": [
+        "🧸 My buddy in my arms: in Accessories there's a new 🧸 Buddy square. Pick a buddy made in My Little Buddy and they stand next to your character, holding hands (on the stage and in the photo). No buddy yet? The button takes you to make one",
+        "🏎️ Your Free play character now travels to the other games: in Vruuum! she can drive the car (look for \"Friends from other games\")"
+      ],
+      "es": [
+        "🧸 Mi amiguito en brazos: en Accesorios hay un cuadradito nuevo, 🧸 Amiguito. Elige un amiguito creado en Mi Pequeño Amiguito y se queda al lado de tu personaje, de la mano (en el escenario y en la foto). ¿Aún no tienes ninguno? El botón te lleva a crearlo",
+        "🏎️ Tu personaje del Juego libre ahora viaja a los otros juegos: en Vruuum! puede conducir el coche (búscalo en \"Amigos de otros juegos\")"
+      ]
+    },
+    {
       "versao": "0.24.1",
       "data": "20/Nov/2026",
       "hora": "11:06:14",

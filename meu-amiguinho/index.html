@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Meu Amiguinho — Bolinho de Chuva · SolverONE</title>
+<title>Meu Pequeno Amiguinho — Bolinho de Chuva · SolverONE</title>
 <link rel="icon" href="icone-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="../carregando.js" data-fora-do-arquivo></script>
 <link rel="apple-touch-icon" href="icone-192.png">
 <meta name="theme-color" content="#fbe3ee">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="description" content="Meu Amiguinho: monte a sua pelúcia em 7 etapas — escolha o bichinho, a cor do pelo, o coraçãozinho, encha de fofura, vista, enfeite, dê uma voz e um nome, e ganhe a certidão de nascimento. / My Little Buddy: build your own plush buddy in 7 steps. / Mi Amiguito: arma tu propio peluche en 7 pasos.">
+<meta name="description" content="Meu Pequeno Amiguinho: monte a sua pelúcia em 7 etapas — escolha o bichinho, a cor do pelo, o coraçãozinho, encha de fofura, vista, enfeite, dê uma voz e um nome, e ganhe a certidão de nascimento. / My Little Buddy: build your own plush buddy in 7 steps. / Mi Pequeño Amiguito: arma tu propio peluche en 7 pasos.">
 <link rel="stylesheet" href="estilo.css">
 <!--
-  Meu Amiguinho / My Little Buddy / Mi Amiguito — oficina de pelúcia da família Bolinho de Chuva (SolverONE · kids).
+  Meu Pequeno Amiguinho / My Little Buddy / Mi Pequeño Amiguito — oficina de pelúcia da família Bolinho de Chuva (SolverONE · kids).
   Dados em dados.js, desenho em SVG em arte.js, regras e coleção em regras.js, sons e vozes em voz.js, a pelúcia viva
   (respirar, piscar, abraço, andar, LED do robozinho) em vivo.js, telas e etapas em app.js. Sem login, sem banco: tudo
   fica no aparelho (a voz gravada também). Nada de script inline: a CSP acima não permite. Mapa: LEIA-ME.md.
@@ -25,7 +25,7 @@
 <!-- ===== começo ===== -->
 <section id="menu" class="tela ativa" data-recurso="meu-amiguinho">
   <div class="capa">
-    <h1 class="letreiro"><span class="l1" data-t="Meu|My Little|Mi"></span> <span class="l2" data-t="Amiguinho|Buddy|Amiguito"></span></h1>
+    <h1 class="letreiro"><span class="l1" data-t="Meu Pequeno|My Little|Mi Pequeño"></span> <span class="l2" data-t="Amiguinho|Buddy|Amiguito"></span></h1>
     <p class="sub" data-t="Monte a sua pelúcia do jeitinho que você quiser|Build your very own plush buddy|Arma tu peluche como tú quieras"></p>
     <div id="estante" class="estante" aria-hidden="true"></div>
   </div>
@@ -101,6 +101,7 @@
 <section id="colecao" class="tela" data-recurso="meu-amiguinho">
   <div id="vitrineFundo" class="vitrine-fundo" aria-hidden="true"></div>
   <h2 class="col-titulo" data-t="📚 Minha coleção|📚 My collection|📚 Mi colección"></h2>
+  <p class="col-selo" data-t="🚗 Também no Vruuum! · 💄 na Purpurina: seus amiguinhos aparecem nos outros jogos.|🚗 Also in Vruuum! · 💄 in Purpurina: your buddies show up in the other games.|🚗 También en Vruuum! · 💄 en Purpurina: tus amiguitos salen en los otros juegos."></p>
   <div id="grade" class="grade"></div>
 </section>
 
@@ -154,7 +155,7 @@
 <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
 
 <section id="desligado" class="tela" hidden>
-  <h2 data-t="O Meu Amiguinho está descansando agora.|My Little Buddy is resting right now.|Mi Amiguito está descansando ahora."></h2>
+  <h2 data-t="O Meu Pequeno Amiguinho está descansando agora.|My Little Buddy is resting right now.|Mi Pequeño Amiguito está descansando ahora."></h2>
 </section>
 
 <script src="dados.js"></script>
@@ -164,6 +165,7 @@
 <script src="vivo.js"></script>
 <script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
 <script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../personagens.js" data-fora-do-arquivo></script>
 <script src="../navegacao.js" data-fora-do-arquivo></script>
 <script src="../atualizar.js" data-fora-do-arquivo></script>
 <script src="../telacheia.js" data-fora-do-arquivo></script>

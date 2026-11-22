@@ -74,7 +74,8 @@
     'glub-glub': 'baguncolandia/musicas/spring-chicken.mp3',
     jogoteca: 'purpurina/musicas/club-seamus.mp3',
     'fruta-podre': 'rabiscolandia/musicas/sneaky-snitch.mp3',
-    tijolaco: 'vruuum/musicas/what-you-want.mp3'
+    tijolaco: 'vruuum/musicas/what-you-want.mp3',
+    'meu-amiguinho': 'baguncolandia/musicas/llama-in-pajama.mp3'
   };
   O.FAVORITAS = {};
   Object.keys(FAV).forEach(function (k) { O.FAVORITAS[k] = completo(FAV[k]); });
