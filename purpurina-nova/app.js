@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.8';
+  var APP_VERSION = '0.9.9';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -963,11 +963,12 @@
       lugar(0); pose({ rig: true });
       animD = PurpurinaAnim.criar(pas, { poses: ['relax'], enquanto: vale, modo: 'andar', passoMs: PASSO_MS[idade] || 980 });
       fogos(seq, 9000);
-      var ini = performance.now(), dur = 3600;
+      // anda um número inteiro de passadas, em velocidade constante (o corpo avança no mesmo ritmo dos passos, sem
+      // escorregar); só a primeira e a última passada aceleram e freiam de leve
+      var ini = performance.now(), passada = PASSO_MS[idade] || 980, dur = Math.max(2, Math.round(3600 / passada)) * passada;
       (function andar(agora) {
         if (!vale()) return;
-        // passo constante (os pés não escorregam), freando só no fim
-        var k = Math.min(1, (agora - ini) / dur), e = 1 - Math.pow(1 - k, 1.5);
+        var k = Math.min(1, (agora - ini) / dur), b0 = 0.12, e = k < b0 ? k * k / (2 * b0 * (1 - b0)) : k > 1 - b0 ? 1 - (1 - k) * (1 - k) / (2 * b0 * (1 - b0)) : (k - b0 / 2) / (1 - b0);
         lugar(e);
         if (k < 1) requestAnimationFrame(andar);
         else {

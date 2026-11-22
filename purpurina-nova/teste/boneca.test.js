@@ -612,3 +612,16 @@ test('estúdio enxuto: ferramentas no ⋯, barra de tom só depois de tocar na c
   const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
   assert.match(css, /grid-template-rows: repeat\(2, auto\)/, 'roupas em duas fileiras');
 });
+
+test('andar de passarela de verdade: pé da frente embaixo, perna da frente por cima, sem escorregar (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /var frente = u < 0\.5 \? 1 - 4 \* u : -1 \+ 4 \* \(u - 0\.5\);/, 'no chão o pé vai da frente para trás; no ar volta');
+  assert.match(anim, /var compr = 1 \+ 0\.05 \* frente;/, 'pé da frente mais embaixo na tela');
+  assert.match(anim, /v\.frenteE = e\.frente > d\.frente;/);
+  assert.match(anim, /insertBefore\(gt, gf\)/, 'a perna da frente é desenhada por cima');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /dur = Math\.max\(2, Math\.round\(3600 \/ passada\)\) \* passada/, 'anda um número inteiro de passadas, em velocidade constante');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
+  assert.match(css, /\.modelo \.passarela-boneca \{ filter: drop-shadow\(0 3px 4px/, 'sombra colada nos pés');
+});
