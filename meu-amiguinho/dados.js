@@ -41,7 +41,14 @@
     'cinza': { hex: '#9aa0aa', n: ['cinza', 'gray', 'gris'] },
     'caramelo': { hex: '#c98a4b', n: ['caramelo', 'caramel', 'caramelo'] },
     'holo': { hex: '#cfd8f0', n: ['holográfico', 'holographic', 'holográfico'] },
-    'azul-cinza': { hex: '#a9b8cc', n: ['azul-acinzentado', 'blue-gray', 'gris azulado'] }
+    'azul-cinza': { hex: '#a9b8cc', n: ['azul-acinzentado', 'blue-gray', 'gris azulado'] },
+    'jeans-claro': { hex: '#8fb0dc', n: ['jeans claro', 'light denim', 'vaquero claro'] },
+    'jeans': { hex: '#5b7fb8', n: ['jeans', 'denim', 'vaquero'] },
+    'jeans-escuro': { hex: '#3c5c94', n: ['jeans escuro', 'dark denim', 'vaquero oscuro'] },
+    'grafite': { hex: '#3a3f52', n: ['grafite', 'charcoal', 'grafito'] },
+    'caqui': { hex: '#c8b48a', n: ['cáqui', 'khaki', 'caqui'] },
+    'rosa-claro': { hex: '#fbd3e3', n: ['rosa-claro', 'light pink', 'rosa claro'] },
+    'musgo': { hex: '#7a9a5a', n: ['verde-musgo', 'moss green', 'verde musgo'] }
   };
   var PALETAS = {
     lacos: ['rosa', 'rosa-choque', 'vermelho', 'laranja', 'amarelo', 'lima', 'menta', 'azul-bebe', 'azul', 'azul-cinza', 'lilas', 'roxo', 'marrom', 'bege', 'branco', 'preto', 'prata', 'dourado'],
@@ -78,7 +85,17 @@
     asas: ['rosa', 'lilas', 'azul-bebe', 'turquesa', 'menta', 'amarelo', 'laranja', 'roxo', 'azul'],
     morcego: ['roxo', 'lilas', 'preto', 'rosa', 'marinho'],
     felpudo: ['cinza', 'branco', 'rosa', 'bege', 'lilas'],
-    cadeira: ['azul', 'marinho', 'rosa', 'lilas', 'vermelho', 'roxo']
+    cadeira: ['azul', 'marinho', 'rosa', 'lilas', 'vermelho', 'roxo'],
+    // partes de baixo e roupas novas das fotos (dono, 22/Nov/2026)
+    jeans: ['jeans-claro', 'jeans', 'jeans-escuro', 'preto', 'branco', 'rosa'],
+    baixo: ['jeans-escuro', 'grafite', 'preto', 'caqui', 'marinho', 'cinza', 'azul-cinza', 'branco', 'rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'vermelho', 'verde'],
+    tutu: ['rosa', 'rosa-choque', 'rosa-claro', 'lilas', 'roxo', 'azul-bebe', 'menta', 'amarelo', 'laranja', 'vermelho', 'branco', 'preto', 'prata', 'dourado'],
+    brilho: ['lilas', 'rosa-claro', 'laranja', 'rosa', 'azul-bebe', 'menta', 'amarelo', 'prata'],
+    blusa: ['rosa-claro', 'rosa', 'lilas', 'branco', 'azul-bebe', 'menta', 'amarelo', 'vermelho'],
+    camiseta: ['branco', 'rosa-claro', 'rosa', 'cinza', 'azul-bebe', 'lilas', 'amarelo', 'preto'],
+    folk: ['vermelho', 'marinho', 'verde', 'preto'],
+    camuflado: ['azul-cinza', 'musgo', 'caqui'],
+    sunga: ['branco', 'preto', 'azul', 'vermelho', 'marinho']
   };
 
   // ---------- pelo (cores lisas e degradês tie-dye pastel) ----------
@@ -227,41 +244,108 @@
   // capuz: cobre a cabeça (tira o chapéu/tiara do desenho enquanto estiver vestida)
   var ROUPAS = [
     { id: 'nenhuma', n: ['Sem roupa', 'No clothes', 'Sin ropa'], e: ['sem roupa', 'with no clothes', 'sin ropa'], facil: 1 },
-    { id: 'pijama', n: ['Pijaminha', 'Pajamas', 'Pijama'], e: ['de pijaminha', 'in pajamas', 'en pijama'], cores: 1, estampa: 1, padrao: { cor: 'lilas', estampa: 'estrelas' }, facil: 1 },
-    { id: 'macacao', n: ['Macacão com pezinho e touca', 'Footed onesie and beanie', 'Mono con patucos y gorro'], e: ['de macacão com pezinho', 'in a footed onesie', 'con mono de patucos'], cores: 1, estampa: 1, capuz: 1, padrao: { cor: 'azul-bebe', estampa: 'esportes' } },
-    { id: 'vestido', n: ['Vestidinho', 'Little dress', 'Vestidito'], e: ['de vestidinho', 'in a little dress', 'con vestidito'], cores: 1, estampa: 1, padrao: { cor: 'rosa', estampa: 'bolinhas' }, facil: 1 },
-    { id: 'vestido-unicornio', n: ['Vestido lilás de tutu', 'Lilac tutu dress', 'Vestido lila con tutú'], e: ['de vestido lilás de tutu', 'in a lilac tutu dress', 'con vestido lila de tutú'] },
-    { id: 'vestido-nuvens', n: ['Vestido de nuvens arco-íris', 'Rainbow cloud dress', 'Vestido de nubes arcoíris'], e: ['de vestido de nuvens', 'in a rainbow cloud dress', 'con vestido de nubes'], facil: 1 },
-    { id: 'tule', n: ['Vestido de tule arco-íris', 'Rainbow tulle dress', 'Vestido de tul arcoíris'], e: ['de vestido de tule', 'in a tulle dress', 'con vestido de tul'] },
-    { id: 'jardineira-saia', n: ['Jardineira com sainha', 'Pinafore with ruffle skirt', 'Peto con falda de volantes'], e: ['de jardineira com sainha', 'in a ruffle-skirt pinafore', 'con peto de falda'], cores: 1, padrao: { cor: 'lilas' }, facil: 1 },
-    { id: 'jardineira', n: ['Jardineira jeans', 'Denim overalls', 'Peto vaquero'], e: ['de jardineira jeans', 'in denim overalls', 'con peto vaquero'], cores: 1, padrao: { cor: 'amarelo' } },
-    { id: 'camiseta', n: ['Camiseta Melhores Amigos', 'Best Buddies tee', 'Camiseta Mejores Amigos'], e: ['de camiseta e bermuda', 'in a tee and shorts', 'con camiseta y bermudas'], cores: 1, padrao: { cor: 'branco' }, facil: 1 },
-    { id: 'moletom', n: ['Moletom com capuz', 'Hoodie', 'Sudadera con capucha'], e: ['de moletom', 'in a hoodie', 'con sudadera'], cores: 1, estampa: 1, padrao: { cor: 'azul-bebe', estampa: 'controle' }, facil: 1 },
-    { id: 'jaqueta-prata', n: ['Jaqueta prateada', 'Silver jacket', 'Chaqueta plateada'], e: ['de jaqueta prateada', 'in a silver jacket', 'con chaqueta plateada'] },
-    { id: 'jaqueta-couro', n: ['Jaqueta de couro', 'Leather jacket', 'Chaqueta de cuero'], e: ['de jaqueta de couro', 'in a leather jacket', 'con chaqueta de cuero'] },
-    { id: 'social', n: ['Camisa social azul', 'Blue dress shirt', 'Camisa azul de vestir'], e: ['de camisa social', 'in a dress shirt', 'con camisa de vestir'] },
-    { id: 'futebol', n: ['Uniforme de futebol', 'Soccer kit', 'Equipación de fútbol'], e: ['de uniforme de futebol', 'in a soccer kit', 'con equipación de fútbol'], cores: 1, padrao: { cor: 'amarelo' }, facil: 1 },
-    { id: 'tutu', n: ['Tutu de bailarina', 'Ballerina tutu', 'Tutú de bailarina'], e: ['de tutu de bailarina', 'in a ballerina tutu', 'con tutú de bailarina'], cores: 1, padrao: { cor: 'rosa' }, facil: 1 },
-    { id: 'polo', n: ['Camisa polo', 'Polo shirt', 'Polo'], e: ['de camisa polo', 'in a polo shirt', 'con polo'], cores: 1, paleta: 'roupa2', padrao: { cor: 'preto' } },
-    { id: 'camiseta-lisa', n: ['Camiseta lisa e bermuda jeans', 'Plain tee and denim shorts', 'Camiseta lisa y bermudas vaqueras'], e: ['de camiseta e bermuda jeans', 'in a tee and denim shorts', 'con camiseta y bermudas vaqueras'], cores: 1, paleta: 'roupa2', padrao: { cor: 'cinza' }, facil: 1 },
-    { id: 'play', n: ['Camiseta PLAY', 'PLAY tee', 'Camiseta PLAY'], e: ['de camiseta PLAY', 'in a PLAY tee', 'con camiseta PLAY'], cores: 1, paleta: 'roupa2', padrao: { cor: 'branco' } },
-    { id: 'corta-vento', n: ['Corta-vento com zíper', 'Zip windbreaker', 'Cortavientos con cremallera'], e: ['de corta-vento', 'in a windbreaker', 'con cortavientos'], cores: 1, paleta: 'roupa2', padrao: { cor: 'turquesa' } },
-    { id: 'jardineira-curta', n: ['Jardineira jeans curta', 'Denim shortalls', 'Peto vaquero corto'], e: ['de jardineira curta', 'in denim shortalls', 'con peto corto'], cores: 1, padrao: { cor: 'branco' } },
-    { id: 'skatista', n: ['Colete jeans de skatista', 'Skater denim vest', 'Chaleco vaquero de skater'], e: ['de colete jeans', 'in a denim vest', 'con chaleco vaquero'], cores: 1, paleta: 'roupa2', padrao: { cor: 'branco' } },
-    { id: 'vestido-doces', n: ['Vestido de docinhos', 'Candy dress', 'Vestido de golosinas'], e: ['de vestido de docinhos', 'in a candy dress', 'con vestido de golosinas'], cores: 1, padrao: { cor: 'rosa' } },
-    { id: 'neve', n: ['Macacão de neve', 'Snowsuit', 'Mono de nieve'], e: ['de macacão de neve', 'in a snowsuit', 'con mono de nieve'], cores: 1, padrao: { cor: 'azul' }, capuz: 1 },
-    { id: 'heroi-raio', heroi: 1, n: ['Herói do Raio', 'Lightning Hero', 'Héroe del Rayo'], e: ['de Herói do Raio', 'as the Lightning Hero', 'de Héroe del Rayo'], facil: 1 },
-    { id: 'heroi-estrela', heroi: 1, n: ['Heroína Estrela', 'Star Heroine', 'Heroína Estrella'], e: ['de Heroína Estrela', 'as the Star Heroine', 'de Heroína Estrella'], facil: 1 },
-    { id: 'heroi-coracao', heroi: 1, n: ['Herói Coração', 'Heart Hero', 'Héroe Corazón'], e: ['de Herói Coração', 'as the Heart Hero', 'de Héroe Corazón'] },
-    { id: 'heroi-gota', heroi: 1, n: ['Heroína Gota', 'Droplet Heroine', 'Heroína Gota'], e: ['de Heroína Gota', 'as the Droplet Heroine', 'de Heroína Gota'] },
-    { id: 'heroi-folha', heroi: 1, n: ['Herói Folha', 'Leaf Hero', 'Héroe Hoja'], e: ['de Herói Folha', 'as the Leaf Hero', 'de Héroe Hoja'] },
-    { id: 'heroi-lua', heroi: 1, n: ['Heroína Lua', 'Moon Heroine', 'Heroína Luna'], e: ['de Heroína Lua', 'as the Moon Heroine', 'de Heroína Luna'] },
-    { id: 'duende', n: ['Roupa de duende de Natal', 'Holiday elf outfit', 'Traje de duende navideño'], e: ['de duende de Natal', 'as a holiday elf', 'de duende navideño'], capuz: 1 },
-    { id: 'dino', n: ['Fantasia de dinossauro', 'Dinosaur costume', 'Disfraz de dinosaurio'], e: ['fantasiado de dinossauro', 'dressed as a dinosaur', 'disfrazado de dinosaurio'], cores: 1, capuz: 1, padrao: { cor: 'verde' } },
-    { id: 'noel', n: ['Casaco de Papai Noel', 'Santa coat', 'Abrigo de Papá Noel'], e: ['de casaco de Papai Noel', 'in a Santa coat', 'con abrigo de Papá Noel'], capuz: 1, facil: 1 },
-    { id: 'abobora', n: ['Fantasia de abóbora', 'Pumpkin costume', 'Disfraz de calabaza'], e: ['fantasiado de abóbora', 'dressed as a pumpkin', 'disfrazado de calabaza'], capuz: 1 },
-    { id: 'pinguim', n: ['Capa de pinguim', 'Penguin cape', 'Capa de pingüino'], e: ['de capa de pinguim', 'in a penguin cape', 'con capa de pingüino'], capuz: 1 },
-    { id: 'boneco-neve', n: ['Capa de boneco de neve', 'Snowman cape', 'Capa de muñeco de nieve'], e: ['de capa de boneco de neve', 'in a snowman cape', 'con capa de muñeco de nieve'], capuz: 1 }
+    { id: 'pijama', grupo: 'inteira', n: ['Pijaminha', 'Pajamas', 'Pijama'], e: ['de pijaminha', 'in pajamas', 'en pijama'], cores: 1, estampa: 1, padrao: { cor: 'lilas', estampa: 'estrelas' }, facil: 1 },
+    { id: 'macacao', grupo: 'inteira', n: ['Macacão com pezinho e touca', 'Footed onesie and beanie', 'Mono con patucos y gorro'], e: ['de macacão com pezinho', 'in a footed onesie', 'con mono de patucos'], cores: 1, estampa: 1, capuz: 1, padrao: { cor: 'azul-bebe', estampa: 'esportes' } },
+    { id: 'vestido', grupo: 'inteira', n: ['Vestidinho', 'Little dress', 'Vestidito'], e: ['de vestidinho', 'in a little dress', 'con vestidito'], cores: 1, estampa: 1, padrao: { cor: 'rosa', estampa: 'bolinhas' }, facil: 1 },
+    { id: 'vestido-unicornio', grupo: 'inteira', n: ['Vestido lilás de tutu', 'Lilac tutu dress', 'Vestido lila con tutú'], e: ['de vestido lilás de tutu', 'in a lilac tutu dress', 'con vestido lila de tutú'] },
+    { id: 'vestido-nuvens', grupo: 'inteira', n: ['Vestido de nuvens arco-íris', 'Rainbow cloud dress', 'Vestido de nubes arcoíris'], e: ['de vestido de nuvens', 'in a rainbow cloud dress', 'con vestido de nubes'], facil: 1 },
+    { id: 'tule', grupo: 'inteira', n: ['Vestido de tule arco-íris', 'Rainbow tulle dress', 'Vestido de tul arcoíris'], e: ['de vestido de tule', 'in a tulle dress', 'con vestido de tul'] },
+    { id: 'jardineira-saia', grupo: 'inteira', n: ['Jardineira com sainha', 'Pinafore with ruffle skirt', 'Peto con falda de volantes'], e: ['de jardineira com sainha', 'in a ruffle-skirt pinafore', 'con peto de falda'], cores: 1, padrao: { cor: 'lilas' }, facil: 1 },
+    { id: 'jardineira', grupo: 'inteira', n: ['Jardineira jeans', 'Denim overalls', 'Peto vaquero'], e: ['de jardineira jeans', 'in denim overalls', 'con peto vaquero'], cores: 1, padrao: { cor: 'amarelo' } },
+    { id: 'camiseta', grupo: 'cima', vinhaCom: ['bermuda', 'jeans-escuro'], n: ['Camiseta Melhores Amigos', 'Best Buddies tee', 'Camiseta Mejores Amigos'], e: ['de camiseta Melhores Amigos', 'in a Best Buddies tee', 'con camiseta Mejores Amigos'], cores: 1, padrao: { cor: 'branco' }, facil: 1 },
+    { id: 'moletom', grupo: 'cima', vinhaCom: ['bermuda', 'preto'], n: ['Moletom com capuz', 'Hoodie', 'Sudadera con capucha'], e: ['de moletom', 'in a hoodie', 'con sudadera'], cores: 1, estampa: 1, padrao: { cor: 'azul-bebe', estampa: 'controle' }, facil: 1 },
+    { id: 'jaqueta-prata', grupo: 'cima', vinhaCom: ['calca', 'grafite'], n: ['Jaqueta prateada', 'Silver jacket', 'Chaqueta plateada'], e: ['de jaqueta prateada', 'in a silver jacket', 'con chaqueta plateada'] },
+    { id: 'jaqueta-couro', grupo: 'cima', vinhaCom: ['calca-jeans', 'jeans'], n: ['Jaqueta de couro', 'Leather jacket', 'Chaqueta de cuero'], e: ['de jaqueta de couro', 'in a leather jacket', 'con chaqueta de cuero'] },
+    { id: 'social', grupo: 'cima', vinhaCom: ['calca', 'marinho'], n: ['Camisa social azul', 'Blue dress shirt', 'Camisa azul de vestir'], e: ['de camisa social', 'in a dress shirt', 'con camisa de vestir'] },
+    { id: 'futebol', grupo: 'inteira', n: ['Uniforme de futebol', 'Soccer kit', 'Equipación de fútbol'], e: ['de uniforme de futebol', 'in a soccer kit', 'con equipación de fútbol'], cores: 1, padrao: { cor: 'amarelo' }, facil: 1 },
+    { id: 'tutu', grupo: 'inteira', n: ['Tutu de bailarina', 'Ballerina tutu', 'Tutú de bailarina'], e: ['de tutu de bailarina', 'in a ballerina tutu', 'con tutú de bailarina'], cores: 1, padrao: { cor: 'rosa' }, facil: 1 },
+    { id: 'polo', grupo: 'cima', vinhaCom: ['bermuda', 'caqui'], n: ['Camisa polo', 'Polo shirt', 'Polo'], e: ['de camisa polo', 'in a polo shirt', 'con polo'], cores: 1, paleta: 'roupa2', padrao: { cor: 'preto' } },
+    { id: 'camiseta-lisa', grupo: 'cima', vinhaCom: ['short-rasgado', 'jeans'], n: ['Camiseta lisa', 'Plain tee', 'Camiseta lisa'], e: ['de camiseta lisa', 'in a plain tee', 'con camiseta lisa'], cores: 1, paleta: 'roupa2', padrao: { cor: 'cinza' }, facil: 1 },
+    { id: 'play', grupo: 'cima', vinhaCom: ['bermuda', 'grafite'], n: ['Camiseta PLAY', 'PLAY tee', 'Camiseta PLAY'], e: ['de camiseta PLAY', 'in a PLAY tee', 'con camiseta PLAY'], cores: 1, paleta: 'roupa2', padrao: { cor: 'branco' } },
+    { id: 'corta-vento', grupo: 'cima', vinhaCom: ['calca', 'marinho'], n: ['Corta-vento com zíper', 'Zip windbreaker', 'Cortavientos con cremallera'], e: ['de corta-vento', 'in a windbreaker', 'con cortavientos'], cores: 1, paleta: 'roupa2', padrao: { cor: 'turquesa' } },
+    { id: 'jardineira-curta', grupo: 'inteira', n: ['Jardineira jeans curta', 'Denim shortalls', 'Peto vaquero corto'], e: ['de jardineira curta', 'in denim shortalls', 'con peto corto'], cores: 1, padrao: { cor: 'branco' } },
+    { id: 'skatista', grupo: 'cima', vinhaCom: ['short-rasgado', 'jeans-claro'], n: ['Colete jeans claro', 'Light denim vest', 'Chaleco vaquero claro'], e: ['de colete jeans', 'in a denim vest', 'con chaleco vaquero'], cores: 1, paleta: 'roupa2', padrao: { cor: 'branco' } },
+    { id: 'vestido-doces', grupo: 'inteira', n: ['Vestido de docinhos', 'Candy dress', 'Vestido de golosinas'], e: ['de vestido de docinhos', 'in a candy dress', 'con vestido de golosinas'], cores: 1, padrao: { cor: 'rosa' } },
+    { id: 'neve', grupo: 'inteira', n: ['Macacão de neve', 'Snowsuit', 'Mono de nieve'], e: ['de macacão de neve', 'in a snowsuit', 'con mono de nieve'], cores: 1, padrao: { cor: 'azul' }, capuz: 1 },
+    { id: 'heroi-raio', grupo: 'inteira', heroi: 1, n: ['Herói do Raio', 'Lightning Hero', 'Héroe del Rayo'], e: ['de Herói do Raio', 'as the Lightning Hero', 'de Héroe del Rayo'], facil: 1 },
+    { id: 'heroi-estrela', grupo: 'inteira', heroi: 1, n: ['Heroína Estrela', 'Star Heroine', 'Heroína Estrella'], e: ['de Heroína Estrela', 'as the Star Heroine', 'de Heroína Estrella'], facil: 1 },
+    { id: 'heroi-coracao', grupo: 'inteira', heroi: 1, n: ['Herói Coração', 'Heart Hero', 'Héroe Corazón'], e: ['de Herói Coração', 'as the Heart Hero', 'de Héroe Corazón'] },
+    { id: 'heroi-gota', grupo: 'inteira', heroi: 1, n: ['Heroína Gota', 'Droplet Heroine', 'Heroína Gota'], e: ['de Heroína Gota', 'as the Droplet Heroine', 'de Heroína Gota'] },
+    { id: 'heroi-folha', grupo: 'inteira', heroi: 1, n: ['Herói Folha', 'Leaf Hero', 'Héroe Hoja'], e: ['de Herói Folha', 'as the Leaf Hero', 'de Héroe Hoja'] },
+    { id: 'heroi-lua', grupo: 'inteira', heroi: 1, n: ['Heroína Lua', 'Moon Heroine', 'Heroína Luna'], e: ['de Heroína Lua', 'as the Moon Heroine', 'de Heroína Luna'] },
+    { id: 'duende', grupo: 'inteira', n: ['Roupa de duende de Natal', 'Holiday elf outfit', 'Traje de duende navideño'], e: ['de duende de Natal', 'as a holiday elf', 'de duende navideño'], capuz: 1 },
+    { id: 'dino', grupo: 'inteira', n: ['Fantasia de dinossauro', 'Dinosaur costume', 'Disfraz de dinosaurio'], e: ['fantasiado de dinossauro', 'dressed as a dinosaur', 'disfrazado de dinosaurio'], cores: 1, capuz: 1, padrao: { cor: 'verde' } },
+    { id: 'noel', grupo: 'inteira', n: ['Casaco de Papai Noel', 'Santa coat', 'Abrigo de Papá Noel'], e: ['de casaco de Papai Noel', 'in a Santa coat', 'con abrigo de Papá Noel'], capuz: 1, facil: 1 },
+    { id: 'abobora', grupo: 'inteira', n: ['Fantasia de abóbora', 'Pumpkin costume', 'Disfraz de calabaza'], e: ['fantasiado de abóbora', 'dressed as a pumpkin', 'disfrazado de calabaza'], capuz: 1 },
+    { id: 'pinguim', grupo: 'inteira', n: ['Capa de pinguim', 'Penguin cape', 'Capa de pingüino'], e: ['de capa de pinguim', 'in a penguin cape', 'con capa de pingüino'], capuz: 1 },
+    { id: 'boneco-neve', grupo: 'inteira', n: ['Capa de boneco de neve', 'Snowman cape', 'Capa de muñeco de nieve'], e: ['de capa de boneco de neve', 'in a snowman cape', 'con capa de muñeco de nieve'], capuz: 1 },
+    // roupas inteiras das fotos do dono (REFERENCIAS.md, seção 1; 22/Nov/2026)
+    { id: 'vestido-brilho', grupo: 'inteira', n: ['Vestido de alcinha com brilho', 'Sparkly strappy dress', 'Vestido de tirantes con brillo'], e: ['de vestido com brilho', 'in a sparkly dress', 'con vestido con brillo'], cores: 1, paleta: 'brilho', padrao: { cor: 'lilas' } },
+    { id: 'vestido-listrado', grupo: 'inteira', n: ['Vestido listrado arco-íris', 'Rainbow striped dress', 'Vestido de rayas arcoíris'], e: ['de vestido listrado', 'in a striped dress', 'con vestido de rayas'] },
+    { id: 'vestido-carinhas', grupo: 'inteira', n: ['Vestido de carinhas', 'Smiley-face dress', 'Vestido de caritas'], e: ['de vestido de carinhas', 'in a smiley-face dress', 'con vestido de caritas'], cores: 1, paleta: 'blusa', padrao: { cor: 'lilas' } },
+    { id: 'vestido-amarrado', grupo: 'inteira', n: ['Vestido de amarrar nos ombros', 'Shoulder-tie dress', 'Vestido de lazos en los hombros'], e: ['de vestido de amarrar', 'in a shoulder-tie dress', 'con vestido de lazos'], cores: 1, paleta: 'blusa', padrao: { cor: 'rosa' } },
+    { id: 'macacao-cachorrinho', grupo: 'inteira', n: ['Macacão de cachorrinhos', 'Puppy onesie', 'Mono de perritos'], e: ['de macacão de cachorrinhos', 'in a puppy onesie', 'con mono de perritos'] },
+    { id: 'macacaozinho', grupo: 'inteira', n: ['Macacãozinho curto de bichinhos', 'Critter romper', 'Mono corto de animalitos'], e: ['de macacãozinho', 'in a romper', 'con mono corto'], cores: 1, paleta: 'blusa', padrao: { cor: 'rosa' } },
+    { id: 'macacao-dinos', grupo: 'inteira', n: ['Macacão de dinossauros', 'Dinosaur onesie', 'Mono de dinosaurios'], e: ['de macacão de dinossauros', 'in a dinosaur onesie', 'con mono de dinosaurios'] },
+    { id: 'pijama-espacial', grupo: 'inteira', n: ['Pijama espacial', 'Space pajamas', 'Pijama espacial'], e: ['de pijama espacial', 'in space pajamas', 'con pijama espacial'] },
+    { id: 'camisola', grupo: 'inteira', n: ['Camisola de coração', 'Heart nightie', 'Camisón de corazón'], e: ['de camisola', 'in a nightie', 'con camisón'], cores: 1, paleta: 'blusa', padrao: { cor: 'rosa' } },
+    { id: 'macacao-noel', grupo: 'inteira', n: ['Macacão de Papai Noel', 'Santa suit', 'Traje de Papá Noel'], e: ['de macacão de Papai Noel', 'in a Santa suit', 'con traje de Papá Noel'], capuz: 1 },
+    { id: 'tunica-magia', grupo: 'inteira', n: ['Túnica de escola de magia', 'Magic school robe', 'Túnica de escuela de magia'], e: ['de túnica de magia', 'in a magic robe', 'con túnica de magia'] },
+    { id: 'marinheiro', grupo: 'inteira', n: ['Roupa de marinheiro', 'Sailor outfit', 'Traje de marinero'], e: ['de marinheiro', 'in a sailor outfit', 'de marinero'] },
+    { id: 'sapo', grupo: 'inteira', n: ['Fantasia de sapinho', 'Little frog costume', 'Disfraz de ranita'], e: ['fantasiado de sapinho', 'dressed as a little frog', 'disfrazado de ranita'], capuz: 1 },
+    // partes de cima das fotos (seção 2): combinam com as saias, os shorts e as calças
+    { id: 'camiseta-coracao-dourado', grupo: 'cima', n: ['Camiseta de coração dourado', 'Gold heart tee', 'Camiseta de corazón dorado'], e: ['de camiseta de coração dourado', 'in a gold heart tee', 'con camiseta de corazón dorado'], cores: 1, paleta: 'camiseta', padrao: { cor: 'branco' } },
+    { id: 'camiseta-coracao', grupo: 'cima', n: ['Camiseta de coração rosa', 'Pink heart tee', 'Camiseta de corazón rosa'], e: ['de camiseta de coração', 'in a heart tee', 'con camiseta de corazón'], cores: 1, paleta: 'camiseta', padrao: { cor: 'rosa-claro' } },
+    { id: 'camiseta-turma', grupo: 'cima', n: ['Camiseta da turma', 'Buddy faces tee', 'Camiseta de la pandilla'], e: ['de camiseta da turma', 'in a buddy faces tee', 'con camiseta de la pandilla'] },
+    { id: 'camiseta-surfe', grupo: 'cima', n: ['Camiseta de surfe', 'Surf tee', 'Camiseta de surf'], e: ['de camiseta de surfe', 'in a surf tee', 'con camiseta de surf'] },
+    { id: 'camiseta-quadros', grupo: 'cima', n: ['Camiseta de quadrinhos', 'Critter panels tee', 'Camiseta de cuadritos'], e: ['de camiseta de quadrinhos', 'in a critter panels tee', 'con camiseta de cuadritos'] },
+    { id: 'raglan-coruja', grupo: 'cima', n: ['Camiseta raglan da corujinha', 'Owl raglan tee', 'Camiseta raglán del búho'], e: ['de camiseta da corujinha', 'in an owl raglan tee', 'con camiseta del búho'] },
+    { id: 'raglan-natal', grupo: 'cima', n: ['Camiseta raglan de Natal', 'Holiday raglan tee', 'Camiseta raglán navideña'], e: ['de camiseta de Natal', 'in a holiday tee', 'con camiseta navideña'] },
+    { id: 'listrada-noel', grupo: 'cima', n: ['Camiseta listrada do Papai Noel', 'Striped Santa tee', 'Camiseta de rayas de Papá Noel'], e: ['de camiseta listrada', 'in a striped Santa tee', 'con camiseta de rayas'] },
+    { id: 'gamer', grupo: 'cima', n: ['Camiseta GAMER', 'GAMER tee', 'Camiseta GAMER'], e: ['de camiseta GAMER', 'in a GAMER tee', 'con camiseta GAMER'] },
+    { id: 'camiseta-capivaras', grupo: 'cima', n: ['Camiseta de capivaras', 'Capybara tee', 'Camiseta de capibaras'], e: ['de camiseta de capivaras', 'in a capybara tee', 'con camiseta de capibaras'] },
+    { id: 'camiseta-jeans', grupo: 'cima', n: ['Camiseta jeans com ursinho', 'Denim tee with a teddy', 'Camiseta vaquera con osito'], e: ['de camiseta jeans', 'in a denim tee', 'con camiseta vaquera'] },
+    { id: 'regata-bff', grupo: 'cima', n: ['Regata #BFF', '#BFF tank top', 'Camiseta de tirantes #BFF'], e: ['de regata #BFF', 'in a #BFF tank top', 'con camiseta #BFF'], cores: 1, paleta: 'camiseta', padrao: { cor: 'azul-bebe' } },
+    { id: 'blusa-tule', grupo: 'cima', n: ['Blusa de tule com manga bufante', 'Puff-sleeve tulle top', 'Blusa de tul con manga abullonada'], e: ['de blusa de tule', 'in a tulle top', 'con blusa de tul'], cores: 1, paleta: 'blusa', padrao: { cor: 'lilas' } },
+    { id: 'blusa-babado', grupo: 'cima', n: ['Blusa de manga babado', 'Ruffle-sleeve top', 'Blusa de manga de volantes'], e: ['de blusa de babado', 'in a ruffle top', 'con blusa de volantes'], cores: 1, paleta: 'blusa', padrao: { cor: 'rosa-claro' } },
+    { id: 'camiseta-laco', grupo: 'cima', n: ['Camiseta de bichinhos com laço', 'Critter tee with a bow', 'Camiseta de animalitos con lazo'], e: ['de camiseta com laço', 'in a tee with a bow', 'con camiseta con lazo'] },
+    { id: 'moletom-listras', grupo: 'cima', n: ['Moletom de capuz com listras', 'Hoodie with striped sleeves', 'Sudadera con capucha y rayas'], e: ['de moletom listrado', 'in a striped hoodie', 'con sudadera de rayas'], cores: 1, paleta: 'roupa', padrao: { cor: 'vermelho' } },
+    { id: 'colete-capuz', grupo: 'cima', n: ['Colete de moletom com capuz', 'Hooded sweat vest', 'Chaleco de felpa con capucha'], e: ['de colete de capuz', 'in a hooded vest', 'con chaleco con capucha'], cores: 1, paleta: 'baixo', padrao: { cor: 'azul-cinza' } },
+    { id: 'jaqueta-estrelas', grupo: 'cima', n: ['Jaqueta roxa de estrelas', 'Purple star jacket', 'Chaqueta morada de estrellas'], e: ['de jaqueta de estrelas', 'in a star jacket', 'con chaqueta de estrellas'] },
+    { id: 'jaqueta-jeans', grupo: 'cima', n: ['Jaqueta jeans da capivara', 'Capybara denim jacket', 'Chaqueta vaquera de la capibara'], e: ['de jaqueta jeans', 'in a denim jacket', 'con chaqueta vaquera'] },
+    { id: 'casaco-pelucia', grupo: 'cima', n: ['Casaco de pelúcia com capuz', 'Fluffy hooded coat', 'Abrigo de peluche con capucha'], e: ['de casaco de pelúcia', 'in a fluffy coat', 'con abrigo de peluche'], cores: 1, paleta: 'roupa', padrao: { cor: 'vermelho' } }
+  ];
+  // ---------- partes de baixo (dono, 22/Nov/2026: "vários tipos de saias, vários tipos de shortinhos"): saias, shorts e calças
+  // (REFERENCIAS.md, seções 3 e 4). Ficam em a.baixo + a.corBaixo e combinam com uma parte de cima; uma roupa inteira tira a
+  // parte de baixo, e uma parte de baixo tira a roupa inteira (R.vestir / R.vestirBaixo). saia: true = fica no grupo das saias.
+  var BAIXOS = [
+    { id: 'tutu-arco', saia: 1, n: ['Tutu arco-íris', 'Rainbow tutu', 'Tutú arcoíris'], e: ['de tutu arco-íris', 'in a rainbow tutu', 'con tutú arcoíris'] },
+    { id: 'tutu-glitter', saia: 1, n: ['Tutu de glitter', 'Glitter tutu', 'Tutú de purpurina'], e: ['de tutu de glitter', 'in a glitter tutu', 'con tutú de purpurina'], cores: 1, paleta: 'tutu', padrao: { cor: 'rosa-choque' } },
+    { id: 'tutu-jeans', saia: 1, n: ['Tutu com cós jeans', 'Denim-waist tutu', 'Tutú con cintura vaquera'], e: ['de tutu com cós jeans', 'in a denim-waist tutu', 'con tutú de cintura vaquera'], cores: 1, paleta: 'tutu', padrao: { cor: 'rosa-choque' } },
+    { id: 'tutu-pompons', saia: 1, n: ['Tutu de pompons', 'Pom-pom tutu', 'Tutú de pompones'], e: ['de tutu de pompons', 'in a pom-pom tutu', 'con tutú de pompones'], cores: 1, paleta: 'tutu', padrao: { cor: 'branco' } },
+    { id: 'saia-babado', saia: 1, n: ['Saia de babado', 'Ruffle skirt', 'Falda de volantes'], e: ['de saia de babado', 'in a ruffle skirt', 'con falda de volantes'], cores: 1, paleta: 'roupa', padrao: { cor: 'rosa' } },
+    { id: 'saia-jeans', saia: 1, n: ['Saia jeans com patch', 'Denim skirt with a patch', 'Falda vaquera con parche'], e: ['de saia jeans', 'in a denim skirt', 'con falda vaquera'], cores: 1, paleta: 'jeans', padrao: { cor: 'jeans-escuro' } },
+    { id: 'saia-folk', saia: 1, n: ['Saia bordada', 'Embroidered skirt', 'Falda bordada'], e: ['de saia bordada', 'in an embroidered skirt', 'con falda bordada'], cores: 1, paleta: 'folk', padrao: { cor: 'vermelho' } },
+    { id: 'short-jeans', n: ['Short jeans', 'Denim shorts', 'Short vaquero'], e: ['de short jeans', 'in denim shorts', 'con pantalón corto vaquero'], cores: 1, paleta: 'jeans', padrao: { cor: 'jeans' } },
+    { id: 'short-rasgado', n: ['Short jeans desfiado', 'Frayed denim shorts', 'Short vaquero deshilachado'], e: ['de short desfiado', 'in frayed shorts', 'con pantalón corto deshilachado'], cores: 1, paleta: 'jeans', padrao: { cor: 'jeans-claro' } },
+    { id: 'short-moletom', n: ['Short de moletom', 'Sweat shorts', 'Short de felpa'], e: ['de short de moletom', 'in sweat shorts', 'con pantalón corto de felpa'], cores: 1, paleta: 'baixo', padrao: { cor: 'azul-cinza' } },
+    { id: 'short-cordao', n: ['Short com cordão', 'Drawstring shorts', 'Short con cordón'], e: ['de short com cordão', 'in drawstring shorts', 'con pantalón corto con cordón'], cores: 1, paleta: 'baixo', padrao: { cor: 'azul-bebe' } },
+    { id: 'short-sapinhos', n: ['Short de sapinhos', 'Little frog shorts', 'Short de ranitas'], e: ['de short de sapinhos', 'in frog shorts', 'con pantalón corto de ranitas'] },
+    { id: 'short-malha', n: ['Shortinho de malha', 'Knit shorts', 'Pantaloncito de punto'], e: ['de shortinho de malha', 'in knit shorts', 'con pantaloncito de punto'], cores: 1, paleta: 'roupa', padrao: { cor: 'rosa' } },
+    { id: 'short-esportivo', n: ['Short esportivo', 'Sports shorts', 'Short deportivo'], e: ['de short esportivo', 'in sports shorts', 'con pantalón corto deportivo'], cores: 1, paleta: 'baixo', padrao: { cor: 'preto' } },
+    { id: 'bermuda', n: ['Bermuda', 'Bermuda shorts', 'Bermudas'], e: ['de bermuda', 'in bermuda shorts', 'con bermudas'], cores: 1, paleta: 'baixo', padrao: { cor: 'jeans-escuro' } },
+    { id: 'sunga', n: ['Sunguinha', 'Swim briefs', 'Bañador'], e: ['de sunguinha', 'in swim briefs', 'con bañador'], cores: 1, paleta: 'sunga', padrao: { cor: 'branco' } },
+    { id: 'calca', n: ['Calça lisa', 'Plain pants', 'Pantalón liso'], e: ['de calça', 'in pants', 'con pantalón'], cores: 1, paleta: 'baixo', padrao: { cor: 'marinho' } },
+    { id: 'calca-jeans', n: ['Calça jeans', 'Jeans', 'Vaqueros'], e: ['de calça jeans', 'in jeans', 'con vaqueros'], cores: 1, paleta: 'jeans', padrao: { cor: 'jeans' } },
+    { id: 'calca-elfo', n: ['Calça listrada de elfo', 'Striped elf pants', 'Pantalón de rayas de elfo'], e: ['de calça de elfo', 'in elf pants', 'con pantalón de elfo'] },
+    { id: 'calca-camuflada', n: ['Calça camuflada', 'Camo pants', 'Pantalón de camuflaje'], e: ['de calça camuflada', 'in camo pants', 'con pantalón de camuflaje'], cores: 1, paleta: 'camuflado', padrao: { cor: 'azul-cinza' } },
+    { id: 'calca-pijama', n: ['Calça de pijama de cachorrinhos', 'Puppy pajama pants', 'Pantalón de perritos'], e: ['de calça de pijama', 'in pajama pants', 'con pantalón de pijama'] }
+  ];
+  // os grupos do guarda-roupa (etapa 4, "Me veste!"), como as caixinhas do balcão
+  var GRUPOS_ROUPA = [
+    { id: 'inteira', ico: '👗', n: ['Roupas inteiras', 'Full outfits', 'Conjuntos enteros'] },
+    { id: 'cima', ico: '👕', n: ['Partes de cima', 'Tops', 'Partes de arriba'] },
+    { id: 'baixo', ico: '🩳', n: ['Saias e shorts', 'Skirts & shorts', 'Faldas y pantalones'] }
   ];
   var ESTAMPAS = [
     { id: 'lisa', n: ['Lisa', 'Plain', 'Lisa'] },
@@ -481,10 +565,10 @@
   var NIVEIS = { facil: { todas: false, encomenda: false }, medio: { todas: true, encomenda: false }, dificil: { todas: true, encomenda: true } };
 
   var D = { ETAPAS: ETAPAS, CORES: CORES, PALETAS: PALETAS, PELOS: PELOS, OLHOS: OLHOS, ESTILOS_OLHO: ESTILOS_OLHO, BOCHECHAS: BOCHECHAS,
-    CORACOES: CORACOES, BASES: BASES, ROUPAS: ROUPAS, ESTAMPAS: ESTAMPAS, CAIXAS: CAIXAS, ACESS: ACESS, CONFLITOS: CONFLITOS, VOZES: VOZES,
+    CORACOES: CORACOES, BASES: BASES, ROUPAS: ROUPAS, BAIXOS: BAIXOS, GRUPOS_ROUPA: GRUPOS_ROUPA, ESTAMPAS: ESTAMPAS, CAIXAS: CAIXAS, ACESS: ACESS, CONFLITOS: CONFLITOS, VOZES: VOZES,
     NOMES: NOMES, NIVEIS: NIVEIS, PATCHES: PATCHES, FRASES: FRASES };
   function porId(lista) { var m = {}; lista.forEach(function (x) { m[x.id] = x; }); return m; }
-  D.base = porId(BASES); D.pelo = porId(PELOS); D.olho = porId(OLHOS); D.coracao = porId(CORACOES); D.roupa = porId(ROUPAS);
+  D.base = porId(BASES); D.pelo = porId(PELOS); D.olho = porId(OLHOS); D.coracao = porId(CORACOES); D.roupa = porId(ROUPAS); D.baixo = porId(BAIXOS);
   D.acess = porId(ACESS); D.caixa = porId(CAIXAS); D.voz = porId(VOZES); D.estampa = porId(ESTAMPAS); D.patch = porId(PATCHES); D.frase = porId(FRASES);
   raiz.AmiguinhoDados = D;
   if (typeof module === 'object' && module.exports) module.exports = D;

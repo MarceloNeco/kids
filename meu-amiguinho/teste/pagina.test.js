@@ -101,6 +101,48 @@ test('barra de tom ☀️ ↔ 🌙 no pelo, na roupa e no acessório: aparece ao
   } finally { await pg.ctx.close(); }
 });
 
+// Guarda-roupa em grupos (dono, 22/Nov/2026): Roupas inteiras · Partes de cima · Saias e shorts, todos à vista, sem rolar.
+test('etapa 4: grupos do guarda-roupa, parte de cima + saia, a inteira tira a de baixo; rascunho antigo de camiseta ganha a bermuda', async () => {
+  for (const [w, h, lang] of [[360, 740, 'pt'], [412, 915, 'es']]) {
+    const pg = await abrir(w, h, lang);
+    try {
+      await pg.click('#btCriar'); await pg.waitForTimeout(200);
+      for (let i = 0; i < 3; i++) { await pg.click('#btProximo'); await pg.waitForTimeout(200); }
+      assert.equal(await pg.locator('#painel [data-grupo]').count(), 3);
+      for (const g of ['inteira', 'cima', 'baixo']) assert.ok(await inteiro(pg, '#painel [data-grupo="' + g + '"]'), 'grupo ' + g + ' à vista');
+      assert.equal(await pg.locator('#painel [data-roupa]').count(), await pg.evaluate(() => AmiguinhoDados.ROUPAS.filter((r) => r.grupo === 'inteira').length + 1), 'roupas inteiras (e "Sem roupa")');
+      await pg.click('#painel [data-grupo="cima"]'); await pg.waitForTimeout(150);
+      await pg.click('#painel [data-roupa="raglan-coruja"]'); await pg.waitForTimeout(150);
+      await pg.click('#painel [data-grupo="baixo"]'); await pg.waitForTimeout(150);
+      assert.equal(await pg.locator('#painel [data-baixo]').count(), await pg.evaluate(() => AmiguinhoDados.BAIXOS.length + 1), 'todas as saias, shorts e calças (e "Nada")');
+      await pg.click('#painel [data-baixo="tutu-pompons"]'); await pg.waitForTimeout(150);
+      await pg.click('#painel [data-cor-baixo="lilas"]'); await pg.waitForTimeout(150);
+      assert.equal(await pg.locator('#painel input[type=range]').count(), 1, 'barra de tom da parte de baixo');
+      assert.ok(await naoRola(pg), 'etapa 4 rola');
+      let e = (await est(pg)).amigo;
+      assert.equal(e.roupa, 'raglan-coruja'); assert.equal(e.baixo, 'tutu-pompons'); assert.equal(e.corBaixo, 'lilas');
+      await pg.click('#painel [data-grupo="inteira"]'); await pg.waitForTimeout(150);
+      await pg.click('#painel [data-roupa="vestido-listrado"]'); await pg.waitForTimeout(150);
+      e = (await est(pg)).amigo; assert.equal(e.baixo, null, 'o vestido tirou o tutu');
+      await pg.click('#painel [data-grupo="baixo"]'); await pg.waitForTimeout(150);
+      await pg.click('#painel [data-baixo="calca-jeans"]'); await pg.waitForTimeout(150);
+      e = (await est(pg)).amigo; assert.equal(e.roupa, 'nenhuma', 'a calça tirou o vestido'); assert.equal(e.baixo, 'calca-jeans');
+      assert.deepEqual(pg.erros, []);
+    } finally { await pg.ctx.close(); }
+  }
+  // rascunho de antes (camiseta com a bermuda junto, sem o campo "baixo"): abre com a bermuda separada, na mesma cor
+  const pg2 = await abrir(360, 740);
+  try {
+    await pg2.evaluate(() => localStorage.setItem('bolinho:meu-amiguinho:rascunho', JSON.stringify({ amigo: { id: 'velho2', base: 'urso', corpo: 'pe', pelo: 'creme', roupa: 'camiseta', corRoupa: 'amarelo', acess: {}, frases: [{ pronta: 'teamo' }] }, etapa: 3 })));
+    await pg2.reload(); await pg2.waitForFunction(() => window.AmiguinhoDebug && AmiguinhoDebug.pronto);
+    await pg2.click('#btContinuar'); await pg2.waitForTimeout(250);
+    const e = (await est(pg2)).amigo;
+    assert.equal(e.roupa, 'camiseta'); assert.equal(e.corRoupa, 'amarelo'); assert.equal(e.baixo, 'bermuda'); assert.equal(e.corBaixo, 'jeans-escuro');
+    assert.ok(await pg2.evaluate(() => document.querySelector('#pelucia').innerHTML.includes('#3c5c94')), 'a bermuda de antes, na mesma cor');
+    assert.deepEqual(pg2.erros, []);
+  } finally { await pg2.ctx.close(); }
+});
+
 test('montar uma coala do jeito da Alice, Pronto: caixinha, amiguinho vivo com ❤, certidão em PNG e coleção', async () => {
   const pg = await abrir(390, 844);
   try {

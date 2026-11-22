@@ -29,7 +29,7 @@ test('nada da loja de referência: nomes proibidos não aparecem', () => {
 });
 
 test('textos de todas as listas nos 3 idiomas', () => {
-  for (const [nome, lista, k] of [['PELOS', D.PELOS, 'n'], ['ROUPAS', D.ROUPAS, 'n'], ['ACESS', D.ACESS, 'n'], ['CAIXAS', D.CAIXAS, 'n'], ['VOZES', D.VOZES, 'n'], ['ESTAMPAS', D.ESTAMPAS, 'n'], ['FRASES', D.FRASES, 't'], ['ETAPAS', D.ETAPAS, 'titulo']])
+  for (const [nome, lista, k] of [['PELOS', D.PELOS, 'n'], ['ROUPAS', D.ROUPAS, 'n'], ['BAIXOS', D.BAIXOS, 'n'], ['GRUPOS_ROUPA', D.GRUPOS_ROUPA, 'n'], ['ACESS', D.ACESS, 'n'], ['CAIXAS', D.CAIXAS, 'n'], ['VOZES', D.VOZES, 'n'], ['ESTAMPAS', D.ESTAMPAS, 'n'], ['FRASES', D.FRASES, 't'], ['ETAPAS', D.ETAPAS, 'titulo']])
     for (const x of lista) assert.equal(x[k].length, 3, nome + ' ' + x.id);
   assert.equal(D.ETAPAS.length, 7);
   for (const it of D.ACESS) { assert.ok(D.caixa[it.caixa], it.id); if (it.paleta) { assert.ok(D.PALETAS[it.paleta], it.id); assert.ok(D.PALETAS[it.paleta].includes(it.cor), it.id + ' cor padrão na paleta'); } }
@@ -86,6 +86,16 @@ test('encaixe: cada roupa e cada acessório em cada bichinho (em pé e de 4 pata
       const s = A.svg(a, { id: 't' }); n++;
       assert.ok(!/NaN|undefined|Infinity/.test(s), base + '/' + corpo + '/' + r.id + ': número estragado');
       if (r.id !== 'nenhuma') assert.ok(s.length > semNada.length + 200, base + '/' + corpo + '/' + r.id + ': a roupa não apareceu');
+    }
+    for (const x of D.BAIXOS) {
+      const a = R.novo(base); R.escolherCorpo(a, corpo);
+      if (!R.vestirBaixo(a, x.id)) { assert.ok(x.so && x.so !== corpo, x.id + ' recusado sem motivo'); continue; }
+      const s = A.svg(a, { id: 't' }); n++;
+      assert.ok(!/NaN|undefined|Infinity/.test(s), base + '/' + corpo + '/' + x.id + ': número estragado');
+      assert.ok(s.length > semNada.length + 200, base + '/' + corpo + '/' + x.id + ': a parte de baixo não apareceu');
+      R.vestir(a, 'camiseta-lisa'); const s2 = A.svg(a, { id: 't' });
+      const soBlusa = A.svg(Object.assign({}, a, { baixo: null }), { id: 't' });
+      assert.ok(!/NaN|undefined|Infinity/.test(s2) && s2 !== s && s2 !== soBlusa && s2.length > semNada.length + 400, base + '/' + corpo + '/' + x.id + ' com blusa');
     }
     for (const it of D.ACESS) {
       const a = R.novo(base); R.escolherCorpo(a, corpo);
@@ -190,6 +200,52 @@ test('tom: clareia e escurece o pelo, a roupa e cada acessório no desenho; fica
   assert.deepEqual(R.validar({ base: 'urso', tom: { pelo: 'x', roupa: 9, acess: { 'nao-existe': 0.5, laco: -3 } } }).tom, { roupa: 1, acess: { laco: -1 } });
   // o holográfico (arco-íris) não tem claro e escuro
   assert.equal(A.comTom('#cfd8f0', 1), '#cfd8f0');
+});
+
+// Partes de baixo (dono, 22/Nov/2026: "vários tipos de saias, vários tipos de shortinhos, vários tipos de roupa").
+test('guarda-roupa: roupas inteiras, partes de cima e partes de baixo; inteira tira a de baixo e vice-versa; cor e tom da parte de baixo', () => {
+  assert.ok(D.ROUPAS.every((r) => r.id === 'nenhuma' || r.grupo === 'inteira' || r.grupo === 'cima'), 'toda roupa diz o grupo');
+  assert.ok(D.ROUPAS.filter((r) => r.grupo === 'inteira').length >= 38, 'roupas inteiras');
+  assert.ok(D.ROUPAS.filter((r) => r.grupo === 'cima').length >= 28, 'partes de cima');
+  assert.ok(D.BAIXOS.filter((x) => x.saia).length >= 7 && D.BAIXOS.filter((x) => !x.saia).length >= 13, 'saias, shorts e calças');
+  assert.deepEqual(D.GRUPOS_ROUPA.map((g) => g.id), ['inteira', 'cima', 'baixo']);
+  for (const x of D.BAIXOS) if (x.cores) { assert.ok(D.PALETAS[x.paleta], x.id); assert.ok(D.PALETAS[x.paleta].includes(x.padrao.cor), x.id + ' cor padrão na paleta'); }
+  for (const r of D.ROUPAS) if (r.cores && r.paleta) assert.ok(D.PALETAS[r.paleta].includes(r.padrao.cor), r.id + ' cor padrão na paleta');
+  const a = R.novo('urso');
+  assert.equal(a.baixo, null);
+  assert.ok(R.vestir(a, 'camiseta-coracao')); assert.ok(R.vestirBaixo(a, 'tutu-glitter'));
+  assert.equal(a.roupa, 'camiseta-coracao'); assert.equal(a.baixo, 'tutu-glitter'); assert.equal(a.corBaixo, 'rosa-choque', 'parte de cima e de baixo juntas');
+  assert.ok(R.corBaixo(a, 'lilas')); assert.ok(!R.corBaixo(a, 'jeans'), 'cor fora da paleta do tutu');
+  const comTutu = A.svg(a, { id: 't' });
+  assert.ok(comTutu.includes(D.CORES.lilas.hex));
+  assert.ok(R.tom(a, 'baixo', 0.7)); assert.ok(A.svg(a, { id: 't' }).includes(A.comTom(D.CORES.lilas.hex, 0.7)), 'tom da parte de baixo');
+  assert.ok(R.vestir(a, 'vestido-nuvens')); assert.equal(a.baixo, null, 'roupa inteira tira a parte de baixo');
+  assert.ok(R.vestirBaixo(a, 'short-jeans')); assert.equal(a.roupa, 'nenhuma', 'parte de baixo tira a roupa inteira');
+  assert.ok(R.vestir(a, 'moletom-listras')); assert.equal(a.baixo, 'short-jeans', 'parte de cima não tira a de baixo');
+  assert.ok(R.vestirBaixo(a, 'nenhum')); assert.equal(a.baixo, null);
+  assert.ok(!R.vestirBaixo(a, 'nao-existe'));
+  // a parte de baixo sozinha também aparece (sem blusa) e o patch do peito só aparece com blusa
+  const b = R.novo('urso'); b.patch = 'letra-A'; R.vestirBaixo(b, 'calca-jeans');
+  assert.ok(!/>A<\/text>/.test(A.svg(b, { id: 't' })), 'sem blusa, sem patch');
+});
+
+test('amiguinho antigo: a parte de cima que vinha com bermuda ou calça ganha a mesma, separada, com a mesma cor', () => {
+  const VELHAS = { camiseta: '#3c5c94', moletom: '#2e2a33', 'corta-vento': '#2f3f6e', social: '#2f3f6e', polo: '#c8b48a', 'jaqueta-prata': '#3a3f52', 'jaqueta-couro': '#5b7fb8', 'camiseta-lisa': '#5b7fb8', skatista: '#8fb0dc' };
+  for (const r of D.ROUPAS.filter((x) => x.vinhaCom)) {
+    const [bx, cor] = r.vinhaCom;
+    assert.ok(D.baixo[bx], r.id + ': ' + bx); assert.ok(D.PALETAS[D.baixo[bx].paleta].includes(cor), r.id + ': ' + cor + ' na paleta');
+    const a = R.validar({ base: 'urso', roupa: r.id, acess: {} });
+    assert.equal(a.baixo, bx, r.id); assert.equal(a.corBaixo, cor, r.id);
+    if (VELHAS[r.id]) assert.ok(A.svg(a, { id: 't' }).includes(VELHAS[r.id]), r.id + ': a parte de baixo de antes (' + VELHAS[r.id] + ')');
+  }
+  // guardado já no jeito novo: a escolha fica (sem parte de baixo, ou outra)
+  assert.equal(R.validar({ base: 'urso', roupa: 'camiseta', baixo: null }).baixo, null);
+  assert.equal(R.validar({ base: 'urso', roupa: 'camiseta', baixo: 'tutu-arco' }).baixo, 'tutu-arco');
+  // roupa inteira e parte de baixo juntas (dado estragado): fica a parte de baixo
+  const x = R.validar({ base: 'urso', roupa: 'pijama', baixo: 'saia-jeans', corBaixo: 'rosa' });
+  assert.equal(x.roupa, 'nenhuma'); assert.equal(x.baixo, 'saia-jeans'); assert.equal(x.corBaixo, 'rosa');
+  // os exemplos da coleção (roupas inteiras) continuam iguais
+  assert.equal(R.validar(R.EXEMPLOS[0]).baixo, null);
 });
 
 test('frases: prontas nos 3 idiomas com o nome da criança, escritas até 60 letras', () => {

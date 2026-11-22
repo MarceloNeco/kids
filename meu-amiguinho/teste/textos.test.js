@@ -1,6 +1,7 @@
 // Nenhum texto saindo da caixinha (dono, 22/Nov/2026: "tem escritos que estão saindo fora da caixinha"): no Chromium
 // (Playwright), em 360×740 e 412×915, em PT, EN e ES, passa pela tela de começo, pelas 7 etapas e por TODAS as opções de
-// cada etapa (todo bichinho, toda cor, toda roupa, toda caixinha de acessórios e cada acessório com as suas cores, toda voz)
+// cada etapa (todo bichinho, toda cor, cada grupo do guarda-roupa com toda roupa, saia, short e calça e as cores deles, toda
+// caixinha de acessórios e cada acessório com as suas cores, toda voz; depois de tocar numa cor, a barra de tom também)
 // e reprova se:
 //   - um texto sai da caixa (scrollWidth > clientWidth + 1 ou scrollHeight > clientHeight + 1);
 //   - um texto fica cortado com reticências (text-overflow: ellipsis ativo);
@@ -106,7 +107,7 @@ function instalarConferencia() {
     if (etapa === 'bicho') passa('base', () => passa('corpo'));
     else if (etapa === 'pelo') { passa('pelo'); passa('olhos'); passa('estilo-olho'); passa('bochecha'); }
     else if (etapa === 'fofura') passa('coracao');
-    else if (etapa === 'roupa') { passa('roupa', () => { passa('cor-roupa'); passa('estampa'); }); passa('patch'); }
+    else if (etapa === 'roupa') for (const gr of todos('grupo')) { tocar('grupo', gr); conferir('grupo=' + gr); passa('roupa', () => { passa('cor-roupa'); passa('estampa'); }); passa('baixo', () => passa('cor-baixo')); passa('patch'); }
     else if (etapa === 'acess') {
       for (const cx of todos('caixa')) { tocar('caixa', cx); conferir('caixinha=' + cx); passa('acess', () => passa('cor-acess')); }
     } else if (etapa === 'voz') { passa('genero'); passa('pronta'); passa('voz'); passa('som'); tocar('mais-frase', '1'); conferir('duas frases'); }

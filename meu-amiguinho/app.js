@@ -5,7 +5,7 @@
    Histórico: cada tela de dentro (cada etapa também) é uma entrada; o Voltar do celular volta uma etapa. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.1', APP_DATA = '22/Nov/2026';
+  var APP_VERSION = '0.3.0', APP_DATA = '22/Nov/2026';
   var D = window.AmiguinhoDados, A = window.AmiguinhoArte, R = window.AmiguinhoRegras, V = window.AmiguinhoVoz, VIVO = window.AmiguinhoVivo;
   var $ = function (id) { return document.getElementById(id); };
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -142,7 +142,7 @@
     $('maquina').hidden = etapa !== 2; $('medidor').hidden = etapa !== 2;
     if (etapa === 2) { if (!$('maquina').firstChild) $('maquina').innerHTML = A.maquina({ id: 'mq' }); pintarMedidor(); }
     $('fala').hidden = true;
-    if (pintarOficina.etapa !== etapa) { tomAberto = null; pintarOficina.etapa = etapa; }
+    if (pintarOficina.etapa !== etapa) { tomAberto = null; grupoRoupa = null; pintarOficina.etapa = etapa; }
     atualizarPelucia();
     $('painel').scrollTop = 0;
     PAINEL[E.id](); depoisDoPainel();
@@ -210,7 +210,7 @@
   }
   function miniDoAcess(a, id, cor, idSvg) {
     var it = D.acess[id]; if (!it) return '';
-    var b = Object.assign({}, a, { acess: {}, roupa: 'nenhuma', corAcess: {}, tom: a.tom && a.tom.pelo ? { pelo: a.tom.pelo } : undefined });
+    var b = Object.assign({}, a, { acess: {}, roupa: 'nenhuma', baixo: null, corAcess: {}, tom: a.tom && a.tom.pelo ? { pelo: a.tom.pelo } : undefined });
     b.acess[it.caixa] = id; if (cor) b.corAcess[id] = cor;
     if (b.corpo === 'q' && it.so === 'pe') b.corpo = 'pe';
     var com = A.svg(b, { id: idSvg }), sem = A.svg(Object.assign({}, b, { acess: {} }), { id: idSvg + 's' });
@@ -323,13 +323,47 @@
     },
     roupa: function () {
       var p = limparPainel();
-      var L1 = linha(t('Guarda-roupa', 'Wardrobe', 'Armario'), 'cabides');
+      /* guarda-roupa em grupos (dono, 22/Nov/2026: "vários tipos de saias, vários tipos de shortinhos"), como o balcão da
+         etapa 5: Roupas inteiras · Partes de cima · Saias e shorts, todos à vista; a roupa inteira tira a parte de baixo */
+      var R0 = D.roupa[amigo.roupa], gr = grupoRoupa || (R0 && R0.grupo) || (amigo.baixo ? 'baixo' : 'inteira');
+      var prat = el('div', 'balcao prateleira'); prat.setAttribute('role', 'tablist'); prat.setAttribute('aria-label', t('Guarda-roupa', 'Wardrobe', 'Armario'));
+      D.GRUPOS_ROUPA.forEach(function (g) {
+        var tem = g.id === 'baixo' ? !!amigo.baixo : !!(R0 && R0.grupo === g.id);
+        var b = el('button', 'acrilico' + (gr === g.id ? ' aberta' : '') + (tem ? ' tem' : ''), '<span class="ico" aria-hidden="true">' + g.ico + '</span><small>' + tr(g.n) + '</small>');
+        b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(gr === g.id)); b.dataset.grupo = g.id;
+        prat.appendChild(b);
+      });
+      p.appendChild(prat);
+      var G = D.GRUPOS_ROUPA.filter(function (g) { return g.id === gr; })[0];
+      var L1 = linha(null, 'cabides'); L1.r.setAttribute('aria-label', tr(G.n));   // (o nome do grupo já está na prateleira)
+      if (gr === 'baixo') {
+        L1.r.appendChild(opc('<span>✕ ' + t('Nada', 'None', 'Nada') + '</span>', !amigo.baixo, null, { baixo: 'nenhum' }));
+        D.BAIXOS.forEach(function (x) {
+          var svg = mini('cbb-' + x.id, function () { var a = R.novo('urso'); R.vestirBaixo(a, x.id); return A.cabideBaixo(a, x.id, { id: 'cbb' + x.id }); });
+          var b = opc(svg + '<small>' + tr(x.n) + '</small>', amigo.baixo === x.id, tr(x.n), { baixo: x.id });
+          if (!R.podeVestir(amigo, x.id, true)) { b.disabled = true; b.title = t('Só para quem fica em pé', 'Only for standing buddies', 'Solo para los que están de pie'); }
+          L1.r.appendChild(b);
+        });
+        p.appendChild(L1.l);
+        var X0 = D.baixo[amigo.baixo];
+        if (X0 && X0.cores) {
+          var Lb = linha(t('Cor', 'Color', 'Color'));
+          D.PALETAS[X0.paleta || 'roupa'].forEach(function (c) { Lb.r.appendChild(opc(amostraCor(D.CORES[c].hex), amigo.corBaixo === c, tr(D.CORES[c].n), { corBaixo: c })); });
+          p.appendChild(Lb.l);
+          if (tomAberto === 'baixo' && D.CORES[amigo.corBaixo]) p.appendChild(linhaTom('baixo', null, D.CORES[amigo.corBaixo].hex));
+        }
+        rolarAteSel(L1.r);
+        return;
+      }
       D.ROUPAS.forEach(function (r) {
+        if (r.id !== 'nenhuma' && r.grupo !== gr) return;
         var svg = mini('cb-' + r.id + '-' + lingua, function () { var a = R.novo('urso'); R.vestir(a, r.id); a.lang = lingua; return A.cabide(a, r.id, { id: 'cb' + r.id }); });
-        L1.r.appendChild(opc(svg + '<small>' + tr(r.n) + '</small>', amigo.roupa === r.id, tr(r.n), { roupa: r.id }));
+        var b = opc(svg + '<small>' + tr(r.n) + '</small>', amigo.roupa === r.id, tr(r.n), { roupa: r.id });
+        if (!R.podeVestir(amigo, r.id)) { b.disabled = true; b.title = t('Só para quem fica em pé', 'Only for standing buddies', 'Solo para los que están de pie'); }
+        L1.r.appendChild(b);
       });
       p.appendChild(L1.l);
-      var R0 = D.roupa[amigo.roupa];
+      if (R0 && R0.grupo !== gr) R0 = null;   // cor, estampa e patch: da roupa deste grupo
       if (R0 && R0.cores) {
         var L2 = linha(t('Cor', 'Color', 'Color'));
         D.PALETAS[R0.paleta || 'roupa'].forEach(function (c) { L2.r.appendChild(opc(amostraCor(D.CORES[c].hex), amigo.corRoupa === c, tr(D.CORES[c].n), { corRoupa: c })); });
@@ -341,7 +375,7 @@
         D.ESTAMPAS.forEach(function (x) { L3.r.appendChild(opc('<span>' + tr(x.n) + '</span>', amigo.estampa === x.id, null, { estampa: x.id })); });
         p.appendChild(L3.l);
       }
-      if (amigo.roupa !== 'nenhuma') {
+      if (R0) {
         var L4 = linha(t('Patch no peito', 'Chest patch', 'Parche en el pecho'), 'patches');
         D.PATCHES.forEach(function (x) {
           var ico = x.letra ? '<b>' + x.letra + '</b>' : x.id === 'nenhum' ? '<span>' + tr(x.n) + '</span>' : { coracao: '❤️', 'arco-iris': '🌈', estrela: '⭐', capivara: '<b class="capi">ᴖᴥᴖ</b>' }[x.id];
@@ -438,7 +472,7 @@
       $('btSortear').addEventListener('click', function () { var n = D.NOMES[Math.floor(Math.random() * D.NOMES.length)]; amigo.nome = n; $('inNome').value = n; V.pop(); guardarRascunho(); });
     }
   };
-  var caixaAberta = 'laco';
+  var caixaAberta = 'laco', grupoRoupa = null;
   function marcarProntas() { document.querySelectorAll('#painel [data-pronta]').forEach(function (b) { var fr = amigo.frases[amigo.frase || 0]; var s = !fr.gravada && fr.pronta === b.dataset.pronta; b.classList.toggle('sel', s); b.setAttribute('aria-checked', String(s)); }); }
 
   // escolhas (um ouvinte só para o painel inteiro)
@@ -452,7 +486,10 @@
     else if (d.estiloOlho) amigo.estiloOlho = d.estiloOlho;
     else if (d.bochecha) amigo.bochecha = d.bochecha;
     else if (d.coracao) { amigo.coracao = d.coracao; }
+    else if (d.grupo) { grupoRoupa = d.grupo; tomAberto = null; mudouDesenho = false; }
     else if (d.roupa) { R.vestir(amigo, d.roupa); tomAberto = null; if (vOf) setTimeout(function () { vOf.acao('cabeca'); }, 50); }
+    else if (d.baixo) { R.vestirBaixo(amigo, d.baixo); tomAberto = null; if (vOf) setTimeout(function () { vOf.acao('pulinho'); }, 50); }
+    else if (d.corBaixo) { R.corBaixo(amigo, d.corBaixo); tomAberto = 'baixo'; }
     else if (d.corRoupa) { R.corRoupa(amigo, d.corRoupa); tomAberto = 'roupa'; }
     else if (d.estampa) R.estampa(amigo, d.estampa);
     else if (d.patch) amigo.patch = d.patch;

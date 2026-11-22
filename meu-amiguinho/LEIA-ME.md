@@ -25,11 +25,18 @@ fica sempre à vista (o resto já vem escolhido). O Voltar do celular volta uma 
    a **máquina de fofura** (carrocinha com rodas, janela de flocos girando e luzes que trocam): segure o botão, os flocos
    voam pelo bico e a pelúcia incha; medidor pouco · no ponto · cheio demais; no ponto = estrelinhas; cheio demais =
    gordinha engraçada; 🤗 Apertão tira um pouco.
-4. **Me veste!** — 35 roupas num guarda-roupa de cabides (pijamas, macacão com pezinho e touca, vestidos, tule, tutu,
-   jardineiras, camisetas, moletom, polo, corta-vento, jaquetas, colete de skatista, uniforme, 6 heróis próprios com capa
-   e máscara, duende, Papai Noel, abóbora, pinguim, boneco de neve, dinossauro, neve), cores, estampas próprias e
-   **patches** no peito (letras A–Z e figurinhas). Cada roupa tem versão de 4 patas (casaco nas costas, mangas nas patas da
-   frente, perninhas de trás).
+4. **Me veste!** — guarda-roupa de cabides em **três grupos** numa prateleira (como o balcão da etapa 5, todos à vista):
+   **Roupas inteiras** (38: pijamas, macacões, vestidos, tule, tutu, jardineiras, camisola, uniforme, 6 heróis próprios com
+   capa e máscara, fantasias de duende, Papai Noel, abóbora, pinguim, boneco de neve, dinossauro, sapinho, marinheiro e
+   túnica de escola de magia), **Partes de cima** (30: camisetas lisas e estampadas, raglan, regata, blusas de tule e de
+   babado, moletons, colete, jaquetas, casaco de pelúcia) e **Saias e shorts** (21: 7 saias e tutus, shorts, bermuda,
+   sunguinha e calças). A parte de baixo fica em `amigo.baixo` + `corBaixo` (lista `BAIXOS` no `dados.js`) e combina com a
+   parte de cima; **a roupa inteira tira a parte de baixo e a parte de baixo tira a roupa inteira** (`R.vestir`,
+   `R.vestirBaixo`). Cores (com a barra de tom), estampas próprias e **patches** no peito (letras A–Z e figurinhas, só com
+   blusa). Cada peça tem versão de 4 patas (casaco nas costas, mangas nas patas da frente, perninhas de trás; sem blusa,
+   short e calça cobrem o traseiro e as pernas de trás, e saia e tutu abrem como um sininho presos num cós na cintura).
+   Peças das fotos do dono: `REFERENCIAS.md`, seções 1 a 4. Amiguinho guardado antes (parte de cima que vinha com bermuda
+   ou calça, `vinhaCom`): ganha a mesma parte de baixo, separada e na mesma cor.
 5. **Me enfeita!** — **balcão de caixinhas de acrílico** (12 caixinhas, 50 acessórios, vários ao mesmo tempo, um por
    caixinha): laços (cores, glitter, pedrinhas, gigante, mini arco-íris, fitinhas), tiaras e chapéus, óculos, colares,
    coleira com guia, pulseiras e pochete, mochilas e asas, na mãozinha, filhotinho no colo (da mesma espécie, com nome) e
@@ -68,9 +75,9 @@ corpo 384×512) e aparece no Vruuum! e na Purpurina; apagar tira de lá.
 
 | Arquivo | O quê |
 |---|---|
-| `dados.js` | Etapas, cores, pelos, olhos, turma (bases), roupas, estampas, patches, caixinhas e acessórios, conflitos, vozes, frases prontas, níveis. |
+| `dados.js` | Etapas, cores, pelos, olhos, turma (bases), roupas (com o grupo: inteira ou de cima), partes de baixo (`BAIXOS`) e os grupos do guarda-roupa, estampas, patches, caixinhas e acessórios, conflitos, vozes, frases prontas, níveis. |
 | `arte.js` | Todo o desenho em SVG: geometria e **pontos de ancoragem** por base (`AmiguinhoArte.geo`), camadas, roupas em pé e de 4 patas, acessórios, robozinho e LED, máquina, caixinha, cabide, certidão, vitrine. |
-| `regras.js` | Montar (base, corpo, roupa, acessórios com conflitos), fofura, frases, gênero da voz (`R.genero`), validar dado lido (peça que mudou de caixinha vai para a caixinha atual), coleção no `localStorage` (`bolinho:meu-amiguinho:colecao`) com os exemplos. |
+| `regras.js` | Montar (base, corpo, roupa, parte de baixo, acessórios com conflitos), tom, fofura, frases, gênero da voz (`R.genero`), validar dado lido (peça que mudou de caixinha vai para a caixinha atual), coleção no `localStorage` (`bolinho:meu-amiguinho:colecao`) com os exemplos. |
 | `voz.js` | Efeitos WebAudio, fala do aparelho (voz de menininha ou de menininho), gravação e IndexedDB (`meu-amiguinho`/`vozes`), vozes prontas (`vozes/lista.json`, hoje vazia; `vozes/<idioma>/<f\|m>/<frase>.mp3`). |
 | `vivo.js` | A pelúcia viva: partes com pivô animadas com curvas suaves; ~30 qps no aparelho fraco; "reduzir movimento" = só pisca. |
 | `app.js` | Telas, histórico (uma entrada por etapa), painéis, máquina, Pronto, certidão PNG, coleção, personagens. `?teste` → `window.AmiguinhoDebug`. |

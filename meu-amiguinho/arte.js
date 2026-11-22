@@ -132,6 +132,37 @@
     else if (tipo === 'tartan') { w = 14; h = 14; s = ret(0, 5, 14, 4, { fill: escuro(cor, 0.45), opacity: 0.45 }) + ret(5, 0, 4, 14, { fill: escuro(cor, 0.45), opacity: 0.45 }) + lin(0, 12, 14, 12, { stroke: '#ffffff', 'stroke-width': 0.8, opacity: 0.7 }) + lin(12, 0, 12, 14, { stroke: '#ffffff', 'stroke-width': 0.8, opacity: 0.7 }); }
     else if (tipo === 'trico') { w = 6; h = 6; s = p('M0.5,0 L3,3 L5.5,0 M0.5,3 L3,6 L5.5,3', { stroke: escuro(cor, 0.3), 'stroke-width': 0.9, fill: 'none', opacity: 0.7 }); }
     else if (tipo === 'lantejoula') { w = 10; h = 9; s = circ(2.5, 2.5, 2.4, { fill: claro(cor, 0.2), stroke: escuro(cor, 0.25), 'stroke-width': 0.5 }) + circ(7.5, 7, 2.4, { fill: claro(cor, 0.5), stroke: escuro(cor, 0.25), 'stroke-width': 0.5 }) + circ(2, 2, 0.6, { fill: '#fff' }) + circ(7, 6.4, 0.5, { fill: '#fff' }); }
+    else if (tipo === 'carinhas') { w = 26; h = 24; s = circ(7, 7, 4.6, { fill: '#ffe27a', stroke: '#e0b23a', 'stroke-width': 0.6 }) + circ(5.4, 6, 0.7, { fill: '#3a2a2a' }) + circ(8.6, 6, 0.7, { fill: '#3a2a2a' }) + p('M5,8.4 q2,2 4,0', { stroke: '#3a2a2a', 'stroke-width': 0.7, fill: 'none' }) + circ(19, 18, 4.2, { fill: '#ff9ec4', stroke: '#e0559a', 'stroke-width': 0.6 }) + circ(17.6, 17, 0.7, { fill: '#3a2a2a' }) + circ(20.4, 17, 0.7, { fill: '#3a2a2a' }) + p('M17.2,19.2 q1.8,1.8 3.6,0', { stroke: '#3a2a2a', 'stroke-width': 0.7, fill: 'none' }); }
+    else if (tipo === 'cachorrinhos') {
+      w = 32; h = 30;
+      s = circ(8, 9, 4.6, { fill: '#f4e2c8' }) + elip(3.8, 9, 1.8, 3.4, { fill: '#8a5a3c' }) + elip(12.2, 9, 1.8, 3.4, { fill: '#8a5a3c' }) + circ(6.6, 8.4, 0.7, { fill: '#2a2230' }) + circ(9.4, 8.4, 0.7, { fill: '#2a2230' }) + elip(8, 10.6, 1.2, 0.8, { fill: '#2a2230' }) +
+        circ(24, 22, 3.6, { fill: '#fff', stroke: '#2e2a33', 'stroke-width': 0.6 }) + p('M24,19.8 l1.6,1.2 -0.6,1.9 h-2 l-0.6,-1.9z', { fill: '#2e2a33' }) + circ(25, 7, 2.6, { fill: '#f08a3c', stroke: '#7a3a10', 'stroke-width': 0.5 }) + circ(7, 24, 1.2, { fill: tinta, opacity: 0.7 });
+    }
+    else if (tipo === 'dinos') {
+      w = 34; h = 30;
+      s = p('M4,14 q2,-8 9,-6 q3,-4 6,0 l3,5 q-1,3 -4,3 l0,4 h-2 l0,-3 h-5 l0,3 h-2 l0,-4 q-4,0 -5,-2z', { fill: '#3f6a34', opacity: 0.75 }) + circ(18.5, 9, 0.7, { fill: '#fff' }) +
+        p('M24,26 q3,-8 8,-6 q-3,3 -8,6z M24,26 q-1,-7 -6,-8 q2,4 6,8z', { fill: '#a8c878', opacity: 0.9 });
+    }
+    else if (tipo === 'espaco') {
+      w = 34; h = 32;
+      s = circ(8, 9, 4, { fill: '#ffb04d' }) + elip(8, 9, 7.2, 1.6, { fill: 'none', stroke: '#ffe27a', 'stroke-width': 0.9 }) + circ(24, 22, 3.4, { fill: '#7fd38a' }) + circ(22.8, 21.4, 0.8, { fill: '#2a2230' }) + circ(25.2, 21.4, 0.8, { fill: '#2a2230' }) + lin(24, 18.6, 24, 16.6, { stroke: '#7fd38a', 'stroke-width': 0.8 }) +
+        p(estrelaD(26, 6, 2.2, 0.9), { fill: '#fff6c8' }) + circ(6, 26, 1, { fill: '#ffffff' }) + circ(16, 15, 0.7, { fill: '#ffffff' });
+    }
+    else if (tipo === 'capivaras') {
+      w = 32; h = 26;
+      s = elip(10, 10, 6.4, 4.6, { fill: '#a87a55' }) + circ(5.4, 6.4, 1.4, { fill: '#a87a55' }) + circ(13.8, 6.2, 1.4, { fill: '#a87a55' }) + circ(8, 9.4, 0.7, { fill: '#2a2230' }) + circ(12, 9.4, 0.7, { fill: '#2a2230' }) + elip(10, 12, 2.4, 1.4, { fill: '#7a5238' }) +
+        p('M22,22 q4,-6 8,0z', { fill: '#3f8a4a', opacity: 0.7 }) + circ(25, 4, 1.4, { fill: '#ffd447' });
+    }
+    else if (tipo === 'natal') {
+      w = 30; h = 30;
+      s = p('M7,3 v8 M3,7 h8 M4.2,4.2 l5.6,5.6 M9.8,4.2 l-5.6,5.6', { stroke: '#8fb8e8', 'stroke-width': 1, 'stroke-linecap': 'round' }) +
+        circ(22, 21, 3.4, { fill: '#a8703c' }) + p('M19.4,18.4 l-2,-4 M18.4,16 l-2,0 M24.6,18.4 l2,-4 M25.6,16 l2,0', { stroke: '#8a5a3c', 'stroke-width': 0.9, 'stroke-linecap': 'round' }) + circ(22, 23, 1.2, { fill: '#e5404f' }) + circ(21, 20.4, 0.5, { fill: '#2a2230' }) + circ(23, 20.4, 0.5, { fill: '#2a2230' }) + circ(6, 24, 1.4, { fill: '#e5404f' });
+    }
+    else if (tipo === 'faixas-arco') { w = 10; h = 50; s = ['#f9b4c4', '#fde49a', '#a8d8f8', '#cdb6ec', '#b8ecc8'].map(function (cc, i) { return ret(0, i * 10, 10, 10, { fill: cc }); }).join(''); }
+    else if (tipo === 'listras-pb') { w = 10; h = 12; s = ret(0, 0, 10, 6, { fill: '#2e2a33' }); }
+    else if (tipo === 'faixas-elfo') { w = 10; h = 28; s = ret(0, 0, 10, 11, { fill: '#d8435f' }); }
+    else if (tipo === 'sapinhos') { w = 26; h = 24; s = elip(8, 9, 4.6, 3.4, { fill: '#7fd36a', stroke: '#3f8a2e', 'stroke-width': 0.6 }) + circ(5.8, 6, 1.6, { fill: '#fff', stroke: '#3f8a2e', 'stroke-width': 0.5 }) + circ(10.2, 6, 1.6, { fill: '#fff', stroke: '#3f8a2e', 'stroke-width': 0.5 }) + circ(5.8, 6, 0.6, { fill: '#2a2230' }) + circ(10.2, 6, 0.6, { fill: '#2a2230' }) + circ(20, 19, 1.4, { fill: '#ffffff', opacity: 0.8 }); }
+    else if (tipo === 'bordado') { w = 18; h = 18; s = p(coracaoD(5, 5, 2.4), { fill: '#fbf3e0' }) + circ(13, 13, 2, { fill: '#ffd447' }) + [0, 1, 2, 3].map(function (k) { var an = rad(k * 90 + 45); return circ(13 + Math.cos(an) * 3, 13 + Math.sin(an) * 3, 1.3, { fill: '#2f7a4a' }); }).join(''); }
     else if (tipo === 'paete') { w = 10; h = 9; s = circ(2.5, 2.5, 2.4, { fill: '#ff9ed0', stroke: '#e0559a', 'stroke-width': 0.5 }) + circ(7.5, 7, 2.4, { fill: '#ffc2e2', stroke: '#e0559a', 'stroke-width': 0.5 }) + circ(2, 2, 0.6, { fill: '#fff' }); }
     else return null;
     this.defs.push('<pattern id="' + id + '" width="' + w + '" height="' + h + '" patternUnits="userSpaceOnUse">' + s + '</pattern>');
@@ -594,7 +625,14 @@
 
   /* ---------- roupas: cada uma é feita de peças (blusa, parte de baixo, jardineira, jaqueta, capuz…) ---------- */
   var JEANS = '#5b7fb8', JEANS_CL = '#8fb0dc';
+  // a roupa de cima (ou inteira) + a parte de baixo separada (saia, short ou calça; dono, 22/Nov/2026). A roupa inteira
+  // ignora a parte de baixo (as regras já tiram uma quando entra a outra).
   function especRoupa(a) {
+    var S = especCima(a), Bx = especBaixo(a), R0 = D.roupa[a.roupa];
+    if (Bx && !(R0 && R0.grupo === 'inteira')) { S = Object.assign({}, S || {}); S.baixo = Bx; }
+    return S;
+  }
+  function especCima(a) {
     var id = a.roupa || 'nenhuma', cor = D.CORES[a.corRoupa] ? D.CORES[a.corRoupa].hex : null, est = a.estampa;
     var R = D.roupa[id] || D.ROUPAS[0], pad = R.padrao || {};
     if (!cor || !R.cores) cor = corHex(pad.cor, '#f59ac0');
@@ -610,18 +648,18 @@
       'jardineira-saia': { top: { cor: cor, mangas: 'bufante', gola: 'redonda', tule: 1 }, bib: { cor: JEANS }, baixo: { tipo: 'babado', cor: JEANS } },
       jardineira: { top: { cor: cor, mangas: 'curta', gola: 'redonda' }, bib: { cor: JEANS }, baixo: { tipo: 'calca', cor: JEANS, costura: 1 } },
       'jardineira-curta': { top: { cor: cor, mangas: 'curta', gola: 'redonda' }, bib: { cor: JEANS }, baixo: { tipo: 'bermuda', cor: JEANS, costura: 1 } },
-      camiseta: { top: { cor: cor, mangas: 'curta', gola: 'redonda', texto: 'amigos' }, baixo: { tipo: 'bermuda', cor: '#3c5c94' } },
-      'camiseta-lisa': { top: { cor: cor, mangas: 'curta', gola: 'redonda' }, baixo: { tipo: 'bermuda', cor: JEANS, desfiado: 1, costura: 1 } },
-      play: { top: { cor: cor, mangas: 'curta', gola: 'redonda', texto: 'PLAY' }, baixo: { tipo: 'bermuda', cor: '#3a3944' } },
-      moletom: { top: { cor: cor, est: est === 'controle' ? 'lisa' : est, mangas: 'longa', gola: 'capuz', bolso: 1, cordao: 1, controle: est === 'controle' }, baixo: { tipo: 'bermuda', cor: '#2e2a33' } },
-      'corta-vento': { top: { cor: cor, mangas: 'longa', gola: 'alta', ziper: 1, faixa: '#ffffff' }, baixo: { tipo: 'calca', cor: '#2f3f6e' } },
-      'jaqueta-prata': { top: { cor: '#f4f1ec', mangas: 'curta', gola: 'redonda' }, jaqueta: { cor: '#cfd5e0', metal: 1 }, baixo: { tipo: 'calca', cor: '#3a3f52' } },
-      'jaqueta-couro': { top: { cor: '#ece6de', mangas: 'curta', gola: 'redonda' }, jaqueta: { cor: '#2b272f', couro: 1 }, baixo: { tipo: 'calca', cor: JEANS, costura: 1 } },
-      social: { top: { cor: '#a9cdf0', mangas: 'longa', gola: 'social', botoes: 1, gravata: '#d8434f' }, baixo: { tipo: 'calca', cor: '#2f3f6e' } },
-      polo: { top: { cor: cor, mangas: 'curta', gola: 'polo' }, baixo: { tipo: 'bermuda', cor: '#c8b48a' } },
+      camiseta: { top: { cor: cor, mangas: 'curta', gola: 'redonda', texto: 'amigos' } },
+      'camiseta-lisa': { top: { cor: cor, mangas: 'curta', gola: 'redonda' } },
+      play: { top: { cor: cor, mangas: 'curta', gola: 'redonda', texto: 'PLAY' } },
+      moletom: { top: { cor: cor, est: est === 'controle' ? 'lisa' : est, mangas: 'longa', gola: 'capuz', bolso: 1, cordao: 1, controle: est === 'controle' } },
+      'corta-vento': { top: { cor: cor, mangas: 'longa', gola: 'alta', ziper: 1, faixa: '#ffffff' } },
+      'jaqueta-prata': { top: { cor: '#f4f1ec', mangas: 'curta', gola: 'redonda' }, jaqueta: { cor: '#cfd5e0', metal: 1 } },
+      'jaqueta-couro': { top: { cor: '#ece6de', mangas: 'curta', gola: 'redonda' }, jaqueta: { cor: '#2b272f', couro: 1 } },
+      social: { top: { cor: '#a9cdf0', mangas: 'longa', gola: 'social', botoes: 1, gravata: '#d8434f' } },
+      polo: { top: { cor: cor, mangas: 'curta', gola: 'polo' } },
       futebol: { top: { cor: cor, mangas: 'curta', gola: 'v', numero: '10' }, baixo: { tipo: 'calcao', cor: '#fbfaf7' }, meias: { cor: cor } },
       tutu: { top: { cor: cor, mangas: 'nenhuma', gola: 'redonda' }, baixo: { tipo: 'tutu', cor: claro(cor, 0.25) } },
-      skatista: { top: { cor: cor, mangas: 'curta', gola: 'redonda', texto: 'UAU', controle: 1 }, colete: { cor: JEANS_CL }, baixo: { tipo: 'bermuda', cor: JEANS_CL, desfiado: 1, costura: 1 } },
+      skatista: { top: { cor: cor, mangas: 'curta', gola: 'redonda', texto: 'UAU', controle: 1 }, colete: { cor: JEANS_CL } },
       'vestido-doces': { top: { cor: cor, est: 'doces', mangas: 'bufante', gola: 'boneca' }, baixo: { tipo: 'tule', cor: claro(cor, 0.2), est: 'doces' } },
       neve: { top: { cor: cor, mangas: 'longa', gola: 'alta', ziper: 1, comp: 1, gomos: 1 }, baixo: { tipo: 'calca', cor: cor, gomos: 1 }, capuz: { tipo: 'capuz', cor: cor, pelucia: '#f6f1ea' } },
       dino: { top: { cor: cor, mangas: 'longa', gola: 'redonda', comp: 1, barriga: 1 }, baixo: { tipo: 'calca', cor: cor }, capuz: { tipo: 'dino', cor: cor } },
@@ -630,10 +668,74 @@
       pinguim: { capa: { cor: '#2b2a36', forro: '#fbfaf7' }, capuz: { tipo: 'pinguim' } },
       'heroi-raio': heroi('#2ec4b6', '#ffd447', 'raio'), 'heroi-estrela': heroi('#8a5cd6', '#ffd447', 'estrela'), 'heroi-coracao': heroi('#ff7a59', '#ffffff', 'coracao'),
       'heroi-gota': heroi('#4fb3f0', '#e8f7ff', 'gota'), 'heroi-folha': heroi('#5fbf5a', '#fff09a', 'folha'), 'heroi-lua': heroi('#3a3f7a', '#f2e6ff', 'lua'),
-      duende: { top: { cor: '#2fa37a', mangas: 'longa', gola: 'redonda', barra: '#f4e6c8', cinto: '#5a3418', bolinhas: 1 }, baixo: { tipo: 'calca', cor: '#d8435f' }, capuz: { tipo: 'gorro-duende', cor: '#2fa37a' }, sapatoPonta: '#d8435f' },
-      'boneco-neve': { capa: { cor: '#f7f7fa', forro: '#dfe6f2', botoes: 1 }, capuz: { tipo: 'neve' }, cachecol: '#d8434f' }
+      duende: { top: { cor: '#2fa37a', mangas: 'longa', gola: 'redonda', barra: '#f4e6c8', cinto: '#5a3418', bolinhas: 1, gravata: '#d8435f' }, baixo: { tipo: 'calca', cor: '#2fa37a', est: 'faixas-elfo' }, capuz: { tipo: 'gorro-duende', cor: '#2fa37a' }, sapatoPonta: '#d8435f' },
+      'boneco-neve': { capa: { cor: '#f7f7fa', forro: '#dfe6f2', botoes: 1 }, capuz: { tipo: 'neve' }, cachecol: '#d8434f' },
+      // roupas inteiras das fotos (REFERENCIAS.md, seção 1)
+      'vestido-brilho': { top: { cor: cor, mangas: 'alcinha', gola: 'reta', glitter: 1 }, baixo: { tipo: 'tule', cor: claro(cor, 0.12), glitter: ['#ffffff', '#e4e8f0'] } },
+      'vestido-listrado': { top: { cor: '#f9c4d8', est: 'faixas-arco', mangas: 'curta', gola: 'redonda' }, baixo: { tipo: 'saia', cor: '#f9c4d8', est: 'faixas-arco', bico: 1 } },
+      'vestido-carinhas': { top: { cor: cor, est: 'carinhas', mangas: 'alcinha', gola: 'reta' }, baixo: { tipo: 'saia', cor: cor, est: 'carinhas' } },
+      'vestido-amarrado': { top: { cor: cor, mangas: 'alcinha', gola: 'reta', lacinhos: 1, corLaco: escuro(cor, 0.12) }, baixo: { tipo: 'saia', cor: cor, babados: 1 } },
+      'macacao-cachorrinho': { top: { cor: '#a3b6c9', est: 'cachorrinhos', mangas: 'longa', gola: 'redonda', comp: 1, debrum: '#2f3f6e', ziper: 1 }, baixo: { tipo: 'calca', cor: '#a3b6c9', est: 'cachorrinhos', pezinho: 1 }, pompomRabo: '#ffffff' },
+      macacaozinho: { top: { cor: cor, est: 'bichinhos', mangas: 'curta', gola: 'boneca', comp: 1 }, baixo: { tipo: 'calcao', cor: cor, est: 'bichinhos' } },
+      'macacao-dinos': { top: { cor: '#7a9a5a', est: 'dinos', mangas: 'longa', gola: 'redonda', comp: 1, ziper: 1 }, baixo: { tipo: 'calca', cor: '#7a9a5a', est: 'dinos', pezinho: 1 } },
+      'pijama-espacial': { top: { cor: '#2f3f6e', est: 'espaco', mangas: 'longa', gola: 'redonda', comp: 1, botoes: 1 }, baixo: { tipo: 'calca', cor: '#2f3f6e', est: 'espaco', pezinho: 1 } },
+      camisola: { top: { cor: cor, mangas: 'alcinha', gola: 'reta', emblema: 'coracao-bichinhos' }, baixo: { tipo: 'saia', cor: cor, longa: 1 } },
+      'macacao-noel': { top: { cor: '#d92f3a', mangas: 'longa', gola: 'redonda', barra: '#fbf8f2', cinto: '#2a2228', comp: 1 }, baixo: { tipo: 'calca', cor: '#d92f3a', barraPelucia: '#fbf8f2' }, capuz: { tipo: 'capuz', cor: '#d92f3a', pelucia: '#fbf8f2' } },
+      'tunica-magia': { top: { cor: '#2b2733', mangas: 'longa', gola: 'social', golaCor: '#f4f1ec', aberta: '#f4f1ec', gravataLonga: ['#f2c14e', '#2e2a33'], emblema: 'escudo' }, baixo: { tipo: 'saia', cor: '#2b2733', longa: 1, reta: 1 } },
+      marinheiro: { top: { cor: '#fbfaf7', mangas: 'curta', gola: 'marinheiro', golaCor: '#2f3f6e', gravata: '#d8434f' }, baixo: { tipo: 'bermuda', cor: '#2f3f6e' } },
+      sapo: { top: { cor: '#6cc04a', mangas: 'longa', gola: 'redonda', comp: 1, barriga: 1 }, baixo: { tipo: 'calca', cor: '#6cc04a', pezinho: 1 }, capuz: { tipo: 'sapo', cor: '#6cc04a' } },
+      // partes de cima das fotos (seção 2)
+      'camiseta-coracao-dourado': { top: { cor: cor, mangas: 'curta', gola: 'redonda', emblema: 'coracao-dourado' } },
+      'camiseta-coracao': { top: { cor: cor, mangas: 'curta', gola: 'redonda', emblema: 'coracao-rosa' } },
+      'camiseta-turma': { top: { cor: '#fbfaf7', mangas: 'curta', gola: 'redonda', emblema: 'turma' } },
+      'camiseta-surfe': { top: { cor: '#5fa8e0', est: 'praia', mangas: 'curta', gola: 'redonda', cordao: 1 } },
+      'camiseta-quadros': { top: { cor: '#2f3f6e', mangas: 'curta', gola: 'redonda', golaCor: '#ffd447', emblema: 'quadros' } },
+      'raglan-coruja': { top: { cor: '#fbfaf7', corManga: '#d8434f', mangas: 'curta', gola: 'redonda', golaCor: '#d8434f', emblema: 'coruja' } },
+      'raglan-natal': { top: { cor: '#fbfaf7', est: 'natal', corManga: '#d92f3a', mangas: 'longa', gola: 'redonda', golaCor: '#d92f3a' } },
+      'listrada-noel': { top: { cor: '#fbfaf7', est: 'listras-pb', mangas: 'curta', gola: 'redonda', emblema: 'noel' } },
+      gamer: { top: { cor: '#fbfaf7', mangas: 'curta', gola: 'redonda', texto: 'GAMER', controle: 1 } },
+      'camiseta-capivaras': { top: { cor: '#7cc48a', est: 'capivaras', mangas: 'curta', gola: 'redonda' } },
+      'camiseta-jeans': { top: { cor: JEANS_CL, mangas: 'curta', gola: 'redonda', emblema: 'ursinho' } },
+      'regata-bff': { top: { cor: cor, mangas: 'regata', gola: 'reta', texto: '#BFF' } },
+      'blusa-tule': { top: { cor: cor, mangas: 'bufante', gola: 'redonda', tule: 1, glitter: 1 } },
+      'blusa-babado': { top: { cor: cor, mangas: 'babado', gola: 'redonda' } },
+      'camiseta-laco': { top: { cor: '#fbfaf7', est: 'bichinhos', mangas: 'curta', gola: 'redonda', gravata: '#f58cc0' } },
+      'moletom-listras': { top: { cor: cor, mangas: 'longa', gola: 'capuz', bolso: 1, listrasManga: '#ffffff' } },
+      'colete-capuz': { top: { cor: '#bfe0f6', mangas: 'curta', gola: 'redonda' }, colete: { cor: cor, moletom: 1 } },
+      'jaqueta-estrelas': { top: { cor: '#fbfaf7', mangas: 'curta', gola: 'redonda' }, jaqueta: { cor: '#7a4ec8', estrelas: 1 } },
+      'jaqueta-jeans': { top: { cor: '#fbfaf7', mangas: 'curta', gola: 'redonda' }, jaqueta: { cor: JEANS, jeans: 1 } },
+      'casaco-pelucia': { top: { cor: cor, mangas: 'longa', gola: 'capuz', felpudo: 1, ziper: 1 } }
     }[id];
     return S || null;
+  }
+  // a parte de baixo separada (seções 3 e 4 do REFERENCIAS.md): mesmo jeito de descrever da parte de baixo das roupas inteiras
+  function especBaixo(a) {
+    var X = D.baixo[a.baixo]; if (!X) return null;
+    var cor = X.cores && D.CORES[a.corBaixo] ? D.CORES[a.corBaixo].hex : corHex((X.padrao || {}).cor, JEANS);
+    if (X.cores) cor = comTom(cor, tomDe(a, 'baixo'));
+    return {
+      'tutu-arco': { tipo: 'tutu', camadas: ['#8fc3ef', '#f7a8cc', '#f2d27a'], glitter: ['#ffffff', '#f2c14e'] },
+      'tutu-glitter': { tipo: 'tutu', cor: cor, glitter: ['#ffffff', '#ffe9a8'] },
+      'tutu-jeans': { tipo: 'tutu', cor: cor, cos: JEANS, peludo: 1 },
+      'tutu-pompons': { tipo: 'tutu', cor: cor, pompons: ['#ff6b8a', '#ffd447', '#5fb0f0', '#6fd68a', '#b07be6'] },
+      'saia-babado': { tipo: 'saia', cor: cor, babados: 1 },
+      'saia-jeans': { tipo: 'saia', cor: cor, costura: 1, botao: 1, patchBicho: 1 },
+      'saia-folk': { tipo: 'saia', cor: cor, est: 'bordado', barraOuro: 1, longa: 1 },
+      'short-jeans': { tipo: 'calcao', cor: cor, costura: 1, botao: 1, dobra: 1 },
+      'short-rasgado': { tipo: 'bermuda', cor: cor, desfiado: 1, costura: 1 },
+      'short-moletom': { tipo: 'calcao', cor: cor, desfiado: 1, cordao: '#ffffff' },
+      'short-cordao': { tipo: 'calcao', cor: cor, cordao: '#ffffff' },
+      'short-sapinhos': { tipo: 'calcao', cor: '#6fa8dc', est: 'sapinhos', cordao: '#ffffff' },
+      'short-malha': { tipo: 'calcao', cor: cor },
+      'short-esportivo': { tipo: 'calcao', cor: cor, faixaLado: '#ffffff' },
+      bermuda: { tipo: 'bermuda', cor: cor },
+      sunga: { tipo: 'sunga', cor: cor, cos: luz(cor) > 0.5 ? '#2e2a33' : '#fbfaf7' },
+      calca: { tipo: 'calca', cor: cor },
+      'calca-jeans': { tipo: 'calca', cor: cor, costura: 1 },
+      'calca-elfo': { tipo: 'calca', cor: '#3f9a5a', est: 'faixas-elfo' },
+      'calca-camuflada': { tipo: 'calca', cor: cor, est: 'camuflado', bolsoLado: 1 },
+      'calca-pijama': { tipo: 'calca', cor: '#86acd8', est: 'cachorrinhos' }
+    }[X.id] || null;
   }
   // heróis e heroínas deste jogo: macacão, capa, máscara de olhos, símbolo no peito, luvas e botas (cores e símbolos próprios)
   function heroi(cor, cor2, simbolo) {
@@ -676,6 +778,7 @@
     // punho
     var dx = (m[0] - o[0]), dy = (m[1] - o[1]), L = Math.sqrt(dx * dx + dy * dy), ux = dx / L, uy = dy / L;
     if (M.barra) s += lin(x2 - uy * r, y2 + ux * r, x2 + uy * r, y2 - ux * r, { stroke: M.barra, 'stroke-width': 9, 'stroke-linecap': 'round' });
+    else if (M.debrum) s += lin(x2 - uy * (r - 1), y2 + ux * (r - 1), x2 + uy * (r - 1), y2 - ux * (r - 1), { stroke: M.debrum, 'stroke-width': 4, 'stroke-linecap': 'round' });
     else if (comp > 0.6) s += lin(x2 - uy * (r - 1), y2 + ux * (r - 1), x2 + uy * (r - 1), y2 - ux * (r - 1), { stroke: escuro(M.cor, 0.18), 'stroke-width': 4, 'stroke-linecap': 'round' });
     return s;
   }
@@ -699,8 +802,8 @@
     var B = S.baixo;
     if (B) {
       var cinto = troncoD(g, 3.5), corteB = c.faixa(cintura, 420);
-      if (B.tipo === 'calca' || B.tipo === 'bermuda' || B.tipo === 'calcao') {
-        var compP = B.tipo === 'calca' ? 1 : B.tipo === 'bermuda' ? 0.5 : 0.36;
+      if (B.tipo === 'calca' || B.tipo === 'bermuda' || B.tipo === 'calcao' || B.tipo === 'sunga') {
+        var compP = B.tipo === 'calca' ? 1 : B.tipo === 'bermuda' ? 0.5 : B.tipo === 'sunga' ? 0.1 : 0.36;
         for (var k = 0; k < 2; k++) {
           var q = g.qua[k], pe = g.pe[k], x2 = q[0] + (pe[0] - q[0]) * compP, y2 = q[1] + (pe[1] - 8 - q[1]) * compP;
           if (B.pezinho) { x2 = pe[0]; y2 = pe[1] - 6; }
@@ -708,12 +811,17 @@
           var e = c.estampa(B.est, B.cor); if (e) s += lin(q[0], q[1] - 4, x2, y2, { stroke: e, 'stroke-width': (g.rp + 4) * 2, 'stroke-linecap': 'round' });
           if (B.pezinho) s += pePelucia(pe[0], pe[1], g, B.cor, { s: escuro(B.cor, 0.35), cl: claro(B.cor, 0.4) }, g.sentado, claro(B.cor, 0.5));
           else if (B.desfiado) for (var f = -3; f <= 3; f++) s += lin(x2 + f * 5, y2 + g.rp - 2, x2 + f * 5 + 1, y2 + g.rp + 4, { stroke: '#e8eef8', 'stroke-width': 1.4, 'stroke-linecap': 'round' });
-          else s += lin(x2 - g.rp - 2, y2 + 3, x2 + g.rp + 2, y2 + 3, { stroke: escuro(B.cor, 0.2), 'stroke-width': 3 });
+          else if (B.dobra) s += ret(x2 - g.rp - 4, y2 + g.rp - 9, (g.rp + 4) * 2, 10, { rx: 4, fill: claro(B.cor, 0.22), stroke: escuro(B.cor, 0.3), 'stroke-width': 1.4 });
+          else if (B.barraPelucia) s += lin(x2 - g.rp - 3, y2 + 2, x2 + g.rp + 3, y2 + 2, { stroke: B.barraPelucia, 'stroke-width': 11, 'stroke-linecap': 'round' });
+          else if (B.tipo !== 'sunga') s += lin(x2 - g.rp - 2, y2 + 3, x2 + g.rp + 2, y2 + 3, { stroke: escuro(B.cor, 0.2), 'stroke-width': 3 });
+          if (B.faixaLado) s += lin(q[0] + (k ? 1 : -1) * (g.rp + 1), q[1] - 2, x2 + (k ? 1 : -1) * (g.rp + 1), y2 + g.rp - 4, { stroke: B.faixaLado, 'stroke-width': 3.4, 'stroke-linecap': 'round' });
+          if (B.bolsoLado) s += ret(x2 + (k ? 1 : -1) * (g.rp - 2) - 7, q[1] + 10, 14, 13, { rx: 3, fill: escuro(B.cor, 0.12), stroke: escuro(B.cor, 0.4), 'stroke-width': 1.2 });
           if (S.heroi) s += p('M' + n(pe[0] - g.peRx - 3) + ',' + n(pe[1] + 6) + ' L' + n(pe[0] - g.rp - 3) + ',' + n(pe[1] - 30) + ' L' + n(pe[0] + g.rp + 3) + ',' + n(pe[1] - 30) + ' L' + n(pe[0] + g.peRx + 3) + ',' + n(pe[1] + 6) + ' Q' + pe[0] + ',' + n(pe[1] + 22) + ' ' + n(pe[0] - g.peRx - 3) + ',' + n(pe[1] + 6) + 'Z', { fill: S.heroi.cor2, stroke: escuro(S.heroi.cor2, 0.35), 'stroke-width': 1.8 });
           if (B.gomos) s += lin(q[0], q[1] + 14, x2, y2 - 6, { stroke: escuro(B.cor, 0.2), 'stroke-width': 1.4, 'stroke-dasharray': '1 8' });
         }
         s += tecido(c, cinto, B.cor, B.est, { 'clip-path': corteB });
         if (B.costura) s += p('M' + n(x) + ',' + n(cintura + 4) + ' L' + x + ',' + n(t.y1 + 6), { stroke: '#f2c14e', 'stroke-width': 1.3, 'stroke-dasharray': '3 2', fill: 'none' });
+        if (!top) s += cos(c, g, B, cintura);   // sem blusa por cima: o cós aparece
       }
       if (S.sapatoPonta) for (var sk = 0; sk < 2; sk++) { var pp = g.pe[sk], kk = sk ? 1 : -1; s += p('M' + n(pp[0] - g.peRx) + ',' + n(pp[1] + 8) + ' Q' + n(pp[0] - g.peRx) + ',' + n(pp[1] - 14) + ' ' + pp[0] + ',' + n(pp[1] - 14) + ' Q' + n(pp[0] + kk * 30) + ',' + n(pp[1] - 12) + ' ' + n(pp[0] + kk * 36) + ',' + n(pp[1] - 22) + ' Q' + n(pp[0] + kk * 34) + ',' + n(pp[1] + 8) + ' ' + n(pp[0] + g.peRx * kk) + ',' + n(pp[1] + 8) + 'Z', { fill: S.sapatoPonta, stroke: escuro(S.sapatoPonta, 0.35), 'stroke-width': 1.8 }) + circ(pp[0] + kk * 36, pp[1] - 24, 4.5, { fill: '#f2c14e', stroke: '#a8801e', 'stroke-width': 1 }); }
       if (S.meias) for (var mk = 0; mk < 2; mk++) { var pe2 = g.pe[mk]; s += capsula(pe2[0], pe2[1] - 30, pe2[0], pe2[1] - 8, g.rp + 2, S.meias.cor, escuro(S.meias.cor, 0.35)) + lin(pe2[0] - g.rp, pe2[1] - 26, pe2[0] + g.rp, pe2[1] - 26, { stroke: '#ffffff', 'stroke-width': 3 }); }
@@ -723,10 +831,13 @@
       var hem = S.bib || B && B.tipo !== 'calca' && B.tipo !== 'bermuda' && B.tipo !== 'calcao' ? cintura + 4 : (top.comp ? t.y1 + 20 : t.y1 - 12);
       var corpoT = troncoD(g, 3), corteT;
       if (top.mangas === 'alcinha' || top.mangas === 'nenhuma' && top.gola === 'reta') corteT = c.faixa(t.y0 + 26, hem);
+      else if (top.mangas === 'regata') corteT = c.faixa(t.y0 + 16, hem);
       else corteT = c.faixa(0, hem);
       s += tecido(c, corpoT, top.cor, top.est, { 'clip-path': corteT });
       if (top.comp && B && B.tipo === 'calca') s += tecido(c, troncoD(g, 3.5), top.cor, top.est, { 'clip-path': c.faixa(cintura, 420) });
       if (top.glitter) s += p(corpoT, { fill: c.estampa('glitter', top.cor), 'clip-path': corteT });
+      if (top.felpudo) s += p(corpoT, { fill: c.pelo(escuro(top.cor, 0.45), true), 'clip-path': corteT }) + p(corpoT, { fill: c.pelo('#ffffff', true), 'clip-path': corteT, opacity: 0.6 });
+      if (top.aberta) s += p('M' + n(x - 22) + ',' + n(t.y0 + 2) + ' L' + x + ',' + n(t.y0 + 46) + ' L' + n(x + 22) + ',' + n(t.y0 + 2) + 'Z', { fill: top.aberta, stroke: escuro(top.aberta, 0.2), 'stroke-width': 1 });
       // barra
       if (top.barra) s += lin(x - t.wb - 6, hem - 2, x + t.wb + 6, hem - 2, { stroke: top.barra, 'stroke-width': 12, 'stroke-linecap': 'round', 'clip-path': c.corte(troncoD(g, 6)) }) + lin(x, t.y0 + 4, x, hem - 4, { stroke: top.barra, 'stroke-width': 10 });
       else if (!S.bib && !(B && (B.tipo === 'saia' || B.tipo === 'tutu' || B.tipo === 'tule' || B.tipo === 'babado' || B.tipo === 'nuvens' || B.tipo === 'arco'))) s += lin(x - t.wb - 2, hem - 2, x + t.wb + 2, hem - 2, { stroke: escuro(top.cor, 0.2), 'stroke-width': 3, 'clip-path': c.corte(troncoD(g, 3)) });
@@ -745,17 +856,24 @@
       if (top.controle) s += controle(x + (top.texto ? 0 : -18), t.y0 + (top.texto ? 66 : 44), top.texto ? 0.7 : 1);
       if (top.barriga) s += elip(x, t.y0 + 64, t.wb * 0.6, 40, { fill: claro(top.cor, 0.55), 'clip-path': corteT }) + [0, 1, 2].map(function (i) { return lin(x - 22, t.y0 + 44 + i * 18, x + 22, t.y0 + 44 + i * 18, { stroke: escuro(top.cor, 0.2), 'stroke-width': 1.4 }); }).join('');
       if (top.emblema === 'unicornio') s += emblemaUnicornio(c, x, t.y0 + 46);
+      else if (top.emblema) s += emblemaRoupa(c, top.emblema, x, t.y0 + 48);
+      if (top.gravataLonga) s += gravataLonga(c, x, t.y0 + 14, top.gravataLonga);
       if (S.heroi) s += lin(x - t.wb - 4, cintura - 2, x + t.wb + 4, cintura - 2, { stroke: S.heroi.cor2, 'stroke-width': 8, 'clip-path': c.corte(troncoD(g, 4)) }) + emblemaHeroi(S.heroi, x, t.y0 + 46, 22);
-      if (top.lacinhos) [-1, 1].forEach(function (k) { s += lacoD(x + k * (t.wt - 4), t.y0 + 26, '#c7a8ee', 0.42); });
+      if (top.lacinhos) [-1, 1].forEach(function (k) { s += lacoD(x + k * (t.wt - 4), t.y0 + 26, top.corLaco || '#c7a8ee', 0.42); });
     }
     if (B && (B.tipo === 'saia' || B.tipo === 'babado' || B.tipo === 'tutu' || B.tipo === 'tule' || B.tipo === 'nuvens' || B.tipo === 'arco')) s += saia(c, g, B, cintura);
     if (S.bib) s += jardineira(c, g, S, cintura);
     if (S.jaqueta) s += jaqueta(c, g, S.jaqueta);
     if (S.colete) s += colete(c, g, S.colete);
-    if (top && top.gravata) s += lacoD(x, t.y0 + 10, top.gravata, 0.5);
+    if (top && top.gravata) s += lacoD(x, t.y0 + (top.gola === 'marinheiro' ? 36 : 10), top.gravata, 0.5);
     if (S.cachecol) s += cachecol(g, S.cachecol);
-    if (a.patch && a.patch !== 'nenhum' && !S.capa && !S.abobora) s += patch(c, a.patch, S.bib ? x : x - 22, S.bib ? cintura - 34 : t.y0 + 46, 13);
+    if (a.patch && a.patch !== 'nenhum' && (top || S.bib) && !S.capa && !S.abobora) s += patch(c, a.patch, S.bib ? x : x - 22, S.bib ? cintura - 34 : t.y0 + 46, 13);
     return s;
+  }
+  function gravataLonga(c, x, y, cores) {   // gravata comprida listrada (túnica de escola de magia)
+    var d = 'M' + n(x - 4) + ',' + n(y + 6) + ' L' + n(x - 7) + ',' + n(y + 34) + ' L' + x + ',' + n(y + 42) + ' L' + n(x + 7) + ',' + n(y + 34) + ' L' + n(x + 4) + ',' + n(y + 6) + 'Z', cl = c.corte(d), s = p(d, { fill: cores[0], stroke: escuro(cores[0], 0.4), 'stroke-width': 1 });
+    for (var i = 0; i < 6; i++) s += lin(x - 10, y + 8 + i * 7, x + 10, y + 2 + i * 7, { stroke: cores[1], 'stroke-width': 2.6, 'clip-path': cl });
+    return s + p(d, { fill: 'none', stroke: escuro(cores[0], 0.4), 'stroke-width': 1 }) + ret(x - 5, y, 10, 7, { rx: 2, fill: cores[0], stroke: escuro(cores[0], 0.4), 'stroke-width': 1 });
   }
   function textoRoupa(g, top, a) {
     var x = 150, y = g.t.y0 + 46, cor = luz(top.cor) > 0.6 ? '#2f3f6e' : '#ffffff', L = a && a.lang ? a.lang : 'pt';
@@ -764,7 +882,8 @@
       return p(coracaoD(x, y - 6, 9), { fill: '#f06292' }) + txt(x, y + 18, palavra, { 'font-family': 'Fredoka, Arial Rounded MT Bold, sans-serif', 'font-weight': 700, 'font-size': 12, fill: cor, 'text-anchor': 'middle', 'letter-spacing': 0.5 });
     }
     var cores = ['#e5404f', '#ff9a4d', '#3aa35a', '#4f8fe0', '#8a5cd6'], s = '';
-    top.texto.split('').forEach(function (l, i, arr) { s += txt(x - (arr.length - 1) * 8 + i * 16, y + (top.controle ? 0 : 6), l, { 'font-family': 'Fredoka, Arial Rounded MT Bold, sans-serif', 'font-weight': 700, 'font-size': 19, fill: cores[i % cores.length], 'text-anchor': 'middle', stroke: '#ffffff', 'stroke-width': 0.6 }); });
+    var passo = top.texto.length > 4 ? 10 : top.texto.length > 3 ? 12 : 16, fs = top.texto.length > 4 ? 13 : top.texto.length > 3 ? 15 : 19;   // palavra comprida (GAMER, #BFF) não some embaixo dos braços
+    top.texto.split('').forEach(function (l, i, arr) { s += txt(x - (arr.length - 1) * passo / 2 + i * passo, y + (top.controle ? 0 : 6), l, { 'font-family': 'Fredoka, Arial Rounded MT Bold, sans-serif', 'font-weight': 700, 'font-size': fs, fill: cores[i % cores.length], 'text-anchor': 'middle', stroke: '#ffffff', 'stroke-width': 0.6 }); });
     return s;
   }
   function controle(x, y, e) {
@@ -779,28 +898,110 @@
       circ(x - 7, y - 6, 4, { fill: '#a8d0f8' }) + circ(x - 9, y - 1, 3.6, { fill: '#cdb0f4' }) + circ(x + 6, y - 7, 3.4, { fill: '#ffd08a' }) +
       circ(x - 3.5, y + 2, 1.6, { fill: '#2a1e28' }) + circ(x + 3.5, y + 2, 1.6, { fill: '#2a1e28' }) + elip(x - 7, y + 6, 2.4, 1.4, { fill: '#ff8fb3', opacity: 0.7 }) + elip(x + 7, y + 6, 2.4, 1.4, { fill: '#ff8fb3', opacity: 0.7 });
   }
+  // figurinhas e bordados no peito das roupas das fotos (desenhos deste jogo, sem marca nem personagem de ninguém)
+  function emblemaRoupa(c, tipo, x, y) {
+    var s = '';
+    if (tipo === 'coracao-dourado' || tipo === 'coracao-rosa') {
+      var hc = tipo === 'coracao-dourado' ? '#f2c14e' : '#f06292', f = tipo === 'coracao-dourado' ? c.lin(['#fff0b8', '#f2c14e', '#d89a2a', '#f8dc7a'], 0, 0, 1, 1) : hc;
+      return p(coracaoD(x, y, 17), { fill: f, stroke: escuro(hc, 0.3), 'stroke-width': 1.4 }) + p(coracaoD(x, y, 17), { fill: c.estampa('glitter', hc) }) + p(brilhoD(x - 7, y - 6, 3.6), { fill: '#ffffff' });
+    }
+    if (tipo === 'turma') {
+      [['#d9a066', 'urso'], ['#f6b8cf', 'coelho'], ['#c2c6cf', 'gato']].forEach(function (b, i) {
+        var bx = x - 22 + i * 22, by = y + (i === 1 ? -2 : 2), cc = b[0], ct = escuro(cc, 0.4);
+        if (b[1] === 'urso') s += circ(bx - 6, by - 6, 3.4, { fill: cc, stroke: ct, 'stroke-width': 0.8 }) + circ(bx + 6, by - 6, 3.4, { fill: cc, stroke: ct, 'stroke-width': 0.8 });
+        if (b[1] === 'coelho') s += elip(bx - 3.6, by - 10, 2.6, 6, { fill: cc, stroke: ct, 'stroke-width': 0.8 }) + elip(bx + 3.6, by - 10, 2.6, 6, { fill: cc, stroke: ct, 'stroke-width': 0.8 });
+        if (b[1] === 'gato') s += p('M' + n(bx - 8) + ',' + n(by - 3) + ' l1,-8 l5,4z M' + n(bx + 8) + ',' + n(by - 3) + ' l-1,-8 l-5,4z', { fill: cc, stroke: ct, 'stroke-width': 0.8, 'stroke-linejoin': 'round' });
+        s += circ(bx, by, 8, { fill: cc, stroke: ct, 'stroke-width': 0.9 }) + circ(bx - 3, by - 1, 1.1, { fill: '#2a2230' }) + circ(bx + 3, by - 1, 1.1, { fill: '#2a2230' }) + elip(bx, by + 2.4, 1.4, 1, { fill: '#5a3440' });
+      });
+      return s;
+    }
+    if (tipo === 'quadros') {
+      [['#ffd447', '#d9a066'], ['#8fdcc0', '#f6b8cf'], ['#f7a8cc', '#ffffff'], ['#a9d2f5', '#c2c6cf']].forEach(function (q, i) {
+        var qx = x - 17 + (i % 2) * 18, qy = y - 14 + Math.floor(i / 2) * 16;
+        s += ret(qx, qy, 16, 14, { rx: 2, fill: q[0], stroke: '#fbfaf7', 'stroke-width': 1.4 }) + circ(qx + 8, qy + 8, 4, { fill: q[1], stroke: escuro(q[1], 0.35), 'stroke-width': 0.6 }) + circ(qx + 5, qy + 4.6, 1.5, { fill: q[1] }) + circ(qx + 11, qy + 4.6, 1.5, { fill: q[1] }) + circ(qx + 6.6, qy + 7.6, 0.6, { fill: '#2a2230' }) + circ(qx + 9.4, qy + 7.6, 0.6, { fill: '#2a2230' });
+      });
+      return s;
+    }
+    if (tipo === 'coruja') {
+      s += elip(x - 4, y + 2, 13, 15, { fill: '#a8703c', stroke: '#6a4222', 'stroke-width': 1.2 }) + elip(x - 4, y + 8, 8, 8, { fill: '#e8c89a' }) + p('M' + n(x - 15) + ',' + n(y - 10) + ' l3,-6 l4,4z M' + n(x + 7) + ',' + n(y - 10) + ' l-3,-6 l-4,4z', { fill: '#a8703c', stroke: '#6a4222', 'stroke-width': 0.8 });
+      [-1, 1].forEach(function (k) { s += circ(x - 4 + k * 5.4, y - 4, 5, { fill: '#ffffff', stroke: '#6a4222', 'stroke-width': 0.8 }) + circ(x - 4 + k * 5.4, y - 3.4, 2.4, { fill: '#2a2230' }) + circ(x - 4 + k * 5.4 + 0.8, y - 4.4, 0.8, { fill: '#ffffff' }); });
+      s += p('M' + n(x - 6) + ',' + n(y) + ' l2,3 l2,-3z', { fill: '#ff9a3a' });
+      s += ret(x + 10, y + 4, 14, 10, { rx: 1.4, fill: '#fbf3e0', stroke: '#c9a26a', 'stroke-width': 0.9 }) + p('M' + n(x + 10) + ',' + n(y + 4) + ' l7,5 l7,-5', { stroke: '#c9a26a', 'stroke-width': 0.9, fill: 'none' }) + p(coracaoD(x + 17, y + 10, 2), { fill: '#e5404f' });
+      return s;
+    }
+    if (tipo === 'noel') {
+      s += circ(x, y, 12, { fill: '#f8d4bc', stroke: '#c89a80', 'stroke-width': 1 }) + p('M' + n(x - 13) + ',' + n(y + 1) + ' Q' + n(x - 12) + ',' + n(y + 20) + ' ' + x + ',' + n(y + 20) + ' Q' + n(x + 12) + ',' + n(y + 20) + ' ' + n(x + 13) + ',' + n(y + 1) + ' Q' + x + ',' + n(y + 9) + ' ' + n(x - 13) + ',' + n(y + 1) + 'Z', { fill: '#ffffff', stroke: '#d8d2da', 'stroke-width': 1 });
+      s += p('M' + n(x - 13) + ',' + n(y - 4) + ' Q' + n(x - 4) + ',' + n(y - 26) + ' ' + n(x + 14) + ',' + n(y - 18) + ' L' + n(x + 13) + ',' + n(y - 4) + 'Z', { fill: '#d92f3a', stroke: '#a01e2a', 'stroke-width': 1 }) + lin(x - 14, y - 4, x + 14, y - 4, { stroke: '#ffffff', 'stroke-width': 4.4, 'stroke-linecap': 'round' }) + circ(x + 15, y - 19, 3.4, { fill: '#ffffff' });
+      s += circ(x - 4, y - 0.5, 1.3, { fill: '#2a2230' }) + circ(x + 4, y - 0.5, 1.3, { fill: '#2a2230' }) + circ(x, y + 3, 2, { fill: '#f0a0a0' }) + elip(x - 7, y + 3, 2, 1.2, { fill: '#ff8fb3', opacity: 0.7 }) + elip(x + 7, y + 3, 2, 1.2, { fill: '#ff8fb3', opacity: 0.7 });
+      return s;
+    }
+    if (tipo === 'ursinho') {   // ursinho bordado no lado do peito, de linha marrom
+      var ux = x + 20, uy = y - 2;
+      return circ(ux - 6, uy - 6, 3.6, { fill: '#c98a4b', stroke: '#7a4a2a', 'stroke-width': 0.8, 'stroke-dasharray': '1.4 1' }) + circ(ux + 6, uy - 6, 3.6, { fill: '#c98a4b', stroke: '#7a4a2a', 'stroke-width': 0.8, 'stroke-dasharray': '1.4 1' }) +
+        circ(ux, uy, 8, { fill: '#c98a4b', stroke: '#7a4a2a', 'stroke-width': 0.9, 'stroke-dasharray': '1.6 1' }) + elip(ux, uy + 2.6, 3.4, 2.6, { fill: '#f0d8b8' }) + circ(ux - 3, uy - 1.4, 1, { fill: '#2a2230' }) + circ(ux + 3, uy - 1.4, 1, { fill: '#2a2230' }) + circ(ux, uy + 1.6, 1, { fill: '#2a2230' });
+    }
+    if (tipo === 'escudo') {   // brasão inventado: escudo de quatro partes com uma estrelinha
+      var ex = x + 20, ey = y - 4, d = 'M' + n(ex - 10) + ',' + n(ey - 10) + ' H' + n(ex + 10) + ' V' + n(ey + 2) + ' Q' + n(ex + 10) + ',' + n(ey + 10) + ' ' + ex + ',' + n(ey + 14) + ' Q' + n(ex - 10) + ',' + n(ey + 10) + ' ' + n(ex - 10) + ',' + n(ey + 2) + 'Z';
+      return p(d, { fill: '#f2c14e', stroke: '#a8801e', 'stroke-width': 1.2 }) + p('M' + n(ex - 10) + ',' + n(ey - 10) + ' H' + ex + ' V' + n(ey + 1) + ' H' + n(ex - 10) + 'Z M' + ex + ',' + n(ey + 1) + ' H' + n(ex + 10) + ' V' + n(ey + 3) + ' Q' + n(ex + 10) + ',' + n(ey + 10) + ' ' + ex + ',' + n(ey + 14) + 'Z', { fill: '#4f6fb8' }) +
+        p(d, { fill: 'none', stroke: '#a8801e', 'stroke-width': 1.2 }) + p(estrelaD(ex, ey + 1, 4, 1.8), { fill: '#ffffff' });
+    }
+    if (tipo === 'coracao-bichinhos') {
+      s += p(coracaoD(x, y, 20), { fill: '#f58cc0', stroke: '#e0559a', 'stroke-width': 1.4 });
+      [[-7, '#f6e2c8'], [7, '#ffffff']].forEach(function (b) { var bx = x + b[0], by = y - 2; s += circ(bx - 4, by - 4.6, 2.4, { fill: b[1], stroke: '#c89aa8', 'stroke-width': 0.6 }) + circ(bx + 4, by - 4.6, 2.4, { fill: b[1], stroke: '#c89aa8', 'stroke-width': 0.6 }) + circ(bx, by, 5.4, { fill: b[1], stroke: '#c89aa8', 'stroke-width': 0.7 }) + circ(bx - 2, by - 0.6, 0.8, { fill: '#2a2230' }) + circ(bx + 2, by - 0.6, 0.8, { fill: '#2a2230' }); });
+      return s;
+    }
+    return s;
+  }
   function gola(c, g, top) {
-    var x = 150, y = g.t.y0 + 2, cor = escuro(top.cor, 0.12), s = '';
+    var x = 150, y = g.t.y0 + 2, cor = top.golaCor || top.debrum || escuro(top.cor, 0.12), s = '';
     if (top.gola === 'redonda' || top.gola === 'pijama') s = p('M' + n(x - 24) + ',' + n(y + 2) + ' Q' + x + ',' + n(y + 20) + ' ' + n(x + 24) + ',' + n(y + 2), { stroke: cor, 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' });
     if (top.gola === 'pijama') s += p('M' + n(x - 24) + ',' + n(y + 2) + ' L' + n(x - 6) + ',' + n(y + 28) + ' L' + n(x - 2) + ',' + n(y + 12) + 'Z M' + n(x + 24) + ',' + n(y + 2) + ' L' + n(x + 6) + ',' + n(y + 28) + ' L' + n(x + 2) + ',' + n(y + 12) + 'Z', { fill: claro(top.cor, 0.5), stroke: cor, 'stroke-width': 1.4 });
     if (top.gola === 'boneca') s = p('M' + n(x - 26) + ',' + n(y) + ' Q' + n(x - 28) + ',' + n(y + 22) + ' ' + n(x - 2) + ',' + n(y + 16) + ' Z M' + n(x + 26) + ',' + n(y) + ' Q' + n(x + 28) + ',' + n(y + 22) + ' ' + n(x + 2) + ',' + n(y + 16) + ' Z', { fill: '#ffffff', stroke: '#e0d6de', 'stroke-width': 1.4 });
     if (top.gola === 'v') s = p('M' + n(x - 18) + ',' + n(y) + ' L' + x + ',' + n(y + 22) + ' L' + n(x + 18) + ',' + n(y), { stroke: '#ffffff', 'stroke-width': 5, fill: 'none', 'stroke-linejoin': 'round' });
     if (top.gola === 'polo') s = p('M' + n(x - 26) + ',' + n(y - 2) + ' L' + n(x - 4) + ',' + n(y + 18) + ' L' + n(x - 14) + ',' + n(y + 22) + ' Z M' + n(x + 26) + ',' + n(y - 2) + ' L' + n(x + 4) + ',' + n(y + 18) + ' L' + n(x + 14) + ',' + n(y + 22) + ' Z', { fill: top.cor, stroke: '#ffffff', 'stroke-width': 2.4 }) + lin(x, y + 14, x, y + 34, { stroke: escuro(top.cor, 0.3), 'stroke-width': 1.6 }) + circ(x, y + 22, 2, { fill: '#ffffff' }) + circ(x, y + 30, 2, { fill: '#ffffff' });
-    if (top.gola === 'social') s = p('M' + n(x - 24) + ',' + n(y - 2) + ' L' + n(x - 2) + ',' + n(y + 14) + ' L' + n(x - 18) + ',' + n(y + 22) + ' Z M' + n(x + 24) + ',' + n(y - 2) + ' L' + n(x + 2) + ',' + n(y + 14) + ' L' + n(x + 18) + ',' + n(y + 22) + ' Z', { fill: claro(top.cor, 0.3), stroke: escuro(top.cor, 0.3), 'stroke-width': 1.4 }) + lin(x, y + 14, x, g.t.y1 - 10, { stroke: escuro(top.cor, 0.25), 'stroke-width': 1.4 });
+    if (top.gola === 'social') s = p('M' + n(x - 24) + ',' + n(y - 2) + ' L' + n(x - 2) + ',' + n(y + 14) + ' L' + n(x - 18) + ',' + n(y + 22) + ' Z M' + n(x + 24) + ',' + n(y - 2) + ' L' + n(x + 2) + ',' + n(y + 14) + ' L' + n(x + 18) + ',' + n(y + 22) + ' Z', { fill: top.golaCor || claro(top.cor, 0.3), stroke: escuro(top.golaCor || top.cor, 0.3), 'stroke-width': 1.4 }) + (top.aberta ? '' : lin(x, y + 14, x, g.t.y1 - 10, { stroke: escuro(top.cor, 0.25), 'stroke-width': 1.4 }));
+    if (top.gola === 'marinheiro') {   // gola de marinheiro: aba larga que cai nos ombros e fecha em V, com duas listras brancas
+      var gm = top.golaCor || '#2f3f6e', cg = c.corte(troncoD(g, 6)), dm = 'M' + n(x - 34) + ',' + n(y - 2) + ' L' + n(x - 46) + ',' + n(y + 26) + ' L' + x + ',' + n(y + 54) + ' L' + n(x + 46) + ',' + n(y + 26) + ' L' + n(x + 34) + ',' + n(y - 2) + ' Q' + x + ',' + n(y + 8) + ' ' + n(x - 34) + ',' + n(y - 2) + 'Z';
+      s = p(dm, { fill: gm, stroke: escuro(gm, 0.3), 'stroke-width': 1.4, 'clip-path': cg }) + p('M' + n(x - 22) + ',' + n(y + 4) + ' L' + x + ',' + n(y + 34) + ' L' + n(x + 22) + ',' + n(y + 4) + 'Z', { fill: top.cor, stroke: escuro(gm, 0.3), 'stroke-width': 1.2 }) +
+        p('M' + n(x - 42) + ',' + n(y + 24) + ' L' + x + ',' + n(y + 48) + ' L' + n(x + 42) + ',' + n(y + 24), { stroke: '#ffffff', 'stroke-width': 2.2, fill: 'none', 'clip-path': cg }) + p('M' + n(x - 40) + ',' + n(y + 19) + ' L' + x + ',' + n(y + 42) + ' L' + n(x + 40) + ',' + n(y + 19), { stroke: '#ffffff', 'stroke-width': 1.4, fill: 'none', 'clip-path': cg });
+    }
     if (top.gola === 'alta') s = p('M' + n(x - 26) + ',' + n(y - 4) + ' Q' + x + ',' + n(y + 8) + ' ' + n(x + 26) + ',' + n(y - 4) + ' L' + n(x + 24) + ',' + n(y + 10) + ' Q' + x + ',' + n(y + 20) + ' ' + n(x - 24) + ',' + n(y + 10) + 'Z', { fill: escuro(top.cor, 0.08), stroke: escuro(top.cor, 0.35), 'stroke-width': 1.6 });
     if (top.gola === 'capuz') s = p('M' + n(x - 40) + ',' + n(y - 2) + ' Q' + n(x - 44) + ',' + n(y + 26) + ' ' + x + ',' + n(y + 26) + ' Q' + n(x + 44) + ',' + n(y + 26) + ' ' + n(x + 40) + ',' + n(y - 2) + ' Q' + x + ',' + n(y + 12) + ' ' + n(x - 40) + ',' + n(y - 2) + 'Z', { fill: escuro(top.cor, 0.1), stroke: escuro(top.cor, 0.35), 'stroke-width': 1.6 });
-    if (top.gola === 'reta') s = lin(x - g.t.wt - 4, g.t.y0 + 26, x + g.t.wt + 4, g.t.y0 + 26, { stroke: escuro(top.cor, 0.15), 'stroke-width': 3, 'clip-path': c.corte(troncoD(g, 3)) });
+    var yr = g.t.y0 + (top.mangas === 'regata' ? 16 : 26);
+    if (top.gola === 'reta') s = lin(x - g.t.wt - 4, yr, x + g.t.wt + 4, yr, { stroke: escuro(top.cor, 0.15), 'stroke-width': 3, 'clip-path': c.corte(troncoD(g, 3)) });
     if (top.mangas === 'alcinha') [-1, 1].forEach(function (k) { s += lin(x + k * (g.t.wt - 8), g.t.y0 + 26, x + k * (g.t.wt - 2), g.t.y0 + 2, { stroke: top.cor, 'stroke-width': 4, 'stroke-linecap': 'round' }); });
+    if (top.mangas === 'regata') [-1, 1].forEach(function (k) { s += lin(x + k * (g.t.wt - 12), yr, x + k * (g.t.wt - 8), g.t.y0 + 2, { stroke: escuro(top.cor, 0.3), 'stroke-width': 13, 'stroke-linecap': 'round' }) + lin(x + k * (g.t.wt - 12), yr, x + k * (g.t.wt - 8), g.t.y0 + 2, { stroke: top.cor, 'stroke-width': 10, 'stroke-linecap': 'round' }); });
+    return s;
+  }
+  // cós da parte de baixo, quando não tem blusa por cima (com botão, cordão ou elástico de outra cor)
+  function cos(c, g, B, cintura) {
+    var x = 150, t = g.t, s = '', cc = B.cos || escuro(B.cor, 0.12);
+    s += lin(x - t.wb - 6, cintura + 3, x + t.wb + 6, cintura + 3, { stroke: cc, 'stroke-width': 8, 'clip-path': c.corte(troncoD(g, 4)) });
+    s += lin(x - t.wb - 6, cintura + 7.5, x + t.wb + 6, cintura + 7.5, { stroke: escuro(cc, 0.3), 'stroke-width': 1.2, 'clip-path': c.corte(troncoD(g, 4)) });
+    if (B.botao) s += circ(x, cintura + 3, 3.4, { fill: '#d8c070', stroke: '#8a7030', 'stroke-width': 1 });
+    if (B.cordao) s += p('M' + n(x - 2) + ',' + n(cintura + 5) + ' q-6,8 -3,16 M' + n(x + 2) + ',' + n(cintura + 5) + ' q6,8 3,16', { stroke: B.cordao, 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' }) + circ(x - 5, cintura + 21, 2.2, { fill: B.cordao }) + circ(x + 5, cintura + 21, 2.2, { fill: B.cordao });
     return s;
   }
   function saia(c, g, B, cintura) {
-    var x = 150, t = g.t, y0 = cintura - 2, y1 = t.y1 + 30, w0 = t.wb + 2, w1 = t.wb + 26, s = '';
+    var x = 150, t = g.t, y0 = cintura - 2, y1 = t.y1 + (B.longa ? 44 : 30), w0 = t.wb + 2, w1 = t.wb + (B.reta ? 14 : 26), s = '';
     if (B.tipo === 'saia' || B.tipo === 'babado') {
       var d = 'M' + n(x - w0) + ',' + n(y0) + ' L' + n(x + w0) + ',' + n(y0) + ' L' + n(x + w1) + ',' + n(y1);
-      var onda = 9, k = Math.round(w1 * 2 / 18);
-      for (var i = 0; i < k; i++) { var xa = x + w1 - i * (w1 * 2 / k), xb = xa - w1 * 2 / k; d += ' Q' + n((xa + xb) / 2) + ',' + n(y1 + onda) + ' ' + n(xb) + ',' + n(y1); }
+      var onda = B.reta ? 3 : 9, k = Math.round(w1 * 2 / 18);
+      for (var i = 0; i < k; i++) { var xa = x + w1 - i * (w1 * 2 / k), xb = xa - w1 * 2 / k, yb = B.bico ? y1 + 10 * (1 - Math.abs((xa + xb) / 2 - x) / w1) : y1; d += ' Q' + n((xa + xb) / 2) + ',' + n(yb + onda) + ' ' + n(xb) + ',' + n(B.bico ? y1 + 10 * (1 - Math.abs(xb - x) / w1) : y1); }
       d += ' Z';
       s += tecido(c, d, B.cor, B.est);
+      if (B.babados) {   // dois babados na barra
+        [0, 1].forEach(function (j) {
+          var yy = y1 - 16 + j * 12, ww = w1 - 6 + j * 6, dd = 'M' + n(x - ww) + ',' + n(yy - 8), kk = 10;
+          for (var q = 0; q < kk; q++) { var xx = x - ww + (q + 1) * (ww * 2 / kk); dd += ' Q' + n(xx - ww / kk) + ',' + n(yy + 12) + ' ' + n(xx) + ',' + n(yy); }
+          dd += ' L' + n(x + ww) + ',' + n(yy - 8) + 'Z';
+          s += p(dd, { fill: j ? claro(B.cor, 0.18) : B.cor, stroke: escuro(B.cor, 0.3), 'stroke-width': 1.3 });
+        });
+      }
+      if (B.barraOuro) { var dz = 'M' + n(x - w1 + 4) + ',' + n(y1 - 8); for (var z = 0; z < 16; z++) dz += ' L' + n(x - w1 + 4 + (z + 0.5) * ((w1 * 2 - 8) / 16)) + ',' + n(y1 - (z % 2 ? 8 : 2)); s += p(dz, { stroke: '#f2c14e', 'stroke-width': 2.4, fill: 'none', 'stroke-linejoin': 'round' }); }
+      if (B.costura) s += lin(x, y0 + 6, x, y1 - 4, { stroke: '#f2c14e', 'stroke-width': 1.3, 'stroke-dasharray': '3 2' });
+      if (B.botao) s += circ(x, y0 + 5, 3.4, { fill: '#d8c070', stroke: '#8a7030', 'stroke-width': 1 });
+      if (B.patchBicho) s += circ(x + 26, y1 - 18, 9, { fill: '#fffaf2', stroke: '#e0c8a8', 'stroke-width': 1.2 }) + circ(x + 21, y1 - 24, 3, { fill: '#d9a066' }) + circ(x + 31, y1 - 24, 3, { fill: '#d9a066' }) + circ(x + 26, y1 - 18, 6, { fill: '#d9a066' }) + elip(x + 26, y1 - 16, 2.6, 2, { fill: '#f4e2c8' }) + circ(x + 24, y1 - 19.6, 0.9, { fill: '#2a2230' }) + circ(x + 28, y1 - 19.6, 0.9, { fill: '#2a2230' });
       if (B.tipo === 'babado') {
         var d2 = 'M' + n(x - w1 + 2) + ',' + n(y1 - 4), kk = 12;
         for (var j = 0; j < kk; j++) { var xx = x - w1 + 2 + (j + 1) * ((w1 * 2 - 4) / kk); d2 += ' Q' + n(xx - (w1 * 2 - 4) / kk / 2) + ',' + n(y1 + 18) + ' ' + n(xx) + ',' + n(y1 - 4); }
@@ -810,8 +1011,8 @@
       return s;
     }
     if (B.tipo === 'tutu' || B.tipo === 'tule' || B.tipo === 'nuvens' || B.tipo === 'arco') {
-      var camadas = B.tipo === 'arco' ? ['#f9a8c4', '#ffd08a', '#fff09a', '#a8e8c0', '#a8d0f8', '#cdb0f4'] :
-        B.tipo === 'nuvens' ? ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4'] : [escuro(B.cor, 0.08), B.cor, claro(B.cor, 0.3)];
+      var camadas = B.camadas || (B.tipo === 'arco' ? ['#f9a8c4', '#ffd08a', '#fff09a', '#a8e8c0', '#a8d0f8', '#cdb0f4'] :
+        B.tipo === 'nuvens' ? ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4'] : [escuro(B.cor, 0.08), B.cor, claro(B.cor, 0.3)]);
       var larg = B.tipo === 'tutu' ? 44 : 30, alto = B.tipo === 'tutu' ? 26 : 46;
       camadas.forEach(function (cor, i) {
         var yy = y0 + i * (alto / camadas.length) + 6, ww = w0 + larg - i * 4, d3 = 'M' + n(x - w0) + ',' + n(y0) + ' L' + n(x + w0) + ',' + n(y0) + ' L' + n(x + ww) + ',' + n(yy + alto * 0.5);
@@ -826,7 +1027,10 @@
         for (var z = 0; z < 26; z++) { var gx = x + (r() - 0.5) * (w0 + larg) * 1.8, gy = y0 + 8 + r() * alto * 0.95; if (Math.abs(gx - x) < w0 + larg - 6 - (gy - y0) * 0.2 + 8) s += circ(gx, gy, 1.2 + r() * 1.6, { fill: B.glitter ? B.glitter[z % 2] : '#ffffff', opacity: 0.9 }); }
       }
       if (B.est === 'doces') s += p('M' + n(x - w0) + ',' + n(y0) + ' L' + n(x + w0) + ',' + n(y0) + ' L' + n(x + w0 + 22) + ',' + n(y0 + 30) + ' L' + n(x - w0 - 22) + ',' + n(y0 + 30) + 'Z', { fill: c.estampa('doces', B.cor), opacity: 0.9 });
-      s += lin(x - w0, y0 + 1, x + w0, y0 + 1, { stroke: escuro(camadas[0], 0.25), 'stroke-width': 4, 'stroke-linecap': 'round' });
+      if (B.pompons) { var rp = sorteio(9); for (var pz = 0; pz < 9; pz++) { var px = x - w0 - larg * 0.7 + (pz + 0.5) * ((w0 + larg * 0.7) * 2 / 9), py = y0 + alto * (0.55 + rp() * 0.35); s += circ(px, py, 3.6, { fill: B.pompons[pz % B.pompons.length], stroke: '#ffffff', 'stroke-width': 0.8 }); } }
+      if (B.peludo) { var rf = sorteio(5); for (var fz = 0; fz < 22; fz++) { var fx = x + (rf() - 0.5) * (w0 + larg) * 1.7, fy = y0 + 10 + rf() * alto * 0.8; if (Math.abs(fx - x) < w0 + larg - 10 - (fy - y0) * 0.2) s += circ(fx, fy, 2.4 + rf() * 1.6, { fill: claro(B.cor, 0.35), opacity: 0.75 }); } }
+      if (B.cos) s += ret(x - w0 - 1, y0 - 3, (w0 + 1) * 2, 10, { rx: 4, fill: B.cos, stroke: escuro(B.cos, 0.35), 'stroke-width': 1.4 }) + lin(x - w0 + 2, y0 + 4, x + w0 - 2, y0 + 4, { stroke: '#f2c14e', 'stroke-width': 1, 'stroke-dasharray': '2 1.6' });
+      else s += lin(x - w0, y0 + 1, x + w0, y0 + 1, { stroke: escuro(camadas[0], 0.25), 'stroke-width': 4, 'stroke-linecap': 'round' });
       void ultima;
       return s;
     }
@@ -848,10 +1052,13 @@
     [-1, 1].forEach(function (k) {
       var d = 'M' + n(x + k * 6) + ',' + n(t.y0 + 4) + ' L' + n(x + k * 14) + ',' + n(t.y1 - 8) + ' L' + n(x + k * (t.wb + 5)) + ',' + n(t.y1 - 12) + ' C' + n(x + k * (t.wb + 5)) + ',' + n(t.y1 - 56) + ' ' + n(x + k * (t.wt + 9)) + ',' + n(t.y0 + 40) + ' ' + n(x + k * (t.wt + 4)) + ',' + n(t.y0 + 4) + 'Z';
       s += p(d, { fill: cor, stroke: cont, 'stroke-width': 2, 'stroke-linejoin': 'round' });
-      s += p('M' + n(x + k * 6) + ',' + n(t.y0 + 4) + ' L' + n(x + k * 26) + ',' + n(t.y0 + 4) + ' L' + n(x + k * 14) + ',' + n(t.y0 + 34) + 'Z', { fill: J.couro ? '#3a353f' : '#e6eaf2', stroke: cont, 'stroke-width': 1.4 });
+      if (J.estrelas) { s += p(d, { fill: c.estampa('glitter', J.cor) }); [[30, 48], [42, 76], [26, 92]].forEach(function (e) { s += p(estrelaD(x + k * e[0], t.y0 + e[1], 5, 2.2), { fill: '#ffe27a', stroke: '#c9962a', 'stroke-width': 0.6 }); }); }
+      if (J.jeans) s += p('M' + n(x + k * 12) + ',' + n(t.y0 + 40) + ' L' + n(x + k * 15) + ',' + n(t.y1 - 14) + ' M' + n(x + k * (t.wb + 2)) + ',' + n(t.y1 - 22) + ' L' + n(x + k * 15) + ',' + n(t.y1 - 20), { stroke: '#f2c14e', 'stroke-width': 1.2, 'stroke-dasharray': '2.4 1.6', fill: 'none' });
+      s += p('M' + n(x + k * 6) + ',' + n(t.y0 + 4) + ' L' + n(x + k * 26) + ',' + n(t.y0 + 4) + ' L' + n(x + k * 14) + ',' + n(t.y0 + 34) + 'Z', { fill: J.couro ? '#3a353f' : J.jeans ? JEANS_CL : J.estrelas ? '#9a74e0' : '#e6eaf2', stroke: cont, 'stroke-width': 1.4 });
       if (J.couro) s += lin(x + k * 12, t.y0 + 40, x + k * 15, t.y1 - 14, { stroke: '#c9ced8', 'stroke-width': 1.6, 'stroke-dasharray': '2 1.5' });
       if (J.metal) s += p(brilhoD(x + k * 30, t.y0 + 50, 4), { fill: '#ffffff' });
     });
+    if (J.jeans) s += patch(c, 'capivara', x + 34, t.y0 + 66, 11);
     return s;
   }
   function colete(c, g, C) {
@@ -859,9 +1066,11 @@
     [-1, 1].forEach(function (k) {
       var d = 'M' + n(x + k * 10) + ',' + n(t.y0 + 6) + ' L' + n(x + k * 18) + ',' + n(t.y1 - 16) + ' L' + n(x + k * (t.wb + 4)) + ',' + n(t.y1 - 18) + ' C' + n(x + k * (t.wb + 4)) + ',' + n(t.y1 - 56) + ' ' + n(x + k * (t.wt + 8)) + ',' + n(t.y0 + 40) + ' ' + n(x + k * (t.wt + 2)) + ',' + n(t.y0 + 4) + 'Z';
       s += p(d, { fill: C.cor, stroke: escuro(C.cor, 0.35), 'stroke-width': 2 }) + p(d, { fill: c.volume(), opacity: 0.4 });
+      if (C.moletom) { s += p('M' + n(x + k * 18) + ',' + n(t.y1 - 50) + ' L' + n(x + k * (t.wb - 4)) + ',' + n(t.y1 - 50) + ' L' + n(x + k * (t.wb + 2)) + ',' + n(t.y1 - 20) + ' L' + n(x + k * 18) + ',' + n(t.y1 - 18) + 'Z', { fill: escuro(C.cor, 0.06), stroke: escuro(C.cor, 0.3), 'stroke-width': 1.4 }); return; }
       for (var f = 0; f < 5; f++) s += lin(x + k * (22 + f * 7), t.y1 - 16, x + k * (22 + f * 7), t.y1 - 10, { stroke: '#eef3fa', 'stroke-width': 1.3 });
       s += lin(x + k * 20, t.y0 + 20, x + k * (t.wb - 6), t.y0 + 26, { stroke: '#f2c14e', 'stroke-width': 1, 'stroke-dasharray': '2 2' });
     });
+    if (C.moletom) s += gola(c, g, { gola: 'capuz', cor: C.cor });
     return s;
   }
   function cachecol(g, cor) {
@@ -873,9 +1082,13 @@
   function mangaLado(c, a, g, S, k) {
     if (!S || S.abobora || S.capa) return '';
     var s = '', top = S.top;
-    if (top && top.mangas && top.mangas !== 'nenhuma' && top.mangas !== 'alcinha') {
+    if (top && top.mangas && top.mangas !== 'nenhuma' && top.mangas !== 'alcinha' && top.mangas !== 'regata') {
       var comp = top.mangas === 'longa' ? (g.bracoLongo ? 0.8 : 0.72) : top.mangas === 'bufante' ? 0.36 : 0.42;
-      s += mangaPe(c, g, k, { cor: top.cor, est: top.est, barra: top.barra }, comp);
+      s += mangaPe(c, g, k, { cor: top.corManga || top.cor, est: top.corManga ? null : top.est, barra: top.barra, debrum: top.debrum }, comp);
+      var o1 = g.omb[k], m1 = g.mao[k], ux1 = m1[0] - o1[0], uy1 = m1[1] - o1[1], L1 = Math.sqrt(ux1 * ux1 + uy1 * uy1), rr = g.rb + 3.5;
+      ux1 /= L1; uy1 /= L1;
+      if (top.listrasManga) [0.5, 0.6].forEach(function (f) { var px = o1[0] + (m1[0] - o1[0]) * f, py = o1[1] + (m1[1] - o1[1]) * f; s += lin(px - uy1 * rr, py + ux1 * rr, px + uy1 * rr, py - ux1 * rr, { stroke: top.listrasManga, 'stroke-width': 3.4, 'stroke-linecap': 'round' }); });
+      if (top.mangas === 'babado') { var bx0 = o1[0] + (m1[0] - o1[0]) * comp, by0 = o1[1] + (m1[1] - o1[1]) * comp; for (var bq = -2; bq <= 2; bq++) s += circ(bx0 - uy1 * bq * 5.4 + ux1 * 3, by0 + ux1 * bq * 5.4 + uy1 * 3, 5.4, { fill: claro(top.cor, 0.1), stroke: escuro(top.cor, 0.3), 'stroke-width': 1.1 }); }
       if (top.mangas === 'bufante') { var o = g.omb[k]; s += circ(o[0] + (k ? 6 : -6), o[1] + 8, 19, { fill: top.tule ? claro(top.cor, 0.3) : top.cor, stroke: escuro(top.cor, 0.3), 'stroke-width': 1.6, opacity: top.tule ? 0.9 : 1 }) + (top.tule ? circ(o[0] + (k ? 6 : -6), o[1] + 8, 19, { fill: c.estampa('glitter', top.cor) }) : ''); }
       if (S.heroi) { var m = g.mao[k]; s += circ(m[0], m[1] + 2, g.rb + 3, { fill: S.heroi.cor2, stroke: escuro(S.heroi.cor2, 0.35), 'stroke-width': 1.8 }); }
     }
@@ -918,6 +1131,10 @@
     s += p(aro, { fill: cor, 'fill-rule': 'evenodd', stroke: escuro(cor, 0.35), 'stroke-width': 2, 'clip-path': corte });
     if (C.pelucia) s += elip(cb.x, cb.y + 10, ix + 2, iy + 2, { fill: 'none', stroke: C.pelucia, 'stroke-width': 11, 'clip-path': corte }) + elip(cb.x, cb.y + 10, ix + 2, iy + 2, { fill: 'none', stroke: '#e4ddd2', 'stroke-width': 2, 'stroke-dasharray': '1 4', 'clip-path': corte });
     if (C.tipo === 'dino') for (var i = -2; i <= 2; i++) { var an = rad(-90 + i * 26), x = cb.x + Math.cos(an) * (rx - 2), y = cb.y + 2 + Math.sin(an) * (ry - 2); s += '<g transform="rotate(' + (i * 26) + ' ' + n(x) + ' ' + n(y) + ')">' + p('M' + n(x - 10) + ',' + n(y + 4) + ' L' + x + ',' + n(y - 18) + ' L' + n(x + 10) + ',' + n(y + 4) + 'Z', { fill: '#ffd447', stroke: '#c9962a', 'stroke-width': 1.6, 'stroke-linejoin': 'round' }) + '</g>'; }
+    if (C.tipo === 'sapo') {   // olhões de sapinho no alto do capuz
+      [-1, 1].forEach(function (k) { var ex = cb.x + k * 26, ey = cb.y - ry + 2; s += circ(ex, ey, 17, { fill: cor, stroke: escuro(cor, 0.35), 'stroke-width': 2 }) + circ(ex, ey - 1, 11, { fill: '#ffffff', stroke: escuro(cor, 0.3), 'stroke-width': 1 }) + circ(ex + k * 1.5, ey, 5.6, { fill: '#1a1220' }) + circ(ex + k * 1.5 + 1.6, ey - 1.8, 1.8, { fill: '#ffffff' }); });
+      s += p('M' + n(cb.x - 16) + ',' + n(cb.y - ry + 16) + ' Q' + cb.x + ',' + n(cb.y - ry + 26) + ' ' + n(cb.x + 16) + ',' + n(cb.y - ry + 16), { stroke: escuro(cor, 0.4), 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' });
+    }
     if (C.tipo === 'dino' || C.tipo === 'pinguim' || C.tipo === 'neve') {   // olhinhos e nariz no alto do capuz
       var ty = cb.y - cb.ry - 2;
       [-1, 1].forEach(function (k) { s += circ(cb.x + k * 16, ty, 6, { fill: '#ffffff', stroke: '#2a1e28', 'stroke-width': 1 }) + circ(cb.x + k * 16, ty + 1, 3, { fill: '#2a1e28' }); });
@@ -929,10 +1146,45 @@
   }
 
   /* ---------- roupa de 4 patas: casaco que cobre as costas, mangas nas patas da frente, pernas de trás ---------- */
+  // 4 patas só com a parte de baixo (sem blusa nem casaco): short e calça cobrem o traseiro e as pernas de trás; saia e tutu
+  // são um anel em volta da cintura (de lado, como um tutu de cachorrinho), com a barra caindo embaixo da barriga
+  function baixoQ(c, a, g, B) {
+    var b = g.b, s = '', corpoD = 'M' + n(b.x - b.rx - 4) + ',' + n(b.y) + ' a' + n(b.rx + 4) + ',' + n(b.ry + 4) + ' 0 1 1 ' + n((b.rx + 4) * 2) + ',0 a' + n(b.rx + 4) + ',' + n(b.ry + 4) + ' 0 1 1 ' + n(-(b.rx + 4) * 2) + ',0z';
+    var cl = c.corte(corpoD);
+    if (B.tipo === 'calca' || B.tipo === 'bermuda' || B.tipo === 'calcao' || B.tipo === 'sunga') {
+      var xc = b.x + (B.tipo === 'sunga' ? 40 : 22), traseiro = 'M' + n(xc) + ',' + n(b.y - b.ry - 10) + ' Q' + n(xc - 10) + ',' + n(b.y) + ' ' + n(xc) + ',' + n(b.y + b.ry + 10) + ' H' + n(b.x + b.rx + 10) + ' V' + n(b.y - b.ry - 10) + 'Z';
+      s += '<g clip-path="' + cl + '">' + tecido(c, traseiro, B.cor, B.est) + '</g>';
+      s += p('M' + n(xc) + ',' + n(b.y - b.ry - 10) + ' Q' + n(xc - 10) + ',' + n(b.y) + ' ' + n(xc) + ',' + n(b.y + b.ry + 10), { stroke: B.cos || escuro(B.cor, 0.15), 'stroke-width': 7, fill: 'none', 'clip-path': cl });
+      if (B.costura) s += p('M' + n(xc + 24) + ',' + n(b.y - b.ry) + ' Q' + n(xc + 18) + ',' + n(b.y) + ' ' + n(xc + 26) + ',' + n(b.y + b.ry), { stroke: '#f2c14e', 'stroke-width': 1.3, 'stroke-dasharray': '3 2', fill: 'none', 'clip-path': cl });
+      if (B.botao) s += circ(xc - 4, b.y - b.ry * 0.5, 3.2, { fill: '#d8c070', stroke: '#8a7030', 'stroke-width': 1 });
+      return s;
+    }
+    // saia, babado, tutu: presa num cós em volta da cintura e abrindo como um sininho até embaixo da barriga
+    var saiaLisa = B.tipo === 'saia' || B.tipo === 'babado', cx = b.x + 6, topo = b.y - b.ry + 4, fundo = b.y + b.ry + (B.longa ? 24 : 16), w0 = 16, w1 = saiaLisa ? 54 : 62;
+    var cores = B.camadas || (B.tipo === 'arco' ? ['#f9a8c4', '#ffd08a', '#a8e8c0', '#a8d0f8', '#cdb0f4'] : B.tipo === 'nuvens' ? ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4'] : saiaLisa ? [B.cor] : [escuro(B.cor, 0.08), B.cor, claro(B.cor, 0.3)]);
+    cores.forEach(function (cc, j) {
+      var ww = w1 - j * 7, yy = fundo - j * 7, d = 'M' + n(cx - w0) + ',' + n(topo) + ' Q' + cx + ',' + n(topo - 6) + ' ' + n(cx + w0) + ',' + n(topo) + ' L' + n(cx + ww) + ',' + n(yy);
+      var k = saiaLisa ? 7 : 12;
+      for (var i = 0; i < k; i++) { var xa = cx + ww - i * (ww * 2 / k), xb = xa - ww * 2 / k; d += saiaLisa ? ' Q' + n((xa + xb) / 2) + ',' + n(yy + 8) + ' ' + n(xb) + ',' + n(yy) : ' L' + n((xa + xb) / 2) + ',' + n(yy + 8) + ' L' + n(xb) + ',' + n(yy); }
+      d += 'Z';
+      s += saiaLisa ? tecido(c, d, cc, B.est) : p(d, { fill: cc, opacity: 0.9, stroke: escuro(cc, 0.2), 'stroke-width': 1.1 });
+    });
+    if (B.babados) [0, 1].forEach(function (j) { var yy = fundo - 12 + j * 10, ww = w1 - 10 + j * 6, dd = 'M' + n(cx - ww) + ',' + n(yy - 8); for (var q = 0; q < 9; q++) { var xx = cx - ww + (q + 1) * (ww * 2 / 9); dd += ' Q' + n(xx - ww / 9) + ',' + n(yy + 10) + ' ' + n(xx) + ',' + n(yy); } dd += ' L' + n(cx + ww) + ',' + n(yy - 8) + 'Z'; s += p(dd, { fill: j ? claro(B.cor, 0.18) : B.cor, stroke: escuro(B.cor, 0.3), 'stroke-width': 1.2 }); });
+    if (B.barraOuro) s += lin(cx - w1 + 8, fundo - 6, cx + w1 - 8, fundo - 6, { stroke: '#f2c14e', 'stroke-width': 2.4, 'stroke-dasharray': '4 2' });
+    if (B.costura) s += lin(cx, topo + 8, cx, fundo - 4, { stroke: '#f2c14e', 'stroke-width': 1.3, 'stroke-dasharray': '3 2' });
+    if (B.glitter || B.peludo) { var r = sorteio(6); for (var z = 0; z < 22; z++) { var gy = topo + 14 + r() * (fundo - topo - 18), lim = w0 + (w1 - w0) * (gy - topo) / (fundo - topo) - 6; s += circ(cx + (r() * 2 - 1) * lim, gy, B.peludo ? 2.6 : 1.4, { fill: B.peludo ? claro(B.cor, 0.35) : B.glitter[z % 2], opacity: 0.85 }); } }
+    if (B.pompons) for (var pz = 0; pz < 7; pz++) s += circ(cx - w1 * 0.75 + pz * w1 * 0.25, fundo - 6 - (pz % 2) * 9, 3.6, { fill: B.pompons[pz % B.pompons.length], stroke: '#ffffff', 'stroke-width': 0.8 });
+    // cós em volta da cintura (por cima do corpo)
+    s += p('M' + n(cx - w0 - 2) + ',' + n(topo - 2) + ' Q' + cx + ',' + n(topo - 8) + ' ' + n(cx + w0 + 2) + ',' + n(topo - 2) + ' L' + n(cx + w0 + 4) + ',' + n(topo + 9) + ' Q' + cx + ',' + n(topo + 3) + ' ' + n(cx - w0 - 4) + ',' + n(topo + 9) + 'Z', { fill: B.cos || escuro(cores[0], 0.1), stroke: escuro(B.cos || cores[0], 0.32), 'stroke-width': 1.3 });
+    if (B.botao) s += circ(cx, topo + 2, 3, { fill: '#d8c070', stroke: '#8a7030', 'stroke-width': 1 });
+    if (B.patchBicho) s += patch(c, 'coracao', cx + 22, fundo - 22, 8);
+    return s;
+  }
   function roupaQ(c, a, g, S) {
     if (!S) return '';
+    if (!S.top && !S.capa && !S.abobora && !S.bib) return S.baixo ? baixoQ(c, a, g, S.baixo) : '';
     var b = g.b, s = '', top = S.top || {}, B = S.baixo || {};
-    var cor = S.abobora ? '#f7922e' : S.capa ? S.capa.cor : (S.bib ? S.bib.cor : top.cor) || '#f59ac0';
+    var cor = S.abobora ? '#f7922e' : S.capa ? S.capa.cor : (S.bib ? S.bib.cor : S.colete && S.colete.moletom ? S.colete.cor : S.jaqueta && (S.jaqueta.estrelas || S.jaqueta.jeans) ? S.jaqueta.cor : top.cor) || '#f59ac0';
     var est = S.bib ? null : top.est;
     var casaco = 'M' + n(b.x - b.rx - 4) + ',' + n(b.y) + ' a' + n(b.rx + 4) + ',' + n(b.ry + 4) + ' 0 1 1 ' + n((b.rx + 4) * 2) + ',0 a' + n(b.rx + 4) + ',' + n(b.ry + 4) + ' 0 1 1 ' + n(-(b.rx + 4) * 2) + ',0z';
     var bainha = b.y + b.ry * (S.capa ? 0.5 : 0.55), corte = c.faixa(-50, bainha);
@@ -946,16 +1198,23 @@
     if (top.ziper) s += p('M' + n(b.x - b.rx + 12) + ',' + n(b.y - 30) + ' Q' + n(b.x - b.rx + 2) + ',' + n(b.y) + ' ' + n(b.x - b.rx + 14) + ',' + n(bainha - 4), { stroke: escuro(cor, 0.45), 'stroke-width': 2.2, fill: 'none' });
     // saias: babado na bainha
     if (B.tipo === 'tutu' || B.tipo === 'tule' || B.tipo === 'nuvens' || B.tipo === 'arco' || B.tipo === 'saia' || B.tipo === 'babado') {
-      var cores = B.tipo === 'arco' ? ['#f9a8c4', '#ffd08a', '#a8e8c0', '#a8d0f8', '#cdb0f4'] : B.tipo === 'nuvens' ? ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4'] : [B.cor || cor];
+      var cores = B.camadas || (B.tipo === 'arco' ? ['#f9a8c4', '#ffd08a', '#a8e8c0', '#a8d0f8', '#cdb0f4'] : B.tipo === 'nuvens' ? ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4'] : [B.cor || cor]);
       var x0 = b.x - b.rx + 18, x1 = b.x + b.rx - 8, k = 14, d = 'M' + n(x0) + ',' + n(bainha - 4);
       for (var i = 0; i < k; i++) { var xa = x0 + (i + 1) * (x1 - x0) / k; d += ' L' + n(xa - (x1 - x0) / k / 2) + ',' + n(bainha + 18 + (i % 2) * 4) + ' L' + n(xa) + ',' + n(bainha - 2); }
       d += 'Z';
       cores.forEach(function (cc, j) { s += p(d, { fill: cc, opacity: 0.85, stroke: escuro(cc, 0.2), 'stroke-width': 1, transform: 'translate(0 ' + (j * 4) + ')' }); });
       if (B.glitter || B.tipo === 'nuvens') { var r = sorteio(4); for (var z = 0; z < 14; z++) s += circ(x0 + r() * (x1 - x0), bainha + 2 + r() * 14, 1.4, { fill: B.glitter ? B.glitter[z % 2] : '#ffffff' }); }
+      if (B.pompons) for (var pz = 0; pz < 7; pz++) s += circ(x0 + 8 + pz * (x1 - x0 - 16) / 6, bainha + 12 + (pz % 2) * 4, 3.4, { fill: B.pompons[pz % B.pompons.length], stroke: '#ffffff', 'stroke-width': 0.8 });
+      if (B.cos) s += lin(x0, bainha - 3, x1, bainha - 3, { stroke: B.cos, 'stroke-width': 7, 'stroke-linecap': 'round' });
     }
     if (S.bib) { s += lin(b.x - 30, b.y - b.ry + 4, b.x - 40, bainha, { stroke: '#f2c14e', 'stroke-width': 1.2, 'stroke-dasharray': '3 2', 'clip-path': c.corte(casaco) }); }
     if (top.texto || top.controle) s += top.controle ? controle(b.x + 10, b.y - 8, 0.9) : '';
     if (top.emblema === 'unicornio') s += emblemaUnicornio(c, b.x + 14, b.y - 12);
+    else if (top.emblema) s += emblemaRoupa(c, top.emblema, b.x + 6, b.y - 8);
+    if (top.texto && !top.controle && top.texto !== 'amigos') s += txt(b.x + 10, b.y - 2, top.texto, { 'font-family': 'Fredoka, Arial Rounded MT Bold, sans-serif', 'font-weight': 700, 'font-size': 17, fill: luz(top.cor) > 0.6 ? '#e0559a' : '#ffffff', 'text-anchor': 'middle' });
+    if (S.jaqueta && S.jaqueta.estrelas) [[-30, -18], [8, -26], [40, -6]].forEach(function (e) { s += p(estrelaD(b.x + e[0], b.y + e[1], 6, 2.6), { fill: '#ffe27a', stroke: '#c9962a', 'stroke-width': 0.6 }); });
+    if (top.gola === 'marinheiro') s += p('M' + n(b.x - b.rx + 10) + ',' + n(b.y - b.ry + 6) + ' Q' + n(b.x - 20) + ',' + n(b.y - b.ry - 8) + ' ' + n(b.x + 30) + ',' + n(b.y - b.ry + 4) + ' L' + n(b.x - 10) + ',' + n(b.y - 6) + 'Z', { fill: top.golaCor, stroke: escuro(top.golaCor, 0.3), 'stroke-width': 1.4, 'clip-path': c.corte(casaco) }) + p('M' + n(b.x - b.rx + 14) + ',' + n(b.y - b.ry + 10) + ' Q' + n(b.x - 18) + ',' + n(b.y - b.ry - 2) + ' ' + n(b.x + 22) + ',' + n(b.y - b.ry + 8), { stroke: '#ffffff', 'stroke-width': 2, fill: 'none', 'clip-path': c.corte(casaco) });
+    if (top.felpudo) s += p(casaco, { fill: c.pelo('#ffffff', true), 'clip-path': corte, opacity: 0.7 });
     if (S.heroi) s += emblemaHeroi(S.heroi, b.x + 10, b.y - 10, 20);
     if (a.patch && a.patch !== 'nenhum' && !S.capa && !S.abobora) s += patch(c, a.patch, b.x + 30, b.y - 10, 13);
     if (S.cachecol) s += cachecol(g, S.cachecol);
@@ -963,19 +1222,29 @@
   }
   function pernasRoupaQ(c, a, g, S) {
     if (!S || S.capa || S.abobora) return null;
+    if (!S.top && !S.bib && !S.baixo) return null;
     var top = S.top || {}, B = S.baixo || {}, pr = g.pernas;
     var manga = top.mangas && top.mangas !== 'nenhuma' && top.mangas !== 'alcinha' ? (top.mangas === 'longa' ? 0.62 : 0.34) : 0;
-    var corM = S.jaqueta ? (S.jaqueta.metal ? '#c9d0dc' : S.jaqueta.cor) : top.cor;
+    var corM = S.jaqueta ? (S.jaqueta.metal ? '#c9d0dc' : S.jaqueta.cor) : top.corManga || top.cor;
+    if (top.mangas === 'regata') manga = 0;
     if (S.jaqueta) manga = 0.62;
+    var trasFrac;
     var perna = function (l, frac, cor, est, longe) {
       var t0 = l[0], pe = l[1], y2 = t0[1] + (pe[1] - t0[1]) * frac, r = g.rp + 3.5, x = t0[0];
       var r2 = capsula(x, t0[1] - 6, x, y2, r, longe ? escuro(cor, 0.12) : cor, escuro(cor, 0.4));
       var e = c.estampa(est, cor); if (e) r2 += lin(x, t0[1] - 6, x, y2, { stroke: e, 'stroke-width': r * 2, 'stroke-linecap': 'round' });
       if (top.barra && !B.tipo) r2 += lin(x - r, y2 + 2, x + r, y2 + 2, { stroke: top.barra, 'stroke-width': 8, 'stroke-linecap': 'round' });
+      if (cor === corM && frac === manga) {   // manga da pata da frente
+        if (top.listrasManga) r2 += lin(x - r, y2 - 10, x + r, y2 - 10, { stroke: top.listrasManga, 'stroke-width': 3.4 }) + lin(x - r, y2 - 4, x + r, y2 - 4, { stroke: top.listrasManga, 'stroke-width': 3.4 });
+        if (top.mangas === 'babado') for (var bq = -1; bq <= 1; bq++) r2 += circ(x + bq * 7, y2 + 4, 5.4, { fill: claro(cor, 0.1), stroke: escuro(cor, 0.3), 'stroke-width': 1.1 });
+        if (top.debrum) r2 += lin(x - r, y2 + 2, x + r, y2 + 2, { stroke: top.debrum, 'stroke-width': 6, 'stroke-linecap': 'round' });
+      }
+      if (B.barraPelucia && cor === B.cor && frac === trasFrac) r2 += lin(x - r, y2 + 2, x + r, y2 + 2, { stroke: B.barraPelucia, 'stroke-width': 9, 'stroke-linecap': 'round' });
+      if (B.faixaLado && cor === B.cor && frac === trasFrac) r2 += lin(x + r - 3, t0[1] - 4, x + r - 3, y2, { stroke: B.faixaLado, 'stroke-width': 3, 'stroke-linecap': 'round' });
       if (S.heroi && frac > 0.6) r2 += elip(x, pe[1] - 2, g.peRx + 3, g.peRy + 6, { fill: S.heroi.cor2, stroke: escuro(S.heroi.cor2, 0.35), 'stroke-width': 1.8 });
       return r2;
     };
-    var trasFrac = B.tipo === 'calca' ? (B.pezinho ? 0.92 : 0.8) : B.tipo === 'bermuda' ? 0.42 : B.tipo === 'calcao' ? 0.3 : 0;
+    trasFrac = B.tipo === 'calca' ? (B.pezinho ? 0.92 : 0.8) : B.tipo === 'bermuda' ? 0.42 : B.tipo === 'calcao' ? 0.3 : B.tipo === 'sunga' ? 0.12 : 0;
     return function (i) {
       var frente = i === 0 || i === 2;
       if (frente) return manga ? perna(pr[i], manga, corM, top.est, i < 2) : '';
@@ -1903,7 +2172,7 @@
     if (a.base === 'raposa') { T.membro = null; T.pe = '#3a2a2e'; }
     if (a.base === 'pinguim') { T.pe = '#ffa53a'; T.sola = '#ffcf8a'; }
     if (a.base === 'panda') T.membro = T.m;
-    var S = a.roupa && a.roupa !== 'nenhuma' ? especRoupa(a) : null;
+    var S = especRoupa(a);
     var capuzVestido = S && S.capuz;
     var corA = function (id) { return acessCor(a, id); };
     var lev = A.levantar(a);
@@ -1918,6 +2187,7 @@
     if (S && S.capa && !q) corpo += p('M' + n(150 - g.t.wt - 10) + ',' + n(g.t.y0) + ' Q' + n(150 - g.t.wb - 40) + ',' + n(g.t.y1) + ' ' + n(150 - g.t.wb - 30) + ',' + n(g.t.y1 + 26) + ' L' + n(150 + g.t.wb + 30) + ',' + n(g.t.y1 + 26) + ' Q' + n(150 + g.t.wb + 40) + ',' + n(g.t.y1) + ' ' + n(150 + g.t.wt + 10) + ',' + n(g.t.y0) + 'Z', { fill: escuro(S.capa.cor, 0.12), stroke: escuro(S.capa.cor, 0.35), 'stroke-width': 2 });
     if (S && S.heroi) corpo += capaHeroi(g, S.heroi);
     var rabo = cauda(c, a, g, T);
+    if (rabo && q && S && S.pompomRabo) rabo += circ(g.cauda[0] + 4, g.cauda[1] + 2, 9, { fill: S.pompomRabo, stroke: '#d8d2da', 'stroke-width': 1.4 });
     if (rabo) corpo += gr(rabo, { 'class': 'ma-rabo', 'data-px': q ? g.cauda[0] : 196, 'data-py': q ? g.cauda[1] : 276 });
     if (q) {
       var RQ = pernasRoupaQ(c, a, g, S);
@@ -2007,7 +2277,7 @@
   /* ---------- miniaturas: roupa no cabide e acessório sozinho ---------- */
   A.cabide = function (a, roupaId, op) {
     op = op || {};
-    var b = Object.assign({}, a, { base: 'urso', corpo: 'pe', roupa: roupaId, acess: {}, patch: null, pelo: 'branco' });
+    var b = Object.assign({}, a, { base: 'urso', corpo: 'pe', roupa: roupaId, acess: {}, patch: null, pelo: 'branco', baixo: null });
     var c = new Ctx(op.id || 'cb'), g = A.geo('urso', 'pe', null, b), S = roupaId === 'nenhuma' ? null : especRoupa(b), s = '';
     s += p('M150,150 q0,-14 10,-14 q10,0 10,8 q0,8 -10,12 L150,166', { stroke: '#8a7a6a', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' });
     s += p('M150,166 L92,192 Q86,196 92,198 L208,198 Q214,196 208,192 Z', { fill: '#c99a6a', stroke: '#8a6a4a', 'stroke-width': 2 });
@@ -2019,9 +2289,20 @@
     if (S.capuz) { s = capuz(c, b, g, S, false) + capuz(c, b, g, S, true) + s; vb = '50 40 200 330'; }
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + vb + '" aria-hidden="true"><defs>' + c.defs.join('') + '</defs>' + s + '</svg>';
   };
+  // a parte de baixo no cabide de prendedor (saia, short e calça penduradas pela cintura)
+  A.cabideBaixo = function (a, baixoId, op) {
+    op = op || {};
+    var b = Object.assign({}, a, { base: 'urso', corpo: 'pe', roupa: 'nenhuma', baixo: baixoId, acess: {}, patch: null, pelo: 'branco' });
+    var c = new Ctx(op.id || 'cbb'), g = A.geo('urso', 'pe', null, b), S = especRoupa(b), s = '', y = g.t.y1 - 32;
+    s += p('M150,' + n(y - 26) + ' q0,-12 9,-12 q9,0 9,7 q0,7 -9,10 L150,' + n(y - 14), { stroke: '#8a7a6a', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' });
+    s += ret(96, y - 16, 108, 7, { rx: 3.5, fill: '#c99a6a', stroke: '#8a6a4a', 'stroke-width': 2 });
+    if (S) s += roupaPeCorpo(c, b, g, S);
+    [-1, 1].forEach(function (k) { s += ret(150 + k * 42 - 4.5, y - 12, 9, 15, { rx: 2, fill: '#d8dbe2', stroke: '#8a909c', 'stroke-width': 1.4 }); });
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="78 ' + n(y - 42) + ' 144 ' + n(g.chao - y + 48) + '" aria-hidden="true"><defs>' + c.defs.join('') + '</defs>' + s + '</svg>';
+  };
   A.miniAcess = function (a, id, op) {
     op = op || {};
-    var it = D.acess[id], b = Object.assign({}, a, { acess: {}, roupa: 'nenhuma' });
+    var it = D.acess[id], b = Object.assign({}, a, { acess: {}, roupa: 'nenhuma', baixo: null });
     if (!it) return '';
     b.acess[it.caixa] = id;
     if (b.corpo === 'q' && it.so === 'pe') b.corpo = 'pe';
