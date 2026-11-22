@@ -278,10 +278,9 @@ test('no navegador: Campo Minado e Labirinto dão a volta com a favorita no fim;
     }
     await pg.goto(base); await pg.waitForSelector('.radio');
     const bol = await pg.$$eval('.r-bolinhas button', bs => bs.map(x => x.getAttribute('aria-label')));
-    assert.strictEqual(bol.length, 11);
-    assert.match(bol[0], /Abertura do Bolinho FM/, 'a abertura na frente (teste/radio-abertura.test.js)');
-    assert.match(bol[10], /Cool Rock/, 'a favorita da rádio por último: ' + bol.join(' | '));
-    assert.doesNotMatch(bol[1], /Cool Rock/);
+    assert.strictEqual(bol.length, 10);
+    assert.match(bol[9], /Cool Rock/, 'a favorita da rádio por último: ' + bol.join(' | '));
+    assert.doesNotMatch(bol[0], /Cool Rock/);
     assert.deepStrictEqual(erros, []);
   } finally { await b.close(); srv.close(); }
 });

@@ -340,16 +340,15 @@ def compor():
     # ---- 2. tema heroico (Ré maior)
     for p in (trompas, violas, cellos, baixos, trombones, cordas, coro, harpa, timpanos, trompetes, flauta):
         p.cc(A, 11, 112)
-    frase(trompas, A, TEMA[:30], 100)
-    frase(trompas, A + 32, TEMA[30:], 110)
-    ostinato(violas, P_TEMA, A, nota('A3'), 72)
+    frase(trompas, A, TEMA[:30], 92)
+    frase(trompas, A + 32, TEMA[30:], 104)
+    ostinato(violas, P_TEMA, A, nota('A3'), 62)
     raizes(cellos, P_TEMA, A, nota('D2'), 74, ritmo=((0, 1.5), (1.5, .5), (2, 2)), quinta=True, leg=0.85)
     raizes(baixos, P_TEMA, A, nota('E1'), 74, ritmo=((0, 2), (2, 2)), leg=0.9)
-    cama(trombones, P_TEMA[:9], A, nota('A2'), 64)
-    cama(trombones, P_TEMA[9:], A + 32, nota('A2'), 78)
+    cama(trombones, P_TEMA[:9], A, nota('A2'), 56)
+    cama(trombones, P_TEMA[9:], A + 32, nota('A2'), 70)
     arpejo(harpa, P_TEMA, A, nota('D3'), 48, alcance=17)
-    cama(cordas, P_TEMA[:9], A, nota('A3'), 58)
-    cama(cordas, P_TEMA[9:], A + 32, nota('D5'), 70)
+    cama(cordas, P_TEMA[9:], A + 32, nota('D5'), 62)
     cama(coro, P_TEMA[9:], A + 32, nota('F#4'), 62)
     frase(flauta, A + 32, TEMA[30:], 66, oit=1)
     b = A
@@ -655,7 +654,7 @@ def main():
     final = os.path.join(pasta, 'abertura-final.wav')
     ganho = ALVO_LUFS - i0 + 2.0
     for _ in range(4):
-        filtro = ('highpass=f=28,acompressor=threshold=-27dB:ratio=2.5:attack=25:release=300:knee=6,volume=%.2fdB,'
+        filtro = ('acompressor=threshold=-22dB:ratio=2:attack=25:release=300:knee=6,volume=%.2fdB,'
                   'alimiter=limit=%.4f:attack=4:release=120:level=false' % (ganho, 10 ** (TETO_DB / 20)))
         rodar(['ffmpeg', '-y', '-hide_banner', '-i', bruto, '-af', filtro, '-c:a', 'pcm_f32le', final])
         i1, pk, lra = medir(final)

@@ -6,17 +6,6 @@ Rock alegre e leve, escolhido para criança: tom maior e pouca distorção, medi
 Todas instrumentais e de licença livre, que permite uso comercial. Única alteração: conversão para MP3 de 96 kbps
 com o volume igualado entre as faixas (loudnorm). O autor aparece no próprio player.
 
-### SolverONE / Bolinho de Chuva — composição original — CC0 1.0 (domínio público)
-
-Abertura da rádio, sempre a primeira a tocar (pedido do dono, 21/Nov/2026): uma fantasia orquestral composta para o Bolinho
-de Chuva neste repositório, nota por nota, em `ferramentas/musica-abertura.py` (melodia e harmonia originais, nada copiado de
-outra música). Tocada por instrumentos virtuais (banco General MIDI FluidR3_GM, de Frank Wen, licença MIT) e gravada com o
-FluidSynth; o volume igualado ao das outras músicas da rádio. Doada ao domínio público: qualquer um pode usar.
-
-| Arquivo | Música |
-|---|---|
-| `bolinho-abertura.mp3` | "Abertura do Bolinho FM" — SolverONE / Bolinho de Chuva, composição original, CC0 1.0 |
-
 ### HoliznaCC0 — álbum "Rock Montage" — CC0 1.0 (domínio público)
 
 Doadas ao domínio público: não exigem crédito; ele fica aqui como cortesia.
