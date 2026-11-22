@@ -14,7 +14,7 @@
   var RODANDO = 0.9;       // segundos rodopiando depois de bater num carro
   var DEPOIS_DO_FIM = 3;   // segundos de festa depois que todos chegam
   // pontos (ninguém perde a corrida, mas o placar sobe e desce)
-  var PONTOS = { estrela: 100, estrelaAr: 200, turbo: 50, rampa: 50, checkpoint: 500, chegada: 1000, cone: -50, batida: -150, looping: 300, miniturbo: 40, splat: 150 };
+  var PONTOS = { estrela: 100, estrelaAr: 200, turbo: 50, rampa: 50, checkpoint: 500, chegada: 1000, cone: -50, batida: -150, looping: 300, miniturbo: 40, splat: 150, raio: 150, desviou: 100 };
   // derrapagem: segurando para dentro numa curva, rápido. Ao soltar, um turbinho do tamanho da derrapagem
   var DERRAPA = [0.6, 1.4, 2.4];          // segundos derrapando para o nível 1 (faísca azul), 2 (laranja), 3 (roxa)
   var MINI_TURBO = [0, 0.7, 1.1, 1.6];    // segundos de turbo ao soltar, por nível
@@ -29,6 +29,12 @@
   /* Bruxa na vassoura (1.33.0, dono 20/Nov/2026): começa no chão, junto com os carros; o botão PULAR faz ela subir
      para o céu (junto com os que voam) e, de novo, descer. A troca leva BRUXA.troca segundos (passa por cima de tudo). */
   var BRUXA = { troca: 0.9 };
+  /* Raio da Bruxinha (1.36.0, dono 21/Nov/2026): "um botão de soltar raios nos oponentes; quando ela for do computador,
+     solta raios, mas não o tempo inteiro (...) jogabilidade decente". Quem joga de bruxa: ⚡ RAIO acerta o rival mais perto
+     na frente (fica lento um pouquinho) e recarrega em RAIO.recarga s. A bruxa do computador solta raio de vez em quando
+     (cfg.raioCada, conforme o nível), sempre com aviso antes (uma nuvem em cima do carro, cfg.raioAviso s): quem pula
+     (ou está de bolha) desvia; quem leva fica mais lento (cfg.raioFreia), sem rodopiar. O Ursão nem sente. */
+  var RAIO = { recarga: 6, lento: 1.6, alcance: 60 * SEG, mostra: 0.45, primeiro: 9 };
   var URSO = { vel: 1.1, largura: 0.75, beirada: 0.92, freio: 4, freioAte: 0.15, saltito: 0.38, risada: 2.6 };   // 1.32.0 (dono): um pouco mais lento (era 1,25) e freando mais na beirada (era até 30%)
 
   // rivais (personagens): configs = [{ id, veic, mod: { vel, curva } }]
@@ -87,10 +93,34 @@
     // botão PULAR: um pulinho que passa por cima de cone, lama e carrinho
     if (j.recarga > 0) j.recarga = Math.max(0, j.recarga - dt);
     if (mod.bruxa && ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou && !lp) {
-      j.voando = !j.voando; mod.voa = j.voando; j.pulo = j.puloMax = BRUXA.troca; j.recarga = RECARGA;
+      j.voando = !j.voando; mod.voa = j.voando; j.pulo = j.puloMax = BRUXA.troca; j.recarga = RECARGA; if (j.raioAviso > 0) j.desviando = true;
       e.eventos.push({ tipo: j.voando ? 'bruxaSobe' : 'bruxaDesce', j: j.n });
     } else if (ent && ent.pular && j.pulo <= 0 && j.recarga <= 0 && j.rodando <= 0 && !j.chegou && !lp) {
-      j.pulo = j.puloMax = PULINHO; j.recarga = RECARGA; e.eventos.push({ tipo: 'pulo', j: j.n, manual: true });
+      j.pulo = j.puloMax = PULINHO; j.recarga = RECARGA; if (j.raioAviso > 0) j.desviando = true; e.eventos.push({ tipo: 'pulo', j: j.n, manual: true });
+    }
+    // ⚡ RAIO (só a bruxa): no rival mais perto na frente
+    if (j.raioRec > 0) j.raioRec = Math.max(0, j.raioRec - dt);
+    if (j.raio > 0) j.raio = Math.max(0, j.raio - dt);
+    if (mod.bruxa && ent && ent.raio && !(j.raioRec > 0) && !j.chegou) {
+      var alvoR = -1, dR = Infinity;
+      e.rivais.forEach(function (rv, k) { var d = rv.z - j.z; if (!rv.remoto && !rv.chegou && d > SEG && d < RAIO.alcance && d < dR) { dR = d; alvoR = k; } });
+      if (alvoR >= 0) {
+        var rvR = e.rivais[alvoR];
+        rvR.lento = Math.max(rvR.lento, RAIO.lento); rvR.raio = RAIO.mostra; j.raioRec = RAIO.recarga;
+        if (rvR.proxRaio != null) rvR.proxRaio += 3;   // acertou a outra bruxa: ela demora mais para soltar o dela
+        e.eventos.push({ tipo: 'raio', j: j.n, r: alvoR }); somar(e, j, PONTOS.raio, 'raio');
+      } else { j.raioRec = 0.6; e.eventos.push({ tipo: 'raioNada', j: j.n }); }
+    }
+    // raio da bruxa do computador: depois do aviso, cai
+    if (j.raioAviso > 0) {
+      j.raioAviso = Math.max(0, j.raioAviso - dt);
+      if (j.raioAviso <= 0) {
+        j.raio = RAIO.mostra;
+        if (mod.urso) rir(e, j);   // o Ursão nem sente
+        else if (j.desviando || j.pulo > 0 || j.escudo > 0) { e.eventos.push({ tipo: 'raioDesviou', j: j.n }); somar(e, j, PONTOS.desviou, 'desviou'); }
+        else { j.vel *= cfg.raioFreia || 0.6; j.tremor = 0.6; e.eventos.push({ tipo: 'raioPegou', j: j.n }); perder(e, j, cfg.perdeCone); }
+        j.desviando = false;
+      }
     }
     // o urso, virando para o lado, vai saltitando (um pulinho atrás do outro enquanto segura)
     if (mod.urso && Math.abs(dir) > 0.3 && j.pulo <= 0 && j.rodando <= 0 && !j.chegou && !lp) { j.pulo = j.puloMax = URSO.saltito; e.eventos.push({ tipo: 'saltito', j: j.n }); }
@@ -295,6 +325,22 @@
     if (rv.proxTurbo <= 0) { rv.proxTurbo = 5 + Math.random() * 6; if (d < 2 && d > -14 && !rv.chegou) { rv.turbo = 1.6; e.eventos.push({ tipo: 'turboRival', r: rv.r }); } }
     if (rv.turbo > 0) { rv.turbo -= dt; alvo *= 1.35; }
     if (rv.gosma > 0) rv.gosma -= dt;
+    if (rv.raio > 0) rv.raio -= dt;
+    // a bruxa do computador solta raio de vez em quando (com aviso antes) em quem está na frente dela ou do lado
+    if (rv.mod.bruxa && e.fase === 'corrida' && !rv.chegou) {
+      var cada = cfg.raioCada || [12, 18];
+      if (rv.proxRaio == null) rv.proxRaio = RAIO.primeiro + Math.random() * (cada[1] - cada[0]);
+      rv.proxRaio -= dt;
+      if (rv.proxRaio <= 0) {
+        var alvoJ = null, dJ = Infinity;
+        e.jogadores.forEach(function (j) { var dz = j.z - rv.z; if (!j.chegou && !(j.raioAviso > 0) && dz > -SEG * 5 && dz < RAIO.alcance && Math.abs(dz) < dJ) { dJ = Math.abs(dz); alvoJ = j; } });
+        if (alvoJ) {
+          alvoJ.raioAviso = cfg.raioAviso || 1.4; alvoJ.desviando = false;
+          rv.proxRaio = cada[0] + Math.random() * (cada[1] - cada[0]);
+          e.eventos.push({ tipo: 'raioAviso', j: alvoJ.n, r: rv.r });
+        } else rv.proxRaio = 2;
+      }
+    }
     if (rv.lento > 0) { rv.lento -= dt; alvo *= 0.55; }
     var lpR = P.noLoop(pista, rv.z);
     if (lpR) alvo = Math.max(alvo, max * 0.95);
@@ -394,7 +440,7 @@
     return e;
   }
 
-  var VruuumMotor = { nivelDerrapa: nivelDerrapa, DERRAPA: DERRAPA, MINI_TURBO: MINI_TURBO, ROLETA: ROLETA, ESCUDO: ESCUDO, FOGUETE: FOGUETE, usarPoder: usarPoder, URSO: URSO, BRUXA: BRUXA, PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
+  var VruuumMotor = { nivelDerrapa: nivelDerrapa, DERRAPA: DERRAPA, MINI_TURBO: MINI_TURBO, ROLETA: ROLETA, ESCUDO: ESCUDO, FOGUETE: FOGUETE, usarPoder: usarPoder, URSO: URSO, BRUXA: BRUXA, RAIO: RAIO, PONTOS: PONTOS, PONTOS_LUGAR: PONTOS_LUGAR, novaCorrida: novaCorrida, atualizar: atualizar, CONTAGEM: CONTAGEM, TURBO: TURBO, PULO: PULO, PULINHO: PULINHO, RECARGA: RECARGA, RODANDO: RODANDO, DEPOIS_DO_FIM: DEPOIS_DO_FIM };
   if (typeof module !== 'undefined' && module.exports) module.exports = VruuumMotor;
   else raiz.VruuumMotor = VruuumMotor;
 })(this);

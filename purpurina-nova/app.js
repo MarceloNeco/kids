@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.8';
+  var APP_VERSION = '0.9.16';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -581,9 +581,9 @@
     pl.setAttribute('aria-label', t('Baladinha da Purpurina — toque para começar', 'Purpurina’s Dance Party — tap to start', 'Minidisco de Purpurina — toca para empezar'));
     pl.innerHTML = '<span class="bal-estrela e1">✦</span><span class="bal-estrela e2">✦</span><span class="bal-estrela e3">✦</span><span class="bal-estrela e4">✦</span>' +
       '<p class="bal-letreiro"><span class="bal-l1">' + t('Baladinha', 'Dance Party', 'Minidisco') + '</span><span class="bal-l2">' + t('da Purpurina', 'with Purpurina', 'de Purpurina') + '</span></p>' +
-      '<div class="bal-placa-boneca"><div class="bal-placa-pulo">' + B.svg(estado, { id: 'placa', fundo: false, anim: !CALMO, realce: false, rig: !CALMO, passos: !CALMO, sorriso: true, piscadinha: true }) + '</div></div>';
+      '<div class="bal-placa-boneca"><div class="bal-placa-pulo">' + B.svg(estado, { id: 'placa', fundo: false, anim: !CALMO, realce: false, rig: !CALMO, passos: !CALMO, sorriso: true, joelho: false }) + '</div></div>';   // sem piscadinha fixa (dono, 22/Nov/2026): pisca sozinha
     $('balada').appendChild(pl);
-    var anim = CALMO ? null : PurpurinaAnim.criar(pl.querySelector('.bal-placa-pulo'), { poses: ['abracao'], enquanto: function () { return pl.isConnected; } });
+    var anim = CALMO ? null : PurpurinaAnim.criar(pl.querySelector('.bal-placa-pulo'), { poses: ['abracao'], modo: 'pular', puloMs: 1100, enquanto: function () { return pl.isConnected; } });   // pulo de verdade (animador.js, modo 'pular')
     function tirar() { if (!pl.isConnected) return; pl.classList.add('saindo'); if (anim) anim.parar(); setTimeout(function () { pl.remove(); }, 450); }
     pl.addEventListener('click', tirar);
     setTimeout(tirar, CALMO ? 1800 : 3200);
@@ -845,6 +845,39 @@
     });
   }
 
+  /* ---------- GIF do desfile e da Baladinha (dono, 22/Nov/2026: "gerar um GIF… e compartilhar, por exemplo
+     WhatsApp") ----------
+     Grava a cena que está na tela (gif.js), monta o GIF no próprio aparelho e abre com Compartilhar (WhatsApp e os outros
+     apps do celular) e Salvar. No desfile ela entra de novo pela passarela enquanto grava; na Baladinha, grava a dança. */
+  var gravandoGif = false;
+  function gifDe(palco, ms, nome) {
+    if (gravandoGif || !window.PurpurinaGif) return;
+    gravandoGif = true; Som.tocar('clique');
+    recado(t('🔴 Gravando o GIF…', '🔴 Recording the GIF…', '🔴 Grabando el GIF…'));
+    PurpurinaGif.gravar(palco, { ms: ms, fps: 10, largura: 360, andamento: function (p) {
+      if (p >= 0.4 && $('janela').hidden) abrirJanela({ titulo: t('🎞️ Preparando o GIF…', '🎞️ Making the GIF…', '🎞️ Preparando el GIF…'), texto: '0%', botoes: [] }, true);
+      if (p >= 0.4) $('janelaTexto').textContent = Math.round((p - 0.4) / 0.6 * 100) + '%';
+    } }).then(function (blob) {
+      gravandoGif = false;
+      var url = URL.createObjectURL(blob), arq = null, nomeArq = 'purpurina-' + nome + '-' + carimbo() + '.gif';
+      try { arq = new File([blob], nomeArq, { type: 'image/gif' }); } catch (x) { /* navegador antigo */ }
+      var botoes = [];
+      if (arq && navigator.canShare && navigator.canShare({ files: [arq] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), classe: 'grande', ficar: true, fn: function () { navigator.share({ files: [arq], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
+      botoes.push({ t: t('💾 Salvar o GIF', '💾 Save the GIF', '💾 Guardar el GIF'), classe: botoes.length ? 'medio' : 'grande', ficar: true, fn: function () {
+        var a = document.createElement('a'); a.href = url; a.download = nomeArq; document.body.appendChild(a); a.click(); a.remove();
+        recado(t('O GIF foi para a pasta Downloads (ou Arquivos).', 'The GIF went to your Downloads (or Files).', 'El GIF se ha guardado en la carpeta Descargas (o Archivos).'));
+      } });
+      botoes.push({ t: t('Fechar', 'Close', 'Cerrar') });
+      abrirJanela({ titulo: t('🎞️ Seu GIF!', '🎞️ Your GIF!', '🎞️ ¡Tu GIF!'), img: url, alt: 'GIF', botoes: botoes }, true);
+      Som.tocar('tada');
+    }).catch(function () {
+      gravandoGif = false;
+      abrirJanela({ titulo: '🎞️ GIF', texto: t('Este navegador não conseguiu fazer o GIF. A foto continua funcionando.', "This browser couldn't make the GIF. Photos still work.", 'Este navegador no ha podido hacer el GIF. La foto sigue funcionando.'), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true);
+    });
+  }
+  $('btGifDesfile').addEventListener('click', function () { if (gravandoGif) return; desfilar(); setTimeout(function () { gifDe($('palcoDesfile'), 5400, 'desfile'); }, 150); });
+  $('btGifBalada').addEventListener('click', function () { gifDe($('palcoBalada'), 3200, 'baladinha'); });
+
   // ---------- desfile ----------
   var FRASES = {
     3: [['Arrasou!', 'Amazing!', '¡Lo has bordado!'], ['Perfeito!', 'Perfect!', '¡Perfecto!'], ['Uau, que brilho!', 'Wow, so sparkly!', '¡Hala, cuánto brillo!']],
@@ -963,11 +996,12 @@
       lugar(0); pose({ rig: true });
       animD = PurpurinaAnim.criar(pas, { poses: ['relax'], enquanto: vale, modo: 'andar', passoMs: PASSO_MS[idade] || 980 });
       fogos(seq, 9000);
-      var ini = performance.now(), dur = 3600;
+      // anda um número inteiro de passadas, em velocidade constante (o corpo avança no mesmo ritmo dos passos, sem
+      // escorregar); só a primeira e a última passada aceleram e freiam de leve
+      var ini = performance.now(), passada = PASSO_MS[idade] || 980, dur = Math.max(2, Math.round(3600 / passada)) * passada;
       (function andar(agora) {
         if (!vale()) return;
-        // passo constante (os pés não escorregam), freando só no fim
-        var k = Math.min(1, (agora - ini) / dur), e = 1 - Math.pow(1 - k, 1.5);
+        var k = Math.min(1, (agora - ini) / dur), b0 = 0.12, e = k < b0 ? k * k / (2 * b0 * (1 - b0)) : k > 1 - b0 ? 1 - (1 - k) * (1 - k) / (2 * b0 * (1 - b0)) : (k - b0 / 2) / (1 - b0);
         lugar(e);
         if (k < 1) requestAnimationFrame(andar);
         else {

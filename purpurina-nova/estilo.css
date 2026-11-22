@@ -177,7 +177,7 @@ ul { list-style: none; }
 .cena-desfile svg { width: 100%; height: 100%; display: block; }
 .cena-desfile svg.teto-show { position: absolute; top: 0; left: 0; height: 42%; pointer-events: none; }
 .modelo { position: absolute; left: 50%; bottom: 0; height: 90%; aspect-ratio: 400 / 720; transform-origin: 50% 100%; transform: translateX(-50%); will-change: transform; }
-.modelo .passarela-boneca { filter: drop-shadow(0 12px 14px rgba(0, 0, 0, .5)); }
+.modelo .passarela-boneca { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35)); }   /* sombra colada nos pés (12 px para baixo parecia que ela flutuava) */
 .fogos { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .pas-lampada { animation: lampada 1.1s ease-in-out infinite alternate; }
 /* refletores do teto: acendem forte e apagam, cada um no seu tempo; o facho de luz acompanha */
@@ -571,7 +571,7 @@ dialog.pp-ia::backdrop { background: rgba(61, 35, 82, .45); }
 .bal-estrela.e3 { left: 12%; top: 50%; font-size: 2rem; animation-delay: 1s; } .bal-estrela.e4 { right: 14%; bottom: 14%; font-size: 3rem; color: #ff9fd8; animation-delay: .3s; }
 @keyframes balPisca { 0%, 100% { transform: scale(.7); opacity: .6; } 50% { transform: scale(1.15); opacity: 1; } }
 .bal-placa-boneca { position: relative; flex: 1 1 auto; width: 100%; min-height: 0; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 2vh; }
-.bal-placa-pulo { height: 100%; max-height: 62vh; aspect-ratio: 400 / 720; animation: balPulo 1s cubic-bezier(.3, .7, .4, 1) infinite; }
+.bal-placa-pulo { height: 100%; max-height: 62vh; aspect-ratio: 400 / 720; }   /* o pulo é do esqueleto (animador.js, modo 'pular'): agacha, impulsiona, sobe e pousa */
 .bal-placa-pulo svg { width: 100%; height: 100%; display: block; overflow: visible; }
 @keyframes balPulo { 0%, 100% { transform: translateY(0) rotate(0); } 40% { transform: translateY(-9%) rotate(-3deg); } 60% { transform: translateY(-9%) rotate(2deg); } }
 @media (prefers-reduced-motion: reduce) { .bal-letreiro, .bal-estrela, .bal-placa-pulo { animation: none; } }

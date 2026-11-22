@@ -347,6 +347,26 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - `desenho.js`: `etiquetaNome()` (pino vermelho com o nome em cima do outro) e a bolinha vermelha maior no mapinha.
 - Testes: `teste/duelo.test.js`.
 
+## 1.36.0 — ⚡ raio da Bruxinha (dono, 21/Nov/2026)
+
+- Pedido: "a bruxinha ter um botão de soltar raios nos seus oponentes (...) quando ela for do computador, ela solta raios,
+  mas não o tempo inteiro, para não ficar impossível (...) jogabilidade decente".
+- Quem joga de Bruxinha: botão ⚡ RAIO (`D.botaoRaio`, logo acima do VOAR/DESCER; teclado E, ou R para o jogador 2;
+  controle: botão Y). `motor.js` (`RAIO`): acerta o rival mais perto na frente (de 1 a 60 pedaços), que fica lento
+  (`rv.lento` 1,6 s, `rv.raio` para o desenho), +150 pontos, recarga de 6 s (o anel em volta do botão mostra). Sem
+  ninguém na frente: "Ninguém na frente!", e quase não gasta a recarga. Rival do duelo (remoto) não é alvo.
+- Bruxinha do computador: `app.js` agora deixa a bruxa entrar nos rivais (corridas no chão) e a põe entre os sorteados em
+  ~metade das corridas; o rival leva `mod.bruxa`. No `moverRival`, de `cfg.raioCada` em `cfg.raioCada` segundos
+  (`pista.js`: Criança 18–26, Normal 12–18, Turbo 9–14; o primeiro depois de ~9 s), ela avisa o jogador mais perto na
+  frente ou do lado (`j.raioAviso`, `cfg.raioAviso`: 1,8 / 1,4 / 1,2 s): nuvem escura piscando em cima do veículo e a faixa
+  "⚡ Raio! PULE!". Quem pula em qualquer momento do aviso (`j.desviando`), está no ar ou de bolha desvia (+100); senão
+  `j.vel *= cfg.raioFreia` (0,75 / 0,6 / 0,5), treme e perde as estrelas de um cone (nada no nível Criança), sem rodopiar.
+  O Ursão nem sente (dá risada). Acertar a bruxa rival com o seu raio atrasa o dela em 3 s.
+- Som: o trovão é a explosão gravada mais grave; o aviso é a risada de bruxa (`dracula` mais aguda). Vibração no aviso e
+  no raio.
+- Testes: `teste/raio.test.js` (botão, recarga, alvo, aviso, desvio pulando e de bolha, Ursão, frequência por nível, e o
+  sorteio da bruxa rival no `app.js`).
+
 ## 1.35.0 — veículo sempre à vista, escolha pelo carrossel (dono, 21/Nov/2026)
 
 - Pedido (com prints): "tinha que mostrar sempre o carrinho que você escolheu e você faz a escolha pelo carrossel, assim

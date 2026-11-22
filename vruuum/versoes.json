@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.36.0",
+      "data": "21/Nov/2026",
+      "hora": "18:05:04",
+      "pt": [
+        "⚡ A Bruxinha agora solta raios! Jogando de Bruxinha, aparece o botão ⚡ RAIO (acima do VOAR; no teclado, E): o raio cai do céu no oponente mais perto na frente, que fica mais lento um pouquinho. Depois de cada raio, o botão recarrega (o anel em volta mostra).",
+        "🧹 A Bruxinha também corre contra você, pelo computador (em mais ou menos metade das corridas). Ela solta raio só de vez em quando, e sempre avisa antes: aparece uma nuvem escura em cima do seu veículo e \"⚡ Raio! PULE!\". Pulou a tempo (ou está de bolha), desvia; se levar, fica mais lento, sem rodopiar. No nível Criança ela solta menos e o aviso dura mais."
+      ],
+      "en": [
+        "⚡ The Little Witch now casts lightning! Playing as the Little Witch, you get a ⚡ ZAP button (above FLY; on the keyboard, E): lightning strikes the nearest opponent ahead from the sky, slowing them down a little. After each zap, the button recharges (the ring around it shows how much).",
+        "🧹 The Little Witch also races against you as a computer opponent (in about half the races). She only casts lightning now and then, and always warns you first: a dark cloud appears above your ride and \"⚡ Zap! JUMP!\". Jump in time (or have a bubble) and you dodge it; if it hits, you slow down, without spinning. On the Kids level she casts less and the warning lasts longer."
+      ],
+      "es": [
+        "⚡ ¡La Brujita ahora lanza rayos! Jugando con la Brujita aparece el botón ⚡ RAYO (encima de VOLAR; en el teclado, E): el rayo cae del cielo sobre el rival más cercano que va delante, que se vuelve un poco más lento. Después de cada rayo, el botón se recarga (lo muestra el anillo de alrededor).",
+        "🧹 La Brujita también corre contra ti, manejada por el ordenador (en más o menos la mitad de las carreras). Solo lanza un rayo de vez en cuando, y siempre avisa antes: aparece una nube oscura encima de tu vehículo y \"⚡ ¡Rayo! ¡SALTA!\". Si saltas a tiempo (o llevas burbuja), lo esquivas; si te da, vas más lento, sin dar vueltas. En el nivel Niños lanza menos y el aviso dura más."
+      ]
+    },
+    {
       "versao": "1.35.0",
       "data": "21/Nov/2026",
       "hora": "17:30:31",
