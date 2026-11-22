@@ -30,8 +30,7 @@
   var CH_PREF = 'bolinho:meu-amiguinho:pref', CH_RASC = 'bolinho:meu-amiguinho:rascunho';
   function lerJSON(k, pad) { try { var v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : pad; } catch (e) { return pad; } }
   function gravarJSON(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  var pref = Object.assign({ nivel: 'facil', efeitos: true }, lerJSON(CH_PREF, {}));
-  if (!D.NIVEIS[pref.nivel]) pref.nivel = 'facil';
+  var pref = { efeitos: lerJSON(CH_PREF, {}).efeitos !== false };   // (preferências antigas com "nivel" são só ignoradas)
   function salvarPref() { gravarJSON(CH_PREF, pref); }
   var col = R.Colecao();
 
@@ -64,7 +63,7 @@
 
   /* ---------- telas e histórico ---------- */
   var tela = 'menu', pilha = [], depoisDoMenu = null;
-  var amigo = null, etapa = 0, enc = null, encheuAgora = false, mostrado = null;
+  var amigo = null, etapa = 0, encheuAgora = false, mostrado = null;
   function mostrar(id) {
     document.querySelectorAll('.tela').forEach(function (s) { s.classList.toggle('ativa', s.id === id); });
     tela = id; document.body.setAttribute('data-tela', id);
@@ -93,7 +92,6 @@
 
   /* ---------- começo ---------- */
   function pintarMenu() {
-    document.querySelectorAll('[data-nivel]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.nivel === pref.nivel)); });
     $('btEfeitos').textContent = pref.efeitos ? '🔊' : '🔇';
     var lista = col.listar();
     $('nColecao').textContent = String(lista.length);
@@ -102,12 +100,9 @@
     if (mostrar3.length < 3) mostrar3.splice(1, 0, (function () { var x = R.novo('urso'); R.porAcess(x, 'laco'); return x; })());
     est.innerHTML = mostrar3.map(function (x, i) { return '<div class="na-estante">' + A.svg(x, { id: 'es' + i }) + '</div>'; }).join('');
   }
-  document.querySelectorAll('[data-nivel]').forEach(function (b) {
-    b.addEventListener('click', function () { pref.nivel = b.dataset.nivel; salvarPref(); V.toque(); pintarMenu(); });
-  });
   function comecar() {
     V.acordar();
-    amigo = R.novo(); enc = D.NIVEIS[pref.nivel].encomenda ? R.novaEncomenda() : null; encheuAgora = false;
+    amigo = R.novo(); encheuAgora = false;
     guardarRascunho();
     ir({ tela: 'oficina', etapa: 0 });
   }
@@ -115,7 +110,7 @@
   $('btContinuar').addEventListener('click', function () {
     var r = lerJSON(CH_RASC, null), a = r && R.validar(r.amigo);
     if (!a) { comecar(); return; }
-    amigo = a; enc = r.enc || null; pref.nivel = r.nivel || pref.nivel; encheuAgora = true;
+    amigo = a; encheuAgora = true;   // rascunho antigo com nivel/enc: esses campos são ignorados
     ir({ tela: 'oficina', etapa: r.etapa || 0 });
   });
   $('btColecao').addEventListener('click', function () { V.toque(); ir({ tela: 'colecao' }); });
@@ -123,12 +118,10 @@
   $('btAjuda').addEventListener('click', function () { $('ajuda').hidden = false; $('btFecharAjuda').focus(); });
   $('btFecharAjuda').addEventListener('click', function () { $('ajuda').hidden = true; $('btAjuda').focus(); });
   V.ligar(pref.efeitos);
-  function guardarRascunho() { gravarJSON(CH_RASC, amigo ? { amigo: amigo, enc: enc, etapa: etapa, nivel: pref.nivel } : null); }
+  function guardarRascunho() { gravarJSON(CH_RASC, amigo ? { amigo: amigo, etapa: etapa } : null); }
 
   /* ---------- a oficina ---------- */
   var vOf = null;   // a pelúcia viva da oficina
-  function nivelTodas() { return D.NIVEIS[pref.nivel].todas; }
-  function opcoes(lista) { return nivelTodas() ? lista.slice() : lista.filter(function (x) { return x.facil; }); }
   function atualizarPelucia() {
     var caixa = $('pelucia'), a = amigo;
     if (etapa === 2 && !encheuAgora) a = Object.assign({}, amigo, { fofura: 6 });   // começa murchinha, encostada no bico
@@ -141,11 +134,9 @@
     $('seloNum').textContent = String(etapa + 1);
     $('etTitulo').textContent = tr(E.titulo);
     $('etSub').textContent = tr(E.sub);
-    $('etConta').textContent = t((etapa + 1) + ' de 7', (etapa + 1) + ' of 7', (etapa + 1) + ' de 7');
+    $('etConta').textContent = t((etapa + 1) + '\u00a0de\u00a07', (etapa + 1) + '\u00a0of\u00a07', (etapa + 1) + '\u00a0de\u00a07');   // "5 de 7" não se separa na quebra de linha
     var pts = $('pontos'); pts.innerHTML = '';
     D.ETAPAS.forEach(function (x, i) { var l = document.createElement('li'); l.className = i === etapa ? 'atual' : i < etapa ? 'feito' : ''; pts.appendChild(l); });
-    $('encomenda').hidden = !enc;
-    if (enc) $('encTexto').textContent = R.textoEncomenda(enc, lingua);
     $('btProximo').hidden = etapa === 6;
     $('oficina').setAttribute('data-etapa', E.id);
     $('maquina').hidden = etapa !== 2; $('medidor').hidden = etapa !== 2;
@@ -153,7 +144,7 @@
     $('fala').hidden = true;
     atualizarPelucia();
     $('painel').scrollTop = 0;
-    PAINEL[E.id]();
+    PAINEL[E.id](); depoisDoPainel();
     if (E.id === 'bicho') mostrarFala(falaBase());
   }
   function irEtapa(n) { if (n < 0 || n > 6 || n === etapa) return; V.toque(); ir({ tela: 'oficina', etapa: n }); }
@@ -182,11 +173,85 @@
   var cacheMini = {};
   function mini(chave, f) { if (!cacheMini[chave]) cacheMini[chave] = f(); return cacheMini[chave]; }
 
+  /* Miniatura que MOSTRA o acessório (dono, 22/Nov/2026: "a mochila é só o ursinho de frente"): desenha o bichinho com e
+     sem a peça, acha as partes novas do desenho, dá zoom nelas (pés para sapatos, cabeça para laços e óculos, mão para
+     bolsas…) e, se a peça fica escondida atrás do corpo (mochila nas costas), mostra a peça sozinha, inteira, como na
+     vitrine da loja. Vale para qualquer acessório novo do dados.js/arte.js, sem lista fixa aqui. */
+  var medidor = null;
+  function folhas(svg) {   // as formas desenhadas (sem os <defs>), na ordem
+    return [].filter.call(svg.querySelectorAll('*'), function (e) { return !e.firstElementChild && !e.closest('defs, clipPath, mask, pattern, linearGradient, radialGradient, title'); });
+  }
+  function chaveFolha(e) {   // a forma sem os ids (os ids dos degradês mudam quando entra uma peça nova)
+    var k = e.tagName;
+    [].slice.call(e.attributes).map(function (at) { return at.name === 'id' ? '' : at.name + '=' + at.value.replace(/url\(#[^)]*\)/g, 'url()').replace(/^#.*/, '#'); }).sort().forEach(function (x) { k += '|' + x; });
+    return k;
+  }
+  function miniDoAcess(a, id, cor, idSvg) {
+    var it = D.acess[id]; if (!it) return '';
+    var b = Object.assign({}, a, { acess: {}, roupa: 'nenhuma', corAcess: {} });
+    b.acess[it.caixa] = id; if (cor) b.corAcess[id] = cor;
+    if (b.corpo === 'q' && it.so === 'pe') b.corpo = 'pe';
+    var com = A.svg(b, { id: idSvg }), sem = A.svg(Object.assign({}, b, { acess: {} }), { id: idSvg + 's' });
+    if (!medidor) { medidor = el('div'); medidor.setAttribute('aria-hidden', 'true'); medidor.style.cssText = 'position:fixed;left:-2000px;top:0;width:300px;height:396px;visibility:hidden;pointer-events:none'; document.body.appendChild(medidor); }
+    medidor.innerHTML = sem + com;
+    var svgs = medidor.querySelectorAll('svg'), vSem = svgs[0], vCom = svgs[1];
+    [vSem, vCom].forEach(function (v) { v.style.cssText = 'position:absolute;left:0;top:0;width:300px;height:396px'; v.setAttribute('viewBox', '0 -24 300 396'); });
+    var conta = {};
+    folhas(vSem).forEach(function (e) { var k = chaveFolha(e); conta[k] = (conta[k] || 0) + 1; });
+    var todas = folhas(vCom), novas = [];
+    todas.forEach(function (e) { var k = chaveFolha(e); if (conta[k]) conta[k]--; else novas.push(e); });
+    var puro = !Object.keys(conta).some(function (k) { return conta[k] > 0; });   // a peça só acrescentou (não mudou a pose)
+    var o = vCom.getBoundingClientRect();
+    function caixa(e) { var r = e.getBoundingClientRect(); return { x: r.left - o.left, y: r.top - o.top - 24, w: r.width, h: r.height }; }
+    var cxs = novas.map(caixa).filter(function (c) { return c.w > 0 || c.h > 0; });
+    if (!cxs.length) { medidor.innerHTML = ''; return A.miniAcess(a, id, { id: idSvg }); }
+    var x0 = Math.min.apply(null, cxs.map(function (c) { return c.x; })), y0 = Math.min.apply(null, cxs.map(function (c) { return c.y; }));
+    var x1 = Math.max.apply(null, cxs.map(function (c) { return c.x + c.w; })), y1 = Math.max.apply(null, cxs.map(function (c) { return c.y + c.h; }));
+    var lado = Math.max(110, Math.min(396, Math.max(x1 - x0, y1 - y0) * 1.3 + 24)), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    var vb = [cx - lado / 2, cy - lado / 2, lado, lado].map(function (v) { return Math.round(v * 10) / 10; });
+    // atrás do corpo? (uma parte grande da peça fica metade ou mais coberta por uma forma desenhada depois): a peça sozinha
+    var atras = puro && novas.some(function (e) {
+      var c = caixa(e), area = c.w * c.h, i = todas.indexOf(e); if (area < 100) return false;
+      return todas.slice(i + 1).some(function (f) {
+        if (novas.indexOf(f) >= 0) return false;
+        var d = caixa(f), w = Math.min(c.x + c.w, d.x + d.w) - Math.max(c.x, d.x), h = Math.min(c.y + c.h, d.y + d.h) - Math.max(c.y, d.y);
+        return w > 0 && h > 0 && w * h >= area * 0.5;
+      });
+    });
+    var res;
+    if (atras) {
+      var raizM = vCom.getScreenCTM().inverse(), defs = vCom.querySelector('defs');
+      res = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + vb.join(' ') + '" class="ma-svg" aria-hidden="true">' + (defs ? defs.outerHTML : '') +
+        novas.map(function (e) { var m = raizM.multiply(e.getScreenCTM()); return '<g transform="matrix(' + [m.a, m.b, m.c, m.d, m.e, m.f].map(function (v) { return Math.round(v * 1000) / 1000; }).join(' ') + ')">' + e.outerHTML + '</g>'; }).join('') + '</svg>';
+    } else res = com.replace(/viewBox="[^"]*"/, 'viewBox="' + vb.join(' ') + '"');
+    medidor.innerHTML = '';
+    return res;
+  }
+  // nomes que não cabem em 2 linhas no cartão (3 no rótulo da caixinha do balcão, que é estreita): a fonte diminui um
+  // pouco (até 7,5 px), nunca reticências
+  function encaixarTextos(raiz) {
+    raiz.querySelectorAll('.opc small, .opc span, .acrilico small').forEach(function (e) {
+      e.style.fontSize = ''; e.style.overflowWrap = 'normal';   // mede sem partir palavra no meio
+      var f = parseFloat(getComputedStyle(e).fontSize), pai = e.parentNode, max = pai.classList.contains('acrilico') ? 3 : 2;
+      function sobra() { var lh = parseFloat(getComputedStyle(e).lineHeight) || f * 1.15; return e.scrollWidth > e.clientWidth + 1 || e.offsetWidth > pai.clientWidth || e.offsetHeight > lh * max + 2; }
+      while (f > 7.5 && sobra()) { f -= 0.5; e.style.fontSize = f + 'px'; }
+      e.style.overflowWrap = '';
+    });
+  }
+  function depoisDoPainel() { encaixarTextos($('painel')); marcarRolagem($('painel')); }
+  // fileira que corre para o lado: marca se tem mais para ver (a ponta fica esfumada até chegar no fim)
+  function marcarRolagem(raiz) {
+    raiz.querySelectorAll('.roda').forEach(function (r) {
+      var ver = function () { r.classList.toggle('rola', r.scrollWidth > r.clientWidth + 2); r.classList.toggle('fim', r.scrollLeft + r.clientWidth >= r.scrollWidth - 4); };
+      ver(); if (!r.dataset.vigia) { r.dataset.vigia = '1'; r.addEventListener('scroll', ver, { passive: true }); }
+    });
+  }
+
   var PAINEL = {
     bicho: function () {
       var p = $('painel'); p.innerHTML = '';
       var L = linha(t('Escolha o seu bichinho', 'Choose your buddy', 'Elige tu animalito'), 'bichos');
-      opcoes(D.BASES).forEach(function (b) {
+      D.BASES.forEach(function (b) {
         var a = R.novo(b.id);
         var svg = mini('cab-' + b.id, function () { return A.svg(a, { id: 'tb' + b.id, vista: 'cabeca' }); });
         L.r.appendChild(opc(svg + '<span>' + tr(b.apelido) + '</span><small>' + tr(b.esp) + '</small>', amigo.base === b.id, tr(b.esp) + ' ' + tr(b.apelido), { base: b.id }));
@@ -203,7 +268,7 @@
     pelo: function () {
       var p = $('painel'); p.innerHTML = '';
       var L1 = linha(t('Cor do pelo', 'Fur color', 'Color del pelo'));
-      opcoes(D.PELOS).forEach(function (x) { L1.r.appendChild(opc(amostraPelo(x), amigo.pelo === x.id, tr(x.n), { pelo: x.id })); });
+      D.PELOS.forEach(function (x) { L1.r.appendChild(opc(amostraPelo(x), amigo.pelo === x.id, tr(x.n), { pelo: x.id })); });
       var L2 = linha(t('Olhinhos', 'Eyes', 'Ojitos'));
       D.OLHOS.forEach(function (x) { L2.r.appendChild(opc(amostraCor(x.cor), amigo.olhos === x.id, tr(x.n), { olhos: x.id })); });
       D.ESTILOS_OLHO.forEach(function (x) { L2.r.appendChild(opc('<span>' + tr(x.n) + '</span>', amigo.estiloOlho === x.id, null, { estiloOlho: x.id })); });
@@ -215,7 +280,7 @@
     fofura: function () {
       var p = $('painel'); p.innerHTML = '';
       var L1 = linha(t('Coraçãozinho', 'Little heart', 'Corazoncito'));
-      opcoes(D.CORACOES).forEach(function (x) { L1.r.appendChild(opc('<i class="cor-coracao" style="' + (x.grad ? 'background:linear-gradient(135deg,' + x.grad.join(',') + ')' : 'background:' + x.cor) + '"></i>', amigo.coracao === x.id, tr(x.n), { coracao: x.id })); });
+      D.CORACOES.forEach(function (x) { L1.r.appendChild(opc('<i class="cor-coracao" style="' + (x.grad ? 'background:linear-gradient(135deg,' + x.grad.join(',') + ')' : 'background:' + x.cor) + '"></i>', amigo.coracao === x.id, tr(x.n), { coracao: x.id })); });
       p.appendChild(L1.l);
       var d = el('div', 'desejo');
       d.innerHTML = '<button id="btDesejo" type="button" class="bt-desejo" aria-label="' + t('Segure para dar um beijinho', 'Hold to give a kiss', 'Mantén para dar un besito') + '"><i class="cor-coracao grande"></i></button><p>' +
@@ -234,7 +299,7 @@
     roupa: function () {
       var p = $('painel'); p.innerHTML = '';
       var L1 = linha(t('Guarda-roupa', 'Wardrobe', 'Armario'), 'cabides');
-      opcoes(D.ROUPAS).forEach(function (r) {
+      D.ROUPAS.forEach(function (r) {
         var svg = mini('cb-' + r.id + '-' + lingua, function () { var a = R.novo('urso'); R.vestir(a, r.id); a.lang = lingua; return A.cabide(a, r.id, { id: 'cb' + r.id }); });
         L1.r.appendChild(opc(svg + '<small>' + tr(r.n) + '</small>', amigo.roupa === r.id, tr(r.n), { roupa: r.id }));
       });
@@ -265,10 +330,10 @@
       var balcao = el('div', 'balcao'); balcao.setAttribute('role', 'tablist'); balcao.setAttribute('aria-label', t('Balcão de acessórios', 'Accessory counter', 'Mostrador de accesorios'));
       var ICO = { laco: '🎀', cabeca: '👑', olhos: '👓', pescoco: '📿', pulso: '💎', costas: '🎒', mao: '🪄', colo: '🧸', abraco: '🦄', pes: '👟', chao: '🛹', apoio: '♿' };
       D.CAIXAS.forEach(function (cx) {
-        var itens = opcoes(D.ACESS).filter(function (it) { return it.caixa === cx.id; });
+        var itens = D.ACESS.filter(function (it) { return it.caixa === cx.id; });
         if (!itens.length) return;
         var tem = amigo.acess[cx.id];
-        var b = el('button', 'acrilico' + (caixaAberta === cx.id ? ' aberta' : '') + (tem ? ' tem' : ''), '<span class="ico" aria-hidden="true">' + ICO[cx.id] + '</span><small>' + tr(cx.n) + '</small>');
+        var b = el('button', 'acrilico' + (caixaAberta === cx.id ? ' aberta' : '') + (tem ? ' tem' : ''), '<span class="ico" aria-hidden="true">' + (cx.ico || ICO[cx.id] || '🎁') + '</span><small>' + tr(cx.n) + '</small>');
         b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(caixaAberta === cx.id)); b.dataset.caixa = cx.id;
         balcao.appendChild(b);
       });
@@ -276,10 +341,10 @@
       var it0 = D.caixa[caixaAberta];
       var L = linha(tr(it0.n), 'itens');
       L.r.appendChild(opc('<span>✕ ' + t('Nada', 'None', 'Nada') + '</span>', !amigo.acess[caixaAberta], null, { tirar: caixaAberta }));
-      opcoes(D.ACESS).filter(function (it) { return it.caixa === caixaAberta; }).forEach(function (it) {
+      D.ACESS.filter(function (it) { return it.caixa === caixaAberta; }).forEach(function (it) {
         var pode = R.podeUsar(amigo, it.id);
         var cor = (amigo.corAcess && amigo.corAcess[it.id]) || it.cor || '';
-        var svg = mini('ac-' + amigo.base + amigo.corpo + amigo.pelo + it.id + cor, function () { var a = Object.assign({}, amigo, { corAcess: {} }); a.corAcess[it.id] = cor; return A.miniAcess(a, it.id, { id: 'ac' + it.id }); });
+        var svg = mini('ac-' + amigo.base + amigo.corpo + amigo.pelo + it.id + cor, function () { return miniDoAcess(amigo, it.id, cor, 'ac' + it.id); });
         var b = opc(svg + '<small>' + tr(it.n) + '</small>', amigo.acess[caixaAberta] === it.id, tr(it.n), { acess: it.id });
         if (!pode) { b.disabled = true; b.title = t('Só para quem fica em pé', 'Only for standing buddies', 'Solo para los que están de pie'); }
         L.r.appendChild(b);
@@ -317,6 +382,10 @@
         '<label class="efeito"><input id="chkEfeito" type="checkbox"' + (fr.gravada && fr.efeito === false ? '' : ' checked') + '> ' + t('voz de bichinho', 'critter voice', 'voz de animalito') + '</label><i id="barraGrav" class="barra-grav"></i>';
       p.appendChild(gv);
       var L2 = linha(t('Jeito de falar', 'How it talks', 'Forma de hablar'));
+      // voz de menininha ou de menininho (dono, 22/Nov/2026): vem do bichinho, a criança troca quando quiser
+      var gen = R.genero(amigo);
+      L2.r.appendChild(opc('<span>' + t('♀ Menininha', '♀ Little girl', '♀ Niña') + '</span>', gen === 'f', null, { genero: 'f' }));
+      L2.r.appendChild(opc('<span>' + t('♂ Menininho', '♂ Little boy', '♂ Niño') + '</span>', gen === 'm', null, { genero: 'm' }));
       D.VOZES.filter(function (v) { return v.tipo === 'fala'; }).forEach(function (v) { L2.r.appendChild(opc('<span>' + v.ico + ' ' + tr(v.n) + '</span>', amigo.voz === v.id, null, { voz: v.id })); });
       D.VOZES.filter(function (v) { return v.tipo === 'som'; }).forEach(function (v) { L2.r.appendChild(opc('<span>' + v.ico + ' ' + tr(v.n) + '</span>', amigo.som === v.id, null, { som: v.id })); });
       p.appendChild(L2.l);
@@ -368,12 +437,13 @@
     else if (d.tirarFrase) { var k = +d.tirarFrase; if (amigo.frases[k] && amigo.frases[k].gravada) V.apagar(amigo.id + ':' + k); amigo.frases.splice(k, 1); if (!amigo.frases.length) amigo.frases = [{ pronta: 'teamo' }]; amigo.frase = 0; mudouDesenho = false; }
     else if (d.ouvir) { falarFrase(amigo, vOf, $('fala')); return; }
     else if (d.pronta) { var i = amigo.frase || 0; if (amigo.frases[i] && amigo.frases[i].gravada) V.apagar(amigo.id + ':' + i); amigo.frases[i] = { pronta: d.pronta }; mudouDesenho = false; falarFrase(amigo, vOf, $('fala')); }
+    else if (d.genero) { amigo.genero = d.genero; mudouDesenho = false; falarFrase(amigo, vOf, $('fala')); }
     else if (d.voz) { amigo.voz = d.voz; mudouDesenho = false; falarFrase(amigo, vOf, $('fala')); }
     else if (d.som) { amigo.som = amigo.som === d.som ? null : d.som; mudouDesenho = false; if (amigo.som) V.somFofo(amigo.som); }
     else return;
-    if (!d.ouvir && !d.pronta && !d.voz && !d.som) V.toque();
+    if (!d.ouvir && !d.pronta && !d.voz && !d.som && !d.genero) V.toque();
     if (mudouDesenho) atualizarPelucia(); else guardarRascunho();
-    if (repintar) { var sx = {}; document.querySelectorAll('#painel .roda').forEach(function (r, k) { sx[k] = r.scrollLeft; }); PAINEL[D.ETAPAS[etapa].id](); document.querySelectorAll('#painel .roda').forEach(function (r, k) { if (sx[k] != null) r.scrollLeft = sx[k]; }); }
+    if (repintar) { var sx = {}; document.querySelectorAll('#painel .roda').forEach(function (r, k) { sx[k] = r.scrollLeft; }); PAINEL[D.ETAPAS[etapa].id](); document.querySelectorAll('#painel .roda').forEach(function (r, k) { if (sx[k] != null) r.scrollLeft = sx[k]; }); depoisDoPainel(); }
   });
 
   /* ---------- segurar um botão (beijinho, máquina) ---------- */
@@ -460,8 +530,9 @@
     if (viva) viva.falando(true);
     if (balao) { balao.textContent = fr.gravada ? '🎙️ ♪' : '“' + txt + '”'; balao.hidden = false; }
     if (fr.gravada) { V.ler(a.id + ':' + i).then(function (blob) { if (!V.tocarBlob(blob, fr.efeito !== false, acabou)) acabou(); }, acabou); return; }
-    if (fr.pronta && V.temPronta(fr.pronta, lingua)) { V.tocarArquivo('vozes/' + lingua + '/' + fr.pronta + '.mp3', acabou); return; }
-    if (!V.falar(txt, a.voz, acabou)) setTimeout(acabou, 1400);
+    var gen = R.genero(a);
+    if (fr.pronta && V.temPronta(fr.pronta, lingua, gen)) { V.tocarArquivo('vozes/' + lingua + '/' + gen + '/' + fr.pronta + '.mp3', acabou); return; }
+    if (!V.falar(txt, a.voz, acabou, gen)) setTimeout(acabou, 1400);
   }
   function gravarFrase() {
     var i = amigo.frase || 0, bt = $('btGravar'), barra = $('barraGrav');
@@ -471,25 +542,24 @@
     V.gravar(5000, function (f) { if (barra) barra.style.width = (f * 100) + '%'; }).then(function (blob) {
       return V.guardar(amigo.id + ':' + i, blob).then(function () {
         amigo.frases[i] = { gravada: true, efeito: $('chkEfeito') ? $('chkEfeito').checked : true };
-        guardarRascunho(); PAINEL.voz(); falarFrase(amigo, vOf, $('fala'));
+        guardarRascunho(); PAINEL.voz(); depoisDoPainel(); falarFrase(amigo, vOf, $('fala'));
       });
     }).catch(function () {
       avisar(t('Não deu para usar o microfone. Escolha uma frase pronta. 💛', 'Couldn\'t use the microphone. Pick a ready phrase. 💛', 'No se pudo usar el micrófono. Elige una frase lista. 💛'), 3200);
-      PAINEL.voz();
+      PAINEL.voz(); depoisDoPainel();
     });
   }
 
   /* ---------- Pronto! caixinha-casinha e o amiguinho pulando dela ---------- */
   function terminar() {
     V.acordar(); V.calar();
-    if (enc) { var res = R.conferir(amigo, enc); amigo.encomenda = { estrelas: res.estrelas, acertos: res.acertos, total: res.total }; }
     if (!amigo.nome) amigo.nome = tr(D.base[amigo.base].apelido);
     var salvo = col.salvar(amigo);
     if (!salvo) { avisar(t('Não consegui guardar no aparelho (sem espaço?).', 'Couldn\'t save on this device (out of space?).', 'No pude guardar en el aparato (¿sin espacio?).'), 3500); return; }
     if (salvo.id !== amigo.id) { [0, 1].forEach(function (k) { if (amigo.frases[k] && amigo.frases[k].gravada) V.ler(amigo.id + ':' + k).then(function (b) { if (b) V.guardar(salvo.id + ':' + k, b); }); }); }
     gravarJSON(CH_RASC, null);
     exportarPersonagem(salvo);
-    mostrado = salvo; amigo = null; enc = null;
+    mostrado = salvo; amigo = null;
     caixinha(salvo, function () { voltarMenu(function () { ir({ tela: 'amigo', id: salvo.id }); }); });
   }
   function caixinha(a, depois) {
@@ -520,8 +590,6 @@
     var a = mostrado, b = D.base[a.base];
     $('amNome').textContent = a.nome || tr(b.apelido);
     $('amEspecie').textContent = tr(b.esp) + ' · ' + t('nasceu em ', 'born ', 'nació el ') + dataTexto(a.nasceu) + (a.exemplo ? ' · ' + t('exemplo', 'example', 'ejemplo') : '');
-    $('amEstrelas').hidden = !a.encomenda;
-    if (a.encomenda) $('amEstrelas').textContent = '⭐'.repeat(a.encomenda.estrelas) + '☆'.repeat(3 - a.encomenda.estrelas) + ' ' + t('Encomenda: ', 'Order: ', 'Encargo: ') + a.encomenda.acertos + '/' + a.encomenda.total;
     var pose = poseDe(a);
     if (!vAm) vAm = VIVO.criar($('peluciaAmigo'), a, { id: 'am', pose: pose, rotulo: a.nome });
     else vAm.trocar(a, { pose: pose });
@@ -560,7 +628,7 @@
   $('btEditar').addEventListener('click', function () {
     var a = R.validar(JSON.parse(JSON.stringify(mostrado)));
     if (a.exemplo) { a.exemplo = false; a.id = 'a' + Date.now().toString(36); a.frases = a.frases.map(function (f) { return f.gravada ? { pronta: 'teamo' } : f; }); }
-    amigo = a; enc = null; encheuAgora = true; guardarRascunho();
+    amigo = a; encheuAgora = true; guardarRascunho();
     ir({ tela: 'oficina', etapa: 0 });
   });
   $('btNovo').addEventListener('click', function () { voltarMenu(comecar); });
@@ -585,14 +653,30 @@
       fofuraNome: z === 'ponto' ? t('no ponto', 'just right', 'en su punto') : z === 'cheio' ? t('bem gordinho', 'extra chubby', 'bien gordito') : t('molinho', 'extra floppy', 'blandito'),
       voz: t('Minha frase', 'My words', 'Mi frase'), vozNome: voz,
       filhote: a.acess && a.acess.colo === 'filhote' && a.nomeFilhote ? t('Filhotinho', 'Baby', 'Bebé') : null, filhoteNome: a.nomeFilhote,
-      estrelas: a.encomenda ? '⭐'.repeat(a.encomenda.estrelas) + ' ' + t('Encomenda entregue!', 'Order delivered!', '¡Encargo entregado!') : '',
       rodape: t('Feito com carinho no Bolinho de Chuva', 'Made with love at Rainy Day Donuts', 'Hecho con cariño en Buñuelos de Lluvia') };
   }
   $('btCertidao').addEventListener('click', function () {
     var a = mostrado;
     $('certDesenho').innerHTML = A.certidao(a, textosCertidao(a), { id: 'ct', pose: poseDe(a) });
     $('certJanela').hidden = false; $('btSalvarPng').focus(); V.brilho();
+    prepararCompartilhar(a);
   });
+  // 📤 Compartilhar (WhatsApp etc.): o PNG fica pronto ao abrir a certidão, para o toque já mandar; sem suporte, o botão nem aparece
+  var arquivoCert = null;
+  function prepararCompartilhar(a) {
+    arquivoCert = null; $('btCompartilhar').hidden = true;
+    if (!navigator.canShare || !navigator.share) return;
+    certidaoPng(a).then(function (b) {
+      var f = null; try { f = new File([b], nomeCertidao(a), { type: 'image/png' }); } catch (e) { return; }
+      if (mostrado !== a || $('certJanela').hidden || !navigator.canShare({ files: [f] })) return;
+      arquivoCert = f; $('btCompartilhar').hidden = false;
+    }).catch(function () {});
+  }
+  $('btCompartilhar').addEventListener('click', function () {
+    if (!arquivoCert) return;
+    navigator.share({ files: [arquivoCert], title: t('Certidão de nascimento', 'Birth certificate', 'Certificado de nacimiento') }).catch(function () { /* cancelou */ });
+  });
+  function nomeCertidao(a) { return t('certidao-', 'certificate-', 'certificado-') + String(a.nome || 'amiguinho').toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.png'; }
   $('btFecharCert').addEventListener('click', function () { $('certJanela').hidden = true; });
   $('certJanela').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
   function carregarFonte() {
@@ -621,7 +705,7 @@
     var a = mostrado;
     certidaoPng(a).then(function (b) {
       var l = document.createElement('a'), u = URL.createObjectURL(b);
-      l.href = u; l.download = t('certidao-', 'certificate-', 'certificado-') + String(a.nome || 'amiguinho').toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.png';
+      l.href = u; l.download = nomeCertidao(a);
       document.body.appendChild(l); l.click(); l.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
       avisar(t('💾 Certidão salva no aparelho!', '💾 Certificate saved on this device!', '💾 ¡Certificado guardado en el aparato!'));
     }).catch(function () { avisar(t('Não deu para salvar a imagem aqui.', 'Couldn\'t save the picture here.', 'No se pudo guardar la imagen aquí.')); });
@@ -656,7 +740,7 @@
       var b = el('button', 'cartao-amigo'); b.type = 'button'; b.dataset.id = a.id;
       var pd = A.pedacos(a, { id: 'cl' + i, pose: poseDe(a) }), miolo = '<g transform="translate(150 286) scale(0.5) translate(-150 -186)">' + pd.corpo + '</g>';
       b.innerHTML = A.caixinha({ id: 'ccx' + i, miolo: miolo, cor: ['#f7a8c8', '#a9d2f5', '#b5e5cd', '#f7df8c', '#cdb6ec'][i % 5] }).replace('<defs>', '<defs>' + pd.defs) +
-        '<span class="nome">' + A.util.esc(a.nome || tr(D.base[a.base].apelido)) + (a.encomenda ? ' ' + '⭐'.repeat(a.encomenda.estrelas) : '') + '</span>';
+        '<span class="nome">' + A.util.esc(a.nome || tr(D.base[a.base].apelido)) + '</span>';
       b.setAttribute('aria-label', (a.nome || '') + ', ' + tr(D.base[a.base].esp));
       g.appendChild(b);
     });
@@ -683,9 +767,8 @@
 
   if (TESTE) window.AmiguinhoDebug = {
     pronto: true, versao: APP_VERSION, MUSICAS: MUSICAS,
-    estado: function () { return { tela: tela, etapa: etapa, amigo: amigo ? JSON.parse(JSON.stringify(amigo)) : null, enc: enc, mostrado: mostrado ? mostrado.id : null, colecao: col.listar().length, pilha: pilha.length, nivel: pref.nivel }; },
+    estado: function () { return { tela: tela, etapa: etapa, amigo: amigo ? JSON.parse(JSON.stringify(amigo)) : null, mostrado: mostrado ? mostrado.id : null, colecao: col.listar().length, pilha: pilha.length }; },
     amigo: function () { return amigo; },
-    encomendar: function (semente) { enc = R.novaEncomenda(semente); if (tela === 'oficina') pintarOficina(); return enc; },
     encher: function (f) { encheuAgora = true; amigo.fofura = f; atualizarPelucia(); pintarMedidor(); },
     certidaoPng: function () { return certidaoPng(mostrado).then(function (b) { return b.size; }); },
     vivo: function () { return vAm || vOf; }

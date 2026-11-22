@@ -1,10 +1,12 @@
 /* Meu Pequeno Amiguinho — sons e vozes.
-   - fala(texto, estilo): a voz do aparelho no idioma escolhido, o mais fininha e suave possível (voz infantil não vem
-     pronta nos navegadores: escolhemos a voz mais aguda/feminina/"child" que existir, com tom alto e um pouco mais devagar).
+   - falar(texto, estilo, aoAcabar, genero): a voz do aparelho no idioma escolhido, de MENININHA ('f') ou de MENININHO
+     ('m') (dono, 22/Nov/2026: o ursinho menina falava com voz de homem). Voz infantil não vem pronta nos navegadores:
+     escolhemos pelo nome a voz feminina (menininha) ou masculina (menininho) do idioma e subimos o tom para soar criança;
+     se o aparelho só tiver uma voz, o tom diferencia (menininha bem mais aguda).
    - Frases gravadas com o microfone: ficam SÓ neste aparelho (IndexedDB "meu-amiguinho", gaveta "vozes"); nunca são
      enviadas. O microfone só é pedido quando a pessoa toca em "Gravar". Efeito "voz de bichinho": tocar mais agudo
      (playbackRate 1.4 sem preservar o tom).
-   - Vozes prontas gravadas (para depois): vozes/lista.json diz quais arquivos existem em vozes/<idioma>/<frase>.mp3;
+   - Vozes prontas gravadas (para depois): vozes/lista.json diz quais arquivos existem em vozes/<idioma>/<f|m>/<frase>.mp3;
      hoje a lista está vazia e a fala do aparelho é usada.
    - Efeitos (WebAudio, feitos aqui): toque, pop, vento da máquina de fofura, beijinho com brilho, festa, e os sons fofos
      (cantarolar, apitinho, ronronar, risadinha, beijinhos). */
@@ -60,25 +62,34 @@
   };
 
   /* ---------- fala do aparelho, o mais fofa possível ---------- */
-  var ESTILOS = { fina: { tom: 1.9, ritmo: 0.92 }, grossa: { tom: 0.6, ritmo: 0.85 }, devagar: { tom: 1.5, ritmo: 0.6 } };
+  // tom (pitch) e ritmo de cada jeito de falar, para menininha (f) e menininho (m): os dois com tom de criança;
+  // a "fala de urso" continua grossa, mas no gênero escolhido
+  var ESTILOS = {
+    fina: { f: { tom: 1.9, ritmo: 0.92 }, m: { tom: 1.45, ritmo: 0.95 } },
+    grossa: { f: { tom: 0.8, ritmo: 0.85 }, m: { tom: 0.5, ritmo: 0.85 } },
+    devagar: { f: { tom: 1.7, ritmo: 0.6 }, m: { tom: 1.3, ritmo: 0.6 } }
+  };
   function lingua() { return raiz.BolinhoIdioma ? BolinhoIdioma.voz() : 'pt-BR'; }
-  // a voz mais fininha do idioma: primeiro as "child/kid", depois as femininas conhecidas, depois a primeira do idioma
-  var FEMININAS = /child|kid|crian|niñ|girl|junior|female|mulher|mujer|luciana|francisca|vit[oó]ria|maria|camila|thalita|fernanda|leticia|helena|joana|samantha|victoria|karen|allison|ava|susan|zira|jenny|aria|monica|paulina|lucia|elvira|laura|marisol|esperanza|google.*(feminina|female)/i;
-  var MASCULINAS = /male\b|daniel|felipe|ricardo|jorge|diego|alex|fred|david|mark|guy|pablo|antonio|enrique|homem/i;
-  V.escolherVoz = function (lang) {
+  var FEMININAS = /female|feminin|mujer|mulher|girl|menina|niña|luciana|francisca|vit[oó]ria|maria|camila|thalita|fernanda|leticia|helena|joana|samantha|victoria|karen|allison|\bava\b|susan|zira|jenny|\baria\b|m[oó]nica|paulina|lucia|elvira|laura|marisol|esperanza/i;
+  var MASCULINAS = /\bmale\b|mascul|hombre|homem|\bboy\b|menino|niño|daniel|felipe|ricardo|jorge|diego|\balex\b|\bfred\b|david|\bmark\b|\bguy\b|pablo|antonio|enrique|\btom\b|thomas/i;
+  function generoDe(g) { return g === 'm' ? 'm' : 'f'; }
+  // a voz do idioma com mais cara de menininha (g = 'f') ou de menininho (g = 'm'); sem nenhuma do gênero, a primeira do idioma
+  V.escolherVoz = function (lang, g) {
     if (!raiz.speechSynthesis) return null;
+    g = generoDe(g);
     var todas = speechSynthesis.getVoices() || [], l2 = (lang || lingua()).toLowerCase(), base = l2.slice(0, 2);
     var doIdioma = todas.filter(function (v) { return (v.lang || '').toLowerCase().replace('_', '-') === l2; });
     if (!doIdioma.length) doIdioma = todas.filter(function (v) { return (v.lang || '').toLowerCase().indexOf(base) === 0; });
     if (!doIdioma.length) return null;
-    var nota = function (v) { var n = v.name || ''; return (/child|kid|crian|niñ|junior/i.test(n) ? 4 : 0) + (FEMININAS.test(n) ? 2 : 0) - (MASCULINAS.test(n) ? 3 : 0) + (v.localService ? 0.5 : 0); };
+    var quer = g === 'f' ? FEMININAS : MASCULINAS, nao = g === 'f' ? MASCULINAS : FEMININAS;
+    var nota = function (v) { var n = v.name || ''; return (quer.test(n) ? 4 : 0) - (nao.test(n) ? 4 : 0) + (/child|kid|crian|junior/i.test(n) ? 1 : 0) + (v.localService ? 0.5 : 0); };
     return doIdioma.slice().sort(function (a, b) { return nota(b) - nota(a); })[0];
   };
-  V.falar = function (texto, estilo, aoAcabar) {
+  V.falar = function (texto, estilo, aoAcabar, genero) {
     if (!raiz.speechSynthesis || !texto) { if (aoAcabar) aoAcabar(); return false; }
     try {
       speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(texto), e = ESTILOS[estilo] || ESTILOS.fina, v = V.escolherVoz();
+      var g = generoDe(genero), u = new SpeechSynthesisUtterance(texto), e = (ESTILOS[estilo] || ESTILOS.fina)[g], v = V.escolherVoz(null, g);
       u.lang = lingua(); if (v) u.voice = v;
       u.pitch = e.tom; u.rate = e.ritmo; u.volume = 1;
       u.onend = u.onerror = function () { if (aoAcabar) aoAcabar(); };
@@ -95,7 +106,7 @@
     prontas = {};
     fetch('vozes/lista.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j && j.arquivos) j.arquivos.forEach(function (f) { prontas[f] = true; }); }).catch(function () {});
   };
-  V.temPronta = function (fraseId, lang) { return !!(prontas && prontas[(lang || 'pt') + '/' + fraseId + '.mp3']); };
+  V.temPronta = function (fraseId, lang, genero) { return !!(prontas && prontas[(lang || 'pt') + '/' + generoDe(genero) + '/' + fraseId + '.mp3']); };
 
   /* ---------- gravações no aparelho (IndexedDB) ---------- */
   var BANCO = 'meu-amiguinho', GAVETA = 'vozes';

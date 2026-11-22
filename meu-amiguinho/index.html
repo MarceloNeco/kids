@@ -30,11 +30,6 @@
     <div id="estante" class="estante" aria-hidden="true"></div>
   </div>
   <div class="painel-menu">
-    <div class="seg" role="radiogroup" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
-      <button class="chip verde" type="button" role="radio" data-nivel="facil" aria-checked="true" data-t="🐣 Fácil|🐣 Easy|🐣 Fácil"></button>
-      <button class="chip amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false" data-t="🐥 Médio|🐥 Medium|🐥 Medio"></button>
-      <button class="chip vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false" data-t="📋 Encomenda|📋 Order|📋 Encargo"></button>
-    </div>
     <button id="btCriar" class="principal" type="button" data-t="✨ Criar meu amiguinho|✨ Make my buddy|✨ Crear mi amiguito"></button>
     <button id="btContinuar" class="secundario" type="button" hidden data-t="🧵 Continuar o que eu estava montando|🧵 Keep building the one I started|🧵 Seguir con el que estaba armando"></button>
     <button id="btColecao" class="secundario" type="button"><span data-t="📚 Minha coleção|📚 My collection|📚 Mi colección"></span> <b id="nColecao">2</b></button>
@@ -57,9 +52,6 @@
     </div>
     <ol id="pontos" class="pontos" aria-hidden="true"></ol>
   </header>
-  <div id="encomenda" class="encomenda" hidden>
-    <span class="enc-ico" aria-hidden="true">📋</span><p id="encTexto"></p>
-  </div>
   <div class="of-corpo">
     <div id="palco" class="palco">
       <div id="fala" class="fala" hidden></div>
@@ -81,7 +73,6 @@
   <header class="am-topo">
     <h2 id="amNome"></h2>
     <p id="amEspecie"></p>
-    <p id="amEstrelas" class="estrelas" hidden></p>
   </header>
   <div id="palcoAmigo" class="palco palco-amigo">
     <div id="peluciaAmigo" class="pelucia"></div>
@@ -119,6 +110,7 @@
     <div id="certDesenho" class="cert-desenho"></div>
     <div class="janela-botoes">
       <button id="btSalvarPng" class="principal" type="button" data-t="💾 Salvar imagem|💾 Save picture|💾 Guardar imagen"></button>
+      <button id="btCompartilhar" class="secundario" type="button" hidden data-t="📤 Compartilhar|📤 Share|📤 Compartir"></button>
       <button id="btFecharCert" class="mini largo" type="button" data-t="Fechar|Close|Cerrar"></button>
     </div>
   </div>
@@ -144,8 +136,8 @@
       <li data-t="🧸 Monte a sua pelúcia em 7 etapas: bichinho, pelo e olhinhos, coração e fofura, roupinha, acessórios, voz e nome.|🧸 Build your plush in 7 steps: animal, fur and eyes, heart and fluff, outfit, accessories, voice and name.|🧸 Arma tu peluche en 7 pasos: animalito, pelo y ojitos, corazón y relleno, ropita, accesorios, voz y nombre."></li>
       <li data-t="🎁 O botão Pronto fica sempre à vista: dá para terminar quando quiser, o resto já vem escolhido.|🎁 The Done button is always there: finish whenever you like, the rest is already picked.|🎁 El botón Listo siempre está a la vista: termina cuando quieras, lo demás ya viene elegido."></li>
       <li data-t="❤️ No coração: segure o coraçãozinho para dar um beijinho e fazer um desejo. Depois segure o botão da máquina para encher de fofura e solte no ponto certo!|❤️ Heart step: hold the little heart to give it a kiss and make a wish. Then hold the machine button to fill your buddy with fluff and let go at just the right moment!|❤️ En el corazón: mantén pulsado el corazoncito para darle un besito y pedir un deseo. ¡Luego mantén el botón de la máquina para rellenarlo y suelta en el punto justo!"></li>
-      <li data-t="🎙️ Na voz: escolha uma frase pronta, escreva a sua ou grave a sua voz. A gravação fica só neste aparelho.|🎙️ Voice step: pick a ready phrase, write your own or record your voice. The recording stays on this device only.|🎙️ En la voz: elige una frase lista, escribe la tuya o graba tu voz. La grabación se queda solo en este aparato."></li>
-      <li data-t="🐣 Fácil: menos opções em cada etapa. 🐥 Médio: todas as opções. 📋 Encomenda (difícil): um cartão pede um amiguinho e você monta igual para ganhar estrelas.|🐣 Easy: fewer choices in each step. 🐥 Medium: every choice. 📋 Order (hard): a card asks for a buddy and you build it just right to earn stars.|🐣 Fácil: menos opciones en cada paso. 🐥 Medio: todas las opciones. 📋 Encargo (difícil): una tarjeta pide un amiguito y lo armas igual para ganar estrellas."></li>
+      <li data-t="🎙️ Na voz: voz de menininha (♀) ou de menininho (♂); escolha uma frase pronta, escreva a sua ou grave a sua voz. A gravação fica só neste aparelho.|🎙️ Voice step: a little girl's voice (♀) or a little boy's (♂); pick a ready phrase, write your own or record your voice. The recording stays on this device only.|🎙️ En la voz: voz de niña (♀) o de niño (♂); elige una frase lista, escribe la tuya o graba tu voz. La grabación se queda solo en este aparato."></li>
+      <li data-t="🌈 Tudo liberado: todos os bichinhos, cores, roupas e acessórios, para desenhar com calma.|🌈 Everything is open: every animal, color, outfit and accessory, so you can design at your own pace.|🌈 Todo está abierto: todos los animalitos, colores, ropas y accesorios, para diseñar con calma."></li>
       <li data-t="💖 Toque no amiguinho pronto: ele abraça, acena e pula; toque no coração do peito para ouvir a frase. Tudo fica guardado em Minha coleção.|💖 Tap your finished buddy: it hugs, waves and jumps; tap the heart on its chest to hear its words. Everything is kept in My collection.|💖 Toca a tu amiguito terminado: abraza, saluda y salta; toca el corazón del pecho para oír su frase. Todo se guarda en Mi colección."></li>
     </ul>
     <div class="janela-botoes"><button id="btFecharAjuda" class="principal" type="button" data-t="Entendi!|Got it!|¡Entendido!"></button></div>
