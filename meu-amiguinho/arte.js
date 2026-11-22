@@ -1,6 +1,6 @@
 /* Meu Pequeno Amiguinho — todo o desenho, em SVG feito em código (nenhuma imagem de fora; tudo original).
    AmiguinhoArte.svg(amigo, op) devolve o <svg> da pelúcia montada, em camadas:
-     sombra → apoio de trás (cadeira) → costas (mochila, asas) → cauda → pernas e pés → corpo → roupa → sapatos →
+     sombra → apoio de trás (cadeira) → asinhas → costas (mochila; a bolsa vai no corpo, na mão ou por cima dos braços) → cauda → pernas e pés → corpo → roupa → sapatos →
      braços e mangas → pescoço → cabeça (orelhas, focinho, olhos, nariz, bochechas) → capuz → laços e chapéus → óculos →
      o que vai na mãozinha → apoio da frente (muletas).
    Cada bichinho (base) tem a sua geometria e os seus PONTOS DE ANCORAGEM (topo da cabeça, olhos, pescoço, mãos, pés,
@@ -113,6 +113,7 @@
     }
     else if (tipo === 'camuflado') { w = 26; h = 26; s = p('M2,4 q6,-3 9,2 q-4,5 -9,2z M14,14 q6,-4 10,1 q-3,6 -10,2z M3,18 q4,-3 7,1 q-3,4 -7,1z', { fill: '#5a6b3a' }) + p('M14,3 q5,0 6,4 q-4,2 -6,-1z M8,10 q3,-1 4,2 q-2,2 -4,0z', { fill: '#3a3226' }); }
     else if (tipo === 'glitter') { w = 14; h = 14; s = circ(3, 3, 1, { fill: '#fff' }) + circ(10, 8, 0.8, { fill: '#fff8d0' }) + circ(6, 11, 0.6, { fill: '#fff' }); }
+    else if (tipo === 'lantejoula') { w = 10; h = 9; s = circ(2.5, 2.5, 2.4, { fill: claro(cor, 0.2), stroke: escuro(cor, 0.25), 'stroke-width': 0.5 }) + circ(7.5, 7, 2.4, { fill: claro(cor, 0.5), stroke: escuro(cor, 0.25), 'stroke-width': 0.5 }) + circ(2, 2, 0.6, { fill: '#fff' }) + circ(7, 6.4, 0.5, { fill: '#fff' }); }
     else if (tipo === 'paete') { w = 10; h = 9; s = circ(2.5, 2.5, 2.4, { fill: '#ff9ed0', stroke: '#e0559a', 'stroke-width': 0.5 }) + circ(7.5, 7, 2.4, { fill: '#ffc2e2', stroke: '#e0559a', 'stroke-width': 0.5 }) + circ(2, 2, 0.6, { fill: '#fff' }); }
     else return null;
     this.defs.push('<pattern id="' + id + '" width="' + w + '" height="' + h + '" patternUnits="userSpaceOnUse">' + s + '</pattern>');
@@ -1130,45 +1131,223 @@
   }
   function pulsoAcess(c, a, g, id) {
     var m = g.pulso, s = '';
-    if (id === 'pochete') {
-      if (g.corpo === 'q') { var b = g.b; return ret(b.x - 30, b.y + b.ry * 0.2, 46, 22, { rx: 9, fill: c.estampa('camuflado', '#8a9a5a') ? '#8a9a5a' : '#8a9a5a', stroke: '#4a5a2a', 'stroke-width': 1.6 }) + ret(b.x - 30, b.y + b.ry * 0.2, 46, 22, { rx: 9, fill: c.estampa('camuflado', '#8a9a5a') }); }
-      var t = g.t, y = t.y1 - 24;
-      s += p('M' + n(150 - t.wb - 2) + ',' + n(y - 10) + ' Q150,' + n(y + 2) + ' ' + n(150 + t.wb + 2) + ',' + n(y - 10), { stroke: '#3a3226', 'stroke-width': 5, fill: 'none' });
-      s += ret(124, y - 14, 52, 26, { rx: 10, fill: '#8a9a5a', stroke: '#4a5a2a', 'stroke-width': 1.6 }) + ret(124, y - 14, 52, 26, { rx: 10, fill: c.estampa('camuflado', '#8a9a5a') }) + lin(128, y - 6, 172, y - 6, { stroke: '#2e2a26', 'stroke-width': 1.6 }) + circ(170, y - 6, 2.2, { fill: '#d8dbe2' });
-      return s;
-    }
     var x = m[0], yy = m[1] - (g.corpo === 'q' ? 0 : 16), cs = id === 'pulseira-strass' ? ['#f4f8ff', '#dfe8f4'] : ['#f9b4d0', '#fde08a', '#a8e0f8', '#c8b0f4'];
     for (var i = 0; i < 7; i++) { var an = rad(200 + i * 22), bx = x + Math.cos(an) * 19, by = yy + Math.sin(an) * 6 + 6; s += circ(bx, by, id === 'pulseira-strass' ? 3 : 3.6, { fill: cs[i % cs.length], stroke: id === 'pulseira-strass' ? '#8aa0c0' : escuro(cs[i % cs.length], 0.3), 'stroke-width': 0.8 }) + (id === 'pulseira-strass' ? circ(bx - 0.8, by - 0.8, 1, { fill: '#ffffff' }) : ''); }
     return s;
   }
-  function costasAcess(c, a, g, id, cor, frente) {
+  /* ---------- asinhas (atrás de tudo) ---------- */
+  function asasAcess(c, a, g, id, cor) {
     var q = g.corpo === 'q', s = '';
-    if (id === 'asas') {
-      if (frente) return '';
-      var x = q ? g.costas[0] : 150, y = q ? g.costas[1] - 10 : g.t.y0 + 30, gw = c.lin([['#e8f4ff', 0.9], ['#f8d8f4', 0.85], ['#d8f0e8', 0.85]], 0, 0, 1, 1);
-      [-1, 1].forEach(function (k) {
-        if (q && k < 0) return;
-        var dx = q ? -6 : 0;
-        s += p('M' + n(x + dx) + ',' + n(y) + ' C' + n(x + k * 40) + ',' + n(y - 70) + ' ' + n(x + k * 98) + ',' + n(y - 60) + ' ' + n(x + k * 86) + ',' + n(y - 14) + ' C' + n(x + k * 80) + ',' + n(y + 8) + ' ' + n(x + k * 40) + ',' + n(y + 8) + ' ' + n(x + dx) + ',' + n(y) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
-        s += p('M' + n(x + dx) + ',' + n(y + 6) + ' C' + n(x + k * 40) + ',' + n(y + 20) + ' ' + n(x + k * 70) + ',' + n(y + 44) + ' ' + n(x + k * 52) + ',' + n(y + 58) + ' C' + n(x + k * 34) + ',' + n(y + 64) + ' ' + n(x + k * 14) + ',' + n(y + 34) + ' ' + n(x + dx) + ',' + n(y + 6) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
-        s += brilhos(x + k * 60, y - 26, 20, 16, 4);
+    var x = q ? g.costas[0] : 150, y = q ? g.costas[1] - 10 : g.t.y0 + 30, gw = c.lin([['#e8f4ff', 0.9], ['#f8d8f4', 0.85], ['#d8f0e8', 0.85]], 0, 0, 1, 1);
+    [-1, 1].forEach(function (k) {
+      if (q && k < 0) return;
+      var dx = q ? -6 : 0;
+      s += p('M' + n(x + dx) + ',' + n(y) + ' C' + n(x + k * 40) + ',' + n(y - 70) + ' ' + n(x + k * 98) + ',' + n(y - 60) + ' ' + n(x + k * 86) + ',' + n(y - 14) + ' C' + n(x + k * 80) + ',' + n(y + 8) + ' ' + n(x + k * 40) + ',' + n(y + 8) + ' ' + n(x + dx) + ',' + n(y) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
+      s += p('M' + n(x + dx) + ',' + n(y + 6) + ' C' + n(x + k * 40) + ',' + n(y + 20) + ' ' + n(x + k * 70) + ',' + n(y + 44) + ' ' + n(x + k * 52) + ',' + n(y + 58) + ' C' + n(x + k * 34) + ',' + n(y + 64) + ' ' + n(x + k * 14) + ',' + n(y + 34) + ' ' + n(x + dx) + ',' + n(y + 6) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
+      s += brilhos(x + k * 60, y - 26, 20, 16, 4);
+    });
+    return s;
+  }
+
+  /* ---------- bolsas e mochilas ---------- */
+  // bolsas de levar na mão (em pé: na mão esquerda; 4 patas: na boquinha, ou do lado do corpo se a boca estiver ocupada)
+  var BOLSA_MAO = { 'bolsa-coracao': 1, 'bolsa-bicho': 1, 'bolsa-palha': 1, 'lancheira': 1, 'sacola-presente': 1 };
+  // mochilas de bichinho de pelúcia: a cabecinha espia por cima do ombro
+  var MOCHILA_BICHO = { 'mochila-ursinho': 'ursinho', 'mochila-ovelha': 'ovelha', 'mochila-pug': 'pug', 'mochila-unicornio': 'unicornio', 'mochila-neve': 'neve', 'mochila-pinguim': 'pinguim', 'mochila-bicho': 'dino' };
+  var HOLO = '#cfd8f0';
+  function metalico(c, cor) {
+    if (cor === HOLO) return c.lin(['#f8c6f0', '#c6e8f8', '#e8f8c6', '#f8d8c6', '#d8c6f8'], 0, 0, 1, 1);
+    return c.lin([claro(cor, 0.55), cor, claro(cor, 0.3), escuro(cor, 0.18)], 0, 0, 1, 1);
+  }
+  function alca(x1, y1, x2, y2, tipo, cor) {   // alça com uma barriguinha; tipo: 'fita' | 'corrente' | 'couro'
+    var d = 'M' + n(x1) + ',' + n(y1) + ' Q' + n((x1 + x2) / 2 + 4) + ',' + n((y1 + y2) / 2 + 6) + ' ' + n(x2) + ',' + n(y2);
+    if (tipo === 'corrente') return p(d, { stroke: '#a8862a', 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' }) + p(d, { stroke: '#f2d77a', 'stroke-width': 2.4, fill: 'none', 'stroke-dasharray': '3 1.6' });
+    var base = tipo === 'couro' ? '#7a4a2a' : escuro(cor, 0.15);
+    return p(d, { stroke: escuro(base, 0.45), 'stroke-width': 5.4, fill: 'none', 'stroke-linecap': 'round' }) + p(d, { stroke: base, 'stroke-width': 3.4, fill: 'none', 'stroke-linecap': 'round' });
+  }
+  function escala(s, x, y, e) { return s ? '<g transform="translate(' + n(x) + ' ' + n(y) + ') scale(' + e + ') translate(' + n(-x) + ' ' + n(-y) + ')">' + s + '</g>' : ''; }
+  function tipoAlca(id) { return id === 'bolsa-metal' || id === 'bolsa-coracao' ? 'corrente' : id === 'bolsa-rena' ? 'couro' : 'fita'; }
+  // bolsa de usar no corpo, com a boca (onde a alça prende) em (x, y)
+  function bolsaCorpo(c, id, cor, x, y) {
+    var s = '', ct = escuro(cor, 0.38);
+    if (id === 'bolsa-tiracolo') {
+      s += ret(x - 19, y, 38, 28, { rx: 9, fill: cor, stroke: ct, 'stroke-width': 1.8 });
+      s += p('M' + n(x - 19) + ',' + n(y + 9) + ' Q' + n(x - 19) + ',' + n(y) + ' ' + n(x - 10) + ',' + n(y) + ' L' + n(x + 10) + ',' + n(y) + ' Q' + n(x + 19) + ',' + n(y) + ' ' + n(x + 19) + ',' + n(y + 9) + ' L' + n(x + 19) + ',' + n(y + 11) + ' Q' + x + ',' + n(y + 23) + ' ' + n(x - 19) + ',' + n(y + 11) + 'Z', { fill: escuro(cor, 0.1), stroke: ct, 'stroke-width': 1.6 });
+      s += p(coracaoD(x, y + 15, 3.8), { fill: '#f2c14e', stroke: '#b8862a', 'stroke-width': 0.8 });
+      return s + lin(x - 14, y + 24, x + 14, y + 24, { stroke: claro(cor, 0.5), 'stroke-width': 1, 'stroke-dasharray': '2 2' });
+    }
+    if (id === 'bolsa-ombro') {
+      s += p('M' + n(x - 17) + ',' + n(y) + ' L' + n(x + 17) + ',' + n(y) + ' L' + n(x + 22) + ',' + n(y + 30) + ' Q' + x + ',' + n(y + 36) + ' ' + n(x - 22) + ',' + n(y + 30) + 'Z', { fill: cor, stroke: ct, 'stroke-width': 1.8, 'stroke-linejoin': 'round' });
+      s += lin(x - 16, y + 5, x + 16, y + 5, { stroke: escuro(cor, 0.15), 'stroke-width': 3 });
+      s += p('M' + n(x - 18) + ',' + n(y + 26) + ' Q' + x + ',' + n(y + 31) + ' ' + n(x + 18) + ',' + n(y + 26), { stroke: claro(cor, 0.5), 'stroke-width': 1, 'stroke-dasharray': '2 2', fill: 'none' });
+      return s + lacoD(x + 7, y + 15, claro(cor, 0.45), 0.26);
+    }
+    if (id === 'bolsa-metal') {
+      s += ret(x - 18, y, 36, 26, { rx: 11, fill: metalico(c, cor), stroke: escuro(cor, 0.3), 'stroke-width': 1.6 });
+      s += p('M' + n(x - 18) + ',' + n(y + 10) + ' Q' + x + ',' + n(y + 16) + ' ' + n(x + 18) + ',' + n(y + 10), { stroke: escuro(cor, 0.25), 'stroke-width': 1.4, fill: 'none' });
+      return s + circ(x, y + 13, 3, { fill: '#f2e2a0', stroke: '#b8962a', 'stroke-width': 0.8 }) + p(brilhoD(x - 9, y + 6, 3.4), { fill: '#ffffff', opacity: 0.9 });
+    }
+    if (id === 'bolsa-estrela') {
+      s += p(estrelaD(x, y + 19, 20, 11), { fill: cor, stroke: ct, 'stroke-width': 1.8, 'stroke-linejoin': 'round' }) + p(estrelaD(x, y + 19, 15, 8), { fill: 'none', stroke: claro(cor, 0.55), 'stroke-width': 1, 'stroke-dasharray': '2 1.6' });
+      return s + circ(x - 4, y + 19, 1.6, { fill: '#2a1e28' }) + circ(x + 4, y + 19, 1.6, { fill: '#2a1e28' }) + p('M' + n(x - 2) + ',' + n(y + 23) + ' q2,2 4,0', { stroke: '#2a1e28', 'stroke-width': 1.1, fill: 'none' }) + elip(x - 7, y + 23, 2.4, 1.4, { fill: '#ff8fb3', opacity: 0.7 }) + elip(x + 7, y + 23, 2.4, 1.4, { fill: '#ff8fb3', opacity: 0.7 });
+    }
+    if (id === 'bolsa-morango') {
+      s += p('M' + x + ',' + n(y + 5) + ' C' + n(x + 25) + ',' + n(y + 1) + ' ' + n(x + 22) + ',' + n(y + 26) + ' ' + x + ',' + n(y + 37) + ' C' + n(x - 22) + ',' + n(y + 26) + ' ' + n(x - 25) + ',' + n(y + 1) + ' ' + x + ',' + n(y + 5) + 'Z', { fill: '#ef4a5a', stroke: '#a82634', 'stroke-width': 1.8 });
+      [[-9, 13], [0, 15], [9, 13], [-6, 22], [6, 22], [0, 29], [-12, 19], [12, 19]].forEach(function (k) { s += elip(x + k[0], y + k[1], 1.3, 2, { fill: '#ffe08a' }); });
+      return s + p(estrelaD(x, y + 5, 12, 5, 6), { fill: '#5cb85c', stroke: '#2f7a2e', 'stroke-width': 1, 'stroke-linejoin': 'round' }) + elip(x - 8, y + 12, 3, 5, { fill: '#ffffff', opacity: 0.35 });
+    }
+    if (id === 'bolsa-paete') {
+      s += ret(x - 18, y, 36, 26, { rx: 12, fill: cor, stroke: escuro(cor, 0.35), 'stroke-width': 1.6 }) + ret(x - 18, y, 36, 26, { rx: 12, fill: c.estampa('lantejoula', cor) });
+      return s + circ(x - 4, y - 1, 3, { fill: '#f2d77a', stroke: '#a8862a', 'stroke-width': 0.8 }) + circ(x + 4, y - 1, 3, { fill: '#f2d77a', stroke: '#a8862a', 'stroke-width': 0.8 });
+    }
+    if (id === 'bolsa-rena') {
+      [-1, 1].forEach(function (k) {   // chifrinhos
+        var ax = x + k * 7, d = 'M' + n(ax) + ',' + n(y + 6) + ' q' + n(k * -1) + ',-10 ' + n(k * 5) + ',-16 M' + n(ax + k * 3) + ',' + n(y - 4) + ' q' + n(k * 5) + ',-2 ' + n(k * 8) + ',-7';
+        s += p(d, { stroke: '#8a6a3a', 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }) + p(d, { stroke: '#e2c48e', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' });
+        s += elip(x + k * 16, y + 9, 7, 4, { fill: '#9a6a44', stroke: '#5e3c22', 'stroke-width': 1.2, transform: 'rotate(' + (k * 25) + ' ' + n(x + k * 16) + ' ' + n(y + 9) + ')' });
       });
+      s += circ(x, y + 18, 16, { fill: '#9a6a44', stroke: '#5e3c22', 'stroke-width': 1.8 }) + circ(x, y + 18, 16, { fill: c.pelo('#5e3c22', true) });
+      return s + elip(x, y + 25, 9, 7, { fill: '#c9a27c' }) + circ(x, y + 22, 4.4, { fill: '#e5404f', stroke: '#a82634', 'stroke-width': 0.8 }) + circ(x - 1.4, y + 20.6, 1.2, { fill: '#ffffff' }) + circ(x - 6, y + 14, 2.2, { fill: '#2a1e28' }) + circ(x + 6, y + 14, 2.2, { fill: '#2a1e28' });
+    }
+    return s;
+  }
+  // bolsa de mão: a alça sai da mãozinha em (x, y) e a bolsa fica pendurada embaixo
+  function bolsaMao(c, id, cor, x, y) {
+    var s = '';
+    if (id === 'bolsa-coracao') {
+      s += alca(x - 9, y + 12, x, y - 1, 'corrente') + alca(x + 9, y + 12, x, y - 1, 'corrente');
+      return s + p(coracaoD(x, y + 24, 15), { fill: metalico(c, cor), stroke: escuro(cor, 0.35), 'stroke-width': 1.6 }) + p(coracaoD(x, y + 24, 15), { fill: c.estampa('glitter', cor) }) + p(brilhoD(x - 6, y + 19, 3.4), { fill: '#ffffff' });
+    }
+    if (id === 'bolsa-bicho') return p('M' + n(x - 10) + ',' + n(y + 12) + ' Q' + x + ',' + n(y - 6) + ' ' + n(x + 10) + ',' + n(y + 12), { stroke: '#d0809a', 'stroke-width': 2.6, fill: 'none' }) + p('M' + n(x - 15) + ',' + n(y + 20) + ' l2,-12 8,8 z M' + n(x + 15) + ',' + n(y + 20) + ' l-2,-12 -8,8 z', { fill: '#fbd1e0', stroke: '#d0809a', 'stroke-width': 1.2 }) + circ(x, y + 30, 16, { fill: '#fbd1e0', stroke: '#d0809a', 'stroke-width': 1.6 }) + circ(x - 6, y + 28, 2, { fill: '#2a1e28' }) + circ(x + 6, y + 28, 2, { fill: '#2a1e28' }) + p('M' + n(x - 2) + ',' + n(y + 33) + ' q2,2 4,0', { stroke: '#2a1e28', 'stroke-width': 1.2, fill: 'none' }) + elip(x - 10, y + 34, 3, 2, { fill: '#ff8fb3', opacity: 0.7 }) + elip(x + 10, y + 34, 3, 2, { fill: '#ff8fb3', opacity: 0.7 });
+    if (id === 'bolsa-palha') {
+      [-1, 1].forEach(function (k) { s += p('M' + n(x + k * 13) + ',' + n(y + 16) + ' Q' + n(x + k * 6) + ',' + n(y - 6) + ' ' + n(x - k * 2) + ',' + n(y + 1), { stroke: '#a8803e', 'stroke-width': 3.4, fill: 'none', 'stroke-linecap': 'round' }); });
+      var d = 'M' + n(x - 21) + ',' + n(y + 14) + ' L' + n(x + 21) + ',' + n(y + 14) + ' L' + n(x + 16) + ',' + n(y + 42) + ' Q' + x + ',' + n(y + 46) + ' ' + n(x - 16) + ',' + n(y + 42) + 'Z';
+      s += p(d, { fill: '#ecd096', stroke: '#a8803e', 'stroke-width': 1.8, 'stroke-linejoin': 'round' });
+      for (var i = 0; i < 4; i++) s += lin(x - 19 + i, y + 22 + i * 6, x + 19 - i, y + 22 + i * 6, { stroke: '#c9a25e', 'stroke-width': 1.4, 'stroke-dasharray': '3 2' });
+      s += ret(x - 21, y + 15, 42, 5, { fill: cor, stroke: escuro(cor, 0.3), 'stroke-width': 0.8 }) + lacoD(x + 9, y + 18, cor, 0.3);
+      for (var pt = 0; pt < 5; pt++) { var an = rad(pt * 72); s += circ(x - 9 + Math.cos(an) * 3.4, y + 32 + Math.sin(an) * 3.4, 3, { fill: '#ffffff', stroke: '#e0d0b0', 'stroke-width': 0.5 }); }
+      return s + circ(x - 9, y + 32, 2.2, { fill: '#ffd447' });
+    }
+    if (id === 'lancheira') {
+      s += p('M' + n(x - 9) + ',' + n(y + 13) + ' L' + n(x - 8) + ',' + n(y + 1) + ' L' + n(x + 8) + ',' + n(y + 1) + ' L' + n(x + 9) + ',' + n(y + 13), { stroke: escuro(cor, 0.4), 'stroke-width': 4.4, fill: 'none', 'stroke-linejoin': 'round' });
+      s += ret(x - 20, y + 12, 40, 30, { rx: 6, fill: cor, stroke: escuro(cor, 0.4), 'stroke-width': 1.8 }) + ret(x - 20, y + 22, 40, 9, { fill: '#fbfaf7', opacity: 0.9 });
+      s += ret(x - 4, y + 10, 8, 6, { rx: 2, fill: '#d8dbe2', stroke: '#8a909c', 'stroke-width': 0.8 }) + p(estrelaD(x - 9, y + 26.5, 4, 1.8), { fill: '#ffd447' }) + p(coracaoD(x + 9, y + 26.5, 3.2), { fill: '#f06292' });
+      return s + elip(x - 12, y + 17, 4, 2, { fill: '#ffffff', opacity: 0.4 });
+    }
+    if (id === 'sacola-presente') {
+      var rosa = cor !== '#ff9a4d', alcaC = rosa ? '#ff3d8b' : '#c85a1a';
+      [-1, 1].forEach(function (k) { s += p('M' + n(x + k * 8) + ',' + n(y + 15) + ' Q' + n(x + k * 7) + ',' + n(y - 4) + ' ' + x + ',' + n(y) + '', { stroke: alcaC, 'stroke-width': 2.4, fill: 'none', 'stroke-linecap': 'round' }); });
+      s += p('M' + n(x - 12) + ',' + n(y + 15) + ' L' + n(x - 4) + ',' + n(y + 5) + ' L' + n(x + 1) + ',' + n(y + 14) + ' L' + n(x + 7) + ',' + n(y + 4) + ' L' + n(x + 12) + ',' + n(y + 15) + 'Z', { fill: '#fdf6fb', stroke: '#d8c8d8', 'stroke-width': 0.8 });
+      s += ret(x - 17, y + 14, 34, 34, { rx: 2, fill: rosa ? '#fbd5e6' : cor, stroke: escuro(cor, 0.35), 'stroke-width': 1.6 });
+      if (rosa) ['#f9707f', '#ffb04d', '#ffe45c', '#6fd68a', '#5fb0f0', '#b07be6'].forEach(function (cc, i) { s += ret(x - 15 + i * 5.3, y + 16, 3, 30, { fill: cc, opacity: 0.9 }); });
+      else [[-7, 25], [7, 38]].forEach(function (b, i) { var bx = x + b[0], by = y + b[1]; s += circ(bx, by, 6, { fill: i ? '#f7b6cf' : '#f2d8a8', stroke: '#8a5a3c', 'stroke-width': 0.8 }) + circ(bx - 4.5, by - 5, 2.2, { fill: i ? '#f7b6cf' : '#f2d8a8', stroke: '#8a5a3c', 'stroke-width': 0.8 }) + circ(bx + 4.5, by - 5, 2.2, { fill: i ? '#f7b6cf' : '#f2d8a8', stroke: '#8a5a3c', 'stroke-width': 0.8 }) + circ(bx - 2, by, 0.9, { fill: '#2a1e28' }) + circ(bx + 2, by, 0.9, { fill: '#2a1e28' }); });
       return s;
     }
-    var paete = id === 'mochila-paete', mc = paete ? '#ff9ed0' : cor;
+    return s;
+  }
+  function pochete(c, g) {
+    if (g.corpo === 'q') { var b = g.b; return ret(b.x - 30, b.y + b.ry * 0.2, 46, 22, { rx: 9, fill: '#8a9a5a', stroke: '#4a5a2a', 'stroke-width': 1.6 }) + ret(b.x - 30, b.y + b.ry * 0.2, 46, 22, { rx: 9, fill: c.estampa('camuflado', '#8a9a5a') }); }
+    var t = g.t, y = t.y1 - 24, s = '';
+    s += p('M' + n(150 - t.wb - 2) + ',' + n(y - 10) + ' Q150,' + n(y + 2) + ' ' + n(150 + t.wb + 2) + ',' + n(y - 10), { stroke: '#3a3226', 'stroke-width': 5, fill: 'none' });
+    s += ret(124, y - 14, 52, 26, { rx: 10, fill: '#8a9a5a', stroke: '#4a5a2a', 'stroke-width': 1.6 }) + ret(124, y - 14, 52, 26, { rx: 10, fill: c.estampa('camuflado', '#8a9a5a') }) + lin(128, y - 6, 172, y - 6, { stroke: '#2e2a26', 'stroke-width': 1.6 }) + circ(170, y - 6, 2.2, { fill: '#d8dbe2' });
+    return s;
+  }
+  // cabecinha de pelúcia (mochila de bichinho): centro (x, y), raio r
+  function cabecinha(c, tipo, x, y, r, cor) {
+    var cf = { ursinho: '#d9b48a', ovelha: '#f3e2cf', pug: '#e6cfa9', unicornio: '#fbe3ee', neve: '#fbfaf7', pinguim: '#2e2a33', dino: cor }[tipo] || '#d9b48a';
+    var ct = tipo === 'pinguim' ? '#16121a' : tipo === 'neve' ? '#a8b4c8' : escuro(cf, 0.42), s = '', k;
+    if (tipo === 'ursinho') [-1, 1].forEach(function (k) { s += circ(x + k * r * 0.72, y - r * 0.7, r * 0.36, { fill: cf, stroke: ct, 'stroke-width': 1.4 }) + circ(x + k * r * 0.72, y - r * 0.7, r * 0.18, { fill: '#f3d6c0' }); });
+    if (tipo === 'ovelha') {
+      [-1, 1].forEach(function (k) { s += elip(x + k * r * 1.02, y - r * 0.05, r * 0.36, r * 0.16, { fill: '#e2c6b0', stroke: ct, 'stroke-width': 1 }); });
+      for (k = 0; k < 9; k++) { var an = rad(190 + k * 20); s += circ(x + Math.cos(an) * r * 0.9, y + Math.sin(an) * r * 0.9, r * 0.34, { fill: '#fffaf0', stroke: '#d8cbb8', 'stroke-width': 1.1 }); }
+    }
+    if (tipo === 'unicornio') {
+      ['#f9a8c4', '#cdb0f4', '#a8d0f8', '#ffd08a'].forEach(function (cc, i) { s += circ(x - r * 0.86 + i * 2, y - r * 0.5 + i * r * 0.36, r * 0.3, { fill: cc, stroke: escuro(cc, 0.25), 'stroke-width': 1 }); });
+      [-1, 1].forEach(function (k) { s += p('M' + n(x + k * r * 0.3) + ',' + n(y - r * 0.85) + ' L' + n(x + k * r * 0.62) + ',' + n(y - r * 1.25) + ' L' + n(x + k * r * 0.74) + ',' + n(y - r * 0.6) + 'Z', { fill: cf, stroke: ct, 'stroke-width': 1.2, 'stroke-linejoin': 'round' }); });
+    }
+    if (tipo === 'dino') for (k = -1; k <= 1; k++) { var ax = x + k * r * 0.5, ay = y - r * (k ? 0.86 : 1) + 2; s += p('M' + n(ax - r * 0.22) + ',' + n(ay + 2) + ' L' + n(ax) + ',' + n(ay - r * 0.42) + ' L' + n(ax + r * 0.22) + ',' + n(ay + 2) + 'Z', { fill: escuro(cf, 0.2), stroke: ct, 'stroke-width': 1.2, 'stroke-linejoin': 'round' }); }
+    s += circ(x, y, r, { fill: cf, stroke: ct, 'stroke-width': 1.6 });
+    if (tipo === 'ursinho' || tipo === 'ovelha' || tipo === 'pug') s += circ(x, y, r, { fill: c.pelo(escuro(cf, 0.5), true) });
+    if (tipo === 'pinguim') s += p(coracaoD(x, y + r * 0.12, r * 0.66), { fill: '#fbfaf7' }) + p('M' + n(x - r * 0.16) + ',' + n(y + r * 0.22) + ' L' + n(x + r * 0.16) + ',' + n(y + r * 0.22) + ' L' + x + ',' + n(y + r * 0.42) + 'Z', { fill: '#ffa53a', stroke: '#c86a10', 'stroke-width': 0.8 });
+    if (tipo === 'pug') {
+      s += elip(x, y + r * 0.36, r * 0.48, r * 0.34, { fill: '#5a4a42' });
+      [-1, 1].forEach(function (k) { s += p('M' + n(x + k * r * 0.5) + ',' + n(y - r * 0.82) + ' Q' + n(x + k * r * 1.15) + ',' + n(y - r * 0.8) + ' ' + n(x + k * r * 1.02) + ',' + n(y - r * 0.2) + ' Q' + n(x + k * r * 0.8) + ',' + n(y - r * 0.5) + ' ' + n(x + k * r * 0.5) + ',' + n(y - r * 0.82) + 'Z', { fill: '#5a4a42', stroke: '#3a2e2a', 'stroke-width': 1 }); });
+    }
+    if (tipo === 'unicornio') s += p('M' + n(x - r * 0.15) + ',' + n(y - r * 0.8) + ' L' + x + ',' + n(y - r * 1.5) + ' L' + n(x + r * 0.15) + ',' + n(y - r * 0.8) + 'Z', { fill: '#ffd86b', stroke: '#c9962a', 'stroke-width': 1.2, 'stroke-linejoin': 'round' });
+    if (tipo === 'neve') {
+      s += ret(x - r * 0.48, y - r * 1.55, r * 0.96, r * 0.8, { rx: 2, fill: '#2e2a33' }) + ret(x - r * 0.78, y - r * 0.86, r * 1.56, r * 0.18, { rx: 2, fill: '#2e2a33' }) + ret(x - r * 0.48, y - r * 0.98, r * 0.96, r * 0.14, { fill: '#e5404f' });
+      s += p('M' + x + ',' + n(y + r * 0.08) + ' L' + n(x + r * 0.62) + ',' + n(y + r * 0.2) + ' L' + x + ',' + n(y + r * 0.32) + 'Z', { fill: '#ff9a4d', stroke: '#c86a10', 'stroke-width': 0.8 });
+    }
+    // olhinhos, bochechas, narizinho
+    [-1, 1].forEach(function (k) { s += circ(x + k * r * 0.34, y - r * 0.08, r * 0.13, { fill: tipo === 'pinguim' ? '#2a1e28' : '#2a1e28' }) + circ(x + k * r * 0.34 - r * 0.04, y - r * 0.12, r * 0.05, { fill: '#ffffff' }); });
+    if (tipo !== 'pinguim' && tipo !== 'neve') [-1, 1].forEach(function (k) { s += elip(x + k * r * 0.58, y + r * 0.28, r * 0.15, r * 0.09, { fill: '#ff8fb3', opacity: 0.6 }); });
+    if (tipo === 'ursinho' || tipo === 'ovelha') s += elip(x, y + r * 0.22, r * 0.12, r * 0.09, { fill: '#4a3226' });
+    if (tipo === 'pug') s += elip(x, y + r * 0.2, r * 0.14, r * 0.1, { fill: '#1e1614' });
+    if (tipo === 'dino' || tipo === 'unicornio') s += p('M' + n(x - r * 0.14) + ',' + n(y + r * 0.26) + ' q' + n(r * 0.14) + ',' + n(r * 0.14) + ' ' + n(r * 0.28) + ',0', { stroke: '#2a1e28', 'stroke-width': 1.2, fill: 'none', 'stroke-linecap': 'round' });
+    if (tipo === 'dino') s += elip(x - r * 0.42, y - r * 0.48, r * 0.24, r * 0.12, { fill: '#ffffff', opacity: 0.65, transform: 'rotate(-30 ' + n(x - r * 0.42) + ' ' + n(y - r * 0.48) + ')' });
+    return s;
+  }
+  var COR_MOCHILA_BICHO = { ursinho: '#d9b48a', ovelha: '#f6efe2', pug: '#e6cfa9', unicornio: '#f8c6dc', neve: '#fbfaf7', pinguim: '#2e2a33' };
+  function mochila(c, g, id, cor, camada) {
+    var q = g.corpo === 'q', bicho = MOCHILA_BICHO[id], s = '';
+    var mc = id === 'mochila-espaco' ? '#2f3f6e' : id === 'mochila-degrade' ? '#e0c8f0' : bicho && bicho !== 'dino' ? COR_MOCHILA_BICHO[bicho] : cor;
+    var fundo = id === 'mochila-degrade' ? c.lin(['#f9b6d6', '#e0c8f4', '#a9d2f5'], 0, 0, 1, 1) : mc;
+    var brilho = id === 'mochila-paete' ? c.estampa('lantejoula', cor) : id === 'mochila-glitter' ? c.estampa('glitter', cor) : null;
+    var fita = bicho === 'unicornio' ? '#f06292' : bicho === 'pinguim' ? '#e5404f' : escuro(mc, 0.22);
+    function enfeite(x0, y0, w, h) {   // o que aparece na parte visível da mochila
+      var e = '';
+      if (id === 'mochila-espaco') e += circ(x0 + 8, y0 + 22, 5, { fill: '#ffb04d' }) + elip(x0 + 8, y0 + 22, 9, 2.2, { fill: 'none', stroke: '#ffe27a', 'stroke-width': 1.2 }) + circ(x0 + w - 8, y0 + 34, 4.4, { fill: '#6fd68a' }) + p(estrelaD(x0 + 7, y0 + 50, 3.4, 1.4), { fill: '#fff6c8' }) + p(estrelaD(x0 + w - 7, y0 + 14, 3.4, 1.4), { fill: '#fff6c8' }) + circ(x0 + w - 9, y0 + 60, 3.6, { fill: '#f9a8c4' });
+      if (id === 'mochila-degrade' || id === 'mochila-bicho') e += elip(x0 + 9, y0 + 16, 3, 9, { fill: '#ffffff', opacity: 0.55 }) + elip(x0 + w - 9, y0 + 16, 3, 9, { fill: '#ffffff', opacity: 0.55 });
+      return e;
+    }
+    function orelhas(x1, x2, y) {   // orelhinhas de coelho em pé nos cantos de cima
+      var e = '';
+      [[x1, -1], [x2, 1]].forEach(function (o) { var ox = o[0], k = o[1]; e += '<g transform="rotate(' + (k * 16) + ' ' + n(ox) + ' ' + n(y) + ')">' + elip(ox, y - 16, 7, 19, { fill: mc, stroke: escuro(mc, 0.38), 'stroke-width': 1.6 }) + elip(ox, y - 15, 3.4, 13, { fill: '#f8c6d6' }) + '</g>'; });
+      return e;
+    }
     if (q) {
-      if (!frente) return '';
+      if (camada !== 'frente') return '';
       var bx = g.costas[0], by = g.costas[1];
-      s += ret(bx - 30, by - 22, 60, 40, { rx: 14, fill: mc, stroke: escuro(mc, 0.35), 'stroke-width': 2 }) + (paete ? ret(bx - 30, by - 22, 60, 40, { rx: 14, fill: c.estampa('paete', mc) }) : '') + ret(bx - 20, by - 6, 40, 18, { rx: 7, fill: escuro(mc, 0.1), stroke: escuro(mc, 0.35), 'stroke-width': 1.4 }) + lin(bx - 26, by + 18, bx - 26, by + 50, { stroke: escuro(mc, 0.25), 'stroke-width': 6 });
+      if (bicho) return lin(bx - 16, by + 12, bx - 24, by + 46, { stroke: fita, 'stroke-width': 6, 'stroke-linecap': 'round' }) + cabecinha(c, bicho, bx, by - 2, 24, cor);
+      if (id === 'mochila-orelhas') s += orelhas(bx - 20, bx + 20, by - 18);
+      s += ret(bx - 30, by - 22, 60, 40, { rx: 14, fill: fundo, stroke: escuro(mc, 0.35), 'stroke-width': 2 }) + (brilho ? ret(bx - 30, by - 22, 60, 40, { rx: 14, fill: brilho }) : '') + enfeite(bx - 30, by - 28, 60, 40);
+      s += ret(bx - 20, by - 6, 40, 18, { rx: 7, fill: id === 'mochila-espaco' ? '#3f5290' : escuro(mc, 0.1), stroke: escuro(mc, 0.35), 'stroke-width': 1.4, opacity: brilho ? 0.85 : 1 }) + lin(bx - 26, by + 18, bx - 26, by + 50, { stroke: fita, 'stroke-width': 6 });
       return s;
     }
     var t = g.t;
-    if (!frente) {   // a mochila aparece por trás, dos lados
-      s += ret(150 - t.wb - 12, t.y0 + 14, (t.wb + 12) * 2, 86, { rx: 22, fill: mc, stroke: escuro(mc, 0.35), 'stroke-width': 2 }) + (paete ? ret(150 - t.wb - 12, t.y0 + 14, (t.wb + 12) * 2, 86, { rx: 22, fill: c.estampa('paete', mc) }) : '');
+    if (camada === 'tras') {   // a mochila aparece por trás, dos lados (e a cabecinha do bichinho espia por cima do ombro)
+      var x0 = 150 - t.wb - 12, w = (t.wb + 12) * 2, y0 = t.y0 + 14;
+      if (id === 'mochila-orelhas') s += orelhas(x0 + 14, x0 + w - 14, y0 + 6);
+      s += ret(x0, y0, w, 86, { rx: 22, fill: fundo, stroke: escuro(mc, 0.35), 'stroke-width': 2 }) + (brilho ? ret(x0, y0, w, 86, { rx: 22, fill: brilho }) : '') + enfeite(x0, y0, w, 86);
+      if (bicho) s += cabecinha(c, bicho, 150 + t.wb + 8, t.y0 - 8, 24, cor);
       return s;
     }
-    [-1, 1].forEach(function (k) { s += p('M' + n(150 + k * (t.wt - 4)) + ',' + n(t.y0 + 2) + ' Q' + n(150 + k * (t.wt + 2)) + ',' + n(t.y0 + 40) + ' ' + n(150 + k * (t.wb - 4)) + ',' + n(t.y0 + 74), { stroke: escuro(mc, 0.2), 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' }); });
+    if (camada === 'frente') [-1, 1].forEach(function (k) { s += p('M' + n(150 + k * (t.wt - 4)) + ',' + n(t.y0 + 2) + ' Q' + n(150 + k * (t.wt + 2)) + ',' + n(t.y0 + 40) + ' ' + n(150 + k * (t.wb - 4)) + ',' + n(t.y0 + 74), { stroke: fita, 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' }); });
     return s;
+  }
+  // camadas: 'tras' (atrás do corpo), 'frente' (no corpo, embaixo dos braços), 'cima' (por cima dos braços),
+  // 'mao' (na mão esquerda, dentro do braço), 'boca' (4 patas: depois da cabeça)
+  function bolsaAcess(c, a, g, id, cor, camada) {
+    var q = g.corpo === 'q', t = g.t, s = '', tipo = tipoAlca(id);
+    if (id === 'pochete') return camada === 'frente' ? pochete(c, g) : '';
+    if (id.indexOf('mochila') === 0) return mochila(c, g, id, cor, camada);
+    var naMao = BOLSA_MAO[id];
+    if (q) {
+      if (naMao && !(a.acess && a.acess.mao)) return camada === 'boca' ? bolsaMao(c, id, cor, g.maoItem[0], g.maoItem[1] - 14) : '';
+      if (camada !== 'frente') return '';
+      var b = g.b, bx = b.x - 4, by = b.y - 6;
+      var costa = function (x) { return b.y - b.ry * Math.sqrt(Math.max(0, 1 - Math.pow((x - b.x) / b.rx, 2))) + 5; };
+      var ya = naMao ? by - 10 : by + 2, dx = naMao ? 7 : 14;
+      s += alca(bx - dx, ya, bx - 30, costa(bx - 30), tipo, cor) + alca(bx + dx, ya, bx + 28, costa(bx + 28), tipo, cor);
+      return s + (naMao ? bolsaMao(c, id, cor, bx, by - 14) : bolsaCorpo(c, id, cor, bx, by));
+    }
+    if (naMao) return camada === 'mao' ? escala(bolsaMao(c, id, cor, g.mao[0][0], g.mao[0][1] + (g.pendurada ? -4 : 4)), g.mao[0][0], g.mao[0][1], 1.2) : '';
+    var ombro = id === 'bolsa-ombro', x = ombro ? 150 + t.wb - 14 : 178, y = ombro ? t.y1 - 34 : t.y1 - 46;
+    if (camada === 'frente') {
+      if (ombro) return alca(150 + t.wt - 12, t.y0 + 2, x - 13, y + 2, tipo, cor) + alca(150 + t.wt - 4, t.y0 + 6, x + 13, y + 2, tipo, cor);
+      return alca(150 - t.wt + 4, t.y0 + 4, x + 15, y + 3, tipo, cor) + alca(x - 18, y + 4, x - 14, y + 2, tipo, cor);
+    }
+    return camada === 'cima' ? escala(bolsaCorpo(c, id, cor, x, y), x, y, 1.3) : '';
   }
   function maoAcess(c, a, g, id) {
     if (g.pendurada) return '';
@@ -1185,9 +1364,6 @@
       s += p(coracaoD(bx, by, 26), { fill: '#f0507a', stroke: '#b82c58', 'stroke-width': 1.8 }) + elip(bx - 10, by - 6, 5, 8, { fill: '#ffffff', opacity: 0.45, transform: 'rotate(-25 ' + n(bx - 10) + ' ' + n(by - 6) + ')' });
       return s;
     }
-    var pend = q ? 0 : 14;
-    if (id === 'bolsa-coracao') return p('M' + n(x - 10) + ',' + n(y + 2) + ' Q' + x + ',' + n(y - 12) + ' ' + n(x + 10) + ',' + n(y + 2), { stroke: '#a8b0c0', 'stroke-width': 2.4, fill: 'none' }) + p(coracaoD(x, y + 20 + pend * 0.3, 15), { fill: c.lin(['#f4f6fa', '#b8c0ce', '#eef1f6', '#a9b2c2'], 0, 0, 1, 1), stroke: '#8a92a2', 'stroke-width': 1.6 }) + p(brilhoD(x - 6, y + 16, 3.4), { fill: '#ffffff' });
-    if (id === 'bolsa-bicho') return p('M' + n(x - 10) + ',' + n(y + 2) + ' Q' + x + ',' + n(y - 12) + ' ' + n(x + 10) + ',' + n(y + 2), { stroke: '#d0809a', 'stroke-width': 2.4, fill: 'none' }) + p('M' + n(x - 15) + ',' + n(y + 10) + ' l2,-12 8,8 z M' + n(x + 15) + ',' + n(y + 10) + ' l-2,-12 -8,8 z', { fill: '#fbd1e0', stroke: '#d0809a', 'stroke-width': 1.2 }) + circ(x, y + 22, 16, { fill: '#fbd1e0', stroke: '#d0809a', 'stroke-width': 1.6 }) + circ(x - 6, y + 20, 2, { fill: '#2a1e28' }) + circ(x + 6, y + 20, 2, { fill: '#2a1e28' }) + p('M' + n(x - 2) + ',' + n(y + 25) + ' q2,2 4,0', { stroke: '#2a1e28', 'stroke-width': 1.2, fill: 'none' }) + elip(x - 10, y + 26, 3, 2, { fill: '#ff8fb3', opacity: 0.7 }) + elip(x + 10, y + 26, 3, 2, { fill: '#ff8fb3', opacity: 0.7 });
     if (id === 'chaveiro') return circ(x, y + 8, 6, { fill: 'none', stroke: '#c9ced8', 'stroke-width': 2.2 }) + lin(x, y + 14, x, y + 22, { stroke: '#c9ced8', 'stroke-width': 1.6 }) + p(estrelaD(x, y + 31, 10, 5), { fill: '#ffd447', stroke: '#c9962a', 'stroke-width': 1.4 }) + circ(x - 2, y + 30, 1.2, { fill: '#2a1e28' }) + circ(x + 2.5, y + 30, 1.2, { fill: '#2a1e28' });
     return s;
   }
@@ -1285,7 +1461,8 @@
     if (e.chao === 'skate') s += skate(g, corA('skate'));
     var corpo = '';
     if (e.apoio === 'cadeira') corpo += cadeira(g, false);
-    if (e.costas) corpo += costasAcess(c, a, g, e.costas, corA(e.costas), false);
+    if (e.asas) corpo += asasAcess(c, a, g, e.asas, corA(e.asas));
+    if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'tras');
     if (S && S.capa && !q) corpo += p('M' + n(150 - g.t.wt - 10) + ',' + n(g.t.y0) + ' Q' + n(150 - g.t.wb - 40) + ',' + n(g.t.y1) + ' ' + n(150 - g.t.wb - 30) + ',' + n(g.t.y1 + 26) + ' L' + n(150 + g.t.wb + 30) + ',' + n(g.t.y1 + 26) + ' Q' + n(150 + g.t.wb + 40) + ',' + n(g.t.y1) + ' ' + n(150 + g.t.wt + 10) + ',' + n(g.t.y0) + 'Z', { fill: escuro(S.capa.cor, 0.12), stroke: escuro(S.capa.cor, 0.35), 'stroke-width': 2 });
     if (S && S.heroi) corpo += capaHeroi(g, S.heroi);
     var rabo = cauda(c, a, g, T);
@@ -1295,15 +1472,14 @@
       var roupaCorpo = roupaQ(c, a, g, S);
       var patas = [0, 1, 2, 3].map(function (i) {
         var extra = (RQ ? RQ(i) : '') + (e.pes ? sapato(c, e.pes, corA(e.pes), g.pernas[i][1][0], g.pernas[i][1][1], g, false, i) : '');
-        if (i === 2 && e.pulso && e.pulso !== 'pochete') extra += pulsoAcess(c, a, g, e.pulso);
+        if (i === 2 && e.pulso) extra += pulsoAcess(c, a, g, e.pulso);
         if ((i === 2 && e.abraco === 'abracadinho-braco') || (i === 3 && e.abraco === 'abracadinho-perna')) extra += abracadinho(c, a, g, e.abraco);
         return pataQ(c, a, g, T, i, extra);
       });
       // pescocinho de pelúcia atrás do corpo e da cabeça: liga os dois (girafa e pescoçudo têm o pescoço comprido deles)
       if (!g.pescocoLongo) corpo += capsula(g.cab.x + 16, g.cab.y + g.cab.ry * 0.45, g.b.x - g.b.rx * 0.5, g.b.y - g.b.ry * 0.25, 30, T.f, T.s);
       corpo += corpoQ(c, a, g, T, roupaCorpo, patas);
-      if (e.pulso === 'pochete') corpo += pulsoAcess(c, a, g, e.pulso);
-      if (e.costas) corpo += costasAcess(c, a, g, e.costas, corA(e.costas), true);
+      if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'frente');
       if (e.colo) corpo += miniPelucia(c, a, g, e.colo);
       if (e.apoio === 'cadeira') corpo += cadeira(g, true);
     } else {
@@ -1312,18 +1488,19 @@
       if (S) corpo += roupaPeCorpo(c, a, g, S);
       if (e.pes) for (var i = 0; i < 2; i++) corpo += sapato(c, e.pes, corA(e.pes), g.pe[i][0], g.pe[i][1], g, g.sentado, i);
       if (e.abraco === 'abracadinho-perna') corpo += abracadinho(c, a, g, e.abraco);
-      if (e.costas) corpo += costasAcess(c, a, g, e.costas, corA(e.costas), true);
+      if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'frente');
       if (e.colo && !g.pendurada) corpo += miniPelucia(c, a, g, e.colo);
       var bracos = '';
       for (var k = 0; k < 2; k++) {
         var lado = bracoPe(c, a, g, T, k) + mangaLado(c, a, g, S, k);
-        if (k === 0 && e.pulso && e.pulso !== 'pochete') lado += pulsoAcess(c, a, g, e.pulso);
+        if (k === 0 && e.pulso) lado += pulsoAcess(c, a, g, e.pulso);
         if (k === 0 && e.abraco === 'abracadinho-braco') lado += abracadinho(c, a, g, e.abraco);
+        if (k === 0 && e.costas) lado += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'mao');
         if (k === 1 && e.mao) lado += maoAcess(c, a, g, e.mao);
         bracos += gr(lado, { 'class': 'ma-braco', 'data-k': k, 'data-px': g.omb[k][0], 'data-py': g.omb[k][1] });
       }
-      if (e.pulso === 'pochete') corpo += pulsoAcess(c, a, g, e.pulso);
       if (g.pendurada) corpo = bracos + corpo; else corpo += bracos;
+      if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'cima');
       if (e.apoio === 'cadeira') corpo += cadeira(g, true);
     }
     // cabeça
@@ -1337,6 +1514,7 @@
     if (e.olhos) cab += oculos(c, a, g, e.olhos, corA(e.olhos));
     var frente = '';
     if (e.mao && q) frente += maoAcess(c, a, g, e.mao);
+    if (e.costas && q) frente += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'boca');
     if (e.apoio === 'muletas' && !q) frente += muletas(g);
     var murcho = '';
     var f = op.fofura != null ? op.fofura : a.fofura;

@@ -55,7 +55,12 @@
     patins: ['azul', 'rosa', 'preto', 'lilas', 'menta'],
     skate: ['rosa-choque', 'azul', 'lima', 'roxo', 'preto'],
     coleira: ['vermelho', 'holo', 'azul-bebe', 'azul', 'preto', 'rosa'],
-    bone: ['marinho', 'rosa', 'vermelho', 'azul', 'preto', 'lima']
+    bone: ['marinho', 'rosa', 'vermelho', 'azul', 'preto', 'lima'],
+    vivas: ['rosa', 'rosa-choque', 'vermelho', 'laranja', 'amarelo', 'lima', 'menta', 'verde', 'turquesa', 'azul-bebe', 'azul', 'marinho', 'lilas', 'roxo', 'marrom', 'caramelo', 'bege', 'branco', 'cinza', 'preto'],
+    paete: ['rosa', 'prata', 'lilas', 'dourado', 'azul-bebe', 'turquesa', 'holo'],
+    metal: ['prata', 'dourado', 'rosa-choque', 'vermelho', 'rosa', 'holo'],
+    presente: ['laranja', 'rosa'],
+    verniz: ['lima', 'rosa-choque', 'azul', 'roxo', 'amarelo', 'preto']
   };
 
   // ---------- pelo (cores lisas e degradês tie-dye pastel) ----------
@@ -259,18 +264,19 @@
 
   // ---------- acessórios: um por caixinha (lugar), vários ao mesmo tempo ----------
   var CAIXAS = [
-    { id: 'laco', n: ['Laços', 'Bows', 'Lazos'] },
-    { id: 'cabeca', n: ['Tiaras e chapéus', 'Headbands & hats', 'Diademas y sombreros'] },
-    { id: 'olhos', n: ['Óculos', 'Glasses', 'Gafas'] },
-    { id: 'pescoco', n: ['Colares', 'Necklaces', 'Collares'] },
-    { id: 'pulso', n: ['Pulseiras e pochete', 'Bracelets & belt bag', 'Pulseras y riñonera'] },
-    { id: 'costas', n: ['Mochilas e asas', 'Backpacks & wings', 'Mochilas y alas'] },
-    { id: 'mao', n: ['Na mãozinha', 'In the paw', 'En la manita'] },
-    { id: 'colo', n: ['Filhotinho', 'Little baby', 'Bebé'] },
-    { id: 'abraco', n: ['Abraçadinho', 'Cuddle buddy', 'Abrazadito'] },
-    { id: 'pes', n: ['Sapatos e patins', 'Shoes & skates', 'Zapatos y patines'] },
-    { id: 'chao', n: ['Skate', 'Skateboard', 'Monopatín'] },
-    { id: 'apoio', n: ['Apoios', 'Mobility', 'Apoyos'] }
+    { id: 'laco', ico: '🎀', n: ['Laços', 'Bows', 'Lazos'] },
+    { id: 'cabeca', ico: '👑', n: ['Tiaras e chapéus', 'Headbands & hats', 'Diademas y sombreros'] },
+    { id: 'olhos', ico: '👓', n: ['Óculos', 'Glasses', 'Gafas'] },
+    { id: 'pescoco', ico: '📿', n: ['Colares', 'Necklaces', 'Collares'] },
+    { id: 'pulso', ico: '💎', n: ['Pulseiras', 'Bracelets', 'Pulseras'] },
+    { id: 'costas', ico: '👜', n: ['Bolsas e mochilas', 'Bags & backpacks', 'Bolsos y mochilas'] },
+    { id: 'asas', ico: '🧚', n: ['Asinhas', 'Little wings', 'Alitas'] },
+    { id: 'mao', ico: '🪄', n: ['Na mãozinha', 'In the paw', 'En la manita'] },
+    { id: 'colo', ico: '🧸', n: ['Filhotinho', 'Little baby', 'Bebé'] },
+    { id: 'abraco', ico: '🦄', n: ['Abraçadinho', 'Cuddle buddy', 'Abrazadito'] },
+    { id: 'pes', ico: '👟', n: ['Sapatos e patins', 'Shoes & skates', 'Zapatos y patines'] },
+    { id: 'chao', ico: '🛹', n: ['Skate', 'Skateboard', 'Monopatín'] },
+    { id: 'apoio', ico: '♿', n: ['Apoios', 'Mobility', 'Apoyos'] }
   ];
   // e = como aparece na encomenda ("com laço azul"); {c} = nome da cor
   var ACESS = [
@@ -298,15 +304,39 @@
     { id: 'lenco', caixa: 'pescoco', n: ['Bandana de florzinha', 'Flower bandana', 'Bandana de florecitas'], e: ['bandana {c}', '{c} bandana', 'bandana {c}'], paleta: 'geral', cor: 'rosa' },
     { id: 'coleira', caixa: 'pescoco', n: ['Coleira com guia', 'Collar and leash', 'Collar con correa'], e: ['coleira {c}', '{c} collar and leash', 'collar {c}'], paleta: 'coleira', cor: 'vermelho' },
     { id: 'coleira-pata', caixa: 'pescoco', n: ['Guia com controle de patinha', 'Leash with paw remote', 'Correa con mando de patita'], e: ['guia de patinha', 'paw remote leash', 'correa de patita'], paleta: 'coleira', cor: 'azul-bebe' },
-    { id: 'pochete', caixa: 'pulso', n: ['Pochete camuflada', 'Camo belt bag', 'Riñonera de camuflaje'], e: ['pochete', 'belt bag', 'riñonera'] },
     { id: 'pulseira-strass', caixa: 'pulso', n: ['Pulseira de strass', 'Rhinestone bracelet', 'Pulsera de brillantes'], e: ['pulseira de strass', 'rhinestone bracelet', 'pulsera de brillantes'] },
     { id: 'pulseira-bolinhas', caixa: 'pulso', n: ['Pulseira de bolinhas', 'Bead bracelet', 'Pulsera de bolitas'], e: ['pulseira de bolinhas', 'bead bracelet', 'pulsera de bolitas'] },
-    { id: 'mochila', caixa: 'costas', n: ['Mochila', 'Backpack', 'Mochila'], e: ['mochila', 'backpack', 'mochila'], paleta: 'geral', cor: 'azul', facil: 1 },
-    { id: 'mochila-paete', caixa: 'costas', n: ['Mochila de paetê', 'Sequin backpack', 'Mochila de lentejuelas'], e: ['mochila de paetê', 'sequin backpack', 'mochila de lentejuelas'] },
     { id: 'asas', caixa: 'costas', n: ['Asinhas de fada', 'Fairy wings', 'Alitas de hada'], e: ['asinhas de fada', 'fairy wings', 'alitas de hada'], facil: 1 },
+    // bolsas e mochilas (dono, 22/Nov/2026: "não tem bolsas"; modelos e cores das fotos de referência)
+    { id: 'bolsa-tiracolo', caixa: 'costas', n: ['Bolsa a tiracolo', 'Crossbody bag', 'Bolso bandolera'], e: ['bolsa a tiracolo', 'crossbody bag', 'bolso bandolera'], paleta: 'vivas', cor: 'rosa', facil: 1 },
+    { id: 'bolsa-ombro', caixa: 'costas', n: ['Bolsa de ombro', 'Shoulder bag', 'Bolso de hombro'], e: ['bolsa de ombro', 'shoulder bag', 'bolso de hombro'], paleta: 'vivas', cor: 'lilas' },
+    { id: 'bolsa-metal', caixa: 'costas', n: ['Bolsa metalizada de corrente', 'Shiny chain bag', 'Bolso metalizado de cadena'], e: ['bolsa metalizada', 'shiny chain bag', 'bolso metalizado'], paleta: 'metal', cor: 'rosa-choque' },
+    { id: 'bolsa-coracao', caixa: 'costas', n: ['Bolsinha de coração', 'Heart purse', 'Bolsito de corazón'], e: ['bolsinha de coração', 'heart purse', 'bolsito de corazón'], paleta: 'metal', cor: 'prata', facil: 1 },
+    { id: 'bolsa-estrela', caixa: 'costas', n: ['Bolsinha de estrela', 'Star purse', 'Bolsito de estrella'], e: ['bolsinha de estrela', 'star purse', 'bolsito de estrella'], paleta: 'vivas', cor: 'amarelo' },
+    { id: 'bolsa-morango', caixa: 'costas', n: ['Bolsinha de morango', 'Strawberry purse', 'Bolsito de fresa'], e: ['bolsinha de morango', 'strawberry purse', 'bolsito de fresa'] },
+    { id: 'bolsa-paete', caixa: 'costas', n: ['Bolsinha de paetê', 'Sequin purse', 'Bolsito de lentejuelas'], e: ['bolsinha de paetê', 'sequin purse', 'bolsito de lentejuelas'], paleta: 'paete', cor: 'lilas' },
+    { id: 'bolsa-rena', caixa: 'costas', n: ['Bolsa de rena', 'Reindeer bag', 'Bolso de reno'], e: ['bolsa de rena', 'reindeer bag', 'bolso de reno'] },
+    { id: 'bolsa-bicho', caixa: 'costas', n: ['Bolsa de gatinho', 'Kitty bag', 'Bolso de gatito'], e: ['bolsa de gatinho', 'kitty bag', 'bolso de gatito'] },
+    { id: 'bolsa-palha', caixa: 'costas', n: ['Bolsa de praia de palha', 'Straw beach bag', 'Bolso de playa de paja'], e: ['bolsa de palha', 'straw beach bag', 'bolso de paja'], paleta: 'lacos', cor: 'rosa' },
+    { id: 'lancheira', caixa: 'costas', n: ['Lancheira', 'Lunch box', 'Fiambrera'], e: ['lancheira', 'lunch box', 'fiambrera'], paleta: 'vivas', cor: 'azul' },
+    { id: 'sacola-presente', caixa: 'costas', n: ['Sacola de presente', 'Gift bag', 'Bolsa de regalo'], e: ['sacola de presente', 'gift bag', 'bolsa de regalo'], paleta: 'presente', cor: 'laranja' },
+    { id: 'pochete', caixa: 'costas', n: ['Pochete camuflada', 'Camo belt bag', 'Riñonera de camuflaje'], e: ['pochete', 'belt bag', 'riñonera'] },
+    { id: 'mochila', caixa: 'costas', n: ['Mochila', 'Backpack', 'Mochila'], e: ['mochila', 'backpack', 'mochila'], paleta: 'vivas', cor: 'azul', facil: 1 },
+    { id: 'mochila-paete', caixa: 'costas', n: ['Mochila de paetê', 'Sequin backpack', 'Mochila de lentejuelas'], e: ['mochila de paetê', 'sequin backpack', 'mochila de lentejuelas'], paleta: 'paete', cor: 'rosa' },
+    { id: 'mochila-glitter', caixa: 'costas', n: ['Mochila de brilho', 'Glitter backpack', 'Mochila de purpurina'], e: ['mochila de brilho', 'glitter backpack', 'mochila de purpurina'], paleta: 'glitter', cor: 'preto' },
+    { id: 'mochila-degrade', caixa: 'costas', n: ['Mochilinha degradê', 'Ombré mini backpack', 'Mochilita degradada'], e: ['mochilinha degradê', 'ombré mini backpack', 'mochilita degradada'] },
+    { id: 'mochila-espaco', caixa: 'costas', n: ['Mochila de planetas', 'Space backpack', 'Mochila de planetas'], e: ['mochila de planetas', 'space backpack', 'mochila de planetas'] },
+    { id: 'mochila-orelhas', caixa: 'costas', n: ['Mochila de orelhinhas', 'Bunny-ear backpack', 'Mochila con orejitas'], e: ['mochila de orelhinhas', 'bunny-ear backpack', 'mochila con orejitas'], paleta: 'vivas', cor: 'lilas' },
+    { id: 'mochila-bicho', caixa: 'costas', n: ['Mochilinha de dino', 'Dino face backpack', 'Mochilita de dino'], e: ['mochilinha de dino', 'dino face backpack', 'mochilita de dino'], paleta: 'verniz', cor: 'lima' },
+    { id: 'mochila-ursinho', caixa: 'costas', n: ['Mochila de ursinho', 'Teddy backpack', 'Mochila de osito'], e: ['mochila de ursinho', 'teddy backpack', 'mochila de osito'], facil: 1 },
+    { id: 'mochila-ovelha', caixa: 'costas', n: ['Mochila de ovelhinha', 'Lamb backpack', 'Mochila de ovejita'], e: ['mochila de ovelhinha', 'lamb backpack', 'mochila de ovejita'] },
+    { id: 'mochila-pug', caixa: 'costas', n: ['Mochila de cachorrinho', 'Pug backpack', 'Mochila de carlino'], e: ['mochila de cachorrinho', 'pug backpack', 'mochila de carlino'] },
+    { id: 'mochila-unicornio', caixa: 'costas', n: ['Mochila de unicórnio', 'Unicorn backpack', 'Mochila de unicornio'], e: ['mochila de unicórnio', 'unicorn backpack', 'mochila de unicornio'], facil: 1 },
+    { id: 'mochila-neve', caixa: 'costas', n: ['Mochilinha de boneco de neve', 'Snowman backpack', 'Mochilita de muñeco de nieve'], e: ['mochilinha de boneco de neve', 'snowman backpack', 'mochilita de muñeco de nieve'] },
+    { id: 'mochila-pinguim', caixa: 'costas', n: ['Mochilinha de pinguim', 'Penguin backpack', 'Mochilita de pingüino'], e: ['mochilinha de pinguim', 'penguin backpack', 'mochilita de pingüino'] },
+    // asinhas
+    { id: 'asas', caixa: 'asas', n: ['Asinhas de fada', 'Fairy wings', 'Alitas de hada'], e: ['asinhas de fada', 'fairy wings', 'alitas de hada'], facil: 1 },
     { id: 'varinha', caixa: 'mao', n: ['Varinha de estrela', 'Star wand', 'Varita de estrella'], e: ['varinha', 'star wand', 'varita'], facil: 1 },
-    { id: 'bolsa-coracao', caixa: 'mao', n: ['Bolsinha de coração', 'Heart purse', 'Bolsito de corazón'], e: ['bolsinha de coração', 'heart purse', 'bolsito de corazón'] },
-    { id: 'bolsa-bicho', caixa: 'mao', n: ['Bolsa de gatinho', 'Kitty bag', 'Bolso de gatito'], e: ['bolsa de gatinho', 'kitty bag', 'bolso de gatito'] },
     { id: 'chaveiro', caixa: 'mao', n: ['Chaveirinho', 'Little keychain', 'Llaverito'], e: ['chaveirinho', 'little keychain', 'llaverito'] },
     { id: 'balao', caixa: 'mao', n: ['Balão de coração', 'Heart balloon', 'Globo de corazón'], e: ['balão', 'balloon', 'globo'], facil: 1 },
     { id: 'filhote', caixa: 'colo', n: ['Filhotinho no colo', 'Baby to cuddle', 'Bebé en brazos'], e: ['filhotinho no colo', 'a baby to cuddle', 'un bebé en brazos'], facil: 1 },
