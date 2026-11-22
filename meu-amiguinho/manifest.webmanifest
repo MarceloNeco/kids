@@ -1,0 +1,17 @@
+{
+  "name": "Meu Pequeno Amiguinho — Bolinho de Chuva",
+  "short_name": "Amiguinho",
+  "description": "Monte a sua pelúcia: bichinho, pelo, coraçãozinho, fofura, roupinha, acessórios, voz e nome, com certidão de nascimento. / My Little Buddy: build your own plush buddy. / Mi Pequeño Amiguito: arma tu propio peluche.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fdeef5",
+  "theme_color": "#fbe3ee",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

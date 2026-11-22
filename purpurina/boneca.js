@@ -5,6 +5,7 @@
      opcoes.fundo   false = sem cenário (padrão: true);  opcoes.soFundo = só o cenário
      opcoes.anim    true = glitter piscando (na tela); false = parado (foto e miniaturas)
      opcoes.largura / opcoes.altura  tamanho em pixels (foto)
+     opcoes.amigo   true = com o amiguinho de outro jogo na mão (amigos.js), quando a criança escolheu um
    Coordenadas da personagem: 400 de largura por 720 de altura; cabeça em (200, 205). */
 (function (raiz) {
   'use strict';
@@ -205,6 +206,8 @@
       out.push('<g clip-path="url(#' + I + 'brTopFixo)">' + topo + '</g><g clip-path="url(#' + I + 'brMeio)">' + depoisTop + '</g>');
       out.push('<g class="pp-braco-e">' + lado('brE', 'brEtop') + '</g>', '<g class="pp-braco-d">' + lado('brD', 'brDtop') + '</g>');
     }
+    // amiguinho de outro jogo segurado pela mão direita (opcoes.amigo: palco e foto; amigos.js + ../personagens.js)
+    if (op.amigo && !angB && !semDireito && !op.passos && raiz.PurpurinaAmigos) { var amigo = raiz.PurpurinaAmigos.svg(); if (amigo) out.push(amigo, mao(282, 1, pele, peleE, esmalte)); }
     if (corpoCostas) out.push(asasF);
 
     // ---------- cabeça (tudo aqui dentro vai para o grupo aumentado) ----------

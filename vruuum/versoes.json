@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.37.0",
+      "data": "22/Nov/2026",
+      "hora": "16:29:18",
+      "pt": [
+        "🧸 Amigos dos outros jogos no volante! Na etapa do Piloto apareceu a fileira \"Amigos dos outros jogos\": os amiguinhos montados no Meu Pequeno Amiguinho e a personagem da Purpurina podem pilotar o veículo, com o rosto deles. O jogo lembra a escolha. Sem nenhum amigo ainda, a fileira mostra onde criar um."
+      ],
+      "en": [
+        "🧸 Friends from other games behind the wheel! In the Driver step there's a new row, \"Friends from other games\": the little friends made in My Little Buddy and the Purpurina character can drive, with their own faces. The game remembers your pick. No friends yet? The row shows where to make one."
+      ],
+      "es": [
+        "🧸 ¡Amigos de otros juegos al volante! En el paso del Piloto hay una fila nueva, \"Amigos de otros juegos\": los amiguitos creados en Mi Pequeño Amiguito y el personaje de Purpurina pueden conducir, con su propia cara. El juego recuerda tu elección. ¿Aún no tienes amigos? La fila te enseña dónde crear uno."
+      ]
+    },
+    {
       "versao": "1.36.0",
       "data": "21/Nov/2026",
       "hora": "18:05:04",

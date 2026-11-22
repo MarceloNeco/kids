@@ -2,7 +2,7 @@
    e o laço da corrida. As regras ficam em motor.js; o desenho em desenho.js; o som em som.js. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.36.0';
+  var APP_VERSION = '1.37.0';
   var $ = function (id) { return document.getElementById(id); };
   /* Página e código têm de ser da mesma versão. Com internet lenta, o aparelho pode juntar a página guardada de uma
      versão com o código de outra (a garagem perdia botões e o corpo escolhido não valia). Se acontecer, recarrega
@@ -34,9 +34,10 @@
   D.definirEstilo(pref.visual);
   delete pref.lingua;   // 1.17.0: o idioma não fica mais nas preferências do jogo; vem da estante (../idioma.js)
   if (!pref.carros || pref.carros.length !== 2) pref.carros = [{ cor: 0, piloto: 0 }, { cor: 2, piloto: 1 }];
-  var VE = window.VruuumVeiculos, SE = window.VruuumSelfie;
-  // a selfie do jogador k, se ele escolheu usar a foto (fica só neste aparelho: selfie.js)
-  function fotoDe(k) { return k >= 0 && pref.carros[k] && pref.carros[k].foto && SE ? SE.carregar(k) : null; }
+  var VE = window.VruuumVeiculos, SE = window.VruuumSelfie, AM = window.VruuumAmigos;
+  // a selfie do jogador k, se ele escolheu usar a foto (fica só neste aparelho: selfie.js); ou o rosto do amigo de outro
+  // jogo que ele escolheu (1.37.0, amigos.js + ../personagens.js)
+  function fotoDe(k) { var c = k >= 0 && pref.carros[k]; if (c && c.amigo && AM) return AM.foto(c.amigo); return c && c.foto && SE ? SE.carregar(k) : null; }
   pref.carros.forEach(function (c, k) { if (!VE.achar(c.veic)) c.veic = k ? 'gt' : 'classico'; if (c.corpo !== 'menino') c.corpo = 'menina'; });
   function salvar() { gravar('vruuum.pref', pref); }
 
@@ -289,21 +290,23 @@
         b.style.background = cor; b.setAttribute('data-cor', k); $('cores').appendChild(b);
       });
       D.PILOTOS.forEach(function (emo, k) {
-        var b = botao('bicho', emo, function () { pref.carros[editando].piloto = k; pref.carros[editando].foto = false; pref.carros[editando].personagem = null; salvar(); Som.tocar('buzina', editando); marcar(); });
+        var b = botao('bicho', emo, function () { pref.carros[editando].piloto = k; pref.carros[editando].foto = false; pref.carros[editando].personagem = null; pref.carros[editando].amigo = null; salvar(); Som.tocar('buzina', editando); marcar(); });
         b.textContent = emo; b.setAttribute('data-piloto', k); $('bichos').appendChild(b);
       });
       if (SE) {
         // a própria foto (aparece depois de tirar) e o botão de tirar/trocar a selfie
-        var bf = botao('bicho foto', ['Minha foto', 'My photo', 'Mi foto'], function () { pref.carros[editando].foto = true; pref.carros[editando].personagem = null; salvar(); Som.tocar('buzina', editando); marcar(); });
+        var bf = botao('bicho foto', ['Minha foto', 'My photo', 'Mi foto'], function () { pref.carros[editando].foto = true; pref.carros[editando].personagem = null; pref.carros[editando].amigo = null; salvar(); Som.tocar('buzina', editando); marcar(); });
         bf.id = 'btFoto'; var cvf = document.createElement('canvas'); cvf.width = cvf.height = 76; bf.appendChild(cvf); $('bichos').appendChild(bf);
         var bc = botao('bicho camera', ['Tirar selfie', 'Take a selfie', 'Hacerte un selfie'], abrirSelfie); bc.textContent = '📸'; $('bichos').appendChild(bc);
       }
       if (PE) PE.LISTA.forEach(function (p) {   // personagens de domínio público como piloto
-        var b = botao('bicho pers', p.nome, function () { var cc = pref.carros[editando]; cc.personagem = p.id; cc.foto = false; if (PE.corpoDe(p.id)) cc.corpo = PE.corpoDe(p.id); salvar(); Som.tocar('buzina', editando); marcar(); });
+        var b = botao('bicho pers', p.nome, function () { var cc = pref.carros[editando]; cc.personagem = p.id; cc.foto = false; cc.amigo = null; if (PE.corpoDe(p.id)) cc.corpo = PE.corpoDe(p.id); salvar(); Som.tocar('buzina', editando); marcar(); });
         b.setAttribute('data-personagem', p.id); b.title = tn(p.nome);
         var cv = document.createElement('canvas'); cv.width = cv.height = 80; p.frente(cv.getContext('2d'), 40, 46, 26); b.appendChild(cv);
         $('bichos').appendChild(b);
       });
+      // 1.37.0 (dono): amigos dos outros jogos (Meu Pequeno Amiguinho, Purpurina...) como piloto, com o rosto deles
+      if (AM) AM.iniciar($('amigos'), { escolher: function (id) { var cc = pref.carros[editando]; cc.amigo = id; cc.foto = false; cc.personagem = null; salvar(); Som.tocar('buzina', editando); marcar(); }, mudou: function () { if (montado) marcar(); } });
       // cenários (1.24.0, dono): fileira de fotinhos com o nome embaixo, para arrastar com o dedo; a ordem é sorteada
       // cada vez que o jogo abre (🎲 Surpresa sempre no começo). Toque para escolher (até 4, na ordem do toque).
       var ordemM = window.VruuumPista.MUNDOS.slice();
@@ -417,6 +420,7 @@
 
   function nomePiloto(k) {
     var c = pref.carros[k], p = c.personagem && PE ? PE.achar(c.personagem) : null;
+    if (c.amigo && AM && AM.existe(c.amigo)) return AM.nome(c.amigo) || '🧸';
     return p ? tn(p.nome) : (c.foto && fotoDe(k) ? '📸' : D.PILOTOS[c.piloto]);
   }
   function barra(v) { return Math.max(25, Math.min(100, 30 + (v - 0.92) / 0.2 * 70)) + '%'; }
@@ -434,6 +438,7 @@
     });
     if (editando >= pref.jogadores) editando = 0;
     var c = pref.carros[editando], v = VE.achar(c.veic);
+    if (AM) { pref.carros.forEach(function (cc) { if (cc.amigo && !AM.existe(cc.amigo)) { cc.amigo = null; salvar(); } }); AM.marcar(c.amigo); }   // o amigo foi apagado no outro jogo
     $('abas').hidden = pref.jogadores < 2;
     Array.prototype.forEach.call(document.querySelectorAll('[data-aba]'), function (b) {
       var k = +b.getAttribute('data-aba'); b.setAttribute('aria-selected', String(k === editando));
@@ -446,7 +451,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-cor]'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-cor') === c.cor)); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-corpo]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-corpo') === c.corpo)); });
     $('btCorrer').textContent = pref.jogadores === 2 ? t('🏁 Correr! · 2 jogadores', '🏁 Race! · 2 players', '🏁 ¡A correr! · 2 jugadores') : t('🏁 Correr!', '🏁 Race!', '🏁 ¡A correr!');
-    Array.prototype.forEach.call(document.querySelectorAll('[data-piloto]'), function (b) { b.setAttribute('aria-pressed', String(!c.foto && !c.personagem && +b.getAttribute('data-piloto') === c.piloto)); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-piloto]'), function (b) { b.setAttribute('aria-pressed', String(!c.foto && !c.personagem && !c.amigo && +b.getAttribute('data-piloto') === c.piloto)); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-personagem]'), function (b) { b.setAttribute('aria-pressed', String(c.personagem === b.getAttribute('data-personagem'))); });
     var bf = $('btFoto'), fot = SE && SE.carregar(editando);
     if (bf) {
@@ -454,7 +459,7 @@
       if (fot) { var desenhaFoto = function () { var x = bf.querySelector('canvas').getContext('2d'); x.clearRect(0, 0, 76, 76); x.save(); x.beginPath(); x.arc(38, 38, 37, 0, Math.PI * 2); x.clip(); x.drawImage(fot.img, 0, 0, 76, 76); x.restore(); }; if (fot.img.complete) desenhaFoto(); else fot.img.onload = function () { desenhaFoto(); marcar(); }; }
     }
     if (c.foto && !fot) c.foto = false;
-    $('nomeVeic').textContent = (pref.jogadores === 2 || (c.personagem && !v.semPiloto) ? nomePiloto(editando) + ' · ' : '') + tn(v.nome) + (v.bruxa ? t(' · voa e desce 🧹', ' · flies and lands 🧹', ' · vuela y baja 🧹') : VE.voa(v.id) ? t(' · voa no céu ✈️', ' · flies in the sky ✈️', ' · vuela por el cielo ✈️') : '');
+    $('nomeVeic').textContent = (pref.jogadores === 2 || ((c.personagem || (c.amigo && AM && AM.existe(c.amigo))) && !v.semPiloto) ? nomePiloto(editando) + ' · ' : '') + tn(v.nome) + (v.bruxa ? t(' · voa e desce 🧹', ' · flies and lands 🧹', ' · vuela y baja 🧹') : VE.voa(v.id) ? t(' · voa no céu ✈️', ' · flies in the sky ✈️', ' · vuela por el cielo ✈️') : '');
     $('barraVel').style.width = barra(v.vel); $('barraCurva').style.width = barra(v.curva);
     var dica = $('dicaTecla'); dica.hidden = TOQUE || pref.jogadores < 2;
     dica.textContent = editando ? t('Teclado: setas e ⬆', 'Keyboard: arrows and ⬆', 'Teclado: flechas y ⬆') : t('Teclado: A, D e W', 'Keyboard: A, D and W', 'Teclado: A, D y W');

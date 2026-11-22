@@ -27,6 +27,7 @@ const JOGOS = {
   jogoteca: [[], '#btJogar'],
   'fruta-podre': [[], '#btJogar'],
   tijolaco: [[], '#btJogar'],
+  'meu-amiguinho': [[], '#btCriar'],
   'a-garra': [[], '#btJogar'],
   labirinto: [[], '#btJogar'],
   cozinha: [['#btEntrar'], '#btCozinhar'],

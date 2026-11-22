@@ -128,6 +128,7 @@ no código, `t(pt, en, es)`; peças e desafios com `pt`, `en` e `es` no `pecas.j
 | `pecas.js` | **só dados**: paletas, abas, categorias, opções (com `tags`), áreas de zoom (`ZOOM`, e `zoom` em cada parte), padrão e os desafios. Peça nova entra aqui. |
 | `visual.js` | **puro**: regras (vestido × blusa/saia/calça, nunca sem roupa), surpresa, desfazer, limpar look antigo, dicas e estrelas. |
 | `boneca.js` | o desenho em SVG da personagem (com giro contínuo: `opcoes.angulo` em graus — a cabeça é feita de volumes 3D (`VOLUMES`, `NARIZ_V`, `LABIOS_V`; `contorno` = união das elipses projetadas), `cabecaVirada`, `torcer`; `opcoes.olhar`, `sorriso` e `tchau` no desfile), das roupas, acessórios e dos 8 cenários (tudo em código). Peça nova = um `case` aqui. |
+| `amigos.js` | personagens que viajam entre os jogos (0.25.0; peça comum `../personagens.js`): exporta a personagem do Brincar livre ("Purpurina 80's", ex.: pilota no Vruuum!) e traz o 🧸 Amiguinho (aba Acessórios) do Meu Pequeno Amiguinho, de mãos dadas com ela no palco e na foto (`opcoes.amigo` no `boneca.js`). |
 | `som.js` | a rádio (gravadas; no arquivo baixado, as feitas pelo jogo) e os efeitos sintetizados (WebAudio). |
 | `musicas/` | as 21 músicas gravadas (MP3, CC BY 4.0) e `LICENCAS.md`. |
 | `sala.js` | canal TV ↔ celular (Supabase Realtime; `BroadcastChannel` com `?teste`); confere toda mensagem que chega. |

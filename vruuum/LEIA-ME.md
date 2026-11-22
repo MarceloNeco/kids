@@ -193,6 +193,7 @@ No arquivo baixado (📲 Guardar no celular) tocam só as feitas pelo jogo, para
 | `movimento.js` | **puro**: acelerômetro → direção do volante e pulo pelo toquinho (com calibração no 3‑2‑1), testado no Node. |
 | `cabeca.js` | o piloto animado (de costas, vira em 3D como uma bola e sorri; bichinho, selfie ou personagem), testado no Node. |
 | `selfie.js` | a selfie: acha o rosto sem internet (MediaPipe + `rosto.tflite`), recorta e guarda só no aparelho. |
+| `amigos.js` | amigos dos outros jogos como piloto (1.37.0): fileira "Amigos dos outros jogos" na etapa do Piloto, com quem foi salvo na peça comum `../personagens.js` (Meu Pequeno Amiguinho, Purpurina); o retrato vira o rosto do piloto, pelo mesmo caminho da selfie. |
 | `baixar.js` | monta o `vruuum.html` de arquivo único (genérico: serve para outro jogo do Bolinho de Chuva; scripts com `data-fora-do-arquivo` ficam de fora). |
 | `sw.js` | cache `vruuum-v…` para funcionar sem internet. `VERSAO` aqui. |
 | `versoes.json` | novidades de cada versão (PT e EN). |
