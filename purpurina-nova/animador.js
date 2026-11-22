@@ -10,7 +10,7 @@
   // o = abrir o braço para fora, c = dobrar o cotovelo para dentro (graus), f = braço de cima vindo para a frente (1 = não)
   // cab = inclinar a cabeça, olho = para onde os olhos vão (-1 esquerda … 1 direita), base = como estão as pernas
   var POSES = {
-    relax: { oE: 6, cE: 8, oD: 6, cD: 8, cab: 0, olho: 0, base: 'reta' },
+    relax: { oE: 4, cE: 2, oD: 4, cD: 2, cab: 0, olho: 0, base: 'reta' },   // braços soltos ao lado do corpo, quase retos (dono, 22/Nov/2026: "levemente arqueados, não natural")
     cintura: { oE: 8, cE: 14, oD: 40, cD: 105, cab: -5, olho: 0.4, base: 'gingaD' },
     duasCintura: { oE: 40, cE: 105, oD: 40, cD: 105, cab: 4, olho: 0, base: 'aberta' },
     cabeca: { oE: 150, cE: -110, oD: 40, cD: 105, cab: 5, olho: -0.3, base: 'gingaD' },
@@ -246,7 +246,7 @@
         v.esy = syP; v.dsy = syP; v.ey = 0; v.dy = 0; v.er = 4 * ag - 3 * enc; v.dr = -4 * ag + 3 * enc; v.q = 0;   // agachada: joelhos abrem um pouco
         v.pulo = 23 * ag - 48 * alto; v.noAr = alto;   // agachado o corpo desce o mesmo tanto que a perna encolhe (pés no chão)
         var braco = Math.max(0, bra), atras = Math.max(0, -bra);
-        v.oE = 22 + 128 * braco - 8 * atras; v.oD = v.oE; v.cE = 12 - 30 * braco + 18 * atras; v.cD = v.cE; v.fE = 1; v.fD = 1;
+        v.oE = 14 + 136 * braco; v.oD = v.oE; v.cE = 4 - 22 * braco; v.cD = v.cE; v.fE = 1; v.fD = 1;   // braços retos para trás na agachada, sobem no ar
         v.cab = 0;
       } else if (modo === 'dancar') {
         var B2 = op.batida || 500, g = ((t - modoIni) / B2) % 2, lado = g < 1 ? 1 : -1, w = g % 1, bat = Math.sin(Math.PI * w);

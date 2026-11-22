@@ -3,7 +3,7 @@
 Guardado a pedido do dono em 22/Nov/2026: "a ideia é ter um funcionamento minimamente decente antes de eu ter os
 créditos do Higgsfield recarregados". Reúne as especificações que ele trouxe (geradas no Gemini, 21–22/Nov/2026) e o
 estado real de cada item no jogo, com o porquê das decisões. **Leia antes de mexer no movimento, no desfile, na
-Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.12**.
+Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.13**.
 
 Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌ não feito, com o motivo.
 
@@ -16,7 +16,7 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Árvore completa quadril → coluna → pescoço / coxa → joelho → tornozelo | 🟡 | Sem joelho e tornozelo separados: seria preciso redesenhar todas as calças, saias e sapatos em pedaços. O joelho "dobra" encolhendo a perna e levantando o pé (`perna()` no `animador.js`) |
 | Cintura sem degrau entre blusa e calça | ✅ | O corpo inteiro se curva em duas faixas que se encontram na linha do quadril (`.pp-rebola`, `.pp-banda-*`; 0.9.4) |
 | Contorno fino 25% mais escuro, nunca preto; degradê de volume | ✅ | `esc(cor, …)` nos traços; gradientes `vol` e `lado` |
-| 8,5 cabeças de altura | ❌ | O dono pediu "tamanhos normais" e antes reclamou da adulta "muito esticada". Hoje: adulta com 6,8 cabeças, pernas com quase metade da altura, pescoço, braços e pernas na grossura medida de gente de verdade (0.9.5) |
+| 8,5 cabeças de altura | ❌ | O dono pediu "tamanhos normais" e antes reclamou da adulta "muito esticada". Hoje: adulta com 6,8 cabeças, pescoço, braços e pernas na grossura medida de gente de verdade (0.9.5). Em 0.9.13 (dono: "pernas um pouco compridas", "pescoço muito comprido", "braços arqueados"): quadril 3,0 e ombro 1,2 (adulta), braço do mesmo tamanho e rente ao corpo (`ENCURTA` 0,79, pulso base 124/276), pose solta quase reta (`relax` 4/2) |
 
 ## 2. Camadas (o que fica na frente)
 
