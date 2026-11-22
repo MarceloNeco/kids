@@ -1485,16 +1485,70 @@
     for (var i = 0; i < 7; i++) { var an = rad(200 + i * 22), bx = x + Math.cos(an) * 19, by = yy + Math.sin(an) * 6 + 6; s += circ(bx, by, id === 'pulseira-strass' ? 3 : 3.6, { fill: cs[i % cs.length], stroke: id === 'pulseira-strass' ? '#8aa0c0' : escuro(cs[i % cs.length], 0.3), 'stroke-width': 0.8 }) + (id === 'pulseira-strass' ? circ(bx - 0.8, by - 0.8, 1, { fill: '#ffffff' }) : ''); }
     return s;
   }
-  /* ---------- asinhas (atrás de tudo) ---------- */
-  function asasAcess(c, a, g, id, cor) {
+  /* ---------- asinhas e capinhas (atrás de tudo; o fecho da capinha vai na frente) ---------- */
+  function capinha(c, g, id, cor, frente) {
+    var q = g.corpo === 'q', s = '', natal = id === 'capinha-natal', cc = natal ? '#e5404f' : cor, ce = escuro(cc, 0.38);
+    var fecho = function (fx, fy) { return natal ? circ(fx - 6, fy, 5.4, { fill: '#fbf8f4', stroke: '#d8d0c4', 'stroke-width': 1 }) + circ(fx + 6, fy, 5.4, { fill: '#fbf8f4', stroke: '#d8d0c4', 'stroke-width': 1 }) : p(estrelaD(fx, fy, 8, 3.6), { fill: '#ffd447', stroke: '#c9962a', 'stroke-width': 1.2, 'stroke-linejoin': 'round' }); };
+    if (q) {
+      if (!frente) return '';
+      var b = g.b, d = 'M' + n(b.x - 56) + ',' + n(b.y - b.ry + 12) + ' Q' + n(b.x - 4) + ',' + n(b.y - b.ry - 12) + ' ' + n(b.x + 62) + ',' + n(b.y - b.ry + 16) + ' Q' + n(b.x + 78) + ',' + n(b.y - 6) + ' ' + n(b.x + 70) + ',' + n(b.y + 12) + ' Q' + n(b.x + 10) + ',' + n(b.y + 24) + ' ' + n(b.x - 44) + ',' + n(b.y + 6) + ' Q' + n(b.x - 62) + ',' + n(b.y - 16) + ' ' + n(b.x - 56) + ',' + n(b.y - b.ry + 12) + 'Z';
+      s += p(d, { fill: cc, stroke: ce, 'stroke-width': 2 }) + p('M' + n(b.x - 30) + ',' + n(b.y - b.ry + 6) + ' Q' + n(b.x - 10) + ',' + n(b.y - 10) + ' ' + n(b.x - 16) + ',' + n(b.y + 14) + ' M' + n(b.x + 20) + ',' + n(b.y - b.ry + 2) + ' Q' + n(b.x + 34) + ',' + n(b.y - 10) + ' ' + n(b.x + 30) + ',' + n(b.y + 18), { stroke: ce, 'stroke-width': 1.2, fill: 'none', opacity: 0.5 });
+      if (natal) s += p('M' + n(b.x - 44) + ',' + n(b.y + 6) + ' Q' + n(b.x + 10) + ',' + n(b.y + 24) + ' ' + n(b.x + 70) + ',' + n(b.y + 12), { stroke: '#fbf8f4', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+      return s + fecho(b.x - 50, b.y - b.ry + 16);
+    }
+    var t = g.t;
+    if (frente) {   // golinha e fecho no pescoço
+      s += p('M' + n(150 - t.wt + 2) + ',' + n(t.y0 + 4) + ' Q150,' + n(t.y0 + 18) + ' ' + n(150 + t.wt - 2) + ',' + n(t.y0 + 4), { stroke: natal ? '#fbf8f4' : cc, 'stroke-width': natal ? 9 : 6, fill: 'none', 'stroke-linecap': 'round' });
+      return s + fecho(150, t.y0 + 12);
+    }
+    var dc = 'M' + n(150 - t.wt - 10) + ',' + n(t.y0) + ' Q' + n(150 - t.wb - 40) + ',' + n(t.y1) + ' ' + n(150 - t.wb - 30) + ',' + n(t.y1 + 26) + ' L' + n(150 + t.wb + 30) + ',' + n(t.y1 + 26) + ' Q' + n(150 + t.wb + 40) + ',' + n(t.y1) + ' ' + n(150 + t.wt + 10) + ',' + n(t.y0) + 'Z';
+    s += p(dc, { fill: escuro(cc, 0.1), stroke: ce, 'stroke-width': 2 });
+    if (natal) s += lin(150 - t.wb - 30, t.y1 + 24, 150 + t.wb + 30, t.y1 + 24, { stroke: '#fbf8f4', 'stroke-width': 10, 'stroke-linecap': 'round' });
+    return s;
+  }
+  function asasAcess(c, a, g, id, cor, frente, S) {
     var q = g.corpo === 'q', s = '';
-    var x = q ? g.costas[0] : 150, y = q ? g.costas[1] - 10 : g.t.y0 + 30, gw = c.lin([['#e8f4ff', 0.9], ['#f8d8f4', 0.85], ['#d8f0e8', 0.85]], 0, 0, 1, 1);
-    [-1, 1].forEach(function (k) {
-      if (q && k < 0) return;
-      var dx = q ? -6 : 0;
-      s += p('M' + n(x + dx) + ',' + n(y) + ' C' + n(x + k * 40) + ',' + n(y - 70) + ' ' + n(x + k * 98) + ',' + n(y - 60) + ' ' + n(x + k * 86) + ',' + n(y - 14) + ' C' + n(x + k * 80) + ',' + n(y + 8) + ' ' + n(x + k * 40) + ',' + n(y + 8) + ' ' + n(x + dx) + ',' + n(y) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
-      s += p('M' + n(x + dx) + ',' + n(y + 6) + ' C' + n(x + k * 40) + ',' + n(y + 20) + ' ' + n(x + k * 70) + ',' + n(y + 44) + ' ' + n(x + k * 52) + ',' + n(y + 58) + ' C' + n(x + k * 34) + ',' + n(y + 64) + ' ' + n(x + k * 14) + ',' + n(y + 34) + ' ' + n(x + dx) + ',' + n(y + 6) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
-      s += brilhos(x + k * 60, y - 26, 20, 16, 4);
+    if (id === 'capinha' || id === 'capinha-natal') return S && (S.capa || S.heroi) ? '' : capinha(c, g, id, cor, frente);
+    if (frente) return '';
+    var x = q ? g.costas[0] : 150, y = q ? g.costas[1] - (id === 'asas' ? 10 : 0) : g.t.y0 + 30, gw = c.lin([['#e8f4ff', 0.9], ['#f8d8f4', 0.85], ['#d8f0e8', 0.85]], 0, 0, 1, 1);
+    var E = q ? 0.82 : 1;
+    [-1, 1].forEach(function (k0) {
+      if (q && k0 < 0) return;
+      var dx = q ? -6 : 0, k = k0 * E, X = function (v) { return n(x + dx + k * v); }, Y = function (v) { return n(y + v * E); };
+      if (id === 'asas') {
+        k = k0;
+        s += p('M' + n(x + dx) + ',' + n(y) + ' C' + n(x + k * 40) + ',' + n(y - 70) + ' ' + n(x + k * 98) + ',' + n(y - 60) + ' ' + n(x + k * 86) + ',' + n(y - 14) + ' C' + n(x + k * 80) + ',' + n(y + 8) + ' ' + n(x + k * 40) + ',' + n(y + 8) + ' ' + n(x + dx) + ',' + n(y) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
+        s += p('M' + n(x + dx) + ',' + n(y + 6) + ' C' + n(x + k * 40) + ',' + n(y + 20) + ' ' + n(x + k * 70) + ',' + n(y + 44) + ' ' + n(x + k * 52) + ',' + n(y + 58) + ' C' + n(x + k * 34) + ',' + n(y + 64) + ' ' + n(x + k * 14) + ',' + n(y + 34) + ' ' + n(x + dx) + ',' + n(y + 6) + 'Z', { fill: gw, stroke: '#b8a8d8', 'stroke-width': 1.6 });
+        s += brilhos(x + k * 60, y - 26, 20, 16, 4);
+        return;
+      }
+      if (id === 'asas-borboleta') {
+        var gb = c.lin([claro(cor, 0.55), cor, escuro(cor, 0.12)], 0, 0, 1, 1), cbd = escuro(cor, 0.45);
+        s += p('M' + X(0) + ',' + Y(0) + ' C' + X(28) + ',' + Y(-84) + ' ' + X(112) + ',' + Y(-82) + ' ' + X(104) + ',' + Y(-24) + ' C' + X(100) + ',' + Y(0) + ' ' + X(44) + ',' + Y(4) + ' ' + X(0) + ',' + Y(0) + 'Z', { fill: gb, stroke: cbd, 'stroke-width': 2.2 });
+        s += p('M' + X(0) + ',' + Y(4) + ' C' + X(50) + ',' + Y(10) + ' ' + X(86) + ',' + Y(42) + ' ' + X(62) + ',' + Y(62) + ' C' + X(38) + ',' + Y(76) + ' ' + X(12) + ',' + Y(36) + ' ' + X(0) + ',' + Y(4) + 'Z', { fill: gb, stroke: cbd, 'stroke-width': 2.2 });
+        s += circ(+X(70), +Y(-42), 13 * E, { fill: claro(cor, 0.7), opacity: 0.85 }) + circ(+X(70), +Y(-42), 6 * E, { fill: cbd, opacity: 0.6 }) + circ(+X(44), +Y(-26), 6 * E, { fill: '#ffffff', opacity: 0.7 }) + circ(+X(46), +Y(38), 8 * E, { fill: claro(cor, 0.7), opacity: 0.85 });
+        [[96, -40], [100, -26], [86, -66], [60, 58], [70, 48]].forEach(function (pt) { s += circ(+X(pt[0]), +Y(pt[1]), 2.4 * E, { fill: '#ffffff' }); });
+        return;
+      }
+      if (id === 'asas-anjo') {
+        var da = 'M' + X(0) + ',' + Y(0) + ' C' + X(30) + ',' + Y(-52) + ' ' + X(82) + ',' + Y(-70) + ' ' + X(106) + ',' + Y(-54) + ' Q' + X(106) + ',' + Y(-34) + ' ' + X(94) + ',' + Y(-30) + ' Q' + X(96) + ',' + Y(-10) + ' ' + X(80) + ',' + Y(-8) + ' Q' + X(80) + ',' + Y(12) + ' ' + X(62) + ',' + Y(10) + ' Q' + X(58) + ',' + Y(28) + ' ' + X(40) + ',' + Y(22) + ' Q' + X(30) + ',' + Y(32) + ' ' + X(0) + ',' + Y(12) + 'Z';
+        s += p(da, { fill: c.lin(['#ffffff', '#eef2fa', '#dde4f2'], 0, 0, 1, 1), stroke: '#a8b4cc', 'stroke-width': 1.8, 'stroke-linejoin': 'round' });
+        s += p('M' + X(14) + ',' + Y(-4) + ' Q' + X(50) + ',' + Y(-36) + ' ' + X(92) + ',' + Y(-46) + ' M' + X(14) + ',' + Y(6) + ' Q' + X(46) + ',' + Y(-10) + ' ' + X(80) + ',' + Y(-22) + ' M' + X(14) + ',' + Y(12) + ' Q' + X(36) + ',' + Y(10) + ' ' + X(60) + ',' + Y(2), { stroke: '#c6cee0', 'stroke-width': 1.4, fill: 'none', 'stroke-linecap': 'round' });
+        return;
+      }
+      if (id === 'asas-morcego') {
+        var dm = 'M' + X(0) + ',' + Y(0) + ' C' + X(22) + ',' + Y(-40) + ' ' + X(62) + ',' + Y(-58) + ' ' + X(100) + ',' + Y(-46) + ' Q' + X(80) + ',' + Y(-30) + ' ' + X(76) + ',' + Y(-4) + ' Q' + X(60) + ',' + Y(-14) + ' ' + X(48) + ',' + Y(6) + ' Q' + X(34) + ',' + Y(-4) + ' ' + X(22) + ',' + Y(14) + ' L' + X(0) + ',' + Y(8) + 'Z';
+        s += p(dm, { fill: cor, stroke: escuro(cor, 0.45), 'stroke-width': 2, 'stroke-linejoin': 'round' });
+        s += p('M' + X(4) + ',' + Y(2) + ' L' + X(96) + ',' + Y(-44) + ' M' + X(4) + ',' + Y(4) + ' L' + X(76) + ',' + Y(-6) + ' M' + X(4) + ',' + Y(6) + ' L' + X(48) + ',' + Y(4), { stroke: claro(cor, 0.35), 'stroke-width': 1.8, 'stroke-linecap': 'round', opacity: 0.8 });
+        s += p(coracaoD(+X(46), +Y(-24), 5 * E), { fill: claro(cor, 0.5), opacity: 0.9 });
+        return;
+      }
+      if (id === 'asas-arco-iris') {
+        ['#f9707f', '#ffb04d', '#ffe45c', '#6fd68a', '#5fb0f0', '#b07be6'].forEach(function (cc, i) {
+          var ang = (q ? -74 : -52) + i * 16, L = (q ? 96 - i * 7 : 112 - i * 6) * E, rr = rad(ang), x0 = x + dx + (q ? 0 : k0 * 26), cx0 = x0 + k0 * Math.cos(rr) * L / 2, cy0 = y + Math.sin(rr) * L / 2, giro = k0 > 0 ? ang : 180 - ang;
+          s += elip(cx0, cy0, L / 2, 10 * E, { fill: cc, stroke: escuro(cc, 0.3), 'stroke-width': 1.4, transform: 'rotate(' + n(giro) + ' ' + n(cx0) + ' ' + n(cy0) + ')' }) + lin(x0, y, x0 + k0 * Math.cos(rr) * L * 0.9, y + Math.sin(rr) * L * 0.9, { stroke: claro(cc, 0.5), 'stroke-width': 1, opacity: 0.8 });
+        });
+      }
     });
     return s;
   }
@@ -1810,7 +1864,7 @@
     if (e.chao === 'skate') s += skate(g, corA('skate'));
     var corpo = '';
     if (e.apoio === 'cadeira') corpo += cadeira(g, false);
-    if (e.asas) corpo += asasAcess(c, a, g, e.asas, corA(e.asas));
+    if (e.asas) corpo += asasAcess(c, a, g, e.asas, corA(e.asas), false, S);
     if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'tras');
     if (S && S.capa && !q) corpo += p('M' + n(150 - g.t.wt - 10) + ',' + n(g.t.y0) + ' Q' + n(150 - g.t.wb - 40) + ',' + n(g.t.y1) + ' ' + n(150 - g.t.wb - 30) + ',' + n(g.t.y1 + 26) + ' L' + n(150 + g.t.wb + 30) + ',' + n(g.t.y1 + 26) + ' Q' + n(150 + g.t.wb + 40) + ',' + n(g.t.y1) + ' ' + n(150 + g.t.wt + 10) + ',' + n(g.t.y0) + 'Z', { fill: escuro(S.capa.cor, 0.12), stroke: escuro(S.capa.cor, 0.35), 'stroke-width': 2 });
     if (S && S.heroi) corpo += capaHeroi(g, S.heroi);
@@ -1828,6 +1882,7 @@
       // pescocinho de pelúcia atrás do corpo e da cabeça: liga os dois (girafa e pescoçudo têm o pescoço comprido deles)
       if (!g.pescocoLongo) corpo += capsula(g.cab.x + 16, g.cab.y + g.cab.ry * 0.45, g.b.x - g.b.rx * 0.5, g.b.y - g.b.ry * 0.25, 30, T.f, T.s);
       corpo += corpoQ(c, a, g, T, roupaCorpo, patas);
+      if (e.asas) corpo += asasAcess(c, a, g, e.asas, corA(e.asas), true, S);
       if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'frente');
       if (e.colo) corpo += miniPelucia(c, a, g, e.colo);
       if (e.apoio === 'cadeira') corpo += cadeira(g, true);
@@ -1837,6 +1892,7 @@
       if (S) corpo += roupaPeCorpo(c, a, g, S);
       if (e.pes) for (var i = 0; i < 2; i++) corpo += sapato(c, e.pes, corA(e.pes), g.pe[i][0], g.pe[i][1], g, g.sentado, i);
       if (e.abraco === 'abracadinho-perna') corpo += abracadinho(c, a, g, e.abraco);
+      if (e.asas) corpo += asasAcess(c, a, g, e.asas, corA(e.asas), true, S);
       if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'frente');
       if (e.colo && !g.pendurada) corpo += miniPelucia(c, a, g, e.colo);
       var bracos = '';

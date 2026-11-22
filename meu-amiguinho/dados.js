@@ -74,7 +74,9 @@
     capacete: ['rosa-choque', 'azul', 'lima', 'roxo', 'preto', 'marinho', 'rosa', 'prata'],
     fones: ['prata', 'dourado', 'holo', 'rosa', 'lilas'],
     perolas: ['branco', 'rosa', 'lilas', 'dourado', 'azul-bebe'],
-    medalha: ['dourado', 'prata', 'rosa']
+    medalha: ['dourado', 'prata', 'rosa'],
+    asas: ['rosa', 'lilas', 'azul-bebe', 'turquesa', 'menta', 'amarelo', 'laranja', 'roxo', 'azul'],
+    morcego: ['roxo', 'lilas', 'preto', 'rosa', 'marinho']
   };
 
   // ---------- pelo (cores lisas e degradês tie-dye pastel) ----------
@@ -284,7 +286,7 @@
     { id: 'pescoco', ico: '📿', n: ['Colares', 'Necklaces', 'Collares'] },
     { id: 'pulso', ico: '💎', n: ['Pulseiras', 'Bracelets', 'Pulseras'] },
     { id: 'costas', ico: '👜', n: ['Bolsas e mochilas', 'Bags & backpacks', 'Bolsos y mochilas'] },
-    { id: 'asas', ico: '🧚', n: ['Asinhas', 'Little wings', 'Alitas'] },
+    { id: 'asas', ico: '🧚', n: ['Asinhas e capinhas', 'Wings & capes', 'Alitas y capas'] },
     { id: 'mao', ico: '🪄', n: ['Na mãozinha', 'In the paw', 'En la manita'] },
     { id: 'colo', ico: '🧸', n: ['Filhotinho', 'Little baby', 'Bebé'] },
     { id: 'abraco', ico: '🦄', n: ['Abraçadinho', 'Cuddle buddy', 'Abrazadito'] },
@@ -395,6 +397,12 @@
     { id: 'mochila-pinguim', caixa: 'costas', n: ['Mochilinha de pinguim', 'Penguin backpack', 'Mochilita de pingüino'], e: ['mochilinha de pinguim', 'penguin backpack', 'mochilita de pingüino'] },
     // asinhas
     { id: 'asas', caixa: 'asas', n: ['Asinhas de fada', 'Fairy wings', 'Alitas de hada'], e: ['asinhas de fada', 'fairy wings', 'alitas de hada'], facil: 1 },
+    { id: 'asas-borboleta', caixa: 'asas', n: ['Asas de borboleta', 'Butterfly wings', 'Alas de mariposa'], e: ['asas de borboleta', 'butterfly wings', 'alas de mariposa'], paleta: 'asas', cor: 'lilas', facil: 1 },
+    { id: 'asas-anjo', caixa: 'asas', n: ['Asinhas de anjinho', 'Little angel wings', 'Alitas de angelito'], e: ['asinhas de anjinho', 'little angel wings', 'alitas de angelito'], facil: 1 },
+    { id: 'asas-morcego', caixa: 'asas', n: ['Asinhas de morcego fofo', 'Cute bat wings', 'Alitas de murciélago'], e: ['asinhas de morcego', 'cute bat wings', 'alitas de murciélago'], paleta: 'morcego', cor: 'roxo' },
+    { id: 'asas-arco-iris', caixa: 'asas', n: ['Asas de arco-íris', 'Rainbow wings', 'Alas de arcoíris'], e: ['asas de arco-íris', 'rainbow wings', 'alas de arcoíris'] },
+    { id: 'capinha', caixa: 'asas', n: ['Capinha com estrela', 'Little star cape', 'Capita con estrella'], e: ['capinha', 'little cape', 'capita'], paleta: 'vivas', cor: 'amarelo' },
+    { id: 'capinha-natal', caixa: 'asas', n: ['Capinha de Natal', 'Christmas cape', 'Capita de Navidad'], e: ['capinha de Natal', 'Christmas cape', 'capita de Navidad'] },
     { id: 'varinha', caixa: 'mao', n: ['Varinha de estrela', 'Star wand', 'Varita de estrella'], e: ['varinha', 'star wand', 'varita'], facil: 1 },
     { id: 'chaveiro', caixa: 'mao', n: ['Chaveirinho', 'Little keychain', 'Llaverito'], e: ['chaveirinho', 'little keychain', 'llaverito'] },
     { id: 'balao', caixa: 'mao', n: ['Balão de coração', 'Heart balloon', 'Globo de corazón'], e: ['balão', 'balloon', 'globo'], facil: 1 },
