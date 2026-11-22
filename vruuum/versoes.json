@@ -2,6 +2,29 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.38.0",
+      "data": "22/Nov/2026",
+      "hora": "21:15:00",
+      "pt": [
+        "🚨 Polícia na garagem! Viatura de Polícia (com os carros) e Moto de Polícia (com as motos), as duas com a sirene azul e vermelha piscando o tempo todo, com flashes fortes: a viatura é um SUV arredondado, alto, com rodas grandes, faixa preta embaixo e a barra da sirene no teto; na moto, duas hastes altas atrás do baú. Escrito POLÍCIA na porta, atrás e nas malas da moto. A buzina delas é a sirene \"uó-uó\" (e ela toca na largada).",
+        "🚐 Van Verde de Passeio: a van alta e comprida, verde com faixas verde-limão, faixa cinza embaixo, o \"calombo\" do ar no teto e as lanternas vermelhas altas atrás. Pelas janelas, a família dá tchau!",
+        "🫧 Bolha Gigante (com as motos): a bola transparente enorme com a criança andando dentro, de braços abertos, como na rodinha do hamster. A bola rola de verdade!",
+        "🤡 Palhaço de Bicicleta (com as motos): pedala sem parar, com as pernas acompanhando os pedais e as rodas de raios girando. Peruca laranja, chapeuzinho, gola de babados, macacão de bolinhas e sapatões vermelhos. A buzina é o fon-fon de palhaço!"
+      ],
+      "en": [
+        "🚨 Police in the garage! A Police Car (with the cars) and a Police Motorbike (with the bikes), both with blue and red sirens flashing all the time, with bright strobes: the car is a rounded, tall SUV with big wheels, black trim at the bottom and the light bar on the roof; and two tall poles behind the bike's top box. POLICE written on the doors, on the back and on the bike's side cases. Their horn is the \"wee-woo\" siren (it also plays at the start).",
+        "🚐 Green Shuttle Van: a tall, long green van with lime stripes, a grey band at the bottom, the air-conditioning bump on the roof and tall red tail lights. The family waves at you through the windows!",
+        "🫧 Giant Bubble Ball (with the bikes): a huge see-through ball with a kid walking inside, arms out, like a hamster wheel. The ball really rolls!",
+        "🤡 Clown on a Bike (with the bikes): pedals nonstop, legs following the pedals and spoked wheels spinning. Orange curly wig, tiny hat, ruffled collar, polka-dot suit and big red shoes. The horn is a clown honk-honk!"
+      ],
+      "es": [
+        "🚨 ¡La policía llega al garaje! Coche de Policía (con los coches) y Moto de Policía (con las motos), los dos con la sirena azul y roja parpadeando todo el rato, con destellos fuertes: el coche es un SUV redondeado y alto, con ruedas grandes, franja negra abajo y la barra de la sirena en el techo; en la moto, dos mástiles altos detrás del baúl. Pone POLICÍA en las puertas, detrás y en las maletas de la moto. Su bocina es la sirena \"nino-nino\" (y suena en la salida).",
+        "🚐 Furgoneta Verde de Paseo: alta y larga, verde con rayas verde lima, una franja gris abajo, el bulto del aire acondicionado en el techo y los pilotos rojos altos detrás. ¡La familia te saluda por las ventanas!",
+        "🫧 Burbuja Gigante (con las motos): una bola transparente enorme con un niño caminando dentro, con los brazos abiertos, como en la rueda del hámster. ¡La bola rueda de verdad!",
+        "🤡 Payaso en Bici (con las motos): pedalea sin parar, con las piernas siguiendo los pedales y las ruedas de radios girando. Peluca naranja rizada, sombrerito, gorguera, mono de lunares y zapatones rojos. ¡La bocina es el mec-mec de payaso!"
+      ]
+    },
+    {
       "versao": "1.37.0",
       "data": "22/Nov/2026",
       "hora": "16:29:18",

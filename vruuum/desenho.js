@@ -1283,7 +1283,7 @@
     c.save();
     c.translate(g.cx, chao - lift);
     // avião inclina bem nas curvas; moto deita um pouco; carro quase nada
-    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'skate' || vv.id === 'patins') ? 0.22 : vv && vv.cavalo ? 0.04 : 0.07);
+    var inclina = voa ? 0.3 : (vv && (vv.id === 'moto' || vv.id === 'motopolicia' || vv.id === 'palhaco' || vv.id === 'skate' || vv.id === 'patins') ? 0.22 : vv && vv.cavalo ? 0.04 : 0.07);
     var derr = j.derrapa > 0 && !voa, nivD = derr ? M2().nivelDerrapa(j.derrapa) : 0;
     if (derr && !naAgua && !(vv && vv.cavalo)) { c.restore(); marcasPneu(c, g, h, cw, j.ladoDerrapa, lift); c.save(); c.translate(g.cx, chao - lift); }
     c.rotate(vs.lado * inclina + (derr ? j.ladoDerrapa * 0.14 : 0) + (j.rodando > 0 ? Math.sin(j.rodando * 22) * 0.25 : 0));

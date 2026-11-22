@@ -53,12 +53,12 @@ Endereço: https://solverone.com.br/kids/vruuum/ · também pelos cartões em
 
 - O veículo escolhido fica **sempre à vista**: em pé, preso no topo da tela enquanto as opções rolam; deitado, de um
   lado, com as opções do outro. O botão 🏁 Correr fica preso embaixo. Com 2 jogadores, abas Jogador 1 e Jogador 2.
-- **26 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
+- **37 veículos**, todos à mostra (desenhados em código no `veiculos.js`, vistos de trás, sem marca nem logotipo):
 
 | Grupo | Veículos |
 |---|---|
-| 🚗 Carros | Clássico, Conversível Rosa, GT Redondo (traseira redonda), Superesportivo (largo, aerofólio), Kart, Monstrão, Furgão de Surfe (degradê, prancha no teto), Ônibus Escolar (luzes piscando, placa de PARE), Caminhão de Pelúcias (máquina de pegar bichinho, pelúcias balançando e a garra passeando) |
-| 🏍️ Moto, skate e montarias | Dinossauro verde (o mesmo esqueleto 3D do cavalo, com espinhos roxos e rabo grosso), Cavalo (galopando, montado em 3D em `cavalo.js`: de costas na reta, de lado nas curvas; quem monta acompanha macio), Moto (deita nas curvas) e Skate (menino de costas, um pé no shape e o outro empurrando a rua; quanto mais rápido, mais rema; deslizando fica de lado, pé esquerdo na frente; os braços seguem a curva: o de dentro desce, o de fora sobe) |
+| 🚗 Carros | Clássico, Conversível Rosa, GT Redondo (traseira redonda), Superesportivo (largo, aerofólio), Kart, Monstrão, Furgão de Surfe (degradê, prancha no teto), Ônibus Escolar (luzes piscando, placa de PARE), Caminhão de Pelúcias (máquina de pegar bichinho, pelúcias balançando e a garra passeando), Viatura de Polícia (sirene azul e vermelha piscando), Van Verde de Passeio (família dando tchau) |
+| 🏍️ Moto, skate e montarias | Dinossauro verde (o mesmo esqueleto 3D do cavalo, com espinhos roxos e rabo grosso), Cavalo (galopando, montado em 3D em `cavalo.js`: de costas na reta, de lado nas curvas; quem monta acompanha macio), Moto (deita nas curvas) e Skate (menino de costas, um pé no shape e o outro empurrando a rua; quanto mais rápido, mais rema; deslizando fica de lado, pé esquerdo na frente; os braços seguem a curva: o de dentro desce, o de fora sobe), Moto de Polícia (sirene em duas hastes), Bolha Gigante (a criança anda dentro da bola transparente), Palhaço de Bicicleta (pedala sem parar) |
 | ✈️ No céu | Aviãozinho (hélice), Jato (fogo azul no turbo), Helicóptero (rotor girando), Trenó do Papai Noel (renas puxando, a do nariz vermelho na frente, e o Papai Noel junto), Arara Gigante (batendo as asas) |
 
 - Cada um tem um jeito (barrinhas de velocidade e curvas), com diferenças pequenas, de no máximo uns 10%.
@@ -465,3 +465,33 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
 - TV (`tvc` no `app.js`): 📺 Celulares como controle mostra o código; o 1º celular é o Jogador 1, o 2º o Jogador 2 (com
   dois, a tela dividida liga sozinha); celular sumido por 6 s libera a vaga. `lerEntradas()` soma a direção e o pulo.
 - Celular (`ctlc`, tela `#controle`): ◀ ▶ (segurar), ⬆ PULAR, 🏁 Começar a corrida, tela sempre acesa (Wake Lock).
+
+## 1.38.0 — 🚨 polícia, 🚐 van verde, 🫧 bolha gigante e 🤡 palhaço de bicicleta (dono, 22/Nov/2026)
+
+- Pedido: "carro e moto de polícia com sirene vermelha e azul piscando (...) tanto moto quanto carro", com prints de
+  referência; e "uma van da localiza verde, vai ser engraçado", com fotos da van.
+- `modelos3d.js`: `policia` — depois do dono ("realista, nada de caixa quadrada, formato parecido com um SUV compacto"),
+  um SUV alto e arredondado, sem marca: casco com faixa de plástico preto embaixo, portas e teto brancos, POLÍCIA nas
+  portas em `painelEmPartes` e atrás, cabine com vidro de trás deitado e colunas pretas, rack, aerofólio, lanternas finas
+  deitadas, rodas grandes e a barra de sirene no teto e `motopolicia` (branca, carenagem com
+  para-brisa, malas dos lados e baú com POLÍCIA, duas hastes altas atrás do baú com as luzes, para aparecerem dos lados
+  do piloto). Peças comuns: `policia()` (POLÍCIA / POLICE / POLICÍA pelo idioma da estante), `sirene(f, op)` (na corrida
+  segue o relógio `op.t`; nos quadros parados dos rivais, a fase: 8 quadros = uma volta, dois flashes azuis e dois
+  vermelhos; depois do dono, "tem que ter sirene piscando": sempre um lado aceso, nunca os dois juntos, com dois flashes
+  fortes em cada vez) e `luzSirene()` (bola acesa ou apagada + brilho).
+- `van`: van alta (tipo shuttle de aluguel de carros), verde com faixas verde-limão e seta branca, faixa cinza com
+  refletivos, "calombo" do ar no teto, lanternas altas, vidro de trás de verdade (o piloto no último banco aparece) e a
+  família dando tchau nas janelas. **Sem nome nem logotipo de empresa**, como todos os veículos da garagem.
+- `bolha` (pedido: "aquelas bolas gigantes transparentes que entra uma pessoa dentro e fica andando"): a bola é pintada em
+  duas camadas (o fundo, antes de tudo, e a frente com borda, costuras e brilho, depois de tudo), com a criança andando
+  dentro (pernas no passo dos quadros, braços abertos na parede). As costuras são círculos em volta do eixo x que giram
+  com o relógio: parece rolar para a frente.
+- `palhaco` (dono: "um palhacinho andando de bicicleta (...) pedalando sem parar, bem realista"): bicicleta de quadro fino
+  na cor escolhida, rodas de aro com raios girando para a frente, corrente, coroa e pedivelas; as pernas acham o joelho
+  sozinhas (duas partes de mesmo tamanho, do quadril ao pedal), então acompanham o pedal de verdade. Pedala pelo relógio
+  (nunca para). Macacão de duas cores com bolinhas, gola de babados, luvas, sapatões, peruca laranja, chapeuzinho, nariz.
+  Sem piloto (a cabeça é a dele); a buzina é o `fonfom` do `som.js`.
+- `veiculos.js`: 37 veículos; `voz: 'sirene'` nos dois da polícia. `som.js`: efeito `sirene` (uó-uó, feito no código;
+  é efeito, não música). `desenho.js`: a moto de polícia deita nas curvas como a moto.
+- Testes: `teste/policia.test.js` (garagem, nomes, sirene piscando nos quadros e no relógio, a bolha rolando, o palhaço pedalando).
+

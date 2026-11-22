@@ -272,6 +272,10 @@
     turboRival: function (t) { tom('sawtooth', 120, t, 0.4, 0.07, 500); },
     looping2: function (t) { tom('sine', 440, t, 0.2, 0.1); },
     torcida: function (t) { for (var k = 0; k < 5; k++) ruido(t + k * 0.35, 0.9, 0.12, 'bandpass', 900 + k * 120); [784, 988, 1175].forEach(function (f, k) { tom('triangle', f, t + 0.2 + k * 0.1, 0.3, 0.08); }); },
+    // 🚨 sirene da polícia (1.38.0): a buzina da viatura e da moto de polícia é o "uó-uó" subindo e descendo
+    sirene: function (t, k) { var b = k ? 0.94 : 1; for (var n = 0; n < 3; n++) { tom('triangle', 650 * b, t + n * 0.5, 0.25, 0.14, 1250 * b); tom('triangle', 1250 * b, t + n * 0.5 + 0.25, 0.25, 0.14, 650 * b); } },
+    // 🤡 buzina de palhaço (1.38.0): a pera de borracha, "fon-fon"
+    fonfom: function (t) { [0, 0.28].forEach(function (d) { tom('sawtooth', 330, t + d, 0.2, 0.12, 300); tom('square', 495, t + d, 0.2, 0.06, 450); }); },
     whoosh: function (t) { ruido(t, 0.7, 0.3, 'bandpass', 900); tom('sine', 300, t, 0.6, 0.1, 1200); }
   };
   // chiado do pneu (contínuo, um por jogador): força 0 a 1 (0 = quieto)
