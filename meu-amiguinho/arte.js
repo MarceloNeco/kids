@@ -1288,6 +1288,57 @@
   }
   function oculos(c, a, g, id, cor) {
     var y = g.olhoY + 1, dx = g.olhoDx, x = g.cab.x, r = g.olhoR + 7, s = '';
+    var arm = cor === HOLO ? metalico(c, cor) : cor, ce = escuro(cor, 0.35), cb = g.cab;
+    var ponte = function (yy, w) { return p('M' + n(x - dx + r * 0.8) + ',' + n(yy) + ' Q' + x + ',' + n(yy - 6) + ' ' + n(x + dx - r * 0.8) + ',' + n(yy), { stroke: arm, 'stroke-width': w || 3.5, fill: 'none', 'stroke-linecap': 'round' }); };
+    var reflexo = function (cx, w) { return p('M' + n(cx - r * 0.5) + ',' + n(y - r * 0.3) + ' l6,-4', { stroke: '#ffffff', 'stroke-width': w || 2, 'stroke-linecap': 'round', opacity: 0.8 }); };
+    if (id === 'oculos-gatinho') {
+      [-1, 1].forEach(function (k) {
+        var cx = x + k * dx, d = 'M' + n(cx - k * r * 0.85) + ',' + n(y - r * 0.45) + ' Q' + n(cx) + ',' + n(y - r * 0.75) + ' ' + n(cx + k * r * 1.2) + ',' + n(y - r * 1.05) + ' Q' + n(cx + k * r * 1.1) + ',' + n(y + r * 0.6) + ' ' + n(cx) + ',' + n(y + r * 0.8) + ' Q' + n(cx - k * r * 0.95) + ',' + n(y + r * 0.7) + ' ' + n(cx - k * r * 0.85) + ',' + n(y - r * 0.45) + 'Z';
+        s += p(d, { fill: '#e8f4ff', 'fill-opacity': 0.25, stroke: ce, 'stroke-width': 6, 'stroke-linejoin': 'round' }) + p(d, { fill: 'none', stroke: arm, 'stroke-width': 4, 'stroke-linejoin': 'round' }) + reflexo(cx) + circ(cx + k * r * 1.12, y - r * 0.95, 2.2, { fill: '#f4f8ff', stroke: '#9ab0c8', 'stroke-width': 0.6 });
+      });
+      return s + ponte(y - r * 0.45);
+    }
+    if (id === 'oculos-estrela') {
+      [-1, 1].forEach(function (k) { var cx = x + k * dx; s += p(estrelaD(cx, y + 1, r * 1.18, r * 0.66), { fill: cor, 'fill-opacity': 0.3, stroke: arm, 'stroke-width': 4, 'stroke-linejoin': 'round' }) + reflexo(cx); });
+      return s + ponte(y - 4, 3);
+    }
+    if (id === 'oculos-aviador') {
+      var lente = cor === HOLO ? metalico(c, cor) : c.lin([[claro(cor, 0.2), 0.9], [escuro(cor, 0.25), 0.95]], 0, 0, 0, 1);
+      [-1, 1].forEach(function (k) {
+        var cx = x + k * dx, d = 'M' + n(cx - r) + ',' + n(y - r * 0.62) + ' L' + n(cx + r) + ',' + n(y - r * 0.62) + ' Q' + n(cx + r * 1.08) + ',' + n(y + r * 0.85) + ' ' + n(cx + k * r * 0.1) + ',' + n(y + r * 0.92) + ' Q' + n(cx - r * 1.08) + ',' + n(y + r * 0.85) + ' ' + n(cx - r) + ',' + n(y - r * 0.62) + 'Z';
+        s += p(d, { fill: lente, stroke: '#b8962a', 'stroke-width': 2.4, 'stroke-linejoin': 'round' }) + p('M' + n(cx - r * 0.6) + ',' + n(y - r * 0.2) + ' l' + n(r * 0.5) + ',' + n(-r * 0.3), { stroke: '#ffffff', 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.55 });
+      });
+      return s + lin(x - dx + r, y - r * 0.6, x + dx - r, y - r * 0.6, { stroke: '#d8b850', 'stroke-width': 2.6 }) + p('M' + n(x - dx + r * 0.9) + ',' + n(y - r * 0.2) + ' Q' + x + ',' + n(y - r * 0.5) + ' ' + n(x + dx - r * 0.9) + ',' + n(y - r * 0.2), { stroke: '#d8b850', 'stroke-width': 2.2, fill: 'none' });
+    }
+    if (id === 'oculos-quadrado') {
+      [-1, 1].forEach(function (k) { var cx = x + k * dx; s += ret(cx - r * 1.05, y - r * 0.85, r * 2.1, r * 1.7, { rx: r * 0.3, fill: '#e8f4ff', 'fill-opacity': 0.22, stroke: ce, 'stroke-width': 7 }) + ret(cx - r * 1.05, y - r * 0.85, r * 2.1, r * 1.7, { rx: r * 0.3, fill: 'none', stroke: arm, 'stroke-width': 5 }) + reflexo(cx, 2.4); });
+      return s + lin(x - dx + r * 1.05, y - 4, x + dx - r * 1.05, y - 4, { stroke: arm, 'stroke-width': 5 });
+    }
+    if (id === 'oculos-flor') {
+      [-1, 1].forEach(function (k) {
+        var cx = x + k * dx;
+        for (var pt = 0; pt < 8; pt++) { var an = rad(pt * 45); s += circ(cx + Math.cos(an) * r * 0.92, y + Math.sin(an) * r * 0.92, r * 0.4, { fill: cor === HOLO ? arm : cor, stroke: ce, 'stroke-width': 1.2 }); }
+        s += circ(cx, y, r * 0.78, { fill: '#fffbe0', 'fill-opacity': 0.35, stroke: '#ffd447', 'stroke-width': 3 }) + reflexo(cx);
+      });
+      return s + ponte(y - 4, 3.4);
+    }
+    if (id === 'oculos-natacao' || id === 'oculos-mergulho') {
+      var fx = cb.rx * 0.97, tira = 'M' + n(x - fx) + ',' + n(y - 6) + ' Q' + x + ',' + n(y - 12) + ' ' + n(x + fx) + ',' + n(y - 6);
+      s += p(tira, { stroke: ce, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' }) + p(tira, { stroke: arm, 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' });
+      if (id === 'oculos-natacao') {
+        [-1, 1].forEach(function (k) { var cx = x + k * dx; s += elip(cx, y, r * 0.98, r * 0.78, { fill: claro(cor, 0.6), 'fill-opacity': 0.45, stroke: ce, 'stroke-width': 7.5 }) + elip(cx, y, r * 0.98, r * 0.78, { fill: 'none', stroke: arm, 'stroke-width': 5 }) + reflexo(cx, 2.6); });
+        return s + lin(x - dx + r * 0.9, y, x + dx - r * 0.9, y, { stroke: arm, 'stroke-width': 4 });
+      }
+      var mx = dx + r * 1.02, tubo = 'M' + n(x + mx - 4) + ',' + n(y + r * 0.7) + ' Q' + n(x + fx + 4) + ',' + n(y + r * 0.8) + ' ' + n(x + fx + 2) + ',' + n(y - r) + ' L' + n(x + fx - 2) + ',' + n(cb.y - cb.ry - 8);
+      s += p(tubo, { stroke: escuro(cor, 0.45), 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }) + p(tubo, { stroke: cor === HOLO ? arm : claro(cor, 0.15), 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+      s += ret(x - mx, y - r * 0.95, mx * 2, r * 1.85, { rx: r * 0.75, fill: '#cfeeff', 'fill-opacity': 0.4, stroke: ce, 'stroke-width': 8.5 }) + ret(x - mx, y - r * 0.95, mx * 2, r * 1.85, { rx: r * 0.75, fill: 'none', stroke: arm, 'stroke-width': 6 });
+      return s + p('M' + n(x - 8) + ',' + n(y + r * 0.9) + ' Q' + x + ',' + n(y + r * 0.2) + ' ' + n(x + 8) + ',' + n(y + r * 0.9), { fill: claro(cor, 0.3), stroke: ce, 'stroke-width': 2 }) + reflexo(x - dx, 2.6) + reflexo(x + dx, 2.6);
+    }
+    if (id === 'oculos-espelhado') {
+      var esp = cor === HOLO ? metalico(c, cor) : c.lin([claro(cor, 0.55), cor, escuro(cor, 0.25)], 0, 0, 0.3, 1);
+      [-1, 1].forEach(function (k) { var cx = x + k * dx; s += circ(cx, y + 1, r * 0.98, { fill: esp, stroke: '#9aa0aa', 'stroke-width': 3.4 }) + p('M' + n(cx - r * 0.6) + ',' + n(y + r * 0.2) + ' L' + n(cx + r * 0.2) + ',' + n(y - r * 0.6), { stroke: '#ffffff', 'stroke-width': 4, 'stroke-linecap': 'round', opacity: 0.55 }); });
+      return s + lin(x - dx + r * 0.95, y - 4, x + dx - r * 0.95, y - 4, { stroke: '#9aa0aa', 'stroke-width': 3.4 });
+    }
     if (id === 'oculos') {
       [-1, 1].forEach(function (k) { s += circ(x + k * dx, y, r, { fill: '#e8f4ff', 'fill-opacity': 0.25, stroke: cor, 'stroke-width': 4 }) + p('M' + n(x + k * dx - r * 0.5) + ',' + n(y - r * 0.4) + ' l6,-4', { stroke: '#ffffff', 'stroke-width': 2, 'stroke-linecap': 'round', opacity: 0.8 }); });
       s += p('M' + n(x - dx + r) + ',' + n(y - 2) + ' Q' + x + ',' + n(y - 8) + ' ' + n(x + dx - r) + ',' + n(y - 2), { stroke: cor, 'stroke-width': 3.5, fill: 'none' });
