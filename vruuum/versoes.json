@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.39.0",
+      "data": "22/Nov/2026",
+      "hora": "22:05:00",
+      "pt": [
+        "🫧 Bolha Gigante transparente de verdade, como as bolas de andar na água: dá para ver a pista através dela. Ganhou o zíper vermelho de entrar (que roda junto com a bola), a válvula redondinha e brilhinhos no plástico."
+      ],
+      "en": [
+        "🫧 The Giant Bubble Ball is truly see-through now, like real water-walking balls: you can see the track through it. It got the red entry zipper (which rolls with the ball), the little round valve and sparkles on the plastic."
+      ],
+      "es": [
+        "🫧 La Burbuja Gigante ahora es transparente de verdad, como las bolas para caminar sobre el agua: se ve la pista a través de ella. Tiene la cremallera roja para entrar (que gira con la bola), la valvulita redonda y brillitos en el plástico."
+      ]
+    },
+    {
       "versao": "1.38.0",
       "data": "22/Nov/2026",
       "hora": "21:15:00",

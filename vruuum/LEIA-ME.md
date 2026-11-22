@@ -495,3 +495,10 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   é efeito, não música). `desenho.js`: a moto de polícia deita nas curvas como a moto.
 - Testes: `teste/policia.test.js` (garagem, nomes, sirene piscando nos quadros e no relógio, a bolha rolando, o palhaço pedalando).
 
+## 1.39.0 — 🫧 bolha transparente (dono, 22/Nov/2026)
+
+- Pedido (com fotos de bolas de andar na água): "quero que a bola seja transparente".
+- `modelos3d.js` (`bolha`): o fundo e a frente quase sem cor (só a borda clara, o reflexo e brilhinhos que cintilam pelo
+  relógio); o zíper vermelho de entrar e a válvula ficam presos na bola e rolam com ela — cada pedaço do zíper entra na
+  lista com a sua profundidade, então aparece na frente ou atrás da criança conforme o lado em que está.
+
