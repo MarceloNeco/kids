@@ -143,6 +143,12 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   14/Nov/2026). Aberto sem a estante antes na aba (link de fora, hub de projetos; a estante marca a aba em `sessionStorage` "bolinho:estante", no `jogos.js`), o Voltar na tela de começo leva para a estante em vez de sair (dono, 14/Nov/2026). Jogo com aviso próprio passa `guarda: false`. Nada de 🏠, ✕ ou "← menu" próprio no canto: o jogo abre espaço para a barra com as classes
   `bn-nav`/`bn-dentro` e as medidas `--nav-alto`/`--nav-largo` no `<html>`. Na TV (`?tv=`) a barra some. Vigia:
   `teste/navegacao.test.js`.
+- **Personagem montado por partes = teste de alinhamento obrigatório (dono, 22/Nov/2026):** "não pode deixar nada
+  desalinhado... teste básico, não tem que ficar pedindo". Todo jogo que monta personagem por partes (cabeça, corpo, patas,
+  roupa, acessório — Meu Pequeno Amiguinho, Purpurinas, pilotos do Vruuum!, jogo novo) tem um teste que desenha **toda
+  combinação** e olha os pixels: uma peça só (nada solto ou flutuando), apoiado no chão, nada cortado, cabeça e corpo no eixo.
+  Modelo: `meu-amiguinho/teste/alinhamento.test.js`. Mexeu no desenho? Esse teste tem que passar antes de publicar; nunca
+  afrouxar o teste nem diminuir o personagem para passar. Texto ou balão nunca tampa o rosto: some sozinho e fecha num toque.
 - **Escolhas em etapas e Jogar sempre à vista (dono, 20/Nov/2026; vale para todo jogo, atual e novo):** nada de uma
   coluna comprida de opções (jogadores, nível, personagem, carrinho, cenário, música…) com o Jogar lá no fim. No celular
   em pé, a tela de começo **não rola**: escolhas demais viram **etapas curtas** (ex.: 1 Quem joga e nível · 2 Cenário ·
