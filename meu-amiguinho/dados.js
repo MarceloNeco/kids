@@ -76,7 +76,9 @@
     perolas: ['branco', 'rosa', 'lilas', 'dourado', 'azul-bebe'],
     medalha: ['dourado', 'prata', 'rosa'],
     asas: ['rosa', 'lilas', 'azul-bebe', 'turquesa', 'menta', 'amarelo', 'laranja', 'roxo', 'azul'],
-    morcego: ['roxo', 'lilas', 'preto', 'rosa', 'marinho']
+    morcego: ['roxo', 'lilas', 'preto', 'rosa', 'marinho'],
+    felpudo: ['cinza', 'branco', 'rosa', 'bege', 'lilas'],
+    cadeira: ['azul', 'marinho', 'rosa', 'lilas', 'vermelho', 'roxo']
   };
 
   // ---------- pelo (cores lisas e degradês tie-dye pastel) ----------
@@ -404,10 +406,17 @@
     { id: 'capinha', caixa: 'asas', n: ['Capinha com estrela', 'Little star cape', 'Capita con estrella'], e: ['capinha', 'little cape', 'capita'], paleta: 'vivas', cor: 'amarelo' },
     { id: 'capinha-natal', caixa: 'asas', n: ['Capinha de Natal', 'Christmas cape', 'Capita de Navidad'], e: ['capinha de Natal', 'Christmas cape', 'capita de Navidad'] },
     { id: 'varinha', caixa: 'mao', n: ['Varinha de estrela', 'Star wand', 'Varita de estrella'], e: ['varinha', 'star wand', 'varita'], facil: 1 },
+    { id: 'controle', caixa: 'mao', n: ['Controle de videogame', 'Game controller', 'Mando de videojuego'], e: ['controle de videogame', 'game controller', 'mando de videojuego'], paleta: 'vivas', cor: 'roxo' },
+    { id: 'celular', caixa: 'mao', n: ['Celular de brinquedo', 'Toy phone', 'Móvil de juguete'], e: ['celular de brinquedo', 'toy phone', 'móvil de juguete'], paleta: 'vivas', cor: 'rosa', facil: 1 },
+    { id: 'chaveiro-pelucia', caixa: 'mao', n: ['Chaveiro felpudo de coelhinho', 'Fluffy bunny keychain', 'Llavero peludo de conejito'], e: ['chaveiro felpudo', 'fluffy keychain', 'llavero peludo'], paleta: 'felpudo', cor: 'cinza' },
     { id: 'chaveiro', caixa: 'mao', n: ['Chaveirinho', 'Little keychain', 'Llaverito'], e: ['chaveirinho', 'little keychain', 'llaverito'] },
     { id: 'balao', caixa: 'mao', n: ['Balão de coração', 'Heart balloon', 'Globo de corazón'], e: ['balão', 'balloon', 'globo'], facil: 1 },
     { id: 'filhote', caixa: 'colo', n: ['Filhotinho no colo', 'Baby to cuddle', 'Bebé en brazos'], e: ['filhotinho no colo', 'a baby to cuddle', 'un bebé en brazos'], facil: 1 },
     { id: 'mini-urso', caixa: 'colo', n: ['Ursinho de bolso', 'Pocket teddy', 'Osito de bolsillo'], e: ['ursinho de bolso', 'pocket teddy', 'osito de bolsillo'] },
+    { id: 'mini-urso-marrom', caixa: 'colo', n: ['Ursinho marrom de colo', 'Brown baby bear', 'Osito marrón'], e: ['ursinho marrom no colo', 'a brown baby bear', 'un osito marrón en brazos'], facil: 1 },
+    { id: 'mini-urso-cinza', caixa: 'colo', n: ['Ursinho cinza de colo', 'Gray baby bear', 'Osito gris'], e: ['ursinho cinza no colo', 'a gray baby bear', 'un osito gris en brazos'] },
+    { id: 'mini-coelho', caixa: 'colo', n: ['Coelhinho de colo', 'Baby bunny', 'Conejito en brazos'], e: ['coelhinho no colo', 'a baby bunny', 'un conejito en brazos'], facil: 1 },
+    { id: 'mini-gato', caixa: 'colo', n: ['Gatinho de colo com laço', 'Kitten with a bow', 'Gatito con lazo'], e: ['gatinho de laço no colo', 'a kitten with a bow', 'un gatito con lazo en brazos'] },
     { id: 'abracadinho-braco', caixa: 'abraco', n: ['Abraçado no braço', 'Hugging the arm', 'Abrazado al brazo'], e: ['unicorninho abraçado no braço', 'a little unicorn hugging the arm', 'un unicornito abrazado al brazo'] },
     { id: 'abracadinho-perna', caixa: 'abraco', n: ['Abraçado na perna', 'Hugging the leg', 'Abrazado a la pierna'], e: ['unicorninho abraçado na perna', 'a little unicorn hugging the leg', 'un unicornito abrazado a la pierna'] },
     { id: 'tenis', caixa: 'pes', n: ['Tênis branco', 'White sneakers', 'Zapatillas blancas'], e: ['tênis branco', 'white sneakers', 'zapatillas blancas'], facil: 1 },
@@ -434,12 +443,13 @@
     { id: 'patins', caixa: 'pes', n: ['Patins', 'Roller skates', 'Patines'], e: ['patins', 'roller skates', 'patines'], paleta: 'patins', cor: 'azul', facil: 1 },
     { id: 'skate', caixa: 'chao', n: ['Skate', 'Skateboard', 'Monopatín'], e: ['skate', 'skateboard', 'monopatín'], paleta: 'skate', cor: 'rosa-choque', facil: 1 },
     { id: 'muletas', caixa: 'apoio', n: ['Muletas', 'Crutches', 'Muletas'], e: ['muletas', 'crutches', 'muletas'], so: 'pe' },
-    { id: 'cadeira', caixa: 'apoio', n: ['Cadeira de rodas', 'Wheelchair', 'Silla de ruedas'], e: ['cadeira de rodas', 'a wheelchair', 'silla de ruedas'], facil: 1 }
+    { id: 'cadeira', caixa: 'apoio', n: ['Cadeira de rodas', 'Wheelchair', 'Silla de ruedas'], e: ['cadeira de rodas', 'a wheelchair', 'silla de ruedas'], paleta: 'cadeira', cor: 'azul', facil: 1 },
+    { id: 'andador', caixa: 'apoio', n: ['Andador de rodinhas', 'Rolling walker', 'Andador con ruedas'], e: ['andador', 'a walker', 'andador'], paleta: 'cadeira', cor: 'rosa', so: 'pe' }
   ];
   // escolher um tira o outro (não dá para usar os dois ao mesmo tempo)
   var CONFLITOS = [['patins', 'skate'], ['cadeira', 'skate'], ['cadeira', 'patins'], ['muletas', 'skate'], ['muletas', 'patins'], ['patins-linha', 'skate'], ['cadeira', 'patins-linha'], ['muletas', 'patins-linha'], ['cadeira', 'abracadinho-perna'],
     ['tiara-laco', 'tiara'], ['tiara-laco', 'tiara-sapinho'], ['tiara-laco', 'tiara-chifres'], ['tiara-laco', 'coroa-flores'], ['tiara-laco', 'bone'], ['tiara-laco', 'viseira'], ['tiara-laco', 'capacete'], ['tiara-laco', 'chapeu'],
-    ['chuquinhas', 'bone'], ['chuquinhas', 'capacete'], ['chuquinhas', 'chapeu']];
+    ['andador', 'skate'], ['andador', 'patins'], ['andador', 'patins-linha'], ['chuquinhas', 'bone'], ['chuquinhas', 'capacete'], ['chuquinhas', 'chapeu']];
 
   // ---------- vozes ----------
   // fala: voz do aparelho no idioma escolhido (fininha, de urso, devagarinho); sons: feitos no WebAudio; minha: gravada aqui

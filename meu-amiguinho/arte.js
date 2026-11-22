@@ -1767,13 +1767,35 @@
       s += p(coracaoD(bx, by, 26), { fill: '#f0507a', stroke: '#b82c58', 'stroke-width': 1.8 }) + elip(bx - 10, by - 6, 5, 8, { fill: '#ffffff', opacity: 0.45, transform: 'rotate(-25 ' + n(bx - 10) + ' ' + n(by - 6) + ')' });
       return s;
     }
+    var cm = acessCor(a, id);
+    if (id === 'controle') {   // controle de videogame segurado com as duas pontinhas
+      var cy = y + 4, dctl = 'M' + n(x - 14) + ',' + n(cy - 10) + ' L' + n(x + 14) + ',' + n(cy - 10) + ' Q' + n(x + 26) + ',' + n(cy - 10) + ' ' + n(x + 26) + ',' + n(cy + 2) + ' Q' + n(x + 27) + ',' + n(cy + 14) + ' ' + n(x + 19) + ',' + n(cy + 14) + ' Q' + n(x + 14) + ',' + n(cy + 14) + ' ' + n(x + 10) + ',' + n(cy + 6) + ' L' + n(x - 10) + ',' + n(cy + 6) + ' Q' + n(x - 14) + ',' + n(cy + 14) + ' ' + n(x - 19) + ',' + n(cy + 14) + ' Q' + n(x - 27) + ',' + n(cy + 14) + ' ' + n(x - 26) + ',' + n(cy + 2) + ' Q' + n(x - 26) + ',' + n(cy - 10) + ' ' + n(x - 14) + ',' + n(cy - 10) + 'Z';
+      s += p(dctl, { fill: cm, stroke: escuro(cm, 0.4), 'stroke-width': 1.8, 'stroke-linejoin': 'round' });
+      s += p('M' + n(x - 17) + ',' + n(cy - 1) + ' h8 M' + n(x - 13) + ',' + n(cy - 5) + ' v8', { stroke: '#2e2a33', 'stroke-width': 3, 'stroke-linecap': 'round' });
+      [[13, -4, '#f06292'], [18, -1, '#ffd447'], [13, 2, '#6fd68a'], [8, -1, '#5fb0f0']].forEach(function (b) { s += circ(x + b[0], cy + b[1], 2.2, { fill: b[2], stroke: escuro(b[2], 0.3), 'stroke-width': 0.6 }); });
+      return s + ret(x - 4, cy - 5, 3, 1.6, { rx: 0.8, fill: escuro(cm, 0.35) }) + ret(x + 1, cy - 5, 3, 1.6, { rx: 0.8, fill: escuro(cm, 0.35) });
+    }
+    if (id === 'celular') {   // celular de brinquedo, em pé na mãozinha
+      s += ret(x - 10, y - 30, 20, 34, { rx: 5, fill: cm, stroke: escuro(cm, 0.4), 'stroke-width': 1.6 }) + ret(x - 7, y - 26, 14, 22, { rx: 2, fill: '#bfe6ff' });
+      [[-4, -22, '#f06292'], [1, -22, '#ffd447'], [-4, -17, '#6fd68a'], [1, -17, '#b07be6']].forEach(function (b) { s += ret(x + b[0], y + b[1], 3.4, 3.4, { rx: 1, fill: b[2] }); });
+      return s + p(coracaoD(x, y - 9, 2.6), { fill: '#f06292' }) + circ(x, y + 1, 1.4, { fill: claro(cm, 0.5) }) + circ(x - 6, y - 27, 1.2, { fill: '#ffffff', opacity: 0.7 });
+    }
+    if (id === 'chaveiro-pelucia') {   // chaveiro felpudo de coelhinho
+      s += circ(x, y + 6, 5, { fill: 'none', stroke: '#c9ced8', 'stroke-width': 2 }) + lin(x, y + 11, x, y + 17, { stroke: '#ffffff', 'stroke-width': 2.4 }) + lin(x, y + 11, x, y + 17, { stroke: '#c9ced8', 'stroke-width': 1 });
+      [-1, 1].forEach(function (k) { s += elip(x + k * 5, y + 18, 3.4, 8, { fill: cm, stroke: escuro(cm, 0.3), 'stroke-width': 1, transform: 'rotate(' + (k * 14) + ' ' + n(x + k * 5) + ' ' + n(y + 24) + ')' }); });
+      for (var f = 0; f < 10; f++) { var an = rad(f * 36); s += circ(x + Math.cos(an) * 9, y + 32 + Math.sin(an) * 9, 5, { fill: cm }); }
+      s += circ(x, y + 32, 10, { fill: cm, stroke: escuro(cm, 0.2), 'stroke-width': 0.8 }) + circ(x, y + 32, 10, { fill: c.pelo(escuro(cm, 0.5), true) });
+      return s + circ(x - 3.6, y + 31, 1.5, { fill: '#2a1e28' }) + circ(x + 3.6, y + 31, 1.5, { fill: '#2a1e28' }) + elip(x, y + 34, 1.4, 1, { fill: '#f06292' });
+    }
     if (id === 'chaveiro') return circ(x, y + 8, 6, { fill: 'none', stroke: '#c9ced8', 'stroke-width': 2.2 }) + lin(x, y + 14, x, y + 22, { stroke: '#c9ced8', 'stroke-width': 1.6 }) + p(estrelaD(x, y + 31, 10, 5), { fill: '#ffd447', stroke: '#c9962a', 'stroke-width': 1.4 }) + circ(x - 2, y + 30, 1.2, { fill: '#2a1e28' }) + circ(x + 2.5, y + 30, 1.2, { fill: '#2a1e28' });
     return s;
   }
   // mini pelúcia (filhotinho da mesma espécie, ou o ursinho de bolso)
+  var MINI = { 'mini-urso': ['urso', 'creme'], 'mini-urso-marrom': ['urso', 'chocolate'], 'mini-urso-cinza': ['urso', 'cinza'], 'mini-coelho': ['coelha', 'creme'], 'mini-gato': ['gata-preta', 'preto'] };
   function miniPelucia(c, a, g, id) {
-    var x = g.colo[0], y = g.colo[1], base = id === 'mini-urso' ? 'urso' : a.base;
-    var mini = { base: base, corpo: 'pe', pelo: id === 'mini-urso' ? 'creme' : a.pelo, olhos: a.olhos, estiloOlho: 'brilho', bochecha: 'rosa', coracao: a.coracao, roupa: 'nenhuma', acess: {}, fofura: 70 };
+    var x = g.colo[0], y = g.colo[1], M = MINI[id], base = M ? M[0] : a.base;
+    var mini = { base: base, corpo: 'pe', pelo: M ? M[1] : a.pelo, olhos: a.olhos, estiloOlho: 'brilho', bochecha: 'rosa', coracao: a.coracao, roupa: 'nenhuma', acess: {}, fofura: 70 };
+    if (id === 'mini-gato') { mini.acess = { laco: 'laco' }; mini.corAcess = { laco: 'vermelho' }; }
     var c2 = new Ctx(c.id + 'm'), e = g.corpo === 'q' ? 0.3 : 0.34, inner = desenhar(c2, mini, { vista: 'inteiro' });
     c.defs.push(c2.defs.join(''));
     return '<g transform="translate(' + n(x - 150 * e) + ' ' + n(y - 236 * e) + ') scale(' + e + ')">' + inner + '</g>';
@@ -1802,8 +1824,19 @@
     });
     return s;
   }
-  function cadeira(g, frente) {   // cadeira de rodas (em pé = sentado) ou carrinho de rodas (4 patas)
-    var s = '', cor = '#6aa8e8', aro = '#3a4a62';
+  function andador(g, cor) {   // andador de rodinhas: a pelúcia segura nas duas alças
+    var s = '', ce = escuro(cor, 0.38), yb = Math.min(300, g.chao - 40);
+    [[g.mao[0], -1], [g.mao[1], 1]].forEach(function (m) {
+      var x = m[0][0], y = m[0][1] + 10, k = m[1], xb = x + k * 6;
+      s += lin(x, y, xb, g.chao - 8, { stroke: ce, 'stroke-width': 8, 'stroke-linecap': 'round' }) + lin(x, y, xb, g.chao - 8, { stroke: cor, 'stroke-width': 5.4, 'stroke-linecap': 'round' });
+      s += ret(x - 6, y - 4, 12, 13, { rx: 5, fill: '#6a5a6e', stroke: '#3e3442', 'stroke-width': 1.2 });
+      s += circ(xb, g.chao - 7, 7, { fill: '#ffffff', stroke: ce, 'stroke-width': 2.4 }) + circ(xb, g.chao - 7, 2.4, { fill: cor });
+    });
+    s += lin(g.mao[0][0] + 3, yb, g.mao[1][0] - 3, yb, { stroke: ce, 'stroke-width': 7, 'stroke-linecap': 'round' }) + lin(g.mao[0][0] + 3, yb, g.mao[1][0] - 3, yb, { stroke: cor, 'stroke-width': 4.6, 'stroke-linecap': 'round' });
+    return s + p(coracaoD(150, yb, 6), { fill: '#ffffff', stroke: ce, 'stroke-width': 1.2 });
+  }
+  function cadeira(g, frente, corC) {   // cadeira de rodas (em pé = sentado) ou carrinho de rodas (4 patas)
+    var s = '', cor = corC || '#6aa8e8', aro = '#3a4a62';
     if (g.corpo === 'q') {
       var b = g.b, wx = b.x + b.rx * 0.55, wy = g.chao - 30;
       if (!frente) return circ(wx + 8, wy - 2, 30, { fill: 'none', stroke: '#9aa6b8', 'stroke-width': 5 });
@@ -1863,7 +1896,7 @@
     if (pose === 'pendurada') s += galho();
     if (e.chao === 'skate') s += skate(g, corA('skate'));
     var corpo = '';
-    if (e.apoio === 'cadeira') corpo += cadeira(g, false);
+    if (e.apoio === 'cadeira') corpo += cadeira(g, false, corA('cadeira'));
     if (e.asas) corpo += asasAcess(c, a, g, e.asas, corA(e.asas), false, S);
     if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'tras');
     if (S && S.capa && !q) corpo += p('M' + n(150 - g.t.wt - 10) + ',' + n(g.t.y0) + ' Q' + n(150 - g.t.wb - 40) + ',' + n(g.t.y1) + ' ' + n(150 - g.t.wb - 30) + ',' + n(g.t.y1 + 26) + ' L' + n(150 + g.t.wb + 30) + ',' + n(g.t.y1 + 26) + ' Q' + n(150 + g.t.wb + 40) + ',' + n(g.t.y1) + ' ' + n(150 + g.t.wt + 10) + ',' + n(g.t.y0) + 'Z', { fill: escuro(S.capa.cor, 0.12), stroke: escuro(S.capa.cor, 0.35), 'stroke-width': 2 });
@@ -1885,7 +1918,7 @@
       if (e.asas) corpo += asasAcess(c, a, g, e.asas, corA(e.asas), true, S);
       if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'frente');
       if (e.colo) corpo += miniPelucia(c, a, g, e.colo);
-      if (e.apoio === 'cadeira') corpo += cadeira(g, true);
+      if (e.apoio === 'cadeira') corpo += cadeira(g, true, corA('cadeira'));
     } else {
       corpo += pernasPe(c, a, g, T);
       corpo += troncoPe(c, a, g, T);
@@ -1906,7 +1939,7 @@
       }
       if (g.pendurada) corpo = bracos + corpo; else corpo += bracos;
       if (e.costas) corpo += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'cima');
-      if (e.apoio === 'cadeira') corpo += cadeira(g, true);
+      if (e.apoio === 'cadeira') corpo += cadeira(g, true, corA('cadeira'));
     }
     // cabeça
     var cab = cabeca(c, a, g, T, capuz(c, a, g, S, false));
@@ -1921,6 +1954,7 @@
     if (e.mao && q) frente += maoAcess(c, a, g, e.mao);
     if (e.costas && q) frente += bolsaAcess(c, a, g, e.costas, corA(e.costas), 'boca');
     if (e.apoio === 'muletas' && !q) frente += muletas(g);
+    if (e.apoio === 'andador' && !q) frente += andador(g, corA('andador'));
     var murcho = '';
     var f = op.fofura != null ? op.fofura : a.fofura;
     if (f != null && f < 45) {   // ruguinhas da pelúcia murcha
