@@ -3,7 +3,7 @@
 Guardado a pedido do dono em 22/Nov/2026: "a ideia é ter um funcionamento minimamente decente antes de eu ter os
 créditos do Higgsfield recarregados". Reúne as especificações que ele trouxe (geradas no Gemini, 21–22/Nov/2026) e o
 estado real de cada item no jogo, com o porquê das decisões. **Leia antes de mexer no movimento, no desfile, na
-Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.14**.
+Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.15**.
 
 Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌ não feito, com o motivo.
 
@@ -35,6 +35,9 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Respiração | ✅ | Peito sobe e desce de leve (`resp`, ~4 s) |
 | Pé plantado (sola paralela ao chão) | ✅ | O sapato gira e estica ao contrário da perna em volta do tornozelo (`data-ae` / `data-ad`; 0.9.9) |
 | Sombra de cada pé no chão | ✅ | `.pp-sombra-pe-*`: escura no apoio, mais clara e menor quando o pé sobe (0.9.9) |
+| Braço caído sem "parêntese" | ✅ | 0.9.15 (dono/Gemini: "braços armados como parênteses ( )"). O braço de base (`bracoRig`) já desce 10° para fora (ombro x 150, punho x 124), então o braço caído usa o ombro **para dentro** (`o` −6 a −4) e o cotovelo quase reto (`c` −3 a −5): o cotovelo fica perto da cintura. Vale no `relax`, no braço solto de `cintura`, `beijo`, `tchau`, `olhaE`/`olhaD` (do lado para onde o quadril vai, −1: acompanha o quadril) e no desenho sem pose. Andando: `abre` 1 (menina) e 5 (menino). Manga um pouco menos bufante (12,3k / 10,3k) |
+| Mão relaxada de lado (sem "punho cerrado de frente") | ✅ | 0.9.15. `maoDeLado()` no `boneca.js`: palma virada para a coxa, fina e comprida vista de frente, polegar na frente, dedos curvando para a perna, aliança e esmalte. As duas mãos saem no desenho (`.rig-mao-frente-*` / `.rig-mao-lado-*`) e o animador mostra uma só: `maoSolta(o, c)` = braço caído (`o < 35`, `−40 < c < 45`) |
+| Descanso assimétrico | ✅ | 0.9.15: `relax` com base `leve` (quadril 6 px para a esquerda, `solta` 0,75: a perna direita dobra de leve e o pé vira de lado); antes era `reta`, simétrica |
 | Parada: peso numa perna, a outra solta (contrapposto) | ✅ | 0.9.14 (dono: "mão no ombro com o braço esquerdo… a perna e o pezinho virar para o lado direito"). `solta` nas `BASES` `gingaD`/`gingaE` (o quadril vai para o lado do peso). A perna solta gira 6° para o meio (joelho para dentro), a canela volta (`kE`/`kD` = ∓0,17), encolhe 3% (calcanhar sai do chão), passa na frente da outra e o pé vira de lado (`rotate(∓16) skewX(∓10)` no tornozelo). Só parada (`modo` vazio: estúdio, apresentação, fim do desfile); menino fica plantado (`cruza` 0). Bota, galocha, patins e cano alto (sapato com mais de 60 de altura) não giram nem desentortam: vão inteiros com a perna, senão o cano sai da calça |
 | Piscar natural | ✅ | O olho pisca sozinho de tempos em tempos (`anim`); sem piscadinha fixa na placa da Baladinha (0.9.13) |
 
