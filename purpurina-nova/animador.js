@@ -48,14 +48,15 @@
     // (dono, 22/Nov/2026: "mão no ombro com o braço esquerdo… a perna e o pezinho virar para o lado direito")
     gingaD: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: -2, q: 1, solta: -1 },
     gingaE: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 2, q: -1, solta: 1 },
-    leve: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 1, q: -0.5, solta: 0.75 },   // descanso: peso na esquerda, de leve
-    cruzada: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
+    leve: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 1, q: -0.7, solta: 1 },   // descanso: peso na esquerda (foto de referência do dono, 22/Nov/2026: joelhos quase se encostando)
+    // pernas cruzadas (segunda foto de referência do dono, 22/Nov/2026): peso na direita, a esquerda cruza na frente
+    cruzada: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: -1.5, q: 0.7, solta: -1, cruz: 1 },
     aberta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 }
   };
   function valores(nome) {
     var p = POSES[nome] || POSES.relax, b = BASES[p.base] || BASES.reta;
     return { oE: p.oE, cE: p.cE, fE: p.fE || 1, oD: p.oD, cD: p.cD, fD: p.fD || 1, cab: p.cab, olho: p.olho,
-      cx: b.c[0], cy: b.c[1], cr: b.c[2], ex: b.e[0], ey: b.e[1], er: b.e[2], dx: b.d[0], dy: b.d[1], dr: b.d[2], s: b.s, q: b.q || 0, solta: b.solta || 0, aceno: p.aceno ? 1 : 0 };
+      cx: b.c[0], cy: b.c[1], cr: b.c[2], ex: b.e[0], ey: b.e[1], er: b.e[2], dx: b.d[0], dy: b.d[1], dr: b.d[2], s: b.s, q: b.q || 0, solta: b.solta || 0, cruz: b.cruz || 0, aceno: p.aceno ? 1 : 0 };
   }
   /* perfis de movimento (dono, 21/Nov/2026, especificação "motor biomecânico dual"): a menina continua como está; o
      menino (criança, adolescente ou adulto) anda com as pernas em trilhos paralelos (sem cruzar o pé na linha do meio),
@@ -108,12 +109,13 @@
           Array.prototype.forEach.call(svg.querySelectorAll('.rig-atras-' + b[0]), function (g) { g.style.display = atr === '1' ? '' : 'none'; });
           Array.prototype.forEach.call(svg.querySelectorAll('.rig-frente-' + b[0]), function (g) { g.style.display = atr === '1' ? 'none' : ''; });
         }
-        // braço caído: a mão de lado (palma para a coxa); levantado, na cintura ou no rosto: a mão de frente
-        var sol = B.maoSolta(b[1], b[2]) ? '1' : '0';
-        if (om.getAttribute('data-solta') !== sol) {
-          om.setAttribute('data-solta', sol);
-          Array.prototype.forEach.call(svg.querySelectorAll('.rig-mao-lado-' + b[0]), function (g) { g.style.display = sol === '1' ? '' : 'none'; });
-          Array.prototype.forEach.call(svg.querySelectorAll('.rig-mao-frente-' + b[0]), function (g) { g.style.display = sol === '1' ? 'none' : ''; });
+        // braço caído: a mão de lado (palma para a coxa); levantado, na cintura ou no rosto: a mão de frente — trocando aos
+        // poucos (uma some enquanto a outra aparece), sem pulo
+        var wl = Math.max(0, Math.min(1, (35 - b[1]) / 14, (45 - b[2]) / 14, (b[2] + 40) / 14)), wk = wl.toFixed(2);
+        if (om.getAttribute('data-solta') !== wk) {
+          om.setAttribute('data-solta', wk);
+          Array.prototype.forEach.call(svg.querySelectorAll('.rig-mao-lado-' + b[0]), function (g) { g.style.display = wl > 0.01 ? '' : 'none'; g.style.opacity = wl < 0.99 ? wk : ''; });
+          Array.prototype.forEach.call(svg.querySelectorAll('.rig-mao-frente-' + b[0]), function (g) { g.style.display = wl < 0.99 ? '' : 'none'; g.style.opacity = wl > 0.01 ? (1 - wl).toFixed(2) : ''; });
         }
         var tc = B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E);
         for (var q = 0; q < cos.length; q++) cos[q].setAttribute('transform', tc);   // contorno e preenchimento do antebraço
@@ -167,7 +169,7 @@
       [['e', v.er || 0, v.esy || 1, v.ex || 0, Math.max(v.sobeE || 0, 0.3 * (v.peE || 0)), v.peE || 0, 1], ['d', v.dr || 0, v.dsy || 1, v.dx || 0, Math.max(v.sobeD || 0, 0.3 * (v.peD || 0)), v.peD || 0, -1]].forEach(function (pl) {
         var rr = pl[1] * amp, sy = 1 + (pl[2] - 1) * amp;
         // bota e cano alto: o cano sobe pela perna, então não vira nem desentorta (sairia de dentro da calça); o pé baixo, sim
-        var sap = svg.querySelector('.pp-passo-' + pl[0] + ' .pp-canela-' + pl[0] + ' .pp-sapato-frente'), alto = false;
+        var sap = svg.querySelector('.pp-passo-' + pl[0] + ' .pp-canela-' + pl[0] + ' .pp-sapato-frente-' + pl[0]), alto = false;
         if (sap) { if (!sap.hasAttribute('data-alto')) { var bb = { height: 0 }; try { bb = sap.getBBox(); } catch (er) {} sap.setAttribute('data-alto', bb.height > 60 ? '1' : '0'); } alto = sap.getAttribute('data-alto') === '1'; }
         if (pl[0] === 'e') altoE = alto; else altoD = alto;
         // joelho: a canela entorta em volta da linha do joelho; o sapato desfaz isso no tornozelo (fica reto no chão)
@@ -177,10 +179,24 @@
           if (kk) g.setAttribute('transform', 'matrix(1 0 ' + kk.toFixed(4) + ' 1 ' + (-kk * jo).toFixed(3) + ' 0)'); else if (g.hasAttribute('transform')) g.removeAttribute('transform');
         });
         if (kk && !alto) des = ' skewX(' + (-Math.atan(kk) * 180 / Math.PI).toFixed(2) + ')';
-        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' .pp-sapato-frente, .pp-passo-' + pl[0] + ' .pp-sapato-dentro-' + pl[0]), function (g) {
-          var a = (g.getAttribute('data-a' + pl[0]) || '').split(',').map(Number); if (a.length < 2) return;
-          if (alto) { if (g.hasAttribute('transform')) g.removeAttribute('transform'); return; }   // bota: vai inteira com a perna
-          g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(1 ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ') translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
+        /* o pé vira aos poucos (dono, 22/Nov/2026: "o pé vira para o lado de uma vez… não está natural"): um número de 0
+           (de frente) a 1 (de lado) anda junto com a perna; o sapato de frente vai estreitando e o de lado cresce a partir
+           do tornozelo (a ponta vai saindo para o lado) — como um pé girando, sem troca seca. Na vitrine (pé levantado) e na perna solta parada, a ponta vai para fora */
+        // (dono, 22/Nov/2026, referências: o pé solto vira PARA FORA — a ponta para o lado de fora do corpo — e o joelho dobra
+        // para dentro; a bota e o cano alto ficam de frente)
+        // (como um cartão virando: o de frente estreita até ficar fininho, e nesse instante vira o de lado, também fininho,
+        // que vai alargando; nunca os dois ao mesmo tempo, meio transparentes, como fantasma)
+        var tt = alto ? 0 : Math.max(0, Math.min(1, (pl[5] - 0.15) / 0.55)), sm = tt < 0.5 ? 0 : 1;
+        [['.pp-sapato-frente-' + pl[0], 1 - 1.4 * Math.min(tt, 0.5), 1 - sm, true], ['.pp-sapato-lado-' + pl[0], 0.3 + 0.7 * Math.max(0, (tt - 0.5) / 0.5), sm, false]].forEach(function (sp) {
+          Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' ' + sp[0]), function (g) {
+            var vis = sp[2] > 0.01;
+            g.style.display = vis ? '' : 'none'; if (!vis) return;
+            g.style.opacity = sp[2] < 0.99 ? sp[2].toFixed(3) : '';
+            var a = (g.getAttribute('data-a' + pl[0]) || '').split(',').map(Number); if (a.length < 2) return;
+            var kx = sp[1] < 0.999 ? sp[1] : 1;
+            if (alto && sp[3]) { if (kx === 1) { if (g.hasAttribute('transform')) g.removeAttribute('transform'); } else g.setAttribute('transform', 'translate(' + a[0] + ' 0) scale(' + kx.toFixed(3) + ' 1) translate(' + (-a[0]) + ' 0)'); return; }   // bota: vai inteira com a perna
+            g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(' + kx.toFixed(3) + ' ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ') translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
+          });
         });
         var sb = svg.querySelector('.pp-sombra-pe-' + pl[0]);
         if (sb) {
@@ -189,19 +205,9 @@
           sb.setAttribute('cx', (q[0] + pl[3] * amp + Math.cos(ra) * dx - Math.sin(ra) * dy + kk * Math.max(0, p[1] - jo)).toFixed(1));
           sb.setAttribute('cy', Math.min(670, q[1] + Math.sin(ra) * dx + Math.cos(ra) * dy).toFixed(1));
           var ar = v.noAr || 0;
-          sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4]) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4]) * (1 - 0.6 * ar)).toFixed(3));
+          var pq = Math.max(0, Math.min(1, pl[4])); ar = Math.max(0, Math.min(1, ar));   // (nunca tamanho negativo: a sombra sumia num quadro)
+          sb.setAttribute('rx', (20 * (1 - 0.35 * pq) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pq) * (1 - 0.6 * ar)).toFixed(3));
         }
-      });
-      // qual sapato aparece em cada pé: de frente; de lado (vitrine, pé levantado, ponta para fora); ou para dentro (perna
-      // solta parada, ponta para o meio) — a bota e o cano alto ficam de frente
-      [['e', v.ladoE ? 'l' : (v.peE || 0) > 0.5 && !altoE ? 'd' : 'f'], ['d', v.ladoD ? 'l' : (v.peD || 0) > 0.5 && !altoD ? 'd' : 'f']].forEach(function (pl) {
-        var g = svg.querySelector('.pp-passo-' + pl[0]), qual = pl[1]; if (!g || (g.getAttribute('data-lado') || 'f') === qual) return;
-        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0]), function (gg) {
-          gg.setAttribute('data-lado', qual);
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-lado-' + pl[0]), function (x) { x.style.display = qual === 'l' ? '' : 'none'; });
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-dentro-' + pl[0]), function (x) { x.style.display = qual === 'd' ? '' : 'none'; });
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-frente'), function (x) { x.style.display = qual === 'f' ? '' : 'none'; });
-        });
       });
       Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
     }
@@ -255,13 +261,13 @@
         v.oD = pf.abre + pf.abreVai * aO; v.cD = 8 + pf.cotovelo * cb; v.fD = 1 - pf.frente * fb;
         v.cab = -1 * Math.sin(W - 0.6); v.olho = 0;
       } else if (modo === 'vitrine') {
-        /* vitrine dos sapatos (dono, 21/Nov/2026): um pé de cada vez sobe um pouco, vira para fora e mostra o sapato de
-           lado; desce e volta de frente; depois o outro. O peso vai para a perna que fica no chão. Ciclo de 4,8 s. */
-        var T = 4800, ph = ((t - modoIni) % T) / T, seg4 = Math.floor(ph * 4), u = ph * 4 - seg4, sobe = Math.sin(Math.PI * u);
-        v.ladoE = false; v.ladoD = false;
-        if (seg4 === 0) { v.ey += -12 * sobe; v.esy = 1 - 0.04 * sobe; v.er += 6 * sobe; v.q = 0.5 * sobe; v.ladoE = sobe > 0.35; }
-        else if (seg4 === 2) { v.dy += -12 * sobe; v.dsy = 1 - 0.04 * sobe; v.dr += -6 * sobe; v.q = -0.5 * sobe; v.ladoD = sobe > 0.35; }
-        else v.q = 0;
+        /* vitrine dos sapatos (dono, 22/Nov/2026: "o pé vira para o lado de uma vez… principalmente quando tiver o zoom no
+           pé"): ela passa o peso de uma perna para a outra, devagar — a perna solta dobra o joelho para dentro e o pé vira
+           para fora, mostrando o sapato de lado; depois a outra. Sem levantar o pé no ar. Ciclo de 6 s, curva suave (fica
+           um tempo em cada lado e passa pelo meio sem tranco). */
+        var T = 6000, ph = ((t - modoIni) % T) / T, sv = -Math.tanh(2.4 * Math.sin(2 * Math.PI * ph)) / Math.tanh(2.4);
+        v.er = 0; v.dr = 0; v.esy = 1; v.dsy = 1; v.ey = 0; v.dy = 0;
+        pernaSolta(v, sv, 0); v.q = -0.8 * sv; v.s = 1.5 * sv;
       } else if (modo === 'pular') {
         /* pulo de verdade (dono, 22/Nov/2026: "aquele pulinho sem movimentos de pulo… tá muito ruim"): agacha dobrando os
            joelhos (o corpo desce e os braços vão para trás), estica as pernas e sai do chão (braços sobem), no ar as
@@ -283,9 +289,22 @@
         v.q += lado * bat * perfil().parado;   // o quadril rebola para o lado da batida (menino: só passa o peso de leve)
         // a perna do lado contrário ao quadril dobra o joelho (sobe um pouco e encolhe)
         if (lado > 0) { v.esy = 1 - 0.07 * bat; v.ey += -6 * bat; v.er += 2 * bat; } else { v.dsy = 1 - 0.07 * bat; v.dy += -6 * bat; v.dr += -2 * bat; }
+        // e o pé dela gira para fora na batida e volta, aos poucos (dono, 22/Nov/2026: a pose do pé também na Baladinha)
+        if (lado > 0) v.peE = 0.85 * bat; else v.peD = 0.85 * bat;
         v.oE += 4 * bat; v.oD += 4 * bat;
       }
     }
+    /* perna solta, com o peso na outra (sl: -1 esquerda solta … 1 direita solta; cruz: 0 a 1, a solta cruza na frente da
+       outra — foto de referência do dono, 22/Nov/2026): a coxa gira para o meio (o joelho vai para dentro, quase
+       encostando no outro) e a canela volta (joelho dobrado); o calcanhar sai do chão, ela passa na frente e o pé vira
+       para fora. Cruzando, a coxa gira mais e a canela volta menos: o pé pousa na frente do outro */
+    function pernaSolta(v, sl, cruz) {
+      var wE = Math.max(0, -sl), wD = Math.max(0, sl), r = 8 + 4 * cruz, k = 0.24 * (1 - 0.4 * cruz);
+      v.er -= r * wE; v.esy = 1 - 0.012 * wE; v.peE = wE; v.kE = -k * wE;
+      v.dr += r * wD; v.dsy = 1 - 0.012 * wD; v.peD = wD; v.kD = k * wD;
+      if (Math.abs(sl) > 0.3) v.frenteE = wE > wD;
+    }
+    var misturaDe = null, misturaIni = 0;
     function passo(t) {
       if (!vivo) return;
       if (op.enquanto && !op.enquanto()) { vivo = false; return; }   // a tela acabou (ex.: saiu do desfile)
@@ -301,17 +320,17 @@
       if (modo !== 'andar') { v.cab += micro * 0.4; v.cE += micro * 0.6; v.cD -= micro * 0.6; v.q += micro * 0.04; }
       /* parada (apresentação e estúdio), o peso fica numa perna só (dono, 22/Nov/2026: "o pezinho está sempre de frente,
          isso não é natural… a perna tem que dar uma leve arqueadinha e o pezinho um pouquinho dobrado"): a outra dobra o
-         joelho de leve (encolhe, o calcanhar sai do chão), vem um pouco para o meio, passa na frente e o pé vira de lado.
+         joelho de leve (encolhe, o calcanhar sai do chão), vem um pouco para o meio, passa na frente e o pé vira para fora.
          Menino fica plantado (cruza 0); andando, dançando, pulando ou na vitrine dos sapatos, não */
       v.peE = 0; v.peD = 0; v.kE = 0; v.kD = 0;
-      if (!modo && v.solta) {
-        var sl = v.solta * pf0.cruza, wE = Math.max(0, -sl), wD = Math.max(0, sl);
-        // a coxa gira para o meio (o joelho vai para dentro) e a canela volta (joelho dobrado): o pé quase não sai do lugar
-        v.er -= 6 * wE; v.esy = 1 - 0.03 * wE; v.peE = wE; v.kE = -0.17 * wE;
-        v.dr += 6 * wD; v.dsy = 1 - 0.03 * wD; v.peD = wD; v.kD = 0.17 * wD;
-        if (Math.abs(sl) > 0.3) v.frenteE = wE > wD;
-      }
+      if (!modo && v.solta) pernaSolta(v, v.solta * pf0.cruza, (v.cruz || 0) * pf0.cruza);
       if (modo) mover(v, t);
+      // troca de modo sem pulo (dono, 22/Nov/2026: "nada de aparecer de uma posição depois aparecer em outra"): ao sair do
+      // andar para a pose, entrar ou sair da vitrine dos sapatos etc., o corpo vai do último quadro para o novo em 0,6 s
+      if (misturaDe && t - misturaIni < 600) {
+        var km = suave(Math.max(0, (t - misturaIni) / 600));
+        for (var cm in misturaDe) if (typeof misturaDe[cm] === 'number' && typeof v[cm] === 'number') v[cm] = misturaDe[cm] + (v[cm] - misturaDe[cm]) * km;
+      } else misturaDe = null;
       amp += (ampAlvo - amp) * 0.06;   // muda de amplitude devagar, sem tranco
       atual = v; aplicar(v, t);
       quadro = requestAnimationFrame(passo);
@@ -322,7 +341,7 @@
       trocar: function (nome, ms) { trocar(nome, ms); prox = performance.now() + (op.segura || 3200); },
       pose: function () { return nomeAtual; },
       amplitude: function (a) { ampAlvo = a; },
-      modo: function (m) { if (m !== modo) { modo = m || ''; modoIni = performance.now(); } },
+      modo: function (m) { if ((m || '') !== modo) { modo = m || ''; modoIni = performance.now(); misturaDe = atual; misturaIni = modoIni; } },
       parar: function () { vivo = false; cancelAnimationFrame(quadro); },
       lista: function (l) { lista = l; i = 0; prox = performance.now() + (op.segura || 3200); trocar(l[0]); }
     };
