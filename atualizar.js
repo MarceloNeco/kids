@@ -83,9 +83,10 @@
       var esperar = reg.update().then(function () {
         var novo = reg.installing || reg.waiting;
         if (!novo) return;
+        // espera ATIVAR: recarregar com a nova só "esperando" abria a velha de novo (quem atende ainda é a velha)
         return new Promise(function (ok) {
-          if (novo.state === 'installed' || novo.state === 'activated') return ok();
-          novo.addEventListener('statechange', function () { if (novo.state === 'installed' || novo.state === 'activated' || novo.state === 'redundant') ok(); });
+          if (novo.state === 'activated') return ok();
+          novo.addEventListener('statechange', function () { if (novo.state === 'activated' || novo.state === 'redundant') ok(); });
         });
       });
       // no máximo 45 s esperando a cópia nova chegar INTEIRA (sw-comum.js); se demorar mais, recarrega na versão do aparelho
@@ -94,11 +95,20 @@
     }).catch(recarregar);
   }
 
+  // jogo aberto há tempo (app na lista de recentes do tablet, TV): sem abrir a página de novo, o navegador não confere a
+  // versão nova; pede ao service worker para já ir baixando por trás (sw-comum.js), e a próxima abertura já é na nova
+  function baixarAoFundo() {
+    if (!('serviceWorker' in navigator) || !navigator.serviceWorker.getRegistration) return;
+    navigator.serviceWorker.getRegistration().then(function (reg) { if (reg) return reg.update(); }).catch(function () {});
+  }
+
   function conferir() {
     if (!visto || navigator.onLine === false) return;
+    if (document.querySelector('.bc-aviso')) return;   // a tela de carregando acabou de avisar da versão nova (carregando.js)
     lerVersao(true).then(function (v) {
       if (!v || !v.versao || v.versao === visto || v.versao === mostrado) return;
       mostrado = v.versao;
+      baixarAoFundo();
       avisar(v);
     });
   }

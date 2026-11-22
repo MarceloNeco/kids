@@ -8,9 +8,12 @@
     estante). O jogo fica escondido por baixo (só escondido: ele monta tudo normalmente).
   - Mostra o jogo quando a página terminou de carregar e as letras (fontes) chegaram — botões já com os escritos.
   - Com internet, antes de mostrar, confere se há versão nova do jogo (sw-comum.js). Se houver, mostra "Baixando a
-    versão nova…", espera ela chegar INTEIRA e abre já nela (uma vez só). Não chegou inteira: abre a versão que
-    está no aparelho, que continua inteira.
-  - Trava de segurança: nunca fica preso no carregando (no máximo 12 s; baixando versão nova, 45 s).
+    versão nova… 3 de 25", espera ela chegar INTEIRA e abre já nela (uma vez só). Espera enquanto o download anda
+    (tablet velho com internet fraca: arquivo grande passa de 45 s). Não chegou inteira (erro, internet parada, aparelho
+    sem espaço): abre a versão que está no aparelho, que continua inteira, e AVISA embaixo "Tem versão nova… abra o
+    jogo de novo com internet" (dono, 22/Nov/2026: nunca ficar calado na versão velha).
+  - Trava de segurança: nunca fica preso no carregando (no máximo 12 s; conferindo, 10 s; baixando a versão nova, 45 s
+    sem andar ou 3 minutos no total).
   Escrito em JavaScript antigo (sem =>) de propósito: o tablet Fire mais velho também roda.
 */
 (function () {
@@ -54,20 +57,45 @@
     if (!sw || !sw.controller || navigator.onLine === false || !sw.getRegistration) return Promise.resolve(false);
     var chave = 'bc-recarregou:' + location.pathname, agora = Date.now();
     try { if (agora - (+sessionStorage.getItem(chave) || 0) < 60000) return Promise.resolve(false); } catch (e) {}   // já abriu na nova agora há pouco
+    clearTimeout(trava);   // daqui em diante valem os prazos de baixo (nunca fica preso)
     return sw.getRegistration().then(function (reg) {
       if (!reg) return false;
       if (trocou) return true;
       return new Promise(function (ok) {
-        var t = setTimeout(function () { ok(false); }, 3000), seguindo = false;
+        var seguindo = false, fim = false, canal = null, parado = 0, teto = 0;
+        function acabar(v) {
+          if (fim) return;
+          fim = true; clearTimeout(t); clearTimeout(parado); clearTimeout(teto);
+          if (canal) try { canal.close(); } catch (e) {}
+          ok(v);
+        }
+        // não chegou inteira: abre a do aparelho e avisa
+        function desistir(motivo) { pendente = pendente || motivo || 'rede'; acabar(false); }
+        // conferir no site leva alguns segundos no tablet velho
+        var t = setTimeout(function () { acabar(trocou); }, 10000);
+        function andou() { clearTimeout(parado); parado = setTimeout(function () { desistir(); }, 45000); }
         function seguir(w) {
           if (!w || seguindo) return;
-          seguindo = true; clearTimeout(t); clearTimeout(trava);
+          seguindo = true; clearTimeout(t);
           msg(T('Baixando a versão nova…', 'Downloading the new version…', 'Descargando la versión nueva…'));
-          t = setTimeout(function () { ok(false); }, 45000);
-          if (w.state === 'activated') { clearTimeout(t); return ok(true); }
+          andou(); teto = setTimeout(function () { desistir(); }, 180000);
+          // o service worker conta o andamento (sw-comum.js): enquanto anda, espera
+          try {
+            canal = new BroadcastChannel('bolinho-sw');
+            canal.onmessage = function (ev) {
+              var m = ev.data || {};
+              if (m.escopo !== reg.scope) return;
+              if (m.fase === 'falhou') return desistir(m.motivo);
+              if (m.total) {
+                andou();
+                msg(T('Baixando a versão nova…', 'Downloading the new version…', 'Descargando la versión nueva…') + '\n' + m.feitos + T(' de ', ' of ', ' de ') + m.total);
+              }
+            };
+          } catch (e) {}
+          if (w.state === 'activated') return acabar(true);
           w.addEventListener('statechange', function () {
-            if (w.state === 'activated') { clearTimeout(t); ok(true); }
-            else if (w.state === 'redundant') { clearTimeout(t); ok(false); }   // não baixou inteira: fica a do aparelho
+            if (w.state === 'activated') acabar(true);
+            else if (w.state === 'redundant') desistir();   // não baixou inteira: fica a do aparelho
           });
         }
         if (reg.installing || reg.waiting) seguir(reg.installing || reg.waiting);
@@ -77,7 +105,7 @@
           setTimeout(function () {
             if (seguindo) return;
             if (reg.installing || reg.waiting) return seguir(reg.installing || reg.waiting);
-            clearTimeout(t); ok(trocou);
+            acabar(trocou);
           }, 50);
         }
         reg.update().then(conferiu, conferiu);
@@ -88,10 +116,34 @@
     }, function () { return false; });
   }
 
+  // a versão nova não chegou inteira desta vez: aviso embaixo (não tampa o jogo), some sozinho e fecha num toque
+  var pendente = '';
+  function avisar() {
+    if (!pendente || !d.body) return;
+    var a = d.createElement('div');
+    a.className = 'bc-aviso';
+    a.setAttribute('role', 'status');
+    a.style.cssText = 'position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);z-index:2147483000;' +
+      'width:max-content;max-width:calc(100% - 2rem);box-sizing:border-box;padding:.7rem 1rem;border-radius:16px;text-align:center;' +
+      'background:#1a1446;border:2px solid #ffd166;color:#f3f0ff;font:600 16px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;' +
+      'box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer';
+    a.textContent = pendente === 'espaco'
+      ? T('✨ Tem versão nova deste jogo, mas falta espaço no aparelho. Libere espaço e abra o jogo de novo.',
+        '✨ There\'s a new version of this game, but the device is out of space. Free up some space and open the game again.',
+        '✨ Hay una versión nueva de este juego, pero falta espacio en el dispositivo. Libera espacio y vuelve a abrir el juego.')
+      : T('✨ Tem versão nova deste jogo, mas ela não terminou de chegar. Abra o jogo de novo com internet.',
+        '✨ There\'s a new version of this game, but it didn\'t finish downloading. Open the game again with the internet on.',
+        '✨ Hay una versión nueva de este juego, pero no terminó de descargarse. Vuelve a abrir el juego con internet.');
+    function fechar() { if (a.parentNode) a.parentNode.removeChild(a); }
+    a.addEventListener('click', fechar);
+    setTimeout(fechar, 12000);
+    d.body.appendChild(a);
+  }
+
   window.addEventListener('load', function () {
     var fontes = d.fonts && d.fonts.ready ? d.fonts.ready : Promise.resolve();
     Promise.race([fontes, espera(3000)]).then(quadro).then(versaoNova).then(function (nova) {
-      if (nova && !mostrou) location.reload(); else mostrar();
+      if (nova && !mostrou) location.reload(); else { mostrar(); avisar(); }
     }, mostrar);
   });
   window.BolinhoCarregando = { mostrar: mostrar };
