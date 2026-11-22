@@ -1,5 +1,7 @@
 # Purpurina Nova Era (Purpurina New Age)
 
+> **Movimento e desenho do corpo:** antes de mexer, leia `MOTOR-MOVIMENTO.md` (especificação do dono e o que foi feito, com o porquê).
+
 > **Jogo novo ao lado da Purpurina de antes** (dono, 19/Nov/2026: "o antigo e o atual eu quero manter"). Nasceu em
 > 19/Nov/2026 como cópia da Purpurina 0.24.0 e vai recebendo o `BACKLOG.md` por etapas. A pasta `purpurina/` continua
 > igual e é a referência. Diferenças desta pasta:
