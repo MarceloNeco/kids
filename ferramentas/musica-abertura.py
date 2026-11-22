@@ -34,13 +34,9 @@ import subprocess
 import sys
 import tempfile
 
-import warnings
-
 import mido
 import numpy as np
 from scipy.io import wavfile
-
-warnings.filterwarnings('ignore', category=wavfile.WavFileWarning)
 
 SF2 = '/usr/share/sounds/sf2/FluidR3_GM.sf2'
 PPQ = 480
@@ -125,21 +121,21 @@ def parte(nome, *a, **k):
     return P[nome]
 
 
-violinos = parte('violinos', 48, vol=100, pan=44, rev=80, ganho=1.35)        # String Ensemble (melodia e escalas)
+violinos = parte('violinos', 48, vol=100, pan=44, rev=80)        # String Ensemble (melodia e escalas)
 violas = parte('violas', 48, vol=92, pan=74, rev=75)             # ostinato
 cordas = parte('cordas', 49, vol=96, pan=64, rev=90, ligar=True)  # Slow Strings: a cama
 cellos = parte('cellos', 42, vol=100, pan=86, rev=70)
 baixos = parte('baixos', 43, vol=100, pan=94, rev=65)
 pizz = parte('pizz', 45, vol=98, pan=52, rev=70)
 harpa = parte('harpa', 46, vol=100, pan=30, rev=85)
-celesta = parte('celesta', 8, vol=100, pan=98, rev=90, ganho=1.8)
-glock = parte('glock', 9, vol=80, pan=88, rev=90, ganho=2.5)
+celesta = parte('celesta', 8, vol=100, pan=98, rev=90)
+glock = parte('glock', 9, vol=80, pan=88, rev=90)
 trompas = parte('trompas', 60, vol=110, pan=50, rev=80)
-trompetes = parte('trompetes', 56, vol=96, pan=76, rev=75, ganho=1.35)
+trompetes = parte('trompetes', 56, vol=96, pan=76, rev=75)
 trombones = parte('trombones', 57, vol=92, pan=84, rev=75, ligar=True)
 tuba = parte('tuba', 58, vol=92, pan=90, rev=70, ligar=True)
 flauta = parte('flauta', 73, vol=100, pan=56, rev=85)
-oboe = parte('oboe', 68, vol=92, pan=70, rev=85, ganho=1.6)
+oboe = parte('oboe', 68, vol=92, pan=70, rev=85)
 clarinete = parte('clarinete', 71, vol=96, pan=60, rev=85)
 timpanos = parte('timpanos', 47, vol=110, pan=64, rev=75)
 kit = parte('kit', 48, vol=100, pan=64, rev=80, kit=True)       # Orchestra Kit (banco 128)
@@ -315,11 +311,11 @@ def compor():
         p.cc(0, 11, 100)
 
     # ---- 1. introdução mágica (pp, crescendo)
-    arpejo(harpa, P_INTRO, INTRO, nota('D3'), 64, alcance=24)
+    arpejo(harpa, P_INTRO, INTRO, nota('D3'), 58, alcance=24)
     harpa.rampa(INTRO, A, 85, 110)
     cama(cordas, P_INTRO, INTRO, nota('A3'), 60)
-    cordas.rampa(INTRO, A, 64, 108)
-    raizes(cellos, P_INTRO, INTRO, nota('C2'), 60, leg=1.0)
+    cordas.rampa(INTRO, A, 45, 105)
+    raizes(cellos, P_INTRO, INTRO, nota('C2'), 55, leg=1.0)
     cellos.rampa(INTRO, A, 60, 105)
     raizes(baixos, P_INTRO[4:], INTRO + 16, nota('E1'), 55, leg=1.0)
     baixos.rampa(INTRO + 16, A, 60, 105)
