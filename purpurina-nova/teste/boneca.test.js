@@ -625,3 +625,11 @@ test('andar de passarela de verdade: pé da frente embaixo, perna da frente por 
   const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
   assert.match(css, /\.modelo \.passarela-boneca \{ filter: drop-shadow\(0 3px 4px/, 'sombra colada nos pés');
 });
+
+test('pé no chão: sapato reto no piso e sombrinha de cada pé (dono, 22/Nov/2026)', () => {
+  const s = B.svg({}, { id: 'pc', rig: true, passos: true, fundo: false });
+  assert.match(s, /class="pp-sapato-frente" data-ae="[\d.]+,640" data-ad="[\d.]+,640"/, 'tornozelos marcados');
+  assert.match(s, /class="pp-sombra-pe-e" data-p="[\d.]+,662" data-q=/); assert.match(s, /class="pp-sombra-pe-d"/);
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /scale\(1 ' \+ \(1 \/ sy\)\.toFixed\(4\) \+ '\) rotate\(' \+ \(-rr\)/, 'o sapato gira e estica ao contrário da perna');
+});
