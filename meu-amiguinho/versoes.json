@@ -2,6 +2,14 @@
   "app": "meu-amiguinho",
   "versoes": [
     {
+      "versao": "0.3.0",
+      "data": "22/Nov/2026",
+      "hora": "21:30:00",
+      "pt": ["👗 54 roupas novas tiradas das fotos de referência: 13 roupas inteiras, 20 partes de cima (camisetas, blusas, moletons, jaquetas) e 21 saias, shortinhos e calças", "🧩 Agora dá para combinar parte de cima com saia ou short, cada um da sua cor e do seu tom", "🗂️ A etapa Me veste! tem prateleira: Roupas inteiras · Partes de cima · Saias e shorts"],
+      "en": ["👗 54 new outfits taken from the reference photos: 13 full outfits, 20 tops (tees, blouses, hoodies, jackets) and 21 skirts, shorts and pants", "🧩 Now you can mix a top with a skirt or shorts, each in its own color and shade", "🗂️ The Dress me! step has a shelf: Full outfits · Tops · Skirts and shorts"],
+      "es": ["👗 54 prendas nuevas sacadas de las fotos de referencia: 13 conjuntos enteros, 20 partes de arriba (camisetas, blusas, sudaderas, chaquetas) y 21 faldas, shorts y pantalones", "🧩 Ahora puedes combinar la parte de arriba con falda o short, cada una con su color y su tono", "🗂️ El paso ¡Vísteme! tiene estantería: Conjuntos · Partes de arriba · Faldas y shorts"]
+    },
+    {
       "versao": "0.2.1",
       "data": "22/Nov/2026",
       "hora": "19:30:00",

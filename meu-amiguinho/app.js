@@ -5,7 +5,7 @@
    Histórico: cada tela de dentro (cada etapa também) é uma entrada; o Voltar do celular volta uma etapa. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.2.1', APP_DATA = '22/Nov/2026';
+  var APP_VERSION = '0.3.0', APP_DATA = '22/Nov/2026';
   var D = window.AmiguinhoDados, A = window.AmiguinhoArte, R = window.AmiguinhoRegras, V = window.AmiguinhoVoz, VIVO = window.AmiguinhoVivo;
   var $ = function (id) { return document.getElementById(id); };
   var TESTE = /[?&]teste\b/.test(location.search);
