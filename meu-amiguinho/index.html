@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Meu Amiguinho — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../carregando.js" data-fora-do-arquivo></script>
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#fbe3ee">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Meu Amiguinho: monte a sua pelúcia em 7 etapas — escolha o bichinho, a cor do pelo, o coraçãozinho, encha de fofura, vista, enfeite, dê uma voz e um nome, e ganhe a certidão de nascimento. / My Little Buddy: build your own plush buddy in 7 steps. / Mi Amiguito: arma tu propio peluche en 7 pasos.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Meu Amiguinho / My Little Buddy / Mi Amiguito — oficina de pelúcia da família Bolinho de Chuva (SolverONE · kids).
+  Dados em dados.js, desenho em SVG em arte.js, regras e coleção em regras.js, sons e vozes em voz.js, a pelúcia viva
+  (respirar, piscar, abraço, andar, LED do robozinho) em vivo.js, telas e etapas em app.js. Sem login, sem banco: tudo
+  fica no aparelho (a voz gravada também). Nada de script inline: a CSP acima não permite. Mapa: LEIA-ME.md.
+-->
+</head>
+<body>
+
+<!-- ===== começo ===== -->
+<section id="menu" class="tela ativa" data-recurso="meu-amiguinho">
+  <div class="capa">
+    <h1 class="letreiro"><span class="l1" data-t="Meu|My Little|Mi"></span> <span class="l2" data-t="Amiguinho|Buddy|Amiguito"></span></h1>
+    <p class="sub" data-t="Monte a sua pelúcia do jeitinho que você quiser|Build your very own plush buddy|Arma tu peluche como tú quieras"></p>
+    <div id="estante" class="estante" aria-hidden="true"></div>
+  </div>
+  <div class="painel-menu">
+    <div class="seg" role="radiogroup" aria-label="Nível" data-rotulo="Nível|Level|Nivel">
+      <button class="chip verde" type="button" role="radio" data-nivel="facil" aria-checked="true" data-t="🐣 Fácil|🐣 Easy|🐣 Fácil"></button>
+      <button class="chip amarelo" type="button" role="radio" data-nivel="medio" aria-checked="false" data-t="🐥 Médio|🐥 Medium|🐥 Medio"></button>
+      <button class="chip vermelho" type="button" role="radio" data-nivel="dificil" aria-checked="false" data-t="📋 Encomenda|📋 Order|📋 Encargo"></button>
+    </div>
+    <button id="btCriar" class="principal" type="button" data-t="✨ Criar meu amiguinho|✨ Make my buddy|✨ Crear mi amiguito"></button>
+    <button id="btContinuar" class="secundario" type="button" hidden data-t="🧵 Continuar o que eu estava montando|🧵 Keep building the one I started|🧵 Seguir con el que estaba armando"></button>
+    <button id="btColecao" class="secundario" type="button"><span data-t="📚 Minha coleção|📚 My collection|📚 Mi colección"></span> <b id="nColecao">2</b></button>
+    <div class="rodape">
+      <button id="btAjuda" class="mini" type="button" aria-label="Como brincar" data-rotulo="Como brincar|How to play|Cómo se juega">❓</button>
+      <button id="btEfeitos" class="mini" type="button" aria-label="Sons" data-rotulo="Sons|Sounds|Sonidos">🔊</button>
+      <button id="btInstalar" class="mini" type="button" hidden data-t="📲 Instalar|📲 Install|📲 Instalar"></button>
+      <p id="versao" class="versao"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== a oficina: 7 etapas ===== -->
+<section id="oficina" class="tela" data-recurso="meu-amiguinho">
+  <header class="of-topo">
+    <div class="selo" aria-hidden="true"><b id="seloNum">1</b></div>
+    <div class="of-titulo">
+      <h2 id="etTitulo"></h2>
+      <p><span id="etSub"></span> · <span id="etConta"></span></p>
+    </div>
+    <ol id="pontos" class="pontos" aria-hidden="true"></ol>
+  </header>
+  <div id="encomenda" class="encomenda" hidden>
+    <span class="enc-ico" aria-hidden="true">📋</span><p id="encTexto"></p>
+  </div>
+  <div class="of-corpo">
+    <div id="palco" class="palco">
+      <div id="fala" class="fala" hidden></div>
+      <div id="maquina" class="maquina" hidden></div>
+      <div id="pelucia" class="pelucia"></div>
+      <div id="medidor" class="medidor" hidden aria-hidden="true"><i id="medidorEnche"></i><span class="z1"></span><span class="z2"></span></div>
+    </div>
+    <div id="painel" class="painel"></div>
+  </div>
+  <nav class="of-rodape">
+    <button id="btVoltar" class="mini largo" type="button" data-t="◀ Voltar|◀ Back|◀ Atrás"></button>
+    <button id="btProximo" class="secundario" type="button" data-t="Próximo ▶|Next ▶|Siguiente ▶"></button>
+    <button id="btPronto" class="principal" type="button" data-t="🎁 Pronto!|🎁 Done!|🎁 ¡Listo!"></button>
+  </nav>
+</section>
+
+<!-- ===== o amiguinho pronto (no fim e na coleção) ===== -->
+<section id="amigo" class="tela" data-recurso="meu-amiguinho">
+  <header class="am-topo">
+    <h2 id="amNome"></h2>
+    <p id="amEspecie"></p>
+    <p id="amEstrelas" class="estrelas" hidden></p>
+  </header>
+  <div id="palcoAmigo" class="palco palco-amigo">
+    <div id="peluciaAmigo" class="pelucia"></div>
+    <button id="btCoracao" class="bt-coracao" type="button" aria-label="Ouvir a frase" data-rotulo="Ouvir a frase|Hear my words|Oír la frase">❤</button>
+    <div id="falaAmigo" class="fala" hidden></div>
+  </div>
+  <div class="am-acoes">
+    <button id="btBrincar" class="secundario" type="button"></button>
+    <button id="btCertidao" class="principal" type="button" data-t="📜 Certidão|📜 Certificate|📜 Certificado"></button>
+    <button id="btEditar" class="mini largo" type="button" data-t="✏️ Editar|✏️ Edit|✏️ Editar"></button>
+    <button id="btApagar" class="mini largo" type="button" data-t="🗑️ Apagar|🗑️ Delete|🗑️ Borrar"></button>
+    <button id="btNovo" class="mini largo" type="button" data-t="✨ Outro|✨ Another|✨ Otro"></button>
+  </div>
+</section>
+
+<!-- ===== minha coleção (vitrine) ===== -->
+<section id="colecao" class="tela" data-recurso="meu-amiguinho">
+  <div id="vitrineFundo" class="vitrine-fundo" aria-hidden="true"></div>
+  <h2 class="col-titulo" data-t="📚 Minha coleção|📚 My collection|📚 Mi colección"></h2>
+  <div id="grade" class="grade"></div>
+</section>
+
+<!-- caixinha-casinha: o amiguinho pulando dela -->
+<div id="caixaAnim" class="caixa-anim" hidden aria-hidden="true">
+  <div id="caixaDesenho" class="caixa-desenho"></div>
+  <div id="pulo" class="pulo"></div>
+  <div id="confete" class="confete"></div>
+</div>
+
+<!-- a certidão -->
+<div id="certJanela" class="janela" hidden role="dialog" aria-modal="true" aria-labelledby="certTitulo">
+  <div class="janela-caixa cert-caixa">
+    <h2 id="certTitulo" class="so-leitor" data-t="Certidão de nascimento|Birth certificate|Certificado de nacimiento"></h2>
+    <div id="certDesenho" class="cert-desenho"></div>
+    <div class="janela-botoes">
+      <button id="btSalvarPng" class="principal" type="button" data-t="💾 Salvar imagem|💾 Save picture|💾 Guardar imagen"></button>
+      <button id="btFecharCert" class="mini largo" type="button" data-t="Fechar|Close|Cerrar"></button>
+    </div>
+  </div>
+</div>
+
+<!-- confirmar apagar -->
+<div id="apagarJanela" class="janela" hidden role="dialog" aria-modal="true" aria-labelledby="apagarTitulo">
+  <div class="janela-caixa">
+    <h2 id="apagarTitulo" data-t="Apagar este amiguinho?|Delete this buddy?|¿Borrar este amiguito?"></h2>
+    <p data-t="Ele sai da sua coleção (e a voz gravada também).|It leaves your collection (and its recorded voice too).|Sale de tu colección (y su voz grabada también)."></p>
+    <div class="janela-botoes">
+      <button id="btApagarSim" class="perigo" type="button" data-t="🗑️ Apagar|🗑️ Delete|🗑️ Borrar"></button>
+      <button id="btApagarNao" class="mini largo" type="button" data-t="Não, fica!|No, keep it!|¡No, que se quede!"></button>
+    </div>
+  </div>
+</div>
+
+<!-- como brincar -->
+<div id="ajuda" class="janela" hidden role="dialog" aria-modal="true" aria-labelledby="ajudaTitulo">
+  <div class="janela-caixa ajuda-caixa">
+    <h2 id="ajudaTitulo" data-t="Como brincar|How to play|Cómo se juega"></h2>
+    <ul class="ajuda-lista">
+      <li data-t="🧸 Monte a sua pelúcia em 7 etapas: bichinho, pelo e olhinhos, coração e fofura, roupinha, acessórios, voz e nome.|🧸 Build your plush in 7 steps: animal, fur and eyes, heart and fluff, outfit, accessories, voice and name.|🧸 Arma tu peluche en 7 pasos: animalito, pelo y ojitos, corazón y relleno, ropita, accesorios, voz y nombre."></li>
+      <li data-t="🎁 O botão Pronto fica sempre à vista: dá para terminar quando quiser, o resto já vem escolhido.|🎁 The Done button is always there: finish whenever you like, the rest is already picked.|🎁 El botón Listo siempre está a la vista: termina cuando quieras, lo demás ya viene elegido."></li>
+      <li data-t="❤️ No coração: segure o coraçãozinho para dar um beijinho e fazer um desejo. Depois segure o botão da máquina para encher de fofura e solte no ponto certo!|❤️ Heart step: hold the little heart to give it a kiss and make a wish. Then hold the machine button to fill your buddy with fluff and let go at just the right moment!|❤️ En el corazón: mantén pulsado el corazoncito para darle un besito y pedir un deseo. ¡Luego mantén el botón de la máquina para rellenarlo y suelta en el punto justo!"></li>
+      <li data-t="🎙️ Na voz: escolha uma frase pronta, escreva a sua ou grave a sua voz. A gravação fica só neste aparelho.|🎙️ Voice step: pick a ready phrase, write your own or record your voice. The recording stays on this device only.|🎙️ En la voz: elige una frase lista, escribe la tuya o graba tu voz. La grabación se queda solo en este aparato."></li>
+      <li data-t="🐣 Fácil: menos opções em cada etapa. 🐥 Médio: todas as opções. 📋 Encomenda (difícil): um cartão pede um amiguinho e você monta igual para ganhar estrelas.|🐣 Easy: fewer choices in each step. 🐥 Medium: every choice. 📋 Order (hard): a card asks for a buddy and you build it just right to earn stars.|🐣 Fácil: menos opciones en cada paso. 🐥 Medio: todas las opciones. 📋 Encargo (difícil): una tarjeta pide un amiguito y lo armas igual para ganar estrellas."></li>
+      <li data-t="💖 Toque no amiguinho pronto: ele abraça, acena e pula; toque no coração do peito para ouvir a frase. Tudo fica guardado em Minha coleção.|💖 Tap your finished buddy: it hugs, waves and jumps; tap the heart on its chest to hear its words. Everything is kept in My collection.|💖 Toca a tu amiguito terminado: abraza, saluda y salta; toca el corazón del pecho para oír su frase. Todo se guarda en Mi colección."></li>
+    </ul>
+    <div class="janela-botoes"><button id="btFecharAjuda" class="principal" type="button" data-t="Entendi!|Got it!|¡Entendido!"></button></div>
+  </div>
+</div>
+
+<div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+
+<section id="desligado" class="tela" hidden>
+  <h2 data-t="O Meu Amiguinho está descansando agora.|My Little Buddy is resting right now.|Mi Amiguito está descansando ahora."></h2>
+</section>
+
+<script src="dados.js"></script>
+<script src="arte.js"></script>
+<script src="regras.js"></script>
+<script src="voz.js"></script>
+<script src="vivo.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../trilha.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
