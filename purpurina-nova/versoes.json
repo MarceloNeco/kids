@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.12",
+      "data": "22/Nov/2026",
+      "hora": "09:45:25",
+      "pt": [
+        "👠 Desfile em linha única, como modelo de verdade: as pernas sempre fecham para o meio da passarela, um pé na frente do outro (antes abriam para fora, em \"A\"), e a perna que vem para a frente passa por cima da outra."
+      ],
+      "en": [
+        "👠 A single-line runway walk, like a real model: the legs always come in toward the middle of the runway, one foot in front of the other (before they opened outward in an \"A\"), and the leg coming forward passes in front of the other."
+      ],
+      "es": [
+        "👠 Desfile en una sola línea, como una modelo de verdad: las piernas siempre se cierran hacia el centro de la pasarela, un pie delante del otro (antes se abrían hacia fuera, en \"A\"), y la pierna que avanza pasa por delante de la otra."
+      ]
+    },
+    {
       "versao": "0.9.11",
       "data": "22/Nov/2026",
       "hora": "09:16:02",

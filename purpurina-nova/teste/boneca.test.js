@@ -655,8 +655,9 @@ test('GIF do desfile e da Baladinha para compartilhar (dono, 22/Nov/2026)', asyn
 test('catwalk sem pernas fantasma e pulo de verdade na Baladinha (dono, 22/Nov/2026)', () => {
   const fs = require('fs'), path = require('path');
   const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
-  assert.match(anim, /var cruzado = dentro \* Math\.max\(0, frente\);/, 'só o pé da frente cruza');
-  assert.match(anim, /r: cruzado - lado \* 6 \* sob \* cruza/, 'no ar a perna contorna a outra por fora');
+  // (0.9.12, GIF do dono: "pernas abrem para fora"): linha única — as pernas sempre fecham para o meio, nunca abrem
+  assert.match(anim, /var cruzado = dentro \* \(0\.62 \+ 0\.38 \* Math\.max\(0, frente\)\);/, 'sempre fechando para a linha do meio');
+  assert.doesNotMatch(anim, /lado \* 6 \* sob/, 'no ar a perna não abre para fora');
   assert.match(anim, /modo === 'pular'/); assert.match(anim, /v\.pulo = 23 \* ag - 48 \* alto/, 'agacha, sobe e pousa');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   assert.match(app, /modo: 'pular', puloMs: 1100/);
