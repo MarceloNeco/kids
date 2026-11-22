@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.9';
+  var APP_VERSION = '0.9.10';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -844,6 +844,39 @@
       abrirJanela({ titulo: t('🎬 Vídeo', '🎬 Video', '🎬 Vídeo'), texto: t('Este navegador não conseguiu gravar o vídeo. A foto continua funcionando.', "This browser couldn't record the video. Photos still work.", "Este navegador no ha podido grabar el vídeo. La foto sigue funcionando."), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true);
     });
   }
+
+  /* ---------- GIF do desfile e da Baladinha (dono, 22/Nov/2026: "gerar um GIF… e compartilhar, por exemplo
+     WhatsApp") ----------
+     Grava a cena que está na tela (gif.js), monta o GIF no próprio aparelho e abre com Compartilhar (WhatsApp e os outros
+     apps do celular) e Salvar. No desfile ela entra de novo pela passarela enquanto grava; na Baladinha, grava a dança. */
+  var gravandoGif = false;
+  function gifDe(palco, ms, nome) {
+    if (gravandoGif || !window.PurpurinaGif) return;
+    gravandoGif = true; Som.tocar('clique');
+    recado(t('🔴 Gravando o GIF…', '🔴 Recording the GIF…', '🔴 Grabando el GIF…'));
+    PurpurinaGif.gravar(palco, { ms: ms, fps: 10, largura: 360, andamento: function (p) {
+      if (p >= 0.4 && $('janela').hidden) abrirJanela({ titulo: t('🎞️ Preparando o GIF…', '🎞️ Making the GIF…', '🎞️ Preparando el GIF…'), texto: '0%', botoes: [] }, true);
+      if (p >= 0.4) $('janelaTexto').textContent = Math.round((p - 0.4) / 0.6 * 100) + '%';
+    } }).then(function (blob) {
+      gravandoGif = false;
+      var url = URL.createObjectURL(blob), arq = null, nomeArq = 'purpurina-' + nome + '-' + carimbo() + '.gif';
+      try { arq = new File([blob], nomeArq, { type: 'image/gif' }); } catch (x) { /* navegador antigo */ }
+      var botoes = [];
+      if (arq && navigator.canShare && navigator.canShare({ files: [arq] })) botoes.push({ t: t('📤 Compartilhar', '📤 Share', '📤 Compartir'), classe: 'grande', ficar: true, fn: function () { navigator.share({ files: [arq], title: 'Purpurina' }).catch(function () { /* cancelou */ }); } });
+      botoes.push({ t: t('💾 Salvar o GIF', '💾 Save the GIF', '💾 Guardar el GIF'), classe: botoes.length ? 'medio' : 'grande', ficar: true, fn: function () {
+        var a = document.createElement('a'); a.href = url; a.download = nomeArq; document.body.appendChild(a); a.click(); a.remove();
+        recado(t('O GIF foi para a pasta Downloads (ou Arquivos).', 'The GIF went to your Downloads (or Files).', 'El GIF se ha guardado en la carpeta Descargas (o Archivos).'));
+      } });
+      botoes.push({ t: t('Fechar', 'Close', 'Cerrar') });
+      abrirJanela({ titulo: t('🎞️ Seu GIF!', '🎞️ Your GIF!', '🎞️ ¡Tu GIF!'), img: url, alt: 'GIF', botoes: botoes }, true);
+      Som.tocar('tada');
+    }).catch(function () {
+      gravandoGif = false;
+      abrirJanela({ titulo: '🎞️ GIF', texto: t('Este navegador não conseguiu fazer o GIF. A foto continua funcionando.', "This browser couldn't make the GIF. Photos still work.", 'Este navegador no ha podido hacer el GIF. La foto sigue funcionando.'), botoes: [{ t: t('Fechar', 'Close', 'Cerrar') }] }, true);
+    });
+  }
+  $('btGifDesfile').addEventListener('click', function () { if (gravandoGif) return; desfilar(); setTimeout(function () { gifDe($('palcoDesfile'), 5400, 'desfile'); }, 150); });
+  $('btGifBalada').addEventListener('click', function () { gifDe($('palcoBalada'), 3200, 'baladinha'); });
 
   // ---------- desfile ----------
   var FRASES = {
