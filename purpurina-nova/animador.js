@@ -135,6 +135,32 @@
       estilo('.pp-corpo', v.cx * amp, v.cy * amp - resp, v.cr * amp);
       estilo('.pp-passo-e', v.ex * amp, v.ey * amp, v.er * amp, v.esy ? ' scaleY(' + v.esy.toFixed(3) + ')' : '');
       estilo('.pp-passo-d', v.dx * amp, v.dy * amp, v.dr * amp, v.dsy ? ' scaleY(' + v.dsy.toFixed(3) + ')' : '');
+      // a perna da frente vai por cima da outra (na passada as pernas se cruzam: a que vem para a frente passa na frente)
+      if (v.frenteE != null) {
+        var fr = v.frenteE ? 'e' : 'd', tr = v.frenteE ? 'd' : 'e';
+        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + fr), function (gf) {
+          var gt = gf.parentNode && gf.parentNode.querySelector(':scope > .pp-passo-' + tr);
+          if (gt && (gt.compareDocumentPosition(gf) & Node.DOCUMENT_POSITION_PRECEDING)) gf.parentNode.insertBefore(gt, gf);
+        });
+      }
+      /* pé no chão de verdade (dono, 22/Nov/2026): o sapato não inclina nem estica junto com a perna — gira e estica ao
+         contrário em volta do tornozelo, então fica reto no piso; e a sombrinha de cada pé fica no chão, embaixo dele,
+         mais clara e menor quando o pé levanta */
+      [['e', v.er || 0, v.esy || 1, v.ex || 0, v.sobeE || 0], ['d', v.dr || 0, v.dsy || 1, v.dx || 0, v.sobeD || 0]].forEach(function (pl) {
+        var rr = pl[1] * amp, sy = 1 + (pl[2] - 1) * amp;
+        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' .pp-sapato-frente'), function (g) {
+          var a = (g.getAttribute('data-a' + pl[0]) || '').split(',').map(Number); if (a.length < 2) return;
+          g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ') scale(1 ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ') translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
+        });
+        var sb = svg.querySelector('.pp-sombra-pe-' + pl[0]);
+        if (sb) {
+          var p = sb.getAttribute('data-p').split(',').map(Number), q = sb.getAttribute('data-q').split(',').map(Number), ra = rr * Math.PI / 180;
+          var dx = p[0] - q[0], dy = (p[1] - q[1]) * sy;
+          sb.setAttribute('cx', (q[0] + pl[3] * amp + Math.cos(ra) * dx - Math.sin(ra) * dy).toFixed(1));
+          sb.setAttribute('cy', Math.min(670, q[1] + Math.sin(ra) * dx + Math.cos(ra) * dy).toFixed(1));
+          sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4])).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4])).toFixed(3));
+        }
+      });
       // vitrine dos sapatos: troca o sapato de frente pelo de lado só na perna que está levantada
       [['e', !!v.ladoE], ['d', !!v.ladoD]].forEach(function (pl) {
         var g = svg.querySelector('.pp-passo-' + pl[0]), lig = pl[1] ? '1' : '0'; if (!g || g.getAttribute('data-lado') === lig) return;
@@ -153,11 +179,20 @@
        dançar (Baladinha): no ritmo, o peso vai de uma perna para a outra, o joelho do outro lado dobra, o quadril
        balança e o corpo desce em cada batida — sem a boneca inteira pular. */
     var modo = op.modo || '', modoIni = performance.now();
-    function perna(u, lado, cruza) {   // u: 0 → 1 do ciclo desta perna (0 – 0,5 apoio; 0,5 – 1 no ar); lado -1 esquerda, 1 direita
+    /* uma perna no ciclo (u: 0 → 1; 0 – 0,5 no chão, 0,5 – 1 no ar; lado -1 esquerda, 1 direita).
+       De frente, "ir para a frente" é o pé descer na tela (fica mais perto de quem olha) e "ficar para trás" é subir:
+       no chão, o pé fica parado no piso enquanto o corpo passa por cima dele, então, em relação ao corpo, ele vai da
+       frente (embaixo) para trás (em cima); no ar, ele volta de trás para a frente, levantando, e pousa na frente.
+       frente: +1 = pé da frente, -1 = pé de trás (a perna da frente é desenhada por cima da outra — animador ordena).
+       (dono, 22/Nov/2026: "as pernas se sobrepondo incorretamente… parece flutuar e não caminhar") */
+    function perna(u, lado, cruza) {
       var dentro = lado * 7 * cruza;   // pé na linha do meio (girar a perna para dentro, até o pé cruzar); menino: 0 (trilhos paralelos)
-      if (u < 0.5) return { x: 0, y: 0, r: dentro, sy: 1 };
+      var frente = u < 0.5 ? 1 - 4 * u : -1 + 4 * (u - 0.5);
+      var compr = 1 + 0.05 * frente;   // pé da frente mais embaixo (perna "mais comprida" na tela), o de trás mais em cima
+      var cruzado = dentro * (0.55 + 0.45 * (frente + 1) / 2);   // o pé da frente cruza mais (pousa na linha do meio)
+      if (u < 0.5) return { x: 0, y: 0, r: cruzado, sy: compr, frente: frente };
       var w = (u - 0.5) / 0.5, sob = Math.sin(Math.PI * w);
-      return { x: 0, y: -10 * sob + 4 * w * w, r: dentro * (0.3 + 0.7 * w) + lado * 3 * sob + dentro * 0.25 * w, sy: 1 - 0.1 * sob };
+      return { x: 0, y: -9 * sob, r: cruzado + lado * 3 * sob, sy: compr * (1 - 0.1 * sob), frente: frente, sobe: sob };
     }
     function mover(v, t) {
       if (modo === 'andar') {
@@ -166,6 +201,8 @@
         function fase(x) { return (x + 0.22 * Math.sin(2 * Math.PI * x) / (2 * Math.PI) + 1) % 1; }
         var e = perna(fase(f), -1, pf.cruza), d = perna(fase((f + 0.5) % 1), 1, pf.cruza);
         v.ex = e.x; v.ey = e.y; v.er = e.r; v.esy = e.sy; v.dx = d.x; v.dy = d.y; v.dr = d.r; v.dsy = d.sy;
+        v.frenteE = e.frente > d.frente;   // qual perna está na frente (desenhada por cima)
+        v.sobeE = e.sobe || 0; v.sobeD = d.sobe || 0;   // quanto cada pé está no ar (sombra do pé)
         // o quadril vai para o lado da perna de apoio pelo rebolado (curva do corpo inteiro), sem arrastar pedaços
         // (dono, 21/Nov/2026, vídeo de mulheres andando: "jeito de andar"): quadril gingando bem para o lado da perna de
         // apoio, ombros firmes, cabeça parada olhando para a frente, o corpo descendo de leve em cada passo

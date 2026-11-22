@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.9",
+      "data": "22/Nov/2026",
+      "hora": "00:33:39",
+      "pt": [
+        "👠 Desfile de verdade: o pé que vai para a frente pousa mais embaixo e o de trás fica para trás, a perna da frente passa por cima da outra (antes se cruzavam do jeito errado), ela avança no mesmo ritmo dos passos (sem escorregar) e a sombra fica colada nos pés (antes parecia flutuar).",
+        "👣 Pé no chão de verdade: o sapato fica reto no piso mesmo com a perna inclinada, e cada pé tem sua sombrinha no chão, que clareia e diminui quando o pé levanta."
+      ],
+      "en": [
+        "👠 A real runway walk: the foot going forward lands lower and the back foot stays behind, the front leg passes in front of the other (before they crossed the wrong way), she moves forward at the same pace as her steps (no sliding) and the shadow stays at her feet (before she seemed to float).",
+        "👣 Feet really on the floor: the shoe stays flat on the floor even when the leg leans, and each foot has its own little shadow on the floor that fades and shrinks when the foot lifts."
+      ],
+      "es": [
+        "👠 Desfile de verdad: el pie que va hacia delante se apoya más abajo y el de atrás se queda atrás, la pierna de delante pasa por encima de la otra (antes se cruzaban al revés), avanza al mismo ritmo que los pasos (sin resbalar) y la sombra queda pegada a los pies (antes parecía flotar).",
+        "👣 Pies de verdad en el suelo: el zapato queda plano en el suelo aunque la pierna se incline, y cada pie tiene su sombrita en el suelo, que se aclara y se achica cuando el pie se levanta."
+      ]
+    },
+    {
       "versao": "0.9.8",
       "data": "21/Nov/2026",
       "hora": "14:46:46",

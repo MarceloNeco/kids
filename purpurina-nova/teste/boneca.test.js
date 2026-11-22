@@ -612,3 +612,24 @@ test('estúdio enxuto: ferramentas no ⋯, barra de tom só depois de tocar na c
   const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
   assert.match(css, /grid-template-rows: repeat\(2, auto\)/, 'roupas em duas fileiras');
 });
+
+test('andar de passarela de verdade: pé da frente embaixo, perna da frente por cima, sem escorregar (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /var frente = u < 0\.5 \? 1 - 4 \* u : -1 \+ 4 \* \(u - 0\.5\);/, 'no chão o pé vai da frente para trás; no ar volta');
+  assert.match(anim, /var compr = 1 \+ 0\.05 \* frente;/, 'pé da frente mais embaixo na tela');
+  assert.match(anim, /v\.frenteE = e\.frente > d\.frente;/);
+  assert.match(anim, /insertBefore\(gt, gf\)/, 'a perna da frente é desenhada por cima');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /dur = Math\.max\(2, Math\.round\(3600 \/ passada\)\) \* passada/, 'anda um número inteiro de passadas, em velocidade constante');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
+  assert.match(css, /\.modelo \.passarela-boneca \{ filter: drop-shadow\(0 3px 4px/, 'sombra colada nos pés');
+});
+
+test('pé no chão: sapato reto no piso e sombrinha de cada pé (dono, 22/Nov/2026)', () => {
+  const s = B.svg({}, { id: 'pc', rig: true, passos: true, fundo: false });
+  assert.match(s, /class="pp-sapato-frente" data-ae="[\d.]+,640" data-ad="[\d.]+,640"/, 'tornozelos marcados');
+  assert.match(s, /class="pp-sombra-pe-e" data-p="[\d.]+,662" data-q=/); assert.match(s, /class="pp-sombra-pe-d"/);
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /scale\(1 ' \+ \(1 \/ sy\)\.toFixed\(4\) \+ '\) rotate\(' \+ \(-rr\)/, 'o sapato gira e estica ao contrário da perna');
+});

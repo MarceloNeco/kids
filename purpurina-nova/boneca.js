@@ -384,7 +384,8 @@
     var vitrine = op.rig !== false && op.passos && !angB && !(POSES.indexOf(op.pose) >= 0);   // (o rig ainda não foi decidido aqui)
     if (vitrine) {
       var XE = DF.fx(177, 650);
-      out.push('<g class="pp-sapato-frente">' + sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas) + '</g>');
+      // tornozelos (para o animador manter o sapato reto no chão mesmo com a perna inclinada ou esticada)
+      out.push('<g class="pp-sapato-frente" data-ae="' + n(DF.fx(177, 640)) + ',640" data-ad="' + n(DF.fx(223, 640)) + ',640">' + sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas) + '</g>');
       // (cada pé com o seu: na perna esquerda só o sapato de lado esquerdo, senão a ponta do outro aparecia no corte)
       out.push('<g class="pp-sapato-lado-e" style="display:none"><g transform="translate(' + n(2 * XE) + ' 0) scale(-1 1)">' + sapatoLado(167, false) + '</g></g>' +
         '<g class="pp-sapato-lado-d" style="display:none">' + sapatoLado(213, false) + '</g>');
@@ -600,6 +601,11 @@
        na mesma altura vai junto (a mão na cintura fica na cintura). O animador só muda as duas matrizes (.pp-banda-*). */
     if (rig && op.passos && op.rebolar !== false) {
       var yJ = DF.fy(456), fica = cenarioS && out[0] === cenarioS ? [out.shift()] : [], chao = out.indexOf(sombraChao) >= 0 ? [sombraChao] : [];
+      // uma sombrinha embaixo de cada pé, no chão: escura com o pé apoiado, mais clara e menor quando ele levanta
+      // (o animador acompanha o pé; data-q = quadril da perna, de onde ela gira)
+      [['e', 177], ['d', 223]].forEach(function (pp) {
+        chao.push(elip(DF.fx(pp[1], 662), 662, 20, 5, { fill: '#000', opacity: 0.28, class: 'pp-sombra-pe-' + pp[0], 'data-p': n(DF.fx(pp[1], 662)) + ',662', 'data-q': n(DF.fx(pp[1], 455)) + ',' + n(DF.fy(455)) }));
+      });
       var fig = out.filter(function (x) { return x !== sombraChao; }).join('');
       defs += '<clipPath id="' + I + 'bandaC"><rect x="-1000" y="-2000" width="2400" height="' + n(2000 + yJ + 1.5) + '"/></clipPath>' +
         '<clipPath id="' + I + 'bandaB"><rect x="-1000" y="' + n(yJ - 1.5) + '" width="2400" height="2000"/></clipPath>';
