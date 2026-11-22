@@ -1212,9 +1212,27 @@
         for (var j = 0; j <= 32; j++) { var th = j / 32 * PI * 2; pts.push(cam.pt(add(C, [R * Math.cos(th), R * Math.sin(th) * Math.cos(fi), R * Math.sin(th) * Math.sin(fi)]))); }
         return pts;
       });
+      // 1.39.0 (fotos do dono): a "porta" da bola — o zíper vermelho com o tubo — e a válvula redondinha. Ficam presos na
+      // bola e rolam com ela; a profundidade de cada pedaço decide se aparecem na frente ou atrás da criança
+      var brilhos = []; for (var b = 0; b < 26; b++) { var ra = Math.sqrt((b * 0.618) % 1) * 0.92, ab = b * 2.4; brilhos.push([Math.cos(ab) * ra, Math.sin(ab) * ra, b]); }
+      var fiZ = a + 0.9;
+      for (var j = 0; j < 10; j++) {
+        (function (j) {
+          var s0 = -0.55 + j * 0.11, s1 = s0 + 0.115, P = function (sx) { return add(C, [R * 0.995 * Math.sin(sx), R * 0.995 * Math.cos(sx) * Math.cos(fiZ), R * 0.995 * Math.cos(sx) * Math.sin(fiZ)]); };
+          var p0 = cam.pt(P(s0)), p1 = cam.pt(P(s1));
+          L.push({ d: (p0.d + p1.d) / 2, f: function (c) {
+            var w = Math.max(2, R * q.s * 0.07); c.save(); c.lineCap = 'round';
+            c.strokeStyle = '#a3101e'; c.lineWidth = w; c.beginPath(); c.moveTo(p0.x, p0.y); c.lineTo(p1.x, p1.y); c.stroke();
+            c.strokeStyle = '#e8283a'; c.lineWidth = w * 0.7; c.stroke();
+            c.restore();
+          } });
+        })(j);
+      }
+      var pv = cam.pt(add(C, [R * 0.995 * Math.sin(0.62), R * 0.995 * Math.cos(0.62) * Math.cos(fiZ - 0.25), R * 0.995 * Math.cos(0.62) * Math.sin(fiZ - 0.25)]));
+      L.push({ d: pv.d, f: function (c) { var r = Math.max(1.5, R * q.s * 0.045); c.save(); c.strokeStyle = '#2a2d33'; c.lineWidth = r * 0.5; c.beginPath(); c.arc(pv.x, pv.y, r, 0, PI * 2); c.stroke(); c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.arc(pv.x, pv.y, r * 0.45, 0, PI * 2); c.fill(); c.restore(); } });   // válvula
       L.push({ d: q.d + R, f: function (c) {   // o fundo da bola (do lado de lá): azulado bem clarinho
         var Rp = R * q.s; if (Rp < 1) return;
-        c.save(); var g = c.createRadialGradient(q.x, q.y, Rp * 0.3, q.x, q.y, Rp); g.addColorStop(0, 'rgba(200,235,255,.10)'); g.addColorStop(1, 'rgba(160,215,255,.38)');
+        c.save(); var g = c.createRadialGradient(q.x, q.y, Rp * 0.3, q.x, q.y, Rp); g.addColorStop(0, 'rgba(235,248,255,.03)'); g.addColorStop(0.8, 'rgba(225,242,255,.06)'); g.addColorStop(1, 'rgba(210,235,255,.24)');   // 1.39.0 (dono): transparente de verdade
         c.fillStyle = g; c.beginPath(); c.arc(q.x, q.y, Rp, 0, PI * 2); c.fill(); c.restore();
       } });
       // a criança andando lá dentro: pernas alternando, corpo um pouco para a frente, braços abertos na parede
@@ -1230,10 +1248,11 @@
       L.push({ d: q.d - R - 0.2, f: function (c) {   // a frente: borda, costuras e o brilho do plástico
         var Rp = R * q.s; if (Rp < 1) return;
         c.save();
-        c.fillStyle = 'rgba(210,240,255,.12)'; c.beginPath(); c.arc(q.x, q.y, Rp, 0, PI * 2); c.fill();
-        c.lineWidth = Math.max(1, Rp * 0.012); c.strokeStyle = 'rgba(255,255,255,.4)';
+        c.lineWidth = Math.max(1, Rp * 0.01); c.strokeStyle = 'rgba(255,255,255,.3)';
         costuras.forEach(function (pts) { c.beginPath(); pts.forEach(function (p, j) { if (j) c.lineTo(p.x, p.y); else c.moveTo(p.x, p.y); }); c.stroke(); });
-        c.lineWidth = Math.max(1.5, Rp * 0.035); c.strokeStyle = 'rgba(190,230,255,.85)'; c.beginPath(); c.arc(q.x, q.y, Rp, 0, PI * 2); c.stroke();
+        c.lineWidth = Math.max(1.5, Rp * 0.03); c.strokeStyle = 'rgba(235,246,255,.75)'; c.beginPath(); c.arc(q.x, q.y, Rp, 0, PI * 2); c.stroke();
+        c.lineWidth = Math.max(1, Rp * 0.012); c.strokeStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.arc(q.x, q.y, Rp * 0.96, PI * 0.95, PI * 1.55); c.stroke();   // reflexo da borda
+        brilhos.forEach(function (b) { var tw = 0.35 + 0.65 * Math.abs(Math.sin(relogio * 3 + b[2])); c.globalAlpha = tw; c.fillStyle = '#ffffff'; c.beginPath(); c.arc(q.x + b[0] * Rp, q.y + b[1] * Rp, Math.max(0.6, Rp * 0.012), 0, PI * 2); c.fill(); }); c.globalAlpha = 1;   // purpurina do plástico
         var g = c.createRadialGradient(q.x - Rp * 0.42, q.y - Rp * 0.45, 0, q.x - Rp * 0.42, q.y - Rp * 0.45, Rp * 0.42); g.addColorStop(0, 'rgba(255,255,255,.75)'); g.addColorStop(1, 'rgba(255,255,255,0)');
         c.fillStyle = g; c.beginPath(); c.arc(q.x - Rp * 0.42, q.y - Rp * 0.45, Rp * 0.42, 0, PI * 2); c.fill();
         c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.ellipse(q.x + Rp * 0.55, q.y + Rp * 0.5, Rp * 0.1, Rp * 0.05, -0.7, 0, PI * 2); c.fill();
