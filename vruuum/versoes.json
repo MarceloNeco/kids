@@ -2,6 +2,23 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.40.0",
+      "data": "22/Nov/2026",
+      "hora": "23:20:00",
+      "pt": [
+        "🫧 Bolha Gigante com gomos, como uma bola de verdade: as costuras se juntam nos dois polos e giram quando a bola rola. A bola ficou bem maior que a criança.",
+        "🏃 A criança corre o tempo todo lá dentro durante a corrida (joelho subindo e braços balançando), pisando no fundo de plástico da bola, sem pisar no asfalto; a sombra da bola ficou redonda."
+      ],
+      "en": [
+        "🫧 The Giant Bubble Ball now has panels like a real ball: the seams meet at both poles and turn as the ball rolls. The ball is much bigger than the child now.",
+        "🏃 The child runs nonstop inside during the race (knees up, arms swinging), on the ball's plastic bottom, not on the road; the ball's shadow is round now."
+      ],
+      "es": [
+        "🫧 La Burbuja Gigante tiene gajos como un balón de verdad: las costuras se juntan en los dos polos y giran cuando la bola rueda. La bola es mucho más grande que el niño.",
+        "🏃 El niño corre sin parar dentro durante la carrera (rodillas arriba, brazos moviéndose), sobre el fondo de plástico de la bola, sin pisar el asfalto; la sombra de la bola es redonda."
+      ]
+    },
+    {
       "versao": "1.39.0",
       "data": "22/Nov/2026",
       "hora": "22:05:00",

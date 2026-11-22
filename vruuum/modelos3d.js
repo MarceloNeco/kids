@@ -1205,15 +1205,21 @@
     /* bolha gigante (1.38.0, dono: "aquelas bolas gigantes transparentes que entra uma pessoa dentro e fica andando"):
        a bola de plástico transparente rola (as costuras giram para a frente) e a criança anda dentro, como na rodinha
        do hamster, com os braços abertos encostando na parede. Fundo da bola, criança, depois a frente com o brilho */
-    bolha: { alt: 3.5, y: 1.25, larg: 0.85, comp: 0.85, montar: function (cam, L, cor, f, op) {
-      var R = 1.2, C = [0, R + 0.02, 0], q = cam.pt(C), a = op.t ? op.t * 2.4 : f * PI * 2, passo = Math.sin(f * PI * 2), esc = tom(cor, -0.35);
-      var costuras = [0, 1, 2].map(function (k) {   // costuras: círculos em volta do eixo x, girando = rolando para a frente
-        var fi = a + k * PI / 3, pts = [];
-        for (var j = 0; j <= 32; j++) { var th = j / 32 * PI * 2; pts.push(cam.pt(add(C, [R * Math.cos(th), R * Math.sin(th) * Math.cos(fi), R * Math.sin(th) * Math.sin(fi)]))); }
-        return pts;
-      });
-      // 1.39.0 (fotos do dono): a "porta" da bola — o zíper vermelho com o tubo — e a válvula redondinha. Ficam presos na
-      // bola e rolam com ela; a profundidade de cada pedaço decide se aparecem na frente ou atrás da criança
+    bolha: { alt: 4.0, y: 1.5, larg: 1.05, comp: 1.05, semSombra: true, montar: function (cam, L, cor, f, op) {
+      var R = 1.5, C = [0, R + 0.02, 0], q = cam.pt(C), a = op.t ? op.t * 2.4 : f * PI * 2, fase = (op.t ? op.t * 2.6 : f) * PI * 2, passo = Math.sin(fase), pula = Math.abs(Math.cos(fase)) * 0.05, esc = tom(cor, -0.35);
+      // 1.40.0 (dono: "tem que ter divisões, igual uma bola"): gomos como numa bola de praia — 8 costuras que se juntam
+      // nos dois polos (sem anel nos polos: parecia uma bolha dentro da outra, dono). O eixo dos polos gira junto quando a bola rola para a frente.
+      // Cada costura vira pedacinhos: os da frente vão na camada da frente (mais fortes), os de trás na de trás (fraquinhos)
+      var ang0 = a + 0.6, U = [0, Math.cos(ang0), Math.sin(ang0)], V = [0, -Math.sin(ang0), Math.cos(ang0)], Wx = [1, 0, 0];
+      function naBola(t, fi, raio) { var ct = Math.cos(t), st = Math.sin(t), cf = Math.cos(fi), sf = Math.sin(fi); return add(C, [raio * (ct * U[0] + st * (cf * V[0] + sf * Wx[0])), raio * (ct * U[1] + st * (cf * V[1] + sf * Wx[1])), raio * (ct * U[2] + st * (cf * V[2] + sf * Wx[2]))]); }
+      var costFrente = [], costTras = [];
+      function linha(pts) { for (var j = 1; j < pts.length; j++) { var p0 = pts[j - 1], p1 = pts[j]; ((p0.d + p1.d) / 2 < q.d ? costFrente : costTras).push([p0, p1]); } }
+      for (var gm = 0; gm < 8; gm++) { var pts = []; for (var j = 0; j <= 24; j++) pts.push(cam.pt(naBola(0.12 + j / 24 * (PI - 0.24), gm / 8 * PI * 2, R))); linha(pts); }   // os gomos
+      function costurar(c, lista, alfa, Rp) {
+        c.lineCap = 'round';
+        c.strokeStyle = 'rgba(255,255,255,' + alfa + ')'; c.lineWidth = Math.max(1, Rp * 0.016); c.beginPath(); lista.forEach(function (sg) { c.moveTo(sg[0].x, sg[0].y); c.lineTo(sg[1].x, sg[1].y); }); c.stroke();
+        c.strokeStyle = 'rgba(150,180,205,' + alfa * 0.8 + ')'; c.lineWidth = Math.max(0.5, Rp * 0.005); c.stroke();   // a solda do plástico
+      }
       var brilhos = []; for (var b = 0; b < 26; b++) { var ra = Math.sqrt((b * 0.618) % 1) * 0.92, ab = b * 2.4; brilhos.push([Math.cos(ab) * ra, Math.sin(ab) * ra, b]); }
       var fiZ = a + 0.9;
       for (var j = 0; j < 10; j++) {
@@ -1233,23 +1239,32 @@
       L.push({ d: q.d + R, f: function (c) {   // o fundo da bola (do lado de lá): azulado bem clarinho
         var Rp = R * q.s; if (Rp < 1) return;
         c.save(); var g = c.createRadialGradient(q.x, q.y, Rp * 0.3, q.x, q.y, Rp); g.addColorStop(0, 'rgba(235,248,255,.03)'); g.addColorStop(0.8, 'rgba(225,242,255,.06)'); g.addColorStop(1, 'rgba(210,235,255,.24)');   // 1.39.0 (dono): transparente de verdade
-        c.fillStyle = g; c.beginPath(); c.arc(q.x, q.y, Rp, 0, PI * 2); c.fill(); c.restore();
+        c.fillStyle = g; c.beginPath(); c.arc(q.x, q.y, Rp, 0, PI * 2); c.fill(); costurar(c, costTras, 0.28, Rp); c.restore();
       } });
-      // a criança andando lá dentro: pernas alternando, corpo um pouco para a frente, braços abertos na parede
-      var quadril = [0, 0.95, 0.05];
+      // 1.40.0 (dono: "não pode ser diretamente no chão", "tem que ser maior" que a pessoa, "tem que correr enquanto está na
+      // corrida"): a bola é bem maior que a criança (ela fica com pouco mais da metade da altura), a criança pisa no fundo
+      // de plástico, um pouco acima do asfalto, e corre o tempo todo — na corrida pelo relógio, nos quadros pela fase
+      var yP = 0.18, pePiso = cam.pt([0, yP, 0.05]);
+      L.push({ d: q.d + R * 0.6, f: function (c) {   // sombrinha dos pés no fundo da bola
+        if (R * q.s < 2) return;
+        c.save(); c.fillStyle = 'rgba(20,40,60,.25)'; c.beginPath(); c.ellipse(pePiso.x, pePiso.y, R * q.s * 0.17, R * q.s * 0.045, 0, 0, PI * 2); c.fill(); c.restore();
+      } });
+      // a criança correndo: joelho da frente sobe, o pé de trás chuta para trás, braços dobrados balançando ao contrário
+      // das pernas, corpo um pouco para a frente e dando pulinhos
+      var y0 = yP + pula, quadril = [0, y0 + 0.62, 0.05];
       [-1, 1].forEach(function (l) {
-        var ps = l * passo, joelho = [l * 0.16, 0.6, 0.05 + ps * 0.25], pe = [l * 0.17, 0.2 + Math.max(0, -ps) * 0.15, ps * 0.45];
-        cano(cam, L, add(quadril, [l * 0.14, 0, 0]), joelho, 0.11, 0.09, '#2a2d3a'); cano(cam, L, joelho, pe, 0.09, 0.08, '#2a2d3a');
-        bola(cam, L, add(pe, [0, -0.02, 0.06]), 0.1, 0.07, 0.15, tres('#f4f4f8'));   // tênis
-        cano(cam, L, [l * 0.28, 1.5, 0.05], [l * 0.85, 1.6 - l * passo * 0.05, 0.35], 0.09, 0.07, esc); bola(cam, L, [l * 0.88, 1.62 - l * passo * 0.05, 0.37], 0.08, 0.08, 0.08, tres('#f2c9a0'));   // braços e mãos
+        var ps = l * passo, joelho = [l * 0.11, y0 + 0.35 + Math.max(0, ps) * 0.1, 0.07 + ps * 0.2], pe = [l * 0.12, y0 + 0.06 + Math.max(0, -ps) * 0.22, 0.02 + ps * 0.26 - Math.max(0, -ps) * 0.06];
+        cano(cam, L, add(quadril, [l * 0.1, 0, 0]), joelho, 0.075, 0.062, '#2a2d3a'); cano(cam, L, joelho, pe, 0.062, 0.055, '#2a2d3a');
+        bola(cam, L, add(pe, [0, -0.02, 0.04]), 0.07, 0.05, 0.1, tres('#f4f4f8'));   // tênis
+        var sa = -ps, ombro = [l * 0.19, y0 + 1.02, 0.07], cotovelo = [l * 0.25, y0 + 0.84, 0.07 + sa * 0.16], mao = [l * 0.21, y0 + 0.92 + Math.max(0, sa) * 0.08, 0.14 + sa * 0.24];
+        cano(cam, L, ombro, cotovelo, 0.065, 0.055, esc); cano(cam, L, cotovelo, mao, 0.055, 0.05, esc); bola(cam, L, mao, 0.055, 0.055, 0.055, tres('#f2c9a0'));   // braços e mãos
       });
-      bola(cam, L, [0, 1.3, 0.05], 0.32, 0.42, 0.24, tres(cor));   // camiseta
-      piloto(cam, L, [0, 1.92, 0.08], 0.36, op);
+      bola(cam, L, [0, y0 + 0.86, 0.08], 0.22, 0.29, 0.17, tres(cor));   // camiseta
+      piloto(cam, L, [0, y0 + 1.31, 0.13], 0.25, op);
       L.push({ d: q.d - R - 0.2, f: function (c) {   // a frente: borda, costuras e o brilho do plástico
         var Rp = R * q.s; if (Rp < 1) return;
         c.save();
-        c.lineWidth = Math.max(1, Rp * 0.01); c.strokeStyle = 'rgba(255,255,255,.3)';
-        costuras.forEach(function (pts) { c.beginPath(); pts.forEach(function (p, j) { if (j) c.lineTo(p.x, p.y); else c.moveTo(p.x, p.y); }); c.stroke(); });
+        costurar(c, costFrente, 0.7, Rp);
         c.lineWidth = Math.max(1.5, Rp * 0.03); c.strokeStyle = 'rgba(235,246,255,.75)'; c.beginPath(); c.arc(q.x, q.y, Rp, 0, PI * 2); c.stroke();
         c.lineWidth = Math.max(1, Rp * 0.012); c.strokeStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.arc(q.x, q.y, Rp * 0.96, PI * 0.95, PI * 1.55); c.stroke();   // reflexo da borda
         brilhos.forEach(function (b) { var tw = 0.35 + 0.65 * Math.abs(Math.sin(relogio * 3 + b[2])); c.globalAlpha = tw; c.fillStyle = '#ffffff'; c.beginPath(); c.arc(q.x + b[0] * Rp, q.y + b[1] * Rp, Math.max(0.6, Rp * 0.012), 0, PI * 2); c.fill(); }); c.globalAlpha = 1;   // purpurina do plástico
