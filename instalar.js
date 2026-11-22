@@ -13,6 +13,12 @@
   - Já aberto como aplicativo (pelo ícone), o botão some. No navegador, se o Chrome disser que o Bolinho já está
     instalado neste aparelho (getInstalledRelatedApps), também some. No navegador ele fica sempre à vista ("Já instalei" só o
     esconde nesta visita): é o único botão de instalar da estante.
+  - Lembra que já instalou (dono, 22/Nov/2026: 4 ícones "Bolinho de Chuva" repetidos no tablet Fire, onde o navegador só
+    cria atalho e não sabe dizer que já instalou). A marca fica em localStorage "bolinho:instalado:<endereço>" (uma por
+    app: a estante e cada jogo) e é gravada no appinstalled, no prompt() aceito, no "Já instalei" e ao abrir pelo ícone
+    (a estante aqui; os jogos no navegacao.js). Com a marca, o botão vira "✓ Na tela inicial": o toque explica que o
+    ícone já existe (no Fire, como tirar os repetidos) e só o link "Pôr outro ícone mesmo assim" instala de novo.
+    O cartão de cada jogo (catalogo.js) lê a mesma marca e troca o ⬇ por ✓.
   Enquanto a janela de passos está aberta, <body> ganha a classe "bc-modal" (o kids.js deixa as
   setas e o OK do controle para ela).
 
@@ -34,7 +40,7 @@
   var FILA = /[?&]fila\b/.test(location.search);
   if (SO_COM && !new RegExp('[?&]' + SO_COM + '\\b').test(location.search)) return;
   var ua = navigator.userAgent;
-  var CHAVE = 'bolinho:instalado:' + location.pathname;
+  var CHAVE = 'bolinho:instalado:' + location.pathname.replace(/index\.html$/, '');   // o mesmo endereço do cartão (catalogo.js)
   var pedido = null; // janela de instalar guardada pelo navegador
 
   function ler() { try { return localStorage.getItem(CHAVE); } catch (e) { return null; } }
@@ -53,7 +59,7 @@
   if (janelaDeApp && /[?&]app=1\b/.test(location.search)) { try { sessionStorage.setItem(MARCA_APP, '1'); } catch (e) {} }
   var comoApp = janelaDeApp && (function () { try { return sessionStorage.getItem(MARCA_APP) === '1'; } catch (e) { return true; } })();
   var dentroDeOutroApp = janelaDeApp && !comoApp;
-  if (comoApp) return;
+  if (comoApp) { gravar('1'); return; }   // aberto pelo ícone: o navegador da mesma origem fica sabendo que já tem ícone
   // "⋮ → Abrir no Chrome" leva ESTA página da janelinha com ✕ para uma aba do Chrome SEM recarregar: o aviso "abriu por
   // dentro de outro app" ficava lá, no Chrome de verdade, e o Chrome não oferecia instalar (dono, 14/Nov/2026, print).
   // Saiu da janela de app → recarrega uma vez; já no Chrome, a barra volta a ser o Instalar de um toque.
@@ -108,7 +114,11 @@
     '.bc-fundo{z-index:2147483001}' +
     '.bc-prox{pointer-events:auto;min-height:48px;padding:.5rem 1rem;border-radius:999px;border:1px solid #3a2f73;background:#221b4d;color:#f3f0ff;font:inherit;font-weight:700;cursor:pointer}' +
     '.bc-prox.ok{border:0;background:#c6ff3d;color:#1a1446}' +
-    '.bc-inst{gap:.5rem;flex-wrap:wrap}';
+    '.bc-inst{gap:.5rem;flex-wrap:wrap}' +
+    '.bc-btn.na-tela{min-height:44px;padding:.45rem 1.1rem;background:rgba(198,255,61,.08);color:#c6ff3d;border:1.5px solid rgba(198,255,61,.45);box-shadow:none;font-weight:700;font-size:.95rem}' +
+    '.bc-btn.na-tela svg{display:none}' +
+    '.bc-passos .bc-mais{font-size:.85rem;color:#b3acd6;margin-top:1rem}' +
+    '.bc-botoes [hidden]{display:none}';
   var estilo = document.createElement('style');
   estilo.textContent = css;
   document.head.appendChild(estilo);
@@ -149,18 +159,22 @@
   document.body.insertBefore(barra, document.body.firstChild);
   var botao = barra.querySelector('button');
   var texto = barra.querySelector('span');
+  var naTela = !!ler();   // já tem ícone na tela inicial (marca gravada antes)
+  var chromeNaoSabe = !navigator.getInstalledRelatedApps;   // o navegador não diz se está instalado (Fire, atalho sem WebAPK)
   // No navegador o botão fica sempre à vista (dono, 14/Nov/2026: um botão só, e que não suma); só some aberto pelo ícone.
 
   var fundo = document.createElement('div');
   fundo.className = 'bc-fundo';
   fundo.hidden = true;
   fundo.innerHTML = '<div class="bc-passos" role="dialog" aria-modal="true" aria-labelledby="bcTitulo">' +
-    '<div class="bc-topo"><img src="' + ICONE + '" alt=""><h2 id="bcTitulo">' + T('Instalar o ', 'Install ', 'Instalar ') + nomeIdioma() + '</h2>' +
+    '<div class="bc-topo"><img src="' + ICONE + '" alt=""><h2 id="bcTitulo"></h2>' +
     '<button type="button" class="bc-fechar" aria-label="' + T('Fechar', 'Close', 'Cerrar') + '">✕</button></div>' +
     '<div class="bc-corpo"></div>' +
     '<div class="bc-botoes"><button type="button" class="bc-leve bc-ja"><span class="pt">✓ Já instalei</span><span class="en">✓ I installed it</span><span class="es">✓ Ya la he instalado</span></button></div></div>';
   document.body.appendChild(fundo);
   var corpo = fundo.querySelector('.bc-corpo');
+  var tituloJanela = fundo.querySelector('#bcTitulo');
+  var bJa = fundo.querySelector('.bc-ja');
 
   // Já instalado neste aparelho? No Chrome do Android (e do computador) o site pode perguntar ao navegador
   // (getInstalledRelatedApps + "related_applications" no manifest). Instalado = a barra não aparece, nem no navegador
@@ -170,6 +184,7 @@
     try {
       navigator.getInstalledRelatedApps().then(function (apps) {
         if (apps && apps.length && !pedido) { gravar('1'); barra.hidden = true; }
+        else if (!apps || !apps.length) chromeNaoSabe = true;   // com a marca, foi atalho (sem WebAPK)
       }).catch(function () {});
     } catch (e) { /* navegador sem a pergunta */ }
   }
@@ -177,7 +192,8 @@
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     pedido = e;
-    gravar(null);       // o navegador diz que ainda não está instalado
+    // o navegador diz que ainda não está instalado. No Fire não vale: lá ele só cria atalho e oferece de novo para sempre
+    if (!fireOS) { gravar(null); marcarNaTela(false); }
     barra.hidden = false;
   });
   window.addEventListener('appinstalled', function () { pedido = null; gravar('1'); pronto(); });
@@ -186,12 +202,18 @@
     botao.className = 'bc-btn ok';
     texto.innerHTML = T('✓ Instalado! Procure o ícone ', '✓ Installed! Look for the icon ', '✓ ¡Instalada! Busca el icono ') + NOME + (android ? T(' (ou na lista de apps)', ' (or in the app list)', ' (o en la lista de apps)') : '');   // o ícone instalado se chama assim
     if (FILA) { barra.hidden = false; rotuloProx(true); return; }   // na fila, a barra fica para seguir ao próximo
-    setTimeout(function () { barra.hidden = true; }, 6000);
+    setTimeout(function () { marcarNaTela(true); }, 6000);
+  }
+  function marcarNaTela(sim) {
+    naTela = sim;
+    botao.className = sim ? 'bc-btn na-tela' : 'bc-btn';
+    pintarRotulo();
   }
 
   // Qual aparelho e navegador é (para escrever o passo a passo certo).
   var tv = /SmartTV|SMART-TV|Web0S|WebOS|Tizen|NetCast|HbbTV|BRAVIA|VIDAA|Roku|AFT[A-Z]|Android TV|GoogleTV|CrKey/i.test(ua);
   var fire = /Silk\//.test(ua) && !tv;   // tablet Fire da Amazon (navegador Silk)
+  var fireOS = /Silk|KF[A-Z]{2,4}/.test(ua) && !tv;   // tablet Fire com qualquer navegador (Silk ou Chrome): só cria atalho
   var ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   var android = /Android/.test(ua);
   var samsung = /SamsungBrowser/.test(ua) && !tv;
@@ -218,10 +240,13 @@
   function curtinho() { return tv ? rotulo() : T('Instalar o ', 'Install ', 'Instalar ') + curto(); }
   function pintarRotulo() {
     if (botao.classList.contains('ok')) return;
+    if (naTela) { texto.textContent = T('✓ Na tela inicial', '✓ On home screen', '✓ En la pantalla de inicio'); return; }
     texto.textContent = rotulo();
     if (botao.getBoundingClientRect().height > 52) texto.textContent = curtinho();
   }
   window.addEventListener('resize', pintarRotulo);
+  if (naTela) botao.className = 'bc-btn na-tela';
+  if (FILA) rotuloProx(naTela);
   pintarRotulo();
   if (window.BolinhoIdioma) BolinhoIdioma.aoMudar(pintarRotulo);
 
@@ -365,6 +390,26 @@
       '<p class="aviso">Si no aparece nada de esto, seguramente ya está instalada: busca <b>' + N + '</b> en tus programas.</p>');
   }
 
+  // Já tem ícone: explica que é só abrir por ele; onde o navegador só cria atalho (Fire), ensina a tirar os repetidos.
+  function jaNaTela() {
+    var N = nomeIdioma(), repetidos = fireOS || (android && chromeNaoSabe);
+    return T('<p>Este aparelho já tem um ícone do <b>' + N + '</b> na tela inicial. Para não criar outro ícone igual, abra sempre <b>pelo ícone</b>, e não pelo navegador.</p>' +
+      (repetidos ? '<p class="aviso">Ficou com ícones repetidos? Na tela inicial, <b>segure o dedo</b> em cima de um ícone repetido e toque em <b>Remover</b>. Faça isso até sobrar um só.</p>' : '') +
+      '<p class="bc-mais"><a href="#" class="bc-outro">Pôr outro ícone mesmo assim</a> (se você apagou o ícone)</p>',
+      '<p>This device already has a <b>' + N + '</b> icon on the home screen. To avoid making another copy, always open it <b>from the icon</b>, not from the browser.</p>' +
+      (repetidos ? '<p class="aviso">Ended up with repeated icons? On the home screen, <b>press and hold</b> a repeated icon and tap <b>Remove</b>. Do this until only one is left.</p>' : '') +
+      '<p class="bc-mais"><a href="#" class="bc-outro">Add another icon anyway</a> (if you deleted the icon)</p>',
+      '<p>Este dispositivo ya tiene un icono de <b>' + N + '</b> en la pantalla de inicio. Para no crear otro igual, ábrelo siempre <b>desde el icono</b>, no desde el navegador.</p>' +
+      (repetidos ? '<p class="aviso">¿Te han quedado iconos repetidos? En la pantalla de inicio, <b>mantén el dedo</b> sobre un icono repetido y toca <b>Quitar</b> (o <b>Eliminar</b>). Hazlo hasta que quede solo uno.</p>' : '') +
+      '<p class="bc-mais"><a href="#" class="bc-outro">Poner otro icono de todos modos</a> (si has borrado el icono)</p>');
+  }
+  function preencher(modo) {
+    var jaTem = modo === 'naTela';
+    tituloJanela.textContent = jaTem ? T('✓ Já está na tela inicial', '✓ Already on your home screen', '✓ Ya está en la pantalla de inicio') : T('Instalar o ', 'Install ', 'Instalar ') + nomeIdioma();
+    corpo.innerHTML = jaTem ? jaNaTela() : passos();
+    bJa.hidden = jaTem;
+  }
+
   // Janela de passos: abre com movimento curto, fecha no ✕, no Esc, tocando fora e no Voltar do celular.
   var naHistoria = false;
   // trava a página de trás enquanto a janela está aberta (dono, 14/Nov/2026: rolar até o fim da janela não pode mexer o fundo)
@@ -372,8 +417,8 @@
     var h = document.documentElement, n = Math.max(0, (+h.getAttribute('data-travas') || 0) + (sim ? 1 : -1));
     h.setAttribute('data-travas', n); h.classList.toggle('trava-fundo', n > 0);
   }
-  function abrir() {
-    corpo.innerHTML = passos();
+  function abrir(modo) {
+    preencher(modo);
     fundo.hidden = false;
     document.body.classList.add('bc-modal'); travarFundo(true);
     requestAnimationFrame(function () { fundo.classList.add('aberto'); });
@@ -393,13 +438,24 @@
   fundo.querySelector('.bc-fechar').addEventListener('click', function () { fechar(); });
   fundo.addEventListener('click', function (e) { if (e.target === fundo) fechar(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.keyCode === 27) fechar(); });
-  fundo.querySelector('.bc-ja').addEventListener('click', function () {
+  // "Pôr outro ícone mesmo assim": esquece a marca e instala como da primeira vez
+  corpo.addEventListener('click', function (e) {
+    if (!e.target.closest || !e.target.closest('.bc-outro')) return;
+    e.preventDefault();
+    gravar(null); marcarNaTela(false);
+    if (pedido) { fechar(); instalar(); } else preencher();
+  });
+  bJa.addEventListener('click', function () {
     gravar('1'); fechar();
     if (FILA) return pronto();
     barra.hidden = true;   // só nesta visita
   });
 
   botao.addEventListener('click', function () {
+    if (naTela) { abrir('naTela'); return; }   // já tem ícone: explica, sem pedir para instalar de novo
+    instalar();
+  });
+  function instalar() {
     if (!pedido) { abrir(); return; }
     var p = pedido;
     pedido = null; // a janela do navegador só pode ser usada uma vez
@@ -407,5 +463,5 @@
     p.userChoice.then(function (r) {
       if (r && r.outcome === 'accepted') { gravar('1'); pronto(); }
     }).catch(function () {});
-  });
+  }
 })();

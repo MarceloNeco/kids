@@ -195,6 +195,7 @@
     incl: '<rect x="8.6" y="5.6" width="6.8" height="12.8" rx="1.6" transform="rotate(25 12 12)"/><path d="M3.3 9.7A9 9 0 0 1 8.9 3.5M7.4 5.7l1.5-2.1-2.5-.7M20.7 14.3a9 9 0 0 1-5.6 6.2M16.6 18.3l-1.5 2.1 2.5.7" stroke-width="1.9"/>',
     dois: '<circle cx="8" cy="7.5" r="3"/><circle cx="16.5" cy="7.5" r="3"/><path d="M2.5 20.5c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6"/><path d="M14.5 14.6c.6-.1 1.3-.1 2-.1 3 0 5.5 2.4 5.5 6"/>',
     baixar: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+    feito: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     todos: '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>',
     seta: '<path d="M6 9l6 6 6-6"/>'
   };
@@ -219,6 +220,8 @@
     var n = INFO[k][0]; return rotulo(b, n[0], n[1], n[2]);
   }
   function recursos(j) { return [j.soOnline ? 'net' : 'off'].concat(j.rec || []); }
+  // o jogo já tem ícone na tela inicial deste aparelho? (marca do instalar.js / navegacao.js; dono, 22/Nov/2026)
+  function naTela(url) { try { return !!localStorage.getItem('bolinho:instalado:' + url.replace(/index\.html$/, '')); } catch (e) { return false; } }
 
   // Um cartão por jogo (dono, 15/Nov/2026): ícone, nome inteiro, "? ⌄" que abre a explicação, os ícones do que o
   // jogo faz, ⬇ Instalar e ▶ Jogar sempre na ponta direita. A kids.js, numa TV de verdade, põe ?tv=auto no Jogar
@@ -251,8 +254,13 @@
     var bts = baixo.appendChild(el('div', 'c-bts'));   // ⬇ e Jogar juntos, sempre na ponta direita
     if (j.instalar) {
       var inst = bts.appendChild(el('a', 'c-inst')); inst.href = j.url + '?instalar=1';
-      inst.innerHTML = svg('baixar');
-      rotulo(inst, 'Instalar ' + nm[0] + ' no aparelho', 'Install ' + nm[1] + ' on this device', 'Instalar ' + nm[2] + ' en el dispositivo');
+      if (naTela(j.url)) {   // ✓ discreto: o toque abre o jogo, que explica que o ícone já existe (instalar.js)
+        inst.className += ' feito'; inst.innerHTML = svg('feito');
+        rotulo(inst, nm[0] + ' já está na tela inicial', nm[1] + ' is already on your home screen', nm[2] + ' ya está en la pantalla de inicio');
+      } else {
+        inst.innerHTML = svg('baixar');
+        rotulo(inst, 'Instalar ' + nm[0] + ' no aparelho', 'Install ' + nm[1] + ' on this device', 'Instalar ' + nm[2] + ' en el dispositivo');
+      }
     }
     var jogar = bts.appendChild(el('a', 'c-jogar')); jogar.href = j.url;
     tri(jogar, 'Jogar', 'Play', 'Jugar');
