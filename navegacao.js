@@ -52,6 +52,12 @@
     try { if (sessionStorage.getItem('bolinho:estante') === '1') return true; } catch (e) { return true; }
     return !!(d.referrer && d.referrer.indexOf(ESTANTE) === 0);
   })();
+  // aberto pelo próprio ícone (janela de app, sem a estante antes nesta aba): o jogo já está na tela inicial. O cartão da
+  // estante e a barra de instalar (instalar.js) leem a marca e não oferecem outro ícone (dono, 22/Nov/2026: ícones
+  // repetidos no tablet Fire, onde o navegador só cria atalho e não sabe dizer que já instalou)
+  if (!veioDaEstante && instalado() && !/[?&]tv=/.test(location.search)) {
+    try { localStorage.setItem('bolinho:instalado:' + location.pathname.replace(/index\.html$/, ''), '1'); } catch (e) { /* sem localStorage */ }
+  }
 
   function chamar(fn, padrao) { try { return typeof fn === 'function' ? fn() : padrao; } catch (e) { return padrao; } }
   function noInicio() { return !!chamar(cfg.noInicio, true); }
