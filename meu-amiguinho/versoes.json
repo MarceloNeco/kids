@@ -2,6 +2,14 @@
   "app": "meu-amiguinho",
   "versoes": [
     {
+      "versao": "0.1.3",
+      "data": "22/Nov/2026",
+      "hora": "17:38:00",
+      "pt": ["🐾 Todos os bichinhos conferidos peça por peça: nada solto, cortado ou flutuando (rabos dentro da imagem e presos no corpo, balão preso na mão, rodinhas do skate e dos patins no chão)"],
+      "en": ["🐾 Every buddy checked piece by piece: nothing loose, cut off or floating (tails inside the picture and attached to the body, balloon tied to the paw, skateboard and roller skate wheels on the ground)"],
+      "es": ["🐾 Todos los peluches revisados pieza a pieza: nada suelto, cortado ni flotando (colas dentro de la imagen y pegadas al cuerpo, globo atado a la mano, ruedas del monopatín y de los patines en el suelo)"]
+    },
+    {
       "versao": "0.1.2",
       "data": "22/Nov/2026",
       "hora": "14:45:00",
