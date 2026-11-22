@@ -3,7 +3,7 @@
 Guardado a pedido do dono em 22/Nov/2026: "a ideia é ter um funcionamento minimamente decente antes de eu ter os
 créditos do Higgsfield recarregados". Reúne as especificações que ele trouxe (geradas no Gemini, 21–22/Nov/2026) e o
 estado real de cada item no jogo, com o porquê das decisões. **Leia antes de mexer no movimento, no desfile, na
-Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.13**.
+Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.14**.
 
 Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌ não feito, com o motivo.
 
@@ -13,7 +13,7 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 |---|---|---|
 | Cada parte gira na articulação (ombro, cotovelo, quadril, cabeça), não no centro da peça | ✅ | `boneca.js` (`bracoRig`, `.rig-cabeca`, `.pp-passo-*` com `transform-origin` no quadril) |
 | Pontas arredondadas nas juntas (sem frestas) | ✅ | `seg()` em `bracoRig` (cápsulas); braço em duas passadas (contorno, depois preenchimento) |
-| Árvore completa quadril → coluna → pescoço / coxa → joelho → tornozelo | 🟡 | Sem joelho e tornozelo separados: seria preciso redesenhar todas as calças, saias e sapatos em pedaços. O joelho "dobra" encolhendo a perna e levantando o pé (`perna()` no `animador.js`) |
+| Árvore completa quadril → coluna → pescoço / coxa → joelho → tornozelo | 🟡 | Joelho desde a 0.9.14: cada perna sai em dois pedaços cortados na mesma linha do joelho (`.pp-canela-*`, `data-j`), e a canela entorta em volta dessa linha (não abre fresta, não precisa redesenhar calça nem sapato). O corte do lado da perna fica **dentro** da canela (senão a canela entortada traz um pedaço da outra perna: "perna fantasma"). Tornozelo: o sapato desentorta em volta dele. Baladinha e pulo usam `joelho: false` (uma cópia a menos de cada perna) |
 | Cintura sem degrau entre blusa e calça | ✅ | O corpo inteiro se curva em duas faixas que se encontram na linha do quadril (`.pp-rebola`, `.pp-banda-*`; 0.9.4) |
 | Contorno fino 25% mais escuro, nunca preto; degradê de volume | ✅ | `esc(cor, …)` nos traços; gradientes `vol` e `lado` |
 | 8,5 cabeças de altura | ❌ | O dono pediu "tamanhos normais" e antes reclamou da adulta "muito esticada". Hoje: adulta com 6,8 cabeças, pescoço, braços e pernas na grossura medida de gente de verdade (0.9.5). Em 0.9.13 (dono: "pernas um pouco compridas", "pescoço muito comprido", "braços arqueados"): quadril 3,0 e ombro 1,2 (adulta), braço do mesmo tamanho e rente ao corpo (`ENCURTA` 0,79, pulso base 124/276), pose solta quase reta (`relax` 4/2) |
@@ -35,6 +35,8 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Respiração | ✅ | Peito sobe e desce de leve (`resp`, ~4 s) |
 | Pé plantado (sola paralela ao chão) | ✅ | O sapato gira e estica ao contrário da perna em volta do tornozelo (`data-ae` / `data-ad`; 0.9.9) |
 | Sombra de cada pé no chão | ✅ | `.pp-sombra-pe-*`: escura no apoio, mais clara e menor quando o pé sobe (0.9.9) |
+| Parada: peso numa perna, a outra solta (contrapposto) | ✅ | 0.9.14 (dono: "mão no ombro com o braço esquerdo… a perna e o pezinho virar para o lado direito"). `solta` nas `BASES` `gingaD`/`gingaE` (o quadril vai para o lado do peso). A perna solta gira 6° para o meio (joelho para dentro), a canela volta (`kE`/`kD` = ∓0,17), encolhe 3% (calcanhar sai do chão), passa na frente da outra e o pé vira de lado (`rotate(∓16) skewX(∓10)` no tornozelo). Só parada (`modo` vazio: estúdio, apresentação, fim do desfile); menino fica plantado (`cruza` 0). Bota, galocha, patins e cano alto (sapato com mais de 60 de altura) não giram nem desentortam: vão inteiros com a perna, senão o cano sai da calça |
+| Piscar natural | ✅ | O olho pisca sozinho de tempos em tempos (`anim`); sem piscadinha fixa na placa da Baladinha (0.9.13) |
 
 ## 4. Perfis menina × menino (`BIO` no `animador.js`)
 

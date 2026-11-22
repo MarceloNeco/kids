@@ -2,6 +2,23 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.14",
+      "data": "22/Nov/2026",
+      "hora": "14:16:00",
+      "pt": [
+        "🦵 Parada, ela fica do jeito de gente de verdade: quando põe a mão no ombro, na nuca ou na cintura, o peso vai para uma perna e a outra dobra de leve o joelho, vem um pouquinho para o meio e o pezinho vira de lado (antes os dois pés ficavam sempre de frente). O menino continua firme, com os dois pés plantados.",
+        "👢 Botas de cano e tênis de cano alto acompanham a perna inteira, sem o cano escapar da calça."
+      ],
+      "en": [
+        "🦵 Standing still, she now poses like a real person: when she puts a hand on her shoulder, neck or waist, her weight shifts to one leg and the other knee bends slightly, comes a little toward the middle and the foot turns sideways (before, both feet always faced forward). The boy stays steady, both feet planted.",
+        "👢 Tall boots and high-top sneakers follow the whole leg, and the shaft no longer pokes out of the pants."
+      ],
+      "es": [
+        "🦵 Quieta, ahora posa como una persona de verdad: cuando se pone la mano en el hombro, en la nuca o en la cintura, el peso pasa a una pierna y la otra dobla un poco la rodilla, se acerca un poquito al centro y el pie se gira de lado (antes los dos pies miraban siempre al frente). El niño sigue firme, con los dos pies plantados.",
+        "👢 Las botas altas y las zapatillas de caña alta acompañan toda la pierna, y la caña ya no se sale del pantalón."
+      ]
+    },
+    {
       "versao": "0.9.13",
       "data": "22/Nov/2026",
       "hora": "10:52:27",

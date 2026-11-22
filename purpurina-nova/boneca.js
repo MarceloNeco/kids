@@ -401,7 +401,16 @@
       // as pernas começam na junta do quadril (y 456), por baixo da barra da blusa: a perna que anda gira ali e nada da
       // calça escapa para fora da roupa (dono, 20/Nov/2026: "os quadrados da calça não acompanham")
       defs += deformar('<clipPath id="' + I + 'pernaE"><rect x="-200" y="456" width="403" height="900"/></clipPath><clipPath id="' + I + 'pernaD"><rect x="197" y="456" width="403" height="900"/></clipPath>');
-      out.push('<g class="pp-passo-e"><g clip-path="url(#' + I + 'pernaE)">' + pernas + '</g></g>', '<g class="pp-passo-d"><g clip-path="url(#' + I + 'pernaD)">' + pernas + '</g></g>',
+      /* joelho (dono, 22/Nov/2026: "a perna tem que dar uma leve arqueadinha"): cada perna sai em dois pedaços cortados
+         na mesma linha do joelho — a coxa e a canela com o pé (.pp-canela-*). O animador entorta a canela em volta dessa
+         linha (a linha fica no lugar, então não abre fresta), e a perna dobra no joelho sem redesenhar calça nem sapato */
+      var yK = DF.fy(555);
+      defs += deformar('<clipPath id="' + I + 'coxa"><rect x="-200" y="0" width="800" height="555.5"/></clipPath><clipPath id="' + I + 'canela"><rect x="-200" y="555" width="800" height="900"/></clipPath>');
+      // (o corte do lado vai dentro da canela, senão a canela entortada traz para a janela um pedaço da outra perna)
+      // (op.joelho false: Baladinha e pulo, que nunca ficam paradas numa perna só — uma cópia a menos de cada perna)
+      var perna2 = op.joelho === false ? function (l, L) { return '<g class="pp-passo-' + l + '"><g clip-path="url(#' + I + 'perna' + L + ')">' + pernas + '</g></g>'; } : function (l, L) { return '<g class="pp-passo-' + l + '"><g clip-path="url(#' + I + 'perna' + L + ')"><g clip-path="url(#' + I + 'coxa)">' + pernas + '</g></g>' +
+        '<g class="pp-canela-' + l + '" data-j="' + n(yK) + '"><g clip-path="url(#' + I + 'perna' + L + ')"><g clip-path="url(#' + I + 'canela)">' + pernas + '</g></g></g></g>'; };
+      out.push(perna2('e', 'E'), perna2('d', 'D'),
         '<g clip-path="url(#' + I + 'quadrilP)">' + pernas + '</g>');
       defs += deformar('<clipPath id="' + I + 'quadrilP"><rect x="-200" y="0" width="800" height="458"/></clipPath>');   // o cós (escondido pela blusa), junto com o corpo
     }
