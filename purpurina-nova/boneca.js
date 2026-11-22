@@ -44,8 +44,8 @@
     // mais cheios — 4,8 / 5,8 / 6,5 / 7 cabeças
     pequena: { cabecas: 4.5, topo: 150, ombro: 1.28, quadril: 2.25, larg: [0.87, 0.89, 0.92, 0.99, 0.98, 0.9, 0.94, 0.86] },
     crianca: { cabecas: 5.2, topo: 100, ombro: 1.32, quadril: 2.72, larg: [0.82, 0.84, 0.8, 0.95, 0.96, 0.88, 0.94, 0.84] },
-    adolescente: { cabecas: 6.2, topo: 76, ombro: 1.31, quadril: 2.72, larg: [0.82, 0.82, 0.65, 1.0, 1.25, 1.0, 1.05, 0.9] },
-    adulta: { cabecas: 6.8, topo: 64, ombro: 1.32, quadril: 2.8, larg: [0.84, 0.84, 0.65, 1.06, 1.3, 1.05, 1.1, 0.95] }
+    adolescente: { cabecas: 6.2, topo: 76, ombro: 1.2, quadril: 2.9, larg: [0.82, 0.82, 0.65, 1.0, 1.25, 1.0, 1.05, 0.9] },
+    adulta: { cabecas: 6.8, topo: 64, ombro: 1.2, quadril: 3.0, larg: [0.84, 0.84, 0.65, 1.06, 1.3, 1.05, 1.1, 0.95] }
   };
   // menino: ombros mais largos que o quadril (forma de V), cintura pouco marcada, pernas retas
   var MENINO = { pequena: [0.92, 0.92, 0.92, 0.94, 0.94, 0.88, 0.9, 0.84], crianca: [0.88, 0.88, 0.84, 0.88, 0.9, 0.84, 0.88, 0.8],
@@ -155,7 +155,7 @@
     return voltarRigidas(deformarResto(str, D), rigidas);
   }
   function voltarRigidas(str, rigidas) { return rigidas.length ? str.replace(/\u0001(\d+)\u0001/g, function (m, i) { return rigidas[+i]; }) : str; }
-  var ENCURTA = 0.86;
+  var ENCURTA = 0.79;   // (22/Nov/2026: com o pescoço mais curto o ombro subiu; o braço fica do mesmo tamanho de antes, rente ao corpo)
   // transformações do esqueleto (as mesmas do animador.js): ombro gira e encolhe o braço de cima no eixo dele;
   // o cotovelo desfaz o encolhimento em volta dele mesmo e gira o antebraço
   function transformaOmbro(a, f, S) { return 'rotate(' + n(a) + ' ' + n(S[0]) + ' ' + n(S[1]) + ')' + (f < 0.999 ? ' translate(' + n(S[0]) + ' ' + n(S[1]) + ') scale(1 ' + n(f * 1000) / 1000 + ') translate(' + n(-S[0]) + ' ' + n(-S[1]) + ')' : ''); }
@@ -622,7 +622,7 @@
     // braço do esqueleto, já no corpo novo: ombro S, cotovelo E, pulso W (em repouso, pendurado); a pose inicial vem de
     // opcoes.poseRig { oE, cE, oD, cD } (graus: o = abrir para fora, c = dobrar o cotovelo para dentro)
     function bracoRig(lado, atras) {
-      var sx0 = lado < 0 ? 150 : 250, wx0 = lado < 0 ? 118 : 282, S = [DF.fx(sx0, 354), DF.fy(354)], W0 = [DF.fx(wx0, 498), DF.fy(498)];
+      var sx0 = lado < 0 ? 150 : 250, wx0 = lado < 0 ? 124 : 276, S = [DF.fx(sx0, 354), DF.fy(354)], W0 = [DF.fx(wx0, 498), DF.fy(498)];
       var W = [S[0] + (W0[0] - S[0]) * ENCURTA, S[1] + (W0[1] - S[1]) * ENCURTA], L = Math.sqrt((W[0] - S[0]) * (W[0] - S[0]) + (W[1] - S[1]) * (W[1] - S[1]));
       var d = [(W[0] - S[0]) / L, (W[1] - S[1]) / L], Lu = L * 0.5, E = [S[0] + d[0] * Lu, S[1] + d[1] * Lu], k = DF.traco * 1.3 * DF.braco;   // grossura de braço de verdade (dono, 21/Nov/2026)
       function seg(A, B, w0, w1) {   // pedaço do braço: começa largo e afina, com as pontas redondas
@@ -1208,7 +1208,7 @@
     /* menina: queixinho pequeno e recolhido (de lado não fica "queixudo") e maxilar suave — o cantinho do rosto
        quadradinho fica mais alto e redondinho. Continua sendo cada formato, só que delicado. */
     if (!menino) base0 = base0.map(function (v) {
-      if (v.c[0] === 0 && v.c[1] >= 70) return { c: [0, v.c[1] - 12, v.c[2] - 24], r: [v.r[0] * 1.05, v.r[1] * 0.85, v.r[2] * 0.6] };   // queixinho redondo e curto, nada de ponta
+      if (v.c[0] === 0 && v.c[1] >= 70) return { c: [0, v.c[1] - 16, v.c[2] - 24], r: [v.r[0] * 1.05, v.r[1] * 0.85, v.r[2] * 0.6] };   // queixinho redondo e curto, nada de ponta (fica dentro da curva do rosto: sem "dentinho" embaixo — dono, 22/Nov/2026)
       if (v.c[0] === 0 && v.c[1] >= 30 && v.c[1] < 70) return { c: [0, v.c[1] - 8, v.c[2] - 8], r: [v.r[0] * 1.0, v.r[1] * 0.72, v.r[2] * 0.9] };   // maxilar curto e arredondado (dono, 20/Nov/2026: "queixo ainda masculino"): bochecha cheia, sem rosto comprido
       // (20/Nov/2026, dono: "queixo de mulheres não femininos"): o crânio termina mais alto, para o rosto não fechar em "U"
       // largo; quem desenha a parte de baixo é o maxilar, que afina em V suave até um queixinho delicado
@@ -1378,7 +1378,7 @@
     return elip(152, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa }) + elip(248, 246, 26, 16, { fill: '#ff8f9a', opacity: rosa });
   }
   function luzMeio(pele, I) {
-    return elip(200, 276, 8, 3, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);   // luzinha no queixo (dentro do queixo novo, mais curto)
+    return elip(200, 270, 8, 3, { fill: '#fff', opacity: 0.12 }) + brilhoPele(pele, I);   // luzinha no queixo (dentro do queixo novo, mais curto)
   }
   // quão escura é a pele (0 = branca, 1 = bem escura)
   function escuridao(h) { var c = rgb(h), l = (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; return Math.max(0, Math.min(1, (0.72 - l) / 0.45)); }
@@ -1390,7 +1390,7 @@
     var o = function (v) { return n(v * k * 100) / 100; }, L = { fill: 'url(#' + I + 'luzPele)' }, Q = { fill: 'url(#' + I + 'calorPele)' };
     return '<g opacity="' + o(0.85) + '">' + elip(200, 152, 40, 18, L) + elip(200, 230, 4, 18, L) +
       elip(150, 234, 20, 10, Object.assign({ transform: 'rotate(-18 150 234)' }, L)) + elip(250, 234, 20, 10, Object.assign({ transform: 'rotate(18 250 234)' }, L)) +
-      elip(200, 276, 6, 3, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
+      elip(200, 270, 6, 3, L) + '</g>' + '<g opacity="' + o(0.18) + '">' + elip(152, 252, 26, 16, Q) + elip(248, 252, 26, 16, Q) + '</g>';
   }
 
 

@@ -547,7 +547,9 @@ test('proporções normais: pescoço, braços e pernas com grossura de verdade (
   assert.match(fonte, /var lado = x < 200 \? -1 : 1, c0 = 200 \+ lado \* 26;/);
   const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
   assert.ok(L[4] > L[5] && L[6] > L[5] && L[5] > L[7], 'coxa > joelho < panturrilha > tornozelo');
-  assert.ok(+fonte.match(/adulta: \{ cabecas: [\d.]+, topo: \d+, ombro: [\d.]+, quadril: ([\d.]+)/)[1] <= 2.85, 'pernas compridas (gancho perto da metade da altura)');
+  // (22/Nov/2026, dono: "as pernas estão um pouco compridas demais"; "o pescoço está muito comprido") — nem curtas nem compridas
+  const pa = fonte.match(/adulta: \{ cabecas: [\d.]+, topo: \d+, ombro: ([\d.]+), quadril: ([\d.]+)/);
+  assert.ok(+pa[2] >= 2.9 && +pa[2] <= 3.1, 'pernas na medida'); assert.ok(+pa[1] <= 1.22, 'pescoço curto');
   assert.equal(bemFormado(B.svg({ idade: 'adulta', vestido: 'verao' }, { id: 'pn', fundo: false })), '');
 });
 
@@ -662,4 +664,16 @@ test('catwalk sem pernas fantasma e pulo de verdade na Baladinha (dono, 22/Nov/2
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   assert.match(app, /modo: 'pular', puloMs: 1100/);
   assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8'), /\.bal-placa-pulo \{[^}]*animation: balPulo/, 'sem o pulinho de CSS');
+});
+
+test('braços soltos retos, sem piscadinha fixa na Baladinha e queixo liso (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /relax: \{ oE: 4, cE: 2, oD: 4, cD: 2,/, 'braços quase retos, rentes ao corpo');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const placa = app.slice(app.indexOf("B.svg(estado, { id: 'placa'"), app.indexOf("B.svg(estado, { id: 'placa'") + 200);
+  assert.doesNotMatch(placa, /piscadinha: true/, 'pisca sozinha, não fica piscando o tempo todo');
+  const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /return \{ c: \[0, v\.c\[1\] - 16, v\.c\[2\] - 24\]/, 'ponta do queixo dentro da curva do rosto');
+  assert.match(fonte, /var ENCURTA = 0\.79;/);
 });
