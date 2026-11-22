@@ -718,3 +718,15 @@ test('descanso natural: braço caído sem parêntese, mão de lado e peso numa p
   assert.match(anim, /relax: \{[^}]*base: 'leve' \}/); assert.match(anim, /leve: \{[^}]*q: -0\.5, solta: 0\.75 \}/);
   assert.match(anim, /feminino: \{[^}]*abre: 1,/, 'andando, os braços balançam perto do corpo');
 });
+
+test('pé virado de lado com o desenho de lado, não o de frente entortado (dono, 22/Nov/2026: "bloquinho torto")', () => {
+  const fs = require('fs'), path = require('path');
+  const s = B.svg(V.novo(), { id: 'p', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const l of ['e', 'd']) assert.match(s, new RegExp('<g class="pp-sapato-dentro-' + l + '" style="display:none" data-a' + l + '="'), 'sapato de lado para dentro (' + l + ')');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.doesNotMatch(anim, /skewX\(' \+ \(-pl\[6\]/, 'nada de entortar o sapato de frente');
+  assert.match(anim, /\(v\.peE \|\| 0\) > 0\.5 && !altoE \? 'd'/, 'perna solta parada: o sapato de lado aparece');
+  const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /fundo = salto \? 647 : 656\.5/, 'salto: calcanhar no alto e a sola descendo até a ponta');
+});

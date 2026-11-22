@@ -163,13 +163,13 @@
       /* pé no chão de verdade (dono, 22/Nov/2026): o sapato não inclina nem estica junto com a perna — gira e estica ao
          contrário em volta do tornozelo, então fica reto no piso; e a sombrinha de cada pé fica no chão, embaixo dele,
          mais clara e menor quando o pé levanta */
+      var altoE = false, altoD = false;
       [['e', v.er || 0, v.esy || 1, v.ex || 0, Math.max(v.sobeE || 0, 0.3 * (v.peE || 0)), v.peE || 0, 1], ['d', v.dr || 0, v.dsy || 1, v.dx || 0, Math.max(v.sobeD || 0, 0.3 * (v.peD || 0)), v.peD || 0, -1]].forEach(function (pl) {
-        var rr = pl[1] * amp, sy = 1 + (pl[2] - 1) * amp, vira = '';
-        // pé da perna solta virado de lado (a ponta para o meio), em três quartos
-        // bota e cano alto: o cano sobe pela perna, então não gira nem desentorta (sairia de dentro da calça); o pé baixo, sim
+        var rr = pl[1] * amp, sy = 1 + (pl[2] - 1) * amp;
+        // bota e cano alto: o cano sobe pela perna, então não vira nem desentorta (sairia de dentro da calça); o pé baixo, sim
         var sap = svg.querySelector('.pp-passo-' + pl[0] + ' .pp-canela-' + pl[0] + ' .pp-sapato-frente'), alto = false;
         if (sap) { if (!sap.hasAttribute('data-alto')) { var bb = { height: 0 }; try { bb = sap.getBBox(); } catch (er) {} sap.setAttribute('data-alto', bb.height > 60 ? '1' : '0'); } alto = sap.getAttribute('data-alto') === '1'; }
-        if (pl[5] && !alto) vira = ' rotate(' + (-pl[6] * 16 * pl[5] * amp).toFixed(2) + ') skewX(' + (-pl[6] * 10 * pl[5] * amp).toFixed(2) + ')';
+        if (pl[0] === 'e') altoE = alto; else altoD = alto;
         // joelho: a canela entorta em volta da linha do joelho; o sapato desfaz isso no tornozelo (fica reto no chão)
         var kk = (pl[0] === 'e' ? v.kE : v.kD) * amp || 0, jo = 0, des = '';
         Array.prototype.forEach.call(svg.querySelectorAll('.pp-canela-' + pl[0]), function (g) {
@@ -177,10 +177,10 @@
           if (kk) g.setAttribute('transform', 'matrix(1 0 ' + kk.toFixed(4) + ' 1 ' + (-kk * jo).toFixed(3) + ' 0)'); else if (g.hasAttribute('transform')) g.removeAttribute('transform');
         });
         if (kk && !alto) des = ' skewX(' + (-Math.atan(kk) * 180 / Math.PI).toFixed(2) + ')';
-        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' .pp-sapato-frente'), function (g) {
+        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' .pp-sapato-frente, .pp-passo-' + pl[0] + ' .pp-sapato-dentro-' + pl[0]), function (g) {
           var a = (g.getAttribute('data-a' + pl[0]) || '').split(',').map(Number); if (a.length < 2) return;
           if (alto) { if (g.hasAttribute('transform')) g.removeAttribute('transform'); return; }   // bota: vai inteira com a perna
-          g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(1 ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ')' + vira + ' translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
+          g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(1 ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ') translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
         });
         var sb = svg.querySelector('.pp-sombra-pe-' + pl[0]);
         if (sb) {
@@ -192,13 +192,15 @@
           sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4]) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4]) * (1 - 0.6 * ar)).toFixed(3));
         }
       });
-      // vitrine dos sapatos: troca o sapato de frente pelo de lado só na perna que está levantada
-      [['e', !!v.ladoE], ['d', !!v.ladoD]].forEach(function (pl) {
-        var g = svg.querySelector('.pp-passo-' + pl[0]), lig = pl[1] ? '1' : '0'; if (!g || g.getAttribute('data-lado') === lig) return;
+      // qual sapato aparece em cada pé: de frente; de lado (vitrine, pé levantado, ponta para fora); ou para dentro (perna
+      // solta parada, ponta para o meio) — a bota e o cano alto ficam de frente
+      [['e', v.ladoE ? 'l' : (v.peE || 0) > 0.5 && !altoE ? 'd' : 'f'], ['d', v.ladoD ? 'l' : (v.peD || 0) > 0.5 && !altoD ? 'd' : 'f']].forEach(function (pl) {
+        var g = svg.querySelector('.pp-passo-' + pl[0]), qual = pl[1]; if (!g || (g.getAttribute('data-lado') || 'f') === qual) return;
         Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0]), function (gg) {
-          gg.setAttribute('data-lado', lig);
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-lado-' + pl[0]), function (x) { x.style.display = pl[1] ? '' : 'none'; });
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-frente'), function (x) { x.style.display = pl[1] ? 'none' : ''; });
+          gg.setAttribute('data-lado', qual);
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-lado-' + pl[0]), function (x) { x.style.display = qual === 'l' ? '' : 'none'; });
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-dentro-' + pl[0]), function (x) { x.style.display = qual === 'd' ? '' : 'none'; });
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-frente'), function (x) { x.style.display = qual === 'f' ? '' : 'none'; });
         });
       });
       Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
