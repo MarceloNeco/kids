@@ -1,19 +1,16 @@
 /* Meu Pequeno Amiguinho — as regras, sem tela (roda no navegador e no Node, para os testes):
-   montar o amiguinho (bichinho, pelo, coração e fofura, roupa, acessórios, voz, nome), a Encomenda do nível Difícil
-   (pedido + estrelas por acerto) e a coleção guardada no aparelho (localStorage), com os dois amiguinhos de exemplo. */
+   montar o amiguinho (bichinho, pelo, coração e fofura, roupa, acessórios, voz, nome) e a coleção guardada no aparelho
+   (localStorage), com os dois amiguinhos de exemplo. Sem níveis nem Encomenda (dono, 22/Nov/2026: "é só para desenho
+   tranquilo"): tudo liberado sempre. */
 (function (raiz) {
   'use strict';
   var D = raiz.AmiguinhoDados || (typeof require === 'function' ? require('./dados.js') : null);
   var R = {};
-  var CAIXAS = D.CAIXAS.map(function (c) { return c.id; });
 
   function hoje() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   R.hoje = hoje;
   function novoId() { return 'a' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36); }
   function copia(o) { return JSON.parse(JSON.stringify(o)); }
-
-  /* ---------- opções de cada nível (Fácil = menos opções) ---------- */
-  R.opcoes = function (lista, nivel) { return nivel === 'facil' ? lista.filter(function (x) { return x.facil; }) : lista.slice(); };
 
   /* ---------- um amiguinho novo, com as escolhas padrão (pronto para "Pronto!" a qualquer momento) ---------- */
   R.novo = function (base) {
@@ -67,6 +64,8 @@
   R.estrelinhasFofura = function (f) { var z = R.zonaFofura(f); return z !== 'ponto' ? 0 : (f >= 60 && f <= 75 ? 3 : 2); };
 
   /* ---------- frases e voz ---------- */
+  // voz de menininha ('f') ou de menininho ('m'): a escolha da criança; sem escolha (ou amiguinho antigo), o gênero do bichinho
+  R.genero = function (a) { return a && (a.genero === 'f' || a.genero === 'm') ? a.genero : (a && D.base[a.base] && D.base[a.base].g === 'm' ? 'm' : 'f'); };
   var LI = { pt: 0, en: 1, es: 2 };
   R.textoFrase = function (fr, lang, crianca) {
     if (!fr) return '';
@@ -75,61 +74,6 @@
     else t = String(fr.texto || '').slice(0, 60);
     var c = String(crianca || '').trim().slice(0, 20);
     return t.replace(/\{, c\}/g, c ? ', ' + c : '').replace(/\{c\}/g, c);
-  };
-
-  /* ---------- Encomenda (nível Difícil): o cartão pede, a criança monta igual, estrelas por acerto ---------- */
-  function sorteador(semente) { var s = ((semente >>> 0) * 2654435761 >>> 0) || 1; var f = function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; f(); f(); f(); return f; }
-  function um(lista, r) { return lista[Math.floor(r() * lista.length)]; }
-  R.novaEncomenda = function (semente) {
-    var r = sorteador(semente == null ? Date.now() : semente);
-    var b = um(D.BASES, r);
-    var lisos = D.PELOS.filter(function (p) { return !p.grad && !p.brilho; }).map(function (p) { return p.id; });
-    var roupa = um(D.ROUPAS.filter(function (x) { return x.id !== 'nenhuma'; }), r);
-    var e = { base: b.id, pelo: r() < 0.5 ? b.pelo : um(lisos, r), roupa: roupa.id, corRoupa: roupa.cores ? um(D.PALETAS[roupa.paleta || 'roupa'], r) : null, acess: {} };
-    var caixas = ['laco', 'cabeca', 'olhos', 'pescoco', 'costas', 'mao', 'pes', 'chao'], n = 1 + Math.floor(r() * 2);
-    for (var k = 0; k < n; k++) {
-      var cx = um(caixas, r), its = D.ACESS.filter(function (it) { return it.caixa === cx && !it.so; });
-      if (roupa.capuz && cx === 'cabeca') continue;
-      var it = um(its, r); if (!it || e.acess[cx]) continue;
-      if ((cx === 'pes' && e.acess.chao) || (cx === 'chao' && e.acess.pes === 'patins')) continue;
-      e.acess[cx] = { id: it.id, cor: it.paleta && (cx === 'laco' || cx === 'olhos') ? um(D.PALETAS[it.paleta], r) : null };
-    }
-    if (r() < 0.5) e.coracao = um(D.CORACOES, r).id;
-    if (r() < 0.5) e.fofura = r() < 0.7 ? 'ponto' : 'cheio';
-    return e;
-  };
-  function corNome(id, i) { return D.CORES[id] ? D.CORES[id].n[i] : ''; }
-  // o pedido em palavras ("Quero uma coelhinha de pelo rosa, de pijaminha lilás, com laço azul e patins.")
-  R.textoEncomenda = function (e, lang) {
-    var i = LI[lang] || 0, b = D.base[e.base], pelo = D.pelo[e.pelo], roupa = D.roupa[e.roupa];
-    var art = i === 0 ? (b.g === 'f' ? 'uma ' : 'um ') : i === 1 ? (/^[aeiou]/i.test(b.esp[1]) ? 'an ' : 'a ') : (b.g === 'f' ? 'una ' : 'un ');
-    var partes = [];
-    partes.push(art + b.esp[i] + [' de pelo ', ' with ', ' de pelo '][i] + pelo.n[i] + (i === 1 ? ' fur' : ''));
-    if (e.corRoupa && i === 1) partes.push(roupa.e[1].replace(/^(in an? |in |dressed as an? |as the )/, '$1' + corNome(e.corRoupa, 1) + ' '));
-    else partes.push(roupa.e[i] + (e.corRoupa ? ' ' + corNome(e.corRoupa, i) : ''));
-    var acs = Object.keys(e.acess).map(function (cx) { var it = D.acess[e.acess[cx].id]; var c = e.acess[cx].cor; return it.e[i].replace('{c}', c ? corNome(c, i) : '').replace(/\s+/g, ' ').trim(); });
-    if (e.coracao) acs.push(['coração ', '', 'corazón '][i] + D.coracao[e.coracao].n[i] + ['', ' heart', ''][i]);
-    if (e.fofura) acs.push(e.fofura === 'cheio' ? ['bem gordinho de fofura', 'extra chubby and fluffy', 'bien gordito de relleno'][i] : ['fofinho no ponto certo', 'fluffed just right', 'blandito en su punto'][i]);
-    var junta = function (l) { return l.length < 2 ? l.join('') : l.slice(0, -1).join(', ') + [' e ', ' and ', ' y '][i] + l[l.length - 1]; };
-    var inicio = ['Quero ', 'I\'d like ', 'Quiero '][i];
-    return inicio + partes.join(', ') + (acs.length ? [', com ', ', with ', ', con '][i] + junta(acs) : '') + '.';
-  };
-  // confere o amiguinho com o pedido: uma "casinha" por item pedido
-  R.conferir = function (a, e) {
-    var itens = [];
-    itens.push({ k: 'base', ok: a.base === e.base });
-    itens.push({ k: 'pelo', ok: a.pelo === e.pelo });
-    itens.push({ k: 'roupa', ok: a.roupa === e.roupa });
-    if (e.corRoupa) itens.push({ k: 'corRoupa', ok: a.roupa === e.roupa && a.corRoupa === e.corRoupa });
-    Object.keys(e.acess).forEach(function (cx) {
-      var pedido = e.acess[cx], tem = a.acess && a.acess[cx] === pedido.id;
-      itens.push({ k: 'acess:' + pedido.id, ok: tem });
-      if (pedido.cor) itens.push({ k: 'cor:' + pedido.id, ok: tem && ((a.corAcess && a.corAcess[pedido.id]) || D.acess[pedido.id].cor) === pedido.cor });
-    });
-    if (e.coracao) itens.push({ k: 'coracao', ok: a.coracao === e.coracao });
-    if (e.fofura) itens.push({ k: 'fofura', ok: R.zonaFofura(a.fofura) === e.fofura });
-    var acertos = itens.filter(function (x) { return x.ok; }).length, total = itens.length, f = acertos / total;
-    return { itens: itens, acertos: acertos, total: total, estrelas: f === 1 ? 3 : f >= 0.7 ? 2 : 1 };
   };
 
   /* ---------- deixar um amiguinho lido do aparelho sempre válido ---------- */
@@ -147,10 +91,12 @@
     a.desejo = !!x.desejo;
     if (D.roupa[x.roupa]) { R.vestir(a, x.roupa); if (x.corRoupa) R.corRoupa(a, x.corRoupa); if (x.estampa) R.estampa(a, x.estampa); }
     if (D.patch[x.patch]) a.patch = x.patch;
-    Object.keys(x.acess || {}).forEach(function (cx) { if (CAIXAS.indexOf(cx) >= 0 && D.acess[x.acess[cx]] && D.acess[x.acess[cx]].caixa === cx) R.porAcess(a, x.acess[cx]); });
+    // cada peça vai para a caixinha ATUAL dela (peças que mudaram de caixinha não se perdem); duas na mesma caixinha: fica a primeira
+    Object.keys(x.acess || {}).forEach(function (k) { var it = D.acess[x.acess[k]]; if (it && !a.acess[it.caixa]) R.porAcess(a, it.id); });
     Object.keys(x.corAcess || {}).forEach(function (id) { R.corAcess(a, id, x.corAcess[id]); });
     if (D.voz[x.voz] && D.voz[x.voz].tipo === 'fala') a.voz = x.voz;
     if (D.voz[x.som] && D.voz[x.som].tipo === 'som') a.som = x.som;
+    if (x.genero === 'f' || x.genero === 'm') a.genero = x.genero;
     if (Array.isArray(x.frases)) {
       a.frases = x.frases.slice(0, 2).map(function (f) {
         if (!f || typeof f !== 'object') return { pronta: 'teamo' };
@@ -163,7 +109,6 @@
     }
     a.frase = x.frase === 1 && a.frases.length > 1 ? 1 : 0;
     if (x.exemplo) a.exemplo = true;
-    if (x.encomenda && typeof x.encomenda.estrelas === 'number') a.encomenda = { estrelas: Math.max(1, Math.min(3, x.encomenda.estrelas)), acertos: x.encomenda.acertos | 0, total: x.encomenda.total | 0 };
     return a;
   };
 

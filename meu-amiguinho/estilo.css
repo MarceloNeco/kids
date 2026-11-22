@@ -1,5 +1,8 @@
 /* Meu Amiguinho — oficina de pelúcia: tons pastel, costurinhas, papel de presente. Tudo cabe na tela sem rolar
-   (as fileiras de opções correm para o lado). Celular em pé: etapas em coluna; tablet/computador deitado: lado a lado. */
+   (as fileiras de opções correm para o lado). Celular em pé: etapas em coluna; tablet/computador deitado: lado a lado.
+   Texto nunca sai da caixinha nem vira reticências (dono, 22/Nov/2026): nomes quebram em até 2 linhas e, se preciso,
+   a fonte diminui um pouco (encaixarTextos no app.js); nada fica embaixo da bolinha 🎵 (canto de baixo à direita).
+   Vigia: teste/textos.test.js. */
 @font-face { font-family: 'Fredoka'; src: url('../rabiscolandia/fontes/fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
 :root { --rosa: #f06292; --rosa2: #f7b6cf; --lilas: #b79be8; --azul: #8fc3ef; --menta: #8fdcc0; --creme: #fff7ee; --tinta: #5a3a6a; --tinta2: #9a6a8a;
   --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px); }
@@ -39,12 +42,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .painel-menu .principal { width: 100%; min-height: 58px; font-size: 21px; }
 .painel-menu .secundario { width: 100%; }
 #btColecao b { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 999px; background: var(--rosa2); color: #fff; font-size: 14px; }
-.seg { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
-.chip { min-height: 42px; padding: 6px 14px; border-radius: 999px; border: 2px solid transparent; background: rgba(255, 255, 255, .75); font-size: 15px; font-weight: 600; }
-.chip[aria-checked="true"] { color: #fff; box-shadow: 0 3px 0 rgba(0, 0, 0, .15); }
-.chip.verde[aria-checked="true"] { background: #4fbf8a; } .chip.amarelo[aria-checked="true"] { background: #f2a516; } .chip.vermelho[aria-checked="true"] { background: #e85a8a; }
-.rodape { display: flex; align-items: center; gap: 8px; }
-.versao { margin: 0; font-size: 12px; color: var(--tinta2); opacity: .8; }
+.rodape { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 8px; box-sizing: border-box; width: 100%; padding: 0 48px; }   /* os 48 px da direita são da bolinha 🎵 */
+.versao { margin: 0; font-size: 12px; color: var(--tinta2); opacity: .8; text-align: center; }
 
 /* ---------- oficina ---------- */
 #oficina.ativa { padding: calc(var(--st) + 6px) 8px calc(var(--sb) + 8px); gap: 6px; }
@@ -52,12 +51,9 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .selo { flex: none; width: 54px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 24px;
   background: radial-gradient(circle at 30% 30%, #ff9cc4, #d94680); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .7), inset 0 0 0 5px #d94680, 0 3px 8px rgba(217, 70, 128, .35); }
 .of-titulo { flex: 1; min-width: 0; }
-.of-titulo h2 { margin: 0; font-size: clamp(17px, 4.8vw, 24px); line-height: 1.05; color: #d94680; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.of-titulo p { margin: 1px 0 0; font-size: 13px; color: var(--tinta2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.of-titulo h2 { margin: 0; font-size: clamp(17px, 4.8vw, 24px); line-height: 1.05; color: #d94680; overflow-wrap: anywhere; }
+.of-titulo p { margin: 1px 0 0; font-size: 12.5px; line-height: 1.15; color: var(--tinta2); overflow-wrap: anywhere; }
 .pontos { display: none; }
-.encomenda { display: flex; align-items: center; gap: 8px; margin: 0; padding: 6px 10px; border-radius: 14px; background: #fffbe8; border: 2px dashed #f2c14e; font-size: 13.5px; line-height: 1.2; box-shadow: 0 2px 6px rgba(200, 150, 40, .15); }
-.encomenda p { margin: 0; max-height: 3.6em; overflow: hidden; }
-.enc-ico { font-size: 22px; }
 .of-corpo { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
 .palco { position: relative; flex: 1 1 auto; min-height: 150px; touch-action: none; border-radius: 22px; background: radial-gradient(ellipse at 50% 90%, rgba(240, 98, 146, .14), transparent 60%), rgba(255, 255, 255, .45); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .8); overflow: hidden; }
 .pelucia { position: absolute; inset: 4px; cursor: pointer; }
@@ -71,22 +67,24 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .medidor .z1 { bottom: 37.5%; } .medidor .z2 { bottom: 70.8%; }
 /* balão embaixo, nos pés: nunca tampa a cabeça; some sozinho e fecha num toque (dono, 22/Nov/2026) */
 .fala { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 3; max-width: 88%; padding: 6px 12px; border-radius: 16px; background: rgba(255, 255, 255, .94); box-shadow: 0 4px 12px rgba(90, 58, 106, .18); font-size: 13px; line-height: 1.25; text-align: center; color: var(--tinta); cursor: pointer; }
-.painel { flex: none; display: flex; flex-direction: column; gap: 5px; max-height: 50%; overflow: hidden; }
+.painel { flex: none; display: flex; flex-direction: column; gap: 5px; max-height: 64%; overflow: hidden; }   /* do tamanho das escolhas (o bichinho fica com o resto, no mínimo 150 px) */
 .linha { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .rot { font-size: 13px; font-weight: 600; color: var(--tinta2); padding-left: 4px; }
 .roda { display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; padding: 3px 4px 5px; scroll-snap-type: x proximity; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
 .roda::-webkit-scrollbar { height: 4px; } .roda::-webkit-scrollbar-thumb { background: var(--rosa2); border-radius: 4px; }
+/* fileira que continua para o lado: a ponta some aos pouquinhos (sinal de "tem mais, arraste") */
+.roda.rola:not(.fim) { -webkit-mask-image: linear-gradient(90deg, #000 82%, rgba(0, 0, 0, .25)); mask-image: linear-gradient(90deg, #000 82%, rgba(0, 0, 0, .25)); }
 .opc { flex: none; scroll-snap-align: center; min-width: 44px; min-height: 44px; padding: 4px 8px; border-radius: 14px; border: 2px solid transparent; background: rgba(255, 255, 255, .9); box-shadow: 0 2px 0 #ead2de; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: 13px; font-weight: 600; line-height: 1.1; }
 .opc.sel { border-color: var(--rosa); background: #fff0f6; box-shadow: 0 0 0 3px rgba(240, 98, 146, .2); }
 .opc:disabled { opacity: .35; }
-.opc small { font-size: 11px; font-weight: 500; color: var(--tinta2); white-space: nowrap; max-width: 86px; overflow: hidden; text-overflow: ellipsis; }
+.opc small { font-size: 11px; font-weight: 500; line-height: 1.12; color: var(--tinta2); text-align: center; max-width: 100%; overflow-wrap: break-word; hyphens: manual; }
 .opc span { white-space: nowrap; }
 .amostra { display: block; width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .7), 0 0 0 1px rgba(90, 58, 106, .2); }
 .bichos .opc { width: 74px; padding: 2px 2px 4px; }
 .bichos .opc svg { width: 54px; height: 54px; }
 .cabides .opc { width: 78px; padding: 2px 2px 4px; }
 .cabides .opc svg { width: 62px; height: 64px; }
-.itens .opc { width: 70px; padding: 2px 2px 4px; }
+.itens .opc { width: auto; min-width: 72px; max-width: 108px; padding: 2px 4px 4px; justify-content: flex-start; }
 .itens .opc svg { width: 54px; height: 54px; }
 .patches .opc { min-width: 40px; font-size: 18px; }
 .patches .opc b { color: #e0559a; font-size: 18px; }
@@ -102,11 +100,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .bt-encher { flex: 1; touch-action: none; min-height: 56px; }
 .bt-encher.segurando { transform: translateY(3px) scale(.98); box-shadow: 0 1px 0 #c03d6e, 0 0 0 8px rgba(255, 141, 182, .3); }
 .dica { margin: 0; font-size: 13px; color: var(--tinta2); text-align: center; }
-.balcao { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px 4px; padding: 6px 6px 10px; border-radius: 14px;
-  background: repeating-linear-gradient(180deg, transparent 0 52px, #c99060 52px 60px, #a8703e 60px 62px), linear-gradient(180deg, #f7e9dc, #f1dccb); box-shadow: inset 0 0 0 2px #e6c9ad; }
-.acrilico { position: relative; height: 50px; padding: 2px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, .95); background: linear-gradient(135deg, rgba(255, 255, 255, .7), rgba(220, 235, 255, .35) 60%, rgba(255, 255, 255, .6)); box-shadow: inset 0 -6px 10px rgba(160, 190, 220, .25), 0 2px 3px rgba(90, 50, 20, .2); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
-.acrilico .ico { font-size: 21px; }
-.acrilico small { font-size: 8.5px; font-weight: 600; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--tinta); }
+/* o balcão: todas as caixinhas à vista, em quantas fileiras precisar (cabem 14 a 16 sem rolar); cada uma em cima da sua prateleirinha */
+.balcao { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 9px 4px; padding: 5px 5px 9px; border-radius: 14px;
+  background: linear-gradient(180deg, #f7e9dc, #f1dccb); box-shadow: inset 0 0 0 2px #e6c9ad; }
+.acrilico { position: relative; min-width: 0; min-height: 46px; padding: 2px 1px 3px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, .95); background: linear-gradient(135deg, rgba(255, 255, 255, .7), rgba(220, 235, 255, .35) 60%, rgba(255, 255, 255, .6)); box-shadow: inset 0 -6px 10px rgba(160, 190, 220, .25), 0 5px 0 -1px #b98251, 0 6px 3px rgba(90, 50, 20, .2); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1px; line-height: 1; }
+.acrilico .ico { font-size: 19px; line-height: 1.1; }
+.acrilico small { font-size: 9.5px; font-weight: 600; line-height: 1.08; max-width: 100%; text-align: center; overflow-wrap: break-word; color: var(--tinta); }
 .acrilico.aberta { border-color: var(--rosa); box-shadow: 0 0 0 3px rgba(240, 98, 146, .25), inset 0 -6px 10px rgba(240, 98, 146, .15); }
 .acrilico.tem::after { content: ""; position: absolute; top: 3px; right: 3px; width: 8px; height: 8px; border-radius: 50%; background: var(--rosa); }
 .abas { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
@@ -134,12 +133,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .am-topo { padding-left: calc(var(--nav-largo, 104px) - 4px); min-height: 50px; }
 .am-topo h2 { margin: 0; font-size: clamp(24px, 7vw, 36px); line-height: 1.05; color: #d94680; }
 .am-topo p { margin: 0; font-size: 13.5px; color: var(--tinta2); }
-.am-topo .estrelas { color: #d9940a; font-weight: 700; font-size: 15px; }
 .palco-amigo { flex: 1 1 auto; min-height: 220px; }
 .bt-coracao { position: absolute; z-index: 2; width: 46px; height: 46px; margin: -23px 0 0 -23px; border: 0; border-radius: 50%; font-size: 24px; line-height: 1; color: #e8475f;
   background: radial-gradient(circle at 35% 35%, #fff, #ffe3ec); box-shadow: 0 0 0 3px rgba(255, 255, 255, .9), 0 4px 12px rgba(232, 71, 95, .35); animation: bate 1.6s ease-in-out infinite; }
 @keyframes bate { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.14); } 24% { transform: scale(1); } 36% { transform: scale(1.1); } 48% { transform: scale(1); } }
-.am-acoes { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.am-acoes { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-right: 46px; }   /* canto livre para a bolinha 🎵 */
 .am-acoes .principal, .am-acoes .secundario { min-height: 50px; font-size: 17px; }
 .am-acoes .mini { min-height: 44px; }
 .am-acoes > .mini:last-child:nth-child(odd) { grid-column: span 2; }
@@ -153,7 +151,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .grade { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; align-content: start; padding: 4px 4px 20px; }
 .cartao-amigo { position: relative; border: 0; padding: 0 0 6px; border-radius: 18px; background: linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .06)); display: flex; flex-direction: column; align-items: center; }
 .cartao-amigo svg { width: 100%; height: auto; aspect-ratio: 300 / 410; }
-.cartao-amigo .nome { margin-top: -4px; padding: 3px 12px; border-radius: 999px; background: #fff; color: var(--tinta); font-weight: 700; font-size: 14px; box-shadow: 0 3px 0 #e2c6d6; max-width: 92%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cartao-amigo .nome { margin-top: -4px; padding: 3px 12px; border-radius: 999px; background: #fff; color: var(--tinta); font-weight: 700; font-size: 14px; box-shadow: 0 3px 0 #e2c6d6; max-width: 92%; box-sizing: border-box; text-align: center; overflow-wrap: anywhere; }
 
 /* ---------- caixinha-casinha ---------- */
 .caixa-anim { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: radial-gradient(circle, rgba(255, 240, 248, .96), rgba(243, 214, 232, .97)); overflow: hidden; }
@@ -212,7 +210,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
   .palco { flex: 1 1 46%; }
   .painel { flex: 1 1 54%; max-height: none; overflow-y: auto; justify-content: flex-start; }
   .roda { flex-wrap: wrap; overflow-x: visible; }
-  .balcao { grid-template-columns: repeat(6, 1fr); }
   #menu.ativa { flex-direction: row; justify-content: center; gap: 4vw; padding-left: calc(var(--nav-largo, 104px) + 10px); }
   .capa { flex: 1 1 50%; max-width: 560px; height: 100%; justify-content: center; }
   .painel-menu { flex: 1 1 40%; }
@@ -225,11 +222,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
   .estante { max-height: 46vh; min-height: 60px; }
   .painel-menu { gap: 5px; } .painel-menu .principal { min-height: 48px; font-size: 18px; }
   /* oficina: o bichinho ocupa a altura toda à esquerda; título, escolhas e botões à direita */
-  #oficina.ativa { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto;
-    grid-template-areas: "palco topo" "palco enc" "palco painel" "palco rodape"; column-gap: 8px; row-gap: 4px; padding-left: calc(env(safe-area-inset-left, 0px) + 8px); }
+  #oficina.ativa { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "palco topo" "palco painel" "palco rodape"; column-gap: 8px; row-gap: 4px; padding-left: calc(env(safe-area-inset-left, 0px) + 8px); }
   .of-corpo { display: contents; }
   .of-topo { grid-area: topo; padding-left: 0; min-height: 40px; }
-  .encomenda { grid-area: enc; font-size: 12px; padding: 3px 8px; }
   .palco { grid-area: palco; min-height: 0; }
   .painel { grid-area: painel; max-height: none; overflow-y: auto; }
   .of-rodape { grid-area: rodape; }

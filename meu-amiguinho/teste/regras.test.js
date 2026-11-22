@@ -115,19 +115,26 @@ test('pelúcia viva: partes com pivô (corpo, cabeça, braços ou patas, rabo, o
   assert.match(A.svg(R.novo('preguica'), { id: 'p', pose: 'pendurada' }), /#9a6a46/, 'preguiça pendurada no galho');
 });
 
-test('encomenda: pedido nos 3 idiomas; montar igual dá 3 estrelas, errar tudo dá 1', () => {
-  for (let s = 1; s < 40; s++) {
-    const e = R.novaEncomenda(s);
-    for (const l of ['pt', 'en', 'es']) { const t = R.textoEncomenda(e, l); assert.ok(t.length > 20 && !/undefined|\{c\}/.test(t), l + ': ' + t); }
-    const a = R.novo(e.base); a.pelo = e.pelo; R.vestir(a, e.roupa); if (e.corRoupa) R.corRoupa(a, e.corRoupa);
-    for (const cx of Object.keys(e.acess)) { R.porAcess(a, e.acess[cx].id); if (e.acess[cx].cor) R.corAcess(a, e.acess[cx].id, e.acess[cx].cor); }
-    if (e.coracao) a.coracao = e.coracao; if (e.fofura) a.fofura = e.fofura === 'cheio' ? 100 : 70;
-    const r = R.conferir(a, e);
-    assert.equal(r.estrelas, 3, 'semente ' + s + ': ' + JSON.stringify(r.itens.filter((x) => !x.ok)));
-    const errado = R.novo(e.base === 'urso' ? 'gato' : 'urso'); errado.pelo = 'arco-iris';
-    assert.equal(R.conferir(errado, e).estrelas, 1);
-  }
-  assert.match(R.textoEncomenda({ base: 'coelha', pelo: 'rosa', roupa: 'pijama', corRoupa: 'lilas', acess: { laco: { id: 'laco', cor: 'azul' }, pes: { id: 'patins' } } }, 'pt'), /uma coelhinha de pelo rosa, de pijaminha lilás, com laço azul e patins/);
+// Dono, 22/Nov/2026: "não precisa de nível médio, encomenda, difícil, é só para desenho tranquilo".
+test('sem níveis nem Encomenda; amiguinho antigo (com encomenda e estrelas) continua abrindo normal', () => {
+  for (const f of ['opcoes', 'novaEncomenda', 'textoEncomenda', 'conferir']) assert.equal(R[f], undefined, f + ' não existe mais');
+  const antigo = { id: 'a1', base: 'coelha', corpo: 'pe', pelo: 'rosa', roupa: 'pijama', corRoupa: 'lilas', acess: { laco: 'laco', pes: 'patins' }, corAcess: { laco: 'azul' },
+    encomenda: { estrelas: 3, acertos: 7, total: 7 }, nome: 'Bibi', frases: [{ pronta: 'teamo' }] };
+  const a = R.validar(antigo);
+  assert.equal(a.base, 'coelha'); assert.equal(a.roupa, 'pijama'); assert.deepEqual(a.acess, { laco: 'laco', pes: 'patins' }); assert.equal(a.nome, 'Bibi');
+  assert.equal(a.encomenda, undefined, 'as estrelas da Encomenda não aparecem mais');
+  assert.ok(A.svg(a, { id: 'x' }).length > 1000);
+});
+
+// Peças que mudaram de caixinha (asas, bolsas, pochete): o amiguinho guardado antes continua com elas, na caixinha nova.
+test('amiguinho antigo: cada peça vai para a caixinha atual dela; duas na mesma caixinha, fica a primeira', () => {
+  const a = R.validar({ base: 'urso', acess: { costas: 'asas', mao: 'bolsa-coracao', pulso: 'pochete' } });
+  const ordem = ['asas', 'bolsa-coracao', 'pochete'], primeira = {};
+  for (const id of ordem) if (!primeira[D.acess[id].caixa]) primeira[D.acess[id].caixa] = id;   // (se duas caírem na mesma caixinha, fica a primeira)
+  assert.deepEqual(a.acess, primeira);
+  const b = R.validar({ base: 'urso', acess: { laco: 'laco', cabeca: 'lacos2' } });
+  assert.deepEqual(b.acess, { laco: 'laco' });
+  assert.deepEqual(R.validar({ base: 'urso', acess: { laco: 'nao-existe' } }).acess, {});
 });
 
 test('coleção: os 2 exemplos sempre lá; salvar, editar e apagar; dado estragado não entra', () => {
