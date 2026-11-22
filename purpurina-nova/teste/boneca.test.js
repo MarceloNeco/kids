@@ -513,7 +513,7 @@ test('calça sem degraus no gingado e queixo redondo (dono, 20/Nov/2026: "os qua
   // o corpo vem em mais de um grupo .pp-corpo: todos se mexem juntos com as pernas
   assert.match(anim, /svg\.querySelectorAll\(sel\)/, 'o movimento vale para todos os pedaços do corpo');
   // o gingado é só um deslocamento igual para corpo e pernas (girar separado abre degrau na cintura)
-  assert.match(anim, /gingaD: \{ c: \[0, 0, 0\], e: \[0, 0, 0\], d: \[0, 0, 0\], s: -2, q: 1 \}/, 'parada, corpo e pernas não se mexem separados');
+  assert.match(anim, /gingaD: \{ c: \[0, 0, 0\], e: \[0, 0, 0\], d: \[0, 0, 0\], s: -2, q: 1, solta: -1 \}/, 'parada, corpo e pernas não se mexem separados');
   const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
   assert.match(fonte, /adulta: \{[^}]*queixoY: 0, queixoL: 0\.95/, 'queixo da adulta curto e redondo, sem ponta');
   assert.match(fonte, /r: \[v\.r\[0\] \* 1\.05, v\.r\[1\] \* 0\.85, v\.r\[2\] \* 0\.6\] \};   \/\/ queixinho redondo/);
@@ -676,4 +676,25 @@ test('braços soltos retos, sem piscadinha fixa na Baladinha e queixo liso (dono
   const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
   assert.match(fonte, /return \{ c: \[0, v\.c\[1\] - 16, v\.c\[2\] - 24\]/, 'ponta do queixo dentro da curva do rosto');
   assert.match(fonte, /var ENCURTA = 0\.79;/);
+});
+
+test('parada, peso numa perna: a outra dobra o joelho e o pé vira de lado (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const s = B.svg(V.novo(), { id: 'j', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const l of ['e', 'd']) {
+    // cada perna em dois pedaços cortados na linha do joelho; a canela leva o próprio corte do lado (sem perna fantasma)
+    const i = s.indexOf('<g class="pp-canela-' + l + '" data-j="');
+    assert.ok(i > s.indexOf('<g class="pp-passo-' + l + '">'), 'canela ' + l + ' dentro da perna');
+    assert.match(s.slice(i, i + 200), new RegExp('data-j="[\\d.]+"><g clip-path="url\\(#j-?perna' + l.toUpperCase() + '\\)"><g clip-path="url\\(#j-?canela\\)">'));
+  }
+  // Baladinha e pulo não precisam do joelho (uma cópia a menos de cada perna)
+  assert.doesNotMatch(B.svg(V.novo(), { id: 'k', rig: true, passos: true, anim: true, joelho: false }), /pp-canela-/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'balada.js'), 'utf8'), /joelho: false/);
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  // mão no ombro/nuca com o braço esquerdo (quadril para a direita): a perna esquerda fica solta, e vice-versa
+  assert.match(anim, /gingaD: \{[^}]*q: 1, solta: -1 \}/); assert.match(anim, /gingaE: \{[^}]*q: -1, solta: 1 \}/);
+  assert.match(anim, /if \(!modo && v\.solta\) \{\s*var sl = v\.solta \* pf0\.cruza/, 'só parada, e o menino fica plantado (cruza 0)');
+  assert.match(anim, /v\.kE = -0\.17 \* wE/, 'canela volta: joelho dobrado');
+  assert.match(anim, /bb\.height > 60/, 'bota e cano alto não giram (o cano ficaria fora da calça)');
 });
