@@ -161,6 +161,9 @@
   function transformaOmbro(a, f, S) { return 'rotate(' + n(a) + ' ' + n(S[0]) + ' ' + n(S[1]) + ')' + (f < 0.999 ? ' translate(' + n(S[0]) + ' ' + n(S[1]) + ') scale(1 ' + n(f * 1000) / 1000 + ') translate(' + n(-S[0]) + ' ' + n(-S[1]) + ')' : ''); }
   // a mão vai para trás da cabeça? (braço erguido bem alto e o cotovelo dobrando de volta para a cabeça: mão na nuca)
   function maoAtras(o, c) { return o > 110 && c < -60; }
+  /* braço caído ao lado do corpo (dono, 22/Nov/2026, "punhos cerrados de frente"): a mão fica de lado, com a palma
+     virada para a coxa (vista de frente aparece fina e comprida, o polegar na frente e os dedos curvando para a perna) */
+  function maoSolta(o, c) { return o < 35 && c > -40 && c < 45; }
   function transformaCotovelo(b, f, E) { return (f < 0.999 ? 'translate(' + n(E[0]) + ' ' + n(E[1]) + ') scale(1 ' + n(1000 / f) / 1000 + ') translate(' + n(-E[0]) + ' ' + n(-E[1]) + ') ' : '') + 'rotate(' + n(b) + ' ' + n(E[0]) + ' ' + n(E[1]) + ')'; }   // quanto o braço inteiro encolhe depois de ir para o corpo novo
   function rigido(x, y, s, ombro) { return s ? '<g data-rigido="' + x + ',' + y + (ombro ? ',' + ombro[0] + ',' + ombro[1] : '') + '">' + s + '</g><!--/rigido-->' : ''; }
   function deformarResto(str, D) {
@@ -387,8 +390,15 @@
       // tornozelos (para o animador manter o sapato reto no chão mesmo com a perna inclinada ou esticada)
       out.push('<g class="pp-sapato-frente" data-ae="' + n(DF.fx(177, 640)) + ',640" data-ad="' + n(DF.fx(223, 640)) + ',640">' + sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas) + '</g>');
       // (cada pé com o seu: na perna esquerda só o sapato de lado esquerdo, senão a ponta do outro aparecia no corte)
-      out.push('<g class="pp-sapato-lado-e" style="display:none"><g transform="translate(' + n(2 * XE) + ' 0) scale(-1 1)">' + sapatoLado(167, false) + '</g></g>' +
-        '<g class="pp-sapato-lado-d" style="display:none">' + sapatoLado(213, false) + '</g>');
+      // (do tamanho do sapato de frente: cresce a partir do tornozelo, y 632, e a sola encosta no chão)
+      var XD = DF.fx(223, 650), TQ = 1.02, TY = 1.25, Y0 = 632 * (1 - TY);
+      out.push('<g class="pp-sapato-lado-e" style="display:none"><g transform="translate(' + n(XE * (1 + TQ)) + ' ' + n(Y0) + ') scale(' + (-TQ) + ' ' + TY + ')">' + sapatoLado(167, false) + '</g></g>' +
+        '<g class="pp-sapato-lado-d" style="display:none"><g transform="translate(' + n(XD * (1 - TQ)) + ' ' + n(Y0) + ') scale(' + TQ + ' ' + TY + ')">' + sapatoLado(213, false) + '</g></g>');
+      /* perna solta, parada (dono, 22/Nov/2026, print do pé "bloquinho torto"): o pé vira para o meio — o sapato DE LADO
+         (desenho próprio, com calcanhar, peito do pé e biqueira), um pouco mais curto para ficar em três quartos; nunca o
+         de frente entortado */
+      out.push('<g class="pp-sapato-dentro-e" style="display:none" data-ae="' + n(DF.fx(177, 640)) + ',640"><g transform="translate(' + n(XE * (1 - TQ)) + ' ' + n(Y0) + ') scale(' + TQ + ' ' + TY + ')">' + sapatoLado(167, false) + '</g></g>' +
+        '<g class="pp-sapato-dentro-d" style="display:none" data-ad="' + n(DF.fx(223, 640)) + ',640"><g transform="translate(' + n(XD * (1 + TQ)) + ' ' + n(Y0) + ') scale(' + (-TQ) + ' ' + TY + ')">' + sapatoLado(213, false) + '</g></g>');
     } else out.push(sapatos(e, C('sapatos'), pele, peleE, peca, corpoCostas));
 
     // ---------- parte de baixo ----------
@@ -649,7 +659,7 @@
       if (corTop && manga === 'longa') {
         var mc = duas(seg(S, E, 12.8 * k, 9.2 * k), corTop.hex), mb = duas(seg(E, [W[0] - d[0] * 4, W[1] - d[1] * 4], 9.2 * k, 6.8 * k), corTop.hex);
         cimaC += mc.c; cimaF += mc.f; baixoC += mb.c; baixoF += mb.f;
-      } else if (corTop && manga !== 'nada') cimaF += p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 13 * k, 11 * k), { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
+      } else if (corTop && manga !== 'nada') cimaF += p(seg(S, [S[0] + d[0] * Lu * 0.55, S[1] + d[1] * Lu * 0.55], 12.3 * k, 10.3 * k), { fill: corTop.hex, stroke: esc(corTop.hex, 0.35), 'stroke-width': 1.4, 'stroke-linejoin': 'round' });
       // ombro redondo por baixo do braço (some o "ganchinho" no ombro)
       cimaC = circ(S[0], S[1], 13 * k, { fill: corTop && manga !== 'nada' ? corTop.hex : pele }) + cimaC;
       // sem manga: o arco do contorno do braço não risca o ombro (a pele do braço continua a do ombro)
@@ -657,16 +667,23 @@
       var esm = { tipo: e.unhas, cor: C('unhas') }, mk = DF.traco * 0.78;
       // a bolsa de mão (e o guarda-chuva) vai na mão direita e o anel no dedo: tudo dentro do grupo da mão, que gira com o braço
       var naMao = lado > 0 && vis('bolsa') && e.bolsa !== 'ombro' ? bolsa(e.bolsa, C('bolsa'), peca, linha) : '';
-      var maoS = '<g transform="translate(' + n(W[0]) + ' ' + n(W[1]) + ') scale(' + n(mk * 100) / 100 + ') translate(' + (-wx0) + ' -497)">' + naMao + mao(wx0, lado, pele, peleE, esm) +
-        (lado < 0 && vis('pulseira') ? pulseira(e.pulseira, C('pulseira')) : '') + (vis('anel') ? anel(e.anel, C('anel'), lado) : '') + '</g>';
+      // (sem pose: braço solto natural — o braço de base já desce 10° para fora, então o ombro vem 6° para dentro e o
+      // cotovelo fica quase reto; dono, 22/Nov/2026: "braços armados como parênteses")
+      var pr = op.poseRig || {}, oo = lado < 0 ? (pr.oE != null ? pr.oE : -6) : (pr.oD != null ? pr.oD : -6), cc = lado < 0 ? (pr.cE != null ? pr.cE : -3) : (pr.cD != null ? pr.cD : -3);
+      var a = lado < 0 ? oo : -oo, b = lado < 0 ? -cc : cc, f0 = (lado < 0 ? pr.fE : pr.fD) || 1, lt = lado < 0 ? 'e' : 'd';
+      // duas mãos: de frente (acenando, na cintura, no rosto) e de lado (braço caído); o animador mostra uma só (maoSolta)
+      var deLado = maoSolta(oo, cc);
+      var maoS = '<g transform="translate(' + n(W[0]) + ' ' + n(W[1]) + ') scale(' + n(mk * 100) / 100 + ') translate(' + (-wx0) + ' -497)">' + naMao +
+        '<g class="rig-mao-frente-' + lt + '"' + (deLado ? ' style="display:none"' : '') + '>' + mao(wx0, lado, pele, peleE, esm) + (vis('anel') ? anel(e.anel, C('anel'), lado) : '') + '</g>' +
+        '<g class="rig-mao-lado-' + lt + '"' + (deLado ? '' : ' style="display:none"') + '>' + maoDeLado(wx0, lado, pele, peleE, esm, vis('anel') ? C('anel') : null) + '</g>' +
+        (lado < 0 && vis('pulseira') ? pulseira(e.pulseira, C('pulseira')) : '') + '</g>';
       // f: o braço de cima "vem para a frente" (fica mais curto na tela) — o antebraço desfaz o encolhimento e não deforma
-      var pr = op.poseRig || {}, a = lado < 0 ? (pr.oE || 6) : -(pr.oD || 6), b = lado < 0 ? -(pr.cE || 8) : (pr.cD || 8), f0 = (lado < 0 ? pr.fE : pr.fD) || 1, lt = lado < 0 ? 'e' : 'd';
       // o antebraço sai em dois grupos com a mesma classe (contorno e preenchimento): o animador gira os dois juntos
       var cot = '<g class="rig-cotovelo-' + lt + '" data-x="' + n(E[0]) + '" data-y="' + n(E[1]) + '" transform="' + transformaCotovelo(b, f0, E) + '">';
       /* mão na nuca (dono, 21/Nov/2026): o antebraço e a mão saem duas vezes — uma na frente de tudo e outra atrás da
          cabeça e do cabelo da frente (mas na frente do cabelo de trás). Só uma aparece: quando a mão vai para trás da
          cabeça (maoAtras), aparece a de trás; o braço de cima fica sempre na frente do ombro. */
-      var vaiAtras = maoAtras(lado < 0 ? (pr.oE || 6) : (pr.oD || 6), lado < 0 ? (pr.cE || 8) : (pr.cD || 8));
+      var vaiAtras = maoAtras(oo, cc);
       var ombroG = '<g class="rig-ombro-' + lt + '" data-x="' + n(S[0]) + '" data-y="' + n(S[1]) + '" transform="' + transformaOmbro(a, f0, S) + '">';
       if (atras) return '<g class="rig-atras-' + lt + '"' + (vaiAtras ? '' : ' style="display:none"') + '>' + ombroG + cot + baixoC + '</g>' + cot + baixoF + maoS + '</g></g></g>';
       var fr = '<g class="rig-frente-' + lt + '"' + (vaiAtras ? ' style="display:none"' : '') + '>';
@@ -737,10 +754,17 @@
         if (!la) s += unhas([[x + 26, 650, 0.85]], { tipo: e.unhas, cor: C('unhas') }, pele);
       } else {
         var salto = ['salto', 'scarpin', 'saltoMedio', 'princesa', 'anabela', 'plataforma'].indexOf(t) >= 0, cano = t === 'bota' || t === 'galocha' || t === 'botaNeve' ? 600 : t === 'botaCano' ? 560 : t === 'patins' ? 598 : 0;
-        var d = 'M' + (x - 10) + ',' + (cano || 632) + ' L' + (x + 8) + ',' + (cano || 632) + ' L' + (x + 8) + ',638 Q' + (x + 26) + ',638 ' + (x + 30) + ',' + (salto ? 652 : 648) + ' Q' + (x + 30) + ',656 ' + (x + 18) + ',656 L' + (x - 10) + ',656Z';
+        /* perfil de sapato de verdade (dono, 22/Nov/2026, print do "bloquinho"): calcanhar redondo atrás, a boca do
+           sapato descendo um pouco para a frente, o peito do pé em curva até a ponta arredondada e a sola reta */
+        // (salto: o calcanhar fica no alto e a sola desce inclinada até a ponta, com o salto embaixo do calcanhar)
+        var top = cano || 631, bocaF = cano ? cano : 635, pz = salto ? 652 : 649, fundo = salto ? 647 : 656.5;
+        var d = 'M' + (x - 8) + ',' + top + ' L' + (x + 7) + ',' + bocaF + ' L' + (x + 8) + ',' + (cano ? 637 : bocaF + 2) +
+          ' C' + (x + 13) + ',' + (salto ? 640 : 638.5) + ' ' + (x + 21) + ',' + (salto ? 645 : 641) + ' ' + (x + 27) + ',' + pz +
+          ' Q' + (x + 32) + ',' + (pz + 3) + ' ' + (x + 29) + ',655.5 Q' + (x + 27) + ',656.5 ' + (x + 20) + ',656.5 L' + (x - 5) + ',' + fundo +
+          ' Q' + (x - 12) + ',' + fundo + ' ' + (x - 12) + ',' + (fundo - 7) + ' Q' + (x - 12) + ',' + (top + 6) + ' ' + (x - 8) + ',' + top + 'Z';
         s = peca(d, c, 'sapatos'); forma = d;
-        if (salto) s += p('M' + (x - 10) + ',652 L' + (x - 3) + ',652 L' + (x - 5) + ',666 L' + (x - 9) + ',666Z', { fill: esc(c.hex, 0.25) });
-        if (t === 'tenis' || t === 'tenisAlto' || t === 'tenisLuz' || t === 'tenisGlitter') s += p('M' + (x - 10) + ',652 L' + (x + 26) + ',652', { stroke: '#fff', 'stroke-width': 3 }) + p('M' + (x - 2) + ',640 L' + (x + 10) + ',642', { stroke: '#fff', 'stroke-width': 1.6, opacity: 0.8 });
+        if (salto) s += p('M' + (x - 10) + ',' + (fundo - 1) + ' L' + (x - 3) + ',' + (fundo - 0.5) + ' L' + (x - 5.5) + ',656.5 L' + (x - 8.5) + ',656.5Z', { fill: esc(c.hex, 0.25), stroke: esc(c.hex, 0.45), 'stroke-width': 0.8 });
+        if (t === 'tenis' || t === 'tenisAlto' || t === 'tenisLuz' || t === 'tenisGlitter') s += p('M' + (x - 11) + ',652.5 L' + (x + 28) + ',652.5', { stroke: '#fff', 'stroke-width': 3, 'stroke-linecap': 'round' }) + p('M' + (x + 9) + ',639 L' + (x + 13) + ',641.5 M' + (x + 12) + ',640 L' + (x + 16) + ',643', { stroke: '#fff', 'stroke-width': 1.4, opacity: 0.85, 'stroke-linecap': 'round' });
         // patins de lado: aqui sim as rodas aparecem redondas, uma na frente e uma atrás, com o freio na ponta
         if (t === 'patins') {
           s += ret(x - 12, 654, 44, 5, { fill: '#9aa3b5', stroke: '#6f7788', 'stroke-width': 1, rx: 2.5 }) + circ(x + 33, 659, 3.6, { fill: '#ff8fb1', stroke: '#d0567c', 'stroke-width': 1.1 });
@@ -1490,6 +1514,21 @@
   // dedos vistos de fora para dentro: mindinho, anelar, médio, indicador. lado -1 = mão da esquerda da imagem.
   var DEDOS = [[-7, 10], [-2.4, 12.5], [2.4, 13], [7, 11]];
   function dedos(x, lado) { return DEDOS.map(function (d) { var dx = d[0] * -lado; return 'M' + n(x + dx) + ',506 L' + n(x + dx * 1.18) + ',' + n(506 + d[1]); }).join(' ') + ' M' + n(x - lado * 8) + ',496 L' + n(x - lado * 14) + ',508'; }
+  /* mão de lado, relaxada (braço caído): palma virada para a coxa, fina e comprida vista de frente; o polegar fica na
+     frente e os dedos curvam um pouco para a perna (dono, 22/Nov/2026: "adeus punho cerrado") */
+  function maoDeLado(x, lado, pele, peleE, esmalte, corAnel) {
+    var s = -lado;   // para dentro (para o lado do corpo)
+    function X(d) { return n(x + s * d * 1.45); }   // largura da mão de lado (do dorso à palma), da largura do pulso
+    var cont = 'M' + X(-5) + ',492 C' + X(-6.6) + ',501 ' + X(-6.4) + ',511 ' + X(-4.2) + ',517.5 C' + X(-2.4) + ',522.6 ' + X(1.8) + ',525.2 ' + X(4.3) + ',522 C' + X(5.8) + ',519.6 ' + X(5.8) + ',511 ' + X(5.3) + ',503 L' + X(4.9) + ',492 Z';
+    var polegar = 'M' + X(0.4) + ',499.5 C' + X(3.6) + ',500.5 ' + X(4.8) + ',506.8 ' + X(3.8) + ',511.4 C' + X(3) + ',513.6 ' + X(0.7) + ',512.8 ' + X(0.4) + ',510 C' + X(0.1) + ',507 ' + X(-0.7) + ',502 ' + X(0.4) + ',499.5 Z';
+    var r = p(cont, { fill: pele, stroke: peleE, 'stroke-width': 2, 'stroke-linejoin': 'round' }) +
+      p('M' + X(-3.6) + ',514.5 Q' + X(-1.2) + ',517.5 ' + X(-0.2) + ',521.5 M' + X(-1) + ',513.5 Q' + X(1.6) + ',516.5 ' + X(2.6) + ',520.8', { fill: 'none', stroke: peleE, 'stroke-width': 0.8, opacity: 0.55, 'stroke-linecap': 'round' }) +
+      p(polegar, { fill: pele, stroke: peleE, 'stroke-width': 1.2, 'stroke-linejoin': 'round' }) +
+      elip(x - s * 3.4, 500, 2.6, 5, { fill: '#fff', opacity: 0.16 });
+    if (corAnel) r += p('M' + X(-5.4) + ',512.6 Q' + X(-0.5) + ',515.6 ' + X(5.6) + ',512.2', { fill: 'none', stroke: esc(corAnel.hex, 0.3), 'stroke-width': 3, 'stroke-linecap': 'round' }) +
+      p('M' + X(-5.4) + ',512.6 Q' + X(-0.5) + ',515.6 ' + X(5.6) + ',512.2', { fill: 'none', stroke: corAnel.hex, 'stroke-width': 1.9, 'stroke-linecap': 'round' });
+    return r + unhas([[x + s * 4.2, 510.4, 0.8], [x + s * 4.9, 520.6, 0.85]], esmalte, pele);
+  }
   function mao(x, lado, pele, peleE, esmalte) {
     var d = dedos(x, lado);
     var s = p(d, { fill: 'none', stroke: peleE, 'stroke-width': 7.4, 'stroke-linecap': 'round' }) + elip(x, 501, 12, 12.5, { fill: pele, stroke: peleE, 'stroke-width': 2 }) +
@@ -2562,7 +2601,7 @@
     var m = minimo || 90, w = Math.max(x2 - x1, m), h = Math.max(y2 - y1, m), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
     return [n(cx - w / 2), n(cy - h / 2), n(w), n(h)];
   }
-  var API = { maoAtras: maoAtras, transformaOmbro: transformaOmbro, transformaCotovelo: transformaCotovelo, corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
+  var API = { maoAtras: maoAtras, maoSolta: maoSolta, transformaOmbro: transformaOmbro, transformaCotovelo: transformaCotovelo, corAjustada: corAjustada, MAQUIAGEM: MAQUIAGEM, svg: svg, espelhar: espelhar, passarela: passarela, tetoShow: tetoShow, areaZoom: areaZoom };
   API.POSES = POSES;
   raiz.PurpurinaBoneca = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

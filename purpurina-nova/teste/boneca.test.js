@@ -669,7 +669,7 @@ test('catwalk sem pernas fantasma e pulo de verdade na Baladinha (dono, 22/Nov/2
 test('braços soltos retos, sem piscadinha fixa na Baladinha e queixo liso (dono, 22/Nov/2026)', () => {
   const fs = require('fs'), path = require('path');
   const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
-  assert.match(anim, /relax: \{ oE: 4, cE: 2, oD: 4, cD: 2,/, 'braços quase retos, rentes ao corpo');
+  assert.match(anim, /relax: \{ oE: -6, cE: -3, oD: -4, cD: -5,/, 'braços quase retos, rentes ao corpo (o braço de base já desce 10° para fora)');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   const placa = app.slice(app.indexOf("B.svg(estado, { id: 'placa'"), app.indexOf("B.svg(estado, { id: 'placa'") + 200);
   assert.doesNotMatch(placa, /piscadinha: true/, 'pisca sozinha, não fica piscando o tempo todo');
@@ -697,4 +697,36 @@ test('parada, peso numa perna: a outra dobra o joelho e o pé vira de lado (dono
   assert.match(anim, /if \(!modo && v\.solta\) \{\s*var sl = v\.solta \* pf0\.cruza/, 'só parada, e o menino fica plantado (cruza 0)');
   assert.match(anim, /v\.kE = -0\.17 \* wE/, 'canela volta: joelho dobrado');
   assert.match(anim, /bb\.height > 60/, 'bota e cano alto não giram (o cano ficaria fora da calça)');
+});
+
+test('descanso natural: braço caído sem parêntese, mão de lado e peso numa perna (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  // braço caído: mão de lado (palma para a coxa); levantado ou na cintura: mão de frente
+  assert.equal(B.maoSolta(-6, -3), true); assert.equal(B.maoSolta(40, 105), false); assert.equal(B.maoSolta(150, -110), false);
+  const s = B.svg(V.aplicar(V.novo(), 'anel', 'pedra'), { id: 'm', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const l of ['e', 'd']) {
+    assert.match(s, new RegExp('<g class="rig-mao-lado-' + l + '">'), 'sem pose: a mão de lado aparece (' + l + ')');
+    assert.match(s, new RegExp('<g class="rig-mao-frente-' + l + '" style="display:none">'), 'e a de frente fica escondida (' + l + ')');
+  }
+  // com a mão na cintura, a mão de frente
+  const c = B.svg(V.novo(), { id: 'n', rig: true, poseRig: { oE: 8, cE: 14, oD: 40, cD: 105 } });
+  assert.match(c, /<g class="rig-mao-frente-d">/); assert.match(c, /<g class="rig-mao-lado-d" style="display:none">/);
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /B\.maoSolta\(b\[1\], b\[2\]\)/, 'o animador troca a mão conforme o braço');
+  // descanso com o peso na perna esquerda, a direita solta (sem simetria de soldado)
+  assert.match(anim, /relax: \{[^}]*base: 'leve' \}/); assert.match(anim, /leve: \{[^}]*q: -0\.5, solta: 0\.75 \}/);
+  assert.match(anim, /feminino: \{[^}]*abre: 1,/, 'andando, os braços balançam perto do corpo');
+});
+
+test('pé virado de lado com o desenho de lado, não o de frente entortado (dono, 22/Nov/2026: "bloquinho torto")', () => {
+  const fs = require('fs'), path = require('path');
+  const s = B.svg(V.novo(), { id: 'p', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const l of ['e', 'd']) assert.match(s, new RegExp('<g class="pp-sapato-dentro-' + l + '" style="display:none" data-a' + l + '="'), 'sapato de lado para dentro (' + l + ')');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.doesNotMatch(anim, /skewX\(' \+ \(-pl\[6\]/, 'nada de entortar o sapato de frente');
+  assert.match(anim, /\(v\.peE \|\| 0\) > 0\.5 && !altoE \? 'd'/, 'perna solta parada: o sapato de lado aparece');
+  const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /fundo = salto \? 647 : 656\.5/, 'salto: calcanhar no alto e a sola descendo até a ponta');
 });

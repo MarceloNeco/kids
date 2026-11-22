@@ -10,18 +10,23 @@
   // o = abrir o braço para fora, c = dobrar o cotovelo para dentro (graus), f = braço de cima vindo para a frente (1 = não)
   // cab = inclinar a cabeça, olho = para onde os olhos vão (-1 esquerda … 1 direita), base = como estão as pernas
   var POSES = {
-    relax: { oE: 4, cE: 2, oD: 4, cD: 2, cab: 0, olho: 0, base: 'reta' },   // braços soltos ao lado do corpo, quase retos (dono, 22/Nov/2026: "levemente arqueados, não natural")
-    cintura: { oE: 8, cE: 14, oD: 40, cD: 105, cab: -5, olho: 0.4, base: 'gingaD' },
+    // (dono, 22/Nov/2026, "braços armados como parênteses", "simetria rígida"): o braço de base já desce 10° para fora,
+    // então o ombro vem para dentro (o cotovelo quase encosta na cintura) e o cotovelo fica quase reto; e ela fica com o
+    // peso na perna esquerda (o quadril vai um pouco para a esquerda), a direita solta com o pé de lado
+    relax: { oE: -6, cE: -3, oD: -4, cD: -5, cab: 1, olho: 0, base: 'leve' },
+    // (o braço caído das outras poses também: ombro para dentro e cotovelo quase reto; do lado para onde o quadril vai,
+    // ele abre um pouquinho para acompanhar o quadril)   // braços soltos ao lado do corpo, quase retos (dono, 22/Nov/2026: "levemente arqueados, não natural")
+    cintura: { oE: -6, cE: -3, oD: 40, cD: 105, cab: -5, olho: 0.4, base: 'gingaD' },
     duasCintura: { oE: 40, cE: 105, oD: 40, cD: 105, cab: 4, olho: 0, base: 'aberta' },
     cabeca: { oE: 150, cE: -110, oD: 40, cD: 105, cab: 5, olho: -0.3, base: 'gingaD' },
-    beijo: { oE: 8, cE: 14, oD: -10, cD: 172, fD: 0.45, cab: 6, olho: 0, base: 'cruzada' },
+    beijo: { oE: -5, cE: -3, oD: -10, cD: 172, fD: 0.45, cab: 6, olho: 0, base: 'cruzada' },
     queixo: { oE: 25, cE: 95, oD: -20, cD: 165, fD: 0.6, cab: -6, olho: 0.6, base: 'reta' },
     apontar: { oE: 78, cE: 5, oD: -5, cD: 150, fD: 0.6, cab: -8, olho: -1, base: 'gingaE' },
     bolsos: { oE: 12, cE: 30, oD: 12, cD: 30, cab: 3, olho: 0.5, base: 'cruzada' },
-    tchau: { oE: 8, cE: 14, oD: 62, cD: -95, cab: 4, olho: 0, base: 'reta', aceno: true },
+    tchau: { oE: -5, cE: -3, oD: 62, cD: -95, cab: 4, olho: 0, base: 'reta', aceno: true },
     cruzados: { oE: 18, cE: 112, fE: 0.8, oD: 18, cD: 108, fD: 0.8, cab: 3, olho: 0, base: 'aberta' },
-    olhaE: { oE: 8, cE: 12, oD: 8, cD: 12, cab: -4, olho: -1, base: 'gingaE' },
-    olhaD: { oE: 8, cE: 12, oD: 8, cD: 12, cab: 4, olho: 1, base: 'gingaD' },
+    olhaE: { oE: -1, cE: -3, oD: -6, cD: -3, cab: -4, olho: -1, base: 'gingaE' },
+    olhaD: { oE: -6, cE: -3, oD: -1, cD: -3, cab: 4, olho: 1, base: 'gingaD' },
     // passos da baladinha (dono, 20/Nov/2026, vídeos da sala de luzes): braços para cima, um braço para cima de cada
     // lado, cotovelos dançando, palminhas e o dedo para cima da discoteca
     bracosCima: { oE: 150, cE: 25, oD: 150, cD: 25, cab: 0, olho: 0, base: 'aberta' },
@@ -43,6 +48,7 @@
     // (dono, 22/Nov/2026: "mão no ombro com o braço esquerdo… a perna e o pezinho virar para o lado direito")
     gingaD: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: -2, q: 1, solta: -1 },
     gingaE: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 2, q: -1, solta: 1 },
+    leve: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 1, q: -0.5, solta: 0.75 },   // descanso: peso na esquerda, de leve
     cruzada: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 },
     aberta: { c: [0, 0, 0], e: [0, 0, 0], d: [0, 0, 0], s: 0 }
   };
@@ -56,8 +62,8 @@
      o quadril quase parado (só passa o peso de leve, sem rebolar), os braços balançando mais soltos e um pouco afastados
      do corpo, e parado fica plantado (sem quadril jogado para o lado, sem mão na cintura). Tudo aqui num lugar só. */
   var BIO = {
-    feminino: { quadril: 1.25, parado: 1, cruza: 1, abre: 7, abreVai: 3, cotovelo: 30, frente: 0.12, quique: 1, cadencia: 1, troca: {} },
-    masculino: { quadril: 0.2, parado: 0.2, cruza: 0, abre: 10, abreVai: 4, cotovelo: 24, frente: 0.18, quique: 1, cadencia: 1,
+    feminino: { quadril: 1.25, parado: 1, cruza: 1, abre: 1, abreVai: 3, cotovelo: 30, frente: 0.12, quique: 1, cadencia: 1, troca: {} },
+    masculino: { quadril: 0.2, parado: 0.2, cruza: 0, abre: 5, abreVai: 4, cotovelo: 24, frente: 0.18, quique: 1, cadencia: 1,
       troca: { cintura: 'bolsos', duasCintura: 'cruzados', cabeca: 'relax', beijo: 'tchau', maoCabelo: 'olhaD', carinha: 'relax' } },
     // menino pequeno anda mais rápido e quica mais; adolescente e adulto, passos mais compassados
     idadeMasculino: { pequena: { cadencia: 1.25, quique: 1.3 }, crianca: { cadencia: 1.25, quique: 1.3 }, adolescente: { cadencia: 0.95, quique: 1 }, adulta: { cadencia: 0.95, quique: 1 } }
@@ -101,6 +107,13 @@
           om.setAttribute('data-atras', atr);
           Array.prototype.forEach.call(svg.querySelectorAll('.rig-atras-' + b[0]), function (g) { g.style.display = atr === '1' ? '' : 'none'; });
           Array.prototype.forEach.call(svg.querySelectorAll('.rig-frente-' + b[0]), function (g) { g.style.display = atr === '1' ? 'none' : ''; });
+        }
+        // braço caído: a mão de lado (palma para a coxa); levantado, na cintura ou no rosto: a mão de frente
+        var sol = B.maoSolta(b[1], b[2]) ? '1' : '0';
+        if (om.getAttribute('data-solta') !== sol) {
+          om.setAttribute('data-solta', sol);
+          Array.prototype.forEach.call(svg.querySelectorAll('.rig-mao-lado-' + b[0]), function (g) { g.style.display = sol === '1' ? '' : 'none'; });
+          Array.prototype.forEach.call(svg.querySelectorAll('.rig-mao-frente-' + b[0]), function (g) { g.style.display = sol === '1' ? 'none' : ''; });
         }
         var tc = B.transformaCotovelo(b[0] === 'e' ? -b[2] : b[2], b[3], E);
         for (var q = 0; q < cos.length; q++) cos[q].setAttribute('transform', tc);   // contorno e preenchimento do antebraço
@@ -150,13 +163,13 @@
       /* pé no chão de verdade (dono, 22/Nov/2026): o sapato não inclina nem estica junto com a perna — gira e estica ao
          contrário em volta do tornozelo, então fica reto no piso; e a sombrinha de cada pé fica no chão, embaixo dele,
          mais clara e menor quando o pé levanta */
+      var altoE = false, altoD = false;
       [['e', v.er || 0, v.esy || 1, v.ex || 0, Math.max(v.sobeE || 0, 0.3 * (v.peE || 0)), v.peE || 0, 1], ['d', v.dr || 0, v.dsy || 1, v.dx || 0, Math.max(v.sobeD || 0, 0.3 * (v.peD || 0)), v.peD || 0, -1]].forEach(function (pl) {
-        var rr = pl[1] * amp, sy = 1 + (pl[2] - 1) * amp, vira = '';
-        // pé da perna solta virado de lado (a ponta para o meio), em três quartos
-        // bota e cano alto: o cano sobe pela perna, então não gira nem desentorta (sairia de dentro da calça); o pé baixo, sim
+        var rr = pl[1] * amp, sy = 1 + (pl[2] - 1) * amp;
+        // bota e cano alto: o cano sobe pela perna, então não vira nem desentorta (sairia de dentro da calça); o pé baixo, sim
         var sap = svg.querySelector('.pp-passo-' + pl[0] + ' .pp-canela-' + pl[0] + ' .pp-sapato-frente'), alto = false;
         if (sap) { if (!sap.hasAttribute('data-alto')) { var bb = { height: 0 }; try { bb = sap.getBBox(); } catch (er) {} sap.setAttribute('data-alto', bb.height > 60 ? '1' : '0'); } alto = sap.getAttribute('data-alto') === '1'; }
-        if (pl[5] && !alto) vira = ' rotate(' + (-pl[6] * 16 * pl[5] * amp).toFixed(2) + ') skewX(' + (-pl[6] * 10 * pl[5] * amp).toFixed(2) + ')';
+        if (pl[0] === 'e') altoE = alto; else altoD = alto;
         // joelho: a canela entorta em volta da linha do joelho; o sapato desfaz isso no tornozelo (fica reto no chão)
         var kk = (pl[0] === 'e' ? v.kE : v.kD) * amp || 0, jo = 0, des = '';
         Array.prototype.forEach.call(svg.querySelectorAll('.pp-canela-' + pl[0]), function (g) {
@@ -164,10 +177,10 @@
           if (kk) g.setAttribute('transform', 'matrix(1 0 ' + kk.toFixed(4) + ' 1 ' + (-kk * jo).toFixed(3) + ' 0)'); else if (g.hasAttribute('transform')) g.removeAttribute('transform');
         });
         if (kk && !alto) des = ' skewX(' + (-Math.atan(kk) * 180 / Math.PI).toFixed(2) + ')';
-        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' .pp-sapato-frente'), function (g) {
+        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' .pp-sapato-frente, .pp-passo-' + pl[0] + ' .pp-sapato-dentro-' + pl[0]), function (g) {
           var a = (g.getAttribute('data-a' + pl[0]) || '').split(',').map(Number); if (a.length < 2) return;
           if (alto) { if (g.hasAttribute('transform')) g.removeAttribute('transform'); return; }   // bota: vai inteira com a perna
-          g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(1 ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ')' + vira + ' translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
+          g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(1 ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ') translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
         });
         var sb = svg.querySelector('.pp-sombra-pe-' + pl[0]);
         if (sb) {
@@ -179,13 +192,15 @@
           sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4]) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4]) * (1 - 0.6 * ar)).toFixed(3));
         }
       });
-      // vitrine dos sapatos: troca o sapato de frente pelo de lado só na perna que está levantada
-      [['e', !!v.ladoE], ['d', !!v.ladoD]].forEach(function (pl) {
-        var g = svg.querySelector('.pp-passo-' + pl[0]), lig = pl[1] ? '1' : '0'; if (!g || g.getAttribute('data-lado') === lig) return;
+      // qual sapato aparece em cada pé: de frente; de lado (vitrine, pé levantado, ponta para fora); ou para dentro (perna
+      // solta parada, ponta para o meio) — a bota e o cano alto ficam de frente
+      [['e', v.ladoE ? 'l' : (v.peE || 0) > 0.5 && !altoE ? 'd' : 'f'], ['d', v.ladoD ? 'l' : (v.peD || 0) > 0.5 && !altoD ? 'd' : 'f']].forEach(function (pl) {
+        var g = svg.querySelector('.pp-passo-' + pl[0]), qual = pl[1]; if (!g || (g.getAttribute('data-lado') || 'f') === qual) return;
         Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0]), function (gg) {
-          gg.setAttribute('data-lado', lig);
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-lado-' + pl[0]), function (x) { x.style.display = pl[1] ? '' : 'none'; });
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-frente'), function (x) { x.style.display = pl[1] ? 'none' : ''; });
+          gg.setAttribute('data-lado', qual);
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-lado-' + pl[0]), function (x) { x.style.display = qual === 'l' ? '' : 'none'; });
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-dentro-' + pl[0]), function (x) { x.style.display = qual === 'd' ? '' : 'none'; });
+          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-frente'), function (x) { x.style.display = qual === 'f' ? '' : 'none'; });
         });
       });
       Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
