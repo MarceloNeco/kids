@@ -633,7 +633,7 @@ test('pé no chão: sapato reto no piso e sombrinha de cada pé (dono, 22/Nov/20
   assert.match(s, /class="pp-sapato-frente" data-ae="[\d.]+,640" data-ad="[\d.]+,640"/, 'tornozelos marcados');
   assert.match(s, /class="pp-sombra-pe-e" data-p="[\d.]+,662" data-q=/); assert.match(s, /class="pp-sombra-pe-d"/);
   const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
-  assert.match(anim, /scale\(1 ' \+ \(1 \/ sy\)\.toFixed\(4\) \+ '\) rotate\(' \+ \(-rr\)/, 'o sapato gira e estica ao contrário da perna');
+  assert.match(anim, /' scale\(' \+ kx\.toFixed\(3\) \+ ' ' \+ \(1 \/ sy\)\.toFixed\(4\) \+ '\) rotate\(' \+ \(-rr\)/, 'o sapato gira e estica ao contrário da perna (kx: o pé virando)');
 });
 
 test('GIF do desfile e da Baladinha para compartilhar (dono, 22/Nov/2026)', async () => {
@@ -726,7 +726,11 @@ test('pé virado de lado com o desenho de lado, não o de frente entortado (dono
   for (const l of ['e', 'd']) assert.match(s, new RegExp('<g class="pp-sapato-dentro-' + l + '" style="display:none" data-a' + l + '="'), 'sapato de lado para dentro (' + l + ')');
   const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
   assert.doesNotMatch(anim, /skewX\(' \+ \(-pl\[6\]/, 'nada de entortar o sapato de frente');
-  assert.match(anim, /\(v\.peE \|\| 0\) > 0\.5 && !altoE \? 'd'/, 'perna solta parada: o sapato de lado aparece');
+  // (0.9.16, dono: "o pé vira para o lado de uma vez"): o pé gira aos poucos, de 0 (frente) a 1 (lado), sem troca seca
+  assert.match(anim, /var tDentro = alto \|\| tFora \? 0 : Math\.max\(0, Math\.min\(1, \(pl\[5\] - 0\.15\) \/ 0\.55\)\);/, 'perna solta parada: vira aos poucos');
+  assert.match(anim, /\['\.pp-sapato-frente', 1 - 0\.5 \* tt, 1 - sm, true\]/, 'o de frente estreita e some devagar');
+  assert.match(anim, /v\.viraE = Math\.min\(1, sobe \/ 0\.75\)/, 'vitrine: vira enquanto sobe');
+  assert.doesNotMatch(anim, /data-lado/, 'sem a troca seca de antes');
   const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
   assert.match(fonte, /fundo = salto \? 647 : 656\.5/, 'salto: calcanhar no alto e a sola descendo até a ponta');
 });

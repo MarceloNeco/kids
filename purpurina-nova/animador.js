@@ -177,10 +177,23 @@
           if (kk) g.setAttribute('transform', 'matrix(1 0 ' + kk.toFixed(4) + ' 1 ' + (-kk * jo).toFixed(3) + ' 0)'); else if (g.hasAttribute('transform')) g.removeAttribute('transform');
         });
         if (kk && !alto) des = ' skewX(' + (-Math.atan(kk) * 180 / Math.PI).toFixed(2) + ')';
-        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' .pp-sapato-frente, .pp-passo-' + pl[0] + ' .pp-sapato-dentro-' + pl[0]), function (g) {
-          var a = (g.getAttribute('data-a' + pl[0]) || '').split(',').map(Number); if (a.length < 2) return;
-          if (alto) { if (g.hasAttribute('transform')) g.removeAttribute('transform'); return; }   // bota: vai inteira com a perna
-          g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(1 ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ') translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
+        /* o pé vira aos poucos (dono, 22/Nov/2026: "o pé vira para o lado de uma vez… não está natural"): um número de 0
+           (de frente) a 1 (de lado) anda junto com a perna; o sapato de frente vai estreitando e some devagar enquanto o de
+           lado cresce a partir do tornozelo (a ponta vai saindo para o lado) e aparece devagar — como um pé girando, sem
+           troca seca. Vitrine: ponta para fora (pé levantado); perna solta parada: ponta para o meio (bota: fica de frente) */
+        var tFora = Math.max(0, Math.min(1, (pl[0] === 'e' ? v.viraE : v.viraD) || 0));
+        var tDentro = alto || tFora ? 0 : Math.max(0, Math.min(1, (pl[5] - 0.15) / 0.55));
+        var tt = Math.max(tFora, tDentro), sm = tt <= 0.3 ? 0 : tt >= 0.7 ? 1 : (function (u) { return u * u * (3 - 2 * u); })((tt - 0.3) / 0.4);
+        [['.pp-sapato-frente', 1 - 0.5 * tt, 1 - sm, true], ['.pp-sapato-lado-' + pl[0], 0.3 + 0.7 * tFora, tFora ? sm : 0, false], ['.pp-sapato-dentro-' + pl[0], 0.3 + 0.7 * tDentro, tDentro ? sm : 0, false]].forEach(function (sp) {
+          Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0] + ' ' + sp[0]), function (g) {
+            var vis = sp[2] > 0.01;
+            g.style.display = vis ? '' : 'none'; if (!vis) return;
+            g.style.opacity = sp[2] < 0.99 ? sp[2].toFixed(3) : '';
+            var a = (g.getAttribute('data-a' + pl[0]) || '').split(',').map(Number); if (a.length < 2) return;
+            var kx = sp[1] < 0.999 ? sp[1] : 1;
+            if (alto && sp[3]) { if (kx === 1) { if (g.hasAttribute('transform')) g.removeAttribute('transform'); } else g.setAttribute('transform', 'translate(' + a[0] + ' 0) scale(' + kx.toFixed(3) + ' 1) translate(' + (-a[0]) + ' 0)'); return; }   // bota: vai inteira com a perna
+            g.setAttribute('transform', 'translate(' + a[0] + ' ' + a[1] + ')' + des + ' scale(' + kx.toFixed(3) + ' ' + (1 / sy).toFixed(4) + ') rotate(' + (-rr).toFixed(2) + ') translate(' + (-a[0]) + ' ' + (-a[1]) + ')');
+          });
         });
         var sb = svg.querySelector('.pp-sombra-pe-' + pl[0]);
         if (sb) {
@@ -191,17 +204,6 @@
           var ar = v.noAr || 0;
           sb.setAttribute('rx', (20 * (1 - 0.35 * pl[4]) * (1 - 0.3 * ar)).toFixed(1)); sb.setAttribute('opacity', (0.28 * (1 - 0.6 * pl[4]) * (1 - 0.6 * ar)).toFixed(3));
         }
-      });
-      // qual sapato aparece em cada pé: de frente; de lado (vitrine, pé levantado, ponta para fora); ou para dentro (perna
-      // solta parada, ponta para o meio) — a bota e o cano alto ficam de frente
-      [['e', v.ladoE ? 'l' : (v.peE || 0) > 0.5 && !altoE ? 'd' : 'f'], ['d', v.ladoD ? 'l' : (v.peD || 0) > 0.5 && !altoD ? 'd' : 'f']].forEach(function (pl) {
-        var g = svg.querySelector('.pp-passo-' + pl[0]), qual = pl[1]; if (!g || (g.getAttribute('data-lado') || 'f') === qual) return;
-        Array.prototype.forEach.call(svg.querySelectorAll('.pp-passo-' + pl[0]), function (gg) {
-          gg.setAttribute('data-lado', qual);
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-lado-' + pl[0]), function (x) { x.style.display = qual === 'l' ? '' : 'none'; });
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-dentro-' + pl[0]), function (x) { x.style.display = qual === 'd' ? '' : 'none'; });
-          Array.prototype.forEach.call(gg.querySelectorAll('.pp-sapato-frente'), function (x) { x.style.display = qual === 'f' ? '' : 'none'; });
-        });
       });
       Array.prototype.forEach.call(svg.querySelectorAll('.pp-barra'), function (g) { g.style.transformBox = 'view-box'; g.style.transform = 'skewX(' + (v.s * amp).toFixed(2) + 'deg)'; });
     }
@@ -258,9 +260,10 @@
         /* vitrine dos sapatos (dono, 21/Nov/2026): um pé de cada vez sobe um pouco, vira para fora e mostra o sapato de
            lado; desce e volta de frente; depois o outro. O peso vai para a perna que fica no chão. Ciclo de 4,8 s. */
         var T = 4800, ph = ((t - modoIni) % T) / T, seg4 = Math.floor(ph * 4), u = ph * 4 - seg4, sobe = Math.sin(Math.PI * u);
-        v.ladoE = false; v.ladoD = false;
-        if (seg4 === 0) { v.ey += -12 * sobe; v.esy = 1 - 0.04 * sobe; v.er += 6 * sobe; v.q = 0.5 * sobe; v.ladoE = sobe > 0.35; }
-        else if (seg4 === 2) { v.dy += -12 * sobe; v.dsy = 1 - 0.04 * sobe; v.dr += -6 * sobe; v.q = -0.5 * sobe; v.ladoD = sobe > 0.35; }
+        // (o pé vira aos poucos enquanto sobe e desvira enquanto desce: viraE/viraD de 0 a 1)
+        v.viraE = 0; v.viraD = 0;
+        if (seg4 === 0) { v.ey += -12 * sobe; v.esy = 1 - 0.04 * sobe; v.er += 6 * sobe; v.q = 0.5 * sobe; v.viraE = Math.min(1, sobe / 0.75); }
+        else if (seg4 === 2) { v.dy += -12 * sobe; v.dsy = 1 - 0.04 * sobe; v.dr += -6 * sobe; v.q = -0.5 * sobe; v.viraD = Math.min(1, sobe / 0.75); }
         else v.q = 0;
       } else if (modo === 'pular') {
         /* pulo de verdade (dono, 22/Nov/2026: "aquele pulinho sem movimentos de pulo… tá muito ruim"): agacha dobrando os

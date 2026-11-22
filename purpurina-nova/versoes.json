@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.16",
+      "data": "22/Nov/2026",
+      "hora": "15:12:00",
+      "pt": [
+        "👟 O pezinho vira de lado aos poucos, como um pé girando de verdade: o sapato de frente vai estreitando enquanto o de lado vai aparecendo a partir do tornozelo, acompanhando a perna (antes ele trocava de uma vez, num pulo). Vale quando ela fica parada com uma perna solta e na vitrine dos sapatos, onde o pé vira enquanto sobe e volta enquanto desce."
+      ],
+      "en": [
+        "👟 The foot turns sideways little by little, like a real foot turning: the front shoe narrows while the side shoe grows from the ankle, following the leg (before, it switched all at once, in a jump). This works when she stands with one leg relaxed and in the shoe showcase, where the foot turns as it lifts and turns back as it lowers."
+      ],
+      "es": [
+        "👟 El pie se gira de lado poco a poco, como un pie de verdad: el zapato de frente se va estrechando mientras el de lado va apareciendo desde el tobillo, siguiendo la pierna (antes cambiaba de golpe, de un salto). Vale cuando está quieta con una pierna suelta y en el escaparate de zapatos, donde el pie gira al subir y vuelve al bajar."
+      ]
+    },
+    {
       "versao": "0.9.15",
       "data": "22/Nov/2026",
       "hora": "14:38:00",

@@ -392,8 +392,8 @@
       // (cada pé com o seu: na perna esquerda só o sapato de lado esquerdo, senão a ponta do outro aparecia no corte)
       // (do tamanho do sapato de frente: cresce a partir do tornozelo, y 632, e a sola encosta no chão)
       var XD = DF.fx(223, 650), TQ = 1.02, TY = 1.25, Y0 = 632 * (1 - TY);
-      out.push('<g class="pp-sapato-lado-e" style="display:none"><g transform="translate(' + n(XE * (1 + TQ)) + ' ' + n(Y0) + ') scale(' + (-TQ) + ' ' + TY + ')">' + sapatoLado(167, false) + '</g></g>' +
-        '<g class="pp-sapato-lado-d" style="display:none"><g transform="translate(' + n(XD * (1 - TQ)) + ' ' + n(Y0) + ') scale(' + TQ + ' ' + TY + ')">' + sapatoLado(213, false) + '</g></g>');
+      out.push('<g class="pp-sapato-lado-e" style="display:none" data-ae="' + n(DF.fx(177, 640)) + ',640"><g transform="translate(' + n(XE * (1 + TQ)) + ' ' + n(Y0) + ') scale(' + (-TQ) + ' ' + TY + ')">' + sapatoLado(167, false) + '</g></g>' +
+        '<g class="pp-sapato-lado-d" style="display:none" data-ad="' + n(DF.fx(223, 640)) + ',640"><g transform="translate(' + n(XD * (1 - TQ)) + ' ' + n(Y0) + ') scale(' + TQ + ' ' + TY + ')">' + sapatoLado(213, false) + '</g></g>');
       /* perna solta, parada (dono, 22/Nov/2026, print do pé "bloquinho torto"): o pé vira para o meio — o sapato DE LADO
          (desenho próprio, com calcanhar, peito do pé e biqueira), um pouco mais curto para ficar em três quartos; nunca o
          de frente entortado */
