@@ -182,3 +182,24 @@ test('4 patas e robozinho vivos: patas andam, telinha de LED troca de carinha', 
     assert.deepEqual(pg.erros, []);
   } finally { await pg.ctx.close(); }
 });
+
+// Dono, 22/Nov/2026: "o escrito tampa toda a cabeça dos animais e não dá pra sair dele" e a bolinha 🎵 tampava o Pronto.
+test('balão: fica embaixo (nunca na cabeça), some sozinho, fecha num toque; a 🎵 não tampa o Pronto', async () => {
+  const pg = await abrir(360, 740);
+  try {
+    await pg.click('#btCriar'); await pg.waitForTimeout(300);
+    const outro = await pg.$$eval('[data-base]', (bs) => { const b = bs.find((x) => x.getAttribute('aria-pressed') !== 'true'); return b && b.dataset.base; });
+    await pg.click('[data-base="' + outro + '"]'); await pg.waitForTimeout(150);
+    assert.ok(await pg.isVisible('#fala'), 'o balão aparece ao escolher o bichinho');
+    const r = await pg.evaluate(() => { const f = fala.getBoundingClientRect(), p = palco.getBoundingClientRect(); return { fTopo: f.top, meio: p.top + p.height * 0.55, fBaixo: f.bottom, pBaixo: p.bottom }; });
+    assert.ok(r.fTopo >= r.meio && r.fBaixo <= r.pBaixo + 1, 'o balão fica na metade de baixo do palco, longe da cabeça (' + JSON.stringify(r) + ')');
+    await pg.click('#fala'); assert.ok(!(await pg.isVisible('#fala')), 'um toque fecha o balão');
+    await pg.click('[data-base="' + outro + '"]'); await pg.click('[data-base]:not([data-base="' + outro + '"])'); await pg.waitForTimeout(150);
+    assert.ok(await pg.isVisible('#fala'));
+    await pg.waitForTimeout(5400); assert.ok(!(await pg.isVisible('#fala')), 'o balão some sozinho');
+    // a bolinha da música (fixa no canto de baixo à direita, 36 px + margem) não fica em cima do Pronto
+    const livre = await pg.$eval('#btPronto', (e) => { const b = e.getBoundingClientRect(); return innerWidth - b.right; });
+    assert.ok(livre >= 46, 'o Pronto deixa o canto livre para a 🎵 (' + livre + ' px)');
+    assert.deepEqual(pg.erros, []);
+  } finally { await pg.ctx.close(); }
+});
