@@ -3,7 +3,7 @@
 Guardado a pedido do dono em 22/Nov/2026: "a ideia é ter um funcionamento minimamente decente antes de eu ter os
 créditos do Higgsfield recarregados". Reúne as especificações que ele trouxe (geradas no Gemini, 21–22/Nov/2026) e o
 estado real de cada item no jogo, com o porquê das decisões. **Leia antes de mexer no movimento, no desfile, na
-Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.10**.
+Baladinha ou no desenho do corpo.** Situação válida para a versão **0.9.11**.
 
 Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌ não feito, com o motivo.
 
@@ -23,7 +23,7 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Pedido | Situação | Onde |
 |---|---|---|
 | Mão na nuca: antebraço e mão atrás da cabeça e do cabelo da frente, na frente do cabelo de trás | ✅ | `bracoRig(lado, atras)` desenha o antebraço duas vezes (`.rig-frente-*` e `.rig-atras-*`); `maoAtras(o, c)` escolhe; o animador troca (0.9.7) |
-| Catwalk: a perna que vem para a frente fica por cima da outra | ✅ | O animador reordena `.pp-passo-e` / `.pp-passo-d` no DOM a cada troca (0.9.9) |
+| Catwalk: a perna que vem para a frente fica por cima da outra | ✅ | O animador reordena `.pp-passo-e` / `.pp-passo-d` no DOM a cada troca (0.9.9). Sem "perna fantasma" (0.9.11): no ar a perna contorna a de apoio por fora (`- lado * 6 * sob`) e só o pé da frente cruza (`dentro * max(0, frente)`); a troca de camada acontece com as pernas afastadas |
 
 ## 3. Movimento orgânico
 
@@ -58,20 +58,26 @@ Legenda: ✅ feito · 🟡 feito de outro jeito (mesmo resultado na tela) · ❌
 | Faixas do chão deslizando | ❌ | Quem anda é a modelo, não a câmera; com o chão andando parece esteira |
 | Sombra colada nos pés | ✅ | `drop-shadow(0 3px 4px)` (antes 12 px, parecia flutuar) |
 
-## 6. GIF para compartilhar (0.9.10)
+## 6. Pulo (0.9.11)
+
+Modo `pular` do animador (placa de entrada da Baladinha): agacha (pernas encolhem a partir do quadril, joelhos abrem um
+pouco, corpo desce o mesmo tanto, braços para trás), impulsiona, fica no ar (`.pp-rebola` sobe; a sombra fica no chão e
+diminui), pousa amortecendo e volta. Ciclo de 1,1 s.
+
+## 7. GIF para compartilhar (0.9.10)
 
 `gif.js`: grava a cena 10 vezes por segundo, monta cada quadro com 360 px de largura e codifica um GIF que se repete
 (256 cores por quadro, compressão LZW). Tudo no aparelho, sem internet. Botões 🎞️ GIF no fim do desfile e na
 Baladinha, com 📤 Compartilhar (WhatsApp e outros apps) e 💾 Salvar. Ainda não roda no módulo `Fundo` (o jogo não
 tem): se sair da tela no meio, o GIF se perde.
 
-## 7. O que fica para quando houver créditos no Higgsfield
+## 8. O que fica para quando houver créditos no Higgsfield
 
 Fundos pintados (salão, provador, manicure, maquiagem, passarela), músicas compostas e ícones 3D: ver a tarefa
 programada "Purpurina: checar créditos do Higgsfield" e `../purpurina/AGENDA.md`. Personagem pintada por IA em
 camadas (pendência da Nova Era) só depois dos fundos.
 
-## 8. Como conferir sem celular
+## 9. Como conferir sem celular
 
 - `node --test purpurina-nova/teste/*.test.js` (os testes da Nova Era conferem cada item acima).
 - Quadros do andar: criar o animador com `modo: 'andar'` num desenho com `{ rig: true, passos: true }` e fotografar a

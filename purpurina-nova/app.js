@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.10';
+  var APP_VERSION = '0.9.11';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -583,7 +583,7 @@
       '<p class="bal-letreiro"><span class="bal-l1">' + t('Baladinha', 'Dance Party', 'Minidisco') + '</span><span class="bal-l2">' + t('da Purpurina', 'with Purpurina', 'de Purpurina') + '</span></p>' +
       '<div class="bal-placa-boneca"><div class="bal-placa-pulo">' + B.svg(estado, { id: 'placa', fundo: false, anim: !CALMO, realce: false, rig: !CALMO, passos: !CALMO, sorriso: true, piscadinha: true }) + '</div></div>';
     $('balada').appendChild(pl);
-    var anim = CALMO ? null : PurpurinaAnim.criar(pl.querySelector('.bal-placa-pulo'), { poses: ['abracao'], enquanto: function () { return pl.isConnected; } });
+    var anim = CALMO ? null : PurpurinaAnim.criar(pl.querySelector('.bal-placa-pulo'), { poses: ['abracao'], modo: 'pular', puloMs: 1100, enquanto: function () { return pl.isConnected; } });   // pulo de verdade (animador.js, modo 'pular')
     function tirar() { if (!pl.isConnected) return; pl.classList.add('saindo'); if (anim) anim.parar(); setTimeout(function () { pl.remove(); }, 450); }
     pl.addEventListener('click', tirar);
     setTimeout(tirar, CALMO ? 1800 : 3200);
