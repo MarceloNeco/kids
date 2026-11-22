@@ -51,8 +51,14 @@
     coracaoOc: ['vermelho', 'rosa'],
     geral: ['rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'vermelho', 'azul', 'roxo', 'preto', 'branco'],
     roupa2: ['branco', 'cinza', 'marinho', 'preto', 'azul-bebe', 'turquesa', 'rosa', 'lilas', 'amarelo', 'vermelho', 'verde'],
-    tenis: ['rosa', 'rosa-choque', 'dourado', 'prata', 'holo', 'branco'],
-    patins: ['azul', 'rosa', 'preto', 'lilas', 'menta'],
+    tenis: ['rosa', 'rosa-choque', 'dourado', 'prata', 'holo', 'branco', 'preto'],
+    strass: ['rosa', 'rosa-choque', 'lilas', 'prata', 'dourado'],
+    sapatilha: ['rosa', 'lilas', 'azul-bebe', 'menta', 'amarelo', 'vermelho', 'azul', 'marinho', 'roxo', 'preto', 'branco', 'dourado', 'prata'],
+    bale: ['rosa', 'branco', 'lilas', 'azul-bebe', 'preto'],
+    cadarco: ['preto', 'holo', 'marrom', 'branco', 'rosa', 'marinho'],
+    bota: ['rosa', 'amarelo', 'preto', 'caramelo', 'branco', 'lilas', 'vermelho'],
+    linha: ['preto', 'rosa', 'azul', 'roxo', 'branco'],
+    patins: ['azul', 'rosa', 'preto', 'lilas', 'menta', 'laranja', 'azul-bebe', 'holo'],
     skate: ['rosa-choque', 'azul', 'lima', 'roxo', 'preto'],
     coleira: ['vermelho', 'holo', 'azul-bebe', 'azul', 'preto', 'rosa'],
     bone: ['marinho', 'rosa', 'vermelho', 'azul', 'preto', 'lima'],
@@ -345,18 +351,32 @@
     { id: 'abracadinho-perna', caixa: 'abraco', n: ['Abraçado na perna', 'Hugging the leg', 'Abrazado a la pierna'], e: ['unicorninho abraçado na perna', 'a little unicorn hugging the leg', 'un unicornito abrazado a la pierna'] },
     { id: 'tenis', caixa: 'pes', n: ['Tênis branco', 'White sneakers', 'Zapatillas blancas'], e: ['tênis branco', 'white sneakers', 'zapatillas blancas'], facil: 1 },
     { id: 'tenis-brilho', caixa: 'pes', n: ['Tênis de cano alto', 'High-top sneakers', 'Zapatillas altas'], e: ['tênis de cano alto {c}', '{c} high-tops', 'zapatillas altas {c}'], paleta: 'tenis', cor: 'holo' },
-    { id: 'tenis-strass', caixa: 'pes', n: ['Tênis com bico de strass', 'Rhinestone-toe sneakers', 'Zapatillas con puntera de brillantes'], e: ['tênis de strass', 'rhinestone sneakers', 'zapatillas de brillantes'] },
+    { id: 'tenis-strass', caixa: 'pes', n: ['Tênis com bico de strass', 'Rhinestone-toe sneakers', 'Zapatillas con puntera de brillantes'], e: ['tênis de strass', 'rhinestone sneakers', 'zapatillas de brillantes'], paleta: 'strass', cor: 'rosa' },
     { id: 'botinhas', caixa: 'pes', n: ['Botinhas pretas', 'Black boots', 'Botitas negras'], e: ['botinhas pretas', 'black boots', 'botitas negras'] },
     { id: 'coturno', caixa: 'pes', n: ['Coturno caramelo', 'Caramel lace-up boots', 'Botas caramelo'], e: ['coturno', 'lace-up boots', 'botas de cordones'] },
+    { id: 'sandalia', caixa: 'pes', n: ['Sandália', 'Sandals', 'Sandalias'], e: ['sandália', 'sandals', 'sandalias'], paleta: 'vivas', cor: 'rosa', facil: 1 },
+    { id: 'chinelo', caixa: 'pes', n: ['Chinelo', 'Flip-flops', 'Chanclas'], e: ['chinelo', 'flip-flops', 'chanclas'], paleta: 'vivas', cor: 'azul' },
+    { id: 'galocha', caixa: 'pes', n: ['Galocha de chuva', 'Rain boots', 'Botas de agua'], e: ['galocha', 'rain boots', 'botas de agua'], paleta: 'vivas', cor: 'amarelo', facil: 1 },
+    { id: 'bota-neve', caixa: 'pes', n: ['Bota de neve com pelinho', 'Fluffy snow boots', 'Botas de nieve con pelito'], e: ['botas de neve', 'snow boots', 'botas de nieve'], paleta: 'vivas', cor: 'lilas' },
+    { id: 'sapatilha-bale', caixa: 'pes', n: ['Sapatilha de balé com fitinhas', 'Ballet slippers with ribbons', 'Zapatillas de ballet con cintas'], e: ['sapatilhas de balé', 'ballet slippers', 'zapatillas de ballet'], paleta: 'bale', cor: 'rosa', facil: 1 },
+    { id: 'pantufa', caixa: 'pes', n: ['Pantufa de coelhinho', 'Bunny slippers', 'Zapatillas de conejito'], e: ['pantufas de coelhinho', 'bunny slippers', 'zapatillas de conejito'], paleta: 'vivas', cor: 'rosa' },
+    { id: 'tenis-luz', caixa: 'pes', n: ['Tênis de luzinha', 'Light-up sneakers', 'Zapatillas con luces'], e: ['tênis de luzinha', 'light-up sneakers', 'zapatillas con luces'], paleta: 'vivas', cor: 'rosa-choque', facil: 1 },
+    { id: 'sapato-boneca', caixa: 'pes', n: ['Sapato boneca com fivela', 'Mary Janes with a buckle', 'Merceditas con hebilla'], e: ['sapato boneca', 'Mary Janes', 'merceditas'], paleta: 'vivas', cor: 'vermelho' },
+    { id: 'sapato-cadarco', caixa: 'pes', n: ['Sapato de cadarço', 'Lace-up shoes', 'Zapatos de cordones'], e: ['sapato de cadarço', 'lace-up shoes', 'zapatos de cordones'], paleta: 'cadarco', cor: 'holo' },
+    { id: 'babuche', caixa: 'pes', n: ['Babuche de furinhos com enfeites', 'Clogs with charms', 'Zuecos con adornos'], e: ['babuche de furinhos', 'clogs with charms', 'zuecos con adornos'], paleta: 'vivas', cor: 'lima' },
+    { id: 'bota-cadarco', caixa: 'pes', n: ['Bota de cadarço', 'Lace-up boots', 'Botas de cordones'], e: ['bota de cadarço', 'lace-up boots', 'botas de cordones'], paleta: 'bota', cor: 'rosa' },
+    { id: 'bota-elfo', caixa: 'pes', n: ['Bota de duende', 'Elf boots', 'Botas de duende'], e: ['botas de duende', 'elf boots', 'botas de duende'] },
+    { id: 'patins-linha', caixa: 'pes', n: ['Patins em linha', 'Inline skates', 'Patines en línea'], e: ['patins em linha', 'inline skates', 'patines en línea'], paleta: 'linha', cor: 'preto' },
+
     { id: 'sapatinho', caixa: 'pes', n: ['Sapatinho preto', 'Black Mary Janes', 'Merceditas negras'], e: ['sapatinho preto', 'black Mary Janes', 'merceditas negras'] },
-    { id: 'sapatilhas', caixa: 'pes', n: ['Sapatilhas', 'Ballet flats', 'Bailarinas'], e: ['sapatilhas', 'ballet flats', 'bailarinas'], paleta: 'geral', cor: 'rosa' },
+    { id: 'sapatilhas', caixa: 'pes', n: ['Sapatilhas', 'Ballet flats', 'Bailarinas'], e: ['sapatilhas', 'ballet flats', 'bailarinas'], paleta: 'sapatilha', cor: 'rosa' },
     { id: 'patins', caixa: 'pes', n: ['Patins', 'Roller skates', 'Patines'], e: ['patins', 'roller skates', 'patines'], paleta: 'patins', cor: 'azul', facil: 1 },
     { id: 'skate', caixa: 'chao', n: ['Skate', 'Skateboard', 'Monopatín'], e: ['skate', 'skateboard', 'monopatín'], paleta: 'skate', cor: 'rosa-choque', facil: 1 },
     { id: 'muletas', caixa: 'apoio', n: ['Muletas', 'Crutches', 'Muletas'], e: ['muletas', 'crutches', 'muletas'], so: 'pe' },
     { id: 'cadeira', caixa: 'apoio', n: ['Cadeira de rodas', 'Wheelchair', 'Silla de ruedas'], e: ['cadeira de rodas', 'a wheelchair', 'silla de ruedas'], facil: 1 }
   ];
   // escolher um tira o outro (não dá para usar os dois ao mesmo tempo)
-  var CONFLITOS = [['patins', 'skate'], ['cadeira', 'skate'], ['cadeira', 'patins'], ['muletas', 'skate'], ['muletas', 'patins'], ['cadeira', 'abracadinho-perna']];
+  var CONFLITOS = [['patins', 'skate'], ['cadeira', 'skate'], ['cadeira', 'patins'], ['muletas', 'skate'], ['muletas', 'patins'], ['patins-linha', 'skate'], ['cadeira', 'patins-linha'], ['muletas', 'patins-linha'], ['cadeira', 'abracadinho-perna']];
 
   // ---------- vozes ----------
   // fala: voz do aparelho no idioma escolhido (fininha, de urso, devagarinho); sons: feitos no WebAudio; minha: gravada aqui
