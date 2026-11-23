@@ -12,13 +12,20 @@
 
   Como funciona:
   1. Versão nova = gaveta nova (prefixo + v + VERSAO + peças comuns). A instalação baixa TODOS os ARQUIVOS da internet
-     (sem cache do navegador, 4 de cada vez, cada um com uma segunda tentativa). Só quando o último chega, grava a marca
+     (sem cache do navegador, 4 de cada vez, cada um com até 3 tentativas). Só quando o último chega, grava a marca
      "completa". Faltou um, deu erro ou a internet caiu: apaga a gaveta nova e a instalação falha — o jogo continua na
      versão anterior, inteira, e tenta de novo na próxima vez que abrir. Nunca existem duas versões misturadas.
+     Andamento e falha vão pelo canal "bolinho-sw" (BroadcastChannel: { escopo, versao, fase: 'baixando' | 'falhou',
+     feitos, total, motivo: 'rede' | 'espaco' }): a tela de carregando e o Guardar todos mostram e esperam enquanto anda.
   2. Só ativa uma gaveta completa; aí apaga as gavetas antigas do jogo (nunca as de outros jogos nem as de "manter").
-  3. Recuperação: gaveta sem a marca (o aparelho desligou no meio, o navegador apagou algo) nunca é usada pela metade:
-     na instalação seguinte ela é apagada e baixada de novo; e a gaveta ativa sem marca é completada sozinha na primeira
-     abertura com internet.
+  3. Recuperação: gaveta sem a marca nunca é usada pela metade. Sobra de uma instalação que o aparelho interrompeu (o
+     tablet fechou o navegador, dormiu, desligou): a instalação seguinte CONTINUA de onde parou (cada arquivo só entra na
+     gaveta depois de chegar inteiro), em vez de começar do zero — no tablet com internet fraca, começar do zero toda
+     vez fazia a versão nova nunca chegar (dono, 22/Nov/2026). E a gaveta ativa sem marca é completada sozinha na
+     primeira abertura com internet.
+  6. Pedido à internet pendurado (Wi-Fi do tablet acordando) segurava a versão nova "esperando" para sempre: o navegador
+     só troca de versão quando a velha não tem pedido em andamento. Então todo pedido que o service worker faz à
+     internet tem prazo para a resposta começar a chegar (versoes.json 8 s, o resto 20 s; baixar a versão nova 30 s).
   4. Abrir o jogo: tudo vem da gaveta do próprio jogo (rápido, até no tablet velho, e igual com ou sem internet). Nunca
      procura nas gavetas dos outros jogos (pegava peça comum antiga — pendência 46). Arquivo que não está na lista vem
      da internet e fica guardado na gaveta da versão. versoes.json pedido "sem cache" (o aviso de versão nova) vem
@@ -30,7 +37,7 @@
   delas, rode  node ferramentas/pecas-comuns.js  (o vigia teste/sw-jogos.test.js avisa): todos os jogos baixam de novo.
   Escrito em JavaScript antigo (sem =>) de propósito: o tablet Fire mais velho também roda.
 */
-var PECAS = '01ea9d1862';
+var PECAS = '49f5a8c16c';
 function BolinhoSW(op) {
   'use strict';
   var P = op.prefixo, CACHE = P + 'v' + op.versao + '-' + PECAS, MANTER = op.manter || [];
@@ -42,32 +49,59 @@ function BolinhoSW(op) {
       return tem && caches.open(nome).then(function (c) { return c.match(MARCA); }).then(function (r) { return !!r; });
     });
   }
-  // baixa um arquivo da internet (sem o cache do navegador), com uma segunda tentativa; só aceita resposta 200
+  // andamento da versão nova para as páginas (carregando.js, jogos.js), pelo canal "bolinho-sw"
+  var canal = null;
+  try { canal = new BroadcastChannel('bolinho-sw'); } catch (e) { /* navegador sem o canal: as páginas esperam pelo relógio */ }
+  function contar(fase, feitos, total, motivo) {
+    if (canal) try { canal.postMessage({ escopo: self.registration.scope, versao: String(op.versao), fase: fase, feitos: feitos, total: total, motivo: motivo || '' }); } catch (e) {}
+  }
+  // pedido à internet com prazo para a resposta COMEÇAR a chegar (depois disso, arquivo grande demora o que precisar)
+  function buscar(req, ms) {
+    if (typeof AbortController !== 'function') return fetch(req);
+    var ctl = new AbortController(), tm = setTimeout(function () { ctl.abort(); }, ms);
+    return fetch(req, { signal: ctl.signal }).then(function (r) { clearTimeout(tm); return r; }, function (e) { clearTimeout(tm); throw e; });
+  }
+  function espera(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+  // baixa um arquivo da internet (sem o cache do navegador), com até 3 tentativas; só aceita resposta 200
   function baixar(a, tentativa) {
+    tentativa = tentativa || 0;
     var req = new Request(a, { cache: 'reload' });
-    return fetch(req).then(function (r) {
+    return buscar(req, 30000).then(function (r) {
       if (r.status !== 200) throw new Error(a + ': ' + r.status);
       // resposta que veio de redirecionamento não serve para abrir página: guarda uma cópia limpa
       return r.redirected ? r.blob().then(function (b) { return new Response(b, { status: 200, headers: r.headers }); }) : r;
-    }).catch(function (e) { if (!tentativa) return baixar(a, 1); throw e; });
+    }).catch(function (e) {
+      if (tentativa < 2) return espera(1000 * (tentativa + 1)).then(function () { return baixar(a, tentativa + 1); });
+      throw e;
+    });
   }
-  function encher(c, lista) {
+  function encher(c, lista, aoGuardar) {
     var fila = lista.slice(), erro = null;
     function proximo() {
       if (erro || !fila.length) return Promise.resolve();
       var a = fila.shift();
-      return baixar(a).then(function (r) { return c.put(a, r); }).then(proximo, function (e) { erro = e; });
+      return baixar(a).then(function (r) { return c.put(a, r); }).then(function () { if (aoGuardar) aoGuardar(); }).then(proximo, function (e) { erro = e; });
     }
     return Promise.all([proximo(), proximo(), proximo(), proximo()]).then(function () { if (erro) throw erro; });
+  }
+  // o que ainda não está na gaveta (Cache.put só grava o arquivo que chegou inteiro)
+  function faltando(c) {
+    return Promise.all(ARQ.map(function (a) { return c.match(a).then(function (r) { return r ? null : a; }); }))
+      .then(function (f) { return f.filter(Boolean); });
   }
   function instalar() {
     return completo(CACHE).then(function (ok) {
       if (ok) return;   // a mesma versão já está inteira no aparelho
-      // sobra de uma instalação que parou no meio: começa do zero
-      return caches.delete(CACHE).then(function () { return caches.open(CACHE); }).then(function (c) {
-        return encher(c, ARQ).then(function () { return c.put(MARCA, new Response(String(op.versao))); });
+      // sobra de uma instalação que o aparelho interrompeu: continua de onde parou (só baixa o que falta)
+      return caches.open(CACHE).then(function (c) {
+        return faltando(c).then(function (lista) {
+          var total = ARQ.length, feitos = total - lista.length;
+          contar('baixando', feitos, total);
+          return encher(c, lista, function () { feitos++; contar('baixando', feitos, total); });
+        }).then(function () { return c.put(MARCA, new Response(String(op.versao))); });
       }).catch(function (e) {
-        // não baixou tudo: descarta a gaveta nova; a versão anterior continua valendo
+        // não baixou tudo: descarta a gaveta nova; a versão anterior continua valendo (e as páginas avisam)
+        contar('falhou', 0, ARQ.length, e && e.name === 'QuotaExceededError' ? 'espaco' : 'rede');
         return caches.delete(CACHE).then(function () { throw e; });
       });
     });
@@ -79,8 +113,8 @@ function BolinhoSW(op) {
     curando = completo(CACHE).then(function (ok) {
       if (ok) return;
       return caches.open(CACHE).then(function (c) {
-        return Promise.all(ARQ.map(function (a) { return c.match(a).then(function (r) { return r ? null : a; }); })).then(function (faltam) {
-          return encher(c, faltam.filter(Boolean)).then(function () { return c.put(MARCA, new Response(String(op.versao))); });
+        return faltando(c).then(function (faltam) {
+          return encher(c, faltam).then(function () { return c.put(MARCA, new Response(String(op.versao))); });
         });
       });
     }).then(function () { curando = null; }, function () { curando = null; });   // confere de novo na próxima abertura
@@ -120,12 +154,12 @@ function BolinhoSW(op) {
     if (nav) e.waitUntil(curar());
     // conferir se tem versão nova: da internet; sem internet, a da gaveta
     if (/\/versoes\.json$/.test(url.pathname) && (req.cache === 'no-store' || req.cache === 'reload' || req.cache === 'no-cache')) {
-      e.respondWith(fetch(req).catch(function () { return daGaveta(req, false).then(function (r) { return r || Response.error(); }); }));
+      e.respondWith(buscar(req, 8000).catch(function () { return daGaveta(req, false).then(function (r) { return r || Response.error(); }); }));
       return;
     }
     var guardavel = !/[?&]code=/.test(url.search);   // volta do login (Bagunçolândia): nunca guarda
     e.respondWith(daGaveta(req, nav).then(function (r) {
-      return r || fetch(req).then(function (resp) { return guardavel ? guardar(req, resp) : resp; });
+      return r || (nav ? fetch(req) : buscar(req, 20000)).then(function (resp) { return guardavel ? guardar(req, resp) : resp; });
     }));
   });
   return CACHE;

@@ -222,35 +222,110 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rosa); outl
 .ma-antena { animation: antena 1.4s ease-in-out infinite alternate; }
 @keyframes antena { from { fill: #ff8fb3; } to { fill: #ffd447; } }
 
-/* ---------- tablet e computador (deitado): bichinho de um lado, escolhas do outro ---------- */
-@media (min-aspect-ratio: 1/1) and (min-width: 640px) {
-  .of-corpo { flex-direction: row; }
-  .palco { flex: 1 1 46%; }
-  .painel { flex: 1 1 54%; max-height: none; overflow-y: auto; justify-content: flex-start; }
-  .roda { flex-wrap: wrap; overflow-x: visible; }
+/* ---------- deitado (tablet, computador e celular deitado) ----------
+   Dono, 22/Nov/2026 (Fire 7 deitado): "é ruim que não tem um aproveitamento". O bichinho fica grande à esquerda, na altura
+   toda (uns 48 % da largura); título em cima; escolhas e botões à direita. A etapa não rola: a fileira principal
+   (bichinhos, cabides, acessórios) ocupa a altura que sobra, em quantas fileiras couberem, com cartões grandes e o nome
+   inteiro, e corre para o lado com a ponta esfumada; as outras fileiras correm para o lado (as cores do pelo e as frases
+   prontas quebram linha; na tela alta, tudo do pelo e da voz). Cores, barra de tom e botões com alvo de 44 px ou mais.
+   Vigias: teste/paisagem.test.js e teste/textos.test.js (desta pasta). */
+@media (min-aspect-ratio: 1/1) and (min-width: 640px), (min-aspect-ratio: 1/1) and (max-height: 480px) {
+  #oficina.ativa { --carta-alto: clamp(108px, 18vh, 150px); --carta-largo: calc(var(--carta-alto) * .88);
+    display: grid; grid-template-columns: minmax(0, 48fr) minmax(0, 52fr); grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "topo topo" "palco painel" "palco rodape"; column-gap: 12px; row-gap: 6px;
+    padding-left: calc(env(safe-area-inset-left, 0px) + 8px); padding-right: calc(env(safe-area-inset-right, 0px) + 8px); }
+  .of-corpo { display: contents; }
+  .of-topo { grid-area: topo; }
+  .palco { grid-area: palco; min-height: 0; }
+  .painel { grid-area: painel; max-height: none; overflow-x: hidden; overflow-y: auto; gap: 8px; }
+  .painel > * { flex-shrink: 0; }   /* (a fileira de abas, que rola para o lado, não pode sumir espremida) */
+  /* rodapé só embaixo das escolhas: ◀ Voltar na ponta, Próximo e Pronto de tamanho proporcional (sem botão gigante vazio);
+     os 50 px da direita continuam sendo da bolinha 🎵 */
+  .of-rodape { grid-area: rodape; justify-content: flex-end; gap: 8px; }
+  .of-rodape .mini { margin-right: auto; min-height: 50px; }
+  .of-rodape .secundario { flex: 1 1 0; max-width: 230px; min-height: 50px; }
+  .of-rodape .principal { flex: 1.25 1 0; max-width: 280px; min-height: 54px; }
+  /* escolhas maiores, para dedo de criança */
+  .rot { font-size: 14px; }
+  .roda { gap: 6px; }
+  #oficina[data-etapa="pelo"] .painel > .linha:first-child .roda, #oficina[data-etapa="voz"] .abas + .linha .roda { flex-wrap: wrap; }
+  .opc { min-width: 52px; min-height: 52px; padding: 4px 7px; font-size: 14px; border-radius: 16px; }
+  .patches .opc { min-width: 52px; }
+  .opc small { font-size: 12px; }
+  .amostra { width: 38px; height: 38px; }
+  .opc .cor-coracao { transform: scale(1.3); }
+  /* a fileira principal: quantas fileiras couberem na altura que sobra, correndo para o lado */
+  .linha-bichos, .linha-cabides, .linha-itens { flex: 1 1 0; }
+  .roda.bichos, .roda.cabides, .roda.itens { flex: 1 1 0; min-height: calc(var(--carta-alto) + 10px); display: grid; grid-auto-flow: column;
+    grid-template-rows: repeat(auto-fill, var(--carta-alto)); grid-auto-columns: var(--carta-largo); align-content: center; gap: 8px;
+    overflow-x: auto; overflow-y: hidden; }
+  .bichos .opc, .cabides .opc, .itens .opc { width: auto; min-width: 0; max-width: none; padding: 4px 4px 6px; justify-content: flex-start; }
+  .bichos .opc svg { flex: none; width: calc(var(--carta-alto) - 52px); height: calc(var(--carta-alto) - 52px); }
+  .cabides .opc svg, .itens .opc svg, #oficina[data-etapa="acess"] .painel.com-tom .itens .opc svg { flex: none; width: calc(var(--carta-alto) - 40px); height: calc(var(--carta-alto) - 40px); }
+  .bichos .opc span { font-size: 15px; }
+  /* guarda-roupa e balcão: as outras fileiras correm para o lado (a altura é da fileira principal) */
+  .balcao { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px 6px; padding: 6px 6px 10px; }
+  .acrilico { min-height: 54px; padding: 4px 2px 5px; }
+  .acrilico .ico { font-size: 23px; }
+  .acrilico small { font-size: 11.5px; }
+  .balcao.prateleira { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 5px 6px 9px; }
+  .prateleira .acrilico { min-height: 48px; gap: 6px; }
+  .prateleira .acrilico .ico { font-size: 24px; }
+  .prateleira .acrilico small { font-size: 14px; }
+  /* barra de tom ☀️ ↔ 🌙: 44 px de altura para o dedo (o degradê fica no meio, a bolinha maior) */
+  .linha-tom { min-height: 44px; gap: 6px; }
+  .rot-tom { flex-basis: 7.5em; font-size: 12.5px; }
+  .barra-ponta { font-size: 22px; }
+  .barra input[type=range] { box-sizing: border-box; height: 44px; padding: 12px 0; margin: 0; border: 0; box-shadow: none; background-clip: content-box !important; }
+  .barra input[type=range]::-webkit-slider-thumb { width: 34px; height: 34px; }
+  .barra input[type=range]::-moz-range-thumb { width: 34px; height: 34px; }
+  /* coração e fofura: a máquina divide o palco com o bichinho, então o palco fica mais largo nesta etapa */
+  #oficina[data-etapa="fofura"].ativa { grid-template-columns: minmax(0, 58fr) minmax(0, 42fr); }
+  #oficina[data-etapa="fofura"] .pelucia { left: 6%; right: 40%; }
+  .maquina { width: 40%; }
+  #oficina[data-etapa="fofura"] .painel, #oficina[data-etapa="nome"] .painel { justify-content: center; }
+  .desejo p, .dica { font-size: 15px; }
+  .bt-encher { min-height: 60px; }
+  .escrever input, .campo input { min-height: 48px; }
+  .aba, .gravar .secundario { min-height: 46px; }
+  .aba { font-size: 15px; }
+  .campo { font-size: 14px; }
+  /* começo: o letreiro e os bichinhos na estante de um lado, os botões do outro */
   #menu.ativa { flex-direction: row; justify-content: center; gap: 4vw; padding-left: calc(var(--nav-largo, 104px) + 10px); }
-  .capa { flex: 1 1 50%; max-width: 560px; height: 100%; justify-content: center; }
+  .capa { flex: 1 1 50%; max-width: 620px; height: 100%; justify-content: center; }
+  .estante { width: 100%; max-height: 58vh; }
+  .na-estante svg { height: auto; max-height: 100%; }   /* os bichinhos em pé na prateleira, não flutuando */
   .painel-menu { flex: 1 1 40%; }
+  /* o amiguinho pronto: botões numa fileira só */
   #amigo.ativa .palco-amigo { min-height: 0; }
   .am-acoes { grid-template-columns: repeat(5, auto); justify-content: center; }
+  .am-acoes > .mini:last-child:nth-child(odd) { grid-column: auto; }
+  /* coleção: casinhas maiores, nomes inteiros */
+  .grade { grid-template-columns: repeat(auto-fill, minmax(150px, 180px)); justify-content: center; gap: 14px; }
+  .cartao-amigo .nome { font-size: 15px; overflow-wrap: break-word; }
 }
-/* celular deitado (pouca altura): tudo menor */
+/* tablet e computador altos: sobra altura, então as cores do pelo, os olhinhos, as bochechas e o jeito de falar quebram linha */
+@media (min-aspect-ratio: 1/1) and (min-height: 760px) {
+  #oficina[data-etapa="pelo"] .roda, #oficina[data-etapa="voz"] .roda { flex-wrap: wrap; }
+}
+/* celular deitado (pouca altura): o bichinho na altura toda à esquerda, o título vai para a direita; tudo menor */
 @media (max-height: 480px) and (min-aspect-ratio: 1/1) {
   .letreiro .l1 { font-size: 22px; } .letreiro .l2 { font-size: 36px; } .sub { display: none; }
   .estante { max-height: 46vh; min-height: 60px; }
   .painel-menu { gap: 5px; } .painel-menu .principal { min-height: 48px; font-size: 18px; }
-  /* oficina: o bichinho ocupa a altura toda à esquerda; título, escolhas e botões à direita */
-  #oficina.ativa { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas: "palco topo" "palco painel" "palco rodape"; column-gap: 8px; row-gap: 4px; padding-left: calc(env(safe-area-inset-left, 0px) + 8px); }
-  .of-corpo { display: contents; }
-  .of-topo { grid-area: topo; padding-left: 0; min-height: 40px; }
-  .palco { grid-area: palco; min-height: 0; }
-  .painel { grid-area: painel; max-height: none; overflow-y: auto; }
-  .of-rodape { grid-area: rodape; }
-  .of-rodape .principal, .of-rodape .secundario { min-height: 46px; }
+  #oficina.ativa { --carta-alto: 92px; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); grid-template-areas: "palco topo" "palco painel" "palco rodape"; column-gap: 8px; row-gap: 4px; }
+  #oficina[data-etapa="fofura"].ativa { grid-template-columns: minmax(0, 46%) minmax(0, 1fr); }
+  .of-topo { padding-left: 0; min-height: 40px; }
+  .painel { gap: 5px; }
+  .of-rodape .mini, .of-rodape .principal, .of-rodape .secundario { min-height: 46px; }
   .selo { width: 44px; height: 36px; font-size: 20px; }
-  .am-acoes { grid-template-columns: repeat(5, auto); justify-content: center; }
-  #amigo.ativa .palco-amigo { min-height: 0; }
+  .opc { min-width: 46px; min-height: 46px; }
+  .amostra { width: 32px; height: 32px; }
+  .bichos .opc span { font-size: 13px; }
+  .balcao { grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px 4px; padding: 5px 5px 9px; }
+  .acrilico { min-height: 46px; padding: 2px 1px 3px; } .acrilico .ico { font-size: 19px; } .acrilico small { font-size: 10px; }
+  #oficina[data-etapa="pelo"] .painel > .linha:first-child .roda, #oficina[data-etapa="voz"] .abas + .linha .roda { flex-wrap: nowrap; }
+  .prateleira .acrilico { min-height: 38px; } .prateleira .acrilico small { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .mq-flocos, .mq-luz, .mq-luzinha, .ma-brilha, .ma-antena, .bt-coracao, .led.on { animation: none !important; }

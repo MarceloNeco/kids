@@ -64,6 +64,7 @@ mais usados.
 **Tela sem texto saindo da caixinha:** nomes dos cartões quebram em até 2 linhas e, se preciso, a fonte diminui um pouco
 (`encaixarTextos`); nada de reticências; o balcão mostra **todas** as caixinhas em fileiras (aguenta 14 a 16); a fileira de
 itens corre para o lado com a ponta esfumada enquanto tem mais; nada embaixo da bolinha 🎵. Vigia: `teste/textos.test.js`.
+Tablet e computador deitados (dono, 23/Nov/2026): bichinho grande à esquerda (~48 % da largura, altura toda), escolhas à direita com cartões de 95 px ou mais, cores e barra de tom com alvo de 44 px, rodapé proporcional. Vigia: `teste/paisagem.test.js` (1024×600, 1280×800, 1340×800, 1920×1080).
 **Miniatura de acessório** (`miniDoAcess` no `app.js`): desenha com e sem a peça, dá zoom nas partes novas (pés,
 cabeça, mão…) e, se a peça fica atrás do corpo (mochila), mostra a peça sozinha. **📤 Compartilhar** a certidão (quando o
 aparelho deixa compartilhar arquivo; senão, só 💾 Salvar).
@@ -81,6 +82,6 @@ corpo 384×512) e aparece no Vruuum! e na Purpurina; apagar tira de lá.
 | `voz.js` | Efeitos WebAudio, fala do aparelho (voz de menininha ou de menininho), gravação e IndexedDB (`meu-amiguinho`/`vozes`), vozes prontas (`vozes/lista.json`, hoje vazia; `vozes/<idioma>/<f\|m>/<frase>.mp3`). |
 | `vivo.js` | A pelúcia viva: partes com pivô animadas com curvas suaves; ~30 qps no aparelho fraco; "reduzir movimento" = só pisca. |
 | `app.js` | Telas, histórico (uma entrada por etapa), painéis, máquina, Pronto, certidão PNG, coleção, personagens. `?teste` → `window.AmiguinhoDebug`. |
-| `teste/` | `regras.test.js` (montagem, encaixe de cada peça em cada base, coleção), `arquivos.test.js`, `pagina.test.js`, `textos.test.js` (nenhum texto fora da caixinha, 2 tamanhos × 3 idiomas × todas as opções), `voz.test.js` (menininha/menininho), `alinhamento.test.js` (no Chromium). |
+| `teste/` | `regras.test.js` (montagem, encaixe de cada peça em cada base, coleção), `arquivos.test.js`, `pagina.test.js`, `textos.test.js` (nenhum texto fora da caixinha, em pé e deitado × 3 idiomas × todas as opções), `paisagem.test.js` (aproveitamento da tela deitada), `voz.test.js` (menininha/menininho), `alinhamento.test.js` (no Chromium). |
 
 Versão: `APP_VERSION` no `app.js` = `VERSAO` no `sw.js` = 1ª entrada do `versoes.json`.

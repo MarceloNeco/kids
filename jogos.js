@@ -53,16 +53,24 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
   function escopo(card) { return card.getAttribute('data-sw').replace(/[^\/]*$/, ''); }
 
   // ---------- guardar todos ----------
-  // espera a versão mais nova do jogo ficar ativa (a que está chegando, se houver); se ela falhar, vale a que já estava
+  // espera a versão mais nova do jogo ficar ativa (a que está chegando, se houver). true = está na última versão.
+  // Se a nova falhar ou parar de andar, continua valendo a que já estava, mas NÃO conta como atualizado (dono,
+  // 22/Nov/2026: o "✓ Pronto, última versão" aparecia com o jogo na versão velha). Enquanto o download anda (canal
+  // "bolinho-sw" do sw-comum.js), espera: no tablet velho, um jogo grande passa de 45 s.
   function esperarAtivo(reg) {
     return new Promise(function (ok) {
       var w = reg.installing || reg.waiting;
       if (!w) return ok(!!reg.active);
-      var fim = setTimeout(function () { ok(!!reg.active); }, 45000);
+      var feito = false, canal = null, parado = 0, teto = setTimeout(function () { fim(false); }, 180000);
+      function fim(v) { if (feito) return; feito = true; clearTimeout(parado); clearTimeout(teto); if (canal) try { canal.close(); } catch (e) {} ok(v); }
+      function andou() { clearTimeout(parado); parado = setTimeout(function () { fim(false); }, 45000); }
+      andou();
+      try { canal = new BroadcastChannel('bolinho-sw'); canal.onmessage = function (ev) { if (ev.data && ev.data.escopo === reg.scope) andou(); }; } catch (e) {}
       w.addEventListener('statechange', function () {
-        if (w.state === 'activated') { clearTimeout(fim); ok(true); }
-        if (w.state === 'redundant') { clearTimeout(fim); ok(!!reg.active); }
+        if (w.state === 'activated') fim(true);
+        if (w.state === 'redundant') fim(false);
       });
+      if (w.state === 'activated') fim(true);
     });
   }
   // "Guardar" também deixa todos na última versão (dono, 20/Nov/2026: "quando eu coloco guardar local, ele já tem que
@@ -82,7 +90,10 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
       var nome = nomeDe(card);
       agora.push(nome); avisar();
       return navigator.serviceWorker.register(card.getAttribute('data-sw'), { scope: escopo(card) })
-        .then(atualizarJa).then(esperarAtivo).then(function (ok) { if (ok) { feitos++; marcar(card); } }).catch(function () {})
+        .then(atualizarJa).then(function (reg) {
+          // guardado (abre sem internet) mesmo que a versão nova não tenha chegado; só conta se está na última
+          return esperarAtivo(reg).then(function (ok) { if (ok) feitos++; if (ok || reg.active) marcar(card); });
+        }).catch(function () {})
         .then(function () { agora.splice(agora.indexOf(nome), 1); prontos++; avisar(); });
     }
     function fila() { if (prox >= instalaveis.length) return Promise.resolve(); return um(instalaveis[prox++]).then(fila); }
@@ -148,9 +159,9 @@ try { sessionStorage.setItem('bolinho:estante', '1'); } catch (e) { /* sem sessi
           tri(bGuardar, '✓ Todos guardados', '✓ All saved', '✓ Todos guardados');
         } else {
           tri(bGuardar, '⬇ Guardar todos (jogar sem internet)', '⬇ Save them all (play offline)', '⬇ Guardar todos (jugar sin internet)');
-          tri(st, n + ' de ' + instalaveis.length + ' guardados.' + musicas + ' Confira a internet e toque de novo para terminar.',
-            n + ' of ' + instalaveis.length + ' saved.' + musicasEn + ' Check the internet and tap again to finish.',
-            n + ' de ' + instalaveis.length + ' guardados.' + musicasEs + ' Comprueba la conexión a internet y toca otra vez para terminar.');
+          tri(st, n + ' de ' + instalaveis.length + ' guardados e atualizados.' + musicas + ' Confira a internet e toque de novo para terminar.',
+            n + ' of ' + instalaveis.length + ' saved and up to date.' + musicasEn + ' Check the internet and tap again to finish.',
+            n + ' de ' + instalaveis.length + ' guardados y actualizados.' + musicasEs + ' Comprueba la conexión a internet y toca otra vez para terminar.');
         }
       });
     });

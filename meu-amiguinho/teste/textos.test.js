@@ -1,5 +1,6 @@
 // Nenhum texto saindo da caixinha (dono, 22/Nov/2026: "tem escritos que estão saindo fora da caixinha"): no Chromium
-// (Playwright), em 360×740 e 412×915, em PT, EN e ES, passa pela tela de começo, pelas 7 etapas e por TODAS as opções de
+// (Playwright), em 360×740 e 412×915 (celular em pé) e em 1024×600 e 1280×800 (tablet deitado: o Fire 7 do dono e um
+// tablet maior), em PT, EN e ES, passa pela tela de começo, pelas 7 etapas e por TODAS as opções de
 // cada etapa (todo bichinho, toda cor, cada grupo do guarda-roupa com toda roupa, saia, short e calça e as cores deles, toda
 // caixinha de acessórios e cada acessório com as suas cores, toda voz; depois de tocar numa cor, a barra de tom também)
 // e reprova se:
@@ -115,7 +116,7 @@ function instalarConferencia() {
   };
 }
 
-for (const [w, h] of [[360, 740], [412, 915]]) {
+for (const [w, h] of [[360, 740], [412, 915], [1024, 600], [1280, 800]]) {
   for (const lang of ['pt', 'en', 'es']) {
     test('textos dentro da caixinha, ' + w + '×' + h + ', ' + lang + ': começo, 7 etapas e todas as opções', { timeout: 300000 }, async () => {
       const ctx = await browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
@@ -146,7 +147,7 @@ for (const [w, h] of [[360, 740], [412, 915]]) {
 
 // O balcão vai crescer (dono, 22/Nov/2026: bolsas, asinhas, saias e shorts, dezenas de acessórios): com 16 caixinhas de
 // nomes compridos e 15 itens por caixinha, tudo continua à vista, sem cortar categoria nem nome, e a etapa não rola.
-for (const [w, h, lang] of [[360, 740, 'pt'], [360, 740, 'es'], [412, 915, 'en']]) {
+for (const [w, h, lang] of [[360, 740, 'pt'], [360, 740, 'es'], [412, 915, 'en'], [1024, 600, 'es']]) {
   test('balcão cheio (16 caixinhas × 15 itens), ' + w + '×' + h + ', ' + lang, { timeout: 300000 }, async () => {
     const ctx = await browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
     await ctx.addInitScript((l) => { localStorage.setItem('bolinho:idioma', l); }, lang);

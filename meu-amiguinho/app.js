@@ -5,7 +5,7 @@
    Histórico: cada tela de dentro (cada etapa também) é uma entrada; o Voltar do celular volta uma etapa. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.3.0', APP_DATA = '22/Nov/2026';
+  var APP_VERSION = '0.3.1', APP_DATA = '23/Nov/2026';
   var D = window.AmiguinhoDados, A = window.AmiguinhoArte, R = window.AmiguinhoRegras, V = window.AmiguinhoVoz, VIVO = window.AmiguinhoVivo;
   var $ = function (id) { return document.getElementById(id); };
   var TESTE = /[?&]teste\b/.test(location.search);
@@ -161,7 +161,7 @@
 
   // pedaços de painel
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
-  function linha(rotulo, roda) { var l = el('div', 'linha'); if (rotulo) l.appendChild(el('span', 'rot', rotulo)); var r = el('div', 'roda' + (roda ? ' ' + roda : '')); r.setAttribute('role', 'radiogroup'); r.setAttribute('aria-label', rotulo || ''); l.appendChild(r); return { l: l, r: r }; }
+  function linha(rotulo, roda) { var l = el('div', 'linha' + (roda ? ' linha-' + roda : '')); if (rotulo) l.appendChild(el('span', 'rot', rotulo)); var r = el('div', 'roda' + (roda ? ' ' + roda : '')); r.setAttribute('role', 'radiogroup'); r.setAttribute('aria-label', rotulo || ''); l.appendChild(r); return { l: l, r: r }; }
   function opc(conteudo, sel, rotulo, dados) {
     var b = el('button', 'opc' + (sel ? ' sel' : ''), conteudo); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(!!sel));
     if (rotulo) { b.setAttribute('aria-label', rotulo); b.title = rotulo; }
@@ -673,7 +673,7 @@
     var s = Math.min(r.width / 300, r.height / 396), ox = r.left + (r.width - 300 * s) / 2, oy = r.top + (r.height - 396 * s) / 2;
     var b = $('btCoracao'); b.style.left = Math.round(ox + x * s - caixa.left) + 'px'; b.style.top = Math.round(oy + (y + 24) * s - caixa.top) + 'px';
   }
-  window.addEventListener('resize', function () { if (tela === 'amigo') posicionarCoracao(); });
+  window.addEventListener('resize', function () { if (tela === 'amigo') posicionarCoracao(); if (tela === 'oficina') depoisDoPainel(); });   // virou o tablet: os nomes e a ponta esfumada se ajeitam
   $('peluciaAmigo').addEventListener('click', function () {
     if (!vAm) return;
     vAm.tocar();
