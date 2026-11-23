@@ -2,6 +2,14 @@
   "app": "meu-amiguinho",
   "versoes": [
     {
+      "versao": "0.3.1",
+      "data": "23/Nov/2026",
+      "hora": "00:30:00",
+      "pt": ["📐 Tablet e computador deitados: bichinho grande à esquerda, cartões maiores com o nome inteiro, cores e barra de tom fáceis para o dedo, botões do rodapé proporcionais"],
+      "en": ["📐 Tablets and computers in landscape: big buddy on the left, larger cards with full names, easy-to-tap colors and shade slider, balanced bottom buttons"],
+      "es": ["📐 Tablets y ordenadores en horizontal: peluche grande a la izquierda, tarjetas más grandes con el nombre entero, colores y barra de tono fáciles de tocar, botones de abajo proporcionados"]
+    },
+    {
       "versao": "0.3.0",
       "data": "22/Nov/2026",
       "hora": "21:30:00",
