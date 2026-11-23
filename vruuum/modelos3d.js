@@ -1206,7 +1206,7 @@
        a bola de plástico transparente rola (as costuras giram para a frente) e a criança anda dentro, como na rodinha
        do hamster, com os braços abertos encostando na parede. Fundo da bola, criança, depois a frente com o brilho */
     bolha: { alt: 4.0, y: 1.5, larg: 1.05, comp: 1.05, semSombra: true, montar: function (cam, L, cor, f, op) {
-      var R = 1.5, C = [0, R + 0.02, 0], q = cam.pt(C), a = op.t ? op.t * 2.4 : f * PI * 2, fase = (op.t ? op.t * 2.6 : f) * PI * 2, passo = Math.sin(fase), pula = Math.abs(Math.cos(fase)) * 0.05, esc = tom(cor, -0.35);
+      var R = 1.5, salto = Math.abs(Math.sin(op.t ? op.t * PI * 1.6 : f * PI * 2)) * 0.45, C = [0, R + 0.02 + salto, 0], q = cam.pt(C), a = op.t ? op.t * 2.4 : f * PI * 2, fase = (op.t ? op.t * 2.6 : f) * PI * 2, passo = Math.sin(fase), pula = Math.abs(Math.cos(fase)) * 0.05, esc = tom(cor, -0.35);
       // 1.40.0 (dono: "tem que ter divisões, igual uma bola"): gomos como numa bola de praia — 8 costuras que se juntam
       // nos dois polos (sem anel nos polos: parecia uma bolha dentro da outra, dono). O eixo dos polos gira junto quando a bola rola para a frente.
       // Cada costura vira pedacinhos: os da frente vão na camada da frente (mais fortes), os de trás na de trás (fraquinhos)
@@ -1244,7 +1244,11 @@
       // 1.40.0 (dono: "não pode ser diretamente no chão", "tem que ser maior" que a pessoa, "tem que correr enquanto está na
       // corrida"): a bola é bem maior que a criança (ela fica com pouco mais da metade da altura), a criança pisa no fundo
       // de plástico, um pouco acima do asfalto, e corre o tempo todo — na corrida pelo relógio, nos quadros pela fase
-      var yP = 0.18, pePiso = cam.pt([0, yP, 0.05]);
+      // 1.41.0 (dono: "a water ball tem que ir dando pulinhos"): a bola inteira quica pela pista (salto); a sombra fica no
+      // chão e encolhe e clareia quando a bola sobe
+      var chao = [], enc = 1 - salto * 0.5; for (var k0 = 0; k0 <= 24; k0++) { var tc = k0 / 24 * PI * 2; chao.push(cam.pt([Math.cos(tc) * R * 0.85 * enc, 0, Math.sin(tc) * R * 0.85 * enc])); }
+      L.push({ d: 1e9, f: function (c) { c.save(); c.globalAlpha = 0.28 * (1 - salto * 0.9); c.fillStyle = '#000'; c.beginPath(); chao.forEach(function (p, k) { if (k) c.lineTo(p.x, p.y); else c.moveTo(p.x, p.y); }); c.closePath(); c.fill(); c.restore(); } });
+      var yP = 0.18 + salto, pePiso = cam.pt([0, yP, 0.05]);
       L.push({ d: q.d + R * 0.6, f: function (c) {   // sombrinha dos pés no fundo da bola
         if (R * q.s < 2) return;
         c.save(); c.fillStyle = 'rgba(20,40,60,.25)'; c.beginPath(); c.ellipse(pePiso.x, pePiso.y, R * q.s * 0.17, R * q.s * 0.045, 0, 0, PI * 2); c.fill(); c.restore();

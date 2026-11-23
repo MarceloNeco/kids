@@ -495,6 +495,14 @@ Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8
   é efeito, não música). `desenho.js`: a moto de polícia deita nas curvas como a moto.
 - Testes: `teste/policia.test.js` (garagem, nomes, sirene piscando nos quadros e no relógio, a bolha rolando, o palhaço pedalando).
 
+## 1.41.0 — 🫧 bolha dando pulinhos (dono, 23/Nov/2026)
+
+- Pedido: "a water ball tem que ir dando pulinhos".
+- `modelos3d.js` (`bolha`): `salto` = |sen| do relógio (na corrida) ou da fase (quadros dos rivais), até 0,45 de altura;
+  sobe a bola inteira e a criança junto. A sombra redonda fica no chão e encolhe/clareia no alto do pulo (ela tinha
+  sumido sem querer numa edição da 1.40.0 e voltou aqui).
+- Teste: `teste/policia.test.js` confere que a bola sobe na tela no alto do pulo e volta ao chão.
+
 ## 1.40.0 — 🫧 bolha maior, com gomos, e a criança correndo dentro (dono, 22/Nov/2026)
 
 - Pedidos (com as mesmas fotos): "não pode ser diretamente no chão", "a bexiga tem que ter divisões, igual uma bola",

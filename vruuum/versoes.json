@@ -2,6 +2,20 @@
   "app": "vruuum",
   "versoes": [
     {
+      "versao": "1.41.0",
+      "data": "23/Nov/2026",
+      "hora": "00:10:00",
+      "pt": [
+        "🫧 A Bolha Gigante vai dando pulinhos pela pista enquanto a criança corre lá dentro; a sombra no chão encolhe quando a bola sobe."
+      ],
+      "en": [
+        "🫧 The Giant Bubble Ball now bounces along the track while the child runs inside; its shadow on the ground shrinks as the ball goes up."
+      ],
+      "es": [
+        "🫧 La Burbuja Gigante va dando saltitos por la pista mientras el niño corre dentro; la sombra en el suelo se encoge cuando la bola sube."
+      ]
+    },
+    {
       "versao": "1.40.0",
       "data": "22/Nov/2026",
       "hora": "23:20:00",

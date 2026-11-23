@@ -58,3 +58,10 @@ test('1.38.0: palhaço de bicicleta pedala sem parar (pernas e pedais mudam com 
   const quadro = t => { const pts = []; const c = new Proxy({}, { get: (o, k) => k in o ? o[k] : (k === 'lineTo' || k === 'moveTo' ? (x, y) => pts.push(Math.round(x) + ',' + Math.round(y)) : k.startsWith('create') ? () => ({ addColorStop() {} }) : () => {}), set: (o, k, v) => { o[k] = v; return true; } }); M3.vivo(c, 'palhaco', 0, 0, 600, 1100, '#ff4fa3', 0.5, 0, 0, { t }); return pts.join(' '); };
   assert.notEqual(quadro(0), quadro(0.2)); assert.notEqual(quadro(0.2), quadro(0.4));
 });
+
+test('1.41.0: a Bolha Gigante vai dando pulinhos (a bola sobe e desce com o relógio)', () => {
+  const centro = t => { let maior = null; const c = new Proxy({}, { get: (o, k) => k in o ? o[k] : (k === 'arc' ? (x, y, r) => { if (!maior || r > maior.r) maior = { y, r }; } : k.startsWith('create') ? () => ({ addColorStop() {} }) : () => {}), set: (o, k, v) => { o[k] = v; return true; } }); M3.vivo(c, 'bolha', 0, 0, 900, 1000, '#ff4fa3', 0.2, 0, 0, { t }); return maior.y; };
+  const chao = centro(0.625), alto = centro(0.3125);   // (t = 0 é "sem relógio": aí vale a fase do quadro)
+  assert.ok(chao - alto > 10, 'no alto do pulo a bola fica mais para cima na tela: ' + chao + ' → ' + alto);
+  assert.ok(Math.abs(centro(1.25) - chao) < 1, 'e volta ao chão');
+});
