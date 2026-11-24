@@ -4,7 +4,7 @@
    livre", os looks favoritos e as estrelas de cada desafio. Nada vai para a internet. */
 (function () {
   'use strict';
-  var APP_VERSION = '0.9.17';
+  var APP_VERSION = '0.9.18';
   var $ = function (id) { return document.getElementById(id); };
   var P = window.PurpurinaPecas, V = window.PurpurinaVisual, B = window.PurpurinaBoneca, Som = window.PurpurinaSom;
   var TOQUE = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
@@ -690,7 +690,20 @@
      Monta a foto em camadas, como uma câmera de verdade: o cenário bem desfocado atrás (profundidade), a personagem
      nítida com sombra macia, luz de estúdio, um brilho suave em volta (o glitter brilha), granulado fino de câmera e
      cantos levemente escuros. Navegador sem filtro de canvas (Safari antigo): sai sem o desfoque, mas sai. */
+  /* fundos pintados na foto e no GIF (24/Nov/2026): o desenho vira uma imagem fechada, que não busca arquivos de fora;
+     então a imagem do fundo vai junto, embutida (lida uma vez, ao abrir o jogo) */
+  var PurpurinaFundos = window.PurpurinaFundos = (function () {
+    var dados = {};
+    ['camarim', 'provador', 'manicure', 'maquiagem', 'passarela'].forEach(function (n) {
+      var u = 'fundos/' + n + '.webp';
+      if (window.fetch && window.FileReader) fetch(u).then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) {
+        if (!b) return; var fr = new FileReader(); fr.onload = function () { dados[u] = fr.result; }; fr.readAsDataURL(b);
+      }).catch(function () { /* sem internet e sem cópia: a foto sai sem o fundo */ });
+    });
+    return { embutir: function (s) { return s.replace(/href="(fundos\/[a-z]+\.webp)"/g, function (m, u) { return dados[u] ? 'href="' + dados[u] + '"' : m; }); } };
+  })();
   function imagemDe(svg) {
+    svg = PurpurinaFundos.embutir(svg);
     return new Promise(function (ok, erro) { var img = new Image(); img.onload = function () { ok(img); }; img.onerror = erro; img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); });
   }
   var graoCache = null;

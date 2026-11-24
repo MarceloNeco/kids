@@ -113,6 +113,12 @@ Fotos e figuras que o dono mandou como "pose natural decente". **Ficam só como 
 
 ## 9. O que fica para quando houver créditos no Higgsfield
 
+**Fundos pintados: feitos** (24/Nov/2026, aprovados pelo dono): `fundos/camarim.webp`, `provador`, `manicure`, `maquiagem`,
+`passarela` (Qwen-Image, 1328×1328, ~50–70 KB cada), como cenários em `pecas.js` (o camarim é o padrão). No desenho é um
+`<image>` que cobre o quadro (`boneca.js`, `PINTADOS`); a foto e o GIF embutem a imagem (`PurpurinaFundos.embutir` no
+`app.js`, usado também pelo `gif.js`), porque o desenho vira uma imagem fechada que não busca arquivos. Falta: o resto
+abaixo.
+
 Fundos pintados (salão, provador, manicure, maquiagem, passarela), músicas compostas e ícones 3D: ver a tarefa
 programada "Purpurina: checar créditos do Higgsfield" e `../purpurina/AGENDA.md`. Personagem pintada por IA em
 camadas (pendência da Nova Era) só depois dos fundos.
