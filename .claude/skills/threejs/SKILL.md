@@ -50,3 +50,22 @@ inteiro: procure o que precisa (`grep -n "NomeDaClasse" referencia/llms-full.txt
 
 Atualizar a referência: copiar de novo `docs/llms.txt` e `docs/llms-full.txt` do repositório oficial na mesma versão
 do Three.js que o motor usa.
+
+## Receita: motion 3D a partir de um vídeo de referência (dono, 24/Nov/2026)
+
+Quando o dono anexar um vídeo de referência para uma animação 3D (abertura, vinheta, telão, personagem dançando):
+
+1. **Estudar e medir em números**, não "no olho": extrair os quadros com `ffmpeg` (ex.: `ffmpeg -i ref.mp4 -vf fps=10 q/%04d.png`),
+   olhar os quadros e anotar numa tabela a **estrutura** (momentos e duração de cada um), o **ritmo** (batidas por minuto,
+   cortes por segundo), as **pausas**, os **picos** (quando acontece o "uau") e a **câmera** (posição, lente, movimento,
+   velocidade). Mudança entre quadros (`ffmpeg ... -vf "select='gt(scene,0.3)'",showinfo`) ajuda a achar cortes e picos.
+2. **Do vídeo fica só o método.** Nunca copiar marca, personagem, cenário, texto nem paleta de cores (regra de propriedade
+   intelectual da SolverONE): os bichinhos, cores e cenários são nossos.
+3. **Montar o motion em Three.js, em código**, seguindo a câmera e o ritmo medidos, com o tema do dono e as regras desta
+   skill (Three.js do motor, WebGL, leve, "reduzir movimento").
+4. **Antes de animar, mostrar uma imagem parada de cada momento** (print de cada etapa) e **esperar o ok do dono**.
+5. **No fim, comparar**: medir o resultado do mesmo jeito do passo 1 (tempos, picos, câmera), mostrar as duas tabelas
+   lado a lado e ajustar o que ficou diferente.
+
+Modelo de pedido que o dono pode usar (veio de um treinamento): "Anexei um vídeo de referência. Use ele para modelar o meu
+motion graphic 3D sobre [TEMA], em three.js, tudo em código", seguido dos 5 passos acima.
