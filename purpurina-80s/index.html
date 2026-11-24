@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.youtube.com https://open.spotify.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://i.ytimg.com; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://generativelanguage.googleapis.com https://api.openai.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Purpurina 80's — Bolinho de Chuva · SolverONE</title>
+<link rel="icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../carregando.js" data-fora-do-arquivo></script>
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="theme-color" content="#2a1146">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Maquiagem, roupas e muito brilho: monte o visual da sua personagem, faça desafios, tire foto e guarde os looks favoritos. / Makeup, outfits and sparkle: style your character, take challenges, save photos and favorite looks. / Maquillaje, ropa y mucho brillo: arma el look de tu personaje, haz desafíos, toma fotos y guarda tus looks favoritos.">
+<link rel="stylesheet" href="estilo.css">
+<!--
+  Purpurina — quinta brincadeira da família Bolinho de Chuva (SolverONE · Feature Tester).
+  Jogo de vestir e maquiar: personagem (pele, cabelo, olhos), maquiagem, roupas, acessórios e cenários,
+  com desfazer, surpresa, desafios com estrelas, desfile com festa, foto do visual e looks favoritos.
+  Sem login, sem banco, sem cookie: só arquivos estáticos (cache no aparelho pelo sw.js). Nada de
+  script inline: a CSP acima não permite. Mapa dos arquivos: LEIA-ME.md.
+  Versão: APP_VERSION em app.js, VERSAO em sw.js e versoes.json.
+-->
+</head>
+<body>
+
+<section id="entrada" class="tela ativa" data-recurso="purpurina-80s">
+  <div class="brilhos" aria-hidden="true"></div>
+  <div id="entradaBoneca" class="entrada-boneca" aria-hidden="true"></div>
+  <h1 class="logo">Purpurina <span class="nova-era" data-t="80's|80's|80's"></span></h1>
+  <p class="sub" data-t="maquiagem, roupas e muito brilho|makeup, outfits and lots of sparkle|maquillaje, ropa y mucho brillo"></p>
+  <button id="btEntrar" class="grande" type="button" data-t="✨ Toque para brilhar!|✨ Tap to sparkle!|✨ ¡Toca para brillar!"></button>
+  <p class="dica" data-t="Aumente o volume 🔊|Turn the volume up 🔊|Sube el volumen 🔊"></p>
+</section>
+
+<section id="menu" class="tela" data-recurso="purpurina-80s">
+  <div class="faixa">
+    <button id="btSom" class="mini" type="button" aria-label="Som" data-rotulo="Som|Sound|Sonido">🔊</button>
+    <button id="btSemMusicaMenu" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🎶</button>
+    <button id="btProxMusicaMenu" class="mini" type="button" aria-label="Próxima música" data-rotulo="Próxima música|Next song|Siguiente canción">⏭</button>
+    <button id="btAjuda" class="mini" type="button" aria-label="Como brincar" data-rotulo="Como brincar|How to play|Cómo jugar" aria-expanded="false">❓</button>
+  </div>
+  <h1 class="logo pequeno">Purpurina <span class="nova-era" data-t="80's|80's|80's"></span></h1>
+  <div id="ajuda" class="ajuda" hidden>
+    <p data-t="Monte o visual da sua personagem: escolha a pele, o cabelo, as mechas e os olhos, faça a maquiagem (base, blush, sombra, delineado, cílios, batom, glitter e adesivos), vista roupas e sapatos, coloque joias (brincos, colares, pulseiras, anéis e broches) e acessórios. Toque numa aba embaixo (👧 💄 👗 💎 👑 🏞️), depois numa parte e numa opção. As bolinhas coloridas trocam a cor.|Style your character: pick skin, hair, highlights and eyes, do the makeup (foundation, blush, eyeshadow, eyeliner, lashes, lipstick, glitter and stickers), choose clothes and shoes, add jewelry (earrings, necklaces, bracelets, rings and brooches) and accessories. Tap a tab at the bottom (👧 💄 👗 💎 👑 🏞️), then a part and an option. The colored dots change the color.|Crea el look de tu personaje: elige la piel, el pelo, los mechones y los ojos, maquíllalo (base, colorete, sombra, delineador, pestañas, pintalabios, purpurina y pegatinas), ponle ropa y zapatos, joyas (pendientes, collares, pulseras, anillos y broches) y accesorios. Toca una pestaña de abajo (👧 💄 👗 💎 👑 🏞️), luego una parte y una opción. Los circulitos de colores cambian el color."></p>
+    <p data-t="🔍 Zoom: na maquiagem e nas joias a tela chega perto sozinha (rosto, colar ou mãos). O botão 🔍 lá em cima chega perto e o 👗 volta a mostrar a personagem inteira.|🔍 Zoom: for makeup and jewelry the screen zooms in by itself (face, necklace or hands). The 🔍 button at the top zooms in and 👗 shows the whole character again.|🔍 Zoom: en el maquillaje y en las joyas la pantalla se acerca sola (cara, collar o manos). El botón 🔍 de arriba acerca la imagen y el 👗 vuelve a mostrar al personaje entero."></p>
+    <p data-t="↩ desfaz a última troca, 🎲 sorteia um visual surpresa e 🔄 começa de novo. 📸 tira uma foto para guardar no celular e 💖 guarda o look nos favoritos. Para tirar uma peça (uma tiara, um brinco…), toque em ✕ Tirar em cima das opções, ou toque de novo na peça escolhida.|↩ undoes the last change, 🎲 picks a surprise look and 🔄 starts over. 📸 takes a photo to save on the phone and 💖 saves the look to favorites. To take something off (a tiara, an earring…), tap ✕ Remove above the options, or tap the chosen piece again.|↩ deshace el último cambio, 🎲 elige un look sorpresa y 🔄 empieza de nuevo. 📸 hace una foto para guardarla en el móvil y 💖 guarda el look en tus favoritos. Para quitar algo (una tiara, un pendiente…), toca ✕ Quitar encima de las opciones, o vuelve a tocar la prenda elegida."></p>
+    <p data-t="👀 Vistas: cada toque na personagem (ou no 👀) mostra ela de três-quartos e de lado, para um lado e para o outro; o 🙂 volta para a frente.|👀 Views: each tap on the character (or on 👀) shows her three-quarter and side views, one way and the other; 🙂 turns her to the front again.|👀 Vistas: cada toque en el personaje (o en el 👀) lo muestra de tres cuartos y de lado, hacia un lado y hacia el otro; el 🙂 lo pone de frente otra vez."></p>
+    <p data-t="⭐ Desafios: monte o visual para o tema, siga as 3 dicas e toque em ✨ Desfilar! Ninguém perde: todo desfile ganha pelo menos 1 estrela.|⭐ Challenges: style a look for the theme, follow the 3 tips and tap ✨ Runway! Nobody loses: every show gets at least 1 star.|⭐ Desafíos: crea el look para el tema, sigue las 3 pistas y toca ✨ ¡Desfila! Nadie pierde: cada desfile gana por lo menos 1 estrella."></p>
+  </div>
+  <div id="menuBoneca" class="menu-boneca" aria-hidden="true"></div>
+  <div class="botoes-menu">
+    <button id="btLivre" class="grande" type="button" data-t="🎨 Brincar livre|🎨 Free play|🎨 Juego libre"></button>
+    <button id="btDesafios" class="grande roxo" type="button" data-t="⭐ Desafios|⭐ Challenges|⭐ Desafíos"></button>
+    <button id="btLooks" class="medio" type="button"><span data-t="💖 Meus looks|💖 My looks|💖 Mis looks"></span> <span id="qtdLooks" class="bolha">0</span></button>
+    <div class="linha-menu">
+      <button id="btMusica" class="medio" type="button" data-t="🎵 Música|🎵 Music|🎵 Música"></button>
+      <button id="btTV" class="medio" type="button" data-so-site data-t="📺 Conectar na TV|📺 Connect to TV|📺 Conectar a la tele"></button>
+    </div>
+  </div>
+  <div id="guardar" class="guardar">
+    <button id="btInstalar" class="medio forte" type="button" data-t="📲 Instalar no celular (com ícone)|📲 Install on the phone (with icon)|📲 Instalar en el móvil (con icono)"></button>
+  </div>
+  <p class="rodape"><span id="ver"></span> · SolverONE · <a href="https://solverone.com.br/kids/" data-t="🍩 Mais brincadeiras|🍩 More games|🍩 Más juegos"></a></p>
+</section>
+
+<section id="desafios" class="tela" data-recurso="purpurina-80s">
+  <div class="topo-simples">
+    <h2 data-t="⭐ Desafios|⭐ Challenges|⭐ Desafíos"></h2>
+  </div>
+  <p class="dica" data-t="Escolha um tema, monte o visual e desfile. Cada dica cumprida vale uma estrela!|Pick a theme, style the look and walk the runway. Each tip you follow is worth a star!|Elige un tema, crea el look y ¡a desfilar! ¡Cada pista que cumplas vale una estrella!"></p>
+  <div id="listaDesafios" class="lista-desafios"></div>
+</section>
+
+<section id="looks" class="tela" data-recurso="purpurina-80s">
+  <div class="topo-simples">
+    <h2 data-t="💖 Meus looks|💖 My looks|💖 Mis looks"></h2>
+  </div>
+  <h3 class="titulo-prontas" data-t="👗 Estilos prontos (na sua personagem)|👗 Ready-made styles (on your character)|👗 Estilos listos (en tu personaje)"></h3>
+  <div id="listaEstilos" class="lista-looks"></div>
+  <h3 class="titulo-prontas" data-t="✨ Prontas para brincar|✨ Ready to play|✨ Listas para jugar"></h3>
+  <div id="listaProntas" class="lista-looks"></div>
+  <h3 class="titulo-prontas" data-t="💖 Guardados por você|💖 Saved by you|💖 Guardados por ti"></h3>
+  <p id="semLooks" class="dica" data-t="Nenhum look guardado ainda. No estúdio, toque em 💖 para guardar o visual aqui (fica só neste aparelho).|No saved looks yet. In the studio, tap 💖 to save the look here (it stays on this device only).|Todavía no hay looks guardados. En el estudio, toca 💖 para guardar el look aquí (se queda solo en este dispositivo)."></p>
+  <div id="listaLooks" class="lista-looks"></div>
+</section>
+
+<section id="conectar" class="tela" data-recurso="purpurina-80s">
+  <div class="topo-simples">
+    <button class="mini voltar" type="button" aria-label="Voltar" data-rotulo="Voltar|Back|Volver">⬅</button>
+    <h2 data-t="📺 Conectar na TV|📺 Connect to TV|📺 Conectar a la tele"></h2>
+  </div>
+  <ol class="passos">
+    <li data-t="Na TV, abra o navegador e digite: solverone.com.br/tv/purpurina (ou solverone.com.br/kids e escolha a Purpurina). Aparece um código de 4 letras.|On the TV, open the browser and type: solverone.com.br/tv/purpurina (or solverone.com.br/kids and pick Purpurina). A 4-letter code shows up.|En la tele, abre el navegador y escribe: solverone.com.br/tv/purpurina (o solverone.com.br/kids y elige Purpurina). Aparece un código de 4 letras."></li>
+    <li data-t="Digite aqui o código e o seu nome e toque em Conectar.|Type the code and your name here and tap Connect.|Escribe aquí el código y tu nombre, y toca Conectar."></li>
+    <li data-t="Pronto: sua personagem aparece grande na TV, e tudo o que você fizer aqui aparece lá. Até 4 celulares ao mesmo tempo!|Done: your character shows big on the TV, and everything you do here shows there. Up to 4 phones at once!|¡Listo! Tu personaje aparece en grande en la tele, y todo lo que hagas aquí aparece allí. ¡Hasta 4 móviles a la vez!"></li>
+  </ol>
+  <div id="formConectar" class="form-conectar">
+    <label><span data-t="Código da TV|TV code|Código de la tele"></span><input id="codigoTV" class="campo codigo" maxlength="4" autocomplete="off" autocapitalize="characters" inputmode="text"></label>
+    <label><span data-t="Seu nome|Your name|Tu nombre"></span><input id="nomeTV" class="campo" maxlength="16" autocomplete="off"></label>
+    <button id="btConectar" class="grande" type="button" data-t="📺 Conectar|📺 Connect|📺 Conectar"></button>
+  </div>
+  <button id="btDesconectar" class="medio" type="button" hidden data-t="✕ Desconectar da TV|✕ Disconnect from the TV|✕ Desconectar de la tele"></button>
+  <p id="conectarAviso" class="dica" aria-live="polite"></p>
+  <p class="dica" data-t="Outro jeito: espelhar a tela do celular na TV (no Android: Transmitir ou Smart View; no iPhone: Espelhar Tela).|Another way: mirror the phone screen on the TV (Android: Cast or Smart View; iPhone: Screen Mirroring).|Otra forma: duplicar la pantalla del móvil en la tele (en Android: Enviar o Smart View; en iPhone: Duplicar pantalla)."></p>
+</section>
+
+<section id="musica" class="tela" data-recurso="purpurina-80s">
+  <div class="topo-simples">
+    <button class="mini voltar" type="button" aria-label="Voltar" data-rotulo="Voltar|Back|Volver">⬅</button>
+    <h2 data-t="🎵 Música|🎵 Music|🎵 Música"></h2>
+  </div>
+  <p id="ondeToca" class="dica"></p>
+  <div class="fontes" role="group">
+    <button class="opcao-fonte" type="button" data-fonte-bt="purpurina" data-t="✨ Da Purpurina|✨ Purpurina's|✨ De Purpurina"></button>
+    <button class="opcao-fonte" type="button" data-fonte-bt="youtube" data-so-site data-t="▶ YouTube|▶ YouTube|▶ YouTube"></button>
+    <button class="opcao-fonte" type="button" data-fonte-bt="spotify" data-so-site data-t="🟢 Spotify|🟢 Spotify|🟢 Spotify"></button>
+  </div>
+  <div id="linkMusica" class="link-musica" hidden>
+    <input id="linkMusicaCampo" class="campo" inputmode="url" autocomplete="off">
+    <button id="btTocarLink" class="grande" type="button" data-t="▶ Tocar|▶ Play|▶ Reproducir"></button>
+    <p id="ajudaYT" class="dica" hidden><span data-t="No app do YouTube, abra a música ou a playlist, toque em Compartilhar → Copiar link e cole aqui.|In the YouTube app, open the song or playlist, tap Share → Copy link and paste it here.|En la app de YouTube, abre la canción o la lista, toca Compartir → Copiar enlace y pégalo aquí."></span> <a href="https://m.youtube.com/" target="_blank" rel="noopener" data-t="Abrir o YouTube ↗|Open YouTube ↗|Abrir YouTube ↗"></a></p>
+    <p id="ajudaSP" class="dica" hidden><span data-t="No app do Spotify, toque nos ⋯ da música ou da playlist → Compartilhar → Copiar link e cole aqui. Sem estar conectado no Spotify neste aparelho, o Spotify toca só 30 segundos de cada música.|In the Spotify app, tap ⋯ on the song or playlist → Share → Copy link and paste it here. Without being logged in to Spotify on this device, Spotify plays only 30 seconds of each song.|En la app de Spotify, toca los ⋯ de la canción o de la lista → Compartir → Copiar enlace y pégalo aquí. Si no has iniciado sesión en Spotify en este dispositivo, Spotify solo reproduce 30 segundos de cada canción."></span> <a href="https://open.spotify.com/" target="_blank" rel="noopener" data-t="Abrir o Spotify ↗|Open Spotify ↗|Abrir Spotify ↗"></a></p>
+  </div>
+  <p id="musicaAgora" class="musica-agora" aria-live="polite"></p>
+  <div class="controles-musica">
+    <button id="btMusAnt" class="mini" type="button" aria-label="Anterior" data-rotulo="Anterior|Previous|Anterior">⏮</button>
+    <button id="btMusTocar" class="mini grande-mini" type="button" aria-label="Tocar" data-rotulo="Tocar|Play|Reproducir">▶</button>
+    <button id="btMusProx" class="mini" type="button" aria-label="Próxima" data-rotulo="Próxima|Next|Siguiente">⏭</button>
+    <button id="btMusParar" class="mini" type="button" aria-label="Parar" data-rotulo="Parar|Stop|Detener">⏹</button>
+  </div>
+  <p id="musicaAviso" class="dica" aria-live="polite"></p>
+</section>
+
+<section id="tv" class="tela tela-tv">
+  <div id="tvPalcos" class="tv-palcos"></div>
+  <div id="tvEspera" class="tv-espera">
+    <h1 class="logo">Purpurina <span class="nova-era" data-t="80's|80's|80's"></span></h1>
+    <p class="tv-passos"><span data-t="No celular, abra|On the phone, open|En el móvil, abre"></span> <b id="tvEndereco"></b><br><span data-t="toque em 💄 Purpurina, depois em 📺 Conectar na TV, e digite o código:|tap 💄 Purpurina, then 📺 Connect to TV, and type the code:|toca 💄 Purpurina, luego 📺 Conectar a la tele, y escribe el código:"></span></p>
+    <p id="tvCodigo" class="tv-codigo"></p>
+    <button id="btLigarSom" class="grande" type="button" data-t="🔊 Ligar o som (aperte OK)|🔊 Turn on the sound (press OK)|🔊 Encender el sonido (pulsa OK)"></button>
+    <p class="tv-ou" data-t="— ou —|— or —|— o —"></p>
+    <button id="btTvControle" class="grande" type="button" data-t="👆 Brincar aqui, sem celular|👆 Play right here, no phone|👆 Jugar aquí, sin móvil"></button>
+  </div>
+  <p id="tvCanto" class="tv-canto" hidden><span id="tvCodigoCanto"></span></p>
+  <p id="tvTitulo" class="tv-titulo" hidden></p>
+  <div id="tvMusica" class="tv-musica" hidden></div>
+  <div id="tvDesfile" class="tv-desfile" hidden><p id="tvDesfileTxt"></p><p id="tvDesfileEst" class="tv-estrelas"></p><p id="tvJurados" class="tv-jurados"></p></div>
+</section>
+
+<section id="estudio" class="tela" data-recurso="purpurina-80s">
+  <div class="topo">
+    <div class="linha-titulo">
+      <p id="titulo" class="titulo"></p>
+      <!-- menos botão e mais roupa (dono, 21/Nov/2026): as 7 ferramentas (zoom, desfazer, surpresa, recomeçar e música)
+           ficam guardadas num botão só, ⋯, que abre e fecha a caixinha -->
+      <button id="btFerramentas" class="mini" type="button" aria-expanded="false" aria-controls="ferramentas" aria-label="Mais botões" data-rotulo="Mais botões|More buttons|Más botones">⋯</button>
+      <button id="seloTV" class="mini selo-tv" type="button" hidden aria-label="TV"></button>
+    </div>
+    <div id="ferramentas" class="ferramentas" hidden>
+      <button id="btZoom" class="mini" type="button" aria-pressed="false" aria-label="Zoom">🔍</button>
+      <button id="btDesfazer" class="mini" type="button" aria-label="Desfazer" data-rotulo="Desfazer|Undo|Deshacer">↩</button>
+      <button id="btSurpresa" class="mini" type="button" aria-label="Surpresa" data-rotulo="Surpresa|Surprise|Sorpresa">🎲</button>
+      <button id="btRecomecar" class="mini" type="button" aria-label="Começar de novo" data-rotulo="Começar de novo|Start over|Empezar de nuevo">🔄</button>
+      <button id="btMusicaPalco" class="mini" type="button" aria-label="Música" data-rotulo="Música|Music|Música">🎵</button>
+      <button id="btSemMusica" class="mini bt-sem-musica" type="button" aria-pressed="false" aria-label="Sem música" data-rotulo="Sem música|No music|Sin música">🎶</button>
+      <button id="btProxMusica" class="mini" type="button" aria-label="Próxima música" data-rotulo="Próxima música|Next song|Siguiente canción">⏭</button>
+    </div>
+  </div>
+  <div id="palco" class="palco">
+    <div id="boneca" class="boneca" role="img"></div>
+    <div class="giro">
+    </div>
+    <div id="efeitos" class="efeitos" aria-hidden="true"></div>
+  </div>
+  <div id="dicasCaixa" class="dicas" hidden>
+    <span id="dicasTitulo" class="dicas-titulo"></span>
+    <ul id="dicas"></ul>
+  </div>
+  <div class="acoes">
+    <button id="btFoto" class="medio" type="button" data-t="📸 Foto|📸 Photo|📸 Foto"></button>
+    <button id="btGuardar" class="medio" type="button" data-t="💖 Guardar|💖 Save|💖 Guardar"></button>
+    <button id="btBalada" class="medio" type="button" data-t="🪩 Baladinha|🪩 Dance party|🪩 Minidisco"></button>
+    <button id="btDesfilar" class="medio forte" type="button" data-t="✨ Desfilar!|✨ Runway!|✨ ¡Desfila!"></button>
+  </div>
+  <div class="painel">
+    <div id="grupos" class="grupos" role="tablist"></div>
+    <div id="cats" class="cats"></div>
+    <div id="parteBar" class="parte-bar" hidden>
+      <button id="btPartes" class="partes-bt" type="button" data-t="⬅ Partes|⬅ Parts|⬅ Partes"></button>
+      <span id="parteNome" class="parte-nome"></span>
+    </div>
+    <button id="btMais" class="mais-bt" type="button" hidden data-t="⬇ mais|⬇ more|⬇ más"></button>
+    <div id="opcoes" class="opcoes-painel">
+      <div class="tirar-linha">
+        <button id="btTirar" class="tirar-bt" type="button" hidden></button>
+        <button id="btTirarTudo" class="tirar-bt" type="button" hidden></button>
+      </div>
+      <div id="cores" class="cores" role="group"></div>
+      <div id="barras" class="barras" hidden></div>
+      <div id="estilos" class="estilos" role="group"></div>
+    </div>
+  </div>
+</section>
+
+<section id="desfile" class="tela">
+  <div id="palcoDesfile" class="passarela" aria-hidden="true">
+    <div id="cameraDesfile" class="camera-desfile">
+      <div id="cenaDesfile" class="cena-desfile"></div>
+      <canvas id="fogos" class="fogos"></canvas>
+      <div id="modelo" class="modelo">
+        <div id="passarela" class="passarela-boneca"></div>
+      </div>
+    </div>
+    <div id="corteDesfile" class="corte-desfile"></div>
+  </div>
+  <div class="placar">
+    <p id="desfileTitulo" class="desfile-titulo"></p>
+    <p id="desfileEstrelas" class="desfile-estrelas" aria-live="polite"></p>
+    <div id="jurados" class="jurados" aria-hidden="true"></div>
+    <ul id="desfileDicas" class="desfile-dicas"></ul>
+    <p id="desfileRecorde" class="recorde" hidden data-t="🎉 Novo recorde neste desafio!|🎉 New record on this challenge!|🎉 ¡Nuevo récord en este desafío!"></p>
+    <div class="desfile-botoes">
+      <button id="btProximo" class="grande" type="button"></button>
+      <button id="btMaisUm" class="medio" type="button" data-t="✏️ Arrumar mais|✏️ Keep styling|✏️ Arreglar más"></button>
+      <button id="btFotoDesfile" class="medio" type="button" data-t="📸 Foto|📸 Photo|📸 Foto"></button>
+      <button id="btGifDesfile" class="medio" type="button" data-t="🎞️ GIF|🎞️ GIF|🎞️ GIF"></button>
+      <button id="btGuardarDesfile" class="medio" type="button" data-t="💖 Guardar|💖 Save|💖 Guardar"></button>
+      <button id="btMenuDesfile" class="medio" type="button" data-t="🏠 Menu|🏠 Menu|🏠 Menú"></button>
+    </div>
+  </div>
+</section>
+
+<!-- Baladinha (dono, 20/Nov/2026): a personagem e as amigas dançando na sala de luzes (balada.js) -->
+<section id="balada" class="tela">
+  <div id="palcoBalada" class="balada-palco" role="button" tabindex="0" data-rotulo="Trocar a luz e o passo de dança|Change the light and the dance move|Cambiar la luz y el paso de baile"></div>
+  <p class="balada-dica" aria-hidden="true" data-t="👆 Toque para trocar a luz e o passo|👆 Tap to change the light and the move|👆 Toca para cambiar la luz y el paso"></p>
+  <div class="balada-botoes">
+    <button id="btBaladaVoltar" class="medio" type="button" data-t="✏️ Arrumar mais|✏️ Keep styling|✏️ Arreglar más"></button>
+    <button id="btGifBalada" class="medio" type="button" data-t="🎞️ GIF|🎞️ GIF|🎞️ GIF"></button>
+    <button id="btBaladaDesfile" class="medio" type="button" data-t="✨ Desfilar!|✨ Runway!|✨ ¡Desfila!"></button>
+  </div>
+</section>
+
+<section id="desligado" class="tela">
+  <p data-t="Esta brincadeira está desligada no momento.|This game is turned off right now.|Este juego está apagado ahora mismo."></p>
+</section>
+
+<div id="janela" class="janela" hidden role="dialog" aria-modal="true" aria-labelledby="janelaTitulo">
+  <div class="janela-caixa">
+    <h2 id="janelaTitulo"></h2>
+    <p id="janelaTexto"></p>
+    <img id="janelaImg" alt="" hidden>
+    <video id="janelaVideo" playsinline loop muted autoplay hidden></video>
+    <div id="janelaBotoes" class="janela-botoes"></div>
+  </div>
+</div>
+
+<div id="miniTocador" class="mini-tocador" hidden>
+  <button id="btFecharMini" class="mini fechar-mini" type="button" aria-label="Parar a música" data-rotulo="Parar a música|Stop the music|Detener la música">✕</button>
+</div>
+<canvas id="festa" class="festa" aria-hidden="true"></canvas>
+<div id="recado" class="recado" role="status" aria-live="polite" hidden></div>
+<button id="btNovaVersao" class="nova-versao" type="button" hidden></button>
+
+<script src="pecas.js"></script>
+<script src="visual.js"></script>
+<script src="boneca.js"></script>
+<script src="animador.js"></script>
+<script src="balada.js"></script>
+<script src="som.js"></script>
+<script src="../recursos.js" data-app="kids" data-fora-do-arquivo></script>
+<script src="../idioma.js" data-fora-do-arquivo></script>
+<script src="../personagens.js" data-fora-do-arquivo></script>
+<script src="../navegacao.js" data-fora-do-arquivo></script>
+<script src="../janela.js" data-fora-do-arquivo></script>
+<script src="../cofre.js" data-fora-do-arquivo></script>
+<script src="../atualizar.js" data-fora-do-arquivo></script>
+<script src="../telacheia.js" data-fora-do-arquivo></script>
+<script src="../versao.js" data-alvo="#entrada" data-fora-do-arquivo defer></script>
+<script src="../trilha.js" data-fora-do-arquivo></script>
+<script src="gif.js"></script>
+<script src="app.js"></script>
+<script src="viajar.js"></script>
+<script src="sala.js"></script>
+<script src="musica.js"></script>
+<script src="tv.js"></script>
+<script src="ia-foto.js" data-fora-do-arquivo></script>
+</body>
+</html>

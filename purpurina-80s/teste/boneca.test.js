@@ -1,0 +1,749 @@
+// Testes do desenho: o SVG sai bem formado, com ids únicos por prefixo, para qualquer visual.
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const P = require('../pecas.js');
+const V = require('../visual.js');
+const B = require('../boneca.js');
+
+// confere que as tags abrem e fecham direito (sem precisar de navegador)
+function bemFormado(s) {
+  const pilha = [], re = /<(\/?)([a-zA-Z][\w:-]*)([^>]*?)(\/?)>/g; let m;
+  while ((m = re.exec(s))) {
+    if (m[1]) { const t = pilha.pop(); if (t !== m[2]) return 'fechou ' + m[2] + ' esperando ' + t; }
+    else if (!m[4]) pilha.push(m[2]);
+  }
+  return pilha.length ? 'ficou aberto: ' + pilha.join(',') : '';
+}
+
+test('todas as opções de todas as categorias desenham', () => {
+  for (const c of P.CATEGORIAS) for (const o of (c.opcoes || [{ id: null }])) {
+    const e = o.id ? V.aplicar(V.novo(), c.id, o.id) : V.novo();
+    const s = B.svg(e, { id: 't' });
+    assert.equal(bemFormado(s), '', c.id + '/' + o.id);
+    assert.ok(!/NaN|undefined/.test(s), c.id + '/' + o.id + ' com NaN ou undefined');
+  }
+});
+
+test('surpresas desenham sem erro, com e sem animação', () => {
+  for (let i = 1; i <= 120; i++) {
+    const s = B.svg(V.surpresa(V.novo(), V.semente(i)), { id: 's' + i, anim: i % 2 === 0 });
+    assert.equal(bemFormado(s), '', 'sorteio ' + i); assert.ok(!/NaN|undefined/.test(s), 'sorteio ' + i);
+  }
+});
+
+test('ids com prefixo: dois desenhos na mesma página não se misturam', () => {
+  const a = B.svg(V.novo(), { id: 'aa' }), b = B.svg(V.novo(), { id: 'bb' });
+  const ids = s => [...s.matchAll(/ id="([^"]+)"/g)].map(m => m[1]);
+  assert.ok(ids(a).every(i => i.startsWith('aa-')));
+  assert.ok(ids(a).every(i => !ids(b).includes(i)));
+});
+
+test('miniatura (área), só cenário e foto (tamanho)', () => {
+  assert.match(B.svg(V.novo(), { id: 'm', area: [96, 100, 208, 208] }), /viewBox="96 100 208 208"/);
+  assert.match(B.svg(V.novo(), { id: 'f', largura: 800, altura: 1440 }), /width="800" height="1440"/);
+  for (const o of P.categoria('cenario').opcoes) assert.equal(bemFormado(B.svg(V.aplicar(V.novo(), 'cenario', o.id), { id: 'c', soFundo: true })), '');
+});
+
+test('espelhar troca só o x', () => {
+  assert.equal(B.espelhar('M100,50 L150,60 Q120,70 130,80Z'), 'M300,50 L250,60 Q280,70 270,80Z');
+});
+
+test('giro: frente, lado e costas desenham; de costas não tem rosto', () => {
+  const e = Object.assign(V.novo(), { brincos: 'coracao', anel: 'pedra', pulseira: 'micangas', oculos: 'sol', vestido: 'fada' });
+  for (let a = 0; a < 360; a += 15) {
+    const s = B.svg(e, { id: 'g', angulo: a });
+    assert.equal(bemFormado(s), '', 'ângulo ' + a); assert.ok(!/NaN|undefined/.test(s), 'ângulo ' + a);
+  }
+  const frente = B.svg(e, { id: 'f', angulo: 0 }), costas = B.svg(e, { id: 'c', angulo: 180 });
+  assert.match(frente, /olhoE/); assert.ok(!/clip-path="url\(#c-olho/.test(costas), 'de costas sem olhos');
+  assert.ok(!/translate\(200 0\) scale\(/.test(B.svg(e, { id: 'l', angulo: 90 })), 'de lado é o corpo de perfil, não o de frente apertado');
+});
+
+test('anel e pulseira: só a parte da frente (arco aberto, sem círculo inteiro)', () => {
+  const e = Object.assign(V.novo(), { anel: 'simples', pulseira: 'simples' });
+  const s = B.svg(e, { id: 'j' });
+  assert.match(s, /A[\d.]+,[\d.]+ 0 0 0/, 'pulseira em meio arco');   // Nova Era: raios afinam com o corpo de moda
+  assert.ok(!/<ellipse cx="120\.5" cy="487"/.test(s), 'pulseira sem elipse inteira');
+});
+
+test('perfil: de lado a cabeça vira de verdade (contorno do perfil) para os dois lados', () => {
+  const e = Object.assign(V.novo(), { oculos: 'sol', brincos: 'perola', batom: 'gloss', cilios: 'arco' });
+  for (const a of [70, 90, 95, 265, 270, 290]) { const s = B.svg(e, { id: 'p', angulo: a }); assert.equal(bemFormado(s), ''); assert.match(s, /p-rostoV/, 'cabeça girada em ' + a); }
+  assert.match(B.svg(e, { id: 'p', angulo: 110 }), /p-rostoV/, 'passando de 100° a cabeça continua girando (sem pular para as costas)');
+  assert.ok(!/p-rostoV/.test(B.svg(e, { id: 'p', angulo: 0 })), 'de frente é o desenho de frente');
+});
+
+test('giro contínuo: cada grau desenha diferente e com 0° fica igual ao de frente', () => {
+  const e = Object.assign(V.novo(), { cabelo: 'ondasLongas', brincos: 'argola' });
+  assert.notEqual(B.svg(e, { id: 'g', angulo: 10 }), B.svg(e, { id: 'g', angulo: 12 }), 'sem pular de 22,5 em 22,5');
+  assert.equal(B.svg(e, { id: 'g', angulo: 360 }), B.svg(e, { id: 'g', angulo: 0 }));
+  // olhos: os dois de frente; de lado, só o do lado de cá
+  const olhos = (a) => (B.svg(e, { id: 'o', angulo: a, fundo: false }).match(/clip-path="url\(#o-olho[ED]\)"/g) || []).length;
+  assert.equal(olhos(30), 2); assert.equal(olhos(90), 1); assert.equal(olhos(270), 1);
+});
+
+test('unhas pintadas nas mãos e nos pés descalços', () => {
+  const e = Object.assign(V.novo(), { unhas: 'liso', unhasCor: 'vermelho', sapatos: 'nenhum' });
+  const s = B.svg(e, { id: 'u' }), cor = P.cor('roupa', 'vermelho').hex;
+  assert.ok(s.split('fill="' + cor + '"').length - 1 >= 20, 'esperava 10 unhas das mãos + 10 dos pés');
+});
+
+test('realce: palco com fundo desfocado e sombra; miniaturas e camadas da foto sem filtro', () => {
+  const e = V.novo();
+  const palco = B.svg(e, { id: 'p' });
+  assert.match(palco, /filter="url\(#p-desf\)"/); assert.match(palco, /filter="url\(#p-somb\)"/);
+  assert.ok(!/filter="url/.test(B.svg(e, { id: 'm', fundo: false, area: [86, 96, 228, 228] })), 'miniatura sem filtro');
+  assert.ok(!/filter="url/.test(B.svg(e, { id: 'g', realce: false })), 'girando sem filtro');
+});
+
+test('olhos piscam no palco (anim) e não na foto', () => {
+  const e = V.novo();
+  assert.match(B.svg(e, { id: 'p', anim: true }), /<animate attributeName="opacity" values="0;0;1;1;0;0"/);
+  assert.ok(!/values="0;0;1;1;0;0"/.test(B.svg(e, { id: 'p', anim: false })), 'foto com olhos abertos');
+});
+
+test('sem "barba": nada de sombra escura na parte de baixo do rosto', () => {
+  for (const a of [0, 40, 80]) {
+    const s = B.svg(V.novo(), { id: 'b', fundo: false, angulo: a });
+    assert.ok(!/<ellipse cx="200" cy="2(8[0-9]|9[0-9])"[^>]*fill="#000"/.test(s), 'queixo sem sombra preta em ' + a);
+    assert.ok(!/stop-color="#7a3040"/.test(s), 'sem sombra marrom no rosto girado');
+  }
+});
+
+test('todos os formatos de rosto e nariz, menino e penteados novos desenham de frente e girando', () => {
+  for (const rosto of ['oval', 'redondo', 'coracao', 'fininho', 'bochechudo']) for (const nariz of ['botao', 'arrebitado', 'fininho', 'redondinho', 'pequenino']) for (const a of [0, 60, 300]) {
+    const s = B.svg(Object.assign(V.novo(), { rosto, nariz }), { id: 'f', angulo: a }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s), rosto + nariz + a);
+  }
+  const m = V.aplicar(V.novo(), 'personagem', 'menino');
+  for (const c of ['curtinho', 'topete', 'lisoPontas', 'lisoRepartido', 'chanelPontas', 'pontasFora', 'cachinhos', 'encaracolado', 'rabinhoCachos']) for (const a of [0, 45, 90, 180]) {
+    const s = B.svg(Object.assign({}, m, { cabelo: c }), { id: 'c', angulo: a, anim: true }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s), c + a);
+  }
+});
+
+test('desfile: passarela de show, sorriso, tchau e olhar para os lados', () => {
+  const pas = B.passarela('p'); assert.equal(bemFormado(pas), ''); assert.match(pas, /pas-holofote/); assert.match(pas, /pas-flash/);
+  const e = Object.assign(V.novo(), { bolsa: 'mao', pulseira: 'perolas', anel: 'pedra' });
+  for (const op of [{ sorriso: true }, { tchau: true, anim: true }, { olhar: -38, sorriso: true }, { olhar: 38, tchau: true }]) {
+    const s = B.svg(e, Object.assign({ id: 'd', fundo: false }, op)); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  }
+  assert.match(B.svg(e, { id: 'd', tchau: true, anim: true }), /animateTransform/, 'a mão do tchau balança');
+  const olhando = B.svg(e, { id: 'd', fundo: false, olhar: 38 });
+  // Nova Era (dono, 20/Nov/2026): olhar inclina a cabeça e mexe os olhos (desenho de frente), sem girar a cabeça em 3D
+  assert.doesNotMatch(olhando, /d-rostoV/); assert.match(olhando, /rotate\(6\.1 200 300\)/, 'olhar inclina a cabeça');
+  assert.ok(!/translate\(200 0\) scale\(/.test(olhando), 'o corpo continua de frente');
+});
+
+test('de lado: corpo de perfil próprio (sem o corpo de frente apertado), para os dois lados e com todas as roupas', () => {
+  const V0 = V.novo();
+  for (const l of [{}, { vestido: 'princesa' }, { blusa: 'sueter', calca: 'shorts' }, { saia: 'longa', calca: 'nenhum' }, { sapatos: 'salto' }, { sapatos: 'botaCano' }, { sapatos: 'nenhum' }]) {
+    for (const a of [60, 90, 120, 270]) {
+      const s = B.svg(Object.assign({}, V0, l), { id: 'l', angulo: a }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s), JSON.stringify(l) + a);
+    }
+  }
+  assert.ok(!/translate\(200 0\) scale\(/.test(B.svg(V0, { id: 'l', angulo: 90 })), 'de lado não usa o corpo de frente apertado');
+  assert.match(B.svg(V0, { id: 'l', angulo: 30 }), /translate\(200 0\) scale\(/, 'de três-quartos ainda é o corpo de frente');
+});
+
+test('volta completa sem pular: a cabeça é sempre a girada (de 1° a 359°) e a pele some aos poucos', () => {
+  const e = Object.assign(V.novo(), { cabelo: 'ondasLongas', cabeca: 'tiara', laco: 'lado' });
+  for (let a = 5; a < 360; a += 5) {
+    const s = B.svg(e, { id: 'v', angulo: a }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s), 'ângulo ' + a);
+    assert.match(s, /v-peleR/, 'cabeça girada (sem trocar para outro desenho) em ' + a);
+  }
+  // área da pele do rosto (fórmula do laço): diminui de frente para costas, sem pular
+  const larg = (a) => { const d = (B.svg(e, { id: 'w', angulo: a }).match(/id="w-peleR"><path d="([^"]+)"/) || [])[1]; const pts = [...d.matchAll(/(-?[\d.]+),(-?[\d.]+)/g)].map(m => [+m[1], +m[2]]); let ar = 0; pts.forEach((q, i) => { const r = pts[(i + 1) % pts.length]; ar += q[0] * r[1] - r[0] * q[1]; }); return Math.abs(ar) / 2; };
+  let antes = larg(10);
+  for (let a = 30; a <= 170; a += 20) { const l = larg(a); assert.ok(l <= antes + 50, 'pele não cresce de novo em ' + a); antes = l; }
+  assert.ok(larg(180) < larg(10) * 0.02, 'de costas quase sem pele');
+  assert.ok(!/<path d="M126,152 Q200,96 274,152"/.test(B.svg(e, { id: 't', angulo: 180 })), 'tiara não aparece de costas');
+});
+
+test('traços novos desenham de frente, girando e de costas', () => {
+  const L = [{ formaOlho: 'amendoados', distOlhos: 'afastados', formaBoca: 'sorrisinho', nariz: 'batatinha', rosto: 'largo', cabelo: 'armado', oculos: 'retangular' },
+    { formaOlho: 'caidos', distOlhos: 'juntos', formaBoca: 'cheinha', nariz: 'reto', rosto: 'quadradinho', cabelo: 'armadoLongo', oculos: 'gatinho' },
+    { formaOlho: 'puxadinhos', formaBoca: 'larga', nariz: 'largo', rosto: 'comprido', oculos: 'aviador' }, { formaOlho: 'pequenos', formaBoca: 'fininha', oculos: 'meioAro' },
+    { formaOlho: 'grandes', formaBoca: 'pequenininha', oculos: 'redondoGrande' }, { formaOlho: 'fininhos' }, { formaOlho: 'fininhosPuxados', oculos: 'retangular' }, { formaOlho: 'sorridentes', cilios: 'arco', sombra: 'simples' }, { oculos: 'quadrado' }, { oculos: 'oval' }, { oculos: 'fininho' }];
+  for (const l of L) for (const a of [0, 40, 90, 140, 200, 300]) {
+    const s = B.svg(Object.assign(V.novo(), l), { id: 'n', angulo: a, anim: true }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s), JSON.stringify(l) + a);
+  }
+  // olhos afastados ficam mais longe um do outro (e a lente do óculos vai junto)
+  const lente = (d) => (B.svg(Object.assign(V.novo(), { distOlhos: d, oculos: 'retangular' }), { id: 'o', fundo: false }).match(/translate\((-?\d+) 0\)/) || [0, '0'])[1];
+  assert.equal(lente('afastados'), '-9'); assert.equal(lente('juntos'), '7');
+});
+
+test('testa: a linha do cabelo sobe ou desce, de frente e girando, e o cacheado solto desenha', () => {
+  for (const testa of ['baixa', 'normal', 'alta', 'bemAlta']) for (const cabelo of ['cachosSoltos', 'franja', 'longo', 'coqueDuplo']) for (const a of [0, 60, 180]) {
+    const s = B.svg(Object.assign(V.novo(), { testa, cabelo, cabeloCor: 'loiroEscuro', olhos: 'cinza' }), { id: 't', angulo: a }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s), testa + cabelo + a);
+  }
+  const franja = (t) => B.svg(Object.assign(V.novo(), { cabelo: 'franja', testa: t }), { id: 'f', fundo: false });
+  assert.notEqual(franja('alta'), franja('normal')); assert.notEqual(franja('baixa'), franja('normal'));
+});
+
+test('testa alta: de lado a cabeça não fica careca (a linha do cabelo sobe só na testa, não nas têmporas nem até o cocuruto)', () => {
+  const pts = (testa, a) => { const d = (B.svg(Object.assign(V.novo(), { testa, cabelo: 'rabinhoCachos' }), { id: 'k', angulo: a }).match(/id="k-peleR"><path d="([^"]+)"/) || [])[1]; return [...d.matchAll(/(-?[\d.]+),(-?[\d.]+)/g)].map(m => [+m[1], +m[2]]); };
+  for (const testa of ['normal', 'alta', 'bemAlta']) for (const a of [80, 90, 100, -90]) {
+    const q = pts(testa, a), topo = Math.min(...q.map(v => v[1]));
+    assert.ok(topo >= 112, testa + ' ' + a + '°: a pele chega no alto da cabeça (y ' + topo + ')');
+    // na frente da orelha (costeleta), a linha do cabelo fica quase onde fica com a testa normal
+    const perto = (v) => Math.min(...v.filter(t => Math.abs(t[0] - 200) < 14 && t[1] < 230).map(t => t[1]));
+    assert.ok(perto(q) >= perto(pts('normal', a)) - 6, testa + ' ' + a + '°: a pele sobe na frente da orelha até y ' + perto(q));
+  }
+});
+
+test('menina: queixo pequeno e maxilar suave em todos os formatos de rosto (menino continua igual)', () => {
+  const P2 = require('../pecas.js');
+  // largura do contorno de lado na altura do queixo (y ≈ 285): a menina fica para trás do menino
+  const frente = (e) => { const d = (B.svg(e, { id: 'q', angulo: 90 }).match(/id="q-rostoV"><path d="([^"]+)"/) || [])[1]; let mx = 0; d.replace(/M([\d.]+),([\d.]+)a([\d.]+),([\d.]+)/g, (m, x, y, rx, ry) => { const cy = +y, top = cy - +ry, bot = cy + +ry; if (top < 282 && bot > 282) { const k = (282 - cy) / +ry; mx = Math.max(mx, +x + +rx + +rx * Math.sqrt(1 - k * k)); } }); return mx; };
+  for (const rosto of P2.categoria('rosto').opcoes.map(o => o.id)) {
+    const menina = frente(Object.assign(V.novo(), { rosto })), menino = frente(Object.assign(V.novo(), { rosto, personagem: 'menino' }));
+    assert.ok(menina < menino, 'queixo da menina mais delicado: ' + rosto + ' ' + menina + ' x ' + menino);
+  }
+});
+
+test('glitter brilha de verdade: lantejoulas e faíscas animadas na tela, paradas na foto', () => {
+  for (const g of ['bochechas', 'olhos', 'cabelo', 'tudo']) for (const a of [0, 60]) {
+    const e = Object.assign(V.novo(), { glitter: g, glitterCor: 'arco', batom: 'brilho' });
+    const tela = B.svg(e, { id: 'g', anim: true, angulo: a }), foto = B.svg(e, { id: 'g', anim: false, angulo: a });
+    assert.equal(bemFormado(tela), ''); assert.ok(!/NaN|undefined/.test(tela), g + a);
+    if (a === 0 || g === 'bochechas') assert.ok((tela.match(/class="pp-fa"/g) || []).length >= 3, g + ' ' + a + ': faíscas animadas');
+    assert.ok(!/pp-fa|pp-pi/.test(foto), g + ': na foto fica parado');
+  }
+  const boca = B.svg(Object.assign(V.novo(), { batom: 'brilho' }), { id: 'b', anim: true });
+  assert.match(boca, /id="b-labG"/, 'o glitter da boca fica só dentro da boca');
+});
+
+test('patins: de frente as rodas ficam de pé e estreitas; de lado, redondas', () => {
+  const e = Object.assign(V.novo(), { sapatos: 'patins', calca: 'nenhum' });
+  const frente = B.svg(e, { id: 'p' }), lado = B.svg(e, { id: 'p', angulo: 90 });
+  const rodas = [...frente.matchAll(/<rect x="[^"]*" y="651" width="[\d.]+" height="16"/g)];   // Nova Era: largura afina com o corpo
+  assert.equal(rodas.length, 4, 'duas rodas da frente em cada pé, em pé');
+  assert.ok(!/<circle cx="[^"]*" cy="661" r="6" fill="#ffd166"/.test(frente), 'sem roda redonda de frente');
+  assert.ok((lado.match(/<circle [^>]*r="[\d.]+" fill="#ffd166"/g) || []).length >= 2, 'de lado as rodas são redondas');
+});
+
+test('pés descalços: de frente, unha em cima de cada dedo (5 por pé); de costas, calcanhar sem unha', () => {
+  const e = Object.assign(V.novo(), { sapatos: 'nenhum', unhas: 'arco', calca: 'nenhum', saia: 'nenhum' });
+  const arco = ['#ff5a6e', '#ffd23f', '#5cc46a', '#5ac8ff', '#b892ff'];
+  const unhasPe = (s) => [...s.matchAll(/<ellipse cx="([\d.]+)" cy="([\d.]+)" rx="([\d.]+)" ry="[\d.]+" fill="([^"]+)" stroke/g)].filter(m => arco.includes(m[4]) && +m[2] > 640).map(m => [+m[1], +m[2], +m[3]]);
+  const frente = B.svg(e, { id: 'f' });
+  const u = unhasPe(frente);
+  assert.equal(u.length, 10, 'cinco unhas em cada pé');
+  u.forEach(q => assert.ok(q[1] < 656, 'a unha fica no dedo, não embaixo do pé (y ' + q[1] + ')'));
+  // dedão (unha maior) do lado de dentro
+  const esq = u.filter(q => q[0] < 200).sort((a, b) => b[2] - a[2])[0], dir = u.filter(q => q[0] > 200).sort((a, b) => b[2] - a[2])[0];
+  assert.ok(esq[0] > 172 && dir[0] < 228, 'dedão para dentro');
+  assert.equal(unhasPe(B.svg(e, { id: 'c', angulo: 180 })).length, 0, 'de costas não aparecem as unhas');
+});
+
+test('cabelo comprido: nenhum penteado desce até os pés e, girando, não fica um "fantasma" transparente', () => {
+  const P2 = require('../pecas.js');
+  for (const cabelo of P2.categoria('cabelo').opcoes.map(o => o.id)) {
+    const s = B.svg(Object.assign(V.novo(), { cabelo }), { id: 'q', fundo: false });
+    let mx = 0; s.replace(/<path d="([^"]*)"[^>]*fill="url\(#q-cab\)"/g, (m, d) => { d.replace(/(-?[\d.]+),(-?[\d.]+)/g, (a, x, y) => { mx = Math.max(mx, +y); }); });
+    assert.ok(mx < 600, cabelo + ' desce até y ' + mx);
+  }
+  for (const a of [20, 30, 45]) assert.ok(!/url\(#q-trasC\)"><g opacity=/.test(B.svg(Object.assign(V.novo(), { cabelo: 'sereia' }), { id: 'q', angulo: a })), a + '°: sem cabelo transparente');
+});
+
+test('desfile: catwalk sem tombar (dono, 14/Nov/2026: "um pezinho na frente do outro", "de vestido parece que tá sambando")', () => {
+  const fs = require('fs'), path = require('path');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
+  for (const ex of [{}, { vestido: 'gala', calca: 'nenhum' }, { saia: 'tutu', calca: 'nenhum' }]) {
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'd', fundo: false, passos: true });
+    assert.equal(bemFormado(s), '');
+    assert.ok(s.includes('class="pp-passo-e"') && s.includes('class="pp-passo-d"'), 'as duas pernas andam');
+    assert.ok(s.includes('class="pp-corpo"'), 'o corpo acompanha o quadril separado das pernas');
+    if (ex.vestido || ex.saia) assert.ok(s.includes('class="pp-barra"'), 'a barra acompanha o passo');
+  }
+  assert.doesNotMatch(css, /\.modelo\.andando \.passarela-boneca \{ animation/, 'a boneca inteira não gira mais de um lado para o outro');
+  assert.doesNotMatch(css.match(/@keyframes quadril[^\n]*/)[0], /rotate/, 'o quadril só desloca, não tomba');
+  // cada pé vai para a linha do meio e cruza: perna esquerda gira para dentro (graus negativos), a direita espelhada
+  const e = css.match(/@keyframes passoE[\s\S]*?\} \}/)[0], d = css.match(/@keyframes passoD[\s\S]*?\} \}/)[0];
+  assert.ok([...e.matchAll(/rotate\((-?[\d.]+)deg\)/g)].every(m => +m[1] < 0));
+  assert.ok([...d.matchAll(/rotate\((-?[\d.]+)deg\)/g)].every(m => +m[1] > 0));
+});
+
+test('desfile: braços balançam, poses do fim da passarela e idade (dono, 14/Nov/2026, com fotos de referência)', () => {
+  const fs = require('fs'), path = require('path');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8'), app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  // andando: os dois braços em grupos próprios que giram no ombro, também de manga comprida e de vestido
+  for (const ex of [{}, { blusa: 'sueter' }, { vestido: 'festa', calca: 'nenhum' }]) {
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'a', fundo: false, passos: true, rig: false });
+    assert.equal(bemFormado(s), '');
+    assert.ok(s.includes('class="pp-braco-e"') && s.includes('class="pp-braco-d"'), 'os braços balançam');
+  }
+  assert.match(css, /@keyframes bracoE/); assert.match(css, /@keyframes bracoD/);
+  // cada pose desenha e tira o braço solto do lado dela (sem braço sobrando)
+  for (const pose of B.POSES) for (const ex of [{}, { blusa: 'sueter' }, { personagem: 'menino' }, { vestido: 'gala', calca: 'nenhum' }]) {
+    const s = B.svg(Object.assign({}, P.PADRAO, ex), { id: 'p', fundo: false, passos: true, pose });
+    assert.equal(bemFormado(s), '', pose);
+    assert.ok(!s.includes('pp-braco-'), pose + ': em pose os braços não balançam');
+  }
+  for (const pose of ['cintura', 'duasCintura', 'maoCabelo', 'cruzados', 'bolsos', 'carinha', 'joinha']) assert.ok(B.POSES.includes(pose), pose);
+  // idade: as quatro opções, com o jeito de andar de cada uma, e as poses sorteadas no desfile
+  assert.deepEqual(P.categoria('idade').opcoes.map(o => o.id), ['pequena', 'crianca', 'adolescente', 'adulta']);
+  assert.match(css, /\.modelo\.idade-pequena\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-crianca\.andando \.pp-passo-e/); assert.match(css, /\.modelo\.idade-adolescente\.andando \.pp-passo-e/);
+  // paradinha (Nova Era, 20/Nov/2026): as pernas vêm do animador.js — gingada, cruzada ou aberta nas poses do desfile
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  for (const b of ['gingaD', 'gingaE', 'cruzada', 'aberta']) assert.match(anim, new RegExp(b + ': \\{ c:'));
+  assert.match(app, /var NOME_RIG = /); assert.match(app, /PurpurinaAnim\.criar\(pas/);
+  for (const pe of ['perna-cruzada', 'perna-aberta', 'ginga-dir', 'ginga-esq']) assert.match(css, new RegExp('\\.modelo\\.' + pe + ' \\.pp-passo'));
+  // os dois pés no chão (dono, 15/Nov/2026: "parece que tem um pé flutuando"): nenhuma paradinha levanta o pé
+  assert.doesNotMatch(app, /perna-dobrada|perna-relaxada/);
+  for (const m of css.matchAll(/\.modelo\.(perna-[a-z]+|ginga-[a-z]+) \.pp-passo-[ed] \{ transform: ([^}]*)\}/g)) assert.doesNotMatch(m[2], /translateY\(-|scaleY\(0?\.\d/, m[1] + ' tira o pé do chão');
+  assert.match(app, /POSES_DESFILE/); assert.match(app, /function cortar\(take\)/); assert.doesNotMatch(app, /girar\(0, -45/, 'sem giro de lado no desfile (Nova Era sempre de frente)');
+});
+
+test('Nova Era: rosto natural que acompanha a idade, sem sombra escura embaixo (dono, 19/Nov/2026, referência do Poki)', () => {
+  const svgDe = (idade) => B.svg(Object.assign({}, P.PADRAO, { idade }), { id: 'r', fundo: false });
+  const escala = (s) => +s.match(/translate\(200 297\) scale\(([\d.]+)/)[1];
+  const idades = ['pequena', 'crianca', 'adolescente', 'adulta'];
+  idades.forEach(i => assert.equal(bemFormado(svgDe(i)), '', i));
+  // a cabeça vai diminuindo com a idade (a criancinha tem a cabeça maior) e o rosto vai ficando oval
+  const larg = idades.map(i => escala(svgDe(i)));
+  for (let k = 1; k < larg.length; k++) assert.ok(larg[k] < larg[k - 1], idades[k] + ' com a cabeça menor que ' + idades[k - 1]);
+  // ilustração 2D (dono, 19/Nov/2026: "não seria 3D"): rosto de cor lisa, sem degradê de volume (nada escurece o queixo)
+  assert.doesNotMatch(svgDe('adulta'), /r-volRosto|r-volCab/);
+});
+
+test('Nova Era em ilustração (dono, 19/Nov/2026): olho amendoado com pálpebra, sobrancelha cheia, fios no cabelo e sem giro de 360°', () => {
+  const s = B.svg(Object.assign(V.novo(), { cabelo: 'longo' }), { id: 'i', fundo: false });
+  assert.equal(bemFormado(s), '');
+  // o olho é de curvas (C), não mais o arco redondo antigo
+  assert.match(s, /id="i-olhoE"><path d="M[\d.]+,[\d.]+C/);
+  // fios desenhados por cima do cabelo liso, só dentro dele (máscara); cacheado não ganha fios
+  assert.match(s, /<mask id="i-fiosF"/); assert.match(s, /<mask id="i-fiosT"/);
+  assert.doesNotMatch(B.svg(Object.assign(V.novo(), { cabelo: 'cacheado' }), { id: 'c', fundo: false }), /<mask id="c-fiosF"/);
+  // as vistas do estúdio, do desfile, do vídeo e da TV não passam de 45° (sem volta inteira, sem costas)
+  const fs = require('fs'), path = require('path');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), tv = fs.readFileSync(path.join(__dirname, '..', 'tv.js'), 'utf8');
+  // (20/Nov/2026, dono: "não precisa olhar pro lado, porque não será 3D"): o jogo não mostra mais vistas de lado
+  assert.doesNotMatch(app, /var VISTAS|proximaVista|ANG_TAKE|btGirar/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'), /btGirar|dicaGiro/);
+  assert.doesNotMatch(app, /\* 360|e \* 360|-115|pointermove/); assert.doesNotMatch(tv, /e \* 360/);
+  for (const a of [28, 45, -28, -45]) for (const idade of ['pequena', 'crianca', 'adolescente', 'adulta']) {
+    const v = B.svg(Object.assign(V.novo(), { idade }), { id: 'v', angulo: a }); assert.equal(bemFormado(v), ''); assert.ok(!/NaN|undefined/.test(v), idade + a);
+  }
+});
+
+test('Nova Era sem 3D e com corpo de moda (dono, 19/Nov/2026: "não seria 3D"; pesquisa do Poki)', () => {
+  const s = B.svg(Object.assign(V.novo(), { idade: 'adulta' }), { id: 'm', fundo: false });
+  assert.equal(bemFormado(s), '');
+  // sem degradê redondo de volume (o "plástico" 3D): sombra e luz são lineares, de lado a lado (20/Nov/2026: macias, sem a
+  // borda dura que desenhava um retângulo na roupa)
+  assert.doesNotMatch(s, /<radialGradient id="m-(vol|pele|volCab|volRosto)"/);
+  assert.match(s, /<linearGradient id="m-vol"[^>]*><stop offset=".55" stop-color="#7a5ba8" stop-opacity="0"\/><stop offset="1"/);
+  // a cabeça fica pequena (corpo de moda): a adulta tem bem mais cabeças de altura que a criancinha
+  const escalaCabeca = (idade) => +B.svg(Object.assign(V.novo(), { idade }), { id: 'k', fundo: false }).match(/translate\(200 [\d.]+\) scale\(([\d.]+)\) translate\(-200/)[1];
+  assert.ok(escalaCabeca('adulta') < 0.5 && escalaCabeca('pequena') > escalaCabeca('adulta'));
+  // o zoom da maquiagem vai para o rosto no lugar novo
+  const z = B.areaZoom(P.ZOOM.rosto, Object.assign(V.novo(), { idade: 'adulta' }));
+  assert.ok(z[1] < 120 && z[2] < 200, JSON.stringify(z));
+});
+
+test('barras de ajuste (dono, 20/Nov/2026): tom claro/escuro em toda cor e intensidade da maquiagem', () => {
+  const e = Object.assign(V.novo(), { blush: 'redondo', pele: 'p6' });
+  const normal = B.corAjustada(e, 'pele').hex, escura = B.corAjustada(Object.assign({}, e, { peleTom: 0.8 }), 'pele').hex, clara = B.corAjustada(Object.assign({}, e, { peleTom: -0.8 }), 'pele').hex;
+  const luz = (h) => parseInt(h.slice(1, 3), 16) + parseInt(h.slice(3, 5), 16) + parseInt(h.slice(5, 7), 16);
+  assert.ok(luz(escura) < luz(normal) && luz(clara) > luz(normal), 'tom escurece e clareia');
+  // intensidade: a cor do blush vai para a cor da pele
+  const leve = B.corAjustada(Object.assign({}, e, { blushForca: 0.2 }), 'blush').hex, forte = B.corAjustada(e, 'blush').hex;
+  assert.notEqual(leve, forte);
+  assert.ok(Math.abs(luz(leve) - luz(B.corAjustada(e, 'pele').hex)) < Math.abs(luz(forte) - luz(B.corAjustada(e, 'pele').hex)));
+  // o ajuste fica guardado (limpar) e conta como mudança (iguais)
+  const guardado = V.limpar(Object.assign({}, e, { peleTom: 0.5, blushForca: 0.4, lixoTom: 3 }));
+  assert.equal(guardado.peleTom, 0.5); assert.equal(guardado.blushForca, 0.4); assert.equal(guardado.lixoTom, undefined);
+  assert.ok(!V.iguais(e, Object.assign({}, e, { peleTom: 0.5 })));
+  const s = B.svg(Object.assign({}, e, { peleTom: 0.6, blushForca: 0.3 }), { id: 'aj', fundo: false }); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+});
+
+test('esqueleto (dono, 20/Nov/2026: "poses com movimento, não trocar de foto") e tipo de corpo', () => {
+  const s = B.svg(Object.assign(V.novo(), { idade: 'adulta' }), { id: 'r', fundo: false, rig: true, passos: true, poseRig: { oD: 50, cD: 120 } });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const c of ['rig-ombro-e', 'rig-cotovelo-e', 'rig-ombro-d', 'rig-cotovelo-d', 'rig-cabeca', 'rig-iris', 'pp-corpo', 'pp-passo-e']) assert.match(s, new RegExp('class="' + c + '"'), c);
+  // o braço de cima "vindo para a frente" encolhe e o cotovelo desfaz (o antebraço não deforma)
+  assert.match(B.transformaOmbro(10, 0.5, [100, 200]), /scale\(1 0\.5\)/); assert.match(B.transformaCotovelo(10, 0.5, [100, 300]), /scale\(1 2\)/);
+  // tipos de corpo: o gordinho é mais largo na cintura que o magrinho
+  const largura = (corpo) => { const t = B.svg(Object.assign(V.novo(), { corpo, blusa: 'nenhum' }), { id: 'c', fundo: false }); return t.length; };
+  assert.notEqual(largura('magrinho'), largura('gordinho'));
+  const fs = require('fs'), path = require('path');
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'), /'animador\.js'/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'), /<script src="animador\.js"><\/script>/);
+});
+
+test('maquiando, zoom no olho e na boca (dono, 20/Nov/2026) com movimento sutil', () => {
+  const fs = require('fs'), path = require('path');
+  ['sombra', 'delineado', 'cilios', 'olhos'].forEach(id => assert.equal(P.categoria(id).zoom, 'olho', id));
+  assert.equal(P.categoria('batom').zoom, 'boca');
+  const e = { idade: 'adulta' }, rosto = B.areaZoom(P.ZOOM.rosto, e), olho = B.areaZoom(P.ZOOM.olho, e, 50), boca = B.areaZoom(P.ZOOM.boca, e, 50);
+  assert.ok(olho[2] < rosto[2] && boca[2] < rosto[2], 'olho e boca mais perto que o rosto');
+  assert.ok(boca[1] > olho[1], 'boca abaixo do olho');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(app, /movimentoDaVista/); assert.match(anim, /amplitude: function/);
+});
+
+test('baladinha (dono, 20/Nov/2026): sala de luzes, amigas dançando e sombras coloridas', () => {
+  const fs = require('fs'), path = require('path'), raiz = path.join(__dirname, '..');
+  global.window = global.window || global;
+  global.PurpurinaBoneca = B; require('../animador.js'); require('../balada.js');
+  const BL = global.PurpurinaBalada;
+  const sala = BL.sala(); assert.equal(bemFormado(sala), ''); assert.match(sala, /bal-parede/); assert.match(sala, /bal-flor/);
+  BL.PASSOS.forEach(p => assert.ok(global.PurpurinaAnim.POSES[p], 'passo ' + p + ' existe no animador'));
+  const html = fs.readFileSync(path.join(raiz, 'index.html'), 'utf8'), app = fs.readFileSync(path.join(raiz, 'app.js'), 'utf8');
+  assert.match(html, /id="btBalada"/); assert.match(html, /<section id="balada"/); assert.match(html, /<script src="balada\.js"><\/script>/);
+  assert.match(fs.readFileSync(path.join(raiz, 'sw.js'), 'utf8'), /'balada\.js'/);
+  assert.match(app, /PurpurinaBalada\.iniciar/); assert.match(app, /purpurina80s\.looks/);
+  assert.match(fs.readFileSync(path.join(raiz, 'estilo.css'), 'utf8'), /\.bal-sombra svg \* \{ fill: currentColor !important/);
+});
+
+test('roupas de chuva (dono, 20/Nov/2026): capas com capuz por cima de qualquer roupa, guarda-chuva e bolsa/anel na mão do esqueleto', () => {
+  const capa = P.categoria('capa');
+  assert.deepEqual(capa.opcoes.map(o => o.id), ['nenhum', 'transparente', 'patinho', 'colorida', 'arcoiris']);
+  assert.ok(P.categoria('bolsa').opcoes.some(o => o.id === 'guardaChuva'));
+  // a capa vem com a cor do estilo (patinho amarela) e não tira a calça
+  let e = V.aplicar(V.limpar({ calca: 'legging' }), 'capa', 'patinho');
+  assert.equal(e.capaCor, 'amarelo'); assert.equal(e.calca, 'legging'); assert.ok(V.visivel(e, 'calca'));
+  for (const t of ['transparente', 'patinho', 'colorida', 'arcoiris']) {
+    for (const op of [{ rig: true }, {}, { angulo: 60 }, { angulo: 180 }]) {
+      const s = B.svg({ capa: t, bolsa: 'guardaChuva', idade: 'crianca' }, Object.assign({ id: 'ch' }, op));
+      assert.equal(bemFormado(s), '', t); assert.ok(!/NaN|undefined/.test(s), t);
+    }
+  }
+  // com o esqueleto, a bolsa de mão e o anel ficam dentro do braço (giram com ele)
+  const r = B.svg({ bolsa: 'coracao', anel: 'dois' }, { id: 'rg', rig: true }), iD = r.indexOf('class="rig-ombro-d"');
+  assert.ok(iD > 0 && r.slice(iD).includes('2.2 2'), 'bolsa na mão direita');
+  // combinação de roupa sem capa tira a capa
+  assert.ok(P.COMBOS.roupa.filter(c => c.id !== 'chuva').every(c => c.e.capa === 'nenhum'));
+  // braço sem "emenda": o antebraço sai em dois grupos (contorno e preenchimento) que o animador gira juntos
+  // (mais a cópia de trás da cabeça, para a mão na nuca: 2 na frente + 2 atrás)
+  assert.equal((r.match(/class="rig-cotovelo-e"/g) || []).length, 4);
+  assert.match(require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8'), /querySelectorAll\('\.rig-cotovelo-'/);
+});
+
+test('placa de entrada da Baladinha (dono, 20/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path'), raiz = path.join(__dirname, '..');
+  const app = fs.readFileSync(path.join(raiz, 'app.js'), 'utf8'), css = fs.readFileSync(path.join(raiz, 'estilo.css'), 'utf8');
+  assert.match(app, /function placaBalada/); assert.match(app, /'Baladinha', 'Dance Party', 'Minidisco'/);
+  assert.match(css, /\.bal-placa \{/); assert.ok(global.PurpurinaAnim.POSES.abracao);
+});
+
+test('silhueta feminina natural (dono, 20/Nov/2026: "dois triângulos… o busto saindo pros lados… sovaco aparecendo")', () => {
+  const s = B.svg({ blusa: 'camiseta', idade: 'adulta' }, { id: 'sl', rig: true, fundo: false });
+  assert.ok(!s.includes('M172,393'), 'sem as curvinhas desenhadas no peito');
+  // medidas da silhueta de referência: ombro ≥ busto, cintura bem menor que o quadril, e a largura muda em curva
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
+  assert.ok(L[0] >= L[1] && L[2] / L[3] < 0.75 && L[2] / L[3] > 0.6, 'ombro, busto, cintura e quadril');
+  assert.match(fonte, /t = t \* t \* \(3 - 2 \* t\)/, 'largura em curva, não em reta');
+  const clip = s.match(/<clipPath id="sl-semManga">([\s\S]*?)<\/clipPath>/)[1];
+  assert.match(clip, /^<path d="/, 'o recorte do meio é um caminho que segue o corpo, não um retângulo');
+  // a borda do recorte faz curva: mais larga no busto que na cintura
+  const pts = clip.match(/L(-?[\d.]+),(-?[\d.]+)/g).map(t => t.slice(1).split(',').map(Number)).filter(q => q[0] < 200 && q[1] > 300 && q[1] < 600);
+  const xs = pts.map(q => q[0]); assert.ok(Math.max(...xs) - Math.min(...xs) > 12, 'curva de verdade');
+  // com o braço se mexendo, a manga parada nem é desenhada (sem toco do lado)
+  assert.match(require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8'), /function pecaTopo/);
+});
+
+test('desfile de modelo e dança no ritmo (dono, 20/Nov/2026: "quero desfile realista e baladinha")', () => {
+  const fs = require('fs'), path = require('path'), raiz = path.join(__dirname, '..');
+  const anim = fs.readFileSync(path.join(raiz, 'animador.js'), 'utf8'), app = fs.readFileSync(path.join(raiz, 'app.js'), 'utf8'), bal = fs.readFileSync(path.join(raiz, 'balada.js'), 'utf8');
+  assert.match(anim, /modo === 'andar'/); assert.match(anim, /modo === 'dancar'/); assert.match(anim, /modo: function/);
+  assert.match(anim, /var dentro = lado \* 7/, 'o pé vai para a linha do meio (catwalk)');
+  assert.match(app, /modo: 'andar', passoMs: PASSO_MS\[idade\]/, 'a modelo anda com o esqueleto');
+  assert.doesNotMatch(app, /mod\.classList\.add\('andando'\)/, 'sem o andar antigo de CSS na modelo');
+  assert.match(bal, /modo: 'dancar'/); assert.doesNotMatch(bal, /bal-pula/, 'na Baladinha as pernas dançam, a boneca não pula inteira');
+});
+
+test('estilo masculino anos 70 (dono, 20/Nov/2026): camisa de gola, jaqueta, corrente, cinto, bigode e prontos', () => {
+  const fs = require('fs'), path = require('path');
+  ['disco', 'jaquetaGola'].forEach(id => assert.ok(P.categoria('blusa').opcoes.some(o => o.id === id), id));
+  assert.ok(P.categoria('colar').opcoes.some(o => o.id === 'corrente'));
+  assert.deepEqual(P.categoria('cinto').opcoes.map(o => o.id), ['nenhum', 'fivela', 'fino', 'corrente']);
+  const big = P.categoria('bigode'); assert.ok(big && big.menino, 'bigode só para menino');
+  assert.ok(P.ESTILOS.some(s => s.id === 'disco')); assert.ok(P.COMBOS.roupa.some(s => s.id === 'disco'));
+  const moco = P.PRONTAS.find(p => p.id === 'mocoDisco'); assert.equal(moco.e.personagem, 'menino');
+  const e = V.limpar(Object.assign({}, P.PADRAO, moco.e));
+  for (const op of [{ rig: true }, {}, { angulo: 60 }]) { const s = B.svg(e, Object.assign({ id: 'dd' }, op)); assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s)); }
+  // menina não fica de bigode
+  assert.equal(V.aplicar(e, 'personagem', 'menina').bigode, 'nenhum');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /c\.menino && estado\.personagem !== 'menino'/); assert.match(app, /Brincar com ele/);
+});
+
+test('roupa acompanha o gingado e pescoço sem divisão (dono, 20/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta', calca: 'jeans' }, { id: 'gg', rig: true, passos: true, fundo: false });
+  assert.match(s, /<clipPath id="gg-quadrilP">/, 'o quadril da calça vai com o corpo');
+  assert.match(s, /<g clip-path="url\(#gg-quadrilP\)">/);
+  assert.doesNotMatch(s, /fill="#7a5ba8" opacity="0.1"\/>/, 'sem a faixa reta de sombra no pescoço');
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /v\.ey \+= v\.cy; v\.dy \+= v\.cy/, 'andando, as pernas sobem e descem com o corpo');
+});
+
+test('esqueleto em todo desenho de frente, ombros femininos e queixo delicado (dono, 20/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta' }, { id: 'pd', fundo: false });
+  assert.match(s, /class="rig-ombro-e"/, 'sem pedir, o desenho de frente já usa o esqueleto (mangas acompanham os braços)');
+  assert.doesNotMatch(B.svg({}, { id: 'pr', fundo: false, rig: false }), /rig-ombro/, 'rig: false mantém o braço parado antigo');
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
+  assert.ok(L[0] < L[3], 'ombro mais estreito que o quadril');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /poseRig: poseCartao\(k\)/);
+});
+
+test('contorno dos dois lados da roupa e queixo curto (dono, 20/Nov/2026)', () => {
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /if \(cmd === 'Z'\) \{ var z0 = cur, z1 = ini;/, 'o fechar (Z) também segue a curva do corpo');
+  // a blusa sai simétrica: o ponto mais à esquerda e o mais à direita ficam à mesma distância do meio
+  const s = B.svg({ blusa: 'camiseta' }, { id: 'sim', fundo: false });
+  const g = s.match(/<g clip-path="url\(#sim-semManga\)">([\s\S]*?)<\/g>/)[1];
+  const xs = (g.match(/<path d="([^"]+)"/) || [])[1].match(/-?[\d.]+(?=,)/g).map(Number);
+  assert.ok(Math.abs((200 - Math.min(...xs)) - (Math.max(...xs) - 200)) < 2, 'blusa simétrica');
+});
+
+test('desfile sempre de frente, olhando para a plateia (dono, 20/Nov/2026: "nem no desfile")', () => {
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  const desfile = app.slice(app.indexOf('function desfilar()'), app.indexOf('// fogos de artifício'));
+  assert.ok(desfile.length > 1000);
+  assert.doesNotMatch(desfile, /olhaE|olhaD|angulo:/, 'no desfile ela não olha nem vira para os lados');
+});
+
+test('calça sem degraus no gingado e queixo redondo (dono, 20/Nov/2026: "os quadrados da calça", "queixo masculino")', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  // o corpo vem em mais de um grupo .pp-corpo: todos se mexem juntos com as pernas
+  assert.match(anim, /svg\.querySelectorAll\(sel\)/, 'o movimento vale para todos os pedaços do corpo');
+  // o gingado é só um deslocamento igual para corpo e pernas (girar separado abre degrau na cintura)
+  assert.match(anim, /gingaD: \{ c: \[0, 0, 0\], e: \[0, 0, 0\], d: \[0, 0, 0\], s: -2, q: 1, solta: -1 \}/, 'parada, corpo e pernas não se mexem separados');
+  const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /adulta: \{[^}]*queixoY: 0, queixoL: 0\.95/, 'queixo da adulta curto e redondo, sem ponta');
+  assert.match(fonte, /r: \[v\.r\[0\] \* 1\.05, v\.r\[1\] \* 0\.85, v\.r\[2\] \* 0\.6\] \};   \/\/ queixinho redondo/);
+});
+
+test('rebolado do corpo inteiro, sem emenda, e saia solta (dono, 21/Nov/2026)', () => {
+  const s = B.svg({ blusa: 'camiseta', calca: 'jeans' }, { id: 'rb', rig: true, passos: true, fundo: false });
+  assert.equal(bemFormado(s), '');
+  // duas cópias cortadas na mesma linha do quadril: pernas inclinam a partir dos pés, tronco a partir do quadril
+  const m = s.match(/<g class="pp-rebola" data-y="([\d.]+)"/); assert.ok(m, 'tem o rebolado');
+  assert.equal((s.match(/class="pp-banda-baixo"/g) || []).length, 1);
+  assert.equal((s.match(/class="pp-banda-cima"/g) || []).length, 1);
+  const yJ = +m[1], cima = s.match(/<clipPath id="rb-bandaC"><rect [^>]*height="([\d.]+)"/)[1], baixo = s.match(/<clipPath id="rb-bandaB"><rect x="-1000" y="([\d.]+)"/)[1];
+  assert.ok(Math.abs(-2000 + +cima - yJ) <= 2 && Math.abs(+baixo - yJ) <= 2, 'as duas partes se encontram no quadril');
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  // as duas matrizes levam a linha do quadril para o mesmo lugar: baixo = -h/(pé-yJ)·(y-pé); cima = h + t·(y-yJ)
+  const h = 12, yP = 664, sB = -h / (yP - yJ), tC = 0.03;
+  assert.ok(Math.abs((sB * yJ - sB * yP) - (h + tC * yJ - tC * yJ)) < 1e-9);
+  assert.match(anim, /'\.pp-banda-baixo'/); assert.match(anim, /'\.pp-banda-cima'/);
+  assert.doesNotMatch(anim, /feDisplacementMap|rig-rebola/, 'nada de filtro pesado');
+  // saia e vestido não apertam no joelho
+  assert.match(B.svg({ vestido: 'verao', blusa: 'nenhum', calca: 'nenhum' }, { id: 'vs', fundo: false }), /<g><path/);
+  assert.doesNotMatch(B.svg({ vestido: 'verao' }, { id: 'vt', fundo: false }), /data-solta/, 'a marca some depois de deformar');
+});
+
+test('proporções normais: pescoço, braços e pernas com grossura de verdade (dono, 21/Nov/2026)', () => {
+  const fonte = require('fs').readFileSync(require('path').join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /M173,262 L227,262/, 'pescoço de ~5,5% da altura, não um palito');
+  assert.match(fonte, /k = DF\.traco \* 1\.3 \* DF\.braco/, 'braço com a grossura de um braço');
+  // cada perna engrossa em volta do próprio meio (não abre em "O") e as contas se encontram no gancho
+  assert.match(fonte, /var lado = x < 200 \? -1 : 1, c0 = 200 \+ lado \* 26;/);
+  const L = JSON.parse(fonte.match(/adulta: \{ cabecas: [\d.]+[^\[]*larg: (\[[^\]]*\])/)[1]);
+  assert.ok(L[4] > L[5] && L[6] > L[5] && L[5] > L[7], 'coxa > joelho < panturrilha > tornozelo');
+  // (22/Nov/2026, dono: "as pernas estão um pouco compridas demais"; "o pescoço está muito comprido") — nem curtas nem compridas
+  const pa = fonte.match(/adulta: \{ cabecas: [\d.]+, topo: \d+, ombro: ([\d.]+), quadril: ([\d.]+)/);
+  assert.ok(+pa[2] >= 2.9 && +pa[2] <= 3.1, 'pernas na medida'); assert.ok(+pa[1] <= 1.22, 'pescoço curto');
+  assert.equal(bemFormado(B.svg({ idade: 'adulta', vestido: 'verao' }, { id: 'pn', fundo: false })), '');
+});
+
+test('jeito de andar do vídeo de referência (dono, 21/Nov/2026)', () => {
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  const andar = anim.slice(anim.indexOf("if (modo === 'andar') {"), anim.indexOf("} else if (modo === 'dancar')"));
+  // (desde a 0.9.8 os números vêm do perfil BIO: menina = quadril 1,25, cotovelo 30, frente 0,12)
+  assert.match(andar, /v\.q = -pf\.quadril \* a/, 'quadril gingando para o lado da perna de apoio');
+  assert.match(andar, /v\.cE = 8 \+ pf\.cotovelo \* ca; v\.fE = 1 - pf\.frente \* fa/, 'braço que vai à frente dobra o cotovelo');
+  assert.match(andar, /v\.cD = 8 \+ pf\.cotovelo \* cb/, 'braços ao contrário um do outro');
+  assert.match(andar, /v\.cab = -1 \* Math\.sin\(W - 0\.6\)/, 'cabeça quase parada');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /PASSO_MS = \{ pequena: 800, crianca: 1000, adolescente: 1150, adulta: 1250 \}/, 'sem pressa');
+});
+
+test('mão na nuca: antebraço e mão atrás da cabeça e do cabelo da frente (dono, 21/Nov/2026)', () => {
+  assert.ok(B.maoAtras(150, -110) && !B.maoAtras(40, 105) && !B.maoAtras(150, 25), 'só quando a mão vai para trás da cabeça');
+  const s = B.svg({ blusa: 'camiseta' }, { id: 'nc', rig: true, poseRig: { oE: 150, cE: -110, oD: 40, cD: 105 } });
+  assert.equal(bemFormado(s), '');
+  const iAtras = s.indexOf('class="rig-atras-e"'), iCab = s.indexOf('class="rig-cabeca"'), iFrente = s.indexOf('class="rig-frente-e"');
+  assert.ok(iAtras > 0 && iAtras < iCab && iFrente > iCab, 'a cópia de trás vem antes da cabeça e a da frente depois');
+  assert.doesNotMatch(s.slice(iAtras, iAtras + 60), /display:none/, 'na mão na nuca aparece a de trás');
+  assert.match(s.slice(iFrente, iFrente + 60), /display:none/, 'e a da frente some');
+  const r = B.svg({ blusa: 'camiseta' }, { id: 'nr', rig: true });
+  assert.match(r.slice(r.indexOf('class="rig-atras-e"'), r.indexOf('class="rig-atras-e"') + 60), /display:none/, 'braço normal: na frente');
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /B\.maoAtras\(b\[1\], b\[2\]\)/, 'o animador troca a camada quando a pose muda');
+});
+
+test('perfis de movimento: menino anda firme e paralelo, menina com o andar dela + polimento (dono, 21/Nov/2026)', () => {
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /masculino: \{ quadril: 0\.2, parado: 0\.2, cruza: 0,/, 'menino: quadril quase parado e pernas sem cruzar');
+  assert.match(anim, /feminino: \{ quadril: 1\.25, parado: 1, cruza: 1,/, 'menina: como estava');
+  assert.match(anim, /troca: \{ cintura: 'bolsos', duasCintura: 'cruzados'/, 'menino parado: sem mão na cintura');
+  assert.match(anim, /pequena: \{ cadencia: 1\.25, quique: 1\.3 \}/, 'menino pequeno anda mais rápido e quica mais');
+  assert.match(anim, /x \+ 0\.22 \* Math\.sin\(2 \* Math\.PI \* x\)/, 'passo assimétrico (impulso e pouso)');
+  assert.match(anim, /Math\.sin\(W - 0\.15\)[\s\S]*Math\.sin\(W - 0\.45\)/, 'ombro e cotovelo com atraso');
+  assert.match(anim, /Math\.sin\(seg \* 1\.7\) \* 0\.6 \+ Math\.cos\(seg \* 2\.9\) \* 0\.4/, 'micro-movimento parado');
+  assert.match(B.svg({ personagem: 'menino', idade: 'crianca' }, { id: 'pm', fundo: false }), /data-perfil="masculino" data-idade="crianca"/);
+  assert.match(B.svg({}, { id: 'pf', fundo: false }), /data-perfil="feminino"/);
+});
+
+test('vitrine dos sapatos e roupa sem zoom afasta (dono, 21/Nov/2026)', () => {
+  const s = B.svg({ sapatos: 'salto' }, { id: 'vt', rig: true, passos: true, fundo: false });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  assert.match(s, /class="pp-sapato-frente pp-sapato-frente-e"/); assert.match(s, /class="pp-sapato-lado-e" style="display:none"/); assert.match(s, /class="pp-sapato-lado-d" style="display:none"/);
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /modo === 'vitrine'/, 'um pé de cada vez sobe e vira de lado');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /c\.id === 'sapatos' && naParte \? 'vitrine' : ''/, 'só na parte dos sapatos');
+  assert.match(app, /cm\.grupo === 'roupa' && !cm\.zoom && zoomLigado\) zoom\(false, true\)/, 'vestido e outras roupas: afasta para mostrar inteira');
+});
+
+test('estúdio enxuto: ferramentas no ⋯, barra de tom só depois de tocar na cor, roupas em 2 fileiras (dono, 21/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const ferr = html.slice(html.indexOf('id="ferramentas"'), html.indexOf('</div>', html.indexOf('id="ferramentas"')));
+  for (const id of ['btZoom', 'btDesfazer', 'btSurpresa', 'btRecomecar', 'btMusicaPalco', 'btSemMusica', 'btProxMusica']) assert.ok(ferr.includes('id="' + id + '"'), id + ' dentro do ⋯');
+  assert.match(html, /id="btFerramentas"[^>]*aria-expanded="false"/);
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /caixa\.classList\.toggle\('escondida', tomDaCat !== cat\.id\)/, 'barra de tom escondida até tocar numa cor');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
+  assert.match(css, /grid-template-rows: repeat\(2, auto\)/, 'roupas em duas fileiras');
+});
+
+test('andar de passarela de verdade: pé da frente embaixo, perna da frente por cima, sem escorregar (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /var frente = u < 0\.5 \? 1 - 4 \* u : -1 \+ 4 \* \(u - 0\.5\);/, 'no chão o pé vai da frente para trás; no ar volta');
+  assert.match(anim, /var compr = 1 \+ 0\.05 \* frente;/, 'pé da frente mais embaixo na tela');
+  assert.match(anim, /v\.frenteE = e\.frente > d\.frente;/);
+  assert.match(anim, /insertBefore\(gt, gf\)/, 'a perna da frente é desenhada por cima');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /dur = Math\.max\(2, Math\.round\(3600 \/ passada\)\) \* passada/, 'anda um número inteiro de passadas, em velocidade constante');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8');
+  assert.match(css, /\.modelo \.passarela-boneca \{ filter: drop-shadow\(0 3px 4px/, 'sombra colada nos pés');
+});
+
+test('pé no chão: sapato reto no piso e sombrinha de cada pé (dono, 22/Nov/2026)', () => {
+  const s = B.svg({}, { id: 'pc', rig: true, passos: true, fundo: false });
+  assert.match(s, /class="pp-sapato-frente pp-sapato-frente-e" data-ae="[\d.]+,640"/, 'tornozelos marcados'); assert.match(s, /class="pp-sapato-frente pp-sapato-frente-d" data-ad="[\d.]+,640"/);
+  assert.match(s, /class="pp-sombra-pe-e" data-p="[\d.]+,662" data-q=/); assert.match(s, /class="pp-sombra-pe-d"/);
+  const anim = require('fs').readFileSync(require('path').join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /' scale\(' \+ kx\.toFixed\(3\) \+ ' ' \+ \(1 \/ sy\)\.toFixed\(4\) \+ '\) rotate\(' \+ \(-rr\)/, 'o sapato gira e estica ao contrário da perna (kx: o pé virando)');
+});
+
+test('GIF do desfile e da Baladinha para compartilhar (dono, 22/Nov/2026)', async () => {
+  const fs = require('fs'), path = require('path'), G = require('../gif.js');
+  const W = 40, H = 30, qs = [0, 1].map(f => { const d = new Uint8ClampedArray(W * H * 4); for (let i = 0; i < W * H; i++) { d[i * 4] = (i * 7 + f * 90) % 256; d[i * 4 + 1] = (i * 3) % 256; d[i * 4 + 2] = 128; d[i * 4 + 3] = 255; } return { width: W, height: H, data: d }; });
+  const b = new Uint8Array(await G.codificar(qs, 10).arrayBuffer());
+  assert.equal(String.fromCharCode(...b.slice(0, 6)), 'GIF89a', 'cabeçalho do GIF');
+  assert.equal(b[6] | (b[7] << 8), W); assert.equal(b[8] | (b[9] << 8), H);
+  assert.ok(String.fromCharCode(...b.slice(16, 27)) === 'NETSCAPE2.0', 'repete para sempre');
+  assert.equal(b[b.length - 1], 0x3B, 'termina certo');
+  assert.equal([...b].filter((x, i) => x === 0x2C && b[i - 8] === 0x21 && b[i - 7] === 0xF9).length, 2, 'dois quadros');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  assert.match(html, /id="btGifDesfile"/); assert.match(html, /id="btGifBalada"/); assert.match(html, /<script src="gif\.js"><\/script>/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'), /'gif\.js'/, 'funciona sem internet');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /navigator\.share\(\{ files: \[arq\], title: 'Purpurina' \}\)/, 'compartilhar (WhatsApp e outros)');
+  assert.match(app, /type: 'image\/gif'/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'balada.js'), 'utf8'), /data-de', 'bd' \+ d\.i/, 'sombras usam o desenho da dançarina');
+});
+
+test('catwalk sem pernas fantasma e pulo de verdade na Baladinha (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  // (0.9.12, GIF do dono: "pernas abrem para fora"): linha única — as pernas sempre fecham para o meio, nunca abrem
+  assert.match(anim, /var cruzado = dentro \* \(0\.62 \+ 0\.38 \* Math\.max\(0, frente\)\);/, 'sempre fechando para a linha do meio');
+  assert.doesNotMatch(anim, /lado \* 6 \* sob/, 'no ar a perna não abre para fora');
+  assert.match(anim, /modo === 'pular'/); assert.match(anim, /v\.pulo = 23 \* ag - 48 \* alto/, 'agacha, sobe e pousa');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(app, /modo: 'pular', puloMs: 1100/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'estilo.css'), 'utf8'), /\.bal-placa-pulo \{[^}]*animation: balPulo/, 'sem o pulinho de CSS');
+});
+
+test('braços soltos retos, sem piscadinha fixa na Baladinha e queixo liso (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.match(anim, /relax: \{ oE: -6, cE: -3, oD: -4, cD: -5,/, 'braços quase retos, rentes ao corpo (o braço de base já desce 10° para fora)');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const placa = app.slice(app.indexOf("B.svg(estado, { id: 'placa'"), app.indexOf("B.svg(estado, { id: 'placa'") + 200);
+  assert.doesNotMatch(placa, /piscadinha: true/, 'pisca sozinha, não fica piscando o tempo todo');
+  const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
+  assert.match(fonte, /return \{ c: \[0, v\.c\[1\] - 16, v\.c\[2\] - 24\]/, 'ponta do queixo dentro da curva do rosto');
+  assert.match(fonte, /var ENCURTA = 0\.79;/);
+});
+
+test('parada, peso numa perna: a outra dobra o joelho e o pé vira de lado (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  const s = B.svg(V.novo(), { id: 'j', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const l of ['e', 'd']) {
+    // cada perna em dois pedaços cortados na linha do joelho; a canela leva o próprio corte do lado (sem perna fantasma)
+    const i = s.indexOf('<g class="pp-canela-' + l + '" data-j="');
+    assert.ok(i > s.indexOf('<g class="pp-passo-' + l + '">'), 'canela ' + l + ' dentro da perna');
+    assert.match(s.slice(i, i + 200), new RegExp('data-j="[\\d.]+"><g clip-path="url\\(#j-?perna' + l.toUpperCase() + '\\)"><g clip-path="url\\(#j-?canela\\)">'));
+  }
+  // Baladinha e pulo não precisam do joelho (uma cópia a menos de cada perna)
+  assert.doesNotMatch(B.svg(V.novo(), { id: 'k', rig: true, passos: true, anim: true, joelho: false }), /pp-canela-/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'balada.js'), 'utf8'), /joelho: false/);
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  // mão no ombro/nuca com o braço esquerdo (quadril para a direita): a perna esquerda fica solta, e vice-versa
+  assert.match(anim, /gingaD: \{[^}]*q: 1, solta: -1 \}/); assert.match(anim, /gingaE: \{[^}]*q: -1, solta: 1 \}/);
+  assert.match(anim, /if \(!modo && v\.solta\) pernaSolta\(v, v\.solta \* pf0\.cruza, \(v\.cruz \|\| 0\) \* pf0\.cruza\);/, 'parada, e o menino fica plantado (cruza 0)');
+  assert.match(anim, /k = 0\.24 \* \(1 - 0\.4 \* cruz\);\s*v\.er -= r \* wE; v\.esy = 1 - 0\.012 \* wE; v\.peE = wE; v\.kE = -k \* wE;/, 'canela volta: joelho dobrado');
+  assert.match(anim, /bb\.height > 60/, 'bota e cano alto não giram (o cano ficaria fora da calça)');
+});
+
+test('descanso natural: braço caído sem parêntese, mão de lado e peso numa perna (dono, 22/Nov/2026)', () => {
+  const fs = require('fs'), path = require('path');
+  // braço caído: mão de lado (palma para a coxa); levantado ou na cintura: mão de frente
+  assert.equal(B.maoSolta(-6, -3), true); assert.equal(B.maoSolta(40, 105), false); assert.equal(B.maoSolta(150, -110), false);
+  const s = B.svg(V.aplicar(V.novo(), 'anel', 'pedra'), { id: 'm', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const l of ['e', 'd']) {
+    assert.match(s, new RegExp('<g class="rig-mao-lado-' + l + '">'), 'sem pose: a mão de lado aparece (' + l + ')');
+    assert.match(s, new RegExp('<g class="rig-mao-frente-' + l + '" style="display:none">'), 'e a de frente fica escondida (' + l + ')');
+  }
+  // com a mão na cintura, a mão de frente
+  const c = B.svg(V.novo(), { id: 'n', rig: true, poseRig: { oE: 8, cE: 14, oD: 40, cD: 105 } });
+  assert.match(c, /<g class="rig-mao-frente-d">/); assert.match(c, /<g class="rig-mao-lado-d" style="display:none">/);
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  // (0.9.16, dono: "nada de aparecer de uma posição depois aparecer em outra"): a mão troca aos poucos
+  assert.match(anim, /var wl = Math\.max\(0, Math\.min\(1, \(35 - b\[1\]\) \/ 14, \(45 - b\[2\]\) \/ 14, \(b\[2\] \+ 40\) \/ 14\)\)/, 'o animador troca a mão aos poucos, conforme o braço');
+  // descanso com o peso na perna esquerda, a direita solta (sem simetria de soldado)
+  assert.match(anim, /relax: \{[^}]*base: 'leve' \}/); assert.match(anim, /leve: \{[^}]*q: -0\.7, solta: 1 \}/);
+  assert.match(anim, /feminino: \{[^}]*abre: 1,/, 'andando, os braços balançam perto do corpo');
+});
+
+test('pé virado de lado com o desenho de lado, não o de frente entortado (dono, 22/Nov/2026: "bloquinho torto")', () => {
+  const fs = require('fs'), path = require('path');
+  const s = B.svg(V.novo(), { id: 'p', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(s), ''); assert.ok(!/NaN|undefined/.test(s));
+  for (const l of ['e', 'd']) assert.match(s, new RegExp('<g class="pp-sapato-lado-' + l + '" style="display:none" data-a' + l + '="'), 'sapato de lado (' + l + ')');
+  const anim = fs.readFileSync(path.join(__dirname, '..', 'animador.js'), 'utf8');
+  assert.doesNotMatch(anim, /skewX\(' \+ \(-pl\[6\]/, 'nada de entortar o sapato de frente');
+  // (0.9.16, dono: "o pé vira para o lado de uma vez"): o pé gira aos poucos, de 0 (frente) a 1 (lado), sem troca seca
+  // (dono, referências: o pé solto vira PARA FORA, como o da vitrine; bota fica de frente)
+  assert.match(anim, /var tt = alto \? 0 : Math\.max\(0, Math\.min\(1, \(pl\[5\] - 0\.15\) \/ 0\.55\)\)/, 'perna solta: vira para fora aos poucos');
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8'), /pp-sapato-dentro/, 'sem o pé virado para dentro');
+  assert.match(anim, /\['\.pp-sapato-frente-' \+ pl\[0\], 1 - 1\.4 \* Math\.min\(tt, 0\.5\), 1 - sm, true\]/, 'o de frente estreita até ficar fininho e vira o de lado (como um cartão)');
+  // vitrine (zoom no pé): passa o peso de uma perna para a outra, devagar, e o pé da solta vira para fora
+  assert.match(anim, /pernaSolta\(v, sv, 0\); v\.q = -0\.8 \* sv;/, 'vitrine: perna solta alternando');
+  // troca de modo sem pulo (andar → pose, vitrine) e o pé girando na batida da Baladinha
+  assert.match(anim, /misturaDe = atual; misturaIni = modoIni;/); assert.match(anim, /if \(lado > 0\) v\.peE = 0\.85 \* bat; else v\.peD = 0\.85 \* bat;/);
+  // pernas cruzadas (segunda foto de referência)
+  assert.match(anim, /cruzada: \{[^}]*solta: -1, cruz: 1 \}/);
+  assert.doesNotMatch(anim, /data-lado/, 'sem a troca seca de antes');
+  const fonte = fs.readFileSync(path.join(__dirname, '..', 'boneca.js'), 'utf8');
+  // sapato de lado com medidas de pé (dono: "cadê o sapatinho de lado… que coisa torta"): tornozelo em cima do calcanhar,
+  // comprido e baixo; salto com o calcanhar no alto e o salto fino embaixo; pé e perna sem emenda riscada
+  assert.match(fonte, /var t = e\.sapatos, c = C\('sapatos'\), s, A = x \+ 10, F = 663, K = 1\.22;/);
+  assert.match(fonte, /function peNu\(w\)/, 'o contorno não risca a emenda do pé com a perna');
+  const lado = B.svg(V.aplicar(V.novo(), 'sapatos', 'scarpin'), { id: 'sl', rig: true, passos: true, anim: true });
+  assert.equal(bemFormado(lado), ''); assert.ok(!/NaN|undefined/.test(lado));
+});
