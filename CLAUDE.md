@@ -185,6 +185,8 @@ Resumo do que nunca pode ser esquecido (o detalhe está na diretriz):
   carregam cada um o seu Three.js: juntar quando o motor existir). A gaveta compartilhada segue a regra do jogo íntegro:
   versão nova só entra inteira; o jogo diz o que precisa e só o que ele usa é baixado. Medir o peso antes e depois de
   cada mudança e contar ao dono.
+- **3D com Three.js = skill `threejs`** (`.claude/skills/threejs/`, dono 24/Nov/2026): instruções oficiais do Three.js para
+  IAs adaptadas às regras daqui (Three.js só o do motor-pixel, sem CDN; WebGL por padrão, o tablet Fire não tem WebGPU).
 - **Regra da música (pedido do dono, 06/Nov/2026), vale para todo jogo e para a rádio da estante:**
   - **Com internet**: tocam **todas** as músicas gravadas do jogo (instrumentos de verdade), em **ordem sorteada**. A
     favorita do jogo (a música "simples" de sem internet) **nunca é a primeira**: vai para o **fim** da volta.
