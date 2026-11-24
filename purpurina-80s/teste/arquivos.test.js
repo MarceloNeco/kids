@@ -82,7 +82,7 @@ test('músicas: as mesmas da Purpurina (sem copiar os MP3), todas existem, estã
   assert.match(ler('app.js'), /Som\.desfile\(\)/, 'o desfile sorteia uma de passarela');
   // as duas Purpurinas guardam as coisas separadas no aparelho e a gaveta desta não começa com "purpurina-" (a antiga apagaria)
   assert.doesNotMatch(ler('app.js') + ler('tv.js') + ler('ia-foto.js'), /['"]purpurina\./);
-  assert.match(ler('sw.js'), /prefixo: 'purpurina80s-'/);
+  assert.match(ler('sw.js'), /prefixo: 'purpurinaoitenta-'/);
 });
 
 test('estilos prontos na tela de looks e desfile com a turma (dono, 15/Nov/2026)', () => {

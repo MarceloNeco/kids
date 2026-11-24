@@ -9,7 +9,7 @@
 > Diferenças desta pasta:
 > - endereço `/kids/purpurina-80s/`, interruptores `purpurina-80s` e `purpurina-80s-ia` no RootifyONE;
 > - guarda tudo no aparelho com chaves `purpurina80s.*` (não mistura com a Nova Era nem com a Purpurina antiga);
-> - gaveta do `sw.js` com prefixo `purpurina80s-` (não pode começar com `purpurina-`: a antiga apagaria);
+> - gaveta do `sw.js` com prefixo `purpurinaoitenta-` (não pode começar com `purpurina-`: a antiga apagaria);
 > - a personagem viaja para os outros jogos como "Purpurina 80's" (`purpurina-80s:minha`, `viajar.js`).
 
 > **Jogo novo ao lado da Purpurina de antes** (dono, 19/Nov/2026: "o antigo e o atual eu quero manter"). Nasceu em
@@ -17,7 +17,7 @@
 > igual e é a referência. Diferenças desta pasta:
 > - endereço `/kids/purpurina-80s/`, interruptores `purpurina-80s` e `purpurina-80s-ia` no RootifyONE;
 > - guarda tudo no aparelho com chaves `purpurina80s.*` (não mistura com a de antes);
-> - gaveta do `sw.js` com prefixo `purpurina80s-` (não pode começar com `purpurina-`: a de antes apagaria);
+> - gaveta do `sw.js` com prefixo `purpurinaoitenta-` (não pode começar com `purpurina-`: a de antes apagaria);
 > - as músicas são as mesmas, tocadas da pasta `../purpurina/musicas/` (sem copiar 69 MB) e guardadas na mesma gaveta
 >   `purpurina-musicas-v1`;
 > - rosto natural que acompanha Eu → Idade (`IDADES` no `boneca.js`): cabeça, largura, olhos, maxilar, queixo e boca;

@@ -1,4 +1,4 @@
-/* Purpurina 80's — service worker (prefixo 'purpurina80s-': não pode começar com 'purpurina-', senão a Purpurina
+/* Purpurina 80's — service worker (prefixo 'purpurinaoitenta-': não pode começar com 'purpurina-', senão a Purpurina
    antiga apagaria a gaveta desta; o cache de músicas 'purpurina-musicas-v1' é o mesmo das duas, para não baixar duas vezes): guarda o jogo inteiro no aparelho, de forma segura, pela peça comum ../sw-comum.js: a versão nova só entra
    quando chega INTEIRA (senão continua a anterior) e tudo abre da cópia do próprio jogo. Músicas gravadas (MP3, ~47 MB): as 3 primeiras baixadas em segundo plano depois de instalar, as outras na primeira
    vez que tocam, num cache próprio que não muda a cada versão (não baixam de novo). Cache com o nome do app: só apaga caches "purpurina-" (nunca os dos outros apps
@@ -30,4 +30,4 @@ function musica(e, url) {
     });
   });
 }
-var CACHE = BolinhoSW({ prefixo: 'purpurina80s-', versao: VERSAO, arquivos: ARQUIVOS, manter: [CACHE_MUSICAS], depois: guardarMusicas, rota: musica });
+var CACHE = BolinhoSW({ prefixo: 'purpurinaoitenta-', versao: VERSAO, arquivos: ARQUIVOS, manter: [CACHE_MUSICAS], depois: guardarMusicas, rota: musica });
