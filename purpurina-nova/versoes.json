@@ -2,6 +2,20 @@
   "app": "purpurina-nova",
   "versoes": [
     {
+      "versao": "0.9.18",
+      "data": "24/Nov/2026",
+      "hora": "14:30:00",
+      "pt": [
+        "🎨 Cenários pintados de verdade: Camarim (o novo cenário de começo), Provador, Manicure, Estúdio de maquiagem e Passarela, ilustrados com acabamento de revista. Ficam em Cenário, junto com os de antes, e aparecem também na foto."
+      ],
+      "en": [
+        "🎨 Truly painted scenes: Dressing room (the new starting scene), Fitting room, Nail salon, Makeup studio and Runway, illustrated with a magazine finish. They're in Scene, together with the old ones, and they show up in the photo too."
+      ],
+      "es": [
+        "🎨 Escenarios pintados de verdad: Camerino (el nuevo escenario de inicio), Probador, Manicura, Estudio de maquillaje y Pasarela, ilustrados con acabado de revista. Están en Escenario, junto con los de antes, y también salen en la foto."
+      ]
+    },
+    {
       "versao": "0.9.17",
       "data": "22/Nov/2026",
       "hora": "16:38:35",

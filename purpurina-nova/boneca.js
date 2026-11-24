@@ -2532,7 +2532,11 @@
   }
 
   // ---------- cenários ----------
+  /* fundos pintados (dono aprovou em 24/Nov/2026; gerados no Higgsfield): a imagem cobre o quadro inteiro, cortando as
+     laterais (a foto e o GIF trocam o endereço pela imagem embutida: app.js, PurpurinaFundos.embutir) */
+  var PINTADOS = ['camarim', 'provador', 'manicure', 'maquiagem', 'passarela'];
   function cenario(id, I) {
+    if (PINTADOS.indexOf(id) >= 0) return '<image href="fundos/' + id + '.webp" x="0" y="0" width="' + W + '" height="' + H + '" preserveAspectRatio="xMidYMid slice"/>';
     var s = '', r = sorteio(99), k;
     function grad(nome, a, b) { return '<defs><linearGradient id="' + I + nome + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/></linearGradient></defs>'; }
     switch (id) {

@@ -139,6 +139,7 @@
         if (sombra) { it.de = sombra.getAttribute('data-de'); it.cor = getComputedStyle(sombra).color; }
         else {
           it.svg = semTamanho(el.querySelector('[class^="pp-"], .rig-cabeca') ? SER.serializeToString(el) : comCores(el));
+          if (window.PurpurinaFundos) it.svg = window.PurpurinaFundos.embutir(it.svg);   // fundo pintado embutido
           if (dona) it.id = dona.getAttribute('data-id');
         }
       }

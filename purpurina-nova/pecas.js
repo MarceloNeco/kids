@@ -349,6 +349,9 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
     ] },
 
     { id: 'cenario', grupo: 'fundo', ico: '🏞️', pt: 'Cenário', en: 'Scene', es: 'Escenario', area: null, opcoes: [
+      // fundos pintados (Higgsfield, aprovados pelo dono em 24/Nov/2026): imagens em fundos/
+      o('camarim', 'Camarim', 'Dressing room', 'Camerino'), o('provador', 'Provador', 'Fitting room', 'Probador'), o('manicure', 'Manicure', 'Nail salon', 'Manicura'),
+      o('maquiagem', 'Estúdio de maquiagem', 'Makeup studio', 'Estudio de maquillaje'), o('passarela', 'Passarela', 'Runway', 'Pasarela'),
       o('quarto', 'Meu quarto', 'My bedroom', 'Mi habitación', ['pijama']), o('praia', 'Praia', 'Beach', 'Playa', ['praia']), o('castelo', 'Baile no castelo', 'Castle ball', 'Baile en el castillo', ['princesa']),
       o('palco', 'Palco do show', 'Concert stage', 'Escenario del concierto', ['pop']), o('jardim', 'Jardim', 'Garden', 'Jardín', ['jardim']), o('neve', 'Neve', 'Snow', 'Nieve', ['inverno']),
       o('festa', 'Festa de aniversário', 'Birthday party', 'Fiesta de cumpleaños', ['aniversario']), o('mar', 'Fundo do mar', 'Under the sea', 'Fondo del mar', ['sereia'])
@@ -363,7 +366,7 @@ o('cachosSoltos', 'Cacheado solto (risca no meio)', 'Loose curls (middle part)',
     vestido: 'nenhum', vestidoCor: 'lilas', blusa: 'camiseta', blusaCor: 'rosaclaro', saia: 'nenhum', saiaCor: 'chiclete',
     calca: 'jeans', calcaCor: 'ceu', estampa: 'liso', estampaCor: 'branco', capa: 'nenhum', capaCor: 'amarelo', cinto: 'nenhum', cintoCor: 'preto', bigode: 'nenhum', sapatos: 'tenis', sapatosCor: 'branco',
     cabeca: 'nenhum', cabecaCor: 'dourado', laco: 'nenhum', lacoCor: 'chiclete', brincos: 'nenhum', brincosCor: 'dourado', pulseira: 'nenhum', pulseiraCor: 'dourado', anel: 'nenhum', anelCor: 'dourado', broche: 'nenhum', brocheCor: 'dourado',
-    colar: 'nenhum', colarCor: 'dourado', oculos: 'nenhum', oculosCor: 'chiclete', bolsa: 'nenhum', bolsaCor: 'chiclete', cenario: 'quarto'
+    colar: 'nenhum', colarCor: 'dourado', oculos: 'nenhum', oculosCor: 'chiclete', bolsa: 'nenhum', bolsaCor: 'chiclete', cenario: 'camarim'
   };
 
   /* Personagens prontas (em 💖 Meus looks): começam já com o jeito de uma criança de verdade — traços, cabelo, olhos e
