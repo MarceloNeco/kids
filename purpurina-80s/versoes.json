@@ -1,0 +1,640 @@
+{
+  "app": "purpurina-80s",
+  "versoes": [
+    {
+      "versao": "1.0.0",
+      "data": "24/Nov/2026",
+      "hora": "04:10:00",
+      "pt": [
+        "💄 A Purpurina 80's agora é a Purpurina Nova Era de 22/Nov/2026, congelada do jeito que estava: rosto natural para cada idade, braços e pernas que se mexem de verdade, pose natural com o peso numa perna, desfile andando de verdade, Baladinha e GIF para o WhatsApp. A Purpurina Nova Era continua ao lado e vai ganhar os fundos pintados e os recursos novos."
+      ],
+      "en": [
+        "💄 Purpurina 80's is now the Purpurina New Age from Nov 22, 2026, frozen as it was: a natural face for each age, arms and legs that really move, a natural pose with the weight on one leg, a real runway walk, the dance party and GIFs for WhatsApp. Purpurina New Age stays right next to it and will get the painted backgrounds and the new features."
+      ],
+      "es": [
+        "💄 Purpurina 80's ahora es la Purpurina Nueva Era del 22/nov/2026, congelada tal como estaba: cara natural para cada edad, brazos y piernas que se mueven de verdad, pose natural con el peso en una pierna, desfile caminando de verdad, minidisco y GIF para WhatsApp. La Purpurina Nueva Era sigue al lado y va a recibir los fondos pintados y las novedades."
+      ]
+    },
+    {
+      "versao": "0.9.17",
+      "data": "22/Nov/2026",
+      "hora": "16:38:35",
+      "pt": [
+        "🏎️ A sua personagem do Brincar livre agora viaja para os outros jogos: no Vruuum! ela pode pilotar o carrinho (aparece em \"Amigos dos outros jogos\")"
+      ],
+      "en": [
+        "🏎️ Your Free play character now travels to the other games: in Vruuum! she can drive the car (look for \"Friends from other games\")"
+      ],
+      "es": [
+        "🏎️ Tu personaje del Juego libre ahora viaja a los otros juegos: en Vruuum! puede conducir el coche (búscalo en \"Amigos de otros juegos\")"
+      ]
+    },
+    {
+      "versao": "0.9.16",
+      "data": "22/Nov/2026",
+      "hora": "15:12:00",
+      "pt": [
+        "👟 O pezinho vira de lado aos poucos, como um pé girando de verdade: o sapato de frente vai estreitando enquanto o de lado vai aparecendo a partir do tornozelo, acompanhando a perna (antes ele trocava de uma vez, num pulo). Vale quando ela fica parada com uma perna solta e na vitrine dos sapatos, onde o pé vira enquanto sobe e volta enquanto desce.",
+        "🩰 Como nas referências de pose: o pezinho da perna solta vira para fora (a ponta para o lado de fora do corpo), com o joelho dobrado para dentro, quase encostando no outro, e o quadril bem para o lado da perna de apoio. Bota e tênis de cano alto ficam de frente.",
+        "👟 Sapato de lado redesenhado com medidas de pé de verdade: comprido e baixo, o tornozelo em cima do calcanhar, calcanhar redondo, peito do pé em curva, ponta arredondada e a sola marcada (tênis com cadarço). O salto alto aparece com o calcanhar no alto e o salto fino embaixo, e o pé descalço de lado tem arco e dedão, sem emenda riscada entre a perna e o pé.",
+        "🔍 No zoom do pé (Roupas → Sapatos) ela não levanta mais o pé no ar: passa o peso de uma perna para a outra, devagar, e o pé solto vira para fora mostrando o sapato de lado, com a barra da calça por cima.",
+        "🌀 Tudo muda aos poucos, sem pulo: o pé vira como um cartão virando, a mão troca de frente para de lado devagar e, quando ela para de andar no desfile ou entra e sai do zoom no pé, o corpo vai suave para a pose nova.",
+        "💃 Na Baladinha o pé da perna que dobra gira para fora na batida, e nas poses com as pernas cruzadas (como mandar beijo) uma perna cruza na frente da outra."
+      ],
+      "en": [
+        "👟 The foot turns sideways little by little, like a real foot turning: the front shoe narrows while the side shoe grows from the ankle, following the leg (before, it switched all at once, in a jump). This works when she stands with one leg relaxed and in the shoe showcase, where the foot turns as it lifts and turns back as it lowers.",
+        "🩰 Like the pose references: the relaxed leg's foot turns outward (toe pointing away from the body), with the knee bent inward, almost touching the other one, and the hips well over the supporting leg. Boots and high-top sneakers stay facing forward.",
+        "👟 Side-view shoe redrawn with real foot proportions: long and low, the ankle above the heel, rounded heel, curved instep, rounded toe and a visible sole (sneakers with laces). High heels show the heel raised with a thin heel underneath, and the bare foot from the side has an arch and big toe, with no drawn seam between leg and foot.",
+        "🔍 In the foot close-up (Clothes → Shoes) she no longer lifts her foot: she slowly shifts her weight from one leg to the other, and the relaxed foot turns outward showing the shoe from the side, with the pants hem over it.",
+        "🌀 Everything changes gradually, without jumps: the foot turns like a card flipping, the hand changes from front to side slowly, and when she stops walking on the runway or enters and leaves the foot close-up, her body moves smoothly into the new pose.",
+        "💃 At the dance party the foot of the bending leg turns outward on the beat, and in crossed-leg poses (like blowing a kiss) one leg crosses in front of the other."
+      ],
+      "es": [
+        "👟 El pie se gira de lado poco a poco, como un pie de verdad: el zapato de frente se va estrechando mientras el de lado va apareciendo desde el tobillo, siguiendo la pierna (antes cambiaba de golpe, de un salto). Vale cuando está quieta con una pierna suelta y en el escaparate de zapatos, donde el pie gira al subir y vuelve al bajar.",
+        "🩰 Como en las referencias de pose: el pie de la pierna suelta se gira hacia fuera (la punta hacia el exterior del cuerpo), con la rodilla doblada hacia dentro, casi tocando la otra, y la cadera bien hacia la pierna de apoyo. Las botas y las zapatillas de caña alta quedan de frente.",
+        "👟 Zapato de lado rediseñado con medidas de pie de verdad: largo y bajo, el tobillo sobre el talón, talón redondo, empeine curvo, punta redondeada y la suela marcada (zapatillas con cordones). El tacón alto aparece con el talón arriba y el tacón fino debajo, y el pie descalzo de lado tiene arco y dedo gordo, sin costura dibujada entre la pierna y el pie.",
+        "🔍 En el zoom del pie (Ropa → Zapatos) ya no levanta el pie: pasa el peso de una pierna a la otra, despacio, y el pie suelto se gira hacia fuera mostrando el zapato de lado, con el bajo del pantalón por encima.",
+        "🌀 Todo cambia poco a poco, sin saltos: el pie gira como una carta que se da la vuelta, la mano pasa de frente a de lado despacio y, cuando deja de caminar en el desfile o entra y sale del zoom del pie, el cuerpo va suave a la nueva pose.",
+        "💃 En la minidisco el pie de la pierna que se dobla gira hacia fuera con el ritmo, y en las poses con las piernas cruzadas (como lanzar un beso) una pierna cruza por delante de la otra."
+      ]
+    },
+    {
+      "versao": "0.9.15",
+      "data": "22/Nov/2026",
+      "hora": "14:38:00",
+      "pt": [
+        "🙋‍♀️ Braços caídos de verdade: o cotovelo fica perto da cintura e o braço desce quase reto, rente ao corpo (antes abria para fora, como um parêntese \"( )\"). Vale parada, em todas as poses com um braço solto e também andando.",
+        "✋ Com o braço caído, a mão fica de lado, com a palma virada para a perna, o polegar na frente e os dedos curvando de leve (antes era uma mãozinha de frente que parecia uma bolinha). O anel e o esmalte aparecem nela também.",
+        "🧍‍♀️ Descansando, ela não fica mais reta como soldado: o peso vai para a perna esquerda e a direita fica solta, com o joelho dobrado e o pezinho de lado. As mangas ficaram um pouco menos bufantes.",
+        "👟 O pezinho virado de lado agora é um sapato de lado de verdade (calcanhar redondo, peito do pé e ponta), no lugar do sapato de frente entortado que virava um bloquinho com quina. Vale também na vitrine dos sapatos, e o salto alto aparece com o calcanhar no alto e o salto embaixo."
+      ],
+      "en": [
+        "🙋‍♀️ Arms that really hang: the elbow stays near the waist and the arm goes down almost straight, close to the body (before, it bowed outward like a parenthesis \"( )\"). This works standing still, in every pose with one arm down and while walking.",
+        "✋ With the arm down, the hand turns sideways, palm toward the leg, thumb in front and fingers gently curved (before, it was a front-facing little hand that looked like a ball). Rings and nail polish show on it too.",
+        "🧍‍♀️ Resting, she no longer stands stiff like a soldier: her weight shifts to the left leg and the right one relaxes, knee bent and foot turned sideways. Sleeves are a little less puffy.",
+        "👟 The foot turned sideways is now a real side-view shoe (rounded heel, instep and toe) instead of the bent front shoe that looked like a crooked block. This also applies to the shoe showcase, and high heels show the heel raised with the heel underneath."
+      ],
+      "es": [
+        "🙋‍♀️ Brazos que caen de verdad: el codo queda cerca de la cintura y el brazo baja casi recto, junto al cuerpo (antes se abría hacia fuera, como un paréntesis \"( )\"). Vale quieta, en todas las poses con un brazo suelto y también al caminar.",
+        "✋ Con el brazo caído, la mano queda de lado, con la palma hacia la pierna, el pulgar delante y los dedos un poco curvados (antes era una manita de frente que parecía una bolita). El anillo y el esmalte también se ven.",
+        "🧍‍♀️ Descansando, ya no está tiesa como un soldado: el peso pasa a la pierna izquierda y la derecha queda suelta, con la rodilla doblada y el pie de lado. Las mangas son un poco menos abullonadas.",
+        "👟 El pie girado de lado ahora es un zapato de lado de verdad (talón redondo, empeine y punta), en lugar del zapato de frente torcido que parecía un bloque con esquina. También vale en el escaparate de zapatos, y el tacón alto aparece con el talón arriba y el tacón debajo."
+      ]
+    },
+    {
+      "versao": "0.9.14",
+      "data": "22/Nov/2026",
+      "hora": "14:16:00",
+      "pt": [
+        "🦵 Parada, ela fica do jeito de gente de verdade: quando põe a mão no ombro, na nuca ou na cintura, o peso vai para uma perna e a outra dobra de leve o joelho, vem um pouquinho para o meio e o pezinho vira de lado (antes os dois pés ficavam sempre de frente). O menino continua firme, com os dois pés plantados.",
+        "👢 Botas de cano e tênis de cano alto acompanham a perna inteira, sem o cano escapar da calça."
+      ],
+      "en": [
+        "🦵 Standing still, she now poses like a real person: when she puts a hand on her shoulder, neck or waist, her weight shifts to one leg and the other knee bends slightly, comes a little toward the middle and the foot turns sideways (before, both feet always faced forward). The boy stays steady, both feet planted.",
+        "👢 Tall boots and high-top sneakers follow the whole leg, and the shaft no longer pokes out of the pants."
+      ],
+      "es": [
+        "🦵 Quieta, ahora posa como una persona de verdad: cuando se pone la mano en el hombro, en la nuca o en la cintura, el peso pasa a una pierna y la otra dobla un poco la rodilla, se acerca un poquito al centro y el pie se gira de lado (antes los dos pies miraban siempre al frente). El niño sigue firme, con los dos pies plantados.",
+        "👢 Las botas altas y las zapatillas de caña alta acompañan toda la pierna, y la caña ya no se sale del pantalón."
+      ]
+    },
+    {
+      "versao": "0.9.13",
+      "data": "22/Nov/2026",
+      "hora": "10:52:27",
+      "pt": [
+        "🙆‍♀️ Corpo mais natural: braços soltos caem quase retos, rentes ao corpo (antes ficavam arqueados), pescoço mais curto e alinhado com os ombros, pernas um pouco mais curtas e o queixo com a curva lisa, sem o \"dentinho\" embaixo.",
+        "😉 Na entrada da Baladinha ela não fica mais piscando o tempo todo: pisca sozinha, de vez em quando, e na agachada do pulo os braços vão retos para trás."
+      ],
+      "en": [
+        "🙆‍♀️ A more natural body: relaxed arms hang almost straight, close to the body (before they were bowed), a shorter neck in line with the shoulders, slightly shorter legs and a smooth chin curve with no little bump underneath.",
+        "😉 At the dance party entrance she no longer winks all the time: she blinks on her own now and then, and when she crouches to jump her arms go straight back."
+      ],
+      "es": [
+        "🙆‍♀️ Un cuerpo más natural: los brazos sueltos caen casi rectos, pegados al cuerpo (antes quedaban arqueados), el cuello más corto y alineado con los hombros, las piernas un poco más cortas y la barbilla con una curva lisa, sin el \"bultito\" de abajo.",
+        "😉 En la entrada de la minidisco ya no guiña el ojo todo el tiempo: parpadea sola de vez en cuando, y al agacharse para saltar los brazos van rectos hacia atrás."
+      ]
+    },
+    {
+      "versao": "0.9.12",
+      "data": "22/Nov/2026",
+      "hora": "09:45:25",
+      "pt": [
+        "👠 Desfile em linha única, como modelo de verdade: as pernas sempre fecham para o meio da passarela, um pé na frente do outro (antes abriam para fora, em \"A\"), e a perna que vem para a frente passa por cima da outra."
+      ],
+      "en": [
+        "👠 A single-line runway walk, like a real model: the legs always come in toward the middle of the runway, one foot in front of the other (before they opened outward in an \"A\"), and the leg coming forward passes in front of the other."
+      ],
+      "es": [
+        "👠 Desfile en una sola línea, como una modelo de verdad: las piernas siempre se cierran hacia el centro de la pasarela, un pie delante del otro (antes se abrían hacia fuera, en \"A\"), y la pierna que avanza pasa por delante de la otra."
+      ]
+    },
+    {
+      "versao": "0.9.11",
+      "data": "22/Nov/2026",
+      "hora": "09:16:02",
+      "pt": [
+        "👠 Pernas sem atravessar uma na outra no desfile: no ar, a perna contorna a de apoio por fora e só cruza na frente na hora de pousar; a perna de trás volta para o próprio lado.",
+        "🤸‍♀️ Pulo de verdade na entrada da Baladinha: ela agacha com os braços para trás, impulsiona, sai do chão com os braços para cima (a sombra fica no chão) e pousa dobrando os joelhos."
+      ],
+      "en": [
+        "👠 Legs no longer pass through each other on the runway: in the air the leg goes around the supporting leg on the outside and only crosses in front when it lands; the back leg returns to its own side.",
+        "🤸‍♀️ A real jump at the dance party entrance: she crouches with her arms back, pushes off, leaves the floor with her arms up (the shadow stays on the floor) and lands bending her knees."
+      ],
+      "es": [
+        "👠 Las piernas ya no se atraviesan en el desfile: en el aire, la pierna rodea por fuera a la de apoyo y solo cruza por delante al apoyarse; la pierna de atrás vuelve a su lado.",
+        "🤸‍♀️ Salto de verdad en la entrada de la minidisco: se agacha con los brazos atrás, se impulsa, despega con los brazos arriba (la sombra se queda en el suelo) y aterriza doblando las rodillas."
+      ]
+    },
+    {
+      "versao": "0.9.10",
+      "data": "22/Nov/2026",
+      "hora": "08:14:19",
+      "pt": [
+        "🎞️ GIF para compartilhar: no fim do desfile e na Baladinha tem o botão 🎞️ GIF. No desfile ela entra de novo pela passarela enquanto o jogo grava; na Baladinha, grava a dança com as amigas. O GIF é feito no próprio celular (nada vai para a internet) e aparece com 📤 Compartilhar (WhatsApp e os outros apps) e 💾 Salvar."
+      ],
+      "en": [
+        "🎞️ GIFs to share: at the end of the runway and at the dance party there's a 🎞️ GIF button. On the runway she walks in again while the game records; at the dance party it records the dance with her friends. The GIF is made on the phone itself (nothing goes to the internet) and shows up with 📤 Share (WhatsApp and other apps) and 💾 Save."
+      ],
+      "es": [
+        "🎞️ GIF para compartir: al final del desfile y en la minidisco hay un botón 🎞️ GIF. En el desfile vuelve a entrar por la pasarela mientras el juego graba; en la minidisco, graba el baile con sus amigas. El GIF se hace en el propio móvil (nada va a internet) y aparece con 📤 Compartir (WhatsApp y las demás apps) y 💾 Guardar."
+      ]
+    },
+    {
+      "versao": "0.9.9",
+      "data": "22/Nov/2026",
+      "hora": "00:33:39",
+      "pt": [
+        "👠 Desfile de verdade: o pé que vai para a frente pousa mais embaixo e o de trás fica para trás, a perna da frente passa por cima da outra (antes se cruzavam do jeito errado), ela avança no mesmo ritmo dos passos (sem escorregar) e a sombra fica colada nos pés (antes parecia flutuar).",
+        "👣 Pé no chão de verdade: o sapato fica reto no piso mesmo com a perna inclinada, e cada pé tem sua sombrinha no chão, que clareia e diminui quando o pé levanta."
+      ],
+      "en": [
+        "👠 A real runway walk: the foot going forward lands lower and the back foot stays behind, the front leg passes in front of the other (before they crossed the wrong way), she moves forward at the same pace as her steps (no sliding) and the shadow stays at her feet (before she seemed to float).",
+        "👣 Feet really on the floor: the shoe stays flat on the floor even when the leg leans, and each foot has its own little shadow on the floor that fades and shrinks when the foot lifts."
+      ],
+      "es": [
+        "👠 Desfile de verdad: el pie que va hacia delante se apoya más abajo y el de atrás se queda atrás, la pierna de delante pasa por encima de la otra (antes se cruzaban al revés), avanza al mismo ritmo que los pasos (sin resbalar) y la sombra queda pegada a los pies (antes parecía flotar).",
+        "👣 Pies de verdad en el suelo: el zapato queda plano en el suelo aunque la pierna se incline, y cada pie tiene su sombrita en el suelo, que se aclara y se achica cuando el pie se levanta."
+      ]
+    },
+    {
+      "versao": "0.9.8",
+      "data": "21/Nov/2026",
+      "hora": "14:46:46",
+      "pt": [
+        "🧍‍♂️ Menino anda e fica parado como menino: pernas paralelas (sem cruzar o pé), quadril firme (sem rebolar), braços balançando mais soltos e um pouco afastados do corpo, e parado sem mão na cintura (mão no bolso ou braços cruzados). O menino pequeno anda mais rápido e quicando.",
+        "✨ Movimento mais natural para todos: a perna sai do chão com impulso e pousa devagar, ombro, cotovelo e cabeça chegam um pouquinho depois do quadril, e parada ela nunca fica dura (pequenos movimentos que não se repetem iguais).",
+        "👟 Sapatos à mostra: escolhendo sapatos, um pé de cada vez sobe, vira de lado e mostra o sapato de perfil, depois o outro. E ao escolher vestido, blusa, saia ou calça estando de perto, a tela se afasta para mostrar a roupa inteira.",
+        "📱 Menos botão e mais roupa: as ferramentas (lupa, desfazer, surpresa, recomeçar e música) ficam num botão só, ⋯; Foto, Guardar, Baladinha e Desfilar numa fileira fina; a barra de tom aparece só depois de tocar numa cor; as roupas aparecem em duas fileiras e a personagem ficou bem maior."
+      ],
+      "en": [
+        "🧍‍♂️ Boys walk and stand like boys: parallel legs (no crossing feet), steady hips (no swaying), arms swinging more loosely and a bit away from the body, and standing without hands on hips (hand in pocket or arms crossed). Little boys walk faster and bouncier.",
+        "✨ More natural movement for everyone: the leg pushes off and lands softly, shoulder, elbow and head arrive a little after the hips, and standing still she never looks stiff (small movements that never repeat exactly).",
+        "👟 Shoes on display: when choosing shoes, one foot at a time lifts, turns sideways and shows the shoe in profile, then the other. And when you pick a dress, top, skirt or pants while zoomed in, the view zooms out to show the whole outfit.",
+        "📱 Fewer buttons, more clothes: the tools (zoom, undo, surprise, start over and music) are in a single ⋯ button; Photo, Save, Dance party and Runway in one slim row; the shade bar only appears after you tap a color; clothes show in two rows and the character is much bigger."
+      ],
+      "es": [
+        "🧍‍♂️ Los chicos caminan y se quedan de pie como chicos: piernas paralelas (sin cruzar los pies), cadera firme (sin contoneo), brazos que se balancean más sueltos y un poco separados del cuerpo, y de pie sin la mano en la cintura (mano en el bolsillo o brazos cruzados). Los niños pequeños caminan más rápido y con más rebote.",
+        "✨ Movimiento más natural para todos: la pierna se impulsa y aterriza suave, hombro, codo y cabeza llegan un poquito después de la cadera, y quieta nunca se ve rígida (pequeños movimientos que nunca se repiten iguales).",
+        "👟 Zapatos a la vista: al elegir zapatos, un pie cada vez se levanta, se gira de lado y muestra el zapato de perfil, luego el otro. Y al elegir vestido, blusa, falda o pantalón estando de cerca, la vista se aleja para mostrar la ropa entera.",
+        "📱 Menos botones y más ropa: las herramientas (lupa, deshacer, sorpresa, empezar de nuevo y música) están en un solo botón, ⋯; Foto, Guardar, Minidisco y Desfilar en una fila fina; la barra de tono solo aparece después de tocar un color; la ropa sale en dos filas y el personaje es mucho más grande."
+      ]
+    },
+    {
+      "versao": "0.9.7",
+      "data": "21/Nov/2026",
+      "hora": "09:01:54",
+      "pt": [
+        "🙋‍♀️ Mão na nuca de verdade: o braço sobe pelo lado e o antebraço e a mão passam para trás da cabeça e do cabelo (antes o braço ficava na frente do rosto). Só os dedinhos aparecem do lado da cabeça."
+      ],
+      "en": [
+        "🙋‍♀️ A real hand behind the head: the arm goes up at the side and the forearm and hand go behind the head and hair (before, the arm covered the face). Only the fingertips peek out beside the head."
+      ],
+      "es": [
+        "🙋‍♀️ Mano en la nuca de verdad: el brazo sube por el lado y el antebrazo y la mano pasan por detrás de la cabeza y del pelo (antes el brazo tapaba la cara). Solo asoman las puntas de los dedos junto a la cabeza."
+      ]
+    },
+    {
+      "versao": "0.9.6",
+      "data": "21/Nov/2026",
+      "hora": "23:06:31",
+      "pt": [
+        "🚶‍♀️ Novo jeito de andar no desfile, como mulheres de verdade: quadril gingando para o lado do pé de apoio, um pé quase na frente do outro, ombros firmes e cabeça olhando para a frente, braços soltos balançando ao contrário das pernas (o que vai à frente dobra o cotovelo) e passos sem pressa."
+      ],
+      "en": [
+        "🚶‍♀️ A new runway walk, like real women: hips swaying toward the supporting foot, one foot almost in front of the other, steady shoulders and head looking ahead, relaxed arms swinging opposite the legs (the one going forward bends at the elbow) and unhurried steps."
+      ],
+      "es": [
+        "🚶‍♀️ Nueva forma de caminar en el desfile, como mujeres de verdad: la cadera se balancea hacia el pie de apoyo, un pie casi delante del otro, hombros firmes y la cabeza mirando al frente, brazos sueltos que se mueven al contrario de las piernas (el que va delante dobla el codo) y pasos sin prisa."
+      ]
+    },
+    {
+      "versao": "0.9.5",
+      "data": "21/Nov/2026",
+      "hora": "22:39:34",
+      "pt": [
+        "📏 Proporções de gente de verdade: pescoço, braços e pernas com a grossura certa (antes eram finos como palitos), coxa mais cheia afinando até o joelho, panturrilha e tornozelo fino, e pernas mais compridas (o gancho perto da metade da altura).",
+        "👚 Mangas na medida do braço novo e vestidos caindo retos do quadril, sem virar balão."
+      ],
+      "en": [
+        "📏 Real-person proportions: neck, arms and legs with the right thickness (before they were stick-thin), fuller thighs tapering to the knee, calves and slim ankles, and longer legs (the crotch near half the height).",
+        "👚 Sleeves sized to the new arms and dresses falling straight from the hips, without ballooning."
+      ],
+      "es": [
+        "📏 Proporciones de persona de verdad: cuello, brazos y piernas con el grosor adecuado (antes eran finos como palillos), muslos más llenos que se afinan hasta la rodilla, pantorrillas y tobillos finos, y piernas más largas (la entrepierna cerca de la mitad de la altura).",
+        "👚 Mangas a la medida del brazo nuevo y vestidos que caen rectos desde la cadera, sin hacer globo."
+      ]
+    },
+    {
+      "versao": "0.9.4",
+      "data": "21/Nov/2026",
+      "hora": "22:21:47",
+      "pt": [
+        "💃 Rebolado de volta, com o corpo inteiro: o quadril vai para o lado e a cintura, as pernas, a blusa e a calça acompanham juntas, sem degrau; os pés ficam no chão e a cabeça vai junto com o pescoço. Vale parada, no desfile e na Baladinha.",
+        "👗 Silhueta de tamanho normal: cabeça um pouco menor, ombros mais estreitos, cintura fina, quadril e coxa cheios, joelho e tornozelo finos.",
+        "💪 Braços na medida: um pouco mais curtos, mãos menores e, com a mão na cintura, os cotovelos não abrem tanto.",
+        "👗 Saia e vestido caem soltos do quadril (a barra não fica mais ondulada)."
+      ],
+      "en": [
+        "💃 The hip sway is back, with the whole body: the hips move to the side and the waist, legs, top and pants follow together, with no step; the feet stay on the floor and the head moves with the neck. Standing, on the runway and at the dance party.",
+        "👗 A normal-sized silhouette: slightly smaller head, narrower shoulders, slim waist, fuller hips and thighs, slim knees and ankles.",
+        "💪 Arms the right size: a bit shorter, smaller hands, and with hands on hips the elbows don't stick out so much.",
+        "👗 Skirts and dresses fall loose from the hips (the hem is no longer wavy)."
+      ],
+      "es": [
+        "💃 Vuelve el contoneo, con todo el cuerpo: la cadera va hacia un lado y la cintura, las piernas, la blusa y el pantalón la siguen juntas, sin escalón; los pies se quedan en el suelo y la cabeza va con el cuello. De pie, en el desfile y en la minidisco.",
+        "👗 Silueta de tamaño normal: cabeza un poco más pequeña, hombros más estrechos, cintura fina, cadera y muslos llenos, rodillas y tobillos finos.",
+        "💪 Brazos a la medida: un poco más cortos, manos más pequeñas y, con las manos en la cintura, los codos no se abren tanto.",
+        "👗 Faldas y vestidos caen sueltos desde la cadera (el bajo ya no queda ondulado)."
+      ]
+    },
+    {
+      "versao": "0.9.3",
+      "data": "20/Nov/2026",
+      "hora": "19:59:39",
+      "pt": [
+        "👖 Calça sem degraus: quando ela ginga, dança ou anda, a blusa e a calça se mexem juntas (antes a blusa ficava parada e a calça fazia um degrau no quadril).",
+        "🙂 Queixo de menina: rosto mais curto e arredondado embaixo, queixinho redondo sem ponta; a boca ficou um pouco menor e mais alta, e o sorriso aberto não passa do queixo."
+      ],
+      "en": [
+        "👖 No more steps in the pants: when she sways, dances or walks, the top and the pants move together (before, the top stood still and the pants made a step at the hips).",
+        "🙂 A girl's chin: a shorter face, rounded at the bottom, with a small round chin and no point; the mouth is a bit smaller and higher, and the open smile stays inside the chin."
+      ],
+      "es": [
+        "👖 Pantalón sin escalones: cuando se balancea, baila o camina, la blusa y el pantalón se mueven juntos (antes la blusa se quedaba quieta y el pantalón hacía un escalón en la cadera).",
+        "🙂 Barbilla de chica: cara más corta y redondeada abajo, con una barbilla pequeña y redonda, sin punta; la boca es un poco más pequeña y más alta, y la sonrisa abierta no pasa de la barbilla."
+      ]
+    },
+    {
+      "versao": "0.9.2",
+      "data": "20/Nov/2026",
+      "hora": "19:27:25",
+      "pt": [
+        "🙂 Boca na medida: o sorriso de boca aberta ficou menor e um pouco mais alto, sem encostar na ponta do queixo (o queixo fica delicado também sorrindo).",
+        "👀 Sempre de frente: saíram o botão de ver de lado, o giro ao tocar na personagem e as vistas de lado do desfile. O vídeo do look agora mostra ela trocando de pose.",
+        "💃 No desfile ela olha sempre para a frente, para a plateia, trocando de pose (sem olhar para os lados)."
+      ],
+      "en": [
+        "🙂 The right mouth size: the open-mouth smile is smaller and a bit higher, no longer touching the tip of the chin (the chin stays delicate while smiling too).",
+        "👀 Always facing front: the side-view button, the turn when you tap the character and the side views on the runway are gone. The look video now shows her changing poses.",
+        "💃 On the runway she always looks ahead at the audience while changing poses (no looking to the sides)."
+      ],
+      "es": [
+        "🙂 Boca a la medida: la sonrisa con la boca abierta es más pequeña y un poco más alta, sin tocar la punta de la barbilla (la barbilla sigue delicada al sonreír).",
+        "👀 Siempre de frente: se quitaron el botón de ver de lado, el giro al tocar el personaje y las vistas de lado del desfile. El vídeo del look ahora la muestra cambiando de pose.",
+        "💃 En el desfile mira siempre al frente, al público, mientras cambia de pose (sin mirar a los lados)."
+      ]
+    },
+    {
+      "versao": "0.9.1",
+      "data": "20/Nov/2026",
+      "hora": "18:49:21",
+      "pt": [
+        "🙂 Queixo feminino de verdade: rosto curto e delicado, afinando numa pontinha suave (antes ficava comprido e largo).",
+        "👚 Contorno da roupa dos dois lados: o lado esquerdo da blusa e de outras peças perdia a linha e ficava reto; agora os dois lados têm contorno e acompanham a curva do corpo."
+      ],
+      "en": [
+        "🙂 A truly feminine chin: a short, delicate face tapering to a soft point (before it was long and wide).",
+        "👚 Clothing outline on both sides: the left side of tops and other pieces lost its line and went straight; now both sides have an outline and follow the body's curve."
+      ],
+      "es": [
+        "🙂 Barbilla femenina de verdad: cara corta y delicada que se afina en una puntita suave (antes era larga y ancha).",
+        "👚 Contorno de la ropa a los dos lados: el lado izquierdo de la blusa y de otras prendas perdía la línea y quedaba recto; ahora los dos lados tienen contorno y siguen la curva del cuerpo."
+      ]
+    },
+    {
+      "versao": "0.9.0",
+      "data": "20/Nov/2026",
+      "hora": "16:41:56",
+      "pt": [
+        "🕺 Estilo anos 70: camisa de gola grande aberta no peito, jaqueta com essa camisa por baixo, corrente grossa de ouro e cintos (fivela grande dourada, fino e de corrente). Para menino, bigode (bigodão, fino ou com cavanhaque), da cor do cabelo.",
+        "✨ Prontos: visual \"Disco anos 70\" (jaqueta roxa, calça preta justa, bota, corrente e cinto de fivela), nas combinações de Roupas, Joias e Acessórios, e o personagem \"Moço dos anos 70\" com cabelo comprido e bigodão.",
+        "👖 A roupa acompanha o gingado: o cós e o quadril da calça (e da saia) vão junto com o quadril e as pernas saem dele — sem o pedaço reto de calça sobrando. Pescoço sem a divisão: cabeça, pescoço e ombros como uma peça só.",
+        "💪 Braços e mangas: todos os desenhos (cartões de looks, estilos prontos, personagens prontas, miniaturas) usam o esqueleto — as mangas acompanham os braços, sem manga torta. Ombros mais estreitos e femininos. Cada cartão numa pose natural diferente. 🙂 Queixo feminino: o rosto afina em V suave até um queixinho delicado.",
+        "📐 Proporções do estilo da pesquisa do Poki: cabeça maior, tronco mais estreito e braços que afinam do ombro ao punho — corpo, pescoço, braços e pernas na mesma medida.",
+        "🫶 Sem divisão no pescoço e nos ombros: pescoço, ombros e braços sem manga são uma pele só, sem linhas cortando. Vestidos sem manga (festa, fada, sereia, gala) deixam os braços de pele."
+      ],
+      "en": [
+        "🕺 70s style: big-collar shirt open at the chest, a jacket with that shirt underneath, a chunky gold chain and belts (big gold buckle, thin and chain). For boys, a mustache (big, thin or with a goatee) in the hair color.",
+        "✨ Ready-made: a \"70s disco\" look (purple jacket, skinny black pants, boots, chain and buckle belt), in the Clothes, Jewelry and Accessories combos, and the \"70s guy\" character with long hair and a big mustache.",
+        "👖 Clothes follow the sway: the waistband and hips of pants (and skirts) move with the hips and the legs come out of them — no leftover straight piece of pants. Neck without the split: head, neck and shoulders as one piece.",
+        "💪 Arms and sleeves: every drawing (look cards, ready-made styles and characters, thumbnails) uses the skeleton — sleeves follow the arms, no crooked sleeves. Narrower, more feminine shoulders. Each card in a different natural pose. 🙂 Feminine chin: the face tapers in a soft V to a delicate chin.",
+        "📐 Proportions in the style from the Poki research: a bigger head, a slimmer torso and arms that taper from shoulder to wrist — body, neck, arms and legs in balance.",
+        "🫶 No split at the neck and shoulders: neck, shoulders and bare arms are one smooth skin, with no lines cutting across. Sleeveless dresses (party, fairy, mermaid, gala) leave the arms bare."
+      ],
+      "es": [
+        "🕺 Estilo años 70: camisa de cuello grande abierta en el pecho, chaqueta con esa camisa debajo, cadena gruesa de oro y cinturones (hebilla grande dorada, fino y de cadena). Para chico, bigote (bigotazo, fino o con perilla) del color del pelo.",
+        "✨ Listos: look \"Disco de los 70\" (chaqueta morada, pantalón negro ajustado, botas, cadena y cinturón de hebilla), en las combinaciones de Ropa, Joyas y Accesorios, y el personaje \"Chico de los 70\" con pelo largo y bigotazo.",
+        "👖 La ropa sigue el movimiento: la cintura y la cadera del pantalón (y de la falda) van con la cadera y las piernas salen de ella — sin el trozo recto de pantalón sobrando. Cuello sin la división: cabeza, cuello y hombros como una sola pieza.",
+        "💪 Brazos y mangas: todos los dibujos (tarjetas de looks, estilos y personajes listos, miniaturas) usan el esqueleto — las mangas siguen los brazos, sin mangas torcidas. Hombros más estrechos y femeninos. Cada tarjeta en una pose natural distinta. 🙂 Barbilla femenina: la cara se afina en V suave hasta una barbilla delicada.",
+        "📐 Proporciones del estilo de la investigación de Poki: cabeza más grande, torso más estrecho y brazos que se afinan del hombro a la muñeca — cuerpo, cuello, brazos y piernas en equilibrio.",
+        "🫶 Sin división en el cuello y los hombros: cuello, hombros y brazos sin manga son una sola piel, sin líneas que corten. Los vestidos sin manga (fiesta, hada, sirena, gala) dejan los brazos al aire."
+      ]
+    },
+    {
+      "versao": "0.8.0",
+      "data": "20/Nov/2026",
+      "hora": "16:08:32",
+      "pt": [
+        "👠 Desfile de modelo de verdade: ela anda com um pé na frente do outro, cruzando na linha do meio, o quadril vai para o lado da perna de apoio, o corpo sobe e desce de leve, os braços balançam soltos e a cabeça fica firme. Ao chegar, para numa pose e sorri. As amigas também entram andando assim.",
+        "🪩 Baladinha: as pernas dançam no ritmo — o peso passa de uma perna para a outra, o joelho dobra e o quadril balança — em vez de a boneca inteira pular."
+      ],
+      "en": [
+        "👠 A real model runway walk: one foot in front of the other on the center line, hips swinging toward the standing leg, a gentle bounce, loose swinging arms and a steady head. At the end she stops in a pose and smiles. Her friends walk in the same way.",
+        "🪩 Dance party: the legs dance to the beat — weight shifts from one leg to the other, the knee bends and the hips sway — instead of the whole doll jumping."
+      ],
+      "es": [
+        "👠 Desfile de modelo de verdad: camina con un pie delante del otro sobre la línea del centro, la cadera va hacia la pierna de apoyo, el cuerpo sube y baja un poco, los brazos se balancean sueltos y la cabeza se mantiene firme. Al llegar, se para en una pose y sonríe. Las amigas también entran caminando así.",
+        "🪩 Minidisco: las piernas bailan al ritmo — el peso pasa de una pierna a la otra, la rodilla se dobla y la cadera se mueve — en vez de saltar la muñeca entera."
+      ]
+    },
+    {
+      "versao": "0.7.2",
+      "data": "20/Nov/2026",
+      "hora": "15:27:36",
+      "pt": [
+        "👗 Contorno feminino natural, medido numa silhueta de referência: ombro, busto um pouco menor que o ombro, cintura afinando em curva e quadril redondo, em todos os tipos de corpo. A roupa acompanha a curva, sem quinas nem cortes retos.",
+        "🎨 Sombra das roupas macia (antes eram faixas retas que pareciam um retângulo).",
+        "✋ O braço esticado (apontando) não é mais cortado na borda."
+      ],
+      "en": [
+        "👗 Natural feminine outline, measured from a reference silhouette: shoulders, bust a little narrower than the shoulders, waist curving in and round hips, for every body type. Clothes follow the curve, with no corners or straight cuts.",
+        "🎨 Soft shading on clothes (before, hard stripes looked like a rectangle).",
+        "✋ The outstretched arm (pointing) is no longer cut off at the edge."
+      ],
+      "es": [
+        "👗 Contorno femenino natural, medido en una silueta de referencia: hombros, busto un poco más estrecho que los hombros, cintura que se curva y cadera redonda, en todos los tipos de cuerpo. La ropa sigue la curva, sin esquinas ni cortes rectos.",
+        "🎨 Sombra suave en la ropa (antes eran franjas rectas que parecían un rectángulo).",
+        "✋ El brazo estirado (señalando) ya no se corta en el borde."
+      ]
+    },
+    {
+      "versao": "0.7.1",
+      "data": "20/Nov/2026",
+      "hora": "14:51:10",
+      "pt": [
+        "👗 Silhueta feminina natural: a blusa e o vestido seguem o corpo (busto saindo para os lados, cintura e quadril), sem o \"caixote\" quando ela mexe os braços. Saíram as duas curvinhas desenhadas no peito e a pele que aparecia do lado, embaixo do braço."
+      ],
+      "en": [
+        "👗 Natural feminine silhouette: tops and dresses follow the body (bust curving out, waist and hips), with no \"box\" shape when she moves her arms. The two little lines drawn on the chest and the skin showing at the side, under the arm, are gone."
+      ],
+      "es": [
+        "👗 Silueta femenina natural: la blusa y el vestido siguen el cuerpo (el busto hacia los lados, la cintura y la cadera), sin la forma de \"caja\" cuando mueve los brazos. Se fueron las dos rayitas dibujadas en el pecho y la piel que se veía en el costado, debajo del brazo."
+      ]
+    },
+    {
+      "versao": "0.7.0",
+      "data": "20/Nov/2026",
+      "hora": "14:13:33",
+      "pt": [
+        "☔ Roupas de chuva: nova parte \"Capas de chuva\" em Roupas, por cima de qualquer roupa e com capuz: transparente com unicórnios e arco-íris, de patinho (com olhinhos e bico no capuz), colorida com botões e arco-íris. E guarda-chuva em Acessórios → Bolsas. Combinação pronta \"Dia de chuva\" (capa de patinho, legging e galocha).",
+        "🪩 Baladinha com placa de entrada: \"Baladinha da Purpurina\" brilhando no fundo roxo, com estrelinhas, e ela pulando de braços abertos e piscando (toque para entrar).",
+        "💪 Braços sem emenda: o braço é uma peça só, sem as bolinhas no ombro e no cotovelo.",
+        "👜 A bolsa de mão e os anéis voltaram a aparecer e agora acompanham o braço quando ela se mexe."
+      ],
+      "en": [
+        "☔ Rain clothes: new \"Raincoats\" part in Clothes, over any outfit and with a hood: clear with unicorns and rainbows, duckling (with little eyes and a beak on the hood), colorful with snaps, and rainbow. Plus an umbrella in Accessories → Bags. Ready-made \"Rainy day\" combo (duckling raincoat, leggings and rain boots).",
+        "🪩 Dance party with a welcome sign: \"Dance Party with Purpurina\" glowing on a purple background, with sparkles, and her jumping with open arms and winking (tap to go in).",
+        "💪 Seamless arms: each arm is one piece, with no little balls at the shoulder and elbow.",
+        "👜 The handbag and rings are back and now move along with her arm."
+      ],
+      "es": [
+        "☔ Ropa de lluvia: nueva parte \"Chubasqueros\" en Ropa, encima de cualquier ropa y con capucha: transparente con unicornios y arcoíris, de patito (con ojitos y pico en la capucha), de colores con botones y arcoíris. Y un paraguas en Accesorios → Bolsos. Combinación lista \"Día de lluvia\" (chubasquero de patito, mallas y botas de agua).",
+        "🪩 Minidisco con cartel de entrada: \"Minidisco de Purpurina\" brillando sobre el fondo morado, con estrellitas, y ella saltando con los brazos abiertos y guiñando un ojo (toca para entrar).",
+        "💪 Brazos sin costura: cada brazo es una sola pieza, sin bolitas en el hombro ni en el codo.",
+        "👜 El bolso de mano y los anillos vuelven a aparecer y ahora siguen al brazo cuando se mueve."
+      ]
+    },
+    {
+      "versao": "0.6.0",
+      "data": "20/Nov/2026",
+      "hora": "13:42:43",
+      "pt": [
+        "🪩 Baladinha: novo botão no estúdio, ao lado do Desfilar. A personagem dança com 2 amigas (looks guardados ou combinações prontas) numa sala de luzes coloridas, com flor de luz, coração pendurado e sombras de arco-íris na parede (verde, rosa e azul) que dançam junto. Toque na tela para trocar a luz: todas fazem o mesmo passo juntas."
+      ],
+      "en": [
+        "🪩 Dance party: new button in the studio, next to Runway. Your character dances with 2 friends (saved looks or ready-made combos) in a room of colorful lights, with a flower of light, a hanging heart and rainbow shadows on the wall (green, pink and blue) that dance along. Tap the screen to change the light: everyone does the same move together."
+      ],
+      "es": [
+        "🪩 Minidisco: nuevo botón en el estudio, al lado de Desfila. Tu personaje baila con 2 amigas (looks guardados o combinaciones listas) en una sala de luces de colores, con flor de luz, corazón colgante y sombras de arcoíris en la pared (verde, rosa y azul) que bailan con ellas. Toca la pantalla para cambiar la luz: todas hacen el mismo paso a la vez."
+      ]
+    },
+    {
+      "versao": "0.5.0",
+      "data": "20/Nov/2026",
+      "hora": "13:24:43",
+      "pt": [
+        "🤸 Poses com movimento de verdade: braços com ombro, cotovelo e mão, cabeça e olhos se mexem aos poucos de uma pose para a outra (sem trocar de desenho): mão na cintura com o quadril para o lado, mão na cabeça, beijinho, mão no queixo, apontando, mãos no bolso, braços cruzados, tchauzinho e pernas cruzadas. Na abertura, no menu, no estúdio e no desfile.",
+        "🧍 Tipo de corpo em Eu → Corpo: magrinho, médio, cheinho, gordinho, curvilíneo e atlético.",
+        "📏 Proporções mais naturais: 4,8 / 5,8 / 6,5 / 7 cabeças de altura (antes a adulta ficava esticada), com braços e pernas mais cheios.",
+        "📱 Menu: os botões ocupam menos de um quarto da tela e a personagem fica grande.",
+        "💄 Maquiando, a câmera chega perto: no olho (sombra, delineado, cílios e cor dos olhos) e na boca (batom). Ela continua viva, bem de leve: olha para os lados, inclina a cabeça, respira e pisca. De corpo inteiro ela troca de pose para você ver a roupa com o corpo se mexendo."
+      ],
+      "en": [
+        "🤸 Poses with real movement: arms with shoulder, elbow and hand, head and eyes move gradually from one pose to the next (no more swapping drawings): hand on hip with the hip out, hand on head, blowing a kiss, hand on chin, pointing, hands in pockets, arms crossed, waving and crossed legs. On the opening screen, menu, studio and runway.",
+        "🧍 Body type in Me → Body: slim, medium, fuller, plus size, curvy and athletic.",
+        "📏 More natural proportions: 4.8 / 5.8 / 6.5 / 7 heads tall (the adult used to look stretched), with fuller arms and legs.",
+        "📱 Menu: the buttons take less than a quarter of the screen and the character is big.",
+        "💄 While doing makeup the camera zooms in: on the eyes (eyeshadow, eyeliner, lashes and eye color) and on the mouth (lipstick). She stays alive, very gently: looks around, tilts her head, breathes and blinks. Full body, she changes poses so you can see the outfit moving."
+      ],
+      "es": [
+        "🤸 Poses con movimiento de verdad: brazos con hombro, codo y mano, cabeza y ojos que se mueven poco a poco de una pose a otra (sin cambiar de dibujo): mano en la cintura con la cadera de lado, mano en la cabeza, lanzando un beso, mano en la barbilla, señalando, manos en los bolsillos, brazos cruzados, saludando y piernas cruzadas. En la portada, el menú, el estudio y el desfile.",
+        "🧍 Tipo de cuerpo en Yo → Cuerpo: delgado, medio, rellenito, gordito, curvilíneo y atlético.",
+        "📏 Proporciones más naturales: 4,8 / 5,8 / 6,5 / 7 cabezas de alto (antes la adulta se veía estirada), con brazos y piernas más llenos.",
+        "📱 Menú: los botones ocupan menos de una cuarta parte de la pantalla y el personaje se ve grande.",
+        "💄 Al maquillar, la cámara se acerca: al ojo (sombra, delineador, pestañas y color de ojos) y a la boca (pintalabios). Sigue viva, muy suave: mira a los lados, inclina la cabeza, respira y parpadea. De cuerpo entero cambia de pose para que veas la ropa con el cuerpo en movimiento."
+      ]
+    },
+    {
+      "versao": "0.4.5",
+      "data": "20/Nov/2026",
+      "hora": "11:06:14",
+      "pt": [
+        "🎵 Aberto pelo Bolinho, o jogo já começa com a música tocando (sem precisar tocar na tela antes). Aberto direto, pelo ícone ou no iPhone, a música continua começando no primeiro toque"
+      ],
+      "en": [
+        "🎵 Opened from Rainy Day Donuts, the game starts with the music already playing (no need to tap the screen first). Opened directly, from its icon or on an iPhone, the music still starts on the first tap"
+      ],
+      "es": [
+        "🎵 Abierto desde Buñuelos de Lluvia, el juego empieza con la música ya sonando (sin tener que tocar la pantalla antes). Abierto directamente, desde su icono o en un iPhone, la música sigue empezando con el primer toque"
+      ]
+    },
+    {
+      "versao": "0.4.4",
+      "data": "20/Nov/2026",
+      "hora": "11:33:02",
+      "pt": [
+        "🎚️ Barras de arrastar: embaixo das bolinhas de cor, ☀️ mais claro ↔ mais escuro 🌙 em toda cor (pele, cabelo, olhos, maquiagem, roupas e joias) e, na maquiagem, a intensidade, de leve a forte. Arrastando, ela muda na hora; dá para desfazer com ↩."
+      ],
+      "en": [
+        "🎚️ Drag bars: under the color dots, ☀️ lighter ↔ darker 🌙 for every color (skin, hair, eyes, makeup, clothes and jewelry) and, for makeup, the intensity, from soft to bold. She changes as you drag; ↩ undoes it."
+      ],
+      "es": [
+        "🎚️ Barras para deslizar: debajo de los colores, ☀️ más claro ↔ más oscuro 🌙 en todos los colores (piel, pelo, ojos, maquillaje, ropa y joyas) y, en el maquillaje, la intensidad, de suave a intensa. Cambia al momento mientras deslizas; ↩ lo deshace."
+      ]
+    },
+    {
+      "versao": "0.4.3",
+      "data": "20/Nov/2026",
+      "hora": "11:09:47",
+      "pt": [
+        "🤎 Pele negra e morena com brilho de verdade: luz suave dourada na testa, no nariz, nas maçãs do rosto e no queixo. O cabelo ganhou contorno mais escuro e sombra na testa, para não se misturar com o rosto.",
+        "🔍 Estúdio revisto no celular: o painel ocupa no máximo 40% da tela (só o que precisa), as opções ficam numa fileira só que rola para o lado, os botões de cima ficaram menores e a personagem (ou o rosto, ao escolher maquiagem e joias) fica bem maior. As miniaturas das opções mostram o lugar certo (boca, orelhas, pés, mãos).",
+        "💃 Desfile: catwalk com um pé cruzando na frente do outro e rebolado de verdade (a saia acompanha), ela aparece inteira quando chega na frente, o close pega do rosto até a cintura, e ao olhar para os lados ela inclina a cabeça e mexe os olhos (sem 'troca de foto'). A parte de baixo ficou compacta e a passarela ocupa quase a tela toda."
+      ],
+      "en": [
+        "🤎 Dark and brown skin with a real glow: soft golden light on the forehead, nose, cheekbones and chin. The hair has a darker outline and casts a shadow on the forehead, so it no longer blends into the face.",
+        "🔍 Studio reworked for phones: the panel takes at most 40% of the screen (only what it needs), options sit in one row that scrolls sideways, the top buttons are smaller and the character (or her face, when picking makeup and jewelry) is much bigger. Option thumbnails show the right spot (lips, ears, feet, hands).",
+        "💃 Runway: a real catwalk with one foot crossing in front of the other and a hip sway (the skirt follows), she is fully visible when she reaches the front, the close-up frames her from face to waist, and when she looks around she tilts her head and moves her eyes (no more 'photo swaps'). The bottom panel is compact and the runway fills almost the whole screen."
+      ],
+      "es": [
+        "🤎 Piel oscura y morena con brillo de verdad: una luz dorada suave en la frente, la nariz, los pómulos y la barbilla. El pelo tiene un contorno más oscuro y hace sombra en la frente, para no confundirse con la cara.",
+        "🔍 Estudio rehecho para el móvil: el panel ocupa como mucho el 40% de la pantalla (solo lo que necesita), las opciones van en una sola fila que se desliza de lado, los botones de arriba son más pequeños y el personaje (o su cara, al elegir maquillaje y joyas) se ve mucho más grande. Las miniaturas muestran el sitio correcto (boca, orejas, pies, manos).",
+        "💃 Desfile: pasarela de verdad, con un pie cruzando delante del otro y movimiento de cadera (la falda acompaña), se ve entera al llegar al frente, el primer plano va de la cara a la cintura y, al mirar a los lados, inclina la cabeza y mueve los ojos (sin 'cambio de foto'). La parte de abajo es compacta y la pasarela ocupa casi toda la pantalla."
+      ]
+    },
+    {
+      "versao": "0.4.2",
+      "data": "20/Nov/2026",
+      "hora": "10:36:30",
+      "pt": [
+        "👗 Corpo com curvas: busto, cintura marcada, quadril e coxa na menina adolescente e adulta (a criança quase sem cintura; o menino com ombros mais largos). As roupas acompanham as curvas.",
+        "🦵 Pernas e braços com forma de verdade: coxa cheia, joelho e tornozelo finos; ombro redondo e braço afinando até o pulso. O pescoço encaixa nos ombros.",
+        "💃 Viva no estúdio: ela respira, passa o peso de uma perna para a outra e balança os braços, e de vez em quando dá tchauzinho. Braços um pouco mais curtos (a mão no começo da coxa); bolsa de mão, anel e pulseira vão junto com a mão.",
+        "📸 Na abertura e no menu ela faz poses de modelo, uma depois da outra, com troca suave: mão na cintura e a outra na cabeça, beijinho (com coraçõezinhos saindo), tchauzinho, as duas mãos na cintura e mão no rosto. Ela fica maior e de pé no chão.",
+        "😉 Na abertura e no menu, de vez em quando a câmera chega no rosto dela, ela sorri e dá uma piscadinha; no estúdio ela também pisca de vez em quando."
+      ],
+      "en": [
+        "👗 A body with curves: bust, a defined waist, hips and thighs on the teen and adult girl (the child with almost no waist; the boy with broader shoulders). Clothes follow the curves.",
+        "🦵 Legs and arms with real shapes: full thighs, slim knees and ankles; rounded shoulders and arms tapering to the wrist. The neck blends into the shoulders.",
+        "💃 Alive in the studio: she breathes, shifts her weight from one leg to the other, swings her arms and waves now and then. Arms a little shorter (the hand at the top of the thigh); clutch, ring and bracelet move with the hand.",
+        "📸 On the opening and menu screens she strikes model poses one after another, with smooth changes: hand on hip and the other on her head, blowing a kiss (with little hearts), waving, both hands on hips and hand on her face. She is bigger and standing on the floor.",
+        "😉 On the opening and menu screens the camera zooms in on her face now and then, she smiles and winks; in the studio she winks now and then too."
+      ],
+      "es": [
+        "👗 Un cuerpo con curvas: busto, cintura marcada, cadera y muslos en la chica adolescente y adulta (la niña casi sin cintura; el chico con hombros más anchos). La ropa sigue las curvas.",
+        "🦵 Piernas y brazos con forma de verdad: muslos llenos, rodillas y tobillos finos; hombros redondeados y brazos que se afinan hasta la muñeca. El cuello encaja con los hombros.",
+        "💃 Viva en el estudio: respira, pasa el peso de una pierna a la otra, balancea los brazos y de vez en cuando saluda. Brazos un poco más cortos (la mano al principio del muslo); el bolso de mano, el anillo y la pulsera van con la mano.",
+        "📸 En la portada y en el menú hace poses de modelo, una tras otra, con cambios suaves: mano en la cintura y la otra en la cabeza, lanzando un beso (con corazoncitos), saludando, las dos manos en la cintura y la mano en la cara. Ahora es más grande y está de pie en el suelo.",
+        "😉 En la portada y en el menú, de vez en cuando la cámara se acerca a su cara, sonríe y guiña un ojo; en el estudio también guiña de vez en cuando."
+      ]
+    },
+    {
+      "versao": "0.4.1",
+      "data": "19/Nov/2026",
+      "hora": "20:58:03",
+      "pt": [
+        "📏 Corpo com medidas de gente de verdade: 5 cabeças de altura aos 5 anos, 6 aos 10, 7 aos 15 e 7,5 na adulta; pernas com metade da altura (antes estavam compridas demais), tronco do tamanho certo, coxa mais grossa afinando até o tornozelo, quadril e ombros reais para cada idade.",
+        "✋ As mãos (com anel e pulseira) não esticam mais junto com as pernas: ficam do tamanho certo."
+      ],
+      "en": [
+        "📏 A body with real-life measurements: 5 heads tall at age 5, 6 at 10, 7 at 15 and 7.5 as an adult; legs are half the height (they were far too long), the torso is the right size, thighs are fuller and taper to the ankle, and hips and shoulders match each age.",
+        "✋ Hands (with ring and bracelet) no longer stretch with the legs: they stay the right size."
+      ],
+      "es": [
+        "📏 Un cuerpo con medidas de verdad: 5 cabezas de alto a los 5 años, 6 a los 10, 7 a los 15 y 7,5 de adulta; las piernas miden la mitad de la altura (antes eran demasiado largas), el torso tiene el tamaño correcto, los muslos son más llenos y se afinan hasta el tobillo, y caderas y hombros reales para cada edad.",
+        "✋ Las manos (con anillo y pulsera) ya no se estiran con las piernas: se quedan del tamaño correcto."
+      ]
+    },
+    {
+      "versao": "0.4.0",
+      "data": "19/Nov/2026",
+      "hora": "20:41:11",
+      "pt": [
+        "🎨 Sem cara de boneco 3D: a personagem agora é desenho 2D, de cor lisa, com uma sombra e uma luz de corte reto e contorno fino na cor de cada peça (nunca preto), como pede a pesquisa do Poki.",
+        "👗 Corpo de ilustração de moda: cabeça menor, pescoço, cintura e pernas longas. Muda com a idade: a criancinha tem 4 cabeças de altura e a adulta quase 7.",
+        "🌸 Telas novas, claras, de ateliê: creme, ameixa, rosa, lavanda, mel e menta, e o nome em letra de revista. Bem diferente da Purpurina 80's.",
+        "🔍 O zoom da maquiagem, das mãos e dos pés acompanha o corpo novo."
+      ],
+      "en": [
+        "🎨 No more 3D doll look: the character is now a 2D drawing with flat colors, one hard-edged shadow and one highlight, and a thin outline in each piece's own color (never black), as the Poki research recommends.",
+        "👗 Fashion-illustration body: smaller head, a neck, a waist and long legs. It changes with age: the little one is 4 heads tall and the adult almost 7.",
+        "🌸 New light atelier screens: cream, plum, pink, lavender, honey and mint, with the name in magazine lettering. Very different from Purpurina 80's.",
+        "🔍 Zooming in for makeup, hands and feet follows the new body."
+      ],
+      "es": [
+        "🎨 Adiós al aspecto de muñeca 3D: el personaje es ahora un dibujo 2D de colores planos, con una sombra y una luz de corte limpio y un contorno fino del color de cada prenda (nunca negro), como recomienda la investigación de Poki.",
+        "👗 Cuerpo de ilustración de moda: cabeza más pequeña, cuello, cintura y piernas largas. Cambia con la edad: la pequeña mide 4 cabezas y la adulta casi 7.",
+        "🌸 Pantallas nuevas y claras, de taller de moda: crema, ciruela, rosa, lavanda, miel y menta, y el nombre con letra de revista. Muy distinta de Purpurina 80's.",
+        "🔍 El zoom del maquillaje, las manos y los pies sigue al cuerpo nuevo."
+      ]
+    },
+    {
+      "versao": "0.3.0",
+      "data": "19/Nov/2026",
+      "hora": "19:17:25",
+      "pt": [
+        "🎨 A personagem ganhou desenho de ilustração, como nos jogos de maquiagem do Poki: olhos amendoados com pálpebra, dobrinha e cílios saindo do traço, sobrancelhas desenhadas, nariz delicado com as narinas marcadas de leve e lábios com o arco do cupido. Contornos mais finos.",
+        "💇 O cabelo ganhou fios desenhados e brilho em mechas finas (no lugar da faixa larga de brilho). A franja agora cai de lado e o cabelo preso tem risca no meio.",
+        "👀 Sem giro de 360°: um toque na personagem (ou no 👀) mostra ela de três-quartos e de lado, para um lado e para o outro. No desfile ela vira de três-quartos e de lado, e as câmeras mostram esses ângulos. A Purpurina 80's continua com o giro."
+      ],
+      "en": [
+        "🎨 The character now has an illustration-style drawing, like Poki's makeup games: almond eyes with eyelids, creases and lashes coming out of the line, drawn eyebrows, a delicate nose with softly marked nostrils and lips with a cupid's bow. Finer outlines.",
+        "💇 The hair has drawn strands and thin shiny streaks (instead of the wide shine band). The fringe now falls to the side and tied-up hair has a middle part.",
+        "👀 No more 360° spin: a tap on the character (or on 👀) shows her three-quarter and side views, one way and the other. On the runway she turns three-quarter and to the side, and the cameras show those angles. Purpurina 80's keeps the spin."
+      ],
+      "es": [
+        "🎨 El personaje tiene ahora un dibujo de ilustración, como en los juegos de maquillaje de Poki: ojos almendrados con párpado, pliegue y pestañas que salen del trazo, cejas dibujadas, una nariz delicada con las aletas marcadas suavemente y labios con arco de Cupido. Contornos más finos.",
+        "💇 El pelo tiene mechones dibujados y brillos finos (en lugar de la franja ancha de brillo). El flequillo ahora cae de lado y el pelo recogido lleva raya al medio.",
+        "👀 Sin giro de 360°: un toque en el personaje (o en el 👀) lo muestra de tres cuartos y de lado, hacia un lado y hacia el otro. En el desfile se gira de tres cuartos y de lado, y las cámaras enseñan esos ángulos. Purpurina 80's sigue con el giro."
+      ]
+    },
+    {
+      "versao": "0.2.0",
+      "data": "19/Nov/2026",
+      "hora": "18:22:12",
+      "pt": [
+        "✨ Combinações prontas dentro do estúdio, em cada aba: penteado com brincos e laço, maquiagens (natural, festa, K-pop, rock, princesa, praia), roupas (casual, festa, verão, esporte, inverno, gala), conjuntos de joias e de acessórios. Mudam só aquela parte, sem desfazer o resto.",
+        "👉 Quando a fileira tem mais opções para o lado, a borda esmaece e aparece uma setinha › que rola.",
+        "🎂 Em Eu, a escolha agora se chama só Idade: ela muda o rosto e o jeito de desfilar."
+      ],
+      "en": [
+        "✨ Ready-made combos inside the studio, in each tab: hairstyle with earrings and bow, makeup looks (natural, party, K-pop, rock, princess, beach), outfits (casual, party, summer, sporty, winter, gala), jewelry and accessory sets. They only change that part, without undoing the rest.",
+        "👉 When a row has more options to the side, the edge fades and a little › arrow appears that scrolls it.",
+        "🎂 In Me, the choice is now just called Age: it changes the face and the runway walk."
+      ],
+      "es": [
+        "✨ Combinaciones listas dentro del estudio, en cada pestaña: peinado con pendientes y lazo, maquillajes (natural, fiesta, K-pop, rock, princesa, playa), ropa (casual, fiesta, verano, deporte, invierno, gala), conjuntos de joyas y de accesorios. Solo cambian esa parte, sin deshacer el resto.",
+        "👉 Cuando una fila tiene más opciones hacia el lado, el borde se difumina y aparece una flechita › que la desplaza.",
+        "🎂 En Yo, la opción ahora se llama solo Edad: cambia la cara y la forma de desfilar."
+      ]
+    },
+    {
+      "versao": "0.1.0",
+      "data": "19/Nov/2026",
+      "hora": "18:03:04",
+      "pt": [
+        "✨ Nasceu a Purpurina 80's: a nova versão do jogo de vestir e maquiar, que vai ganhando as novidades por etapas. A Purpurina de antes continua igual, logo acima na estante.",
+        "🙂 Rosto mais natural, que acompanha a idade escolhida em Eu → Idade: a criancinha tem cabeça e olhos maiores e bochechas cheias; com 11 a 15 anos e adulta o rosto fica oval, com queixo pequeno, nariz delicado com brilho e lábios mais cheios. A sombra escura embaixo do rosto (que parecia barba) saiu."
+      ],
+      "en": [
+        "✨ Purpurina New Age is here: the new version of the dress-up and makeup game, getting new features step by step. The original Purpurina stays the same, right above on the shelf.",
+        "🙂 A more natural face that follows the age picked in Me → Age: the little one has a bigger head, bigger eyes and chubby cheeks; at 11 to 15 and as an adult the face becomes oval, with a small chin, a delicate nose with a highlight and fuller lips. The dark shadow under the face (it looked like a beard) is gone."
+      ],
+      "es": [
+        "✨ Llega Purpurina Nueva Era: la nueva versión del juego de vestir y maquillar, que irá recibiendo novedades por etapas. La Purpurina de antes sigue igual, justo encima en la estantería.",
+        "🙂 Una cara más natural que acompaña la edad elegida en Yo → Edad: la peque tiene la cabeza y los ojos más grandes y mofletes llenos; de 11 a 15 años y de adulta la cara se vuelve ovalada, con barbilla pequeña, nariz delicada con brillo y labios más llenos. Ya no está la sombra oscura debajo de la cara (parecía barba)."
+      ]
+    }
+  ]
+}

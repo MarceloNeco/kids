@@ -2,6 +2,20 @@
   "app": "purpurina",
   "versoes": [
     {
+      "versao": "0.25.1",
+      "data": "24/Nov/2026",
+      "hora": "04:20:00",
+      "pt": [
+        "💄 A Purpurina 80's mudou de endereço: o cartão da estante e este endereço agora abrem a nova Purpurina 80's (a Nova Era de 22/Nov, congelada). Os desenhos e as músicas daqui continuam, porque outros jogos usam."
+      ],
+      "en": [
+        "💄 Purpurina 80's moved: the shelf card and this address now open the new Purpurina 80's (the Nov 22 New Age, frozen). The drawings and the music here stay, because other games use them."
+      ],
+      "es": [
+        "💄 Purpurina 80's se ha mudado: la tarjeta de la estantería y esta dirección ahora abren la nueva Purpurina 80's (la Nueva Era del 22/nov, congelada). Los dibujos y la música de aquí se quedan, porque otros juegos los usan."
+      ]
+    },
+    {
       "versao": "0.25.0",
       "data": "22/Nov/2026",
       "hora": "16:35:41",

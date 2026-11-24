@@ -16,6 +16,7 @@ const JOGOS = {
   baguncolandia: [[], '#btPassoCel'],
   peluqueria: [['#btEntrar'], '#btJogar'],
   purpurina: [['#btEntrar'], '#btLivre'],
+  'purpurina-80s': [['#btEntrar'], '#btLivre'],
   'purpurina-nova': [['#btEntrar'], '#btLivre'],
   rabiscolandia: [['#btEntrar'], '#btLivre'],
   'campo-minado': [[], '.nivel.facil'],

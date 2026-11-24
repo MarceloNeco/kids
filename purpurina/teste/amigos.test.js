@@ -34,7 +34,7 @@ after(async () => { if (navegador) await navegador.close(); servidor.close(); })
 async function abrir(ctx, erros) {
   const pg = await ctx.newPage();
   pg.on('pageerror', (e) => erros.push(e.message));
-  await pg.goto(base + 'purpurina/'); await pg.waitForTimeout(500);
+  await pg.goto(base + 'purpurina/?antiga'); await pg.waitForTimeout(500);   // (?antiga: o endereço sem ela leva para a Purpurina 80's nova, 24/Nov/2026)
   return pg;
 }
 async function contexto() {

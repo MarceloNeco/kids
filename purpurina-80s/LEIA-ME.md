@@ -1,0 +1,190 @@
+# Purpurina 80's
+
+> **Movimento e desenho do corpo:** antes de mexer, leia `MOTOR-MOVIMENTO.md` (especificação do dono e o que foi feito, com o porquê).
+
+> **Purpurina 80's = cópia congelada da Purpurina Nova Era de 22/Nov/2026 (versão 0.9.17)** (dono, 24/Nov/2026: "a
+> Purpurina de hoje no lugar da Purpurina 80s; as que têm o Higgsfield e os recursos do Poki são a Nova Era"). O cartão
+> "Purpurina 80's" da estante abre esta pasta, e o endereço antigo `/kids/purpurina/` leva para cá. A **Nova Era**
+> (`purpurina-nova/`) continua evoluindo; aqui só correções. O texto abaixo veio da Nova Era (os nomes foram trocados).
+> Diferenças desta pasta:
+> - endereço `/kids/purpurina-80s/`, interruptores `purpurina-80s` e `purpurina-80s-ia` no RootifyONE;
+> - guarda tudo no aparelho com chaves `purpurina80s.*` (não mistura com a Nova Era nem com a Purpurina antiga);
+> - gaveta do `sw.js` com prefixo `purpurinaoitenta-` (não pode começar com `purpurina-`: a antiga apagaria);
+> - a personagem viaja para os outros jogos como "Purpurina 80's" (`purpurina-80s:minha`, `viajar.js`).
+
+> **Jogo novo ao lado da Purpurina de antes** (dono, 19/Nov/2026: "o antigo e o atual eu quero manter"). Nasceu em
+> 19/Nov/2026 como cópia da Purpurina 0.24.0 e vai recebendo o `BACKLOG.md` por etapas. A pasta `purpurina/` continua
+> igual e é a referência. Diferenças desta pasta:
+> - endereço `/kids/purpurina-80s/`, interruptores `purpurina-80s` e `purpurina-80s-ia` no RootifyONE;
+> - guarda tudo no aparelho com chaves `purpurina80s.*` (não mistura com a de antes);
+> - gaveta do `sw.js` com prefixo `purpurinaoitenta-` (não pode começar com `purpurina-`: a de antes apagaria);
+> - as músicas são as mesmas, tocadas da pasta `../purpurina/musicas/` (sem copiar 69 MB) e guardadas na mesma gaveta
+>   `purpurina-musicas-v1`;
+> - rosto natural que acompanha Eu → Idade (`IDADES` no `boneca.js`): cabeça, largura, olhos, maxilar, queixo e boca;
+>   volume do rosto só nas laterais (nada escuro embaixo).
+> - desenho de ilustração (0.3.0): olho amendoado (`geoOlho`/`olho`), sobrancelha cheia (`sobrancelha`), nariz e lábios
+>   desenhados, contorno fino e fios no cabelo (`fiosIlustra`, máscara do próprio penteado);
+> - **sem giro de 360°**: vistas fixas `VISTAS = [0, 28, 45, -28, -45]` no estúdio (toque ou 👀), no desfile, no vídeo e na TV.
+> - **sem 3D** (0.4.0): cor lisa, sombra e luz em faixas de corte reto (`vol`, `lado`), contorno fino da cor da peça;
+> - **corpo com medidas reais** (0.4.1; dono: "tem que ser medidas reais"): `PROPORCAO` e `deformar()` no `boneca.js` põem
+>   o corpo em 5/6/7/7,5 cabeças (5 anos/10/15/adulta), pernas com metade da altura, pernas em forma (`perna()`) e mãos
+>   que não esticam (`rigido()`); a cabeça só é reduzida; curvas (0.4.2): `larg` com ombro, busto, cintura, quadril,
+>   coxa, joelho, panturrilha e tornozelo (`MENINO` para o menino), caminhos viram muitos pontos (`curvar`) para a roupa
+>   ganhar cintura, e braços com forma presos ao "osso" (`data-osso`: só ombro e pulso mudam de lugar); `areaZoom()` leva o zoom para o lugar novo; telas claras no fim do `estilo.css` (tema "ateliê").
+> - **esqueleto e movimento** (0.5.0): `opcoes.rig` no `boneca.js` desenha os braços como ombro → cotovelo → mão
+>   (`.rig-ombro-*`, `.rig-cotovelo-*`), a cabeça (`.rig-cabeca`) e as íris (`.rig-iris`); o `animador.js` leva tudo de pose
+>   em pose (abertura, menu, estúdio e desfile) sem redesenhar; tipo de corpo em Eu → Corpo (`TIPOS`).
+> - **baladinha** (0.6.0): `balada.js` monta a sala de luzes em camadas (fundo parado; luzes borradas e flor de luz em
+>   camadas que só deslizam ou giram) e põe a personagem e 2 amigas dançando com o `animador.js`; cada uma tem 3 sombras
+>   coloridas (`copias` do animador, atualizadas a cada 3 quadros, sem recorte nem máscara) para o celular aguentar.
+> - **roupas de chuva** (0.7.0): categoria `capa` (pecas.js) por cima de qualquer roupa — `capa()` no boneca.js entra na mesma
+>   camada da blusa/vestido (as mangas seguem o braço), `capuzAtras`/`capuzFrente` na cabeça (só de frente); estilo com `cor:`
+>   já troca a cor (visual.aplicar). Braço do esqueleto em duas passadas (contorno, depois preenchimento): sem emenda.
+
+# Purpurina — maquiagem, roupas e muito brilho
+
+Quinta brincadeira da família **Bolinho de Chuva** (Feature Tester · SolverONE), junto com a Bagunçolândia, a
+Peluqueria, a Dança na Sala e o Vruuum!. Jogo de **vestir e maquiar** para meninas de uns 10 anos: a criança monta a
+personagem, faz a maquiagem, escolhe roupas, acessórios e cenário, faz desafios por tema e desfila.
+Funciona com o celular **deitado ou em pé**, sem login, e **sem internet** depois de aberto uma vez.
+
+Endereço: https://solverone.com.br/kids/purpurina/ · também pelos cartões em
+`solverone.com.br/bolinho-de-chuva` e `solverone.com.br/kids` (TV).
+
+## Como brincar
+
+- Toque em **✨ Toque para brilhar!** (o navegador só deixa tocar som depois de um toque).
+- **🎨 Brincar livre**: o estúdio. Embaixo ficam 6 abas: **👧 Eu** (pele, menina ou menino — o jogo é feito para meninas, menina é o padrão —, 8 formatos de rosto, 8 de nariz, 4 alturas de testa, 9 formatos de olho (inclusive fininhos sem dobrinha e fechadinhos sorrindo) e a distância entre eles, 6 bocas, 42 penteados, mechas, olhos), **💄 Maquiagem**
+  (base, blush, sombra, delineado, 12 cílios, 💅 unhas, batom, glitter, adesivos), **👗 Roupas** (13 vestidos, 11 blusas,
+  8 saias, 9 calças, 9 estampas, 28 sapatos), **💎 Joias** (18 brincos, 14 colares, pulseiras, anéis e broches),
+  **👑 Acessórios** (coroas, chapéus, tiaras e faixas, laços e presilhas, 12 óculos/armações, bolsas) e **🏞️ Cenário** (8 lugares). Cada parte tem
+  estilos (com miniatura do resultado) e bolinhas de cor. Escolher é em dois passos, para caber no celular: primeiro
+  aparecem as partes da aba, grandes; tocou numa, as partes recolhem no botão **⬅ Partes**, o palco diminui um pouco e
+  as opções ganham a tela (o Voltar do celular também volta para as partes).
+- **🔍 Zoom**: ao escolher uma parte da maquiagem, dos olhos ou dos brincos, o palco chega perto do rosto sozinho; no
+  colar e no broche, do busto; na pulseira e no anel, das mãos; no cabelo e nas coroas, da cabeça. Nas roupas e no
+  cenário volta a mostrar a personagem inteira. O botão 🔍 do topo liga o zoom e o 👗 desliga.
+- Na maquiagem, o **pincel vai até o rosto** e a maquiagem aparece com brilho. Tocar na personagem faz ela girar.
+- **↩** desfaz a última troca · **🎲** sorteia um visual surpresa que combina (a personagem continua) ·
+  **🔄** começa de novo (tira maquiagem, roupa e acessórios; a personagem continua; dá para desfazer).
+- **📸 Foto**: monta uma imagem do visual com o cenário e a faixa "Purpurina" e oferece **💾 Salvar no celular**
+  (vai para Downloads) e **📤 Compartilhar** (quando o celular deixa; dá para mandar para a galeria ou WhatsApp).
+- **💖 Guardar**: guarda o look em **💖 Meus looks** (até 30, só neste aparelho). Lá dá para **👗 Vestir** de novo ou
+  apagar.
+- **✨ Desfilar!**: passarela de show (letreiro de lâmpadas, luzes nas bordas, holofotes, plateia com flashes e fogos de
+  artifício). Ela entra lá do fundo andando, sorri, dá tchauzinho, olha para os lados, gira e fica posando; aí vêm as
+  estrelas, o confete, os aplausos e os 3 jurados (🐱 🦄 🐰). Com "reduzir movimento", ela aparece parada e sorrindo.
+- **⭐ Desafios** (10): Festa na praia, Baile de princesa, Show de pop star, Piquenique no jardim, Festa do pijama,
+  Dia de neve, Festa de aniversário, Sereia no fundo do mar, Noite das joias e Dia do cabelo maluco. Cada um começa com a personagem dela e o cenário do
+  tema, e mostra **3 dicas** que ganham ✅ na hora. No desfile, cada dica cumprida vale uma estrela; **ninguém
+  perde** (sempre pelo menos 1 ⭐). A melhor nota de cada desafio fica guardada no aparelho. As dicas ficam numa
+  faixa logo abaixo da personagem (nunca por cima dela).
+- **🔄 Girar**: arrastar o dedo para os lados em cima da personagem gira ela suave, grau por grau (o rosto vai para o lado do dedo): olhos, nariz e boca andam numa esfera e o contorno do rosto vira o perfil aos poucos; o cabelo da frente gira junto e o de trás vai para trás; a volta é inteira, sem trocar de desenho: a pele do rosto (`regiaoPele`) é uma região presa na cabeça que some atrás dela aos poucos, e de costas sobra só cabelo. Um toque nela
+  ou no **↻** dá uma volta inteira com rastro de luz (cópias do desenho que vão sumindo; não pisca a tela). O **🙂** volta
+  para a frente. No desfile ela dá uma volta sozinha. Com "reduzir movimento" no aparelho, a volta é em 4 paradas.
+- **🚫 Tirar**: toda parte que dá para tirar tem a bolinha com a diagonal; em cima das opções aparece **🚫 Tirar: …** quando
+  a peça está colocada, e **🚫 Tirar toda a maquiagem / todas as joias / todos os acessórios**. Tocar de novo na peça escolhida também tira.
+- **🔄 Reiniciar**: Brincar livre pergunta se quer continuar o visual ou começar do zero; no estúdio, o 🔄 tira maquiagem,
+  roupas e acessórios (a personagem continua) ou começa tudo do zero. O ↩ desfaz.
+- **📸 Foto de estúdio**: montada em camadas no aparelho (cenário bem desfocado, personagem nítida com sombra macia, luz de
+  estúdio, brilho suave, granulado fino e cantos escuros). No palco e na TV, o cenário fica levemente desfocado e a
+  personagem tem sombra; enquanto ela gira, esses efeitos saem (giro liso em celular simples) e voltam quando para.
+- **🎬 Vídeo girando** (na janela da foto): grava no aparelho um vídeo de uns 4 s da personagem dando duas voltas (MP4 quando o
+  navegador sabe, senão WebM), para salvar ou compartilhar. A foto sai em 1080×2094 com luz de estúdio.
+- O botão **Voltar do celular** volta uma tela (ou fecha a janela da foto) em vez de sair do jogo.
+
+## 📺 Na TV, com o celular de controle
+
+Tablet ou celular de toque que abre o endereço da TV (`?tv=auto`, como pelo cartão da página Kids) entra na brincadeira
+normal — só TV de verdade (sem toque, ou com nome de TV no navegador) mostra o código. Para usar um tablet como a
+"TV", abra com `?tv=sim`.
+
+1. Na TV, abra **solverone.com.br/tv/purpurina** (ou o cartão Purpurina em `solverone.com.br/kids`). Aparece um **código
+   de 4 letras**. Aperte **OK** no controle para ligar o som.
+2. No celular, abra a Purpurina (cartão em `solverone.com.br/bolinho-de-chuva`), toque em **📺 Conectar na TV**, digite o
+   código e o nome. Até **4 celulares**: cada um vira uma personagem, lado a lado na TV.
+3. Tudo o que a criança faz no celular aparece na TV na hora: maquiagem, roupa, giro (inclusive a volta com rastro) e
+   o desfile (com confete, aplausos e o nome dela).
+4. **🎵 Música** (no menu ou no 🎵 do palco): **✨ da Purpurina**, **▶ YouTube** (colar o link de um vídeo ou playlist) ou
+   **🟢 Spotify** (colar o link de uma música, álbum ou playlist). Conectado, a música toca **na TV** e o celular comanda
+   ⏮ ⏯ ⏭ ⏹; sem TV, toca no próprio celular (o tocador do YouTube/Spotify aparece num quadrinho no canto, com ✕).
+   - O YouTube só deixa tocar vídeos cujo dono permite tocar fora do YouTube; o app avisa quando não pode.
+   - O Spotify, sem a pessoa estar conectada no Spotify naquele navegador, toca só 30 s de cada música (regra do
+     Spotify). Para a música inteira na TV, o jeito mais simples é o próprio app do Spotify ("Dispositivos" → TV).
+5. Sem celular: **🎮 Brincar aqui com o controle da TV** (setas e OK).
+6. Outro jeito, sem código: **espelhar a tela** do celular na TV (Android: Transmitir/Smart View; iPhone: Espelhar Tela).
+
+Como funciona: a TV e os celulares trocam mensagens pequenas pela "sala" (`sala.js`, Supabase Realtime da plataforma,
+o mesmo canal da Peluqueria): o visual de cada personagem, o ângulo do giro, o desfile e os comandos de música. Nada de
+vídeo, foto nem dado pessoal (só o nome que a criança digita). Toda mensagem que chega é conferida antes de ser usada.
+
+## Versão nova
+
+Se a aba do jogo ficou aberta desde antes, ela continua com a versão antiga. Ao abrir e ao voltar para o jogo, ele
+confere o `versoes.json` do site e, se houver versão mais nova, mostra **✨ Versão nova! Toque para atualizar**.
+
+## Controles
+
+| Onde | Como |
+|---|---|
+| Celular / tablet | tocar nas abas, nas partes e nas opções. Em pé: personagem em cima, painel embaixo. Deitado: lado a lado. Abre em **tela cheia** (no Android) e nada fica embaixo do recorte da câmera. |
+| Teclado / controle da TV | setas andam entre os botões (para o lado que apertou), Enter/OK escolhe, Esc/Voltar fecha a janela ou volta uma tela. Com `?tv=auto` (cartão do Kids na TV), tudo um pouco maior. |
+
+## Música
+
+A "rádio" da Purpurina (`som.js`) toca **o tempo todo**, uma música depois da outra, começando pela de abertura
+(Disco Medusae); desafio novo e desfile começam a próxima. Atalhos no canto do palco e no alto do menu: **🔕 sem
+música** (fica guardado no aparelho: ao abrir de novo, continua sem; os efeitos continuam) e **⏭ próxima música**
+(liga a música se estava sem e mostra o nome). Silencia também com o app escondido (outra aba, tela apagada) e no 🔊.
+
+- **Gravadas** (`musicas/*.mp3`, ~47 MB, licença livre — detalhes em `musicas/LICENCAS.md`): 21 músicas animadas de
+  dança e pop, sem voz, do **Kevin MacLeod** (incompetech.com, **CC BY 4.0**): disco, house, funk, electro-pop e
+  synth-pop dos anos 80. O nome, o autor e a licença aparecem enquanto toca. Músicas de artistas famosos (Madonna,
+  Beyoncé, Dua Lipa…) não podem entrar: têm direitos autorais.
+- **Feitas pelo jogo**: três dance-pops próprios (Brilho de Purpurina 128 bpm, Passarela Rosa 136, Laço de Estrela
+  142), com estrofe, refrão, sininhos, palmas, viradas e prato. Tocam no arquivo baixado (que não leva MP3).
+- Sem internet: as 3 primeiras gravadas ficam guardadas no aparelho depois da primeira abertura, e cada outra na
+  primeira vez que toca (cache `purpurina-musicas-v1`, que não baixa de novo a cada versão); se uma não estiver guardada, pula para a próxima. No arquivo baixado tocam
+  só as feitas pelo jogo, para o arquivo continuar pequeno.
+
+## Instalar e brincar sem internet
+
+- Depois da primeira abertura com internet, o jogo funciona **sem internet** no mesmo endereço (`sw.js`).
+- **📲 Instalar no celular (com ícone)**, no menu, sempre à vista no navegador: com a janela do Chrome instala na hora; sem
+  ela (ou já instalado), abre o passo a passo comum (`../instalar.js`), que ensina a achar o ícone na lista de apps.
+- O botão de baixar um arquivo `purpurina.html` saiu na 0.21.0 (dono, 14/Nov/2026: confundia com instalar e não criava ícone).
+
+## O que fica guardado (só neste aparelho)
+
+`purpurina.atual` (o visual do brincar livre) · `purpurina.looks` (favoritos) ·
+`purpurina.estrelas.<desafio>` (melhor nota). Nada vai para a internet; não há login, cookie nem coleta.
+O idioma (português, inglês ou espanhol) é escolhido só na estante do Bolinho de Chuva (`../idioma.js`); o jogo não tem
+botão de idioma próprio. Textos da tela: `data-t="pt|en|es"` e `data-rotulo="pt|en|es"` (aria-label) no `index.html`;
+no código, `t(pt, en, es)`; peças e desafios com `pt`, `en` e `es` no `pecas.js`.
+
+## Mapa dos arquivos
+
+| Arquivo | O que faz |
+|---|---|
+| `index.html` | as telas (entrada, menu, desafios, meus looks, estúdio, desfile, janela). CSP sem script inline. |
+| `estilo.css` | visual, em pé × deitado, bordas seguras, animações (respeita "reduzir movimento"). |
+| `pecas.js` | **só dados**: paletas, abas, categorias, opções (com `tags`), áreas de zoom (`ZOOM`, e `zoom` em cada parte), padrão e os desafios. Peça nova entra aqui. |
+| `visual.js` | **puro**: regras (vestido × blusa/saia/calça, nunca sem roupa), surpresa, desfazer, limpar look antigo, dicas e estrelas. |
+| `boneca.js` | o desenho em SVG da personagem (com giro contínuo: `opcoes.angulo` em graus — a cabeça é feita de volumes 3D (`VOLUMES`, `NARIZ_V`, `LABIOS_V`; `contorno` = união das elipses projetadas), `cabecaVirada`, `torcer`; `opcoes.olhar`, `sorriso` e `tchau` no desfile), das roupas, acessórios e dos 8 cenários (tudo em código). Peça nova = um `case` aqui. |
+| `som.js` | a rádio (gravadas; no arquivo baixado, as feitas pelo jogo) e os efeitos sintetizados (WebAudio). |
+| `musicas/` | as 21 músicas gravadas (MP3, CC BY 4.0) e `LICENCAS.md`. |
+| `sala.js` | canal TV ↔ celular (Supabase Realtime; `BroadcastChannel` com `?teste`); confere toda mensagem que chega. |
+| `musica.js` | links do YouTube/Spotify e o tocador (Purpurina, YouTube IFrame API, Spotify iFrame API). |
+| `tv.js` | modo TV (código, até 4 personagens, desfile, música), celular-controle (📺 Conectar) e a tela 🎵 Música. |
+| `app.js` | telas, Voltar do celular, estúdio, zoom do palco, pincel e faíscas, foto, looks, desfile, confete, teclado/TV e instalar. `APP_VERSION` aqui. |
+| `ia-foto.js` | ✨ foto de cinema com IA (escondida: ?ia=1 ou interruptor `purpurina-ia`): manda só o desenho para o Gemini ou a OpenAI; chave no cofre comum (`../cofre.js` + `../janela.js`, cópias dos masters do rootify-one), com o PIN do adulto. Partes sem tela testadas em `teste/ia.test.js`. |
+| `sw.js` | cache `purpurina-v…` para funcionar sem internet e `purpurina-musicas-v1` para as músicas. `VERSAO` aqui. |
+| `versoes.json` | novidades de cada versão (PT e EN). |
+| `teste/` | testes no Node: `node --test purpurina/teste/*.test.js` (rodar da raiz do repositório). |
+
+A cada versão: subir `APP_VERSION` (`app.js`), `VERSAO` (`sw.js`) e a entrada nova do `versoes.json` (os testes
+avisam se diferirem). Arquivo novo entra na lista do `sw.js`. Interruptor do RootifyONE: `data-recurso="purpurina"`.
+
+## Testar no computador
+
+Na raiz do repositório: `python3 -m http.server 8000` e abra http://localhost:8000/purpurina/ no navegador.

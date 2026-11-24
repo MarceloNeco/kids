@@ -59,6 +59,22 @@
       "pagina": "purpurina/"
     },
     {
+      "id": "purpurina-80s",
+      "nome": {
+        "pt": "Purpurina 80's",
+        "en": "Purpurina 80's"
+      },
+      "pagina": "purpurina-80s/"
+    },
+    {
+      "id": "purpurina-80s-ia",
+      "nome": {
+        "pt": "Purpurina 80's: foto de cinema com IA (começa desligada)",
+        "en": "Purpurina 80's: AI movie-style photo (starts off)"
+      },
+      "pagina": "purpurina-80s/"
+    },
+    {
       "id": "purpurina-nova",
       "nome": {
         "pt": "Purpurina Nova Era",
