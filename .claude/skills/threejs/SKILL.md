@@ -104,11 +104,23 @@ dono, 24/Nov/2026: "importar as técnicas que ele está ensinando"). Resumo com 
 - Cena com vários objetos: **cada objeto é uma peça** própria, feita e revisada sozinha (quatro vistas, com a luz do filme),
   enquanto a cena anda com "substitutos" do mesmo tamanho. Até cinco rodadas por peça.
 
-**Ferramenta completa do autor (medir a referência, modelo de projeto, comparar no fim, Atlas com 18 motions):** não fica
-copiada aqui; baixe na hora de fazer um vídeo:
-```bash
-git clone --depth 1 https://github.com/Felpborges/motion-3d-por-referencia /tmp/motion-3d && bash /tmp/motion-3d/instalar.sh
-# precisa de node, python3 (numpy, pillow, scipy) e ffmpeg; depois: skill "motion-3d-por-referencia" e "/referencia" (Atlas)
-```
-Ela segue a "Receita" acima (medir, só o método, imagem parada antes, comparar). O vídeo pronto entra no app como arquivo
+**Ferramenta completa do autor** (medir a referência, modelo de projeto, comparar no fim, Atlas com 18 motions): está
+no repositório **motor-pixel** (a casa de tudo que é gráfico na SolverONE: 3D, vetorial, SVG; dono, 24/Nov/2026), nas skills
+`motion-3d-por-referencia` e `referencia`, como o autor publicou (fonte e crédito em
+`motor-pixel/.claude/skills/motion-3d-por-referencia/FONTE-SOLVERONE.md`). Vídeo 3D e motion: fazer numa conversa do
+motor-pixel e trazer só o arquivo pronto para o jogo. Vídeo 3D a partir de referência, do
+Atlas ou de um motion 2D: use ela, por cima das regras desta skill. O vídeo pronto entra no app como arquivo
 (ex.: `clipes/radio-dj.mp4` no kids), sem CDN.
+
+## Receita: transformar um motion 2D em 3D (Felipe Borges, dono 24/Nov/2026)
+
+Quando o dono mandar um motion 2D (vídeo, HTML/GSAP, animação de tela) para virar 3D:
+- **Manter** o roteiro, os textos e o ritmo do 2D (mesmos momentos e tempos; medir com `ffmpeg`/`pericia.py`).
+- **Trocar** as formas planas por objetos com volume, luz e sombra (técnicas acima: luz de lado, pouco ambiente, verniz,
+  bloco macio de brinquedo) e **dar movimento de câmera**.
+- **Antes de animar, mostrar uma imagem parada de cada momento e esperar o ok do dono.**
+- Tudo em código, com Three.js (o do motor-pixel nos apps; no projeto de vídeo da ferramenta, o do modelo dela).
+
+Modelo de pedido (do treinamento): "Transforme esse motion 2D em 3D, com three.js, tudo em código. Mantenha o roteiro, os
+textos e o ritmo. Troque as formas planas por objetos com volume, luz e sombra, e dê movimento de câmera. Antes de animar,
+me mostre uma imagem parada de cada momento e espere o meu ok."
