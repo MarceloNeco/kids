@@ -69,3 +69,46 @@ Quando o dono anexar um vídeo de referência para uma animação 3D (abertura, 
 
 Modelo de pedido que o dono pode usar (veio de um treinamento): "Anexei um vídeo de referência. Use ele para modelar o meu
 motion graphic 3D sobre [TEMA], em three.js, tudo em código", seguido dos 5 passos acima.
+
+## Técnicas do "Motion 3D por referência" (Felipe Borges)
+
+Fonte: github.com/Felpborges/motion-3d-por-referencia (material distribuído pelo autor para uso livre em vídeo público;
+dono, 24/Nov/2026: "importar as técnicas que ele está ensinando"). Resumo com as nossas palavras e as regras daqui.
+
+**Para jogo e para vídeo:**
+- **Luz de lado, pouco ambiente.** Luz principal a 50°–60° da câmera e uma contraluz por trás. Quem decide o contraste é o
+  ambiente: `environmentIntensity` 0,95 deixa chapado (≈1:1); 0,5–0,6 dá volume (2:1 a 2,5:1). Baixou o ambiente, suba a
+  exposição. O objeto principal ("herói") sempre com lado claro e lado escuro.
+- **Sombra:** `PCFShadowMap` (o `PCFSoftShadowMap` saiu no r187, a nossa versão) e câmera de sombra justa em volta da cena.
+  A sombra tem que encostar no objeto.
+- **Material de brinquedo bonito, não de massinha:** verniz (`clearcoat`), duas cores, microrrelevo em superfície grande;
+  metal precisa de algo claro para refletir.
+- **Bloco macio de brinquedo** (cantos arredondados, "superelipse") para pelúcias, peças e móveis fofos.
+- **Lente da câmera:** quase sem convergência 17°–26°; natural 28°–42°; linhas fugindo 55°–70°. Nada alto entre a câmera e o
+  herói; o lado de perto cresce com a perspectiva.
+- **Cor "acesa":** a cor de um material se mede numa área iluminada e sem brilho; no olho sai mais escura e mais saturada.
+- **Tom de cor:** "neutro" para cores de marca, produto e pastel (o Bolinho); "ACES" para noite, neon e fotorreal.
+- **Shader:** todo `pow()` com `max(x, 0.0)`; brilho (bloom) com limiar acima de 1,0; torno (`LatheGeometry`) de baixo para cima.
+- **Troca de estado** (solto → preso, parado → andando) é sempre uma mistura de 0,2–0,4 s, nunca um salto seco.
+- **Ritmo:** "eleja um soco e acalme o resto": um momento forte (muita coisa mudando em pouco tempo), com pausa antes e
+  depois e câmera parada durante a ação. Nunca "acelerar tudo".
+- **Revisão de um minuto** (antes de animar e antes de entregar): tudo cabe na tela? algo tapa o herói? herói de frente ou
+  três quartos? tem lado claro e escuro? sombra encosta? branco estourado ou preto afundado? cada peça se reconhece na
+  miniatura? alguma atravessa outra? texto inteiro, com acento? algo some por ter a cor do fundo?
+- **Os números servem ao olho:** nunca mudar uma cor do design só para um teste passar.
+
+**Só para vídeo (MP4):**
+- O quadro é **função pura do tempo** (`renderAt(t)`): sem relógio, sem somar entre quadros, sem `Math.random` (sorteio com
+  semente). Todos os instantes numa tabela. Um render final só; antes, rascunhos pequenos e uma **folha de quadros** para
+  olhar antes de gastar o render final.
+- Cena com vários objetos: **cada objeto é uma peça** própria, feita e revisada sozinha (quatro vistas, com a luz do filme),
+  enquanto a cena anda com "substitutos" do mesmo tamanho. Até cinco rodadas por peça.
+
+**Ferramenta completa do autor (medir a referência, modelo de projeto, comparar no fim, Atlas com 18 motions):** não fica
+copiada aqui; baixe na hora de fazer um vídeo:
+```bash
+git clone --depth 1 https://github.com/Felpborges/motion-3d-por-referencia /tmp/motion-3d && bash /tmp/motion-3d/instalar.sh
+# precisa de node, python3 (numpy, pillow, scipy) e ffmpeg; depois: skill "motion-3d-por-referencia" e "/referencia" (Atlas)
+```
+Ela segue a "Receita" acima (medir, só o método, imagem parada antes, comparar). O vídeo pronto entra no app como arquivo
+(ex.: `clipes/radio-dj.mp4` no kids), sem CDN.
