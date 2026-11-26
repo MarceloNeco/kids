@@ -120,3 +120,58 @@ interruptor em `recursos-do-app.json`. Antes de começar cada um, fazer uma entr
 | 73 | **Meu Pequeno Amiguinho** (dono, 22/Nov/2026; EN *My Little Buddy*, ES *Mi Pequeño Amiguito*) — oficina de pelúcia, 2º na estante, v0.1.0 em `meu-amiguinho/`. Fica para depois (detalhe em `meu-amiguinho/PENDENCIAS.md`): **vozes infantis gravadas** para as frases prontas (gerar com IA de áudio só com aprovação do dono), conferir a ovelhinha Coraçãozinho com as fotos novas, poses de 4 patas (sentar, deitar, passear puxado pela guia), vitrine de Natal como tema escolhível, compartilhar a certidão no WhatsApp, desenhos pelo motor-pixel. | aberto |
 | 74 | **Personagens que viajam entre os jogos, 1ª versão** (dono, 22/Nov/2026: "intercambiar os personagens da Purpurina ou do Meu Pequeno Amiguinho (...) uma conexão, uma integralidade entre os joguinhos"). Feito: peça comum `personagens.js` (`BolinhoPersonagens`: retrato 256×256 e corpo 384×512 no IndexedDB, índice leve no localStorage, até 40, tudo no aparelho); **exportam**: Meu Pequeno Amiguinho (cada amiguinho), Purpurina 80's e Purpurina Nova Era (a personagem do Brincar livre); **importam**: Vruuum! (fileira "Amigos dos outros jogos" na etapa do Piloto: o rosto vira o do piloto) e Purpurina 80's (🧸 Amiguinho em Acessórios: o amiguinho fica de mãos dadas com ela, no palco e na foto). **Próximos passos**: (a) no Vruuum!, usar o `corpo` do amigo (hoje só o rosto: o corpo do piloto é o boneco 3D menina/menino) e mostrar o nome dele no placar da corrida; (b) exportar do Vruuum! o piloto da selfie — **perguntar ao dono antes** (é foto de criança de verdade; hoje a selfie fica só no Vruuum!); (c) Purpurina Nova Era também importar o amiguinho (mexer pouco: outra conversa muda a Nova Era quase todo dia); (d) cada look guardado da Purpurina também viajar (hoje só a personagem do Brincar livre); (e) mais jogos importando: pescador no GLUB GLUB, corredor no Labirinto, convidado na Cozinha, figurante no Desfile; (f) com o motor gráfico (54/62), o mesmo personagem em 3D; (g) quando houver login (50), guardar na conta e passar para outro aparelho, com aviso de privacidade. | Dono, 22/Nov/2026 | 🟡 1ª versão feita |
 | 75 | **Teste de alinhamento obrigatório** (dono, 22/Nov/2026: "teste obrigatório de ver o realismo dos bichinhos (...) alinhamento dos corpos, das cabeças. Não pode deixar nada desalinhado (...) não tem que ficar pedindo"). Regra no `CLAUDE.md`; modelo `meu-amiguinho/teste/alinhamento.test.js` (desenha toda combinação bichinho × corpo × roupa × acessório e olha os pixels: uma peça só, apoiado no chão, nada cortado, no eixo). **Falta**: o mesmo teste na Purpurina 80's, na Purpurina Nova Era e nos pilotos do Vruuum! | Dono, 22/Nov/2026 | 🟡 Meu Pequeno Amiguinho 0.1.3: 1537 desenhos corrigidos, teste passando (0 falhas em 3681). Faltam Purpurinas e Vruuum! |
+
+## Retomar aqui: conversa "(KIDS) Bolinho de Chuva" (anotado em 26/Nov/2026)
+
+O dono pausou o Bolinho para cuidar de outras prioridades. Ao voltar, comece por esta seção.
+
+**Publicado até 26/Nov (já no ar):**
+- **Meu Pequeno Amiguinho 0.3.1:**
+  - sem níveis (só criar);
+  - 144 acessórios e 54 roupas novas tiradas das fotos do dono (`meu-amiguinho/REFERENCIAS.md`), com parte de cima + saia/short separadas;
+  - barra de tom ☀️/🌙;
+  - voz ♀ menininha / ♂ menininho;
+  - 📤 Compartilhar a certidão;
+  - balão que não tampa o rosto;
+  - tablet deitado bem aproveitado.
+  - Testes obrigatórios: alinhamento (mais de 8.000 desenhos), textos, paisagem, voz.
+- **Estante 109:**
+  - a versão nova sempre chega, mesmo com Wi-Fi fraco ou tablet que dorme; se não chegar inteira, avisa (`teste/versao-nova.test.js`);
+  - Instalar lembra que já instalou ("✓ Na tela inicial"), sem ícone repetido no tablet Fire.
+- **Personagens que viajam entre os jogos** (`personagens.js`): o amiguinho e a Purpurina no Vruuum!, e o amiguinho de mãos dadas na Purpurina 80's.
+- **Skill `threejs`** (`.claude/skills/threejs/`): Three.js oficial + técnicas e receitas do Felipe Borges (Fala IA). A ferramenta completa de motion e o Atlas ficam no **motor-pixel**.
+
+**O dono precisa fazer no tablet (com Wi-Fi):**
+1. Remover os ícones "Bolinho de..." repetidos: segurar o dedo no ícone e tocar em Remover, até sobrar um.
+2. Abrir o Bolinho por esse ícone.
+3. Abrir o Meu Pequeno Amiguinho, esperar "Baixando a versão nova…" e conferir "Versão 0.3.1" embaixo da tela de começo.
+
+**Esperando decisão ou ação do dono:**
+- **Música de abertura orquestral da rádio Bolinho FM:** está no ramo `espera-abertura`, esperando ele ouvir e aprovar.
+- **Músicas de Natal de domínio público:** esperando resposta.
+- **Parque do Amiguinho:** 4 decisões (`meu-amiguinho/PROPOSTA-PARQUE.md`).
+- **Visual da ovelhinha Coraçãozinho** (4 patas, casaco de Papai Noel): conferir.
+- **Selfie do Vruuum!:** pode viajar para os outros jogos? É foto de criança de verdade; perguntar antes (item 74 b).
+- **Barbante do balão nos bichinhos de 4 patas:** contorna a cabeça. Ficou bom?
+- **Vídeo dos DJs do Bolinho FM:**
+  - A tarefa agendada diária (19h43, `trig_0197uT9Qs5e13Qp6daEJPW7W`) tenta pelo Higgsfield, mas a conexão ainda não tem a ferramenta de gerar vídeo.
+  - Alternativa: fazer em código na conversa do motor-pixel, com a ferramenta do Felipe Borges.
+  - Decidir se pausa a tarefa diária, que gasta um pouco de crédito a cada dia.
+
+**Próximos passos anotados (quando voltar):**
+- **Item 74, personagens entre jogos:** (a) corpo e nome do amigo no Vruuum!; (c) Nova Era importar o amiguinho; (d) looks guardados viajarem; (e) mais jogos importando; (f) 3D; (g) conta e login.
+- **Item 75:** teste de alinhamento também nas Purpurinas e nos pilotos do Vruuum!.
+- **Meu Pequeno Amiguinho:**
+  - "Skateboard" quebra a palavra no meio em inglês;
+  - `D.NIVEIS` e `facil` sem uso em `dados.js`;
+  - mochila sem vista de costas;
+  - no celular deitado (740×360), as etapas 4 a 7 ainda rolam por dentro;
+  - a pochete divide a caixinha com as bolsas;
+  - o gatinho de colo é todo preto (a foto é preto e branco);
+  - vozes infantis gravadas (pendem de aprovação).
+- **Rodapé de "Tela inteira":** o botão cobre a borda esquerda do palco no Amiguinho. É peça comum (`telacheia.js`).
+
+**Motor gráfico (3D, vetorial, motion), para todos os apps e não só o Bolinho:**
+- Fica numa conversa dedicada ao **motor-pixel**, aberta pelo dono.
+- Prompt completo em `motor-pixel/docs/PROMPT-CONVERSA-DEDICADA.md`.
+- Modelo Fable 5.2, esforço "high".
